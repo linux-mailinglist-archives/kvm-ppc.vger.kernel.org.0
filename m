@@ -2,480 +2,551 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 44B78DC31
-	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Apr 2019 08:50:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2788EDD5B
+	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Apr 2019 10:05:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727380AbfD2GuX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 29 Apr 2019 02:50:23 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:39171 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727173AbfD2GuX (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Apr 2019 02:50:23 -0400
-Received: by mail-pf1-f194.google.com with SMTP id z26so953302pfg.6
-        for <kvm-ppc@vger.kernel.org>; Sun, 28 Apr 2019 23:50:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:openpgp:autocrypt:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3nIoAVq8OubA6jKOhldirUznC+0bAeJb/lc6XTSTQaw=;
-        b=e9F/ei0r79CZD8FOQyW2hXPa44u2tgFvzxZDS93YWLrkfkGB0tLd13w1QfZENwdCyO
-         +PMosu8aYoZaRhWmHjsOE3d9R6j2euWM/MOQioyH/qhnLC5W9+klz96NhXppxRpQn8T/
-         UFYvHZqDB8R6R+E0asjrft3Qdtg+sCuLf/4CYpF2bPBtzo0VbCRcV74coorTvlsxMmYB
-         OTbwYdnyHHwk/UKumpPQ3zVi8GQjyopJmGN1Y48AfOljciZlL+dbPhcix7bQDWJzpLCY
-         mzRFDpv7CzNA39dIo2Cy8epa2UCs7CvTj5xnFHqJNXm0cNkg1bm1Z0i70dsM8nSOf9g3
-         GaEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=3nIoAVq8OubA6jKOhldirUznC+0bAeJb/lc6XTSTQaw=;
-        b=kwz8jcWPSk/Msnb4oeSeBQeqOE4Y72xGS7e5ceBX40+axzm7CcYkhRRNSkHKTZVCEq
-         A8kWLOnvav8D2b2eMWp1zKGUp6laFKp5QJGoejQ7ZTZ7qbbeczrNabzgFNt2tp80tNBM
-         Ue+X/1cXY2piOeBFCHFjnOt82RyvW59Brk6OgO5evf+Js2G+MI8rFNGaPGPFWwbzvUgy
-         iDndE9XcOdMglH2QpwEs56vNLhvMhkFU9/vRbVZaR87umlzCOTn8F4QAQtOfE9tOHYWW
-         VNYCN81WABtr4YavEMR8YIgXf4HdbsXhKwFlFB7we6e+tCmZOVE7F27dXxc8LknLt5cP
-         9sUQ==
-X-Gm-Message-State: APjAAAV7U+q005DVaTTLyZVgXxoX9dAqEXmlTkVDX3/yGP87v5hc7rg1
-        hgj/KUmH7gBFRHqqxFynjXyG0i0Iec4=
-X-Google-Smtp-Source: APXvYqzihnlkF/B/C8oRafg2yI6viVoCBsuRKGbPOd+9LCCsqHQidjpXAo/J652uTCwY+s6l9pxvDQ==
-X-Received: by 2002:a63:fd0c:: with SMTP id d12mr34374002pgh.172.1556520622360;
-        Sun, 28 Apr 2019 23:50:22 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id q20sm40669622pfi.166.2019.04.28.23.50.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 28 Apr 2019 23:50:21 -0700 (PDT)
-Subject: Re: [PATCH kernel v3] powerpc/powernv: Isolate NVLinks between
- GV100GL on Witherspoon
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     linuxppc-dev@lists.ozlabs.org,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        Reza Arbab <arbab@linux.ibm.com>,
-        Sam Bobroff <sbobroff@linux.ibm.com>,
-        Piotr Jaroszynski <pjaroszynski@nvidia.com>,
-        =?UTF-8?Q?Leonardo_Augusto_Guimar=c3=a3es_Garcia?= 
-        <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>
-References: <20190411064844.8241-1-aik@ozlabs.ru>
- <20190411105251.20165f1d@x1.home>
- <4f7069cf-8c25-6fe1-42df-3b4af2d52172@ozlabs.ru>
-Openpgp: preference=signencrypt
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <da41cd35-32f6-043e-13ab-9a225c4e910a@ozlabs.ru>
-Date:   Mon, 29 Apr 2019 16:50:16 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1727599AbfD2IFU convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Mon, 29 Apr 2019 04:05:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59928 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727597AbfD2IFT (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Apr 2019 04:05:19 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3T7xlBT015057
+        for <kvm-ppc@vger.kernel.org>; Mon, 29 Apr 2019 04:05:17 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2s5vh6j98b-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Mon, 29 Apr 2019 04:05:16 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <sathnaga@linux.vnet.ibm.com>;
+        Mon, 29 Apr 2019 09:05:14 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 29 Apr 2019 09:05:12 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3T85BDf48234686
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 29 Apr 2019 08:05:11 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0359DA405B;
+        Mon, 29 Apr 2019 08:05:11 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C7731A4062;
+        Mon, 29 Apr 2019 08:05:08 +0000 (GMT)
+Received: from sathnaga86.in.ibm.com (unknown [9.193.110.53])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 29 Apr 2019 08:05:08 +0000 (GMT)
+Date:   Mon, 29 Apr 2019 13:35:06 +0530
+From:   Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+To:     =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        Paul Mackerras <paulus@samba.org>,
+        linuxppc-dev@lists.ozlabs.org,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v5 00/16] KVM: PPC: Book3S HV: add XIVE native
+ exploitation mode
+Reply-To: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+References: <20190410170448.3923-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <4f7069cf-8c25-6fe1-42df-3b4af2d52172@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20190410170448.3923-1-clg@kaod.org>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-TM-AS-GCONF: 00
+x-cbid: 19042908-0008-0000-0000-000002E15E84
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19042908-0009-0000-0000-0000224DC15E
+Message-Id: <20190429080506.GA9070@sathnaga86.in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-29_04:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1904290060
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Wed, Apr 10, 2019 at 07:04:32PM +0200, Cédric Le Goater wrote:
+> Hello,
+> 
+> GitHub trees available here :
+> 
+> QEMU sPAPR:
+> 
+>   https://github.com/legoater/qemu/commits/xive-next
+>   
+> Linux/KVM:
+> 
+>   https://github.com/legoater/linux/commits/xive-5.1
+
+Hi,
+
+Xive(both ic-mode=dual and ic-mode=xive) guest fails to boot with guest memory > 64G, till 64G it boots fine.
+
+Note: xics(ic-mode=xics) guest with the same configuration boots fine
+
+Tested with below current latest code(v6).
+
+HW: Power9 DD 2.2
+
+Qemu:
+# git log -1
+commit 34cc68411a5ada92df6ef968c32bad424911474c (HEAD -> xive-next, origin/xive-next)
+Author: Cédric Le Goater <clg@kaod.org>
+Date:   Thu Apr 18 18:31:37 2019 +0200
+
+    spapr/irq: add KVM support to the 'dual' machine
+    
+Kernel Guest/Host: (Host kernel built with `ppc64le_defconfig`, Guest kernel built with `ppc64le_guest_defconfig`)
+# git log -1
+commit fac6994841aa8cfa5af02552f2eb9858fee9a25d (HEAD -> xive-5.1, origin/xive-5.1, origin/HEAD)
+Author: Cédric Le Goater <clg@kaod.org>
+Date:   Thu Apr 18 08:46:33 2019 +0200
+
+    KVM: PPC: Book3S HV: XIVE: replace the 'destroy' method by a 'release' method
+    
+
+Qemu Commandline:
+LC_ALL=C PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin QEMU_AUDIO_DRV=none /home/sath/qemu/ppc64-softmmu/qemu-system-ppc64 -name guest=vm2,debug-threads=on -S -object secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-13-vm2/master-key.aes -machine pseries-4.0,accel=kvm,usb=off,dump-guest-core=off -m 66560 -realtime mlock=off -smp 56,sockets=1,cores=28,threads=2 -uuid 5510791f-f156-4f5a-8c3d-30cfa7a4c7a2 -display none -no-user-config -nodefaults -chardev socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-13-vm2/monitor.sock,server,nowait -mon chardev=charmonitor,id=monitor,mode=control -rtc base=utc -no-shutdown -boot strict=on -kernel /home/sath/linux/vmlinux -append 'root=/dev/sda2 rw console=tty0 console=ttyS0,115200 init=/sbin/init initcall_debug selinux=0 secure=on' -device qemu-xhci,id=usb,bus=pci.0,addr=0x3 -device virtio-scsi-pci,id=scsi0,bus=pci.0,addr=0x2 -drive file=/home/sath/tests/data/avocado-vt/images/jeos-27-ppc64le_vm2.qcow2,format=qcow2,if=none,id=drive-scsi0-0-0-0 -device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1 -netdev tap,fd=25,id=hostnet0,vhost=on,vhostfd=27 -device virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:57:58:59,bus=pci.0,addr=0x1 -chardev pty,id=charserial0 -device spapr-vty,chardev=charserial0,id=serial0,reg=0x30000000 -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x4 -M pseries,ic-mode=dual -msg timestamp=on
 
 
-On 12/04/2019 13:48, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 12/04/2019 02:52, Alex Williamson wrote:
->> On Thu, 11 Apr 2019 16:48:44 +1000
->> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->>
->>> The NVIDIA V100 SXM2 GPUs are connected to the CPU via PCIe links and
->>> (on POWER9) NVLinks. In addition to that, GPUs themselves have direct
->>> peer-to-peer NVLinks in groups of 2 to 4 GPUs with no buffers/latches
->>> between GPUs.
->>>
->>> Because of these interconnected NVLinks, the POWERNV platform puts such
->>> interconnected GPUs to the same IOMMU group. However users want to pass
->>> GPUs through individually which requires separate IOMMU groups.
->>>
->>> Thankfully V100 GPUs implement an interface to disable arbitrary links
->>> by programming link disabling mask via the GPU's BAR0. Once a link is
->>> disabled, it only can be enabled after performing the secondary bus reset
->>> (SBR) on the GPU. Since these GPUs do not advertise any other type of
->>> reset, it is reset by the platform's SBR handler.
->>>
->>> This adds an extra step to the POWERNV's SBR handler to block NVLinks to
->>> GPUs which do not belong to the same group as the GPU being reset.
->>>
->>> This adds a new "isolate_nvlink" kernel parameter to force GPU isolation;
->>> when enabled, every GPU gets placed in its own IOMMU group. The new
->>> parameter is off by default to preserve the existing behaviour.
->>>
->>> Before isolating:
->>> [nvdbg ~]$ nvidia-smi topo -m
->>>         GPU0    GPU1    GPU2    CPU Affinity
->>> GPU0     X      NV2     NV2     0-0
->>> GPU1    NV2      X      NV2     0-0
->>> GPU2    NV2     NV2      X      0-0
->>>
->>> After isolating:
->>> [nvdbg ~]$ nvidia-smi topo -m
->>>         GPU0    GPU1    GPU2    CPU Affinity
->>> GPU0     X      PHB     PHB     0-0
->>> GPU1    PHB      X      PHB     0-0
->>> GPU2    PHB     PHB      X      0-0
->>>
->>> Where:
->>>   X    = Self
->>>   PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
->>>   NV#  = Connection traversing a bonded set of # NVLinks
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>> ---
->>> Changes:
->>> v3:
->>> * added pci_err() for failed ioremap
->>> * reworked commit log
->>>
->>> v2:
->>> * this is rework of [PATCH kernel RFC 0/2] vfio, powerpc/powernv: Isolate GV100GL
->>> but this time it is contained in the powernv platform
->>> ---
->>>  arch/powerpc/platforms/powernv/Makefile      |   2 +-
->>>  arch/powerpc/platforms/powernv/pci.h         |   1 +
->>>  arch/powerpc/platforms/powernv/eeh-powernv.c |   1 +
->>>  arch/powerpc/platforms/powernv/npu-dma.c     |  24 +++-
->>>  arch/powerpc/platforms/powernv/nvlinkgpu.c   | 137 +++++++++++++++++++
->>>  5 files changed, 162 insertions(+), 3 deletions(-)
->>>  create mode 100644 arch/powerpc/platforms/powernv/nvlinkgpu.c
->>>
->>> diff --git a/arch/powerpc/platforms/powernv/Makefile b/arch/powerpc/platforms/powernv/Makefile
->>> index da2e99efbd04..60a10d3b36eb 100644
->>> --- a/arch/powerpc/platforms/powernv/Makefile
->>> +++ b/arch/powerpc/platforms/powernv/Makefile
->>> @@ -6,7 +6,7 @@ obj-y			+= opal-msglog.o opal-hmi.o opal-power.o opal-irqchip.o
->>>  obj-y			+= opal-kmsg.o opal-powercap.o opal-psr.o opal-sensor-groups.o
->>>  
->>>  obj-$(CONFIG_SMP)	+= smp.o subcore.o subcore-asm.o
->>> -obj-$(CONFIG_PCI)	+= pci.o pci-ioda.o npu-dma.o pci-ioda-tce.o
->>> +obj-$(CONFIG_PCI)	+= pci.o pci-ioda.o npu-dma.o pci-ioda-tce.o nvlinkgpu.o
->>>  obj-$(CONFIG_CXL_BASE)	+= pci-cxl.o
->>>  obj-$(CONFIG_EEH)	+= eeh-powernv.o
->>>  obj-$(CONFIG_PPC_SCOM)	+= opal-xscom.o
->>> diff --git a/arch/powerpc/platforms/powernv/pci.h b/arch/powerpc/platforms/powernv/pci.h
->>> index 8e36da379252..9fd3f391482c 100644
->>> --- a/arch/powerpc/platforms/powernv/pci.h
->>> +++ b/arch/powerpc/platforms/powernv/pci.h
->>> @@ -250,5 +250,6 @@ extern void pnv_pci_unlink_table_and_group(struct iommu_table *tbl,
->>>  extern void pnv_pci_setup_iommu_table(struct iommu_table *tbl,
->>>  		void *tce_mem, u64 tce_size,
->>>  		u64 dma_offset, unsigned int page_shift);
->>> +extern void pnv_try_isolate_nvidia_v100(struct pci_dev *gpdev);
->>>  
->>>  #endif /* __POWERNV_PCI_H */
->>> diff --git a/arch/powerpc/platforms/powernv/eeh-powernv.c b/arch/powerpc/platforms/powernv/eeh-powernv.c
->>> index f38078976c5d..464b097d9635 100644
->>> --- a/arch/powerpc/platforms/powernv/eeh-powernv.c
->>> +++ b/arch/powerpc/platforms/powernv/eeh-powernv.c
->>> @@ -937,6 +937,7 @@ void pnv_pci_reset_secondary_bus(struct pci_dev *dev)
->>>  		pnv_eeh_bridge_reset(dev, EEH_RESET_HOT);
->>>  		pnv_eeh_bridge_reset(dev, EEH_RESET_DEACTIVATE);
->>>  	}
->>> +	pnv_try_isolate_nvidia_v100(dev);
->>>  }
->>>  
->>>  static void pnv_eeh_wait_for_pending(struct pci_dn *pdn, const char *type,
->>> diff --git a/arch/powerpc/platforms/powernv/npu-dma.c b/arch/powerpc/platforms/powernv/npu-dma.c
->>> index dc23d9d2a7d9..d4f9ee6222b5 100644
->>> --- a/arch/powerpc/platforms/powernv/npu-dma.c
->>> +++ b/arch/powerpc/platforms/powernv/npu-dma.c
->>> @@ -22,6 +22,23 @@
->>>  
->>>  #include "pci.h"
->>>  
->>> +static bool isolate_nvlink;
->>> +
->>> +static int __init parse_isolate_nvlink(char *p)
->>> +{
->>> +	bool val;
->>> +
->>> +	if (!p)
->>> +		val = true;
->>> +	else if (kstrtobool(p, &val))
->>> +		return -EINVAL;
->>> +
->>> +	isolate_nvlink = val;
->>> +
->>> +	return 0;
->>> +}
->>> +early_param("isolate_nvlink", parse_isolate_nvlink);
->>> +
->>>  /*
->>>   * spinlock to protect initialisation of an npu_context for a particular
->>>   * mm_struct.
->>> @@ -549,7 +566,7 @@ struct iommu_table_group *pnv_try_setup_npu_table_group(struct pnv_ioda_pe *pe)
->>>  
->>>  	hose = pci_bus_to_host(npdev->bus);
->>>  
->>> -	if (hose->npu) {
->>> +	if (hose->npu && !isolate_nvlink) {
->>>  		table_group = &hose->npu->npucomp.table_group;
->>>  
->>>  		if (!table_group->group) {
->>> @@ -559,7 +576,10 @@ struct iommu_table_group *pnv_try_setup_npu_table_group(struct pnv_ioda_pe *pe)
->>>  					pe->pe_number);
->>>  		}
->>>  	} else {
->>> -		/* Create a group for 1 GPU and attached NPUs for POWER8 */
->>> +		/*
->>> +		 * Create a group for 1 GPU and attached NPUs for
->>> +		 * POWER8 (always) or POWER9 (when isolate_nvlink).
->>> +		 */
->>>  		pe->npucomp = kzalloc(sizeof(*pe->npucomp), GFP_KERNEL);
->>>  		table_group = &pe->npucomp->table_group;
->>>  		table_group->ops = &pnv_npu_peers_ops;
->>> diff --git a/arch/powerpc/platforms/powernv/nvlinkgpu.c b/arch/powerpc/platforms/powernv/nvlinkgpu.c
->>> new file mode 100644
->>> index 000000000000..2a97cb15b6d0
->>> --- /dev/null
->>> +++ b/arch/powerpc/platforms/powernv/nvlinkgpu.c
->>> @@ -0,0 +1,137 @@
->>> +// SPDX-License-Identifier: GPL-2.0+
->>> +/*
->>> + * A helper to disable NVLinks between GPUs on IBM Withersponn platform.
->>> + *
->>> + * Copyright (C) 2019 IBM Corp.  All rights reserved.
->>> + *     Author: Alexey Kardashevskiy <aik@ozlabs.ru>
->>> + *
->>> + * This program is free software; you can redistribute it and/or modify
->>> + * it under the terms of the GNU General Public License version 2 as
->>> + * published by the Free Software Foundation.
->>> + */
->>> +
->>> +#include <linux/module.h>
->>> +#include <linux/device.h>
->>> +#include <linux/of.h>
->>> +#include <linux/iommu.h>
->>> +#include <linux/pci.h>
->>> +
->>> +static int nvlinkgpu_is_ph_in_group(struct device *dev, void *data)
->>> +{
->>> +	return dev->of_node->phandle == *(phandle *) data;
->>> +}
->>> +
->>> +static u32 nvlinkgpu_get_disable_mask(struct device *dev)
->>> +{
->>> +	int npu, peer;
->>> +	u32 mask;
->>> +	struct device_node *dn;
->>> +	struct iommu_group *group;
->>> +
->>> +	dn = dev->of_node;
->>> +	if (!of_find_property(dn, "ibm,nvlink-peers", NULL))
->>> +		return 0;
->>> +
->>> +	group = iommu_group_get(dev);
->>> +	if (!group)
->>> +		return 0;
->>> +
->>> +	/*
->>> +	 * Collect links to keep which includes links to NPU and links to
->>> +	 * other GPUs in the same IOMMU group.
->>> +	 */
->>> +	for (npu = 0, mask = 0; ; ++npu) {
->>> +		u32 npuph = 0;
->>> +
->>> +		if (of_property_read_u32_index(dn, "ibm,npu", npu, &npuph))
->>> +			break;
->>> +
->>> +		for (peer = 0; ; ++peer) {
->>> +			u32 peerph = 0;
->>> +
->>> +			if (of_property_read_u32_index(dn, "ibm,nvlink-peers",
->>> +					peer, &peerph))
->>> +				break;
->>> +
->>> +			if (peerph != npuph &&
->>> +				!iommu_group_for_each_dev(group, &peerph,
->>> +					nvlinkgpu_is_ph_in_group))
->>> +				continue;
->>> +
->>> +			mask |= 1 << (peer + 16);
->>> +		}
->>> +	}
->>> +	iommu_group_put(group);
->>> +
->>> +	/* Disabling mechanism takes links to disable so invert it here */
->>> +	mask = ~mask & 0x3F0000;
->>> +
->>> +	return mask;
->>> +}
->>> +
->>> +void pnv_try_isolate_nvidia_v100(struct pci_dev *bridge)
->>> +{
->>> +	u32 mask, val;
->>> +	void __iomem *bar0_0, *bar0_120000, *bar0_a00000;
->>> +	struct pci_dev *pdev;
->>> +	u16 cmd = 0, cmdmask = PCI_COMMAND_MEMORY;
->>> +
->>> +	if (!bridge->subordinate)
->>> +		return;
->>> +
->>> +	pdev = list_first_entry_or_null(&bridge->subordinate->devices,
->>> +			struct pci_dev, bus_list);
->>> +	if (!pdev)
->>> +		return;
->>> +
->>> +	if (pdev->vendor != PCI_VENDOR_ID_NVIDIA)
->>> +		return;
->>> +
->>> +	mask = nvlinkgpu_get_disable_mask(&pdev->dev);
->>> +	if (!mask)
->>> +		return;
->>> +
->>> +	bar0_0 = pci_iomap_range(pdev, 0, 0, 0x10000);
->>> +	if (!bar0_0) {
->>> +		pci_err(pdev, "Error mapping BAR0 @0\n");
->>> +		return;
->>> +	}
->>> +	bar0_120000 = pci_iomap_range(pdev, 0, 0x120000, 0x10000);
->>> +	if (!bar0_120000) {
->>> +		pci_err(pdev, "Error mapping BAR0 @120000\n");
->>> +		goto bar0_0_unmap;
->>> +	}
->>> +	bar0_a00000 = pci_iomap_range(pdev, 0, 0xA00000, 0x10000);
->>> +	if (!bar0_a00000) {
->>> +		pci_err(pdev, "Error mapping BAR0 @A00000\n");
->>> +		goto bar0_120000_unmap;
->>> +	}
->>
->> Is it really necessary to do three separate ioremaps vs one that would
->> cover them all here?  I suspect you're just sneaking in PAGE_SIZE with
->> the 0x10000 size mappings anyway.  Seems like it would simplify setup,
->> error reporting, and cleanup to to ioremap to the PAGE_ALIGN'd range
->> of the highest register accessed. Thanks,
-> 
-> 
-> Sure I can map it once, I just do not see the point in mapping/unmapping
-> all 0xa10000>>16=161 system pages for a very short period of time while
-> we know precisely that we need just 3 pages.
-> 
-> Repost?
+Guest Console:
 
-Ping?
+Escape character is ^]
+Populating /vdevice methods
+Populating /vdevice/vty@30000000
+Populating /vdevice/nvram@71000000
+Populating /pci@800000020000000
+                     00 0800 (D) : 1af4 1000    virtio [ net ]
+                     00 1000 (D) : 1af4 1004    virtio [ scsi ]
+Populating /pci@800000020000000/scsi@2
+       SCSI: Looking for devices
+          100000000000000 DISK     : "QEMU     QEMU HARDDISK    2.5+"
+                     00 1800 (D) : 1b36 000d    serial bus [ usb-xhci ]
+                     00 2000 (D) : 1af4 1002    unknown-legacy-device*
+No NVRAM common partition, re-initializing...
+Scanning USB 
+  XHCI: Initializing
+Using default console: /vdevice/vty@30000000
+Detected RAM kernel at 400000 (17fe068 bytes) 
+     
+  Welcome to Open Firmware
 
-Can this go in as it is (i.e. should I ping Michael) or this needs
-another round? It would be nice to get some formal acks. Thanks,
+  Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
+  This program and the accompanying materials are made available
+  under the terms of the BSD License available at
+  http://www.opensource.org/licenses/bsd-license.php
+
+Booting from memory...
+OF stdout device is: /vdevice/vty@30000000
+Preparing to boot Linux version 5.1.0-rc5-176614-gfac6994841aa (root@kvmupstream) (gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04)) #2 SMP Wed Apr 24 07:58:04 EDT 2019
+Detected machine type: 0000000000000101
+command line: root=/dev/sda2 rw console=tty0 console=ttyS0,115200 init=/sbin/init initcall_debug selinux=0 secure=on
+Max number of cores passed to firmware: 1024 (NR_CPUS = 2048)
+Calling ibm,client-architecture-support...
+
+SLOF **********************************************************************
+QEMU Starting
+ Build Date = Jan 14 2019 18:00:39
+ FW Version = git-a5b428e1c1eae703
+ Press "s" to enter Open Firmware.
+
+Populating /vdevice methods
+Populating /vdevice/vty@30000000
+Populating /vdevice/nvram@71000000
+Populating /pci@800000020000000
+                     00 0800 (D) : 1af4 1000    virtio [ net ]
+                     00 1000 (D) : 1af4 1004    virtio [ scsi ]
+Populating /pci@800000020000000/scsi@2
+       SCSI: Looking for devices
+          100000000000000 DISK     : "QEMU     QEMU HARDDISK    2.5+"
+                     00 1800 (D) : 1b36 000d    serial bus [ usb-xhci ]
+                     00 2000 (D) : 1af4 1002    unknown-legacy-device*
+Scanning USB 
+  XHCI: Initializing
+Using default console: /vdevice/vty@30000000
+Detected RAM kernel at 400000 (17fe068 bytes) 
+     
+  Welcome to Open Firmware
+
+  Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
+  This program and the accompanying materials are made available
+  under the terms of the BSD License available at
+  http://www.opensource.org/licenses/bsd-license.php
+
+Booting from memory...
+OF stdout device is: /vdevice/vty@30000000
+Preparing to boot Linux version 5.1.0-rc5-176614-gfac6994841aa (root@kvmupstream) (gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04)) #2 SMP Wed Apr 24 07:58:04 EDT 2019
+Detected machine type: 0000000000000101
+command line: root=/dev/sda2 rw console=tty0 console=ttyS0,115200 init=/sbin/init initcall_debug selinux=0 secure=on
+Max number of cores passed to firmware: 1024 (NR_CPUS = 2048)
+Calling ibm,client-architecture-support... done
+memory layout at init:
+  memory_limit : 0000000000000000 (16 MB aligned)
+  alloc_bottom : 0000000001c10000
+  alloc_top    : 0000000010000000
+  alloc_top_hi : 0000001040000000
+  rmo_top      : 0000000010000000
+  ram_top      : 0000001040000000
+instantiating rtas at 0x000000000daf0000... done
+prom_hold_cpus: skipped
+copying OF device tree...
+Building dt strings...
+Building dt structure...
+Device tree strings 0x0000000001c20000 -> 0x0000000001c20af8
+Device tree struct  0x0000000001c30000 -> 0x0000000001c40000
+Quiescing Open Firmware ...
+Booting Linux via __start() @ 0x0000000000400000 ...
+[    0.000000] radix-mmu: Page sizes from device-tree:
+[    0.000000] radix-mmu: Page size shift = 12 AP=0x0
+[    0.000000] radix-mmu: Page size shift = 16 AP=0x5
+[    0.000000] radix-mmu: Page size shift = 21 AP=0x1
+[    0.000000] radix-mmu: Page size shift = 30 AP=0x2
+[    0.000000] lpar: Using radix MMU under hypervisor
+[    0.000000] radix-mmu: Mapped 0x0000000000000000-0x0000000040000000 with 1.00 GiB pages (exec)
+[    0.000000] radix-mmu: Mapped 0x0000000040000000-0x0000001040000000 with 1.00 GiB pages
+[    0.000000] radix-mmu: Process table (____ptrval____) and radix root for kernel: (____ptrval____)
+[    0.000000] Linux version 5.1.0-rc5-176614-gfac6994841aa (root@kvmupstream) (gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04)) #2 SMP Wed Apr 24 07:58:04 EDT 2019
+[    0.000000] Using pSeries machine description
+[    0.000000] printk: bootconsole [udbg0] enabled
+[    0.000000] Partition configured for 56 cpus.
+[    0.000000] CPU maps initialized for 2 threads per core
+[    0.000000] -----------------------------------------------------
+[    0.000000] ppc64_pft_size    = 0x0
+[    0.000000] phys_mem_size     = 0x1040000000
+[    0.000000] dcache_bsize      = 0x80
+[    0.000000] icache_bsize      = 0x80
+[    0.000000] cpu_features      = 0x0000c06f8f5f91a7
+[    0.000000]   possible        = 0x0000fbffcf5fb1a7
+[    0.000000]   always          = 0x00000003800081a1
+[    0.000000] cpu_user_features = 0xdc0065c2 0xaee00000
+[    0.000000] mmu_features      = 0x3c006041
+[    0.000000] firmware_features = 0x00000005455a445f
+[    0.000000] -----------------------------------------------------
+[    0.000000] numa:   NODE_DATA [mem 0x103fe17000-0x103fe1bfff]
+[    0.000000] rfi-flush: fallback displacement flush available
+[    0.000000] rfi-flush: ori type flush available
+[    0.000000] rfi-flush: mttrig type flush available
+[    0.000000] count-cache-flush: full software flush sequence enabled.
+[    0.000000] stf-barrier: eieio barrier available
+[    0.000000] PCI host bridge /pci@800000020000000  ranges:
+[    0.000000]   IO 0x0000200000000000..0x000020000000ffff -> 0x0000000000000000
+[    0.000000]  MEM 0x0000200080000000..0x00002000ffffffff -> 0x0000000080000000 
+[    0.000000]  MEM 0x0000210000000000..0x000021ffffffffff -> 0x0000210000000000 
+[    0.000000] PPC64 nvram contains 65536 bytes
+[    0.000000] barrier-nospec: using ORI speculation barrier
+[    0.000000] Zone ranges:
+[    0.000000]   Normal   [mem 0x0000000000000000-0x000000103fffffff]
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x000000103fffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x000000103fffffff]
+[    0.000000] random: get_random_u64 called from start_kernel+0xbc/0x648 with crng_init=0
+[    0.000000] percpu: Embedded 4 pages/cpu @(____ptrval____) s169368 r0 d92776 u262144
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 1063920
+[    0.000000] Policy zone: Normal
+[    0.000000] Kernel command line: root=/dev/sda2 rw console=tty0 console=ttyS0,115200 init=/sbin/init initcall_debug selinux=0 secure=on
+[    0.000000] printk: log_buf_len individual max cpu contribution: 8192 bytes
+[    0.000000] printk: log_buf_len total cpu_extra contributions: 450560 bytes
+[    0.000000] printk: log_buf_len min size: 262144 bytes
+[    0.000000] printk: log_buf_len: 1048576 bytes
+[    0.000000] printk: early log buf free: 257356(98%)
+[    0.000000] Memory: 68034688K/68157440K available (12800K kernel code, 1728K rwdata, 3264K rodata, 4224K init, 2488K bss, 122752K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=128, Order=0-3, MinObjects=0, CPUs=56, Nodes=1
+[    0.000000] ftrace: allocating 32078 entries in 12 pages
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU event tracing is enabled.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=2048 to nr_cpu_ids=56.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=56
+[    0.000000] NR_IRQS: 512, nr_irqs: 512, preallocated irqs: 16
+[    0.000000] xive: Using IRQ range [0-df]
+[    0.000000] xive: Interrupt handling initialized with spapr backend
+[    0.000000] xive: Using priority 6 for all interrupts
+[    0.000000] xive: Using 64kB queues
+[    0.000002] time_init: 56 bit decrementer (max: 7fffffffffffff)
+[    0.000536] clocksource: timebase: mask: 0xffffffffffffffff max_cycles: 0x761537d007, max_idle_ns: 440795202126 ns
+[    0.001486] clocksource: timebase mult[1f40000] shift[24] registered
+[    0.002374] Console: colour dummy device 80x25
+[    0.000000] radix-mmu: Page sizes from device-tree:
+[    0.000000] radix-mmu: Page size shift = 12 AP=0x0
+[    0.000000] radix-mmu: Page size shift = 16 AP=0x5
+[    0.000000] radix-mmu: Page size shift = 21 AP=0x1
+[    0.000000] radix-mmu: Page size shift = 30 AP=0x2
+[    0.000000] lpar: Using radix MMU under hypervisor
+[    0.000000] radix-mmu: Mapped 0x0000000000000000-0x0000000040000000 with 1.00 GiB pages (exec)
+[    0.000000] radix-mmu: Mapped 0x0000000040000000-0x0000001040000000 with 1.00 GiB pages
+[    0.000000] radix-mmu: Process table (____ptrval____) and radix root for kernel: (____ptrval____)
+[    0.000000] Linux version 5.1.0-rc5-176614-gfac6994841aa (root@kvmupstream) (gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04)) #2 SMP Wed Apr 24 07:58:04 EDT 2019
+[    0.000000] Using pSeries machine description
+[    0.000000] printk: bootconsole [udbg0] enabled
+[    0.000000] Partition configured for 56 cpus.
+[    0.000000] CPU maps initialized for 2 threads per core
+[    0.000000] -----------------------------------------------------
+[    0.000000] ppc64_pft_size    = 0x0
+[    0.000000] phys_mem_size     = 0x1040000000
+[    0.000000] dcache_bsize      = 0x80
+[    0.000000] icache_bsize      = 0x80
+[    0.000000] cpu_features      = 0x0000c06f8f5f91a7
+[    0.000000]   possible        = 0x0000fbffcf5fb1a7
+[    0.000000]   always          = 0x00000003800081a1
+[    0.000000] cpu_user_features = 0xdc0065c2 0xaee00000
+[    0.000000] mmu_features      = 0x3c006041
+[    0.000000] firmware_features = 0x00000005455a445f
+[    0.000000] -----------------------------------------------------
+[    0.000000] numa:   NODE_DATA [mem 0x103fe17000-0x103fe1bfff]
+[    0.000000] rfi-flush: fallback displacement flush available
+[    0.000000] rfi-flush: ori type flush available
+[    0.000000] rfi-flush: mttrig type flush available
+[    0.000000] count-cache-flush: full software flush sequence enabled.
+[    0.000000] stf-barrier: eieio barrier available
+[    0.000000] PCI host bridge /pci@800000020000000  ranges:
+[    0.000000]   IO 0x0000200000000000..0x000020000000ffff -> 0x0000000000000000
+[    0.000000]  MEM 0x0000200080000000..0x00002000ffffffff -> 0x0000000080000000 
+[    0.000000]  MEM 0x0000210000000000..0x000021ffffffffff -> 0x0000210000000000 
+[    0.000000] PPC64 nvram contains 65536 bytes
+[    0.000000] barrier-nospec: using ORI speculation barrier
+[    0.000000] Zone ranges:
+[    0.000000]   Normal   [mem 0x0000000000000000-0x000000103fffffff]
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x000000103fffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x000000103fffffff]
+[    0.000000] random: get_random_u64 called from start_kernel+0xbc/0x648 with crng_init=0
+[    0.000000] percpu: Embedded 4 pages/cpu @(____ptrval____) s169368 r0 d92776 u262144
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 1063920
+[    0.000000] Policy zone: Normal
+[    0.000000] Kernel command line: root=/dev/sda2 rw console=tty0 console=ttyS0,115200 init=/sbin/init initcall_debug selinux=0 secure=on
+[    0.000000] printk: log_buf_len individual max cpu contribution: 8192 bytes
+[    0.000000] printk: log_buf_len total cpu_extra contributions: 450560 bytes
+[    0.000000] printk: log_buf_len min size: 262144 bytes
+[    0.000000] printk: log_buf_len: 1048576 bytes
+[    0.000000] printk: early log buf free: 257356(98%)
+[    0.000000] Memory: 68034688K/68157440K available (12800K kernel code, 1728K rwdata, 3264K rodata, 4224K init, 2488K bss, 122752K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=128, Order=0-3, MinObjects=0, CPUs=56, Nodes=1
+[    0.000000] ftrace: allocating 32078 entries in 12 pages
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU event tracing is enabled.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=2048 to nr_cpu_ids=56.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=56
+[    0.000000] NR_IRQS: 512, nr_irqs: 512, preallocated irqs: 16
+[    0.000000] xive: Using IRQ range [0-df]
+[    0.000000] xive: Interrupt handling initialized with spapr backend
+[    0.000000] xive: Using priority 6 for all interrupts
+[    0.000000] xive: Using 64kB queues
+[    0.000002] time_init: 56 bit decrementer (max: 7fffffffffffff)
+[    0.000536] clocksource: timebase: mask: 0xffffffffffffffff max_cycles: 0x761537d007, max_idle_ns: 440795202126 ns
+[    0.001486] clocksource: timebase mult[1f40000] shift[24] registered
+[    0.002374] Console: colour dummy device 80x25
+[    0.041204] printk: console [tty0] enabled
+[    0.041652] pid_max: default: 57344 minimum: 448
+[    0.047640] Dentry cache hash table entries: 8388608 (order: 10, 67108864 bytes)
+[    0.051167] Inode-cache hash table entries: 4194304 (order: 9, 33554432 bytes)
+[    0.052040] Mount-cache hash table entries: 131072 (order: 4, 1048576 bytes)
+[    0.052748] Mountpoint-cache hash table entries: 131072 (order: 4, 1048576 bytes)
+[    0.053855] *** VALIDATE proc ***
+[    0.054280] *** VALIDATE cgroup1 ***
+[    0.054612] *** VALIDATE cgroup2 ***
+[    0.055735] EEH: pSeries platform initialized
+[    0.056187] POWER9 performance monitor hardware support registered
+[    0.056912] rcu: Hierarchical SRCU implementation.
+[    0.058350] smp: Bringing up secondary CPUs ...
+[    0.594474] smp: Brought up 1 node, 56 CPUs
+[    0.595265] numa: Node 0 CPUs: 0-55
+[    0.595639] Using standard scheduler topology
+[    0.624525] devtmpfs: initialized
+[    0.644891] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.646019] futex hash table entries: 16384 (order: 5, 2097152 bytes)
+[    0.647574] NET: Registered protocol family 16
+[    0.665143] kworker/u112:0 (294) used greatest stack depth: 12608 bytes left
+[    0.694670] cpuidle: using governor menu
+Linux ppc64le
+#2 SMP Wed Apr 2[    4.103966] kworker/u112:1 (324) used greatest stack depth: 12464 bytes left
+[  197.780442] PCI: Probing PCI hardware
+[  197.781468] PCI host bridge to bus 0000:00
+[  197.782323] pci_bus 0000:00: root bus resource [io  0x10000-0x1ffff] (bus address [0x0000-0xffff])
+[  197.784122] pci_bus 0000:00: root bus resource [mem 0x200080000000-0x2000ffffffff] (bus address [0x80000000-0xffffffff])
+[  197.786303] pci_bus 0000:00: root bus resource [mem 0x210000000000-0x21ffffffffff]
+[  197.787822] pci_bus 0000:00: root bus resource [bus 00-ff]
+[  197.789299] pci 0000:00:01.0: calling  pci_dev_pdn_setup+0x0/0x50 @ 1
+[  197.790809] pci 0000:00:01.0: pci_dev_pdn_setup+0x0/0x50 took 0 usecs
+[  197.792106] pci 0000:00:01.0: calling  pnv_npu2_opencapi_cfg_size_fixup+0x0/0x50 @ 1
+[  197.793659] pci 0000:00:01.0: pnv_npu2_opencapi_cfg_size_fixup+0x0/0x50 took 0 usecs
+[  197.795269] pci 0000:00:01.0: calling  pcibios_fixup_resources+0x0/0x1b0 @ 1
+[  197.796674] pci 0000:00:01.0: pcibios_fixup_resources+0x0/0x1b0 took 0 usecs
+[  197.798102] pci 0000:00:01.0: calling  pnv_ocxl_fixup_actag+0x0/0x2a0 @ 1
+[  197.799461] pci 0000:00:01.0: pnv_ocxl_fixup_actag+0x0/0x2a0 took 0 usecs
+[  197.801612] pci 0000:00:02.0: calling  pci_dev_pdn_setup+0x0/0x50 @ 1
+[  197.802395] pci 0000:00:02.0: pci_dev_pdn_setup+0x0/0x50 took 0 usecs
+[  197.803195] pci 0000:00:02.0: calling  pnv_npu2_opencapi_cfg_size_fixup+0x0/0x50 @ 1
+[  197.804167] pci 0000:00:02.0: pnv_npu2_opencapi_cfg_size_fixup+0x0/0x50 took 0 usecs
+[  197.805140] pci 0000:00:02.0: calling  pcibios_fixup_resources+0x0/0x1b0 @ 1
+[  197.806018] pci 0000:00:02.0: pcibios_fixup_resources+0x0/0x1b0 took 0 usecs
+[  197.806902] pci 0000:00:02.0: calling  pnv_ocxl_fixup_actag+0x0/0x2a0 @ 1
+[  197.807746] pci 0000:00:02.0: pnv_ocxl_fixup_actag+0x0/0x2a0 took 0 usecs
+[  197.809277] pci 0000:00:03.0: calling  pci_dev_pdn_setup+0x0/0x50 @ 1
+[  197.810068] pci 0000:00:03.0: pci_dev_pdn_setup+0x0/0x50 took 0 usecs
+[  197.810956] pci 0000:00:03.0: calling  pnv_npu2_opencapi_cfg_size_fixup+0x0/0x50 @ 1
+[  197.811944] pci 0000:00:03.0: pnv_npu2_opencapi_cfg_size_fixup+0x0/0x50 took 0 usecs
+[  197.812930] pci 0000:00:03.0: calling  pcibios_fixup_resources+0x0/0x1b0 @ 1
+[  197.813827] pci 0000:00:03.0: pcibios_fixup_resources+0x0/0x1b0 took 0 usecs
+[  197.814739] pci 0000:00:03.0: calling  pnv_ocxl_fixup_actag+0x0/0x2a0 @ 1
+[  197.815599] pci 0000:00:03.0: pnv_ocxl_fixup_actag+0x0/0x2a0 took 0 usecs
+[  197.816935] pci 0000:00:04.0: calling  pci_dev_pdn_setup+0x0/0x50 @ 1
+[  197.817725] pci 0000:00:04.0: pci_dev_pdn_setup+0x0/0x50 took 0 usecs
+[  197.818487] pci 0000:00:04.0: calling  pnv_npu2_opencapi_cfg_size_fixup+0x0/0x50 @ 1
+[  197.819407] pci 0000:00:04.0: pnv_npu2_opencapi_cfg_size_fixup+0x0/0x50 took 0 usecs
+[  197.820414] pci 0000:00:04.0: calling  pcibios_fixup_resources+0x0/0x1b0 @ 1
+[  197.821322] pci 0000:00:04.0: pcibios_fixup_resources+0x0/0x1b0 took 0 usecs
+[  197.822219] pci 0000:00:04.0: calling  pnv_ocxl_fixup_actag+0x0/0x2a0 @ 1
+[  197.823088] pci 0000:00:04.0: pnv_ocxl_fixup_actag+0x0/0x2a0 took 0 usecs
+[  197.826289] IOMMU table initialized, virtual merging enabled
+[  197.827014] pci 0000:00:01.0: Adding to iommu group 0
+[  197.827749] pci 0000:00:02.0: Adding to iommu group 0
+[  197.828451] pci 0000:00:03.0: Adding to iommu group 0
+[  197.829158] pci 0000:00:04.0: Adding to iommu group 0
+[  197.831587] EEH: No capable adapters found
+[  200.724067] HugeTLB registered 2.00 MiB page size, pre-allocated 0 pages
+[  200.724986] HugeTLB registered 1.00 GiB page size, pre-allocated 0 pages
+[  202.781050] vgaarb: loaded
+[  202.782052] SCSI subsystem initialized
+[  204.738109] usbcore: registered new interface driver usbfs
+[  204.738794] usbcore: registered new interface driver hub
+[  204.739502] usbcore: registered new device driver usb
+[  204.740234] pps_core: LinuxPPS API ver. 1 registered
+[  204.741014] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[  204.742571] PTP clock support registered
+[  208.752064] EDAC MC: Ver: 3.0.0
+
+---gets stuck here
+
+
 
 
 
 > 
+> Thanks,
 > 
+> C.
 > 
->>
->> Alex
->>
->>> +
->>> +	pci_restore_state(pdev);
->>> +	pci_read_config_word(pdev, PCI_COMMAND, &cmd);
->>> +	if ((cmd & cmdmask) != cmdmask)
->>> +		pci_write_config_word(pdev, PCI_COMMAND, cmd | cmdmask);
->>> +
->>> +	/*
->>> +	 * The sequence is from "Tesla P100 and V100 SXM2 NVLink Isolation on
->>> +	 * Multi-Tenant Systems".
->>> +	 * The register names are not provided there either, hence raw values.
->>> +	 */
->>> +	iowrite32(0x4, bar0_120000 + 0x4C);
->>> +	iowrite32(0x2, bar0_120000 + 0x2204);
->>> +	val = ioread32(bar0_0 + 0x200);
->>> +	val |= 0x02000000;
->>> +	iowrite32(val, bar0_0 + 0x200);
->>> +	val = ioread32(bar0_a00000 + 0x148);
->>> +	val |= mask;
->>> +	iowrite32(val, bar0_a00000 + 0x148);
->>> +
->>> +	if ((cmd | cmdmask) != cmd)
->>> +		pci_write_config_word(pdev, PCI_COMMAND, cmd);
->>> +
->>> +	pci_iounmap(pdev, bar0_a00000);
->>> +bar0_120000_unmap:
->>> +	pci_iounmap(pdev, bar0_120000);
->>> +bar0_0_unmap:
->>> +	pci_iounmap(pdev, bar0_0);
->>> +}
->>
+> Caveats :
+> 
+>  - We should introduce a set of definitions common to XIVE and XICS
+>  - The XICS-over-XIVE device file book3s_xive.c could be renamed to
+>    book3s_xics_on_xive.c or book3s_xics_p9.c
+>  - The XICS-over-XIVE device still has locking issues in the setup.
+>  - xc->valid is not useful
+>  - xc->xive is not very useful either
+> 
+> Changes since v4:
+> 
+>  - add check on EQ page alignment
+>  - add requirement on KVM_XIVE_EQ_ALWAYS_NOTIFY
+>  - add documentation in Documentation/virtual/kvm/api.txt
+>  - remove 'destroy' method
+>  - introduce a 'release' device operation called when device fd is
+>    closed.
+>  - introduce a 'xive_devices' array under the VM to store kvmppc_xive
+>    objects until VM is destroyed.
+> 
+> Changes since v3:
+> 
+>  - removed a couple of useless includes
+>  - fix the test ont the initial setting of the EQ toggle bit : 0 -> 1
+>  - renamed qsize to qshift
+>  - renamed qpage to qaddr
+>  - checked host page size
+>  - limited flags to KVM_XIVE_EQ_ALWAYS_NOTIFY to fit sPAPR specs
+>  - Fixed xive_timaval description in documentation
+> 
+> Changes since v2:
+> 
+>  - removed extra OPAL call definitions
+>  - removed ->q_order setting. Only useful in the XICS-on-XIVE KVM
+>    device which allocates the EQs on behalf of the guest.
+>  - returned -ENXIO when VP base is invalid
+>  - made use of the xive_vp() macro to compute VP identifiers
+>  - reworked locking in kvmppc_xive_native_connect_vcpu() to fix races 
+>  - stop advertising KVM_CAP_PPC_IRQ_XIVE as support is not fully
+>    available yet
+>  - fixed comment on XIVE IRQ number space
+>  - removed usage of the __x_* macros
+>  - fixed locking on source block
+>  - fixed comments on the KVM device attribute definitions
+>  - handled MASKED EAS configuration
+>  - fixed check on supported EQ size to restrict to 64K pages
+>  - checked kvm_eq.flags that need to be zero
+>  - removed the OPAL call when EQ qtoggle bit and index are zero. 
+>  - reduced the size of kvmppc_one_reg timaval attribute to two u64s
+>  - stopped returning of the OS CAM line value
+> 
+> Changes since v1:
+> 
+>  - Better documentation (was missing)
+>  - Nested support. XIVE not advertised on non PowerNV platforms. This
+>    is a good way to test the fallback on QEMU emulated devices.
+>  - ESB and TIMA special mapping done using the KVM device fd
+>  - All hcalls moved to QEMU. Dropped the patch moving the hcall flags.
+>  - Reworked of the KVM device ioctl controls to support hcalls and
+>    migration needs to capture/save states
+>  - Merged the control syncing XIVE and marking the EQ page dirty
+>  - Fixed passthrough support using the KVM device file address_space
+>    to clear the ESB pages from the mapping
+>  - Misc enhancements and fixes 
+> 
+> Cédric Le Goater (16):
+>   powerpc/xive: add OPAL extensions for the XIVE native exploitation
+>     support
+>   KVM: PPC: Book3S HV: add a new KVM device for the XIVE native
+>     exploitation mode
+>   KVM: PPC: Book3S HV: XIVE: introduce a new capability
+>     KVM_CAP_PPC_IRQ_XIVE
+>   KVM: PPC: Book3S HV: XIVE: add a control to initialize a source
+>   KVM: PPC: Book3S HV: XIVE: add a control to configure a source
+>   KVM: PPC: Book3S HV: XIVE: add controls for the EQ configuration
+>   KVM: PPC: Book3S HV: XIVE: add a global reset control
+>   KVM: PPC: Book3S HV: XIVE: add a control to sync the sources
+>   KVM: PPC: Book3S HV: XIVE: add a control to dirty the XIVE EQ pages
+>   KVM: PPC: Book3S HV: XIVE: add get/set accessors for the VP XIVE state
+>   KVM: introduce a 'mmap' method for KVM devices
+>   KVM: PPC: Book3S HV: XIVE: add a TIMA mapping
+>   KVM: PPC: Book3S HV: XIVE: add a mapping for the source ESB pages
+>   KVM: PPC: Book3S HV: XIVE: add passthrough support
+>   KVM: PPC: Book3S HV: XIVE: activate XIVE exploitation mode
+>   KVM: PPC: Book3S HV: XIVE: introduce a 'release' device operation
+> 
+>  arch/powerpc/include/asm/kvm_host.h        |    3 +
+>  arch/powerpc/include/asm/kvm_ppc.h         |   32 +
+>  arch/powerpc/include/asm/opal-api.h        |    7 +-
+>  arch/powerpc/include/asm/opal.h            |    7 +
+>  arch/powerpc/include/asm/xive.h            |   17 +
+>  arch/powerpc/include/uapi/asm/kvm.h        |   46 +
+>  arch/powerpc/kvm/book3s_xive.h             |   37 +
+>  include/linux/kvm_host.h                   |    2 +
+>  include/uapi/linux/kvm.h                   |    3 +
+>  arch/powerpc/kvm/book3s.c                  |   31 +-
+>  arch/powerpc/kvm/book3s_xive.c             |  230 +++-
+>  arch/powerpc/kvm/book3s_xive_native.c      | 1243 ++++++++++++++++++++
+>  arch/powerpc/kvm/powerpc.c                 |   37 +
+>  arch/powerpc/platforms/powernv/opal-call.c |    3 +
+>  arch/powerpc/sysdev/xive/native.c          |  110 ++
+>  virt/kvm/kvm_main.c                        |   24 +
+>  Documentation/virtual/kvm/api.txt          |   10 +
+>  Documentation/virtual/kvm/devices/xive.txt |  197 ++++
+>  arch/powerpc/kvm/Makefile                  |    2 +-
+>  19 files changed, 1980 insertions(+), 61 deletions(-)
+>  create mode 100644 arch/powerpc/kvm/book3s_xive_native.c
+>  create mode 100644 Documentation/virtual/kvm/devices/xive.txt
+> 
+> -- 
+> 2.20.1
 > 
 
--- 
-Alexey
