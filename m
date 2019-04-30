@@ -2,185 +2,281 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E4E12F011
-	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Apr 2019 07:45:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 104AAF05B
+	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Apr 2019 08:14:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725769AbfD3Fpj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 30 Apr 2019 01:45:39 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45718 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725446AbfD3Fpj (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 30 Apr 2019 01:45:39 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3U5fNXp124695
-        for <kvm-ppc@vger.kernel.org>; Tue, 30 Apr 2019 01:45:38 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2s6fjv1u78-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Tue, 30 Apr 2019 01:45:38 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <alistair@popple.id.au>;
-        Tue, 30 Apr 2019 06:45:36 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 30 Apr 2019 06:45:32 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3U5jVUn51904766
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Apr 2019 05:45:31 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 35A8742042;
-        Tue, 30 Apr 2019 05:45:31 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90A544203F;
-        Tue, 30 Apr 2019 05:45:30 +0000 (GMT)
-Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 30 Apr 2019 05:45:30 +0000 (GMT)
-Received: from townsend.localnet (haven.au.ibm.com [9.192.254.114])
-        (using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ozlabs.au.ibm.com (Postfix) with ESMTPSA id EBDD7A01D2;
-        Tue, 30 Apr 2019 15:45:28 +1000 (AEST)
-From:   Alistair Popple <alistair@popple.id.au>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Alex Williamson <alex.williamson@redhat.com>,
+        id S1725790AbfD3GOo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 30 Apr 2019 02:14:44 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:43225 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725554AbfD3GOn (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 30 Apr 2019 02:14:43 -0400
+Received: by mail-pl1-f196.google.com with SMTP id n8so6230210plp.10
+        for <kvm-ppc@vger.kernel.org>; Mon, 29 Apr 2019 23:14:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6OnqqAYq2y9I/Sv4S4GHmJJEGS4WFLJ3f7efuuglpEQ=;
+        b=H0wXuuGGMjL1UyFYqleWlOQqU1mEKI74UZmR8Xw2I/CcJLigyu1P2GH2ayALJ52nq0
+         12bQsjewdRPXRMgMkZbDbJMIXe9P5KG/wEg2slkgss1GZxhGZgMfhFC9LRheipEUvbPE
+         hBzGyI0Fpj8id6oDgi68tFn0Ie7giFnPqtOEyZb1G1R/10QSZw/CJpoHHGc7vBsYRoUa
+         LIymAHiNcxO8aDaSPtQFp9/sZ1pm4+kMR/BBWfztue9yqJBgIQjntz+jkEGfdPIPzal7
+         2zzg3N9y88io228YR+WCTTVO56nQmw2/I1MyargNoLlPVIZsGrgK0D2mqO9adQhrvbKI
+         sXsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=6OnqqAYq2y9I/Sv4S4GHmJJEGS4WFLJ3f7efuuglpEQ=;
+        b=Dls1Zc4lWcOB3KIiIbV8oGKWgTU9k+rPQEfwwDAICBLgy34fi0XG6AIXmfJ9O6AZei
+         8smsj577fnVfdv6C15LYn6zuFwjazVQIzmIcCnQ3q4FFFxPziRdrzCHQtbTQjs8m//4i
+         JxQ6taLKeU6MsQxji7oVx1+yWwAF2LfgE/qL2PMj/9m6SzaD6c04n6kip/NPDiVndXCh
+         HLTiNa4FZomCGcCUlWz6orFaqrElmecxKQPiLQua0IK6zkRGGK2TMktV/Px1BnNFD04U
+         9mraD0P7BDOnRyY6WuhBz3JwPjl896xuDp8mfjo612ttZKJCjM7Kzek3sErj2PotSF6j
+         /mcw==
+X-Gm-Message-State: APjAAAUcd8OdWE9afDkxOILNgqg67IcPzgyQJbvCKk7viJVUIkPStyyj
+        nOhda0+SIS3qOTbRltsET2Bvkw==
+X-Google-Smtp-Source: APXvYqwCU3cskrIE+xIqbrIVN+Q64hjBi49B00qCuEgXCe0WsMTWIKSg1DUHoU4un3c69LZLSTORWA==
+X-Received: by 2002:a17:902:9686:: with SMTP id n6mr68461248plp.282.1556604882775;
+        Mon, 29 Apr 2019 23:14:42 -0700 (PDT)
+Received: from [10.61.2.175] ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id r138sm28115792pfr.2.2019.04.29.23.14.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 29 Apr 2019 23:14:41 -0700 (PDT)
+Subject: Re: [PATCH kernel v3] powerpc/powernv: Isolate NVLinks between
+ GV100GL on Witherspoon
+To:     Alistair Popple <alistair@popple.id.au>,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Jose Ricardo Ziviani <joserz@linux.ibm.com>,
         kvm@vger.kernel.org, Sam Bobroff <sbobroff@linux.ibm.com>,
         Daniel Henrique Barboza <danielhb413@gmail.com>,
         kvm-ppc@vger.kernel.org,
         Piotr Jaroszynski <pjaroszynski@nvidia.com>,
-        Leonardo Augusto =?ISO-8859-1?Q?Guimar=E3es?= Garcia 
+        =?UTF-8?Q?Leonardo_Augusto_Guimar=c3=a3es_Garcia?= 
         <lagarcia@br.ibm.com>, Reza Arbab <arbab@linux.ibm.com>,
         David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH kernel v3] powerpc/powernv: Isolate NVLinks between GV100GL on Witherspoon
-Date:   Tue, 30 Apr 2019 15:45:28 +1000
-User-Agent: KMail/5.2.3 (Linux/4.18.0-0.bpo.1-amd64; KDE/5.28.0; x86_64; ; )
-In-Reply-To: <da41cd35-32f6-043e-13ab-9a225c4e910a@ozlabs.ru>
-References: <20190411064844.8241-1-aik@ozlabs.ru> <4f7069cf-8c25-6fe1-42df-3b4af2d52172@ozlabs.ru> <da41cd35-32f6-043e-13ab-9a225c4e910a@ozlabs.ru>
+References: <20190411064844.8241-1-aik@ozlabs.ru>
+ <4f7069cf-8c25-6fe1-42df-3b4af2d52172@ozlabs.ru>
+ <da41cd35-32f6-043e-13ab-9a225c4e910a@ozlabs.ru>
+ <5149814.2BROG1NTNO@townsend>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+Openpgp: preference=signencrypt
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
+ EePO1JqpVuIow/wGud9xaPA5uvuVgRS1q7RU8otD+7VLDFzPRiRE4Jfr2CW89Ox6BF+q5ZPV
+ /pS4v4G9eOrw1v09lEKHB9WtiBVhhxKK1LnUjPEH3ifkOkgW7jFfoYgTdtB3XaXVgYnNPDFo
+ PTBYsJy+wr89XfyHr2Ev7BB3Xaf7qICXdBF8MEVY8t/UFsesg4wFWOuzCfqxFmKEaPDZlTuR
+ tfLAeVpslNfWCi5ybPlowLx6KJqOsI9R2a9o4qRXWGP7IwiMRAC3iiPyk9cknt8ee6EUIxI6
+ t847eFaVKI/6WcxhszI0R6Cj+N4y+1rHfkGWYWupCiHwj9DjILW9iEAncVgQmkNPpUsZECLT
+ WQzMuVSxjuXW4nJ6f4OFHqL2dU//qR+BM/eJ0TT3OnfLcPqfucGxubhT7n/CXUxEy+mvWwnm
+ s9p4uqVpTfEuzQ0/bE6t7dZdPBua7eYox1AQnk8JQDwC3Rn9kZq2O7u5KuJP5MfludMmQevm
+ pHYEMF4vZuIpWcOrrSctJfIIEyhDoDmR34bCXAZfNJ4p4H6TPqPh671uMQV82CfTxTrMhGFq
+ 8WYU2AH86FrVQfWoH09z1WqhlOm/KZhAV5FndwVjQJs1MRXD8QARAQABtCRBbGV4ZXkgS2Fy
+ ZGFzaGV2c2tpeSA8YWlrQG96bGFicy5ydT6JAjgEEwECACIFAk+rT0sCGwMGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAAAoJEIYTPdgrwSC5fAIP/0wf/oSYaCq9PhO0UP9zLSEz66SSZUf7
+ AM9O1rau1lJpT8RoNa0hXFXIVbqPPKPZgorQV8SVmYRLr0oSmPnTiZC82x2dJGOR8x4E01gK
+ TanY53J/Z6+CpYykqcIpOlGsytUTBA+AFOpdaFxnJ9a8p2wA586fhCZHVpV7W6EtUPH1SFTQ
+ q5xvBmr3KkWGjz1FSLH4FeB70zP6uyuf/B2KPmdlPkyuoafl2UrU8LBADi/efc53PZUAREih
+ sm3ch4AxaL4QIWOmlE93S+9nHZSRo9jgGXB1LzAiMRII3/2Leg7O4hBHZ9Nki8/fbDo5///+
+ kD4L7UNbSUM/ACWHhd4m1zkzTbyRzvL8NAVQ3rckLOmju7Eu9whiPueGMi5sihy9VQKHmEOx
+ OMEhxLRQbzj4ypRLS9a+oxk1BMMu9cd/TccNy0uwx2UUjDQw/cXw2rRWTRCxoKmUsQ+eNWEd
+ iYLW6TCfl9CfHlT6A7Zmeqx2DCeFafqEd69DqR9A8W5rx6LQcl0iOlkNqJxxbbW3ddDsLU/Y
+ r4cY20++WwOhSNghhtrroP+gouTOIrNE/tvG16jHs8nrYBZuc02nfX1/gd8eguNfVX/ZTHiR
+ gHBWe40xBKwBEK2UeqSpeVTohYWGBkcd64naGtK9qHdo1zY1P55lHEc5Uhlk743PgAnOi27Q
+ ns5zuQINBE+rT0sBEACnV6GBSm+25ACT+XAE0t6HHAwDy+UKfPNaQBNTTt31GIk5aXb2Kl/p
+ AgwZhQFEjZwDbl9D/f2GtmUHWKcCmWsYd5M/6Ljnbp0Ti5/xi6FyfqnO+G/wD2VhGcKBId1X
+ Em/B5y1kZVbzcGVjgD3HiRTqE63UPld45bgK2XVbi2+x8lFvzuFq56E3ZsJZ+WrXpArQXib2
+ hzNFwQleq/KLBDOqTT7H+NpjPFR09Qzfa7wIU6pMNF2uFg5ihb+KatxgRDHg70+BzQfa6PPA
+ o1xioKXW1eHeRGMmULM0Eweuvpc7/STD3K7EJ5bBq8svoXKuRxoWRkAp9Ll65KTUXgfS+c0x
+ gkzJAn8aTG0z/oEJCKPJ08CtYQ5j7AgWJBIqG+PpYrEkhjzSn+DZ5Yl8r+JnZ2cJlYsUHAB9
+ jwBnWmLCR3gfop65q84zLXRQKWkASRhBp4JK3IS2Zz7Nd/Sqsowwh8x+3/IUxVEIMaVoUaxk
+ Wt8kx40h3VrnLTFRQwQChm/TBtXqVFIuv7/Mhvvcq11xnzKjm2FCnTvCh6T2wJw3de6kYjCO
+ 7wsaQ2y3i1Gkad45S0hzag/AuhQJbieowKecuI7WSeV8AOFVHmgfhKti8t4Ff758Z0tw5Fpc
+ BFDngh6Lty9yR/fKrbkkp6ux1gJ2QncwK1v5kFks82Cgj+DSXK6GUQARAQABiQIfBBgBAgAJ
+ BQJPq09LAhsMAAoJEIYTPdgrwSC5NYEP/2DmcEa7K9A+BT2+G5GXaaiFa098DeDrnjmRvumJ
+ BhA1UdZRdfqICBADmKHlJjj2xYo387sZpS6ABbhrFxM6s37g/pGPvFUFn49C47SqkoGcbeDz
+ Ha7JHyYUC+Tz1dpB8EQDh5xHMXj7t59mRDgsZ2uVBKtXj2ZkbizSHlyoeCfs1gZKQgQE8Ffc
+ F8eWKoqAQtn3j4nE3RXbxzTJJfExjFB53vy2wV48fUBdyoXKwE85fiPglQ8bU++0XdOr9oyy
+ j1llZlB9t3tKVv401JAdX8EN0++ETiOovQdzE1m+6ioDCtKEx84ObZJM0yGSEGEanrWjiwsa
+ nzeK0pJQM9EwoEYi8TBGhHC9ksaAAQipSH7F2OHSYIlYtd91QoiemgclZcSgrxKSJhyFhmLr
+ QEiEILTKn/pqJfhHU/7R7UtlDAmFMUp7ByywB4JLcyD10lTmrEJ0iyRRTVfDrfVP82aMBXgF
+ tKQaCxcmLCaEtrSrYGzd1sSPwJne9ssfq0SE/LM1J7VdCjm6OWV33SwKrfd6rOtvOzgadrG6
+ 3bgUVBw+bsXhWDd8tvuCXmdY4bnUblxF2B6GOwSY43v6suugBttIyW5Bl2tXSTwP+zQisOJo
+ +dpVG2pRr39h+buHB3NY83NEPXm1kUOhduJUA17XUY6QQCAaN4sdwPqHq938S3EmtVhsuQIN
+ BFq54uIBEACtPWrRdrvqfwQF+KMieDAMGdWKGSYSfoEGGJ+iNR8v255IyCMkty+yaHafvzpl
+ PFtBQ/D7Fjv+PoHdFq1BnNTk8u2ngfbre9wd9MvTDsyP/TmpF0wyyTXhhtYvE267Av4X/BQT
+ lT9IXKyAf1fP4BGYdTNgQZmAjrRsVUW0j6gFDrN0rq2J9emkGIPvt9rQt6xGzrd6aXonbg5V
+ j6Uac1F42ESOZkIh5cN6cgnGdqAQb8CgLK92Yc8eiCVCH3cGowtzQ2m6U32qf30cBWmzfSH0
+ HeYmTP9+5L8qSTA9s3z0228vlaY0cFGcXjdodBeVbhqQYseMF9FXiEyRs28uHAJEyvVZwI49
+ CnAgVV/n1eZa5qOBpBL+ZSURm8Ii0vgfvGSijPGbvc32UAeAmBWISm7QOmc6sWa1tobCiVmY
+ SNzj5MCNk8z4cddoKIc7Wt197+X/X5JPUF5nQRvg3SEHvfjkS4uEst9GwQBpsbQYH9MYWq2P
+ PdxZ+xQE6v7cNB/pGGyXqKjYCm6v70JOzJFmheuUq0Ljnfhfs15DmZaLCGSMC0Amr+rtefpA
+ y9FO5KaARgdhVjP2svc1F9KmTUGinSfuFm3quadGcQbJw+lJNYIfM7PMS9fftq6vCUBoGu3L
+ j4xlgA/uQl/LPneu9mcvit8JqcWGS3fO+YeagUOon1TRqQARAQABiQRsBBgBCAAgFiEEZSrP
+ ibrORRTHQ99dhhM92CvBILkFAlq54uICGwICQAkQhhM92CvBILnBdCAEGQEIAB0WIQQIhvWx
+ rCU+BGX+nH3N7sq0YorTbQUCWrni4gAKCRDN7sq0YorTbVVSD/9V1xkVFyUCZfWlRuryBRZm
+ S4GVaNtiV2nfUfcThQBfF0sSW/aFkLP6y+35wlOGJE65Riw1C2Ca9WQYk0xKvcZrmuYkK3DZ
+ 0M9/Ikkj5/2v0vxz5Z5w/9+IaCrnk7pTnHZuZqOh23NeVZGBls/IDIvvLEjpD5UYicH0wxv+
+ X6cl1RoP2Kiyvenf0cS73O22qSEw0Qb9SId8wh0+ClWet2E7hkjWFkQfgJ3hujR/JtwDT/8h
+ 3oCZFR0KuMPHRDsCepaqb/k7VSGTLBjVDOmr6/C9FHSjq0WrVB9LGOkdnr/xcISDZcMIpbRm
+ EkIQ91LkT/HYIImL33ynPB0SmA+1TyMgOMZ4bakFCEn1vxB8Ir8qx5O0lHMOiWMJAp/PAZB2
+ r4XSSHNlXUaWUg1w3SG2CQKMFX7vzA31ZeEiWO8tj/c2ZjQmYjTLlfDK04WpOy1vTeP45LG2
+ wwtMA1pKvQ9UdbYbovz92oyZXHq81+k5Fj/YA1y2PI4MdHO4QobzgREoPGDkn6QlbJUBf4To
+ pEbIGgW5LRPLuFlOPWHmIS/sdXDrllPc29aX2P7zdD/ivHABslHmt7vN3QY+hG0xgsCO1JG5
+ pLORF2N5XpM95zxkZqvYfC5tS/qhKyMcn1kC0fcRySVVeR3tUkU8/caCqxOqeMe2B6yTiU1P
+ aNDq25qYFLeYxg67D/4w/P6BvNxNxk8hx6oQ10TOlnmeWp1q0cuutccblU3ryRFLDJSngTEu
+ ZgnOt5dUFuOZxmMkqXGPHP1iOb+YDznHmC0FYZFG2KAc9pO0WuO7uT70lL6larTQrEneTDxQ
+ CMQLP3qAJ/2aBH6SzHIQ7sfbsxy/63jAiHiT3cOaxAKsWkoV2HQpnmPOJ9u02TPjYmdpeIfa
+ X2tXyeBixa3i/6dWJ4nIp3vGQicQkut1YBwR7dJq67/FCV3Mlj94jI0myHT5PIrCS2S8LtWX
+ ikTJSxWUKmh7OP5mrqhwNe0ezgGiWxxvyNwThOHc5JvpzJLd32VDFilbxgu4Hhnf6LcgZJ2c
+ Zd44XWqUu7FzVOYaSgIvTP0hNrBYm/E6M7yrLbs3JY74fGzPWGRbBUHTZXQEqQnZglXaVB5V
+ ZhSFtHopZnBSCUSNDbB+QGy4B/E++Bb02IBTGl/JxmOwG+kZUnymsPvTtnNIeTLHxN/H/ae0
+ c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
+ DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
+ XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
+Message-ID: <cf35d5be-d0a3-aef3-d5eb-c2318ef7d92b@ozlabs.ru>
+Date:   Tue, 30 Apr 2019 16:14:35 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-TM-AS-GCONF: 00
-x-cbid: 19043005-0012-0000-0000-00000316B566
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19043005-0013-0000-0000-0000214F1CAC
-Message-Id: <5149814.2BROG1NTNO@townsend>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-30_02:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=67 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=793 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1904300038
+In-Reply-To: <5149814.2BROG1NTNO@townsend>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Alexey,
 
-> >>> +void pnv_try_isolate_nvidia_v100(struct pci_dev *bridge)
-> >>> +{
-> >>> +	u32 mask, val;
-> >>> +	void __iomem *bar0_0, *bar0_120000, *bar0_a00000;
-> >>> +	struct pci_dev *pdev;
-> >>> +	u16 cmd = 0, cmdmask = PCI_COMMAND_MEMORY;
-> >>> +
-> >>> +	if (!bridge->subordinate)
-> >>> +		return;
-> >>> +
-> >>> +	pdev = list_first_entry_or_null(&bridge->subordinate->devices,
-> >>> +			struct pci_dev, bus_list);
-> >>> +	if (!pdev)
-> >>> +		return;
-> >>> +
-> >>> +	if (pdev->vendor != PCI_VENDOR_ID_NVIDIA)
 
-Don't you also need to check the PCIe devid to match only [PV]100 devices as 
-well? I doubt there's any guarantee these registers will remain the same for 
-all future (or older) NVIDIA devices.
-
-IMHO this should really be done in the device driver in the guest. A malcious 
-guest could load a modified driver that doesn't do this, but that should not 
-compromise other guests which presumably load a non-compromised driver that 
-disables the links on that guests GPU. However I guess in practice what you 
-have here should work equally well.
-
-- Alistair
-
-> >>> +		return;
-> >>> +
-> >>> +	mask = nvlinkgpu_get_disable_mask(&pdev->dev);
-> >>> +	if (!mask)
-> >>> +		return;
-> >>> +
-> >>> +	bar0_0 = pci_iomap_range(pdev, 0, 0, 0x10000);
-> >>> +	if (!bar0_0) {
-> >>> +		pci_err(pdev, "Error mapping BAR0 @0\n");
-> >>> +		return;
-> >>> +	}
-> >>> +	bar0_120000 = pci_iomap_range(pdev, 0, 0x120000, 0x10000);
-> >>> +	if (!bar0_120000) {
-> >>> +		pci_err(pdev, "Error mapping BAR0 @120000\n");
-> >>> +		goto bar0_0_unmap;
-> >>> +	}
-> >>> +	bar0_a00000 = pci_iomap_range(pdev, 0, 0xA00000, 0x10000);
-> >>> +	if (!bar0_a00000) {
-> >>> +		pci_err(pdev, "Error mapping BAR0 @A00000\n");
-> >>> +		goto bar0_120000_unmap;
-> >>> +	}
-> >> 
-> >> Is it really necessary to do three separate ioremaps vs one that would
-> >> cover them all here?  I suspect you're just sneaking in PAGE_SIZE with
-> >> the 0x10000 size mappings anyway.  Seems like it would simplify setup,
-> >> error reporting, and cleanup to to ioremap to the PAGE_ALIGN'd range
-> >> of the highest register accessed. Thanks,
-> > 
-> > Sure I can map it once, I just do not see the point in mapping/unmapping
-> > all 0xa10000>>16=161 system pages for a very short period of time while
-> > we know precisely that we need just 3 pages.
-> > 
-> > Repost?
+On 30/04/2019 15:45, Alistair Popple wrote:
+> Alexey,
 > 
-> Ping?
+>>>>> +void pnv_try_isolate_nvidia_v100(struct pci_dev *bridge)
+>>>>> +{
+>>>>> +	u32 mask, val;
+>>>>> +	void __iomem *bar0_0, *bar0_120000, *bar0_a00000;
+>>>>> +	struct pci_dev *pdev;
+>>>>> +	u16 cmd = 0, cmdmask = PCI_COMMAND_MEMORY;
+>>>>> +
+>>>>> +	if (!bridge->subordinate)
+>>>>> +		return;
+>>>>> +
+>>>>> +	pdev = list_first_entry_or_null(&bridge->subordinate->devices,
+>>>>> +			struct pci_dev, bus_list);
+>>>>> +	if (!pdev)
+>>>>> +		return;
+>>>>> +
+>>>>> +	if (pdev->vendor != PCI_VENDOR_ID_NVIDIA)
 > 
-> Can this go in as it is (i.e. should I ping Michael) or this needs
-> another round? It would be nice to get some formal acks. Thanks,
-> 
-> >> Alex
-> >> 
-> >>> +
-> >>> +	pci_restore_state(pdev);
-> >>> +	pci_read_config_word(pdev, PCI_COMMAND, &cmd);
-> >>> +	if ((cmd & cmdmask) != cmdmask)
-> >>> +		pci_write_config_word(pdev, PCI_COMMAND, cmd | cmdmask);
-> >>> +
-> >>> +	/*
-> >>> +	 * The sequence is from "Tesla P100 and V100 SXM2 NVLink Isolation on
-> >>> +	 * Multi-Tenant Systems".
-> >>> +	 * The register names are not provided there either, hence raw values.
-> >>> +	 */
-> >>> +	iowrite32(0x4, bar0_120000 + 0x4C);
-> >>> +	iowrite32(0x2, bar0_120000 + 0x2204);
-> >>> +	val = ioread32(bar0_0 + 0x200);
-> >>> +	val |= 0x02000000;
-> >>> +	iowrite32(val, bar0_0 + 0x200);
-> >>> +	val = ioread32(bar0_a00000 + 0x148);
-> >>> +	val |= mask;
-> >>> +	iowrite32(val, bar0_a00000 + 0x148);
-> >>> +
-> >>> +	if ((cmd | cmdmask) != cmd)
-> >>> +		pci_write_config_word(pdev, PCI_COMMAND, cmd);
-> >>> +
-> >>> +	pci_iounmap(pdev, bar0_a00000);
-> >>> +bar0_120000_unmap:
-> >>> +	pci_iounmap(pdev, bar0_120000);
-> >>> +bar0_0_unmap:
-> >>> +	pci_iounmap(pdev, bar0_0);
-> >>> +}
+> Don't you also need to check the PCIe devid to match only [PV]100 devices as 
+> well? I doubt there's any guarantee these registers will remain the same for 
+> all future (or older) NVIDIA devices.
 
 
+I do not have the complete list of IDs and I already saw 3 different
+device ids and this only works for machines with ibm,npu/gpu/nvlinks
+properties so for now it works and for the future we are hoping to
+either have an open source nvidia driver or some small minidriver (also
+from nvidia, or may be a spec allowing us to write one) to allow
+topology discovery on the host so we would not depend on the skiboot's
+powernv DT.
+
+> IMHO this should really be done in the device driver in the guest. A malcious 
+> guest could load a modified driver that doesn't do this, but that should not 
+> compromise other guests which presumably load a non-compromised driver that 
+> disables the links on that guests GPU. However I guess in practice what you 
+> have here should work equally well.
+
+Doing it in the guest means a good guest needs to have an updated
+driver, we do not really want to depend on this. The idea of IOMMU
+groups is that the hypervisor provides isolation irrespective to what
+the guest does.
+
+Also vfio+qemu+slof needs to convey the nvlink topology to the guest,
+seems like an unnecessary complication.
+
+
+
+> - Alistair
+> 
+>>>>> +		return;
+>>>>> +
+>>>>> +	mask = nvlinkgpu_get_disable_mask(&pdev->dev);
+>>>>> +	if (!mask)
+>>>>> +		return;
+>>>>> +
+>>>>> +	bar0_0 = pci_iomap_range(pdev, 0, 0, 0x10000);
+>>>>> +	if (!bar0_0) {
+>>>>> +		pci_err(pdev, "Error mapping BAR0 @0\n");
+>>>>> +		return;
+>>>>> +	}
+>>>>> +	bar0_120000 = pci_iomap_range(pdev, 0, 0x120000, 0x10000);
+>>>>> +	if (!bar0_120000) {
+>>>>> +		pci_err(pdev, "Error mapping BAR0 @120000\n");
+>>>>> +		goto bar0_0_unmap;
+>>>>> +	}
+>>>>> +	bar0_a00000 = pci_iomap_range(pdev, 0, 0xA00000, 0x10000);
+>>>>> +	if (!bar0_a00000) {
+>>>>> +		pci_err(pdev, "Error mapping BAR0 @A00000\n");
+>>>>> +		goto bar0_120000_unmap;
+>>>>> +	}
+>>>>
+>>>> Is it really necessary to do three separate ioremaps vs one that would
+>>>> cover them all here?  I suspect you're just sneaking in PAGE_SIZE with
+>>>> the 0x10000 size mappings anyway.  Seems like it would simplify setup,
+>>>> error reporting, and cleanup to to ioremap to the PAGE_ALIGN'd range
+>>>> of the highest register accessed. Thanks,
+>>>
+>>> Sure I can map it once, I just do not see the point in mapping/unmapping
+>>> all 0xa10000>>16=161 system pages for a very short period of time while
+>>> we know precisely that we need just 3 pages.
+>>>
+>>> Repost?
+>>
+>> Ping?
+>>
+>> Can this go in as it is (i.e. should I ping Michael) or this needs
+>> another round? It would be nice to get some formal acks. Thanks,
+>>
+>>>> Alex
+>>>>
+>>>>> +
+>>>>> +	pci_restore_state(pdev);
+>>>>> +	pci_read_config_word(pdev, PCI_COMMAND, &cmd);
+>>>>> +	if ((cmd & cmdmask) != cmdmask)
+>>>>> +		pci_write_config_word(pdev, PCI_COMMAND, cmd | cmdmask);
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * The sequence is from "Tesla P100 and V100 SXM2 NVLink Isolation on
+>>>>> +	 * Multi-Tenant Systems".
+>>>>> +	 * The register names are not provided there either, hence raw values.
+>>>>> +	 */
+>>>>> +	iowrite32(0x4, bar0_120000 + 0x4C);
+>>>>> +	iowrite32(0x2, bar0_120000 + 0x2204);
+>>>>> +	val = ioread32(bar0_0 + 0x200);
+>>>>> +	val |= 0x02000000;
+>>>>> +	iowrite32(val, bar0_0 + 0x200);
+>>>>> +	val = ioread32(bar0_a00000 + 0x148);
+>>>>> +	val |= mask;
+>>>>> +	iowrite32(val, bar0_a00000 + 0x148);
+>>>>> +
+>>>>> +	if ((cmd | cmdmask) != cmd)
+>>>>> +		pci_write_config_word(pdev, PCI_COMMAND, cmd);
+>>>>> +
+>>>>> +	pci_iounmap(pdev, bar0_a00000);
+>>>>> +bar0_120000_unmap:
+>>>>> +	pci_iounmap(pdev, bar0_120000);
+>>>>> +bar0_0_unmap:
+>>>>> +	pci_iounmap(pdev, bar0_0);
+>>>>> +}
+> 
+> 
+
+-- 
+Alexey
