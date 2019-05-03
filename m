@@ -2,74 +2,46 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FCB512802
-	for <lists+kvm-ppc@lfdr.de>; Fri,  3 May 2019 08:50:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BAE312804
+	for <lists+kvm-ppc@lfdr.de>; Fri,  3 May 2019 08:50:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726754AbfECGuH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 3 May 2019 02:50:07 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:43061 "EHLO ozlabs.org"
+        id S1726989AbfECGuJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 3 May 2019 02:50:09 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:59743 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726989AbfECGuF (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 3 May 2019 02:50:05 -0400
+        id S1726985AbfECGuE (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 3 May 2019 02:50:04 -0400
 Received: by ozlabs.org (Postfix, from userid 1034)
-        id 44wN6g3cqXz9sBr; Fri,  3 May 2019 16:50:03 +1000 (AEST)
+        id 44wN6g1QrVz9sBb; Fri,  3 May 2019 16:50:03 +1000 (AEST)
 X-powerpc-patch-notification: thanks
-X-powerpc-patch-commit: 10d91611f426d4bafd2a83d966c36da811b2f7ad
+X-powerpc-patch-commit: 88ec6b93c8e7d6d4ffaf6ad6395ceb3bf552de15
 X-Patchwork-Hint: ignore
-In-Reply-To: <20190412143053.18567-1-npiggin@gmail.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+In-Reply-To: <20190410170448.3923-2-clg@kaod.org>
+To:     =?utf-8?q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+        kvm-ppc@vger.kernel.org
 From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-Cc:     "Gautham R . Shenoy" <ego@linux.vnet.ibm.com>,
-        kvm-ppc@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v9 1/2] powerpc/64s: reimplement book3s idle code in C
-Message-Id: <44wN6g3cqXz9sBr@ozlabs.org>
+Cc:     kvm@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+        =?utf-8?b?Q8Op?= =?utf-8?q?dric_Le_Goater?= <clg@kaod.org>,
+        linuxppc-dev@lists.ozlabs.org,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v5 01/16] powerpc/xive: add OPAL extensions for the XIVE native exploitation support
+Message-Id: <44wN6g1QrVz9sBb@ozlabs.org>
 Date:   Fri,  3 May 2019 16:50:03 +1000 (AEST)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, 2019-04-12 at 14:30:52 UTC, Nicholas Piggin wrote:
-> Reimplement Book3S idle code in C, moving POWER7/8/9 implementation
-> speific HV idle code to the powernv platform code.
+On Wed, 2019-04-10 at 17:04:33 UTC, =?utf-8?q?C=C3=A9dric_Le_Goater?= wrote:
+> The support for XIVE native exploitation mode in Linux/KVM needs a
+> couple more OPAL calls to get and set the state of the XIVE internal
+> structures being used by a sPAPR guest.
 > 
-> Book3S assembly stubs are kept in common code and used only to save
-> the stack frame and non-volatile GPRs before executing architected
-> idle instructions, and restoring the stack and reloading GPRs then
-> returning to C after waking from idle.
-> 
-> The complex logic dealing with threads and subcores, locking, SPRs,
-> HMIs, timebase resync, etc., is all done in C which makes it more
-> maintainable.
-> 
-> This is not a strict translation to C code, there are some
-> significant differences:
-> 
-> - Idle wakeup no longer uses the ->cpu_restore call to reinit SPRs,
->   but saves and restores them itself.
-> 
-> - The optimisation where EC=ESL=0 idle modes did not have to save GPRs
->   or change MSR is restored, because it's now simple to do. ESL=1
->   sleeps that do not lose GPRs can use this optimization too.
-> 
-> - KVM secondary entry and cede is now more of a call/return style
->   rather than branchy. nap_state_lost is not required because KVM
->   always returns via NVGPR restoring path.
-> 
-> - KVM secondary wakeup from offline sequence is moved entirely into
->   the offline wakeup, which avoids a hwsync in the normal idle wakeup
->   path.
-> 
-> Performance measured with context switch ping-pong on different
-> threads or cores, is possibly improved a small amount, 1-3% depending
-> on stop state and core vs thread test for shallow states. Deep states
-> it's in the noise compared with other latencies.
-> 
-> Reviewed-by: Gautham R. Shenoy <ego@linux.vnet.ibm.com>
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> Signed-off-by: Céddric Le Goater <clg@kaod.org>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 Applied to powerpc topic/ppc-kvm, thanks.
 
-https://git.kernel.org/powerpc/c/10d91611f426d4bafd2a83d966c36da8
+https://git.kernel.org/powerpc/c/88ec6b93c8e7d6d4ffaf6ad6395ceb3b
 
 cheers
