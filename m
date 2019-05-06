@@ -2,124 +2,292 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CB541501A
-	for <lists+kvm-ppc@lfdr.de>; Mon,  6 May 2019 17:25:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15EB7150E0
+	for <lists+kvm-ppc@lfdr.de>; Mon,  6 May 2019 18:05:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726473AbfEFPZ5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 6 May 2019 11:25:57 -0400
-Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:58202 "EHLO
-        15.mo1.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726414AbfEFPZ5 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 6 May 2019 11:25:57 -0400
-Received: from player731.ha.ovh.net (unknown [10.109.143.146])
-        by mo1.mail-out.ovh.net (Postfix) with ESMTP id E1BB716AAD5
-        for <kvm-ppc@vger.kernel.org>; Mon,  6 May 2019 17:16:14 +0200 (CEST)
+        id S1726743AbfEFQFe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 6 May 2019 12:05:34 -0400
+Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:45161 "EHLO
+        9.mo177.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726349AbfEFQFe (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 6 May 2019 12:05:34 -0400
+Received: from player793.ha.ovh.net (unknown [10.108.57.226])
+        by mo177.mail-out.ovh.net (Postfix) with ESMTP id BACC4F141F
+        for <kvm-ppc@vger.kernel.org>; Mon,  6 May 2019 18:05:29 +0200 (CEST)
 Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
         (Authenticated sender: clg@kaod.org)
-        by player731.ha.ovh.net (Postfix) with ESMTPSA id 2DBE955A8813;
-        Mon,  6 May 2019 15:16:10 +0000 (UTC)
-Subject: Re: [PATCH v6 14/17] KVM: PPC: Book3S HV: XIVE: add passthrough
- support
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     kvm-ppc@vger.kernel.org,
-        David Gibson <david@gibson.dropbear.id.au>, kvm@vger.kernel.org
+        by player793.ha.ovh.net (Postfix) with ESMTPSA id 8189F58B01D8;
+        Mon,  6 May 2019 16:05:24 +0000 (UTC)
+Subject: Re: [PATCH v2] KVM: PPC: Book3S HV: XIVE: Prevent races when
+ releasing device
+To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
 References: <20190418103942.2883-1-clg@kaod.org>
- <20190418103942.2883-15-clg@kaod.org> <20190425070705.GA12768@blackberry>
+ <20190418103942.2883-18-clg@kaod.org> <20190426061014.GB12768@blackberry>
+ <20190429012403.GA11154@blackberry>
 From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <d83b5f6a-4d1e-714c-bd67-e3c37b64e5e9@kaod.org>
-Date:   Mon, 6 May 2019 17:16:09 +0200
+Message-ID: <576628e1-724a-7691-598b-74072f06416d@kaod.org>
+Date:   Mon, 6 May 2019 18:05:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190425070705.GA12768@blackberry>
+In-Reply-To: <20190429012403.GA11154@blackberry>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 5746030177071434631
+X-Ovh-Tracer-Id: 6577788732898642918
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrjeejgdeklecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrjeejgdeliecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 4/25/19 9:07 AM, Paul Mackerras wrote:
-> On Thu, Apr 18, 2019 at 12:39:39PM +0200, Cédric Le Goater wrote:
->> The KVM XICS-over-XIVE device and the proposed KVM XIVE native device
->> implement an IRQ space for the guest using the generic IPI interrupts
->> of the XIVE IC controller. These interrupts are allocated at the OPAL
->> level and "mapped" into the guest IRQ number space in the range 0-0x1FFF.
->> Interrupt management is performed in the XIVE way: using loads and
->> stores on the addresses of the XIVE IPI interrupt ESB pages.
->>
->> Both KVM devices share the same internal structure caching information
->> on the interrupts, among which the xive_irq_data struct containing the
->> addresses of the IPI ESB pages and an extra one in case of pass-through.
->> The later contains the addresses of the ESB pages of the underlying HW
->> controller interrupts, PHB4 in all cases for now.
->>
->> A guest, when running in the XICS legacy interrupt mode, lets the KVM
->> XICS-over-XIVE device "handle" interrupt management, that is to
->> perform the loads and stores on the addresses of the ESB pages of the
->> guest interrupts. However, when running in XIVE native exploitation
->> mode, the KVM XIVE native device exposes the interrupt ESB pages to
->> the guest and lets the guest perform directly the loads and stores.
->>
->> The VMA exposing the ESB pages make use of a custom VM fault handler
->> which role is to populate the VMA with appropriate pages. When a fault
->> occurs, the guest IRQ number is deduced from the offset, and the ESB
->> pages of associated XIVE IPI interrupt are inserted in the VMA (using
->> the internal structure caching information on the interrupts).
->>
->> Supporting device passthrough in the guest running in XIVE native
->> exploitation mode adds some extra refinements because the ESB pages
->> of a different HW controller (PHB4) need to be exposed to the guest
->> along with the initial IPI ESB pages of the XIVE IC controller. But
->> the overall mechanic is the same.
->>
->> When the device HW irqs are mapped into or unmapped from the guest
->> IRQ number space, the passthru_irq helpers, kvmppc_xive_set_mapped()
->> and kvmppc_xive_clr_mapped(), are called to record or clear the
->> passthrough interrupt information and to perform the switch.
->>
->> The approach taken by this patch is to clear the ESB pages of the
->> guest IRQ number being mapped and let the VM fault handler repopulate.
->> The handler will insert the ESB page corresponding to the HW interrupt
->> of the device being passed-through or the initial IPI ESB page if the
->> device is being removed.
+On 4/29/19 3:24 AM, Paul Mackerras wrote:
+> Now that we have the possibility of a XIVE or XICS-on-XIVE device being
+> released while the VM is still running, we need to be careful about
+> races and potential use-after-free bugs.  Although the kvmppc_xive
+> struct is not freed, but kept around for re-use, the kvmppc_xive_vcpu
+> structs are freed, and they are used extensively in both the XIVE native
+> and XICS-on-XIVE code.
 > 
-> One comment below:
+> There are various ways in which XIVE code gets invoked:
 > 
->> @@ -257,6 +289,13 @@ static int kvmppc_xive_native_mmap(struct kvm_device *dev,
->>  
->>  	vma->vm_flags |= VM_IO | VM_PFNMAP;
->>  	vma->vm_page_prot = pgprot_noncached_wc(vma->vm_page_prot);
->> +
->> +	/*
->> +	 * Grab the KVM device file address_space to be able to clear
->> +	 * the ESB pages mapping when a device is passed-through into
->> +	 * the guest.
->> +	 */
->> +	xive->mapping = vma->vm_file->f_mapping;
+> - VCPU entry and exit, which do push and pull operations on the XIVE hardware
+> - one_reg get and set functions (vcpu->mutex is held)
+> - XICS hypercalls (but only inside guest execution, not from
+>   kvmppc_pseries_do_hcall)
+> - device creation calls (kvm->lock is held)
+> - device callbacks - get/set attribute, mmap, pagefault, release/destroy
+> - set_mapped/clr_mapped calls (kvm->lock is held)
+> - connect_vcpu calls
+> - debugfs file read callbacks
 > 
-> I'm worried about the lifetime of this pointer.  At the least you
-> should clear it in the release function for the device, when you get
-> one.  It looks like you should hold the xive->mapping_lock around the
-> clearing.  
+> Inside a device release function, we know that userspace cannot have an
+> open file descriptor referring to the device, nor can it have any mmapped
+> regions from the device.  Therefore the device callbacks are excluded,
+> as are the connect_vcpu calls (since they need a fd for the device).
+> Further, since the caller holds the kvm->lock mutex, no other device
+> creation calls or set/clr_mapped calls can be executing concurrently.
+> 
+> To exclude VCPU execution and XICS hypercalls, we temporarily set
+> kvm->arch.mmu_ready to 0.  This forces any VCPU task that is trying to
+> enter the guest to take the kvm->lock mutex, which is held by the caller
+> of the release function.  Then, sending an IPI to all other CPUs forces
+> any VCPU currently executing in the guest to exit.
 
-Yes. This is should be cleaner.
+For my understanding, this method is faster than looping on all vCPUs
+and calling kvm_vcpu_kick() ? 
 
-> I think that should be OK then since the release function
-> won't get called until all of the mmaps of the fd have been destroyed,
-> as I understand things.
+> 
+> Finally, we take the vcpu->mutex for each VCPU around the process of
+> cleaning up and freeing its XIVE data structures, in order to exclude
+> any one_reg get/set calls.
+> 
+> To exclude the debugfs read callbacks, we just need to ensure that
+> debugfs_remove is called before freeing any data structures.  Once it
+> returns we know that no CPU can be executing the callbacks (for our
+> kvmppc_xive instance).
+> 
+> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
 
-and you also have to close the fd by exiting QEMU or resetting the guest.  
+LGTM, 
 
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
-Anyhow, I will send a cleanup in a followup patch. 
+one minor comment below,
 
 Thanks,
 
-C. 
+C.
+
+> ---
+> v2: move debugfs_remove call to eliminate race
+> 
+>  arch/powerpc/kvm/book3s_xive.c        | 51 ++++++++++++++++++++++++++++-------
+>  arch/powerpc/kvm/book3s_xive_native.c | 43 ++++++++++++++++++++++++-----
+>  2 files changed, 78 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+> index 922689b..4280cd8 100644
+> --- a/arch/powerpc/kvm/book3s_xive.c
+> +++ b/arch/powerpc/kvm/book3s_xive.c
+> @@ -846,7 +846,8 @@ int kvmppc_xive_set_icp(struct kvm_vcpu *vcpu, u64 icpval)
+>  
+>  	/*
+>  	 * We can't update the state of a "pushed" VCPU, but that
+> -	 * shouldn't happen.
+> +	 * shouldn't happen because the vcpu->mutex makes running a
+> +	 * vcpu mutually exclusive with doing one_reg get/set on it.
+>  	 */
+>  	if (WARN_ON(vcpu->arch.xive_pushed))
+>  		return -EIO;
+> @@ -1835,7 +1836,7 @@ void kvmppc_xive_free_sources(struct kvmppc_xive_src_block *sb)
+>  }
+>  
+>  /*
+> - * Called when device fd is closed
+> + * Called when device fd is closed.  kvm->lock is held.
+>   */
+>  static void kvmppc_xive_release(struct kvm_device *dev)
+>  {
+> @@ -1843,21 +1844,46 @@ static void kvmppc_xive_release(struct kvm_device *dev)
+>  	struct kvm *kvm = xive->kvm;
+>  	struct kvm_vcpu *vcpu;
+>  	int i;
+> +	int was_ready;
+>  
+>  	pr_devel("Releasing xive device\n");
+>  
+> +	debugfs_remove(xive->dentry);
+> +
+>  	/*
+> -	 * When releasing the KVM device fd, the vCPUs can still be
+> -	 * running and we should clean up the vCPU interrupt
+> -	 * presenters first.
+> +	 * Clearing mmu_ready temporarily while holding kvm->lock
+> +	 * is a way of ensuring that no vcpus can enter the guest
+> +	 * until we drop kvm->lock.  Doing kick_all_cpus_sync()
+> +	 * ensures that any vcpu executing inside the guest has
+> +	 * exited the guest.  Once kick_all_cpus_sync() has finished,
+> +	 * we know that no vcpu can be executing the XIVE push or
+> +	 * pull code, or executing a XICS hcall.
+> +	 *
+> +	 * Since this is the device release function, we know that
+> +	 * userspace does not have any open fd referring to the
+> +	 * device.  Therefore there can not be any of the device
+> +	 * attribute set/get functions being executed concurrently,
+> +	 * and similarly, the connect_vcpu and set/clr_mapped
+> +	 * functions also cannot be being executed.
+>  	 */
+> -	kvm_for_each_vcpu(i, vcpu, kvm)
+> -		kvmppc_xive_cleanup_vcpu(vcpu);
+> +	was_ready = kvm->arch.mmu_ready;
+> +	kvm->arch.mmu_ready = 0;
+> +	kick_all_cpus_sync();
+>  
+> -	debugfs_remove(xive->dentry);
+> +	/*
+> +	 * We should clean up the vCPU interrupt presenters first.
+> +	 */
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		/*
+> +		 * Take vcpu->mutex to ensure that no one_reg get/set ioctl
+> +		 * (i.e. kvmppc_xive_[gs]et_icp) can be done concurrently.
+> +		 */
+> +		mutex_lock(&vcpu->mutex);
+> +		kvmppc_xive_cleanup_vcpu(vcpu);
+> +		mutex_unlock(&vcpu->mutex);
+> +	}
+>  
+> -	if (kvm)
+> -		kvm->arch.xive = NULL;
+> +	kvm->arch.xive = NULL;
+>  
+>  	/* Mask and free interrupts */
+>  	for (i = 0; i <= xive->max_sbid; i++) {
+> @@ -1870,6 +1896,8 @@ static void kvmppc_xive_release(struct kvm_device *dev)
+>  	if (xive->vp_base != XIVE_INVALID_VP)
+>  		xive_native_free_vp_block(xive->vp_base);
+>  
+> +	kvm->arch.mmu_ready = was_ready;
+> +
+>  	/*
+>  	 * A reference of the kvmppc_xive pointer is now kept under
+>  	 * the xive_devices struct of the machine for reuse. It is
+> @@ -1906,6 +1934,9 @@ struct kvmppc_xive *kvmppc_xive_get_device(struct kvm *kvm, u32 type)
+>  	return xive;
+>  }
+>  
+> +/*
+> + * Create a XICS device with XIVE backend.  kvm->lock is held.
+> + */
+>  static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
+>  {
+>  	struct kvmppc_xive *xive;
+> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+> index 0497272a..5e14df1 100644
+> --- a/arch/powerpc/kvm/book3s_xive_native.c
+> +++ b/arch/powerpc/kvm/book3s_xive_native.c
+
+May be also add the comment :
+
+kvm->lock is held when kvmppc_xive_native_release() is called.
+
+
+> @@ -973,21 +973,47 @@ static void kvmppc_xive_native_release(struct kvm_device *dev)
+>  	struct kvm *kvm = xive->kvm;
+>  	struct kvm_vcpu *vcpu;
+>  	int i;
+> +	int was_ready;
+>  
+>  	debugfs_remove(xive->dentry);
+>  
+>  	pr_devel("Releasing xive native device\n");
+>  
+>  	/*
+> -	 * When releasing the KVM device fd, the vCPUs can still be
+> -	 * running and we should clean up the vCPU interrupt
+> -	 * presenters first.
+> +	 * Clearing mmu_ready temporarily while holding kvm->lock
+> +	 * is a way of ensuring that no vcpus can enter the guest
+> +	 * until we drop kvm->lock.  Doing kick_all_cpus_sync()
+> +	 * ensures that any vcpu executing inside the guest has
+> +	 * exited the guest.  Once kick_all_cpus_sync() has finished,
+> +	 * we know that no vcpu can be executing the XIVE push or
+> +	 * pull code or accessing the XIVE MMIO regions.
+> +	 *
+> +	 * Since this is the device release function, we know that
+> +	 * userspace does not have any open fd or mmap referring to
+> +	 * the device.  Therefore there can not be any of the
+> +	 * device attribute set/get, mmap, or page fault functions
+> +	 * being executed concurrently, and similarly, the
+> +	 * connect_vcpu and set/clr_mapped functions also cannot
+> +	 * be being executed.
+>  	 */
+> -	kvm_for_each_vcpu(i, vcpu, kvm)
+> +	was_ready = kvm->arch.mmu_ready;
+> +	kvm->arch.mmu_ready = 0;
+> +	kick_all_cpus_sync();
+> +
+> +	/*
+> +	 * We should clean up the vCPU interrupt presenters first.
+> +	 */
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		/*
+> +		 * Take vcpu->mutex to ensure that no one_reg get/set ioctl
+> +		 * (i.e. kvmppc_xive_native_[gs]et_vp) can be being done.
+> +		 */
+> +		mutex_lock(&vcpu->mutex);
+>  		kvmppc_xive_native_cleanup_vcpu(vcpu);
+> +		mutex_unlock(&vcpu->mutex);
+> +	}
+>  
+> -	if (kvm)
+> -		kvm->arch.xive = NULL;
+> +	kvm->arch.xive = NULL;
+>  
+>  	for (i = 0; i <= xive->max_sbid; i++) {
+>  		if (xive->src_blocks[i])
+> @@ -999,6 +1025,8 @@ static void kvmppc_xive_native_release(struct kvm_device *dev)
+>  	if (xive->vp_base != XIVE_INVALID_VP)
+>  		xive_native_free_vp_block(xive->vp_base);
+>  
+> +	kvm->arch.mmu_ready = was_ready;
+> +
+>  	/*
+>  	 * A reference of the kvmppc_xive pointer is now kept under
+>  	 * the xive_devices struct of the machine for reuse. It is
+> @@ -1009,6 +1037,9 @@ static void kvmppc_xive_native_release(struct kvm_device *dev)
+>  	kfree(dev);
+>  }
+>  
+> +/*
+> + * Create a XIVE device.  kvm->lock is held.
+> + */
+>  static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
+>  {
+>  	struct kvmppc_xive *xive;
+> 
 
