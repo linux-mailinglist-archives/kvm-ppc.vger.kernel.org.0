@@ -2,93 +2,72 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B804175D2
-	for <lists+kvm-ppc@lfdr.de>; Wed,  8 May 2019 12:18:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B41B18575
+	for <lists+kvm-ppc@lfdr.de>; Thu,  9 May 2019 08:34:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726487AbfEHKSD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 8 May 2019 06:18:03 -0400
-Received: from 17.mo5.mail-out.ovh.net ([46.105.56.132]:52652 "EHLO
-        17.mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726435AbfEHKSD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 8 May 2019 06:18:03 -0400
-Received: from player734.ha.ovh.net (unknown [10.108.57.53])
-        by mo5.mail-out.ovh.net (Postfix) with ESMTP id B3E0222D99E
-        for <kvm-ppc@vger.kernel.org>; Wed,  8 May 2019 12:18:01 +0200 (CEST)
+        id S1726452AbfEIGej (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 9 May 2019 02:34:39 -0400
+Received: from 14.mo7.mail-out.ovh.net ([178.33.251.19]:41314 "EHLO
+        14.mo7.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726411AbfEIGej (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 9 May 2019 02:34:39 -0400
+Received: from player772.ha.ovh.net (unknown [10.108.54.38])
+        by mo7.mail-out.ovh.net (Postfix) with ESMTP id 565DA11328A
+        for <kvm-ppc@vger.kernel.org>; Thu,  9 May 2019 08:34:37 +0200 (CEST)
 Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
         (Authenticated sender: clg@kaod.org)
-        by player734.ha.ovh.net (Postfix) with ESMTPSA id F204157A1D76;
-        Wed,  8 May 2019 10:17:54 +0000 (UTC)
-Subject: Re: [PATCH] KVM: fix 'release' method of KVM device
-To:     David Hildenbrand <david@redhat.com>, kvm-ppc@vger.kernel.org
-Cc:     Paul Mackerras <paulus@samba.org>,
-        David Gibson <david@gibson.dropbear.id.au>, kvm@vger.kernel.org
-References: <20190507162047.17152-1-clg@kaod.org>
- <2d3bb5ca-65fe-96ff-5a4e-2ba050c41713@redhat.com>
+        by player772.ha.ovh.net (Postfix) with ESMTPSA id 2D78A586DDA2;
+        Thu,  9 May 2019 06:34:30 +0000 (UTC)
+Subject: Re: [PATCH v5 00/16] KVM: PPC: Book3S HV: add XIVE native
+ exploitation mode
+To:     Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        Paul Mackerras <paulus@samba.org>,
+        linuxppc-dev@lists.ozlabs.org,
+        David Gibson <david@gibson.dropbear.id.au>
+References: <20190410170448.3923-1-clg@kaod.org>
+ <20190429080506.GA9070@sathnaga86.in.ibm.com>
+ <827f230f-1b56-db89-be21-1b2dbd44ef08@kaod.org>
 From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <79107e6e-8562-0b39-9dec-d163ab158a47@kaod.org>
-Date:   Wed, 8 May 2019 12:17:54 +0200
+Message-ID: <b8f9f7d1-087d-fa74-b834-fd57ad03adf4@kaod.org>
+Date:   Thu, 9 May 2019 08:34:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <2d3bb5ca-65fe-96ff-5a4e-2ba050c41713@redhat.com>
+In-Reply-To: <827f230f-1b56-db89-be21-1b2dbd44ef08@kaod.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 12454986248125516679
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 14554789574445534182
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkeefgddvhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkeeggddutdekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 5/7/19 9:32 PM, David Hildenbrand wrote:
-> On 07.05.19 18:20, Cédric Le Goater wrote:
->> There is no need to test for the device pointer validity when releasing
->> a KVM device. The file descriptor should identify it safely.
+
+Satheesh,
+
+>> Xive(both ic-mode=dual and ic-mode=xive) guest fails to boot with 
+>> guest memory > 64G, till 64G it boots fine.
+>>
+>> Note: xics(ic-mode=xics) guest with the same configuration boots fine
 > 
-> "Fix" implies it is broken. Is it broken?
+> Indeed. The guest hangs because IPIs are not correctly received. The guest 
+> sees the EQ page as being filled with zeroes and discards the interrupt 
+> whereas the host, KVM and QEMU, sees the correct entries.
+> 
+> I haven't spotted anything bizarre from guest side. Do we have a 64GB 
+> frontier somewhere in KVM ? 
 
-no, it's not broken indeed. The changes are removing useless 
-checks leftover from a previous patch. A title such as : 
+The issue was an erroneous assignment of the EQ page address in QEMU.
 
-   remove useless checks in 'release' method of KVM device
+I pushed the fix in my QEMU branch : 
 
-would be more appropriate. I can send a v2 with Alexey's rb.
+  https://github.com/legoater/qemu/commits/xive-next
 
 Thanks,
 
 C.
-
->>
->> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->> ---
->>
->>  Fixes http://patchwork.ozlabs.org/patch/1087506/
->>  https://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc.git/commit/?h=kvm-ppc-next&id=2bde9b3ec8bdf60788e9e2ce8c07a2f8d6003dbd
->>
->>  virt/kvm/kvm_main.c | 6 ------
->>  1 file changed, 6 deletions(-)
->>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 161830ec0aa5..ac15b8fd8399 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -2939,12 +2939,6 @@ static int kvm_device_release(struct inode *inode, struct file *filp)
->>  	struct kvm_device *dev = filp->private_data;
->>  	struct kvm *kvm = dev->kvm;
->>  
->> -	if (!dev)
->> -		return -ENODEV;
->> -
->> -	if (dev->kvm != kvm)
->> -		return -EPERM;
->> -
->>  	if (dev->ops->release) {
->>  		mutex_lock(&kvm->lock);
->>  		list_del(&dev->vm_node);
->>
-> 
-> 
-
