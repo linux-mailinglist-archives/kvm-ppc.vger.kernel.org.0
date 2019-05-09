@@ -2,79 +2,171 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7ADDD18CA5
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 May 2019 17:03:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CB1019567
+	for <lists+kvm-ppc@lfdr.de>; Fri, 10 May 2019 00:48:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726234AbfEIPDu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 9 May 2019 11:03:50 -0400
-Received: from foss.arm.com ([217.140.101.70]:43810 "EHLO foss.arm.com"
+        id S1726839AbfEIWr5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 9 May 2019 18:47:57 -0400
+Received: from ozlabs.org ([203.11.71.1]:58977 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726448AbfEIPDt (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 9 May 2019 11:03:49 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2EEA7374;
-        Thu,  9 May 2019 08:03:49 -0700 (PDT)
-Received: from [10.1.196.69] (e112269-lin.cambridge.arm.com [10.1.196.69])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 52BDD3F6C4;
-        Thu,  9 May 2019 08:03:45 -0700 (PDT)
-Subject: Re: [PATCH v8 05/20] KVM: PPC: Book3S HV: Remove pmd_is_leaf()
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Mark Rutland <Mark.Rutland@arm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Will Deacon <will.deacon@arm.com>, linux-mm@kvack.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Liang, Kan" <kan.liang@linux.intel.com>,
-        Michael Ellerman <mpe@ellerman.id.au>, x86@kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>, kvm-ppc@vger.kernel.org,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-arm-kernel@lists.infradead.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev@lists.ozlabs.org
-References: <20190403141627.11664-1-steven.price@arm.com>
- <20190403141627.11664-6-steven.price@arm.com>
- <20190429020555.GB11154@blackberry>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <bf689c22-92ab-e0bf-65d8-9cd495d9e6e1@arm.com>
-Date:   Thu, 9 May 2019 16:03:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726710AbfEIWr4 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 9 May 2019 18:47:56 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 450T562HTQz9s7h; Fri, 10 May 2019 08:47:54 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1557442074; bh=lhEqPifvK3jxTNbX68BGTn3nBXN1zLT33EbkUjW90gk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YjVvP41NwFPgaMNZyFzu+/T2+DNtnJf3ly+n+bzal6UoHOeKiu3zzwa7l5tE/IhXs
+         vRklwuI/l4CVEauUYw5Ir02SesfR9CZM2fB9n9i1WA1ppedlcsP7V6xKdBZ6M8LNgK
+         t2bAYN3jsOXw6JcDxnw9tfEEgnbi2c7sbhbhoRDRNl9lc3YJOrEA4UUvkzpbyERjq/
+         1f2Ve90EcE3vTOYMFcegAVx0YSmCyLWUO92rUjotb2YlKpQNSk0yxcpkPsmsy2ARTv
+         kzW8DAb9Wa2BQFp0ETSggmozP86Su9IFyYUXxAfOEF3F/OskSxBDHf6umRK51xQBna
+         lCuDfK8Y1mPrg==
+Date:   Fri, 10 May 2019 08:46:09 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org
+Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.2-1 tag
+Message-ID: <20190509224609.GA5685@blackberry>
+References: <20190502040646.GA3661@blackberry>
 MIME-Version: 1.0
-In-Reply-To: <20190429020555.GB11154@blackberry>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190502040646.GA3661@blackberry>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 29/04/2019 03:05, Paul Mackerras wrote:
-> On Wed, Apr 03, 2019 at 03:16:12PM +0100, Steven Price wrote:
->> Since pmd_large() is now always available, pmd_is_leaf() is redundant.
->> Replace all uses with calls to pmd_large().
+On Thu, May 02, 2019 at 02:06:46PM +1000, Paul Mackerras wrote:
+> Paolo or Radim,
 > 
-> NAK.  I don't want to do this, because pmd_is_leaf() is purely about
-> the guest page tables (the "partition-scoped" radix tree which
-> specifies the guest physical to host physical translation), not about
-> anything to do with the Linux process page tables.  The guest page
-> tables have the same format as the Linux process page tables, but they
-> are managed separately.
+> Please do a pull from my kvm-ppc-next-5.2-1 tag to get a PPC update
+> for 5.2.  The main new feature here is that we can now let guests
+> access the POWER9 XIVE interrupt controller directly for things like
+> acknowledge, EOI, enable and disable on interrupts, rather than
+> requiring guests to do hypercalls for these operations.
+> 
+> I have merged in the topic/ppc-kvm branch from the powerpc tree
+> because one of the patches there is a prerequisite for the XIVE patch
+> series.  That's why there are changes to arch/powerpc/kernel in the
+> diffstat.
+> 
+> Stephen Rothwell noted a conflict between my tree and the kvm-arm tree
+> because we have both allocated new capability numbers.
+> 
+> The XIVE patch series also modifies generic KVM code to add mmap and
+> release methods on KVM devices.
+> 
+> Thanks,
+> Paul.
 
-Fair enough, I'll drop this patch in the next posting.
+Ping?
 
-> If it makes things clearer, I could rename it to "guest_pmd_is_leaf()"
-> or something similar.
-
-I'll leave that decision up to you - it might prevent similar confusion
-in the future.
-
-Steve
+> The following changes since commit 345077c8e172c255ea0707214303ccd099e5656b:
+> 
+>   KVM: PPC: Book3S: Protect memslots while validating user address (2019-04-05 14:37:24 +1100)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.2-1
+> 
+> for you to fetch changes up to 0caecf5b00199636eb2d32201199ecd6be52558d:
+> 
+>   KVM: PPC: Book3S HV: XIVE: Clear escalation interrupt pointers on device close (2019-04-30 19:41:01 +1000)
+> 
+> ----------------------------------------------------------------
+> PPC KVM update for 5.2
+> 
+> * Support for guests to access the new POWER9 XIVE interrupt controller
+>   hardware directly, reducing interrupt latency and overhead for guests.
+> 
+> * In-kernel implementation of the H_PAGE_INIT hypercall.
+> 
+> * Reduce memory usage of sparsely-populated IOMMU tables.
+> 
+> * Several bug fixes.
+> 
+> ----------------------------------------------------------------
+> Alexey Kardashevskiy (3):
+>       KVM: PPC: Book3S HV: Fix lockdep warning when entering the guest
+>       KVM: PPC: Book3S HV: Avoid lockdep debugging in TCE realmode handlers
+>       KVM: PPC: Book3S: Allocate guest TCEs on demand too
+> 
+> Cédric Le Goater (17):
+>       powerpc/xive: add OPAL extensions for the XIVE native exploitation support
+>       KVM: PPC: Book3S HV: Add a new KVM device for the XIVE native exploitation mode
+>       KVM: PPC: Book3S HV: XIVE: Introduce a new capability KVM_CAP_PPC_IRQ_XIVE
+>       KVM: PPC: Book3S HV: XIVE: add a control to initialize a source
+>       KVM: PPC: Book3S HV: XIVE: Add a control to configure a source
+>       KVM: PPC: Book3S HV: XIVE: Add controls for the EQ configuration
+>       KVM: PPC: Book3S HV: XIVE: Add a global reset control
+>       KVM: PPC: Book3S HV: XIVE: Add a control to sync the sources
+>       KVM: PPC: Book3S HV: XIVE: Add a control to dirty the XIVE EQ pages
+>       KVM: PPC: Book3S HV: XIVE: Add get/set accessors for the VP XIVE state
+>       KVM: Introduce a 'mmap' method for KVM devices
+>       KVM: PPC: Book3S HV: XIVE: Add a TIMA mapping
+>       KVM: PPC: Book3S HV: XIVE: Add a mapping for the source ESB pages
+>       KVM: PPC: Book3S HV: XIVE: Add passthrough support
+>       KVM: PPC: Book3S HV: XIVE: Activate XIVE exploitation mode
+>       KVM: Introduce a 'release' method for KVM devices
+>       KVM: PPC: Book3S HV: XIVE: Replace the 'destroy' method by a 'release' method
+> 
+> Michael Neuling (1):
+>       powerpc: Add force enable of DAWR on P9 option
+> 
+> Palmer Dabbelt (1):
+>       KVM: PPC: Book3S HV: smb->smp comment fixup
+> 
+> Paul Mackerras (6):
+>       KVM: PPC: Book3S HV: Fix XICS-on-XIVE H_IPI when priority = 0
+>       KVM: PPC: Book3S HV: Move HPT guest TLB flushing to C code
+>       KVM: PPC: Book3S HV: Flush TLB on secondary radix threads
+>       Merge remote-tracking branch 'remotes/powerpc/topic/ppc-kvm' into kvm-ppc-next
+>       KVM: PPC: Book3S HV: XIVE: Prevent races when releasing device
+>       KVM: PPC: Book3S HV: XIVE: Clear escalation interrupt pointers on device close
+> 
+> Suraj Jitindar Singh (4):
+>       KVM: PPC: Book3S HV: Implement virtual mode H_PAGE_INIT handler
+>       KVM: PPC: Book3S HV: Implement real mode H_PAGE_INIT handler
+>       KVM: PPC: Book3S HV: Handle virtual mode in XIVE VCPU push code
+>       KVM: PPC: Book3S HV: Save/restore vrsave register in kvmhv_p9_guest_entry()
+> 
+>  Documentation/powerpc/DAWR-POWER9.txt      |   32 +
+>  Documentation/virtual/kvm/api.txt          |   10 +
+>  Documentation/virtual/kvm/devices/xive.txt |  197 +++++
+>  arch/powerpc/include/asm/hw_breakpoint.h   |    8 +
+>  arch/powerpc/include/asm/kvm_host.h        |   11 +-
+>  arch/powerpc/include/asm/kvm_ppc.h         |   41 +-
+>  arch/powerpc/include/asm/opal-api.h        |    7 +-
+>  arch/powerpc/include/asm/opal.h            |    7 +
+>  arch/powerpc/include/asm/xive.h            |   17 +
+>  arch/powerpc/include/uapi/asm/kvm.h        |   46 +
+>  arch/powerpc/kernel/hw_breakpoint.c        |   62 +-
+>  arch/powerpc/kernel/process.c              |    9 +-
+>  arch/powerpc/kernel/ptrace.c               |    3 +-
+>  arch/powerpc/kvm/Makefile                  |    2 +-
+>  arch/powerpc/kvm/book3s.c                  |   42 +-
+>  arch/powerpc/kvm/book3s_64_vio.c           |   96 ++-
+>  arch/powerpc/kvm/book3s_64_vio_hv.c        |  105 ++-
+>  arch/powerpc/kvm/book3s_hv.c               |  155 ++--
+>  arch/powerpc/kvm/book3s_hv_builtin.c       |   57 ++
+>  arch/powerpc/kvm/book3s_hv_rm_mmu.c        |  144 ++++
+>  arch/powerpc/kvm/book3s_hv_rmhandlers.S    |  103 +--
+>  arch/powerpc/kvm/book3s_xive.c             |  250 ++++--
+>  arch/powerpc/kvm/book3s_xive.h             |   37 +
+>  arch/powerpc/kvm/book3s_xive_native.c      | 1249 ++++++++++++++++++++++++++++
+>  arch/powerpc/kvm/book3s_xive_template.c    |   78 +-
+>  arch/powerpc/kvm/powerpc.c                 |   37 +
+>  arch/powerpc/platforms/powernv/opal-call.c |    3 +
+>  arch/powerpc/sysdev/xive/native.c          |  110 +++
+>  include/linux/kvm_host.h                   |   10 +
+>  include/uapi/linux/kvm.h                   |    3 +
+>  virt/kvm/kvm_main.c                        |   24 +
+>  31 files changed, 2670 insertions(+), 285 deletions(-)
+>  create mode 100644 Documentation/virtual/kvm/devices/xive.txt
+>  create mode 100644 arch/powerpc/kvm/book3s_xive_native.c
