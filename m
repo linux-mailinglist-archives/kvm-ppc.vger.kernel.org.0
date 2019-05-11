@@ -2,171 +2,125 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CB1019567
-	for <lists+kvm-ppc@lfdr.de>; Fri, 10 May 2019 00:48:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABFEC1A81C
+	for <lists+kvm-ppc@lfdr.de>; Sat, 11 May 2019 16:32:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726839AbfEIWr5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 9 May 2019 18:47:57 -0400
-Received: from ozlabs.org ([203.11.71.1]:58977 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726710AbfEIWr4 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 9 May 2019 18:47:56 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 450T562HTQz9s7h; Fri, 10 May 2019 08:47:54 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1557442074; bh=lhEqPifvK3jxTNbX68BGTn3nBXN1zLT33EbkUjW90gk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YjVvP41NwFPgaMNZyFzu+/T2+DNtnJf3ly+n+bzal6UoHOeKiu3zzwa7l5tE/IhXs
-         vRklwuI/l4CVEauUYw5Ir02SesfR9CZM2fB9n9i1WA1ppedlcsP7V6xKdBZ6M8LNgK
-         t2bAYN3jsOXw6JcDxnw9tfEEgnbi2c7sbhbhoRDRNl9lc3YJOrEA4UUvkzpbyERjq/
-         1f2Ve90EcE3vTOYMFcegAVx0YSmCyLWUO92rUjotb2YlKpQNSk0yxcpkPsmsy2ARTv
-         kzW8DAb9Wa2BQFp0ETSggmozP86Su9IFyYUXxAfOEF3F/OskSxBDHf6umRK51xQBna
-         lCuDfK8Y1mPrg==
-Date:   Fri, 10 May 2019 08:46:09 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.2-1 tag
-Message-ID: <20190509224609.GA5685@blackberry>
-References: <20190502040646.GA3661@blackberry>
+        id S1726149AbfEKOcW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 11 May 2019 10:32:22 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:46784 "EHLO
+        mail.default.ilande.uk0.bigv.io" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726147AbfEKOcW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 11 May 2019 10:32:22 -0400
+X-Greylist: delayed 1405 seconds by postgrey-1.27 at vger.kernel.org; Sat, 11 May 2019 10:32:21 EDT
+Received: from host86-177-156-188.range86-177.btcentralplus.com ([86.177.156.188] helo=[192.168.1.65])
+        by mail.default.ilande.uk0.bigv.io with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.89)
+        (envelope-from <mark.cave-ayland@ilande.co.uk>)
+        id 1hPSfe-000657-VR; Sat, 11 May 2019 15:08:15 +0100
+To:     kvm-ppc@vger.kernel.org
+From:   Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Cc:     paulus@ozlabs.org
+Message-ID: <e84fd80c-d6a6-8f19-a4e1-ed309fa68aa9@ilande.co.uk>
+Date:   Sat, 11 May 2019 15:08:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190502040646.GA3661@blackberry>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-SA-Exim-Connect-IP: 86.177.156.188
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on
+        mail.default.ilande.uk0.bigv.io
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.9 required=5.0 tests=ALL_TRUSTED,BAYES_00
+        autolearn=ham autolearn_force=no version=3.4.2
+Subject: KVM: Book3S PR: unbreaking software breakpoints
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, May 02, 2019 at 02:06:46PM +1000, Paul Mackerras wrote:
-> Paolo or Radim,
-> 
-> Please do a pull from my kvm-ppc-next-5.2-1 tag to get a PPC update
-> for 5.2.  The main new feature here is that we can now let guests
-> access the POWER9 XIVE interrupt controller directly for things like
-> acknowledge, EOI, enable and disable on interrupts, rather than
-> requiring guests to do hypercalls for these operations.
-> 
-> I have merged in the topic/ppc-kvm branch from the powerpc tree
-> because one of the patches there is a prerequisite for the XIVE patch
-> series.  That's why there are changes to arch/powerpc/kernel in the
-> diffstat.
-> 
-> Stephen Rothwell noted a conflict between my tree and the kvm-arm tree
-> because we have both allocated new capability numbers.
-> 
-> The XIVE patch series also modifies generic KVM code to add mmap and
-> release methods on KVM devices.
-> 
-> Thanks,
-> Paul.
+Hi all,
 
-Ping?
+Whilst trying to investigate some issues with MacOS under KVM PR I noticed that when
+setting software breakpoints the KVM VCPU would stop as requested, but QEMU's gdbstub
+would hang indefinitely.
 
-> The following changes since commit 345077c8e172c255ea0707214303ccd099e5656b:
-> 
->   KVM: PPC: Book3S: Protect memslots while validating user address (2019-04-05 14:37:24 +1100)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.2-1
-> 
-> for you to fetch changes up to 0caecf5b00199636eb2d32201199ecd6be52558d:
-> 
->   KVM: PPC: Book3S HV: XIVE: Clear escalation interrupt pointers on device close (2019-04-30 19:41:01 +1000)
-> 
-> ----------------------------------------------------------------
-> PPC KVM update for 5.2
-> 
-> * Support for guests to access the new POWER9 XIVE interrupt controller
->   hardware directly, reducing interrupt latency and overhead for guests.
-> 
-> * In-kernel implementation of the H_PAGE_INIT hypercall.
-> 
-> * Reduce memory usage of sparsely-populated IOMMU tables.
-> 
-> * Several bug fixes.
-> 
-> ----------------------------------------------------------------
-> Alexey Kardashevskiy (3):
->       KVM: PPC: Book3S HV: Fix lockdep warning when entering the guest
->       KVM: PPC: Book3S HV: Avoid lockdep debugging in TCE realmode handlers
->       KVM: PPC: Book3S: Allocate guest TCEs on demand too
-> 
-> Cédric Le Goater (17):
->       powerpc/xive: add OPAL extensions for the XIVE native exploitation support
->       KVM: PPC: Book3S HV: Add a new KVM device for the XIVE native exploitation mode
->       KVM: PPC: Book3S HV: XIVE: Introduce a new capability KVM_CAP_PPC_IRQ_XIVE
->       KVM: PPC: Book3S HV: XIVE: add a control to initialize a source
->       KVM: PPC: Book3S HV: XIVE: Add a control to configure a source
->       KVM: PPC: Book3S HV: XIVE: Add controls for the EQ configuration
->       KVM: PPC: Book3S HV: XIVE: Add a global reset control
->       KVM: PPC: Book3S HV: XIVE: Add a control to sync the sources
->       KVM: PPC: Book3S HV: XIVE: Add a control to dirty the XIVE EQ pages
->       KVM: PPC: Book3S HV: XIVE: Add get/set accessors for the VP XIVE state
->       KVM: Introduce a 'mmap' method for KVM devices
->       KVM: PPC: Book3S HV: XIVE: Add a TIMA mapping
->       KVM: PPC: Book3S HV: XIVE: Add a mapping for the source ESB pages
->       KVM: PPC: Book3S HV: XIVE: Add passthrough support
->       KVM: PPC: Book3S HV: XIVE: Activate XIVE exploitation mode
->       KVM: Introduce a 'release' method for KVM devices
->       KVM: PPC: Book3S HV: XIVE: Replace the 'destroy' method by a 'release' method
-> 
-> Michael Neuling (1):
->       powerpc: Add force enable of DAWR on P9 option
-> 
-> Palmer Dabbelt (1):
->       KVM: PPC: Book3S HV: smb->smp comment fixup
-> 
-> Paul Mackerras (6):
->       KVM: PPC: Book3S HV: Fix XICS-on-XIVE H_IPI when priority = 0
->       KVM: PPC: Book3S HV: Move HPT guest TLB flushing to C code
->       KVM: PPC: Book3S HV: Flush TLB on secondary radix threads
->       Merge remote-tracking branch 'remotes/powerpc/topic/ppc-kvm' into kvm-ppc-next
->       KVM: PPC: Book3S HV: XIVE: Prevent races when releasing device
->       KVM: PPC: Book3S HV: XIVE: Clear escalation interrupt pointers on device close
-> 
-> Suraj Jitindar Singh (4):
->       KVM: PPC: Book3S HV: Implement virtual mode H_PAGE_INIT handler
->       KVM: PPC: Book3S HV: Implement real mode H_PAGE_INIT handler
->       KVM: PPC: Book3S HV: Handle virtual mode in XIVE VCPU push code
->       KVM: PPC: Book3S HV: Save/restore vrsave register in kvmhv_p9_guest_entry()
-> 
->  Documentation/powerpc/DAWR-POWER9.txt      |   32 +
->  Documentation/virtual/kvm/api.txt          |   10 +
->  Documentation/virtual/kvm/devices/xive.txt |  197 +++++
->  arch/powerpc/include/asm/hw_breakpoint.h   |    8 +
->  arch/powerpc/include/asm/kvm_host.h        |   11 +-
->  arch/powerpc/include/asm/kvm_ppc.h         |   41 +-
->  arch/powerpc/include/asm/opal-api.h        |    7 +-
->  arch/powerpc/include/asm/opal.h            |    7 +
->  arch/powerpc/include/asm/xive.h            |   17 +
->  arch/powerpc/include/uapi/asm/kvm.h        |   46 +
->  arch/powerpc/kernel/hw_breakpoint.c        |   62 +-
->  arch/powerpc/kernel/process.c              |    9 +-
->  arch/powerpc/kernel/ptrace.c               |    3 +-
->  arch/powerpc/kvm/Makefile                  |    2 +-
->  arch/powerpc/kvm/book3s.c                  |   42 +-
->  arch/powerpc/kvm/book3s_64_vio.c           |   96 ++-
->  arch/powerpc/kvm/book3s_64_vio_hv.c        |  105 ++-
->  arch/powerpc/kvm/book3s_hv.c               |  155 ++--
->  arch/powerpc/kvm/book3s_hv_builtin.c       |   57 ++
->  arch/powerpc/kvm/book3s_hv_rm_mmu.c        |  144 ++++
->  arch/powerpc/kvm/book3s_hv_rmhandlers.S    |  103 +--
->  arch/powerpc/kvm/book3s_xive.c             |  250 ++++--
->  arch/powerpc/kvm/book3s_xive.h             |   37 +
->  arch/powerpc/kvm/book3s_xive_native.c      | 1249 ++++++++++++++++++++++++++++
->  arch/powerpc/kvm/book3s_xive_template.c    |   78 +-
->  arch/powerpc/kvm/powerpc.c                 |   37 +
->  arch/powerpc/platforms/powernv/opal-call.c |    3 +
->  arch/powerpc/sysdev/xive/native.c          |  110 +++
->  include/linux/kvm_host.h                   |   10 +
->  include/uapi/linux/kvm.h                   |    3 +
->  virt/kvm/kvm_main.c                        |   24 +
->  31 files changed, 2670 insertions(+), 285 deletions(-)
->  create mode 100644 Documentation/virtual/kvm/devices/xive.txt
->  create mode 100644 arch/powerpc/kvm/book3s_xive_native.c
+I eventually traced it down to this code in QEMU's target/ppc/kvm.c:
+
+
+static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
+{
+    CPUState *cs = CPU(cpu);
+    CPUPPCState *env = &cpu->env;
+    struct kvm_debug_exit_arch *arch_info = &run->debug.arch;
+
+    if (cs->singlestep_enabled) {
+        return kvm_handle_singlestep();
+    }
+
+    if (arch_info->status) {
+        return kvm_handle_hw_breakpoint(cs, arch_info);
+    }
+
+    if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
+        return kvm_handle_sw_breakpoint();
+    }
+
+
+The problem here is that with Book3S PR on my Mac hardware, run->debug.arch.status !=
+0 which causes QEMU to think that this is a hardware breakpoint and so the software
+breakpoint doesn't get handled correctly.
+
+For comparison both booke.c and e500_emulate.c set debug.arch.status = 0 for software
+breakpoints, whereas both book3s_hv.c and book3s_pr.c do not. Given that emulate.c
+contains shared code for handling software breakpoints, would the following simple
+patch suffice?
+
+
+diff --git a/arch/powerpc/kvm/emulate.c b/arch/powerpc/kvm/emulate.c
+index 9f5b8c01c4e1..e77becaad5dd 100644
+--- a/arch/powerpc/kvm/emulate.c
++++ b/arch/powerpc/kvm/emulate.c
+@@ -282,6 +282,7 @@ int kvmppc_emulate_instruction(struct kvm_run *run, struct
+kvm_vcpu *vcpu)
+                 */
+                if (inst == KVMPPC_INST_SW_BREAKPOINT) {
+                        run->exit_reason = KVM_EXIT_DEBUG;
++                       run->debug.arch.status = 0;
+                        run->debug.arch.address = kvmppc_get_pc(vcpu);
+                        emulated = EMULATE_EXIT_USER;
+                        advance = 0;
+
+
+ATB,
+
+Mark.
