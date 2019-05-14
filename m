@@ -2,125 +2,116 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F8911BE3D
-	for <lists+kvm-ppc@lfdr.de>; Mon, 13 May 2019 21:57:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F37C31C045
+	for <lists+kvm-ppc@lfdr.de>; Tue, 14 May 2019 03:11:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726007AbfEMT5e (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 13 May 2019 15:57:34 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:49228 "EHLO
-        mail.default.ilande.uk0.bigv.io" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725970AbfEMT5e (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 May 2019 15:57:34 -0400
-Received: from host86-177-156-188.range86-177.btcentralplus.com ([86.177.156.188] helo=[192.168.1.65])
-        by mail.default.ilande.uk0.bigv.io with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <mark.cave-ayland@ilande.co.uk>)
-        id 1hQH46-0000GZ-Du; Mon, 13 May 2019 20:56:52 +0100
-To:     Fabiano Rosas <farosas@linux.ibm.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>, kvm-ppc@vger.kernel.org
-Cc:     paulus@ozlabs.org
-References: <e84fd80c-d6a6-8f19-a4e1-ed309fa68aa9@ilande.co.uk>
- <55e6cabb-bf11-13ae-d499-d9f636a9a096@ozlabs.ru>
- <6911b0f0-76d4-4f19-0205-d6bf70b30586@ilande.co.uk>
- <87woiu1agc.fsf@linux.ibm.com>
-From:   Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <8e337dab-e56b-2711-0fe8-70628d6e295c@ilande.co.uk>
-Date:   Mon, 13 May 2019 20:57:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <87woiu1agc.fsf@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.177.156.188
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on
-        mail.default.ilande.uk0.bigv.io
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=5.0 tests=ALL_TRUSTED,BAYES_00
-        autolearn=ham autolearn_force=no version=3.4.2
-Subject: Re: KVM: Book3S PR: unbreaking software breakpoints
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+        id S1726510AbfENBLe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 13 May 2019 21:11:34 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:35712 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726496AbfENBLd (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 May 2019 21:11:33 -0400
+Received: by mail-pf1-f193.google.com with SMTP id t87so8153623pfa.2;
+        Mon, 13 May 2019 18:11:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=7bWwQ71FfpHzsFq5QCxCU8fpo2zNTpbKmIeTHlAEd/c=;
+        b=rfjaphbxiE4QII48Q8F5DTcu12mxhCzzRUNZ/3/DJ0itxrT3RW7IMch44OjkI2Uty5
+         N6VcHxo5iWtLrPKOVg4ppTbAevkKhf2awAbQ/8AsS1WoMym3gegA0VY7HDCGzOO6nAZo
+         SIYMbAQK4PWjSLE12MUMO3Ch3xRxV21dzLSbUGE+PgEODsdrC3y39ixbYkNuOiENsAMP
+         HoTL1ydRLPvlIwKh6WwEfUdkXJN+WNMmTEbpVeI7LPCncCzLeGSMS6MlhfEZ+GSSkXH1
+         pKj7Ay9zUzWIwSbvuvGtWGqGn9KinSNsfNlxKMY0AmDOx1T7dxXPM1F0OmqzDqMeiW1R
+         Gkgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=7bWwQ71FfpHzsFq5QCxCU8fpo2zNTpbKmIeTHlAEd/c=;
+        b=itR2SS2y3kd5Hz99QI2li/5tw0RQuZmDN+wClhZdKuKJEXPDwMB57ZZLbOnBa8w1+z
+         yA/tD+KwHGBoelAYXU46WI+beByhWeWPbcnt5algRjpPzZzCr5AUGRWCqzkWhFQf2fMu
+         x8dUzmcAKOGIXNof1liVuDbbhcaZ9Qp0OH3PB6GCuykfecNCQeWcr24bZEei1BrgE88J
+         06drByslzEEGBrUfWuPguEauCphyO4tRajJPHxZiT1IgdP8GOOHrXsbjcwEdBk9o+Yb6
+         cf2Yf2aXOKTB44tGbNzqX5/vVtq0dC66ucsPtIAXXBhup6yglY0OtI6A3NPRxa1CX7UP
+         IXKQ==
+X-Gm-Message-State: APjAAAWIglrZ2ZA71k6XBIWUlEu/nOqVqhSGmOrBCILLUy0SMujL5BBw
+        bP9iIYW7vEx+wWZovcFAmHhWHL02
+X-Google-Smtp-Source: APXvYqwHPQMQrrnp4rTTGVcsZe01cI5Ag8q1WhsZNGGgqyKTVaM3E7pv+Mu9BNnxrwYl3UqQxKLmYA==
+X-Received: by 2002:a62:7995:: with SMTP id u143mr37347709pfc.61.1557796293202;
+        Mon, 13 May 2019 18:11:33 -0700 (PDT)
+Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.googlemail.com with ESMTPSA id r124sm15861316pgr.91.2019.05.13.18.11.31
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 13 May 2019 18:11:32 -0700 (PDT)
+Message-ID: <1557796288.1877.0.camel@gmail.com>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Make sure to load LPID for radix
+ VCPUs
+From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org
+Date:   Tue, 14 May 2019 11:11:28 +1000
+In-Reply-To: <20190513045818.GA10318@blackberry>
+References: <20190513045818.GA10318@blackberry>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 13/05/2019 19:22, Fabiano Rosas wrote:
-
-> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
+On Mon, 2019-05-13 at 14:58 +1000, Paul Mackerras wrote:
+> Commit 70ea13f6e609 ("KVM: PPC: Book3S HV: Flush TLB on secondary
+> radix
+> threads", 2019-04-29) aimed to make radix guests that are using the
+> real-mode entry path load the LPID register and flush the TLB in the
+> same place where those things are done for HPT guests.  However, it
+> omitted to remove a branch which branches around that code for radix
+> guests.  The result is that with indep_thread_mode = N, radix guests
+> don't run correctly.  (With indep_threads_mode = Y, which is the
+> default, radix guests use a different entry path.)
 > 
->> On 13/05/2019 07:01, Alexey Kardashevskiy wrote:
->>
->>> On 12/05/2019 00:08, Mark Cave-Ayland wrote:
->>>> Hi all,
->>>>
->>>> Whilst trying to investigate some issues with MacOS under KVM PR I noticed that when
->>>> setting software breakpoints the KVM VCPU would stop as requested, but QEMU's gdbstub
->>>> would hang indefinitely.
->>>
->>> What are you trying to do exactly? Just breakpoints or single stepping?
->>> Anyway, I am cc-ing Fabiano who is fixing single stepping and knows this
->>> code well.
->>
->> I'm currently investigating why MacOS 9 fails to start up on KVM using a G4 Mac Mini,
->> and my starting point is to do a side-by-side comparison with TCG which can boot MacOS 9.
->>
->> I discovered this issue setting a software breakpoint using QEMU's gdbstub and
->> finding that whilst execution of the vCPU paused as expected, QEMU would hang because
->> with run->debug.arch.status != 0 the gdbstub tries to handle it as a hardware
->> breakpoint instead of a software breakpoint causing confusion.
->>
->> I've also tried using single-stepping which mostly works, however during OS startup
->> as soon as I step over a mtsrr1 instruction, I lose the single-stepping and vCPU runs
->> as normal. My suspicion here is that something in the emulation code is losing the
->> MSR_SE bit, but I need to dig a bit deeper here.
+> This removes the offending branch, and also the load and compare that
+> the branch depends on, since the cr7 setting is now unused.
 > 
-> I would expect that a mtsrr1 followed by rfid would cause this sort of
-> behavior since MSR_SE is set/cleared at each guest entry/exit
-> (kvmppc_setup_debug and kvmppc_clear_debug functions) and whatever was
-> copied into SRR1 might not have MSR_SE set.
+> Reported-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Fixes: 70ea13f6e609 ("KVM: PPC: Book3S HV: Flush TLB on secondary
+> radix threads")
+> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
 
-Yes indeed, I can confirm that's the sequence which is causing the issue with
-single-stepping here:
+Tested-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-0x0020f0a4:  8203001c  lwz      r16, 0x1c(r3)
-0x0020f0a8:  7cba03a6  mtspr    0x1a, r5
-0x0020f0ac:  38003000  li       r0, 0x3000
-0x0020f0b0:  7c1b03a6  mtspr    0x1b, r0
-0x0020f0b4:  4c000064  rfi
-
-What would be the right way to handle this? Is it necessary to emulate rfi if
-single-step mode is enabled to ensure MSR_SE is still set?
-
-
-ATB,
-
-Mark.
+> ---
+>  arch/powerpc/kvm/book3s_hv_rmhandlers.S | 6 ------
+>  1 file changed, 6 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> index ad1fc01..ad7bee9 100644
+> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> @@ -581,11 +581,8 @@ kvmppc_hv_entry:
+>  1:
+>  #endif
+>  
+> -	/* Use cr7 as an indication of radix mode */
+>  	ld	r5, HSTATE_KVM_VCORE(r13)
+>  	ld	r9, VCORE_KVM(r5)	/* pointer to struct kvm
+> */
+> -	lbz	r0, KVM_RADIX(r9)
+> -	cmpwi	cr7, r0, 0
+>  
+>  	/*
+>  	 * POWER7/POWER8 host -> guest partition switch code.
+> @@ -608,9 +605,6 @@ kvmppc_hv_entry:
+>  	cmpwi	r6,0
+>  	bne	10f
+>  
+> -	/* Radix has already switched LPID and flushed core TLB */
+> -	bne	cr7, 22f
+> -
+>  	lwz	r7,KVM_LPID(r9)
+>  BEGIN_FTR_SECTION
+>  	ld	r6,KVM_SDR1(r9)
