@@ -2,116 +2,99 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F37C31C045
-	for <lists+kvm-ppc@lfdr.de>; Tue, 14 May 2019 03:11:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92BF81C6C0
+	for <lists+kvm-ppc@lfdr.de>; Tue, 14 May 2019 12:13:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726510AbfENBLe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 13 May 2019 21:11:34 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:35712 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726496AbfENBLd (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 May 2019 21:11:33 -0400
-Received: by mail-pf1-f193.google.com with SMTP id t87so8153623pfa.2;
-        Mon, 13 May 2019 18:11:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=7bWwQ71FfpHzsFq5QCxCU8fpo2zNTpbKmIeTHlAEd/c=;
-        b=rfjaphbxiE4QII48Q8F5DTcu12mxhCzzRUNZ/3/DJ0itxrT3RW7IMch44OjkI2Uty5
-         N6VcHxo5iWtLrPKOVg4ppTbAevkKhf2awAbQ/8AsS1WoMym3gegA0VY7HDCGzOO6nAZo
-         SIYMbAQK4PWjSLE12MUMO3Ch3xRxV21dzLSbUGE+PgEODsdrC3y39ixbYkNuOiENsAMP
-         HoTL1ydRLPvlIwKh6WwEfUdkXJN+WNMmTEbpVeI7LPCncCzLeGSMS6MlhfEZ+GSSkXH1
-         pKj7Ay9zUzWIwSbvuvGtWGqGn9KinSNsfNlxKMY0AmDOx1T7dxXPM1F0OmqzDqMeiW1R
-         Gkgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=7bWwQ71FfpHzsFq5QCxCU8fpo2zNTpbKmIeTHlAEd/c=;
-        b=itR2SS2y3kd5Hz99QI2li/5tw0RQuZmDN+wClhZdKuKJEXPDwMB57ZZLbOnBa8w1+z
-         yA/tD+KwHGBoelAYXU46WI+beByhWeWPbcnt5algRjpPzZzCr5AUGRWCqzkWhFQf2fMu
-         x8dUzmcAKOGIXNof1liVuDbbhcaZ9Qp0OH3PB6GCuykfecNCQeWcr24bZEei1BrgE88J
-         06drByslzEEGBrUfWuPguEauCphyO4tRajJPHxZiT1IgdP8GOOHrXsbjcwEdBk9o+Yb6
-         cf2Yf2aXOKTB44tGbNzqX5/vVtq0dC66ucsPtIAXXBhup6yglY0OtI6A3NPRxa1CX7UP
-         IXKQ==
-X-Gm-Message-State: APjAAAWIglrZ2ZA71k6XBIWUlEu/nOqVqhSGmOrBCILLUy0SMujL5BBw
-        bP9iIYW7vEx+wWZovcFAmHhWHL02
-X-Google-Smtp-Source: APXvYqwHPQMQrrnp4rTTGVcsZe01cI5Ag8q1WhsZNGGgqyKTVaM3E7pv+Mu9BNnxrwYl3UqQxKLmYA==
-X-Received: by 2002:a62:7995:: with SMTP id u143mr37347709pfc.61.1557796293202;
-        Mon, 13 May 2019 18:11:33 -0700 (PDT)
-Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.googlemail.com with ESMTPSA id r124sm15861316pgr.91.2019.05.13.18.11.31
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 13 May 2019 18:11:32 -0700 (PDT)
-Message-ID: <1557796288.1877.0.camel@gmail.com>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Make sure to load LPID for radix
- VCPUs
-From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
+        id S1726362AbfENKNe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 14 May 2019 06:13:34 -0400
+Received: from ozlabs.org ([203.11.71.1]:36593 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726211AbfENKNd (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 14 May 2019 06:13:33 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 453D6M23T0z9sMr; Tue, 14 May 2019 20:13:31 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1557828811; bh=3ZC5rwVVnYc/CNFGC04hlUVgDbQl3qTlacY4Q4Fe3gs=;
+        h=Date:From:To:Cc:Subject:From;
+        b=Rip0U82hdADw5tkVqMuajXtlMgTw+dwy1P0+sNBZyRoenbsb3BC2Y3gDT5138MC0r
+         q8+vP9HWUg34wfHaD1pUcg348FAH7QALuiB1iQ8atbJvFXThwiozhXrJ2lGz7qkoWM
+         KQ8nybgvRLQmYuRvjMaqp3s2JS+6YEe0g43qGRbWU0cmoRLmYqP2RnhYvTbcB5335E
+         ByX6j0EFgYhwndgsGkYi0Spmj/q5T539NwGMPR1GRE4NRQX6VJ0jUgX4quTC+H6IQZ
+         smYbuk4iLW3kzkSyuwXYyRfvOxjGDy8+hK4wjeKPcbdl0GKA75YfX05LmSN4fN3RWD
+         opOz+LG6C5F3w==
+Date:   Tue, 14 May 2019 20:13:27 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
 Cc:     kvm-ppc@vger.kernel.org
-Date:   Tue, 14 May 2019 11:11:28 +1000
-In-Reply-To: <20190513045818.GA10318@blackberry>
-References: <20190513045818.GA10318@blackberry>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Subject: [GIT PULL] Please pull my kvm-ppc-next-5.2-2 tag
+Message-ID: <20190514101327.GA13522@blackberry>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, 2019-05-13 at 14:58 +1000, Paul Mackerras wrote:
-> Commit 70ea13f6e609 ("KVM: PPC: Book3S HV: Flush TLB on secondary
-> radix
-> threads", 2019-04-29) aimed to make radix guests that are using the
-> real-mode entry path load the LPID register and flush the TLB in the
-> same place where those things are done for HPT guests.  However, it
-> omitted to remove a branch which branches around that code for radix
-> guests.  The result is that with indep_thread_mode = N, radix guests
-> don't run correctly.  (With indep_threads_mode = Y, which is the
-> default, radix guests use a different entry path.)
-> 
-> This removes the offending branch, and also the load and compare that
-> the branch depends on, since the cr7 setting is now unused.
-> 
-> Reported-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> Fixes: 70ea13f6e609 ("KVM: PPC: Book3S HV: Flush TLB on secondary
-> radix threads")
-> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+Paolo, Radim,
 
-Tested-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+I have added 3 more commits to my kvm-ppc-next tree, for various fixes
+that have come in recently.  There is one bug fix, one spelling fix,
+and one commit that removes some code that does nothing.  The net
+result is 12 fewer lines of code in the kernel. :)
 
-> ---
->  arch/powerpc/kvm/book3s_hv_rmhandlers.S | 6 ------
->  1 file changed, 6 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> index ad1fc01..ad7bee9 100644
-> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> @@ -581,11 +581,8 @@ kvmppc_hv_entry:
->  1:
->  #endif
->  
-> -	/* Use cr7 as an indication of radix mode */
->  	ld	r5, HSTATE_KVM_VCORE(r13)
->  	ld	r9, VCORE_KVM(r5)	/* pointer to struct kvm
-> */
-> -	lbz	r0, KVM_RADIX(r9)
-> -	cmpwi	cr7, r0, 0
->  
->  	/*
->  	 * POWER7/POWER8 host -> guest partition switch code.
-> @@ -608,9 +605,6 @@ kvmppc_hv_entry:
->  	cmpwi	r6,0
->  	bne	10f
->  
-> -	/* Radix has already switched LPID and flushed core TLB */
-> -	bne	cr7, 22f
-> -
->  	lwz	r7,KVM_LPID(r9)
->  BEGIN_FTR_SECTION
->  	ld	r6,KVM_SDR1(r9)
+If you pull this tag and not the earlier kvm-ppc-next-5.2-1 tag, you
+might want to include the text from that tag in the commit message.
+That text is:
+
+"
+PPC KVM update for 5.2
+
+* Support for guests to access the new POWER9 XIVE interrupt controller
+  hardware directly, reducing interrupt latency and overhead for guests.
+
+* In-kernel implementation of the H_PAGE_INIT hypercall.
+
+* Reduce memory usage of sparsely-populated IOMMU tables.
+
+* Several bug fixes.
+"
+
+Thanks,
+Paul.
+
+The following changes since commit 0caecf5b00199636eb2d32201199ecd6be52558d:
+
+  KVM: PPC: Book3S HV: XIVE: Clear escalation interrupt pointers on device close (2019-04-30 19:41:01 +1000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.2-2
+
+for you to fetch changes up to 4894fbcce856635c9ab79f44e50826e86bb92110:
+
+  KVM: PPC: Book3S: Remove useless checks in 'release' method of KVM device (2019-05-14 12:06:03 +1000)
+
+----------------------------------------------------------------
+Second PPC KVM update for 5.2
+
+- Fix a bug, fix a spelling mistake, remove some useless code.
+
+----------------------------------------------------------------
+Colin Ian King (1):
+      KVM: PPC: Book3S HV: XIVE: Fix spelling mistake "acessing" -> "accessing"
+
+Cédric Le Goater (1):
+      KVM: PPC: Book3S: Remove useless checks in 'release' method of KVM device
+
+Paul Mackerras (1):
+      KVM: PPC: Book3S HV: Make sure to load LPID for radix VCPUs
+
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 6 ------
+ arch/powerpc/kvm/book3s_xive_native.c   | 2 +-
+ virt/kvm/kvm_main.c                     | 6 ------
+ 3 files changed, 1 insertion(+), 13 deletions(-)
