@@ -2,145 +2,176 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 30C91218E7
-	for <lists+kvm-ppc@lfdr.de>; Fri, 17 May 2019 15:11:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B508223A4
+	for <lists+kvm-ppc@lfdr.de>; Sat, 18 May 2019 16:25:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728205AbfEQNLP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 17 May 2019 09:11:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34044 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726556AbfEQNLO (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 17 May 2019 09:11:14 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 01B338553F;
-        Fri, 17 May 2019 13:11:09 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-142.ams2.redhat.com [10.36.117.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 452B078372;
-        Fri, 17 May 2019 13:10:58 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PULL 1/2] powerpc: Allow for a custom decr value
- to be specified to load on decr excp
-To:     Laurent Vivier <lvivier@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org,
-        Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-References: <20190517130305.32123-1-lvivier@redhat.com>
- <20190517130305.32123-2-lvivier@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
- yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
- 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
- tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
- 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
- O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
- 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
- gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
- 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
- zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzRxUaG9tYXMgSHV0
- aCA8dGguaHV0aEBnbXguZGU+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIX
- gAUCUfuWKwIZAQAKCRAu2dd0/nAttbe/EACb9hafyOb2FmhUqeAiBORSsUifFacQ7laVjcgR
- I4um8CSHvxijYftpkM2EdAtmXIKgbNDpQoXcWLXB9lu9mLgTO4DVT00TRR65ikn3FCWcyT74
- ENTOzRKyKLsDCjhXKPblTPIQbYAUCOWElcyAPm0ERd62fA/rKNxgIiNo/l4UODOMoOJm2/Ox
- ZoTckW68Eqv7k9L7m7j+Hn3hoDTjAmcCBJt+j7pOhzWvCbqoNOIH8C8qvPaNlrba+R/K6jkO
- 6jZkTbYQpGIofEQJ/TNn38IsNGpI1ALTHWFtoMxp3j2Imz0REO6dRE2fHRN8sVlHgkoeGhmY
- NbDsDE1jFQOEObFnu0euk//7BXU7tGOHckVAZ8T1smiRPHfQU7UEH2a/grndxJ+PNeM5w7n2
- l+FN3cf2KgPotCK2s9MjSdZA7C5e3rFYO8lqiqTJKvc62vqp3e7B0Kjyy5/QtzSOejBij2QL
- xkKSFNtxIz4MtuxN8e3IDQNxsKry3nF7R4MDvouXlMo6wP9KuyNWb+vFJt9GtbgfDMIFVamp
- ZfhEWzWRJH4VgksENA4K/BzjEHCcbTUb1TFsiB1VRnBPJ0SqlvifnfKk6HcpkDk6Pg8Q5FOJ
- gbNHrdgXsm+m/9GF2zUUr+rOlhVbK23TUqKqPfwnD7uxjpakVcJnsVCFqJpZi1F/ga9IN87B
- TQRR+3lMARAAtp831HniPHb9AuKq3wj83ujZK8lH5RLrfVsB4X1wi47bwo56BqhXpR/zxPTR
- eOFT0gnbw9UkphVc7uk/alnXMDEmgvnuxv89PwIQX6k3qLABeV7ykJQG/WT5HQ6+2DdGtVw3
- 2vjYAPiWQeETsgWRRQMDR0/hwp8s8tL/UodwYCScH6Vxx9pdy353L1fK4Bb9G73a+9FPjp9l
- x+WwKTsltVqSBuSjyZQ3c3EE8qbTidXZxB38JwARH8yN3TX+t65cbBqLl/zRUUUTapHQpUEd
- yoAsHIml32e4q+3xdLtTdlLi7FgPBItSazcqZPjEcYW73UAuLcmQmfJlQ5PkDiuqcitn+KzH
- /1pqsTU7QFZjbmSMJyXY0TDErOFuMOjf20b6arcpEqse1V3IKrb+nqqA2azboRm3pEANLAJw
- iVTwK3qwGRgK5ut6N/Znv20VEHkFUsRAZoOusrIRfR5HFDxlXguAdEz8M/hxXFYYXqOoaCYy
- 6pJxTjy0Y/tIfmS/g9Bnp8qg9wsrsnk0+XRnDVPak++G3Uq9tJPwpJbyO0vcqEI3vAXkAB7X
- VXLzvFwi66RrsPUoDkuzj+aCNumtOePDOCpXQGPpKl+l1aYRMN/+lNSk3+1sVuc2C07WnYyE
- gV/cbEVklPmKrNwu6DeUyD0qI/bVzKMWZAiB1r56hsGeyYcAEQEAAcLBXwQYAQIACQUCUft5
- TAIbDAAKCRAu2dd0/nAttYTwEACLAS/THRqXRKb17PQmKwZHerUvZm2klo+lwQ3wNQBHUJAT
- p2R9ULexyXrJPqjUpy7+voz+FcKiuQBTKyieiIxO46oMxsbXGZ70o3gxjxdYdgimUD6U8PPd
- JH8tfAL4BR5FZNjspcnscN2jgbF4OrpDeOLyBaj6HPmElNPtECHWCaf1xbIFsZxSDGMA6cUh
- 0uX3Q8VI7JN1AR2cfiIRY7NrIlWYucJxyKjO3ivWm69nCtsHiJ0wcF8KlVo7F2eLaufo0K8A
- ynL8SHMF3VEyxsXOP2f1UR9T2Ur30MXcTBpjUxml1TX3RWY5uH89Js/jlIugBwuAmacJ7JYh
- lTg6sF/GNc4nPb4kk2yktNWTade+TzsllYlJPaorD2Qe8qX0iFUhFC6y9+O6mP4ZvWoYapp9
- ezYNuebMgEr93ob1+4sFg3812wNP01WqsGtWCJHnPv/JoonFdMzD/bIkXGEJMk6ks2kxQQZq
- g6Ik/s/vxOfao/xCn8nHt7GwvVy41795hzK6tbSl+BuyCRp0vfPRP34OnK7+jR2nvQpJu/pU
- rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
- WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
-Organization: Red Hat
-Message-ID: <1bea83ba-6c64-3b21-baca-8c414ea86770@redhat.com>
-Date:   Fri, 17 May 2019 15:10:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1728283AbfEROZe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 18 May 2019 10:25:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55598 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727594AbfEROZe (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 18 May 2019 10:25:34 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4IEGXjC146113
+        for <kvm-ppc@vger.kernel.org>; Sat, 18 May 2019 10:25:32 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2sje84rtnv-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Sat, 18 May 2019 10:25:32 -0400
+Received: from localhost
+        by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <cclaudio@linux.ibm.com>;
+        Sat, 18 May 2019 15:25:31 +0100
+Received: from b03cxnp07029.gho.boulder.ibm.com (9.17.130.16)
+        by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Sat, 18 May 2019 15:25:30 +0100
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4IEPSqi7078150
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 18 May 2019 14:25:28 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C46AF7805C;
+        Sat, 18 May 2019 14:25:28 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 03CD27805E;
+        Sat, 18 May 2019 14:25:25 +0000 (GMT)
+Received: from rino.ibm.com (unknown [9.85.168.40])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Sat, 18 May 2019 14:25:25 +0000 (GMT)
+From:   Claudio Carvalho <cclaudio@linux.ibm.com>
+To:     Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@ozlabs.org
+Cc:     Ram Pai <linuxram@us.ibm.com>,
+        Michael Anderson <andmike@linux.ibm.com>,
+        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Subject: [RFC PATCH v2 00/10] kvmppc: Paravirtualize KVM to support ultravisor
+Date:   Sat, 18 May 2019 11:25:14 -0300
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190517130305.32123-2-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 17 May 2019 13:11:09 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051814-0036-0000-0000-00000ABE1AB0
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011118; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01205121; UDB=6.00632701; IPR=6.00986061;
+ MB=3.00026948; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-18 14:25:31
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051814-0037-0000-0000-00004BD7C8D2
+Message-Id: <20190518142524.28528-1-cclaudio@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-18_11:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905180103
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 17/05/2019 15.03, Laurent Vivier wrote:
-> From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> 
-> Currently the handler for a decrementer exception will simply reload the
-> maximum value (0x7FFFFFFF), which will take ~4 seconds to expire again.
-> This means that if a vcpu cedes, it will be ~4 seconds between wakeups.
-> 
-> The h_cede_tm test is testing a known breakage when a guest cedes while
-> suspended. To be sure we cede 500 times to check for the bug. However
-> since it takes ~4 seconds to be woken up once we've ceded, we only get
-> through ~20 iterations before we reach the 90 seconds timeout and the
-> test appears to fail.
-> 
-> Add an option when registering the decrementer handler to specify the
-> value which should be reloaded by the handler, allowing the timeout to be
-> chosen.
-> 
-> Modify the spr test to use the max timeout to preserve existing
-> behaviour.
-> Modify the h_cede_tm test to use a 10ms timeout to ensure we can perform
-> 500 iterations before hitting the 90 second time limit for a test.
-> 
-> This means the h_cede_tm test now succeeds rather than timing out.
-> 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-> [lv: reset initial value to 0x3FFFFFFF]
+POWER platforms that supports the Protected Execution Facility (PEF)
+introduce features that combine hardware facilities and firmware to
+enable secure virtual machines. That includes a new processor mode
+(ultravisor mode) and the ultravisor firmware.
 
-Looks like something went wrong here? There is still the 0x7FFFFFFF in
-the hunk below...
+In PEF enabled systems, the ultravisor firmware runs at a privilege
+level above the hypervisor and also takes control over some system
+resources. The hypervisor, though, can make system calls to access these
+resources. Such system calls, a.k.a. ucalls, are handled by the
+ultravisor firmware.
 
-> diff --git a/powerpc/sprs.c b/powerpc/sprs.c
-> index 6744bd8d8049..3c2d98c9ca99 100644
-> --- a/powerpc/sprs.c
-> +++ b/powerpc/sprs.c
-> @@ -253,6 +253,7 @@ int main(int argc, char **argv)
->  		0x1234567890ABCDEFULL, 0xFEDCBA0987654321ULL,
->  		-1ULL,
->  	};
-> +	static uint64_t decr = 0x7FFFFFFF; /* Max value */
->  
->  	for (i = 1; i < argc; i++) {
->  		if (!strcmp(argv[i], "-w")) {
-> @@ -288,7 +289,7 @@ int main(int argc, char **argv)
->  		(void) getchar();
->  	} else {
->  		puts("Sleeping...\n");
-> -		handle_exception(0x900, &dec_except_handler, NULL);
-> +		handle_exception(0x900, &dec_except_handler, &decr);
->  		asm volatile ("mtdec %0" : : "r" (0x3FFFFFFF));
->  		hcall(H_CEDE);
->  	}
+The processor allows part of the system memory to be configured as
+secure memory, and introduces a a new mode, called secure mode, where
+any software entity in that mode can access secure memory. The
+hypervisor doesn't (and can't) run in secure mode, but a secure guest
+and the ultravisor firmware do.
 
- Thomas
+This patch set adds support for ultravisor calls and do some preparation
+for running secure guests
+
+---
+Changelog:
+---
+v1->v2:
+ - Addressed comments from Paul Mackerras:
+     - Write the pate in HV's table before doing that in UV's
+     - Renamed and better documented the ultravisor header files. Also added
+       all possible return codes for each ucall
+     - Updated the commit message that introduces the MSR_S bit
+     - Moved ultravisor.c and ucall.S to arch/powerpc/kernel
+     - Changed ucall.S to not save CR
+ - Rebased
+ - Changed the patches order
+ - Updated several commit messages
+ - Added FW_FEATURE_ULTRAVISOR to enable use of firmware_has_feature()
+ - Renamed CONFIG_PPC_KVM_UV to CONFIG_PPC_UV and used it to ifdef the ucall
+   handler and the code that populates the powerpc_firmware_features for 
+   ultravisor
+ - Exported the ucall symbol. KVM may be built as module.
+ - Restricted LDBAR access if the ultravisor firmware is available
+ - Dropped patches:
+     "[PATCH 06/13] KVM: PPC: Ultravisor: UV_RESTRICTED_SPR_WRITE ucall"
+     "[PATCH 07/13] KVM: PPC: Ultravisor: UV_RESTRICTED_SPR_READ ucall"
+     "[PATCH 08/13] KVM: PPC: Ultravisor: fix mtspr and mfspr"
+ - Squashed patches:
+     "[PATCH 09/13] KVM: PPC: Ultravisor: Return to UV for hcalls from SVM"
+     "[PATCH 13/13] KVM: PPC: UV: Have fast_guest_return check secure_guest"
+
+Anshuman Khandual (1):
+  KVM: PPC: Ultravisor: Add PPC_UV config option
+
+Claudio Carvalho (1):
+  powerpc: Introduce FW_FEATURE_ULTRAVISOR
+
+Michael Anderson (2):
+  KVM: PPC: Ultravisor: Use UV_WRITE_PATE ucall to register a PATE
+  KVM: PPC: Ultravisor: Check for MSR_S during hv_reset_msr
+
+Paul Mackerras (1):
+  KVM: PPC: Book3S HV: Fixed for running secure guests
+
+Ram Pai (3):
+  KVM: PPC: Ultravisor: Add generic ultravisor call handler
+  KVM: PPC: Ultravisor: Restrict flush of the partition tlb cache
+  KVM: PPC: Ultravisor: Restrict LDBAR access
+
+Sukadev Bhattiprolu (2):
+  KVM: PPC: Ultravisor: Introduce the MSR_S bit
+  KVM: PPC: Ultravisor: Return to UV for hcalls from SVM
+
+ arch/powerpc/Kconfig                         | 20 ++++++
+ arch/powerpc/include/asm/firmware.h          |  5 +-
+ arch/powerpc/include/asm/kvm_host.h          |  1 +
+ arch/powerpc/include/asm/reg.h               |  3 +
+ arch/powerpc/include/asm/ultravisor-api.h    | 24 ++++++++
+ arch/powerpc/include/asm/ultravisor.h        | 49 +++++++++++++++
+ arch/powerpc/kernel/Makefile                 |  1 +
+ arch/powerpc/kernel/asm-offsets.c            |  1 +
+ arch/powerpc/kernel/prom.c                   |  6 ++
+ arch/powerpc/kernel/ucall.S                  | 31 ++++++++++
+ arch/powerpc/kernel/ultravisor.c             | 30 +++++++++
+ arch/powerpc/kvm/book3s_64_mmu_hv.c          |  1 +
+ arch/powerpc/kvm/book3s_hv.c                 |  4 +-
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S      | 40 ++++++++++--
+ arch/powerpc/mm/book3s64/hash_utils.c        |  3 +-
+ arch/powerpc/mm/book3s64/pgtable.c           | 65 +++++++++++++++-----
+ arch/powerpc/mm/book3s64/radix_pgtable.c     |  9 ++-
+ arch/powerpc/perf/imc-pmu.c                  | 64 +++++++++++--------
+ arch/powerpc/platforms/powernv/idle.c        |  6 +-
+ arch/powerpc/platforms/powernv/subcore-asm.S |  4 ++
+ 20 files changed, 311 insertions(+), 56 deletions(-)
+ create mode 100644 arch/powerpc/include/asm/ultravisor-api.h
+ create mode 100644 arch/powerpc/include/asm/ultravisor.h
+ create mode 100644 arch/powerpc/kernel/ucall.S
+ create mode 100644 arch/powerpc/kernel/ultravisor.c
+
+-- 
+2.20.1
+
