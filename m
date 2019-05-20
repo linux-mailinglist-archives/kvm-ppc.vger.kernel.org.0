@@ -2,301 +2,191 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B762423883
-	for <lists+kvm-ppc@lfdr.de>; Mon, 20 May 2019 15:43:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C86A923C2E
+	for <lists+kvm-ppc@lfdr.de>; Mon, 20 May 2019 17:31:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389537AbfETNnr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 20 May 2019 09:43:47 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42972 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389581AbfETNnr (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 20 May 2019 09:43:47 -0400
-Received: by mail-wr1-f66.google.com with SMTP id l2so14675062wrb.9
-        for <kvm-ppc@vger.kernel.org>; Mon, 20 May 2019 06:43:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=QfhVu7i0f7PGhiAFSRgiVL/qFyH0Mxci0ZH8NmzFfa0=;
-        b=cSG3xHTtOjaJiOM7Ed+6SirH38r7jLa6RMJyQ8cikVBUShksM5+jARHQ8eNQ0zPR2Z
-         wQqbHZcCz5dCcI3zZOXpVBkTeSe3E0Y6zqjIpLbWlkEWYPAJy7NrJterSBkvQnMNwOKb
-         J190gcklAkGUYufsOCTdhSG3J+7aW0b1GsPOlG1Akx/hL0R/8hpJ5cbJHhTUdyuhg3ae
-         l24y5mvS52AjQN+T2++e55btF1UYdo7L6Tkqc28SaNb4tVDMT78aTit5XQmQH0U+3cVA
-         b9owDTpj5hm/Pzatka9QGlrJjIn1oqktHOuhUKJ/VZftT8AJHt08R02T68wqu7sR/MyY
-         elAg==
-X-Gm-Message-State: APjAAAUeyyA0cWO6vqRLNOLl9Q+HjUUxhd032w+WAltLIgoBuVDG2cB6
-        cGqEEeyEWZxnY3GS4QgcdCoDCIDLt0DKTQ==
-X-Google-Smtp-Source: APXvYqwhMW4qTcPvNNhvZyg7Nr2Dre/Plb85jfTr32mjs9jJbdCtxJLLOLvDyzXXb3guDMS7YvWryA==
-X-Received: by 2002:a5d:688f:: with SMTP id h15mr7859695wru.44.1558359825304;
-        Mon, 20 May 2019 06:43:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
-        by smtp.gmail.com with ESMTPSA id x22sm16824884wmi.4.2019.05.20.06.43.44
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 06:43:44 -0700 (PDT)
-Subject: Re: [PATCH] KVM: Directly return result from
- kvm_arch_check_processor_compat()
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        James Hogan <jhogan@kernel.org>,
+        id S1732168AbfETPbh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 20 May 2019 11:31:37 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:42886 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731262AbfETPbh (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 20 May 2019 11:31:37 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4KFIvpF144705;
+        Mon, 20 May 2019 15:30:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=SXUGhLzqu7OWeZA9OhKeGyoXs0a41JQJFMDBXBRPnVs=;
+ b=LDlo2JtnsgqOL7mMI0IvGprzfGCy4to4pDQltq8uHsDWRMZ5fLF/GBmkz/DPJG16d8+E
+ AphQu0yTg9IX/1qILAVa03FMrn/a0QMIcIuzCfG1x9RXcoTeKLnRbqhxI/u2l3T5i+FO
+ sRlFZbwrPkqowmNwuDTdSihMC/nz2onnFmvR1s6zTFTGeAGe8PUto+cDd13QJ16HajNT
+ QbD1ITdOCo1utBuP6VExYHrORa14RnduNx9MSIKtrhSnSUFWInHvA7sGpIa4C3sHrOG/
+ WMBhF9YM8ifc8XjdVeMUyguDzXTtV5vjfUAJ6BjL40xkPh1CGr3Uvt8OkhE+dqxwuqE3 /g== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2sj9ft7sn9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 May 2019 15:30:35 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4KFTuDs046722;
+        Mon, 20 May 2019 15:30:34 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2sks18nr8g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 May 2019 15:30:34 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4KFUL5K012431;
+        Mon, 20 May 2019 15:30:21 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 20 May 2019 15:30:21 +0000
+Date:   Mon, 20 May 2019 11:30:20 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        akpm@linux-foundation.org, Alan Tull <atull@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christoph Lameter <cl@linux.com>,
+        Christophe Leroy <christophe.leroy@c-s.fr>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Moritz Fischer <mdf@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-References: <20190420051817.5644-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <050c13ef-6797-bff9-58a9-674f6fee9d72@redhat.com>
-Date:   Mon, 20 May 2019 15:43:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Steve Sistare <steven.sistare@oracle.com>,
+        Wu Hao <hao.wu@intel.com>, linux-mm@kvack.org,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-fpga@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] mm: add account_locked_vm utility function
+Message-ID: <20190520153020.mzvjsjwefwxz6cau@ca-dmjordan1.us.oracle.com>
+References: <20190503201629.20512-1-daniel.m.jordan@oracle.com>
+ <4b42057f-b998-f87c-4e0f-a91abcb366f9@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <20190420051817.5644-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4b42057f-b998-f87c-4e0f-a91abcb366f9@ozlabs.ru>
+User-Agent: NeoMutt/20180323-268-5a959c
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9262 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=18 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905200100
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9262 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=18 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905200100
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 20/04/19 07:18, Sean Christopherson wrote:
-> Add a wrapper to invoke kvm_arch_check_processor_compat() so that the
-> boilerplate ugliness of checking virtualization support on all CPUs is
-> hidden from the arch specific code.  x86's implementation in particular
-> is quite heinous, as it unnecessarily propagates the out-param pattern
-> into kvm_x86_ops.
+On Mon, May 20, 2019 at 04:19:34PM +1000, Alexey Kardashevskiy wrote:
+> On 04/05/2019 06:16, Daniel Jordan wrote:
+> > locked_vm accounting is done roughly the same way in five places, so
+> > unify them in a helper.  Standardize the debug prints, which vary
+> > slightly.
 > 
-> While the x86 specific issue could be resolved solely by changing
-> kvm_x86_ops, make the change for all architectures as returning a value
-> directly is prettier and technically more robust, e.g. s390 doesn't set
-> the out param, which could lead to subtle breakage in the (highly
-> unlikely) scenario where the out-param was not pre-initialized by the
-> caller.
-> 
-> Opportunistically annotate svm_check_processor_compat() with __init.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
-> 
-> Tested on VMX only.
-> 
->  arch/mips/kvm/mips.c             | 4 ++--
->  arch/powerpc/kvm/powerpc.c       | 4 ++--
->  arch/s390/include/asm/kvm_host.h | 1 -
->  arch/s390/kvm/kvm-s390.c         | 5 +++++
->  arch/x86/include/asm/kvm_host.h  | 2 +-
->  arch/x86/kvm/svm.c               | 4 ++--
->  arch/x86/kvm/vmx/vmx.c           | 8 ++++----
->  arch/x86/kvm/x86.c               | 4 ++--
->  include/linux/kvm_host.h         | 2 +-
->  virt/kvm/arm/arm.c               | 4 ++--
->  virt/kvm/kvm_main.c              | 9 ++++++---
->  11 files changed, 27 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index 6d0517ac18e5..1c22b938c550 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -123,9 +123,9 @@ int kvm_arch_hardware_setup(void)
->  	return 0;
->  }
->  
-> -void kvm_arch_check_processor_compat(void *rtn)
-> +int kvm_arch_check_processor_compat(void)
->  {
-> -	*(int *)rtn = 0;
-> +	return 0;
->  }
->  
->  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 92910b7c5bcc..7b7635201739 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -425,9 +425,9 @@ int kvm_arch_hardware_setup(void)
->  	return 0;
->  }
->  
-> -void kvm_arch_check_processor_compat(void *rtn)
-> +int kvm_arch_check_processor_compat(void)
->  {
-> -	*(int *)rtn = kvmppc_core_check_processor_compat();
-> +	return kvmppc_core_check_processor_compat();
->  }
->  
->  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index c47e22bba87f..96a1603ecf10 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -903,7 +903,6 @@ extern int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc);
->  extern int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc);
->  
->  static inline void kvm_arch_hardware_disable(void) {}
-> -static inline void kvm_arch_check_processor_compat(void *rtn) {}
->  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 28f35d2b06cb..4c50bd533ebc 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -221,6 +221,11 @@ int kvm_arch_hardware_enable(void)
->  	return 0;
->  }
->  
-> +int kvm_arch_check_processor_compat(void)
-> +{
-> +	return 0;
-> +}
-> +
->  static void kvm_gmap_notifier(struct gmap *gmap, unsigned long start,
->  			      unsigned long end);
->  
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 8d68ba0cba0c..02ba99ef8c5f 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -995,7 +995,7 @@ struct kvm_x86_ops {
->  	int (*disabled_by_bios)(void);             /* __init */
->  	int (*hardware_enable)(void);
->  	void (*hardware_disable)(void);
-> -	void (*check_processor_compatibility)(void *rtn);
-> +	int (*check_processor_compatibility)(void);/* __init */
->  	int (*hardware_setup)(void);               /* __init */
->  	void (*hardware_unsetup)(void);            /* __exit */
->  	bool (*cpu_has_accelerated_tpr)(void);
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 406b558abfef..236e2fc0edec 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -5859,9 +5859,9 @@ svm_patch_hypercall(struct kvm_vcpu *vcpu, unsigned char *hypercall)
->  	hypercall[2] = 0xd9;
->  }
->  
-> -static void svm_check_processor_compat(void *rtn)
-> +static int __init svm_check_processor_compat(void)
->  {
-> -	*(int *)rtn = 0;
-> +	return 0;
->  }
->  
->  static bool svm_cpu_has_accelerated_tpr(void)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index d8f101b58ab8..7d0733b8f383 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6720,22 +6720,22 @@ static int vmx_vm_init(struct kvm *kvm)
->  	return 0;
->  }
->  
-> -static void __init vmx_check_processor_compat(void *rtn)
-> +static int __init vmx_check_processor_compat(void)
->  {
->  	struct vmcs_config vmcs_conf;
->  	struct vmx_capability vmx_cap;
->  
-> -	*(int *)rtn = 0;
->  	if (setup_vmcs_config(&vmcs_conf, &vmx_cap) < 0)
-> -		*(int *)rtn = -EIO;
-> +		return -EIO;
->  	if (nested)
->  		nested_vmx_setup_ctls_msrs(&vmcs_conf.nested, vmx_cap.ept,
->  					   enable_apicv);
->  	if (memcmp(&vmcs_config, &vmcs_conf, sizeof(struct vmcs_config)) != 0) {
->  		printk(KERN_ERR "kvm: CPU %d feature inconsistency!\n",
->  				smp_processor_id());
-> -		*(int *)rtn = -EIO;
-> +		return -EIO;
->  	}
-> +	return 0;
->  }
->  
->  static u64 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c09507057743..6214c27b0c2a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9042,9 +9042,9 @@ void kvm_arch_hardware_unsetup(void)
->  	kvm_x86_ops->hardware_unsetup();
->  }
->  
-> -void kvm_arch_check_processor_compat(void *rtn)
-> +int kvm_arch_check_processor_compat(void)
->  {
-> -	kvm_x86_ops->check_processor_compatibility(rtn);
-> +	return kvm_x86_ops->check_processor_compatibility();
->  }
->  
->  bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 640a03642766..0ddef348b9b0 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -842,7 +842,7 @@ int kvm_arch_hardware_enable(void);
->  void kvm_arch_hardware_disable(void);
->  int kvm_arch_hardware_setup(void);
->  void kvm_arch_hardware_unsetup(void);
-> -void kvm_arch_check_processor_compat(void *rtn);
-> +int kvm_arch_check_processor_compat(void);
->  int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
->  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
->  int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index be4ec5f3ba5f..67ecadbd8961 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -105,9 +105,9 @@ int kvm_arch_hardware_setup(void)
->  	return 0;
->  }
->  
-> -void kvm_arch_check_processor_compat(void *rtn)
-> +int kvm_arch_check_processor_compat(void)
->  {
-> -	*(int *)rtn = 0;
-> +	return 0;
->  }
->  
->  
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 4bb20f2b2a69..41effae3f9ec 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4135,6 +4135,11 @@ static void kvm_sched_out(struct preempt_notifier *pn,
->  	kvm_arch_vcpu_put(vcpu);
->  }
->  
-> +static void check_processor_compat(void *rtn)
-> +{
-> +	*(int *)rtn = kvm_arch_check_processor_compat();
-> +}
-> +
->  int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
->  		  struct module *module)
->  {
-> @@ -4166,9 +4171,7 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
->  		goto out_free_0a;
->  
->  	for_each_online_cpu(cpu) {
-> -		smp_call_function_single(cpu,
-> -				kvm_arch_check_processor_compat,
-> -				&r, 1);
-> +		smp_call_function_single(cpu, check_processor_compat, &r, 1);
->  		if (r < 0)
->  			goto out_free_1;
->  	}
-> 
+> And I rather liked that prints were different and tell precisely which
+> one of three each printk is.
 
-Queued for 5.3, thanks.
+I'm not following.  One of three...callsites?  But there were five callsites.
 
-Paolo
+Anyway, I added a _RET_IP_ to the debug print so you can differentiate.
+
+> I commented below but in general this seems working.
+> 
+> Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+
+Thanks!  And for the review as well.
+
+> > diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
+> > index 6b64e45a5269..d39a1b830d82 100644
+> > --- a/drivers/vfio/vfio_iommu_spapr_tce.c
+> > +++ b/drivers/vfio/vfio_iommu_spapr_tce.c
+> > @@ -34,49 +35,13 @@
+> >  static void tce_iommu_detach_group(void *iommu_data,
+> >  		struct iommu_group *iommu_group);
+> >  
+> > -static long try_increment_locked_vm(struct mm_struct *mm, long npages)
+> > +static int tce_account_locked_vm(struct mm_struct *mm, unsigned long npages,
+> > +				 bool inc)
+> >  {
+> > -	long ret = 0, locked, lock_limit;
+> > -
+> >  	if (WARN_ON_ONCE(!mm))
+> >  		return -EPERM;
+> 
+> 
+> If this WARN_ON is the only reason for having tce_account_locked_vm()
+> instead of calling account_locked_vm() directly, you can then ditch the
+> check as I have never ever seen this triggered.
+
+Great, will do.
+
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > index d0f731c9920a..15ac76171ccd 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -273,25 +273,14 @@ static int vfio_lock_acct(struct vfio_dma *dma, long npage, bool async)
+> >  		return -ESRCH; /* process exited */
+> >  
+> >  	ret = down_write_killable(&mm->mmap_sem);
+> > -	if (!ret) {
+> > -		if (npage > 0) {
+> > -			if (!dma->lock_cap) {
+> > -				unsigned long limit;
+> > -
+> > -				limit = task_rlimit(dma->task,
+> > -						RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+> > -
+> > -				if (mm->locked_vm + npage > limit)
+> > -					ret = -ENOMEM;
+> > -			}
+> > -		}
+> > +	if (ret)
+> > +		goto out;
+> 
+> 
+> A single "goto" to jump just 3 lines below seems unnecessary.
+
+No strong preference here, I'll take out the goto.
+
+> > +int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc,
+> > +			struct task_struct *task, bool bypass_rlim)
+> > +{
+> > +	unsigned long locked_vm, limit;
+> > +	int ret = 0;
+> > +
+> > +	locked_vm = mm->locked_vm;
+> > +	if (inc) {
+> > +		if (!bypass_rlim) {
+> > +			limit = task_rlimit(task, RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+> > +			if (locked_vm + pages > limit) {
+> > +				ret = -ENOMEM;
+> > +				goto out;
+> > +			}
+> > +		}
+> 
+> Nit:
+> 
+> if (!ret)
+> 
+> and then you don't need "goto out".
+
+Ok, sure.
+
+> > +		mm->locked_vm = locked_vm + pages;
+> > +	} else {
+> > +		WARN_ON_ONCE(pages > locked_vm);
+> > +		mm->locked_vm = locked_vm - pages;
+> 
+> 
+> Can go negative here. Not a huge deal but inaccurate imo.
+
+I hear you, but setting a negative value to zero, as we had done previously,
+doesn't make much sense to me.
