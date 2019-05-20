@@ -2,144 +2,96 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A9DEA22BEB
-	for <lists+kvm-ppc@lfdr.de>; Mon, 20 May 2019 08:12:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6C8C22C32
+	for <lists+kvm-ppc@lfdr.de>; Mon, 20 May 2019 08:37:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730690AbfETGMZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 20 May 2019 02:12:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43274 "EHLO mx1.redhat.com"
+        id S1730784AbfETGhu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 20 May 2019 02:37:50 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:49419 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726741AbfETGMZ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 20 May 2019 02:12:25 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4AA8D8762E;
-        Mon, 20 May 2019 06:12:24 +0000 (UTC)
-Received: from [10.40.205.57] (unknown [10.40.205.57])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 71FAA60C8A;
-        Mon, 20 May 2019 06:12:22 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PULL 1/2] powerpc: Allow for a custom decr value
- to be specified to load on decr excp
-To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
-        Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-References: <20190517130305.32123-1-lvivier@redhat.com>
- <20190517130305.32123-2-lvivier@redhat.com>
- <1bea83ba-6c64-3b21-baca-8c414ea86770@redhat.com>
- <1558327647.5110.0.camel@gmail.com>
-From:   Laurent Vivier <lvivier@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <71f2fcbc-af72-e9e6-c77d-c4db1e04d12d@redhat.com>
-Date:   Mon, 20 May 2019 08:12:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1730783AbfETGht (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 20 May 2019 02:37:49 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 456q2g3Df9z9s6w; Mon, 20 May 2019 16:37:47 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1558334267; bh=PNedFHkkuQzcJ3wxJ8NC9BpfSFJPvCUXblZ49yZlqsc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KlUgt4MgHd3B8BHlYvJ2B1gzSvJM5w7HGDLClWT9F190UJn1IloBUPOZdMcPw9+1i
+         zduKxRZi2RjwJM5k936+UYMn7/H+DusJij3vatSXygoObqaymBjdmfqet6hUoVGRni
+         7spLAe9pxOhQj8ZCrAFBHEhlcKXgQ6vNiyOdQ5WvU+PZgketpJNY7Bl36mHEarVHQz
+         0ph0ZY8SU5KVxWkNzq3kncx1aJ7PS4TIrq4HHi5MDl974BZpb4cUdphDLRRrA4OTgK
+         C3038eCuD+OaBnDfRpgoamTfRdVbPfpd62pS9MSobzdz/Tdzw10THIWNKXoROlcAuy
+         fFhBGDEaNpFZw==
+Date:   Mon, 20 May 2019 16:17:00 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Claudio Carvalho <cclaudio@linux.ibm.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@ozlabs.org, Ram Pai <linuxram@us.ibm.com>,
+        Michael Anderson <andmike@linux.ibm.com>,
+        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Subject: Re: [RFC PATCH v2 08/10] KVM: PPC: Ultravisor: Return to UV for
+ hcalls from SVM
+Message-ID: <20190520061700.GC21382@blackberry>
+References: <20190518142524.28528-1-cclaudio@linux.ibm.com>
+ <20190518142524.28528-9-cclaudio@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1558327647.5110.0.camel@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Mon, 20 May 2019 06:12:24 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190518142524.28528-9-cclaudio@linux.ibm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 20/05/2019 06:47, Suraj Jitindar Singh wrote:
-> On Fri, 2019-05-17 at 15:10 +0200, Thomas Huth wrote:
->> On 17/05/2019 15.03, Laurent Vivier wrote:
->>> From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
->>>
->>> Currently the handler for a decrementer exception will simply
->>> reload the
->>> maximum value (0x7FFFFFFF), which will take ~4 seconds to expire
->>> again.
->>> This means that if a vcpu cedes, it will be ~4 seconds between
->>> wakeups.
->>>
->>> The h_cede_tm test is testing a known breakage when a guest cedes
->>> while
->>> suspended. To be sure we cede 500 times to check for the bug.
->>> However
->>> since it takes ~4 seconds to be woken up once we've ceded, we only
->>> get
->>> through ~20 iterations before we reach the 90 seconds timeout and
->>> the
->>> test appears to fail.
->>>
->>> Add an option when registering the decrementer handler to specify
->>> the
->>> value which should be reloaded by the handler, allowing the timeout
->>> to be
->>> chosen.
->>>
->>> Modify the spr test to use the max timeout to preserve existing
->>> behaviour.
->>> Modify the h_cede_tm test to use a 10ms timeout to ensure we can
->>> perform
->>> 500 iterations before hitting the 90 second time limit for a test.
->>>
->>> This means the h_cede_tm test now succeeds rather than timing out.
->>>
->>> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
->>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
->>> [lv: reset initial value to 0x3FFFFFFF]
->>
->> Looks like something went wrong here? There is still the 0x7FFFFFFF
->> in
->> the hunk below...
+On Sat, May 18, 2019 at 11:25:22AM -0300, Claudio Carvalho wrote:
+> From: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
 > 
-> No, I think this is correct.
-> Max value is ox7FFFFFFF, but the initial value we load via mtdec is the
-> original 0x3FFFFFFF.
+> All hcalls from a secure VM go to the ultravisor from where they are
+> reflected into the HV. When we (HV) complete processing such hcalls,
+> we should return to the UV rather than to the guest kernel.
 
-Yes, that's it.
+This paragraph in the patch description, and the comment in
+book3s_hv_rmhandlers.S, are confusing and possibly misleading in
+focussing on returns from hcalls, when the change is needed for any
+sort of entry to the guest from the hypervisor, whether it is a return
+from an hcall, a return from a hypervisor interrupt, or the first time
+that a guest vCPU is run.
 
-Thanks,
-Laurent
+This paragraph needs to explain that to enter a secure guest, we have
+to go through the ultravisor, therefore we do a ucall when we are
+entering a secure guest.
+
+[snip]
+
+> +/*
+> + * The hcall we just completed was from Ultravisor. Use UV_RETURN
+> + * ultra call to return to the Ultravisor. Results from the hcall
+> + * are already in the appropriate registers (r3:12), except for
+> + * R6,7 which we used as temporary registers above. Restore them,
+> + * and set R0 to the ucall number (UV_RETURN).
+> + */
+
+This needs to say something like "We are entering a secure guest, so
+we have to invoke the ultravisor to do that.  If we are returning from
+a hcall, the results are already ...".
+
+> +ret_to_ultra:
+> +	lwz	r6, VCPU_CR(r4)
+> +	mtcr	r6
+> +	LOAD_REG_IMMEDIATE(r0, UV_RETURN)
+> +	ld	r7, VCPU_GPR(R7)(r4)
+> +	ld	r6, VCPU_GPR(R6)(r4)
+> +	ld	r4, VCPU_GPR(R4)(r4)
+> +	sc	2
+>  
+>  /*
+>   * Enter the guest on a P9 or later system where we have exactly
+> -- 
+> 2.20.1
+
+Paul.
