@@ -2,281 +2,110 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AF9F29126
-	for <lists+kvm-ppc@lfdr.de>; Fri, 24 May 2019 08:43:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 085B52949F
+	for <lists+kvm-ppc@lfdr.de>; Fri, 24 May 2019 11:27:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388631AbfEXGn0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 24 May 2019 02:43:26 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:45358 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388735AbfEXGnW (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 May 2019 02:43:22 -0400
-Received: by mail-pg1-f196.google.com with SMTP id i21so4480077pgi.12
-        for <kvm-ppc@vger.kernel.org>; Thu, 23 May 2019 23:43:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vLgUtLgd34YoqqCTxqxpLbSxwvGV3M2LzlOeHp/1Cec=;
-        b=N5cq2X5sCawY7Z9049rLPwU2gWCT9rIbtsT0Gz4DPk13eQy0LpN2Tna59vDAwMCKzz
-         yntDPC/U/AQk4gBrEMzkYjB7r5K+SY6B47c8qwbFaxDoj1bmL8XacFpGy0WTlr8q7xNO
-         SuryBhMNYUt/Ak5gHuag3fv9upiLR/uTCvmuKpm4e1XxqFEnAXoJst7wRjvlw1rHW/JW
-         3WuI/9UfWTZq9oC3gtgoTqofkQjoiCbCPcagQyPFlsjvgHy7ND/g9q5OZB8HZ6MXXBZC
-         XG1XChwOHdsCuhnpSUrbwPVGVmLJKrxvYh8WofIgx35W/kgfETXtzT1hWmmhxl3oHJ/e
-         9hlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=vLgUtLgd34YoqqCTxqxpLbSxwvGV3M2LzlOeHp/1Cec=;
-        b=V+l4/IAgIuLlmysjmmBiUFA3s2WRy7gBsRCPHYTQZWSkTtSdf5esrERU1O1Z89ZRUR
-         y54K3aLLIifxSAP0XdVHMJ0bTjmkhSH2To0x0K/WK3SJLahxU8bmDYPPSIYAUdoPq90y
-         4xh3XluUFaP9tAFJZvDzbHG9ZzdyAA8MV3v5ZitCUp90mZOZ2CDHAKcz2j5pdFQZT5od
-         5N7YI33rcdkx6S/jSSitYBVz4NQqLuXJGoPSjSCrfh4qoun1BQ2rBdEeyTzymLEk31WY
-         MFYdiMmSy2iM/sT6mRvloI5dA4B90x95euw5DNGXlwzb6vZlmFXfBEfgKl/lxgFU8ZWm
-         PEHg==
-X-Gm-Message-State: APjAAAUXZFudRoK3FPKEXxVann8eHWyaVAoH+taWQ3s35QT/1whWRJws
-        o83Rfz4+t93To4elZHEcqBA3jQ==
-X-Google-Smtp-Source: APXvYqxqG0xxpSvgFOlx2V/WqlpEOtxoiKjPS2ntAlHEUsHs+ZwOtWxQSUfVvqJLa+cBrl/pKYMGJg==
-X-Received: by 2002:a63:5c1b:: with SMTP id q27mr104461120pgb.127.1558680200104;
-        Thu, 23 May 2019 23:43:20 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id n27sm2608734pfb.129.2019.05.23.23.43.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 23 May 2019 23:43:19 -0700 (PDT)
-Subject: Re: [PATCH] mm: add account_locked_vm utility function
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     akpm@linux-foundation.org, Alan Tull <atull@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christoph Lameter <cl@linux.com>,
-        Christophe Leroy <christophe.leroy@c-s.fr>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Moritz Fischer <mdf@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Wu Hao <hao.wu@intel.com>, linux-mm@kvack.org,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-fpga@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190503201629.20512-1-daniel.m.jordan@oracle.com>
- <4b42057f-b998-f87c-4e0f-a91abcb366f9@ozlabs.ru>
- <20190520153020.mzvjsjwefwxz6cau@ca-dmjordan1.us.oracle.com>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-Openpgp: preference=signencrypt
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <de375582-2c35-8e8a-4737-c816052a8e58@ozlabs.ru>
-Date:   Fri, 24 May 2019 16:43:10 +1000
+        id S2389745AbfEXJ1I (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 24 May 2019 05:27:08 -0400
+Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:50975 "EHLO
+        4.mo177.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389724AbfEXJ1I (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 May 2019 05:27:08 -0400
+X-Greylist: delayed 583 seconds by postgrey-1.27 at vger.kernel.org; Fri, 24 May 2019 05:27:06 EDT
+Received: from player728.ha.ovh.net (unknown [10.108.54.72])
+        by mo177.mail-out.ovh.net (Postfix) with ESMTP id 8E479F6CAF
+        for <kvm-ppc@vger.kernel.org>; Fri, 24 May 2019 11:17:21 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+        (Authenticated sender: clg@kaod.org)
+        by player728.ha.ovh.net (Postfix) with ESMTPSA id AC82160B1AD8;
+        Fri, 24 May 2019 09:17:18 +0000 (UTC)
+Subject: Re: [PATCH 0/4] KVM: PPC: Book3S: Fix potential deadlocks
+To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org
+References: <20190523063424.GB19655@blackberry>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <3633e945-7126-c655-587d-e09eafb9f9f3@kaod.org>
+Date:   Fri, 24 May 2019 11:17:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190520153020.mzvjsjwefwxz6cau@ca-dmjordan1.us.oracle.com>
+In-Reply-To: <20190523063424.GB19655@blackberry>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13159799586557299671
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudduiedgudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenuc
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-
-
-On 21/05/2019 01:30, Daniel Jordan wrote:
-> On Mon, May 20, 2019 at 04:19:34PM +1000, Alexey Kardashevskiy wrote:
->> On 04/05/2019 06:16, Daniel Jordan wrote:
->>> locked_vm accounting is done roughly the same way in five places, so
->>> unify them in a helper.  Standardize the debug prints, which vary
->>> slightly.
->>
->> And I rather liked that prints were different and tell precisely which
->> one of three each printk is.
+On 5/23/19 8:34 AM, Paul Mackerras wrote:
+> Recent reports of lockdep splats in the HV KVM code revealed that it
+> was taking the kvm->lock mutex in several contexts where a vcpu mutex
+> was already held.  Lockdep has only started warning since I added code
+> to take the vcpu mutexes in the XIVE device release functions, but
+> since Documentation/virtual/kvm/locking.txt specifies that the vcpu
+> mutexes nest inside kvm->lock, it seems that the new code is correct
+> and it is most of the old uses of kvm->lock that are wrong.
 > 
-> I'm not following.  One of three...callsites?  But there were five callsites.
+> This series should fix the problems, by adding new mutexes that nest
+> inside the vcpu mutexes and using them instead of kvm->lock.
+
+Hello,
+
+I guest this warning when running a guest with this patchset :
+
+[  228.686461] DEBUG_LOCKS_WARN_ON(current->hardirqs_enabled)
+[  228.686480] WARNING: CPU: 116 PID: 3803 at ../kernel/locking/lockdep.c:4219 check_flags.part.23+0x21c/0x270
+[  228.686544] Modules linked in: vhost_net vhost xt_CHECKSUM iptable_mangle xt_MASQUERADE iptable_nat nf_nat xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ipt_REJECT nf_reject_ipv4 tun bridge stp llc ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter fuse kvm_hv kvm at24 ipmi_powernv regmap_i2c ipmi_devintf uio_pdrv_genirq ofpart ipmi_msghandler uio powernv_flash mtd ibmpowernv opal_prd ip_tables ext4 mbcache jbd2 btrfs zstd_decompress zstd_compress raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx libcrc32c xor raid6_pq raid1 raid0 ses sd_mod enclosure scsi_transport_sas ast i2c_opal i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm i40e e1000e cxl aacraid tg3 drm_panel_orientation_quirks i2c_core
+[  228.686859] CPU: 116 PID: 3803 Comm: qemu-system-ppc Kdump: loaded Not tainted 5.2.0-rc1-xive+ #42
+[  228.686911] NIP:  c0000000001b394c LR: c0000000001b3948 CTR: c000000000bfad20
+[  228.686963] REGS: c000200cdb50f570 TRAP: 0700   Not tainted  (5.2.0-rc1-xive+)
+[  228.687001] MSR:  9000000002823033 <SF,HV,VEC,VSX,FP,ME,IR,DR,RI,LE>  CR: 48222222  XER: 20040000
+[  228.687060] CFAR: c000000000116db0 IRQMASK: 1 
+[  228.687060] GPR00: c0000000001b3948 c000200cdb50f800 c0000000015e7600 000000000000002e 
+[  228.687060] GPR04: 0000000000000001 c0000000001c71a0 000000006e655f73 72727563284e4f5f 
+[  228.687060] GPR08: 0000200e60680000 0000000000000000 c000200cdb486180 0000000000000000 
+[  228.687060] GPR12: 0000000000002000 c000200fff61a680 0000000000000000 00007fffb75c0000 
+[  228.687060] GPR16: 0000000000000000 0000000000000000 c0000000017d6900 c000000001124900 
+[  228.687060] GPR20: 0000000000000074 c008000006916f68 0000000000000074 0000000000000074 
+[  228.687060] GPR24: ffffffffffffffff ffffffffffffffff 0000000000000003 c000200d4b600000 
+[  228.687060] GPR28: c000000001627e58 c000000001489908 c000000001627e58 c000000002304de0 
+[  228.687377] NIP [c0000000001b394c] check_flags.part.23+0x21c/0x270
+[  228.687415] LR [c0000000001b3948] check_flags.part.23+0x218/0x270
+[  228.687466] Call Trace:
+[  228.687488] [c000200cdb50f800] [c0000000001b3948] check_flags.part.23+0x218/0x270 (unreliable)
+[  228.687542] [c000200cdb50f870] [c0000000001b6548] lock_is_held_type+0x188/0x1c0
+[  228.687595] [c000200cdb50f8d0] [c0000000001d939c] rcu_read_lock_sched_held+0xdc/0x100
+[  228.687646] [c000200cdb50f900] [c0000000001dd704] rcu_note_context_switch+0x304/0x340
+[  228.687701] [c000200cdb50f940] [c0080000068fcc58] kvmhv_run_single_vcpu+0xdb0/0x1120 [kvm_hv]
+[  228.687756] [c000200cdb50fa20] [c0080000068fd5b0] kvmppc_vcpu_run_hv+0x5e8/0xe40 [kvm_hv]
+[  228.687816] [c000200cdb50faf0] [c0080000071797dc] kvmppc_vcpu_run+0x34/0x48 [kvm]
+[  228.687863] [c000200cdb50fb10] [c0080000071755dc] kvm_arch_vcpu_ioctl_run+0x244/0x420 [kvm]
+[  228.687916] [c000200cdb50fba0] [c008000007165ccc] kvm_vcpu_ioctl+0x424/0x838 [kvm]
+[  228.687957] [c000200cdb50fd10] [c000000000433a24] do_vfs_ioctl+0xd4/0xcd0
+[  228.687995] [c000200cdb50fdb0] [c000000000434724] ksys_ioctl+0x104/0x120
+[  228.688033] [c000200cdb50fe00] [c000000000434768] sys_ioctl+0x28/0x80
+[  228.688072] [c000200cdb50fe20] [c00000000000b888] system_call+0x5c/0x70
+[  228.688109] Instruction dump:
+[  228.688142] 4bf6342d 60000000 0fe00000 e8010080 7c0803a6 4bfffe60 3c82ff87 3c62ff87 
+[  228.688196] 388472d0 3863d738 4bf63405 60000000 <0fe00000> 4bffff4c 3c82ff87 3c62ff87 
+[  228.688251] irq event stamp: 205
+[  228.688287] hardirqs last  enabled at (205): [<c0080000068fc1b4>] kvmhv_run_single_vcpu+0x30c/0x1120 [kvm_hv]
+[  228.688344] hardirqs last disabled at (204): [<c0080000068fbff0>] kvmhv_run_single_vcpu+0x148/0x1120 [kvm_hv]
+[  228.688412] softirqs last  enabled at (180): [<c000000000c0b2ac>] __do_softirq+0x4ac/0x5d4
+[  228.688464] softirqs last disabled at (169): [<c000000000122aa8>] irq_exit+0x1f8/0x210
+[  228.688513] ---[ end trace eb16f6260022a812 ]---
+[  228.688548] possible reason: unannotated irqs-off.
+[  228.688571] irq event stamp: 205
+[  228.688607] hardirqs last  enabled at (205): [<c0080000068fc1b4>] kvmhv_run_single_vcpu+0x30c/0x1120 [kvm_hv]
+[  228.688664] hardirqs last disabled at (204): [<c0080000068fbff0>] kvmhv_run_single_vcpu+0x148/0x1120 [kvm_hv]
+[  228.688719] softirqs last  enabled at (180): [<c000000000c0b2ac>] __do_softirq+0x4ac/0x5d4
+[  228.688758] softirqs last disabled at (169): [<c000000000122aa8>] irq_exit+0x1f8/0x210
 
 
-Well, 3 of them are mine, I was referring to them :)
 
-
-> Anyway, I added a _RET_IP_ to the debug print so you can differentiate.
-
-
-I did not know that existed, cool!
-
-
-> 
->> I commented below but in general this seems working.
->>
->> Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> 
-> Thanks!  And for the review as well.
-> 
->>> diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
->>> index 6b64e45a5269..d39a1b830d82 100644
->>> --- a/drivers/vfio/vfio_iommu_spapr_tce.c
->>> +++ b/drivers/vfio/vfio_iommu_spapr_tce.c
->>> @@ -34,49 +35,13 @@
->>>  static void tce_iommu_detach_group(void *iommu_data,
->>>  		struct iommu_group *iommu_group);
->>>  
->>> -static long try_increment_locked_vm(struct mm_struct *mm, long npages)
->>> +static int tce_account_locked_vm(struct mm_struct *mm, unsigned long npages,
->>> +				 bool inc)
->>>  {
->>> -	long ret = 0, locked, lock_limit;
->>> -
->>>  	if (WARN_ON_ONCE(!mm))
->>>  		return -EPERM;
->>
->>
->> If this WARN_ON is the only reason for having tce_account_locked_vm()
->> instead of calling account_locked_vm() directly, you can then ditch the
->> check as I have never ever seen this triggered.
-> 
-> Great, will do.
-> 
->>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->>> index d0f731c9920a..15ac76171ccd 100644
->>> --- a/drivers/vfio/vfio_iommu_type1.c
->>> +++ b/drivers/vfio/vfio_iommu_type1.c
->>> @@ -273,25 +273,14 @@ static int vfio_lock_acct(struct vfio_dma *dma, long npage, bool async)
->>>  		return -ESRCH; /* process exited */
->>>  
->>>  	ret = down_write_killable(&mm->mmap_sem);
->>> -	if (!ret) {
->>> -		if (npage > 0) {
->>> -			if (!dma->lock_cap) {
->>> -				unsigned long limit;
->>> -
->>> -				limit = task_rlimit(dma->task,
->>> -						RLIMIT_MEMLOCK) >> PAGE_SHIFT;
->>> -
->>> -				if (mm->locked_vm + npage > limit)
->>> -					ret = -ENOMEM;
->>> -			}
->>> -		}
->>> +	if (ret)
->>> +		goto out;
->>
->>
->> A single "goto" to jump just 3 lines below seems unnecessary.
-> 
-> No strong preference here, I'll take out the goto.
-> 
->>> +int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc,
->>> +			struct task_struct *task, bool bypass_rlim)
->>> +{
->>> +	unsigned long locked_vm, limit;
->>> +	int ret = 0;
->>> +
->>> +	locked_vm = mm->locked_vm;
->>> +	if (inc) {
->>> +		if (!bypass_rlim) {
->>> +			limit = task_rlimit(task, RLIMIT_MEMLOCK) >> PAGE_SHIFT;
->>> +			if (locked_vm + pages > limit) {
->>> +				ret = -ENOMEM;
->>> +				goto out;
->>> +			}
->>> +		}
->>
->> Nit:
->>
->> if (!ret)
->>
->> and then you don't need "goto out".
-> 
-> Ok, sure.
-> 
->>> +		mm->locked_vm = locked_vm + pages;
->>> +	} else {
->>> +		WARN_ON_ONCE(pages > locked_vm);
->>> +		mm->locked_vm = locked_vm - pages;
->>
->>
->> Can go negative here. Not a huge deal but inaccurate imo.
-> 
-> I hear you, but setting a negative value to zero, as we had done previously,
-> doesn't make much sense to me.
-
-
-Ok then. I have not seen these WARN_ON for a very long time anyway.
-
-
--- 
-Alexey
+C.
