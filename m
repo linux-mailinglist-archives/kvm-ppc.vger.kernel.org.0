@@ -2,110 +2,251 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 085B52949F
-	for <lists+kvm-ppc@lfdr.de>; Fri, 24 May 2019 11:27:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38A992991C
+	for <lists+kvm-ppc@lfdr.de>; Fri, 24 May 2019 15:37:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389745AbfEXJ1I (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 24 May 2019 05:27:08 -0400
-Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:50975 "EHLO
-        4.mo177.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389724AbfEXJ1I (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 May 2019 05:27:08 -0400
-X-Greylist: delayed 583 seconds by postgrey-1.27 at vger.kernel.org; Fri, 24 May 2019 05:27:06 EDT
-Received: from player728.ha.ovh.net (unknown [10.108.54.72])
-        by mo177.mail-out.ovh.net (Postfix) with ESMTP id 8E479F6CAF
-        for <kvm-ppc@vger.kernel.org>; Fri, 24 May 2019 11:17:21 +0200 (CEST)
+        id S2403844AbfEXNhi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 24 May 2019 09:37:38 -0400
+Received: from 14.mo7.mail-out.ovh.net ([178.33.251.19]:41953 "EHLO
+        14.mo7.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391124AbfEXNhi (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 May 2019 09:37:38 -0400
+Received: from player737.ha.ovh.net (unknown [10.108.57.16])
+        by mo7.mail-out.ovh.net (Postfix) with ESMTP id DF6E511E6B0
+        for <kvm-ppc@vger.kernel.org>; Fri, 24 May 2019 15:20:41 +0200 (CEST)
 Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
         (Authenticated sender: clg@kaod.org)
-        by player728.ha.ovh.net (Postfix) with ESMTPSA id AC82160B1AD8;
-        Fri, 24 May 2019 09:17:18 +0000 (UTC)
-Subject: Re: [PATCH 0/4] KVM: PPC: Book3S: Fix potential deadlocks
-To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-References: <20190523063424.GB19655@blackberry>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <3633e945-7126-c655-587d-e09eafb9f9f3@kaod.org>
-Date:   Fri, 24 May 2019 11:17:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        by player737.ha.ovh.net (Postfix) with ESMTPSA id 00A0F64074C1;
+        Fri, 24 May 2019 13:20:34 +0000 (UTC)
+From:   =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To:     Paul Mackerras <paulus@samba.org>
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Greg Kurz <groug@kaod.org>, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Subject: [PATCH] KVM: PPC: Book3S HV: XIVE: introduce a KVM device lock
+Date:   Fri, 24 May 2019 15:20:30 +0200
+Message-Id: <20190524132030.6349-1-clg@kaod.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190523063424.GB19655@blackberry>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13159799586557299671
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 17269334246588713844
 X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudduiedgudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenuc
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudduiedgieehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 5/23/19 8:34 AM, Paul Mackerras wrote:
-> Recent reports of lockdep splats in the HV KVM code revealed that it
-> was taking the kvm->lock mutex in several contexts where a vcpu mutex
-> was already held.  Lockdep has only started warning since I added code
-> to take the vcpu mutexes in the XIVE device release functions, but
-> since Documentation/virtual/kvm/locking.txt specifies that the vcpu
-> mutexes nest inside kvm->lock, it seems that the new code is correct
-> and it is most of the old uses of kvm->lock that are wrong.
-> 
-> This series should fix the problems, by adding new mutexes that nest
-> inside the vcpu mutexes and using them instead of kvm->lock.
+The XICS-on-XIVE KVM device needs to allocate XIVE event queues when a
+priority is used by the OS. This is referred as EQ provisioning and it
+is done under the hood when :
 
-Hello,
+  1. a CPU is hot-plugged in the VM
+  2. the "set-xive" is called at VM startup
+  3. sources are restored at VM restore
 
-I guest this warning when running a guest with this patchset :
+The kvm->lock mutex is used to protect the different XIVE structures
+being modified but in some contextes, kvm->lock is taken under the
+vcpu->mutex which is a forbidden sequence by KVM.
 
-[  228.686461] DEBUG_LOCKS_WARN_ON(current->hardirqs_enabled)
-[  228.686480] WARNING: CPU: 116 PID: 3803 at ../kernel/locking/lockdep.c:4219 check_flags.part.23+0x21c/0x270
-[  228.686544] Modules linked in: vhost_net vhost xt_CHECKSUM iptable_mangle xt_MASQUERADE iptable_nat nf_nat xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ipt_REJECT nf_reject_ipv4 tun bridge stp llc ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter fuse kvm_hv kvm at24 ipmi_powernv regmap_i2c ipmi_devintf uio_pdrv_genirq ofpart ipmi_msghandler uio powernv_flash mtd ibmpowernv opal_prd ip_tables ext4 mbcache jbd2 btrfs zstd_decompress zstd_compress raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx libcrc32c xor raid6_pq raid1 raid0 ses sd_mod enclosure scsi_transport_sas ast i2c_opal i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm i40e e1000e cxl aacraid tg3 drm_panel_orientation_quirks i2c_core
-[  228.686859] CPU: 116 PID: 3803 Comm: qemu-system-ppc Kdump: loaded Not tainted 5.2.0-rc1-xive+ #42
-[  228.686911] NIP:  c0000000001b394c LR: c0000000001b3948 CTR: c000000000bfad20
-[  228.686963] REGS: c000200cdb50f570 TRAP: 0700   Not tainted  (5.2.0-rc1-xive+)
-[  228.687001] MSR:  9000000002823033 <SF,HV,VEC,VSX,FP,ME,IR,DR,RI,LE>  CR: 48222222  XER: 20040000
-[  228.687060] CFAR: c000000000116db0 IRQMASK: 1 
-[  228.687060] GPR00: c0000000001b3948 c000200cdb50f800 c0000000015e7600 000000000000002e 
-[  228.687060] GPR04: 0000000000000001 c0000000001c71a0 000000006e655f73 72727563284e4f5f 
-[  228.687060] GPR08: 0000200e60680000 0000000000000000 c000200cdb486180 0000000000000000 
-[  228.687060] GPR12: 0000000000002000 c000200fff61a680 0000000000000000 00007fffb75c0000 
-[  228.687060] GPR16: 0000000000000000 0000000000000000 c0000000017d6900 c000000001124900 
-[  228.687060] GPR20: 0000000000000074 c008000006916f68 0000000000000074 0000000000000074 
-[  228.687060] GPR24: ffffffffffffffff ffffffffffffffff 0000000000000003 c000200d4b600000 
-[  228.687060] GPR28: c000000001627e58 c000000001489908 c000000001627e58 c000000002304de0 
-[  228.687377] NIP [c0000000001b394c] check_flags.part.23+0x21c/0x270
-[  228.687415] LR [c0000000001b3948] check_flags.part.23+0x218/0x270
-[  228.687466] Call Trace:
-[  228.687488] [c000200cdb50f800] [c0000000001b3948] check_flags.part.23+0x218/0x270 (unreliable)
-[  228.687542] [c000200cdb50f870] [c0000000001b6548] lock_is_held_type+0x188/0x1c0
-[  228.687595] [c000200cdb50f8d0] [c0000000001d939c] rcu_read_lock_sched_held+0xdc/0x100
-[  228.687646] [c000200cdb50f900] [c0000000001dd704] rcu_note_context_switch+0x304/0x340
-[  228.687701] [c000200cdb50f940] [c0080000068fcc58] kvmhv_run_single_vcpu+0xdb0/0x1120 [kvm_hv]
-[  228.687756] [c000200cdb50fa20] [c0080000068fd5b0] kvmppc_vcpu_run_hv+0x5e8/0xe40 [kvm_hv]
-[  228.687816] [c000200cdb50faf0] [c0080000071797dc] kvmppc_vcpu_run+0x34/0x48 [kvm]
-[  228.687863] [c000200cdb50fb10] [c0080000071755dc] kvm_arch_vcpu_ioctl_run+0x244/0x420 [kvm]
-[  228.687916] [c000200cdb50fba0] [c008000007165ccc] kvm_vcpu_ioctl+0x424/0x838 [kvm]
-[  228.687957] [c000200cdb50fd10] [c000000000433a24] do_vfs_ioctl+0xd4/0xcd0
-[  228.687995] [c000200cdb50fdb0] [c000000000434724] ksys_ioctl+0x104/0x120
-[  228.688033] [c000200cdb50fe00] [c000000000434768] sys_ioctl+0x28/0x80
-[  228.688072] [c000200cdb50fe20] [c00000000000b888] system_call+0x5c/0x70
-[  228.688109] Instruction dump:
-[  228.688142] 4bf6342d 60000000 0fe00000 e8010080 7c0803a6 4bfffe60 3c82ff87 3c62ff87 
-[  228.688196] 388472d0 3863d738 4bf63405 60000000 <0fe00000> 4bffff4c 3c82ff87 3c62ff87 
-[  228.688251] irq event stamp: 205
-[  228.688287] hardirqs last  enabled at (205): [<c0080000068fc1b4>] kvmhv_run_single_vcpu+0x30c/0x1120 [kvm_hv]
-[  228.688344] hardirqs last disabled at (204): [<c0080000068fbff0>] kvmhv_run_single_vcpu+0x148/0x1120 [kvm_hv]
-[  228.688412] softirqs last  enabled at (180): [<c000000000c0b2ac>] __do_softirq+0x4ac/0x5d4
-[  228.688464] softirqs last disabled at (169): [<c000000000122aa8>] irq_exit+0x1f8/0x210
-[  228.688513] ---[ end trace eb16f6260022a812 ]---
-[  228.688548] possible reason: unannotated irqs-off.
-[  228.688571] irq event stamp: 205
-[  228.688607] hardirqs last  enabled at (205): [<c0080000068fc1b4>] kvmhv_run_single_vcpu+0x30c/0x1120 [kvm_hv]
-[  228.688664] hardirqs last disabled at (204): [<c0080000068fbff0>] kvmhv_run_single_vcpu+0x148/0x1120 [kvm_hv]
-[  228.688719] softirqs last  enabled at (180): [<c000000000c0b2ac>] __do_softirq+0x4ac/0x5d4
-[  228.688758] softirqs last disabled at (169): [<c000000000122aa8>] irq_exit+0x1f8/0x210
+Introduce a new mutex 'lock' for the KVM devices for them to
+synchronize accesses to the XIVE device structures.
 
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+---
+ arch/powerpc/kvm/book3s_xive.h        |  1 +
+ arch/powerpc/kvm/book3s_xive.c        | 23 +++++++++++++----------
+ arch/powerpc/kvm/book3s_xive_native.c | 15 ++++++++-------
+ 3 files changed, 22 insertions(+), 17 deletions(-)
 
+diff --git a/arch/powerpc/kvm/book3s_xive.h b/arch/powerpc/kvm/book3s_xive.h
+index 426146332984..862c2c9650ae 100644
+--- a/arch/powerpc/kvm/book3s_xive.h
++++ b/arch/powerpc/kvm/book3s_xive.h
+@@ -141,6 +141,7 @@ struct kvmppc_xive {
+ 	struct kvmppc_xive_ops *ops;
+ 	struct address_space   *mapping;
+ 	struct mutex mapping_lock;
++	struct mutex lock;
+ };
+ 
+ #define KVMPPC_XIVE_Q_COUNT	8
+diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+index f623451ec0a3..12c8a36dd980 100644
+--- a/arch/powerpc/kvm/book3s_xive.c
++++ b/arch/powerpc/kvm/book3s_xive.c
+@@ -271,14 +271,14 @@ static int xive_provision_queue(struct kvm_vcpu *vcpu, u8 prio)
+ 	return rc;
+ }
+ 
+-/* Called with kvm_lock held */
++/* Called with xive->lock held */
+ static int xive_check_provisioning(struct kvm *kvm, u8 prio)
+ {
+ 	struct kvmppc_xive *xive = kvm->arch.xive;
+ 	struct kvm_vcpu *vcpu;
+ 	int i, rc;
+ 
+-	lockdep_assert_held(&kvm->lock);
++	lockdep_assert_held(&xive->lock);
+ 
+ 	/* Already provisioned ? */
+ 	if (xive->qmap & (1 << prio))
+@@ -621,9 +621,12 @@ int kvmppc_xive_set_xive(struct kvm *kvm, u32 irq, u32 server,
+ 		 irq, server, priority);
+ 
+ 	/* First, check provisioning of queues */
+-	if (priority != MASKED)
++	if (priority != MASKED) {
++		mutex_lock(&xive->lock);
+ 		rc = xive_check_provisioning(xive->kvm,
+ 			      xive_prio_from_guest(priority));
++		mutex_unlock(&xive->lock);
++	}
+ 	if (rc) {
+ 		pr_devel("  provisioning failure %d !\n", rc);
+ 		return rc;
+@@ -1199,7 +1202,7 @@ int kvmppc_xive_connect_vcpu(struct kvm_device *dev,
+ 		return -ENOMEM;
+ 
+ 	/* We need to synchronize with queue provisioning */
+-	mutex_lock(&vcpu->kvm->lock);
++	mutex_lock(&xive->lock);
+ 	vcpu->arch.xive_vcpu = xc;
+ 	xc->xive = xive;
+ 	xc->vcpu = vcpu;
+@@ -1283,7 +1286,7 @@ int kvmppc_xive_connect_vcpu(struct kvm_device *dev,
+ 		xive_vm_esb_load(&xc->vp_ipi_data, XIVE_ESB_SET_PQ_00);
+ 
+ bail:
+-	mutex_unlock(&vcpu->kvm->lock);
++	mutex_unlock(&xive->lock);
+ 	if (r) {
+ 		kvmppc_xive_cleanup_vcpu(vcpu);
+ 		return r;
+@@ -1527,13 +1530,12 @@ static int xive_get_source(struct kvmppc_xive *xive, long irq, u64 addr)
+ struct kvmppc_xive_src_block *kvmppc_xive_create_src_block(
+ 	struct kvmppc_xive *xive, int irq)
+ {
+-	struct kvm *kvm = xive->kvm;
+ 	struct kvmppc_xive_src_block *sb;
+ 	int i, bid;
+ 
+ 	bid = irq >> KVMPPC_XICS_ICS_SHIFT;
+ 
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&xive->lock);
+ 
+ 	/* block already exists - somebody else got here first */
+ 	if (xive->src_blocks[bid])
+@@ -1560,7 +1562,7 @@ struct kvmppc_xive_src_block *kvmppc_xive_create_src_block(
+ 		xive->max_sbid = bid;
+ 
+ out:
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&xive->lock);
+ 	return xive->src_blocks[bid];
+ }
+ 
+@@ -1670,9 +1672,9 @@ static int xive_set_source(struct kvmppc_xive *xive, long irq, u64 addr)
+ 	/* If we have a priority target the interrupt */
+ 	if (act_prio != MASKED) {
+ 		/* First, check provisioning of queues */
+-		mutex_lock(&xive->kvm->lock);
++		mutex_lock(&xive->lock);
+ 		rc = xive_check_provisioning(xive->kvm, act_prio);
+-		mutex_unlock(&xive->kvm->lock);
++		mutex_unlock(&xive->lock);
+ 
+ 		/* Target interrupt */
+ 		if (rc == 0)
+@@ -1963,6 +1965,7 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
+ 	dev->private = xive;
+ 	xive->dev = dev;
+ 	xive->kvm = kvm;
++	mutex_init(&xive->lock);
+ 
+ 	/* Already there ? */
+ 	if (kvm->arch.xive)
+diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+index cdce9f94738e..684619517d67 100644
+--- a/arch/powerpc/kvm/book3s_xive_native.c
++++ b/arch/powerpc/kvm/book3s_xive_native.c
+@@ -114,7 +114,7 @@ int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
+ 		return -EINVAL;
+ 	}
+ 
+-	mutex_lock(&vcpu->kvm->lock);
++	mutex_lock(&xive->lock);
+ 
+ 	if (kvmppc_xive_find_server(vcpu->kvm, server_num)) {
+ 		pr_devel("Duplicate !\n");
+@@ -159,7 +159,7 @@ int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
+ 
+ 	/* TODO: reset all queues to a clean state ? */
+ bail:
+-	mutex_unlock(&vcpu->kvm->lock);
++	mutex_unlock(&xive->lock);
+ 	if (rc)
+ 		kvmppc_xive_native_cleanup_vcpu(vcpu);
+ 
+@@ -772,7 +772,7 @@ static int kvmppc_xive_reset(struct kvmppc_xive *xive)
+ 
+ 	pr_devel("%s\n", __func__);
+ 
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&xive->lock);
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		struct kvmppc_xive_vcpu *xc = vcpu->arch.xive_vcpu;
+@@ -810,7 +810,7 @@ static int kvmppc_xive_reset(struct kvmppc_xive *xive)
+ 		}
+ 	}
+ 
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&xive->lock);
+ 
+ 	return 0;
+ }
+@@ -878,7 +878,7 @@ static int kvmppc_xive_native_eq_sync(struct kvmppc_xive *xive)
+ 
+ 	pr_devel("%s\n", __func__);
+ 
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&xive->lock);
+ 	for (i = 0; i <= xive->max_sbid; i++) {
+ 		struct kvmppc_xive_src_block *sb = xive->src_blocks[i];
+ 
+@@ -892,7 +892,7 @@ static int kvmppc_xive_native_eq_sync(struct kvmppc_xive *xive)
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		kvmppc_xive_native_vcpu_eq_sync(vcpu);
+ 	}
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&xive->lock);
+ 
+ 	return 0;
+ }
+@@ -965,7 +965,7 @@ static int kvmppc_xive_native_has_attr(struct kvm_device *dev,
+ }
+ 
+ /*
+- * Called when device fd is closed
++ * Called when device fd is closed.  kvm->lock is held.
+  */
+ static void kvmppc_xive_native_release(struct kvm_device *dev)
+ {
+@@ -1064,6 +1064,7 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
+ 	xive->kvm = kvm;
+ 	kvm->arch.xive = xive;
+ 	mutex_init(&xive->mapping_lock);
++	mutex_init(&xive->lock);
+ 
+ 	/*
+ 	 * Allocate a bunch of VPs. KVM_MAX_VCPUS is a large value for
+-- 
+2.20.1
 
-C.
