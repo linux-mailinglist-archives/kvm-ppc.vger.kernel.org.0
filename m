@@ -2,181 +2,211 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 32E4B2C665
-	for <lists+kvm-ppc@lfdr.de>; Tue, 28 May 2019 14:24:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AF3A2C90A
+	for <lists+kvm-ppc@lfdr.de>; Tue, 28 May 2019 16:42:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbfE1MYw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 28 May 2019 08:24:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40678 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726620AbfE1MYw (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 28 May 2019 08:24:52 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4SCMbIS125736
-        for <kvm-ppc@vger.kernel.org>; Tue, 28 May 2019 08:24:50 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ss3mfuh78-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Tue, 28 May 2019 08:24:50 -0400
-Received: from localhost
-        by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <paulmck@linux.vnet.ibm.com>;
-        Tue, 28 May 2019 13:24:49 +0100
-Received: from b01cxnp23034.gho.pok.ibm.com (9.57.198.29)
-        by e16.ny.us.ibm.com (146.89.104.203) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 28 May 2019 13:24:43 +0100
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4SCOgvP29491484
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 May 2019 12:24:43 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C2B1FB206E;
-        Tue, 28 May 2019 12:24:42 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 994BFB2065;
-        Tue, 28 May 2019 12:24:42 +0000 (GMT)
-Received: from paulmck-ThinkPad-W541 (unknown [9.70.82.216])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 28 May 2019 12:24:42 +0000 (GMT)
-Received: by paulmck-ThinkPad-W541 (Postfix, from userid 1000)
-        id C799516C35C0; Tue, 28 May 2019 05:24:47 -0700 (PDT)
-Date:   Tue, 28 May 2019 05:24:47 -0700
-From:   "Paul E. McKenney" <paulmck@linux.ibm.com>
-To:     Joel Fernandes <joel@joelfernandes.org>
-Cc:     Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Josh Triplett <josh@joshtriplett.org>, kvm-ppc@vger.kernel.org,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-doc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>, rcu@vger.kernel.org
-Subject: Re: [PATCH RFC 0/5] Remove some notrace RCU APIs
-Reply-To: paulmck@linux.ibm.com
-References: <20190524234933.5133-1-joel@joelfernandes.org>
- <20190524232458.4bcf4eb4@gandalf.local.home>
- <20190525081444.GC197789@google.com>
- <20190525070826.16f76ee7@gandalf.local.home>
- <20190525141954.GA176647@google.com>
- <20190525155035.GE28207@linux.ibm.com>
- <20190525181407.GA220326@google.com>
+        id S1726313AbfE1Omc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 28 May 2019 10:42:32 -0400
+Received: from [198.50.183.10] ([198.50.183.10]:59135 "EHLO mahatta.net"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726688AbfE1Omc (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 28 May 2019 10:42:32 -0400
+From:   aishatu@mahatta.net
+To:     kvm-ppc@vger.kernel.org
+Subject: Purchase_rfq
+Date:   28 May 2019 16:42:27 +0200
+Message-ID: <20190528164227.55E60FED3667A48D@mahatta.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190525181407.GA220326@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-x-cbid: 19052812-0072-0000-0000-00000434284E
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011175; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01209781; UDB=6.00635551; IPR=6.00990810;
- MB=3.00027084; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-28 12:24:48
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052812-0073-0000-0000-00004C6504FA
-Message-Id: <20190528122447.GS28207@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-28_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905280081
+Content-Type: multipart/mixed;
+        boundary="----=_NextPart_000_0012_3F23E983.84550597"
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Sat, May 25, 2019 at 02:14:07PM -0400, Joel Fernandes wrote:
-> On Sat, May 25, 2019 at 08:50:35AM -0700, Paul E. McKenney wrote:
-> > On Sat, May 25, 2019 at 10:19:54AM -0400, Joel Fernandes wrote:
-> > > On Sat, May 25, 2019 at 07:08:26AM -0400, Steven Rostedt wrote:
-> > > > On Sat, 25 May 2019 04:14:44 -0400
-> > > > Joel Fernandes <joel@joelfernandes.org> wrote:
-> > > > 
-> > > > > > I guess the difference between the _raw_notrace and just _raw variants
-> > > > > > is that _notrace ones do a rcu_check_sparse(). Don't we want to keep
-> > > > > > that check?  
-> > > > > 
-> > > > > This is true.
-> > > > > 
-> > > > > Since the users of _raw_notrace are very few, is it worth keeping this API
-> > > > > just for sparse checking? The API naming is also confusing. I was expecting
-> > > > > _raw_notrace to do fewer checks than _raw, instead of more. Honestly, I just
-> > > > > want to nuke _raw_notrace as done in this series and later we can introduce a
-> > > > > sparse checking version of _raw if need-be. The other option could be to
-> > > > > always do sparse checking for _raw however that used to be the case and got
-> > > > > changed in http://lists.infradead.org/pipermail/linux-afs/2016-July/001016.html
-> > > > 
-> > > > What if we just rename _raw to _raw_nocheck, and _raw_notrace to _raw ?
-> > > 
-> > > That would also mean changing 160 usages of _raw to _raw_nocheck in the
-> > > kernel :-/.
-> > > 
-> > > The tracing usage of _raw_notrace is only like 2 or 3 users. Can we just call
-> > > rcu_check_sparse directly in the calling code for those and eliminate the APIs?
-> > > 
-> > > I wonder what Paul thinks about the matter as well.
-> > 
-> > My thought is that it is likely that a goodly number of the current uses
-> > of _raw should really be some form of _check, with lockdep expressions
-> > spelled out.  Not that working out what exactly those lockdep expressions
-> > should be is necessarily a trivial undertaking.  ;-)
-> 
-> Yes, currently where I am a bit stuck is the rcu_dereference_raw()
-> cannot possibly know what SRCU domain it is under, so lockdep cannot check if
-> an SRCU lock is held without the user also passing along the SRCU domain. I
-> am trying to change lockdep to see if it can check if *any* srcu domain lock
-> is held (regardless of which one) and complain if none are. This is at least
-> better than no check at all.
-> 
-> However, I think it gets tricky for mutexes. If you have something like:
-> mutex_lock(some_mutex);
-> p = rcu_dereference_raw(gp);
-> mutex_unlock(some_mutex);
-> 
-> This might be a perfectly valid invocation of _raw, however my checks (patch
-> is still cooking) trigger a lockdep warning becase _raw cannot know that this
-> is Ok. lockdep thinks it is not in a reader section. This then gets into the
-> territory of a new rcu_derference_raw_protected(gp, assert_held(some_mutex))
-> which sucks because its yet another API. To circumvent this issue, can we
-> just have callers of rcu_dereference_raw ensure that they call
-> rcu_read_lock() if they are protecting dereferences by a mutex? That would
-> make things a lot easier and also may be Ok since rcu_read_lock is quite
-> cheap.
+This is a multi-part message in MIME format.
 
-Why not just rcu_dereference_protected(lockdep_is_held(some_mutex))?
-The API is already there, and no need for spurious readers.
+------=_NextPart_000_0012_3F23E983.84550597
 
-> > That aside, if we are going to change the name of an API that is
-> > used 160 places throughout the tree, we would need to have a pretty
-> > good justification.  Without such a justification, it will just look
-> > like pointless churn to the various developers and maintainers on the
-> > receiving end of the patches.
-> 
-> Actually, the API name change is not something I want to do, it is Steven
-> suggestion. My suggestion is let us just delete _raw_notrace and just use the
-> _raw API for tracing, since _raw doesn't do any tracing anyway. Steve pointed
-> that _raw_notrace does sparse checking unlike _raw, but I think that isn't an
-> issue since _raw doesn't do such checking at the moment anyway.. (if possible
-> check my cover letter again for details/motivation of this series).
+------=_NextPart_000_0012_3F23E983.84550597
+Content-Type: application/octet-stream; name="INQUIRY_4178916..xlsx"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="INQUIRY_4178916..xlsx"
 
-Understood, but regardless of who suggested it, if we are to go through
-with it, good justification will be required.  ;-)
+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
+AAB6IAAAAAA=
 
-							Thanx, Paul
-
-> thanks!
-> 
->  - Joel
-> 
-> > 							Thanx, Paul
-> > 
-> > > thanks, Steven!
-> > > 
-> > 
-> 
-
+------=_NextPart_000_0012_3F23E983.84550597--
