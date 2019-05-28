@@ -2,156 +2,124 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CD092C370
-	for <lists+kvm-ppc@lfdr.de>; Tue, 28 May 2019 11:42:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E6A52BF8B
+	for <lists+kvm-ppc@lfdr.de>; Tue, 28 May 2019 08:49:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726458AbfE1Jmm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 28 May 2019 05:42:42 -0400
-Received: from 14.mo4.mail-out.ovh.net ([46.105.40.29]:48494 "EHLO
-        14.mo4.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726282AbfE1Jml (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 28 May 2019 05:42:41 -0400
-X-Greylist: delayed 12602 seconds by postgrey-1.27 at vger.kernel.org; Tue, 28 May 2019 05:42:38 EDT
-Received: from player761.ha.ovh.net (unknown [10.108.42.228])
-        by mo4.mail-out.ovh.net (Postfix) with ESMTP id 5A7D01F28C7
-        for <kvm-ppc@vger.kernel.org>; Tue, 28 May 2019 08:06:03 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
-        (Authenticated sender: clg@kaod.org)
-        by player761.ha.ovh.net (Postfix) with ESMTPSA id 3977A63D59F3;
-        Tue, 28 May 2019 06:06:00 +0000 (UTC)
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix lockdep warning when entering
- guest on POWER9
-To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-References: <20190528050159.rd5lrvdp6kaydcxx@oak.ozlabs.ibm.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2d3cb3ee-1ff9-1b44-52fa-c6ff3d163ce0@kaod.org>
-Date:   Tue, 28 May 2019 08:05:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190528050159.rd5lrvdp6kaydcxx@oak.ozlabs.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 14972779913196243927
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvgedguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecu
+        id S1726693AbfE1Gtv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 28 May 2019 02:49:51 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46774 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726305AbfE1Gtv (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 28 May 2019 02:49:51 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4S6cg8p078394
+        for <kvm-ppc@vger.kernel.org>; Tue, 28 May 2019 02:49:50 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2srxxjtaeg-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Tue, 28 May 2019 02:49:49 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <bharata@linux.ibm.com>;
+        Tue, 28 May 2019 07:49:48 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 28 May 2019 07:49:46 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4S6niUS47316996
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 May 2019 06:49:44 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7242C11C04A;
+        Tue, 28 May 2019 06:49:44 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BA5F011C04C;
+        Tue, 28 May 2019 06:49:42 +0000 (GMT)
+Received: from bharata.in.ibm.com (unknown [9.124.35.100])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 28 May 2019 06:49:42 +0000 (GMT)
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, linux-mm@kvack.org, paulus@au1.ibm.com,
+        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
+        linuxram@us.ibm.com, sukadev@linux.vnet.ibm.com,
+        cclaudio@linux.ibm.com, Bharata B Rao <bharata@linux.ibm.com>
+Subject: [PATCH v4 0/6] kvmppc: HMM driver to manage pages of secure guest
+Date:   Tue, 28 May 2019 12:19:27 +0530
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+x-cbid: 19052806-0020-0000-0000-000003411FD2
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052806-0021-0000-0000-0000219419A1
+Message-Id: <20190528064933.23119-1-bharata@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-28_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905280045
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 28/05/2019 07:01, Paul Mackerras wrote:
-> Commit 3309bec85e60 ("KVM: PPC: Book3S HV: Fix lockdep warning when
-> entering the guest") moved calls to trace_hardirqs_{on,off} in the
-> entry path used for HPT guests.  Similar code exists in the new
-> streamlined entry path used for radix guests on POWER9.  This makes
-> the same change there, so as to avoid lockdep warnings such as this:
-> 
-> [  228.686461] DEBUG_LOCKS_WARN_ON(current->hardirqs_enabled)
-> [  228.686480] WARNING: CPU: 116 PID: 3803 at ../kernel/locking/lockdep.c:4219 check_flags.part.23+0x21c/0x270
-> [  228.686544] Modules linked in: vhost_net vhost xt_CHECKSUM iptable_mangle xt_MASQUERADE iptable_nat nf_nat
-> +xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ipt_REJECT nf_reject_ipv4 tun bridge stp llc ebtable_filter
-> +ebtables ip6table_filter ip6_tables iptable_filter fuse kvm_hv kvm at24 ipmi_powernv regmap_i2c ipmi_devintf
-> +uio_pdrv_genirq ofpart ipmi_msghandler uio powernv_flash mtd ibmpowernv opal_prd ip_tables ext4 mbcache jbd2 btrfs
-> +zstd_decompress zstd_compress raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx libcrc32c xor
-> +raid6_pq raid1 raid0 ses sd_mod enclosure scsi_transport_sas ast i2c_opal i2c_algo_bit drm_kms_helper syscopyarea
-> +sysfillrect sysimgblt fb_sys_fops ttm drm i40e e1000e cxl aacraid tg3 drm_panel_orientation_quirks i2c_core
-> [  228.686859] CPU: 116 PID: 3803 Comm: qemu-system-ppc Kdump: loaded Not tainted 5.2.0-rc1-xive+ #42
-> [  228.686911] NIP:  c0000000001b394c LR: c0000000001b3948 CTR: c000000000bfad20
-> [  228.686963] REGS: c000200cdb50f570 TRAP: 0700   Not tainted  (5.2.0-rc1-xive+)
-> [  228.687001] MSR:  9000000002823033 <SF,HV,VEC,VSX,FP,ME,IR,DR,RI,LE>  CR: 48222222  XER: 20040000
-> [  228.687060] CFAR: c000000000116db0 IRQMASK: 1
-> [  228.687060] GPR00: c0000000001b3948 c000200cdb50f800 c0000000015e7600 000000000000002e
-> [  228.687060] GPR04: 0000000000000001 c0000000001c71a0 000000006e655f73 72727563284e4f5f
-> [  228.687060] GPR08: 0000200e60680000 0000000000000000 c000200cdb486180 0000000000000000
-> [  228.687060] GPR12: 0000000000002000 c000200fff61a680 0000000000000000 00007fffb75c0000
-> [  228.687060] GPR16: 0000000000000000 0000000000000000 c0000000017d6900 c000000001124900
-> [  228.687060] GPR20: 0000000000000074 c008000006916f68 0000000000000074 0000000000000074
-> [  228.687060] GPR24: ffffffffffffffff ffffffffffffffff 0000000000000003 c000200d4b600000
-> [  228.687060] GPR28: c000000001627e58 c000000001489908 c000000001627e58 c000000002304de0
-> [  228.687377] NIP [c0000000001b394c] check_flags.part.23+0x21c/0x270
-> [  228.687415] LR [c0000000001b3948] check_flags.part.23+0x218/0x270
-> [  228.687466] Call Trace:
-> [  228.687488] [c000200cdb50f800] [c0000000001b3948] check_flags.part.23+0x218/0x270 (unreliable)
-> [  228.687542] [c000200cdb50f870] [c0000000001b6548] lock_is_held_type+0x188/0x1c0
-> [  228.687595] [c000200cdb50f8d0] [c0000000001d939c] rcu_read_lock_sched_held+0xdc/0x100
-> [  228.687646] [c000200cdb50f900] [c0000000001dd704] rcu_note_context_switch+0x304/0x340
-> [  228.687701] [c000200cdb50f940] [c0080000068fcc58] kvmhv_run_single_vcpu+0xdb0/0x1120 [kvm_hv]
-> [  228.687756] [c000200cdb50fa20] [c0080000068fd5b0] kvmppc_vcpu_run_hv+0x5e8/0xe40 [kvm_hv]
-> [  228.687816] [c000200cdb50faf0] [c0080000071797dc] kvmppc_vcpu_run+0x34/0x48 [kvm]
-> [  228.687863] [c000200cdb50fb10] [c0080000071755dc] kvm_arch_vcpu_ioctl_run+0x244/0x420 [kvm]
-> [  228.687916] [c000200cdb50fba0] [c008000007165ccc] kvm_vcpu_ioctl+0x424/0x838 [kvm]
-> [  228.687957] [c000200cdb50fd10] [c000000000433a24] do_vfs_ioctl+0xd4/0xcd0
-> [  228.687995] [c000200cdb50fdb0] [c000000000434724] ksys_ioctl+0x104/0x120
-> [  228.688033] [c000200cdb50fe00] [c000000000434768] sys_ioctl+0x28/0x80
-> [  228.688072] [c000200cdb50fe20] [c00000000000b888] system_call+0x5c/0x70
-> [  228.688109] Instruction dump:
-> [  228.688142] 4bf6342d 60000000 0fe00000 e8010080 7c0803a6 4bfffe60 3c82ff87 3c62ff87
-> [  228.688196] 388472d0 3863d738 4bf63405 60000000 <0fe00000> 4bffff4c 3c82ff87 3c62ff87
-> [  228.688251] irq event stamp: 205
-> [  228.688287] hardirqs last  enabled at (205): [<c0080000068fc1b4>] kvmhv_run_single_vcpu+0x30c/0x1120 [kvm_hv]
-> [  228.688344] hardirqs last disabled at (204): [<c0080000068fbff0>] kvmhv_run_single_vcpu+0x148/0x1120 [kvm_hv]
-> [  228.688412] softirqs last  enabled at (180): [<c000000000c0b2ac>] __do_softirq+0x4ac/0x5d4
-> [  228.688464] softirqs last disabled at (169): [<c000000000122aa8>] irq_exit+0x1f8/0x210
-> [  228.688513] ---[ end trace eb16f6260022a812 ]---
-> [  228.688548] possible reason: unannotated irqs-off.
-> [  228.688571] irq event stamp: 205
-> [  228.688607] hardirqs last  enabled at (205): [<c0080000068fc1b4>] kvmhv_run_single_vcpu+0x30c/0x1120 [kvm_hv]
-> [  228.688664] hardirqs last disabled at (204): [<c0080000068fbff0>] kvmhv_run_single_vcpu+0x148/0x1120 [kvm_hv]
-> [  228.688719] softirqs last  enabled at (180): [<c000000000c0b2ac>] __do_softirq+0x4ac/0x5d4
-> [  228.688758] softirqs last disabled at (169): [<c000000000122aa8>] irq_exit+0x1f8/0x210
-> 
-> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+Hi,
 
+A pseries guest can be run as a secure guest on Ultravisor-enabled
+POWER platforms. On such platforms, this driver will be used to manage
+the movement of guest pages between the normal memory managed by
+hypervisor (HV) and secure memory managed by Ultravisor (UV).
 
+Private ZONE_DEVICE memory equal to the amount of secure memory
+available in the platform for running secure guests is created
+via a HMM device. The movement of pages between normal and secure
+memory is done by ->alloc_and_copy() callback routine of migrate_vma().
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Tested-by: Cédric Le Goater <clg@kaod.org>
+The page-in or page-out requests from UV will come to HV as hcalls and
+HV will call back into UV via uvcalls to satisfy these page requests.
 
-Thanks,
+These patches apply and work on top of the base Ultravisor patches
+posted by Claudio Carvalho at:
+https://lists.ozlabs.org/pipermail/linuxppc-dev/2019-May/190694.html
 
-C.
+In this version, the last two patches are the new additions.
 
-> ---
->  arch/powerpc/kvm/book3s_hv.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 27054d301852..9f49339c6d50 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -4090,16 +4090,20 @@ int kvmhv_run_single_vcpu(struct kvm_run *kvm_run,
->  		kvmppc_check_need_tlb_flush(kvm, pcpu, nested);
->  	}
->  
-> -	trace_hardirqs_on();
->  	guest_enter_irqoff();
->  
->  	srcu_idx = srcu_read_lock(&kvm->srcu);
->  
->  	this_cpu_disable_ftrace();
->  
-> +	/* Tell lockdep that we're about to enable interrupts */
-> +	trace_hardirqs_on();
-> +
->  	trap = kvmhv_p9_guest_entry(vcpu, time_limit, lpcr);
->  	vcpu->arch.trap = trap;
->  
-> +	trace_hardirqs_off();
-> +
->  	this_cpu_enable_ftrace();
->  
->  	srcu_read_unlock(&kvm->srcu, srcu_idx);
-> @@ -4109,7 +4113,6 @@ int kvmhv_run_single_vcpu(struct kvm_run *kvm_run,
->  		isync();
->  	}
->  
-> -	trace_hardirqs_off();
->  	set_irq_happened(trap);
->  
->  	kvmppc_set_host_core(pcpu);
-> 
+Changes in v4
+=============
+- Handling HV side page invalidations by issuing UV_PAGE_INVAL ucall
+- Handling HV side radix page faults by sending the page to UV
+- Support for rebooting a secure guest
+- Some cleanups and code reorgs
+
+v3: https://lists.ozlabs.org/pipermail/linuxppc-dev/2019-January/184731.html
+
+Bharata B Rao (6):
+  kvmppc: HMM backend driver to manage pages of secure guest
+  kvmppc: Shared pages support for secure guests
+  kvmppc: H_SVM_INIT_START and H_SVM_INIT_DONE hcalls
+  kvmppc: Handle memory plug/unplug to secure VM
+  kvmppc: Radix changes for secure guest
+  kvmppc: Support reset of secure guest
+
+ arch/powerpc/include/asm/hvcall.h         |   9 +
+ arch/powerpc/include/asm/kvm_book3s_hmm.h |  41 ++
+ arch/powerpc/include/asm/kvm_host.h       |  37 ++
+ arch/powerpc/include/asm/kvm_ppc.h        |   4 +
+ arch/powerpc/include/asm/ultravisor-api.h |   6 +
+ arch/powerpc/include/asm/ultravisor.h     |  47 ++
+ arch/powerpc/kvm/Makefile                 |   3 +
+ arch/powerpc/kvm/book3s_64_mmu_radix.c    |  19 +
+ arch/powerpc/kvm/book3s_hv.c              |  69 +++
+ arch/powerpc/kvm/book3s_hv_hmm.c          | 666 ++++++++++++++++++++++
+ arch/powerpc/kvm/powerpc.c                |  12 +
+ include/uapi/linux/kvm.h                  |   1 +
+ tools/include/uapi/linux/kvm.h            |   1 +
+ 13 files changed, 915 insertions(+)
+ create mode 100644 arch/powerpc/include/asm/kvm_book3s_hmm.h
+ create mode 100644 arch/powerpc/kvm/book3s_hv_hmm.c
+
+-- 
+2.17.1
 
