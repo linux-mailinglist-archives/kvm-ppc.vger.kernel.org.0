@@ -2,105 +2,130 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 72AFB2D949
-	for <lists+kvm-ppc@lfdr.de>; Wed, 29 May 2019 11:42:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 137742DC62
+	for <lists+kvm-ppc@lfdr.de>; Wed, 29 May 2019 14:04:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725956AbfE2Jmx convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm-ppc@lfdr.de>); Wed, 29 May 2019 05:42:53 -0400
-Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:56755 "EHLO
-        5.mo69.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725874AbfE2Jmx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 29 May 2019 05:42:53 -0400
-X-Greylist: delayed 1194 seconds by postgrey-1.27 at vger.kernel.org; Wed, 29 May 2019 05:42:52 EDT
-Received: from player787.ha.ovh.net (unknown [10.109.146.163])
-        by mo69.mail-out.ovh.net (Postfix) with ESMTP id A67015C15F
-        for <kvm-ppc@vger.kernel.org>; Wed, 29 May 2019 11:07:05 +0200 (CEST)
+        id S1726581AbfE2MEC convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Wed, 29 May 2019 08:04:02 -0400
+Received: from 1.mo69.mail-out.ovh.net ([178.33.251.173]:55588 "EHLO
+        1.mo69.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726547AbfE2MEC (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 29 May 2019 08:04:02 -0400
+X-Greylist: delayed 10268 seconds by postgrey-1.27 at vger.kernel.org; Wed, 29 May 2019 08:04:01 EDT
+Received: from player711.ha.ovh.net (unknown [10.108.35.210])
+        by mo69.mail-out.ovh.net (Postfix) with ESMTP id AE4EE5AAD9
+        for <kvm-ppc@vger.kernel.org>; Wed, 29 May 2019 14:03:59 +0200 (CEST)
 Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
         (Authenticated sender: groug@kaod.org)
-        by player787.ha.ovh.net (Postfix) with ESMTPSA id C360F663451E;
-        Wed, 29 May 2019 09:06:58 +0000 (UTC)
-Date:   Wed, 29 May 2019 11:06:57 +0200
+        by player711.ha.ovh.net (Postfix) with ESMTPSA id 4F69D63843BA;
+        Wed, 29 May 2019 12:03:53 +0000 (UTC)
+Date:   Wed, 29 May 2019 14:03:52 +0200
 From:   Greg Kurz <groug@kaod.org>
-To:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc:     Paul Mackerras <paulus@samba.org>,
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
         Alexey Kardashevskiy <aik@ozlabs.ru>,
         David Gibson <david@gibson.dropbear.id.au>,
         kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: XIVE: fix page offset when
- clearing ESB pages
-Message-ID: <20190529110657.2dbd1d72@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190528211324.18656-1-clg@kaod.org>
-References: <20190528211324.18656-1-clg@kaod.org>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: XIVE: introduce a KVM device lock
+Message-ID: <20190529140352.318c5990@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20190528041711.ewohm2pdrya5ompz@oak.ozlabs.ibm.com>
+References: <20190524132030.6349-1-clg@kaod.org>
+ <20190524201621.23eb7c44@bahia.lan>
+ <20190528041711.ewohm2pdrya5ompz@oak.ozlabs.ibm.com>
 X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8BIT
-X-Ovh-Tracer-Id: 5456392424164596107
+X-Ovh-Tracer-Id: 8443967828062345659
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvjedgudefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvjedggeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, 28 May 2019 23:13:24 +0200
-Cédric Le Goater <clg@kaod.org> wrote:
+On Tue, 28 May 2019 14:17:11 +1000
+Paul Mackerras <paulus@ozlabs.org> wrote:
 
-> Under XIVE, the ESB pages of an interrupt are used for interrupt
-> management (EOI) and triggering. They are made available to guests
-> through a mapping of the XIVE KVM device.
+> Greg,
 > 
-> When a device is passed-through, the passthru_irq helpers,
-> kvmppc_xive_set_mapped() and kvmppc_xive_clr_mapped(), clear the ESB
-> pages of the guest IRQ number being mapped and let the VM fault
-> handler repopulate with the correct page.
+> On Fri, May 24, 2019 at 08:16:21PM +0200, Greg Kurz wrote:
+> > On Fri, 24 May 2019 15:20:30 +0200
+> > Cédric Le Goater <clg@kaod.org> wrote:
+> >   
+> > > The XICS-on-XIVE KVM device needs to allocate XIVE event queues when a
+> > > priority is used by the OS. This is referred as EQ provisioning and it
+> > > is done under the hood when :
+> > > 
+> > >   1. a CPU is hot-plugged in the VM
+> > >   2. the "set-xive" is called at VM startup
+> > >   3. sources are restored at VM restore
+> > > 
+> > > The kvm->lock mutex is used to protect the different XIVE structures
+> > > being modified but in some contextes, kvm->lock is taken under the
+> > > vcpu->mutex which is a forbidden sequence by KVM.
+> > > 
+> > > Introduce a new mutex 'lock' for the KVM devices for them to
+> > > synchronize accesses to the XIVE device structures.
+> > > 
+> > > Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> > > ---
+> > >  arch/powerpc/kvm/book3s_xive.h        |  1 +
+> > >  arch/powerpc/kvm/book3s_xive.c        | 23 +++++++++++++----------
+> > >  arch/powerpc/kvm/book3s_xive_native.c | 15 ++++++++-------
+> > >  3 files changed, 22 insertions(+), 17 deletions(-)
+> > > 
+> > > diff --git a/arch/powerpc/kvm/book3s_xive.h b/arch/powerpc/kvm/book3s_xive.h
+> > > index 426146332984..862c2c9650ae 100644
+> > > --- a/arch/powerpc/kvm/book3s_xive.h
+> > > +++ b/arch/powerpc/kvm/book3s_xive.h
+> > > @@ -141,6 +141,7 @@ struct kvmppc_xive {
+> > >  	struct kvmppc_xive_ops *ops;
+> > >  	struct address_space   *mapping;
+> > >  	struct mutex mapping_lock;
+> > > +	struct mutex lock;
+> > >  };
+> > >  
+> > >  #define KVMPPC_XIVE_Q_COUNT	8
+> > > diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+> > > index f623451ec0a3..12c8a36dd980 100644
+> > > --- a/arch/powerpc/kvm/book3s_xive.c
+> > > +++ b/arch/powerpc/kvm/book3s_xive.c
+> > > @@ -271,14 +271,14 @@ static int xive_provision_queue(struct kvm_vcpu *vcpu, u8 prio)
+> > >  	return rc;
+> > >  }
+> > >  
+> > > -/* Called with kvm_lock held */
+> > > +/* Called with xive->lock held */
+> > >  static int xive_check_provisioning(struct kvm *kvm, u8 prio)
+> > >  {
+> > >  	struct kvmppc_xive *xive = kvm->arch.xive;  
+> > 
+> > Since the kvm_lock isn't protecting kvm->arch anymore, this looks weird.  
 > 
-> The ESB pages are mapped at offset 4 (KVM_XIVE_ESB_PAGE_OFFSET) in the
-> KVM device mapping. Unfortunately, this offset was not taken into
-> account when clearing the pages. This lead to issues with the
-
-Good catch ! :)
-
-Reviwed-by: Greg Kurz <groug@kaod.org>
-
-> passthrough devices for which the interrupts were not functional under
-> some guest configuration (tg3 and single CPU) or in any configuration
-
-And this patch fixes my tg3 use case.
-
-Tested-by: Greg Kurz <groug@kaod.org>
-
-> (e1000e adapter).
+> Are you suggesting that something that was protected before now isn't
+> with Cédric's patch?
 > 
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> ---
+
+Hi Paul,
+
+No I'm not. As you point out below, it is just a matter of rationalizing the
+arguments of xive_check_provisioning().
+
+> > Passing xive instead of kvm and using xive->kvm would make more sense IMHO.
+> > 
+> > Maybe fold the following into your patch ?  
 > 
->  if unmap_mapping_pages() could be called from a module, we would
->  simplify a bit this code.
+> As far as I can see your delta patch doesn't actually change any
+> locking but just rationalizes the parameters for an internal
+> function.  That being so, for 5.2 I am intending to put Cédric's
+> original patch in, unless someone comes up with a good reason not to.
 > 
->  arch/powerpc/kvm/book3s_xive_native.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> index 8b762e3ebbc5..5596c8ec221a 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -172,6 +172,7 @@ int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
->  static int kvmppc_xive_native_reset_mapped(struct kvm *kvm, unsigned long irq)
->  {
->  	struct kvmppc_xive *xive = kvm->arch.xive;
-> +	pgoff_t esb_pgoff = KVM_XIVE_ESB_PAGE_OFFSET + irq * 2;
->  
->  	if (irq >= KVMPPC_XIVE_NR_IRQS)
->  		return -EINVAL;
-> @@ -185,7 +186,7 @@ static int kvmppc_xive_native_reset_mapped(struct kvm *kvm, unsigned long irq)
->  	mutex_lock(&xive->mapping_lock);
->  	if (xive->mapping)
->  		unmap_mapping_range(xive->mapping,
-> -				    irq * (2ull << PAGE_SHIFT),
-> +				    esb_pgoff << PAGE_SHIFT,
->  				    2ull << PAGE_SHIFT, 1);
->  	mutex_unlock(&xive->mapping_lock);
->  	return 0;
+
+I certainly don't have such reason :)
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> Paul.
 
