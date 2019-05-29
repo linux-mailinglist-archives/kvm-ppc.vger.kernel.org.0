@@ -2,159 +2,105 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23DEA2D382
-	for <lists+kvm-ppc@lfdr.de>; Wed, 29 May 2019 03:54:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72AFB2D949
+	for <lists+kvm-ppc@lfdr.de>; Wed, 29 May 2019 11:42:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725855AbfE2ByI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 28 May 2019 21:54:08 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42739 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725828AbfE2ByI (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 28 May 2019 21:54:08 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 45DDK91Jlvz9sBb; Wed, 29 May 2019 11:54:05 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1559094845; bh=imLPVfI8pPH7045d2jFL+whAPxqGVNVVa01gDxyjly4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PeqQSWxnR80D0WNCxxsXKhaUpdE59FnxBCfXoFoSa7Y4apu78HAMfTpnPUTlD6dxk
-         1hN7SK2ndHGT9pUT24BJJhGl9Z1JdWd8gWCT2U7oeUVfHBXxEkztHXfH3WtZy1NqrH
-         J4C40440uOHQROIurZMO36iqT7XFaV0Oj9iF0d5dPBiHiNnQi9WVG3YzOxVBniZeZE
-         7YSHdLJSuXy8ntrDuO+TVbhvRwwaCIrbJHYcZsT0205tIQRa4fm42hC1+ego/OMyLa
-         nu8o7hbAnB6Y0UExQKQsIfnjITaEzsbi5P/meNNHlz+EhCGuSf6pO1811c/rO6N766
-         xJNxvABYdQhpg==
-Date:   Wed, 29 May 2019 11:54:00 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org,
-        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: [PATCH v2 3/4] KVM: PPC: Book3S: Use new mutex to synchronize access
- to rtas token list
-Message-ID: <20190529015400.GA16539@blackberry>
-References: <20190523063424.GB19655@blackberry>
- <20190523063601.GE19655@blackberry>
+        id S1725956AbfE2Jmx convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Wed, 29 May 2019 05:42:53 -0400
+Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:56755 "EHLO
+        5.mo69.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725874AbfE2Jmx (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 29 May 2019 05:42:53 -0400
+X-Greylist: delayed 1194 seconds by postgrey-1.27 at vger.kernel.org; Wed, 29 May 2019 05:42:52 EDT
+Received: from player787.ha.ovh.net (unknown [10.109.146.163])
+        by mo69.mail-out.ovh.net (Postfix) with ESMTP id A67015C15F
+        for <kvm-ppc@vger.kernel.org>; Wed, 29 May 2019 11:07:05 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
+        (Authenticated sender: groug@kaod.org)
+        by player787.ha.ovh.net (Postfix) with ESMTPSA id C360F663451E;
+        Wed, 29 May 2019 09:06:58 +0000 (UTC)
+Date:   Wed, 29 May 2019 11:06:57 +0200
+From:   Greg Kurz <groug@kaod.org>
+To:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc:     Paul Mackerras <paulus@samba.org>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: XIVE: fix page offset when
+ clearing ESB pages
+Message-ID: <20190529110657.2dbd1d72@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20190528211324.18656-1-clg@kaod.org>
+References: <20190528211324.18656-1-clg@kaod.org>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190523063601.GE19655@blackberry>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Ovh-Tracer-Id: 5456392424164596107
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvjedgudefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Currently the Book 3S KVM code uses kvm->lock to synchronize access
-to the kvm->arch.rtas_tokens list.  Because this list is scanned
-inside kvmppc_rtas_hcall(), which is called with the vcpu mutex held,
-taking kvm->lock cause a lock inversion problem, which could lead to
-a deadlock.
+On Tue, 28 May 2019 23:13:24 +0200
+Cédric Le Goater <clg@kaod.org> wrote:
 
-To fix this, we add a new mutex, kvm->arch.rtas_token_lock, which nests
-inside the vcpu mutexes, and use that instead of kvm->lock when
-accessing the rtas token list.
+> Under XIVE, the ESB pages of an interrupt are used for interrupt
+> management (EOI) and triggering. They are made available to guests
+> through a mapping of the XIVE KVM device.
+> 
+> When a device is passed-through, the passthru_irq helpers,
+> kvmppc_xive_set_mapped() and kvmppc_xive_clr_mapped(), clear the ESB
+> pages of the guest IRQ number being mapped and let the VM fault
+> handler repopulate with the correct page.
+> 
+> The ESB pages are mapped at offset 4 (KVM_XIVE_ESB_PAGE_OFFSET) in the
+> KVM device mapping. Unfortunately, this offset was not taken into
+> account when clearing the pages. This lead to issues with the
 
-This removes the lockdep_assert_held() in kvmppc_rtas_tokens_free().
-At this point we don't hold the new mutex, but that is OK because
-kvmppc_rtas_tokens_free() is only called when the whole VM is being
-destroyed, and at that point nothing can be looking up a token in
-the list.
+Good catch ! :)
 
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
----
- arch/powerpc/include/asm/kvm_host.h |  1 +
- arch/powerpc/kvm/book3s.c           |  1 +
- arch/powerpc/kvm/book3s_rtas.c      | 14 ++++++--------
- 3 files changed, 8 insertions(+), 8 deletions(-)
+Reviwed-by: Greg Kurz <groug@kaod.org>
 
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 013c76a..fb7d363 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -309,6 +309,7 @@ struct kvm_arch {
- #ifdef CONFIG_PPC_BOOK3S_64
- 	struct list_head spapr_tce_tables;
- 	struct list_head rtas_tokens;
-+	struct mutex rtas_token_lock;
- 	DECLARE_BITMAP(enabled_hcalls, MAX_HCALL_OPCODE/4 + 1);
- #endif
- #ifdef CONFIG_KVM_MPIC
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 61a212d..ac56648 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -902,6 +902,7 @@ int kvmppc_core_init_vm(struct kvm *kvm)
- #ifdef CONFIG_PPC64
- 	INIT_LIST_HEAD_RCU(&kvm->arch.spapr_tce_tables);
- 	INIT_LIST_HEAD(&kvm->arch.rtas_tokens);
-+	mutex_init(&kvm->arch.rtas_token_lock);
- #endif
- 
- 	return kvm->arch.kvm_ops->init_vm(kvm);
-diff --git a/arch/powerpc/kvm/book3s_rtas.c b/arch/powerpc/kvm/book3s_rtas.c
-index 4e178c4..b7ae3df 100644
---- a/arch/powerpc/kvm/book3s_rtas.c
-+++ b/arch/powerpc/kvm/book3s_rtas.c
-@@ -146,7 +146,7 @@ static int rtas_token_undefine(struct kvm *kvm, char *name)
- {
- 	struct rtas_token_definition *d, *tmp;
- 
--	lockdep_assert_held(&kvm->lock);
-+	lockdep_assert_held(&kvm->arch.rtas_token_lock);
- 
- 	list_for_each_entry_safe(d, tmp, &kvm->arch.rtas_tokens, list) {
- 		if (rtas_name_matches(d->handler->name, name)) {
-@@ -167,7 +167,7 @@ static int rtas_token_define(struct kvm *kvm, char *name, u64 token)
- 	bool found;
- 	int i;
- 
--	lockdep_assert_held(&kvm->lock);
-+	lockdep_assert_held(&kvm->arch.rtas_token_lock);
- 
- 	list_for_each_entry(d, &kvm->arch.rtas_tokens, list) {
- 		if (d->token == token)
-@@ -206,14 +206,14 @@ int kvm_vm_ioctl_rtas_define_token(struct kvm *kvm, void __user *argp)
- 	if (copy_from_user(&args, argp, sizeof(args)))
- 		return -EFAULT;
- 
--	mutex_lock(&kvm->lock);
-+	mutex_lock(&kvm->arch.rtas_token_lock);
- 
- 	if (args.token)
- 		rc = rtas_token_define(kvm, args.name, args.token);
- 	else
- 		rc = rtas_token_undefine(kvm, args.name);
- 
--	mutex_unlock(&kvm->lock);
-+	mutex_unlock(&kvm->arch.rtas_token_lock);
- 
- 	return rc;
- }
-@@ -245,7 +245,7 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
- 	orig_rets = args.rets;
- 	args.rets = &args.args[be32_to_cpu(args.nargs)];
- 
--	mutex_lock(&vcpu->kvm->lock);
-+	mutex_lock(&vcpu->kvm->arch.rtas_token_lock);
- 
- 	rc = -ENOENT;
- 	list_for_each_entry(d, &vcpu->kvm->arch.rtas_tokens, list) {
-@@ -256,7 +256,7 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
--	mutex_unlock(&vcpu->kvm->lock);
-+	mutex_unlock(&vcpu->kvm->arch.rtas_token_lock);
- 
- 	if (rc == 0) {
- 		args.rets = orig_rets;
-@@ -282,8 +282,6 @@ void kvmppc_rtas_tokens_free(struct kvm *kvm)
- {
- 	struct rtas_token_definition *d, *tmp;
- 
--	lockdep_assert_held(&kvm->lock);
--
- 	list_for_each_entry_safe(d, tmp, &kvm->arch.rtas_tokens, list) {
- 		list_del(&d->list);
- 		kfree(d);
--- 
-2.7.4
+> passthrough devices for which the interrupts were not functional under
+> some guest configuration (tg3 and single CPU) or in any configuration
+
+And this patch fixes my tg3 use case.
+
+Tested-by: Greg Kurz <groug@kaod.org>
+
+> (e1000e adapter).
+> 
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> ---
+> 
+>  if unmap_mapping_pages() could be called from a module, we would
+>  simplify a bit this code.
+> 
+>  arch/powerpc/kvm/book3s_xive_native.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+> index 8b762e3ebbc5..5596c8ec221a 100644
+> --- a/arch/powerpc/kvm/book3s_xive_native.c
+> +++ b/arch/powerpc/kvm/book3s_xive_native.c
+> @@ -172,6 +172,7 @@ int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
+>  static int kvmppc_xive_native_reset_mapped(struct kvm *kvm, unsigned long irq)
+>  {
+>  	struct kvmppc_xive *xive = kvm->arch.xive;
+> +	pgoff_t esb_pgoff = KVM_XIVE_ESB_PAGE_OFFSET + irq * 2;
+>  
+>  	if (irq >= KVMPPC_XIVE_NR_IRQS)
+>  		return -EINVAL;
+> @@ -185,7 +186,7 @@ static int kvmppc_xive_native_reset_mapped(struct kvm *kvm, unsigned long irq)
+>  	mutex_lock(&xive->mapping_lock);
+>  	if (xive->mapping)
+>  		unmap_mapping_range(xive->mapping,
+> -				    irq * (2ull << PAGE_SHIFT),
+> +				    esb_pgoff << PAGE_SHIFT,
+>  				    2ull << PAGE_SHIFT, 1);
+>  	mutex_unlock(&xive->mapping_lock);
+>  	return 0;
 
