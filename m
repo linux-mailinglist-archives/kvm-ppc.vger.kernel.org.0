@@ -2,162 +2,169 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FE732DDED
-	for <lists+kvm-ppc@lfdr.de>; Wed, 29 May 2019 15:17:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A987A2E409
+	for <lists+kvm-ppc@lfdr.de>; Wed, 29 May 2019 20:04:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726828AbfE2NRb convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm-ppc@lfdr.de>); Wed, 29 May 2019 09:17:31 -0400
-Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:48765 "EHLO
-        5.mo179.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726949AbfE2NRa (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 29 May 2019 09:17:30 -0400
-Received: from player157.ha.ovh.net (unknown [10.108.42.184])
-        by mo179.mail-out.ovh.net (Postfix) with ESMTP id BF5701337B1
-        for <kvm-ppc@vger.kernel.org>; Wed, 29 May 2019 15:17:28 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player157.ha.ovh.net (Postfix) with ESMTPSA id 5905063CB146;
-        Wed, 29 May 2019 13:17:22 +0000 (UTC)
-Date:   Wed, 29 May 2019 15:17:21 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc:     Paul Mackerras <paulus@samba.org>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: PPC: Book3S HV: XIVE: do not clear IRQ data of
- passthrough interrupts
-Message-ID: <20190529151721.682b5999@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190528121716.18419-2-clg@kaod.org>
-References: <20190528121716.18419-1-clg@kaod.org>
-        <20190528121716.18419-2-clg@kaod.org>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1726054AbfE2SEs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 29 May 2019 14:04:48 -0400
+Received: from mga18.intel.com ([134.134.136.126]:64466 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725990AbfE2SEs (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 29 May 2019 14:04:48 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 May 2019 11:04:47 -0700
+X-ExtLoop1: 1
+Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
+  by orsmga002.jf.intel.com with ESMTP; 29 May 2019 11:04:46 -0700
+Date:   Wed, 29 May 2019 11:05:48 -0700
+From:   Ira Weiny <ira.weiny@intel.com>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     akpm@linux-foundation.org, Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Alan Tull <atull@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christoph Lameter <cl@linux.com>,
+        Christophe Leroy <christophe.leroy@c-s.fr>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Moritz Fischer <mdf@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Steve Sistare <steven.sistare@oracle.com>,
+        Wu Hao <hao.wu@intel.com>, linux-mm@kvack.org,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-fpga@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] mm: add account_locked_vm utility function
+Message-ID: <20190529180547.GA16182@iweiny-DESK2.sc.intel.com>
+References: <de375582-2c35-8e8a-4737-c816052a8e58@ozlabs.ru>
+ <20190524175045.26897-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Ovh-Tracer-Id: 9684991002576918923
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvjedgieegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190524175045.26897-1-daniel.m.jordan@oracle.com>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, 28 May 2019 14:17:15 +0200
-Cédric Le Goater <clg@kaod.org> wrote:
+On Fri, May 24, 2019 at 01:50:45PM -0400, Daniel Jordan wrote:
 
-> The passthrough interrupts are defined at the host level and their IRQ
-> data should not be cleared unless specifically deconfigured (shutdown)
-> by the host. They differ from the IPI interrupts which are allocated
-> by the XIVE KVM device and reserved to the guest usage only.
-> 
-> This fixes a host crash when destroying a VM in which a PCI adapter
-> was passed-through. In this case, the interrupt is cleared and freed
-> by the KVM device and then shutdown by vfio at the host level.
-> 
-> [ 1007.360265] BUG: Kernel NULL pointer dereference at 0x00000d00
-> [ 1007.360285] Faulting instruction address: 0xc00000000009da34
-> [ 1007.360296] Oops: Kernel access of bad area, sig: 7 [#1]
-> [ 1007.360303] LE PAGE_SIZE=64K MMU=Radix MMU=Hash SMP NR_CPUS=2048 NUMA PowerNV
-> [ 1007.360314] Modules linked in: vhost_net vhost iptable_mangle ipt_MASQUERADE iptable_nat nf_nat xt_conntrack nf_conntrack nf_defrag_ipv4 ipt_REJECT nf_reject_ipv4 tun bridge stp llc kvm_hv kvm xt_tcpudp iptable_filter squashfs fuse binfmt_misc vmx_crypto ib_iser rdma_cm iw_cm ib_cm libiscsi scsi_transport_iscsi nfsd ip_tables x_tables autofs4 btrfs zstd_decompress zstd_compress lzo_compress raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq multipath mlx5_ib ib_uverbs ib_core crc32c_vpmsum mlx5_core
-> [ 1007.360425] CPU: 9 PID: 15576 Comm: CPU 18/KVM Kdump: loaded Not tainted 5.1.0-gad7e7d0ef #4
-> [ 1007.360454] NIP:  c00000000009da34 LR: c00000000009e50c CTR: c00000000009e5d0
-> [ 1007.360482] REGS: c000007f24ccf330 TRAP: 0300   Not tainted  (5.1.0-gad7e7d0ef)
-> [ 1007.360500] MSR:  900000000280b033 <SF,HV,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 24002484  XER: 00000000
-> [ 1007.360532] CFAR: c00000000009da10 DAR: 0000000000000d00 DSISR: 00080000 IRQMASK: 1
-> [ 1007.360532] GPR00: c00000000009e62c c000007f24ccf5c0 c000000001510600 c000007fe7f947c0
-> [ 1007.360532] GPR04: 0000000000000d00 0000000000000000 0000000000000000 c000005eff02d200
-> [ 1007.360532] GPR08: 0000000000400000 0000000000000000 0000000000000000 fffffffffffffffd
-> [ 1007.360532] GPR12: c00000000009e5d0 c000007fffff7b00 0000000000000031 000000012c345718
-> [ 1007.360532] GPR16: 0000000000000000 0000000000000008 0000000000418004 0000000000040100
-> [ 1007.360532] GPR20: 0000000000000000 0000000008430000 00000000003c0000 0000000000000027
-> [ 1007.360532] GPR24: 00000000000000ff 0000000000000000 00000000000000ff c000007faa90d98c
-> [ 1007.360532] GPR28: c000007faa90da40 00000000000fe040 ffffffffffffffff c000007fe7f947c0
-> [ 1007.360689] NIP [c00000000009da34] xive_esb_read+0x34/0x120
-> [ 1007.360706] LR [c00000000009e50c] xive_do_source_set_mask.part.0+0x2c/0x50
-> [ 1007.360732] Call Trace:
-> [ 1007.360738] [c000007f24ccf5c0] [c000000000a6383c] snooze_loop+0x15c/0x270 (unreliable)
-> [ 1007.360775] [c000007f24ccf5f0] [c00000000009e62c] xive_irq_shutdown+0x5c/0xe0
-> [ 1007.360795] [c000007f24ccf630] [c00000000019e4a0] irq_shutdown+0x60/0xe0
-> [ 1007.360813] [c000007f24ccf660] [c000000000198c44] __free_irq+0x3a4/0x420
-> [ 1007.360831] [c000007f24ccf700] [c000000000198dc8] free_irq+0x78/0xe0
-> [ 1007.360849] [c000007f24ccf730] [c00000000096c5a8] vfio_msi_set_vector_signal+0xa8/0x350
-> [ 1007.360878] [c000007f24ccf7f0] [c00000000096c938] vfio_msi_set_block+0xe8/0x1e0
-> [ 1007.360899] [c000007f24ccf850] [c00000000096cae0] vfio_msi_disable+0xb0/0x110
-> [ 1007.360912] [c000007f24ccf8a0] [c00000000096cd04] vfio_pci_set_msi_trigger+0x1c4/0x3d0
-> [ 1007.360922] [c000007f24ccf910] [c00000000096d910] vfio_pci_set_irqs_ioctl+0xa0/0x170
-> [ 1007.360941] [c000007f24ccf930] [c00000000096b400] vfio_pci_disable+0x80/0x5e0
-> [ 1007.360963] [c000007f24ccfa10] [c00000000096b9bc] vfio_pci_release+0x5c/0x90
-> [ 1007.360991] [c000007f24ccfa40] [c000000000963a9c] vfio_device_fops_release+0x3c/0x70
-> [ 1007.361012] [c000007f24ccfa70] [c0000000003b5668] __fput+0xc8/0x2b0
-> [ 1007.361040] [c000007f24ccfac0] [c0000000001409b0] task_work_run+0x140/0x1b0
-> [ 1007.361059] [c000007f24ccfb20] [c000000000118f8c] do_exit+0x3ac/0xd00
-> [ 1007.361076] [c000007f24ccfc00] [c0000000001199b0] do_group_exit+0x60/0x100
-> [ 1007.361094] [c000007f24ccfc40] [c00000000012b514] get_signal+0x1a4/0x8f0
-> [ 1007.361112] [c000007f24ccfd30] [c000000000021cc8] do_notify_resume+0x1a8/0x430
-> [ 1007.361141] [c000007f24ccfe20] [c00000000000e444] ret_from_except_lite+0x70/0x74
-> [ 1007.361159] Instruction dump:
-> [ 1007.361175] 38422c00 e9230000 712a0004 41820010 548a2036 7d442378 78840020 71290020
-> [ 1007.361194] 4082004c e9230010 7c892214 7c0004ac <e9240000> 0c090000 4c00012c 792a0022
-> 
-> Fixes: 5af50993850a ("KVM: PPC: Book3S HV: Native usage of the XIVE interrupt controller")
+[snip]
 
-Maybe worth adding:
-
-Cc: stable@vger.kernel.org # v4.12+
-
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  arch/powerpc/kvm/book3s_xive.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> index 12c8a36dd980..922fd62bcd2a 100644
-> --- a/arch/powerpc/kvm/book3s_xive.c
-> +++ b/arch/powerpc/kvm/book3s_xive.c
-> @@ -1828,7 +1828,6 @@ static void kvmppc_xive_cleanup_irq(u32 hw_num, struct xive_irq_data *xd)
->  {
->  	xive_vm_esb_load(xd, XIVE_ESB_SET_PQ_01);
->  	xive_native_configure_irq(hw_num, 0, MASKED, 0);
-> -	xive_cleanup_irq_data(xd);
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 0e8834ac32b7..72c1034d2ec7 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -1564,6 +1564,25 @@ long get_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
+>  int get_user_pages_fast(unsigned long start, int nr_pages,
+>  			unsigned int gup_flags, struct page **pages);
+>  
+> +int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc,
+> +			struct task_struct *task, bool bypass_rlim);
+> +
+> +static inline int account_locked_vm(struct mm_struct *mm, unsigned long pages,
+> +				    bool inc)
+> +{
+> +	int ret;
+> +
+> +	if (pages == 0 || !mm)
+> +		return 0;
+> +
+> +	down_write(&mm->mmap_sem);
+> +	ret = __account_locked_vm(mm, pages, inc, current,
+> +				  capable(CAP_IPC_LOCK));
+> +	up_write(&mm->mmap_sem);
+> +
+> +	return ret;
+> +}
+> +
+>  /* Container for pinned pfns / pages */
+>  struct frame_vector {
+>  	unsigned int nr_allocated;	/* Number of frames we have space for */
+> diff --git a/mm/util.c b/mm/util.c
+> index e2e4f8c3fa12..bd3bdf16a084 100644
+> --- a/mm/util.c
+> +++ b/mm/util.c
+> @@ -6,6 +6,7 @@
+>  #include <linux/err.h>
+>  #include <linux/sched.h>
+>  #include <linux/sched/mm.h>
+> +#include <linux/sched/signal.h>
+>  #include <linux/sched/task_stack.h>
+>  #include <linux/security.h>
+>  #include <linux/swap.h>
+> @@ -346,6 +347,51 @@ int __weak get_user_pages_fast(unsigned long start,
 >  }
+>  EXPORT_SYMBOL_GPL(get_user_pages_fast);
 >  
->  void kvmppc_xive_free_sources(struct kvmppc_xive_src_block *sb)
-> @@ -1842,9 +1841,10 @@ void kvmppc_xive_free_sources(struct kvmppc_xive_src_block *sb)
->  			continue;
->  
->  		kvmppc_xive_cleanup_irq(state->ipi_number, &state->ipi_data);
-> +		xive_cleanup_irq_data(&state->ipi_data);
->  		xive_native_free_irq(state->ipi_number);
->  
-> -		/* Pass-through, cleanup too */
-> +		/* Pass-through, cleanup too but keep IRQ hw data */
->  		if (state->pt_number)
->  			kvmppc_xive_cleanup_irq(state->pt_number, state->pt_data);
->  
+> +/**
+> + * __account_locked_vm - account locked pages to an mm's locked_vm
+> + * @mm:          mm to account against, may be NULL
 
-Also, even if this definitely allows to avoid the crash, I'm still not
-convinced we should be calling kvmppc_xive_cleanup_irq() for pass-through
-at all.
+This kernel doc is wrong.  You dereference mm straight away...
 
-My concern is that kvmppc_xive_clr_mapped() which gets called when VFIO shuts
-the interrupt down seems to be doing extra stuff to release the pass-through
-interrupt back to the host. But when the KVM device gets released before VFIO
-had a chance to do that, kvmppc_xive_clr_mapped() is a nop since both
-kvmppc_xive_release() and kvmppc_xive_native_release() set kvm.arch->xive to
-NULL. This triggers the following warning in the xics-on-xive case:
+> + * @pages:       number of pages to account
+> + * @inc:         %true if @pages should be considered positive, %false if not
+> + * @task:        task used to check RLIMIT_MEMLOCK
+> + * @bypass_rlim: %true if checking RLIMIT_MEMLOCK should be skipped
+> + *
+> + * Assumes @task and @mm are valid (i.e. at least one reference on each), and
+> + * that mmap_sem is held as writer.
+> + *
+> + * Return:
+> + * * 0       on success
+> + * * 0       if @mm is NULL (can happen for example if the task is exiting)
+> + * * -ENOMEM if RLIMIT_MEMLOCK would be exceeded.
+> + */
+> +int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc,
+> +			struct task_struct *task, bool bypass_rlim)
+> +{
+> +	unsigned long locked_vm, limit;
+> +	int ret = 0;
+> +
+> +	locked_vm = mm->locked_vm;
 
-[25185.218975] kvmppc_clr_passthru_irq (irq 94, gsi 4870) fails: -19
+here...
 
-I'm wondering if we should do this extra stuff from kvmppc_xive_clr_mapped()
-as well when closing the KVM device instead of clearing the interrupt as the
-we do now.
+Perhaps the comment was meant to document account_locked_vm()?  Or should the
+parameter checks be moved here?
 
-This needs some more investigation.
+Ira
 
-Cheers,
+> +	if (inc) {
+> +		if (!bypass_rlim) {
+> +			limit = task_rlimit(task, RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+> +			if (locked_vm + pages > limit)
+> +				ret = -ENOMEM;
+> +		}
+> +		if (!ret)
+> +			mm->locked_vm = locked_vm + pages;
+> +	} else {
+> +		WARN_ON_ONCE(pages > locked_vm);
+> +		mm->locked_vm = locked_vm - pages;
+> +	}
+> +
+> +	pr_debug("%s: [%d] caller %ps %c%lu %lu/%lu%s\n", __func__, task->pid,
+> +		 (void *)_RET_IP_, (inc) ? '+' : '-', pages << PAGE_SHIFT,
+> +		 locked_vm << PAGE_SHIFT, task_rlimit(task, RLIMIT_MEMLOCK),
+> +		 ret ? " - exceeded" : "");
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(__account_locked_vm);
+>
 
---
-Greg
+> +
+>  unsigned long vm_mmap_pgoff(struct file *file, unsigned long addr,
+>  	unsigned long len, unsigned long prot,
+>  	unsigned long flag, unsigned long pgoff)
+> 
+> base-commit: a188339ca5a396acc588e5851ed7e19f66b0ebd9
+> -- 
+> 2.21.0
+> 
