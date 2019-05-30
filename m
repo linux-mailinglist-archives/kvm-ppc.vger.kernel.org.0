@@ -2,110 +2,102 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 566572FB4C
-	for <lists+kvm-ppc@lfdr.de>; Thu, 30 May 2019 14:00:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E8103008D
+	for <lists+kvm-ppc@lfdr.de>; Thu, 30 May 2019 19:10:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727001AbfE3L77 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 30 May 2019 07:59:59 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:41551 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726806AbfE3L77 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 30 May 2019 07:59:59 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 45F5jm3gm5z9s5c; Thu, 30 May 2019 21:59:56 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1559217596; bh=DEccgpzpDGHzVjTlyndHNeVJrmmoGpiDRPg30y+OHt0=;
-        h=Date:From:To:Cc:Subject:From;
-        b=uqELnt9erlHUk2hvN4XAPIU89ppi3pH0spJu1LyOvZd0d7E3O+6FS8SFdIUeYwXXL
-         wECpQN74a9DFRAHtqQx4RN34j6ZGdO2EMZ+EMpVXGXir61iWjEA1KGJYJSsvhNnyQA
-         3RFdOsnCZDgsufl9LR34QbCw4t2WXdjPR+h7bsgEvCfye3iUv1GyH57JwQr0wGeuRr
-         zBXqWlVnm5vDU+ohLCNzeFX7wZu0uaoeKegqw5zolHhRpkWLBjV+NLImE6w81cQXNg
-         acdr6hhU/r/DhF0K7+lZAuloKpHZQ8fw4t5Hoh/iQK/f44PXocE0fcOyJDrzBNjwon
-         ZJJ5gYTDekB4w==
-Date:   Thu, 30 May 2019 21:59:44 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-Subject: [GIT PULL] Please pull my kvm-ppc-fixes-5.2-1 tag
-Message-ID: <20190530115944.GA6675@blackberry>
+        id S1726307AbfE3RKX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 30 May 2019 13:10:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44028 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725961AbfE3RKX (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 30 May 2019 13:10:23 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4UH4ncV023714
+        for <kvm-ppc@vger.kernel.org>; Thu, 30 May 2019 13:10:22 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2stjjy1q2g-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Thu, 30 May 2019 13:10:22 -0400
+Received: from localhost
+        by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <farosas@linux.ibm.com>;
+        Thu, 30 May 2019 18:10:21 +0100
+Received: from b01cxnp22033.gho.pok.ibm.com (9.57.198.23)
+        by e12.ny.us.ibm.com (146.89.104.199) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 30 May 2019 18:10:18 +0100
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4UHAHVu36831416
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 30 May 2019 17:10:17 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 222F2112066;
+        Thu, 30 May 2019 17:10:17 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33CC0112061;
+        Thu, 30 May 2019 17:10:16 +0000 (GMT)
+Received: from farosas.linux.ibm.com.br.ibm.com (unknown [9.86.26.122])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 30 May 2019 17:10:15 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Subject: [PATCH] KVM: PPC: Remove leftover comment from emulate_loadstore.c
+Date:   Thu, 30 May 2019 14:10:14 -0300
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-TM-AS-GCONF: 00
+x-cbid: 19053017-0060-0000-0000-0000034A0298
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011185; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01210829; UDB=6.00636183; IPR=6.00991863;
+ MB=3.00027121; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-30 17:10:19
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19053017-0061-0000-0000-0000498E3E5F
+Message-Id: <20190530171014.1733-1-farosas@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-30_10:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=650 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905300120
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paolo or Radim,
+The mmio_vsx_tx_sx_enabled field was removed but its documentation was
+left behind.
 
-Please do a pull from my kvm-ppc-fixes-5.2-1 tag to get a series of
-commits which should go into 5.2 (i.e. via the master branch of the
-kvm tree).  They are mostly fixes for the new code which allows guests
-to access the XIVE interrupt controller on POWER9 machines directly,
-and locking fixes to solve host deadlock issues.
+4eeb85568e56 KVM: PPC: Remove mmio_vsx_tx_sx_enabled in KVM MMIO
+emulation
 
-It turns out that the PPC KVM code had been using the kvm->lock mutex
-in several places where the vcpu mutex was already held.  Although
-this is contrary to what Documentation/virtual/kvm/locking.txt says,
-lockdep didn't complain about it in the past because we (apparently)
-had no places where a vcpu mutex was taken with kvm->lock held.  Now
-there is such a place, in the recently-added XIVE code.  Thus we now
-need to fix those other places that take the locks in the wrong order.
+Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+---
+ arch/powerpc/kvm/emulate_loadstore.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-Thanks,
-Paul.
+diff --git a/arch/powerpc/kvm/emulate_loadstore.c b/arch/powerpc/kvm/emulate_loadstore.c
+index f91b1309a0a8..806dbc439131 100644
+--- a/arch/powerpc/kvm/emulate_loadstore.c
++++ b/arch/powerpc/kvm/emulate_loadstore.c
+@@ -100,12 +100,6 @@ int kvmppc_emulate_loadstore(struct kvm_vcpu *vcpu)
+ 	rs = get_rs(inst);
+ 	rt = get_rt(inst);
+ 
+-	/*
+-	 * if mmio_vsx_tx_sx_enabled == 0, copy data between
+-	 * VSR[0..31] and memory
+-	 * if mmio_vsx_tx_sx_enabled == 1, copy data between
+-	 * VSR[32..63] and memory
+-	 */
+ 	vcpu->arch.mmio_vsx_copy_nums = 0;
+ 	vcpu->arch.mmio_vsx_offset = 0;
+ 	vcpu->arch.mmio_copy_type = KVMPPC_VSX_COPY_NONE;
+-- 
+2.20.1
 
-The following changes since commit cd6c84d8f0cdc911df435bb075ba22ce3c605b07:
-
-  Linux 5.2-rc2 (2019-05-26 16:49:19 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.2-1
-
-for you to fetch changes up to d724c9e54939a597592de3659541da11fc7aa112:
-
-  KVM: PPC: Book3S HV: Restore SPRG3 in kvmhv_p9_guest_entry() (2019-05-30 14:00:54 +1000)
-
-----------------------------------------------------------------
-PPC KVM fixes for 5.2
-
-- Several bug fixes for the new XIVE-native code.
-- Replace kvm->lock by other mutexes in several places where we hold a
-  vcpu mutex, to avoid lock order inversions.
-- Fix a lockdep warning on guest entry for radix-mode guests.
-- Fix a bug causing user-visible corruption of SPRG3 on the host.
-
-----------------------------------------------------------------
-Cédric Le Goater (7):
-      KVM: PPC: Book3S HV: XIVE: Clear file mapping when device is released
-      KVM: PPC: Book3S HV: XIVE: Do not test the EQ flag validity when resetting
-      KVM: PPC: Book3S HV: XIVE: Fix the enforced limit on the vCPU identifier
-      KVM: PPC: Book3S HV: XIVE: Introduce a new mutex for the XIVE device
-      KVM: PPC: Book3S HV: XIVE: Do not clear IRQ data of passthrough interrupts
-      KVM: PPC: Book3S HV: XIVE: Take the srcu read lock when accessing memslots
-      KVM: PPC: Book3S HV: XIVE: Fix page offset when clearing ESB pages
-
-Paul Mackerras (5):
-      KVM: PPC: Book3S HV: Avoid touching arch.mmu_ready in XIVE release functions
-      KVM: PPC: Book3S HV: Use new mutex to synchronize MMU setup
-      KVM: PPC: Book3S: Use new mutex to synchronize access to rtas token list
-      KVM: PPC: Book3S HV: Don't take kvm->lock around kvm_for_each_vcpu
-      KVM: PPC: Book3S HV: Fix lockdep warning when entering guest on POWER9
-
-Suraj Jitindar Singh (1):
-      KVM: PPC: Book3S HV: Restore SPRG3 in kvmhv_p9_guest_entry()
-
- arch/powerpc/include/asm/kvm_host.h   |   2 +
- arch/powerpc/kvm/book3s.c             |   1 +
- arch/powerpc/kvm/book3s_64_mmu_hv.c   |  36 ++++++------
- arch/powerpc/kvm/book3s_hv.c          |  48 ++++++++++------
- arch/powerpc/kvm/book3s_rtas.c        |  14 ++---
- arch/powerpc/kvm/book3s_xive.c        |  55 +++++++++----------
- arch/powerpc/kvm/book3s_xive.h        |   1 +
- arch/powerpc/kvm/book3s_xive_native.c | 100 +++++++++++++++++++---------------
- 8 files changed, 142 insertions(+), 115 deletions(-)
