@@ -2,138 +2,87 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E2D42E810
-	for <lists+kvm-ppc@lfdr.de>; Thu, 30 May 2019 00:22:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D25A42EA8E
+	for <lists+kvm-ppc@lfdr.de>; Thu, 30 May 2019 04:17:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726311AbfE2WWf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 29 May 2019 18:22:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55194 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726240AbfE2WWf (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 29 May 2019 18:22:35 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4TM38da031924
-        for <kvm-ppc@vger.kernel.org>; Wed, 29 May 2019 18:22:34 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2st1p4any5-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Wed, 29 May 2019 18:22:34 -0400
-Received: from localhost
-        by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <farosas@linux.ibm.com>;
-        Wed, 29 May 2019 23:22:33 +0100
-Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
-        by e31.co.us.ibm.com (192.168.1.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 29 May 2019 23:22:29 +0100
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4TMMSev26411456
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 May 2019 22:22:28 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 98613C6055;
-        Wed, 29 May 2019 22:22:28 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 32320C605A;
-        Wed, 29 May 2019 22:22:25 +0000 (GMT)
-Received: from farosas.linux.ibm.com.ibmuc.com (unknown [9.85.162.241])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 29 May 2019 22:22:24 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
+        id S1726462AbfE3CRi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 29 May 2019 22:17:38 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:38099 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726311AbfE3CRh (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 29 May 2019 22:17:37 -0400
+Received: by mail-pl1-f194.google.com with SMTP id f97so1875092plb.5;
+        Wed, 29 May 2019 19:17:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=mG0K6Xuhbuw0UAFGEVQxLHL2UiAfokWdja5pAOSTcpg=;
+        b=VqyPuC7zMupYS4v6p61jz9KDynbRRTkVHwNJiFGnK/Hc22x1CqCZFSBb4M8e4XEiBt
+         KoKy2RQjLyOHhPnY3OXbAVGPfxFbwkqtCh4JBY7mtAlNBqojoAlX6RXSyk6iY15BLOaD
+         JPObD4AEb/7tGgGSGhvu3XQvOWVcaP8HMuuq4bRdnW2jpYkY+sQrjSux25khGi65v9Sl
+         a1K2GuBVQ9unJLDNF/Y3dGrG1982wtYqXqWxS10gUJSf6dbho2UK7+xofFDXvrsrUo2k
+         tFuob60BGNXXGDKJaTTWA4aZUI+CkyqNBlFbK7TXQKlwvn7OzuR/A76hPioKWoIb8Wf2
+         wx2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=mG0K6Xuhbuw0UAFGEVQxLHL2UiAfokWdja5pAOSTcpg=;
+        b=T3QHkmNhwrkGJ8Eqc8lnMFGiIXxIQSvrqhyTCvJUEFAE7vmYiQdbpdK4vjjLIH5V1v
+         7N6p19Wde8r8RVyjfIJt25jvvmZFn9yAq9tNUpUYLl6+EC+B9bCs5rlvm0cnk9/x2byD
+         qboHITxaeAEvIHPUnA0afNdr08yETDNhImxtoCVklLSU3TdoXPfZrEt5zoOwlMwbAPya
+         Fy15ZCboWm6/rlFxPbHj+w3c7Zy0E3U/Q9OOxSMHMh1HiTWqX8QCUQT38xHY7CClChr1
+         FTPPb4le64q3uYidoRx+7oXwTMfZ9gSeYR7I7IJuRjLhFzRenXyf8U+FVhHXfedeqZ4P
+         adXw==
+X-Gm-Message-State: APjAAAVkJIUZFGj6ocrPnszdBgXWXicQxEtq4PBcsVG1oWDImts0MKN6
+        QfKD/jT6N2B4zbzyCDjdmtSMOZHD
+X-Google-Smtp-Source: APXvYqzmsXAqAKLi9iA7Pw+2glcjWOhnjwCr303RsKvFP3aZAWFx95j+iUfQWeD6hFlFPajWOTLlDw==
+X-Received: by 2002:a17:902:a81:: with SMTP id 1mr1257428plp.287.1559182657101;
+        Wed, 29 May 2019 19:17:37 -0700 (PDT)
+Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id x17sm584766pgh.47.2019.05.29.19.17.34
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 29 May 2019 19:17:36 -0700 (PDT)
+From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        pbonzini@redhat.com, rkrcmar@redhat.com,
-        david@gibson.dropbear.id.au, aik@ozlabs.ru
-Subject: [PATCH v2] KVM: PPC: Report single stepping capability
-Date:   Wed, 29 May 2019 19:22:19 -0300
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19052922-8235-0000-0000-00000EA056E7
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011181; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01210457; UDB=6.00635958; IPR=6.00991489;
- MB=3.00027107; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-29 22:22:31
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052922-8236-0000-0000-000045C5ED1E
-Message-Id: <20190529222219.27994-1-farosas@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-29_12:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=990 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905290138
+Cc:     paulus@ozlabs.org, kvm@vger.kernel.org,
+        Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Subject: [PATCH] KVM: PPC: Book3S HV: Restore SPRG3 in kvmhv_p9_guest_entry()
+Date:   Thu, 30 May 2019 12:17:18 +1000
+Message-Id: <20190530021718.22584-1-sjitindarsingh@gmail.com>
+X-Mailer: git-send-email 2.13.6
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-When calling the KVM_SET_GUEST_DEBUG ioctl, userspace might request
-the next instruction to be single stepped via the
-KVM_GUESTDBG_SINGLESTEP control bit of the kvm_guest_debug structure.
+The sprgs are a set of 4 general purpose sprs provided for software use.
+SPRG3 is special in that it can also be read from userspace. Thus it is
+used on linux to store the cpu and numa id of the process to speed up
+syscall access to this information.
 
-We currently don't have support for guest single stepping implemented
-in Book3S HV.
+This register is overwritten with the guest value on kvm guest entry,
+and so needs to be restored on exit again. Thus restore the value on
+the guest exit path in kvmhv_p9_guest_entry().
 
-This patch adds the KVM_CAP_PPC_GUEST_DEBUG_SSTEP capability in order
-to inform userspace about the state of single stepping support.
+Fixes: 95a6432ce9038 ("KVM: PPC: Book3S HV: Streamlined guest entry/exit path on P9 for radix guests")
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
+ arch/powerpc/kvm/book3s_hv.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-v1 -> v2:
- - add capability description to Documentation/virtual/kvm/api.txt
-
- Documentation/virtual/kvm/api.txt | 3 +++
- arch/powerpc/kvm/powerpc.c        | 5 +++++
- include/uapi/linux/kvm.h          | 1 +
- 3 files changed, 9 insertions(+)
-
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index ba6c42c576dd..a77643bfa917 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -2969,6 +2969,9 @@ can be determined by querying the KVM_CAP_GUEST_DEBUG_HW_BPS and
- KVM_CAP_GUEST_DEBUG_HW_WPS capabilities which return a positive number
- indicating the number of supported registers.
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index ecbf66b3d2a4..4fdd7a7fe6a7 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3677,6 +3677,7 @@ out:		kfree(hvregs);
+ 	vc->in_guest = 0;
  
-+For ppc, the KVM_CAP_PPC_GUEST_DEBUG_SSTEP capability indicates whether
-+the single-step debug event (KVM_GUESTDBG_SINGLESTEP) is supported.
-+
- When debug events exit the main run loop with the reason
- KVM_EXIT_DEBUG with the kvm_debug_exit_arch part of the kvm_run
- structure containing architecture specific debug information.
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 3393b166817a..fd7e7d55637e 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -538,6 +538,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_IMMEDIATE_EXIT:
- 		r = 1;
- 		break;
-+	case KVM_CAP_PPC_GUEST_DEBUG_SSTEP:
-+#ifdef CONFIG_BOOKE
-+		r = 1;
-+		break;
-+#endif
- 	case KVM_CAP_PPC_PAIRED_SINGLES:
- 	case KVM_CAP_PPC_OSI:
- 	case KVM_CAP_PPC_GET_PVINFO:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2fe12b40d503..cad9fcd90f39 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_SVE 170
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-+#define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 173
+ 	mtspr(SPRN_DEC, local_paca->kvm_hstate.dec_expires - mftb());
++	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ 	kvmhv_load_host_pmu();
  
 -- 
-2.20.1
+2.13.6
 
