@@ -2,102 +2,56 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E8103008D
-	for <lists+kvm-ppc@lfdr.de>; Thu, 30 May 2019 19:10:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88E34308B2
+	for <lists+kvm-ppc@lfdr.de>; Fri, 31 May 2019 08:38:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbfE3RKX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 30 May 2019 13:10:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44028 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725961AbfE3RKX (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 30 May 2019 13:10:23 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4UH4ncV023714
-        for <kvm-ppc@vger.kernel.org>; Thu, 30 May 2019 13:10:22 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2stjjy1q2g-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Thu, 30 May 2019 13:10:22 -0400
-Received: from localhost
-        by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <farosas@linux.ibm.com>;
-        Thu, 30 May 2019 18:10:21 +0100
-Received: from b01cxnp22033.gho.pok.ibm.com (9.57.198.23)
-        by e12.ny.us.ibm.com (146.89.104.199) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 30 May 2019 18:10:18 +0100
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4UHAHVu36831416
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 May 2019 17:10:17 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 222F2112066;
-        Thu, 30 May 2019 17:10:17 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 33CC0112061;
-        Thu, 30 May 2019 17:10:16 +0000 (GMT)
-Received: from farosas.linux.ibm.com.br.ibm.com (unknown [9.86.26.122])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 30 May 2019 17:10:15 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: [PATCH] KVM: PPC: Remove leftover comment from emulate_loadstore.c
-Date:   Thu, 30 May 2019 14:10:14 -0300
-X-Mailer: git-send-email 2.20.1
+        id S1726716AbfEaGiC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 31 May 2019 02:38:02 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:39583 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726706AbfEaGiC (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 31 May 2019 02:38:02 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 45FZWq6gLRz9sP0; Fri, 31 May 2019 16:37:58 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1559284679; bh=HdJ9JTlKPTsMYfopsBDM8ysZi48X790cH9p1B4LgFdk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hi33gZA5RDPozK5fsByV5Y0Nsk4idB/x5YZOpG0J0sD3B8FQkiu/SWudojhZZ8XIp
+         XOoj2EkDZPrTm4ojXwk0+wwdronHfnW9p/OFv/3LUAXv98DrtLbd5DByVpbkWkkUli
+         nxEaeor2bbhlwuZusoROM9jp1zYxTPe+zeZo3dhV0i/LxxAMpup0wxv86dIPhSLciM
+         fKkkC4L96G6CwjPquhfQnSbmIOJbpT7XTeZetMsbyunzrv8y0X4SB7t8iyduU4kRwY
+         cdyA3kfl1fkRTnRtttKZ9b5vdJ1mWs1H1AYDAn/lrl0C/4RMzRAQzikVJo7nmwpGUb
+         mM1d4DfFk5kmg==
+Date:   Fri, 31 May 2019 16:32:07 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org,
+        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 0/4] KVM: PPC: Book3S: Fix potential deadlocks
+Message-ID: <20190531063207.GB26651@blackberry>
+References: <20190523063424.GB19655@blackberry>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19053017-0060-0000-0000-0000034A0298
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011185; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01210829; UDB=6.00636183; IPR=6.00991863;
- MB=3.00027121; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-30 17:10:19
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19053017-0061-0000-0000-0000498E3E5F
-Message-Id: <20190530171014.1733-1-farosas@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-30_10:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=650 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905300120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190523063424.GB19655@blackberry>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The mmio_vsx_tx_sx_enabled field was removed but its documentation was
-left behind.
+On Thu, May 23, 2019 at 04:34:24PM +1000, Paul Mackerras wrote:
+> Recent reports of lockdep splats in the HV KVM code revealed that it
+> was taking the kvm->lock mutex in several contexts where a vcpu mutex
+> was already held.  Lockdep has only started warning since I added code
+> to take the vcpu mutexes in the XIVE device release functions, but
+> since Documentation/virtual/kvm/locking.txt specifies that the vcpu
+> mutexes nest inside kvm->lock, it seems that the new code is correct
+> and it is most of the old uses of kvm->lock that are wrong.
+> 
+> This series should fix the problems, by adding new mutexes that nest
+> inside the vcpu mutexes and using them instead of kvm->lock.
 
-4eeb85568e56 KVM: PPC: Remove mmio_vsx_tx_sx_enabled in KVM MMIO
-emulation
+Series applied to my kvm-ppc-fixes branch (with v2 of 3/4).
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- arch/powerpc/kvm/emulate_loadstore.c | 6 ------
- 1 file changed, 6 deletions(-)
-
-diff --git a/arch/powerpc/kvm/emulate_loadstore.c b/arch/powerpc/kvm/emulate_loadstore.c
-index f91b1309a0a8..806dbc439131 100644
---- a/arch/powerpc/kvm/emulate_loadstore.c
-+++ b/arch/powerpc/kvm/emulate_loadstore.c
-@@ -100,12 +100,6 @@ int kvmppc_emulate_loadstore(struct kvm_vcpu *vcpu)
- 	rs = get_rs(inst);
- 	rt = get_rt(inst);
- 
--	/*
--	 * if mmio_vsx_tx_sx_enabled == 0, copy data between
--	 * VSR[0..31] and memory
--	 * if mmio_vsx_tx_sx_enabled == 1, copy data between
--	 * VSR[32..63] and memory
--	 */
- 	vcpu->arch.mmio_vsx_copy_nums = 0;
- 	vcpu->arch.mmio_vsx_offset = 0;
- 	vcpu->arch.mmio_copy_type = KVMPPC_VSX_COPY_NONE;
--- 
-2.20.1
-
+Paul.
