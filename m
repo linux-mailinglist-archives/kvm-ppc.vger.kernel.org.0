@@ -2,156 +2,349 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B8F33968B
-	for <lists+kvm-ppc@lfdr.de>; Fri,  7 Jun 2019 22:13:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD5F539D81
+	for <lists+kvm-ppc@lfdr.de>; Sat,  8 Jun 2019 13:43:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729955AbfFGUNL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 7 Jun 2019 16:13:11 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46710 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728724AbfFGUNL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 7 Jun 2019 16:13:11 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x57KCPhd124296;
-        Fri, 7 Jun 2019 16:13:05 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sywfqu5w3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Jun 2019 16:13:05 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x57K1Uqi017260;
-        Fri, 7 Jun 2019 20:10:38 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma01dal.us.ibm.com with ESMTP id 2syxdfr2un-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Jun 2019 20:10:38 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x57KBnJc31130042
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 7 Jun 2019 20:11:49 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E64A9AC05E;
-        Fri,  7 Jun 2019 20:11:48 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4521EAC05B;
-        Fri,  7 Jun 2019 20:11:47 +0000 (GMT)
-Received: from leobras.br.ibm.com (unknown [9.18.235.153])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri,  7 Jun 2019 20:11:47 +0000 (GMT)
-Message-ID: <0f6d278e78b2784a77ce2cd07a84377da6f5262e.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 1/9] KVM: PPC: Ultravisor: Add PPC_UV config option
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
-        Anshuman Khandual <khandual@linux.vnet.ibm.com>
-Date:   Fri, 07 Jun 2019 17:11:42 -0300
-In-Reply-To: <20190606173614.32090-2-cclaudio@linux.ibm.com>
-References: <20190606173614.32090-1-cclaudio@linux.ibm.com>
-         <20190606173614.32090-2-cclaudio@linux.ibm.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-ulrQwuweQ3GGKql+lSZh"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+        id S1728140AbfFHLlX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 8 Jun 2019 07:41:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58724 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728134AbfFHLlW (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sat, 8 Jun 2019 07:41:22 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B0B86214AF;
+        Sat,  8 Jun 2019 11:41:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559994081;
+        bh=kpwtncCienadC4RcdW6GwxkoRXyld5yuUZOnCwHAaOg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=mXkUVwrdOizCeetP+UgLwYyPSpbXrJTccNL6RTU4cf/YJnQPQ4js+LOSDZzGdh4Yt
+         4imK3jGSLJz6aL2t2r/3SPqN4rMT5tsl8lBr5ifEk7m1MNx/XIsRlx7yLOg1UQ7bSz
+         pvrO6NVyPJY33qQMf/6eC0JOGdBhJ6q5/zaN2YYc=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH AUTOSEL 5.1 52/70] KVM: PPC: Book3S HV: Use new mutex to synchronize MMU setup
+Date:   Sat,  8 Jun 2019 07:39:31 -0400
+Message-Id: <20190608113950.8033-52-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190608113950.8033-1-sashal@kernel.org>
+References: <20190608113950.8033-1-sashal@kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-07_11:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906070135
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+From: Paul Mackerras <paulus@ozlabs.org>
 
---=-ulrQwuweQ3GGKql+lSZh
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+[ Upstream commit 0d4ee88d92884c661fcafd5576da243aa943dc24 ]
 
+Currently the HV KVM code uses kvm->lock in conjunction with a flag,
+kvm->arch.mmu_ready, to synchronize MMU setup and hold off vcpu
+execution until the MMU-related data structures are ready.  However,
+this means that kvm->lock is being taken inside vcpu->mutex, which
+is contrary to Documentation/virtual/kvm/locking.txt and results in
+lockdep warnings.
 
+To fix this, we add a new mutex, kvm->arch.mmu_setup_lock, which nests
+inside the vcpu mutexes, and is taken in the places where kvm->lock
+was taken that are related to MMU setup.
 
-On Thu, 2019-06-06 at 14:36 -0300, Claudio Carvalho wrote:
-> From: Anshuman Khandual <khandual@linux.vnet.ibm.com>
->=20
-> CONFIG_PPC_UV adds support for ultravisor.
->=20
-> Signed-off-by: Anshuman Khandual <khandual@linux.vnet.ibm.com>
-> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-> [Update config help and commit message]
-> Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
-> ---
->  arch/powerpc/Kconfig | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
->=20
-> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-> index 8c1c636308c8..276c1857c335 100644
-> --- a/arch/powerpc/Kconfig
-> +++ b/arch/powerpc/Kconfig
-> @@ -439,6 +439,26 @@ config PPC_TRANSACTIONAL_MEM
->         ---help---
->           Support user-mode Transactional Memory on POWERPC.
->=20
-> +config PPC_UV
-> +	bool "Ultravisor support"
-> +	depends on KVM_BOOK3S_HV_POSSIBLE
-> +	select HMM_MIRROR
-> +	select HMM
-> +	select ZONE_DEVICE
-> +	select MIGRATE_VMA_HELPER
-> +	select DEV_PAGEMAP_OPS
-> +	select DEVICE_PRIVATE
-> +	select MEMORY_HOTPLUG
-> +	select MEMORY_HOTREMOVE
-> +	default n
-> +	help
-> +	  This option paravirtualizes the kernel to run in POWER platforms that
-> +	  supports the Protected Execution Facility (PEF). In such platforms,
-> +	  the ultravisor firmware runs at a privilege level above the
-> +	  hypervisor.
-> +
-> +	  If unsure, say "N".
-> +
->  config LD_HEAD_STUB_CATCH
->  	bool "Reserve 256 bytes to cope with linker stubs in HEAD text" if EXPE=
-RT
->  	depends on PPC64
+Additionally we take the new mutex in the vcpu creation code at the
+point where we are creating a new vcore, in order to provide mutual
+exclusion with kvmppc_update_lpcr() and ensure that an update to
+kvm->arch.lpcr doesn't get missed, which could otherwise lead to a
+stale vcore->lpcr value.
 
-Maybe this patch should be the last of the series, as it may cause some
-bisect trouble to have this option enabled while missing some of the
-patches.
+Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/powerpc/include/asm/kvm_host.h |  1 +
+ arch/powerpc/kvm/book3s_64_mmu_hv.c | 36 ++++++++++++++---------------
+ arch/powerpc/kvm/book3s_hv.c        | 31 ++++++++++++++++++-------
+ 3 files changed, 42 insertions(+), 26 deletions(-)
 
-
-
---=-ulrQwuweQ3GGKql+lSZh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAlz6xP4ACgkQlQYWtz9S
-ttQCfQ/9EITv/NW9EfhotrqtIUvzBsquQmS84AYxUYEghiTj5uQIFPn3VBVTxT7e
-ZbKWEMeOVQWHQ87Hrl6Y90IinkIeacnfdOWD1jk8HG81HAvluF5PmPHoEBMJPH0N
-WLSLdvf6+LQKiRR4du5ffta39bVok/CXOIOBdhrH+vC33xAuFZEBRNXfYi3XBGEj
-+DAmiv/ZXF+QBXYqmx9R/q8Po+5lO3OHN2Zm+D7Kh6+yl4xBBlLjaDNaez8YbNpx
-rol3Hw0fhGpL5CasQI7+sxIZU23mm7v5z32THsks+WCaMgXVq+ejT6jeEC3i+Yw+
-bcDpPGkBg5Gczzo8ItpSGCC9MMu/k9ojFsuBjeNL5A5XEw8Je9/GAKXGhn/t468O
-XwAy+dPxFRZdeUo3a0VmJFscQXlMRjVYC9GP2lwHteghfSLZ/xuQDlCk8Jw2r3j6
-240GxjIKnOCKYD/shTdpOCy7h6ZeqzF5EZPMeQgeLJo/ysZdMAIMTOBvf2s4DHFn
-MqzvQkqNwWIOjxH5mn1lsmrzrQGn8dxgtJ/L8Xxsr2qMEqyuBpnqIlDhO0NOXuoq
-dlDilmPtD88qCbNEnGvb2ov/jRQ4SeM5KavckmXuEH3TOvKmrSnF3Z7cQ1+P3PKq
-5NInu8jm3ltKM5704HOS7iXzLEA0jwF1nlnB+e/wbyErqYSf7jc=
-=tU5v
------END PGP SIGNATURE-----
-
---=-ulrQwuweQ3GGKql+lSZh--
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index e6b5bb012ccb..8d3658275a34 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -317,6 +317,7 @@ struct kvm_arch {
+ #endif
+ 	struct kvmppc_ops *kvm_ops;
+ #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
++	struct mutex mmu_setup_lock;	/* nests inside vcpu mutexes */
+ 	u64 l1_ptcr;
+ 	int max_nested_lpid;
+ 	struct kvm_nested_guest *nested_guests[KVM_MAX_NESTED_GUESTS];
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index be7bc070eae5..c1ced22455f9 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -63,7 +63,7 @@ struct kvm_resize_hpt {
+ 	struct work_struct work;
+ 	u32 order;
+ 
+-	/* These fields protected by kvm->lock */
++	/* These fields protected by kvm->arch.mmu_setup_lock */
+ 
+ 	/* Possible values and their usage:
+ 	 *  <0     an error occurred during allocation,
+@@ -73,7 +73,7 @@ struct kvm_resize_hpt {
+ 	int error;
+ 
+ 	/* Private to the work thread, until error != -EBUSY,
+-	 * then protected by kvm->lock.
++	 * then protected by kvm->arch.mmu_setup_lock.
+ 	 */
+ 	struct kvm_hpt_info hpt;
+ };
+@@ -139,7 +139,7 @@ long kvmppc_alloc_reset_hpt(struct kvm *kvm, int order)
+ 	long err = -EBUSY;
+ 	struct kvm_hpt_info info;
+ 
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&kvm->arch.mmu_setup_lock);
+ 	if (kvm->arch.mmu_ready) {
+ 		kvm->arch.mmu_ready = 0;
+ 		/* order mmu_ready vs. vcpus_running */
+@@ -183,7 +183,7 @@ out:
+ 		/* Ensure that each vcpu will flush its TLB on next entry. */
+ 		cpumask_setall(&kvm->arch.need_tlb_flush);
+ 
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&kvm->arch.mmu_setup_lock);
+ 	return err;
+ }
+ 
+@@ -1447,7 +1447,7 @@ static void resize_hpt_pivot(struct kvm_resize_hpt *resize)
+ 
+ static void resize_hpt_release(struct kvm *kvm, struct kvm_resize_hpt *resize)
+ {
+-	if (WARN_ON(!mutex_is_locked(&kvm->lock)))
++	if (WARN_ON(!mutex_is_locked(&kvm->arch.mmu_setup_lock)))
+ 		return;
+ 
+ 	if (!resize)
+@@ -1474,14 +1474,14 @@ static void resize_hpt_prepare_work(struct work_struct *work)
+ 	if (WARN_ON(resize->error != -EBUSY))
+ 		return;
+ 
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&kvm->arch.mmu_setup_lock);
+ 
+ 	/* Request is still current? */
+ 	if (kvm->arch.resize_hpt == resize) {
+ 		/* We may request large allocations here:
+-		 * do not sleep with kvm->lock held for a while.
++		 * do not sleep with kvm->arch.mmu_setup_lock held for a while.
+ 		 */
+-		mutex_unlock(&kvm->lock);
++		mutex_unlock(&kvm->arch.mmu_setup_lock);
+ 
+ 		resize_hpt_debug(resize, "resize_hpt_prepare_work(): order = %d\n",
+ 				 resize->order);
+@@ -1494,9 +1494,9 @@ static void resize_hpt_prepare_work(struct work_struct *work)
+ 		if (WARN_ON(err == -EBUSY))
+ 			err = -EINPROGRESS;
+ 
+-		mutex_lock(&kvm->lock);
++		mutex_lock(&kvm->arch.mmu_setup_lock);
+ 		/* It is possible that kvm->arch.resize_hpt != resize
+-		 * after we grab kvm->lock again.
++		 * after we grab kvm->arch.mmu_setup_lock again.
+ 		 */
+ 	}
+ 
+@@ -1505,7 +1505,7 @@ static void resize_hpt_prepare_work(struct work_struct *work)
+ 	if (kvm->arch.resize_hpt != resize)
+ 		resize_hpt_release(kvm, resize);
+ 
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&kvm->arch.mmu_setup_lock);
+ }
+ 
+ long kvm_vm_ioctl_resize_hpt_prepare(struct kvm *kvm,
+@@ -1522,7 +1522,7 @@ long kvm_vm_ioctl_resize_hpt_prepare(struct kvm *kvm,
+ 	if (shift && ((shift < 18) || (shift > 46)))
+ 		return -EINVAL;
+ 
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&kvm->arch.mmu_setup_lock);
+ 
+ 	resize = kvm->arch.resize_hpt;
+ 
+@@ -1565,7 +1565,7 @@ long kvm_vm_ioctl_resize_hpt_prepare(struct kvm *kvm,
+ 	ret = 100; /* estimated time in ms */
+ 
+ out:
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&kvm->arch.mmu_setup_lock);
+ 	return ret;
+ }
+ 
+@@ -1588,7 +1588,7 @@ long kvm_vm_ioctl_resize_hpt_commit(struct kvm *kvm,
+ 	if (shift && ((shift < 18) || (shift > 46)))
+ 		return -EINVAL;
+ 
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&kvm->arch.mmu_setup_lock);
+ 
+ 	resize = kvm->arch.resize_hpt;
+ 
+@@ -1625,7 +1625,7 @@ out:
+ 	smp_mb();
+ out_no_hpt:
+ 	resize_hpt_release(kvm, resize);
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&kvm->arch.mmu_setup_lock);
+ 	return ret;
+ }
+ 
+@@ -1868,7 +1868,7 @@ static ssize_t kvm_htab_write(struct file *file, const char __user *buf,
+ 		return -EINVAL;
+ 
+ 	/* lock out vcpus from running while we're doing this */
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&kvm->arch.mmu_setup_lock);
+ 	mmu_ready = kvm->arch.mmu_ready;
+ 	if (mmu_ready) {
+ 		kvm->arch.mmu_ready = 0;	/* temporarily */
+@@ -1876,7 +1876,7 @@ static ssize_t kvm_htab_write(struct file *file, const char __user *buf,
+ 		smp_mb();
+ 		if (atomic_read(&kvm->arch.vcpus_running)) {
+ 			kvm->arch.mmu_ready = 1;
+-			mutex_unlock(&kvm->lock);
++			mutex_unlock(&kvm->arch.mmu_setup_lock);
+ 			return -EBUSY;
+ 		}
+ 	}
+@@ -1963,7 +1963,7 @@ static ssize_t kvm_htab_write(struct file *file, const char __user *buf,
+ 	/* Order HPTE updates vs. mmu_ready */
+ 	smp_wmb();
+ 	kvm->arch.mmu_ready = mmu_ready;
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&kvm->arch.mmu_setup_lock);
+ 
+ 	if (err)
+ 		return err;
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index b2b29d4f9842..4519c55ba19d 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -2257,11 +2257,17 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_hv(struct kvm *kvm,
+ 			pr_devel("KVM: collision on id %u", id);
+ 			vcore = NULL;
+ 		} else if (!vcore) {
++			/*
++			 * Take mmu_setup_lock for mutual exclusion
++			 * with kvmppc_update_lpcr().
++			 */
+ 			err = -ENOMEM;
+ 			vcore = kvmppc_vcore_create(kvm,
+ 					id & ~(kvm->arch.smt_mode - 1));
++			mutex_lock(&kvm->arch.mmu_setup_lock);
+ 			kvm->arch.vcores[core] = vcore;
+ 			kvm->arch.online_vcores++;
++			mutex_unlock(&kvm->arch.mmu_setup_lock);
+ 		}
+ 	}
+ 	mutex_unlock(&kvm->lock);
+@@ -3820,7 +3826,7 @@ static int kvmhv_setup_mmu(struct kvm_vcpu *vcpu)
+ 	int r = 0;
+ 	struct kvm *kvm = vcpu->kvm;
+ 
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&kvm->arch.mmu_setup_lock);
+ 	if (!kvm->arch.mmu_ready) {
+ 		if (!kvm_is_radix(kvm))
+ 			r = kvmppc_hv_setup_htab_rma(vcpu);
+@@ -3830,7 +3836,7 @@ static int kvmhv_setup_mmu(struct kvm_vcpu *vcpu)
+ 			kvm->arch.mmu_ready = 1;
+ 		}
+ 	}
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&kvm->arch.mmu_setup_lock);
+ 	return r;
+ }
+ 
+@@ -4435,7 +4441,8 @@ static void kvmppc_core_commit_memory_region_hv(struct kvm *kvm,
+ 
+ /*
+  * Update LPCR values in kvm->arch and in vcores.
+- * Caller must hold kvm->lock.
++ * Caller must hold kvm->arch.mmu_setup_lock (for mutual exclusion
++ * of kvm->arch.lpcr update).
+  */
+ void kvmppc_update_lpcr(struct kvm *kvm, unsigned long lpcr, unsigned long mask)
+ {
+@@ -4487,7 +4494,7 @@ void kvmppc_setup_partition_table(struct kvm *kvm)
+ 
+ /*
+  * Set up HPT (hashed page table) and RMA (real-mode area).
+- * Must be called with kvm->lock held.
++ * Must be called with kvm->arch.mmu_setup_lock held.
+  */
+ static int kvmppc_hv_setup_htab_rma(struct kvm_vcpu *vcpu)
+ {
+@@ -4575,7 +4582,10 @@ static int kvmppc_hv_setup_htab_rma(struct kvm_vcpu *vcpu)
+ 	goto out_srcu;
+ }
+ 
+-/* Must be called with kvm->lock held and mmu_ready = 0 and no vcpus running */
++/*
++ * Must be called with kvm->arch.mmu_setup_lock held and
++ * mmu_ready = 0 and no vcpus running.
++ */
+ int kvmppc_switch_mmu_to_hpt(struct kvm *kvm)
+ {
+ 	if (nesting_enabled(kvm))
+@@ -4592,7 +4602,10 @@ int kvmppc_switch_mmu_to_hpt(struct kvm *kvm)
+ 	return 0;
+ }
+ 
+-/* Must be called with kvm->lock held and mmu_ready = 0 and no vcpus running */
++/*
++ * Must be called with kvm->arch.mmu_setup_lock held and
++ * mmu_ready = 0 and no vcpus running.
++ */
+ int kvmppc_switch_mmu_to_radix(struct kvm *kvm)
+ {
+ 	int err;
+@@ -4697,6 +4710,8 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+ 	char buf[32];
+ 	int ret;
+ 
++	mutex_init(&kvm->arch.mmu_setup_lock);
++
+ 	/* Allocate the guest's logical partition ID */
+ 
+ 	lpid = kvmppc_alloc_lpid();
+@@ -5222,7 +5237,7 @@ static int kvmhv_configure_mmu(struct kvm *kvm, struct kvm_ppc_mmuv3_cfg *cfg)
+ 	if (kvmhv_on_pseries() && !radix)
+ 		return -EINVAL;
+ 
+-	mutex_lock(&kvm->lock);
++	mutex_lock(&kvm->arch.mmu_setup_lock);
+ 	if (radix != kvm_is_radix(kvm)) {
+ 		if (kvm->arch.mmu_ready) {
+ 			kvm->arch.mmu_ready = 0;
+@@ -5250,7 +5265,7 @@ static int kvmhv_configure_mmu(struct kvm *kvm, struct kvm_ppc_mmuv3_cfg *cfg)
+ 	err = 0;
+ 
+  out_unlock:
+-	mutex_unlock(&kvm->lock);
++	mutex_unlock(&kvm->arch.mmu_setup_lock);
+ 	return err;
+ }
+ 
+-- 
+2.20.1
 
