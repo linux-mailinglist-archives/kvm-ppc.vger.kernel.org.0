@@ -2,165 +2,140 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0904539E72
-	for <lists+kvm-ppc@lfdr.de>; Sat,  8 Jun 2019 13:49:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5605B3B47F
+	for <lists+kvm-ppc@lfdr.de>; Mon, 10 Jun 2019 14:18:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727131AbfFHLtb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 8 Jun 2019 07:49:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37882 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730004AbfFHLtF (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sat, 8 Jun 2019 07:49:05 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 010252168B;
-        Sat,  8 Jun 2019 11:49:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559994544;
-        bh=Ga/Q2fsQ3x6HGX8E6Ru0cHNocZm+Y0qsmKRFrj5LVYs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=abHw9JoTBttfanElTateLoHJZoBkk4b9PypJ6O4gmyKVpM39XWAVCOyp3syzad6WB
-         dsHPXh1JYdby17SU/0wjz26F6jR+hg91cWJZFE2YTXoqLcjk1l/6ZKc86KW49eJFqO
-         tBs/gPel0Ez7fa4wGjGO3eRCnfSVra4U6U68YBTo=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 4.4 10/13] KVM: PPC: Book3S: Use new mutex to synchronize access to rtas token list
-Date:   Sat,  8 Jun 2019 07:48:42 -0400
-Message-Id: <20190608114847.9973-10-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190608114847.9973-1-sashal@kernel.org>
-References: <20190608114847.9973-1-sashal@kernel.org>
+        id S2388833AbfFJMSt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 10 Jun 2019 08:18:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42644 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2389824AbfFJMSt (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 10 Jun 2019 08:18:49 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5ACDxmO062640
+        for <kvm-ppc@vger.kernel.org>; Mon, 10 Jun 2019 08:18:47 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t1mwvp2ak-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Mon, 10 Jun 2019 08:18:47 -0400
+Received: from localhost
+        by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <cclaudio@linux.ibm.com>;
+        Mon, 10 Jun 2019 13:18:46 +0100
+Received: from b03cxnp07028.gho.boulder.ibm.com (9.17.130.15)
+        by e31.co.us.ibm.com (192.168.1.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 10 Jun 2019 13:18:44 +0100
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5ACIg6223331120
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Jun 2019 12:18:42 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A94CB7805C;
+        Mon, 10 Jun 2019 12:18:42 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F9D47805E;
+        Mon, 10 Jun 2019 12:18:40 +0000 (GMT)
+Received: from [9.18.235.79] (unknown [9.18.235.79])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Jun 2019 12:18:40 +0000 (GMT)
+Subject: Re: [PATCH v3 1/9] KVM: PPC: Ultravisor: Add PPC_UV config option
+To:     Leonardo Bras <leonardo@linux.ibm.com>, linuxppc-dev@ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
+        Michael Anderson <andmike@linux.ibm.com>,
+        Ram Pai <linuxram@us.ibm.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>
+References: <20190606173614.32090-1-cclaudio@linux.ibm.com>
+ <20190606173614.32090-2-cclaudio@linux.ibm.com>
+ <0f6d278e78b2784a77ce2cd07a84377da6f5262e.camel@linux.ibm.com>
+From:   Claudio Carvalho <cclaudio@linux.ibm.com>
+Date:   Mon, 10 Jun 2019 09:18:39 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <0f6d278e78b2784a77ce2cd07a84377da6f5262e.camel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19061012-8235-0000-0000-00000EA5F1A6
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011242; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01215941; UDB=6.00639292; IPR=6.00997040;
+ MB=3.00027252; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-10 12:18:45
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061012-8236-0000-0000-000045F57D3F
+Message-Id: <156cd4df-7616-1f34-afd6-7298ebdc8dc0@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-10_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906100086
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Paul Mackerras <paulus@ozlabs.org>
 
-[ Upstream commit 1659e27d2bc1ef47b6d031abe01b467f18cb72d9 ]
+On 6/7/19 5:11 PM, Leonardo Bras wrote:
+>
+> On Thu, 2019-06-06 at 14:36 -0300, Claudio Carvalho wrote:
+>> From: Anshuman Khandual <khandual@linux.vnet.ibm.com>
+>>
+>> CONFIG_PPC_UV adds support for ultravisor.
+>>
+>> Signed-off-by: Anshuman Khandual <khandual@linux.vnet.ibm.com>
+>> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+>> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+>> [Update config help and commit message]
+>> Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
+>> ---
+>>  arch/powerpc/Kconfig | 20 ++++++++++++++++++++
+>>  1 file changed, 20 insertions(+)
+>>
+>> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+>> index 8c1c636308c8..276c1857c335 100644
+>> --- a/arch/powerpc/Kconfig
+>> +++ b/arch/powerpc/Kconfig
+>> @@ -439,6 +439,26 @@ config PPC_TRANSACTIONAL_MEM
+>>         ---help---
+>>           Support user-mode Transactional Memory on POWERPC.
+>>
+>> +config PPC_UV
+>> +	bool "Ultravisor support"
+>> +	depends on KVM_BOOK3S_HV_POSSIBLE
+>> +	select HMM_MIRROR
+>> +	select HMM
+>> +	select ZONE_DEVICE
+>> +	select MIGRATE_VMA_HELPER
+>> +	select DEV_PAGEMAP_OPS
+>> +	select DEVICE_PRIVATE
+>> +	select MEMORY_HOTPLUG
+>> +	select MEMORY_HOTREMOVE
+>> +	default n
+>> +	help
+>> +	  This option paravirtualizes the kernel to run in POWER platforms that
+>> +	  supports the Protected Execution Facility (PEF). In such platforms,
+>> +	  the ultravisor firmware runs at a privilege level above the
+>> +	  hypervisor.
+>> +
+>> +	  If unsure, say "N".
+>> +
+>>  config LD_HEAD_STUB_CATCH
+>>  	bool "Reserve 256 bytes to cope with linker stubs in HEAD text" if EXPERT
+>>  	depends on PPC64
+> Maybe this patch should be the last of the series, as it may cause some
+> bisect trouble to have this option enabled while missing some of the
+> patches.
 
-Currently the Book 3S KVM code uses kvm->lock to synchronize access
-to the kvm->arch.rtas_tokens list.  Because this list is scanned
-inside kvmppc_rtas_hcall(), which is called with the vcpu mutex held,
-taking kvm->lock cause a lock inversion problem, which could lead to
-a deadlock.
+Thanks Leonardo. I changed that for the next version.
 
-To fix this, we add a new mutex, kvm->arch.rtas_token_lock, which nests
-inside the vcpu mutexes, and use that instead of kvm->lock when
-accessing the rtas token list.
+Claudio
 
-This removes the lockdep_assert_held() in kvmppc_rtas_tokens_free().
-At this point we don't hold the new mutex, but that is OK because
-kvmppc_rtas_tokens_free() is only called when the whole VM is being
-destroyed, and at that point nothing can be looking up a token in
-the list.
-
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/powerpc/include/asm/kvm_host.h |  1 +
- arch/powerpc/kvm/book3s.c           |  1 +
- arch/powerpc/kvm/book3s_rtas.c      | 14 ++++++--------
- 3 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index a92d95aee42d..1883627eb12c 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -250,6 +250,7 @@ struct kvm_arch {
- #ifdef CONFIG_PPC_BOOK3S_64
- 	struct list_head spapr_tce_tables;
- 	struct list_head rtas_tokens;
-+	struct mutex rtas_token_lock;
- 	DECLARE_BITMAP(enabled_hcalls, MAX_HCALL_OPCODE/4 + 1);
- #endif
- #ifdef CONFIG_KVM_MPIC
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 099c79d8c160..4aab1c9c83e1 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -809,6 +809,7 @@ int kvmppc_core_init_vm(struct kvm *kvm)
- #ifdef CONFIG_PPC64
- 	INIT_LIST_HEAD(&kvm->arch.spapr_tce_tables);
- 	INIT_LIST_HEAD(&kvm->arch.rtas_tokens);
-+	mutex_init(&kvm->arch.rtas_token_lock);
- #endif
- 
- 	return kvm->arch.kvm_ops->init_vm(kvm);
-diff --git a/arch/powerpc/kvm/book3s_rtas.c b/arch/powerpc/kvm/book3s_rtas.c
-index ef27fbd5d9c5..b1b2273d1f6d 100644
---- a/arch/powerpc/kvm/book3s_rtas.c
-+++ b/arch/powerpc/kvm/book3s_rtas.c
-@@ -133,7 +133,7 @@ static int rtas_token_undefine(struct kvm *kvm, char *name)
- {
- 	struct rtas_token_definition *d, *tmp;
- 
--	lockdep_assert_held(&kvm->lock);
-+	lockdep_assert_held(&kvm->arch.rtas_token_lock);
- 
- 	list_for_each_entry_safe(d, tmp, &kvm->arch.rtas_tokens, list) {
- 		if (rtas_name_matches(d->handler->name, name)) {
-@@ -154,7 +154,7 @@ static int rtas_token_define(struct kvm *kvm, char *name, u64 token)
- 	bool found;
- 	int i;
- 
--	lockdep_assert_held(&kvm->lock);
-+	lockdep_assert_held(&kvm->arch.rtas_token_lock);
- 
- 	list_for_each_entry(d, &kvm->arch.rtas_tokens, list) {
- 		if (d->token == token)
-@@ -193,14 +193,14 @@ int kvm_vm_ioctl_rtas_define_token(struct kvm *kvm, void __user *argp)
- 	if (copy_from_user(&args, argp, sizeof(args)))
- 		return -EFAULT;
- 
--	mutex_lock(&kvm->lock);
-+	mutex_lock(&kvm->arch.rtas_token_lock);
- 
- 	if (args.token)
- 		rc = rtas_token_define(kvm, args.name, args.token);
- 	else
- 		rc = rtas_token_undefine(kvm, args.name);
- 
--	mutex_unlock(&kvm->lock);
-+	mutex_unlock(&kvm->arch.rtas_token_lock);
- 
- 	return rc;
- }
-@@ -232,7 +232,7 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
- 	orig_rets = args.rets;
- 	args.rets = &args.args[be32_to_cpu(args.nargs)];
- 
--	mutex_lock(&vcpu->kvm->lock);
-+	mutex_lock(&vcpu->kvm->arch.rtas_token_lock);
- 
- 	rc = -ENOENT;
- 	list_for_each_entry(d, &vcpu->kvm->arch.rtas_tokens, list) {
-@@ -243,7 +243,7 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
--	mutex_unlock(&vcpu->kvm->lock);
-+	mutex_unlock(&vcpu->kvm->arch.rtas_token_lock);
- 
- 	if (rc == 0) {
- 		args.rets = orig_rets;
-@@ -269,8 +269,6 @@ void kvmppc_rtas_tokens_free(struct kvm *kvm)
- {
- 	struct rtas_token_definition *d, *tmp;
- 
--	lockdep_assert_held(&kvm->lock);
--
- 	list_for_each_entry_safe(d, tmp, &kvm->arch.rtas_tokens, list) {
- 		list_del(&d->list);
- 		kfree(d);
--- 
-2.20.1
 
