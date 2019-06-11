@@ -2,140 +2,118 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5605B3B47F
-	for <lists+kvm-ppc@lfdr.de>; Mon, 10 Jun 2019 14:18:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5F513C14C
+	for <lists+kvm-ppc@lfdr.de>; Tue, 11 Jun 2019 04:40:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388833AbfFJMSt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 10 Jun 2019 08:18:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42644 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2389824AbfFJMSt (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 10 Jun 2019 08:18:49 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5ACDxmO062640
-        for <kvm-ppc@vger.kernel.org>; Mon, 10 Jun 2019 08:18:47 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2t1mwvp2ak-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Mon, 10 Jun 2019 08:18:47 -0400
-Received: from localhost
-        by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <cclaudio@linux.ibm.com>;
-        Mon, 10 Jun 2019 13:18:46 +0100
-Received: from b03cxnp07028.gho.boulder.ibm.com (9.17.130.15)
-        by e31.co.us.ibm.com (192.168.1.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 10 Jun 2019 13:18:44 +0100
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5ACIg6223331120
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Jun 2019 12:18:42 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A94CB7805C;
-        Mon, 10 Jun 2019 12:18:42 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6F9D47805E;
-        Mon, 10 Jun 2019 12:18:40 +0000 (GMT)
-Received: from [9.18.235.79] (unknown [9.18.235.79])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 10 Jun 2019 12:18:40 +0000 (GMT)
-Subject: Re: [PATCH v3 1/9] KVM: PPC: Ultravisor: Add PPC_UV config option
-To:     Leonardo Bras <leonardo@linux.ibm.com>, linuxppc-dev@ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        id S2390765AbfFKCkP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 10 Jun 2019 22:40:15 -0400
+Received: from ozlabs.ru ([107.173.13.209]:45294 "EHLO ozlabs.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390244AbfFKCkO (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 10 Jun 2019 22:40:14 -0400
+X-Greylist: delayed 543 seconds by postgrey-1.27 at vger.kernel.org; Mon, 10 Jun 2019 22:40:14 EDT
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 57A47AE80040;
+        Mon, 10 Jun 2019 22:31:08 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, Alistair Popple <alistair@popple.id.au>,
+        Sam Bobroff <sbobroff@linux.ibm.com>,
+        Jose Ricardo Ziviani <joserz@linux.ibm.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
         Michael Ellerman <mpe@ellerman.id.au>,
-        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
-        Anshuman Khandual <khandual@linux.vnet.ibm.com>
-References: <20190606173614.32090-1-cclaudio@linux.ibm.com>
- <20190606173614.32090-2-cclaudio@linux.ibm.com>
- <0f6d278e78b2784a77ce2cd07a84377da6f5262e.camel@linux.ibm.com>
-From:   Claudio Carvalho <cclaudio@linux.ibm.com>
-Date:   Mon, 10 Jun 2019 09:18:39 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.0
-MIME-Version: 1.0
-In-Reply-To: <0f6d278e78b2784a77ce2cd07a84377da6f5262e.camel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19061012-8235-0000-0000-00000EA5F1A6
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011242; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01215941; UDB=6.00639292; IPR=6.00997040;
- MB=3.00027252; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-10 12:18:45
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061012-8236-0000-0000-000045F57D3F
-Message-Id: <156cd4df-7616-1f34-afd6-7298ebdc8dc0@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-10_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906100086
+        Paul Mackerras <paulus@samba.org>,
+        Oliver O'Halloran <oohall@gmail.com>,
+        Russell Currey <ruscur@russell.cc>, stable@vger.kernel.org
+Subject: [PATCH kernel] powerpc/powernv/ioda: Fix race in TCE level allocation
+Date:   Tue, 11 Jun 2019 12:31:03 +1000
+Message-Id: <20190611023103.86977-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+pnv_tce() returns a pointer to a TCE entry and originally a TCE table
+would be pre-allocated. For the default case of 2GB window the table
+needs only a single level and that is fine. However if more levels are
+requested, it is possible to get a race when 2 threads want a pointer
+to a TCE entry from the same page of TCEs.
 
-On 6/7/19 5:11 PM, Leonardo Bras wrote:
->
-> On Thu, 2019-06-06 at 14:36 -0300, Claudio Carvalho wrote:
->> From: Anshuman Khandual <khandual@linux.vnet.ibm.com>
->>
->> CONFIG_PPC_UV adds support for ultravisor.
->>
->> Signed-off-by: Anshuman Khandual <khandual@linux.vnet.ibm.com>
->> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
->> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
->> [Update config help and commit message]
->> Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
->> ---
->>  arch/powerpc/Kconfig | 20 ++++++++++++++++++++
->>  1 file changed, 20 insertions(+)
->>
->> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
->> index 8c1c636308c8..276c1857c335 100644
->> --- a/arch/powerpc/Kconfig
->> +++ b/arch/powerpc/Kconfig
->> @@ -439,6 +439,26 @@ config PPC_TRANSACTIONAL_MEM
->>         ---help---
->>           Support user-mode Transactional Memory on POWERPC.
->>
->> +config PPC_UV
->> +	bool "Ultravisor support"
->> +	depends on KVM_BOOK3S_HV_POSSIBLE
->> +	select HMM_MIRROR
->> +	select HMM
->> +	select ZONE_DEVICE
->> +	select MIGRATE_VMA_HELPER
->> +	select DEV_PAGEMAP_OPS
->> +	select DEVICE_PRIVATE
->> +	select MEMORY_HOTPLUG
->> +	select MEMORY_HOTREMOVE
->> +	default n
->> +	help
->> +	  This option paravirtualizes the kernel to run in POWER platforms that
->> +	  supports the Protected Execution Facility (PEF). In such platforms,
->> +	  the ultravisor firmware runs at a privilege level above the
->> +	  hypervisor.
->> +
->> +	  If unsure, say "N".
->> +
->>  config LD_HEAD_STUB_CATCH
->>  	bool "Reserve 256 bytes to cope with linker stubs in HEAD text" if EXPERT
->>  	depends on PPC64
-> Maybe this patch should be the last of the series, as it may cause some
-> bisect trouble to have this option enabled while missing some of the
-> patches.
+This adds a spinlock to handle the race. The alloc==true case is not
+possible in the real mode so spinlock is safe for KVM as well.
 
-Thanks Leonardo. I changed that for the next version.
+CC: stable@vger.kernel.org # v4.19+
+Fixes: a68bd1267b72 ("powerpc/powernv/ioda: Allocate indirect TCE levels on demand")
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
 
-Claudio
+This fixes EEH's from
+https://patchwork.ozlabs.org/project/linuxppc-dev/list/?series=110810
 
+
+---
+ arch/powerpc/include/asm/iommu.h              |  1 +
+ arch/powerpc/platforms/powernv/pci-ioda-tce.c | 21 ++++++++++++-------
+ 2 files changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/iommu.h b/arch/powerpc/include/asm/iommu.h
+index 2c1845e5e851..1825b4cc0097 100644
+--- a/arch/powerpc/include/asm/iommu.h
++++ b/arch/powerpc/include/asm/iommu.h
+@@ -111,6 +111,7 @@ struct iommu_table {
+ 	struct iommu_table_ops *it_ops;
+ 	struct kref    it_kref;
+ 	int it_nid;
++	spinlock_t it_lock;
+ };
+ 
+ #define IOMMU_TABLE_USERSPACE_ENTRY_RO(tbl, entry) \
+diff --git a/arch/powerpc/platforms/powernv/pci-ioda-tce.c b/arch/powerpc/platforms/powernv/pci-ioda-tce.c
+index e28f03e1eb5e..9a19d61e2b12 100644
+--- a/arch/powerpc/platforms/powernv/pci-ioda-tce.c
++++ b/arch/powerpc/platforms/powernv/pci-ioda-tce.c
+@@ -29,6 +29,7 @@ void pnv_pci_setup_iommu_table(struct iommu_table *tbl,
+ 	tbl->it_size = tce_size >> 3;
+ 	tbl->it_busno = 0;
+ 	tbl->it_type = TCE_PCI;
++	spin_lock_init(&tbl->it_lock);
+ }
+ 
+ static __be64 *pnv_alloc_tce_level(int nid, unsigned int shift)
+@@ -60,18 +61,22 @@ static __be64 *pnv_tce(struct iommu_table *tbl, bool user, long idx, bool alloc)
+ 		unsigned long tce;
+ 
+ 		if (tmp[n] == 0) {
+-			__be64 *tmp2;
+-
+ 			if (!alloc)
+ 				return NULL;
+ 
+-			tmp2 = pnv_alloc_tce_level(tbl->it_nid,
+-					ilog2(tbl->it_level_size) + 3);
+-			if (!tmp2)
+-				return NULL;
++			spin_lock(&tbl->it_lock);
++			if (tmp[n] == 0) {
++				__be64 *tmp2;
+ 
+-			tmp[n] = cpu_to_be64(__pa(tmp2) |
+-					TCE_PCI_READ | TCE_PCI_WRITE);
++				tmp2 = pnv_alloc_tce_level(tbl->it_nid,
++						ilog2(tbl->it_level_size) + 3);
++				if (tmp2)
++					tmp[n] = cpu_to_be64(__pa(tmp2) |
++						TCE_PCI_READ | TCE_PCI_WRITE);
++			}
++			spin_unlock(&tbl->it_lock);
++			if (tmp[n] == 0)
++				return NULL;
+ 		}
+ 		tce = be64_to_cpu(tmp[n]);
+ 
+-- 
+2.17.1
 
