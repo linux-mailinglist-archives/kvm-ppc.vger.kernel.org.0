@@ -2,113 +2,113 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B128F3C32B
-	for <lists+kvm-ppc@lfdr.de>; Tue, 11 Jun 2019 07:08:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74CE341D88
+	for <lists+kvm-ppc@lfdr.de>; Wed, 12 Jun 2019 09:22:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391041AbfFKFIp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 11 Jun 2019 01:08:45 -0400
-Received: from ozlabs.ru ([107.173.13.209]:55931 "EHLO ozlabs.ru"
+        id S1726699AbfFLHWd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 12 Jun 2019 03:22:33 -0400
+Received: from ozlabs.org ([203.11.71.1]:52039 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390539AbfFKFIp (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 11 Jun 2019 01:08:45 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 95A5DAE80040;
-        Tue, 11 Jun 2019 01:08:41 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, Alistair Popple <alistair@popple.id.au>,
-        Reza Arbab <arbab@linux.ibm.com>,
-        Sam Bobroff <sbobroff@linux.ibm.com>,
-        Jose Ricardo Ziviani <joserz@linux.ibm.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Russell Currey <ruscur@russell.cc>, stable@vger.kernel.org
-Subject: [PATCH kernel v2] powerpc/powernv/ioda: Fix race in TCE level allocation
-Date:   Tue, 11 Jun 2019 15:08:38 +1000
-Message-Id: <20190611050838.124094-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
+        id S1731310AbfFLHWd (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 12 Jun 2019 03:22:33 -0400
+Received: from neuling.org (localhost [127.0.0.1])
+        by ozlabs.org (Postfix) with ESMTP id 45Nyxg20Hpz9s4Y;
+        Wed, 12 Jun 2019 17:22:31 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=neuling.org;
+        s=201811; t=1560324151;
+        bh=GXY1l8UpHijUjOEIuXMbGYgLKaTtnVh3BxkcWBU1OG0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=l+GhAzhtMo8tdmyPtrG9nRSy69a9hGknr3LrSh9Of3D9jzCkBQZIBZTmac4Fkp+Ia
+         xZrmNF9K7XqOmcetIExib0x+H48gqWxaW8TnrgTKzchRFTDlsciBCgNbWRK8VuUCux
+         pBXtcwc07y8/agYej1OzRiOeZW8kBJRRZ3eS7QNjLhr3QI/1JWQUgLsQiJEfQbDDdB
+         zy1hd/HS8JAUKDDaZknxsfqBKP2kWMPSVYiBOJ3VHmORBHSfXWSlaejzlHHseOPJ7u
+         np905+L0/NXEIvsODEIfvpKnUII0EHCnImaGNILgTAdOrUTOS5v3btj3/j6rIiBj67
+         k0VvprHdsnB+Q==
+Received: by neuling.org (Postfix, from userid 1000)
+        id 244A42A0E2F; Wed, 12 Jun 2019 17:22:31 +1000 (AEST)
+From:   Michael Neuling <mikey@neuling.org>
+To:     mpe@ellerman.id.au
+Cc:     linuxppc-dev@lists.ozlabs.org, mikey@neuling.org,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+        Christophe Leroy <christophe.leroy@c-s.fr>, paulus@ozlabs.org,
+        kvm-ppc@vger.kernel.org
+Subject: [PATCH] KVM: PPC: Book3S HV: Fix r3 corruption in h_set_dabr()
+Date:   Wed, 12 Jun 2019 17:22:29 +1000
+Message-Id: <20190612072229.15832-1-mikey@neuling.org>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-pnv_tce() returns a pointer to a TCE entry and originally a TCE table
-would be pre-allocated. For the default case of 2GB window the table
-needs only a single level and that is fine. However if more levels are
-requested, it is possible to get a race when 2 threads want a pointer
-to a TCE entry from the same page of TCEs.
+In commit c1fe190c0672 ("powerpc: Add force enable of DAWR on P9
+option") I screwed up some assembler and corrupted a pointer in
+r3. This resulted in crashes like the below from Cédric:
 
-This adds cmpxchg to handle the race. Note that once a TCE is non-zero,
-it cannot become zero again.
+  [   44.374746] BUG: Kernel NULL pointer dereference at 0x000013bf
+  [   44.374848] Faulting instruction address: 0xc00000000010b044
+  [   44.374906] Oops: Kernel access of bad area, sig: 11 [#1]
+  [   44.374951] LE PAGE_SIZE=64K MMU=Radix MMU=Hash SMP NR_CPUS=2048 NUMA pSeries
+  [   44.375018] Modules linked in: vhost_net vhost tap xt_CHECKSUM iptable_mangle xt_MASQUERADE iptable_nat nf_nat xt_conntrack nf_conntrack nf_defrag_ipv6 libcrc32c nf_defrag_ipv4 ipt_REJECT nf_reject_ipv4 xt_tcpudp bridge stp llc ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter bpfilter vmx_crypto crct10dif_vpmsum crc32c_vpmsum kvm_hv kvm sch_fq_codel ip_tables x_tables autofs4 virtio_net net_failover virtio_scsi failover
+  [   44.375401] CPU: 8 PID: 1771 Comm: qemu-system-ppc Kdump: loaded Not tainted 5.2.0-rc4+ #3
+  [   44.375500] NIP:  c00000000010b044 LR: c0080000089dacf4 CTR: c00000000010aff4
+  [   44.375604] REGS: c00000179b397710 TRAP: 0300   Not tainted  (5.2.0-rc4+)
+  [   44.375691] MSR:  800000000280b033 <SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 42244842  XER: 00000000
+  [   44.375815] CFAR: c00000000010aff8 DAR: 00000000000013bf DSISR: 42000000 IRQMASK: 0
+  [   44.375815] GPR00: c0080000089dd6bc c00000179b3979a0 c008000008a04300 ffffffffffffffff
+  [   44.375815] GPR04: 0000000000000000 0000000000000003 000000002444b05d c0000017f11c45d0
+  [   44.375815] GPR08: 078000003e018dfe 0000000000000028 0000000000000001 0000000000000075
+  [   44.375815] GPR12: c00000000010aff4 c000000007ff6300 0000000000000000 0000000000000000
+  [   44.375815] GPR16: 0000000000000000 c0000017f11d0000 00000000ffffffff c0000017f11ca7a8
+  [   44.375815] GPR20: c0000017f11c42ec ffffffffffffffff 0000000000000000 000000000000000a
+  [   44.375815] GPR24: fffffffffffffffc 0000000000000000 c0000017f11c0000 c000000001a77ed8
+  [   44.375815] GPR28: c00000179af70000 fffffffffffffffc c0080000089ff170 c00000179ae88540
+  [   44.376673] NIP [c00000000010b044] kvmppc_h_set_dabr+0x50/0x68
+  [   44.376754] LR [c0080000089dacf4] kvmppc_pseries_do_hcall+0xa3c/0xeb0 [kvm_hv]
+  [   44.376849] Call Trace:
+  [   44.376886] [c00000179b3979a0] [c0000017f11c0000] 0xc0000017f11c0000 (unreliable)
+  [   44.376982] [c00000179b397a10] [c0080000089dd6bc] kvmppc_vcpu_run_hv+0x694/0xec0 [kvm_hv]
+  [   44.377084] [c00000179b397ae0] [c0080000093f8bcc] kvmppc_vcpu_run+0x34/0x48 [kvm]
+  [   44.377185] [c00000179b397b00] [c0080000093f522c] kvm_arch_vcpu_ioctl_run+0x2f4/0x400 [kvm]
+  [   44.377286] [c00000179b397b90] [c0080000093e3618] kvm_vcpu_ioctl+0x460/0x850 [kvm]
+  [   44.377384] [c00000179b397d00] [c0000000004ba6c4] do_vfs_ioctl+0xe4/0xb40
+  [   44.377464] [c00000179b397db0] [c0000000004bb1e4] ksys_ioctl+0xc4/0x110
+  [   44.377547] [c00000179b397e00] [c0000000004bb258] sys_ioctl+0x28/0x80
+  [   44.377628] [c00000179b397e20] [c00000000000b888] system_call+0x5c/0x70
+  [   44.377712] Instruction dump:
+  [   44.377765] 4082fff4 4c00012c 38600000 4e800020 e96280c0 896b0000 2c2b0000 3860ffff
+  [   44.377862] 4d820020 50852e74 508516f6 78840724 <f88313c0> f8a313c8 7c942ba6 7cbc2ba6
 
-CC: stable@vger.kernel.org # v4.19+
-Fixes: a68bd1267b72 ("powerpc/powernv/ioda: Allocate indirect TCE levels on demand")
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+This fixes the problem by only changing r3 when we are returning
+immediately.
+
+Signed-off-by: Michael Neuling <mikey@neuling.org>
+Reported-by: Cédric Le Goater <clg@kaod.org>
+--
+mpe: This is for 5.2 fixes
 ---
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-The race occurs about 30 times in the first 3 minutes of copying files
-via rsync and that's about it.
-
-This fixes EEH's from
-https://patchwork.ozlabs.org/project/linuxppc-dev/list/?series=110810
-
----
-Changes:
-v2:
-* replaced spin_lock with cmpxchg+readonce
----
- arch/powerpc/platforms/powernv/pci-ioda-tce.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
-
-diff --git a/arch/powerpc/platforms/powernv/pci-ioda-tce.c b/arch/powerpc/platforms/powernv/pci-ioda-tce.c
-index e28f03e1eb5e..8d6569590161 100644
---- a/arch/powerpc/platforms/powernv/pci-ioda-tce.c
-+++ b/arch/powerpc/platforms/powernv/pci-ioda-tce.c
-@@ -48,6 +48,9 @@ static __be64 *pnv_alloc_tce_level(int nid, unsigned int shift)
- 	return addr;
- }
- 
-+static void pnv_pci_ioda2_table_do_free_pages(__be64 *addr,
-+		unsigned long size, unsigned int levels);
-+
- static __be64 *pnv_tce(struct iommu_table *tbl, bool user, long idx, bool alloc)
- {
- 	__be64 *tmp = user ? tbl->it_userspace : (__be64 *) tbl->it_base;
-@@ -57,9 +60,9 @@ static __be64 *pnv_tce(struct iommu_table *tbl, bool user, long idx, bool alloc)
- 
- 	while (level) {
- 		int n = (idx & mask) >> (level * shift);
--		unsigned long tce;
-+		unsigned long oldtce, tce = be64_to_cpu(READ_ONCE(tmp[n]));
- 
--		if (tmp[n] == 0) {
-+		if (!tce) {
- 			__be64 *tmp2;
- 
- 			if (!alloc)
-@@ -70,10 +73,15 @@ static __be64 *pnv_tce(struct iommu_table *tbl, bool user, long idx, bool alloc)
- 			if (!tmp2)
- 				return NULL;
- 
--			tmp[n] = cpu_to_be64(__pa(tmp2) |
--					TCE_PCI_READ | TCE_PCI_WRITE);
-+			tce = __pa(tmp2) | TCE_PCI_READ | TCE_PCI_WRITE;
-+			oldtce = be64_to_cpu(cmpxchg(&tmp[n], 0,
-+					cpu_to_be64(tce)));
-+			if (oldtce) {
-+				pnv_pci_ioda2_table_do_free_pages(tmp2,
-+					ilog2(tbl->it_level_size) + 3, 1);
-+				tce = oldtce;
-+			}
- 		}
--		tce = be64_to_cpu(tmp[n]);
- 
- 		tmp = __va(tce & ~(TCE_PCI_READ | TCE_PCI_WRITE));
- 		idx &= ~mask;
+diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+index 139027c62d..f781ee1458 100644
+--- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
++++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+@@ -2519,8 +2519,10 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
+ 	LOAD_REG_ADDR(r11, dawr_force_enable)
+ 	lbz	r11, 0(r11)
+ 	cmpdi	r11, 0
++	bne	3f
+ 	li	r3, H_HARDWARE
+-	beqlr
++	blr
++3:
+ 	/* Emulate H_SET_DABR/X on P8 for the sake of compat mode guests */
+ 	rlwimi	r5, r4, 5, DAWRX_DR | DAWRX_DW
+ 	rlwimi	r5, r4, 2, DAWRX_WT
 -- 
-2.17.1
+2.21.0
 
