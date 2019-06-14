@@ -2,58 +2,94 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EC50E451D4
-	for <lists+kvm-ppc@lfdr.de>; Fri, 14 Jun 2019 04:23:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EECB94523E
+	for <lists+kvm-ppc@lfdr.de>; Fri, 14 Jun 2019 04:59:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726167AbfFNCXr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 13 Jun 2019 22:23:47 -0400
-Received: from qf-corp.com ([43.252.215.172]:38594 "EHLO server1.qf-corp.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726283AbfFNCXr (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 13 Jun 2019 22:23:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=qf-corp.com
-        ; s=default; h=Message-ID:Reply-To:Subject:To:From:Date:
-        Content-Transfer-Encoding:Content-Type:MIME-Version:Sender:Cc:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=x+wk2oDUMoo/hQHPqS9UCKstzOaLw+EthDvW07j7+BE=; b=KSFxT7Ge4mSPVI9GOsHhvIHwVG
-        6Fq9PG5oDSTvekIhN93zTEeXIN0vozNqpCyRwcGi5zi6LzAkK4pwMGRFlZm0576DZ1ck/KSsXhDS7
-        shxTuhZhl1wsSuvh3PcIKYqIj7SyfWrr3b4NmCjcf1hRlx6XnWK8HXSDwqJU0Snve5DQxehU8edD7
-        mIR3VkpVRc9Y2fDyMemWMNwde9S5JI9r/Mz/QiL4R9oUeXixiLmqRoUL+TJfYPqTDYmFF+tY/CLqO
-        uk1+U0XG6MtjZ66OYGedi3OEiKxSyQDjOGEro159IwbrskxP/3ULVjjcN3SWVNZ4l0GRKERYa39tY
-        06+H1kqQ==;
-Received: from [::1] (port=46378 helo=server1.qf-corp.com)
-        by server1.qf-corp.com with esmtpa (Exim 4.92)
-        (envelope-from <admin@qf-corp.com>)
-        id 1hbT8a-0000Ha-0b; Fri, 14 Jun 2019 01:03:44 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Fri, 14 Jun 2019 01:03:43 +0800
-From:   Herr David Williams <admin@qf-corp.com>
-To:     undisclosed-recipients:;
-Subject: dringender Kredit
-Reply-To: david.loanfirm18@gmail.com
-Mail-Reply-To: david.loanfirm18@gmail.com
-Message-ID: <8cc15a66451947297ac398a109b7f1ca@qf-corp.com>
-X-Sender: admin@qf-corp.com
-User-Agent: Roundcube Webmail/1.3.8
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server1.qf-corp.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - qf-corp.com
-X-Get-Message-Sender-Via: server1.qf-corp.com: authenticated_id: admin@qf-corp.com
-X-Authenticated-Sender: server1.qf-corp.com: admin@qf-corp.com
+        id S1725834AbfFNC7W (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 13 Jun 2019 22:59:22 -0400
+Received: from ozlabs.ru ([107.173.13.209]:57018 "EHLO ozlabs.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725777AbfFNC7W (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 13 Jun 2019 22:59:22 -0400
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 0E00EAE807F0;
+        Thu, 13 Jun 2019 22:59:18 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, Alistair Popple <alistair@popple.id.au>,
+        Sam Bobroff <sbobroff@linux.ibm.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Russell Currey <ruscur@russell.cc>,
+        Oliver O'Halloran <oohall@gmail.com>
+Subject: [PATCH kernel] powerpc/pci/of: Parse unassigned resources
+Date:   Fri, 14 Jun 2019 12:59:16 +1000
+Message-Id: <20190614025916.123589-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+The pseries platform uses the PCI_PROBE_DEVTREE method of PCI probing
+which is basically reading "assigned-addresses" of every PCI device.
+However if the property is missing or zero sized, then there is
+no fallback of any kind and the PCI resources remain undiscovered, i.e.
+pdev->resource[] array is empty.
 
+This adds a fallback which parses the "reg" property in pretty much same
+way except it marks resources as "unset" which later makes Linux assign
+those resources with proper addresses.
 
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+
+This is an attempts to boot linux directly under QEMU without slof/rtas;
+the aim is to use petitboot instead and let the guest kernel configure
+devices.
+
+QEMU does not allocate resources, it creates correct "reg" and zero length
+"assigned-addresses" (which is probably a bug on its own) which is
+normally populated by SLOF later but not during this exercise.
+
+---
+ arch/powerpc/kernel/pci_of_scan.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/powerpc/kernel/pci_of_scan.c b/arch/powerpc/kernel/pci_of_scan.c
+index 64ad92016b63..cfe6ec3c6aaf 100644
+--- a/arch/powerpc/kernel/pci_of_scan.c
++++ b/arch/powerpc/kernel/pci_of_scan.c
+@@ -82,10 +82,18 @@ static void of_pci_parse_addrs(struct device_node *node, struct pci_dev *dev)
+ 	const __be32 *addrs;
+ 	u32 i;
+ 	int proplen;
++	bool unset = false;
+ 
+ 	addrs = of_get_property(node, "assigned-addresses", &proplen);
+ 	if (!addrs)
+ 		return;
++	if (!addrs || !proplen) {
++		addrs = of_get_property(node, "reg", &proplen);
++		if (!addrs || !proplen)
++			return;
++		unset = true;
++	}
++
+ 	pr_debug("    parse addresses (%d bytes) @ %p\n", proplen, addrs);
+ 	for (; proplen >= 20; proplen -= 20, addrs += 5) {
+ 		flags = pci_parse_of_flags(of_read_number(addrs, 1), 0);
+@@ -110,6 +118,8 @@ static void of_pci_parse_addrs(struct device_node *node, struct pci_dev *dev)
+ 			continue;
+ 		}
+ 		res->flags = flags;
++		if (unset)
++			res->flags |= IORESOURCE_UNSET;
+ 		res->name = pci_name(dev);
+ 		region.start = base;
+ 		region.end = base + size - 1;
 -- 
-Benötigen Sie dringend einen Kredit? Wenn ja, antworten Sie für weitere 
-Details
+2.17.1
+
