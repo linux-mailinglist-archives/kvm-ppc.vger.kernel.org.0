@@ -2,101 +2,171 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B7495472AD
-	for <lists+kvm-ppc@lfdr.de>; Sun, 16 Jun 2019 03:10:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8E4947584
+	for <lists+kvm-ppc@lfdr.de>; Sun, 16 Jun 2019 17:33:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726683AbfFPBKo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 15 Jun 2019 21:10:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43000 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726434AbfFPBKn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 15 Jun 2019 21:10:43 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5G16w9a139909
-        for <kvm-ppc@vger.kernel.org>; Sat, 15 Jun 2019 21:10:42 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2t5amh9wxc-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Sat, 15 Jun 2019 21:10:42 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
-        Sun, 16 Jun 2019 02:10:40 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Sun, 16 Jun 2019 02:10:37 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5G1AYdM49283240
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 16 Jun 2019 01:10:34 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 80D725204F;
-        Sun, 16 Jun 2019 01:10:34 +0000 (GMT)
-Received: from ram.ibm.com (unknown [9.80.224.136])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 8FC2552051;
-        Sun, 16 Jun 2019 01:10:31 +0000 (GMT)
-Date:   Sat, 15 Jun 2019 18:10:28 -0700
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org,
-        kvm-ppc@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
-        Thiago Bauermann <bauermann@linux.ibm.com>,
-        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
-        rgrimm@us.ibm.com
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <20190606173614.32090-1-cclaudio@linux.ibm.com>
- <20190606173614.32090-8-cclaudio@linux.ibm.com>
- <20190615074334.GD24709@blackberry>
+        id S1727230AbfFPPdz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 16 Jun 2019 11:33:55 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:46438 "EHLO
+        mail.default.ilande.uk0.bigv.io" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727156AbfFPPdz (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 16 Jun 2019 11:33:55 -0400
+Received: from host86-173-229-95.range86-173.btcentralplus.com ([86.173.229.95] helo=[192.168.1.65])
+        by mail.default.ilande.uk0.bigv.io with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.89)
+        (envelope-from <mark.cave-ayland@ilande.co.uk>)
+        id 1hcXA2-00027R-Ry; Sun, 16 Jun 2019 16:33:39 +0100
+To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+        paulus@ozlabs.org
+References: <20190614185745.6863-1-mark.cave-ayland@ilande.co.uk>
+ <871rzv4xx4.fsf@linux.ibm.com>
+From:   Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <6778e703-f408-28ed-d4d3-3e138cb4815b@ilande.co.uk>
+Date:   Sun, 16 Jun 2019 16:33:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190615074334.GD24709@blackberry>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-x-cbid: 19061601-0016-0000-0000-000002896BCC
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061601-0017-0000-0000-000032E6B08F
-Message-Id: <20190616011028.GA10806@ram.ibm.com>
-Subject: Re:  Re: [PATCH v3 7/9] KVM: PPC: Ultravisor: Restrict LDBAR access
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-16_01:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906160009
+In-Reply-To: <871rzv4xx4.fsf@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.173.229.95
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on
+        mail.default.ilande.uk0.bigv.io
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.9 required=5.0 tests=ALL_TRUSTED,BAYES_00,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.2
+Subject: Re: [PATCH] KVM: PPC: Book3S PR: fix software breakpoints
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Sat, Jun 15, 2019 at 05:43:34PM +1000, Paul Mackerras wrote:
-> On Thu, Jun 06, 2019 at 02:36:12PM -0300, Claudio Carvalho wrote:
-> > When the ultravisor firmware is available, it takes control over the
-> > LDBAR register. In this case, thread-imc updates and save/restore
-> > operations on the LDBAR register are handled by ultravisor.
-> > 
-> > Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
-> > Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+On 14/06/2019 23:14, Fabiano Rosas wrote:
+
+> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
 > 
-> Acked-by: Paul Mackerras <paulus@ozlabs.org>
+>> QEMU's kvm_handle_debug() function identifies software breakpoints by checking
+>> for a value of 0 in kvm_debug_exit_arch's status field. Since this field isn't
 > 
-> Just a note on the signed-off-by: it's a bit weird to have Ram's
-> signoff when he is neither the author nor the sender of the patch.
-> The author is assumed to be Claudio; if that is not correct then the
-> patch should have a From: line at the start telling us who the author
-> is, and ideally that person should have a signoff line before
-> Claudio's signoff as the sender of the patch.
+> LGTM, but let me start a discussion:
+> 
+> In arch/powerpc/include/uapi/asm/kvm.h I see the following:
+> 
+> 
+> /*
+>  * Defines for h/w breakpoint, watchpoint (read, write or both) and
+>  * software breakpoint.
+>  * These are used as "type" in KVM_SET_GUEST_DEBUG ioctl and "status"
+>  * for KVM_DEBUG_EXIT.
+>  */
+> #define KVMPPC_DEBUG_NONE		0x0
+> #define KVMPPC_DEBUG_BREAKPOINT		(1UL << 1)
+> #define KVMPPC_DEBUG_WATCH_WRITE	(1UL << 2)
+> #define KVMPPC_DEBUG_WATCH_READ		(1UL << 3)
+> 
+> 
+> this seems to be biased towards the BookE implementation which uses
+> KVMPPC_DEBUG_BREAKPOINT to indicate a "hardware breakpoint" (i.e. Instruction
+> Address Compare - ISA v2 Book III-E, section 10.4.1), and then
+> KVMPPC_DEBUG_NONE ends up implicitly meaning "software breakpoint" for
+> Book3s PR/HV.
+> 
+>> explicitly set to 0 when the software breakpoint instruction is detected, any
+>> previous non-zero value present causes a hang in QEMU as it tries to process
+>> the breakpoint instruction incorrectly as a hardware breakpoint.
+> 
+> What QEMU does (again biased towards BookE) is to check the 'status'
+> field and treat both h/w breakpoints and watchpoints as hardware
+> breakpoints (which is correct in a sense) and then proceed to look for
+> s/w breakpoints:
+> 
+>     if (arch_info->status) {
+>         return kvm_handle_hw_breakpoint(cs, arch_info);
+>     }
+> 
+>     if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
+>         return kvm_handle_sw_breakpoint(cs, arch_info->address);
+>     }
 
-Ryan originally wrote this patch, which I than modified,
-before Claudio further modified it to its current form.
+Right so this feels a bit like BookE was used for the original implementation and
+then the Book3S functionality followed on from that.
 
-So I think the author should be Ryan.
+> So I wonder if it would not be beneficial for future developers if we
+> drew the line and made a clear distinction between:
+> 
+>  software breakpoints - triggered by a KVMPPC_INST_SW_BREAKPOINT execution
+>  hardware breakpoints - triggered by some register match
+> 
+> Maybe by turning the first two defines into:
+> 
+> #define KVMPPC_DEBUG_SW_BREAKPOINT 0x0
+> #define KVMPPC_DEBUG_HW_BREAKPOINT (1UL << 1)
 
-RP
+No objection from me, however I don't really have enough history with KVM PPC to be
+able to opine as to whether this fits with the general design of
+KVM/PPC/BookE/Book3S. I'm really coming at this from the perspective of toying with a
+hobby project on my iMac G4 and fixing up the things I find are broken.
 
+>> Ensure that the kvm_debug_exit_arch status field is set to 0 when the software
+>> breakpoint instruction is detected (similar to the existing logic in booke.c
+>> and e500_emulate.c) to restore software breakpoint functionality under Book3S
+>> PR.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+> 
+> Anyway, the proposed patch fixes the issue.
+> 
+> Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+
+Great, thank you! Is this enough for the patch to be queued?
+
+>>  arch/powerpc/kvm/emulate.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/arch/powerpc/kvm/emulate.c b/arch/powerpc/kvm/emulate.c
+>> index bb4d09c1ad56..6fca38ca791f 100644
+>> --- a/arch/powerpc/kvm/emulate.c
+>> +++ b/arch/powerpc/kvm/emulate.c
+>> @@ -271,6 +271,7 @@ int kvmppc_emulate_instruction(struct kvm_run *run, struct kvm_vcpu *vcpu)
+>>  		 */
+>>  		if (inst == KVMPPC_INST_SW_BREAKPOINT) {
+>>  			run->exit_reason = KVM_EXIT_DEBUG;
+>> +			run->debug.arch.status = 0;
+>>  			run->debug.arch.address = kvmppc_get_pc(vcpu);
+>>  			emulated = EMULATE_EXIT_USER;
+>>  			advance = 0;
+
+
+ATB,
+
+Mark.
