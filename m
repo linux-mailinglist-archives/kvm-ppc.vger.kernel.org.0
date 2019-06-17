@@ -2,118 +2,142 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F28148E76
-	for <lists+kvm-ppc@lfdr.de>; Mon, 17 Jun 2019 21:25:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AE5C49616
+	for <lists+kvm-ppc@lfdr.de>; Tue, 18 Jun 2019 01:52:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726724AbfFQTZ6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 17 Jun 2019 15:25:58 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61028 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726593AbfFQTZ6 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 17 Jun 2019 15:25:58 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5HJI661115897
-        for <kvm-ppc@vger.kernel.org>; Mon, 17 Jun 2019 15:25:57 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2t6fmfu58k-1
+        id S1726776AbfFQXwB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 17 Jun 2019 19:52:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12584 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726427AbfFQXwB (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 17 Jun 2019 19:52:01 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5HNkk2r130392
+        for <kvm-ppc@vger.kernel.org>; Mon, 17 Jun 2019 19:52:00 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t6j7uvvjt-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Mon, 17 Jun 2019 15:25:56 -0400
+        for <kvm-ppc@vger.kernel.org>; Mon, 17 Jun 2019 19:51:59 -0400
 Received: from localhost
-        by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <farosas@linux.ibm.com>;
-        Mon, 17 Jun 2019 20:25:55 +0100
-Received: from b01cxnp22033.gho.pok.ibm.com (9.57.198.23)
-        by e11.ny.us.ibm.com (146.89.104.198) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
+        Tue, 18 Jun 2019 00:51:57 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 17 Jun 2019 20:25:53 +0100
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5HJPqdC37945746
+        Tue, 18 Jun 2019 00:51:56 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5HNps3W51445896
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 17 Jun 2019 19:25:52 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3F52111206B;
-        Mon, 17 Jun 2019 19:25:52 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3D7E3112063;
-        Mon, 17 Jun 2019 19:25:51 +0000 (GMT)
-Received: from localhost (unknown [9.85.180.35])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Mon, 17 Jun 2019 19:25:50 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
+        Mon, 17 Jun 2019 23:51:54 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0EA34A4053;
+        Mon, 17 Jun 2019 23:51:54 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 733B9A4040;
+        Mon, 17 Jun 2019 23:51:50 +0000 (GMT)
+Received: from ram.ibm.com (unknown [9.80.224.136])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 17 Jun 2019 23:51:50 +0000 (GMT)
+Date:   Mon, 17 Jun 2019 16:51:46 -0700
+From:   Ram Pai <linuxram@us.ibm.com>
 To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        pbonzini@redhat.com, rkrcmar@redhat.com,
-        david@gibson.dropbear.id.au, aik@ozlabs.ru
-Subject: Re: [PATCH v2] KVM: PPC: Report single stepping capability
-In-Reply-To: <20190617061608.y5qw26i53si76qqt@oak.ozlabs.ibm.com>
-References: <20190529222219.27994-1-farosas@linux.ibm.com> <20190617061608.y5qw26i53si76qqt@oak.ozlabs.ibm.com>
-Date:   Mon, 17 Jun 2019 16:25:49 -0300
+Cc:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org,
+        kvm-ppc@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
+        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
+        Michael Anderson <andmike@linux.ibm.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
+        Thiago Bauermann <bauermann@linux.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>
+Reply-To: Ram Pai <linuxram@us.ibm.com>
+References: <20190606173614.32090-1-cclaudio@linux.ibm.com>
+ <20190606173614.32090-5-cclaudio@linux.ibm.com>
+ <20190617020632.yywfoqwfinjxs3pb@oak.ozlabs.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190617020632.yywfoqwfinjxs3pb@oak.ozlabs.ibm.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 X-TM-AS-GCONF: 00
-x-cbid: 19061719-2213-0000-0000-000003A02F4C
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011280; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01219392; UDB=6.00641389; IPR=6.01000533;
- MB=3.00027347; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-17 19:25:55
+x-cbid: 19061723-0012-0000-0000-00000329F815
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061719-2214-0000-0000-00005EE48227
-Message-Id: <87y3202ev6.fsf@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-17_07:,,
+x-cbparentid: 19061723-0013-0000-0000-00002163118D
+Message-Id: <20190617235146.GC10806@ram.ibm.com>
+Subject: Re:  Re: [PATCH v3 4/9] KVM: PPC: Ultravisor: Add generic ultravisor call
+ handler
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-17_09:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=762 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906170171
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906170206
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paul Mackerras <paulus@ozlabs.org> writes:
+On Mon, Jun 17, 2019 at 12:06:32PM +1000, Paul Mackerras wrote:
+> On Thu, Jun 06, 2019 at 02:36:09PM -0300, Claudio Carvalho wrote:
+> > From: Ram Pai <linuxram@us.ibm.com>
+> > 
+> > Add the ucall() function, which can be used to make ultravisor calls
+> > with varied number of in and out arguments. Ultravisor calls can be made
+> > from the host or guests.
+> > 
+> > This copies the implementation of plpar_hcall().
+> 
+> One point which I missed when I looked at this patch previously is
+> that the ABI that we're defining here is different from the hcall ABI
+> in that we are putting the ucall number in r0, whereas hcalls have the
+> hcall number in r3.  That makes ucalls more like syscalls, which have
+> the syscall number in r0.  So that last sentence quoted above is
+> somewhat misleading.
+> 
+> The thing we need to consider is that when SMFCTRL[E] = 0, a ucall
+> instruction becomes a hcall (that is, sc 2 is executed as if it was
+> sc 1).  In that case, the first argument to the ucall will be
+> interpreted as the hcall number.  Mostly that will happen not to be a
+> valid hcall number, but sometimes it might unavoidably be a valid but
+> unintended hcall number.
+> 
+> I think that will make it difficult to get ucalls to fail gracefully
+> in the case where SMF/PEF is disabled.  It seems like the assignment
+> of ucall numbers was made so that they wouldn't overlap with valid
+> hcall numbers; presumably that was so that we could tell when an hcall
+> was actually intended to be a ucall.  However, using a different GPR
+> to pass the ucall number defeats that.
 
-> On Wed, May 29, 2019 at 07:22:19PM -0300, Fabiano Rosas wrote:
->> When calling the KVM_SET_GUEST_DEBUG ioctl, userspace might request
->> the next instruction to be single stepped via the
->> KVM_GUESTDBG_SINGLESTEP control bit of the kvm_guest_debug structure.
->> 
->> We currently don't have support for guest single stepping implemented
->> in Book3S HV.
->> 
->> This patch adds the KVM_CAP_PPC_GUEST_DEBUG_SSTEP capability in order
->> to inform userspace about the state of single stepping support.
->
-> Comment/question below:
->
->> --- a/arch/powerpc/kvm/powerpc.c
->> +++ b/arch/powerpc/kvm/powerpc.c
->> @@ -538,6 +538,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>  	case KVM_CAP_IMMEDIATE_EXIT:
->>  		r = 1;
->>  		break;
->> +	case KVM_CAP_PPC_GUEST_DEBUG_SSTEP:
->> +#ifdef CONFIG_BOOKE
->> +		r = 1;
->> +		break;
->> +#endif
->
-> In the !CONFIG_BOOKE case, this will fall through to code which will
-> return 0 for HV KVM or 1 for PR KVM.  Is that what was intended?
+Right this is a valid point. Glad that you caught it, otherwise it would
+have become a difficult to fix it in the future.
 
-Yes. The intention is to return 0 for HV and 1 for everything else.
+> 
+> I realize that there is ultravisor code in development that takes the
+> ucall number in r0, and also that having the ucall number in r3 would
+> possibly make life more difficult for the place where we call
+> UV_RETURN in assembler code.  
 
-> If so, then why do we need the CONFIG_BOOKE case?  Isn't hv_enabled
-> always 0 on Book E?
+Its called from one place in the hypervisor, and the changes look
+simple.
 
-Good point. I made a mistake there indeed.
+-       LOAD_REG_IMMEDIATE(r0, UV_RETURN)
++       LOAD_REG_IMMEDIATE(r3, UV_RETURN)
+        ld      r7, VCPU_GPR(R7)(r4)
+        ld      r6, VCPU_GPR(R6)(r4)
+        ld      r4, VCPU_GPR(R4)(r4)
 
-> In any case, I think this needs at least a /* fall through */ comment
-> in the code, and something explicit in the patch description to say
-> that we intend to return 1 on PR KVM.
+What am i missing?
 
-I'll send another version.
 
-Thanks
+
+> Nevertheless, perhaps we should consider
+> changing the ABI to be like the hcall ABI before everything gets set
+> in concrete.
+
+
+yes.
+
+Thanks Paul!
+RP
 
