@@ -2,78 +2,73 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DB46479ED
-	for <lists+kvm-ppc@lfdr.de>; Mon, 17 Jun 2019 08:17:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93C6E48107
+	for <lists+kvm-ppc@lfdr.de>; Mon, 17 Jun 2019 13:40:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725372AbfFQGQQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 17 Jun 2019 02:16:16 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:49819 "EHLO ozlabs.org"
+        id S1725810AbfFQLkc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 17 Jun 2019 07:40:32 -0400
+Received: from ozlabs.org ([203.11.71.1]:44483 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725280AbfFQGQP (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 17 Jun 2019 02:16:15 -0400
+        id S1725763AbfFQLkc (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 17 Jun 2019 07:40:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 45S1Ds52mKz9sN4; Mon, 17 Jun 2019 16:16:13 +1000 (AEST)
+        id 45S8R16ZTPz9sNR; Mon, 17 Jun 2019 21:40:29 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1560752173; bh=BfRpAModXR8tXIi6RYOirDbI3DXYGaFUuTy9scjmSuY=;
+        t=1560771629; bh=CDgRSuuCpsIKWfcE24KOGkwYw1tW35bw6uPLWPHknvk=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bMdmQ09XCEOlI4FjRKObT5b4KJxEIn36wtYr0X0JdRKAbr2Vsam4P2Egv7srA5gsL
-         Q6sMi9gxI6IUPXdjfmyln+uTHIb8SyRsBoK++TfgzxnVAPErBtKfGBOYflkOEYGMA0
-         8oK3z4aMGK4QB/iq69cpc1lSoCZ5nQ+/2cxe6RKP9zOOxP7dbuuQ3p57/jMdei0C3d
-         T58sJgC22PzPnTUeJh20CQ6rCwRMSBTNAl7KQReJJA+HaOAkWS0Xh9IcdgskMUZYUu
-         mfR39UmgMZFeSEehyla2phYbkngpakMSKYUVlJwXPHdDN/BKwiyxmdQ9S74Ge+Qm1T
-         Avp+wn5WAuL3Q==
-Date:   Mon, 17 Jun 2019 16:16:08 +1000
+        b=bAubgwMxHtGYS8gMdb85LJE5ubV1LOMLvaAGQvRDjeVPeoO4xez4+ME7LGltSfBPh
+         VwwPybvGzGax0u6q5dnG4vQv+BdAbLnIm0t10AvRkz6PcTKHyOWF7kFSdMzYurZvHc
+         N0ZlodBU1HbFkb3f/kk2IjLum0I8nR9JLSbKk4H2c3mUdruTXoFxMZuquoYDq3a5nu
+         g2gxpLdElFOgdtigsAmZxgcar9CQa9cQl3ca0xQGzpWXZYKM/H7Gf5wp1/mCgzdXp0
+         Tf5Uw2wzU2rRo0UU/u/PWezVrE9rQZpV+xLQHJGLWgYjsuqCj3N6D7VNY1fAFAnpdG
+         hxjofkvqNga2Q==
+Date:   Mon, 17 Jun 2019 16:32:54 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Fabiano Rosas <farosas@linux.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        pbonzini@redhat.com, rkrcmar@redhat.com,
-        david@gibson.dropbear.id.au, aik@ozlabs.ru
-Subject: Re: [PATCH v2] KVM: PPC: Report single stepping capability
-Message-ID: <20190617061608.y5qw26i53si76qqt@oak.ozlabs.ibm.com>
-References: <20190529222219.27994-1-farosas@linux.ibm.com>
+To:     Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc:     kvm-ppc@vger.kernel.org, farosas@linux.ibm.com
+Subject: Re: [PATCH] KVM: PPC: Book3S PR: fix software breakpoints
+Message-ID: <20190617063254.qkk6jwx5ud4zit73@oak.ozlabs.ibm.com>
+References: <20190614185745.6863-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190529222219.27994-1-farosas@linux.ibm.com>
+In-Reply-To: <20190614185745.6863-1-mark.cave-ayland@ilande.co.uk>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, May 29, 2019 at 07:22:19PM -0300, Fabiano Rosas wrote:
-> When calling the KVM_SET_GUEST_DEBUG ioctl, userspace might request
-> the next instruction to be single stepped via the
-> KVM_GUESTDBG_SINGLESTEP control bit of the kvm_guest_debug structure.
+On Fri, Jun 14, 2019 at 07:57:45PM +0100, Mark Cave-Ayland wrote:
+> QEMU's kvm_handle_debug() function identifies software breakpoints by checking
+> for a value of 0 in kvm_debug_exit_arch's status field. Since this field isn't
+> explicitly set to 0 when the software breakpoint instruction is detected, any
+> previous non-zero value present causes a hang in QEMU as it tries to process
+> the breakpoint instruction incorrectly as a hardware breakpoint.
 > 
-> We currently don't have support for guest single stepping implemented
-> in Book3S HV.
+> Ensure that the kvm_debug_exit_arch status field is set to 0 when the software
+> breakpoint instruction is detected (similar to the existing logic in booke.c
+> and e500_emulate.c) to restore software breakpoint functionality under Book3S
+> PR.
 > 
-> This patch adds the KVM_CAP_PPC_GUEST_DEBUG_SSTEP capability in order
-> to inform userspace about the state of single stepping support.
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  arch/powerpc/kvm/emulate.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/powerpc/kvm/emulate.c b/arch/powerpc/kvm/emulate.c
+> index bb4d09c1ad56..6fca38ca791f 100644
+> --- a/arch/powerpc/kvm/emulate.c
+> +++ b/arch/powerpc/kvm/emulate.c
+> @@ -271,6 +271,7 @@ int kvmppc_emulate_instruction(struct kvm_run *run, struct kvm_vcpu *vcpu)
+>  		 */
+>  		if (inst == KVMPPC_INST_SW_BREAKPOINT) {
+>  			run->exit_reason = KVM_EXIT_DEBUG;
+> +			run->debug.arch.status = 0;
+>  			run->debug.arch.address = kvmppc_get_pc(vcpu);
+>  			emulated = EMULATE_EXIT_USER;
+>  			advance = 0;
 
-Comment/question below:
-
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -538,6 +538,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_IMMEDIATE_EXIT:
->  		r = 1;
->  		break;
-> +	case KVM_CAP_PPC_GUEST_DEBUG_SSTEP:
-> +#ifdef CONFIG_BOOKE
-> +		r = 1;
-> +		break;
-> +#endif
-
-In the !CONFIG_BOOKE case, this will fall through to code which will
-return 0 for HV KVM or 1 for PR KVM.  Is that what was intended?
-If so, then why do we need the CONFIG_BOOKE case?  Isn't hv_enabled
-always 0 on Book E?
-
-In any case, I think this needs at least a /* fall through */ comment
-in the code, and something explicit in the patch description to say
-that we intend to return 1 on PR KVM.
+Thanks, applied to my kvm-ppc-next branch.
 
 Paul.
