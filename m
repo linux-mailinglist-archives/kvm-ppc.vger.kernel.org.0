@@ -2,52 +2,80 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 08018479B9
-	for <lists+kvm-ppc@lfdr.de>; Mon, 17 Jun 2019 07:39:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECA05479CD
+	for <lists+kvm-ppc@lfdr.de>; Mon, 17 Jun 2019 07:59:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725280AbfFQFi7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 17 Jun 2019 01:38:59 -0400
-Received: from ozlabs.org ([203.11.71.1]:35451 "EHLO ozlabs.org"
+        id S1725280AbfFQF7A (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 17 Jun 2019 01:59:00 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:37349 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725372AbfFQFi7 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 17 Jun 2019 01:38:59 -0400
+        id S1725468AbfFQF7A (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 17 Jun 2019 01:59:00 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 45S0Ps4DC5z9s7h; Mon, 17 Jun 2019 15:38:57 +1000 (AEST)
+        id 45S0ry5xr9z9s7h; Mon, 17 Jun 2019 15:58:58 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1560749937; bh=jR54jSADlnieO8pB4/tHH0OwHqfcoZjTjfV+h+EHZcg=;
+        t=1560751138; bh=AtJPc/0VVu0H7tqiVN+mbcZUFjZD/6+l3t+jKYXhEdk=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=q8UH+np3k8PiZHUFh7G7kdpoPLQbqzVVldUzKvRzM9Z/EajwRjN2hZ2E6c59i+z0U
-         xw12GhPxmJJ2LtmUd092wbw2V7mKpw/vb947ObuutVzuQX26xmCgKUi9wwW7u8aB5S
-         dfwNpEeMUWNE8ERsyrMYTlhTtKuoZhh4NTvpFUKWB6uJqP5BhEaT+gG3Ky4VKhNUS2
-         RDIjOe7x8YX3Tig3IxavQsVxhxPHJmU695FHZ6Ui1rwWzb2eBrAAZbz0idza3oGz1Q
-         4I+lDT1c5EFyFGr4CnunnCKs+lknH2cmXDt1iWSy2Y22pgeO8fTSTVOmuDbcrGLSpq
-         5VwSiRkpYsAyg==
-Date:   Mon, 17 Jun 2019 15:38:54 +1000
+        b=KfyFTV+K2P0IRnQjMacy99zQ2QMxWJgx15PYkFAlB2Lexxrybwm0AoTlfjfSYWSdB
+         dom8i3XJrSjcJTo/SvAb90TrABAstD1FBbZr9vI2OBMfOq3qEvkj8j4K0Stw+NfG17
+         lzLuKpkty2EryUl7PqyWtyUOY/u5CP4PQpDtgOzMSFzGtKAjzA+kuWRqcPLgEGUWZA
+         ZzX3zMShiECtbaR4lAMG6GIgoK1O5pQXGXwLWD6N3sK2ZFyMgtqr3s/7ZIEkrxeGOO
+         FweYEwg3e6RKAAo6G4GPCAZNiv2QpJSLh23qoBAW8n6IQIgeAaPbb8pWAnVe3VvGtg
+         4Dtnsg0J+X0LA==
+Date:   Mon, 17 Jun 2019 15:58:24 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Bharata B Rao <bharata@linux.ibm.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-mm@kvack.org, paulus@au1.ibm.com,
-        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
-        linuxram@us.ibm.com, sukadev@linux.vnet.ibm.com,
-        cclaudio@linux.ibm.com
-Subject: Re: [PATCH v4 4/6] kvmppc: Handle memory plug/unplug to secure VM
-Message-ID: <20190617053854.5niyzcrxeee7vvra@oak.ozlabs.ibm.com>
-References: <20190528064933.23119-1-bharata@linux.ibm.com>
- <20190528064933.23119-5-bharata@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH 5/5] KVM: PPC: Book3S HV: Reject mflags=2 (LPCR[AIL]=2)
+ ADDR_TRANS_MODE mode
+Message-ID: <20190617055824.h6hkzbgp3h2cn3xg@oak.ozlabs.ibm.com>
+References: <20190520005659.18628-1-npiggin@gmail.com>
+ <20190520005659.18628-5-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190528064933.23119-5-bharata@linux.ibm.com>
+In-Reply-To: <20190520005659.18628-5-npiggin@gmail.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, May 28, 2019 at 12:19:31PM +0530, Bharata B Rao wrote:
-> Register the new memslot with UV during plug and unregister
-> the memslot during unplug.
+On Mon, May 20, 2019 at 10:56:59AM +1000, Nicholas Piggin wrote:
+> AIL=2 mode has no known users, so is not well tested or supported.
+> Disallow guests from selecting this mode because it may become
+> deprecated in future versions of the architecture.
 > 
-> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-Acked-by: Paul Mackerras <paulus@ozlabs.org>
+Given that H_SET_MODE_RESOURCE_ADDR_TRANS_MODE gets punted to
+userspace (QEMU), why are we enforcing this here rather than in QEMU?
+
+If there is a reason to do this here rather than in QEMU, then the
+patch description should really comment on why we're rejecting AIL=1
+as well as AIL=2.
+
+> ---
+>  arch/powerpc/kvm/book3s_hv.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 36d16740748a..4295ccdbee26 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -784,6 +784,11 @@ static int kvmppc_h_set_mode(struct kvm_vcpu *vcpu, unsigned long mflags,
+>  		vcpu->arch.dawr  = value1;
+>  		vcpu->arch.dawrx = value2;
+>  		return H_SUCCESS;
+> +	case H_SET_MODE_RESOURCE_ADDR_TRANS_MODE:
+> +		/* KVM does not support mflags=2 (AIL=2) */
+> +		if (mflags != 0 && mflags != 3)
+> +			return H_UNSUPPORTED_FLAG_START;
+> +		return H_TOO_HARD;
+>  	default:
+>  		return H_TOO_HARD;
+>  	}
+> -- 
+> 2.20.1
+
+Paul.
