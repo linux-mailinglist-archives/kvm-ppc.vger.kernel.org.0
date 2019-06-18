@@ -2,59 +2,56 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0586449F8E
-	for <lists+kvm-ppc@lfdr.de>; Tue, 18 Jun 2019 13:47:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 946714A089
+	for <lists+kvm-ppc@lfdr.de>; Tue, 18 Jun 2019 14:15:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729621AbfFRLrP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 18 Jun 2019 07:47:15 -0400
-Received: from gate.crashing.org ([63.228.1.57]:48959 "EHLO gate.crashing.org"
+        id S1726181AbfFRMPW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 18 Jun 2019 08:15:22 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:43223 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729110AbfFRLrP (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 18 Jun 2019 07:47:15 -0400
-Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
-        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id x5IBl3PL028615;
-        Tue, 18 Jun 2019 06:47:03 -0500
-Received: (from segher@localhost)
-        by gate.crashing.org (8.14.1/8.14.1/Submit) id x5IBl1Zl028614;
-        Tue, 18 Jun 2019 06:47:01 -0500
-X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
-Date:   Tue, 18 Jun 2019 06:47:01 -0500
-From:   Segher Boessenkool <segher@kernel.crashing.org>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Claudio Carvalho <cclaudio@linux.ibm.com>,
-        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>, kvm-ppc@vger.kernel.org,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        linuxppc-dev@ozlabs.org,
-        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
-        Thiago Bauermann <bauermann@linux.ibm.com>,
-        Anshuman Khandual <khandual@linux.vnet.ibm.com>
-Subject: Re: [PATCH v3 4/9] KVM: PPC: Ultravisor: Add generic ultravisor call handler
-Message-ID: <20190618114701.GH7313@gate.crashing.org>
-References: <20190606173614.32090-1-cclaudio@linux.ibm.com> <20190606173614.32090-5-cclaudio@linux.ibm.com> <20190617020632.yywfoqwfinjxs3pb@oak.ozlabs.ibm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190617020632.yywfoqwfinjxs3pb@oak.ozlabs.ibm.com>
-User-Agent: Mutt/1.4.2.3i
+        id S1725913AbfFRMPW (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 18 Jun 2019 08:15:22 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 45Sn8l1xnkz9s3l;
+        Tue, 18 Jun 2019 22:15:19 +1000 (AEST)
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, Alistair Popple <alistair@popple.id.au>,
+        Sam Bobroff <sbobroff@linux.ibm.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Russell Currey <ruscur@russell.cc>,
+        Oliver O'Halloran <oohall@gmail.com>
+Subject: Re: [PATCH kernel] powerpc/pci/of: Parse unassigned resources
+In-Reply-To: <20190614025916.123589-1-aik@ozlabs.ru>
+References: <20190614025916.123589-1-aik@ozlabs.ru>
+Date:   Tue, 18 Jun 2019 22:15:17 +1000
+Message-ID: <87sgs7ozsa.fsf@concordia.ellerman.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi Paul,
+Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+> The pseries platform uses the PCI_PROBE_DEVTREE method of PCI probing
+> which is basically reading "assigned-addresses" of every PCI device.
+> However if the property is missing or zero sized, then there is
+> no fallback of any kind and the PCI resources remain undiscovered, i.e.
+> pdev->resource[] array is empty.
+>
+> This adds a fallback which parses the "reg" property in pretty much same
+> way except it marks resources as "unset" which later makes Linux assign
+> those resources with proper addresses.
 
-On Mon, Jun 17, 2019 at 12:06:32PM +1000, Paul Mackerras wrote:
-> The thing we need to consider is that when SMFCTRL[E] = 0, a ucall
-> instruction becomes a hcall (that is, sc 2 is executed as if it was
-> sc 1).  In that case, the first argument to the ucall will be
-> interpreted as the hcall number.  Mostly that will happen not to be a
-> valid hcall number, but sometimes it might unavoidably be a valid but
-> unintended hcall number.
+What happens under PowerVM is the big question.
 
-Shouldn't a caller of the ultravisor *know* that it is talking to the
-ultravisor in the first place?  And not to the hypervisor.
+ie. if we see such a device under PowerVM and then do our own assignment
+what happens?
 
-
-Segher
+cheers
