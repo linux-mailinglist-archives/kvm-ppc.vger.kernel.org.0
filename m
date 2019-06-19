@@ -2,82 +2,141 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F9704B8B8
-	for <lists+kvm-ppc@lfdr.de>; Wed, 19 Jun 2019 14:36:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD7174BD66
+	for <lists+kvm-ppc@lfdr.de>; Wed, 19 Jun 2019 18:01:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731773AbfFSMgZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 19 Jun 2019 08:36:25 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:53983 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731711AbfFSMgY (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 19 Jun 2019 08:36:24 -0400
-Received: by ozlabs.org (Postfix, from userid 1034)
-        id 45TPZY50tMz9s7h; Wed, 19 Jun 2019 22:36:21 +1000 (AEST)
-X-powerpc-patch-notification: thanks
-X-powerpc-patch-commit: fabb2efcf0846e28b4910fc20bdc203d3d0170af
-X-Patchwork-Hint: ignore
-In-Reply-To: <20190617071619.19360-2-sjitindarsingh@gmail.com>
-To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org
-From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-Cc:     mikey@neuling.org, clg@kaod.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: PPC: Book3S HV: Fix r3 corruption in h_set_dabr()
-Message-Id: <45TPZY50tMz9s7h@ozlabs.org>
-Date:   Wed, 19 Jun 2019 22:36:21 +1000 (AEST)
+        id S1725899AbfFSQBn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 19 Jun 2019 12:01:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47928 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726091AbfFSQBn (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 Jun 2019 12:01:43 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5JFqZNV075497
+        for <kvm-ppc@vger.kernel.org>; Wed, 19 Jun 2019 12:01:42 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t7qkc249c-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Wed, 19 Jun 2019 12:01:41 -0400
+Received: from localhost
+        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <farosas@linux.ibm.com>;
+        Wed, 19 Jun 2019 17:01:40 +0100
+Received: from b01cxnp22036.gho.pok.ibm.com (9.57.198.26)
+        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 19 Jun 2019 17:01:37 +0100
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5JG1asX8192548
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Jun 2019 16:01:36 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1136BAC05B;
+        Wed, 19 Jun 2019 16:01:36 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 677BFAC05F;
+        Wed, 19 Jun 2019 16:01:33 +0000 (GMT)
+Received: from farosas.linux.ibm.com.ibmuc.com (unknown [9.80.201.249])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 19 Jun 2019 16:01:33 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
+        pbonzini@redhat.com, rkrcmar@redhat.com,
+        david@gibson.dropbear.id.au, aik@ozlabs.ru
+Subject: [PATCH v3] KVM: PPC: Report single stepping capability
+Date:   Wed, 19 Jun 2019 13:01:27 -0300
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19061916-0052-0000-0000-000003D2D390
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011291; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01220284; UDB=6.00641924; IPR=6.01001425;
+ MB=3.00027379; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-19 16:01:39
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061916-0053-0000-0000-00006161BA1B
+Message-Id: <20190619160127.24561-1-farosas@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-19_10:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906190127
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, 2019-06-17 at 07:16:18 UTC, Suraj Jitindar Singh wrote:
-> From: Michael Neuling <mikey@neuling.org>
-> 
-> Commit c1fe190c0672 ("powerpc: Add force enable of DAWR on P9
-> option") screwed up some assembler and corrupted a pointer in
-> r3. This resulted in crashes like the below:
-> 
->   [   44.374746] BUG: Kernel NULL pointer dereference at 0x000013bf
->   [   44.374848] Faulting instruction address: 0xc00000000010b044
->   [   44.374906] Oops: Kernel access of bad area, sig: 11 [#1]
->   [   44.374951] LE PAGE_SIZE=64K MMU=Radix MMU=Hash SMP NR_CPUS=2048 NUMA pSeries
->   [   44.375018] Modules linked in: vhost_net vhost tap xt_CHECKSUM iptable_mangle xt_MASQUERADE iptable_nat nf_nat xt_conntrack nf_conntrack nf_defrag_ipv6 libcrc32c nf_defrag_ipv4 ipt_REJECT nf_reject_ipv4 xt_tcpudp bridge stp llc ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter bpfilter vmx_crypto crct10dif_vpmsum crc32c_vpmsum kvm_hv kvm sch_fq_codel ip_tables x_tables autofs4 virtio_net net_failover virtio_scsi failover
->   [   44.375401] CPU: 8 PID: 1771 Comm: qemu-system-ppc Kdump: loaded Not tainted 5.2.0-rc4+ #3
->   [   44.375500] NIP:  c00000000010b044 LR: c0080000089dacf4 CTR: c00000000010aff4
->   [   44.375604] REGS: c00000179b397710 TRAP: 0300   Not tainted  (5.2.0-rc4+)
->   [   44.375691] MSR:  800000000280b033 <SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 42244842  XER: 00000000
->   [   44.375815] CFAR: c00000000010aff8 DAR: 00000000000013bf DSISR: 42000000 IRQMASK: 0
->   [   44.375815] GPR00: c0080000089dd6bc c00000179b3979a0 c008000008a04300 ffffffffffffffff
->   [   44.375815] GPR04: 0000000000000000 0000000000000003 000000002444b05d c0000017f11c45d0
->   [   44.375815] GPR08: 078000003e018dfe 0000000000000028 0000000000000001 0000000000000075
->   [   44.375815] GPR12: c00000000010aff4 c000000007ff6300 0000000000000000 0000000000000000
->   [   44.375815] GPR16: 0000000000000000 c0000017f11d0000 00000000ffffffff c0000017f11ca7a8
->   [   44.375815] GPR20: c0000017f11c42ec ffffffffffffffff 0000000000000000 000000000000000a
->   [   44.375815] GPR24: fffffffffffffffc 0000000000000000 c0000017f11c0000 c000000001a77ed8
->   [   44.375815] GPR28: c00000179af70000 fffffffffffffffc c0080000089ff170 c00000179ae88540
->   [   44.376673] NIP [c00000000010b044] kvmppc_h_set_dabr+0x50/0x68
->   [   44.376754] LR [c0080000089dacf4] kvmppc_pseries_do_hcall+0xa3c/0xeb0 [kvm_hv]
->   [   44.376849] Call Trace:
->   [   44.376886] [c00000179b3979a0] [c0000017f11c0000] 0xc0000017f11c0000 (unreliable)
->   [   44.376982] [c00000179b397a10] [c0080000089dd6bc] kvmppc_vcpu_run_hv+0x694/0xec0 [kvm_hv]
->   [   44.377084] [c00000179b397ae0] [c0080000093f8bcc] kvmppc_vcpu_run+0x34/0x48 [kvm]
->   [   44.377185] [c00000179b397b00] [c0080000093f522c] kvm_arch_vcpu_ioctl_run+0x2f4/0x400 [kvm]
->   [   44.377286] [c00000179b397b90] [c0080000093e3618] kvm_vcpu_ioctl+0x460/0x850 [kvm]
->   [   44.377384] [c00000179b397d00] [c0000000004ba6c4] do_vfs_ioctl+0xe4/0xb40
->   [   44.377464] [c00000179b397db0] [c0000000004bb1e4] ksys_ioctl+0xc4/0x110
->   [   44.377547] [c00000179b397e00] [c0000000004bb258] sys_ioctl+0x28/0x80
->   [   44.377628] [c00000179b397e20] [c00000000000b888] system_call+0x5c/0x70
->   [   44.377712] Instruction dump:
->   [   44.377765] 4082fff4 4c00012c 38600000 4e800020 e96280c0 896b0000 2c2b0000 3860ffff
->   [   44.377862] 4d820020 50852e74 508516f6 78840724 <f88313c0> f8a313c8 7c942ba6 7cbc2ba6
-> 
-> Fix the bug by only changing r3 when we are returning immediately.
-> 
-> Fixes: c1fe190c0672 ("powerpc: Add force enable of DAWR on P9 option")
-> Signed-off-by: Michael Neuling <mikey@neuling.org>
-> Reported-by: Cédric Le Goater <clg@kaod.org>
+When calling the KVM_SET_GUEST_DEBUG ioctl, userspace might request
+the next instruction to be single stepped via the
+KVM_GUESTDBG_SINGLESTEP control bit of the kvm_guest_debug structure.
 
-Series applied to powerpc fixes, thanks.
+This patch adds the KVM_CAP_PPC_GUEST_DEBUG_SSTEP capability in order
+to inform userspace about the state of single stepping support.
 
-https://git.kernel.org/powerpc/c/fabb2efcf0846e28b4910fc20bdc203d3d0170af
+We currently don't have support for guest single stepping implemented
+in Book3S HV so the capability is only present for Book3S PR and
+BookE.
 
-cheers
+Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+---
+
+v1 -> v2:
+ - add capability description to Documentation/virtual/kvm/api.txt
+
+v2 -> v3:
+ - be explicit in the commit message about when the capability is
+   present
+ - remove unnecessary check for CONFIG_BOOKE
+
+ Documentation/virtual/kvm/api.txt | 3 +++
+ arch/powerpc/kvm/powerpc.c        | 2 ++
+ include/uapi/linux/kvm.h          | 1 +
+ 3 files changed, 6 insertions(+)
+
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index ba6c42c576dd..a77643bfa917 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -2969,6 +2969,9 @@ can be determined by querying the KVM_CAP_GUEST_DEBUG_HW_BPS and
+ KVM_CAP_GUEST_DEBUG_HW_WPS capabilities which return a positive number
+ indicating the number of supported registers.
+
++For ppc, the KVM_CAP_PPC_GUEST_DEBUG_SSTEP capability indicates whether
++the single-step debug event (KVM_GUESTDBG_SINGLESTEP) is supported.
++
+ When debug events exit the main run loop with the reason
+ KVM_EXIT_DEBUG with the kvm_debug_exit_arch part of the kvm_run
+ structure containing architecture specific debug information.
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 6d704ad2472b..bd0a73eaf7ba 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -527,6 +527,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_IMMEDIATE_EXIT:
+ 		r = 1;
+ 		break;
++	case KVM_CAP_PPC_GUEST_DEBUG_SSTEP:
++		/* fall through */
+ 	case KVM_CAP_PPC_PAIRED_SINGLES:
+ 	case KVM_CAP_PPC_OSI:
+ 	case KVM_CAP_PPC_GET_PVINFO:
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 2fe12b40d503..cad9fcd90f39 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_SVE 170
+ #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+ #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
++#define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 173
+
+ #ifdef KVM_CAP_IRQ_ROUTING
+
+--
+2.20.1
+
