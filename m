@@ -2,54 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 130BA4C518
-	for <lists+kvm-ppc@lfdr.de>; Thu, 20 Jun 2019 03:47:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C98A54C519
+	for <lists+kvm-ppc@lfdr.de>; Thu, 20 Jun 2019 03:47:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731167AbfFTBrR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 19 Jun 2019 21:47:17 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:35778 "EHLO
+        id S1731172AbfFTBrU (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 19 Jun 2019 21:47:20 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:40738 "EHLO
         mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726370AbfFTBrR (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 Jun 2019 21:47:17 -0400
-Received: by mail-pg1-f195.google.com with SMTP id s27so675710pgl.2
-        for <kvm-ppc@vger.kernel.org>; Wed, 19 Jun 2019 18:47:17 -0700 (PDT)
+        with ESMTP id S1726370AbfFTBrU (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 Jun 2019 21:47:20 -0400
+Received: by mail-pg1-f195.google.com with SMTP id w10so657488pgj.7
+        for <kvm-ppc@vger.kernel.org>; Wed, 19 Jun 2019 18:47:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=mCIC2aboa3+r+s8FwQIzqoLVu7DilRd8Ln+aL0vqvn0=;
-        b=qgNZHp/lhGNyohg7ZT58DH0wNF+D5EwcPHyalSMFyf7j727/HvDLykynP9BGEC4SrY
-         EpU0MQeYT+JACzcMGkUhTJy59RpMLJYV/yB7RNZOdsPwZt+4h+zu9FeKxueyzEqT0+vw
-         0y3n3wuaIyhCNKoh96673+B3zjlZ0p9X3wnDz/kQqRDEYmXSSgrwuZiNWrf+LLZHQyid
-         WDk5CSTtan+AxUk9jibW3Qc3PfO7Ye5VRERY5TCU7vjvC7z1iXEqTOcL3VC/Z6qM5eSk
-         xtn+nk4bKeFz3qLmIasf1XG0ffivOI7sFYzhWBmrrXl++VREgpZHFUSSbUrWIlWnA0hB
-         LgyA==
+        bh=Qzjpioy/P2IPckje2dj/C4MHof6bcToLS3p/Qy08+Dc=;
+        b=UkFBpkHnaDzJ4EEr/gPxr3tB5VD3Lt6Sack+HpwPgZWu93UMoqsvLt3ySpWYJ1u+1o
+         9zlwxLM4Xo8bksXVPtVDp3gAm1SozhQxFWLe9i8u+VzmeNAaYXq3GqnueIJgh8wR4JVo
+         Q759N28xmebe3thpfTU2dey91XPLNRBpXYbc6Rft+ZpV4DhdbEpH1xyct1APfOEtv2M8
+         x8h2dli7Wzyp5UTdf6r2VAkvX9UYsn4yxka7OSBhHmGqTBANYM7kMH7XE5key0GiGxSM
+         O8QBmiPI4HXHEMLM/qMZJaIy2VC/kYviJQ7VyTtmGb1DrLsrGlIDm4+ku5eJ4uFsPgIa
+         pt6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=mCIC2aboa3+r+s8FwQIzqoLVu7DilRd8Ln+aL0vqvn0=;
-        b=tUmpJUHqCSt9wnRxw2L+HYpcH+FrGsoL7FY/ZYvEQ9Guw9YDahVPktc8qFRzBREL5I
-         j/87B2XMEyB7mTm+h2xnWWmFOM8SmMY2NBnqeA+g4JGxbtkhdTgra7Q3/AAnWAJ7D0WN
-         DbETx2nnE5QJ0P9rTXbDeURj38wdOgw569VJVP3lpGyqBiz/lppt+ILHXJrMlnumlgzu
-         LbRPKcc1RpeNIS1tfgYj47WAAw/HpTlnXXBYpzct4CH4m2zcKS2PD9hKkHY95hcQIKhD
-         RSLPvob4TsTMypkapbwJAbKXPirnhAUyvnn4kByYpjxGXFykKdTTHkLKrUqwqklkMcoE
-         /rwQ==
-X-Gm-Message-State: APjAAAVSJchiRTDmGpJmrGOk8cLGtKXyMzYXe13knV1Rd2q/9VuRSevF
-        4e+IQeVdxTHTskViZ8WIyp8=
-X-Google-Smtp-Source: APXvYqzxxwvput0hwtg9iKYmnq2VzDGr9V32cZn/53fXeykdeqkBTdooGW36AwvHS58s9fIbCQCIbg==
-X-Received: by 2002:a17:90b:8d2:: with SMTP id ds18mr290574pjb.132.1560995237014;
-        Wed, 19 Jun 2019 18:47:17 -0700 (PDT)
+        bh=Qzjpioy/P2IPckje2dj/C4MHof6bcToLS3p/Qy08+Dc=;
+        b=VeWleb8ooxxhpKPMrYgRbnACuCkjVpMaqvfgRcuUpaWf6OaC9c1L/++uupdo1NWOLR
+         4EYeVx6cFfbpcTxSOt4WKMR1oxF18VSFYr67J7zpEr9x7IujZo/7SioBxDfsbBRP81dL
+         lP42wseNe6CzcKe/u6qAQRGogBr6/mspa8UbmX2heuM986USYi74Ytq1rKMjI9MrQOJT
+         BneFBWzpcmV5HHCmfiuP0W7vBQ7QzwpTMbFpEG6OLW74oxWrNzPcwFD6UXa7hLhSSRuU
+         I90rbHtOWPmDIQH/igVm0v5W9WixyhLELkg7fjEHOA5OVupyxJZXztkhk6PsXqW2m1dT
+         TJ0Q==
+X-Gm-Message-State: APjAAAVkLOJ+P0+nPgrxFOD9Ait4N1op1FgN7EZBpdXmtkPrjjiJQCKv
+        kng14EncbXHQrENFMDmgbTZU9TJ8
+X-Google-Smtp-Source: APXvYqx+2IXeF0bK9VkWnbmx9WmhqjJFeWbAoAZDCTeAWgYBWnohz9q3fIehN5XzGYXsgtu+dH0rtw==
+X-Received: by 2002:a63:5a4b:: with SMTP id k11mr10562073pgm.143.1560995239808;
+        Wed, 19 Jun 2019 18:47:19 -0700 (PDT)
 Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id 23sm20763528pfn.176.2019.06.19.18.47.14
+        by smtp.gmail.com with ESMTPSA id 23sm20763528pfn.176.2019.06.19.18.47.17
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 19 Jun 2019 18:47:16 -0700 (PDT)
+        Wed, 19 Jun 2019 18:47:19 -0700 (PDT)
 From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 To:     linuxppc-dev@lists.ozlabs.org
 Cc:     kvm-ppc@vger.kernel.org, mpe@ellerman.id.au, paulus@ozlabs.org,
         clg@kaod.org, sjitindarsingh@gmail.com
-Subject: [PATCH 2/3] KVM: PPC: Book3S HV: Signed extend decrementer value if not using large decr
-Date:   Thu, 20 Jun 2019 11:46:50 +1000
-Message-Id: <20190620014651.7645-2-sjitindarsingh@gmail.com>
+Subject: [PATCH 3/3] KVM: PPC: Book3S HV: Clear pending decr exceptions on nested guest entry
+Date:   Thu, 20 Jun 2019 11:46:51 +1000
+Message-Id: <20190620014651.7645-3-sjitindarsingh@gmail.com>
 X-Mailer: git-send-email 2.13.6
 In-Reply-To: <20190620014651.7645-1-sjitindarsingh@gmail.com>
 References: <20190620014651.7645-1-sjitindarsingh@gmail.com>
@@ -58,37 +58,56 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On POWER9 the decrementer can operate in large decrementer mode where
-the decrementer is 56 bits and signed extended to 64 bits. When not
-operating in this mode the decrementer behaves as a 32 bit decrementer
-which is NOT signed extended (as on POWER8).
+If we enter an L1 guest with a pending decrementer exception then this
+is cleared on guest exit if the guest has writtien a positive value into
+the decrementer (indicating that it handled the decrementer exception)
+since there is no other way to detect that the guest has handled the
+pending exception and that it should be dequeued. In the event that the
+L1 guest tries to run a nested (L2) guest immediately after this and the
+L2 guest decrementer is negative (which is loaded by L1 before making
+the H_ENTER_NESTED hcall), then the pending decrementer exception
+isn't cleared and the L2 entry is blocked since L1 has a pending
+exception, even though L1 may have already handled the exception and
+written a positive value for it's decrementer. This results in a loop of
+L1 trying to enter the L2 guest and L0 blocking the entry since L1 has
+an interrupt pending with the outcome being that L2 never gets to run
+and hangs.
 
-Currently when reading a guest decrementer value we don't take into
-account whether the large decrementer is enabled or not, and this means
-the value will be incorrect when the guest is not using the large
-decrementer. Fix this by sign extending the value read when the guest
-isn't using the large decrementer.
+Fix this by clearing any pending decrementer exceptions when L1 makes
+the H_ENTER_NESTED hcall since it won't do this if it's decrementer has
+gone negative, and anyway it's decrementer has been communicated to L0
+in the hdec_expires field and L0 will return control to L1 when this
+goes negative by delivering an H_DECREMENTER exception.
 
 Fixes: 95a6432ce903 "KVM: PPC: Book3S HV: Streamlined guest entry/exit path on P9 for radix guests"
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/powerpc/kvm/book3s_hv.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index d3684509da35..719fd2529eec 100644
+index 719fd2529eec..4a5eb29b952f 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3607,6 +3607,8 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+@@ -4128,8 +4128,15 @@ int kvmhv_run_single_vcpu(struct kvm_run *kvm_run,
  
- 	vcpu->arch.slb_max = 0;
- 	dec = mfspr(SPRN_DEC);
-+	if (!(lpcr & LPCR_LD)) /* Sign extend if not using large decrementer */
-+		dec = (s32) dec;
- 	tb = mftb();
- 	vcpu->arch.dec_expires = dec + tb;
- 	vcpu->cpu = -1;
+ 	preempt_enable();
+ 
+-	/* cancel pending decrementer exception if DEC is now positive */
+-	if (get_tb() < vcpu->arch.dec_expires && kvmppc_core_pending_dec(vcpu))
++	/*
++	 * cancel pending decrementer exception if DEC is now positive, or if
++	 * entering a nested guest in which case the decrementer is now owned
++	 * by L2 and the L1 decrementer is provided in hdec_expires
++	 */
++	if (kvmppc_core_pending_dec(vcpu) &&
++			((get_tb() < vcpu->arch.dec_expires) ||
++			 (trap == BOOK3S_INTERRUPT_SYSCALL &&
++			  kvmppc_get_gpr(vcpu, 3) == H_ENTER_NESTED)))
+ 		kvmppc_core_dequeue_dec(vcpu);
+ 
+ 	trace_kvm_guest_exit(vcpu);
 -- 
 2.13.6
 
