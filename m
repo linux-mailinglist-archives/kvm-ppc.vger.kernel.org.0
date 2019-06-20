@@ -2,141 +2,112 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD7174BD66
-	for <lists+kvm-ppc@lfdr.de>; Wed, 19 Jun 2019 18:01:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CCD94C511
+	for <lists+kvm-ppc@lfdr.de>; Thu, 20 Jun 2019 03:45:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725899AbfFSQBn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 19 Jun 2019 12:01:43 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47928 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726091AbfFSQBn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 Jun 2019 12:01:43 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5JFqZNV075497
-        for <kvm-ppc@vger.kernel.org>; Wed, 19 Jun 2019 12:01:42 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2t7qkc249c-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Wed, 19 Jun 2019 12:01:41 -0400
-Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <farosas@linux.ibm.com>;
-        Wed, 19 Jun 2019 17:01:40 +0100
-Received: from b01cxnp22036.gho.pok.ibm.com (9.57.198.26)
-        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 19 Jun 2019 17:01:37 +0100
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5JG1asX8192548
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jun 2019 16:01:36 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1136BAC05B;
-        Wed, 19 Jun 2019 16:01:36 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 677BFAC05F;
-        Wed, 19 Jun 2019 16:01:33 +0000 (GMT)
-Received: from farosas.linux.ibm.com.ibmuc.com (unknown [9.80.201.249])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Jun 2019 16:01:33 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        pbonzini@redhat.com, rkrcmar@redhat.com,
-        david@gibson.dropbear.id.au, aik@ozlabs.ru
-Subject: [PATCH v3] KVM: PPC: Report single stepping capability
-Date:   Wed, 19 Jun 2019 13:01:27 -0300
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
+        id S1730896AbfFTBpW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 19 Jun 2019 21:45:22 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:43645 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726480AbfFTBpW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 Jun 2019 21:45:22 -0400
+Received: by mail-pg1-f194.google.com with SMTP id f25so648908pgv.10
+        for <kvm-ppc@vger.kernel.org>; Wed, 19 Jun 2019 18:45:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=3rH4Li7iQpV2NhLM6R10n6Rmb0Kzzsbup8BQ7TSxMNU=;
+        b=iwtIMmeIJr/cVxE3WxYjZrIBVtItI9+cJkvTm/V2qUz+gSDLgMDlsFlakN/liAj6UP
+         vTnVse3C+Zb6iPCkWTFoUZ/vRV7GfEd8BBSZQnyekicM0Bo0Iepkg6Cb9bdZjXDYlMcS
+         K2U0CNMUdr+8X1DG2Zw2z1Y568j7zu4EgtRmW/zH3k3KORFFMDPL3a1Cp6/8yppUkC7S
+         J3rc6HgY6mhVZa3t8SFDIVXsqDiUQ7cvClS0d43HDUt5L28IHFmqBedo/3qLZkDzoOSl
+         JGbm6mvKONrTtgqxwLC1WCMFjYQEnjrIL9XyfAgA9mXCeKD3/DWczpPrJFCPh0+g42i/
+         CkNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=3rH4Li7iQpV2NhLM6R10n6Rmb0Kzzsbup8BQ7TSxMNU=;
+        b=SX0iFiLGNvGnHgmiLquF0CWTsxXcJ9WQhaxcPusezKywb8ALlCQVXXYdsb9vE1xpzl
+         469WoA5kiGa1qxVAlNT/Zc0iec3FwV2idwLweQ1rJIbTRDofPFZdX4l+ekBWoiYXX6Gb
+         Ue+kSvJMFWy9iWTABrowUOGVQQ6JJpAgM9mXbobSBW0GoZj1cHrl6Z9jHYHAAAClafa5
+         rOShjp4CPq8gjdU+a9csG6TwcodYJIUWxdeeguMIe1oc/hteIqrn5kxl6DUhM2kkaI/3
+         2Em6QRf0idCJOPBd8HLeoeUocgHF7Q0X8cNIQLUu4W/1SSD0gBEJnLLM2frX8SU1KVBS
+         tIrg==
+X-Gm-Message-State: APjAAAX/VRcUBXFdJaIVER8m15k9JQYRnF6nv3rHzY6or3MMKlERHhDy
+        ovkau3G6hO99FyDMGjLKcU0=
+X-Google-Smtp-Source: APXvYqy304rXbVDnxHEwwjd5Cdhw7PS0colGaO5tqp7nM5MG7oxwiK0IgzAtTMcf04uXEMXJRDke3Q==
+X-Received: by 2002:a65:5c88:: with SMTP id a8mr10317050pgt.388.1560995122055;
+        Wed, 19 Jun 2019 18:45:22 -0700 (PDT)
+Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.googlemail.com with ESMTPSA id y22sm39926754pgj.38.2019.06.19.18.45.19
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 19 Jun 2019 18:45:21 -0700 (PDT)
+Message-ID: <1560995116.4771.1.camel@gmail.com>
+Subject: Re: [PATCH 0/2] Fix handling of h_set_dawr
+From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To:     =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, mikey@neuling.org, mpe@ellerman.id.au,
+        paulus@ozlabs.org
+Date:   Thu, 20 Jun 2019 11:45:16 +1000
+In-Reply-To: <87e219c8-1db7-9976-03ce-5a566a8df7ab@kaod.org>
+References: <20190617071619.19360-1-sjitindarsingh@gmail.com>
+         <87e219c8-1db7-9976-03ce-5a566a8df7ab@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19061916-0052-0000-0000-000003D2D390
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011291; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01220284; UDB=6.00641924; IPR=6.01001425;
- MB=3.00027379; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-19 16:01:39
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061916-0053-0000-0000-00006161BA1B
-Message-Id: <20190619160127.24561-1-farosas@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-19_10:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906190127
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-When calling the KVM_SET_GUEST_DEBUG ioctl, userspace might request
-the next instruction to be single stepped via the
-KVM_GUESTDBG_SINGLESTEP control bit of the kvm_guest_debug structure.
+On Mon, 2019-06-17 at 11:06 +0200, Cédric Le Goater wrote:
+> On 17/06/2019 09:16, Suraj Jitindar Singh wrote:
+> > Series contains 2 patches to fix the host in kernel handling of the
+> > hcall
+> > h_set_dawr.
+> > 
+> > First patch from Michael Neuling is just a resend added here for
+> > clarity.
+> > 
+> > Michael Neuling (1):
+> >   KVM: PPC: Book3S HV: Fix r3 corruption in h_set_dabr()
+> > 
+> > Suraj Jitindar Singh (1):
+> >   KVM: PPC: Book3S HV: Only write DAWR[X] when handling h_set_dawr
+> > in
+> >     real mode
+> 
+> 
+> 
+> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+> 
+> and 
+> 
+> Tested-by: Cédric Le Goater <clg@kaod.org>
+> 
+> 
+> but I see slowdowns in nested as if the IPIs were not delivered. Have
+> we
+> touch this part in 5.2 ? 
 
-This patch adds the KVM_CAP_PPC_GUEST_DEBUG_SSTEP capability in order
-to inform userspace about the state of single stepping support.
+Hi,
 
-We currently don't have support for guest single stepping implemented
-in Book3S HV so the capability is only present for Book3S PR and
-BookE.
+I've seen the same and tracked it down to decrementer exceptions not
+being delivered when the guest is using large decrementer. I've got a
+patch I'm about to send so I'll CC you.
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
+Another option is to disable the large decrementer with:
+-machine pseries,cap-large-decr=false
 
-v1 -> v2:
- - add capability description to Documentation/virtual/kvm/api.txt
+Thanks,
+Suraj
 
-v2 -> v3:
- - be explicit in the commit message about when the capability is
-   present
- - remove unnecessary check for CONFIG_BOOKE
-
- Documentation/virtual/kvm/api.txt | 3 +++
- arch/powerpc/kvm/powerpc.c        | 2 ++
- include/uapi/linux/kvm.h          | 1 +
- 3 files changed, 6 insertions(+)
-
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index ba6c42c576dd..a77643bfa917 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -2969,6 +2969,9 @@ can be determined by querying the KVM_CAP_GUEST_DEBUG_HW_BPS and
- KVM_CAP_GUEST_DEBUG_HW_WPS capabilities which return a positive number
- indicating the number of supported registers.
-
-+For ppc, the KVM_CAP_PPC_GUEST_DEBUG_SSTEP capability indicates whether
-+the single-step debug event (KVM_GUESTDBG_SINGLESTEP) is supported.
-+
- When debug events exit the main run loop with the reason
- KVM_EXIT_DEBUG with the kvm_debug_exit_arch part of the kvm_run
- structure containing architecture specific debug information.
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 6d704ad2472b..bd0a73eaf7ba 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -527,6 +527,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_IMMEDIATE_EXIT:
- 		r = 1;
- 		break;
-+	case KVM_CAP_PPC_GUEST_DEBUG_SSTEP:
-+		/* fall through */
- 	case KVM_CAP_PPC_PAIRED_SINGLES:
- 	case KVM_CAP_PPC_OSI:
- 	case KVM_CAP_PPC_GET_PVINFO:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2fe12b40d503..cad9fcd90f39 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_SVE 170
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-+#define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 173
-
- #ifdef KVM_CAP_IRQ_ROUTING
-
---
-2.20.1
-
+> 
+> Thanks,
+> 
+> C.
+> 
