@@ -2,30 +2,30 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BF15A4C8BA
-	for <lists+kvm-ppc@lfdr.de>; Thu, 20 Jun 2019 09:56:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EC234C8BB
+	for <lists+kvm-ppc@lfdr.de>; Thu, 20 Jun 2019 09:57:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725912AbfFTH4y (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 20 Jun 2019 03:56:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43676 "EHLO mx1.redhat.com"
+        id S1725966AbfFTH5I (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 20 Jun 2019 03:57:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51214 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725877AbfFTH4y (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 20 Jun 2019 03:56:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1725877AbfFTH5I (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 20 Jun 2019 03:57:08 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8D68A300B916;
-        Thu, 20 Jun 2019 07:56:53 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 43EA583F3E;
+        Thu, 20 Jun 2019 07:57:07 +0000 (UTC)
 Received: from [10.36.116.36] (ovpn-116-36.ams2.redhat.com [10.36.116.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D8406013D;
-        Thu, 20 Jun 2019 07:56:52 +0000 (UTC)
-Subject: Re: [PATCH 2/3] KVM: PPC: Book3S HV: Signed extend decrementer value
- if not using large decr
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 12ACE1001B04;
+        Thu, 20 Jun 2019 07:57:05 +0000 (UTC)
+Subject: Re: [PATCH 3/3] KVM: PPC: Book3S HV: Clear pending decr exceptions on
+ nested guest entry
 To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
         linuxppc-dev@lists.ozlabs.org
 Cc:     clg@kaod.org, kvm-ppc@vger.kernel.org
 References: <20190620014651.7645-1-sjitindarsingh@gmail.com>
- <20190620014651.7645-2-sjitindarsingh@gmail.com>
+ <20190620014651.7645-3-sjitindarsingh@gmail.com>
 From:   Laurent Vivier <lvivier@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,57 +70,77 @@ Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  oDqSoLt5w9GoQQ6gDVP2ZjTWqwSRMLzNr37rJjZ1pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyx
  FCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbLXiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsB
  kmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZD+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <5e2669f0-33fa-b754-98d8-b8476ce750f1@redhat.com>
-Date:   Thu, 20 Jun 2019 09:56:51 +0200
+Message-ID: <30c02f09-8376-3dd0-e463-94d396df0240@redhat.com>
+Date:   Thu, 20 Jun 2019 09:57:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190620014651.7645-2-sjitindarsingh@gmail.com>
+In-Reply-To: <20190620014651.7645-3-sjitindarsingh@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 20 Jun 2019 07:56:53 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Thu, 20 Jun 2019 07:57:07 +0000 (UTC)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 On 20/06/2019 03:46, Suraj Jitindar Singh wrote:
-> On POWER9 the decrementer can operate in large decrementer mode where
-> the decrementer is 56 bits and signed extended to 64 bits. When not
-> operating in this mode the decrementer behaves as a 32 bit decrementer
-> which is NOT signed extended (as on POWER8).
+> If we enter an L1 guest with a pending decrementer exception then this
+> is cleared on guest exit if the guest has writtien a positive value into
+> the decrementer (indicating that it handled the decrementer exception)
+> since there is no other way to detect that the guest has handled the
+> pending exception and that it should be dequeued. In the event that the
+> L1 guest tries to run a nested (L2) guest immediately after this and the
+> L2 guest decrementer is negative (which is loaded by L1 before making
+> the H_ENTER_NESTED hcall), then the pending decrementer exception
+> isn't cleared and the L2 entry is blocked since L1 has a pending
+> exception, even though L1 may have already handled the exception and
+> written a positive value for it's decrementer. This results in a loop of
+> L1 trying to enter the L2 guest and L0 blocking the entry since L1 has
+> an interrupt pending with the outcome being that L2 never gets to run
+> and hangs.
 > 
-> Currently when reading a guest decrementer value we don't take into
-> account whether the large decrementer is enabled or not, and this means
-> the value will be incorrect when the guest is not using the large
-> decrementer. Fix this by sign extending the value read when the guest
-> isn't using the large decrementer.
+> Fix this by clearing any pending decrementer exceptions when L1 makes
+> the H_ENTER_NESTED hcall since it won't do this if it's decrementer has
+> gone negative, and anyway it's decrementer has been communicated to L0
+> in the hdec_expires field and L0 will return control to L1 when this
+> goes negative by delivering an H_DECREMENTER exception.
 > 
 > Fixes: 95a6432ce903 "KVM: PPC: Book3S HV: Streamlined guest entry/exit path on P9 for radix guests"
 > 
 > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 > ---
->  arch/powerpc/kvm/book3s_hv.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  arch/powerpc/kvm/book3s_hv.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 > 
 > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index d3684509da35..719fd2529eec 100644
+> index 719fd2529eec..4a5eb29b952f 100644
 > --- a/arch/powerpc/kvm/book3s_hv.c
 > +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -3607,6 +3607,8 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+> @@ -4128,8 +4128,15 @@ int kvmhv_run_single_vcpu(struct kvm_run *kvm_run,
 >  
->  	vcpu->arch.slb_max = 0;
->  	dec = mfspr(SPRN_DEC);
-> +	if (!(lpcr & LPCR_LD)) /* Sign extend if not using large decrementer */
-> +		dec = (s32) dec;
->  	tb = mftb();
->  	vcpu->arch.dec_expires = dec + tb;
->  	vcpu->cpu = -1;
+>  	preempt_enable();
+>  
+> -	/* cancel pending decrementer exception if DEC is now positive */
+> -	if (get_tb() < vcpu->arch.dec_expires && kvmppc_core_pending_dec(vcpu))
+> +	/*
+> +	 * cancel pending decrementer exception if DEC is now positive, or if
+> +	 * entering a nested guest in which case the decrementer is now owned
+> +	 * by L2 and the L1 decrementer is provided in hdec_expires
+> +	 */
+> +	if (kvmppc_core_pending_dec(vcpu) &&
+> +			((get_tb() < vcpu->arch.dec_expires) ||
+> +			 (trap == BOOK3S_INTERRUPT_SYSCALL &&
+> +			  kvmppc_get_gpr(vcpu, 3) == H_ENTER_NESTED)))
+>  		kvmppc_core_dequeue_dec(vcpu);
+>  
+>  	trace_kvm_guest_exit(vcpu);
 > 
 
 Patches 2 and 3: tested I can boot and run an L2 nested guest with qemu
 v4.0.0 and caps-large-decr=on in the case we have had a hang previously.
 
 Tested-by: Laurent Vivier <lvivier@redhat.com>
+
