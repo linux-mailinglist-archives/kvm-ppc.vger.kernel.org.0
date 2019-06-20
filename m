@@ -2,112 +2,95 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CCD94C511
-	for <lists+kvm-ppc@lfdr.de>; Thu, 20 Jun 2019 03:45:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AFD7B4C517
+	for <lists+kvm-ppc@lfdr.de>; Thu, 20 Jun 2019 03:47:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730896AbfFTBpW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 19 Jun 2019 21:45:22 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:43645 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726480AbfFTBpW (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 Jun 2019 21:45:22 -0400
-Received: by mail-pg1-f194.google.com with SMTP id f25so648908pgv.10
-        for <kvm-ppc@vger.kernel.org>; Wed, 19 Jun 2019 18:45:22 -0700 (PDT)
+        id S1731156AbfFTBrP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 19 Jun 2019 21:47:15 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:33899 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726370AbfFTBrO (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 Jun 2019 21:47:14 -0400
+Received: by mail-pf1-f195.google.com with SMTP id c85so691386pfc.1
+        for <kvm-ppc@vger.kernel.org>; Wed, 19 Jun 2019 18:47:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=3rH4Li7iQpV2NhLM6R10n6Rmb0Kzzsbup8BQ7TSxMNU=;
-        b=iwtIMmeIJr/cVxE3WxYjZrIBVtItI9+cJkvTm/V2qUz+gSDLgMDlsFlakN/liAj6UP
-         vTnVse3C+Zb6iPCkWTFoUZ/vRV7GfEd8BBSZQnyekicM0Bo0Iepkg6Cb9bdZjXDYlMcS
-         K2U0CNMUdr+8X1DG2Zw2z1Y568j7zu4EgtRmW/zH3k3KORFFMDPL3a1Cp6/8yppUkC7S
-         J3rc6HgY6mhVZa3t8SFDIVXsqDiUQ7cvClS0d43HDUt5L28IHFmqBedo/3qLZkDzoOSl
-         JGbm6mvKONrTtgqxwLC1WCMFjYQEnjrIL9XyfAgA9mXCeKD3/DWczpPrJFCPh0+g42i/
-         CkNg==
+        h=from:to:cc:subject:date:message-id;
+        bh=l3iU69UdUouImGD/C1rzkHrdhSDtisQup2hMO2eAkIQ=;
+        b=X04L84mGDtOAPUYF9lvUCCJDr5J/yI5sqdvwmTUZiaJBHii63YGira00ZHhI/klAIP
+         wYrj1EsaS0Pt+ceZMTSCddNIN946VfJl7c1Dobgnhj8y48oF+DgIZddEoDs3sCo46Fdd
+         ZCFv5s1OeSU2OOriXBJGRqKX/kEiXRZv0Apf8Q6TOHPSd3sopqZ2ZR1o/jBxJmZ0ruRZ
+         DvCAlvIz6CKsVoQ5V0uQtkTVCCjHLad59EaIHROKZ2E3Mj5kCH2of28q09Pr9ecziTtg
+         FS2Ja7+OApeRBWpbAQYgXj6xLnvngVFA74AKrUv6oQQbIygtsWZJ8pTy2kefCAM/3QQQ
+         OenA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3rH4Li7iQpV2NhLM6R10n6Rmb0Kzzsbup8BQ7TSxMNU=;
-        b=SX0iFiLGNvGnHgmiLquF0CWTsxXcJ9WQhaxcPusezKywb8ALlCQVXXYdsb9vE1xpzl
-         469WoA5kiGa1qxVAlNT/Zc0iec3FwV2idwLweQ1rJIbTRDofPFZdX4l+ekBWoiYXX6Gb
-         Ue+kSvJMFWy9iWTABrowUOGVQQ6JJpAgM9mXbobSBW0GoZj1cHrl6Z9jHYHAAAClafa5
-         rOShjp4CPq8gjdU+a9csG6TwcodYJIUWxdeeguMIe1oc/hteIqrn5kxl6DUhM2kkaI/3
-         2Em6QRf0idCJOPBd8HLeoeUocgHF7Q0X8cNIQLUu4W/1SSD0gBEJnLLM2frX8SU1KVBS
-         tIrg==
-X-Gm-Message-State: APjAAAX/VRcUBXFdJaIVER8m15k9JQYRnF6nv3rHzY6or3MMKlERHhDy
-        ovkau3G6hO99FyDMGjLKcU0=
-X-Google-Smtp-Source: APXvYqy304rXbVDnxHEwwjd5Cdhw7PS0colGaO5tqp7nM5MG7oxwiK0IgzAtTMcf04uXEMXJRDke3Q==
-X-Received: by 2002:a65:5c88:: with SMTP id a8mr10317050pgt.388.1560995122055;
-        Wed, 19 Jun 2019 18:45:22 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=l3iU69UdUouImGD/C1rzkHrdhSDtisQup2hMO2eAkIQ=;
+        b=PMUBTSyUTH4eUM9E3bCkOdmlPqw0XRdZtdtbsapnPk6dCwUGYnTccALruQAUFwaD58
+         cft+MT/3aFtUZ49+ZekAnIiTfNzP9l51mOYPBqENI55DFu01tJA5t2hjz3zWC0+IH20T
+         Q0+NObk82NhStiWVvnuUswRW10cF9IGlkJdzFa1zzrX6wFFfpfurmmlOU7YSSi/gkuM1
+         72HObpL7TdRSLKBvfg6Q7hAmz3xseg56+WcMzqWih1EycjD3XBAs3BV0HBhzwM8WaSNT
+         uC997fGvp3g+NNv2vto+uz/OZN34+W2aG92VcpKhfR2e8lMg6wFtA7b1VGVAlvPGfVl8
+         sO3Q==
+X-Gm-Message-State: APjAAAUp5hy2nTjz3hf8lLT25jwYp4o96VvuhAaFREonQYyOQMZ/BV6/
+        i0nDk4mtTiTbEpl2eZGvxZw=
+X-Google-Smtp-Source: APXvYqxMJLWywIo3gBdN535Tn+IYUHBPX4rEbPXeczQStY5K2tm8qniTlv5Y4gN+h8bTWG691puyqQ==
+X-Received: by 2002:a17:90a:3210:: with SMTP id k16mr268761pjb.13.1560995234135;
+        Wed, 19 Jun 2019 18:47:14 -0700 (PDT)
 Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.googlemail.com with ESMTPSA id y22sm39926754pgj.38.2019.06.19.18.45.19
+        by smtp.gmail.com with ESMTPSA id 23sm20763528pfn.176.2019.06.19.18.47.11
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 19 Jun 2019 18:45:21 -0700 (PDT)
-Message-ID: <1560995116.4771.1.camel@gmail.com>
-Subject: Re: [PATCH 0/2] Fix handling of h_set_dawr
+        Wed, 19 Jun 2019 18:47:13 -0700 (PDT)
 From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To:     =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, mikey@neuling.org, mpe@ellerman.id.au,
-        paulus@ozlabs.org
-Date:   Thu, 20 Jun 2019 11:45:16 +1000
-In-Reply-To: <87e219c8-1db7-9976-03ce-5a566a8df7ab@kaod.org>
-References: <20190617071619.19360-1-sjitindarsingh@gmail.com>
-         <87e219c8-1db7-9976-03ce-5a566a8df7ab@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, mpe@ellerman.id.au, paulus@ozlabs.org,
+        clg@kaod.org, sjitindarsingh@gmail.com
+Subject: [PATCH 1/3] KVM: PPC: Book3S HV: Invalidate ERAT when flushing guest TLB entries
+Date:   Thu, 20 Jun 2019 11:46:49 +1000
+Message-Id: <20190620014651.7645-1-sjitindarsingh@gmail.com>
+X-Mailer: git-send-email 2.13.6
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, 2019-06-17 at 11:06 +0200, Cédric Le Goater wrote:
-> On 17/06/2019 09:16, Suraj Jitindar Singh wrote:
-> > Series contains 2 patches to fix the host in kernel handling of the
-> > hcall
-> > h_set_dawr.
-> > 
-> > First patch from Michael Neuling is just a resend added here for
-> > clarity.
-> > 
-> > Michael Neuling (1):
-> >   KVM: PPC: Book3S HV: Fix r3 corruption in h_set_dabr()
-> > 
-> > Suraj Jitindar Singh (1):
-> >   KVM: PPC: Book3S HV: Only write DAWR[X] when handling h_set_dawr
-> > in
-> >     real mode
-> 
-> 
-> 
-> Reviewed-by: Cédric Le Goater <clg@kaod.org>
-> 
-> and 
-> 
-> Tested-by: Cédric Le Goater <clg@kaod.org>
-> 
-> 
-> but I see slowdowns in nested as if the IPIs were not delivered. Have
-> we
-> touch this part in 5.2 ? 
+When a guest vcpu moves from one physical thread to another it is
+necessary for the host to perform a tlb flush on the previous core if
+another vcpu from the same guest is going to run there. This is because the
+guest may use the local form of the tlb invalidation instruction meaning
+stale tlb entries would persist where it previously ran. This is handled
+on guest entry in kvmppc_check_need_tlb_flush() which calls
+flush_guest_tlb() to perform the tlb flush.
 
-Hi,
+Previously the generic radix__local_flush_tlb_lpid_guest() function was
+used, however the functionality was reimplemented in flush_guest_tlb()
+to avoid the trace_tlbie() call as the flushing may be done in real
+mode. The reimplementation in flush_guest_tlb() was missing an erat
+invalidation after flushing the tlb.
 
-I've seen the same and tracked it down to decrementer exceptions not
-being delivered when the guest is using large decrementer. I've got a
-patch I'm about to send so I'll CC you.
+This lead to observable memory corruption in the guest due to the
+caching of stale translations. Fix this by adding the erat invalidation.
 
-Another option is to disable the large decrementer with:
--machine pseries,cap-large-decr=false
+Fixes: 70ea13f6e609 "KVM: PPC: Book3S HV: Flush TLB on secondary radix threads"
 
-Thanks,
-Suraj
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ arch/powerpc/kvm/book3s_hv_builtin.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> 
-> Thanks,
-> 
-> C.
-> 
+diff --git a/arch/powerpc/kvm/book3s_hv_builtin.c b/arch/powerpc/kvm/book3s_hv_builtin.c
+index 6035d24f1d1d..a46286f73eec 100644
+--- a/arch/powerpc/kvm/book3s_hv_builtin.c
++++ b/arch/powerpc/kvm/book3s_hv_builtin.c
+@@ -833,6 +833,7 @@ static void flush_guest_tlb(struct kvm *kvm)
+ 		}
+ 	}
+ 	asm volatile("ptesync": : :"memory");
++	asm volatile(PPC_INVALIDATE_ERAT : : :"memory");
+ }
+ 
+ void kvmppc_check_need_tlb_flush(struct kvm *kvm, int pcpu,
+-- 
+2.13.6
+
