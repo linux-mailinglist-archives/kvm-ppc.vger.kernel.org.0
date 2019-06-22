@@ -2,119 +2,64 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CC564C994
-	for <lists+kvm-ppc@lfdr.de>; Thu, 20 Jun 2019 10:36:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E52A34F63F
+	for <lists+kvm-ppc@lfdr.de>; Sat, 22 Jun 2019 16:38:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726081AbfFTIg5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 20 Jun 2019 04:36:57 -0400
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:57374 "EHLO
-        6.mo2.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726084AbfFTIgw (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 20 Jun 2019 04:36:52 -0400
-X-Greylist: delayed 1017 seconds by postgrey-1.27 at vger.kernel.org; Thu, 20 Jun 2019 04:36:51 EDT
-Received: from player758.ha.ovh.net (unknown [10.109.160.39])
-        by mo2.mail-out.ovh.net (Postfix) with ESMTP id 1D2981A0040
-        for <kvm-ppc@vger.kernel.org>; Thu, 20 Jun 2019 10:19:53 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
-        (Authenticated sender: clg@kaod.org)
-        by player758.ha.ovh.net (Postfix) with ESMTPSA id 50490713A45D;
-        Thu, 20 Jun 2019 08:19:49 +0000 (UTC)
-Subject: Re: [PATCH 3/3] KVM: PPC: Book3S HV: Clear pending decr exceptions on
- nested guest entry
-To:     Laurent Vivier <lvivier@redhat.com>,
-        Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org
-References: <20190620014651.7645-1-sjitindarsingh@gmail.com>
- <20190620014651.7645-3-sjitindarsingh@gmail.com>
- <30c02f09-8376-3dd0-e463-94d396df0240@redhat.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <31d62ffd-2d29-f314-dcff-0cc27919c58a@kaod.org>
-Date:   Thu, 20 Jun 2019 10:19:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726290AbfFVOiL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 22 Jun 2019 10:38:11 -0400
+Received: from sonic303-2.consmr.mail.bf2.yahoo.com ([74.6.131.41]:41798 "EHLO
+        sonic303-2.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726138AbfFVOiL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 22 Jun 2019 10:38:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1561214289; bh=3fXYToOZXvh5MOJ1JSawYDThjnynC/Ekt2gucIg6zZg=; h=Date:From:Reply-To:Subject:From:Subject; b=drNAGbXF8Rm0D1utDg11UciDUgVYypm0wXEUkBEmLoKGzwbruQAQSip9D6U+70o7XTNb+xV2MzT4sFIiC6BwPo3bK1X1HoL/BTLKkK8Kt8nHoxS7+hUtooyIh6UDYB8cXE6Qdtqm0Iy31yy4lmazVUPDcoThXTIWc+om04kxd3yvep2zvqItqzFJS+irfPglP/a684mulTq9qpDA4Ec6JSMRohiayaYJbn+Q8CwfnzbAyLD8vzpxK6XI1mVBknIK2wcUdkJobbtNO8gEM0Y3ua4TgFIosU525yG70DpJgFP2luRHIuiWbPDw6JDBbGezX306Pa8u+WxFcLejM2jptg==
+X-YMail-OSG: jgN7BSMVM1k1hG5xptM9CZs7jNUXn8Z2QkzXMMoZGwowejlx0pgYzJi4IJJekUK
+ PyhPoCZvGvxf7jkyfvcFh4YstunywgsVDpeHnHyOrq4_kZIlxqI58U4AlwECjPrNgUkK56HoV0SR
+ udEJanEurUew74KAmJ0yD533R597p5spd2jiL3GA2hP.aJOZXfkfHXZHEjmWr5nPKVbUlUAIz1ky
+ inRlQiIoFwduKfLRWKowgVGVbvSlPCUsm3mDTSULFmFzobLgTzwL0.Vwtq9QaqRf54xG7E3AZ4dD
+ CJaiXWSZJo0wNMqiBxkssMis_w2MmtS3HYcUSEe.NY_.yJpQ.cOrHg09hk2R.obcFbCdLY2bsekO
+ Xvlwb_YOkv3CNZNLkGPfyzj1zhfSC9sD_jtDdvVbWqTAkVU0cyS3YyqTzvC8aY4.dKLVX36Nvbrn
+ uKA8bOUaD_Xt2TYtlQJxz4usUjE7QO08jwKysv_Bxqx7egiG2vyMEETv9Yx6q.2WElH2UtxnXcII
+ EMXRXhcdKLl9Nu5ydnKFhI7.gOyZ8CN6F3BjdYYamU6Q6PRmky7wf3AiKFxN1260vJD0_9h3udZU
+ VkQtm2My.FbbC87IPbND32ShHpA0L6N9KJWWj4Pbg1W3CBj8q5VVab10lel9vPOgjQgVbCoodxwX
+ RTM6FurZMIte2EporPZNPMus9Pqg7kt7Ggr1P.0mWS1j3XRmljI.yQRYmepdvEXFi1.Srn6JfCr4
+ AxTKnlE0_Mymj49moFwkAsHckQPF2xY5xDEH1vDZqCqK4TdRLvlm1U_2I8o_.XIRwAFdOzzDujvT
+ 0ItoG_izcQjwggH12etti8976ChXDVeSx76eeZQlDamDcPl4bLLliZlH.15EYPRq2ubex8I6DPUO
+ cg49_vZc4XY..N9kKtswGiB4pikzQ59MnjvJfhk2P8RmVyki.aQZc9pNmmN8wkXyS3UbPuhqSzWa
+ o1cKUwkUqe8Au6odheu08qpV3zvkN2pugTemjM7xY5OhgcaC_RCkIcl39q9XLyYK6qKMctpsLcnE
+ m1RvA9B6K8ye4De7He3Pl9RnO60dIYDduimdSx36B9KR__mY2hMjGjSn3Ae8zMwgkJ92_tzExVgp
+ IB8iuy7kcVAcC3zm5HHGL4HTHPYdBVCids4T1IASXMA1dhLqsraIm9cTwW7gkRS5SMZlZbeTDI7p
+ b1ZSxNCl33r848.oYj5Hmn8Vy01yOZiIbRMWK8XE5x6ejJn9htUapTtZg
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic303.consmr.mail.bf2.yahoo.com with HTTP; Sat, 22 Jun 2019 14:38:09 +0000
+Date:   Sat, 22 Jun 2019 14:38:06 +0000 (UTC)
+From:   "Miss.Fatima Yusuf" <fatimayusuf5@outlook.fr>
+Reply-To: miss.fmayusuf11@gmail.com
+Message-ID: <1358850798.259423.1561214286867@mail.yahoo.com>
+Subject: From:Miss: Fatima Yusuf.
 MIME-Version: 1.0
-In-Reply-To: <30c02f09-8376-3dd0-e463-94d396df0240@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 4731031409092824023
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrtdeggddtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 20/06/2019 09:57, Laurent Vivier wrote:
-> On 20/06/2019 03:46, Suraj Jitindar Singh wrote:
->> If we enter an L1 guest with a pending decrementer exception then this
->> is cleared on guest exit if the guest has writtien a positive value into
->> the decrementer (indicating that it handled the decrementer exception)
->> since there is no other way to detect that the guest has handled the
->> pending exception and that it should be dequeued. In the event that the
->> L1 guest tries to run a nested (L2) guest immediately after this and the
->> L2 guest decrementer is negative (which is loaded by L1 before making
->> the H_ENTER_NESTED hcall), then the pending decrementer exception
->> isn't cleared and the L2 entry is blocked since L1 has a pending
->> exception, even though L1 may have already handled the exception and
->> written a positive value for it's decrementer. This results in a loop of
->> L1 trying to enter the L2 guest and L0 blocking the entry since L1 has
->> an interrupt pending with the outcome being that L2 never gets to run
->> and hangs.
->>
->> Fix this by clearing any pending decrementer exceptions when L1 makes
->> the H_ENTER_NESTED hcall since it won't do this if it's decrementer has
->> gone negative, and anyway it's decrementer has been communicated to L0
->> in the hdec_expires field and L0 will return control to L1 when this
->> goes negative by delivering an H_DECREMENTER exception.
->>
->> Fixes: 95a6432ce903 "KVM: PPC: Book3S HV: Streamlined guest entry/exit path on P9 for radix guests"
->>
->> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
->> ---
->>  arch/powerpc/kvm/book3s_hv.c | 11 +++++++++--
->>  1 file changed, 9 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
->> index 719fd2529eec..4a5eb29b952f 100644
->> --- a/arch/powerpc/kvm/book3s_hv.c
->> +++ b/arch/powerpc/kvm/book3s_hv.c
->> @@ -4128,8 +4128,15 @@ int kvmhv_run_single_vcpu(struct kvm_run *kvm_run,
->>  
->>  	preempt_enable();
->>  
->> -	/* cancel pending decrementer exception if DEC is now positive */
->> -	if (get_tb() < vcpu->arch.dec_expires && kvmppc_core_pending_dec(vcpu))
->> +	/*
->> +	 * cancel pending decrementer exception if DEC is now positive, or if
->> +	 * entering a nested guest in which case the decrementer is now owned
->> +	 * by L2 and the L1 decrementer is provided in hdec_expires
->> +	 */
->> +	if (kvmppc_core_pending_dec(vcpu) &&
->> +			((get_tb() < vcpu->arch.dec_expires) ||
->> +			 (trap == BOOK3S_INTERRUPT_SYSCALL &&
->> +			  kvmppc_get_gpr(vcpu, 3) == H_ENTER_NESTED)))
->>  		kvmppc_core_dequeue_dec(vcpu);
->>  
->>  	trace_kvm_guest_exit(vcpu);
->>
-> 
-> Patches 2 and 3: tested I can boot and run an L2 nested guest with qemu
-> v4.0.0 and caps-large-decr=on in the case we have had a hang previously.
-> 
-> Tested-by: Laurent Vivier <lvivier@redhat.com>
-
-You beat me to it. All works fine on L0, L1, L2.
-
-  Tested-by: Cédric Le Goater <clg@kaod.org>
-
-With a QEMU-4.1. In this configuration, L2 runs with the XIVE (emulated) 
-interrupt mode by default now (kernel_irqchip=allowed, ic-mode=dual).
-
-Thanks,
-
-C.
 
 
+From:Miss: Fatima Yusuf.
+
+For sure this mail would definitely come to you as a surprise, but do take your good time to go through it, My name is Ms. Fatima Yusuf,i am from Ivory Coast.
+
+I lost my parents a year and couple of months ago. My father was a serving director of the Agro-exporting board until his death. He was assassinated by his business partners.Before his death, he made a deposit of US$9.7 Million Dollars here in Cote d'ivoire which was for the purchase of cocoa processing machine and development of another factory before his untimely death.
+
+Being that this part of the world experiences political and crises time without number, there is no guarantee of lives and properties. I cannot invest this money here any long, despite the fact it had been my late father's industrial plans.
+
+I want you to do me a favor to receive this funds into your country or any safer place as the beneficiary, I have plans to invest this money in continuation with the investment vision of my late father, but not in this place again rather in your country. I have the vision of going into real estate and industrial production or any profitable business venture.
+
+I will be ready to compensate you with 20% of the total Amount, now all my hope is banked on you and i really wants to invest this money in your country, where there is stability of Government, political and economic welfare.
+
+My greatest worry now is how to move out of this country because my uncle is threatening to kill me as he killed my father,Please do not let anybody hear about this, it is between me and you alone because of my security reason.
+
+I am waiting to hear from you.
+Yours Sincerely,
+Miss.Fatima Yusuf.
