@@ -2,85 +2,72 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A63850A15
-	for <lists+kvm-ppc@lfdr.de>; Mon, 24 Jun 2019 13:48:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D529F521CF
+	for <lists+kvm-ppc@lfdr.de>; Tue, 25 Jun 2019 06:11:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726334AbfFXLsQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 24 Jun 2019 07:48:16 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42915 "EHLO ozlabs.org"
+        id S1726774AbfFYELJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 25 Jun 2019 00:11:09 -0400
+Received: from ozlabs.org ([203.11.71.1]:37085 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729365AbfFXLsQ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 24 Jun 2019 07:48:16 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 45XSGh6ycXz9s6w;
-        Mon, 24 Jun 2019 21:48:12 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Michael Neuling <mikey@neuling.org>
-Cc:     linuxppc-dev@lists.ozlabs.org, mikey@neuling.org,
-        paulus@ozlabs.org, kvm-ppc@vger.kernel.org,
-        sjitindarsingh@gmail.com
+        id S1726453AbfFYELJ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 25 Jun 2019 00:11:09 -0400
+Received: from neuling.org (localhost [127.0.0.1])
+        by ozlabs.org (Postfix) with ESMTP id 45Xt4p1ZWLz9sCJ;
+        Tue, 25 Jun 2019 14:11:06 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=neuling.org;
+        s=201811; t=1561435866;
+        bh=z0/ihHpiOuXsbcpJCDJR+F4nPEv0A8fBy1dW1ce5JiI=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=O/oi0O9LPR58IUljvbxMGkFpcxaf89ElJlcjefVtskrH35b6figdHO0wK4F3w79j/
+         KgulxYc+Ovc/8/SormuKqOpXzsfdbkAyVJtzDOMqdm50gCxYxobrOe91kdynUCZXD0
+         EPG6eLCxFWvdDFMx6og8l260r2DdG9mE3RNayOyQQ6isCRcUnS4hfY7teQuKzMZfxp
+         UzgLdbW+5fU4AC8cO6FwMEbk44WhwrjLwBeyqdT40hgmKuCr+iSJvIABroDJQxktN7
+         8ZtZLM5IpCav7scQYp1/Va7PsgtyrhcOkcmrLnsN3aaS9MFQ66PII9M5AK2lGp73nR
+         tQUzC7XHa5BPQ==
+Received: by neuling.org (Postfix, from userid 1000)
+        id 0BD232A257E; Tue, 25 Jun 2019 14:11:06 +1000 (AEST)
+Message-ID: <d30b3450fadab64705067cda56ddee5e06d60448.camel@neuling.org>
 Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix CR0 setting in TM emulation
-In-Reply-To: <20190620060040.26945-1-mikey@neuling.org>
+From:   Michael Neuling <mikey@neuling.org>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
+        kvm-ppc@vger.kernel.org, sjitindarsingh@gmail.com
+Date:   Tue, 25 Jun 2019 14:11:05 +1000
+In-Reply-To: <87tvcf8arn.fsf@concordia.ellerman.id.au>
 References: <20190620060040.26945-1-mikey@neuling.org>
-Date:   Mon, 24 Jun 2019 21:48:12 +1000
-Message-ID: <87tvcf8arn.fsf@concordia.ellerman.id.au>
+         <87tvcf8arn.fsf@concordia.ellerman.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.32.3 (3.32.3-1.fc30) 
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Michael Neuling <mikey@neuling.org> writes:
-> When emulating tsr, treclaim and trechkpt, we incorrectly set CR0. The
-> code currently sets:
->     CR0 <- 00 || MSR[TS]
-> but according to the ISA it should be:
->     CR0 <-  0 || MSR[TS] || 0
+On Mon, 2019-06-24 at 21:48 +1000, Michael Ellerman wrote:
+> Michael Neuling <mikey@neuling.org> writes:
+> > When emulating tsr, treclaim and trechkpt, we incorrectly set CR0. The
+> > code currently sets:
+> >     CR0 <- 00 || MSR[TS]
+> > but according to the ISA it should be:
+> >     CR0 <-  0 || MSR[TS] || 0
+>=20
+> Seems bad, what's the worst case impact?
 
-Seems bad, what's the worst case impact?
+It's a data integrity issue as CR0 is corrupted.
 
-Do we have a test case for this?
+> Do we have a test case for this?
 
-> This fixes the bit shift to put the bits in the correct location.
+Suraj has a KVM unit test for it.
 
-Fixes: ?
+> > This fixes the bit shift to put the bits in the correct location.
+>=20
+> Fixes: ?
 
-cheers
+It's been around since we first wrote the code so:
 
-> diff --git a/arch/powerpc/kvm/book3s_hv_tm.c b/arch/powerpc/kvm/book3s_hv_tm.c
-> index 888e2609e3..31cd0f327c 100644
-> --- a/arch/powerpc/kvm/book3s_hv_tm.c
-> +++ b/arch/powerpc/kvm/book3s_hv_tm.c
-> @@ -131,7 +131,7 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
->  		}
->  		/* Set CR0 to indicate previous transactional state */
->  		vcpu->arch.regs.ccr = (vcpu->arch.regs.ccr & 0x0fffffff) |
-> -			(((msr & MSR_TS_MASK) >> MSR_TS_S_LG) << 28);
-> +			(((msr & MSR_TS_MASK) >> MSR_TS_S_LG) << 29);
->  		/* L=1 => tresume, L=0 => tsuspend */
->  		if (instr & (1 << 21)) {
->  			if (MSR_TM_SUSPENDED(msr))
-> @@ -175,7 +175,7 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
->  
->  		/* Set CR0 to indicate previous transactional state */
->  		vcpu->arch.regs.ccr = (vcpu->arch.regs.ccr & 0x0fffffff) |
-> -			(((msr & MSR_TS_MASK) >> MSR_TS_S_LG) << 28);
-> +			(((msr & MSR_TS_MASK) >> MSR_TS_S_LG) << 29);
->  		vcpu->arch.shregs.msr &= ~MSR_TS_MASK;
->  		return RESUME_GUEST;
->  
-> @@ -205,7 +205,7 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
->  
->  		/* Set CR0 to indicate previous transactional state */
->  		vcpu->arch.regs.ccr = (vcpu->arch.regs.ccr & 0x0fffffff) |
-> -			(((msr & MSR_TS_MASK) >> MSR_TS_S_LG) << 28);
-> +			(((msr & MSR_TS_MASK) >> MSR_TS_S_LG) << 29);
->  		vcpu->arch.shregs.msr = msr | MSR_TS_S;
->  		return RESUME_GUEST;
->  	}
-> -- 
-> 2.21.0
+Fixes: 4bb3c7a0208fc13c ("KVM: PPC: Book3S HV: Work around transactional me=
+mory bugs in POWER9")
+
+Mikey
