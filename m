@@ -2,114 +2,145 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 97FCF5B54B
-	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Jul 2019 08:46:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 807F75BDAD
+	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Jul 2019 16:10:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727553AbfGAGq5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 1 Jul 2019 02:46:57 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49482 "EHLO
+        id S1729401AbfGAOJ6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 1 Jul 2019 10:09:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13812 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727080AbfGAGq4 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Jul 2019 02:46:56 -0400
+        by vger.kernel.org with ESMTP id S1728016AbfGAOJ5 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Jul 2019 10:09:57 -0400
 Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x616khuF125709
-        for <kvm-ppc@vger.kernel.org>; Mon, 1 Jul 2019 02:46:55 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2tfc1gb6x4-1
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x61E8Sq7116135
+        for <kvm-ppc@vger.kernel.org>; Mon, 1 Jul 2019 10:09:56 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2tfhwd72ec-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Mon, 01 Jul 2019 02:46:54 -0400
+        for <kvm-ppc@vger.kernel.org>; Mon, 01 Jul 2019 10:09:56 -0400
 Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
-        Mon, 1 Jul 2019 07:46:53 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <cclaudio@linux.ibm.com>;
+        Mon, 1 Jul 2019 15:09:55 +0100
+Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
+        by e13.ny.us.ibm.com (146.89.104.200) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 1 Jul 2019 07:46:50 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x616knRb47054894
+        Mon, 1 Jul 2019 15:09:53 +0100
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x61E9qkG38863262
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Jul 2019 06:46:49 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3CBF4AE055;
-        Mon,  1 Jul 2019 06:46:49 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D3F10AE045;
-        Mon,  1 Jul 2019 06:46:45 +0000 (GMT)
-Received: from ram.ibm.com (unknown [9.80.225.192])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon,  1 Jul 2019 06:46:45 +0000 (GMT)
-Date:   Sun, 30 Jun 2019 23:46:42 -0700
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     maddy <maddy@linux.vnet.ibm.com>,
-        Claudio Carvalho <cclaudio@linux.ibm.com>,
-        linuxppc-dev@ozlabs.org, kvm-ppc@vger.kernel.org,
-        Paul Mackerras <paulus@ozlabs.org>,
+        Mon, 1 Jul 2019 14:09:52 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4522EAC066;
+        Mon,  1 Jul 2019 14:09:52 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CDB3EAC05B;
+        Mon,  1 Jul 2019 14:09:49 +0000 (GMT)
+Received: from rino.ibm.com (unknown [9.80.232.19])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  1 Jul 2019 14:09:49 +0000 (GMT)
+From:   Claudio Carvalho <cclaudio@linux.ibm.com>
+To:     linuxppc-dev@ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Michael Anderson <andmike@linux.ibm.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
+        Ram Pai <linuxram@us.ibm.com>,
         Thiago Bauermann <bauerman@linux.ibm.com>,
-        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
-        Ryan Grimm <grimm@linux.ibm.com>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <20190628200825.31049-1-cclaudio@linux.ibm.com>
- <20190628200825.31049-7-cclaudio@linux.ibm.com>
- <f153b6bf-4661-9dc0-c28f-076fc8fe598e@ozlabs.ru>
- <1e7f702a-c0cd-393d-934e-9e1a1234fe28@linux.vnet.ibm.com>
- <abe23edf-e593-ca98-8047-39ecb6cf16b5@ozlabs.ru>
+        Claudio Carvalho <cclaudio@linux.ibm.com>
+Subject: [RFC PATCH] powerpc: Add the ppc_capabilities ELF note
+Date:   Mon,  1 Jul 2019 11:09:48 -0300
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <abe23edf-e593-ca98-8047-39ecb6cf16b5@ozlabs.ru>
-User-Agent: Mutt/1.5.21 (2010-09-15)
 X-TM-AS-GCONF: 00
-x-cbid: 19070106-0008-0000-0000-000002F8AC11
+x-cbid: 19070114-0064-0000-0000-000003F5BE4C
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011359; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01225922; UDB=6.00645354; IPR=6.01007135;
+ MB=3.00027534; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-01 14:09:54
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19070106-0009-0000-0000-00002265EF11
-Message-Id: <20190701064642.GA5009@ram.ibm.com>
-Subject: Re:  Re: [PATCH v4 6/8] KVM: PPC: Ultravisor: Restrict LDBAR access
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-01_05:,,
+x-cbparentid: 19070114-0065-0000-0000-00003E196B74
+Message-Id: <20190701140948.26775-1-cclaudio@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-01_09:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=18 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907010085
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907010175
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Jul 01, 2019 at 04:30:55PM +1000, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 01/07/2019 16:17, maddy wrote:
-> > 
-> > On 01/07/19 11:24 AM, Alexey Kardashevskiy wrote:
-> >>
-> >> On 29/06/2019 06:08, Claudio Carvalho wrote:
-> >>> When the ultravisor firmware is available, it takes control over the
-> >>> LDBAR register. In this case, thread-imc updates and save/restore
-> >>> operations on the LDBAR register are handled by ultravisor.
-> >> What does LDBAR do? "Power ISA™ Version 3.0 B" or "User’s Manual POWER9
-> >> Processor" do not tell.
-> > LDBAR is a per-thread SPR used by thread-imc pmu to dump the counter
-> > data into memory.
-> > LDBAR contains memory address along with few other configuration bits
-> > (it is populated
-> > by the thread-imc pmu driver). It is populated and enabled only when any
-> > of the thread
-> > imc pmu events are monitored.
-> 
-> 
-> I was actually looking for a spec for this register, what is the
-> document name?
+Add the ppc_capabilities ELF note to the powerpc kernel binary. It is a
+bitmap that can be used to advertise kernel capabilities to userland.
 
-  Its not a architected register. Its documented in the Power9
-  workbook.
+This patch also defines PPCCAP_ULTRAVISOR_BIT as being the bit zero.
 
-RP
+Suggested-by: Paul Mackerras <paulus@ozlabs.org>
+Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
+---
+ arch/powerpc/kernel/Makefile |  2 +-
+ arch/powerpc/kernel/note.S   | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+), 1 deletion(-)
+ create mode 100644 arch/powerpc/kernel/note.S
+
+diff --git a/arch/powerpc/kernel/Makefile b/arch/powerpc/kernel/Makefile
+index 0ea6c4aa3a20..4ec36fe4325b 100644
+--- a/arch/powerpc/kernel/Makefile
++++ b/arch/powerpc/kernel/Makefile
+@@ -49,7 +49,7 @@ obj-y				:= cputable.o ptrace.o syscalls.o \
+ 				   signal.o sysfs.o cacheinfo.o time.o \
+ 				   prom.o traps.o setup-common.o \
+ 				   udbg.o misc.o io.o misc_$(BITS).o \
+-				   of_platform.o prom_parse.o
++				   of_platform.o prom_parse.o note.o
+ obj-$(CONFIG_PPC64)		+= setup_64.o sys_ppc32.o \
+ 				   signal_64.o ptrace32.o \
+ 				   paca.o nvram_64.o firmware.o
+diff --git a/arch/powerpc/kernel/note.S b/arch/powerpc/kernel/note.S
+new file mode 100644
+index 000000000000..721bf8ce9eb7
+--- /dev/null
++++ b/arch/powerpc/kernel/note.S
+@@ -0,0 +1,36 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * PowerPC ELF notes.
++ *
++ * Copyright 2019, IBM Corporation
++ */
++#include <linux/elfnote.h>
++
++/*
++ * Ultravisor-capable bit (PowerNV only).
++ *
++ * Indicate that the powerpc kernel binary knows how to run in an
++ * ultravisor-enabled system.
++ *
++ * In an ultravisor-enabled system, some machine resources are now controlled
++ * by the ultravisor. If the kernel is not ultravisor-capable, but it ends up
++ * being run on a machine with ultravisor, the kernel will probably crash
++ * trying to access ultravisor resources. For instance, it may crash in early
++ * boot trying to set the partition table entry 0.
++ *
++ * In an ultravisor-enabled system, petitboot can warn the user or prevent the
++ * kernel from being run if the ppc_capabilities doesn't exist or the
++ * Ultravisor-capable bit is not set.
++ */
++#if defined(CONFIG_PPC_POWERNV)
++#define PPCCAP_ULTRAVISOR_BIT		(1 << 0)
++#else
++#define PPCCAP_ULTRAVISOR_BIT		0
++#endif
++
++/*
++ * Add the ppc_capabilities ELF note to the powerpc kernel binary. It is a
++ * bitmap that can be used to advertise kernel capabilities to userland.
++ */
++ELFNOTE(ppc_capabilities, 3,
++	.long PPCCAP_ULTRAVISOR_BIT)
+-- 
+2.20.1
 
