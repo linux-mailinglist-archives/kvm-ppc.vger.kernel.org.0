@@ -2,62 +2,231 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CF155AF70
-	for <lists+kvm-ppc@lfdr.de>; Sun, 30 Jun 2019 10:37:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A67D65B466
+	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Jul 2019 07:54:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726786AbfF3Ihh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 30 Jun 2019 04:37:37 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:34407 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726738AbfF3Ihg (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sun, 30 Jun 2019 04:37:36 -0400
-Received: by ozlabs.org (Postfix, from userid 1034)
-        id 45c3ly4fpfz9sCJ; Sun, 30 Jun 2019 18:37:34 +1000 (AEST)
-X-powerpc-patch-notification: thanks
-X-powerpc-patch-commit: 3c25ab35fbc8526ac0c9b298e8a78e7ad7a55479
-X-Patchwork-Hint: ignore
-In-Reply-To: <20190620014651.7645-3-sjitindarsingh@gmail.com>
-To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org
-From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-Cc:     clg@kaod.org, kvm-ppc@vger.kernel.org, sjitindarsingh@gmail.com
-Subject: Re: [PATCH 3/3] KVM: PPC: Book3S HV: Clear pending decr exceptions on nested guest entry
-Message-Id: <45c3ly4fpfz9sCJ@ozlabs.org>
-Date:   Sun, 30 Jun 2019 18:37:34 +1000 (AEST)
+        id S1727340AbfGAFyM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 1 Jul 2019 01:54:12 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:33942 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727187AbfGAFyL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Jul 2019 01:54:11 -0400
+Received: by mail-pg1-f196.google.com with SMTP id p10so5471102pgn.1
+        for <kvm-ppc@vger.kernel.org>; Sun, 30 Jun 2019 22:54:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=EusdwECv3FSYGfl0QnviOkJqhLYRClZ95P0kHIs/+W0=;
+        b=NHWgXpJmgLLrVOzoDyWwSHBTSkE5HZSfgLp1Y2viMYZjvSliquTdnrcPTNFAkgzBCO
+         pQja2uYsxWPzpStmvPSWBar706fcalig1KmhybImqDPpis0/cJgn9W/cvEytUyInParZ
+         +UEIFTeVJkuxNdYImMw0cnFBxWpMnCyEMI0xO+6P1tunKRlr8rulvOugkammv98i/fD4
+         l1+H1x0EGgjMlrwc2h4zfevGgcV3leaqRTGUMo/095fgpCGGAx+Gxy2VJNt95nHOXLhY
+         BY2/gsxVY0c1CrzpxF8OvXP5SKJphmNhbC841xdJ9OMa12w4z2q2NXSzcE//V5xaa3x1
+         cMZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=EusdwECv3FSYGfl0QnviOkJqhLYRClZ95P0kHIs/+W0=;
+        b=f5txsSRHz6bRzI/3BdfiUy5/ywHWLVPf4J2a21x3/hFO2pkxrZI2qT+SfqXwDHjx4H
+         /KHJCqUrW6aJD3pVwPXIZyOTRK0b4IOJlTHQZ5OYi04FdC8FYetzL+0k/gWXkQm0NKdl
+         gGdHshzh34hydYbQwu3p6uHE+P6xaqxqhIskM9UxfeojQe04KVrqEQuO8JGnX/jvSKKB
+         A7J0Fb6kGZPw0uMSYvfHn6REGb18GUhiveIOVhOaRU8vJm+Z7zAUeCB7+kcP1iV+j7IN
+         e/R8XhU82+Qn3H/3kFnRjS3ZF4+VS4cOnSzRIb/JBKWnSEyyL4qTbjh4EwVFauOQvIS4
+         /Dbg==
+X-Gm-Message-State: APjAAAWPE8Ky67e1B7tr6RZS2W7YkI39fOJuTUm9Mz5n4AotNL4/rqVv
+        JwHlSux/VavHkMzrS3HZn0gcR2GqWA8=
+X-Google-Smtp-Source: APXvYqwnFgKI41TVsyhJ5NjLLOcS2MWODhhgt3AhXnE1yYC1RZkIeetdbf1nMapOb/SDHGUtLInnrw==
+X-Received: by 2002:a17:90a:8a84:: with SMTP id x4mr28501511pjn.105.1561960450743;
+        Sun, 30 Jun 2019 22:54:10 -0700 (PDT)
+Received: from [10.61.2.175] ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id bg3sm2929930pjb.9.2019.06.30.22.54.06
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 30 Jun 2019 22:54:10 -0700 (PDT)
+Subject: Re: [PATCH v4 6/8] KVM: PPC: Ultravisor: Restrict LDBAR access
+To:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
+        Michael Anderson <andmike@linux.ibm.com>,
+        Ram Pai <linuxram@us.ibm.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
+        Thiago Bauermann <bauerman@linux.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
+        Ryan Grimm <grimm@linux.ibm.com>
+References: <20190628200825.31049-1-cclaudio@linux.ibm.com>
+ <20190628200825.31049-7-cclaudio@linux.ibm.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+Openpgp: preference=signencrypt
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
+ EePO1JqpVuIow/wGud9xaPA5uvuVgRS1q7RU8otD+7VLDFzPRiRE4Jfr2CW89Ox6BF+q5ZPV
+ /pS4v4G9eOrw1v09lEKHB9WtiBVhhxKK1LnUjPEH3ifkOkgW7jFfoYgTdtB3XaXVgYnNPDFo
+ PTBYsJy+wr89XfyHr2Ev7BB3Xaf7qICXdBF8MEVY8t/UFsesg4wFWOuzCfqxFmKEaPDZlTuR
+ tfLAeVpslNfWCi5ybPlowLx6KJqOsI9R2a9o4qRXWGP7IwiMRAC3iiPyk9cknt8ee6EUIxI6
+ t847eFaVKI/6WcxhszI0R6Cj+N4y+1rHfkGWYWupCiHwj9DjILW9iEAncVgQmkNPpUsZECLT
+ WQzMuVSxjuXW4nJ6f4OFHqL2dU//qR+BM/eJ0TT3OnfLcPqfucGxubhT7n/CXUxEy+mvWwnm
+ s9p4uqVpTfEuzQ0/bE6t7dZdPBua7eYox1AQnk8JQDwC3Rn9kZq2O7u5KuJP5MfludMmQevm
+ pHYEMF4vZuIpWcOrrSctJfIIEyhDoDmR34bCXAZfNJ4p4H6TPqPh671uMQV82CfTxTrMhGFq
+ 8WYU2AH86FrVQfWoH09z1WqhlOm/KZhAV5FndwVjQJs1MRXD8QARAQABtCRBbGV4ZXkgS2Fy
+ ZGFzaGV2c2tpeSA8YWlrQG96bGFicy5ydT6JAjgEEwECACIFAk+rT0sCGwMGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAAAoJEIYTPdgrwSC5fAIP/0wf/oSYaCq9PhO0UP9zLSEz66SSZUf7
+ AM9O1rau1lJpT8RoNa0hXFXIVbqPPKPZgorQV8SVmYRLr0oSmPnTiZC82x2dJGOR8x4E01gK
+ TanY53J/Z6+CpYykqcIpOlGsytUTBA+AFOpdaFxnJ9a8p2wA586fhCZHVpV7W6EtUPH1SFTQ
+ q5xvBmr3KkWGjz1FSLH4FeB70zP6uyuf/B2KPmdlPkyuoafl2UrU8LBADi/efc53PZUAREih
+ sm3ch4AxaL4QIWOmlE93S+9nHZSRo9jgGXB1LzAiMRII3/2Leg7O4hBHZ9Nki8/fbDo5///+
+ kD4L7UNbSUM/ACWHhd4m1zkzTbyRzvL8NAVQ3rckLOmju7Eu9whiPueGMi5sihy9VQKHmEOx
+ OMEhxLRQbzj4ypRLS9a+oxk1BMMu9cd/TccNy0uwx2UUjDQw/cXw2rRWTRCxoKmUsQ+eNWEd
+ iYLW6TCfl9CfHlT6A7Zmeqx2DCeFafqEd69DqR9A8W5rx6LQcl0iOlkNqJxxbbW3ddDsLU/Y
+ r4cY20++WwOhSNghhtrroP+gouTOIrNE/tvG16jHs8nrYBZuc02nfX1/gd8eguNfVX/ZTHiR
+ gHBWe40xBKwBEK2UeqSpeVTohYWGBkcd64naGtK9qHdo1zY1P55lHEc5Uhlk743PgAnOi27Q
+ ns5zuQINBE+rT0sBEACnV6GBSm+25ACT+XAE0t6HHAwDy+UKfPNaQBNTTt31GIk5aXb2Kl/p
+ AgwZhQFEjZwDbl9D/f2GtmUHWKcCmWsYd5M/6Ljnbp0Ti5/xi6FyfqnO+G/wD2VhGcKBId1X
+ Em/B5y1kZVbzcGVjgD3HiRTqE63UPld45bgK2XVbi2+x8lFvzuFq56E3ZsJZ+WrXpArQXib2
+ hzNFwQleq/KLBDOqTT7H+NpjPFR09Qzfa7wIU6pMNF2uFg5ihb+KatxgRDHg70+BzQfa6PPA
+ o1xioKXW1eHeRGMmULM0Eweuvpc7/STD3K7EJ5bBq8svoXKuRxoWRkAp9Ll65KTUXgfS+c0x
+ gkzJAn8aTG0z/oEJCKPJ08CtYQ5j7AgWJBIqG+PpYrEkhjzSn+DZ5Yl8r+JnZ2cJlYsUHAB9
+ jwBnWmLCR3gfop65q84zLXRQKWkASRhBp4JK3IS2Zz7Nd/Sqsowwh8x+3/IUxVEIMaVoUaxk
+ Wt8kx40h3VrnLTFRQwQChm/TBtXqVFIuv7/Mhvvcq11xnzKjm2FCnTvCh6T2wJw3de6kYjCO
+ 7wsaQ2y3i1Gkad45S0hzag/AuhQJbieowKecuI7WSeV8AOFVHmgfhKti8t4Ff758Z0tw5Fpc
+ BFDngh6Lty9yR/fKrbkkp6ux1gJ2QncwK1v5kFks82Cgj+DSXK6GUQARAQABiQIfBBgBAgAJ
+ BQJPq09LAhsMAAoJEIYTPdgrwSC5NYEP/2DmcEa7K9A+BT2+G5GXaaiFa098DeDrnjmRvumJ
+ BhA1UdZRdfqICBADmKHlJjj2xYo387sZpS6ABbhrFxM6s37g/pGPvFUFn49C47SqkoGcbeDz
+ Ha7JHyYUC+Tz1dpB8EQDh5xHMXj7t59mRDgsZ2uVBKtXj2ZkbizSHlyoeCfs1gZKQgQE8Ffc
+ F8eWKoqAQtn3j4nE3RXbxzTJJfExjFB53vy2wV48fUBdyoXKwE85fiPglQ8bU++0XdOr9oyy
+ j1llZlB9t3tKVv401JAdX8EN0++ETiOovQdzE1m+6ioDCtKEx84ObZJM0yGSEGEanrWjiwsa
+ nzeK0pJQM9EwoEYi8TBGhHC9ksaAAQipSH7F2OHSYIlYtd91QoiemgclZcSgrxKSJhyFhmLr
+ QEiEILTKn/pqJfhHU/7R7UtlDAmFMUp7ByywB4JLcyD10lTmrEJ0iyRRTVfDrfVP82aMBXgF
+ tKQaCxcmLCaEtrSrYGzd1sSPwJne9ssfq0SE/LM1J7VdCjm6OWV33SwKrfd6rOtvOzgadrG6
+ 3bgUVBw+bsXhWDd8tvuCXmdY4bnUblxF2B6GOwSY43v6suugBttIyW5Bl2tXSTwP+zQisOJo
+ +dpVG2pRr39h+buHB3NY83NEPXm1kUOhduJUA17XUY6QQCAaN4sdwPqHq938S3EmtVhsuQIN
+ BFq54uIBEACtPWrRdrvqfwQF+KMieDAMGdWKGSYSfoEGGJ+iNR8v255IyCMkty+yaHafvzpl
+ PFtBQ/D7Fjv+PoHdFq1BnNTk8u2ngfbre9wd9MvTDsyP/TmpF0wyyTXhhtYvE267Av4X/BQT
+ lT9IXKyAf1fP4BGYdTNgQZmAjrRsVUW0j6gFDrN0rq2J9emkGIPvt9rQt6xGzrd6aXonbg5V
+ j6Uac1F42ESOZkIh5cN6cgnGdqAQb8CgLK92Yc8eiCVCH3cGowtzQ2m6U32qf30cBWmzfSH0
+ HeYmTP9+5L8qSTA9s3z0228vlaY0cFGcXjdodBeVbhqQYseMF9FXiEyRs28uHAJEyvVZwI49
+ CnAgVV/n1eZa5qOBpBL+ZSURm8Ii0vgfvGSijPGbvc32UAeAmBWISm7QOmc6sWa1tobCiVmY
+ SNzj5MCNk8z4cddoKIc7Wt197+X/X5JPUF5nQRvg3SEHvfjkS4uEst9GwQBpsbQYH9MYWq2P
+ PdxZ+xQE6v7cNB/pGGyXqKjYCm6v70JOzJFmheuUq0Ljnfhfs15DmZaLCGSMC0Amr+rtefpA
+ y9FO5KaARgdhVjP2svc1F9KmTUGinSfuFm3quadGcQbJw+lJNYIfM7PMS9fftq6vCUBoGu3L
+ j4xlgA/uQl/LPneu9mcvit8JqcWGS3fO+YeagUOon1TRqQARAQABiQRsBBgBCAAgFiEEZSrP
+ ibrORRTHQ99dhhM92CvBILkFAlq54uICGwICQAkQhhM92CvBILnBdCAEGQEIAB0WIQQIhvWx
+ rCU+BGX+nH3N7sq0YorTbQUCWrni4gAKCRDN7sq0YorTbVVSD/9V1xkVFyUCZfWlRuryBRZm
+ S4GVaNtiV2nfUfcThQBfF0sSW/aFkLP6y+35wlOGJE65Riw1C2Ca9WQYk0xKvcZrmuYkK3DZ
+ 0M9/Ikkj5/2v0vxz5Z5w/9+IaCrnk7pTnHZuZqOh23NeVZGBls/IDIvvLEjpD5UYicH0wxv+
+ X6cl1RoP2Kiyvenf0cS73O22qSEw0Qb9SId8wh0+ClWet2E7hkjWFkQfgJ3hujR/JtwDT/8h
+ 3oCZFR0KuMPHRDsCepaqb/k7VSGTLBjVDOmr6/C9FHSjq0WrVB9LGOkdnr/xcISDZcMIpbRm
+ EkIQ91LkT/HYIImL33ynPB0SmA+1TyMgOMZ4bakFCEn1vxB8Ir8qx5O0lHMOiWMJAp/PAZB2
+ r4XSSHNlXUaWUg1w3SG2CQKMFX7vzA31ZeEiWO8tj/c2ZjQmYjTLlfDK04WpOy1vTeP45LG2
+ wwtMA1pKvQ9UdbYbovz92oyZXHq81+k5Fj/YA1y2PI4MdHO4QobzgREoPGDkn6QlbJUBf4To
+ pEbIGgW5LRPLuFlOPWHmIS/sdXDrllPc29aX2P7zdD/ivHABslHmt7vN3QY+hG0xgsCO1JG5
+ pLORF2N5XpM95zxkZqvYfC5tS/qhKyMcn1kC0fcRySVVeR3tUkU8/caCqxOqeMe2B6yTiU1P
+ aNDq25qYFLeYxg67D/4w/P6BvNxNxk8hx6oQ10TOlnmeWp1q0cuutccblU3ryRFLDJSngTEu
+ ZgnOt5dUFuOZxmMkqXGPHP1iOb+YDznHmC0FYZFG2KAc9pO0WuO7uT70lL6larTQrEneTDxQ
+ CMQLP3qAJ/2aBH6SzHIQ7sfbsxy/63jAiHiT3cOaxAKsWkoV2HQpnmPOJ9u02TPjYmdpeIfa
+ X2tXyeBixa3i/6dWJ4nIp3vGQicQkut1YBwR7dJq67/FCV3Mlj94jI0myHT5PIrCS2S8LtWX
+ ikTJSxWUKmh7OP5mrqhwNe0ezgGiWxxvyNwThOHc5JvpzJLd32VDFilbxgu4Hhnf6LcgZJ2c
+ Zd44XWqUu7FzVOYaSgIvTP0hNrBYm/E6M7yrLbs3JY74fGzPWGRbBUHTZXQEqQnZglXaVB5V
+ ZhSFtHopZnBSCUSNDbB+QGy4B/E++Bb02IBTGl/JxmOwG+kZUnymsPvTtnNIeTLHxN/H/ae0
+ c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
+ DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
+ XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
+Message-ID: <f153b6bf-4661-9dc0-c28f-076fc8fe598e@ozlabs.ru>
+Date:   Mon, 1 Jul 2019 15:54:03 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <20190628200825.31049-7-cclaudio@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, 2019-06-20 at 01:46:51 UTC, Suraj Jitindar Singh wrote:
-> If we enter an L1 guest with a pending decrementer exception then this
-> is cleared on guest exit if the guest has writtien a positive value into
-> the decrementer (indicating that it handled the decrementer exception)
-> since there is no other way to detect that the guest has handled the
-> pending exception and that it should be dequeued. In the event that the
-> L1 guest tries to run a nested (L2) guest immediately after this and the
-> L2 guest decrementer is negative (which is loaded by L1 before making
-> the H_ENTER_NESTED hcall), then the pending decrementer exception
-> isn't cleared and the L2 entry is blocked since L1 has a pending
-> exception, even though L1 may have already handled the exception and
-> written a positive value for it's decrementer. This results in a loop of
-> L1 trying to enter the L2 guest and L0 blocking the entry since L1 has
-> an interrupt pending with the outcome being that L2 never gets to run
-> and hangs.
-> 
-> Fix this by clearing any pending decrementer exceptions when L1 makes
-> the H_ENTER_NESTED hcall since it won't do this if it's decrementer has
-> gone negative, and anyway it's decrementer has been communicated to L0
-> in the hdec_expires field and L0 will return control to L1 when this
-> goes negative by delivering an H_DECREMENTER exception.
-> 
-> Fixes: 95a6432ce903 "KVM: PPC: Book3S HV: Streamlined guest entry/exit path on P9 for radix guests"
-> 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> Tested-by: Laurent Vivier <lvivier@redhat.com>
 
-Applied to powerpc next, thanks.
 
-https://git.kernel.org/powerpc/c/3c25ab35fbc8526ac0c9b298e8a78e7ad7a55479
+On 29/06/2019 06:08, Claudio Carvalho wrote:
+> When the ultravisor firmware is available, it takes control over the
+> LDBAR register. In this case, thread-imc updates and save/restore
+> operations on the LDBAR register are handled by ultravisor.
 
-cheers
+What does LDBAR do? "Power ISA™ Version 3.0 B" or "User’s Manual POWER9
+Processor" do not tell.
+
+
+> 
+> Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
+> Reviewed-by: Ram Pai <linuxram@us.ibm.com>
+> Reviewed-by: Ryan Grimm <grimm@linux.ibm.com>
+> Acked-by: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
+> Acked-by: Paul Mackerras <paulus@ozlabs.org>
+> ---
+>  arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 2 ++
+>  arch/powerpc/platforms/powernv/idle.c     | 6 ++++--
+>  arch/powerpc/platforms/powernv/opal-imc.c | 4 ++++
+>  3 files changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> index f9b2620fbecd..cffb365d9d02 100644
+> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> @@ -375,8 +375,10 @@ BEGIN_FTR_SECTION
+>  	mtspr	SPRN_RPR, r0
+>  	ld	r0, KVM_SPLIT_PMMAR(r6)
+>  	mtspr	SPRN_PMMAR, r0
+> +BEGIN_FW_FTR_SECTION_NESTED(70)
+>  	ld	r0, KVM_SPLIT_LDBAR(r6)
+>  	mtspr	SPRN_LDBAR, r0
+> +END_FW_FTR_SECTION_NESTED(FW_FEATURE_ULTRAVISOR, 0, 70)
+>  	isync
+>  FTR_SECTION_ELSE
+>  	/* On P9 we use the split_info for coordinating LPCR changes */
+> diff --git a/arch/powerpc/platforms/powernv/idle.c b/arch/powerpc/platforms/powernv/idle.c
+> index 77f2e0a4ee37..5593a2d55959 100644
+> --- a/arch/powerpc/platforms/powernv/idle.c
+> +++ b/arch/powerpc/platforms/powernv/idle.c
+> @@ -679,7 +679,8 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
+>  		sprs.ptcr	= mfspr(SPRN_PTCR);
+>  		sprs.rpr	= mfspr(SPRN_RPR);
+>  		sprs.tscr	= mfspr(SPRN_TSCR);
+> -		sprs.ldbar	= mfspr(SPRN_LDBAR);
+> +		if (!firmware_has_feature(FW_FEATURE_ULTRAVISOR))
+> +			sprs.ldbar	= mfspr(SPRN_LDBAR);
+>  
+>  		sprs_saved = true;
+>  
+> @@ -762,7 +763,8 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
+>  	mtspr(SPRN_PTCR,	sprs.ptcr);
+>  	mtspr(SPRN_RPR,		sprs.rpr);
+>  	mtspr(SPRN_TSCR,	sprs.tscr);
+> -	mtspr(SPRN_LDBAR,	sprs.ldbar);
+> +	if (!firmware_has_feature(FW_FEATURE_ULTRAVISOR))
+> +		mtspr(SPRN_LDBAR,	sprs.ldbar);
+>  
+>  	if (pls >= pnv_first_tb_loss_level) {
+>  		/* TB loss */
+> diff --git a/arch/powerpc/platforms/powernv/opal-imc.c b/arch/powerpc/platforms/powernv/opal-imc.c
+> index 1b6932890a73..5fe2d4526cbc 100644
+> --- a/arch/powerpc/platforms/powernv/opal-imc.c
+> +++ b/arch/powerpc/platforms/powernv/opal-imc.c
+> @@ -254,6 +254,10 @@ static int opal_imc_counters_probe(struct platform_device *pdev)
+>  	bool core_imc_reg = false, thread_imc_reg = false;
+>  	u32 type;
+>  
+> +	/* Disable IMC devices, when Ultravisor is enabled. */
+> +	if (firmware_has_feature(FW_FEATURE_ULTRAVISOR))
+> +		return -EACCES;
+> +
+>  	/*
+>  	 * Check whether this is kdump kernel. If yes, force the engines to
+>  	 * stop and return.
+> 
+
+-- 
+Alexey
