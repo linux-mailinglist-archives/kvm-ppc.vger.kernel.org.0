@@ -2,51 +2,52 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A67D65B466
-	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Jul 2019 07:54:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63BDD5B467
+	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Jul 2019 07:54:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727340AbfGAFyM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 1 Jul 2019 01:54:12 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:33942 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727187AbfGAFyL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Jul 2019 01:54:11 -0400
-Received: by mail-pg1-f196.google.com with SMTP id p10so5471102pgn.1
-        for <kvm-ppc@vger.kernel.org>; Sun, 30 Jun 2019 22:54:11 -0700 (PDT)
+        id S1727395AbfGAFyQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 1 Jul 2019 01:54:16 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:43753 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727187AbfGAFyP (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Jul 2019 01:54:15 -0400
+Received: by mail-pl1-f193.google.com with SMTP id cl9so6708909plb.10
+        for <kvm-ppc@vger.kernel.org>; Sun, 30 Jun 2019 22:54:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=EusdwECv3FSYGfl0QnviOkJqhLYRClZ95P0kHIs/+W0=;
-        b=NHWgXpJmgLLrVOzoDyWwSHBTSkE5HZSfgLp1Y2viMYZjvSliquTdnrcPTNFAkgzBCO
-         pQja2uYsxWPzpStmvPSWBar706fcalig1KmhybImqDPpis0/cJgn9W/cvEytUyInParZ
-         +UEIFTeVJkuxNdYImMw0cnFBxWpMnCyEMI0xO+6P1tunKRlr8rulvOugkammv98i/fD4
-         l1+H1x0EGgjMlrwc2h4zfevGgcV3leaqRTGUMo/095fgpCGGAx+Gxy2VJNt95nHOXLhY
-         BY2/gsxVY0c1CrzpxF8OvXP5SKJphmNhbC841xdJ9OMa12w4z2q2NXSzcE//V5xaa3x1
-         cMZw==
+        bh=eceiVhMCm2jzMjMZWUfBDWQDfNbbCoL/myYhskQ11u8=;
+        b=FTYR690RsdJyOvbuJatVKkrCgcrQ51eXwtQTV+L5LQ6OhMwgxPqResopzpjDk5Xn5S
+         Ik9F+qGexTmezEzXZSUl/kVxwzDhkA51THD4EsMrCXXRj7n/9JWpyukfMFH8MW1LovkZ
+         5j3ZocrGXI8FqfSAAqvuCwPW6IylBXhDybmZagUvAfyrlIt8ee2nGW9elLmkUpF6jriu
+         Q234NObKni5vNrcPYKLvf61E3iELH4DNKsmckAe2L7p/kCjhpqui7ShazPJVMYrfyQni
+         yqtJwnIrfuwQyEQy1WqcXQsE4zN0fikoIHil+AbG6Zt63UobO53iRDRsI0WeeYdAioye
+         hBPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=EusdwECv3FSYGfl0QnviOkJqhLYRClZ95P0kHIs/+W0=;
-        b=f5txsSRHz6bRzI/3BdfiUy5/ywHWLVPf4J2a21x3/hFO2pkxrZI2qT+SfqXwDHjx4H
-         /KHJCqUrW6aJD3pVwPXIZyOTRK0b4IOJlTHQZ5OYi04FdC8FYetzL+0k/gWXkQm0NKdl
-         gGdHshzh34hydYbQwu3p6uHE+P6xaqxqhIskM9UxfeojQe04KVrqEQuO8JGnX/jvSKKB
-         A7J0Fb6kGZPw0uMSYvfHn6REGb18GUhiveIOVhOaRU8vJm+Z7zAUeCB7+kcP1iV+j7IN
-         e/R8XhU82+Qn3H/3kFnRjS3ZF4+VS4cOnSzRIb/JBKWnSEyyL4qTbjh4EwVFauOQvIS4
-         /Dbg==
-X-Gm-Message-State: APjAAAWPE8Ky67e1B7tr6RZS2W7YkI39fOJuTUm9Mz5n4AotNL4/rqVv
-        JwHlSux/VavHkMzrS3HZn0gcR2GqWA8=
-X-Google-Smtp-Source: APXvYqwnFgKI41TVsyhJ5NjLLOcS2MWODhhgt3AhXnE1yYC1RZkIeetdbf1nMapOb/SDHGUtLInnrw==
-X-Received: by 2002:a17:90a:8a84:: with SMTP id x4mr28501511pjn.105.1561960450743;
-        Sun, 30 Jun 2019 22:54:10 -0700 (PDT)
+        bh=eceiVhMCm2jzMjMZWUfBDWQDfNbbCoL/myYhskQ11u8=;
+        b=c33XadT7opqjBkKEecl6iMCGlySeRoHqCfLUUmrXfXvVe2gRxxM1lMcxy91V+PcccJ
+         jCRPHS0XFVjvCBb5LBIWmRMw08UCKuTo6a2a2+YutAk0A0iOk31HXmQGWslFAi8UnnAp
+         fzSZPFJWnWblXBoybLeGCDN+nhpY6Ck1q5D3rtssTkj27hfINMRa1fFpys3/rnyBAKN9
+         Q2kCEgvmpj1ey13I9ICCb4eOgUt5yaUOHv3jFoyhTle26GO7A9JmFAdla3kQ9Yr2/p0Y
+         eJy7V3R5kdTKnUuNegfLsqry8CWj7MvLV2Af3RtpEeDqcF+RM/DzgdgoQKNGIJ+uGr2v
+         o6aQ==
+X-Gm-Message-State: APjAAAWgja6qNExWP1kReK7UdvJOtNvh4iFMC6SwNLTFI+325MskqYiE
+        LKmPa+xPGTeiRA5EIt0YWiZ5ng==
+X-Google-Smtp-Source: APXvYqzWn0Z6rO+JtgNuBidGaMXV6UHD4dCNXf6dZyMISiziV2P25THDIeIu8IkdMKoPVWJXQJ8ptg==
+X-Received: by 2002:a17:902:9a49:: with SMTP id x9mr15583196plv.282.1561960455096;
+        Sun, 30 Jun 2019 22:54:15 -0700 (PDT)
 Received: from [10.61.2.175] ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id bg3sm2929930pjb.9.2019.06.30.22.54.06
+        by smtp.gmail.com with ESMTPSA id i9sm6403893pgo.46.2019.06.30.22.54.10
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 30 Jun 2019 22:54:10 -0700 (PDT)
-Subject: Re: [PATCH v4 6/8] KVM: PPC: Ultravisor: Restrict LDBAR access
+        Sun, 30 Jun 2019 22:54:14 -0700 (PDT)
+Subject: Re: [PATCH v4 5/8] KVM: PPC: Ultravisor: Restrict flush of the
+ partition tlb cache
 To:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org
 Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
@@ -59,7 +60,7 @@ Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
         Anshuman Khandual <khandual@linux.vnet.ibm.com>,
         Ryan Grimm <grimm@linux.ibm.com>
 References: <20190628200825.31049-1-cclaudio@linux.ibm.com>
- <20190628200825.31049-7-cclaudio@linux.ibm.com>
+ <20190628200825.31049-6-cclaudio@linux.ibm.com>
 From:   Alexey Kardashevskiy <aik@ozlabs.ru>
 Openpgp: preference=signencrypt
 Autocrypt: addr=aik@ozlabs.ru; keydata=
@@ -135,15 +136,15 @@ Autocrypt: addr=aik@ozlabs.ru; keydata=
  c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
  DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
  XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
-Message-ID: <f153b6bf-4661-9dc0-c28f-076fc8fe598e@ozlabs.ru>
-Date:   Mon, 1 Jul 2019 15:54:03 +1000
+Message-ID: <bd65a80e-c935-d612-bbbd-9ef7cc68d7e3@ozlabs.ru>
+Date:   Mon, 1 Jul 2019 15:54:08 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190628200825.31049-7-cclaudio@linux.ibm.com>
+In-Reply-To: <20190628200825.31049-6-cclaudio@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
@@ -152,80 +153,80 @@ X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
 On 29/06/2019 06:08, Claudio Carvalho wrote:
-> When the ultravisor firmware is available, it takes control over the
-> LDBAR register. In this case, thread-imc updates and save/restore
-> operations on the LDBAR register are handled by ultravisor.
-
-What does LDBAR do? "Power ISA™ Version 3.0 B" or "User’s Manual POWER9
-Processor" do not tell.
-
-
+> From: Ram Pai <linuxram@us.ibm.com>
 > 
+> Ultravisor is responsible for flushing the tlb cache, since it manages
+> the PATE entries. Hence skip tlb flush, if the ultravisor firmware is
+> available.
+> 
+> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
 > Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
-> Reviewed-by: Ram Pai <linuxram@us.ibm.com>
-> Reviewed-by: Ryan Grimm <grimm@linux.ibm.com>
-> Acked-by: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
-> Acked-by: Paul Mackerras <paulus@ozlabs.org>
 > ---
->  arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 2 ++
->  arch/powerpc/platforms/powernv/idle.c     | 6 ++++--
->  arch/powerpc/platforms/powernv/opal-imc.c | 4 ++++
->  3 files changed, 10 insertions(+), 2 deletions(-)
+>  arch/powerpc/mm/book3s64/pgtable.c | 33 +++++++++++++++++-------------
+>  1 file changed, 19 insertions(+), 14 deletions(-)
 > 
-> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> index f9b2620fbecd..cffb365d9d02 100644
-> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> @@ -375,8 +375,10 @@ BEGIN_FTR_SECTION
->  	mtspr	SPRN_RPR, r0
->  	ld	r0, KVM_SPLIT_PMMAR(r6)
->  	mtspr	SPRN_PMMAR, r0
-> +BEGIN_FW_FTR_SECTION_NESTED(70)
->  	ld	r0, KVM_SPLIT_LDBAR(r6)
->  	mtspr	SPRN_LDBAR, r0
-> +END_FW_FTR_SECTION_NESTED(FW_FEATURE_ULTRAVISOR, 0, 70)
->  	isync
->  FTR_SECTION_ELSE
->  	/* On P9 we use the split_info for coordinating LPCR changes */
-> diff --git a/arch/powerpc/platforms/powernv/idle.c b/arch/powerpc/platforms/powernv/idle.c
-> index 77f2e0a4ee37..5593a2d55959 100644
-> --- a/arch/powerpc/platforms/powernv/idle.c
-> +++ b/arch/powerpc/platforms/powernv/idle.c
-> @@ -679,7 +679,8 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
->  		sprs.ptcr	= mfspr(SPRN_PTCR);
->  		sprs.rpr	= mfspr(SPRN_RPR);
->  		sprs.tscr	= mfspr(SPRN_TSCR);
-> -		sprs.ldbar	= mfspr(SPRN_LDBAR);
-> +		if (!firmware_has_feature(FW_FEATURE_ULTRAVISOR))
-> +			sprs.ldbar	= mfspr(SPRN_LDBAR);
+> diff --git a/arch/powerpc/mm/book3s64/pgtable.c b/arch/powerpc/mm/book3s64/pgtable.c
+> index 224c5c7c2e3d..bc8eb2bf9810 100644
+> --- a/arch/powerpc/mm/book3s64/pgtable.c
+> +++ b/arch/powerpc/mm/book3s64/pgtable.c
+> @@ -224,6 +224,23 @@ void __init mmu_partition_table_init(void)
+>  	powernv_set_nmmu_ptcr(ptcr);
+>  }
 >  
->  		sprs_saved = true;
->  
-> @@ -762,7 +763,8 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
->  	mtspr(SPRN_PTCR,	sprs.ptcr);
->  	mtspr(SPRN_RPR,		sprs.rpr);
->  	mtspr(SPRN_TSCR,	sprs.tscr);
-> -	mtspr(SPRN_LDBAR,	sprs.ldbar);
-> +	if (!firmware_has_feature(FW_FEATURE_ULTRAVISOR))
-> +		mtspr(SPRN_LDBAR,	sprs.ldbar);
->  
->  	if (pls >= pnv_first_tb_loss_level) {
->  		/* TB loss */
-> diff --git a/arch/powerpc/platforms/powernv/opal-imc.c b/arch/powerpc/platforms/powernv/opal-imc.c
-> index 1b6932890a73..5fe2d4526cbc 100644
-> --- a/arch/powerpc/platforms/powernv/opal-imc.c
-> +++ b/arch/powerpc/platforms/powernv/opal-imc.c
-> @@ -254,6 +254,10 @@ static int opal_imc_counters_probe(struct platform_device *pdev)
->  	bool core_imc_reg = false, thread_imc_reg = false;
->  	u32 type;
->  
-> +	/* Disable IMC devices, when Ultravisor is enabled. */
-> +	if (firmware_has_feature(FW_FEATURE_ULTRAVISOR))
-> +		return -EACCES;
+> +static void flush_partition(unsigned int lpid, unsigned long dw0)
+> +{
+> +	if (dw0 & PATB_HR) {
+> +		asm volatile(PPC_TLBIE_5(%0, %1, 2, 0, 1) : :
+> +			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> +		asm volatile(PPC_TLBIE_5(%0, %1, 2, 1, 1) : :
+> +			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> +		trace_tlbie(lpid, 0, TLBIEL_INVAL_SET_LPID, lpid, 2, 0, 1);
+> +	} else {
+> +		asm volatile(PPC_TLBIE_5(%0, %1, 2, 0, 0) : :
+> +			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> +		trace_tlbie(lpid, 0, TLBIEL_INVAL_SET_LPID, lpid, 2, 0, 0);
+> +	}
+> +	/* do we need fixup here ?*/
+> +	asm volatile("eieio; tlbsync; ptesync" : : : "memory");
+> +}
 > +
->  	/*
->  	 * Check whether this is kdump kernel. If yes, force the engines to
->  	 * stop and return.
+>  static void __mmu_partition_table_set_entry(unsigned int lpid,
+>  					    unsigned long dw0,
+>  					    unsigned long dw1)
+> @@ -238,20 +255,8 @@ static void __mmu_partition_table_set_entry(unsigned int lpid,
+>  	 * The type of flush (hash or radix) depends on what the previous
+>  	 * use of this partition ID was, not the new use.
+>  	 */
+> -	asm volatile("ptesync" : : : "memory");
+> -	if (old & PATB_HR) {
+> -		asm volatile(PPC_TLBIE_5(%0,%1,2,0,1) : :
+> -			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> -		asm volatile(PPC_TLBIE_5(%0,%1,2,1,1) : :
+> -			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> -		trace_tlbie(lpid, 0, TLBIEL_INVAL_SET_LPID, lpid, 2, 0, 1);
+> -	} else {
+> -		asm volatile(PPC_TLBIE_5(%0,%1,2,0,0) : :
+> -			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> -		trace_tlbie(lpid, 0, TLBIEL_INVAL_SET_LPID, lpid, 2, 0, 0);
+> -	}
+> -	/* do we need fixup here ?*/
+> -	asm volatile("eieio; tlbsync; ptesync" : : : "memory");
+> +	if (!firmware_has_feature(FW_FEATURE_ULTRAVISOR))
+
+
+__mmu_partition_table_set_entry() checks for UV and
+mmu_partition_table_set_entry() (the caller) checks for UV and the whole
+point of having separate flush_partition() and
+__mmu_partition_table_set_entry() is not really clear.
+
+
+4/8 and 5/8 make more sense as one patch imho.
+
+
+> +		flush_partition(lpid, old);
+>  }
+>  
+>  void mmu_partition_table_set_entry(unsigned int lpid, unsigned long dw0,
 > 
 
 -- 
