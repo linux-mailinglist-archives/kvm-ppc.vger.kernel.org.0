@@ -2,113 +2,107 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F2015BDBD
-	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Jul 2019 16:12:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C53CE5DAA3
+	for <lists+kvm-ppc@lfdr.de>; Wed,  3 Jul 2019 03:20:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729440AbfGAOMu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 1 Jul 2019 10:12:50 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35842 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728061AbfGAOMu (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Jul 2019 10:12:50 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x61E8Ppi180503;
-        Mon, 1 Jul 2019 10:12:46 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2tfkmb8gs3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Jul 2019 10:12:45 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x61E9lH8014210;
-        Mon, 1 Jul 2019 14:12:45 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma01dal.us.ibm.com with ESMTP id 2tdym6qcbx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Jul 2019 14:12:44 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x61ECgvJ49480050
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Jul 2019 14:12:43 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D8150C6061;
-        Mon,  1 Jul 2019 14:12:42 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E301BC605A;
-        Mon,  1 Jul 2019 14:12:39 +0000 (GMT)
-Received: from [9.80.232.19] (unknown [9.80.232.19])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon,  1 Jul 2019 14:12:39 +0000 (GMT)
-Subject: Re: [PATCH v3 3/9] powerpc: Introduce FW_FEATURE_ULTRAVISOR
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     linuxppc-dev@ozlabs.org, kvm-ppc@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
-        Anshuman Khandual <khandual@linux.vnet.ibm.com>
-References: <20190606173614.32090-1-cclaudio@linux.ibm.com>
- <20190606173614.32090-4-cclaudio@linux.ibm.com>
- <20190615073600.GA24709@blackberry>
-From:   Claudio Carvalho <cclaudio@linux.ibm.com>
-Message-ID: <990dd9d3-441a-229c-a007-817d1dd856be@linux.ibm.com>
-Date:   Mon, 1 Jul 2019 11:12:38 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.0
-MIME-Version: 1.0
-In-Reply-To: <20190615073600.GA24709@blackberry>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-01_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907010175
+        id S1726635AbfGCBUc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 2 Jul 2019 21:20:32 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:34402 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726329AbfGCBUc (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 2 Jul 2019 21:20:32 -0400
+Received: by mail-pl1-f195.google.com with SMTP id i2so260404plt.1
+        for <kvm-ppc@vger.kernel.org>; Tue, 02 Jul 2019 18:20:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=PQ4NMu50Y3TCTLANEIOA6X2/IvBk3A44Utjy8py8evs=;
+        b=jXj35CazM3QZbbRCCsaLsfk/Wd3IJLUgBLmEgFQvzQBcgh2GsMNzt97j8wVElT7nKm
+         OC5eJShKiW8ihuZQU8qUEinWGcR6vlE9s9i1V1xoH0voEFAmphXy6htvudMPcMHDIGml
+         YsNMmEEGxAQpsQHenuA0eLjKefX3OB5tuUncJw/g9Ryi/R6IGGD4+rlhp62TM+IF95mb
+         wK4JMRDZ8051Y4qFrDXkFQdqvZbzrQb7qxa1XJ3YhNIkWC1Ctl/HzTEaxeA4EF2moYqT
+         FVMjmwYAFBSJ6QPBaKO1O8WBjgciGjoEvML9O4YQWUiT4TrUC6a/yipM4vhZdgNhYP2b
+         eZHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=PQ4NMu50Y3TCTLANEIOA6X2/IvBk3A44Utjy8py8evs=;
+        b=UE898kNbo2ICWIWI3c2VoHufGAS6WNPiBXBWaaiB+lcxAZzPor/s2yBTDuRC8YUbo0
+         9KlD1eWo2cIib6WXGT3Pg1kvbnN22MYJxDCMyXEja+gn0pN2HRZTbYJ1MAMzsNcn9LHt
+         IWr56omNNL0+wxXxu7NseZIx2dxdUConCsnXdaV9BZD/rfQH9B3cky3u6OI2jMDB9i2I
+         zY0tBVv1qZwRhNe5LlpwKG7hLGU2tHqWEhrZdqI7gtHhWhxo4RcS/M+w48jfpBT4W4Sd
+         V/CABX8EOL9P6GFNzU5tH+70R6/UH47nBjvj625ULKL5a8QXmXXdwA3Cl48j9y30svtK
+         u7Rw==
+X-Gm-Message-State: APjAAAW0Uj4VY1n98UGZpljvDLP0mkQpR6/ujwGriDZnzY+encoCj1YS
+        D1vtzscX8l0Qs5CU2JrrfH8=
+X-Google-Smtp-Source: APXvYqxxCayGdd1EX7v0vzne6JjklaJqMqrDnhmtEzSn0ou/oqvDY7xq7c1vlTGWVEBb67pjYVuzAg==
+X-Received: by 2002:a17:902:1129:: with SMTP id d38mr39113510pla.220.1562116831564;
+        Tue, 02 Jul 2019 18:20:31 -0700 (PDT)
+Received: from surajjs2.ozlabs.ibm.com.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id j11sm318058pfa.2.2019.07.02.18.20.29
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 02 Jul 2019 18:20:31 -0700 (PDT)
+From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, mpe@ellerman.id.au, paulus@ozlabs.org,
+        sjitindarsingh@gmail.com
+Subject: [PATCH 1/3] KVM: PPC: Book3S HV: Always save guest pmu for guest capable of nesting
+Date:   Wed,  3 Jul 2019 11:20:20 +1000
+Message-Id: <20190703012022.15644-1-sjitindarsingh@gmail.com>
+X-Mailer: git-send-email 2.13.6
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+The performance monitoring unit (PMU) registers are saved on guest exit
+when the guest has set the pmcregs_in_use flag in its lppaca, if it
+exists, or unconditionally if it doesn't. If a nested guest is being
+run then the hypervisor doesn't, and in most cases can't, know if the
+pmu registers are in use since it doesn't know the location of the lppaca
+for the nested guest, although it may have one for its immediate guest.
+This results in the values of these registers being lost across nested
+guest entry and exit in the case where the nested guest was making use
+of the performance monitoring facility while it's nested guest hypervisor
+wasn't.
 
-On 6/15/19 4:36 AM, Paul Mackerras wrote:
-> On Thu, Jun 06, 2019 at 02:36:08PM -0300, Claudio Carvalho wrote:
->> This feature tells if the ultravisor firmware is available to handle
->> ucalls.
-> Everything in this patch that depends on CONFIG_PPC_UV should just
-> depend on CONFIG_PPC_POWERNV instead.  The reason is that every host
-> kernel needs to be able to do the ultracall to set partition table
-> entry 0, in case it ends up being run on a machine with an ultravisor.
-> Otherwise we will have the situation where a host kernel may crash
-> early in boot just because the machine it's booted on happens to have
-> an ultravisor running.  The crash will be a particularly nasty one
-> because it will happen before we have probed the machine type and
-> initialized the console; therefore it will just look like the machine
-> hangs for no discernable reason.
+Further more the hypervisor could interrupt a guest hypervisor between
+when it has loaded up the pmu registers and it calling H_ENTER_NESTED or
+between returning from the nested guest to the guest hypervisor and the
+guest hypervisor reading the pmu registers, in kvmhv_p9_guest_entry().
+This means that it isn't sufficient to just save the pmu registers when
+entering or exiting a nested guest, but that it is necessary to always
+save the pmu registers whenever a guest is capable of running nested guests
+to ensure the register values aren't lost in the context switch.
 
-> We also need to think about how to provide a way for petitboot to know
-> whether the kernel it is booting knows how to do a ucall to set its
-> partition table entry.  One suggestion would be to modify
-> vmlinux.lds.S to add a new PT_NOTE entry in the program header of the
-> binary with (say) a 64-bit doubleword which is a bitmap indicating
-> capabilities of the binary.  We would define the first bit as
-> indicating that the kernel knows how to run under an ultravisor.
-> When running under an ultravisor, petitboot could then look for the
-> PT_NOTE and the ultravisor-capable bit in it, and if the PT_NOTE is
-> not there or the bit is zero, put up a dialog warning the user that
-> the kernel will probably crash early in boot, and asking for explicit
-> confirmation that the user wants to proceed.
+Ensure the pmu register values are preserved by always saving their
+value into the vcpu struct when a guest is capable of running nested
+guests.
 
+This should have minimal performance impact however any impact can be
+avoided by booting a guest with "-machine pseries,cap-nested-hv=false"
+on the qemu commandline.
 
-I just posted a separated RFC patch for the ELF note.
+Fixes: 95a6432ce903 "KVM: PPC: Book3S HV: Streamlined guest entry/exit path on P9 for radix guests"
 
-Thanks, Claudio.
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ arch/powerpc/kvm/book3s_hv.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index ec1804f822af..b682a429f3ef 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3654,6 +3654,8 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 		vcpu->arch.vpa.dirty = 1;
+ 		save_pmu = lp->pmcregs_in_use;
+ 	}
++	/* Must save pmu if this guest is capable of running nested guests */
++	save_pmu |= nesting_enabled(vcpu->kvm);
+ 
+ 	kvmhv_save_guest_pmu(vcpu, save_pmu);
+ 
+-- 
+2.13.6
 
->
-> Paul.
->
