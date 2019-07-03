@@ -2,54 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E2B95DAA4
-	for <lists+kvm-ppc@lfdr.de>; Wed,  3 Jul 2019 03:20:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFCCC5DAA6
+	for <lists+kvm-ppc@lfdr.de>; Wed,  3 Jul 2019 03:20:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727092AbfGCBUi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 2 Jul 2019 21:20:38 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:42406 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726329AbfGCBUi (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 2 Jul 2019 21:20:38 -0400
-Received: by mail-pl1-f195.google.com with SMTP id ay6so239441plb.9
-        for <kvm-ppc@vger.kernel.org>; Tue, 02 Jul 2019 18:20:37 -0700 (PDT)
+        id S1727208AbfGCBUm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 2 Jul 2019 21:20:42 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:37308 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727051AbfGCBUk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 2 Jul 2019 21:20:40 -0400
+Received: by mail-pl1-f196.google.com with SMTP id bh12so252841plb.4
+        for <kvm-ppc@vger.kernel.org>; Tue, 02 Jul 2019 18:20:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=OT+iSlP7qQxjao2KtTY/wuAA4aL+nqDFMX6/v/uNdu4=;
-        b=eE9NuW60m15qwsjWlt+lK0mLNp+ZuO3yidTHutB9QGlwHs815nBPtwK3wKBDLwWOGd
-         Txaa5TVWA64GJHXRg65hvqw14cbZhnm0035A4Vq4XU5pbjM/YYmEBPrzaPnHIARjzHn2
-         fVilXLh/wJYHl/Zao7bK3hqeSywIeWQJ+CDu0tIM295inos+mE8DuNzyZm4kZ0R3oeFi
-         D2961o3zGGlef3sNPnvL/x0B46zGnfYJ/kr3C7nHBCj1kmc6nEFhHdBY+JMGHu9owJSB
-         N8/pwgcCVBRsZyt3RZwqZq/zEDun9qKdgKigNJt0nv58nVsaCyQSyp3mkMe0bfP2POFw
-         Zp0w==
+        bh=q3fFTelOhqkb1Mwuc5eMY9x9ha5lfJs2EAbdT9hPUxk=;
+        b=RH/3iLdsxo433D8bqQwGL/9FPB5yF+k0fcF0uDWNdIqHFwBKMirdOH4am3QXNHJYSn
+         rY4r/pfbR+HzWOa8YVSKaFR9ZO0LQC9H7zOEQB9tnIzDUuqEI0/DOQsr96nFf1b3qFyb
+         6cXV24+vc/1EXm/XtkVqszJoIDg37R/TAYjbci2YtuwMMmUMcIx/WTBbAXc0Ia8zjZxb
+         KlYMd6yImr8TLShte/YqPNUQ7PxXlM4kt6sNtxgzIpCoFrcMPe1vGPasbGwY0djwAzlE
+         a+iINADzJwNendu1TCWNzcYc0hmoerC/E8aEh16OQx+UthQ07cWtau49tHUp+PXjmr6E
+         MQ3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=OT+iSlP7qQxjao2KtTY/wuAA4aL+nqDFMX6/v/uNdu4=;
-        b=t/+5gXVASonD+dn4y7EJYwxDmYqA/V3xeq+iHDviuqU70kbGeTOjV2DQW61ZBaF432
-         ZylRQVjMB2EX28HAxsXFvvRDlTxB1g1MHdOzkYvzPmJWxGXSoN9fD2lC7Y0eJsQZ1L14
-         2ipa+Zxy4aYaSWl0qoA9i8Ss9o/UDcT+CEj5/4Pk1vic/jVrtLuPZKD0UAd0eYoc19rX
-         IDTTmDVbjNsu8RT+DCyc+4m+7SmQ62QBJ+Fho4PdTujxLO4BbZsOOQeOm5eMk/RahOST
-         fkkXtfwa59YpQzWd4NiQ2thnpBIIrSxkjrZW/dKio8Y0WHLnABhS9NSosIOBEKes43GJ
-         UOGQ==
-X-Gm-Message-State: APjAAAWF+a9ckZ5d/IYRemLNOO29KZhd1TI6+qbz9EPbpQN2nQl2Jovm
-        T5lSU9Z6dZv+izPtdOL+4hg=
-X-Google-Smtp-Source: APXvYqxICivvyS9zvkcXp4qDw3wHK9lxCyuN+p62quvHg5No7Hz1ZHyE+PQInv9p7TP3BKnA+kzhSA==
-X-Received: by 2002:a17:902:8d92:: with SMTP id v18mr39141154plo.211.1562116837371;
-        Tue, 02 Jul 2019 18:20:37 -0700 (PDT)
+        bh=q3fFTelOhqkb1Mwuc5eMY9x9ha5lfJs2EAbdT9hPUxk=;
+        b=dWfg08apRIyjHDCnCC1TZ4wFTPuofCOUmQrEKG+J3AOZDl+0iHpvz0WsRVlIQXY9S9
+         fwLUXchQW18h1qPst7flZKZBZ4KrdlcJRfe0m6Pz/uqas3wakU3ueU85Mh4WnI/M+8g2
+         CaVs+4iqbxSBB8w8iGvRBzy4Qar+T5vWolW7iAbqBiXeehjyAW+fKA78ShgAYVDs4xBI
+         9nSACZTDb5wOJpTi+tX23q0478pwqOD4lBVBJZ3a9nnFP6nMg2Yh25nLvU98znd2xVC7
+         POvzynUanSePTiJmx4cxmocOwSFphHepv6sltQXC/oqYVhBZ7PbxvNH7HCXDT50W+SqZ
+         X1RQ==
+X-Gm-Message-State: APjAAAW+CTrS8G415bQhuHklvUzBnX60SmzP+YNrxCOYEiet9pU+x766
+        8gXng9IQoqoOzNkr2tuw43o=
+X-Google-Smtp-Source: APXvYqzkt5g7kNg6hKYTqsIuNXDzDhDUtUgqHARyXeeseHu6TWKvRfxy1H2TSr3uJ1aWKFKC5zKorA==
+X-Received: by 2002:a17:902:684:: with SMTP id 4mr38647623plh.138.1562116840189;
+        Tue, 02 Jul 2019 18:20:40 -0700 (PDT)
 Received: from surajjs2.ozlabs.ibm.com.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id j11sm318058pfa.2.2019.07.02.18.20.31
+        by smtp.gmail.com with ESMTPSA id j11sm318058pfa.2.2019.07.02.18.20.37
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 02 Jul 2019 18:20:36 -0700 (PDT)
+        Tue, 02 Jul 2019 18:20:39 -0700 (PDT)
 From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 To:     linuxppc-dev@lists.ozlabs.org
 Cc:     kvm-ppc@vger.kernel.org, mpe@ellerman.id.au, paulus@ozlabs.org,
         sjitindarsingh@gmail.com
-Subject: [PATCH 2/3] PPC: PMC: Set pmcregs_in_use in paca when running as LPAR
-Date:   Wed,  3 Jul 2019 11:20:21 +1000
-Message-Id: <20190703012022.15644-2-sjitindarsingh@gmail.com>
+Subject: [PATCH 3/3] KVM: PPC: Book3S HV: Save and restore guest visible PSSCR bits on pseries
+Date:   Wed,  3 Jul 2019 11:20:22 +1000
+Message-Id: <20190703012022.15644-3-sjitindarsingh@gmail.com>
 X-Mailer: git-send-email 2.13.6
 In-Reply-To: <20190703012022.15644-1-sjitindarsingh@gmail.com>
 References: <20190703012022.15644-1-sjitindarsingh@gmail.com>
@@ -58,54 +58,75 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The ability to run nested guests under KVM means that a guest can also
-act as a hypervisor for it's own nested guest. Currently
-ppc_set_pmu_inuse() assumes that either FW_FEATURE_LPAR is set,
-indicating a guest environment, and so sets the pmcregs_in_use flag in
-the lppaca, or that it isn't set, indicating a hypervisor environment,
-and so sets the pmcregs_in_use flag in the paca.
+The performance stop status and control register (PSSCR) is used to
+control the power saving facilities of the processor. This register has
+various fields, some of which can be modified only in hypervisor state,
+and others which can be modified in both hypervisor and priviledged
+non-hypervisor state. The bits which can be modified in priviledged
+non-hypervisor state are referred to as guest visible.
 
-The pmcregs_in_use flag in the lppaca is used to communicate this
-information to a hypervisor and so must be set in a guest environment.
-The pmcregs_in_use flag in the paca is used by KVM code to determine
-whether the host state of the performance monitoring unit (PMU) must be
-saved and restored when running a guest.
+Currently the L0 hypervisor saves and restores both it's own host value
+as well as the guest value of the psscr when context switching between
+the hypervisor and guest. However a nested hypervisor running it's own
+nested guests (as indicated by kvmhv_on_pseries()) doesn't context
+switch the psscr register. This means that if a nested (L2) guest
+modified the psscr that the L1 guest hypervisor will run with this
+value, and if the L1 guest hypervisor modified this value and then goes
+to run the nested (L2) guest again that the L2 psscr value will be lost.
 
-Thus when a guest also acts as a hypervisor it must set this bit in both
-places since it needs to ensure both that the real hypervisor saves it's
-pmu registers when it runs (requires pmcregs_in_use flag in lppaca), and
-that it saves it's own pmu registers when running a nested guest
-(requires pmcregs_in_use flag in paca).
+Fix this by having the (L1) nested hypervisor save and restore both its
+host and the guest psscr value when entering and exiting a nested (L2)
+guest. Note that only the guest visible parts of the psscr are context
+switched since this is all the L1 nested hypervisor can access, this is
+fine however as these are the only fields the L0 hypervisor provides
+guest control of anyway and so all other fields are ignored.
 
-Modify ppc_set_pmu_inuse() so that the pmcregs_in_use bit is set in both
-the lppaca and the paca when a guest (LPAR) is running with the
-capability of running it's own guests (CONFIG_KVM_BOOK3S_HV_POSSIBLE).
+This could also have been implemented by adding the psscr register to
+the hv_regs passed to the L0 hypervisor as input to the H_ENTER_NESTED
+hcall, however this would have meant updating the structure layout and
+thus required modifications to both the L0 and L1 kernels. Whereas the
+approach used doesn't require L0 kernel modifications while achieving
+the same result.
 
 Fixes: 95a6432ce903 "KVM: PPC: Book3S HV: Streamlined guest entry/exit path on P9 for radix guests"
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- arch/powerpc/include/asm/pmc.h | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/powerpc/include/asm/pmc.h b/arch/powerpc/include/asm/pmc.h
-index dc9a1ca70edf..c6bbe9778d3c 100644
---- a/arch/powerpc/include/asm/pmc.h
-+++ b/arch/powerpc/include/asm/pmc.h
-@@ -27,11 +27,10 @@ static inline void ppc_set_pmu_inuse(int inuse)
- #ifdef CONFIG_PPC_PSERIES
- 		get_lppaca()->pmcregs_in_use = inuse;
- #endif
--	} else {
-+	}
- #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
--		get_paca()->pmcregs_in_use = inuse;
-+	get_paca()->pmcregs_in_use = inuse;
- #endif
--	}
- #endif
- }
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index b682a429f3ef..cde3f5a4b3e4 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3569,9 +3569,18 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	mtspr(SPRN_DEC, vcpu->arch.dec_expires - mftb());
  
+ 	if (kvmhv_on_pseries()) {
++		/*
++		 * We need to save and restore the guest visible part of the
++		 * psscr (i.e. using SPRN_PSSCR_PR) since the hypervisor
++		 * doesn't do this for us. Note only required if pseries since
++		 * this is done in kvmhv_load_hv_regs_and_go() below otherwise.
++		 */
++		unsigned long host_psscr;
+ 		/* call our hypervisor to load up HV regs and go */
+ 		struct hv_guest_state hvregs;
+ 
++		host_psscr = mfspr(SPRN_PSSCR_PR);
++		mtspr(SPRN_PSSCR_PR, vcpu->arch.psscr);
+ 		kvmhv_save_hv_regs(vcpu, &hvregs);
+ 		hvregs.lpcr = lpcr;
+ 		vcpu->arch.regs.msr = vcpu->arch.shregs.msr;
+@@ -3590,6 +3599,8 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 		vcpu->arch.shregs.msr = vcpu->arch.regs.msr;
+ 		vcpu->arch.shregs.dar = mfspr(SPRN_DAR);
+ 		vcpu->arch.shregs.dsisr = mfspr(SPRN_DSISR);
++		vcpu->arch.psscr = mfspr(SPRN_PSSCR_PR);
++		mtspr(SPRN_PSSCR_PR, host_psscr);
+ 
+ 		/* H_CEDE has to be handled now, not later */
+ 		if (trap == BOOK3S_INTERRUPT_SYSCALL && !vcpu->arch.nested &&
 -- 
 2.13.6
 
