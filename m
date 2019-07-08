@@ -2,48 +2,47 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BF8362752
-	for <lists+kvm-ppc@lfdr.de>; Mon,  8 Jul 2019 19:36:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9939B62757
+	for <lists+kvm-ppc@lfdr.de>; Mon,  8 Jul 2019 19:38:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729071AbfGHRgO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 8 Jul 2019 13:36:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41340 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726997AbfGHRgO (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Jul 2019 13:36:14 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x68HY7Va118212
-        for <kvm-ppc@vger.kernel.org>; Mon, 8 Jul 2019 13:36:12 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tma9508d6-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Mon, 08 Jul 2019 13:36:12 -0400
-Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <janani@linux.ibm.com>;
-        Mon, 8 Jul 2019 18:36:12 +0100
-Received: from b01cxnp22036.gho.pok.ibm.com (9.57.198.26)
-        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 8 Jul 2019 18:36:09 +0100
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x68Ha8Qs34734410
+        id S2388867AbfGHRiM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 8 Jul 2019 13:38:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49468 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729329AbfGHRiM (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Jul 2019 13:38:12 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x68Hc14M008361;
+        Mon, 8 Jul 2019 13:38:08 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tm8gmcac0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Jul 2019 13:38:08 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x68HXprM023048;
+        Mon, 8 Jul 2019 17:37:43 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma01wdc.us.ibm.com with ESMTP id 2tjk967pp0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Jul 2019 17:37:43 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x68HbfCa52691396
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 8 Jul 2019 17:36:08 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5B90EAC05E;
-        Mon,  8 Jul 2019 17:36:08 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3C490AC059;
-        Mon,  8 Jul 2019 17:36:07 +0000 (GMT)
+        Mon, 8 Jul 2019 17:37:41 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A8A53136055;
+        Mon,  8 Jul 2019 17:37:41 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 493E2136053;
+        Mon,  8 Jul 2019 17:37:41 +0000 (GMT)
 Received: from ltc.linux.ibm.com (unknown [9.16.170.189])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  8 Jul 2019 17:36:07 +0000 (GMT)
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon,  8 Jul 2019 17:37:41 +0000 (GMT)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Mon, 08 Jul 2019 12:38:32 -0500
+Date:   Mon, 08 Jul 2019 12:40:06 -0500
 From:   janani <janani@linux.ibm.com>
 To:     Claudio Carvalho <cclaudio@linux.ibm.com>
 Cc:     linuxppc-dev@ozlabs.org, kvm-ppc@vger.kernel.org,
@@ -57,94 +56,160 @@ Cc:     linuxppc-dev@ozlabs.org, kvm-ppc@vger.kernel.org,
         Thiago Bauermann <bauerman@linux.ibm.com>,
         Anshuman Khandual <khandual@linux.vnet.ibm.com>,
         Ryan Grimm <grimm@linux.ibm.com>
-Subject: Re: [PATCH v4 1/8] KVM: PPC: Ultravisor: Introduce the MSR_S bit
+Subject: Re: [PATCH v4 2/8] powerpc: Introduce FW_FEATURE_ULTRAVISOR
 Organization: IBM
 Reply-To: janani@linux.ibm.com
 Mail-Reply-To: janani@linux.ibm.com
-In-Reply-To: <20190628200825.31049-2-cclaudio@linux.ibm.com>
+In-Reply-To: <20190628200825.31049-3-cclaudio@linux.ibm.com>
 References: <20190628200825.31049-1-cclaudio@linux.ibm.com>
- <20190628200825.31049-2-cclaudio@linux.ibm.com>
+ <20190628200825.31049-3-cclaudio@linux.ibm.com>
+Message-ID: <c585a5370f578d2ce7322eebf0496265@linux.vnet.ibm.com>
 X-Sender: janani@linux.ibm.com
 User-Agent: Roundcube Webmail/1.0.1
 X-TM-AS-GCONF: 00
-x-cbid: 19070817-0052-0000-0000-000003DBD376
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011397; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01229301; UDB=6.00647407; IPR=6.01010561;
- MB=3.00027636; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-08 17:36:11
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19070817-0053-0000-0000-0000619D051D
-Message-Id: <ccd9bdbcc2e4dad9f8c2e7acbb222d5e@linux.vnet.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-08_05:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=891 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907080216
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907080217
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 On 2019-06-28 15:08, Claudio Carvalho wrote:
-> From: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+> This feature tells if the ultravisor firmware is available to handle
+> ucalls.
 > 
-> The ultravisor processor mode is introduced in POWER platforms that
-> supports the Protected Execution Facility (PEF). Ultravisor is higher
-> privileged than hypervisor mode.
-> 
-> In PEF enabled platforms, the MSR_S bit is used to indicate if the
-> thread is in secure state. With the MSR_S bit, the privilege state of
-> the thread is now determined by MSR_S, MSR_HV and MSR_PR, as follows:
-> 
-> S   HV  PR
-> -----------------------
-> 0   x   1   problem
-> 1   0   1   problem
-> x   x   0   privileged
-> x   1   0   hypervisor
-> 1   1   0   ultravisor
-> 1   1   1   reserved
-> 
-> The hypervisor doesn't (and can't) run with the MSR_S bit set, but a
-> secure guest and the ultravisor firmware do.
-> 
-> Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-> [ Update the commit message ]
 > Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
+> [ Device node name to "ibm,ultravisor" ]
+> Signed-off-by: Michael Anderson <andmike@linux.ibm.com>
   Reviewed-by: Janani Janakiraman <janani@linux.ibm.com>
 > ---
->  arch/powerpc/include/asm/reg.h | 3 +++
->  1 file changed, 3 insertions(+)
+>  arch/powerpc/include/asm/firmware.h   |  5 +++--
+>  arch/powerpc/include/asm/ultravisor.h | 15 +++++++++++++++
+>  arch/powerpc/kernel/Makefile          |  1 +
+>  arch/powerpc/kernel/prom.c            |  4 ++++
+>  arch/powerpc/kernel/ultravisor.c      | 24 ++++++++++++++++++++++++
+>  5 files changed, 47 insertions(+), 2 deletions(-)
+>  create mode 100644 arch/powerpc/include/asm/ultravisor.h
+>  create mode 100644 arch/powerpc/kernel/ultravisor.c
 > 
-> diff --git a/arch/powerpc/include/asm/reg.h 
-> b/arch/powerpc/include/asm/reg.h
-> index 10caa145f98b..39b4c0a519f5 100644
-> --- a/arch/powerpc/include/asm/reg.h
-> +++ b/arch/powerpc/include/asm/reg.h
-> @@ -38,6 +38,7 @@
->  #define MSR_TM_LG	32		/* Trans Mem Available */
->  #define MSR_VEC_LG	25	        /* Enable AltiVec */
->  #define MSR_VSX_LG	23		/* Enable VSX */
-> +#define MSR_S_LG	22		/* Secure VM bit */
->  #define MSR_POW_LG	18		/* Enable Power Management */
->  #define MSR_WE_LG	18		/* Wait State Enable */
->  #define MSR_TGPR_LG	17		/* TLB Update registers in use */
-> @@ -71,11 +72,13 @@
->  #define MSR_SF		__MASK(MSR_SF_LG)	/* Enable 64 bit mode */
->  #define MSR_ISF		__MASK(MSR_ISF_LG)	/* Interrupt 64b mode valid on 630 
-> */
->  #define MSR_HV 		__MASK(MSR_HV_LG)	/* Hypervisor state */
-> +#define MSR_S		__MASK(MSR_S_LG)	/* Secure state */
->  #else
->  /* so tests for these bits fail on 32-bit */
->  #define MSR_SF		0
->  #define MSR_ISF		0
->  #define MSR_HV		0
-> +#define MSR_S		0
+> diff --git a/arch/powerpc/include/asm/firmware.h
+> b/arch/powerpc/include/asm/firmware.h
+> index 00bc42d95679..43b48c4d3ca9 100644
+> --- a/arch/powerpc/include/asm/firmware.h
+> +++ b/arch/powerpc/include/asm/firmware.h
+> @@ -54,6 +54,7 @@
+>  #define FW_FEATURE_DRC_INFO	ASM_CONST(0x0000000800000000)
+>  #define FW_FEATURE_BLOCK_REMOVE ASM_CONST(0x0000001000000000)
+>  #define FW_FEATURE_PAPR_SCM 	ASM_CONST(0x0000002000000000)
+> +#define FW_FEATURE_ULTRAVISOR	ASM_CONST(0x0000004000000000)
+> 
+>  #ifndef __ASSEMBLY__
+> 
+> @@ -72,9 +73,9 @@ enum {
+>  		FW_FEATURE_TYPE1_AFFINITY | FW_FEATURE_PRRN |
+>  		FW_FEATURE_HPT_RESIZE | FW_FEATURE_DRMEM_V2 |
+>  		FW_FEATURE_DRC_INFO | FW_FEATURE_BLOCK_REMOVE |
+> -		FW_FEATURE_PAPR_SCM,
+> +		FW_FEATURE_PAPR_SCM | FW_FEATURE_ULTRAVISOR,
+>  	FW_FEATURE_PSERIES_ALWAYS = 0,
+> -	FW_FEATURE_POWERNV_POSSIBLE = FW_FEATURE_OPAL,
+> +	FW_FEATURE_POWERNV_POSSIBLE = FW_FEATURE_OPAL | 
+> FW_FEATURE_ULTRAVISOR,
+>  	FW_FEATURE_POWERNV_ALWAYS = 0,
+>  	FW_FEATURE_PS3_POSSIBLE = FW_FEATURE_LPAR | FW_FEATURE_PS3_LV1,
+>  	FW_FEATURE_PS3_ALWAYS = FW_FEATURE_LPAR | FW_FEATURE_PS3_LV1,
+> diff --git a/arch/powerpc/include/asm/ultravisor.h
+> b/arch/powerpc/include/asm/ultravisor.h
+> new file mode 100644
+> index 000000000000..e5009b0d84ea
+> --- /dev/null
+> +++ b/arch/powerpc/include/asm/ultravisor.h
+> @@ -0,0 +1,15 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Ultravisor definitions
+> + *
+> + * Copyright 2019, IBM Corporation.
+> + *
+> + */
+> +#ifndef _ASM_POWERPC_ULTRAVISOR_H
+> +#define _ASM_POWERPC_ULTRAVISOR_H
+> +
+> +/* Internal functions */
+> +extern int early_init_dt_scan_ultravisor(unsigned long node, const 
+> char *uname,
+> +					 int depth, void *data);
+> +
+> +#endif	/* _ASM_POWERPC_ULTRAVISOR_H */
+> diff --git a/arch/powerpc/kernel/Makefile 
+> b/arch/powerpc/kernel/Makefile
+> index 0ea6c4aa3a20..f0caa302c8c0 100644
+> --- a/arch/powerpc/kernel/Makefile
+> +++ b/arch/powerpc/kernel/Makefile
+> @@ -154,6 +154,7 @@ endif
+> 
+>  obj-$(CONFIG_EPAPR_PARAVIRT)	+= epapr_paravirt.o epapr_hcalls.o
+>  obj-$(CONFIG_KVM_GUEST)		+= kvm.o kvm_emul.o
+> +obj-$(CONFIG_PPC_POWERNV)	+= ultravisor.o
+> 
+>  # Disable GCOV, KCOV & sanitizers in odd or sensitive code
+>  GCOV_PROFILE_prom_init.o := n
+> diff --git a/arch/powerpc/kernel/prom.c b/arch/powerpc/kernel/prom.c
+> index 4221527b082f..67a2c1b39252 100644
+> --- a/arch/powerpc/kernel/prom.c
+> +++ b/arch/powerpc/kernel/prom.c
+> @@ -59,6 +59,7 @@
+>  #include <asm/firmware.h>
+>  #include <asm/dt_cpu_ftrs.h>
+>  #include <asm/drmem.h>
+> +#include <asm/ultravisor.h>
+> 
+>  #include <mm/mmu_decl.h>
+> 
+> @@ -706,6 +707,9 @@ void __init early_init_devtree(void *params)
+>  #ifdef CONFIG_PPC_POWERNV
+>  	/* Some machines might need OPAL info for debugging, grab it now. */
+>  	of_scan_flat_dt(early_init_dt_scan_opal, NULL);
+> +
+> +	/* Scan tree for ultravisor feature */
+> +	of_scan_flat_dt(early_init_dt_scan_ultravisor, NULL);
 >  #endif
 > 
->  /*
-
+>  #ifdef CONFIG_FA_DUMP
+> diff --git a/arch/powerpc/kernel/ultravisor.c 
+> b/arch/powerpc/kernel/ultravisor.c
+> new file mode 100644
+> index 000000000000..dc6021f63c97
+> --- /dev/null
+> +++ b/arch/powerpc/kernel/ultravisor.c
+> @@ -0,0 +1,24 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Ultravisor high level interfaces
+> + *
+> + * Copyright 2019, IBM Corporation.
+> + *
+> + */
+> +#include <linux/init.h>
+> +#include <linux/printk.h>
+> +#include <linux/string.h>
+> +
+> +#include <asm/ultravisor.h>
+> +#include <asm/firmware.h>
+> +
+> +int __init early_init_dt_scan_ultravisor(unsigned long node, const 
+> char *uname,
+> +					 int depth, void *data)
+> +{
+> +	if (depth != 1 || strcmp(uname, "ibm,ultravisor") != 0)
+> +		return 0;
+> +
+> +	powerpc_firmware_features |= FW_FEATURE_ULTRAVISOR;
+> +	pr_debug("Ultravisor detected!\n");
+> +	return 1;
+> +}
