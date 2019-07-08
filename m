@@ -2,62 +2,46 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EED0660D7B
-	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Jul 2019 23:59:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FAF5618C1
+	for <lists+kvm-ppc@lfdr.de>; Mon,  8 Jul 2019 03:19:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728101AbfGEV74 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 5 Jul 2019 17:59:56 -0400
-Received: from out176.e-adjacentdigital.co.uk ([178.156.202.12]:41367 "EHLO
-        slot0.mathewsons.ga" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-        with ESMTP id S1727876AbfGEV74 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Jul 2019 17:59:56 -0400
-X-Greylist: delayed 630 seconds by postgrey-1.27 at vger.kernel.org; Fri, 05 Jul 2019 17:59:54 EDT
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=dkim; d=mathewsons.ga;
- h=Content-Type:MIME-Version:Content-Transfer-Encoding:Content-Description:Subject:To:From:Date:Reply-To:Message-ID; i=purchase@mathewsons.ga;
- bh=onxYcir3NvpNjk2I/gjm/O+ljxo=;
- b=lP5COWGnWyMZS0OujJ9ZF3kVFgm2+/gdvMGcvoc8Fm20BdxlMItR+ftNfMjXIOYBZZKZxNL24j2T
-   zscj1ViVac3JB4dHHp8215VzmvAqwQwuz5A7U1XDsluy/hrBMHf8l0jQNYA1T8Y4tiELKXq5b7pE
-   INjz8eY/xgqXXbhL1EvTzv5SyBPmF6xYo2pp5doqMyFJEUNlNp5ZTSEB9lGTqbOwCyCJ+sfcsETs
-   yLJ9FepWw53NWFZeY2m74xFyucZ9il7UXxqUqzD/4EF7Rfg1Xw6YAftE2aFMqAmae/ccd4bVvPfL
-   PgMrGwAgKqZ2tCKkuVysrwoGo4W4LlrJA4QKAg==
-DomainKey-Signature: a=rsa-sha1; c=nofws; q=dns; s=dkim; d=mathewsons.ga;
- b=g62mDm6/c8zavjiNV8M8T9eYTbyvwzorm2Z41YGo4Hq0uIKim0olskQyenXcR0eUKgMDTa+Yvjp1
-   PRKNz4jKjhUWfojqjYVjT3LJwGkkw7LcECmJxbu1l2+n1a6Gj6ekgGrjIzC5alVjioMARIxRTfXv
-   uNbX27quPDz2IC6bl+T+IEM23f3LYMohkZIGGPHeA3lmpmSe26gck6VXieCqvCVFJecEiOfN4Gsb
-   +Fuv/2c2CyVNmvEPyknJkUow4SoJXstoG8FRrsNiETLPQkff1zRXBwk6rKbXrUZA6mdNveGTgPiH
-   aDdCSo69Vbk/4mj5LYGmS/tIDONWaHBmQJa+MQ==;
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Quotes needed For July Shipments
-To:     Recipients <purchase@mathewsons.ga>
-From:   "Sales -Jpexcc." <purchase@mathewsons.ga>
-Date:   Sat, 06 Jul 2019 00:39:21 +0300
-Reply-To: jpexcc@aol.com
-Message-ID: <0.0.4D.150.1D53379E96EDDB4.0@slot0.mathewsons.ga>
+        id S1728150AbfGHBTo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 7 Jul 2019 21:19:44 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:57703 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728138AbfGHBTo (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sun, 7 Jul 2019 21:19:44 -0400
+Received: by ozlabs.org (Postfix, from userid 1034)
+        id 45hng26v5bz9sP6; Mon,  8 Jul 2019 11:19:42 +1000 (AEST)
+X-powerpc-patch-notification: thanks
+X-powerpc-patch-commit: 3fefd1cd95df04da67c83c1cb93b663f04b3324f
+In-Reply-To: <20190620060040.26945-1-mikey@neuling.org>
+To:     Michael Neuling <mikey@neuling.org>
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+Cc:     mikey@neuling.org, linuxppc-dev@lists.ozlabs.org,
+        sjitindarsingh@gmail.com, kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix CR0 setting in TM emulation
+Message-Id: <45hng26v5bz9sP6@ozlabs.org>
+Date:   Mon,  8 Jul 2019 11:19:42 +1000 (AEST)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hello dear,
- =
+On Thu, 2019-06-20 at 06:00:40 UTC, Michael Neuling wrote:
+> When emulating tsr, treclaim and trechkpt, we incorrectly set CR0. The
+> code currently sets:
+>     CR0 <- 00 || MSR[TS]
+> but according to the ISA it should be:
+>     CR0 <-  0 || MSR[TS] || 0
+> 
+> This fixes the bit shift to put the bits in the correct location.
+> 
+> Tested-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Signed-off-by: Michael Neuling <mikey@neuling.org>
 
-We are in the market for your products after meeting at your stand during l=
-ast expo.
- =
+Applied to powerpc next, thanks.
 
-Please kindly send us your latest catalog and price list so as to start a n=
-ew project/order as promised during the exhibition. =
+https://git.kernel.org/powerpc/c/3fefd1cd95df04da67c83c1cb93b663f04b3324f
 
- =
-
-I would appreciate your response about the above details required so we can=
- revert back to you asap.
- =
-
-Kind regards
- =
-
-Rhema Zoeh
+cheers
