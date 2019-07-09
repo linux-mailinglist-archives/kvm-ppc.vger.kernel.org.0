@@ -2,260 +2,251 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 11E7862EFE
-	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Jul 2019 05:38:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72174633DF
+	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Jul 2019 12:04:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726322AbfGIDfr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 8 Jul 2019 23:35:47 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:37376 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725905AbfGIDfq (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Jul 2019 23:35:46 -0400
-Received: by mail-io1-f66.google.com with SMTP id q22so18286041iog.4
-        for <kvm-ppc@vger.kernel.org>; Mon, 08 Jul 2019 20:35:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JaoS/xwrcMjIyr9vgUEMUpK0WXNWdCfn6nTIH2BE7qQ=;
-        b=CJiBwLV5d+8M2nDN0l29OD9oOwFkZvQoIR4HUnv0UQ4NohKFOo1RKAcFeHlwOYMO9i
-         f6jwhMx3F1p5VQOg0l1HpNW5pOO7dcJ95KmvIfsWjS12lEJmmeaV4T6XbSLmUzunL7Z4
-         +zW6MwPB7bI6z6pSHSxdr0dEEsvafIfdE572BvarSbTMr+XUWVUTehcJG0/L1fcQ/Ci8
-         olUrOBTiavU0DFXo41r7uzix7DUCrJbRzks//xpgHwAqMzeOJfoZ84MZH+HZfFd1nb6i
-         gW/yDvsfm4d0/VKYH2AHJBhgTI9H8xG4tWym6ofLZUfHXD8+K2ifPy+8LRyVrq/DKF56
-         QHYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JaoS/xwrcMjIyr9vgUEMUpK0WXNWdCfn6nTIH2BE7qQ=;
-        b=njsg3+d8ppVpJTt55XxNhV9yzU+2CDGcMjnyiKDfK/1lCelJS4laOWAitxN3I9sO/J
-         zwUAWCL9rqOJVHoUdUHea4prvXbl93SE0w/JadLUydJqMz40fxlfkV690N+sR8349/Ju
-         t6IZslnIC2FcB2mK3MiCN4SwIk1O8D+HoEEWEQLa3cBJ1Rz4u3N4/5bDeOiD11aY4n9O
-         3rFI+vqismuXcagoLWUBnvEhZGuDR+u66GYkrL26gSa0vGlDBLVL32e/fUY0opji/FP8
-         D0lh+wEqDyecvjurFUjhsZBYbsz+B08tYW4F/buYj5e8Z9IlrRJHp7OKo8NQt2h22MrA
-         VA+A==
-X-Gm-Message-State: APjAAAWW77L86N+rqCoC7n71I2ZDnNuxThXw0MLYgcRoY6MjsLxbCFQY
-        m1BKbq0vMf7brZK9LnUUYpGVw//IdMCWEmqXGPo=
-X-Google-Smtp-Source: APXvYqw7JnmTFV0p9XmcusnvRmMRsnItsAf/xkVOhqmIsHhlm0im+EMiWG47Gg3GvkqR0idBrlfL2NC7mAiMrglhHsE=
-X-Received: by 2002:a5d:8404:: with SMTP id i4mr8929682ion.146.1562643345658;
- Mon, 08 Jul 2019 20:35:45 -0700 (PDT)
+        id S1726031AbfGIKEH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 9 Jul 2019 06:04:07 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34912 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725989AbfGIKEH (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 9 Jul 2019 06:04:07 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x69A2Sjm039637
+        for <kvm-ppc@vger.kernel.org>; Tue, 9 Jul 2019 06:04:06 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tmptu5grh-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Tue, 09 Jul 2019 06:04:06 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <bharata@linux.ibm.com>;
+        Tue, 9 Jul 2019 11:04:04 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 9 Jul 2019 11:04:01 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x69A3xV946923860
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 9 Jul 2019 10:03:59 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 87EE8AE045;
+        Tue,  9 Jul 2019 10:03:59 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B6954AE056;
+        Tue,  9 Jul 2019 10:03:57 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.85.81.51])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue,  9 Jul 2019 10:03:57 +0000 (GMT)
+Date:   Tue, 9 Jul 2019 15:33:53 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-mm@kvack.org, paulus@au1.ibm.com,
+        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
+        linuxram@us.ibm.com, sukadev@linux.vnet.ibm.com,
+        cclaudio@linux.ibm.com
+Subject: Re: [PATCH v4 1/6] kvmppc: HMM backend driver to manage pages of
+ secure guest
+Reply-To: bharata@linux.ibm.com
+References: <20190528064933.23119-1-bharata@linux.ibm.com>
+ <20190528064933.23119-2-bharata@linux.ibm.com>
+ <20190617053106.lqwzibpsz4d2464z@oak.ozlabs.ibm.com>
 MIME-Version: 1.0
-References: <20190708201249.29649-1-cclaudio@linux.ibm.com>
-In-Reply-To: <20190708201249.29649-1-cclaudio@linux.ibm.com>
-From:   "Oliver O'Halloran" <oohall@gmail.com>
-Date:   Tue, 9 Jul 2019 13:35:34 +1000
-Message-ID: <CAOSf1CHmvvKHn4oHD28HcUHPh579ZjxQc50kBEMtrn60QiX1BA@mail.gmail.com>
-Subject: Re: [RFC PATCH] powerpc/powernv: Add ultravisor message log interface
-To:     Claudio Carvalho <cclaudio@linux.ibm.com>
-Cc:     linuxppc-dev <linuxppc-dev@ozlabs.org>, kvm-ppc@vger.kernel.org,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Ryan Grimm <grimm@linux.ibm.com>, Joel Stanley <joel@jms.id.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190617053106.lqwzibpsz4d2464z@oak.ozlabs.ibm.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-TM-AS-GCONF: 00
+x-cbid: 19070910-0008-0000-0000-000002FB39DF
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19070910-0009-0000-0000-0000226899A5
+Message-Id: <20190709100353.GA27933@in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-09_04:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=956 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907090122
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Jul 9, 2019 at 6:12 AM Claudio Carvalho <cclaudio@linux.ibm.com> wrote:
->
-> From: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
->
-> Ultravisor provides an in-memory circular buffer containing a message
-> log populated with various runtime message produced by firmware.
->
-> Based on "powernv/opal-msglog.c", this patch provides a sysfs interface
-> /sys/firmware/opal/uv_msglog for userspace to view the messages.
+On Mon, Jun 17, 2019 at 03:31:06PM +1000, Paul Mackerras wrote:
+> On Tue, May 28, 2019 at 12:19:28PM +0530, Bharata B Rao wrote:
+> > HMM driver for KVM PPC to manage page transitions of
+> > secure guest via H_SVM_PAGE_IN and H_SVM_PAGE_OUT hcalls.
+> > 
+> > H_SVM_PAGE_IN: Move the content of a normal page to secure page
+> > H_SVM_PAGE_OUT: Move the content of a secure page to normal page
+> 
+> Comments below...
+> 
+> > @@ -4421,6 +4435,7 @@ static void kvmppc_core_free_memslot_hv(struct kvm_memory_slot *free,
+> >  					struct kvm_memory_slot *dont)
+> >  {
+> >  	if (!dont || free->arch.rmap != dont->arch.rmap) {
+> > +		kvmppc_hmm_release_pfns(free);
+> 
+> I don't think this is the right place to do this.  The memslot will
+> have no pages mapped by this time, because higher levels of code will
+> have called kvmppc_core_flush_memslot_hv() before calling this.
+> Releasing the pfns should be done in that function.
 
-No, it's a copy and paste of the existing memcons code with "uv"
-sprinked around the place. I don't mind stuff being c+p since it's
-occasionally justified, but be honest about it.
+In fact I can get rid of kvmppc_hmm_release_pfns() totally as we don't
+have to do free the HMM pages like this explicitly. During guest shutdown
+all these pages are dropped when unmap_vmas() is called.
 
-> diff --git a/arch/powerpc/platforms/powernv/opal-uv-msglog.c b/arch/powerpc/platforms/powernv/opal-uv-msglog.c
-> new file mode 100644
-> index 000000000000..87d665d7e6ad
-> --- /dev/null
-> +++ b/arch/powerpc/platforms/powernv/opal-uv-msglog.c
-> @@ -0,0 +1,141 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +/*
-> + * PowerNV OPAL in-memory ultravisor console interface
-> + *
-> + * Copyright 2018 IBM Corp.
-> + */
-> +#include <asm/io.h>
-> +#include <asm/opal.h>
-> +#include <linux/debugfs.h>
-> +#include <linux/of.h>
-> +#include <linux/types.h>
-> +#include <asm/barrier.h>
-> +
-> +/* OPAL in-memory console. Defined in OPAL source at core/console.c */
-> +struct memcons {
-> +       __be64 magic;
-> +#define MEMCONS_MAGIC  0x6630696567726173L
-> +       __be64 obuf_phys;
-> +       __be64 ibuf_phys;
-> +       __be32 obuf_size;
-> +       __be32 ibuf_size;
-> +       __be32 out_pos;
-> +#define MEMCONS_OUT_POS_WRAP   0x80000000u
-> +#define MEMCONS_OUT_POS_MASK   0x00ffffffu
-> +       __be32 in_prod;
-> +       __be32 in_cons;
-> +};
-> +
-> +static struct memcons *opal_uv_memcons;
-> +
-> +ssize_t opal_uv_msglog_copy(char *to, loff_t pos, size_t count)
-> +{
-> +       const char *conbuf;
-> +       ssize_t ret;
-> +       size_t first_read = 0;
-> +       uint32_t out_pos, avail;
-> +
-> +       if (!opal_uv_memcons)
-> +               return -ENODEV;
-> +
-> +       out_pos = be32_to_cpu(READ_ONCE(opal_uv_memcons->out_pos));
-> +
-> +       /*
-> +        * Now we've read out_pos, put a barrier in before reading the new data
-> +        * it points to in conbuf.
-> +        */
-> +       smp_rmb();
-> +
-> +       conbuf = phys_to_virt(be64_to_cpu(opal_uv_memcons->obuf_phys));
-> +
-> +       /*
-> +        * When the buffer has wrapped, read from the out_pos marker to the end
-> +        * of the buffer, and then read the remaining data as in the un-wrapped
-> +        * case.
-> +        */
-> +       if (out_pos & MEMCONS_OUT_POS_WRAP) {
-> +
-> +               out_pos &= MEMCONS_OUT_POS_MASK;
-> +               avail = be32_to_cpu(opal_uv_memcons->obuf_size) - out_pos;
-> +
-> +               ret = memory_read_from_buffer(to, count, &pos,
-> +                               conbuf + out_pos, avail);
-> +
-> +               if (ret < 0)
-> +                       goto out;
-> +
-> +               first_read = ret;
-> +               to += first_read;
-> +               count -= first_read;
-> +               pos -= avail;
-> +
-> +               if (count <= 0)
-> +                       goto out;
-> +       }
-> +
-> +       /* Sanity check. The firmware should not do this to us. */
-> +       if (out_pos > be32_to_cpu(opal_uv_memcons->obuf_size)) {
-> +               pr_err("OPAL: memory console corruption. Aborting read.\n");
-> +               return -EINVAL;
-> +       }
-> +
-> +       ret = memory_read_from_buffer(to, count, &pos, conbuf, out_pos);
-> +
-> +       if (ret < 0)
-> +               goto out;
-> +
-> +       ret += first_read;
-> +out:
-> +       return ret;
-> +}
-Make this take an struct memcons as an argument and use the same
-function for the opal and UV consoles. Two copies of the same code
-with tricky barrier crap in them is not a good idea.
+> 
+> > diff --git a/arch/powerpc/kvm/book3s_hv_hmm.c b/arch/powerpc/kvm/book3s_hv_hmm.c
+> > new file mode 100644
+> > index 000000000000..713806003da3
+> 
+> ...
+> 
+> > +#define KVMPPC_PFN_HMM		(0x1ULL << 61)
+> > +
+> > +static inline bool kvmppc_is_hmm_pfn(unsigned long pfn)
+> > +{
+> > +	return !!(pfn & KVMPPC_PFN_HMM);
+> > +}
+> 
+> Since you are putting in these values in the rmap entries, you need to
+> be careful about overlaps between these values and the other uses of
+> rmap entries.  The value you have chosen would be in the middle of the
+> LPID field for an rmap entry for a guest that has nested guests, and
+> in fact kvmhv_remove_nest_rmap_range() effectively assumes that a
+> non-zero rmap entry must be a list of L2 guest mappings.  (This is for
+> radix guests; HPT guests use the rmap entry differently, but I am
+> assuming that we will enforce that only radix guests can be secure
+> guests.)
 
-> +static struct bin_attribute opal_uv_msglog_attr = {
-> +       .attr = {.name = "uv_msglog", .mode = 0444},
-We made the OPAL console only readable to root recently, so the mode
-should be 0400.
-> +       .read = opal_uv_msglog_read
-> +};
-> +
+Worked out with Suraj on sharing the rmap and got a well defined
+bit slot for HMM PFNs in rmap.
 
-> +void __init opal_uv_msglog_init(void)
-> +{
-> +       u64 mcaddr;
-> +       struct memcons *mc;
-Declarations are reverse-christmas-tree, so these should be the other
-way around.
+> 
+> Maybe it is true that the rmap entry will be non-zero only for those
+> guest pages which are not mapped on the host side, that is,
+> kvmppc_radix_flush_memslot() will see !pte_present(*ptep) for any page
+> of a secure guest where the rmap entry contains a HMM pfn.  If that is
+> so and is a deliberate part of the design, then I would like to see it
+> written down in comments and commit messages so it's clear to others
+> working on the code in future.
 
-> +
-> +       if (of_property_read_u64(opal_node, "ibm,opal-uv-memcons", &mcaddr)) {
-> +               pr_warn("OPAL: Property ibm,opal-uv-memcons not found\n");
-> +               return;
-> +       }
-> +
-> +       mc = phys_to_virt(mcaddr);
-> +       if (!mc) {
-> +               pr_warn("OPAL: uv memory console address is invalid\n");
-> +               return;
-> +       }
-> +
-> +       if (be64_to_cpu(mc->magic) != MEMCONS_MAGIC) {
-> +               pr_warn("OPAL: uv memory console version is invalid\n");
-> +               return;
-> +       }
-> +
-> +       /* Report maximum size */
-> +       opal_uv_msglog_attr.size =  be32_to_cpu(mc->ibuf_size) +
-> +               be32_to_cpu(mc->obuf_size);
-> +
-> +       opal_uv_memcons = mc;
-> +}
+Yes, rmap entry will be non-zero only for those guest pages which are
+not mapped on the host side. However as soon as guest becomes secure
+we free the HV side partition scoped page tables and hence
+kvmppc_radix_flush_memslot() and other such routines which lookup
+kvm->arch.pgtable will no longer touch it.
 
-You can probably share this too if you make it take the DT property
-name of the memcons address as an argument, e.g:
+> 
+> Suraj is working on support for nested HPT guests, which will involve
+> changing the rmap format to indicate more explicitly what sort of
+> entry each rmap entry is.  Please work with him to define a format for
+> your rmap entries that is clearly distinguishable from the others.
+> 
+> I think it is reasonable to say that a secure guest can't have nested
+> guests, at least for now, but then we should make sure to kill all
+> nested guests when a guest goes secure.
 
-struct memcons *opal_uv_msglog_init(const char *dt_prop_name)
+Ok. Yet to figure this part out.
 
-> +
-> +void __init opal_uv_msglog_sysfs_init(void)
-> +{
-> +       if (!opal_uv_memcons) {
-> +               pr_warn("OPAL: message log initialisation failed, not creating sysfs entry\n");
-> +               return;
-> +       }
-> +
-> +       if (sysfs_create_bin_file(opal_kobj, &opal_uv_msglog_attr) != 0)
-> +               pr_warn("OPAL: sysfs file creation failed\n");
-> +}
+> 
+> ...
+> 
+> > +/*
+> > + * Move page from normal memory to secure memory.
+> > + */
+> > +unsigned long
+> > +kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
+> > +		     unsigned long flags, unsigned long page_shift)
+> > +{
+> > +	unsigned long addr, end;
+> > +	unsigned long src_pfn, dst_pfn;
+> > +	struct kvmppc_hmm_migrate_args args;
+> > +	struct vm_area_struct *vma;
+> > +	int srcu_idx;
+> > +	unsigned long gfn = gpa >> page_shift;
+> > +	struct kvm_memory_slot *slot;
+> > +	unsigned long *rmap;
+> > +	int ret = H_SUCCESS;
+> > +
+> > +	if (page_shift != PAGE_SHIFT)
+> > +		return H_P3;
+> > +
+> > +	srcu_idx = srcu_read_lock(&kvm->srcu);
+> > +	slot = gfn_to_memslot(kvm, gfn);
+> > +	rmap = &slot->arch.rmap[gfn - slot->base_gfn];
+> > +	addr = gfn_to_hva(kvm, gpa >> page_shift);
+> > +	srcu_read_unlock(&kvm->srcu, srcu_idx);
+> 
+> Shouldn't we keep the srcu read lock until we have finished working on
+> the page?
 
-> diff --git a/arch/powerpc/platforms/powernv/opal.c b/arch/powerpc/platforms/powernv/opal.c
-> index 89b6ddc3ed38..ed000a788456 100644
-> --- a/arch/powerpc/platforms/powernv/opal.c
-> +++ b/arch/powerpc/platforms/powernv/opal.c
-> @@ -946,6 +946,7 @@ static int __init opal_init(void)
->
->         /* Initialise OPAL message log interface */
->         opal_msglog_init();
-> +       opal_uv_msglog_init();
+I wasn't sure, so keeping it locked till the end in the next version.
 
-Gate this behind a FW_FEATURE_ULTRAVISOR (or whatever it is) check.
-The opal_uv_msglog_init() prints errors at pr_warn() which is going to
-be spurious for non-uv systems.
+> 
+> > +	if (kvm_is_error_hva(addr))
+> > +		return H_PARAMETER;
+> > +
+> > +	end = addr + (1UL << page_shift);
+> > +
+> > +	if (flags)
+> > +		return H_P2;
+> > +
+> > +	args.rmap = rmap;
+> > +	args.lpid = kvm->arch.lpid;
+> > +	args.gpa = gpa;
+> > +	args.page_shift = page_shift;
+> > +
+> > +	down_read(&kvm->mm->mmap_sem);
+> > +	vma = find_vma_intersection(kvm->mm, addr, end);
+> > +	if (!vma || vma->vm_start > addr || vma->vm_end < end) {
+> > +		ret = H_PARAMETER;
+> > +		goto out;
+> > +	}
+> > +	ret = migrate_vma(&kvmppc_hmm_migrate_ops, vma, addr, end,
+> > +			  &src_pfn, &dst_pfn, &args);
+> > +	if (ret < 0)
+> > +		ret = H_PARAMETER;
+> > +out:
+> > +	up_read(&kvm->mm->mmap_sem);
+> > +	return ret;
+> > +}
+> 
+> ...
+> 
+> > +/*
+> > + * Move page from secure memory to normal memory.
+> > + */
+> > +unsigned long
+> > +kvmppc_h_svm_page_out(struct kvm *kvm, unsigned long gpa,
+> > +		      unsigned long flags, unsigned long page_shift)
+> > +{
+> > +	unsigned long addr, end;
+> > +	struct vm_area_struct *vma;
+> > +	unsigned long src_pfn, dst_pfn = 0;
+> > +	int srcu_idx;
+> > +	int ret = H_SUCCESS;
+> > +
+> > +	if (page_shift != PAGE_SHIFT)
+> > +		return H_P3;
+> > +
+> > +	if (flags)
+> > +		return H_P2;
+> > +
+> > +	srcu_idx = srcu_read_lock(&kvm->srcu);
+> > +	addr = gfn_to_hva(kvm, gpa >> page_shift);
+> > +	srcu_read_unlock(&kvm->srcu, srcu_idx);
+> 
+> and likewise here, shouldn't we unlock later, after the migrate_vma()
+> call perhaps?
 
->         /* Create "opal" kobject under /sys/firmware */
->         rc = opal_sysfs_init();
-> @@ -964,6 +965,7 @@ static int __init opal_init(void)
->                 opal_sys_param_init();
->                 /* Setup message log sysfs interface. */
->                 opal_msglog_sysfs_init();
-> +               opal_uv_msglog_sysfs_init();
-Also gate this.
+Sure.
 
-Basicly, fold this all into the existing memcons code and ifdef the UV
-specific bits. They're just not different enough to justify doing
-otherwise.
+Regards,
+Bharata.
 
-Oliver
