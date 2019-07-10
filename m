@@ -2,137 +2,137 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 523BF64828
-	for <lists+kvm-ppc@lfdr.de>; Wed, 10 Jul 2019 16:21:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7E6264B3B
+	for <lists+kvm-ppc@lfdr.de>; Wed, 10 Jul 2019 19:09:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726458AbfGJOVO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 10 Jul 2019 10:21:14 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:45233 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726617AbfGJOVO (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 10 Jul 2019 10:21:14 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 45kLvp65xbz9sML; Thu, 11 Jul 2019 00:21:09 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1562768470;
-        bh=sI/DH+2qaA00u9gLOeXhABtLZGyr1KrwFk1UKAd0av0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Rrb7mKSJYp9FZP7ypfXBRYjnss/Z2OSi0QR4liiY+jS9NciIXcMG1wAeb+QDTIGUW
-         DUlIkRF3IBf6YBOcqagQ3nWxd3yWcJg1I50neWRRaHPc8kVOKYShODhJetFh402ejG
-         lxktRQr7pR4FwWlRIrY4M5NH2nc/WQhkxxmSc6hs=
-Date:   Thu, 11 Jul 2019 00:21:03 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        mpe@ellerman.id.au
-Subject: Re: [PATCH] powerpc: mm: Limit rma_size to 1TB when running without
- HV mode
-Message-ID: <20190710142103.GB3360@umbus.fritz.box>
-References: <20190710052018.14628-1-sjitindarsingh@gmail.com>
+        id S1727613AbfGJRJp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 10 Jul 2019 13:09:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44728 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727123AbfGJRJp (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 10 Jul 2019 13:09:45 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6AH3GPZ089876
+        for <kvm-ppc@vger.kernel.org>; Wed, 10 Jul 2019 13:09:44 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tnkw28nc5-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Wed, 10 Jul 2019 13:09:43 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
+        Wed, 10 Jul 2019 18:09:41 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 10 Jul 2019 18:09:39 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6AH9crS35389764
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 10 Jul 2019 17:09:38 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1318252059;
+        Wed, 10 Jul 2019 17:09:38 +0000 (GMT)
+Received: from ram.ibm.com (unknown [9.80.212.138])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 571E052054;
+        Wed, 10 Jul 2019 17:09:35 +0000 (GMT)
+Date:   Wed, 10 Jul 2019 10:09:32 -0700
+From:   Ram Pai <linuxram@us.ibm.com>
+To:     janani <janani@linux.ibm.com>
+Cc:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org,
+        kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
+        Michael Anderson <andmike@linux.ibm.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
+        Thiago Bauermann <bauerman@linux.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
+        Ryan Grimm <grimm@linux.ibm.com>
+Subject: Re: [PATCH v4 5/8] KVM: PPC: Ultravisor: Restrict flush of the
+ partition tlb cache
+Reply-To: Ram Pai <linuxram@us.ibm.com>
+References: <20190628200825.31049-1-cclaudio@linux.ibm.com>
+ <20190628200825.31049-6-cclaudio@linux.ibm.com>
+ <134bd0eb97ed6cc616ced38732b9b52c@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="JP+T4n/bALQSJXh8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190710052018.14628-1-sjitindarsingh@gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <134bd0eb97ed6cc616ced38732b9b52c@linux.vnet.ibm.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-TM-AS-GCONF: 00
+x-cbid: 19071017-0008-0000-0000-000002FBA977
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19071017-0009-0000-0000-000022690EB6
+Message-Id: <20190710170932.GA4864@ram.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-10_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907100192
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Mon, Jul 08, 2019 at 02:54:52PM -0500, janani wrote:
+> On 2019-06-28 15:08, Claudio Carvalho wrote:
+> >From: Ram Pai <linuxram@us.ibm.com>
+> >
+> >Ultravisor is responsible for flushing the tlb cache, since it manages
+> >the PATE entries. Hence skip tlb flush, if the ultravisor firmware is
+> >available.
+> >
+> >Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+> >Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
+> >---
+> > arch/powerpc/mm/book3s64/pgtable.c | 33 +++++++++++++++++-------------
+> > 1 file changed, 19 insertions(+), 14 deletions(-)
+> >
+> >diff --git a/arch/powerpc/mm/book3s64/pgtable.c
+> >b/arch/powerpc/mm/book3s64/pgtable.c
+> >index 224c5c7c2e3d..bc8eb2bf9810 100644
+> >--- a/arch/powerpc/mm/book3s64/pgtable.c
+> >+++ b/arch/powerpc/mm/book3s64/pgtable.c
+> >@@ -224,6 +224,23 @@ void __init mmu_partition_table_init(void)
+> > 	powernv_set_nmmu_ptcr(ptcr);
+> > }
+> >
+> >+static void flush_partition(unsigned int lpid, unsigned long dw0)
+> >+{
+> >+	if (dw0 & PATB_HR) {
+> >+		asm volatile(PPC_TLBIE_5(%0, %1, 2, 0, 1) : :
+> >+			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> >+		asm volatile(PPC_TLBIE_5(%0, %1, 2, 1, 1) : :
+> >+			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> >+		trace_tlbie(lpid, 0, TLBIEL_INVAL_SET_LPID, lpid, 2, 0, 1);
+> >+	} else {
+> >+		asm volatile(PPC_TLBIE_5(%0, %1, 2, 0, 0) : :
+> >+			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> >+		trace_tlbie(lpid, 0, TLBIEL_INVAL_SET_LPID, lpid, 2, 0, 0);
+> >+	}
+> >+	/* do we need fixup here ?*/
+> >+	asm volatile("eieio; tlbsync; ptesync" : : : "memory");
+> >+}
+> >+
+> > static void __mmu_partition_table_set_entry(unsigned int lpid,
+> > 					    unsigned long dw0,
+> > 					    unsigned long dw1)
+> >@@ -238,20 +255,8 @@ static void
+> >__mmu_partition_table_set_entry(unsigned int lpid,
+> > 	 * The type of flush (hash or radix) depends on what the previous
+> > 	 * use of this partition ID was, not the new use.
+> > 	 */
+> >-	asm volatile("ptesync" : : : "memory");
+>  Doesn't the line above that was deleted need to be added to the
+> beginning of flush_partition()
 
---JP+T4n/bALQSJXh8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It has to. It got dropped erroneously.
 
-On Wed, Jul 10, 2019 at 03:20:18PM +1000, Suraj Jitindar Singh wrote:
-> The virtual real mode addressing (VRMA) mechanism is used when a
-> partition is using HPT (Hash Page Table) translation and performs
-> real mode accesses (MSR[IR|DR] =3D 0) in non-hypervisor mode. In this
-> mode effective address bits 0:23 are treated as zero (i.e. the access
-> is aliased to 0) and the access is performed using an implicit 1TB SLB
-> entry.
->=20
-> The size of the RMA (Real Memory Area) is communicated to the guest as
-> the size of the first memory region in the device tree. And because of
-> the mechanism described above can be expected to not exceed 1TB. In the
-> event that the host erroneously represents the RMA as being larger than
-> 1TB, guest accesses in real mode to memory addresses above 1TB will be
-> aliased down to below 1TB. This means that a memory access performed in
-> real mode may differ to one performed in virtual mode for the same memory
-> address, which would likely have unintended consequences.
->=20
-> To avoid this outcome have the guest explicitly limit the size of the
-> RMA to the current maximum, which is 1TB. This means that even if the
-> first memory block is larger than 1TB, only the first 1TB should be
-> accessed in real mode.
->=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+This is a good catch!
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Thanks,
+RP
 
-Although I'd really like to also see some comments added in
-allocate_paca_ptrs() explaining the constraints there.
-
-Oh, also, basing this on the non-compat PVR is bogus, but it's still
-better than what we had.
-
-> ---
->  arch/powerpc/mm/book3s64/hash_utils.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->=20
-> diff --git a/arch/powerpc/mm/book3s64/hash_utils.c b/arch/powerpc/mm/book=
-3s64/hash_utils.c
-> index 28ced26f2a00..4d0e2cce9cd5 100644
-> --- a/arch/powerpc/mm/book3s64/hash_utils.c
-> +++ b/arch/powerpc/mm/book3s64/hash_utils.c
-> @@ -1901,11 +1901,19 @@ void hash__setup_initial_memory_limit(phys_addr_t=
- first_memblock_base,
->  	 *
->  	 * For guests on platforms before POWER9, we clamp the it limit to 1G
->  	 * to avoid some funky things such as RTAS bugs etc...
-> +	 * On POWER9 we limit to 1TB in case the host erroneously told us that
-> +	 * the RMA was >1TB. Effective address bits 0:23 are treated as zero
-> +	 * (meaning the access is aliased to zero i.e. addr =3D addr % 1TB)
-> +	 * for virtual real mode addressing and so it doesn't make sense to
-> +	 * have an area larger than 1TB as it can't be addressed.
->  	 */
->  	if (!early_cpu_has_feature(CPU_FTR_HVMODE)) {
->  		ppc64_rma_size =3D first_memblock_size;
->  		if (!early_cpu_has_feature(CPU_FTR_ARCH_300))
->  			ppc64_rma_size =3D min_t(u64, ppc64_rma_size, 0x40000000);
-> +		else
-> +			ppc64_rma_size =3D min_t(u64, ppc64_rma_size,
-> +					       1UL << SID_SHIFT_1T);
-> =20
->  		/* Finally limit subsequent allocations */
->  		memblock_set_current_limit(ppc64_rma_size);
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---JP+T4n/bALQSJXh8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0l9E8ACgkQbDjKyiDZ
-s5IFWA//TbXp2jHT0NBL9otaSEjTz+MMPoqimPeOEE7+whNl6AfJDpInMoQEmLNT
-sc6j5UFW8jmr+3E8ftnWfpsRpcvdpksvROn7knfR3GoxcecOupQ8o+GMOL/xfkL/
-UHF03iiwu3/oBFJiKYMHJ/g4d0YtkZKHopZ9fsy0avUl1BtHzB4MKpZH1fx4mlSx
-amyZ9A8nNIno7Yxo4igZA1XPlSgD6kozJe5GvCTLs3RoGUyZHA8nzMpp9h2C0Vfs
-H3vIOFWiHP/EvQrPetjhu7e6HokixKFo3w7dQvGY5S48y7coV8ZDQMFh31MBFKUT
-7FmSTAbGis4kFghOQRlx/eA7rNI4zuvdvil0By27fSUM9EJMiLY9unsAAc+m9wFF
-MfxRPOgZy+XXhGtb+lzxETUKbydf+OOvg4c14nonsg/4ADyhwENKLr3b5pZryzDg
-9JQyyReXjWXJw7jNcOeO9XOaFer7Gr4a14ruyyfDYzQnfHBOBSbc+m1pXtPd/wMz
-e+u5NhnYemlJtl1s+5CP7s+n/p+7oPPkf8f9njjJ7OYu5ULsRAEkr6h57dyzJCx0
-mWTyKc0+iKFrOio+ZQ2NGekwYjkNXpPXoHKBKHyATk9Vo5lroG8gXyx5i4jg74VE
-WGGosHiDDJqQnDTZrY2bsFFQLJEXT+cGITVsgYwR+ByfEWC21Ig=
-=x96O
------END PGP SIGNATURE-----
-
---JP+T4n/bALQSJXh8--
