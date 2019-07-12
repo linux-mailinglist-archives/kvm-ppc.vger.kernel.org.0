@@ -2,53 +2,53 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1387866337
-	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Jul 2019 03:03:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FE8166353
+	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Jul 2019 03:21:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728730AbfGLBDD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 11 Jul 2019 21:03:03 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:32844 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728102AbfGLBDD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 11 Jul 2019 21:03:03 -0400
-Received: by mail-pf1-f194.google.com with SMTP id g2so3543643pfq.0
-        for <kvm-ppc@vger.kernel.org>; Thu, 11 Jul 2019 18:03:02 -0700 (PDT)
+        id S1729162AbfGLBVL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 11 Jul 2019 21:21:11 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:46839 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726587AbfGLBVL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 11 Jul 2019 21:21:11 -0400
+Received: by mail-pl1-f194.google.com with SMTP id c2so3910660plz.13
+        for <kvm-ppc@vger.kernel.org>; Thu, 11 Jul 2019 18:21:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:subject:to:cc:references:in-reply-to:mime-version
          :user-agent:message-id:content-transfer-encoding;
-        bh=CSOrids+2zioMvfSrWdODBWKmkYKely5eESzBsRD2Fo=;
-        b=IwY/wWZghazMrD24ZcxIPxEqQ/52LXPX+fJHue9+6Ludf48g47R6bsPVbPmnjIsMff
-         TTAnd6bfXiuTT8VjD2CIzx64n/Zc+r5OpV5Z5AzA23oLuvme01kLEMlMPOI7qEbEObXE
-         SUjoJgCzwgfLTLO8yoNbzerkajENWMuqpps1qaBUHy2qM8kjqIJEWRzFjlBZcIAnHZNJ
-         j55dG5vVpe6l49daWA1stV+3iNJWzk5KRuN5zx/AbFocIHyZKFkvbvbfpkJUWNkMYfv/
-         bon4fVW2s8Xia/4sYDHPy39y3E1uDwEcTWts4YFJ3eo6jqBB0qDsn7cbStBF7UMoVTpD
-         YpLg==
+        bh=3j/AVIUvR2v+mpYnU0BsTGl5FJsU/0jz0GYmQkZbjog=;
+        b=o9/GHKbKtLNSdNvzLND9O3fHfFacKVa9g7mGOC0aRdZRJO0msibZ17trXaAYh0Ks/x
+         HmXWkAF9OreWLvLRxVs4wPXChIU+UwXwLBjyiRteFQ7B2Cah84QekopzlQNK/jjybGco
+         CKhAmeBX2UqPzHTOq9a8zX1gdz9GMko0BPb/Q+/UIEA19/qI1tB3QuzjCcRRbVgLlkiy
+         xbrbeYMRO0ADZQ1RUAEj6PoGU2CX4Zpqx85Lw6ZoDNOCWd8XWPO5mQo1TZ9Iv8v4xCy1
+         1e4ps5EyqMJmZGId9bElgugNl5owC4Pb4hhoEJkdaTB9WgsM7znK78QEfDc2st/qtpus
+         BEvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
          :mime-version:user-agent:message-id:content-transfer-encoding;
-        bh=CSOrids+2zioMvfSrWdODBWKmkYKely5eESzBsRD2Fo=;
-        b=AUDBdhxAOWRbRpVQ9BXoI/ZZqCWvzIXcirnGLQScJXs3EsOQxkOkXCUdMi8m05yERt
-         7M+LyP8YuoXKyu0cZgxVejzlIX3ktq7DL6MbNLf7/9cuDSCCRtW9ziUYziV9Jq4uyImE
-         2ZncH1AqrVy0l4yCgZ5i4Tcw0Tm5XcaTukqCSJA4Nf82wcMP2DRj9eUDqJpSqRi7ASYL
-         1e8HWvOmPoebN/b0Qqmzy1w0r/yZpjnYJU6/t3DVD7tUsxycxQ3/dIIeQ9eoQ/h4PAo1
-         el44JxiDm+dH4Fx1cv8/2yd5WXX7PWqGnLML+HeUtA1BHVlmBEEedeQOXFbRzHU8Qgrp
-         Ya/w==
-X-Gm-Message-State: APjAAAXnXC3hFxSB2Av1lvt4eH29WOyUNDfEoBfBVDvkhbFrNBTqs4sC
-        /oNpb+7xJpJCTS36pyl7vj2YcM+f
-X-Google-Smtp-Source: APXvYqw3C7x+FsI6OUFtrwBE5EEzLMQ9x81ocTuyF10ov7Sj+7r07N4dKob9w1E2TE0tmnrTDM+Vgw==
-X-Received: by 2002:a63:1310:: with SMTP id i16mr7389668pgl.187.1562893382395;
-        Thu, 11 Jul 2019 18:03:02 -0700 (PDT)
+        bh=3j/AVIUvR2v+mpYnU0BsTGl5FJsU/0jz0GYmQkZbjog=;
+        b=MbfvS5JCZnY8ajjrTMPWE2DjRbRUAzfRARKwUxnWdA9hXMsxfd5SnlUClJcTYz5s7Y
+         DueJoY4JQwNdl+U7yXklEqGUFPcRY+mLDmoFqJvoGecKZ3XxBj20HizxXw7ITntSp2SH
+         ddcTqgY1GU/P9by0oVpKgudm63AiZFyyM30mZfSK8Z6ktW3kYxYmD3Bjx1fK+1WmiFZO
+         S5vxYl7yE/aNMYI1+r+b0oc2seL0bHslTVbIbJYlJwVX9faGfoSMSAQ/Jj379i3wfGjz
+         +jwfzngK10YiHjUKyBSpKgh1AeIG6djVDYi7o9zhWFL+yeNV9BYfkvfQpDkCasoGazNS
+         SsqA==
+X-Gm-Message-State: APjAAAWL176wmckuLVAAWsP8SQ3urFbzCZ4SKMqoq5pR5dMZ92FocggI
+        v5j7khJBkfCm/PY/U3LDRoQ=
+X-Google-Smtp-Source: APXvYqxkmrTfx5MDsHmqoR/hBNaqVN1LCz4GaVMUdLNgjg0l3Dnfq8wBuHbsLGSRWTp44Mcl97l1tA==
+X-Received: by 2002:a17:902:6ac6:: with SMTP id i6mr8057956plt.233.1562894470035;
+        Thu, 11 Jul 2019 18:21:10 -0700 (PDT)
 Received: from localhost ([220.240.228.224])
-        by smtp.gmail.com with ESMTPSA id u23sm7183631pfn.140.2019.07.11.18.03.01
+        by smtp.gmail.com with ESMTPSA id z68sm6418485pgz.88.2019.07.11.18.21.08
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 11 Jul 2019 18:03:01 -0700 (PDT)
-Date:   Fri, 12 Jul 2019 10:59:54 +1000
+        Thu, 11 Jul 2019 18:21:09 -0700 (PDT)
+Date:   Fri, 12 Jul 2019 11:18:00 +1000
 From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v4 1/8] KVM: PPC: Ultravisor: Introduce the MSR_S bit
-To:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org,
-        Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v4 3/8] KVM: PPC: Ultravisor: Add generic ultravisor call
+ handler
+To:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org
 Cc:     Michael Anderson <andmike@linux.ibm.com>,
         Thiago Bauermann <bauerman@linux.ibm.com>,
         Bharata B Rao <bharata@linux.ibm.com>,
@@ -58,12 +58,11 @@ Cc:     Michael Anderson <andmike@linux.ibm.com>,
         Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
         Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
 References: <20190628200825.31049-1-cclaudio@linux.ibm.com>
-        <20190628200825.31049-2-cclaudio@linux.ibm.com>
-        <87muhkg258.fsf@concordia.ellerman.id.au>
-In-Reply-To: <87muhkg258.fsf@concordia.ellerman.id.au>
+        <20190628200825.31049-4-cclaudio@linux.ibm.com>
+In-Reply-To: <20190628200825.31049-4-cclaudio@linux.ibm.com>
 MIME-Version: 1.0
 User-Agent: astroid/0.14.0 (https://github.com/astroidmail/astroid)
-Message-Id: <1562893118.ys3k642fnf.astroid@bobo.none>
+Message-Id: <1562893632.8au1xo907s.astroid@bobo.none>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-ppc-owner@vger.kernel.org
@@ -71,78 +70,147 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Michael Ellerman's on July 11, 2019 10:57 pm:
-> Claudio Carvalho <cclaudio@linux.ibm.com> writes:
->> From: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
->>
->> The ultravisor processor mode is introduced in POWER platforms that
->> supports the Protected Execution Facility (PEF). Ultravisor is higher
->> privileged than hypervisor mode.
->>
->> In PEF enabled platforms, the MSR_S bit is used to indicate if the
->> thread is in secure state. With the MSR_S bit, the privilege state of
->> the thread is now determined by MSR_S, MSR_HV and MSR_PR, as follows:
->>
->> S   HV  PR
->> -----------------------
->> 0   x   1   problem
->> 1   0   1   problem
->> x   x   0   privileged
->> x   1   0   hypervisor
->> 1   1   0   ultravisor
->> 1   1   1   reserved
+Claudio Carvalho's on June 29, 2019 6:08 am:
+> From: Ram Pai <linuxram@us.ibm.com>
 >=20
-> What are you trying to express with the 'x' value?
+> Add the ucall() function, which can be used to make ultravisor calls
+> with varied number of in and out arguments. Ultravisor calls can be made
+> from the host or guests.
 >=20
-> I guess you mean it as "either" or "don't care" - but then you have
-> cases where it could only have one value, such as hypervisor. I think it
-> would be clearer if you spelled it out more explicitly.
+> This copies the implementation of plpar_hcall().
 >=20
->> The hypervisor doesn't (and can't) run with the MSR_S bit set, but a
->> secure guest and the ultravisor firmware do.
+> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+> [ Change ucall.S to not save CR, rename and move headers, build ucall.S
+>   if CONFIG_PPC_POWERNV set, use R3 for the ucall number and add some
+>   comments in the code ]
+> Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
+> ---
+>  arch/powerpc/include/asm/ultravisor-api.h | 20 +++++++++++++++
+>  arch/powerpc/include/asm/ultravisor.h     | 20 +++++++++++++++
+>  arch/powerpc/kernel/Makefile              |  2 +-
+>  arch/powerpc/kernel/ucall.S               | 30 +++++++++++++++++++++++
+>  arch/powerpc/kernel/ultravisor.c          |  4 +++
+>  5 files changed, 75 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/powerpc/include/asm/ultravisor-api.h
+>  create mode 100644 arch/powerpc/kernel/ucall.S
 >=20
-> I know you're trying to be helpful, but this comment is really just
-> confusing to someone who doesn't have all the documentation.
->=20
-> I'd really like to see something in Documentation/powerpc describing at
-> least the outline of how the system works. I'm pretty sure most of that
-> is public, so even if it's mostly a list of references to other
-> documentations or presentations that would be fine. But I'm not really
-> happy with a whole new processor mode appearing with zero documentation
-> in the tree.
->=20
->> Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
->> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
->> [ Update the commit message ]
->=20
-> It's normal to prefix these comments with your handle to make it clear
-> who is saying it.
->=20
->> Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
->> ---
->>  arch/powerpc/include/asm/reg.h | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/r=
-eg.h
->> index 10caa145f98b..39b4c0a519f5 100644
->> --- a/arch/powerpc/include/asm/reg.h
->> +++ b/arch/powerpc/include/asm/reg.h
->> @@ -38,6 +38,7 @@
->>  #define MSR_TM_LG	32		/* Trans Mem Available */
->>  #define MSR_VEC_LG	25	        /* Enable AltiVec */
->>  #define MSR_VSX_LG	23		/* Enable VSX */
->> +#define MSR_S_LG	22		/* Secure VM bit */
->=20
-> I don't think that's the best description, because it's also the
-> Ultravisor bit when MSR[HV] =3D 1.
->=20
-> So "Secure state" as you have below would be better IMO.
+> diff --git a/arch/powerpc/include/asm/ultravisor-api.h b/arch/powerpc/inc=
+lude/asm/ultravisor-api.h
+> new file mode 100644
+> index 000000000000..49e766adabc7
+> --- /dev/null
+> +++ b/arch/powerpc/include/asm/ultravisor-api.h
+> @@ -0,0 +1,20 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Ultravisor API.
+> + *
+> + * Copyright 2019, IBM Corporation.
+> + *
+> + */
+> +#ifndef _ASM_POWERPC_ULTRAVISOR_API_H
+> +#define _ASM_POWERPC_ULTRAVISOR_API_H
+> +
+> +#include <asm/hvcall.h>
+> +
+> +/* Return codes */
+> +#define U_NOT_AVAILABLE		H_NOT_AVAILABLE
+> +#define U_SUCCESS		H_SUCCESS
+> +#define U_FUNCTION		H_FUNCTION
+> +#define U_PARAMETER		H_PARAMETER
+> +
+> +#endif /* _ASM_POWERPC_ULTRAVISOR_API_H */
+> +
+> diff --git a/arch/powerpc/include/asm/ultravisor.h b/arch/powerpc/include=
+/asm/ultravisor.h
+> index e5009b0d84ea..a78a2dacfd0b 100644
+> --- a/arch/powerpc/include/asm/ultravisor.h
+> +++ b/arch/powerpc/include/asm/ultravisor.h
+> @@ -8,8 +8,28 @@
+>  #ifndef _ASM_POWERPC_ULTRAVISOR_H
+>  #define _ASM_POWERPC_ULTRAVISOR_H
+> =20
+> +#include <asm/ultravisor-api.h>
+> +
+> +#if !defined(__ASSEMBLY__)
+> +
+>  /* Internal functions */
+>  extern int early_init_dt_scan_ultravisor(unsigned long node, const char =
+*uname,
+>  					 int depth, void *data);
+> =20
+> +/* API functions */
+> +#define UCALL_BUFSIZE 4
+> +/**
+> + * ucall: Make a powerpc ultravisor call.
+> + * @opcode: The ultravisor call to make.
+> + * @retbuf: Buffer to store up to 4 return arguments in.
+> + *
+> + * This call supports up to 6 arguments and 4 return arguments. Use
+> + * UCALL_BUFSIZE to size the return argument buffer.
+> + */
+> +#if defined(CONFIG_PPC_POWERNV)
+> +long ucall(unsigned long opcode, unsigned long *retbuf, ...);
+> +#endif
+> +
+> +#endif /* !__ASSEMBLY__ */
+> +
+>  #endif	/* _ASM_POWERPC_ULTRAVISOR_H */
+> diff --git a/arch/powerpc/kernel/Makefile b/arch/powerpc/kernel/Makefile
+> index f0caa302c8c0..f28baccc0a79 100644
+> --- a/arch/powerpc/kernel/Makefile
+> +++ b/arch/powerpc/kernel/Makefile
+> @@ -154,7 +154,7 @@ endif
+> =20
+>  obj-$(CONFIG_EPAPR_PARAVIRT)	+=3D epapr_paravirt.o epapr_hcalls.o
+>  obj-$(CONFIG_KVM_GUEST)		+=3D kvm.o kvm_emul.o
+> -obj-$(CONFIG_PPC_POWERNV)	+=3D ultravisor.o
+> +obj-$(CONFIG_PPC_POWERNV)	+=3D ultravisor.o ucall.o
+> =20
+>  # Disable GCOV, KCOV & sanitizers in odd or sensitive code
+>  GCOV_PROFILE_prom_init.o :=3D n
+> diff --git a/arch/powerpc/kernel/ucall.S b/arch/powerpc/kernel/ucall.S
+> new file mode 100644
+> index 000000000000..1678f6eb7230
+> --- /dev/null
+> +++ b/arch/powerpc/kernel/ucall.S
+> @@ -0,0 +1,30 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Generic code to perform an ultravisor call.
+> + *
+> + * Copyright 2019, IBM Corporation.
+> + *
+> + */
+> +#include <asm/ppc_asm.h>
+> +
+> +/*
+> + * This function is based on the plpar_hcall()
 
-Ooops I see Michael covered everything I wrote, sorry for the noise
-I missed the thread.
+A better comment might be to specify calling convention.
 
-Thanks,
-Nick
+> + */
+> +_GLOBAL_TOC(ucall)
+> +	std	r4,STK_PARAM(R4)(r1)	/* Save ret buffer */
+> +	mr	r4,r5
+> +	mr	r5,r6
+> +	mr	r6,r7
+> +	mr	r7,r8
+> +	mr	r8,r9
+> +	mr	r9,r10
+
+I guess this is fine, is there any particular reason that you made
+the call convention this way rather than leaving regs in place and
+r4 is a scratch?
+
+> +
+> +	sc 2				/* Invoke the ultravisor */
+> +
+> +	ld	r12,STK_PARAM(R4)(r1)
+> +	std	r4,  0(r12)
+> +	std	r5,  8(r12)
+> +	std	r6, 16(r12)
+> +	std	r7, 24(r12)
+> +
 
 =
