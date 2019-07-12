@@ -2,95 +2,234 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3528F66FAA
-	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Jul 2019 15:09:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B15B1671EA
+	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Jul 2019 17:02:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727366AbfGLNJW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 12 Jul 2019 09:09:22 -0400
-Received: from ozlabs.org ([203.11.71.1]:59563 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727157AbfGLNJV (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 12 Jul 2019 09:09:21 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 45lYCz49PFz9s3l;
-        Fri, 12 Jul 2019 23:09:19 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, david@gibson.dropbear.id.au,
-        sjitindarsingh@gmail.com
-Subject: Re: [PATCH] powerpc: mm: Limit rma_size to 1TB when running without HV mode
-In-Reply-To: <20190710052018.14628-1-sjitindarsingh@gmail.com>
-References: <20190710052018.14628-1-sjitindarsingh@gmail.com>
-Date:   Fri, 12 Jul 2019 23:09:18 +1000
-Message-ID: <87o91ze6wx.fsf@concordia.ellerman.id.au>
+        id S1726992AbfGLPCN (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 12 Jul 2019 11:02:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26224 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726977AbfGLPCM (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 12 Jul 2019 11:02:12 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6CEwjbO014486;
+        Fri, 12 Jul 2019 11:01:13 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tpu50c27p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Jul 2019 11:01:12 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x6CExP1e017416;
+        Fri, 12 Jul 2019 11:01:11 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tpu50c25u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Jul 2019 11:01:11 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6CF0MVc015958;
+        Fri, 12 Jul 2019 15:01:09 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma01wdc.us.ibm.com with ESMTP id 2tjk974cr9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Jul 2019 15:01:09 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6CF18cj31457644
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 15:01:09 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D6E10B2066;
+        Fri, 12 Jul 2019 15:01:07 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A730DB2086;
+        Fri, 12 Jul 2019 15:01:07 +0000 (GMT)
+Received: from paulmck-ThinkPad-W541 (unknown [9.85.195.235])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 12 Jul 2019 15:01:07 +0000 (GMT)
+Received: by paulmck-ThinkPad-W541 (Postfix, from userid 1000)
+        id 8599316C3FC8; Fri, 12 Jul 2019 08:01:07 -0700 (PDT)
+Date:   Fri, 12 Jul 2019 08:01:07 -0700
+From:   "Paul E. McKenney" <paulmck@linux.ibm.com>
+To:     "Joel Fernandes (Google)" <joel@joelfernandes.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Josh Triplett <josh@joshtriplett.org>, kvm-ppc@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-doc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@ozlabs.org>, rcu@vger.kernel.org,
+        Steven Rostedt <rostedt@goodmis.org>, byungchul.park@lge.com,
+        kernel-team@android.com
+Subject: Re: [PATCH] treewide: Rename  rcu_dereference_raw_notrace to _check
+Message-ID: <20190712150107.GT26519@linux.ibm.com>
+Reply-To: paulmck@linux.ibm.com
+References: <20190711204541.28940-1-joel@joelfernandes.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190711204541.28940-1-joel@joelfernandes.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-12_04:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907120162
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Suraj Jitindar Singh <sjitindarsingh@gmail.com> writes:
-> The virtual real mode addressing (VRMA) mechanism is used when a
-> partition is using HPT (Hash Page Table) translation and performs
-> real mode accesses (MSR[IR|DR] = 0) in non-hypervisor mode. In this
-> mode effective address bits 0:23 are treated as zero (i.e. the access
-> is aliased to 0) and the access is performed using an implicit 1TB SLB
-> entry.
->
-> The size of the RMA (Real Memory Area) is communicated to the guest as
-> the size of the first memory region in the device tree. And because of
-> the mechanism described above can be expected to not exceed 1TB. In the
-> event that the host erroneously represents the RMA as being larger than
-> 1TB, guest accesses in real mode to memory addresses above 1TB will be
-> aliased down to below 1TB. This means that a memory access performed in
-> real mode may differ to one performed in virtual mode for the same memory
-> address, which would likely have unintended consequences.
->
-> To avoid this outcome have the guest explicitly limit the size of the
-> RMA to the current maximum, which is 1TB. This means that even if the
-> first memory block is larger than 1TB, only the first 1TB should be
-> accessed in real mode.
->
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+On Thu, Jul 11, 2019 at 04:45:41PM -0400, Joel Fernandes (Google) wrote:
+> The rcu_dereference_raw_notrace() API name is confusing.
+> It is equivalent to rcu_dereference_raw() except that it also does
+> sparse pointer checking.
+> 
+> There are only a few users of rcu_dereference_raw_notrace(). This
+> patches renames all of them to be rcu_dereference_raw_check with the
+> "check" indicating sparse checking.
+> 
+> Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
 
-I added:
+I queued this, but reworked the commit log and fixed a couple of
+irritating checkpatch issues that were in the original code.
+Does this work for you?
 
-Fixes: c3ab300ea555 ("powerpc: Add POWER9 cputable entry")
-Cc: stable@vger.kernel.org # v4.6+
+							Thanx, Paul
 
+------------------------------------------------------------------------
 
-Which is not exactly correct, but probably good enough?
+commit bd5c0fea6016c90cf7a9eb0435cd0c373dfdac2f
+Author: Joel Fernandes (Google) <joel@joelfernandes.org>
+Date:   Thu Jul 11 16:45:41 2019 -0400
 
-cheers
+    treewide: Rename rcu_dereference_raw_notrace() to _check()
+    
+    The rcu_dereference_raw_notrace() API name is confusing.  It is equivalent
+    to rcu_dereference_raw() except that it also does sparse pointer checking.
+    
+    There are only a few users of rcu_dereference_raw_notrace(). This patches
+    renames all of them to be rcu_dereference_raw_check() with the "_check()"
+    indicating sparse checking.
+    
+    Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+    [ paulmck: Fix checkpatch warnings about parentheses. ]
+    Signed-off-by: Paul E. McKenney <paulmck@linux.ibm.com>
 
-> diff --git a/arch/powerpc/mm/book3s64/hash_utils.c b/arch/powerpc/mm/book3s64/hash_utils.c
-> index 28ced26f2a00..4d0e2cce9cd5 100644
-> --- a/arch/powerpc/mm/book3s64/hash_utils.c
-> +++ b/arch/powerpc/mm/book3s64/hash_utils.c
-> @@ -1901,11 +1901,19 @@ void hash__setup_initial_memory_limit(phys_addr_t first_memblock_base,
->  	 *
->  	 * For guests on platforms before POWER9, we clamp the it limit to 1G
->  	 * to avoid some funky things such as RTAS bugs etc...
-> +	 * On POWER9 we limit to 1TB in case the host erroneously told us that
-> +	 * the RMA was >1TB. Effective address bits 0:23 are treated as zero
-> +	 * (meaning the access is aliased to zero i.e. addr = addr % 1TB)
-> +	 * for virtual real mode addressing and so it doesn't make sense to
-> +	 * have an area larger than 1TB as it can't be addressed.
->  	 */
->  	if (!early_cpu_has_feature(CPU_FTR_HVMODE)) {
->  		ppc64_rma_size = first_memblock_size;
->  		if (!early_cpu_has_feature(CPU_FTR_ARCH_300))
->  			ppc64_rma_size = min_t(u64, ppc64_rma_size, 0x40000000);
-> +		else
-> +			ppc64_rma_size = min_t(u64, ppc64_rma_size,
-> +					       1UL << SID_SHIFT_1T);
->  
->  		/* Finally limit subsequent allocations */
->  		memblock_set_current_limit(ppc64_rma_size);
-> -- 
-> 2.13.6
+diff --git a/Documentation/RCU/Design/Requirements/Requirements.html b/Documentation/RCU/Design/Requirements/Requirements.html
+index f04c467e55c5..467251f7fef6 100644
+--- a/Documentation/RCU/Design/Requirements/Requirements.html
++++ b/Documentation/RCU/Design/Requirements/Requirements.html
+@@ -2514,7 +2514,7 @@ disabled across the entire RCU read-side critical section.
+ <p>
+ It is possible to use tracing on RCU code, but tracing itself
+ uses RCU.
+-For this reason, <tt>rcu_dereference_raw_notrace()</tt>
++For this reason, <tt>rcu_dereference_raw_check()</tt>
+ is provided for use by tracing, which avoids the destructive
+ recursion that could otherwise ensue.
+ This API is also used by virtualization in some architectures,
+diff --git a/arch/powerpc/include/asm/kvm_book3s_64.h b/arch/powerpc/include/asm/kvm_book3s_64.h
+index 21b1ed5df888..53388a311967 100644
+--- a/arch/powerpc/include/asm/kvm_book3s_64.h
++++ b/arch/powerpc/include/asm/kvm_book3s_64.h
+@@ -546,7 +546,7 @@ static inline void note_hpte_modification(struct kvm *kvm,
+  */
+ static inline struct kvm_memslots *kvm_memslots_raw(struct kvm *kvm)
+ {
+-	return rcu_dereference_raw_notrace(kvm->memslots[0]);
++	return rcu_dereference_raw_check(kvm->memslots[0]);
+ }
+ 
+ extern void kvmppc_mmu_debugfs_init(struct kvm *kvm);
+diff --git a/include/linux/rculist.h b/include/linux/rculist.h
+index e91ec9ddcd30..932296144131 100644
+--- a/include/linux/rculist.h
++++ b/include/linux/rculist.h
+@@ -622,7 +622,7 @@ static inline void hlist_add_behind_rcu(struct hlist_node *n,
+  * as long as the traversal is guarded by rcu_read_lock().
+  */
+ #define hlist_for_each_entry_rcu(pos, head, member)			\
+-	for (pos = hlist_entry_safe (rcu_dereference_raw(hlist_first_rcu(head)),\
++	for (pos = hlist_entry_safe(rcu_dereference_raw(hlist_first_rcu(head)),\
+ 			typeof(*(pos)), member);			\
+ 		pos;							\
+ 		pos = hlist_entry_safe(rcu_dereference_raw(hlist_next_rcu(\
+@@ -642,10 +642,10 @@ static inline void hlist_add_behind_rcu(struct hlist_node *n,
+  * not do any RCU debugging or tracing.
+  */
+ #define hlist_for_each_entry_rcu_notrace(pos, head, member)			\
+-	for (pos = hlist_entry_safe (rcu_dereference_raw_notrace(hlist_first_rcu(head)),\
++	for (pos = hlist_entry_safe(rcu_dereference_raw_check(hlist_first_rcu(head)),\
+ 			typeof(*(pos)), member);			\
+ 		pos;							\
+-		pos = hlist_entry_safe(rcu_dereference_raw_notrace(hlist_next_rcu(\
++		pos = hlist_entry_safe(rcu_dereference_raw_check(hlist_next_rcu(\
+ 			&(pos)->member)), typeof(*(pos)), member))
+ 
+ /**
+diff --git a/include/linux/rcupdate.h b/include/linux/rcupdate.h
+index 0c9b92799abc..e5161e377ad4 100644
+--- a/include/linux/rcupdate.h
++++ b/include/linux/rcupdate.h
+@@ -478,7 +478,7 @@ do {									      \
+  * The no-tracing version of rcu_dereference_raw() must not call
+  * rcu_read_lock_held().
+  */
+-#define rcu_dereference_raw_notrace(p) __rcu_dereference_check((p), 1, __rcu)
++#define rcu_dereference_raw_check(p) __rcu_dereference_check((p), 1, __rcu)
+ 
+ /**
+  * rcu_dereference_protected() - fetch RCU pointer when updates prevented
+diff --git a/kernel/trace/ftrace_internal.h b/kernel/trace/ftrace_internal.h
+index 0515a2096f90..0456e0a3dab1 100644
+--- a/kernel/trace/ftrace_internal.h
++++ b/kernel/trace/ftrace_internal.h
+@@ -6,22 +6,22 @@
+ 
+ /*
+  * Traverse the ftrace_global_list, invoking all entries.  The reason that we
+- * can use rcu_dereference_raw_notrace() is that elements removed from this list
++ * can use rcu_dereference_raw_check() is that elements removed from this list
+  * are simply leaked, so there is no need to interact with a grace-period
+- * mechanism.  The rcu_dereference_raw_notrace() calls are needed to handle
++ * mechanism.  The rcu_dereference_raw_check() calls are needed to handle
+  * concurrent insertions into the ftrace_global_list.
+  *
+  * Silly Alpha and silly pointer-speculation compiler optimizations!
+  */
+ #define do_for_each_ftrace_op(op, list)			\
+-	op = rcu_dereference_raw_notrace(list);			\
++	op = rcu_dereference_raw_check(list);			\
+ 	do
+ 
+ /*
+  * Optimized for just a single item in the list (as that is the normal case).
+  */
+ #define while_for_each_ftrace_op(op)				\
+-	while (likely(op = rcu_dereference_raw_notrace((op)->next)) &&	\
++	while (likely(op = rcu_dereference_raw_check((op)->next)) &&	\
+ 	       unlikely((op) != &ftrace_list_end))
+ 
+ extern struct ftrace_ops __rcu *ftrace_ops_list;
+diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+index 2c92b3d9ea30..1d69110d9e5b 100644
+--- a/kernel/trace/trace.c
++++ b/kernel/trace/trace.c
+@@ -2642,10 +2642,10 @@ static void ftrace_exports(struct ring_buffer_event *event)
+ 
+ 	preempt_disable_notrace();
+ 
+-	export = rcu_dereference_raw_notrace(ftrace_exports_list);
++	export = rcu_dereference_raw_check(ftrace_exports_list);
+ 	while (export) {
+ 		trace_process_export(export, event);
+-		export = rcu_dereference_raw_notrace(export->next);
++		export = rcu_dereference_raw_check(export->next);
+ 	}
+ 
+ 	preempt_enable_notrace();
