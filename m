@@ -2,59 +2,59 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F25D16821E
-	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Jul 2019 03:58:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0530B68221
+	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Jul 2019 04:01:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728984AbfGOB6b (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 14 Jul 2019 21:58:31 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:33204 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727006AbfGOB6b (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 14 Jul 2019 21:58:31 -0400
-Received: by mail-pf1-f195.google.com with SMTP id g2so6674172pfq.0
-        for <kvm-ppc@vger.kernel.org>; Sun, 14 Jul 2019 18:58:30 -0700 (PDT)
+        id S1728971AbfGOCB5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 14 Jul 2019 22:01:57 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:35514 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727006AbfGOCB5 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 14 Jul 2019 22:01:57 -0400
+Received: by mail-pl1-f194.google.com with SMTP id w24so7484901plp.2
+        for <kvm-ppc@vger.kernel.org>; Sun, 14 Jul 2019 19:01:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:subject:from:to:cc:date:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=g0zyhxh4ks1ak56xEA2lEhz+tyGZV7cQskN34O5j4OQ=;
-        b=nE0METqhxjmhBEfyXwCVsWIUJOj6dIweZWcGREMFX59UaGPo3X9fR6Emdyb7AlPd2U
-         sXg3TtOYP14V48gYKEvYE4BkmvCoKPcAYEvKcbeZT+pGzWwrnzAmFEuYKv1QvC+wCj9m
-         UwI1lAxz8DyAhoNXfj+HU2jvfELg/sTEheZSuePhBRNXbTAvBEhuUTkTGVEITaQ1fXSV
-         yzktriO0SK9nR825fNZgbzgTwn53ofLDrs7DV9UGAAe+q2DSAvJncTP7hkNKJ62BUUwu
-         mmrkaYUGcN5lIsEBqkUHxbJi1AQW/xd1R/8H0PzHvwkSteXAUXxuxKl7/kE8fEW/5ibK
-         PiqA==
+        bh=lA/ZbfEc02zbLPfMDvSjpx/eUQq1QypxqafA6N7NhN8=;
+        b=ErKvuoE9bXRPuW359j9IxktUzXwJuaK19B/rNbenI/pLBptRf1hSLSN8CDDOeDTnUT
+         /uYQUBy4JqyfuqLFlHtEeui51tYAsiTakLpyXDwO7M6KqcMoe+Mw21VufqyO6ELKO9l4
+         gm0n8FLOOE6nt0X0ucK71ZeafFx9k2r10kd/qNkGtjzbaIDUWX6sP48XUjioEOJ1klCJ
+         OZgVdhZU+5m91pAaeYAqu/ChEPAT7bhHQ9cwQ/iSlDavQNxqAIj6r8gCe+HRG+vpBgdC
+         85LyVwQI72Z0n/kEqNBtRZDNsMZKCQogAXsnDNuYgnvOEmsBnGWY/5WNyGSxNPY9AAYD
+         jtEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=g0zyhxh4ks1ak56xEA2lEhz+tyGZV7cQskN34O5j4OQ=;
-        b=aWlz2q2oZGoDv7dpvVMXrdZqN8PJa5pzVlp9scp45OvSkJvnRN17trQ7H3wA9L8+FR
-         9+px8GXWCJx3rCDOUbxcLYCpvOGU4PQPyxfrYyM3XPgfqIOn4GSO2sDqjtLDkUc/mw+Q
-         Uv5dIj0nSHXu3T1BR0Aq6XgpeK7C8R+fPujYcUYTc3g5XnQDculAukjD3CkbyILRnoHb
-         hJ8WA6huVtGbGP3a/wvRQG3iqGrnr9tPWQpvMm0Vq2Qr2T5ftSCoeF7oT989gN1j0nRH
-         FNO9nx7bxvryEnBBzScAyme03Hz7BIGH3y4xuek1RoOI5mlHC18p9igbBH4UAXaymwTr
-         95Gw==
-X-Gm-Message-State: APjAAAUIkQ/jy8qq41aN6O/k95M+slUaSC6w8glJn5z1Pof6q2Dywi1o
-        WFOaeGKG+pTkrQbwLWy+IRjNDE6J
-X-Google-Smtp-Source: APXvYqwypHVqJSzNP6RDRYofw+mVtX+lsRxHONry5ynalPnbbOOX5tuRRJ4VOk9SUIaLaUhUkkW4WA==
-X-Received: by 2002:a63:9249:: with SMTP id s9mr23468299pgn.356.1563155909708;
-        Sun, 14 Jul 2019 18:58:29 -0700 (PDT)
+        bh=lA/ZbfEc02zbLPfMDvSjpx/eUQq1QypxqafA6N7NhN8=;
+        b=FYiu/0kROxBHpWtHOFcv/Szwj2ZsST6odjIAKqpwXGXQDU51UuVCEFVQ1MqUS/OJk/
+         dTPQiHTDMcqiCKilu50KyCY1sTrSrXg6E2Rnl8x8Fs6HPNIdDxW7k/Y6JnXd+EoJmiD6
+         P6GsEmhWV5Gfg9pJgT6+dYfSqi1ZMl0OEMWOZxP3LVehJaT0sKsU3pfrmUl9kj924ESC
+         NW91+kmhlKL2lst1C4PCkRTxJREt/7mCWZ99nHz6O5PLRGNRYYABoe1nbGPqvVrsBcUw
+         DyWxDrzKdQAHTKQSP+bM7wf0mIxPTIANzSmULts8GUOVJSOQvOgvfpYpMakwIak2W5jD
+         pN9g==
+X-Gm-Message-State: APjAAAW4VoieLJ5jLO/lBm0Jm5e7Jtbwb7Vr5GWsDOqQz05VXiayXHi9
+        qdVUZVTR2uQGWaJesRdy1YL1MMNn
+X-Google-Smtp-Source: APXvYqzRcXp0CcRxSqr/P86P+xh+lUDyxmYewjv9BUKmEORpeLvaOYg5X4BtjT421yLiUIt2c/vj7A==
+X-Received: by 2002:a17:902:a417:: with SMTP id p23mr25194413plq.136.1563156116083;
+        Sun, 14 Jul 2019 19:01:56 -0700 (PDT)
 Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.googlemail.com with ESMTPSA id r1sm17597451pfq.100.2019.07.14.18.58.27
+        by smtp.googlemail.com with ESMTPSA id o32sm14954211pje.9.2019.07.14.19.01.53
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sun, 14 Jul 2019 18:58:28 -0700 (PDT)
-Message-ID: <1563155904.2145.1.camel@gmail.com>
-Subject: Re: [PATCH] powerpc: mm: Limit rma_size to 1TB when running without
- HV mode
+        Sun, 14 Jul 2019 19:01:55 -0700 (PDT)
+Message-ID: <1563156110.2145.5.camel@gmail.com>
+Subject: Re: [PATCH 1/3] KVM: PPC: Book3S HV: Always save guest pmu for
+ guest capable of nesting
 From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 To:     Michael Ellerman <mpe@ellerman.id.au>,
         linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, david@gibson.dropbear.id.au
-Date:   Mon, 15 Jul 2019 11:58:24 +1000
-In-Reply-To: <87o91ze6wx.fsf@concordia.ellerman.id.au>
-References: <20190710052018.14628-1-sjitindarsingh@gmail.com>
-         <87o91ze6wx.fsf@concordia.ellerman.id.au>
+Cc:     kvm-ppc@vger.kernel.org, paulus@ozlabs.org
+Date:   Mon, 15 Jul 2019 12:01:50 +1000
+In-Reply-To: <87lfx2egt4.fsf@concordia.ellerman.id.au>
+References: <20190703012022.15644-1-sjitindarsingh@gmail.com>
+         <87lfx2egt4.fsf@concordia.ellerman.id.au>
 Content-Type: text/plain; charset="UTF-8"
 X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
 Mime-Version: 1.0
@@ -64,92 +64,99 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, 2019-07-12 at 23:09 +1000, Michael Ellerman wrote:
+On Sat, 2019-07-13 at 13:47 +1000, Michael Ellerman wrote:
 > Suraj Jitindar Singh <sjitindarsingh@gmail.com> writes:
-> > The virtual real mode addressing (VRMA) mechanism is used when a
-> > partition is using HPT (Hash Page Table) translation and performs
-> > real mode accesses (MSR[IR|DR] = 0) in non-hypervisor mode. In this
-> > mode effective address bits 0:23 are treated as zero (i.e. the
-> > access
-> > is aliased to 0) and the access is performed using an implicit 1TB
-> > SLB
-> > entry.
-> > 
-> > The size of the RMA (Real Memory Area) is communicated to the guest
-> > as
-> > the size of the first memory region in the device tree. And because
-> > of
-> > the mechanism described above can be expected to not exceed 1TB. In
+> > The performance monitoring unit (PMU) registers are saved on guest
+> > exit
+> > when the guest has set the pmcregs_in_use flag in its lppaca, if it
+> > exists, or unconditionally if it doesn't. If a nested guest is
+> > being
+> > run then the hypervisor doesn't, and in most cases can't, know if
 > > the
-> > event that the host erroneously represents the RMA as being larger
-> > than
-> > 1TB, guest accesses in real mode to memory addresses above 1TB will
+> > pmu registers are in use since it doesn't know the location of the
+> > lppaca
+> > for the nested guest, although it may have one for its immediate
+> > guest.
+> > This results in the values of these registers being lost across
+> > nested
+> > guest entry and exit in the case where the nested guest was making
+> > use
+> > of the performance monitoring facility while it's nested guest
+> > hypervisor
+> > wasn't.
+> > 
+> > Further more the hypervisor could interrupt a guest hypervisor
+> > between
+> > when it has loaded up the pmu registers and it calling
+> > H_ENTER_NESTED or
+> > between returning from the nested guest to the guest hypervisor and
+> > the
+> > guest hypervisor reading the pmu registers, in
+> > kvmhv_p9_guest_entry().
+> > This means that it isn't sufficient to just save the pmu registers
+> > when
+> > entering or exiting a nested guest, but that it is necessary to
+> > always
+> > save the pmu registers whenever a guest is capable of running
+> > nested guests
+> > to ensure the register values aren't lost in the context switch.
+> > 
+> > Ensure the pmu register values are preserved by always saving their
+> > value into the vcpu struct when a guest is capable of running
+> > nested
+> > guests.
+> > 
+> > This should have minimal performance impact however any impact can
 > > be
-> > aliased down to below 1TB. This means that a memory access
-> > performed in
-> > real mode may differ to one performed in virtual mode for the same
-> > memory
-> > address, which would likely have unintended consequences.
+> > avoided by booting a guest with "-machine pseries,cap-nested-
+> > hv=false"
+> > on the qemu commandline.
 > > 
-> > To avoid this outcome have the guest explicitly limit the size of
-> > the
-> > RMA to the current maximum, which is 1TB. This means that even if
-> > the
-> > first memory block is larger than 1TB, only the first 1TB should be
-> > accessed in real mode.
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> > Fixes: 95a6432ce903 "KVM: PPC: Book3S HV: Streamlined guest
+> > entry/exit path on P9 for radix guests"
 > 
-> I added:
-> 
-> Fixes: c3ab300ea555 ("powerpc: Add POWER9 cputable entry")
-> Cc: stable@vger.kernel.org # v4.6+
-> 
-> 
-> Which is not exactly correct, but probably good enough?
+> I'm not clear why this and the next commit are marked as fixing the
+> above commit. Wasn't it broken prior to that commit as well?
 
-I think we actually want:
-Fixes: c610d65c0ad0 ("powerpc/pseries: lift RTAS limit for hash")
+That was the commit which introduced the entry path which we use for a
+nested guest, the path on which we need to be saving and restoring the
+pmu registers and so where the new code was introduced.
 
-Which is what actually caused it to break and for the issue to present
-itself.
+It wasn't technically broken prior to that commit since you couldn't
+run nested prior to that commit, and in fact it's a few commits after
+that one where we actually enabled the ability to run nested guests.
+
+However since that's the code which introduced the nested entry path it
+seemed like the best fit for the fixes tag for people who will be
+looking for fixes in that area. Also all the other nested entry path
+fixes used that fixes tag so it ties them together nicely.
+
+Thanks,
+Suraj
 
 > 
 > cheers
 > 
-> > diff --git a/arch/powerpc/mm/book3s64/hash_utils.c
-> > b/arch/powerpc/mm/book3s64/hash_utils.c
-> > index 28ced26f2a00..4d0e2cce9cd5 100644
-> > --- a/arch/powerpc/mm/book3s64/hash_utils.c
-> > +++ b/arch/powerpc/mm/book3s64/hash_utils.c
-> > @@ -1901,11 +1901,19 @@ void
-> > hash__setup_initial_memory_limit(phys_addr_t first_memblock_base,
-> >  	 *
-> >  	 * For guests on platforms before POWER9, we clamp the it
-> > limit to 1G
-> >  	 * to avoid some funky things such as RTAS bugs etc...
-> > +	 * On POWER9 we limit to 1TB in case the host erroneously
-> > told us that
-> > +	 * the RMA was >1TB. Effective address bits 0:23 are
-> > treated as zero
-> > +	 * (meaning the access is aliased to zero i.e. addr = addr
-> > % 1TB)
-> > +	 * for virtual real mode addressing and so it doesn't make
-> > sense to
-> > +	 * have an area larger than 1TB as it can't be addressed.
-> >  	 */
-> >  	if (!early_cpu_has_feature(CPU_FTR_HVMODE)) {
-> >  		ppc64_rma_size = first_memblock_size;
-> >  		if (!early_cpu_has_feature(CPU_FTR_ARCH_300))
-> >  			ppc64_rma_size = min_t(u64,
-> > ppc64_rma_size, 0x40000000);
-> > +		else
-> > +			ppc64_rma_size = min_t(u64,
-> > ppc64_rma_size,
-> > +					       1UL <<
-> > SID_SHIFT_1T);
+> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> > ---
+> >  arch/powerpc/kvm/book3s_hv.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/arch/powerpc/kvm/book3s_hv.c
+> > b/arch/powerpc/kvm/book3s_hv.c
+> > index ec1804f822af..b682a429f3ef 100644
+> > --- a/arch/powerpc/kvm/book3s_hv.c
+> > +++ b/arch/powerpc/kvm/book3s_hv.c
+> > @@ -3654,6 +3654,8 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu
+> > *vcpu, u64 time_limit,
+> >  		vcpu->arch.vpa.dirty = 1;
+> >  		save_pmu = lp->pmcregs_in_use;
+> >  	}
+> > +	/* Must save pmu if this guest is capable of running
+> > nested guests */
+> > +	save_pmu |= nesting_enabled(vcpu->kvm);
 > >  
-> >  		/* Finally limit subsequent allocations */
-> >  		memblock_set_current_limit(ppc64_rma_size);
+> >  	kvmhv_save_guest_pmu(vcpu, save_pmu);
+> >  
 > > -- 
 > > 2.13.6
