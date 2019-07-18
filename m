@@ -2,67 +2,61 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BCC76CF41
-	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Jul 2019 15:57:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 115AE6CF42
+	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Jul 2019 15:57:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726649AbfGRN4l (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 18 Jul 2019 09:56:41 -0400
-Received: from ozlabs.org ([203.11.71.1]:33559 "EHLO ozlabs.org"
+        id S1727623AbfGRN4m (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 18 Jul 2019 09:56:42 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51437 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726608AbfGRN4k (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 18 Jul 2019 09:56:40 -0400
+        id S1726608AbfGRN4m (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 18 Jul 2019 09:56:42 -0400
 Received: by ozlabs.org (Postfix, from userid 1034)
-        id 45qFzp31PNz9sBt; Thu, 18 Jul 2019 23:56:38 +1000 (AEST)
+        id 45qFzq6mgpz9sDQ; Thu, 18 Jul 2019 23:56:39 +1000 (AEST)
 X-powerpc-patch-notification: thanks
-X-powerpc-patch-commit: 63279eeb7f93abb1692573c26f1e038e1a87358b
-In-Reply-To: <20190703012022.15644-1-sjitindarsingh@gmail.com>
+X-powerpc-patch-commit: da0ef93310e67ae6902efded60b6724dab27a5d1
+In-Reply-To: <20190710052018.14628-1-sjitindarsingh@gmail.com>
 To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
         linuxppc-dev@lists.ozlabs.org
 From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-Cc:     sjitindarsingh@gmail.com, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: PPC: Book3S HV: Always save guest pmu for guest capable of nesting
-Message-Id: <45qFzp31PNz9sBt@ozlabs.org>
-Date:   Thu, 18 Jul 2019 23:56:38 +1000 (AEST)
+Cc:     sjitindarsingh@gmail.com, kvm-ppc@vger.kernel.org,
+        david@gibson.dropbear.id.au
+Subject: Re: [PATCH] powerpc: mm: Limit rma_size to 1TB when running without HV mode
+Message-Id: <45qFzq6mgpz9sDQ@ozlabs.org>
+Date:   Thu, 18 Jul 2019 23:56:39 +1000 (AEST)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, 2019-07-03 at 01:20:20 UTC, Suraj Jitindar Singh wrote:
-> The performance monitoring unit (PMU) registers are saved on guest exit
-> when the guest has set the pmcregs_in_use flag in its lppaca, if it
-> exists, or unconditionally if it doesn't. If a nested guest is being
-> run then the hypervisor doesn't, and in most cases can't, know if the
-> pmu registers are in use since it doesn't know the location of the lppaca
-> for the nested guest, although it may have one for its immediate guest.
-> This results in the values of these registers being lost across nested
-> guest entry and exit in the case where the nested guest was making use
-> of the performance monitoring facility while it's nested guest hypervisor
-> wasn't.
+On Wed, 2019-07-10 at 05:20:18 UTC, Suraj Jitindar Singh wrote:
+> The virtual real mode addressing (VRMA) mechanism is used when a
+> partition is using HPT (Hash Page Table) translation and performs
+> real mode accesses (MSR[IR|DR] = 0) in non-hypervisor mode. In this
+> mode effective address bits 0:23 are treated as zero (i.e. the access
+> is aliased to 0) and the access is performed using an implicit 1TB SLB
+> entry.
 > 
-> Further more the hypervisor could interrupt a guest hypervisor between
-> when it has loaded up the pmu registers and it calling H_ENTER_NESTED or
-> between returning from the nested guest to the guest hypervisor and the
-> guest hypervisor reading the pmu registers, in kvmhv_p9_guest_entry().
-> This means that it isn't sufficient to just save the pmu registers when
-> entering or exiting a nested guest, but that it is necessary to always
-> save the pmu registers whenever a guest is capable of running nested guests
-> to ensure the register values aren't lost in the context switch.
+> The size of the RMA (Real Memory Area) is communicated to the guest as
+> the size of the first memory region in the device tree. And because of
+> the mechanism described above can be expected to not exceed 1TB. In the
+> event that the host erroneously represents the RMA as being larger than
+> 1TB, guest accesses in real mode to memory addresses above 1TB will be
+> aliased down to below 1TB. This means that a memory access performed in
+> real mode may differ to one performed in virtual mode for the same memory
+> address, which would likely have unintended consequences.
 > 
-> Ensure the pmu register values are preserved by always saving their
-> value into the vcpu struct when a guest is capable of running nested
-> guests.
-> 
-> This should have minimal performance impact however any impact can be
-> avoided by booting a guest with "-machine pseries,cap-nested-hv=false"
-> on the qemu commandline.
-> 
-> Fixes: 95a6432ce903 "KVM: PPC: Book3S HV: Streamlined guest entry/exit path on P9 for radix guests"
+> To avoid this outcome have the guest explicitly limit the size of the
+> RMA to the current maximum, which is 1TB. This means that even if the
+> first memory block is larger than 1TB, only the first 1TB should be
+> accessed in real mode.
 > 
 > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Tested-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Series applied to powerpc fixes, thanks.
+Applied to powerpc fixes, thanks.
 
-https://git.kernel.org/powerpc/c/63279eeb7f93abb1692573c26f1e038e1a87358b
+https://git.kernel.org/powerpc/c/da0ef93310e67ae6902efded60b6724dab27a5d1
 
 cheers
