@@ -2,128 +2,67 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 831D16CCAC
-	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Jul 2019 12:18:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BCC76CF41
+	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Jul 2019 15:57:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726665AbfGRKSH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 18 Jul 2019 06:18:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44298 "EHLO mx1.redhat.com"
+        id S1726649AbfGRN4l (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 18 Jul 2019 09:56:41 -0400
+Received: from ozlabs.org ([203.11.71.1]:33559 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726454AbfGRKSG (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 18 Jul 2019 06:18:06 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2F17259465;
-        Thu, 18 Jul 2019 10:18:06 +0000 (UTC)
-Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2DE7B608C2;
-        Thu, 18 Jul 2019 10:18:04 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Paul Mackerras <paulus@ozlabs.org>
-Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: [RFC PATCH] KVM: PPC: Enable the kvm_create_max_vcpus selftest on ppc64
-Date:   Thu, 18 Jul 2019 12:17:58 +0200
-Message-Id: <20190718101758.14428-1-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Thu, 18 Jul 2019 10:18:06 +0000 (UTC)
+        id S1726608AbfGRN4k (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 18 Jul 2019 09:56:40 -0400
+Received: by ozlabs.org (Postfix, from userid 1034)
+        id 45qFzp31PNz9sBt; Thu, 18 Jul 2019 23:56:38 +1000 (AEST)
+X-powerpc-patch-notification: thanks
+X-powerpc-patch-commit: 63279eeb7f93abb1692573c26f1e038e1a87358b
+In-Reply-To: <20190703012022.15644-1-sjitindarsingh@gmail.com>
+To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+Cc:     sjitindarsingh@gmail.com, kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: PPC: Book3S HV: Always save guest pmu for guest capable of nesting
+Message-Id: <45qFzp31PNz9sBt@ozlabs.org>
+Date:   Thu, 18 Jul 2019 23:56:38 +1000 (AEST)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The kvm_create_max_vcpus is generic enough so that it works out of the
-box on POWER, too. We just have to provide some stubs for linking the
-code from kvm_util.c.
-Note that you also might have to do "ulimit -n 2500" before running the
-test, to avoid that it runs out of file handles for the vCPUs.
+On Wed, 2019-07-03 at 01:20:20 UTC, Suraj Jitindar Singh wrote:
+> The performance monitoring unit (PMU) registers are saved on guest exit
+> when the guest has set the pmcregs_in_use flag in its lppaca, if it
+> exists, or unconditionally if it doesn't. If a nested guest is being
+> run then the hypervisor doesn't, and in most cases can't, know if the
+> pmu registers are in use since it doesn't know the location of the lppaca
+> for the nested guest, although it may have one for its immediate guest.
+> This results in the values of these registers being lost across nested
+> guest entry and exit in the case where the nested guest was making use
+> of the performance monitoring facility while it's nested guest hypervisor
+> wasn't.
+> 
+> Further more the hypervisor could interrupt a guest hypervisor between
+> when it has loaded up the pmu registers and it calling H_ENTER_NESTED or
+> between returning from the nested guest to the guest hypervisor and the
+> guest hypervisor reading the pmu registers, in kvmhv_p9_guest_entry().
+> This means that it isn't sufficient to just save the pmu registers when
+> entering or exiting a nested guest, but that it is necessary to always
+> save the pmu registers whenever a guest is capable of running nested guests
+> to ensure the register values aren't lost in the context switch.
+> 
+> Ensure the pmu register values are preserved by always saving their
+> value into the vcpu struct when a guest is capable of running nested
+> guests.
+> 
+> This should have minimal performance impact however any impact can be
+> avoided by booting a guest with "-machine pseries,cap-nested-hv=false"
+> on the qemu commandline.
+> 
+> Fixes: 95a6432ce903 "KVM: PPC: Book3S HV: Streamlined guest entry/exit path on P9 for radix guests"
+> 
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- RFC since the stubs are a little bit ugly (does someone here like
- to implement them?), and since it's a little bit annoying that
- you have to raise the ulimit for this test in case the kernel provides
- more vCPUs than the default ulimit...
+Series applied to powerpc fixes, thanks.
 
- tools/testing/selftests/kvm/Makefile          |  6 +++
- .../selftests/kvm/lib/powerpc/processor.c     | 37 +++++++++++++++++++
- 2 files changed, 43 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/lib/powerpc/processor.c
+https://git.kernel.org/powerpc/c/63279eeb7f93abb1692573c26f1e038e1a87358b
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index ba7849751989..c92dc78ff74b 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -11,6 +11,8 @@ LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/ucall.c lib/sparsebi
- LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c
- LIBKVM_aarch64 = lib/aarch64/processor.c
- LIBKVM_s390x = lib/s390x/processor.c
-+LIBKVM_ppc64 = lib/powerpc/processor.c
-+LIBKVM_ppc64le = $(LIBKVM_ppc64)
- 
- TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
-@@ -35,6 +37,10 @@ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_s390x += s390x/sync_regs_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
- 
-+TEST_GEN_PROGS_ppc64 += kvm_create_max_vcpus
-+
-+TEST_GEN_PROGS_ppc64le = $(TEST_GEN_PROGS_ppc64)
-+
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
- 
-diff --git a/tools/testing/selftests/kvm/lib/powerpc/processor.c b/tools/testing/selftests/kvm/lib/powerpc/processor.c
-new file mode 100644
-index 000000000000..c0b7f06e206e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/powerpc/processor.c
-@@ -0,0 +1,37 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * KVM selftest s390x library code - CPU-related functions
-+ */
-+
-+#define _GNU_SOURCE
-+
-+#include "kvm_util.h"
-+#include "../kvm_util_internal.h"
-+
-+void virt_pgd_alloc(struct kvm_vm *vm, uint32_t memslot)
-+{
-+	abort();	/* TODO: implement this */
-+}
-+
-+void virt_pg_map(struct kvm_vm *vm, uint64_t gva, uint64_t gpa,
-+		 uint32_t memslot)
-+{
-+	abort();	/* TODO: implement this */
-+}
-+
-+vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
-+{
-+	abort();	/* TODO: implement this */
-+
-+	return -1;
-+}
-+
-+void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
-+{
-+	abort();	/* TODO: implement this */
-+}
-+
-+void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
-+{
-+	abort();	/* TODO: implement this */
-+}
--- 
-2.21.0
-
+cheers
