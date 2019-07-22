@@ -2,156 +2,171 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 242EA6ED35
-	for <lists+kvm-ppc@lfdr.de>; Sat, 20 Jul 2019 03:39:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 007166FE44
+	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Jul 2019 13:05:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729015AbfGTBjb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 19 Jul 2019 21:39:31 -0400
-Received: from ozlabs.ru ([107.173.13.209]:47902 "EHLO ozlabs.ru"
+        id S1728771AbfGVLFY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Jul 2019 07:05:24 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:56871 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728662AbfGTBjb (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 19 Jul 2019 21:39:31 -0400
-X-Greylist: delayed 602 seconds by postgrey-1.27 at vger.kernel.org; Fri, 19 Jul 2019 21:39:30 EDT
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 506A6AE807F9;
-        Fri, 19 Jul 2019 21:29:25 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: [PATCH kernel RFC 2/2] powerpc/pseries: Kexec style ibm,client-architecture-support support
-Date:   Sat, 20 Jul 2019 11:29:19 +1000
-Message-Id: <20190720012919.14417-3-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190720012919.14417-1-aik@ozlabs.ru>
-References: <20190720012919.14417-1-aik@ozlabs.ru>
+        id S1725989AbfGVLFY (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 22 Jul 2019 07:05:24 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 45sf0K2TtCz9s8m;
+        Mon, 22 Jul 2019 21:05:21 +1000 (AEST)
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+Cc:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org,
+        kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
+        Michael Anderson <andmike@linux.ibm.com>,
+        Ram Pai <linuxram@us.ibm.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Thiago Bauermann <bauerman@linux.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
+        Ryan Grimm <grimm@linux.ibm.com>
+Subject: Re: [PATCH v4 7/8] KVM: PPC: Ultravisor: Enter a secure guest
+In-Reply-To: <20190718024724.GB13492@us.ibm.com>
+References: <20190628200825.31049-1-cclaudio@linux.ibm.com> <20190628200825.31049-8-cclaudio@linux.ibm.com> <87ftncg24e.fsf@concordia.ellerman.id.au> <20190718024724.GB13492@us.ibm.com>
+Date:   Mon, 22 Jul 2019 21:05:17 +1000
+Message-ID: <87h87e72j6.fsf@concordia.ellerman.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This checks the FDT for "/chosen/qemu,h_cas" and calls H_CAS when present.
-The H_CAS hcall is implemented in QEMU for ages and currently returns
-an FDT with a diff to the initial FDT which SLOF updates and returns to
-the OS. For this patch to work, QEMU needs to provide the full tree
-instead, so when QEMU is run with the "-machine pseries,bios=no",
-it reads the existing FDT from the OS, updats it and writes back on top.
+Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com> writes:
+> Michael Ellerman [mpe@ellerman.id.au] wrote:
+>> Claudio Carvalho <cclaudio@linux.ibm.com> writes:
+>> > From: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+>> >
+>> > To enter a secure guest, we have to go through the ultravisor, therefore
+>> > we do a ucall when we are entering a secure guest.
+>> >
+>> > This change is needed for any sort of entry to the secure guest from the
+>> > hypervisor, whether it is a return from an hcall, a return from a
+>> > hypervisor interrupt, or the first time that a secure guest vCPU is run.
+>> >
+>> > If we are returning from an hcall, the results are already in the
+>> > appropriate registers R3:12, except for R3, R6 and R7. R3 has the status
+>> > of the reflected hcall, therefore we move it to R0 for the ultravisor and
+>> > set R3 to the UV_RETURN ucall number. R6,7 were used as temporary
+>> > registers, hence we restore them.
+>> 
+>> This is another case where some documentation would help people to
+>> review the code.
+>> 
+>> > Have fast_guest_return check the kvm_arch.secure_guest field so that a
+>> > new CPU enters UV when started (in response to a RTAS start-cpu call).
+>> >
+>> > Thanks to input from Paul Mackerras, Ram Pai and Mike Anderson.
+>> >
+>> > Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+>> > [ Pass SRR1 in r11 for UV_RETURN, fix kvmppc_msr_interrupt to preserve
+>> >   the MSR_S bit ]
+>> > Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+>> > [ Fix UV_RETURN ucall number and arch.secure_guest check ]
+>> > Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+>> > [ Save the actual R3 in R0 for the ultravisor and use R3 for the
+>> >   UV_RETURN ucall number. Update commit message and ret_to_ultra comment ]
+>> > Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
+>> > ---
+>> >  arch/powerpc/include/asm/kvm_host.h       |  1 +
+>> >  arch/powerpc/include/asm/ultravisor-api.h |  1 +
+>> >  arch/powerpc/kernel/asm-offsets.c         |  1 +
+>> >  arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 40 +++++++++++++++++++----
+>> >  4 files changed, 37 insertions(+), 6 deletions(-)
+>> >
+>> > diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+>> > index cffb365d9d02..89813ca987c2 100644
+>> > --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+>> > +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+>> > @@ -36,6 +36,7 @@
+>> >  #include <asm/asm-compat.h>
+>> >  #include <asm/feature-fixups.h>
+>> >  #include <asm/cpuidle.h>
+>> > +#include <asm/ultravisor-api.h>
+>> >  
+>> >  /* Sign-extend HDEC if not on POWER9 */
+>> >  #define EXTEND_HDEC(reg)			\
+>> > @@ -1092,16 +1093,12 @@ BEGIN_FTR_SECTION
+>> >  END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+>> >  
+>> >  	ld	r5, VCPU_LR(r4)
+>> > -	ld	r6, VCPU_CR(r4)
+>> >  	mtlr	r5
+>> > -	mtcr	r6
+>> >  
+>> >  	ld	r1, VCPU_GPR(R1)(r4)
+>> >  	ld	r2, VCPU_GPR(R2)(r4)
+>> >  	ld	r3, VCPU_GPR(R3)(r4)
+>> >  	ld	r5, VCPU_GPR(R5)(r4)
+>> > -	ld	r6, VCPU_GPR(R6)(r4)
+>> > -	ld	r7, VCPU_GPR(R7)(r4)
+>> >  	ld	r8, VCPU_GPR(R8)(r4)
+>> >  	ld	r9, VCPU_GPR(R9)(r4)
+>> >  	ld	r10, VCPU_GPR(R10)(r4)
+>> > @@ -1119,10 +1116,38 @@ BEGIN_FTR_SECTION
+>> >  	mtspr	SPRN_HDSISR, r0
+>> >  END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
+>> >  
+>> > +	ld	r6, VCPU_KVM(r4)
+>> > +	lbz	r7, KVM_SECURE_GUEST(r6)
+>> > +	cmpdi	r7, 0
+>> 
+>> You could hoist the load of r6 and r7 to here?
+>
+> we could move 'ld r7' here. r6 is used to restore CR below so
+> it (r6) has to stay there?
 
-This changes prom_check_platform_support() not to call the client
-interface's prom_getproplen() as the kexec-style boot does not provide
-the client interface services.
+It's used to restore CR in both paths, so both paths load VCPU_CR(r4)
+into r6. So we could instead do that load once, before the branch?
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- arch/powerpc/kernel/prom_init.c | 12 ++++++----
- arch/powerpc/kernel/setup_64.c  | 41 +++++++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+), 4 deletions(-)
+>> > +	bne	ret_to_ultra
+>> > +
+>> > +	lwz	r6, VCPU_CR(r4)
+>> > +	mtcr	r6
+>> > +
+>> > +	ld	r7, VCPU_GPR(R7)(r4)
+>> > +	ld	r6, VCPU_GPR(R6)(r4)
+>> >  	ld	r0, VCPU_GPR(R0)(r4)
+>> >  	ld	r4, VCPU_GPR(R4)(r4)
+>> >  	HRFI_TO_GUEST
+>> >  	b	.
+>> > +/*
+>> > + * We are entering a secure guest, so we have to invoke the ultravisor to do
+>> > + * that. If we are returning from a hcall, the results are already in the
+>> > + * appropriate registers R3:12, except for R3, R6 and R7. R3 has the status of
+>> > + * the reflected hcall, therefore we move it to R0 for the ultravisor and set
+>> > + * R3 to the UV_RETURN ucall number. R6,7 were used as temporary registers
+>> > + * above, hence we restore them.
+>> > + */
+>> > +ret_to_ultra:
+>> > +	lwz	r6, VCPU_CR(r4)
+>> > +	mtcr	r6
+>> > +	mfspr	r11, SPRN_SRR1
+>> > +	mr	r0, r3
+>> > +	LOAD_REG_IMMEDIATE(r3, UV_RETURN)
+>> 
+>> Worth open coding to save three instructions?
+>
+> Yes, good point:
+>
+> -       LOAD_REG_IMMEDIATE(r3, UV_RETURN)
+> +
+> +       li      r3, 0
+> +       oris    r3, r3, (UV_RETURN)@__AS_ATHIGH
+> +       ori     r3, r3, (UV_RETURN)@l
 
-diff --git a/arch/powerpc/kernel/prom_init.c b/arch/powerpc/kernel/prom_init.c
-index 514707ef6779..6d8e35cb3c57 100644
---- a/arch/powerpc/kernel/prom_init.c
-+++ b/arch/powerpc/kernel/prom_init.c
-@@ -1261,7 +1261,7 @@ static void __init prom_parse_platform_support(u8 index, u8 val,
- 	}
- }
- 
--static void __init prom_check_platform_support(void)
-+struct ibm_arch_vec __init *prom_check_platform_support(int prop_len)
- {
- 	struct platform_support supported = {
- 		.hash_mmu = false,
-@@ -1269,8 +1269,6 @@ static void __init prom_check_platform_support(void)
- 		.radix_gtse = false,
- 		.xive = false
- 	};
--	int prop_len = prom_getproplen(prom.chosen,
--				       "ibm,arch-vec-5-platform-support");
- 
- 	/*
- 	 * First copy the architecture vec template
-@@ -1319,7 +1317,12 @@ static void __init prom_check_platform_support(void)
- 		prom_debug("Asking for XIVE\n");
- 		ibm_architecture_vec.vec5.intarch = OV5_FEAT(OV5_XIVE_EXPLOIT);
- 	}
-+
-+	ibm_architecture_vec.vec5.max_cpus = cpu_to_be32(NR_CPUS);
-+
-+	return &ibm_architecture_vec;
- }
-+EXPORT_SYMBOL_GPL(prom_check_platform_support);
- 
- static void __init prom_send_capabilities(void)
- {
-@@ -1328,7 +1331,8 @@ static void __init prom_send_capabilities(void)
- 	u32 cores;
- 
- 	/* Check ibm,arch-vec-5-platform-support and fixup vec5 if required */
--	prom_check_platform_support();
-+	prom_check_platform_support(prom_getproplen(prom.chosen,
-+				"ibm,arch-vec-5-platform-support"));
- 
- 	root = call_prom("open", 1, 1, ADDR("/"));
- 	if (root != 0) {
-diff --git a/arch/powerpc/kernel/setup_64.c b/arch/powerpc/kernel/setup_64.c
-index 44b4c432a273..6fa384278180 100644
---- a/arch/powerpc/kernel/setup_64.c
-+++ b/arch/powerpc/kernel/setup_64.c
-@@ -284,12 +284,53 @@ void __init record_spr_defaults(void)
-  * device-tree is not accessible via normal means at this point.
-  */
- 
-+/*
-+ * The architecture vector has an array of PVR mask/value pairs,
-+ * followed by # option vectors - 1, followed by the option vectors.
-+ *
-+ * See prom.h for the definition of the bits specified in the
-+ * architecture vector.
-+ */
-+
-+extern struct ibm_arch_vec __init *prom_check_platform_support(
-+		int vec5_prop_len);
-+
-+int __init early_init_dt_scan_chosen_h_cas(unsigned long node,
-+		const char *uname, int depth, void *data)
-+{
-+	int l;
-+	const char *p;
-+
-+	if (depth != 1 || !data ||
-+	    (strcmp(uname, "chosen") != 0 && strcmp(uname, "chosen@0") != 0))
-+		return 0;
-+	p = of_get_flat_dt_prop(node, "qemu,h_cas", &l);
-+	if (p != NULL && l > 0)
-+		*(bool *) data = be32_to_cpu(*(uint32_t *) p) != 0;
-+
-+	return 1;
-+}
-+
- void __init early_setup(unsigned long dt_ptr)
- {
- 	static __initdata struct paca_struct boot_paca;
-+	struct ibm_arch_vec *vec = prom_check_platform_support(0);
- 
- 	/* -------- printk is _NOT_ safe to use here ! ------- */
- 
-+	/* ibm,client-architecture-support support */
-+#define KVMPPC_HCALL_BASE       0xf000
-+#define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
-+#define FDT_MAX_SIZE 0x100000
-+	bool do_h_cas = false;
-+
-+	if (early_init_dt_verify(__va(dt_ptr))) {
-+		of_scan_flat_dt(early_init_dt_scan_chosen_h_cas, &do_h_cas);
-+		if (do_h_cas)
-+			plpar_hcall_norets(KVMPPC_H_CAS, vec, dt_ptr,
-+					FDT_MAX_SIZE);
-+	}
-+
- 	/* Try new device tree based feature discovery ... */
- 	if (!dt_cpu_ftrs_init(__va(dt_ptr)))
- 		/* Otherwise use the old style CPU table */
--- 
-2.17.1
+This should do it no?
 
+       li      r3, 0
+       oris    r3, r3, UV_RETURN
+
+
+cheers
