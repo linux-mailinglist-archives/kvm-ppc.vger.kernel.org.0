@@ -2,142 +2,140 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E932D7F642
-	for <lists+kvm-ppc@lfdr.de>; Fri,  2 Aug 2019 13:56:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDEC183D40
+	for <lists+kvm-ppc@lfdr.de>; Wed,  7 Aug 2019 00:15:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392468AbfHBL4x (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 2 Aug 2019 07:56:53 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42699 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731531AbfHBL4w (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 2 Aug 2019 07:56:52 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 460Qcf1lx4z9s7T;
-        Fri,  2 Aug 2019 21:56:50 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Thiago Bauermann <bauerman@linux.ibm.com>,
-        Claudio Carvalho <cclaudio@linux.ibm.com>
-Subject: Re: [RFC PATCH] powerpc: Add the ppc_capabilities ELF note
-In-Reply-To: <20190701140948.26775-1-cclaudio@linux.ibm.com>
-References: <20190701140948.26775-1-cclaudio@linux.ibm.com>
-Date:   Fri, 02 Aug 2019 21:56:48 +1000
-Message-ID: <874l2zlr0f.fsf@concordia.ellerman.id.au>
+        id S1726821AbfHFWPH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 6 Aug 2019 18:15:07 -0400
+Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:48556 "EHLO
+        5.mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726806AbfHFWPH (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 6 Aug 2019 18:15:07 -0400
+X-Greylist: delayed 16201 seconds by postgrey-1.27 at vger.kernel.org; Tue, 06 Aug 2019 18:15:06 EDT
+Received: from player730.ha.ovh.net (unknown [10.108.57.245])
+        by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6F621248799
+        for <kvm-ppc@vger.kernel.org>; Tue,  6 Aug 2019 19:26:00 +0200 (CEST)
+Received: from kaod.org (bad36-1-78-202-132-1.fbx.proxad.net [78.202.132.1])
+        (Authenticated sender: clg@kaod.org)
+        by player730.ha.ovh.net (Postfix) with ESMTPSA id 4A00688A6119;
+        Tue,  6 Aug 2019 17:25:51 +0000 (UTC)
+From:   =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To:     Paul Mackerras <paulus@samba.org>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Subject: [PATCH] KVM: PPC: Book3S HV: XIVE: Free escalation interrupts before disabling the VP
+Date:   Tue,  6 Aug 2019 19:25:38 +0200
+Message-Id: <20190806172538.5087-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 13269856306298588020
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddruddutddgudduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi Claudio,
+When a vCPU is brought done, the XIVE VP is first disabled and then
+the event notification queues are freed. When freeing the queues, we
+check for possible escalation interrupts and free them also.
 
-Claudio Carvalho <cclaudio@linux.ibm.com> writes:
-> Add the ppc_capabilities ELF note to the powerpc kernel binary. It is a
-> bitmap that can be used to advertise kernel capabilities to userland.
->
-> This patch also defines PPCCAP_ULTRAVISOR_BIT as being the bit zero.
+But when a XIVE VP is disabled, the underlying XIVE ENDs also are
+disabled in OPAL. When an END is disabled, its ESB pages (ESn and ESe)
+are disabled and loads return all 1s. Which means that any access on
+the ESB page of the escalation interrupt will return invalid values.
 
-Apologies for the slow review.
+When an interrupt is freed, the shutdown handler computes a 'saved_p'
+field from the value returned by a load in xive_do_source_set_mask().
+This value is incorrect for escalation interrupts for the reason
+described above.
 
-I think we should use the "PowerPC" name space for the note. There is
-precedent for that in that we already create a note with that name in
-our zImage.pseries. See arch/powerpc/boot/addnote.c
+This has no impact on Linux/KVM today because we don't make use of it
+but we will introduce in future changes a xive_get_irqchip_state()
+handler. This handler will use the 'saved_p' field to return the state
+of an interrupt and 'saved_p' being incorrect, softlockup will occur.
 
-That code uses a note type of 1275 (from IEEE 1275).
+Fix the vCPU cleanup sequence by first freeing the escalation
+interrupts if any, then disable the XIVE VP and last free the queues.
 
-For this capabilities note I think we should probably just use a note
-type of 1, just in case note type 0 confuses something. The note types
-Linux defines in include/uapi/linux/elf.h also start at 1.
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+---
+ arch/powerpc/kvm/book3s_xive.c        | 18 ++++++++++--------
+ arch/powerpc/kvm/book3s_xive_native.c | 12 +++++++-----
+ 2 files changed, 17 insertions(+), 13 deletions(-)
 
-So we should have a powerpc uapi header, elfnote.h I guess, which
-documents we're using the "PowerPC" namespace and defines note type 1 as
-the "Capabilities" type.
+diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+index e3ba67095895..09f838aa3138 100644
+--- a/arch/powerpc/kvm/book3s_xive.c
++++ b/arch/powerpc/kvm/book3s_xive.c
+@@ -1134,20 +1134,22 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
+ 	/* Mask the VP IPI */
+ 	xive_vm_esb_load(&xc->vp_ipi_data, XIVE_ESB_SET_PQ_01);
+ 
+-	/* Disable the VP */
+-	xive_native_disable_vp(xc->vp_id);
+-
+-	/* Free the queues & associated interrupts */
++	/* Free escalations */
+ 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
+-		struct xive_q *q = &xc->queues[i];
+-
+-		/* Free the escalation irq */
+ 		if (xc->esc_virq[i]) {
+ 			free_irq(xc->esc_virq[i], vcpu);
+ 			irq_dispose_mapping(xc->esc_virq[i]);
+ 			kfree(xc->esc_virq_names[i]);
+ 		}
+-		/* Free the queue */
++	}
++
++	/* Disable the VP */
++	xive_native_disable_vp(xc->vp_id);
++
++	/* Free the queues */
++	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
++		struct xive_q *q = &xc->queues[i];
++
+ 		xive_native_disable_queue(xc->vp_id, q, i);
+ 		if (q->qpage) {
+ 			free_pages((unsigned long)q->qpage,
+diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+index a998823f68a3..368427fcad20 100644
+--- a/arch/powerpc/kvm/book3s_xive_native.c
++++ b/arch/powerpc/kvm/book3s_xive_native.c
+@@ -67,10 +67,7 @@ void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu)
+ 	xc->valid = false;
+ 	kvmppc_xive_disable_vcpu_interrupts(vcpu);
+ 
+-	/* Disable the VP */
+-	xive_native_disable_vp(xc->vp_id);
+-
+-	/* Free the queues & associated interrupts */
++	/* Free escalations */
+ 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
+ 		/* Free the escalation irq */
+ 		if (xc->esc_virq[i]) {
+@@ -79,8 +76,13 @@ void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu)
+ 			kfree(xc->esc_virq_names[i]);
+ 			xc->esc_virq[i] = 0;
+ 		}
++	}
+ 
+-		/* Free the queue */
++	/* Disable the VP */
++	xive_native_disable_vp(xc->vp_id);
++
++	/* Free the queues */
++	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
+ 		kvmppc_xive_native_cleanup_queue(vcpu, i);
+ 	}
+ 
+-- 
+2.21.0
 
-I'd also like something more like a specification document, that can go
-in Documentation/powerpc and describes the capabilities bits in general
-and then what the specific ultravisor bit means. Something we could
-point other operating systems at if they want to implement similar
-support.
-
-Also none of this is any use unless petitboot is taught to look for the
-note. I imagine with Sam having left we don't have anyone signed up to
-do that work?
-
-Also when you send v2 do you mind Cc'ing linux kernel and linux-arch,
-thanks.
-
-> diff --git a/arch/powerpc/kernel/Makefile b/arch/powerpc/kernel/Makefile
-> index 0ea6c4aa3a20..4ec36fe4325b 100644
-> --- a/arch/powerpc/kernel/Makefile
-> +++ b/arch/powerpc/kernel/Makefile
-> @@ -49,7 +49,7 @@ obj-y				:= cputable.o ptrace.o syscalls.o \
->  				   signal.o sysfs.o cacheinfo.o time.o \
->  				   prom.o traps.o setup-common.o \
->  				   udbg.o misc.o io.o misc_$(BITS).o \
-> -				   of_platform.o prom_parse.o
-> +				   of_platform.o prom_parse.o note.o
-
-I think for now we should make this 64-bit Book3S only, as there are no
-plans for it to be used on any other platforms. A boot loader can
-interpret the absence of the note entirely as a set of capabilities
-that are all zero.
-
-
->  obj-$(CONFIG_PPC64)		+= setup_64.o sys_ppc32.o \
->  				   signal_64.o ptrace32.o \
->  				   paca.o nvram_64.o firmware.o
-
-cheers
-
-
-> diff --git a/arch/powerpc/kernel/note.S b/arch/powerpc/kernel/note.S
-> new file mode 100644
-> index 000000000000..721bf8ce9eb7
-> --- /dev/null
-> +++ b/arch/powerpc/kernel/note.S
-> @@ -0,0 +1,36 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * PowerPC ELF notes.
-> + *
-> + * Copyright 2019, IBM Corporation
-> + */
-> +#include <linux/elfnote.h>
-> +
-> +/*
-> + * Ultravisor-capable bit (PowerNV only).
-> + *
-> + * Indicate that the powerpc kernel binary knows how to run in an
-> + * ultravisor-enabled system.
-> + *
-> + * In an ultravisor-enabled system, some machine resources are now controlled
-> + * by the ultravisor. If the kernel is not ultravisor-capable, but it ends up
-> + * being run on a machine with ultravisor, the kernel will probably crash
-> + * trying to access ultravisor resources. For instance, it may crash in early
-> + * boot trying to set the partition table entry 0.
-> + *
-> + * In an ultravisor-enabled system, petitboot can warn the user or prevent the
-> + * kernel from being run if the ppc_capabilities doesn't exist or the
-> + * Ultravisor-capable bit is not set.
-> + */
-> +#if defined(CONFIG_PPC_POWERNV)
-> +#define PPCCAP_ULTRAVISOR_BIT		(1 << 0)
-> +#else
-> +#define PPCCAP_ULTRAVISOR_BIT		0
-> +#endif
-> +
-> +/*
-> + * Add the ppc_capabilities ELF note to the powerpc kernel binary. It is a
-> + * bitmap that can be used to advertise kernel capabilities to userland.
-> + */
-> +ELFNOTE(ppc_capabilities, 3,
-> +	.long PPCCAP_ULTRAVISOR_BIT)
-> -- 
-> 2.20.1
