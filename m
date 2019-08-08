@@ -2,140 +2,242 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DDEC183D40
-	for <lists+kvm-ppc@lfdr.de>; Wed,  7 Aug 2019 00:15:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E301B858DC
+	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Aug 2019 06:06:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726821AbfHFWPH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 6 Aug 2019 18:15:07 -0400
-Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:48556 "EHLO
-        5.mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726806AbfHFWPH (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 6 Aug 2019 18:15:07 -0400
-X-Greylist: delayed 16201 seconds by postgrey-1.27 at vger.kernel.org; Tue, 06 Aug 2019 18:15:06 EDT
-Received: from player730.ha.ovh.net (unknown [10.108.57.245])
-        by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6F621248799
-        for <kvm-ppc@vger.kernel.org>; Tue,  6 Aug 2019 19:26:00 +0200 (CEST)
-Received: from kaod.org (bad36-1-78-202-132-1.fbx.proxad.net [78.202.132.1])
-        (Authenticated sender: clg@kaod.org)
-        by player730.ha.ovh.net (Postfix) with ESMTPSA id 4A00688A6119;
-        Tue,  6 Aug 2019 17:25:51 +0000 (UTC)
-From:   =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To:     Paul Mackerras <paulus@samba.org>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        id S1725820AbfHHEGJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 8 Aug 2019 00:06:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21526 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725270AbfHHEGI (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Aug 2019 00:06:08 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7842KMM105994;
+        Thu, 8 Aug 2019 00:06:05 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2u8a23vu88-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Aug 2019 00:06:04 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7844Z8J032135;
+        Thu, 8 Aug 2019 04:06:03 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma01wdc.us.ibm.com with ESMTP id 2u51w6ug0w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Aug 2019 04:06:03 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x78462Jq49086940
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 8 Aug 2019 04:06:02 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E3593C6057;
+        Thu,  8 Aug 2019 04:06:01 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 627DCC6055;
+        Thu,  8 Aug 2019 04:05:57 +0000 (GMT)
+Received: from rino.ibm.com (unknown [9.85.135.60])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu,  8 Aug 2019 04:05:57 +0000 (GMT)
+From:   Claudio Carvalho <cclaudio@linux.ibm.com>
+To:     linuxppc-dev@ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org,
-        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Subject: [PATCH] KVM: PPC: Book3S HV: XIVE: Free escalation interrupts before disabling the VP
-Date:   Tue,  6 Aug 2019 19:25:38 +0200
-Message-Id: <20190806172538.5087-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
+        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
+        Michael Anderson <andmike@linux.ibm.com>,
+        Ram Pai <linuxram@us.ibm.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
+        Thiago Bauermann <bauerman@linux.ibm.com>,
+        Claudio Carvalho <cclaudio@linux.ibm.com>,
+        Ryan Grimm <grimm@linux.ibm.com>,
+        Guerney Hunt <gdhh@linux.ibm.com>
+Subject: [PATCH v5 0/7] kvmppc: Paravirtualize KVM to support ultravisor
+Date:   Thu,  8 Aug 2019 01:05:48 -0300
+Message-Id: <20190808040555.2371-1-cclaudio@linux.ibm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 13269856306298588020
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddruddutddgudduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-08_01:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908080042
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-When a vCPU is brought done, the XIVE VP is first disabled and then
-the event notification queues are freed. When freeing the queues, we
-check for possible escalation interrupts and free them also.
+Protected Execution Facility (PEF) is an architectural change for POWER 9
+that enables Secure Virtual Machines (SVMs). When enabled, PEF adds a new
+higher privileged mode, called Ultravisor mode, to POWER architecture.
+Along with the new mode there is new firmware called the Protected
+Execution Ultravisor (or Ultravisor for short). Ultravisor mode is the
+highest privileged mode in POWER architecture.
 
-But when a XIVE VP is disabled, the underlying XIVE ENDs also are
-disabled in OPAL. When an END is disabled, its ESB pages (ESn and ESe)
-are disabled and loads return all 1s. Which means that any access on
-the ESB page of the escalation interrupt will return invalid values.
+The Ultravisor calls allow the SVMs and Hypervisor to request services from
+the Ultravisor such as accessing a register or memory region that can only
+be accessed when running in Ultravisor-privileged mode.
 
-When an interrupt is freed, the shutdown handler computes a 'saved_p'
-field from the value returned by a load in xive_do_source_set_mask().
-This value is incorrect for escalation interrupts for the reason
-described above.
+This patch set adds support for Ultravisor calls and do some preparation
+for running secure guests.
 
-This has no impact on Linux/KVM today because we don't make use of it
-but we will introduce in future changes a xive_get_irqchip_state()
-handler. This handler will use the 'saved_p' field to return the state
-of an interrupt and 'saved_p' being incorrect, softlockup will occur.
-
-Fix the vCPU cleanup sequence by first freeing the escalation
-interrupts if any, then disable the XIVE VP and last free the queues.
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
 ---
- arch/powerpc/kvm/book3s_xive.c        | 18 ++++++++++--------
- arch/powerpc/kvm/book3s_xive_native.c | 12 +++++++-----
- 2 files changed, 17 insertions(+), 13 deletions(-)
+Changelog:
+---
 
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index e3ba67095895..09f838aa3138 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -1134,20 +1134,22 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
- 	/* Mask the VP IPI */
- 	xive_vm_esb_load(&xc->vp_ipi_data, XIVE_ESB_SET_PQ_01);
- 
--	/* Disable the VP */
--	xive_native_disable_vp(xc->vp_id);
--
--	/* Free the queues & associated interrupts */
-+	/* Free escalations */
- 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
--		struct xive_q *q = &xc->queues[i];
--
--		/* Free the escalation irq */
- 		if (xc->esc_virq[i]) {
- 			free_irq(xc->esc_virq[i], vcpu);
- 			irq_dispose_mapping(xc->esc_virq[i]);
- 			kfree(xc->esc_virq_names[i]);
- 		}
--		/* Free the queue */
-+	}
-+
-+	/* Disable the VP */
-+	xive_native_disable_vp(xc->vp_id);
-+
-+	/* Free the queues */
-+	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
-+		struct xive_q *q = &xc->queues[i];
-+
- 		xive_native_disable_queue(xc->vp_id, q, i);
- 		if (q->qpage) {
- 			free_pages((unsigned long)q->qpage,
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index a998823f68a3..368427fcad20 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -67,10 +67,7 @@ void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu)
- 	xc->valid = false;
- 	kvmppc_xive_disable_vcpu_interrupts(vcpu);
- 
--	/* Disable the VP */
--	xive_native_disable_vp(xc->vp_id);
--
--	/* Free the queues & associated interrupts */
-+	/* Free escalations */
- 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
- 		/* Free the escalation irq */
- 		if (xc->esc_virq[i]) {
-@@ -79,8 +76,13 @@ void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu)
- 			kfree(xc->esc_virq_names[i]);
- 			xc->esc_virq[i] = 0;
- 		}
-+	}
- 
--		/* Free the queue */
-+	/* Disable the VP */
-+	xive_native_disable_vp(xc->vp_id);
-+
-+	/* Free the queues */
-+	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
- 		kvmppc_xive_native_cleanup_queue(vcpu, i);
- 	}
- 
+v4->v5:
+
+- New patch "Documentation/powerpc: Ultravisor API"
+
+- Patch "v4: KVM: PPC: Ultravisor: Add generic ultravisor call handler":
+  - Made global the ucall_norets symbol without adding it to the TOC.
+  - Implemented ucall_norets() rather than ucall().
+  - Defined the ucall_norets in "asm/asm-prototypes.h" for symbol
+    versioning.
+  - Renamed to "powerpc/kernel: Add ucall_norets() ultravisor call
+    handler".
+  - Updated the commit message.
+
+- Patch "v4: powerpc: Introduce FW_FEATURE_ULTRAVISOR":
+  - Changed to scan for a node that is compatible with "ibm,ultravisor"
+  - Renamed to "powerpc/powernv: Introduce FW_FEATURE_ULTRAVISOR".
+  - Updated the commit message.
+
+- Patch "v4: KVM: PPC: Ultravisor: Restrict flush of the partition tlb
+  cache":
+  - Merged into "v4: ... Use UV_WRITE_PATE ucall to register a PATE".
+
+- Patch "v4: KVM: PPC: Ultravisor: Use UV_WRITE_PATE ucall to register a
+  PATE":
+  - Added back the missing "ptesync" instruction in flush_partition().
+  - Updated source code comments for the partition table creation.
+  - Factored out "powerpc/mm: Write to PTCR only if ultravisor disabled".
+  - Cleaned up the code a bit.
+  - Renamed to "powerpc/mm: Use UV_WRITE_PATE ucall to register a PATE".
+  - Updated the commit message.
+
+- Patch "v4: KVM: PPC: Ultravisor: Restrict LDBAR access":
+  - Dropped the change that skips loading the IMC driver if ultravisor
+    enabled because skiboot will remove the IMC devtree nodes if
+    ultravisor enabled.
+  - Dropped the BEGIN_{END_}FW_FTR_SECTION_NESTED in power8 code.
+  - Renamed to "powerpc/powernv: Access LDBAR only if ultravisor
+    disabled".
+  - Updated the commit message.
+
+- Patch "v4: KVM: PPC: Ultravisor: Enter a secure guest":
+  - Openned "LOAD_REG_IMMEDIATE(r3, UV_RETURN)" to save instructions
+  - Used R2, rather than R11, to pass synthesized interrupts in
+    UV_RETURN ucall.
+  - Dropped the change that preserves the MSR[S] bit in
+    "kvmppc_msr_interrupt" because that is done by the ultravisor.
+  - Hoisted up the load of R6 and R7 to before "bne ret_to_ultra".
+  - Cleaned up the code a bit.
+  - Renamed to "powerpc/kvm: Use UV_RETURN ucall to return to ultravisor".
+  - Updated the commit message.
+
+- Patch "v4: KVM: PPC: Ultravisor: Check for MSR_S during hv_reset_msr":
+  - Dropped from the patch set because "kvm_arch->secure_guest" rather
+    than MSR[S] is used to determine if we need to return to the
+    ultravisor.
+
+- Patch "v4: KVM: PPC: Ultravisor: Introduce the MSR_S bit":
+  - Moved to the patch set "Secure Virtual Machine Enablement" posted by
+    Thiago Bauermann. MSR[S] is no longer needed in this patch set.
+
+- Rebased to powerpc/next
+
+v3->v4:
+
+- Patch "KVM: PPC: Ultravisor: Add PPC_UV config option":
+  - Moved to the patchset "kvmppc: HMM driver to manage pages of secure
+    guest" v5 that will be posted by Bharata Rao.
+
+- Patch "powerpc: Introduce FW_FEATURE_ULTRAVISOR":
+  - Changed to depend only on CONFIG_PPC_POWERNV.
+
+- Patch "KVM: PPC: Ultravisor: Add generic ultravisor call handler":
+  - Fixed whitespaces in ucall.S and in ultravisor-api.h.
+  - Changed to depend only on CONFIG_PPC_POWERNV.
+  - Changed the ucall wrapper to pass the ucall number in R3.
+
+- Patch "KVM: PPC: Ultravisor: Use UV_WRITE_PATE ucall to register a
+  PATE:
+  - Changed to depend only on CONFIG_PPC_POWERNV.
+
+- Patch "KVM: PPC: Ultravisor: Restrict LDBAR access":
+  - Fixed comment in opal-imc.c to be "Disable IMC devices, when
+    Ultravisor is enabled.
+  - Fixed signed-off-by.
+
+- Patch "KVM: PPC: Ultravisor: Enter a secure guest":
+  - Changed the UV_RETURN assembly call to save the actual R3 in
+    R0 for the ultravisor and pass the UV_RETURN call number in R3.
+
+- Patch "KVM: PPC: Ultravisor: Check for MSR_S during hv_reset_msr":
+  - Fixed commit message.
+
+- Rebased to powerpc/next.
+
+v2->v3:
+
+- Squashed patches:
+  - "KVM: PPC: Ultravisor: Return to UV for hcalls from SVM"
+  - "KVM: PPC: Book3S HV: Fixed for running secure guests"
+- Renamed patch from/to:
+  - "KVM: PPC: Ultravisor: Return to UV for hcalls from SVM"
+  - "KVM: PPC: Ultravisor: Enter a secure guest
+- Rebased
+- Addressed comments from Paul Mackerras
+  - Dropped ultravisor checks made in power8 code
+  - Updated the commit message for:
+       "KVM: PPC: Ultravisor: Enter a secure guest"
+- Addressed comments from Maddy
+  - Dropped imc-pmu.c changes
+- Changed opal-imc.c to fail the probe when the ultravisor is enabled
+- Fixed "ucall defined but not used" issue when CONFIG_PPC_UV not set 
+
+Claudio Carvalho (4):
+  powerpc/kernel: Add ucall_norets() ultravisor call handler
+  powerpc/powernv: Introduce FW_FEATURE_ULTRAVISOR
+  powerpc/mm: Write to PTCR only if ultravisor disabled
+  powerpc/powernv: Access LDBAR only if ultravisor disabled
+
+Michael Anderson (1):
+  powerpc/mm: Use UV_WRITE_PATE ucall to register a PATE
+
+Sukadev Bhattiprolu (2):
+  Documentation/powerpc: Ultravisor API
+  powerpc/kvm: Use UV_RETURN ucall to return to ultravisor
+
+ Documentation/powerpc/ultravisor.rst        | 1055 +++++++++++++++++++
+ arch/powerpc/include/asm/asm-prototypes.h   |   11 +
+ arch/powerpc/include/asm/firmware.h         |    5 +-
+ arch/powerpc/include/asm/kvm_host.h         |    1 +
+ arch/powerpc/include/asm/reg.h              |   13 +
+ arch/powerpc/include/asm/ultravisor-api.h   |   29 +
+ arch/powerpc/include/asm/ultravisor.h       |   22 +
+ arch/powerpc/kernel/Makefile                |    1 +
+ arch/powerpc/kernel/asm-offsets.c           |    1 +
+ arch/powerpc/kernel/prom.c                  |    4 +
+ arch/powerpc/kernel/ucall.S                 |   20 +
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S     |   39 +-
+ arch/powerpc/mm/book3s64/hash_utils.c       |    4 +-
+ arch/powerpc/mm/book3s64/pgtable.c          |   62 +-
+ arch/powerpc/mm/book3s64/radix_pgtable.c    |    6 +-
+ arch/powerpc/platforms/powernv/Makefile     |    1 +
+ arch/powerpc/platforms/powernv/idle.c       |    6 +-
+ arch/powerpc/platforms/powernv/ultravisor.c |   24 +
+ 18 files changed, 1271 insertions(+), 33 deletions(-)
+ create mode 100644 Documentation/powerpc/ultravisor.rst
+ create mode 100644 arch/powerpc/include/asm/ultravisor-api.h
+ create mode 100644 arch/powerpc/include/asm/ultravisor.h
+ create mode 100644 arch/powerpc/kernel/ucall.S
+ create mode 100644 arch/powerpc/platforms/powernv/ultravisor.c
+
 -- 
-2.21.0
+2.20.1
 
