@@ -2,436 +2,257 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FED78A2C2
-	for <lists+kvm-ppc@lfdr.de>; Mon, 12 Aug 2019 17:59:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 214178AD50
+	for <lists+kvm-ppc@lfdr.de>; Tue, 13 Aug 2019 05:52:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725901AbfHLP7H (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 12 Aug 2019 11:59:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56246 "EHLO
+        id S1726812AbfHMDwS convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Mon, 12 Aug 2019 23:52:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3746 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725648AbfHLP7H (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 12 Aug 2019 11:59:07 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7CFv7TE095721;
-        Mon, 12 Aug 2019 11:58:58 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ub95cpe9x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Aug 2019 11:58:58 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7CFtlpb009325;
-        Mon, 12 Aug 2019 15:58:57 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma03wdc.us.ibm.com with ESMTP id 2u9nj61whn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Aug 2019 15:58:57 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7CFwvvO34800034
+        by vger.kernel.org with ESMTP id S1726296AbfHMDwS (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 12 Aug 2019 23:52:18 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7D3plTV071105
+        for <kvm-ppc@vger.kernel.org>; Mon, 12 Aug 2019 23:52:16 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ubk50mrky-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Mon, 12 Aug 2019 23:52:16 -0400
+Received: from localhost
+        by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <ljp@linux.vnet.ibm.com>;
+        Tue, 13 Aug 2019 04:52:15 +0100
+Received: from b01cxnp23032.gho.pok.ibm.com (9.57.198.27)
+        by e12.ny.us.ibm.com (146.89.104.199) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 13 Aug 2019 04:52:13 +0100
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7D3qCjl53150072
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Aug 2019 15:58:57 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F4081112066;
-        Mon, 12 Aug 2019 15:58:56 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AD65112061;
-        Mon, 12 Aug 2019 15:58:55 +0000 (GMT)
-Received: from localhost (unknown [9.85.135.159])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Mon, 12 Aug 2019 15:58:55 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org
-Cc:     Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Claudio Carvalho <cclaudio@linux.ibm.com>,
-        kvm-ppc@vger.kernel.org, Bharata B Rao <bharata@linux.ibm.com>,
-        Ryan Grimm <grimm@linux.ibm.com>,
-        Ram Pai <linuxram@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
-        Guerney Hunt <gdhh@linux.ibm.com>,
-        Thiago Bauermann <bauerman@linux.ibm.com>
-Subject: Re: [PATCH v5 1/7] Documentation/powerpc: Ultravisor API
-In-Reply-To: <20190808040555.2371-2-cclaudio@linux.ibm.com>
-References: <20190808040555.2371-1-cclaudio@linux.ibm.com> <20190808040555.2371-2-cclaudio@linux.ibm.com>
-Date:   Mon, 12 Aug 2019 12:58:53 -0300
-Message-ID: <877e7i74ua.fsf@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Tue, 13 Aug 2019 03:52:12 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 32DF8124054;
+        Tue, 13 Aug 2019 03:52:12 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C2E95124052;
+        Tue, 13 Aug 2019 03:52:11 +0000 (GMT)
+Received: from [9.85.130.107] (unknown [9.85.130.107])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Tue, 13 Aug 2019 03:52:11 +0000 (GMT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH 2/2] powerpc/xive: Implement get_irqchip_state method for
+ XIVE to fix shutdown race
+From:   Lijun Pan <ljp@linux.vnet.ibm.com>
+In-Reply-To: <20190812050743.aczgcqwmtqpkbx2l@oak.ozlabs.ibm.com>
+Date:   Mon, 12 Aug 2019 22:52:11 -0500
+Cc:     linuxppc-dev@ozlabs.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Content-Transfer-Encoding: 8BIT
+References: <20190812050623.ltla46gh5futsqv4@oak.ozlabs.ibm.com>
+ <20190812050743.aczgcqwmtqpkbx2l@oak.ozlabs.ibm.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+X-Mailer: Apple Mail (2.3445.104.11)
 X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-12_06:,,
+x-cbid: 19081303-0060-0000-0000-0000036C168C
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011587; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000287; SDB=6.01246035; UDB=6.00657517; IPR=6.01027540;
+ MB=3.00028155; MTD=3.00000008; XFM=3.00000015; UTC=2019-08-13 03:52:15
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19081303-0061-0000-0000-00004A8823C7
+Message-Id: <E547965E-CC31-470F-8849-0F2A899A121F@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-13_01:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908120177
+ mlxlogscore=917 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908130040
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Claudio Carvalho <cclaudio@linux.ibm.com> writes:
 
-Some small suggestions below:
 
+> On Aug 12, 2019, at 12:07 AM, Paul Mackerras <paulus@ozlabs.org> wrote:
+> 
+> ---
+> arch/powerpc/include/asm/xive.h   |  8 ++++
+> arch/powerpc/kvm/book3s_xive.c    | 31 ++++++++++++++
+> arch/powerpc/sysdev/xive/common.c | 87 ++++++++++++++++++++++++++++-----------
+> 3 files changed, 103 insertions(+), 23 deletions(-)
+> 
+> diff --git a/arch/powerpc/include/asm/xive.h b/arch/powerpc/include/asm/xive.h
+> index e4016985764e..efb0e597b272 100644
+> --- a/arch/powerpc/include/asm/xive.h
+> +++ b/arch/powerpc/include/asm/xive.h
+> @@ -46,7 +46,15 @@ struct xive_irq_data {
+> 
+> 	/* Setup/used by frontend */
+> 	int target;
+> +	/*
+> +	 * saved_p means that there is a queue entry for this interrupt
+> +	 * in some CPU's queue (not including guest vcpu queues), even
+> +	 * if P is not set in the source ESB.
+> +	 * stale_p means that there is no queue entry for this interrupt
+> +	 * in some CPU's queue, even if P is set in the source ESB.
+> +	 */
+> 	bool saved_p;
+> +	bool stale_p;
+> };
+> #define XIVE_IRQ_FLAG_STORE_EOI	0x01
+> #define XIVE_IRQ_FLAG_LSI	0x02
+> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+> index 09f838aa3138..74eea009c095 100644
+> --- a/arch/powerpc/kvm/book3s_xive.c
+> +++ b/arch/powerpc/kvm/book3s_xive.c
+> @@ -160,6 +160,9 @@ static irqreturn_t xive_esc_irq(int irq, void *data)
+> 	 */
+> 	vcpu->arch.xive_esc_on = false;
+> 
+> +	/* This orders xive_esc_on = false vs. subsequent stale_p = true */
+> +	smp_wmb();	/* goes with smp_mb() in cleanup_single_escalation */
 > +
-> +    * The privilege of a process is now determined by three MSR bits,
-> +      MSR(S, HV, PR). In each of the tables below the modes are listed
-> +      from least privilege to highest privilege. The higher privilege
-> +      modes can access all the resources of the lower privilege modes.
+> 	return IRQ_HANDLED;
+> }
+> 
+> @@ -1113,6 +1116,31 @@ void kvmppc_xive_disable_vcpu_interrupts(struct kvm_vcpu *vcpu)
+> 	vcpu->arch.xive_esc_raddr = 0;
+> }
+> 
+> +/*
+> + * In single escalation mode, the escalation interrupt is marked so
+> + * that EOI doesn't re-enable it, but just sets the stale_p flag to
+> + * indicate that the P bit has already been dealt with.  However, the
+> + * assembly code that enters the guest sets PQ to 00 without clearing
+> + * stale_p (because it has no easy way to address it).  Hence we have
+> + * to adjust stale_p before shutting down the interrupt.
+> + */
+> +static void cleanup_single_escalation(struct kvm_vcpu *vcpu,
+> +				      struct kvmppc_xive_vcpu *xc, int irq)
+> +{
+> +	struct irq_data *d = irq_get_irq_data(irq);
+> +	struct xive_irq_data *xd = irq_data_get_irq_handler_data(d);
 > +
-> +      **Secure Mode MSR Settings**
-> +
-> +      +---+---+---+---------------+
-> +      | S | HV| PR|Privilege      |
-> +      +===+===+===+===============+
-> +      | 1 | 0 | 1 | Problem       |
-> +      +---+---+---+---------------+
-> +      | 1 | 0 | 0 | Privileged(OS)|
-> +      +---+---+---+---------------+
-> +      | 1 | 1 | 0 | Ultravisor    |
-> +      +---+---+---+---------------+
-> +      | 1 | 1 | 1 | Reserved      |
-> +      +---+---+---+---------------+
-> +
-> +      **Normal Mode MSR Settings**
-> +
-> +      +---+---+---+---------------+
-> +      | S | HV| PR|Privilege      |
-> +      +===+===+===+===============+
-> +      | 0 | 0 | 1 | Problem       |
-> +      +---+---+---+---------------+
-> +      | 0 | 0 | 0 | Privileged(OS)|
-> +      +---+---+---+---------------+
-> +      | 0 | 1 | 0 | Hypervisor    |
-> +      +---+---+---+---------------+
-> +      | 0 | 1 | 1 | Problem (HV)  |
-> +      +---+---+---+---------------+
+> +	/*
+> +	 * This slightly odd sequence gives the right result
+> +	 * (i.e. stale_p set if xive_esc_on is false) even if
+> +	 * we race with xive_esc_irq() and xive_irq_eoi().
+> +	 */
 
-I find the use of '(HV)' in this last line a bit ambiguous. Since we are
-already using 'HV' to refer to MSR(HV). I'd suggest using '(Host)' or
-simply leaving it out.
+Hi Paul,
 
-> +
-> +    * Memory is partitioned into secure and normal memory. Only processes
-> +      that are running in secure mode can access secure memory.
-> +
-> +    * The hardware does not allow anything that is not running secure to
-> +      access secure memory. This means that the Hypervisor cannot access
-> +      the memory of the SVM without using an ultracall (asking the
-> +      Ultravisor). The Ultravisor will only allow the hypervisor to see
-> +      the SVM memory encrypted.
-> +
-> +    * I/O systems are not allowed to directly address secure memory. This
-> +      limits the SVMs to virtual I/O only.
-> +
-> +    * The architecture allows the SVM to share pages of memory with the
-> +      hypervisor that are not protected with encryption. However, this
-> +      sharing must be initiated by the SVM.
-> +
-> +    * When a process is running in secure mode all hypercalls
-> +      (syscall lev=1) are reflected to the Ultravisor.
+I don’t quite understand the logic here.
+Are you saying the code sequence is
+vcpu->arch.xive_esc_on = false; (xive_esc_irq)
+then
+xd->stale_p = true; (cleanup_single_escaltion)
 
-Here 'reflected' refers to the Ultravisor. Later on, it is used as
-meaning the Ultravisor reflects hypercalls/interrupts to the
-Hypervisor. I suggest we use this term to mean the latter only.
+> +	xd->stale_p = false;
+> +	smp_mb();		/* paired with smb_wmb in xive_esc_irq */
+> +	if (!vcpu->arch.xive_esc_on)
+> +		xd->stale_p = true;
+> +}
+> +
+> void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
+> {
+> 	struct kvmppc_xive_vcpu *xc = vcpu->arch.xive_vcpu;
+> @@ -1137,6 +1165,9 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
+> 	/* Free escalations */
+> 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
+> 		if (xc->esc_virq[i]) {
+> +			if (xc->xive->single_escalation)
+> +				cleanup_single_escalation(vcpu, xc,
+> +							  xc->esc_virq[i]);
+> 			free_irq(xc->esc_virq[i], vcpu);
+> 			irq_dispose_mapping(xc->esc_virq[i]);
+> 			kfree(xc->esc_virq_names[i]);
+> diff --git a/arch/powerpc/sysdev/xive/common.c b/arch/powerpc/sysdev/xive/common.c
+> index 1cdb39575eae..be86fce1a84e 100644
+> --- a/arch/powerpc/sysdev/xive/common.c
+> +++ b/arch/powerpc/sysdev/xive/common.c
+> @@ -135,7 +135,7 @@ static u32 xive_read_eq(struct xive_q *q, bool just_peek)
+> static u32 xive_scan_interrupts(struct xive_cpu *xc, bool just_peek)
+> {
+> 	u32 irq = 0;
+> -	u8 prio;
+> +	u8 prio = 0;
+> 
+> 	/* Find highest pending priority */
+> 	while (xc->pending_prio != 0) {
+> @@ -148,8 +148,19 @@ static u32 xive_scan_interrupts(struct xive_cpu *xc, bool just_peek)
+> 		irq = xive_read_eq(&xc->queue[prio], just_peek);
+> 
+> 		/* Found something ? That's it */
+> -		if (irq)
+> -			break;
+> +		if (irq) {
+> +			if (just_peek || irq_to_desc(irq))
+> +				break;
+> +			/*
+> +			 * We should never get here; if we do then we must
+> +			 * have failed to synchronize the interrupt properly
+> +			 * when shutting it down.
+> +			 */
+> +			pr_crit("xive: got interrupt %d without descriptor, dropping\n",
+> +				irq);
+> +			WARN_ON(1);
+> +			continue;
+> +		}
+> 
+> 		/* Clear pending bits */
+> 		xc->pending_prio &= ~(1 << prio);
+> @@ -307,6 +318,7 @@ static void xive_do_queue_eoi(struct xive_cpu *xc)
+>  */
+> static void xive_do_source_eoi(u32 hw_irq, struct xive_irq_data *xd)
+> {
+> +	xd->stale_p = false;
+> 	/* If the XIVE supports the new "store EOI facility, use it */
+> 	if (xd->flags & XIVE_IRQ_FLAG_STORE_EOI)
+> 		xive_esb_write(xd, XIVE_ESB_STORE_EOI, 0);
+> @@ -350,7 +362,7 @@ static void xive_do_source_eoi(u32 hw_irq, struct xive_irq_data *xd)
+> 	}
+> }
+> 
+> -/* irq_chip eoi callback */
+> +/* irq_chip eoi callback, called with irq descriptor lock held */
+> static void xive_irq_eoi(struct irq_data *d)
+> {
+> 	struct xive_irq_data *xd = irq_data_get_irq_handler_data(d);
+> @@ -366,6 +378,8 @@ static void xive_irq_eoi(struct irq_data *d)
+> 	if (!irqd_irq_disabled(d) && !irqd_is_forwarded_to_vcpu(d) &&
+> 	    !(xd->flags & XIVE_IRQ_NO_EOI))
+> 		xive_do_source_eoi(irqd_to_hwirq(d), xd);
+> +	else
+> +		xd->stale_p = true;
+> 
+> 	/*
+> 	 * Clear saved_p to indicate that it's no longer occupying
+> @@ -397,11 +411,16 @@ static void xive_do_source_set_mask(struct xive_irq_data *xd,
+> 	 */
+> 	if (mask) {
+> 		val = xive_esb_read(xd, XIVE_ESB_SET_PQ_01);
+> -		xd->saved_p = !!(val & XIVE_ESB_VAL_P);
+> -	} else if (xd->saved_p)
+> +		if (!xd->stale_p && !!(val & XIVE_ESB_VAL_P))
+> +			xd->saved_p = true;
+> +		xd->stale_p = false;
+> +	} else if (xd->saved_p) {
+> 		xive_esb_read(xd, XIVE_ESB_SET_PQ_10);
+> -	else
+> +		xd->saved_p = false;
 
-> +
-> +    * When a process is in secure mode all interrupts go to the
-> +      Ultravisor.
-> +
-> +    * The following resources have become Ultravisor privileged and
-> +      require an Ultravisor interface to manipulate:
-> +
-> +      * Processor configurations registers (SCOMs).
-> +
-> +      * Stop state information.
-> +
-> +      * The debug registers CIABR, DAWR, and DAWRX become Ultravisor
-> +        resources when SMFCTRL(D) is set. If SMFCTRL(D) is not set they do
+Should we also explicitly set xd->stale_p = true; here?
 
-It looks like you could go without "become Ultravisor resources" since
-it is already mentioned in the parent item above (The following...).
+> +	} else {
+> 		xive_esb_read(xd, XIVE_ESB_SET_PQ_00);
+> +		xd->stale_p = false;
 
-> +        not work in secure mode. When set, reading and writing requires
-> +        an Ultravisor call, otherwise that will cause a Hypervisor Emulation
-> +        Assistance interrupt.
-> +
-> +      * PTCR and partition table entries (partition table is in secure
-> +        memory). An attempt to write to PTCR will cause a Hypervisor
-> +        Emulation Assitance interrupt.
-> +
-> +      * LDBAR (LD Base Address Register) and IMC (In-Memory Collection)
-> +        non-architected registers. An attempt to write to them will cause a
-> +        Hypervisor Emulation Assistance interrupt.
-> +
-> +      * Paging for an SVM, sharing of memory with Hypervisor for an SVM.
-> +        (Including Virtual Processor Area (VPA) and virtual I/O).
-> +
-> +
-> +Software/Microcode
-> +==================
-> +
-> +    The software changes include:
-> +
-> +    * SVMs are created from normal VM using (open source) tooling supplied
-> +      by IBM.
-> +
-> +    * All SVMs start as normal VMs and utilize an ultracall, UV_ESM
-> +      (Enter Secure Mode), to make the transition.
-> +
-> +    * When the UV_ESM ultracall is made the Ultravisor copies the VM into
-> +      secure memory, decrypts the verification information, and checks the
-> +      integrity of the SVM. If the integrity check passes the Ultravisor
-> +      passes control in secure mode.
-> +
-> +    * For external interrupts the Ultravisor saves the state of the SVM,
-> +      and reflects the interrupt to the hypervisor for processing.
-> +      For hypercalls, the Ultravisor inserts neutral state into all
-> +      registers not needed for the hypercall then reflects the call to
-> +      the hypervisor for processing. The H_RANDOM hypercall is performed
-> +      by the Ultravisor and not reflected.
-> +
-> +    * The verification information includes the pass phrase for the
-> +      encrypted disk associated with the SVM. This pass phrase is given
-> +      to the SVM when requested.
+Should we also explicitly set xd->saved_p = true; here?
 
-This is the second mention of 'verification information'. Could we
-perhaps move this up after "SMVs are created..." and rephrase it in a way
-that introduces the concept?  What/where/in what state is the
-verification information?
-
-> +
-> +    * The Ultravisor is not involved in protecting the encrypted disk of
-> +      the SVM while at rest.
-> +
-> +    * For virtual I/O to work bounce buffering must be done.
-> +
-> +    * The Ultravisor uses AES (IAPM) for protection of SVM memory. IAPM
-> +      is a mode of AES that provides integrity and secrecy concurrently.
-> +
-> +    * The movement of data between normal and secure pages is coordinated
-> +      with the Ultravisor by a new HMM plug-in in the Hypervisor.
-> +
-> +    The Ultravisor offers new services to the hypervisor and SVMs. These
-> +    are accessed through ultracalls.
-> +
-> +Terminology
-> +===========
-> +
-> +    * Hypercalls: special system calls used to request services from
-> +      Hypervisor.
-> +
-> +    * Normal memory: Memory that is accessible to Hypervisor.
-> +
-> +    * Normal page: Page backed by normal memory and available to
-> +      Hypervisor.
-> +
-> +    * Shared page: A page backed by normal memory and available to both
-> +      the Hypervisor/QEMU and the SVM (i.e page has mappings in SVM and
-> +      Hypervisor/QEMU).
-> +
-> +    * Secure memory: Memory that is accessible only to Ultravisor and
-> +      SVMs.
-> +
-> +    * Secure page: Page backed by secure memory and only available to
-> +      Ultravisor and SVM.
-> +
-> +    * SVM: Secure Virtual Machine.
-> +
-> +    * Ultracalls: special system calls used to request services from
-> +      Ultravisor.
-> +
-> +
-> +Ultravisor calls API
-> +####################
-> +
-> +    This section describes Ultravisor calls (ultracalls) needed to
-> +    support Secure Virtual Machines (SVM)s and Paravirtalized KVM. The
-
-Paravirtualized
-
-> +    ultracalls allow the SVMs and Hypervisor to request services from the
-> +    Ultravisor such as accessing a register or memory region that can only
-> +    be accessed when running in Ultravisor-privileged mode.
-> +
-> +    The specific service needed from an ultracall is specified in register
-> +    R3 (the first parameter to the ultracall). Other parameters to the
-> +    ultracall, if any, are specified in registers R4 through R12.
-> +
-> +    Return value of all ultracalls is in register R3. Other output values
-> +    from the ultracall, if any, are returned in registers R4 through R12.
-> +    The only exception to this register usage is the ``UV_RETURN``
-> +    ultracall described below.
-> +
-> +    Each ultracall returns specific error codes, applicable in the context
-> +    of the ultracall. However, like with the PowerPC Architecture Platform
-> +    Reference (PAPR), if no specific error code is defined for a
-> +    particular situation, then the ultracall will fallback to an erroneous
-> +    parameter-position based code. i.e U_PARAMETER, U_P2, U_P3 etc
-> +    depending on the ultracall parameter that may have caused the error.
-> +
-> +    Some ultracalls involve transferring a page of data between Ultravisor
-> +    and Hypervisor.  Secure pages that are transferred from secure memory
-> +    to normal memory may be encrypted using dynamically generated keys.
-> +    When the secure pages are transferred back to secure memory, they may
-> +    be decrypted using the same dynamically generated keys. Generation and
-> +    management of these keys will be covered in a separate document.
-> +
-> +    For now this only covers ultracalls currently implemented and being
-> +    used by Hypervisor and SVMs but others can be added here when it
-> +    makes sense.
-> +
-> +    The full specification for all hypercalls/ultracalls will eventually
-> +    be made available in the public/OpenPower version of the PAPR
-> +    specification.
-> +
-> +    **Note**
-> +
-> +    If PEF is not enabled, the ultracalls will be redirected to the
-> +    Hypervisor which must handle/fail the calls.
-> +
-> +Ultracalls used by Hypervisor
-> +=============================
-> +
-> +    This section describes the virtual memory management ultracalls used
-> +    by the Hypervisor to manage SVMs.
-> +
-> +UV_PAGE_OUT
-> +-----------
-> +
-> +    Encrypt and move the contents of a page from secure memory to normal
-> +    memory.
-> +
-> +Syntax
-> +~~~~~~
-> +
-> +.. code-block:: c
-> +
-> +	uint64_t ultracall(const uint64_t UV_PAGE_OUT,
-> +		uint16_t lpid,		/* LPAR ID */
-> +		uint64_t dest_ra,	/* real address of destination page */
-> +		uint64_t src_gpa,	/* source guest-physical-address */
-> +		uint8_t  flags,		/* flags */
-> +		uint64_t order)		/* page size order */
-> +
-> +Return values
-> +~~~~~~~~~~~~~
-> +
-> +    One of the following values:
-> +
-> +	* U_SUCCESS	on success.
-> +	* U_PARAMETER	if ``lpid`` is invalid.
-> +	* U_P2 		if ``dest_ra`` is invalid.
-> +	* U_P3		if the ``src_gpa`` address is invalid.
-> +	* U_P4		if any bit in the ``flags`` is unrecognized
-> +	* U_P5		if the ``order`` parameter is unsupported.
-> +	* U_FUNCTION	if functionality is not supported.
-> +	* U_BUSY	if page cannot be currently paged-out.
-> +
-> +Description
-> +~~~~~~~~~~~
-> +
-> +    Encrypt the contents of a secure-page and make it available to
-> +    Hypervisor in a normal page.
-> +
-> +    By default, the source page is unmapped from the SVM's partition-
-> +    scoped page table. But the Hypervisor can provide a hint to the
-> +    Ultravisor to retain the page mapping by setting the ``UV_SNAPSHOT``
-> +    flag in ``flags`` parameter.
-> +
-> +    If the source page is already a shared page the call returns
-> +    U_SUCCESS, without doing anything.
-> +
-> +Use cases
-> +~~~~~~~~~
-> +
-> +    #. QEMU attempts to access an address belonging to the SVM but the
-> +       page frame for that address is not mapped into QEMU's address
-> +       space. In this case, the Hypervisor will allocate a page frame,
-> +       map it into QEMU's address space and issue the ``UV_PAGE_OUT``
-> +       call to retrieve the encrypted contents of the page.
-> +
-> +    #. When Ultravisor runs low on secure memory and it needs to page-out
-> +       an LRU page. In this case, Ultravisor will issue the
-> +       ``H_SVM_PAGE_OUT`` hypercall to the Hypervisor. The Hypervisor will
-> +       then allocate a normal page and issue the ``UV_PAGE_OUT`` ultracall
-> +       and the Ultravisor will encrypt and move the contents of the secure
-> +       page into the normal page.
-> +
-> +
-> +UV_PAGE_IN
-> +----------
-> +
-> +    Move the contents of a page from normal memory to secure memory.
-> +
-> +Syntax
-> +~~~~~~
-> +
-> +.. code-block:: c
-> +
-> +	uint64_t ultracall(const uint64_t UV_PAGE_IN,
-> +		uint16_t lpid,		/* the LPAR ID */
-> +		uint64_t src_ra,	/* source real address of page */
-> +		uint64_t dest_gpa,	/* destination guest physical address */
-> +		uint64_t flags,		/* flags */
-> +		uint64_t order)		/* page size order */
-> +
-> +Return values
-> +~~~~~~~~~~~~~
-> +
-> +    One of the following values:
-> +
-> +	* U_SUCCESS	on success.
-> +	* U_BUSY	if page cannot be currently paged-in.
-> +	* U_FUNCTION	if functionality is not supported
-> +	* U_PARAMETER	if ``lpid`` is invalid.
-> +	* U_P2 		if ``src_ra`` is invalid.
-> +	* U_P3		if the ``dest_gpa`` address is invalid.
-> +	* U_P4		if any bit in the ``flags`` is unrecognized
-> +	* U_P5		if the ``order`` parameter is unsupported.
-> +
-> +Description
-> +~~~~~~~~~~~
-> +
-> +    Move the contents of the page identified by ``src_ra`` from normal
-> +    memory to secure memory and map it to the guest physical address
-> +    ``dest_gpa``.
-> +
-> +    If `dest_gpa` refers to a shared address, map the page into the
-> +    partition-scoped page-table of the SVM.  If `dest_gpa` is not shared,
-> +    copy the contents of the page into the corresponding secure page.
-> +    Depending on the context, decrypt the page before being copied.
-> +
-> +    The caller provides the attributes of the page through the ``flags``
-> +    parameter. Valid values for ``flags`` are:
-> +
-> +	* CACHE_INHIBITED
-> +	* CACHE_ENABLED
-> +	* WRITE_PROTECTION
-> +
-> +    The Hypervisor must pin the page in memory before making
-> +    ``UV_PAGE_IN`` ultracall.
-> +
-> +Use cases
-> +~~~~~~~~~
-> +
-> +    #. When a normal VM switches to secure mode, all its pages residing
-> +       in normal memory, are moved into secure memory.
-> +
-> +    #. When an SVM requests to share a page with Hypervisor the Hypervisor
-> +       allocates a page and informs the Ultravisor.
-> +
-> +    #. When an SVM accesses a secure page that has been paged-out,
-> +       Ultravisor invokes the Hypervisor to locate the page. After
-> +       locating the page, the Hypervisor uses UV_PAGE_IN to make the
-> +       page available to Ultravisor.
-> +
-> +    #. When Hypervisor accesses SVM data, the Hypervisor requests the
-> +       Ultravisor to transfer the corresponding page into a insecure page,
-> +       which the Hypervisor can access. The data in the normal page will
-> +       be encrypted though.
-
-This looks like it should be under UV_PAGE_OUT instead.
+Thanks,
+Lijun
 
