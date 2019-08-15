@@ -2,75 +2,100 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A052C8DD0C
-	for <lists+kvm-ppc@lfdr.de>; Wed, 14 Aug 2019 20:35:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD0F98F20D
+	for <lists+kvm-ppc@lfdr.de>; Thu, 15 Aug 2019 19:22:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728390AbfHNSer (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 14 Aug 2019 14:34:47 -0400
-Received: from gate.crashing.org ([63.228.1.57]:39492 "EHLO gate.crashing.org"
+        id S1730474AbfHORWj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 15 Aug 2019 13:22:39 -0400
+Received: from mga01.intel.com ([192.55.52.88]:19173 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726522AbfHNSer (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 14 Aug 2019 14:34:47 -0400
-Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
-        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id x7EIYYlH007378;
-        Wed, 14 Aug 2019 13:34:34 -0500
-Received: (from segher@localhost)
-        by gate.crashing.org (8.14.1/8.14.1/Submit) id x7EIYWLs007377;
-        Wed, 14 Aug 2019 13:34:32 -0500
-X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
-Date:   Wed, 14 Aug 2019 13:34:32 -0500
-From:   Segher Boessenkool <segher@kernel.crashing.org>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org,
-        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>, kvm-ppc@vger.kernel.org,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Ryan Grimm <grimm@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
-        Guerney Hunt <gdhh@linux.ibm.com>,
-        Thiago Bauermann <bauerman@linux.ibm.com>
-Subject: Re: [PATCH v5 2/7] powerpc/kernel: Add ucall_norets() ultravisor call handler
-Message-ID: <20190814183432.GG31406@gate.crashing.org>
-References: <20190808040555.2371-1-cclaudio@linux.ibm.com> <20190808040555.2371-3-cclaudio@linux.ibm.com> <87wofgqb2g.fsf@concordia.ellerman.id.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+        id S1729931AbfHORWj (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 15 Aug 2019 13:22:39 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Aug 2019 10:22:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,389,1559545200"; 
+   d="scan'208";a="179427792"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
+  by orsmga003.jf.intel.com with ESMTP; 15 Aug 2019 10:22:38 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paul Mackerras <paulus@ozlabs.org>, Joerg Roedel <joro@8bytes.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: Assert that struct kvm_vcpu is always as offset zero
+Date:   Thu, 15 Aug 2019 10:22:37 -0700
+Message-Id: <20190815172237.10464-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.22.0
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87wofgqb2g.fsf@concordia.ellerman.id.au>
-User-Agent: Mutt/1.4.2.3i
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Aug 14, 2019 at 08:46:15PM +1000, Michael Ellerman wrote:
-> Claudio Carvalho <cclaudio@linux.ibm.com> writes:
-> > +_GLOBAL(ucall_norets)
-> > +EXPORT_SYMBOL_GPL(ucall_norets)
-> > +	mfcr	r0
-> > +	stw	r0,8(r1)
-> > +
-> > +	sc	2		/* Invoke the ultravisor */
-> > +
-> > +	lwz	r0,8(r1)
-> > +	mtcrf	0xff,r0
-> > +	blr			/* Return r3 = status */
-> 
-> Paulus points that we shouldn't need to save CR here. Our caller will
-> have already saved it if it needed to, and we don't use CR in this
-> function so we don't need to save it.
-> 
-> That's assuming the Ultravisor follows the hcall ABI in which CR2-4 are
-> non-volatile (PAPR § 14.5.3).
+KVM implementations that wrap struct kvm_vcpu with a vendor specific
+struct, e.g. struct vcpu_vmx, must place the vcpu member at offset 0,
+otherwise the usercopy region intended to encompass struct kvm_vcpu_arch
+will instead overlap random chunks of the vendor specific struct.
+E.g. padding a large number of bytes before struct kvm_vcpu triggers
+a usercopy warn when running with CONFIG_HARDENED_USERCOPY=y.
 
-And assuming the ultravisor already clears (or sets, or whatever) all CR
-fields it does not want to leak the contents of (which it also should,
-of course).
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
 
-> I know plpar_hcall_norets() does save CR, but it shouldn't need to, that
-> seems to be historical. aka. no one knows why it does it but it always
-> has.
+Note, the PowerPC change is completely untested.
 
+ arch/powerpc/kvm/e500.c | 3 +++
+ arch/x86/kvm/svm.c      | 3 +++
+ arch/x86/kvm/vmx/vmx.c  | 3 +++
+ 3 files changed, 9 insertions(+)
 
-Segher
+diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
+index b5a848a55504..00649ca5fa9a 100644
+--- a/arch/powerpc/kvm/e500.c
++++ b/arch/powerpc/kvm/e500.c
+@@ -440,6 +440,9 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_e500(struct kvm *kvm,
+ 	struct kvm_vcpu *vcpu;
+ 	int err;
+ 
++	BUILD_BUG_ON_MSG(offsetof(struct kvmppc_vcpu_e500, vcpu) != 0,
++		"struct kvm_vcpu must be at offset 0 for arch usercopy region");
++
+ 	vcpu_e500 = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
+ 	if (!vcpu_e500) {
+ 		err = -ENOMEM;
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index d685491fce4d..70015ae5fc19 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -2137,6 +2137,9 @@ static struct kvm_vcpu *svm_create_vcpu(struct kvm *kvm, unsigned int id)
+ 	struct page *nested_msrpm_pages;
+ 	int err;
+ 
++	BUILD_BUG_ON_MSG(offsetof(struct vcpu_svm, vcpu) != 0,
++		"struct kvm_vcpu must be at offset 0 for arch usercopy region");
++
+ 	svm = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
+ 	if (!svm) {
+ 		err = -ENOMEM;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 42ed3faa6af8..402cf2fe5cdd 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6615,6 +6615,9 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+ 	unsigned long *msr_bitmap;
+ 	int cpu;
+ 
++	BUILD_BUG_ON_MSG(offsetof(struct vcpu_vmx, vcpu) != 0,
++		"struct kvm_vcpu must be at offset 0 for arch usercopy region");
++
+ 	vmx = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
+ 	if (!vmx)
+ 		return ERR_PTR(-ENOMEM);
+-- 
+2.22.0
+
