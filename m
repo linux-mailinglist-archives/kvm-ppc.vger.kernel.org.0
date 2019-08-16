@@ -2,100 +2,66 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DD0F98F20D
-	for <lists+kvm-ppc@lfdr.de>; Thu, 15 Aug 2019 19:22:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9331B8F962
+	for <lists+kvm-ppc@lfdr.de>; Fri, 16 Aug 2019 05:10:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730474AbfHORWj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 15 Aug 2019 13:22:39 -0400
-Received: from mga01.intel.com ([192.55.52.88]:19173 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729931AbfHORWj (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 15 Aug 2019 13:22:39 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Aug 2019 10:22:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,389,1559545200"; 
-   d="scan'208";a="179427792"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by orsmga003.jf.intel.com with ESMTP; 15 Aug 2019 10:22:38 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paul Mackerras <paulus@ozlabs.org>, Joerg Roedel <joro@8bytes.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: Assert that struct kvm_vcpu is always as offset zero
-Date:   Thu, 15 Aug 2019 10:22:37 -0700
-Message-Id: <20190815172237.10464-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.22.0
+        id S1726487AbfHPDKk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 15 Aug 2019 23:10:40 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:34030 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726437AbfHPDKk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 15 Aug 2019 23:10:40 -0400
+Received: by mail-oi1-f195.google.com with SMTP id l12so3842352oil.1
+        for <kvm-ppc@vger.kernel.org>; Thu, 15 Aug 2019 20:10:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=zXK8wSxYeU6mTfAA+o9q9brcj/U7vzDk9wL4rKw+72U=;
+        b=e9+bE3nA9Pf0tnkg3xp9AiRTCtL2qE8TIpSBWeyE7Imc9WdbI29ecHHwDOOc7UhZGC
+         WhDddR6X+i+m2+4LjbuyeUTBZSITetS0DO/b78fNyb3VjtfCeRLrhts4eQjMGlRHi60z
+         p55+odb6x67waxditCtni4cUSuAm6C8oZl28X+2/gavqSzzqw4R44PLYEEutyUdDj61b
+         M++9XIR3JrQ3rlIZAqfCTkcJFc6tQ81pNTjgHU1k8ewOR5ReuP78qSnDwTmuWGfrafs7
+         VA5/yuwPXFvdMpu+Ni0XSJG0mkKbwUVVUHKPsqc0fqTiX7jhyQl+uikxnJt6qX6fXFGV
+         rRRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=zXK8wSxYeU6mTfAA+o9q9brcj/U7vzDk9wL4rKw+72U=;
+        b=BEgoNdgQwMqdYKUJPOsdRhX0k6D9XTZgZdixUXazkmLO+z/DACuUjoUeUYnuovZPDx
+         nC2WHUmK/XK5tJN+bpzVgqfdCdiHJaVXdj/3cpu5oZmV8V88Wc5IcFprG+ok5yrqmNaJ
+         XhSgA2AYxoiPitADQGEJidRImbHITTM0PnKCyO7ZSTwiZiwJ7cqSPIbcsMMxJeeL2oQR
+         HyEXo1OIdDhTO+AapeXCdw7JtcxpxFCN+9t2MmzYMQsrcBC91on+EGoyuoNtp2TlwXwn
+         jUom43c0y4Ryahk5JojUS+AbGRDykErx9ru5Gk9oisisgb4MgjFMhtSHIgE3zOmQZ4W+
+         xQEA==
+X-Gm-Message-State: APjAAAV7MaFxYHW446mH/cIXFSGggHZmv5eyvyTZe/A/bEBLkvTxEKX+
+        BzGM4IUTJj+eP74/P6B2TWmGwWkzWuPZKppiRYE=
+X-Google-Smtp-Source: APXvYqx8LOj9HK2JIGJv7L318vzz7tYycTill9ahx8kyDc2JCHvUJczs31TXE7yd9KPVvJXZo+ax3vHBhcnuoI5VgDE=
+X-Received: by 2002:aca:f1c4:: with SMTP id p187mr3356030oih.149.1565925039626;
+ Thu, 15 Aug 2019 20:10:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a8a:13c6:0:0:0:0:0 with HTTP; Thu, 15 Aug 2019 20:10:39
+ -0700 (PDT)
+Reply-To: linelink008@gmail.com
+From:   AZIM HASHIM PREMJI <linelink003@gmail.com>
+Date:   Thu, 15 Aug 2019 20:10:39 -0700
+Message-ID: <CAGLKtBVnV+VkY5eZzO_39wXxdZbbATDGv48pn40Pin5uJjei8g@mail.gmail.com>
+Subject: =?UTF-8?Q?HERZLICHEN_GL=C3=9CCKWUNSCH_=E2=82=AC_1=2C000=2E000=2C00_wurde_an_Si?=
+        =?UTF-8?Q?e_gespendet?=
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-KVM implementations that wrap struct kvm_vcpu with a vendor specific
-struct, e.g. struct vcpu_vmx, must place the vcpu member at offset 0,
-otherwise the usercopy region intended to encompass struct kvm_vcpu_arch
-will instead overlap random chunks of the vendor specific struct.
-E.g. padding a large number of bytes before struct kvm_vcpu triggers
-a usercopy warn when running with CONFIG_HARDENED_USERCOPY=y.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
-
-Note, the PowerPC change is completely untested.
-
- arch/powerpc/kvm/e500.c | 3 +++
- arch/x86/kvm/svm.c      | 3 +++
- arch/x86/kvm/vmx/vmx.c  | 3 +++
- 3 files changed, 9 insertions(+)
-
-diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
-index b5a848a55504..00649ca5fa9a 100644
---- a/arch/powerpc/kvm/e500.c
-+++ b/arch/powerpc/kvm/e500.c
-@@ -440,6 +440,9 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_e500(struct kvm *kvm,
- 	struct kvm_vcpu *vcpu;
- 	int err;
- 
-+	BUILD_BUG_ON_MSG(offsetof(struct kvmppc_vcpu_e500, vcpu) != 0,
-+		"struct kvm_vcpu must be at offset 0 for arch usercopy region");
-+
- 	vcpu_e500 = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
- 	if (!vcpu_e500) {
- 		err = -ENOMEM;
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index d685491fce4d..70015ae5fc19 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -2137,6 +2137,9 @@ static struct kvm_vcpu *svm_create_vcpu(struct kvm *kvm, unsigned int id)
- 	struct page *nested_msrpm_pages;
- 	int err;
- 
-+	BUILD_BUG_ON_MSG(offsetof(struct vcpu_svm, vcpu) != 0,
-+		"struct kvm_vcpu must be at offset 0 for arch usercopy region");
-+
- 	svm = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
- 	if (!svm) {
- 		err = -ENOMEM;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 42ed3faa6af8..402cf2fe5cdd 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6615,6 +6615,9 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- 	unsigned long *msr_bitmap;
- 	int cpu;
- 
-+	BUILD_BUG_ON_MSG(offsetof(struct vcpu_vmx, vcpu) != 0,
-+		"struct kvm_vcpu must be at offset 0 for arch usercopy region");
-+
- 	vmx = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
- 	if (!vmx)
- 		return ERR_PTR(-ENOMEM);
--- 
-2.22.0
-
+Ich bin der Vorsitzende von Wipro Limited. Ich habe 25 Prozent meines
+pers=C3=B6nlichen Verm=C3=B6gens verschenkt
+f=C3=BCr die Wohlfahrt. Und ich habe zugesagt, den Rest von 25% dieses Jahr
+2019 an zu vergeben
+Privatpersonen .. Ich habe mich entschieden, Ihnen =E2=82=AC1.000.000,00 zu
+spenden. Wenn du bist
+Interesse an meiner Spende, kontaktieren Sie mich f=C3=BCr weitere Informat=
+ionen.
