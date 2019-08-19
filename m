@@ -2,73 +2,101 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 119E8907B4
-	for <lists+kvm-ppc@lfdr.de>; Fri, 16 Aug 2019 20:25:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F391191ADE
+	for <lists+kvm-ppc@lfdr.de>; Mon, 19 Aug 2019 03:51:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727542AbfHPSZR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 16 Aug 2019 14:25:17 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:40385 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727451AbfHPSZR (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 16 Aug 2019 14:25:17 -0400
-Received: by mail-io1-f66.google.com with SMTP id t6so8059567ios.7
-        for <kvm-ppc@vger.kernel.org>; Fri, 16 Aug 2019 11:25:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=F3S+OzCu1yWNtyjcTHvpsq8kAfwz2WK26QR/yvCAhDU=;
-        b=IN9VuSV7Ibz7E3uVf36DPoeJdSpkGxFHLj6dYNXmXyvQUe4qrojb6pxghaMlkgzjjW
-         fnLDH3LqQ/rIcKzF+XvRbXESIepDNxB0cACcWUEPUQrFp/mKpC4tAvvDNkDxQhKvZLAv
-         DAH75Tga2mmL1lUplWY5DATKzyAhP35VRFzMLyLQQiSEDtmaM2PNRNtsQObBmj2X1jyM
-         OqOQzpQlHmCFChzBmZfGVp14m6nq/gwXheIIWaCvNIrK5qsq8wleodU9gr3l8yGtCweJ
-         Ovi03mGWOzfTMuSzyYAAq9bZRLCKKTeVZHcv13F64CzQqKly7IjGma4x+S84NYwpq6ML
-         4ePQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=F3S+OzCu1yWNtyjcTHvpsq8kAfwz2WK26QR/yvCAhDU=;
-        b=kIDR6fLM2/Eg2wNZaJDed2uK5eKkykJin/C/2F/yJHz8bAc2Pr52EYJwfdzJmRRHff
-         4XN2lvXW+Q3zJPdO1yazIZTHHhwAWoO57DoZbYIqzhhuZh7SIFiwN6odXze37CgO+npO
-         oLOVaognAJGiXeqfPUlE6ywWJOto0Mj8dx/AqzWECiePtVBvbfKQhAmt3HV4wi8hfRpZ
-         WptKN96KC6rW8v3FY4gEu0vi8dhpJJ32PRqrellnzE4r8GdegKsb5SXXU+WAvjIH2NE2
-         s5emuwBIby0m6z5GWQR8VJfxxgbQYgE450xtOQxTSY/hQWuAwOL8owwqO6f/+l1o1/V/
-         F+3Q==
-X-Gm-Message-State: APjAAAWpXQRGDE2II6qjffFH7baU2bEddQBIZFq2go8rqeLGeCH7afjI
-        0mT2eWVRCth0a58bCRv6CkfS6wvrcXT8oGqaZo6Ecw==
-X-Google-Smtp-Source: APXvYqy/pQ68ktJraZx2OOVpVJ8kHPldt0Y3rCKUg8hxUR6Vc+ePWJRCAjjILHp6RQ68WRLW89S+fyHYBIDZKbwX06U=
-X-Received: by 2002:a02:a405:: with SMTP id c5mr12489114jal.54.1565979916097;
- Fri, 16 Aug 2019 11:25:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190815172237.10464-1-sean.j.christopherson@intel.com>
-In-Reply-To: <20190815172237.10464-1-sean.j.christopherson@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 16 Aug 2019 11:25:05 -0700
-Message-ID: <CALMp9eQZ=c4nkKmJQr4omdCmB=P1Yug+g_XK_fqZ0YZuEt0Pkg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: Assert that struct kvm_vcpu is always as offset zero
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>, Joerg Roedel <joro@8bytes.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726132AbfHSBvV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 18 Aug 2019 21:51:21 -0400
+Received: from ozlabs.ru ([107.173.13.209]:58232 "EHLO ozlabs.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726103AbfHSBvV (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sun, 18 Aug 2019 21:51:21 -0400
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 0CA6BAE8001C;
+        Sun, 18 Aug 2019 21:51:00 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        Jose Ricardo Ziviani <joserz@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Subject: [PATCH kernel] vfio/spapr_tce: Fix incorrect tce_iommu_group memory free
+Date:   Mon, 19 Aug 2019 11:51:17 +1000
+Message-Id: <20190819015117.94878-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 10:23 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> KVM implementations that wrap struct kvm_vcpu with a vendor specific
-> struct, e.g. struct vcpu_vmx, must place the vcpu member at offset 0,
-> otherwise the usercopy region intended to encompass struct kvm_vcpu_arch
-> will instead overlap random chunks of the vendor specific struct.
-> E.g. padding a large number of bytes before struct kvm_vcpu triggers
-> a usercopy warn when running with CONFIG_HARDENED_USERCOPY=y.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-X86 parts:
-Reviewed-by: Jim Mattson <jmattson@google.com>
+The @tcegrp variable is used in 1) a loop over attached groups
+2) it stores a pointer to a newly allocated tce_iommu_group if 1) found
+nothing. However the error handler does not distinguish how we got there
+and incorrectly releases memory for a found+incompatible group.
+
+This fixes it by adding another error handling case.
+
+Fixes: 0bd971676e68 ("powerpc/powernv/npu: Add compound IOMMU groups")
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+
+The bug is there since 2157e7b82f3b but it would not appear in practice
+before 0bd971676e68, hence that "Fixes". Or it still should be
+157e7b82f3b ("vfio: powerpc/spapr: Register memory and define IOMMU v2")
+?
+
+Found it when tried adding a "compound PE" (GPU + NPUs) to a container
+with a passed through xHCI host. The compatibility test (->create_table
+should be equal) treats them as incompatible which might a bug (or
+we are just suboptimal here) on its own.
+
+---
+ drivers/vfio/vfio_iommu_spapr_tce.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
+index 8ce9ad21129f..babef8b00daf 100644
+--- a/drivers/vfio/vfio_iommu_spapr_tce.c
++++ b/drivers/vfio/vfio_iommu_spapr_tce.c
+@@ -1234,7 +1234,7 @@ static long tce_iommu_take_ownership_ddw(struct tce_container *container,
+ static int tce_iommu_attach_group(void *iommu_data,
+ 		struct iommu_group *iommu_group)
+ {
+-	int ret;
++	int ret = 0;
+ 	struct tce_container *container = iommu_data;
+ 	struct iommu_table_group *table_group;
+ 	struct tce_iommu_group *tcegrp = NULL;
+@@ -1287,13 +1287,13 @@ static int tce_iommu_attach_group(void *iommu_data,
+ 			!table_group->ops->release_ownership) {
+ 		if (container->v2) {
+ 			ret = -EPERM;
+-			goto unlock_exit;
++			goto free_exit;
+ 		}
+ 		ret = tce_iommu_take_ownership(container, table_group);
+ 	} else {
+ 		if (!container->v2) {
+ 			ret = -EPERM;
+-			goto unlock_exit;
++			goto free_exit;
+ 		}
+ 		ret = tce_iommu_take_ownership_ddw(container, table_group);
+ 		if (!tce_groups_attached(container) && !container->tables[0])
+@@ -1305,10 +1305,11 @@ static int tce_iommu_attach_group(void *iommu_data,
+ 		list_add(&tcegrp->next, &container->group_list);
+ 	}
+ 
+-unlock_exit:
++free_exit:
+ 	if (ret && tcegrp)
+ 		kfree(tcegrp);
+ 
++unlock_exit:
+ 	mutex_unlock(&container->lock);
+ 
+ 	return ret;
+-- 
+2.17.1
+
