@@ -2,220 +2,159 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 00FE49573D
-	for <lists+kvm-ppc@lfdr.de>; Tue, 20 Aug 2019 08:22:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6C419578F
+	for <lists+kvm-ppc@lfdr.de>; Tue, 20 Aug 2019 08:45:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729107AbfHTGWX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 20 Aug 2019 02:22:23 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:43148 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729000AbfHTGWX (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 20 Aug 2019 02:22:23 -0400
-Received: by mail-pf1-f196.google.com with SMTP id v12so2725607pfn.10
-        for <kvm-ppc@vger.kernel.org>; Mon, 19 Aug 2019 23:22:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=LsEyAPx89vt71C2UmHMLuXRw1EoaUy3zZsSSBMjTLq4=;
-        b=IuNT+1bUdIOlhn7H8uUFCTAobEvaJBujn3erlMwDQC4XnfPp941Brrlh4bOm1JIb6C
-         YQbCY4ZrSrv0PBkJqivNVgfv5FSUMyTCduQzs6Qv0iBt10S4ljTiS36YU4zSsp2I83Qa
-         OYfWzh3nwz6xFWE7zBeeYmcioTJA0LhMSr1QAa5RkZ1xoZDOv4+VO8M7OWDQ6q1x9Xu6
-         hFmFOsWsGwP7DidMrLTUjR5Tq7Cq3egd3vGVKflW8ipMFBVe24yWNkjOGhfX+wj8aMN6
-         kJ7wvRSxdSvDoOYU1vX2fWS6bDlJ/mA1rgJXkfgcLcvkkmon8T1cNVY5Xxefi09QLIZ5
-         xtrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=LsEyAPx89vt71C2UmHMLuXRw1EoaUy3zZsSSBMjTLq4=;
-        b=V4PJJIMsH4sR41PwZ1LAfCNvhusVBMsZAgSnFhLyEph3LRrqkPPbAmom2z5EWxQbSf
-         J4vN/ZLkw1V7EfINRZtAQ88UdWmq+s9eWZPjw7pvDRloQ+z6bcPji3HOjUDGFhEc/4H9
-         XSW426CTtxNBX38eeFZ30nDedQOZwos1q61j+MXs4szTQVfaDRxhQhGdyjUtoL8kviZI
-         S1QzUbBqrDiHUse8aPlGyTz3C+3uwcY8L7xCGwdi4EW+TfdiSM3PHTZrCMU1T5wV4oYW
-         zKABvlv18+phUNIdRTKhhkA43ZPCqMC5CVH4z4Qzxw6YKR0zDfHo2cnr1dhR+feauTvX
-         0Xyg==
-X-Gm-Message-State: APjAAAXYUOSyLOKvbpqaz/zgf+85KF4M1/CZNnoLmU6SVAdxd4G1RhEH
-        pDt260ibZGr+Qx1GXODggyQ=
-X-Google-Smtp-Source: APXvYqzExR/3Tv53UARjp6aMbWOaY9pNVjpL0tL+F1uW6x15j6WkwwSDnJHx07vWyy0iTH4pbvRfFA==
-X-Received: by 2002:a63:fc09:: with SMTP id j9mr22343328pgi.377.1566282141988;
-        Mon, 19 Aug 2019 23:22:21 -0700 (PDT)
-Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.googlemail.com with ESMTPSA id 2sm24482074pjh.13.2019.08.19.23.22.17
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 19 Aug 2019 23:22:21 -0700 (PDT)
-Message-ID: <1566282135.2166.6.camel@gmail.com>
-Subject: Re: [PATCH v6 1/7] kvmppc: Driver to manage pages of secure guest
-From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To:     Bharata B Rao <bharata@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, linux-mm@kvack.org, paulus@au1.ibm.com,
+        id S1729254AbfHTGos (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 20 Aug 2019 02:44:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40820 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728777AbfHTGor (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 20 Aug 2019 02:44:47 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7K6gkBM103117
+        for <kvm-ppc@vger.kernel.org>; Tue, 20 Aug 2019 02:44:47 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2ugavjtc29-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Tue, 20 Aug 2019 02:44:46 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <bharata@linux.ibm.com>;
+        Tue, 20 Aug 2019 07:44:45 +0100
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 20 Aug 2019 07:44:41 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7K6iJ0B24052144
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Aug 2019 06:44:20 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 43A364C046;
+        Tue, 20 Aug 2019 06:44:40 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 687304C040;
+        Tue, 20 Aug 2019 06:44:38 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.124.35.129])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 20 Aug 2019 06:44:38 +0000 (GMT)
+Date:   Tue, 20 Aug 2019 12:14:36 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-mm@kvack.org, paulus@au1.ibm.com,
         aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
         linuxram@us.ibm.com, sukadev@linux.vnet.ibm.com,
         cclaudio@linux.ibm.com, hch@lst.de
-Date:   Tue, 20 Aug 2019 16:22:15 +1000
-In-Reply-To: <20190809084108.30343-2-bharata@linux.ibm.com>
+Subject: Re: [PATCH v6 1/7] kvmppc: Driver to manage pages of secure guest
+Reply-To: bharata@linux.ibm.com
 References: <20190809084108.30343-1-bharata@linux.ibm.com>
-         <20190809084108.30343-2-bharata@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ <20190809084108.30343-2-bharata@linux.ibm.com>
+ <1566282135.2166.6.camel@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1566282135.2166.6.camel@gmail.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-TM-AS-GCONF: 00
+x-cbid: 19082006-4275-0000-0000-0000035AFA9A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19082006-4276-0000-0000-0000386D1951
+Message-Id: <20190820064436.GE8784@in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-20_02:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=961 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908200070
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, 2019-08-09 at 14:11 +0530, Bharata B Rao wrote:
-> KVMPPC driver to manage page transitions of secure guest
-> via H_SVM_PAGE_IN and H_SVM_PAGE_OUT hcalls.
+On Tue, Aug 20, 2019 at 04:22:15PM +1000, Suraj Jitindar Singh wrote:
+> On Fri, 2019-08-09 at 14:11 +0530, Bharata B Rao wrote:
+> > KVMPPC driver to manage page transitions of secure guest
+> > via H_SVM_PAGE_IN and H_SVM_PAGE_OUT hcalls.
+> > 
+> > H_SVM_PAGE_IN: Move the content of a normal page to secure page
+> > H_SVM_PAGE_OUT: Move the content of a secure page to normal page
+> > 
+> > Private ZONE_DEVICE memory equal to the amount of secure memory
+> > available in the platform for running secure guests is created
+> > via a char device. Whenever a page belonging to the guest becomes
+> > secure, a page from this private device memory is used to
+> > represent and track that secure page on the HV side. The movement
+> > of pages between normal and secure memory is done via
+> > migrate_vma_pages() using UV_PAGE_IN and UV_PAGE_OUT ucalls.
 > 
-> H_SVM_PAGE_IN: Move the content of a normal page to secure page
-> H_SVM_PAGE_OUT: Move the content of a secure page to normal page
+> Hi Bharata,
 > 
-> Private ZONE_DEVICE memory equal to the amount of secure memory
-> available in the platform for running secure guests is created
-> via a char device. Whenever a page belonging to the guest becomes
-> secure, a page from this private device memory is used to
-> represent and track that secure page on the HV side. The movement
-> of pages between normal and secure memory is done via
-> migrate_vma_pages() using UV_PAGE_IN and UV_PAGE_OUT ucalls.
-
-Hi Bharata,
-
-please see my patch where I define the bits which define the type of
-the rmap entry:
-https://patchwork.ozlabs.org/patch/1149791/
-
-Please add an entry for the devm pfn type like:
-#define KVMPPC_RMAP_PFN_DEVM 0x0200000000000000 /* secure guest devm
-pfn */
-
-And the following in the appropriate header file
-
-static inline bool kvmppc_rmap_is_pfn_demv(unsigned long *rmapp)
-{
-	return !!((*rmapp & KVMPPC_RMAP_TYPE_MASK) ==
-KVMPPC_RMAP_PFN_DEVM));
-}
-
-Also see comment below.
-
-Thanks,
-Suraj
-
+> please see my patch where I define the bits which define the type of
+> the rmap entry:
+> https://patchwork.ozlabs.org/patch/1149791/
 > 
-> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-> ---
->  arch/powerpc/include/asm/hvcall.h          |   4 +
->  arch/powerpc/include/asm/kvm_book3s_devm.h |  29 ++
->  arch/powerpc/include/asm/kvm_host.h        |  12 +
->  arch/powerpc/include/asm/ultravisor-api.h  |   2 +
->  arch/powerpc/include/asm/ultravisor.h      |  14 +
->  arch/powerpc/kvm/Makefile                  |   3 +
->  arch/powerpc/kvm/book3s_hv.c               |  19 +
->  arch/powerpc/kvm/book3s_hv_devm.c          | 492
-> +++++++++++++++++++++
->  8 files changed, 575 insertions(+)
->  create mode 100644 arch/powerpc/include/asm/kvm_book3s_devm.h
->  create mode 100644 arch/powerpc/kvm/book3s_hv_devm.c
+> Please add an entry for the devm pfn type like:
+> #define KVMPPC_RMAP_PFN_DEVM 0x0200000000000000 /* secure guest devm
+> pfn */
 > 
-[snip]
-> +
-> +struct kvmppc_devm_page_pvt {
-> +	unsigned long *rmap;
-> +	unsigned int lpid;
-> +	unsigned long gpa;
-> +};
-> +
-> +struct kvmppc_devm_copy_args {
-> +	unsigned long *rmap;
-> +	unsigned int lpid;
-> +	unsigned long gpa;
-> +	unsigned long page_shift;
-> +};
-> +
-> +/*
-> + * Bits 60:56 in the rmap entry will be used to identify the
-> + * different uses/functions of rmap. This definition with move
-> + * to a proper header when all other functions are defined.
-> + */
-> +#define KVMPPC_PFN_DEVM		(0x2ULL << 56)
-> +
-> +static inline bool kvmppc_is_devm_pfn(unsigned long pfn)
-> +{
-> +	return !!(pfn & KVMPPC_PFN_DEVM);
-> +}
-> +
-> +/*
-> + * Get a free device PFN from the pool
-> + *
-> + * Called when a normal page is moved to secure memory (UV_PAGE_IN).
-> Device
-> + * PFN will be used to keep track of the secure page on HV side.
-> + *
-> + * @rmap here is the slot in the rmap array that corresponds to
-> @gpa.
-> + * Thus a non-zero rmap entry indicates that the corresonding guest
-> + * page has become secure, and is not mapped on the HV side.
-> + *
-> + * NOTE: In this and subsequent functions, we pass around and access
-> + * individual elements of kvm_memory_slot->arch.rmap[] without any
-> + * protection. Should we use lock_rmap() here?
-> + */
-> +static struct page *kvmppc_devm_get_page(unsigned long *rmap,
-> +					unsigned long gpa, unsigned
-> int lpid)
-> +{
-> +	struct page *dpage = NULL;
-> +	unsigned long bit, devm_pfn;
-> +	unsigned long nr_pfns = kvmppc_devm.pfn_last -
-> +				kvmppc_devm.pfn_first;
-> +	unsigned long flags;
-> +	struct kvmppc_devm_page_pvt *pvt;
-> +
-> +	if (kvmppc_is_devm_pfn(*rmap))
-> +		return NULL;
-> +
-> +	spin_lock_irqsave(&kvmppc_devm_lock, flags);
-> +	bit = find_first_zero_bit(kvmppc_devm.pfn_bitmap, nr_pfns);
-> +	if (bit >= nr_pfns)
-> +		goto out;
-> +
-> +	bitmap_set(kvmppc_devm.pfn_bitmap, bit, 1);
-> +	devm_pfn = bit + kvmppc_devm.pfn_first;
-> +	dpage = pfn_to_page(devm_pfn);
-> +
-> +	if (!trylock_page(dpage))
-> +		goto out_clear;
-> +
-> +	*rmap = devm_pfn | KVMPPC_PFN_DEVM;
-> +	pvt = kzalloc(sizeof(*pvt), GFP_ATOMIC);
-> +	if (!pvt)
-> +		goto out_unlock;
-> +	pvt->rmap = rmap;
-
-Am I missing something, why does the rmap need to be stored in pvt?
-Given the gpa is already stored and this is enough to get back to the
-rmap entry, right?
-
-> +	pvt->gpa = gpa;
-> +	pvt->lpid = lpid;
-> +	dpage->zone_device_data = pvt;
-> +	spin_unlock_irqrestore(&kvmppc_devm_lock, flags);
-> +
-> +	get_page(dpage);
-> +	return dpage;
-> +
-> +out_unlock:
-> +	unlock_page(dpage);
-> +out_clear:
-> +	bitmap_clear(kvmppc_devm.pfn_bitmap,
-> +		     devm_pfn - kvmppc_devm.pfn_first, 1);
-> +out:
-> +	spin_unlock_irqrestore(&kvmppc_devm_lock, flags);
-> +	return NULL;
-> +}
-> +
+> And the following in the appropriate header file
 > 
-[snip]
+> static inline bool kvmppc_rmap_is_pfn_demv(unsigned long *rmapp)
+> {
+> 	return !!((*rmapp & KVMPPC_RMAP_TYPE_MASK) ==
+> KVMPPC_RMAP_PFN_DEVM));
+> }
+> 
+
+Sure, I have the equivalents defined locally, will move to appropriate
+headers.
+
+> Also see comment below.
+> 
+> > +static struct page *kvmppc_devm_get_page(unsigned long *rmap,
+> > +					unsigned long gpa, unsigned
+> > int lpid)
+> > +{
+> > +	struct page *dpage = NULL;
+> > +	unsigned long bit, devm_pfn;
+> > +	unsigned long nr_pfns = kvmppc_devm.pfn_last -
+> > +				kvmppc_devm.pfn_first;
+> > +	unsigned long flags;
+> > +	struct kvmppc_devm_page_pvt *pvt;
+> > +
+> > +	if (kvmppc_is_devm_pfn(*rmap))
+> > +		return NULL;
+> > +
+> > +	spin_lock_irqsave(&kvmppc_devm_lock, flags);
+> > +	bit = find_first_zero_bit(kvmppc_devm.pfn_bitmap, nr_pfns);
+> > +	if (bit >= nr_pfns)
+> > +		goto out;
+> > +
+> > +	bitmap_set(kvmppc_devm.pfn_bitmap, bit, 1);
+> > +	devm_pfn = bit + kvmppc_devm.pfn_first;
+> > +	dpage = pfn_to_page(devm_pfn);
+> > +
+> > +	if (!trylock_page(dpage))
+> > +		goto out_clear;
+> > +
+> > +	*rmap = devm_pfn | KVMPPC_PFN_DEVM;
+> > +	pvt = kzalloc(sizeof(*pvt), GFP_ATOMIC);
+> > +	if (!pvt)
+> > +		goto out_unlock;
+> > +	pvt->rmap = rmap;
+> 
+> Am I missing something, why does the rmap need to be stored in pvt?
+> Given the gpa is already stored and this is enough to get back to the
+> rmap entry, right?
+
+I use rmap entry to note that this guest page is secure and is being
+represented by device memory page on the HV side. When the page becomes
+normal again, I need to undo that from dev_pagemap_ops.page_free()
+where I don't have gpa.
+
+Regards,
+Bharata.
+
