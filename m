@@ -2,159 +2,230 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D6C419578F
-	for <lists+kvm-ppc@lfdr.de>; Tue, 20 Aug 2019 08:45:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A58F96E03
+	for <lists+kvm-ppc@lfdr.de>; Wed, 21 Aug 2019 02:04:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729254AbfHTGos (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 20 Aug 2019 02:44:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40820 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728777AbfHTGor (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 20 Aug 2019 02:44:47 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7K6gkBM103117
-        for <kvm-ppc@vger.kernel.org>; Tue, 20 Aug 2019 02:44:47 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ugavjtc29-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Tue, 20 Aug 2019 02:44:46 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <bharata@linux.ibm.com>;
-        Tue, 20 Aug 2019 07:44:45 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 20 Aug 2019 07:44:41 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7K6iJ0B24052144
+        id S1726307AbfHUAEj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 20 Aug 2019 20:04:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2964 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726028AbfHUAEj (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 20 Aug 2019 20:04:39 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7L01t3S102596;
+        Tue, 20 Aug 2019 20:04:33 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ugshjb5ep-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Aug 2019 20:04:33 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7KNxXYL002059;
+        Wed, 21 Aug 2019 00:04:32 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma05wdc.us.ibm.com with ESMTP id 2ue97615e5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Aug 2019 00:04:32 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7L04VCA35062050
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 20 Aug 2019 06:44:20 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 43A364C046;
-        Tue, 20 Aug 2019 06:44:40 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 687304C040;
-        Tue, 20 Aug 2019 06:44:38 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.124.35.129])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 20 Aug 2019 06:44:38 +0000 (GMT)
-Date:   Tue, 20 Aug 2019 12:14:36 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-mm@kvack.org, paulus@au1.ibm.com,
-        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
-        linuxram@us.ibm.com, sukadev@linux.vnet.ibm.com,
-        cclaudio@linux.ibm.com, hch@lst.de
-Subject: Re: [PATCH v6 1/7] kvmppc: Driver to manage pages of secure guest
-Reply-To: bharata@linux.ibm.com
-References: <20190809084108.30343-1-bharata@linux.ibm.com>
- <20190809084108.30343-2-bharata@linux.ibm.com>
- <1566282135.2166.6.camel@gmail.com>
+        Wed, 21 Aug 2019 00:04:31 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5D2D3C6059;
+        Wed, 21 Aug 2019 00:04:31 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33AA0C6055;
+        Wed, 21 Aug 2019 00:04:31 +0000 (GMT)
+Received: from suka-w540.localdomain (unknown [9.70.94.45])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 21 Aug 2019 00:04:31 +0000 (GMT)
+Received: by suka-w540.localdomain (Postfix, from userid 1000)
+        id 7CDA02E1100; Tue, 20 Aug 2019 17:04:29 -0700 (PDT)
+Date:   Tue, 20 Aug 2019 17:04:29 -0700
+From:   Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org,
+        kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
+        Michael Anderson <andmike@linux.ibm.com>,
+        Ram Pai <linuxram@us.ibm.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Thiago Bauermann <bauerman@linux.ibm.com>,
+        Ryan Grimm <grimm@linux.ibm.com>,
+        Guerney Hunt <gdhh@linux.ibm.com>,
+        Ryan Grimm <grimm@linux.vnet.ibm.com>
+Subject: Re: [PATCH v5 4/7] powerpc/mm: Use UV_WRITE_PATE ucall to register a
+ PATE
+Message-ID: <20190821000429.GA16695@us.ibm.com>
+References: <20190808040555.2371-1-cclaudio@linux.ibm.com>
+ <20190808040555.2371-5-cclaudio@linux.ibm.com>
+ <871rxo7zif.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1566282135.2166.6.camel@gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <871rxo7zif.fsf@concordia.ellerman.id.au>
+X-Operating-System: Linux 2.0.32 on an i486
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-TM-AS-GCONF: 00
-x-cbid: 19082006-4275-0000-0000-0000035AFA9A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082006-4276-0000-0000-0000386D1951
-Message-Id: <20190820064436.GE8784@in.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-20_02:,,
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-20_11:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=961 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908200070
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908200219
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Aug 20, 2019 at 04:22:15PM +1000, Suraj Jitindar Singh wrote:
-> On Fri, 2019-08-09 at 14:11 +0530, Bharata B Rao wrote:
-> > KVMPPC driver to manage page transitions of secure guest
-> > via H_SVM_PAGE_IN and H_SVM_PAGE_OUT hcalls.
-> > 
-> > H_SVM_PAGE_IN: Move the content of a normal page to secure page
-> > H_SVM_PAGE_OUT: Move the content of a secure page to normal page
-> > 
-> > Private ZONE_DEVICE memory equal to the amount of secure memory
-> > available in the platform for running secure guests is created
-> > via a char device. Whenever a page belonging to the guest becomes
-> > secure, a page from this private device memory is used to
-> > represent and track that secure page on the HV side. The movement
-> > of pages between normal and secure memory is done via
-> > migrate_vma_pages() using UV_PAGE_IN and UV_PAGE_OUT ucalls.
-> 
-> Hi Bharata,
-> 
-> please see my patch where I define the bits which define the type of
-> the rmap entry:
-> https://patchwork.ozlabs.org/patch/1149791/
-> 
-> Please add an entry for the devm pfn type like:
-> #define KVMPPC_RMAP_PFN_DEVM 0x0200000000000000 /* secure guest devm
-> pfn */
-> 
-> And the following in the appropriate header file
-> 
-> static inline bool kvmppc_rmap_is_pfn_demv(unsigned long *rmapp)
-> {
-> 	return !!((*rmapp & KVMPPC_RMAP_TYPE_MASK) ==
-> KVMPPC_RMAP_PFN_DEVM));
-> }
-> 
+Michael Ellerman [mpe@ellerman.id.au] wrote:
 
-Sure, I have the equivalents defined locally, will move to appropriate
-headers.
-
-> Also see comment below.
+> Hi Claudio,
 > 
-> > +static struct page *kvmppc_devm_get_page(unsigned long *rmap,
-> > +					unsigned long gpa, unsigned
-> > int lpid)
+> Claudio Carvalho <cclaudio@linux.ibm.com> writes:
+> > From: Michael Anderson <andmike@linux.ibm.com>
+> >
+> > In ultravisor enabled systems, the ultravisor creates and maintains the
+> > partition table in secure memory where the hypervisor cannot access, and
+>                                    ^
+>                                    which?
+> 
+> > therefore, the hypervisor have to do the UV_WRITE_PATE ucall whenever it
+>                             ^          ^
+>                             has        a
+> > wants to set a partition table entry (PATE).
+> >
+> > This patch adds the UV_WRITE_PATE ucall and uses it to set a PATE if
+> > ultravisor is enabled. Additionally, this also also keeps a copy of the
+> > partition table because the nestMMU does not have access to secure
+> > memory. Such copy has entries for nonsecure and hypervisor partition.
+> 
+> I'm having trouble parsing the last sentence there.
+> 
+> Or at least it doesn't seem to match the code, or I don't understand
+> either the code or the comment. More below.
+
+Yes, good catch. We could drop the last sentence. Or maybe change the
+last para to:
+
+	This patch adds the UV_WRITE_PATE ucall which is used to update
+	the partition table entry (PATE) for a VM (both normal and secure).
+
+	When UV is enabled, the partition table is stored in secure memory
+	and can only be accessed via the UV. The HV however maintains a
+	copy of the partition table in normal memory to allow NMMU
+	translations to occur (for normal VMs). The HV copy includes PATEs
+	for secure VMs which would currently be unused (NMMU translations
+	cannot access secure memory) but they would be needed as we add
+	functionality.
+
+Basically, with UV, PTCR is controlled by the UV and address translations
+occur based on the UV's copy of the partition table. (See also:
+try_set_ptcr() in "PATCH 5/7 powerpc/mm: Write to PTCR only if ultravisor
+disabled")
+
+> 
+> > diff --git a/arch/powerpc/mm/book3s64/pgtable.c b/arch/powerpc/mm/book3s64/pgtable.c
+> > index 85bc81abd286..033731f5dbaa 100644
+> > --- a/arch/powerpc/mm/book3s64/pgtable.c
+> > +++ b/arch/powerpc/mm/book3s64/pgtable.c
+> > @@ -213,34 +223,50 @@ void __init mmu_partition_table_init(void)
+> >  	powernv_set_nmmu_ptcr(ptcr);
+> >  }
+> >  
+> > -void mmu_partition_table_set_entry(unsigned int lpid, unsigned long dw0,
+> > -				   unsigned long dw1)
+> > +/*
+> > + * Global flush of TLBs and partition table caches for this lpid. The type of
+> > + * flush (hash or radix) depends on what the previous use of this partition ID
+> > + * was, not the new use.
+> > + */
+> > +static void flush_partition(unsigned int lpid, unsigned long old_patb0)
+> 
+> A nicer API would be for the 2nd param to be a "bool radix", and have
+> the caller worry about the fact that it comes from (patb0 & PATB_HR).
+
+Agree
+
+> 
+> >  {
+> > -	unsigned long old = be64_to_cpu(partition_tb[lpid].patb0);
+> > -
+> > -	partition_tb[lpid].patb0 = cpu_to_be64(dw0);
+> > -	partition_tb[lpid].patb1 = cpu_to_be64(dw1);
+> > -
+> > -	/*
+> > -	 * Global flush of TLBs and partition table caches for this lpid.
+> > -	 * The type of flush (hash or radix) depends on what the previous
+> > -	 * use of this partition ID was, not the new use.
+> > -	 */
+> >  	asm volatile("ptesync" : : : "memory");
+> > -	if (old & PATB_HR) {
+> > -		asm volatile(PPC_TLBIE_5(%0,%1,2,0,1) : :
+> > +	if (old_patb0 & PATB_HR) {
+> > +		asm volatile(PPC_TLBIE_5(%0, %1, 2, 0, 1) : :
+> >  			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> > -		asm volatile(PPC_TLBIE_5(%0,%1,2,1,1) : :
+> > +		asm volatile(PPC_TLBIE_5(%0, %1, 2, 1, 1) : :
+> 
+> That looks like an unrelated whitespace change.
+> 
+> >  			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> >  		trace_tlbie(lpid, 0, TLBIEL_INVAL_SET_LPID, lpid, 2, 0, 1);
+> >  	} else {
+> > -		asm volatile(PPC_TLBIE_5(%0,%1,2,0,0) : :
+> > +		asm volatile(PPC_TLBIE_5(%0, %1, 2, 0, 0) : :
+> 
+> Ditto.
+> 
+> >  			     "r" (TLBIEL_INVAL_SET_LPID), "r" (lpid));
+> >  		trace_tlbie(lpid, 0, TLBIEL_INVAL_SET_LPID, lpid, 2, 0, 0);
+> >  	}
+> >  	/* do we need fixup here ?*/
+> >  	asm volatile("eieio; tlbsync; ptesync" : : : "memory");
+> >  }
+> > +
+> > +void mmu_partition_table_set_entry(unsigned int lpid, unsigned long dw0,
+> > +				  unsigned long dw1)
 > > +{
-> > +	struct page *dpage = NULL;
-> > +	unsigned long bit, devm_pfn;
-> > +	unsigned long nr_pfns = kvmppc_devm.pfn_last -
-> > +				kvmppc_devm.pfn_first;
-> > +	unsigned long flags;
-> > +	struct kvmppc_devm_page_pvt *pvt;
+> > +	unsigned long old = be64_to_cpu(partition_tb[lpid].patb0);
 > > +
-> > +	if (kvmppc_is_devm_pfn(*rmap))
-> > +		return NULL;
-> > +
-> > +	spin_lock_irqsave(&kvmppc_devm_lock, flags);
-> > +	bit = find_first_zero_bit(kvmppc_devm.pfn_bitmap, nr_pfns);
-> > +	if (bit >= nr_pfns)
-> > +		goto out;
-> > +
-> > +	bitmap_set(kvmppc_devm.pfn_bitmap, bit, 1);
-> > +	devm_pfn = bit + kvmppc_devm.pfn_first;
-> > +	dpage = pfn_to_page(devm_pfn);
-> > +
-> > +	if (!trylock_page(dpage))
-> > +		goto out_clear;
-> > +
-> > +	*rmap = devm_pfn | KVMPPC_PFN_DEVM;
-> > +	pvt = kzalloc(sizeof(*pvt), GFP_ATOMIC);
-> > +	if (!pvt)
-> > +		goto out_unlock;
-> > +	pvt->rmap = rmap;
+> > +	partition_tb[lpid].patb0 = cpu_to_be64(dw0);
+> > +	partition_tb[lpid].patb1 = cpu_to_be64(dw1);
 > 
-> Am I missing something, why does the rmap need to be stored in pvt?
-> Given the gpa is already stored and this is enough to get back to the
-> rmap entry, right?
+> ie. here we always update the copy of the partition table, regardless of
+> whether we're running under an ultravisor or not. So the copy is a
+> complete copy isn't it?
 
-I use rmap entry to note that this guest page is secure and is being
-represented by device memory page on the HV side. When the page becomes
-normal again, I need to undo that from dev_pagemap_ops.page_free()
-where I don't have gpa.
+Yes.
+> 
+> > +	/*
+> > +	 * In ultravisor enabled systems, the ultravisor maintains the partition
+> > +	 * table in secure memory where we don't have access, therefore, we have
+> > +	 * to do a ucall to set an entry.
+> > +	 */
+> > +	if (firmware_has_feature(FW_FEATURE_ULTRAVISOR)) {
+> > +		uv_register_pate(lpid, dw0, dw1);
+> > +		pr_info("PATE registered by ultravisor: dw0 = 0x%lx, dw1 = 0x%lx\n",
+> > +			dw0, dw1);
+> > +	} else {
+> > +		flush_partition(lpid, old);
+> > +	}
+> 
+> What is different is whether we flush or not.
 
-Regards,
-Bharata.
+only differences are where the partition table used by hardware is stored
+(secure memory) and updated (in UV, with higher privilege).
 
+> 
+> And don't we still need to do the flush for the nestMMU? I assume we're
+> saying the ultravisor will broadcast a flush for us, which will also
+> handle the nestMMU case?
+
+The same sequence of instructions (as HV) are used in uv_register_pate()
+to flush partition and process scoped entries (so nest MMU would also be
+covered when NMMU sees the tlbie?)
+
+Thanks,
+
+Sukadev
