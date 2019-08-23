@@ -2,60 +2,82 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 58ED59AC6A
-	for <lists+kvm-ppc@lfdr.de>; Fri, 23 Aug 2019 12:06:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 415969AE7A
+	for <lists+kvm-ppc@lfdr.de>; Fri, 23 Aug 2019 13:57:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391854AbfHWKGY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 23 Aug 2019 06:06:24 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:57739 "EHLO ozlabs.org"
+        id S2392801AbfHWL5l (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 23 Aug 2019 07:57:41 -0400
+Received: from ozlabs.org ([203.11.71.1]:47185 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389743AbfHWKGX (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 23 Aug 2019 06:06:23 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46FH9T4Jqtz9sNk; Fri, 23 Aug 2019 20:06:21 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1566554781; bh=vyCJEWhJsZnipt2Tis/8DxgyTyAo49/LOtg1TwEpChA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rw+KXEG6NpqAuUwAm6c76N/raeokISjJilKk6eR4+y1v0zLDj5ennM6SLNcO8/Esn
-         Q5/XtHe2GhPcJxC5zz9bvryyEwCJhXkrDz5buL7mM4iLuFwQkARTsrI4gVS6leU0Qk
-         0s56Sco0etHsu4sOWYX0RMXh3yz+h5f1H2gL8vdvCbBsu2C5ysFlIoFpukqZ+dv4hH
-         lH3DkMzM6PUSKKS2E/ey+3pj/mPYnK9aSdFn3GHLcklGv5DL34HTPMHNlTB5YBgZXf
-         NZKtpCg30O2WIz7e4sFcDE9NLVjoz6QlUDRYUuTNrcDhzJcpT5X89YWqeThmn88pic
-         uQT3q749OaFrA==
-Date:   Fri, 23 Aug 2019 20:05:50 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] powerpc/kvm: Mark expected switch fall-through
-Message-ID: <20190823100550.GB11357@blackberry>
-References: <b9870792-412b-91de-8436-a659bbbe76c3@molgen.mpg.de>
- <aa4b6e30-95b1-107f-16bb-5a94e52f62ef@molgen.mpg.de>
+        id S2393004AbfHWL5l (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 23 Aug 2019 07:57:41 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 46FKds2Qn9z9s00;
+        Fri, 23 Aug 2019 21:57:37 +1000 (AEST)
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Paul Mackerras <paulus@ozlabs.org>,
+        Bharata B Rao <bharata@linux.ibm.com>
+Cc:     linuxram@us.ibm.com, cclaudio@linux.ibm.com,
+        kvm-ppc@vger.kernel.org, linux-mm@kvack.org, jglisse@redhat.com,
+        aneesh.kumar@linux.vnet.ibm.com, paulus@au1.ibm.com,
+        sukadev@linux.vnet.ibm.com, linuxppc-dev@lists.ozlabs.org,
+        hch@lst.de
+Subject: Re: [PATCH v7 0/7] KVMPPC driver to manage secure guest pages
+In-Reply-To: <20190823041747.ctquda5uwvy2eiqz@oak.ozlabs.ibm.com>
+References: <20190822102620.21897-1-bharata@linux.ibm.com> <20190823041747.ctquda5uwvy2eiqz@oak.ozlabs.ibm.com>
+Date:   Fri, 23 Aug 2019 21:57:32 +1000
+Message-ID: <87wof43xhv.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aa4b6e30-95b1-107f-16bb-5a94e52f62ef@molgen.mpg.de>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Jul 30, 2019 at 04:46:37PM +0200, Paul Menzel wrote:
-> Date: Tue, 30 Jul 2019 10:53:10 +0200
-> 
-> Fix the error below triggered by `-Wimplicit-fallthrough`, by tagging
-> it as an expected fall-through.
-> 
->     arch/powerpc/kvm/book3s_32_mmu.c: In function ‘kvmppc_mmu_book3s_32_xlate_pte’:
->     arch/powerpc/kvm/book3s_32_mmu.c:241:21: error: this statement may fall through [-Werror=implicit-fallthrough=]
->           pte->may_write = true;
->           ~~~~~~~~~~~~~~~^~~~~~
->     arch/powerpc/kvm/book3s_32_mmu.c:242:5: note: here
->          case 3:
->          ^~~~
-> 
+Paul Mackerras <paulus@ozlabs.org> writes:
+> On Thu, Aug 22, 2019 at 03:56:13PM +0530, Bharata B Rao wrote:
+>> A pseries guest can be run as a secure guest on Ultravisor-enabled
+>> POWER platforms. On such platforms, this driver will be used to manage
+>> the movement of guest pages between the normal memory managed by
+>> hypervisor(HV) and secure memory managed by Ultravisor(UV).
+>> 
+>> Private ZONE_DEVICE memory equal to the amount of secure memory
+>> available in the platform for running secure guests is created.
+>> Whenever a page belonging to the guest becomes secure, a page from
+>> this private device memory is used to represent and track that secure
+>> page on the HV side. The movement of pages between normal and secure
+>> memory is done via migrate_vma_pages(). The reverse movement is driven
+>> via pagemap_ops.migrate_to_ram().
+>> 
+>> The page-in or page-out requests from UV will come to HV as hcalls and
+>> HV will call back into UV via uvcalls to satisfy these page requests.
+>> 
+>> These patches are against hmm.git
+>> (https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/log/?h=hmm)
+>> 
+>> plus
+>> 
+>> Claudio Carvalho's base ultravisor enablement patchset v6
+>> (https://lore.kernel.org/linuxppc-dev/20190822034838.27876-1-cclaudio@linux.ibm.com/T/#t)
+>
+> How are you thinking these patches will go upstream?  Are you going to
+> send them via the hmm tree?
+>
+> I assume you need Claudio's patchset as a prerequisite for your series
+> to compile, which means the hmm maintainers would need to pull in a
+> topic branch from Michael Ellerman's powerpc tree, or something like
+> that.
 
-Thanks, applied to my kvm-ppc-next branch.
+I think more workable would be for me to make a topic branch based on
+the hmm tree (or some commit from the hmm tree), which I then apply the
+patches on top of, and merge any required powerpc changes into that. I
+can then ask Linus to merge that branch late in the merge window once
+the hmm changes have gone in.
 
-Paul.
+The bigger problem at the moment is the lack of reviews or acks on the
+bulk of the series.
+
+cheers
