@@ -2,85 +2,80 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AA5409A66C
-	for <lists+kvm-ppc@lfdr.de>; Fri, 23 Aug 2019 06:00:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 516C29A729
+	for <lists+kvm-ppc@lfdr.de>; Fri, 23 Aug 2019 07:34:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725782AbfHWEAI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 23 Aug 2019 00:00:08 -0400
-Received: from ozlabs.org ([203.11.71.1]:42699 "EHLO ozlabs.org"
+        id S2391664AbfHWFcu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 23 Aug 2019 01:32:50 -0400
+Received: from ozlabs.org ([203.11.71.1]:37185 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725613AbfHWEAH (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 23 Aug 2019 00:00:07 -0400
+        id S2389826AbfHWFcu (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 23 Aug 2019 01:32:50 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46F72s37ZNz9sBp; Fri, 23 Aug 2019 14:00:05 +1000 (AEST)
+        id 46F95q6lYyz9s3Z; Fri, 23 Aug 2019 15:32:47 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1566532805; bh=mNtdsViEFCyavtDiwsHTDK9xXch9sH1Vg8FJtRYNWO4=;
+        t=1566538367; bh=z02FCq36ZOlybuIQo9saHjlkCOE1r+GbTnZ2u8ZYozQ=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TiSuWrKvb8jY5ggylKlgo6MZ25p+tSAZtqIluxy8K+FsmhgL/OEBUqDzdVUnHfEAk
-         YyMUpt1SNIyDCfVOon2irmWAbPfmMEfRRxw3VrmZDfyqMM7EZ9I4gJn7lK8LbTnh/A
-         Q2srBonqZZYrUEHlsFv768NVLLI54CiaISYERWt+G4i2BJHYiulEO3/ztD2yz9eEAe
-         ABTQGZp7QKhTXSaOrTX7PEnwrbvu9wt2SLBFpeORB77isa9x+yQuoIBjrvnnr3ZSYF
-         hraIZKTnsRvoZqiGMBLReMsGnHuZZXKRYW12rcYgoDJ7nq+Cg3yAwWgvVf3q2O6hh3
-         rItA7KzAHpyBA==
-Date:   Fri, 23 Aug 2019 13:59:58 +1000
+        b=J/JhSKyJna3dO+hzVwvKqr555OfMsYkSc6rEU4HDI6t7UXTZHTXFw0kUqNtRyy1fT
+         XZyG/guq1JZXAD1JYZyREjzSKwT6GNg2EdxDMBXY+ve7kgOG8szGrIaMMU/8EKCnyd
+         aqmdM2IfW0NRJlzhmm0iNJfc2uKXKdhv4xxiOzyxO5RBad4beOWcisAo4QRjQvL3uZ
+         L08pjXagLF/YR+8V5WEbqt0bH/8AvagOKgWfNO33k8vwEm3ehMt6BldhXCpwlAKll+
+         Swt7Wc9SWo0muhF2IbJRhtyIOpv1eFZ2DG4ba8glK3yeGGJCS6v7LuIh+B0hvTl8zy
+         vgO9sc3zYRUcA==
+Date:   Fri, 23 Aug 2019 14:17:47 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Claudio Carvalho <cclaudio@linux.ibm.com>
-Cc:     linuxppc-dev@ozlabs.org, kvm-ppc@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
-        Thiago Bauermann <bauerman@linux.ibm.com>,
-        Ryan Grimm <grimm@linux.ibm.com>,
-        Guerney Hunt <gdhh@linux.ibm.com>
-Subject: Re: [PATCH v6 7/7] powerpc/kvm: Use UV_RETURN ucall to return to
- ultravisor
-Message-ID: <20190823035958.tqpdtck2pl3foq5i@oak.ozlabs.ibm.com>
-References: <20190822034838.27876-1-cclaudio@linux.ibm.com>
- <20190822034838.27876-8-cclaudio@linux.ibm.com>
+To:     Bharata B Rao <bharata@linux.ibm.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-mm@kvack.org, paulus@au1.ibm.com,
+        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
+        linuxram@us.ibm.com, sukadev@linux.vnet.ibm.com,
+        cclaudio@linux.ibm.com, hch@lst.de
+Subject: Re: [PATCH v7 0/7] KVMPPC driver to manage secure guest pages
+Message-ID: <20190823041747.ctquda5uwvy2eiqz@oak.ozlabs.ibm.com>
+References: <20190822102620.21897-1-bharata@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190822034838.27876-8-cclaudio@linux.ibm.com>
+In-Reply-To: <20190822102620.21897-1-bharata@linux.ibm.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 12:48:38AM -0300, Claudio Carvalho wrote:
-> From: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+On Thu, Aug 22, 2019 at 03:56:13PM +0530, Bharata B Rao wrote:
+> Hi,
 > 
-> When an SVM makes an hypercall or incurs some other exception, the
-> Ultravisor usually forwards (a.k.a. reflects) the exceptions to the
-> Hypervisor. After processing the exception, Hypervisor uses the
-> UV_RETURN ultracall to return control back to the SVM.
+> A pseries guest can be run as a secure guest on Ultravisor-enabled
+> POWER platforms. On such platforms, this driver will be used to manage
+> the movement of guest pages between the normal memory managed by
+> hypervisor(HV) and secure memory managed by Ultravisor(UV).
 > 
-> The expected register state on entry to this ultracall is:
+> Private ZONE_DEVICE memory equal to the amount of secure memory
+> available in the platform for running secure guests is created.
+> Whenever a page belonging to the guest becomes secure, a page from
+> this private device memory is used to represent and track that secure
+> page on the HV side. The movement of pages between normal and secure
+> memory is done via migrate_vma_pages(). The reverse movement is driven
+> via pagemap_ops.migrate_to_ram().
 > 
-> * Non-volatile registers are restored to their original values.
-> * If returning from an hypercall, register R0 contains the return value
->   (unlike other ultracalls) and, registers R4 through R12 contain any
->   output values of the hypercall.
-> * R3 contains the ultracall number, i.e UV_RETURN.
-> * If returning with a synthesized interrupt, R2 contains the
->   synthesized interrupt number.
-
-This isn't accurate: R2 contains the value that should end up in SRR1
-when we are back in the secure guest.  HSRR0 and HSRR1 contain the
-instruction pointer and MSR that the guest should run with.  They may
-be different from the instruction pointer and MSR that the guest vCPU
-last had, if the hypervisor has synthesized an interrupt for the
-guest.  The ultravisor needs to detect this case and respond
-appropriately.
-
-> Thanks to input from Paul Mackerras, Ram Pai and Mike Anderson.
+> The page-in or page-out requests from UV will come to HV as hcalls and
+> HV will call back into UV via uvcalls to satisfy these page requests.
 > 
-> Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-> Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
+> These patches are against hmm.git
+> (https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/log/?h=hmm)
+> 
+> plus
+> 
+> Claudio Carvalho's base ultravisor enablement patchset v6
+> (https://lore.kernel.org/linuxppc-dev/20190822034838.27876-1-cclaudio@linux.ibm.com/T/#t)
 
-Apart from that comment on the patch description -
+How are you thinking these patches will go upstream?  Are you going to
+send them via the hmm tree?
 
-Acked-by: Paul Mackerras <paulus@ozlabs.org>
+I assume you need Claudio's patchset as a prerequisite for your series
+to compile, which means the hmm maintainers would need to pull in a
+topic branch from Michael Ellerman's powerpc tree, or something like
+that.
+
+Paul.
