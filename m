@@ -2,66 +2,59 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 205F29AC6D
-	for <lists+kvm-ppc@lfdr.de>; Fri, 23 Aug 2019 12:06:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58ED59AC6A
+	for <lists+kvm-ppc@lfdr.de>; Fri, 23 Aug 2019 12:06:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391875AbfHWKGZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 23 Aug 2019 06:06:25 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:58623 "EHLO ozlabs.org"
+        id S2391854AbfHWKGY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 23 Aug 2019 06:06:24 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:57739 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391851AbfHWKGX (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        id S2389743AbfHWKGX (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
         Fri, 23 Aug 2019 06:06:23 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46FH9T5G9Tz9sBp; Fri, 23 Aug 2019 20:06:21 +1000 (AEST)
+        id 46FH9T4Jqtz9sNk; Fri, 23 Aug 2019 20:06:21 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1566554781; bh=QLQsTAOZE1gGL3/Mhe7B43PHJuPQ9BKbedBn6LgDPLU=;
+        t=1566554781; bh=vyCJEWhJsZnipt2Tis/8DxgyTyAo49/LOtg1TwEpChA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=AEVd1JcU6F9umiAv1HUNaZtOkH0Ssq6EKNB92AZOJTAlCP3HveF9B1OrbMZy7RUXS
-         MWcymwiBC8XRU74UntlrxHsRI5Ex522imgkFP94b+qeFOk6KvttiKkvq4LjhdyAHWS
-         wF+qkqTPfIub12ItyKTQL4Hn9DjiXHEtKfz9BWSE8AGHM3mFl/XZ+kmRUXKvcmQm1W
-         STx42UsC3fVdVIcwDJb3GBi+U+FaAMnNBmyCHsijmriNGYZs/SU7t+QV3bn10voMQX
-         87QEMHDbeZqeUh28i8uOqvHouYpeo5Scw0uzibG+P1EyT8eh6+wQ+UgdwD3+hS6UmI
-         7o0e+WIaCAzog==
-Date:   Fri, 23 Aug 2019 20:04:54 +1000
+        b=rw+KXEG6NpqAuUwAm6c76N/raeokISjJilKk6eR4+y1v0zLDj5ennM6SLNcO8/Esn
+         Q5/XtHe2GhPcJxC5zz9bvryyEwCJhXkrDz5buL7mM4iLuFwQkARTsrI4gVS6leU0Qk
+         0s56Sco0etHsu4sOWYX0RMXh3yz+h5f1H2gL8vdvCbBsu2C5ysFlIoFpukqZ+dv4hH
+         lH3DkMzM6PUSKKS2E/ey+3pj/mPYnK9aSdFn3GHLcklGv5DL34HTPMHNlTB5YBgZXf
+         NZKtpCg30O2WIz7e4sFcDE9NLVjoz6QlUDRYUuTNrcDhzJcpT5X89YWqeThmn88pic
+         uQT3q749OaFrA==
+Date:   Fri, 23 Aug 2019 20:05:50 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Define usage types for rmap array
- in guest memslot
-Message-ID: <20190823100454.GA11357@blackberry>
-References: <20190820061349.28995-1-sjitindarsingh@gmail.com>
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] powerpc/kvm: Mark expected switch fall-through
+Message-ID: <20190823100550.GB11357@blackberry>
+References: <b9870792-412b-91de-8436-a659bbbe76c3@molgen.mpg.de>
+ <aa4b6e30-95b1-107f-16bb-5a94e52f62ef@molgen.mpg.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190820061349.28995-1-sjitindarsingh@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aa4b6e30-95b1-107f-16bb-5a94e52f62ef@molgen.mpg.de>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Aug 20, 2019 at 04:13:49PM +1000, Suraj Jitindar Singh wrote:
-> The rmap array in the guest memslot is an array of size number of guest
-> pages, allocated at memslot creation time. Each rmap entry in this array
-> is used to store information about the guest page to which it
-> corresponds. For example for a hpt guest it is used to store a lock bit,
-> rc bits, a present bit and the index of a hpt entry in the guest hpt
-> which maps this page. For a radix guest which is running nested guests
-> it is used to store a pointer to a linked list of nested rmap entries
-> which store the nested guest physical address which maps this guest
-> address and for which there is a pte in the shadow page table.
+On Tue, Jul 30, 2019 at 04:46:37PM +0200, Paul Menzel wrote:
+> Date: Tue, 30 Jul 2019 10:53:10 +0200
 > 
-> As there are currently two uses for the rmap array, and the potential
-> for this to expand to more in the future, define a type field (being the
-> top 8 bits of the rmap entry) to be used to define the type of the rmap
-> entry which is currently present and define two values for this field
-> for the two current uses of the rmap array.
+> Fix the error below triggered by `-Wimplicit-fallthrough`, by tagging
+> it as an expected fall-through.
 > 
-> Since the nested case uses the rmap entry to store a pointer, define
-> this type as having the two high bits set as is expected for a pointer.
-> Define the hpt entry type as having bit 56 set (bit 7 IBM bit ordering).
+>     arch/powerpc/kvm/book3s_32_mmu.c: In function ‘kvmppc_mmu_book3s_32_xlate_pte’:
+>     arch/powerpc/kvm/book3s_32_mmu.c:241:21: error: this statement may fall through [-Werror=implicit-fallthrough=]
+>           pte->may_write = true;
+>           ~~~~~~~~~~~~~~~^~~~~~
+>     arch/powerpc/kvm/book3s_32_mmu.c:242:5: note: here
+>          case 3:
+>          ^~~~
 > 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
 Thanks, applied to my kvm-ppc-next branch.
 
