@@ -2,92 +2,86 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0993C9C7E3
-	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Aug 2019 05:21:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76BF09C891
+	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Aug 2019 06:55:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729292AbfHZDV0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 25 Aug 2019 23:21:26 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:39057 "EHLO ozlabs.org"
+        id S1725806AbfHZEz1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 26 Aug 2019 00:55:27 -0400
+Received: from ozlabs.ru ([107.173.13.209]:52054 "EHLO ozlabs.ru"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729193AbfHZDV0 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sun, 25 Aug 2019 23:21:26 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 46Gy2q45Bxz9sDB;
-        Mon, 26 Aug 2019 13:21:23 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Claudio Carvalho <cclaudio@linux.ibm.com>, linuxppc-dev@ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Ryan Grimm <grimm@linux.ibm.com>,
-        Oliver O'Halloran <oohall@gmail.com>
-Subject: Re: [PATCH v2] powerpc/powernv: Add ultravisor message log interface
-In-Reply-To: <4e577a36-4ce1-410b-3ceb-d31bbf564b3d@linux.ibm.com>
-References: <20190823060654.28842-1-cclaudio@linux.ibm.com> <87o90g3v5o.fsf@concordia.ellerman.id.au> <4e577a36-4ce1-410b-3ceb-d31bbf564b3d@linux.ibm.com>
-Date:   Mon, 26 Aug 2019 13:21:20 +1000
-Message-ID: <87lfvg4nnz.fsf@concordia.ellerman.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S1725446AbfHZEz1 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 26 Aug 2019 00:55:27 -0400
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 96D22AE80011;
+        Mon, 26 Aug 2019 00:55:02 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org,
+        Jose Ricardo Ziviani <joserz@linux.ibm.com>,
+        Paul Mackerras <paulus@ozlabs.org>
+Subject: [PATCH kernel] KVM: PPC: Fix incorrect guest-to-user-translation error handling
+Date:   Mon, 26 Aug 2019 14:55:20 +1000
+Message-Id: <20190826045520.92153-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Claudio Carvalho <cclaudio@linux.ibm.com> writes:
-> On 8/23/19 9:48 AM, Michael Ellerman wrote:
->> Claudio Carvalho <cclaudio@linux.ibm.com> writes:
->>> Ultravisor (UV) provides an in-memory console which follows the OPAL
->>> in-memory console structure.
->>>
->>> This patch extends the OPAL msglog code to also initialize the UV memory
->>> console and provide a sysfs interface (uv_msglog) for userspace to view
->>> the UV message log.
->>>
->>> CC: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
->>> CC: Oliver O'Halloran <oohall@gmail.com>
->>> Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
->>> ---
->>> This patch depends on the "kvmppc: Paravirtualize KVM to support
->>> ultravisor" patchset submitted by Claudio Carvalho.
->>> ---
->>>  arch/powerpc/platforms/powernv/opal-msglog.c | 99 ++++++++++++++------
->>>  1 file changed, 72 insertions(+), 27 deletions(-)
->> I think the code changes look mostly OK here.
->>
->> But I'm not sure about the end result in sysfs.
->>
->> If I'm reading it right this will create:
->>
->>  /sys/firmware/opal/uv_msglog
->>
->> Which I think is a little weird, because the UV is not OPAL.
->>
->> So I guess I wonder if the file should be created elsewhere to avoid any
->> confusion and keep things nicely separated.
->>
->> Possibly /sys/firmware/ultravisor/msglog ?
->
->
-> Yes, makes sense. I will do that.
+H_PUT_TCE_INDIRECT handlers receive a page with up to 512 TCEs from
+a guest. Although we verify correctness of TCEs before we do anything
+with the existing tables, there is a small window when a check in
+kvmppc_tce_validate might pass and right after that the guest alters
+the page with TCEs which can cause early exit from the handler and
+leave srcu_read_lock(&vcpu->kvm->srcu) (virtual mode) or lock_rmap(rmap)
+(real mode) locked.
 
-Thanks.
+This fixes the bug by jumping to the common exit code with an appropriate
+unlock.
 
-> Currently, the ultravisor memory console DT property is in
-> /ibm,opal/ibm,opal-uv-memcons. I think we should move it to
-> /ibm,ultravisor/ibm,uv-firmware/ibm,uv-memcons. What do you think?
+Fixes: 121f80ba68f1 ("KVM: PPC: VFIO: Add in-kernel acceleration for VFIO")
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ arch/powerpc/kvm/book3s_64_vio.c    | 6 ++++--
+ arch/powerpc/kvm/book3s_64_vio_hv.c | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-Yes that looks better.
+diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
+index e99a14798ab0..c4b606fe73eb 100644
+--- a/arch/powerpc/kvm/book3s_64_vio.c
++++ b/arch/powerpc/kvm/book3s_64_vio.c
+@@ -660,8 +660,10 @@ long kvmppc_h_put_tce_indirect(struct kvm_vcpu *vcpu,
+ 		}
+ 		tce = be64_to_cpu(tce);
+ 
+-		if (kvmppc_tce_to_ua(vcpu->kvm, tce, &ua))
+-			return H_PARAMETER;
++		if (kvmppc_tce_to_ua(vcpu->kvm, tce, &ua)) {
++			ret = H_PARAMETER;
++			goto unlock_exit;
++		}
+ 
+ 		list_for_each_entry_lockless(stit, &stt->iommu_tables, next) {
+ 			ret = kvmppc_tce_iommu_map(vcpu->kvm, stt,
+diff --git a/arch/powerpc/kvm/book3s_64_vio_hv.c b/arch/powerpc/kvm/book3s_64_vio_hv.c
+index f50bbeedfc66..b4f20f13b860 100644
+--- a/arch/powerpc/kvm/book3s_64_vio_hv.c
++++ b/arch/powerpc/kvm/book3s_64_vio_hv.c
+@@ -556,8 +556,10 @@ long kvmppc_rm_h_put_tce_indirect(struct kvm_vcpu *vcpu,
+ 		unsigned long tce = be64_to_cpu(((u64 *)tces)[i]);
+ 
+ 		ua = 0;
+-		if (kvmppc_rm_tce_to_ua(vcpu->kvm, tce, &ua, NULL))
+-			return H_PARAMETER;
++		if (kvmppc_rm_tce_to_ua(vcpu->kvm, tce, &ua, NULL)) {
++			ret = H_PARAMETER;
++			goto unlock_exit;
++		}
+ 
+ 		list_for_each_entry_lockless(stit, &stt->iommu_tables, next) {
+ 			ret = kvmppc_rm_tce_iommu_map(vcpu->kvm, stt,
+-- 
+2.17.1
 
-As an aside, you don't really need to namespace every node and property
-under ibm,ultravisor, the top-level ibm,ultravisor is already a
-namespace of sorts.
-
-ie. it could just be: /ibm,ultravisor/firmware/memcons
-
-But if it's too late to change those paths it doesn't really matter.
-
-cheers
