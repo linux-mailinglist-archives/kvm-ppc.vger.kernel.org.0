@@ -2,75 +2,49 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 160549E4F2
-	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Aug 2019 11:53:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5A179EF5B
+	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Aug 2019 17:49:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729461AbfH0Jxp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 27 Aug 2019 05:53:45 -0400
-Received: from ozlabs.org ([203.11.71.1]:58623 "EHLO ozlabs.org"
+        id S1730017AbfH0Ptm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 27 Aug 2019 11:49:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:22067 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728883AbfH0Jxp (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 27 Aug 2019 05:53:45 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46Hkj34P0Dz9sBF; Tue, 27 Aug 2019 19:53:43 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1566899623; bh=t6/73EjuF6lJD3vndlHCMS7wuROyK8CMl9+AMLeKESY=;
-        h=Date:From:To:Cc:Subject:From;
-        b=drvcqPoXL2O5q/SiHCsJcM00v3xX/xRnF6GtGEbpZR+8fhkU+8EnAxFSaumKWmc/Q
-         7AdQdmdRGr2Xl1yLRuq0kVGQJ/zPB6NXghY8zJmYaJBeBn6BBmxwar02Z0ZFRVMlTJ
-         qjZArhmMIeOig0++PCIr3kV+Q1VzdpLJYSbGkk6k6cJLSqWBp/4tTmlrtcwtazL5lH
-         lm4TYBAu9YPdS+EyuYZwPBAH+7+oH+8I294253uidNQ/fVRqi02pxnnPf1CaAQjoQK
-         bVYu4hoc8mSEFi8OFkx2L2df6gJWcfz7W9Fjfg552ptlZ/1vRix3OGMF3GYxPmkYU5
-         6U2zPqPMKKy8w==
-Date:   Tue, 27 Aug 2019 19:53:38 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
-Subject: [GIT PULL] Please pull my kvm-ppc-fixes-5.3-1 tag
-Message-ID: <20190827095338.GA22875@blackberry>
+        id S1728939AbfH0Ptl (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 27 Aug 2019 11:49:41 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4F59A301E12B;
+        Tue, 27 Aug 2019 15:49:41 +0000 (UTC)
+Received: from flask (unknown [10.43.2.55])
+        by smtp.corp.redhat.com (Postfix) with SMTP id AC9704F88;
+        Tue, 27 Aug 2019 15:49:38 +0000 (UTC)
+Received: by flask (sSMTP sendmail emulation); Tue, 27 Aug 2019 17:49:37 +0200
+Date:   Tue, 27 Aug 2019 17:49:37 +0200
+From:   Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [GIT PULL] Please pull my kvm-ppc-fixes-5.3-1 tag
+Message-ID: <20190827154937.GA65641@flask>
+References: <20190827095338.GA22875@blackberry>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190827095338.GA22875@blackberry>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Tue, 27 Aug 2019 15:49:41 +0000 (UTC)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paolo or Radim,
+2019-08-27 19:53+1000, Paul Mackerras:
+> Paolo or Radim,
+> 
+> Please do a pull from my kvm-ppc-fixes-5.3-1 tag to get one small
+> commit which I would like to go to Linus for 5.3 if possible, since it
+> fixes a bug where a malicious guest could cause host CPUs to hang
+> hard.  The fix is small and obviously correct.
 
-Please do a pull from my kvm-ppc-fixes-5.3-1 tag to get one small
-commit which I would like to go to Linus for 5.3 if possible, since it
-fixes a bug where a malicious guest could cause host CPUs to hang
-hard.  The fix is small and obviously correct.
-
-Thanks,
-Paul.
-
-The following changes since commit e4427372398c31f57450565de277f861a4db5b3b:
-
-  selftests/kvm: make platform_info_test pass on AMD (2019-08-21 19:08:18 +0200)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.3-1
-
-for you to fetch changes up to ddfd151f3def9258397fcde7a372205a2d661903:
-
-  KVM: PPC: Book3S: Fix incorrect guest-to-user-translation error handling (2019-08-27 10:59:30 +1000)
-
-----------------------------------------------------------------
-KVM/PPC fix for 5.3
-
-- Fix bug which could leave locks locked in the host on return
-  to a guest.
-
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      KVM: PPC: Book3S: Fix incorrect guest-to-user-translation error handling
-
- arch/powerpc/kvm/book3s_64_vio.c    | 6 ++++--
- arch/powerpc/kvm/book3s_64_vio_hv.c | 6 ++++--
- 2 files changed, 8 insertions(+), 4 deletions(-)
+Pulled, thanks.
