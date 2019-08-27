@@ -2,57 +2,104 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EBD069DAA3
-	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Aug 2019 02:32:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 725E39DB12
+	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Aug 2019 03:35:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727893AbfH0Ac2 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 26 Aug 2019 20:32:28 -0400
-Received: from ozlabs.org ([203.11.71.1]:51715 "EHLO ozlabs.org"
+        id S1726257AbfH0Bfp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 26 Aug 2019 21:35:45 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:37169 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726944AbfH0Ac2 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 26 Aug 2019 20:32:28 -0400
+        id S1727646AbfH0Bfp (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 26 Aug 2019 21:35:45 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46HVFP6JL1z9sDB; Tue, 27 Aug 2019 10:32:25 +1000 (AEST)
+        id 46HWfQ70K5z9sBF; Tue, 27 Aug 2019 11:35:42 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1566865945; bh=n0WxmvwSK65oIhBS+QjYk4vyDjy+iy/5wXOF3pY69BE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tySe8v7xb2A12sBylV8i+NhlV0mc10CpEDBz0n7H/JCr3kE9j08T0vStfZB5ufA7l
-         TH/4ypJDcenroG30bKoL/y8GWQa8dt1j6LtPQB+my1R880OLAdipZCryf7aF3Ms4qE
-         T3jVD07yBHleSv2v8cQk31filyT+jRNKK81E8o1427a71xtyoJHzO/WVNX5JJ0Ix66
-         nrKpJi4mX/IvmFI/Ix48hY43BIQ6aHzAhQwkxfemOKLCG9l3OeuQtHwomOZCJxTf7v
-         TqyoFpRYKQWORL21E2Cz5r8He3OvZ7sy0dS7qk0X2zchu8UyBOFwj2T9nlHaqouE0C
-         0ynQ2eD0KPNvQ==
-Date:   Tue, 27 Aug 2019 10:32:20 +1000
+        t=1566869742; bh=9E9V0XgWnpOd14JVRGHFpTnEq0jq/mMU+nBl6t5zops=;
+        h=Date:From:To:Cc:Subject:From;
+        b=jy39pw7gkEi0bqbY6XV+ca45NcPu8pBdAS0qqKmFxEeAU7plvOSWeLa/zISu5VJnw
+         hGJt7sWhLl4JPJzN3k0sQ9e9aja7tLOWsfmgieOUlj+YZNWe+tu2/aXHonwyd8Mkcl
+         ifDmw8tuFvV0Z/M2OAqt/LWLjaCAbP0csddV6z6AVPA3Dt5iQ9+Po5X/02yk+KAXF6
+         6DlF/Ibw5SMeGPL5k6Hh++606GDAhVy43nkdEnjyVdNa6p2gh/I/kp2+Fu4pRyTnfz
+         6TFmBGqpCg0B9iZOEve2KZtP3jrqKyFebvJ4GdHQta1cNyM49hYtw8a0vJgLJknssN
+         t/esBTEcY+upA==
+Date:   Tue, 27 Aug 2019 11:31:37 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     linuxppc-dev@lists.ozlabs.org,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        Alistair Popple <alistair@popple.id.au>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH kernel v2 2/4] KVM: PPC: Invalidate multiple TCEs at once
-Message-ID: <20190827003220.GA16075@blackberry>
-References: <20190826061705.92048-1-aik@ozlabs.ru>
- <20190826061705.92048-3-aik@ozlabs.ru>
+To:     kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH] KVM: PPC: Book3S HV: Check for MMU ready on piggybacked
+ virtual cores
+Message-ID: <20190827013137.GB16075@blackberry>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190826061705.92048-3-aik@ozlabs.ru>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Aug 26, 2019 at 04:17:03PM +1000, Alexey Kardashevskiy wrote:
-> Invalidating a TCE cache entry for each updated TCE is quite expensive.
-> This makes use of the new iommu_table_ops::xchg_no_kill()/tce_kill()
-> callbacks to bring down the time spent in mapping a huge guest DMA window;
-> roughly 20s to 10s for each guest's 100GB of DMA space.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+When we are running multiple vcores on the same physical core, they
+could be from different VMs and so it is possible that one of the
+VMs could have its arch.mmu_ready flag cleared (for example by a
+concurrent HPT resize) when we go to run it on a physical core.
+We currently check the arch.mmu_ready flag for the primary vcore
+but not the flags for the other vcores that will be run alongside
+it.  This adds that check, and also a check when we select the
+secondary vcores from the preempted vcores list.
 
-With the addition of "Book3S" to the patch title,
+Cc: stable@vger.kernel.org # v4.14+
+Fixes: 38c53af85306 ("KVM: PPC: Book3S HV: Fix exclusion between HPT resizing and other HPT updates")
+Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+---
+ arch/powerpc/kvm/book3s_hv.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-Acked-by: Paul Mackerras <paulus@ozlabs.org>
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index eaed043..ca6c6ec 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -2861,7 +2861,7 @@ static void collect_piggybacks(struct core_info *cip, int target_threads)
+ 		if (!spin_trylock(&pvc->lock))
+ 			continue;
+ 		prepare_threads(pvc);
+-		if (!pvc->n_runnable) {
++		if (!pvc->n_runnable || !pvc->kvm->arch.mmu_ready) {
+ 			list_del_init(&pvc->preempt_list);
+ 			if (pvc->runner == NULL) {
+ 				pvc->vcore_state = VCORE_INACTIVE;
+@@ -2882,15 +2882,20 @@ static void collect_piggybacks(struct core_info *cip, int target_threads)
+ 	spin_unlock(&lp->lock);
+ }
+ 
+-static bool recheck_signals(struct core_info *cip)
++static bool recheck_signals_and_mmu(struct core_info *cip)
+ {
+ 	int sub, i;
+ 	struct kvm_vcpu *vcpu;
++	struct kvmppc_vcore *vc;
+ 
+-	for (sub = 0; sub < cip->n_subcores; ++sub)
+-		for_each_runnable_thread(i, vcpu, cip->vc[sub])
++	for (sub = 0; sub < cip->n_subcores; ++sub) {
++		vc = cip->vc[sub];
++		if (!vc->kvm->arch.mmu_ready)
++			return true;
++		for_each_runnable_thread(i, vcpu, vc)
+ 			if (signal_pending(vcpu->arch.run_task))
+ 				return true;
++	}
+ 	return false;
+ }
+ 
+@@ -3120,7 +3125,7 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
+ 	local_irq_disable();
+ 	hard_irq_disable();
+ 	if (lazy_irq_pending() || need_resched() ||
+-	    recheck_signals(&core_info) || !vc->kvm->arch.mmu_ready) {
++	    recheck_signals_and_mmu(&core_info)) {
+ 		local_irq_enable();
+ 		vc->vcore_state = VCORE_INACTIVE;
+ 		/* Unlock all except the primary vcore */
+-- 
+2.7.4
+
