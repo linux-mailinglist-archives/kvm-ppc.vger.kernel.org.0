@@ -2,59 +2,75 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B08009DCCB
-	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Aug 2019 06:48:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 160549E4F2
+	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Aug 2019 11:53:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725805AbfH0Eso (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 27 Aug 2019 00:48:44 -0400
-Received: from ozlabs.org ([203.11.71.1]:42203 "EHLO ozlabs.org"
+        id S1729461AbfH0Jxp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 27 Aug 2019 05:53:45 -0400
+Received: from ozlabs.org ([203.11.71.1]:58623 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725795AbfH0Esn (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 27 Aug 2019 00:48:43 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 46Hbx52WCgz9s00;
-        Tue, 27 Aug 2019 14:48:41 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-Cc:     David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        Alistair Popple <alistair@popple.id.au>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: [PATCH kernel v2 4/4] powerpc/powernv/ioda: Remove obsolete iommu_table_ops::exchange callbacks
-In-Reply-To: <20190826061705.92048-5-aik@ozlabs.ru>
-References: <20190826061705.92048-1-aik@ozlabs.ru> <20190826061705.92048-5-aik@ozlabs.ru>
-Date:   Tue, 27 Aug 2019 14:48:41 +1000
-Message-ID: <87mufv2oye.fsf@concordia.ellerman.id.au>
+        id S1728883AbfH0Jxp (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 27 Aug 2019 05:53:45 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 46Hkj34P0Dz9sBF; Tue, 27 Aug 2019 19:53:43 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1566899623; bh=t6/73EjuF6lJD3vndlHCMS7wuROyK8CMl9+AMLeKESY=;
+        h=Date:From:To:Cc:Subject:From;
+        b=drvcqPoXL2O5q/SiHCsJcM00v3xX/xRnF6GtGEbpZR+8fhkU+8EnAxFSaumKWmc/Q
+         7AdQdmdRGr2Xl1yLRuq0kVGQJ/zPB6NXghY8zJmYaJBeBn6BBmxwar02Z0ZFRVMlTJ
+         qjZArhmMIeOig0++PCIr3kV+Q1VzdpLJYSbGkk6k6cJLSqWBp/4tTmlrtcwtazL5lH
+         lm4TYBAu9YPdS+EyuYZwPBAH+7+oH+8I294253uidNQ/fVRqi02pxnnPf1CaAQjoQK
+         bVYu4hoc8mSEFi8OFkx2L2df6gJWcfz7W9Fjfg552ptlZ/1vRix3OGMF3GYxPmkYU5
+         6U2zPqPMKKy8w==
+Date:   Tue, 27 Aug 2019 19:53:38 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Subject: [GIT PULL] Please pull my kvm-ppc-fixes-5.3-1 tag
+Message-ID: <20190827095338.GA22875@blackberry>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Alexey Kardashevskiy <aik@ozlabs.ru> writes:
-> As now we have xchg_no_kill/tce_kill, these are not used anymore so
-> remove them.
->
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->  arch/powerpc/include/asm/iommu.h          | 10 -----
->  arch/powerpc/kernel/iommu.c               | 26 +-----------
->  arch/powerpc/platforms/powernv/pci-ioda.c | 50 -----------------------
->  3 files changed, 1 insertion(+), 85 deletions(-)
+Paolo or Radim,
 
-This doesn't build:
+Please do a pull from my kvm-ppc-fixes-5.3-1 tag to get one small
+commit which I would like to go to Linus for 5.3 if possible, since it
+fixes a bug where a malicious guest could cause host CPUs to hang
+hard.  The fix is small and obviously correct.
 
-arch/powerpc/platforms/pseries/iommu.c:652:3: error: 'struct iommu_table_ops' has no member named 'exchange'
-  .exchange = tce_exchange_pseries,
-   ^~~~~~~~
-arch/powerpc/platforms/pseries/iommu.c:652:14: error: initialization of 'int (*)(struct iommu_table *, long int,  long unsigned int *, enum dma_data_direction *, bool)' {aka 'int (*)(struct iommu_table *, long int,  long unsigned int *, enum dma_data_direction *, _Bool)'} from incompatible pointer type 'int (*)(struct iommu_table *, long int,  long unsigned int *, enum dma_data_direction *)' [-Werror=incompatible-pointer-types]
-  .exchange = tce_exchange_pseries,
-              ^~~~~~~~~~~~~~~~~~~~
+Thanks,
+Paul.
 
-cheers
+The following changes since commit e4427372398c31f57450565de277f861a4db5b3b:
+
+  selftests/kvm: make platform_info_test pass on AMD (2019-08-21 19:08:18 +0200)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.3-1
+
+for you to fetch changes up to ddfd151f3def9258397fcde7a372205a2d661903:
+
+  KVM: PPC: Book3S: Fix incorrect guest-to-user-translation error handling (2019-08-27 10:59:30 +1000)
+
+----------------------------------------------------------------
+KVM/PPC fix for 5.3
+
+- Fix bug which could leave locks locked in the host on return
+  to a guest.
+
+----------------------------------------------------------------
+Alexey Kardashevskiy (1):
+      KVM: PPC: Book3S: Fix incorrect guest-to-user-translation error handling
+
+ arch/powerpc/kvm/book3s_64_vio.c    | 6 ++++--
+ arch/powerpc/kvm/book3s_64_vio_hv.c | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
