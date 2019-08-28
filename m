@@ -2,128 +2,118 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4203E9FE85
-	for <lists+kvm-ppc@lfdr.de>; Wed, 28 Aug 2019 11:33:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5691A0E31
+	for <lists+kvm-ppc@lfdr.de>; Thu, 29 Aug 2019 01:24:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726397AbfH1Jc7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 28 Aug 2019 05:32:59 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43108 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726270AbfH1Jc7 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 28 Aug 2019 05:32:59 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7S9N2mk054638
-        for <kvm-ppc@vger.kernel.org>; Wed, 28 Aug 2019 05:32:57 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2unm7bprvp-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Wed, 28 Aug 2019 05:32:57 -0400
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <svaidy@linux.ibm.com>;
-        Wed, 28 Aug 2019 10:22:20 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 28 Aug 2019 10:22:18 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7S9LtUb22151504
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Aug 2019 09:21:55 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 337ACA4051;
-        Wed, 28 Aug 2019 09:22:17 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E9292A404D;
-        Wed, 28 Aug 2019 09:22:14 +0000 (GMT)
-Received: from drishya.in.ibm.com (unknown [9.109.202.191])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 28 Aug 2019 09:22:14 +0000 (GMT)
-Date:   Wed, 28 Aug 2019 14:52:08 +0530
-From:   Vaidyanathan Srinivasan <svaidy@linux.ibm.com>
-To:     Claudio Carvalho <cclaudio@linux.ibm.com>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@ozlabs.org,
-        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>,
-        Michael Anderson <andmike@linux.ibm.com>,
-        Ram Pai <linuxram@us.ibm.com>, kvm-ppc@vger.kernel.org,
-        Ryan Grimm <grimm@linux.ibm.com>,
-        "Oliver O'Halloran" <oohall@gmail.com>
-Subject: Re: [PATCH v2] powerpc/powernv: Add ultravisor message log interface
-Reply-To: svaidy@linux.ibm.com
-References: <20190823060654.28842-1-cclaudio@linux.ibm.com>
- <87o90g3v5o.fsf@concordia.ellerman.id.au>
- <4e577a36-4ce1-410b-3ceb-d31bbf564b3d@linux.ibm.com>
+        id S1726828AbfH1XYB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 28 Aug 2019 19:24:01 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:59645 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726787AbfH1XYB (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 28 Aug 2019 19:24:01 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 46JhdV07mSz9sNk; Thu, 29 Aug 2019 09:23:57 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1567034638; bh=1Ihwg1PIrv+Mdc9qXg3LJ1mTnfGppKTWocJKvY/n2HY=;
+        h=Date:From:To:Cc:Subject:From;
+        b=BTpSvlQlaAVYAutJsv9qyZITFqRVdAwFoyB6CsD9fR8ZYPxHsR0E4/UeJ1Kf2jJOT
+         JBMa/3v85CefRRQxZePQ/SMtDkUkfQwIeaLYRu0J4O1Fa23CYr3nar3jatkgLArpG3
+         PXj5Jt9dGoNgJW+RJMLg4uy8XlDByGS/9og5MqGNi/pFikj0SaRm84glE5Y/C863aD
+         +7RdjJwNcoTPlmvOG9qjQM3YNxktRw3dov0HtIpjD6C63jrUzvrvBHsWYrGGUOR0QJ
+         QuoX6in957C3USXQd3GnLh/J1YBepmzAg5f98sotdbztJwVXwT6UFtPxqAPF2yhFSc
+         qiYjmgsOZN4RQ==
+Date:   Thu, 29 Aug 2019 09:23:53 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Subject: [GIT PULL] Please pull my kvm-ppc-next-5.4-1 tag
+Message-ID: <20190828232353.GA4485@blackberry>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <4e577a36-4ce1-410b-3ceb-d31bbf564b3d@linux.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-TM-AS-GCONF: 00
-x-cbid: 19082809-0028-0000-0000-00000394D2D2
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082809-0029-0000-0000-000024570E70
-Message-Id: <20190828092208.GA26104@drishya.in.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-28_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908280099
+Content-Transfer-Encoding: 8bit
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-* Claudio Carvalho <cclaudio@linux.ibm.com> [2019-08-24 23:19:19]:
+Paolo or Radim,
 
-> 
-> On 8/23/19 9:48 AM, Michael Ellerman wrote:
-> > Hi Claudio,
-> 
-> Hi Michael,
-> 
-> >
-> > Claudio Carvalho <cclaudio@linux.ibm.com> writes:
-> >> Ultravisor (UV) provides an in-memory console which follows the OPAL
-> >> in-memory console structure.
-> >>
-> >> This patch extends the OPAL msglog code to also initialize the UV memory
-> >> console and provide a sysfs interface (uv_msglog) for userspace to view
-> >> the UV message log.
-> >>
-> >> CC: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
-> >> CC: Oliver O'Halloran <oohall@gmail.com>
-> >> Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
-> >> ---
-> >> This patch depends on the "kvmppc: Paravirtualize KVM to support
-> >> ultravisor" patchset submitted by Claudio Carvalho.
-> >> ---
-> >>  arch/powerpc/platforms/powernv/opal-msglog.c | 99 ++++++++++++++------
-> >>  1 file changed, 72 insertions(+), 27 deletions(-)
-> > I think the code changes look mostly OK here.
-> >
-> > But I'm not sure about the end result in sysfs.
-> >
-> > If I'm reading it right this will create:
-> >
-> >  /sys/firmware/opal/uv_msglog
-> >
-> > Which I think is a little weird, because the UV is not OPAL.
-> >
-> > So I guess I wonder if the file should be created elsewhere to avoid any
-> > confusion and keep things nicely separated.
-> >
-> > Possibly /sys/firmware/ultravisor/msglog ?
-> 
-> 
-> Yes, makes sense. I will do that.
+Please do a pull from my kvm-ppc-next-5.4-1 tag to get a PPC KVM
+update for 5.4.  There is not a lot this time, mostly minor fixes and
+some prep for future patch series, plus a series that fixes a race
+condition in the XIVE interrupt controller code where interrupts could
+arrive after free_irq() and cause hangs and crashes in the host.
 
-+1
+The XIVE fix touches both PPC KVM and generic powerpc code, so Michael
+Ellerman put it in his topic/ppc-kvm branch and I have merged that
+branch into my kvm-ppc-next branch.
 
-Letting the UV have its own /sys/firmware/ultravisor/xxx is a good
-idea. We may have a need to export more runtime data from UV for
-debug/profile purposes and this sysfs directory will come handy.
+Thanks,
+Paul.
 
---Vaidy
+The following changes since commit 609488bc979f99f805f34e9a32c1e3b71179d10b:
 
+  Linux 5.3-rc2 (2019-07-28 12:47:02 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.4-1
+
+for you to fetch changes up to ff42df49e75f053a8a6b4c2533100cdcc23afe69:
+
+  KVM: PPC: Book3S HV: Don't lose pending doorbell request on migration on P9 (2019-08-27 14:08:22 +1000)
+
+----------------------------------------------------------------
+PPC KVM update for 5.4
+
+- Some prep for extending the uses of the rmap array
+- Various minor fixes
+- Commits from the powerpc topic/ppc-kvm branch, which fix a problem
+  with interrupts arriving after free_irq, causing host hangs and crashes.
+
+----------------------------------------------------------------
+Cédric Le Goater (1):
+      KVM: PPC: Book3S HV: XIVE: Free escalation interrupts before disabling the VP
+
+Fabiano Rosas (1):
+      KVM: PPC: Remove leftover comment from emulate_loadstore.c
+
+Mark Cave-Ayland (1):
+      KVM: PPC: Book3S PR: Fix software breakpoints
+
+Paul Mackerras (7):
+      KVM: PPC: Book3S HV: Fix race in re-enabling XIVE escalation interrupts
+      KVM: PPC: Book3S HV: Don't push XIVE context when not using XIVE device
+      powerpc/xive: Implement get_irqchip_state method for XIVE to fix shutdown race
+      Merge remote-tracking branch 'remotes/powerpc/topic/ppc-kvm' into kvm-ppc-next
+      KVM: PPC: Book3S: Enable XIVE native capability only if OPAL has required functions
+      KVM: PPC: Book3S HV: Check for MMU ready on piggybacked virtual cores
+      KVM: PPC: Book3S HV: Don't lose pending doorbell request on migration on P9
+
+Paul Menzel (1):
+      KVM: PPC: Book3S: Mark expected switch fall-through
+
+Suraj Jitindar Singh (1):
+      KVM: PPC: Book3S HV: Define usage types for rmap array in guest memslot
+
+ arch/powerpc/include/asm/kvm_host.h     | 22 +++++++--
+ arch/powerpc/include/asm/kvm_ppc.h      |  1 +
+ arch/powerpc/include/asm/xive.h         |  9 ++++
+ arch/powerpc/kvm/book3s.c               |  8 +--
+ arch/powerpc/kvm/book3s_32_mmu.c        |  1 +
+ arch/powerpc/kvm/book3s_hv.c            | 24 ++++++---
+ arch/powerpc/kvm/book3s_hv_rm_mmu.c     |  2 +-
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 38 +++++++++-----
+ arch/powerpc/kvm/book3s_xive.c          | 60 +++++++++++++++++++----
+ arch/powerpc/kvm/book3s_xive.h          |  2 +
+ arch/powerpc/kvm/book3s_xive_native.c   | 23 +++++++--
+ arch/powerpc/kvm/emulate.c              |  1 +
+ arch/powerpc/kvm/emulate_loadstore.c    |  6 ---
+ arch/powerpc/kvm/powerpc.c              |  3 +-
+ arch/powerpc/sysdev/xive/common.c       | 87 ++++++++++++++++++++++++---------
+ arch/powerpc/sysdev/xive/native.c       |  7 +++
+ 16 files changed, 223 insertions(+), 71 deletions(-)
