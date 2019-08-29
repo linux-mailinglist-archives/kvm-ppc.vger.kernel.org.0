@@ -2,118 +2,549 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5691A0E31
-	for <lists+kvm-ppc@lfdr.de>; Thu, 29 Aug 2019 01:24:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21749A0FC3
+	for <lists+kvm-ppc@lfdr.de>; Thu, 29 Aug 2019 05:02:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726828AbfH1XYB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 28 Aug 2019 19:24:01 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:59645 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726787AbfH1XYB (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 28 Aug 2019 19:24:01 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46JhdV07mSz9sNk; Thu, 29 Aug 2019 09:23:57 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1567034638; bh=1Ihwg1PIrv+Mdc9qXg3LJ1mTnfGppKTWocJKvY/n2HY=;
-        h=Date:From:To:Cc:Subject:From;
-        b=BTpSvlQlaAVYAutJsv9qyZITFqRVdAwFoyB6CsD9fR8ZYPxHsR0E4/UeJ1Kf2jJOT
-         JBMa/3v85CefRRQxZePQ/SMtDkUkfQwIeaLYRu0J4O1Fa23CYr3nar3jatkgLArpG3
-         PXj5Jt9dGoNgJW+RJMLg4uy8XlDByGS/9og5MqGNi/pFikj0SaRm84glE5Y/C863aD
-         +7RdjJwNcoTPlmvOG9qjQM3YNxktRw3dov0HtIpjD6C63jrUzvrvBHsWYrGGUOR0QJ
-         QuoX6in957C3USXQd3GnLh/J1YBepmzAg5f98sotdbztJwVXwT6UFtPxqAPF2yhFSc
-         qiYjmgsOZN4RQ==
-Date:   Thu, 29 Aug 2019 09:23:53 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
-Subject: [GIT PULL] Please pull my kvm-ppc-next-5.4-1 tag
-Message-ID: <20190828232353.GA4485@blackberry>
+        id S1726971AbfH2DCs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 28 Aug 2019 23:02:48 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15296 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726369AbfH2DCs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 28 Aug 2019 23:02:48 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7T32PGp103937;
+        Wed, 28 Aug 2019 23:02:26 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2up5busgbt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 28 Aug 2019 23:02:26 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x7T32P1e103970;
+        Wed, 28 Aug 2019 23:02:25 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2up5busgar-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 28 Aug 2019 23:02:25 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7T30sTe008887;
+        Thu, 29 Aug 2019 03:02:23 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma03dal.us.ibm.com with ESMTP id 2umpctnxxt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 29 Aug 2019 03:02:23 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7T32L9i46137752
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 29 Aug 2019 03:02:21 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 89DAFBE056;
+        Thu, 29 Aug 2019 03:02:21 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 656ACBE053;
+        Thu, 29 Aug 2019 03:02:21 +0000 (GMT)
+Received: from suka-w540.localdomain (unknown [9.70.94.45])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 29 Aug 2019 03:02:21 +0000 (GMT)
+Received: by suka-w540.localdomain (Postfix, from userid 1000)
+        id B70132E10CF; Wed, 28 Aug 2019 20:02:19 -0700 (PDT)
+Date:   Wed, 28 Aug 2019 20:02:19 -0700
+From:   Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+To:     Bharata B Rao <bharata@linux.ibm.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-mm@kvack.org, paulus@au1.ibm.com,
+        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
+        linuxram@us.ibm.com, cclaudio@linux.ibm.com, hch@lst.de
+Subject: Re: [PATCH v7 1/7] kvmppc: Driver to manage pages of secure guest
+Message-ID: <20190829030219.GA17497@us.ibm.com>
+References: <20190822102620.21897-1-bharata@linux.ibm.com>
+ <20190822102620.21897-2-bharata@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190822102620.21897-2-bharata@linux.ibm.com>
+X-Operating-System: Linux 2.0.32 on an i486
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-29_02:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908290032
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paolo or Radim,
+Some minor comments/questions below. Overall, the patches look
+fine to me.
 
-Please do a pull from my kvm-ppc-next-5.4-1 tag to get a PPC KVM
-update for 5.4.  There is not a lot this time, mostly minor fixes and
-some prep for future patch series, plus a series that fixes a race
-condition in the XIVE interrupt controller code where interrupts could
-arrive after free_irq() and cause hangs and crashes in the host.
+> +#include <linux/pagemap.h>
+> +#include <linux/migrate.h>
+> +#include <linux/kvm_host.h>
+> +#include <asm/ultravisor.h>
+> +
+> +static struct dev_pagemap kvmppc_devm_pgmap;
+> +static unsigned long *kvmppc_devm_pfn_bitmap;
+> +static DEFINE_SPINLOCK(kvmppc_devm_pfn_lock);
 
-The XIVE fix touches both PPC KVM and generic powerpc code, so Michael
-Ellerman put it in his topic/ppc-kvm branch and I have merged that
-branch into my kvm-ppc-next branch.
+Is this lock protecting just the pfn_bitmap?
 
-Thanks,
-Paul.
+> +
+> +struct kvmppc_devm_page_pvt {
+> +	unsigned long *rmap;
+> +	unsigned int lpid;
+> +	unsigned long gpa;
+> +};
+> +
+> +/*
+> + * Get a free device PFN from the pool
+> + *
+> + * Called when a normal page is moved to secure memory (UV_PAGE_IN). Device
+> + * PFN will be used to keep track of the secure page on HV side.
+> + *
+> + * @rmap here is the slot in the rmap array that corresponds to @gpa.
+> + * Thus a non-zero rmap entry indicates that the corresponding guest
+> + * page has become secure, and is not mapped on the HV side.
+> + *
+> + * NOTE: In this and subsequent functions, we pass around and access
+> + * individual elements of kvm_memory_slot->arch.rmap[] without any
+> + * protection. Should we use lock_rmap() here?
+> + */
+> +static struct page *kvmppc_devm_get_page(unsigned long *rmap, unsigned long gpa,
+> +					 unsigned int lpid)
+> +{
+> +	struct page *dpage = NULL;
+> +	unsigned long bit, devm_pfn;
+> +	unsigned long flags;
+> +	struct kvmppc_devm_page_pvt *pvt;
+> +	unsigned long pfn_last, pfn_first;
+> +
+> +	if (kvmppc_rmap_is_devm_pfn(*rmap))
+> +		return NULL;
+> +
+> +	pfn_first = kvmppc_devm_pgmap.res.start >> PAGE_SHIFT;
+> +	pfn_last = pfn_first +
+> +		   (resource_size(&kvmppc_devm_pgmap.res) >> PAGE_SHIFT);
+> +	spin_lock_irqsave(&kvmppc_devm_pfn_lock, flags);
 
-The following changes since commit 609488bc979f99f805f34e9a32c1e3b71179d10b:
+Blank lines around spin_lock() would help.
 
-  Linux 5.3-rc2 (2019-07-28 12:47:02 -0700)
+> +	bit = find_first_zero_bit(kvmppc_devm_pfn_bitmap, pfn_last - pfn_first);
+> +	if (bit >= (pfn_last - pfn_first))
+> +		goto out;
+> +
+> +	bitmap_set(kvmppc_devm_pfn_bitmap, bit, 1);
+> +	devm_pfn = bit + pfn_first;
 
-are available in the git repository at:
+Can we drop the &kvmppc_devm_pfn_lock here or after the trylock_page()?
+Or does it also protect the ->zone_device_data' assignment below as well?
+If so, maybe drop the 'pfn_' from the name of the lock?
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.4-1
+Besides, we don't seem to hold this lock when accessing ->zone_device_data
+in kvmppc_share_page(). Maybe &kvmppc_devm_pfn_lock just protects the bitmap?
 
-for you to fetch changes up to ff42df49e75f053a8a6b4c2533100cdcc23afe69:
 
-  KVM: PPC: Book3S HV: Don't lose pending doorbell request on migration on P9 (2019-08-27 14:08:22 +1000)
+> +	dpage = pfn_to_page(devm_pfn);
 
-----------------------------------------------------------------
-PPC KVM update for 5.4
+Does this code and hence CONFIG_PPC_UV depend on a specific model like
+CONFIG_SPARSEMEM_VMEMMAP?
+> +
+> +	if (!trylock_page(dpage))
+> +		goto out_clear;
+> +
+> +	*rmap = devm_pfn | KVMPPC_RMAP_DEVM_PFN;
+> +	pvt = kzalloc(sizeof(*pvt), GFP_ATOMIC);
+> +	if (!pvt)
+> +		goto out_unlock;
+> +	pvt->rmap = rmap;
+> +	pvt->gpa = gpa;
+> +	pvt->lpid = lpid;
+> +	dpage->zone_device_data = pvt;
 
-- Some prep for extending the uses of the rmap array
-- Various minor fixes
-- Commits from the powerpc topic/ppc-kvm branch, which fix a problem
-  with interrupts arriving after free_irq, causing host hangs and crashes.
+->zone_device_data is set after locking the dpage here, but in
+kvmppc_share_page() and kvmppc_devm_fault_migrate_alloc_and_copy()
+it is accessed without locking the page?
 
-----------------------------------------------------------------
-Cédric Le Goater (1):
-      KVM: PPC: Book3S HV: XIVE: Free escalation interrupts before disabling the VP
+> +	spin_unlock_irqrestore(&kvmppc_devm_pfn_lock, flags);
+> +
+> +	get_page(dpage);
+> +	return dpage;
+> +
+> +out_unlock:
+> +	unlock_page(dpage);
+> +out_clear:
+> +	bitmap_clear(kvmppc_devm_pfn_bitmap, devm_pfn - pfn_first, 1);
+> +out:
+> +	spin_unlock_irqrestore(&kvmppc_devm_pfn_lock, flags);
+> +	return NULL;
+> +}
+> +
+> +/*
+> + * Alloc a PFN from private device memory pool and copy page from normal
+> + * memory to secure memory.
+> + */
+> +static int
+> +kvmppc_devm_migrate_alloc_and_copy(struct migrate_vma *mig,
+> +				   unsigned long *rmap, unsigned long gpa,
+> +				   unsigned int lpid, unsigned long page_shift)
+> +{
+> +	struct page *spage = migrate_pfn_to_page(*mig->src);
+> +	unsigned long pfn = *mig->src >> MIGRATE_PFN_SHIFT;
+> +	struct page *dpage;
+> +
+> +	*mig->dst = 0;
+> +	if (!spage || !(*mig->src & MIGRATE_PFN_MIGRATE))
+> +		return 0;
+> +
+> +	dpage = kvmppc_devm_get_page(rmap, gpa, lpid);
+> +	if (!dpage)
+> +		return -EINVAL;
+> +
+> +	if (spage)
+> +		uv_page_in(lpid, pfn << page_shift, gpa, 0, page_shift);
+> +
+> +	*mig->dst = migrate_pfn(page_to_pfn(dpage)) | MIGRATE_PFN_LOCKED;
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Move page from normal memory to secure memory.
+> + */
+> +unsigned long
+> +kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
+> +		     unsigned long flags, unsigned long page_shift)
+> +{
+> +	unsigned long addr, end;
+> +	unsigned long src_pfn, dst_pfn;
 
-Fabiano Rosas (1):
-      KVM: PPC: Remove leftover comment from emulate_loadstore.c
+These are the host frame numbers correct? Trying to distinguish them
+from 'gfn' and 'gpa' used in the function.
 
-Mark Cave-Ayland (1):
-      KVM: PPC: Book3S PR: Fix software breakpoints
+> +	struct migrate_vma mig;
+> +	struct vm_area_struct *vma;
+> +	int srcu_idx;
+> +	unsigned long gfn = gpa >> page_shift;
+> +	struct kvm_memory_slot *slot;
+> +	unsigned long *rmap;
+> +	int ret;
+> +
+> +	if (page_shift != PAGE_SHIFT)
+> +		return H_P3;
+> +
+> +	if (flags)
+> +		return H_P2;
+> +
+> +	ret = H_PARAMETER;
+> +	down_read(&kvm->mm->mmap_sem);
+> +	srcu_idx = srcu_read_lock(&kvm->srcu);
+> +	slot = gfn_to_memslot(kvm, gfn);
 
-Paul Mackerras (7):
-      KVM: PPC: Book3S HV: Fix race in re-enabling XIVE escalation interrupts
-      KVM: PPC: Book3S HV: Don't push XIVE context when not using XIVE device
-      powerpc/xive: Implement get_irqchip_state method for XIVE to fix shutdown race
-      Merge remote-tracking branch 'remotes/powerpc/topic/ppc-kvm' into kvm-ppc-next
-      KVM: PPC: Book3S: Enable XIVE native capability only if OPAL has required functions
-      KVM: PPC: Book3S HV: Check for MMU ready on piggybacked virtual cores
-      KVM: PPC: Book3S HV: Don't lose pending doorbell request on migration on P9
+Can slot be NULL? could be a bug in UV...
 
-Paul Menzel (1):
-      KVM: PPC: Book3S: Mark expected switch fall-through
+> +	rmap = &slot->arch.rmap[gfn - slot->base_gfn];
+> +	addr = gfn_to_hva(kvm, gpa >> page_shift);
 
-Suraj Jitindar Singh (1):
-      KVM: PPC: Book3S HV: Define usage types for rmap array in guest memslot
+Use 'gfn' as the second parameter? 
 
- arch/powerpc/include/asm/kvm_host.h     | 22 +++++++--
- arch/powerpc/include/asm/kvm_ppc.h      |  1 +
- arch/powerpc/include/asm/xive.h         |  9 ++++
- arch/powerpc/kvm/book3s.c               |  8 +--
- arch/powerpc/kvm/book3s_32_mmu.c        |  1 +
- arch/powerpc/kvm/book3s_hv.c            | 24 ++++++---
- arch/powerpc/kvm/book3s_hv_rm_mmu.c     |  2 +-
- arch/powerpc/kvm/book3s_hv_rmhandlers.S | 38 +++++++++-----
- arch/powerpc/kvm/book3s_xive.c          | 60 +++++++++++++++++++----
- arch/powerpc/kvm/book3s_xive.h          |  2 +
- arch/powerpc/kvm/book3s_xive_native.c   | 23 +++++++--
- arch/powerpc/kvm/emulate.c              |  1 +
- arch/powerpc/kvm/emulate_loadstore.c    |  6 ---
- arch/powerpc/kvm/powerpc.c              |  3 +-
- arch/powerpc/sysdev/xive/common.c       | 87 ++++++++++++++++++++++++---------
- arch/powerpc/sysdev/xive/native.c       |  7 +++
- 16 files changed, 223 insertions(+), 71 deletions(-)
+Nit. for consistency with gpa and gfn, maybe rename 'addr' to
+'hva' or to match 'end' maybe to 'start'.
+
+Also, can we check 'kvmppc_rmap_is_devm_pfn(*rmap)' here and bail out
+if its already shared? We currently do it further down the call chain
+in kvmppc_devm_get_page() after doing more work.
+
+
+> +	if (kvm_is_error_hva(addr))
+> +		goto out;
+> +
+> +	end = addr + (1UL << page_shift);
+> +	vma = find_vma_intersection(kvm->mm, addr, end);
+> +	if (!vma || vma->vm_start > addr || vma->vm_end < end)
+> +		goto out;
+> +
+> +	memset(&mig, 0, sizeof(mig));
+> +	mig.vma = vma;
+> +	mig.start = addr;
+> +	mig.end = end;
+> +	mig.src = &src_pfn;
+> +	mig.dst = &dst_pfn;
+> +
+> +	if (migrate_vma_setup(&mig))
+> +		goto out;
+> +
+> +	if (kvmppc_devm_migrate_alloc_and_copy(&mig, rmap, gpa,
+> +					       kvm->arch.lpid, page_shift))
+> +		goto out_finalize;
+> +
+> +	migrate_vma_pages(&mig);
+> +	ret = H_SUCCESS;
+> +out_finalize:
+> +	migrate_vma_finalize(&mig);
+> +out:
+> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
+> +	up_read(&kvm->mm->mmap_sem);
+> +	return ret;
+> +}
+> +
+> +/*
+> + * Provision a new page on HV side and copy over the contents
+> + * from secure memory.
+> + */
+> +static int
+> +kvmppc_devm_fault_migrate_alloc_and_copy(struct migrate_vma *mig,
+> +					 unsigned long page_shift)
+> +{
+> +	struct page *dpage, *spage;
+> +	struct kvmppc_devm_page_pvt *pvt;
+> +	unsigned long pfn;
+> +	int ret;
+> +
+> +	spage = migrate_pfn_to_page(*mig->src);
+> +	if (!spage || !(*mig->src & MIGRATE_PFN_MIGRATE))
+> +		return 0;
+> +	if (!is_zone_device_page(spage))
+> +		return 0;
+
+What does it mean if its not a zone_device page at this point? Caller
+would then proceed to migrage_vma_pages() if we return 0 right?
+
+> +
+> +	dpage = alloc_page_vma(GFP_HIGHUSER, mig->vma, mig->start);
+> +	if (!dpage)
+> +		return -EINVAL;
+> +	lock_page(dpage);
+> +	pvt = spage->zone_device_data;
+> +
+> +	pfn = page_to_pfn(dpage);
+> +	ret = uv_page_out(pvt->lpid, pfn << page_shift, pvt->gpa, 0,
+> +			  page_shift);
+> +	if (ret == U_SUCCESS)
+> +		*mig->dst = migrate_pfn(pfn) | MIGRATE_PFN_LOCKED;
+> +	else {
+> +		unlock_page(dpage);
+> +		__free_page(dpage);
+> +	}
+> +	return ret;
+> +}
+> +
+> +/*
+> + * Fault handler callback when HV touches any page that has been
+> + * moved to secure memory, we ask UV to give back the page by
+> + * issuing a UV_PAGE_OUT uvcall.
+> + *
+> + * This eventually results in dropping of device PFN and the newly
+> + * provisioned page/PFN gets populated in QEMU page tables.
+> + */
+> +static vm_fault_t kvmppc_devm_migrate_to_ram(struct vm_fault *vmf)
+> +{
+> +	unsigned long src_pfn, dst_pfn = 0;
+> +	struct migrate_vma mig;
+> +	int ret = 0;
+> +
+> +	memset(&mig, 0, sizeof(mig));
+> +	mig.vma = vmf->vma;
+> +	mig.start = vmf->address;
+> +	mig.end = vmf->address + PAGE_SIZE;
+> +	mig.src = &src_pfn;
+> +	mig.dst = &dst_pfn;
+> +
+> +	if (migrate_vma_setup(&mig)) {
+> +		ret = VM_FAULT_SIGBUS;
+> +		goto out;
+> +	}
+> +
+> +	if (kvmppc_devm_fault_migrate_alloc_and_copy(&mig, PAGE_SHIFT)) {
+> +		ret = VM_FAULT_SIGBUS;
+> +		goto out_finalize;
+> +	}
+> +
+> +	migrate_vma_pages(&mig);
+> +out_finalize:
+> +	migrate_vma_finalize(&mig);
+> +out:
+> +	return ret;
+> +}
+> +
+> +/*
+> + * Release the device PFN back to the pool
+> + *
+> + * Gets called when secure page becomes a normal page during UV_PAGE_OUT.
+
+Nit: Should that be H_SVM_PAGE_OUT?
+
+> + */
+> +static void kvmppc_devm_page_free(struct page *page)
+> +{
+> +	unsigned long pfn = page_to_pfn(page);
+> +	unsigned long flags;
+> +	struct kvmppc_devm_page_pvt *pvt;
+> +
+> +	spin_lock_irqsave(&kvmppc_devm_pfn_lock, flags);
+> +	pvt = page->zone_device_data;
+> +	page->zone_device_data = NULL;
+
+If the pfn_lock only protects the bitmap, would be better to move
+it here?
+
+> +
+> +	bitmap_clear(kvmppc_devm_pfn_bitmap,
+> +		     pfn - (kvmppc_devm_pgmap.res.start >> PAGE_SHIFT), 1);
+> +	*pvt->rmap = 0;
+> +	spin_unlock_irqrestore(&kvmppc_devm_pfn_lock, flags);
+> +	kfree(pvt);
+> +}
+> +
+> +static const struct dev_pagemap_ops kvmppc_devm_ops = {
+> +	.page_free = kvmppc_devm_page_free,
+> +	.migrate_to_ram	= kvmppc_devm_migrate_to_ram,
+> +};
+> +
+> +/*
+> + * Move page from secure memory to normal memory.
+> + */
+> +unsigned long
+> +kvmppc_h_svm_page_out(struct kvm *kvm, unsigned long gpa,
+> +		      unsigned long flags, unsigned long page_shift)
+> +{
+> +	struct migrate_vma mig;
+> +	unsigned long addr, end;
+> +	struct vm_area_struct *vma;
+> +	unsigned long src_pfn, dst_pfn = 0;
+> +	int srcu_idx;
+> +	int ret;
+
+Nit: Not sure its a coding style requirement, but many functions seem
+to "sort" these local variables in descending order of line length for
+appearance :-)  (eg: migrate_vma* functions).
+
+> +
+> +	if (page_shift != PAGE_SHIFT)
+> +		return H_P3;
+> +
+> +	if (flags)
+> +		return H_P2;
+> +
+> +	ret = H_PARAMETER;
+> +	down_read(&kvm->mm->mmap_sem);
+> +	srcu_idx = srcu_read_lock(&kvm->srcu);
+> +	addr = gfn_to_hva(kvm, gpa >> page_shift);
+> +	if (kvm_is_error_hva(addr))
+> +		goto out;
+> +
+> +	end = addr + (1UL << page_shift);
+> +	vma = find_vma_intersection(kvm->mm, addr, end);
+> +	if (!vma || vma->vm_start > addr || vma->vm_end < end)
+> +		goto out;
+> +
+> +	memset(&mig, 0, sizeof(mig));
+> +	mig.vma = vma;
+> +	mig.start = addr;
+> +	mig.end = end;
+> +	mig.src = &src_pfn;
+> +	mig.dst = &dst_pfn;
+> +	if (migrate_vma_setup(&mig))
+> +		goto out;
+> +
+> +	ret = kvmppc_devm_fault_migrate_alloc_and_copy(&mig, page_shift);
+> +	if (ret)
+> +		goto out_finalize;
+> +
+> +	migrate_vma_pages(&mig);
+> +	ret = H_SUCCESS;
+
+Nit: Blank line here?
+
+> +out_finalize:
+> +	migrate_vma_finalize(&mig);
+> +out:
+> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
+> +	up_read(&kvm->mm->mmap_sem);
+> +	return ret;
+> +}
+> +
+> +static u64 kvmppc_get_secmem_size(void)
+> +{
+> +	struct device_node *np;
+> +	int i, len;
+> +	const __be32 *prop;
+> +	u64 size = 0;
+> +
+> +	np = of_find_compatible_node(NULL, NULL, "ibm,uv-firmware");
+> +	if (!np)
+> +		goto out;
+> +
+> +	prop = of_get_property(np, "secure-memory-ranges", &len);
+> +	if (!prop)
+> +		goto out_put;
+> +
+> +	for (i = 0; i < len / (sizeof(*prop) * 4); i++)
+> +		size += of_read_number(prop + (i * 4) + 2, 2);
+> +
+> +out_put:
+> +	of_node_put(np);
+> +out:
+> +	return size;
+> +}
+> +
+> +int kvmppc_devm_init(void)
+> +{
+> +	int ret = 0;
+> +	unsigned long size;
+> +	struct resource *res;
+> +	void *addr;
+> +	unsigned long pfn_last, pfn_first;
+> +
+> +	size = kvmppc_get_secmem_size();
+> +	if (!size) {
+> +		ret = -ENODEV;
+> +		goto out;
+> +	}
+> +
+> +	res = request_free_mem_region(&iomem_resource, size, "kvmppc_devm");
+> +	if (IS_ERR(res)) {
+> +		ret = PTR_ERR(res);
+> +		goto out;
+> +	}
+> +
+> +	kvmppc_devm_pgmap.type = MEMORY_DEVICE_PRIVATE;
+> +	kvmppc_devm_pgmap.res = *res;
+> +	kvmppc_devm_pgmap.ops = &kvmppc_devm_ops;
+> +	addr = memremap_pages(&kvmppc_devm_pgmap, -1);
+> +	if (IS_ERR(addr)) {
+> +		ret = PTR_ERR(addr);
+> +		goto out_free_region;
+> +	}
+> +
+> +	pfn_first = res->start >> PAGE_SHIFT;
+> +	pfn_last = pfn_first + (resource_size(res) >> PAGE_SHIFT);
+> +	kvmppc_devm_pfn_bitmap = kcalloc(BITS_TO_LONGS(pfn_last - pfn_first),
+> +					 sizeof(unsigned long), GFP_KERNEL);
+> +	if (!kvmppc_devm_pfn_bitmap) {
+> +		ret = -ENOMEM;
+> +		goto out_unmap;
+> +	}
+> +
+> +	pr_info("KVMPPC-DEVM: Secure Memory size 0x%lx\n", size);
+> +	return ret;
+
+Nit: Blank line here?
+
+> +out_unmap:
+> +	memunmap_pages(&kvmppc_devm_pgmap);
+> +out_free_region:
+> +	release_mem_region(res->start, size);
+> +out:
+> +	return ret;
+> +}
+> +
+> +void kvmppc_devm_free(void)
+> +{
+> +	memunmap_pages(&kvmppc_devm_pgmap);
+> +	release_mem_region(kvmppc_devm_pgmap.res.start,
+> +			   resource_size(&kvmppc_devm_pgmap.res));
+> +	kfree(kvmppc_devm_pfn_bitmap);
+> +}
+> -- 
+> 2.21.0
