@@ -2,65 +2,52 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A49F0A4D63
-	for <lists+kvm-ppc@lfdr.de>; Mon,  2 Sep 2019 05:06:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D16DA4D66
+	for <lists+kvm-ppc@lfdr.de>; Mon,  2 Sep 2019 05:06:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729089AbfIBDGS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 1 Sep 2019 23:06:18 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:53241 "EHLO ozlabs.org"
+        id S1729212AbfIBDGT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 1 Sep 2019 23:06:19 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:41187 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729212AbfIBDGS (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        id S1729061AbfIBDGS (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
         Sun, 1 Sep 2019 23:06:18 -0400
 Received: by ozlabs.org (Postfix, from userid 1034)
-        id 46MFN75NkJz9sNx; Mon,  2 Sep 2019 13:06:15 +1000 (AEST)
+        id 46MFN82G7vz9sDB; Mon,  2 Sep 2019 13:06:16 +1000 (AEST)
 X-powerpc-patch-notification: thanks
-X-powerpc-patch-commit: 35872480da47ec714fd9c4f2f3d2d83daf304851
-In-Reply-To: <20190829085252.72370-2-aik@ozlabs.ru>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
+X-powerpc-patch-commit: 70ed86f4de5bd74dd2d884dcd2f3275c4cfe665f
+In-Reply-To: <20190829155021.2915-2-maxiwell@linux.ibm.com>
+To:     "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>,
+        linuxppc-dev@ozlabs.org
 From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-Cc:     kvm@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Alistair Popple <alistair@popple.id.au>,
-        kvm-ppc@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH kernel v3 1/5] powerpc/powernv/ioda: Split out TCE invalidation from TCE updates
-Message-Id: <46MFN75NkJz9sNx@ozlabs.org>
-Date:   Mon,  2 Sep 2019 13:06:15 +1000 (AEST)
+Cc:     linux-arch@vger.kernel.org, andmike@linux.ibm.com,
+        linuxram@us.ibm.com, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, cclaudio@linux.ibm.com,
+        "Maxiwell S . Garcia" <maxiwell@linux.ibm.com>,
+        bauerman@linux.ibm.com
+Subject: Re: [PATCH v2 1/2] powerpc: Add PowerPC Capabilities ELF note
+Message-Id: <46MFN82G7vz9sDB@ozlabs.org>
+Date:   Mon,  2 Sep 2019 13:06:16 +1000 (AEST)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, 2019-08-29 at 08:52:48 UTC, Alexey Kardashevskiy wrote:
-> At the moment updates in a TCE table are made by iommu_table_ops::exchange
-> which update one TCE and invalidates an entry in the PHB/NPU TCE cache
-> via set of registers called "TCE Kill" (hence the naming).
-> Writing a TCE is a simple xchg() but invalidating the TCE cache is
-> a relatively expensive OPAL call. Mapping a 100GB guest with PCI+NPU
-> passed through devices takes about 20s.
+On Thu, 2019-08-29 at 15:50:20 UTC, "Maxiwell S. Garcia" wrote:
+> From: Claudio Carvalho <cclaudio@linux.ibm.com>
 > 
-> Thankfully we can do better. Since such big mappings happen at the boot
-> time and when memory is plugged/onlined (i.e. not often), these requests
-> come in 512 pages so we call call OPAL 512 times less which brings 20s
-> from the above to less than 10s. Also, since TCE caches can be flushed
-> entirely, calling OPAL for 512 TCEs helps skiboot [1] to decide whether
-> to flush the entire cache or not.
+> Add the PowerPC name and the PPC_ELFNOTE_CAPABILITIES type in the
+> kernel binary ELF note. This type is a bitmap that can be used to
+> advertise kernel capabilities to userland.
 > 
-> This implements 2 new iommu_table_ops callbacks:
-> - xchg_no_kill() to update a single TCE with no TCE invalidation;
-> - tce_kill() to invalidate multiple TCEs.
-> This uses the same xchg_no_kill() callback for IODA1/2.
+> This patch also defines PPCCAP_ULTRAVISOR_BIT as being the bit zero.
 > 
-> This implements 2 new wrappers on top of the new callbacks similar to
-> the existing iommu_tce_xchg().
-> 
-> This does not use the new callbacks yet, the next patches will;
-> so this should not cause any behavioral change.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Suggested-by: Paul Mackerras <paulus@ozlabs.org>
+> Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
+> [ maxiwell: Define the 'PowerPC' type in the elfnote.h ]
+> Signed-off-by: Maxiwell S. Garcia <maxiwell@linux.ibm.com>
 
 Series applied to powerpc topic/ppc-kvm, thanks.
 
-https://git.kernel.org/powerpc/c/35872480da47ec714fd9c4f2f3d2d83daf304851
+https://git.kernel.org/powerpc/c/70ed86f4de5bd74dd2d884dcd2f3275c4cfe665f
 
 cheers
