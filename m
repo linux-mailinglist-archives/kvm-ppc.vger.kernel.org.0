@@ -2,96 +2,130 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C52AA506B
-	for <lists+kvm-ppc@lfdr.de>; Mon,  2 Sep 2019 09:54:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E9ECA5761
+	for <lists+kvm-ppc@lfdr.de>; Mon,  2 Sep 2019 15:10:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729584AbfIBHyA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 2 Sep 2019 03:54:00 -0400
-Received: from verein.lst.de ([213.95.11.211]:47870 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729457AbfIBHyA (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 2 Sep 2019 03:54:00 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 3F54F227A8A; Mon,  2 Sep 2019 09:53:56 +0200 (CEST)
-Date:   Mon, 2 Sep 2019 09:53:56 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bharata B Rao <bharata@linux.ibm.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linuxppc-dev@lists.ozlabs.org,
-        kvm-ppc@vger.kernel.org, linux-mm@kvack.org, paulus@au1.ibm.com,
-        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
-        linuxram@us.ibm.com, sukadev@linux.vnet.ibm.com,
-        cclaudio@linux.ibm.com
-Subject: Re: [PATCH v7 1/7] kvmppc: Driver to manage pages of secure guest
-Message-ID: <20190902075356.GA28967@lst.de>
-References: <20190822102620.21897-1-bharata@linux.ibm.com> <20190822102620.21897-2-bharata@linux.ibm.com> <20190829083810.GA13039@lst.de> <20190830034259.GD31913@in.ibm.com>
+        id S1729768AbfIBNKa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 2 Sep 2019 09:10:30 -0400
+Received: from mail-lf1-f52.google.com ([209.85.167.52]:44663 "EHLO
+        mail-lf1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726408AbfIBNKa (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 2 Sep 2019 09:10:30 -0400
+Received: by mail-lf1-f52.google.com with SMTP id y4so3470282lfe.11
+        for <kvm-ppc@vger.kernel.org>; Mon, 02 Sep 2019 06:10:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=AMYSEol+RXBcF3mzscuoaAVClZjdtt2UOITA0MeHi90=;
+        b=PaNKGYYGviBmOB5WkFHRD1kvWYQvZs5KCR0D1skW+kNFyRMHiVbm5vQorRJlcMIDpo
+         jihdV7F1vyyZNssaji5SztKhrTD7ieVi3PyVds74D1MKQg4XISIukTbha2z9j08p6TfK
+         6O1XKaMC4FSba2XQ8yTpxnayha3qVUWEIPSnva+z1JOe0BJ3W3n7GP5beEjEUJeK+g4t
+         bPLWirslGgXNQwjGgJ8diL7KkQmvowX77JnZ8CQt/HYwcms4o7ouHkmCdcD13CaQUDcO
+         V6LNLnnQ3Ha3czaIQ+9xOMFhlyAnOoXnuLhzJH4rG0KBY1AJ/vk8zWCY55iw+6i8FPaF
+         okFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=AMYSEol+RXBcF3mzscuoaAVClZjdtt2UOITA0MeHi90=;
+        b=VpCpaidMhd1MXLA+L2lK73VxHTvlW5/tMEkjNOUAV4TC5PXwM8d9AtKWVDJYVxBTLg
+         o6GsOLcPV+jVyUqZpMwOGFrcOLa/U+mcwLRO9U1SogW4nVXymhCDmM521drFfbtI40fN
+         Wf+ENkzAj7oQUMryQwRLESTYOj1titxAwuqEviVSoHy5mjJXFILo1VkCizP3/VUo09OV
+         V821oxWo9zbf8c0qom/ZLFGnUL2QPdtQl4jITW5EBlMqEcMhym+jNRzXIyB29/5v22ig
+         SEAlcOa7eYtvbSG/x3vfb2Hh4TRXzm8fpbOnDX1U+IA2XFWtsh0u7UW+mLRJWDvetz+Y
+         Efzw==
+X-Gm-Message-State: APjAAAVoPKEzLCGHwPmt8b90K8HAm4Yy1g3VEPZkNeDkchlkUNtAhD1o
+        EZ+giklVKyGlpKmaFT2G37+9DphKN2j/i8QNdHhI+xTR
+X-Google-Smtp-Source: APXvYqwxzqHB1hfWUFc3iDudKqmw5ngYBjiIlpMwxzW+C+GW5QpiqhxrfCoT0qzMEYCvrwLSiT5FZkZyzMmSMTAamCY=
+X-Received: by 2002:ac2:5090:: with SMTP id f16mr3081166lfm.66.1567429828383;
+ Mon, 02 Sep 2019 06:10:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190830034259.GD31913@in.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+From:   Turritopsis Dohrnii Teo En Ming <teo.en.ming.smartphone@gmail.com>
+Date:   Mon, 2 Sep 2019 21:10:13 +0800
+Message-ID: <CA+5xKD48qJme+eg2aMfKrPVpr8ZW-S9PyY+32R8YMGdCQSiCZA@mail.gmail.com>
+Subject: Singapore Citizen Mr. Teo En Ming's Refugee Seeking Attempts, In The
+ Search of a Substantially Better Life
+To:     kvm-ppc@vger.kernel.org
+Cc:     Turritopsis Dohrnii Teo En Ming <teo.en.ming.smartphone@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Aug 30, 2019 at 09:12:59AM +0530, Bharata B Rao wrote:
-> On Thu, Aug 29, 2019 at 10:38:10AM +0200, Christoph Hellwig wrote:
-> > On Thu, Aug 22, 2019 at 03:56:14PM +0530, Bharata B Rao wrote:
-> > > +/*
-> > > + * Bits 60:56 in the rmap entry will be used to identify the
-> > > + * different uses/functions of rmap.
-> > > + */
-> > > +#define KVMPPC_RMAP_DEVM_PFN	(0x2ULL << 56)
-> > 
-> > How did you come up with this specific value?
-> 
-> Different usage types of RMAP array are being defined.
-> https://patchwork.ozlabs.org/patch/1149791/
-> 
-> The above value is reserved for device pfn usage.
+Subject: Singapore Citizen Mr. Teo En Ming's Refugee Seeking Attempts,
+In The Search of a Substantially Better Life
 
-Shouldn't all these defintions go in together in a patch?  Also is bi
-t 56+ a set of values, so is there 1 << 56 and 3 << 56 as well?  Seems
-like even that other patch doesn't fully define these "pfn" values.
+In reverse chronological order:
 
-> > No need for !! when returning a bool.  Also the helper seems a little
-> > pointless, just opencoding it would make the code more readable in my
-> > opinion.
-> 
-> I expect similar routines for other usages of RMAP to come up.
+[1] Petition to the Government of Taiwan for Refugee Status, 5th
+August 2019 Monday
 
-Please drop them all.  Having to wade through a header to check for
-a specific bit that also is set manually elsewhere in related code
-just obsfucates it for the reader.
+Photo #1: At the building of the National Immigration Agency, Ministry
+of the Interior, Taipei, Taiwan, 5th August 2019
 
-> > > +	*mig->dst = migrate_pfn(page_to_pfn(dpage)) | MIGRATE_PFN_LOCKED;
-> > > +	return 0;
-> > > +}
-> > 
-> > I think you can just merge this trivial helper into the only caller.
-> 
-> Yes I can, but felt it is nicely abstracted out to a function right now.
+Photo #2: Queue ticket no. 515 at the National Immigration Agency,
+Ministry of the Interior, Taipei, Taiwan, 5th August 2019
 
-Not really.  It just fits the old calling conventions before I removed
-the indirection.
+Photo #3: Submission of documents/petition to the National Immigration
+Agency, Ministry of the Interior, Taipei, Taiwan, 5th August 2019
 
-> > Here we actually have two callers, but they have a fair amount of
-> > duplicate code in them.  I think you want to move that common
-> > code (including setting up the migrate_vma structure) into this
-> > function and maybe also give it a more descriptive name.
-> 
-> Sure, I will give this a try. The name is already very descriptive, will
-> come up with an appropriate name.
+Photos #4 and #5: Acknowledgement of Receipt (no. 03142) for the
+submission of documents/petition from the National Immigration Agency,
+Ministry of the Interior, Taipei, Taiwan, 5th August 2019, 10:00 AM
 
-I don't think alloc_and_copy is very helpful.  It matches some of the
-implementation, but not the intent.  Why not kvmppc_svm_page_in/out
-similar to the hypervisor calls calling them?  Yes, for one case it
-also gets called from the pagefault handler, but it still performs
-these basic page in/out actions.
+References:
 
-> BTW this file and the fuction prefixes in this file started out with
-> kvmppc_hmm, switched to kvmppc_devm when HMM routines weren't used anymore.
-> Now with the use of only non-dev versions, planning to swtich to
-> kvmppc_uvmem_
+(a) Petition to the Government of Taiwan for Refugee Status, 5th
+August 2019 Monday (Blogspot blog)
 
-That prefix sounds fine to me as well.
+Link: https://tdtemcerts.blogspot.sg/2019/08/petition-to-government-of-taiwan-for.html
+
+(b) Petition to the Government of Taiwan for Refugee Status, 5th
+August 2019 Monday (Wordpress blog)
+
+Link: https://tdtemcerts.wordpress.com/2019/08/23/petition-to-the-government-of-taiwan-for-refugee-status/
+
+[2] Application for Refugee Status at the United Nations Refugee
+Agency, Bangkok, Thailand, 21st March 2017 Tuesday
+
+References:
+
+(a) [YOUTUBE] Vlog: The Road to Application for Refugee Status at the
+United Nations High Commissioner for Refugees, Bangkok
+
+Link: https://www.youtube.com/watch?v=utpuAa1eUNI
+
+YouTube video Published on March 22nd, 2017
+
+Views as at 31st August 2019: 593
+
+YouTube Channel: Turritopsis Dohrnii Teo En Ming
+Subscribers as at 31st August 2019: 2815
+Link: https://www.youtube.com/channel/UC__F2hzlqNEEGx-IXxQi3hA
+
+
+
+
+
+
+-----BEGIN EMAIL SIGNATURE-----
+
+The Gospel for all Targeted Individuals (TIs):
+
+[The New York Times] Microwave Weapons Are Prime Suspect in Ills of
+U.S. Embassy Workers
+
+Link: https://www.nytimes.com/2018/09/01/science/sonic-attack-cuba-microwave.html
+
+********************************************************************************************
+
+Singaporean Mr. Turritopsis Dohrnii Teo En Ming's Academic
+Qualifications as at 14 Feb 2019
+
+[1] https://tdtemcerts.wordpress.com/
+
+[2] https://tdtemcerts.blogspot.sg/
+
+[3] https://www.scribd.com/user/270125049/Teo-En-Ming
+
+-----END EMAIL SIGNATURE-----
