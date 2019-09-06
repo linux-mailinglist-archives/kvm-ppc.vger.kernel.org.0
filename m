@@ -2,65 +2,198 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EE44ABDC2
-	for <lists+kvm-ppc@lfdr.de>; Fri,  6 Sep 2019 18:32:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 307A3AC129
+	for <lists+kvm-ppc@lfdr.de>; Fri,  6 Sep 2019 22:01:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726810AbfIFQcq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 6 Sep 2019 12:32:46 -0400
-Received: from verein.lst.de ([213.95.11.211]:58715 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725871AbfIFQcq (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 6 Sep 2019 12:32:46 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 7402B68B20; Fri,  6 Sep 2019 18:32:41 +0200 (CEST)
-Date:   Fri, 6 Sep 2019 18:32:41 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bharata B Rao <bharata@linux.ibm.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linuxppc-dev@lists.ozlabs.org,
-        kvm-ppc@vger.kernel.org, linux-mm@kvack.org, paulus@au1.ibm.com,
-        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
-        linuxram@us.ibm.com, sukadev@linux.vnet.ibm.com,
-        cclaudio@linux.ibm.com
-Subject: Re: [PATCH v7 1/7] kvmppc: Driver to manage pages of secure guest
-Message-ID: <20190906163241.GA12516@lst.de>
-References: <20190822102620.21897-1-bharata@linux.ibm.com> <20190822102620.21897-2-bharata@linux.ibm.com> <20190829083810.GA13039@lst.de> <20190830034259.GD31913@in.ibm.com> <20190902075356.GA28967@lst.de> <20190906113639.GA8748@in.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190906113639.GA8748@in.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+        id S2389321AbfIFUBS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 6 Sep 2019 16:01:18 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:43358 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728262AbfIFUBS (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 6 Sep 2019 16:01:18 -0400
+Received: by mail-qt1-f194.google.com with SMTP id l22so8509386qtp.10
+        for <kvm-ppc@vger.kernel.org>; Fri, 06 Sep 2019 13:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lca.pw; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=XZg1AAkAQ3fXHA3yMI/fVv8b1scLlUoErbv2jydnHF0=;
+        b=KarCypdbxHFg4D7ey/gZUnTb0EZNg7So6Lb194+ZAqwHgNt/6am9DAusFJNYw/oIUV
+         W4IuvyMlguvZ0sDmlwLVK7x2UQX4pPrWLY2OjLKuRmBwom48z4Mn6JF/EwBZmWb88+lR
+         qG3+xUdqDS7gF3pAXooFiVIca42lQ1ZBoeW3VS+8ba6h/nQetemyjqc0URio69HcU9ks
+         +S52SEfh77jeI8RnMGit0O+YIzn9bQw1+KhIcK+T55fTJgM7yYucxjdk8NqnBripdy/3
+         KEK45jw4NqzlO0/QX/Sy5t2NREzBKqvHNpL50kflus8wliNOXpbVvb1hXC6y+tdTvJrg
+         O5HQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=XZg1AAkAQ3fXHA3yMI/fVv8b1scLlUoErbv2jydnHF0=;
+        b=Fe5VGIPH4j9Ck7Rxj3/aFrV89Su7AEnRtUdECUOwzKoMZz/nW6/tCap27qPgzJeKum
+         5ahRJMEqqaQOAghlL8OSlG1EqwfOTEADzhTo0GGuL0ky2lq2kU33J+K4wFvawxbvSaD3
+         +tx9JkXqx0IO+i1Uc7OVIqyxG37vCUtCHU9vVnkEwKGQkvjTqiae3LNMBdSLBx3i2tN9
+         6g8xmOQNt196Ms4wxcZWCnYnbNsZY6j7P/4WcLEU4rnQKUq2PI8+J4FYqLOqZ5PLQU3J
+         /v+dnfhuJRw0CM/GFD1G3pjQDx7rquv8f31NPVMQz+IqP5M2P5mJdbIFl0jRgSMrvi/7
+         KrjQ==
+X-Gm-Message-State: APjAAAUHO0hGu7g2I0cIolFjXWkcCTiXhLj2jaPZMJqwirZR7B7trbq6
+        TVNdDIYM7fz4vbqn9FU9LvEvgw==
+X-Google-Smtp-Source: APXvYqyAiyjvLcIHi9T1V0CgWAtxTzIeILZ4tYXpY7syCNFoM/o6mdeCaLs9QYnSdlVOPXj2yMsDPg==
+X-Received: by 2002:ac8:7558:: with SMTP id b24mr11010769qtr.260.1567800075930;
+        Fri, 06 Sep 2019 13:01:15 -0700 (PDT)
+Received: from qcai.nay.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id x2sm2740340qkf.83.2019.09.06.13.01.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 06 Sep 2019 13:01:15 -0700 (PDT)
+From:   Qian Cai <cai@lca.pw>
+To:     peterz@infradead.org, mingo@kernel.org, mpe@ellerman.id.au
+Cc:     bvanassche@acm.org, arnd@arndb.de, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-arch@vger.kernel.org, Qian Cai <cai@lca.pw>
+Subject: [PATCH] powerpc/lockdep: fix a false positive warning
+Date:   Fri,  6 Sep 2019 16:00:55 -0400
+Message-Id: <1567800055-30309-1-git-send-email-cai@lca.pw>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Sep 06, 2019 at 05:06:39PM +0530, Bharata B Rao wrote:
-> > Also is bit 56+ a set of values, so is there 1 << 56 and 3 << 56 as well?  Seems
-> > like even that other patch doesn't fully define these "pfn" values.
-> 
-> I realized that the bit numbers have changed, it is no longer bits 60:56,
-> but instead top 8bits. 
-> 
-> #define KVMPPC_RMAP_UVMEM_PFN   0x0200000000000000
-> static inline bool kvmppc_rmap_is_uvmem_pfn(unsigned long *rmap)
-> {
->         return ((*rmap & 0xff00000000000000) == KVMPPC_RMAP_UVMEM_PFN);
-> }
+The commit 108c14858b9e ("locking/lockdep: Add support for dynamic
+keys") introduced a boot warning on powerpc below, because since the
+commit 2d4f567103ff ("KVM: PPC: Introduce kvm_tmp framework") adds
+kvm_tmp[] into the .bss section and then free the rest of unused spaces
+back to the page allocator.
 
-In that overall scheme I'd actually much prefer something like (names
-just made up, they should vaguely match the spec this written to):
+kernel_init
+  kvm_guest_init
+    kvm_free_tmp
+      free_reserved_area
+        free_unref_page
+          free_unref_page_prepare
 
-static inline unsigned long kvmppc_rmap_type(unsigned long *rmap)
-{
-	return (rmap & 0xff00000000000000);
-}
+Later, alloc_workqueue() happens to allocate some pages from there and
+trigger the warning at,
 
-And then where you check it you can use:
+if (WARN_ON_ONCE(static_obj(key)))
 
-	if (kvmppc_rmap_type(*rmap) == KVMPPC_RMAP_UVMEM_PFN)
+Fix it by adding a generic helper arch_is_bss_hole() to skip those areas
+in static_obj(). Since kvm_free_tmp() is only done early during the
+boot, just go lockless to make the implementation simple for now.
 
-and where you set it you do:
+WARNING: CPU: 0 PID: 13 at kernel/locking/lockdep.c:1120
+Workqueue: events work_for_cpu_fn
+Call Trace:
+  lockdep_register_key+0x68/0x200
+  wq_init_lockdep+0x40/0xc0
+  trunc_msg+0x385f9/0x4c30f (unreliable)
+  wq_init_lockdep+0x40/0xc0
+  alloc_workqueue+0x1e0/0x620
+  scsi_host_alloc+0x3d8/0x490
+  ata_scsi_add_hosts+0xd0/0x220 [libata]
+  ata_host_register+0x178/0x400 [libata]
+  ata_host_activate+0x17c/0x210 [libata]
+  ahci_host_activate+0x84/0x250 [libahci]
+  ahci_init_one+0xc74/0xdc0 [ahci]
+  local_pci_probe+0x78/0x100
+  work_for_cpu_fn+0x40/0x70
+  process_one_work+0x388/0x750
+  process_scheduled_works+0x50/0x90
+  worker_thread+0x3d0/0x570
+  kthread+0x1b8/0x1e0
+  ret_from_kernel_thread+0x5c/0x7c
 
-	*rmap |= KVMPPC_RMAP_UVMEM_PFN;
+Fixes: 108c14858b9e ("locking/lockdep: Add support for dynamic keys")
+Signed-off-by: Qian Cai <cai@lca.pw>
+---
+ arch/powerpc/include/asm/sections.h | 10 ++++++++++
+ arch/powerpc/kernel/kvm.c           |  5 +++++
+ include/asm-generic/sections.h      |  7 +++++++
+ kernel/locking/lockdep.c            |  3 +++
+ 4 files changed, 25 insertions(+)
 
-as in the current patch to keep things symmetric.
+diff --git a/arch/powerpc/include/asm/sections.h b/arch/powerpc/include/asm/sections.h
+index 4a1664a8658d..abd08b3cb3f3 100644
+--- a/arch/powerpc/include/asm/sections.h
++++ b/arch/powerpc/include/asm/sections.h
+@@ -5,8 +5,12 @@
+ 
+ #include <linux/elf.h>
+ #include <linux/uaccess.h>
++
++#define arch_is_bss_hole arch_is_bss_hole
++
+ #include <asm-generic/sections.h>
+ 
++extern void *bss_hole_start, *bss_hole_end;
+ extern char __head_end[];
+ 
+ #ifdef __powerpc64__
+@@ -24,6 +28,12 @@
+ extern char end_virt_trampolines[];
+ #endif
+ 
++static inline int arch_is_bss_hole(unsigned long addr)
++{
++	return addr >= (unsigned long)bss_hole_start &&
++	       addr < (unsigned long)bss_hole_end;
++}
++
+ static inline int in_kernel_text(unsigned long addr)
+ {
+ 	if (addr >= (unsigned long)_stext && addr < (unsigned long)__init_end)
+diff --git a/arch/powerpc/kernel/kvm.c b/arch/powerpc/kernel/kvm.c
+index b7b3a5e4e224..89e0e522e125 100644
+--- a/arch/powerpc/kernel/kvm.c
++++ b/arch/powerpc/kernel/kvm.c
+@@ -66,6 +66,7 @@
+ static bool kvm_patching_worked = true;
+ char kvm_tmp[1024 * 1024];
+ static int kvm_tmp_index;
++void *bss_hole_start, *bss_hole_end;
+ 
+ static inline void kvm_patch_ins(u32 *inst, u32 new_inst)
+ {
+@@ -707,6 +708,10 @@ static __init void kvm_free_tmp(void)
+ 	 */
+ 	kmemleak_free_part(&kvm_tmp[kvm_tmp_index],
+ 			   ARRAY_SIZE(kvm_tmp) - kvm_tmp_index);
++
++	bss_hole_start = &kvm_tmp[kvm_tmp_index];
++	bss_hole_end = &kvm_tmp[ARRAY_SIZE(kvm_tmp)];
++
+ 	free_reserved_area(&kvm_tmp[kvm_tmp_index],
+ 			   &kvm_tmp[ARRAY_SIZE(kvm_tmp)], -1, NULL);
+ }
+diff --git a/include/asm-generic/sections.h b/include/asm-generic/sections.h
+index d1779d442aa5..4d8b1f2c5fd9 100644
+--- a/include/asm-generic/sections.h
++++ b/include/asm-generic/sections.h
+@@ -91,6 +91,13 @@ static inline int arch_is_kernel_initmem_freed(unsigned long addr)
+ }
+ #endif
+ 
++#ifndef arch_is_bss_hole
++static inline int arch_is_bss_hole(unsigned long addr)
++{
++	return 0;
++}
++#endif
++
+ /**
+  * memory_contains - checks if an object is contained within a memory region
+  * @begin: virtual address of the beginning of the memory region
+diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+index 4861cf8e274b..cd75b51f15ce 100644
+--- a/kernel/locking/lockdep.c
++++ b/kernel/locking/lockdep.c
+@@ -675,6 +675,9 @@ static int static_obj(const void *obj)
+ 	if (arch_is_kernel_initmem_freed(addr))
+ 		return 0;
+ 
++	if (arch_is_bss_hole(addr))
++		return 0;
++
+ 	/*
+ 	 * static variable?
+ 	 */
+-- 
+1.8.3.1
+
