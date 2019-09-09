@@ -2,90 +2,204 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 76E69ACB92
-	for <lists+kvm-ppc@lfdr.de>; Sun,  8 Sep 2019 10:33:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94057ADB2F
+	for <lists+kvm-ppc@lfdr.de>; Mon,  9 Sep 2019 16:30:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726267AbfIHIdD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 8 Sep 2019 04:33:03 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42260 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726002AbfIHIdD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 8 Sep 2019 04:33:03 -0400
-Received: by mail-wr1-f68.google.com with SMTP id q14so10561834wrm.9;
-        Sun, 08 Sep 2019 01:33:01 -0700 (PDT)
+        id S1727256AbfIIOay (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 9 Sep 2019 10:30:54 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:46400 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726759AbfIIOay (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 9 Sep 2019 10:30:54 -0400
+Received: by mail-qt1-f195.google.com with SMTP id v11so16306454qto.13
+        for <kvm-ppc@vger.kernel.org>; Mon, 09 Sep 2019 07:30:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=Dvenms9Y7ILBHUAT3jSNMNmZR/R8ixW/QNiX0T3fndY=;
-        b=Xy0s84Epf/0r5ThM7KFlOlfZVD9d9Ci5oqr03zZd2VEm3Wi/ir6LN98a2DQWDX1j8/
-         TLY4i4EW/VS7X/9Qk5MR6xTXW5Xwp/Yk42/OKbtWmzAEnbbMOHgwhnEIGXoRWJiJPvaW
-         keLOxQ3LcKHLh8Sjw+k/LOLV7qVHUjsciT7T5sqN5+1E9yLr7Xp1Ls3SUahRLTXCGKuZ
-         TN8O6j+iE5YBIikJvz8S5jBB8UsSE/lzygxaC5IiN6jne2TV4m+DkcsFdCYtcdGfD7RL
-         Z+RWoW0KaAYISaO9iSHM71cX9bH2mGEa/l9VSmK19bTHtSWd9XX/VSVDjo+1zerG/v50
-         cMXQ==
+        d=lca.pw; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=CXfqRVCQFw7xqj7AICeJBWtrNhS6pGZdKh11BOOZ9lA=;
+        b=gxEMwh/a/ND2u6HYSSw+CvoCqCBHgB9WAY3kEMDTKnHS721fCqfnpsUSXC2a0oOeGf
+         hS6DIyV3UJqVsob9he/lOalVvuUnlHqXfyaB6/qIu5AZdsXVBD3H5UKaA89p9ehrqtw+
+         HyVJbHyy0BC20nYdMA7IvWJsrq/du8PbBCqzLf/32PujYUN1YiLrJBu2apAoILgQ2QQM
+         WXN1kirG4t98s2AA6PXav/e270xdKKCBwOxaaUgq+gIL67v8Nnc7hzablBWT5tXiqNyZ
+         dztk4qQJT8T3WUmUbdwsE/SUovPAHV8+d9xftGR/FzO4FcQmWQWioLNX0jmu7RnXkbMR
+         l9pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=Dvenms9Y7ILBHUAT3jSNMNmZR/R8ixW/QNiX0T3fndY=;
-        b=Q5RdJoBh1GVY3SL4JTs8NjnkJrjGq4qC7CFIQMfMHz0C4bthroWtYlWtMohiL4iN/B
-         M5GfO/LW2S0axAWFPtEA9JUDIFB9MVzgcGva8NYokXHhpUlHdQNlFUMt+DAG3rW5nn89
-         SfTSBcsCq9pQgnqGhXxudaxo4kxTAvY3v5IvyyItL/PHexwGAKPvCu4RBdDVmMVqJ27b
-         V0UATyvFmMOEXUdm9ae6V/2XpKppJR7lvqfFN5EXnq7skomiuFT/8pVfBnt8CS8mI3rW
-         gXrhgAfQabM/91MXrKFUY6+YOprWHTY5Q6Ts9PtSBNPCMBJMSk6FjAq5eMvSuZndprF8
-         SeEQ==
-X-Gm-Message-State: APjAAAUcWRx3QK3d+ZKDcZKrug8BnPV82HybtdJmvqQhFfcppjUMh/kr
-        Vx7X5qrO7+y7wf6J7vGJObI=
-X-Google-Smtp-Source: APXvYqxmEXYD4KfHG33ISQrdtsla0hWkLH3IEJfmTrLErV0Ihc/bV5nsvOMFY9z0b/uum8iYI9GRGw==
-X-Received: by 2002:a5d:49c2:: with SMTP id t2mr13914364wrs.351.1567931581038;
-        Sun, 08 Sep 2019 01:33:01 -0700 (PDT)
-Received: from gmail.com (2E8B0CD5.catv.pool.telekom.hu. [46.139.12.213])
-        by smtp.gmail.com with ESMTPSA id u68sm17085458wmu.12.2019.09.08.01.32.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Sep 2019 01:33:00 -0700 (PDT)
-Date:   Sun, 8 Sep 2019 10:32:58 +0200
-From:   Ingo Molnar <mingo@kernel.org>
-To:     Qian Cai <cai@lca.pw>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Peter Zijlstra <peterz@infradead.org>, bvanassche@acm.org,
-        arnd@arndb.de, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-arch@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>
-Subject: Re: [PATCH v2] powerpc/lockdep: fix a false positive warning
-Message-ID: <20190908083257.GA126088@gmail.com>
-References: <20190906231754.830-1-cai@lca.pw>
- <20190907070505.GA88784@gmail.com>
- <420D09F4-FC19-421C-AE46-4B2A9157FAE3@lca.pw>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <420D09F4-FC19-421C-AE46-4B2A9157FAE3@lca.pw>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=CXfqRVCQFw7xqj7AICeJBWtrNhS6pGZdKh11BOOZ9lA=;
+        b=e8/GvIBmksQj19OMzCrtq5lCItm240HHIv7476bQifNBARfUNa/mn0JN5Vj/CSAGIP
+         /eKsvCPigiDasR8Z+NcmFVYEQcd80kIRBmr3kykLSTXijt0HV0HHHBYPYNtfnt/foSwE
+         6BWfjhGrNQDi44pOnKKtWljprpcGwH5nbF+AOPojKdFaZOcsbD321LhitG/IlqKhgisN
+         3V4Rg4trmp1aOid0YO9yHL+jnid98T0KqYGi6jrZZSb7uZe7FnU3jDEavtNt8bIUi32w
+         grQj/5Tij59AW1IOwGoCcKy7fj52azRiNw+ew3snMGgB+UexgzBKbnpLjQcrfIlqnYFu
+         yn6A==
+X-Gm-Message-State: APjAAAX+yz/6YF7/3krWM7ZG3rtqSHBubTDxKzyRWFfk1Z/I76nOWUvc
+        h4bkQYm6GG7V1uwzeseKs/GEf0MW3a0=
+X-Google-Smtp-Source: APXvYqz3L3fSgl55DmtBbUTWQgR45D2JISFvfWDBJBH3PWAbVc68BgzFeZ6k0wq1m7D4qm15IYPnzA==
+X-Received: by 2002:a0c:eda7:: with SMTP id h7mr14228023qvr.30.1568039452923;
+        Mon, 09 Sep 2019 07:30:52 -0700 (PDT)
+Received: from qcai.nay.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id w126sm6478943qkd.68.2019.09.09.07.30.51
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Sep 2019 07:30:51 -0700 (PDT)
+From:   Qian Cai <cai@lca.pw>
+To:     mpe@ellerman.id.au
+Cc:     benh@kernel.crashing.org, paulus@samba.org, mingo@kernel.org,
+        peterz@infradead.org, bvanassche@acm.org, arnd@arndb.de,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Qian Cai <cai@lca.pw>
+Subject: [PATCH v3] powerpc/lockdep: fix a false positive warning
+Date:   Mon,  9 Sep 2019 10:30:33 -0400
+Message-Id: <1568039433-10176-1-git-send-email-cai@lca.pw>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+The commit 108c14858b9e ("locking/lockdep: Add support for dynamic
+keys") introduced a boot warning on powerpc below, because since the
+commit 2d4f567103ff ("KVM: PPC: Introduce kvm_tmp framework") adds
+kvm_tmp[] into the .bss section and then free the rest of unused spaces
+back to the page allocator.
 
-* Qian Cai <cai@lca.pw> wrote:
+kernel_init
+  kvm_guest_init
+    kvm_free_tmp
+      free_reserved_area
+        free_unref_page
+          free_unref_page_prepare
 
-> I thought about making it a bool in the first place, but since all 
-> other similar helpers (arch_is_kernel_initmem_freed(), 
-> arch_is_kernel_text(), arch_is_kernel_data() etc) could be bool too but 
-> are not, I kept arch_is_bss_hole() just to be “int” for consistent.
-> 
-> Although then there is is_kernel_rodata() which is bool. I suppose I’ll 
-> change arch_is_bss_hole() to bool, and then could have a follow-up 
-> patch to covert all similar helpers to return boo instead.
+Later, alloc_workqueue() happens to allocate some pages from there and
+trigger the warning at,
 
-Sounds good to me.
+if (WARN_ON_ONCE(static_obj(key)))
 
-Thanks,
+Fix it by adding a generic helper arch_is_bss_hole() to skip those areas
+in static_obj(). Since kvm_free_tmp() is only done early during the
+boot, just go lockless to make the implementation simple for now.
 
-	Ingo
+WARNING: CPU: 0 PID: 13 at kernel/locking/lockdep.c:1120
+Workqueue: events work_for_cpu_fn
+Call Trace:
+  lockdep_register_key+0x68/0x200
+  wq_init_lockdep+0x40/0xc0
+  trunc_msg+0x385f9/0x4c30f (unreliable)
+  wq_init_lockdep+0x40/0xc0
+  alloc_workqueue+0x1e0/0x620
+  scsi_host_alloc+0x3d8/0x490
+  ata_scsi_add_hosts+0xd0/0x220 [libata]
+  ata_host_register+0x178/0x400 [libata]
+  ata_host_activate+0x17c/0x210 [libata]
+  ahci_host_activate+0x84/0x250 [libahci]
+  ahci_init_one+0xc74/0xdc0 [ahci]
+  local_pci_probe+0x78/0x100
+  work_for_cpu_fn+0x40/0x70
+  process_one_work+0x388/0x750
+  process_scheduled_works+0x50/0x90
+  worker_thread+0x3d0/0x570
+  kthread+0x1b8/0x1e0
+  ret_from_kernel_thread+0x5c/0x7c
+
+Fixes: 108c14858b9e ("locking/lockdep: Add support for dynamic keys")
+Signed-off-by: Qian Cai <cai@lca.pw>
+---
+
+v3: Change arch_is_bss_hole() to return a "bool".
+    Rearrange variables in kvm.c a bit.
+v2: No need to actually define arch_is_bss_hole() powerpc64 only.
+
+ arch/powerpc/include/asm/sections.h | 11 +++++++++++
+ arch/powerpc/kernel/kvm.c           |  8 +++++++-
+ include/asm-generic/sections.h      |  7 +++++++
+ kernel/locking/lockdep.c            |  3 +++
+ 4 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/arch/powerpc/include/asm/sections.h b/arch/powerpc/include/asm/sections.h
+index 4a1664a8658d..6e9e39ebbb27 100644
+--- a/arch/powerpc/include/asm/sections.h
++++ b/arch/powerpc/include/asm/sections.h
+@@ -5,8 +5,19 @@
+ 
+ #include <linux/elf.h>
+ #include <linux/uaccess.h>
++
++#define arch_is_bss_hole arch_is_bss_hole
++
+ #include <asm-generic/sections.h>
+ 
++extern void *bss_hole_start, *bss_hole_end;
++
++static inline bool arch_is_bss_hole(unsigned long addr)
++{
++	return addr >= (unsigned long)bss_hole_start &&
++	       addr < (unsigned long)bss_hole_end;
++}
++
+ extern char __head_end[];
+ 
+ #ifdef __powerpc64__
+diff --git a/arch/powerpc/kernel/kvm.c b/arch/powerpc/kernel/kvm.c
+index b7b3a5e4e224..e3c3b076ff07 100644
+--- a/arch/powerpc/kernel/kvm.c
++++ b/arch/powerpc/kernel/kvm.c
+@@ -64,9 +64,11 @@
+ #define KVM_INST_MTSRIN		0x7c0001e4
+ 
+ static bool kvm_patching_worked = true;
+-char kvm_tmp[1024 * 1024];
+ static int kvm_tmp_index;
+ 
++char kvm_tmp[1024 * 1024];
++void *bss_hole_start, *bss_hole_end;
++
+ static inline void kvm_patch_ins(u32 *inst, u32 new_inst)
+ {
+ 	*inst = new_inst;
+@@ -707,6 +709,10 @@ static __init void kvm_free_tmp(void)
+ 	 */
+ 	kmemleak_free_part(&kvm_tmp[kvm_tmp_index],
+ 			   ARRAY_SIZE(kvm_tmp) - kvm_tmp_index);
++
++	bss_hole_start = &kvm_tmp[kvm_tmp_index];
++	bss_hole_end = &kvm_tmp[ARRAY_SIZE(kvm_tmp)];
++
+ 	free_reserved_area(&kvm_tmp[kvm_tmp_index],
+ 			   &kvm_tmp[ARRAY_SIZE(kvm_tmp)], -1, NULL);
+ }
+diff --git a/include/asm-generic/sections.h b/include/asm-generic/sections.h
+index d1779d442aa5..28a7a56e7c8a 100644
+--- a/include/asm-generic/sections.h
++++ b/include/asm-generic/sections.h
+@@ -91,6 +91,13 @@ static inline int arch_is_kernel_initmem_freed(unsigned long addr)
+ }
+ #endif
+ 
++#ifndef arch_is_bss_hole
++static inline bool arch_is_bss_hole(unsigned long addr)
++{
++	return false;
++}
++#endif
++
+ /**
+  * memory_contains - checks if an object is contained within a memory region
+  * @begin: virtual address of the beginning of the memory region
+diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+index 4861cf8e274b..cd75b51f15ce 100644
+--- a/kernel/locking/lockdep.c
++++ b/kernel/locking/lockdep.c
+@@ -675,6 +675,9 @@ static int static_obj(const void *obj)
+ 	if (arch_is_kernel_initmem_freed(addr))
+ 		return 0;
+ 
++	if (arch_is_bss_hole(addr))
++		return 0;
++
+ 	/*
+ 	 * static variable?
+ 	 */
+-- 
+1.8.3.1
+
