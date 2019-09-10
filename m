@@ -2,204 +2,162 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 94057ADB2F
-	for <lists+kvm-ppc@lfdr.de>; Mon,  9 Sep 2019 16:30:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D18EAE583
+	for <lists+kvm-ppc@lfdr.de>; Tue, 10 Sep 2019 10:29:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727256AbfIIOay (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 9 Sep 2019 10:30:54 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:46400 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726759AbfIIOay (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 9 Sep 2019 10:30:54 -0400
-Received: by mail-qt1-f195.google.com with SMTP id v11so16306454qto.13
-        for <kvm-ppc@vger.kernel.org>; Mon, 09 Sep 2019 07:30:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lca.pw; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=CXfqRVCQFw7xqj7AICeJBWtrNhS6pGZdKh11BOOZ9lA=;
-        b=gxEMwh/a/ND2u6HYSSw+CvoCqCBHgB9WAY3kEMDTKnHS721fCqfnpsUSXC2a0oOeGf
-         hS6DIyV3UJqVsob9he/lOalVvuUnlHqXfyaB6/qIu5AZdsXVBD3H5UKaA89p9ehrqtw+
-         HyVJbHyy0BC20nYdMA7IvWJsrq/du8PbBCqzLf/32PujYUN1YiLrJBu2apAoILgQ2QQM
-         WXN1kirG4t98s2AA6PXav/e270xdKKCBwOxaaUgq+gIL67v8Nnc7hzablBWT5tXiqNyZ
-         dztk4qQJT8T3WUmUbdwsE/SUovPAHV8+d9xftGR/FzO4FcQmWQWioLNX0jmu7RnXkbMR
-         l9pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=CXfqRVCQFw7xqj7AICeJBWtrNhS6pGZdKh11BOOZ9lA=;
-        b=e8/GvIBmksQj19OMzCrtq5lCItm240HHIv7476bQifNBARfUNa/mn0JN5Vj/CSAGIP
-         /eKsvCPigiDasR8Z+NcmFVYEQcd80kIRBmr3kykLSTXijt0HV0HHHBYPYNtfnt/foSwE
-         6BWfjhGrNQDi44pOnKKtWljprpcGwH5nbF+AOPojKdFaZOcsbD321LhitG/IlqKhgisN
-         3V4Rg4trmp1aOid0YO9yHL+jnid98T0KqYGi6jrZZSb7uZe7FnU3jDEavtNt8bIUi32w
-         grQj/5Tij59AW1IOwGoCcKy7fj52azRiNw+ew3snMGgB+UexgzBKbnpLjQcrfIlqnYFu
-         yn6A==
-X-Gm-Message-State: APjAAAX+yz/6YF7/3krWM7ZG3rtqSHBubTDxKzyRWFfk1Z/I76nOWUvc
-        h4bkQYm6GG7V1uwzeseKs/GEf0MW3a0=
-X-Google-Smtp-Source: APXvYqz3L3fSgl55DmtBbUTWQgR45D2JISFvfWDBJBH3PWAbVc68BgzFeZ6k0wq1m7D4qm15IYPnzA==
-X-Received: by 2002:a0c:eda7:: with SMTP id h7mr14228023qvr.30.1568039452923;
-        Mon, 09 Sep 2019 07:30:52 -0700 (PDT)
-Received: from qcai.nay.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id w126sm6478943qkd.68.2019.09.09.07.30.51
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 09 Sep 2019 07:30:51 -0700 (PDT)
-From:   Qian Cai <cai@lca.pw>
-To:     mpe@ellerman.id.au
-Cc:     benh@kernel.crashing.org, paulus@samba.org, mingo@kernel.org,
-        peterz@infradead.org, bvanassche@acm.org, arnd@arndb.de,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Qian Cai <cai@lca.pw>
-Subject: [PATCH v3] powerpc/lockdep: fix a false positive warning
-Date:   Mon,  9 Sep 2019 10:30:33 -0400
-Message-Id: <1568039433-10176-1-git-send-email-cai@lca.pw>
-X-Mailer: git-send-email 1.8.3.1
+        id S1727849AbfIJI37 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 10 Sep 2019 04:29:59 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38500 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727824AbfIJI37 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 10 Sep 2019 04:29:59 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8A8SgtY106608
+        for <kvm-ppc@vger.kernel.org>; Tue, 10 Sep 2019 04:29:58 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ux87209ew-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Tue, 10 Sep 2019 04:29:57 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <bharata@linux.ibm.com>;
+        Tue, 10 Sep 2019 09:29:55 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 10 Sep 2019 09:29:52 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8A8TosZ41091092
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Sep 2019 08:29:50 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6391E52051;
+        Tue, 10 Sep 2019 08:29:50 +0000 (GMT)
+Received: from bharata.ibmuc.com (unknown [9.199.35.217])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 5D5775204F;
+        Tue, 10 Sep 2019 08:29:48 +0000 (GMT)
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, linux-mm@kvack.org, paulus@au1.ibm.com,
+        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
+        linuxram@us.ibm.com, sukadev@linux.vnet.ibm.com,
+        cclaudio@linux.ibm.com, hch@lst.de,
+        Bharata B Rao <bharata@linux.ibm.com>
+Subject: [PATCH v8 0/8] kvmppc: Driver to manage pages of secure guest
+Date:   Tue, 10 Sep 2019 13:59:38 +0530
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19091008-0016-0000-0000-000002A96838
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091008-0017-0000-0000-00003309ED99
+Message-Id: <20190910082946.7849-1-bharata@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-10_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909100085
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The commit 108c14858b9e ("locking/lockdep: Add support for dynamic
-keys") introduced a boot warning on powerpc below, because since the
-commit 2d4f567103ff ("KVM: PPC: Introduce kvm_tmp framework") adds
-kvm_tmp[] into the .bss section and then free the rest of unused spaces
-back to the page allocator.
+Hi,
 
-kernel_init
-  kvm_guest_init
-    kvm_free_tmp
-      free_reserved_area
-        free_unref_page
-          free_unref_page_prepare
+A pseries guest can be run as a secure guest on Ultravisor-enabled
+POWER platforms. On such platforms, this driver will be used to manage
+the movement of guest pages between the normal memory managed by
+hypervisor(HV) and secure memory managed by Ultravisor(UV).
 
-Later, alloc_workqueue() happens to allocate some pages from there and
-trigger the warning at,
+Private ZONE_DEVICE memory equal to the amount of secure memory
+available in the platform for running secure guests is created.
+Whenever a page belonging to the guest becomes secure, a page from
+this private device memory is used to represent and track that secure
+page on the HV side. The movement of pages between normal and secure
+memory is done via migrate_vma_pages(). The reverse movement is driven
+via pagemap_ops.migrate_to_ram().
 
-if (WARN_ON_ONCE(static_obj(key)))
+The page-in or page-out requests from UV will come to HV as hcalls and
+HV will call back into UV via uvcalls to satisfy these page requests.
 
-Fix it by adding a generic helper arch_is_bss_hole() to skip those areas
-in static_obj(). Since kvm_free_tmp() is only done early during the
-boot, just go lockless to make the implementation simple for now.
+These patches are against hmm.git
+(https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/log/?h=hmm)
 
-WARNING: CPU: 0 PID: 13 at kernel/locking/lockdep.c:1120
-Workqueue: events work_for_cpu_fn
-Call Trace:
-  lockdep_register_key+0x68/0x200
-  wq_init_lockdep+0x40/0xc0
-  trunc_msg+0x385f9/0x4c30f (unreliable)
-  wq_init_lockdep+0x40/0xc0
-  alloc_workqueue+0x1e0/0x620
-  scsi_host_alloc+0x3d8/0x490
-  ata_scsi_add_hosts+0xd0/0x220 [libata]
-  ata_host_register+0x178/0x400 [libata]
-  ata_host_activate+0x17c/0x210 [libata]
-  ahci_host_activate+0x84/0x250 [libahci]
-  ahci_init_one+0xc74/0xdc0 [ahci]
-  local_pci_probe+0x78/0x100
-  work_for_cpu_fn+0x40/0x70
-  process_one_work+0x388/0x750
-  process_scheduled_works+0x50/0x90
-  worker_thread+0x3d0/0x570
-  kthread+0x1b8/0x1e0
-  ret_from_kernel_thread+0x5c/0x7c
+plus
 
-Fixes: 108c14858b9e ("locking/lockdep: Add support for dynamic keys")
-Signed-off-by: Qian Cai <cai@lca.pw>
----
+Claudio Carvalho's base ultravisor enablement patches that are present
+in Michael Ellerman's tree
+(https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git/log/?h=topic/ppc-kvm)
 
-v3: Change arch_is_bss_hole() to return a "bool".
-    Rearrange variables in kvm.c a bit.
-v2: No need to actually define arch_is_bss_hole() powerpc64 only.
+These patches along with Claudio's above patches are required to
+run secure pseries guests on KVM. This patchset is based on hmm.git
+because hmm.git has migrate_vma cleanup and not-device memremap_pages
+patchsets that are required by this patchset.
 
- arch/powerpc/include/asm/sections.h | 11 +++++++++++
- arch/powerpc/kernel/kvm.c           |  8 +++++++-
- include/asm-generic/sections.h      |  7 +++++++
- kernel/locking/lockdep.c            |  3 +++
- 4 files changed, 28 insertions(+), 1 deletion(-)
+Changes in v8
+=============
+- s/kvmppc_devm/kvmppc_uvmem
+- Carrying Suraj's patch that defines bit positions for different rmap
+  functions from Paul's kvm-next branch. Added KVMPPC_RMAP_UVMEM_PFN
+  to this patch.
+- No need to use irqsave version of spinlock to protect pfn bitmap
+- mmap_sem and srcu_lock reversal in page-in/page-out so that we
+  have uniform locking semantics in page-in, page-out, fault and
+  reset paths. This also matches with other usages of the same
+  two locks in powerpc code.
+- kvmppc_uvmem_free_memslot_pfns() needs kvm srcu read lock.
+- Addressed all the review feedback from Christoph and Sukadev.
+  - Dropped kvmppc_rmap_is_devm_pfn() and introduced kvmppc_rmap_type()
+  - Bail out early if page-in request comes for an already paged-in page
+  - kvmppc_uvmem_pfn_lock re-arrangement
+  - Check for failure from gfn_to_memslot in kvmppc_h_svm_page_in
+  - Consolidate migrate_vma setup and related code into two helpers
+    kvmppc_svm_page_in/out.
+  - Use NUMA_NO_NODE in memremap_pages() instead of -1
+  - Removed externs in declarations
+  - Ensure *rmap assignment gets cleared in the error case in
+    kvmppc_uvmem_get_page()
+- A few other code cleanups
 
-diff --git a/arch/powerpc/include/asm/sections.h b/arch/powerpc/include/asm/sections.h
-index 4a1664a8658d..6e9e39ebbb27 100644
---- a/arch/powerpc/include/asm/sections.h
-+++ b/arch/powerpc/include/asm/sections.h
-@@ -5,8 +5,19 @@
- 
- #include <linux/elf.h>
- #include <linux/uaccess.h>
-+
-+#define arch_is_bss_hole arch_is_bss_hole
-+
- #include <asm-generic/sections.h>
- 
-+extern void *bss_hole_start, *bss_hole_end;
-+
-+static inline bool arch_is_bss_hole(unsigned long addr)
-+{
-+	return addr >= (unsigned long)bss_hole_start &&
-+	       addr < (unsigned long)bss_hole_end;
-+}
-+
- extern char __head_end[];
- 
- #ifdef __powerpc64__
-diff --git a/arch/powerpc/kernel/kvm.c b/arch/powerpc/kernel/kvm.c
-index b7b3a5e4e224..e3c3b076ff07 100644
---- a/arch/powerpc/kernel/kvm.c
-+++ b/arch/powerpc/kernel/kvm.c
-@@ -64,9 +64,11 @@
- #define KVM_INST_MTSRIN		0x7c0001e4
- 
- static bool kvm_patching_worked = true;
--char kvm_tmp[1024 * 1024];
- static int kvm_tmp_index;
- 
-+char kvm_tmp[1024 * 1024];
-+void *bss_hole_start, *bss_hole_end;
-+
- static inline void kvm_patch_ins(u32 *inst, u32 new_inst)
- {
- 	*inst = new_inst;
-@@ -707,6 +709,10 @@ static __init void kvm_free_tmp(void)
- 	 */
- 	kmemleak_free_part(&kvm_tmp[kvm_tmp_index],
- 			   ARRAY_SIZE(kvm_tmp) - kvm_tmp_index);
-+
-+	bss_hole_start = &kvm_tmp[kvm_tmp_index];
-+	bss_hole_end = &kvm_tmp[ARRAY_SIZE(kvm_tmp)];
-+
- 	free_reserved_area(&kvm_tmp[kvm_tmp_index],
- 			   &kvm_tmp[ARRAY_SIZE(kvm_tmp)], -1, NULL);
- }
-diff --git a/include/asm-generic/sections.h b/include/asm-generic/sections.h
-index d1779d442aa5..28a7a56e7c8a 100644
---- a/include/asm-generic/sections.h
-+++ b/include/asm-generic/sections.h
-@@ -91,6 +91,13 @@ static inline int arch_is_kernel_initmem_freed(unsigned long addr)
- }
- #endif
- 
-+#ifndef arch_is_bss_hole
-+static inline bool arch_is_bss_hole(unsigned long addr)
-+{
-+	return false;
-+}
-+#endif
-+
- /**
-  * memory_contains - checks if an object is contained within a memory region
-  * @begin: virtual address of the beginning of the memory region
-diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-index 4861cf8e274b..cd75b51f15ce 100644
---- a/kernel/locking/lockdep.c
-+++ b/kernel/locking/lockdep.c
-@@ -675,6 +675,9 @@ static int static_obj(const void *obj)
- 	if (arch_is_kernel_initmem_freed(addr))
- 		return 0;
- 
-+	if (arch_is_bss_hole(addr))
-+		return 0;
-+
- 	/*
- 	 * static variable?
- 	 */
+v7: https://lists.ozlabs.org/pipermail/linuxppc-dev/2019-August/195631.html
+
+Anshuman Khandual (1):
+  KVM: PPC: Ultravisor: Add PPC_UV config option
+
+Bharata B Rao (6):
+  kvmppc: Movement of pages between normal and secure memory
+  kvmppc: Shared pages support for secure guests
+  kvmppc: H_SVM_INIT_START and H_SVM_INIT_DONE hcalls
+  kvmppc: Handle memory plug/unplug to secure VM
+  kvmppc: Radix changes for secure guest
+  kvmppc: Support reset of secure guest
+
+Suraj Jitindar Singh (1):
+  KVM: PPC: Book3S HV: Define usage types for rmap array in guest
+    memslot
+
+ Documentation/virt/kvm/api.txt              |  19 +
+ arch/powerpc/Kconfig                        |  17 +
+ arch/powerpc/include/asm/hvcall.h           |   9 +
+ arch/powerpc/include/asm/kvm_book3s_uvmem.h |  48 ++
+ arch/powerpc/include/asm/kvm_host.h         |  56 +-
+ arch/powerpc/include/asm/kvm_ppc.h          |   2 +
+ arch/powerpc/include/asm/ultravisor-api.h   |   6 +
+ arch/powerpc/include/asm/ultravisor.h       |  36 ++
+ arch/powerpc/kvm/Makefile                   |   3 +
+ arch/powerpc/kvm/book3s_64_mmu_radix.c      |  22 +
+ arch/powerpc/kvm/book3s_hv.c                | 121 ++++
+ arch/powerpc/kvm/book3s_hv_rm_mmu.c         |   2 +-
+ arch/powerpc/kvm/book3s_hv_uvmem.c          | 604 ++++++++++++++++++++
+ arch/powerpc/kvm/powerpc.c                  |  12 +
+ include/uapi/linux/kvm.h                    |   1 +
+ 15 files changed, 953 insertions(+), 5 deletions(-)
+ create mode 100644 arch/powerpc/include/asm/kvm_book3s_uvmem.h
+ create mode 100644 arch/powerpc/kvm/book3s_hv_uvmem.c
+
 -- 
-1.8.3.1
+2.21.0
 
