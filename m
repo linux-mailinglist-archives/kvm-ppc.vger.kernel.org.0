@@ -2,131 +2,213 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2D57AEE20
-	for <lists+kvm-ppc@lfdr.de>; Tue, 10 Sep 2019 17:08:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77530AEFE7
+	for <lists+kvm-ppc@lfdr.de>; Tue, 10 Sep 2019 18:49:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726535AbfIJPI2 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 10 Sep 2019 11:08:28 -0400
-Received: from 5.mo68.mail-out.ovh.net ([46.105.62.179]:44862 "EHLO
-        5.mo68.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726060AbfIJPI2 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 10 Sep 2019 11:08:28 -0400
-X-Greylist: delayed 2407 seconds by postgrey-1.27 at vger.kernel.org; Tue, 10 Sep 2019 11:08:27 EDT
-Received: from player789.ha.ovh.net (unknown [10.109.160.153])
-        by mo68.mail-out.ovh.net (Postfix) with ESMTP id 6B61E1423AF
-        for <kvm-ppc@vger.kernel.org>; Tue, 10 Sep 2019 15:49:31 +0200 (CEST)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
-        (Authenticated sender: clg@kaod.org)
-        by player789.ha.ovh.net (Postfix) with ESMTPSA id AD28C99B6E00;
-        Tue, 10 Sep 2019 13:49:24 +0000 (UTC)
-Subject: Re: [PATCH 2/2] KVM: PPC: Book3S HV: XIVE: Set kvm->arch.xive when
- VPs are allocated
-To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>
-Cc:     David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
-References: <156812303847.1865227.3495698285729698782.stgit@bahia.tls.ibm.com>
- <156812304395.1865227.18344810689034056117.stgit@bahia.tls.ibm.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6712150c-5d55-8e36-28ae-bf078a405ea6@kaod.org>
-Date:   Tue, 10 Sep 2019 15:49:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2436760AbfIJQtm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 10 Sep 2019 12:49:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4090 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2436785AbfIJQtm (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 10 Sep 2019 12:49:42 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8AGlTAJ119540
+        for <kvm-ppc@vger.kernel.org>; Tue, 10 Sep 2019 12:49:40 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2uxduk4fj7-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Tue, 10 Sep 2019 12:49:40 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <groug@kaod.org>;
+        Tue, 10 Sep 2019 17:49:38 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 10 Sep 2019 17:49:35 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8AGnYPm31261136
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Sep 2019 16:49:34 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 80C704203F;
+        Tue, 10 Sep 2019 16:49:34 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3565042049;
+        Tue, 10 Sep 2019 16:49:34 +0000 (GMT)
+Received: from bahia.tls.ibm.com (unknown [9.101.4.41])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 10 Sep 2019 16:49:34 +0000 (GMT)
+Subject: [PATCH] KVM: PPC: Book3S HV: Tunable to configure maximum # of
+ vCPUs per VM
+From:   Greg Kurz <groug@kaod.org>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Date:   Tue, 10 Sep 2019 18:49:34 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <156812304395.1865227.18344810689034056117.stgit@bahia.tls.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 12243880013991938951
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtddtgdegiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19091016-4275-0000-0000-000003640AE4
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091016-4276-0000-0000-000038766001
+Message-Id: <156813417397.1880979.6162333671088177553.stgit@bahia.tls.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-10_11:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909100161
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 10/09/2019 15:44, Greg Kurz wrote:
-> If we cannot allocate the XIVE VPs in OPAL, the creation of a XIVE or
-> XICS-on-XIVE device is aborted as expected, but we leave kvm->arch.xive
-> set forever since the relase method isn't called in this case. Any
-> subsequent tentative to create a XIVE or XICS-on-XIVE for this VM will
-> thus always fail. This is a problem for QEMU since it destroys and
-> re-creates these devices when the VM is reset: the VM would be
-> restricted to using the emulated XIVE or XICS forever.
-> 
-> As an alternative to adding rollback, do not assign kvm->arch.xive before
-> making sure the XIVE VPs are allocated in OPAL.
-> 
-> Fixes: 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy' method by a 'release' method")
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Each vCPU of a VM allocates a XIVE VP in OPAL which is associated with
+8 event queue (EQ) descriptors, one for each priority. A POWER9 socket
+can handle a maximum of 1M event queues.
 
+The powernv platform allocates NR_CPUS (== 2048) VPs for the hypervisor,
+and each XIVE KVM device allocates KVM_MAX_VCPUS (== 2048) VPs. This means
+that on a bi-socket system, we can create at most:
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+(2 * 1M) / (8 * 2048) - 1 == 127 XIVE or XICS-on-XIVE KVM devices
 
-Thanks,
+ie, start at most 127 VMs benefiting from an in-kernel interrupt controller.
+Subsequent VMs need to rely on much slower userspace emulated XIVE device in
+QEMU.
 
-C.
+This is problematic as one can legitimately expect to start the same
+number of mono-CPU VMs as the number of HW threads available on the
+system (eg, 144 on Witherspoon).
 
-> ---
->  arch/powerpc/kvm/book3s_xive.c        |   11 +++++------
->  arch/powerpc/kvm/book3s_xive_native.c |    2 +-
->  2 files changed, 6 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> index cd2006bfcd3e..2ef43d037a4f 100644
-> --- a/arch/powerpc/kvm/book3s_xive.c
-> +++ b/arch/powerpc/kvm/book3s_xive.c
-> @@ -2006,6 +2006,10 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
->  
->  	pr_devel("Creating xive for partition\n");
->  
-> +	/* Already there ? */
-> +	if (kvm->arch.xive)
-> +		return -EEXIST;
-> +
->  	xive = kvmppc_xive_get_device(kvm, type);
->  	if (!xive)
->  		return -ENOMEM;
-> @@ -2014,12 +2018,6 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
->  	xive->kvm = kvm;
->  	mutex_init(&xive->lock);
->  
-> -	/* Already there ? */
-> -	if (kvm->arch.xive)
-> -		ret = -EEXIST;
-> -	else
-> -		kvm->arch.xive = xive;
-> -
->  	/* We use the default queue size set by the host */
->  	xive->q_order = xive_native_default_eq_shift();
->  	if (xive->q_order < PAGE_SHIFT)
-> @@ -2040,6 +2038,7 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
->  		return ret;
->  
->  	dev->private = xive;
-> +	kvm->arch.xive = xive;
->  	return 0;
->  }
->  
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> index e9cbb42de424..84a354b90f60 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -1087,7 +1087,6 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
->  
->  	xive->dev = dev;
->  	xive->kvm = kvm;
-> -	kvm->arch.xive = xive;
->  	mutex_init(&xive->mapping_lock);
->  	mutex_init(&xive->lock);
->  
-> @@ -1109,6 +1108,7 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
->  		return ret;
->  
->  	dev->private = xive;
-> +	kvm->arch.xive = xive;
->  	return 0;
->  }
->  
-> 
+I'm not aware of any userspace supporting more that 1024 vCPUs. It thus
+seem overkill to consume that many VPs per VM. Ideally we would even
+want userspace to be able to tell KVM about the maximum number of vCPUs
+when creating the VM.
+
+For now, provide a module parameter to configure the maximum number of
+vCPUs per VM. While here, reduce the default value to 1024 to match the
+current limit in QEMU. This number is only used by the XIVE KVM devices,
+but some more users of KVM_MAX_VCPUS could possibly be converted.
+
+With this change, I could successfully run 230 mono-CPU VMs on a
+Witherspoon system using the official skiboot-6.3.
+
+I could even run more VMs by using upstream skiboot containing this
+fix, that allows to better spread interrupts between sockets:
+
+e97391ae2bb5 ("xive: fix return value of opal_xive_allocate_irq()")
+
+MAX VPCUS | MAX VMS
+----------+---------
+     1024 |     255
+      512 |     511
+      256 |    1023 (*)
+
+(*) the system was barely usable because of the extreme load and
+    memory exhaustion but the VMs did start.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ arch/powerpc/include/asm/kvm_host.h   |    1 +
+ arch/powerpc/kvm/book3s_hv.c          |   32 ++++++++++++++++++++++++++++++++
+ arch/powerpc/kvm/book3s_xive.c        |    2 +-
+ arch/powerpc/kvm/book3s_xive_native.c |    2 +-
+ 4 files changed, 35 insertions(+), 2 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 6fb5fb4779e0..17582ce38788 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -335,6 +335,7 @@ struct kvm_arch {
+ 	struct kvm_nested_guest *nested_guests[KVM_MAX_NESTED_GUESTS];
+ 	/* This array can grow quite large, keep it at the end */
+ 	struct kvmppc_vcore *vcores[KVM_MAX_VCORES];
++	unsigned int max_vcpus;
+ #endif
+ };
+ 
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index f8975c620f41..393d8a1ce9d8 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -125,6 +125,36 @@ static bool nested = true;
+ module_param(nested, bool, S_IRUGO | S_IWUSR);
+ MODULE_PARM_DESC(nested, "Enable nested virtualization (only on POWER9)");
+ 
++#define MIN(x, y) (((x) < (y)) ? (x) : (y))
++
++static unsigned int max_vcpus = MIN(KVM_MAX_VCPUS, 1024);
++
++static int set_max_vcpus(const char *val, const struct kernel_param *kp)
++{
++	unsigned int new_max_vcpus;
++	int ret;
++
++	ret = kstrtouint(val, 0, &new_max_vcpus);
++	if (ret)
++		return ret;
++
++	if (new_max_vcpus > KVM_MAX_VCPUS)
++		return -EINVAL;
++
++	max_vcpus = new_max_vcpus;
++
++	return 0;
++}
++
++static struct kernel_param_ops max_vcpus_ops = {
++	.set = set_max_vcpus,
++	.get = param_get_uint,
++};
++
++module_param_cb(max_vcpus, &max_vcpus_ops, &max_vcpus, S_IRUGO | S_IWUSR);
++MODULE_PARM_DESC(max_vcpus, "Maximum number of vCPUS per VM (max = "
++		 __stringify(KVM_MAX_VCPUS) ")");
++
+ static inline bool nesting_enabled(struct kvm *kvm)
+ {
+ 	return kvm->arch.nested_enable && kvm_is_radix(kvm);
+@@ -4918,6 +4948,8 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+ 	if (radix_enabled())
+ 		kvmhv_radix_debugfs_init(kvm);
+ 
++	kvm->arch.max_vcpus = max_vcpus;
++
+ 	return 0;
+ }
+ 
+diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+index 2ef43d037a4f..0fea31b64564 100644
+--- a/arch/powerpc/kvm/book3s_xive.c
++++ b/arch/powerpc/kvm/book3s_xive.c
+@@ -2026,7 +2026,7 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
+ 		xive->q_page_order = xive->q_order - PAGE_SHIFT;
+ 
+ 	/* Allocate a bunch of VPs */
+-	xive->vp_base = xive_native_alloc_vp_block(KVM_MAX_VCPUS);
++	xive->vp_base = xive_native_alloc_vp_block(kvm->arch.max_vcpus);
+ 	pr_devel("VP_Base=%x\n", xive->vp_base);
+ 
+ 	if (xive->vp_base == XIVE_INVALID_VP)
+diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+index 84a354b90f60..20314010da56 100644
+--- a/arch/powerpc/kvm/book3s_xive_native.c
++++ b/arch/powerpc/kvm/book3s_xive_native.c
+@@ -1095,7 +1095,7 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
+ 	 * a default. Getting the max number of CPUs the VM was
+ 	 * configured with would improve our usage of the XIVE VP space.
+ 	 */
+-	xive->vp_base = xive_native_alloc_vp_block(KVM_MAX_VCPUS);
++	xive->vp_base = xive_native_alloc_vp_block(kvm->arch.max_vcpus);
+ 	pr_devel("VP_Base=%x\n", xive->vp_base);
+ 
+ 	if (xive->vp_base == XIVE_INVALID_VP)
 
