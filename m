@@ -2,151 +2,80 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 46DF1B0410
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Sep 2019 20:51:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BA48B04AB
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Sep 2019 21:52:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730072AbfIKSuz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Sep 2019 14:50:55 -0400
-Received: from mga06.intel.com ([134.134.136.31]:39426 "EHLO mga06.intel.com"
+        id S1728753AbfIKTwk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Sep 2019 15:52:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33408 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730273AbfIKSup (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 11 Sep 2019 14:50:45 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Sep 2019 11:50:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,492,1559545200"; 
-   d="scan'208";a="196980903"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by orsmga002.jf.intel.com with ESMTP; 11 Sep 2019 11:50:41 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Marc Zyngier <marc.zyngier@arm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: [PATCH 13/13] KVM: Dynamically size memslot array based on number of used slots
-Date:   Wed, 11 Sep 2019 11:50:38 -0700
-Message-Id: <20190911185038.24341-14-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190911185038.24341-1-sean.j.christopherson@intel.com>
-References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1727581AbfIKTwk (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 11 Sep 2019 15:52:40 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 49B3F30833BE;
+        Wed, 11 Sep 2019 19:52:40 +0000 (UTC)
+Received: from thuth.com (ovpn-116-192.ams2.redhat.com [10.36.116.192])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 00F3A19C6A;
+        Wed, 11 Sep 2019 19:52:38 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: PPC: Remove superfluous check for non-zero return value
+Date:   Wed, 11 Sep 2019 21:52:35 +0200
+Message-Id: <20190911195235.29048-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 11 Sep 2019 19:52:40 +0000 (UTC)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Now that the memslot logic doesn't assume memslots are always non-NULL,
-dynamically size the array of memslots instead of unconditionally
-allocating memory for the maximum number of memslots.
+After the kfree()s haven been removed in the previous
+commit 9798f4ea71ea ("fix rollback when kvmppc_xive_create fails"),
+the code can be simplified even more to simply always "return ret"
+now.
 
-Note, because a to-be-deleted memslot must first be invalidated, the
-array size cannot be immediately reduced when deleting a memslot.
-However, consecutive deletions will realize the memory savings, i.e.
-a second deletion will trim the entry.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/linux/kvm_host.h |  5 ++++-
- virt/kvm/kvm_main.c      | 31 ++++++++++++++++++++++++++++---
- 2 files changed, 32 insertions(+), 4 deletions(-)
+ arch/powerpc/kvm/book3s_xive.c        | 5 +----
+ arch/powerpc/kvm/book3s_xive_native.c | 5 +----
+ 2 files changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 40ea5df50faa..8feb61bfbd1a 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -433,11 +433,14 @@ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
-  */
- struct kvm_memslots {
- 	u64 generation;
--	struct kvm_memory_slot memslots[KVM_MEM_SLOTS_NUM];
- 	/* The mapping table from slot id to the index in memslots[]. */
- 	short id_to_index[KVM_MEM_SLOTS_NUM];
- 	atomic_t lru_slot;
- 	int used_slots;
-+	struct kvm_memory_slot memslots[];
-+	/*
-+	 * WARNING: 'memslots' is dynamically-sized.  It *MUST* be at the end.
-+	 */
- };
+diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+index e3ba67095895..2f6f463fcdfb 100644
+--- a/arch/powerpc/kvm/book3s_xive.c
++++ b/arch/powerpc/kvm/book3s_xive.c
+@@ -1986,10 +1986,7 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
  
- struct kvm {
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index e2571a9ccfc4..f952a0bec67a 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -535,7 +535,7 @@ static struct kvm_memslots *kvm_alloc_memslots(void)
- 		return NULL;
+ 	xive->single_escalation = xive_native_has_single_escalation();
  
- 	for (i = 0; i < KVM_MEM_SLOTS_NUM; i++)
--		slots->id_to_index[i] = slots->memslots[i].id = -1;
-+		slots->id_to_index[i] = -1;
- 
- 	return slots;
- }
-@@ -933,6 +933,32 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
- 	return old_memslots;
+-	if (ret)
+-		return ret;
+-
+-	return 0;
++	return ret;
  }
  
-+/*
-+ * Note, at a minimum, the current number of used slots must be allocated, even
-+ * when deleting a memslot, as we need a complete duplicate of the memslots for
-+ * use when invalidating a memslot prior to deleting/moving the memslot.
-+ */
-+static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
-+					     enum kvm_mr_change change)
-+{
-+	struct kvm_memslots *slots;
-+	size_t old_size, new_size;
-+
-+	old_size = sizeof(struct kvm_memslots) +
-+		   (sizeof(struct kvm_memory_slot) * old->used_slots);
-+
-+	if (change == KVM_MR_CREATE)
-+		new_size = old_size + sizeof(struct kvm_memory_slot);
-+	else
-+		new_size = old_size;
-+
-+	slots = kvzalloc(new_size, GFP_KERNEL_ACCOUNT);
-+	if (likely(slots))
-+		memcpy(slots, old, old_size);
-+
-+	return slots;
-+}
-+
- static int kvm_set_memslot(struct kvm *kvm,
- 			   const struct kvm_userspace_memory_region *mem,
- 			   const struct kvm_memory_slot *old,
-@@ -943,10 +969,9 @@ static int kvm_set_memslot(struct kvm *kvm,
- 	struct kvm_memslots *slots;
- 	int r;
+ int kvmppc_xive_debug_show_queues(struct seq_file *m, struct kvm_vcpu *vcpu)
+diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+index a998823f68a3..7a50772f26fe 100644
+--- a/arch/powerpc/kvm/book3s_xive_native.c
++++ b/arch/powerpc/kvm/book3s_xive_native.c
+@@ -1089,10 +1089,7 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
+ 	xive->single_escalation = xive_native_has_single_escalation();
+ 	xive->ops = &kvmppc_xive_native_ops;
  
--	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
-+	slots = kvm_dup_memslots(__kvm_memslots(kvm, as_id), change);
- 	if (!slots)
- 		return -ENOMEM;
--	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
+-	if (ret)
+-		return ret;
+-
+-	return 0;
++	return ret;
+ }
  
- 	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
- 		/*
+ /*
 -- 
-2.22.0
+2.18.1
 
