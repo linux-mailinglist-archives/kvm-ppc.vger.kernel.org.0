@@ -2,536 +2,208 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D6B3BB05A4
-	for <lists+kvm-ppc@lfdr.de>; Thu, 12 Sep 2019 00:33:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A61DDB0DD3
+	for <lists+kvm-ppc@lfdr.de>; Thu, 12 Sep 2019 13:31:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728462AbfIKWc6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Sep 2019 18:32:58 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24672 "EHLO
+        id S1731376AbfILLbx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 12 Sep 2019 07:31:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51228 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728224AbfIKWc4 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Sep 2019 18:32:56 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8BMQgTR029543;
-        Wed, 11 Sep 2019 18:32:42 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2uy7a547rd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Sep 2019 18:32:30 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x8BMTEco034489;
-        Wed, 11 Sep 2019 18:32:30 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2uy7a547r6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Sep 2019 18:32:30 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8BMTuo2009044;
-        Wed, 11 Sep 2019 22:32:29 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma04dal.us.ibm.com with ESMTP id 2uv467g8e3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Sep 2019 22:32:29 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8BMWSqe38470138
+        by vger.kernel.org with ESMTP id S1731146AbfILLbx (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 12 Sep 2019 07:31:53 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8CBRViO064658
+        for <kvm-ppc@vger.kernel.org>; Thu, 12 Sep 2019 07:31:52 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2uykr7knvj-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Thu, 12 Sep 2019 07:31:52 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Thu, 12 Sep 2019 12:31:50 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 12 Sep 2019 12:31:44 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8CBVh2G61407464
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 Sep 2019 22:32:28 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 19869136051;
-        Wed, 11 Sep 2019 22:32:28 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D1B3F136053;
-        Wed, 11 Sep 2019 22:32:27 +0000 (GMT)
-Received: from localhost (unknown [9.53.179.213])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 11 Sep 2019 22:32:27 +0000 (GMT)
-From:   Michael Roth <mdroth@linux.vnet.ibm.com>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Thu, 12 Sep 2019 11:31:43 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7CA18AE7E9;
+        Thu, 12 Sep 2019 11:31:43 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3B734AE0A4;
+        Thu, 12 Sep 2019 11:31:42 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.92.148])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 12 Sep 2019 11:31:42 +0000 (GMT)
+Subject: Re: [PATCH 04/13] KVM: Drop kvm_arch_create_memslot()
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        James Hogan <jhogan@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Subject: [PATCH v2] KVM: PPC: Book3S HV: use smp_mb() when setting/clearing host_ipi flag
-Date:   Wed, 11 Sep 2019 17:31:55 -0500
-Message-Id: <20190911223155.16045-1-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Marc Zyngier <marc.zyngier@arm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
+ <20190911185038.24341-5-sean.j.christopherson@intel.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Thu, 12 Sep 2019 13:31:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190911185038.24341-5-sean.j.christopherson@intel.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI"
 X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-11_10:,,
+x-cbid: 19091211-0008-0000-0000-00000314C2BB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091211-0009-0000-0000-00004A3331EB
+Message-Id: <b669c7f0-34b8-49b8-2ff8-c062bb8b2f5f@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-12_05:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909110199
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=543 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909120123
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On a 2-socket Power9 system with 32 cores/128 threads (SMT4) and 1TB
-of memory running the following guest configs:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI
+Content-Type: multipart/mixed; boundary="UU4cv3zIJan03aUPjGzvFvmBPuZejgoHK";
+ protected-headers="v1"
+From: Janosch Frank <frankja@linux.ibm.com>
+To: Sean Christopherson <sean.j.christopherson@intel.com>,
+ James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
+ <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
+ Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
+ James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>,
+ Suzuki K Pouloze <suzuki.poulose@arm.com>, linux-mips@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+Message-ID: <b669c7f0-34b8-49b8-2ff8-c062bb8b2f5f@linux.ibm.com>
+Subject: Re: [PATCH 04/13] KVM: Drop kvm_arch_create_memslot()
+References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
+ <20190911185038.24341-5-sean.j.christopherson@intel.com>
+In-Reply-To: <20190911185038.24341-5-sean.j.christopherson@intel.com>
 
-  guest A:
-    - 224GB of memory
-    - 56 VCPUs (sockets=1,cores=28,threads=2), where:
-      VCPUs 0-1 are pinned to CPUs 0-3,
-      VCPUs 2-3 are pinned to CPUs 4-7,
-      ...
-      VCPUs 54-55 are pinned to CPUs 108-111
+--UU4cv3zIJan03aUPjGzvFvmBPuZejgoHK
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-  guest B:
-    - 4GB of memory
-    - 4 VCPUs (sockets=1,cores=4,threads=1)
+On 9/11/19 8:50 PM, Sean Christopherson wrote:
+> Remove kvm_arch_create_memslot() now that all arch implementations are
+> effectively nops.  Explicitly free an allocated-but-unused dirty bitmap=
 
-with the following workloads (with KSM and THP enabled in all):
+> instead of relying on kvm_free_memslot() now that setting a memslot can=
 
-  guest A:
-    stress --cpu 40 --io 20 --vm 20 --vm-bytes 512M
+> no longer fail after arch code has allocated memory.  In practice
+> this was already true, e.g. architectures that allocated memory via
+> kvm_arch_create_memslot() never failed kvm_arch_prepare_memory_region()=
 
-  guest B:
-    stress --cpu 4 --io 4 --vm 4 --vm-bytes 512M
+> and vice versa, but removing kvm_arch_create_memslot() eliminates the
+> potential for future code to stealthily change behavior.
+>=20
+> Eliminating the error path's reliance on kvm_free_memslot() paves the
+> way for simplify kvm_free_memslot(), i.e. dropping its @dont param.
+>=20
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-  host:
-    stress --cpu 4 --io 4 --vm 2 --vm-bytes 256M
+Please either split or adopt the patch title to include the freeing.
+I'd go for splitting.
 
-the below soft-lockup traces were observed after an hour or so and
-persisted until the host was reset (this was found to be reliably
-reproducible for this configuration, for kernels 4.15, 4.18, 5.0,
-and 5.3-rc5):
 
-  [ 1253.183290] rcu: INFO: rcu_sched self-detected stall on CPU
-  [ 1253.183319] rcu:     124-....: (5250 ticks this GP) idle=10a/1/0x4000000000000002 softirq=5408/5408 fqs=1941
-  [ 1256.287426] watchdog: BUG: soft lockup - CPU#105 stuck for 23s! [CPU 52/KVM:19709]
-  [ 1264.075773] watchdog: BUG: soft lockup - CPU#24 stuck for 23s! [worker:19913]
-  [ 1264.079769] watchdog: BUG: soft lockup - CPU#31 stuck for 23s! [worker:20331]
-  [ 1264.095770] watchdog: BUG: soft lockup - CPU#45 stuck for 23s! [worker:20338]
-  [ 1264.131773] watchdog: BUG: soft lockup - CPU#64 stuck for 23s! [avocado:19525]
-  [ 1280.408480] watchdog: BUG: soft lockup - CPU#124 stuck for 22s! [ksmd:791]
-  [ 1316.198012] rcu: INFO: rcu_sched self-detected stall on CPU
-  [ 1316.198032] rcu:     124-....: (21003 ticks this GP) idle=10a/1/0x4000000000000002 softirq=5408/5408 fqs=8243
-  [ 1340.411024] watchdog: BUG: soft lockup - CPU#124 stuck for 22s! [ksmd:791]
-  [ 1379.212609] rcu: INFO: rcu_sched self-detected stall on CPU
-  [ 1379.212629] rcu:     124-....: (36756 ticks this GP) idle=10a/1/0x4000000000000002 softirq=5408/5408 fqs=14714
-  [ 1404.413615] watchdog: BUG: soft lockup - CPU#124 stuck for 22s! [ksmd:791]
-  [ 1442.227095] rcu: INFO: rcu_sched self-detected stall on CPU
-  [ 1442.227115] rcu:     124-....: (52509 ticks this GP) idle=10a/1/0x4000000000000002 softirq=5408/5408 fqs=21403
-  [ 1455.111787] INFO: task worker:19907 blocked for more than 120 seconds.
-  [ 1455.111822]       Tainted: G             L    5.3.0-rc5-mdr-vanilla+ #1
-  [ 1455.111833] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  [ 1455.111884] INFO: task worker:19908 blocked for more than 120 seconds.
-  [ 1455.111905]       Tainted: G             L    5.3.0-rc5-mdr-vanilla+ #1
-  [ 1455.111925] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  [ 1455.111966] INFO: task worker:20328 blocked for more than 120 seconds.
-  [ 1455.111986]       Tainted: G             L    5.3.0-rc5-mdr-vanilla+ #1
-  [ 1455.111998] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  [ 1455.112048] INFO: task worker:20330 blocked for more than 120 seconds.
-  [ 1455.112068]       Tainted: G             L    5.3.0-rc5-mdr-vanilla+ #1
-  [ 1455.112097] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  [ 1455.112138] INFO: task worker:20332 blocked for more than 120 seconds.
-  [ 1455.112159]       Tainted: G             L    5.3.0-rc5-mdr-vanilla+ #1
-  [ 1455.112179] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  [ 1455.112210] INFO: task worker:20333 blocked for more than 120 seconds.
-  [ 1455.112231]       Tainted: G             L    5.3.0-rc5-mdr-vanilla+ #1
-  [ 1455.112242] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  [ 1455.112282] INFO: task worker:20335 blocked for more than 120 seconds.
-  [ 1455.112303]       Tainted: G             L    5.3.0-rc5-mdr-vanilla+ #1
-  [ 1455.112332] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  [ 1455.112372] INFO: task worker:20336 blocked for more than 120 seconds.
-  [ 1455.112392]       Tainted: G             L    5.3.0-rc5-mdr-vanilla+ #1
+--UU4cv3zIJan03aUPjGzvFvmBPuZejgoHK--
 
-CPUs 45, 24, and 124 are stuck on spin locks, likely held by
-CPUs 105 and 31.
+--VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-CPUs 105 and 31 are stuck in smp_call_function_many(), waiting on
-target CPU 42. For instance:
+-----BEGIN PGP SIGNATURE-----
 
-  # CPU 105 registers (via xmon)
-  R00 = c00000000020b20c   R16 = 00007d1bcd800000
-  R01 = c00000363eaa7970   R17 = 0000000000000001
-  R02 = c0000000019b3a00   R18 = 000000000000006b
-  R03 = 000000000000002a   R19 = 00007d537d7aecf0
-  R04 = 000000000000002a   R20 = 60000000000000e0
-  R05 = 000000000000002a   R21 = 0801000000000080
-  R06 = c0002073fb0caa08   R22 = 0000000000000d60
-  R07 = c0000000019ddd78   R23 = 0000000000000001
-  R08 = 000000000000002a   R24 = c00000000147a700
-  R09 = 0000000000000001   R25 = c0002073fb0ca908
-  R10 = c000008ffeb4e660   R26 = 0000000000000000
-  R11 = c0002073fb0ca900   R27 = c0000000019e2464
-  R12 = c000000000050790   R28 = c0000000000812b0
-  R13 = c000207fff623e00   R29 = c0002073fb0ca808
-  R14 = 00007d1bbee00000   R30 = c0002073fb0ca800
-  R15 = 00007d1bcd600000   R31 = 0000000000000800
-  pc  = c00000000020b260 smp_call_function_many+0x3d0/0x460
-  cfar= c00000000020b270 smp_call_function_many+0x3e0/0x460
-  lr  = c00000000020b20c smp_call_function_many+0x37c/0x460
-  msr = 900000010288b033   cr  = 44024824
-  ctr = c000000000050790   xer = 0000000000000000   trap =  100
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl16LJ0ACgkQ41TmuOI4
+ufjw+RAAo+nTA45D/UJQFOtUY4vNWKZfGI7LFIZsBH6EvGMFdMDJOuJzlnd8qPAY
+jEb7EEQ6a8ypWQ+inQtsEQ27SX2+gsIP/nsrU54fhu32Wx9uX0y3wHRWPXOv346i
+Aqo8/NpulFkq1SSmQ/v2ikX1Bzqn/28FQ47hI21vbGt/Do97PUk8Mv1VUnKheMjJ
+hqq7m7CyFHAdbLFxwrhuKuPKblVyZVASaTJ7Z7xQ2wdmHaS9kpsedJlTAxD3ot/d
+o05LlRmLUIRH/u+yLEk+innoWRJuQ6gwVytMwEKer2kO+Yu8jsm9lXv52CYO7fZ9
+B+pOzIfMaupMDGUBIsO93SZCvxZGELnzKoDjD9bZSOwFB/1wqrMpOvkTL28tRVrp
+Ia6ytDOW8shEzxv20xTK8bnFuPlPMwdm84GPpW/en/turzk/Ab7OQiKvVtpAHWLM
+CZsUdz4QEXeNeEjlZJesUcSnqsdviG/LCL7KqX8Ti6NDKI5g5rsu1bulD+7zQufB
+4RbQd5jRQ77MDN+RRz2+8nUXThL0Pp67iMmOfhlvViBShiDuwiKpJ7qnVf+Vze1F
+VPzyxUAFaq7VFQn39tiQW3wnFfDLZzGg9kl9XPJDLoUeaqEiVpo4GiPvSnqebgsR
+MbM+Vn7FjJU4VeUxFONIoTmoBmHyK8SkMZgnHmOvesUCuOnPk9k=
+=oNBi
+-----END PGP SIGNATURE-----
 
-CPU 42 is running normally, doing VCPU work:
-
-  # CPU 42 stack trace (via xmon)
-  [link register   ] c00800001be17188 kvmppc_book3s_radix_page_fault+0x90/0x2b0 [kvm_hv]
-  [c000008ed3343820] c000008ed3343850 (unreliable)
-  [c000008ed33438d0] c00800001be11b6c kvmppc_book3s_hv_page_fault+0x264/0xe30 [kvm_hv]
-  [c000008ed33439d0] c00800001be0d7b4 kvmppc_vcpu_run_hv+0x8dc/0xb50 [kvm_hv]
-  [c000008ed3343ae0] c00800001c10891c kvmppc_vcpu_run+0x34/0x48 [kvm]
-  [c000008ed3343b00] c00800001c10475c kvm_arch_vcpu_ioctl_run+0x244/0x420 [kvm]
-  [c000008ed3343b90] c00800001c0f5a78 kvm_vcpu_ioctl+0x470/0x7c8 [kvm]
-  [c000008ed3343d00] c000000000475450 do_vfs_ioctl+0xe0/0xc70
-  [c000008ed3343db0] c0000000004760e4 ksys_ioctl+0x104/0x120
-  [c000008ed3343e00] c000000000476128 sys_ioctl+0x28/0x80
-  [c000008ed3343e20] c00000000000b388 system_call+0x5c/0x70
-  --- Exception: c00 (System Call) at 00007d545cfd7694
-  SP (7d53ff7edf50) is in userspace
-
-It was subsequently found that ipi_message[PPC_MSG_CALL_FUNCTION]
-was set for CPU 42 by at least 1 of the CPUs waiting in
-smp_call_function_many(), but somehow the corresponding
-call_single_queue entries were never processed by CPU 42, causing the
-callers to spin in csd_lock_wait() indefinitely.
-
-Nick Piggin suggested something similar to the following sequence as
-a possible explanation (interleaving of CALL_FUNCTION/RESCHEDULE
-IPI messages seems to be most common, but any mix of CALL_FUNCTION and
-!CALL_FUNCTION messages could trigger it):
-
-    CPU
-      X: smp_muxed_ipi_set_message():
-      X:   smp_mb()
-      X:   message[RESCHEDULE] = 1
-      X: doorbell_global_ipi(42):
-      X:   kvmppc_set_host_ipi(42, 1)
-      X:   ppc_msgsnd_sync()/smp_mb()
-      X:   ppc_msgsnd() -> 42
-     42: doorbell_exception(): // from CPU X
-     42:   ppc_msgsync()
-    105: smp_muxed_ipi_set_message():
-    105:   smb_mb()
-         // STORE DEFERRED DUE TO RE-ORDERING
-  --105:   message[CALL_FUNCTION] = 1
-  | 105: doorbell_global_ipi(42):
-  | 105:   kvmppc_set_host_ipi(42, 1)
-  |  42:   kvmppc_set_host_ipi(42, 0)
-  |  42: smp_ipi_demux_relaxed()
-  |  42: // returns to executing guest
-  |      // RE-ORDERED STORE COMPLETES
-  ->105:   message[CALL_FUNCTION] = 1
-    105:   ppc_msgsnd_sync()/smp_mb()
-    105:   ppc_msgsnd() -> 42
-     42: local_paca->kvm_hstate.host_ipi == 0 // IPI ignored
-    105: // hangs waiting on 42 to process messages/call_single_queue
-
-This can be prevented with an smp_mb() at the beginning of
-kvmppc_set_host_ipi(), such that stores to message[<type>] (or other
-state indicated by the host_ipi flag) are ordered vs. the store to
-to host_ipi.
-
-However, doing so might still allow for the following scenario (not
-yet observed):
-
-    CPU
-      X: smp_muxed_ipi_set_message():
-      X:   smp_mb()
-      X:   message[RESCHEDULE] = 1
-      X: doorbell_global_ipi(42):
-      X:   kvmppc_set_host_ipi(42, 1)
-      X:   ppc_msgsnd_sync()/smp_mb()
-      X:   ppc_msgsnd() -> 42
-     42: doorbell_exception(): // from CPU X
-     42:   ppc_msgsync()
-         // STORE DEFERRED DUE TO RE-ORDERING
-  -- 42:   kvmppc_set_host_ipi(42, 0)
-  |  42: smp_ipi_demux_relaxed()
-  | 105: smp_muxed_ipi_set_message():
-  | 105:   smb_mb()
-  | 105:   message[CALL_FUNCTION] = 1
-  | 105: doorbell_global_ipi(42):
-  | 105:   kvmppc_set_host_ipi(42, 1)
-  |      // RE-ORDERED STORE COMPLETES
-  -> 42:   kvmppc_set_host_ipi(42, 0)
-     42: // returns to executing guest
-    105:   ppc_msgsnd_sync()/smp_mb()
-    105:   ppc_msgsnd() -> 42
-     42: local_paca->kvm_hstate.host_ipi == 0 // IPI ignored
-    105: // hangs waiting on 42 to process messages/call_single_queue
-
-Fixing this scenario would require an smp_mb() *after* clearing
-host_ipi flag in kvmppc_set_host_ipi() to order the store vs.
-subsequent processing of IPI messages.
-
-To handle both cases, this patch splits kvmppc_set_host_ipi() into
-separate set/clear functions, where we execute smp_mb() prior to
-setting host_ipi flag, and after clearing host_ipi flag. These
-functions pair with each other to synchronize the sender and receiver
-sides.
-
-With that change in place the above workload ran for 20 hours without
-triggering any lock-ups.
-
-Fixes: 755563bc79c7 ("powerpc/powernv: Fixes for hypervisor doorbell handling") # v4.0
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm-ppc@vger.kernel.org
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
-v2:
- - changelog: don't reference CPUs in hex
- - changelog: make pseudocode clearer
- - changelog: drop reference to Witherspoon, various clean-ups
- - changelog: add Fixes tag
- - add code comments to clarify barrier usage/pairing
- - split kvmppc_set_host_ipi() into separate set/clear routines
- - add separate smp_mb() on IPI handler side to guard against additional
-   potential lock-up scenario (detailed in comments/changelog) and
-   provide a proper pairing with the smp_mb() from v1
----
- arch/powerpc/include/asm/kvm_ppc.h    | 100 +++++++++++++++++++++++++-
- arch/powerpc/kernel/dbell.c           |   6 +-
- arch/powerpc/kvm/book3s_hv_rm_xics.c  |   2 +-
- arch/powerpc/platforms/powernv/smp.c  |   2 +-
- arch/powerpc/sysdev/xics/icp-native.c |   6 +-
- arch/powerpc/sysdev/xics/icp-opal.c   |   6 +-
- 6 files changed, 108 insertions(+), 14 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index 2484e6a8f5ca..ecb4d6846698 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -452,9 +452,100 @@ static inline u32 kvmppc_get_xics_latch(void)
- 	return xirr;
- }
- 
--static inline void kvmppc_set_host_ipi(int cpu, u8 host_ipi)
-+/*
-+ * To avoid the need to unnecessarily exit fully to the host kernel, an IPI to
-+ * a CPU thread that's running/napping inside of a guest is by default regarded
-+ * as a request to wake the CPU (if needed) and continue execution within the
-+ * guest, potentially to process new state like externally-generated
-+ * interrupts or IPIs sent from within the guest itself (e.g. H_PROD/H_IPI).
-+ *
-+ * To force an exit to the host kernel, kvmppc_set_host_ipi() must be called
-+ * prior to issuing the IPI to set the corresponding 'host_ipi' flag in the
-+ * target CPU's PACA. To avoid unnecessary exits to the host, this flag should
-+ * be immediately cleared via kvmppc_clear_host_ipi() by the IPI handler on
-+ * the receiving side prior to processing the IPI work.
-+ *
-+ * NOTE:
-+ *
-+ * We currently issue an smp_mb() at the beginning of kvmppc_set_host_ipi().
-+ * This is to guard against sequences such as the following:
-+ *
-+ *      CPU
-+ *        X: smp_muxed_ipi_set_message():
-+ *        X:   smp_mb()
-+ *        X:   message[RESCHEDULE] = 1
-+ *        X: doorbell_global_ipi(42):
-+ *        X:   kvmppc_set_host_ipi(42)
-+ *        X:   ppc_msgsnd_sync()/smp_mb()
-+ *        X:   ppc_msgsnd() -> 42
-+ *       42: doorbell_exception(): // from CPU X
-+ *       42:   ppc_msgsync()
-+ *      105: smp_muxed_ipi_set_message():
-+ *      105:   smb_mb()
-+ *           // STORE DEFERRED DUE TO RE-ORDERING
-+ *    --105:   message[CALL_FUNCTION] = 1
-+ *    | 105: doorbell_global_ipi(42):
-+ *    | 105:   kvmppc_set_host_ipi(42)
-+ *    |  42:   kvmppc_clear_host_ipi(42)
-+ *    |  42: smp_ipi_demux_relaxed()
-+ *    |  42: // returns to executing guest
-+ *    |      // RE-ORDERED STORE COMPLETES
-+ *    ->105:   message[CALL_FUNCTION] = 1
-+ *      105:   ppc_msgsnd_sync()/smp_mb()
-+ *      105:   ppc_msgsnd() -> 42
-+ *       42: local_paca->kvm_hstate.host_ipi == 0 // IPI ignored
-+ *      105: // hangs waiting on 42 to process messages/call_single_queue
-+ *
-+ * We also issue an smp_mb() at the end of kvmppc_clear_host_ipi(). This is
-+ * to guard against sequences such as the following (as well as to create
-+ * a read-side pairing with the barrier in kvmppc_set_host_ipi()):
-+ *
-+ *      CPU
-+ *        X: smp_muxed_ipi_set_message():
-+ *        X:   smp_mb()
-+ *        X:   message[RESCHEDULE] = 1
-+ *        X: doorbell_global_ipi(42):
-+ *        X:   kvmppc_set_host_ipi(42)
-+ *        X:   ppc_msgsnd_sync()/smp_mb()
-+ *        X:   ppc_msgsnd() -> 42
-+ *       42: doorbell_exception(): // from CPU X
-+ *       42:   ppc_msgsync()
-+ *           // STORE DEFERRED DUE TO RE-ORDERING
-+ *    -- 42:   kvmppc_clear_host_ipi(42)
-+ *    |  42: smp_ipi_demux_relaxed()
-+ *    | 105: smp_muxed_ipi_set_message():
-+ *    | 105:   smb_mb()
-+ *    | 105:   message[CALL_FUNCTION] = 1
-+ *    | 105: doorbell_global_ipi(42):
-+ *    | 105:   kvmppc_set_host_ipi(42)
-+ *    |      // RE-ORDERED STORE COMPLETES
-+ *    -> 42:   kvmppc_clear_host_ipi(42)
-+ *       42: // returns to executing guest
-+ *      105:   ppc_msgsnd_sync()/smp_mb()
-+ *      105:   ppc_msgsnd() -> 42
-+ *       42: local_paca->kvm_hstate.host_ipi == 0 // IPI ignored
-+ *      105: // hangs waiting on 42 to process messages/call_single_queue
-+ */
-+static inline void kvmppc_set_host_ipi(int cpu)
- {
--	paca_ptrs[cpu]->kvm_hstate.host_ipi = host_ipi;
-+	/*
-+	 * order stores of IPI messages vs. setting of host_ipi flag
-+	 *
-+	 * pairs with the barrier in kvmppc_clear_host_ipi()
-+	 */
-+	smp_mb();
-+	paca_ptrs[cpu]->kvm_hstate.host_ipi = 1;
-+}
-+
-+static inline void kvmppc_clear_host_ipi(int cpu)
-+{
-+	paca_ptrs[cpu]->kvm_hstate.host_ipi = 0;
-+	/*
-+	 * order clearing of host_ipi flag vs. processing of IPI messages
-+	 *
-+	 * pairs with the barrier in kvmppc_set_host_ipi()
-+	 */
-+	smp_mb();
- }
- 
- static inline void kvmppc_fast_vcpu_kick(struct kvm_vcpu *vcpu)
-@@ -486,7 +577,10 @@ static inline u32 kvmppc_get_xics_latch(void)
- 	return 0;
- }
- 
--static inline void kvmppc_set_host_ipi(int cpu, u8 host_ipi)
-+static inline void kvmppc_set_host_ipi(int cpu)
-+{}
-+
-+static inline void kvmppc_clear_host_ipi(int cpu)
- {}
- 
- static inline void kvmppc_fast_vcpu_kick(struct kvm_vcpu *vcpu)
-diff --git a/arch/powerpc/kernel/dbell.c b/arch/powerpc/kernel/dbell.c
-index 804b1a6196fa..f17ff1200eaa 100644
---- a/arch/powerpc/kernel/dbell.c
-+++ b/arch/powerpc/kernel/dbell.c
-@@ -33,7 +33,7 @@ void doorbell_global_ipi(int cpu)
- {
- 	u32 tag = get_hard_smp_processor_id(cpu);
- 
--	kvmppc_set_host_ipi(cpu, 1);
-+	kvmppc_set_host_ipi(cpu);
- 	/* Order previous accesses vs. msgsnd, which is treated as a store */
- 	ppc_msgsnd_sync();
- 	ppc_msgsnd(PPC_DBELL_MSGTYPE, 0, tag);
-@@ -48,7 +48,7 @@ void doorbell_core_ipi(int cpu)
- {
- 	u32 tag = cpu_thread_in_core(cpu);
- 
--	kvmppc_set_host_ipi(cpu, 1);
-+	kvmppc_set_host_ipi(cpu);
- 	/* Order previous accesses vs. msgsnd, which is treated as a store */
- 	ppc_msgsnd_sync();
- 	ppc_msgsnd(PPC_DBELL_MSGTYPE, 0, tag);
-@@ -84,7 +84,7 @@ void doorbell_exception(struct pt_regs *regs)
- 
- 	may_hard_irq_enable();
- 
--	kvmppc_set_host_ipi(smp_processor_id(), 0);
-+	kvmppc_clear_host_ipi(smp_processor_id());
- 	__this_cpu_inc(irq_stat.doorbell_irqs);
- 
- 	smp_ipi_demux_relaxed(); /* already performed the barrier */
-diff --git a/arch/powerpc/kvm/book3s_hv_rm_xics.c b/arch/powerpc/kvm/book3s_hv_rm_xics.c
-index 4d2ec77d806c..287d5911df0f 100644
---- a/arch/powerpc/kvm/book3s_hv_rm_xics.c
-+++ b/arch/powerpc/kvm/book3s_hv_rm_xics.c
-@@ -58,7 +58,7 @@ static inline void icp_send_hcore_msg(int hcore, struct kvm_vcpu *vcpu)
- 	hcpu = hcore << threads_shift;
- 	kvmppc_host_rm_ops_hv->rm_core[hcore].rm_data = vcpu;
- 	smp_muxed_ipi_set_message(hcpu, PPC_MSG_RM_HOST_ACTION);
--	kvmppc_set_host_ipi(hcpu, 1);
-+	kvmppc_set_host_ipi(hcpu);
- 	smp_mb();
- 	kvmhv_rm_send_ipi(hcpu);
- }
-diff --git a/arch/powerpc/platforms/powernv/smp.c b/arch/powerpc/platforms/powernv/smp.c
-index 94cd96b9b7bb..fbd6e6b7bbf2 100644
---- a/arch/powerpc/platforms/powernv/smp.c
-+++ b/arch/powerpc/platforms/powernv/smp.c
-@@ -193,7 +193,7 @@ static void pnv_smp_cpu_kill_self(void)
- 		 * for coming online, which are handled via
- 		 * generic_check_cpu_restart() calls.
- 		 */
--		kvmppc_set_host_ipi(cpu, 0);
-+		kvmppc_clear_host_ipi(cpu);
- 
- 		srr1 = pnv_cpu_offline(cpu);
- 
-diff --git a/arch/powerpc/sysdev/xics/icp-native.c b/arch/powerpc/sysdev/xics/icp-native.c
-index 485569ff7ef1..7d13d2ef5a90 100644
---- a/arch/powerpc/sysdev/xics/icp-native.c
-+++ b/arch/powerpc/sysdev/xics/icp-native.c
-@@ -140,7 +140,7 @@ static unsigned int icp_native_get_irq(void)
- 
- static void icp_native_cause_ipi(int cpu)
- {
--	kvmppc_set_host_ipi(cpu, 1);
-+	kvmppc_set_host_ipi(cpu);
- 	icp_native_set_qirr(cpu, IPI_PRIORITY);
- }
- 
-@@ -179,7 +179,7 @@ void icp_native_flush_interrupt(void)
- 	if (vec == XICS_IPI) {
- 		/* Clear pending IPI */
- 		int cpu = smp_processor_id();
--		kvmppc_set_host_ipi(cpu, 0);
-+		kvmppc_clear_host_ipi(cpu);
- 		icp_native_set_qirr(cpu, 0xff);
- 	} else {
- 		pr_err("XICS: hw interrupt 0x%x to offline cpu, disabling\n",
-@@ -200,7 +200,7 @@ static irqreturn_t icp_native_ipi_action(int irq, void *dev_id)
- {
- 	int cpu = smp_processor_id();
- 
--	kvmppc_set_host_ipi(cpu, 0);
-+	kvmppc_clear_host_ipi(cpu);
- 	icp_native_set_qirr(cpu, 0xff);
- 
- 	return smp_ipi_demux();
-diff --git a/arch/powerpc/sysdev/xics/icp-opal.c b/arch/powerpc/sysdev/xics/icp-opal.c
-index 8bb8dd7dd6ad..68fd2540b093 100644
---- a/arch/powerpc/sysdev/xics/icp-opal.c
-+++ b/arch/powerpc/sysdev/xics/icp-opal.c
-@@ -126,7 +126,7 @@ static void icp_opal_cause_ipi(int cpu)
- {
- 	int hw_cpu = get_hard_smp_processor_id(cpu);
- 
--	kvmppc_set_host_ipi(cpu, 1);
-+	kvmppc_set_host_ipi(cpu);
- 	opal_int_set_mfrr(hw_cpu, IPI_PRIORITY);
- }
- 
-@@ -134,7 +134,7 @@ static irqreturn_t icp_opal_ipi_action(int irq, void *dev_id)
- {
- 	int cpu = smp_processor_id();
- 
--	kvmppc_set_host_ipi(cpu, 0);
-+	kvmppc_clear_host_ipi(cpu);
- 	opal_int_set_mfrr(get_hard_smp_processor_id(cpu), 0xff);
- 
- 	return smp_ipi_demux();
-@@ -157,7 +157,7 @@ void icp_opal_flush_interrupt(void)
- 		if (vec == XICS_IPI) {
- 			/* Clear pending IPI */
- 			int cpu = smp_processor_id();
--			kvmppc_set_host_ipi(cpu, 0);
-+			kvmppc_clear_host_ipi(cpu);
- 			opal_int_set_mfrr(get_hard_smp_processor_id(cpu), 0xff);
- 		} else {
- 			pr_err("XICS: hw interrupt 0x%x to offline cpu, "
--- 
-2.17.1
+--VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI--
 
