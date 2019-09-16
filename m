@@ -2,55 +2,55 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BDAC5B35A8
-	for <lists+kvm-ppc@lfdr.de>; Mon, 16 Sep 2019 09:31:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23BC2B35A9
+	for <lists+kvm-ppc@lfdr.de>; Mon, 16 Sep 2019 09:31:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727255AbfIPHb1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 16 Sep 2019 03:31:27 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:37870 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725776AbfIPHb1 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 16 Sep 2019 03:31:27 -0400
-Received: by mail-pf1-f195.google.com with SMTP id y5so19698214pfo.4
-        for <kvm-ppc@vger.kernel.org>; Mon, 16 Sep 2019 00:31:26 -0700 (PDT)
+        id S1727256AbfIPHb3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 16 Sep 2019 03:31:29 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:32777 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725776AbfIPHb3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 16 Sep 2019 03:31:29 -0400
+Received: by mail-pg1-f194.google.com with SMTP id n190so19329956pgn.0
+        for <kvm-ppc@vger.kernel.org>; Mon, 16 Sep 2019 00:31:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=0+hjIbMvVNpiR24rYPf4t5s8xy8oDgko+mpsefgX/OU=;
-        b=II0xRlORondtrrl/EfdME2gwH/ag7I1ECLWaZOQlgX8FtrDYaehnWFXYk3jzwwjOVk
-         TdLAq2hq/UJ6EQqUVfnAQrnZJMF6u6jBKKd9/qHHTq/gl3q1gpjjHqu2Z0X9j0Whq803
-         5rIyRPmryZbzcaRPs5gWb+HPIvhM7DTd+9XVVUOMkbnx1qZ7QwkPw1xNUpO+RqpUPp2n
-         NHSigwyFSSLg39BoCPvGW0+P9ha2qhxpnkRvZMQ/t5eItggaeYX5uVrLtEj3wil7iP23
-         aXWeDrLfxcu0eH1BOhBLW6YYpTneGQx4gt13HgbylAZhtr+9Yv9mF7CuEwD7xCoa/fYP
-         FWfw==
+        bh=kNInSqUn4WDWmrev/DGpAq4x5sDdoX62DrJXr09cvjw=;
+        b=K+MVP4xWrkujhIS7u3OyMDDcwHwC1woFxkVSyulPHjcoSXCR8g3MwZlyFs8x0Sjgfc
+         7ddTkGUS8uBeHGP0CzkvZdqE4L/cf7RjaQJ4jwr+LsAbKYSkleJoPfPv95HuepdRrzei
+         av78PQX/k3btdGk7S2Mu9FjXFCFms58qcsSfNbVwy2CcXwtODFVu0WvyBUdDILszkQiN
+         eW+6a2sJa82dU3XvGjMSC3SHSBhD1RYpAhcQr85C0JkEZ2/evVbzOT6nPfIDsLV1RKLm
+         +5b4/F4Hmuy2OxH7eKwDCexRq55Qm7DA0tcxPMTUHKkdZf2rHJS+SmBWKn427+N6+AHQ
+         xkxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=0+hjIbMvVNpiR24rYPf4t5s8xy8oDgko+mpsefgX/OU=;
-        b=APXTti3xCCL+Qmi9W2ol2/i5thTm7EG4a6d0EiL/V4okNZX8gkB9p7lT/fFqUmNiic
-         oIDHW2HHkE0PCXWfLayNm8syPHndiWtVgpuhvGYZCY0+Zz/Pyhi/JWM68CK/ifSTHgaM
-         zbZ3l4Ac7LlTeFJI4SKENSG4c+y11e2tN3+LIp0fNffBgDDp2Opujg9wJczGvlqhszN2
-         z7ws1kiZH8EuRuQAjzz2Xu8XDQOEXmbArPmCvy3XUGgmzP/O7hu2/Aq4UTOCQRVRWHE0
-         TTZFqLw5TBEtXqiOCilB5wSe+JmXeeMUHz4C07U2oxOba1JXwez9FFCTe5AdjsiPy4xq
-         LhkA==
-X-Gm-Message-State: APjAAAXqCfs5YBNuZk0kRB9EjXxRPPEWYp6/mEzOHOd8Rzv3ejrd+bsg
-        HyzYXBde2x+EHod4czRZq6LkXK7f
-X-Google-Smtp-Source: APXvYqzdBsztaiAJevdKdUGaLuY+If6QCdzR0Hq+Q52D8npD6/tAh0w1reKjg01lyN80pSm/7qCHEw==
-X-Received: by 2002:a65:4286:: with SMTP id j6mr13101871pgp.218.1568619086259;
-        Mon, 16 Sep 2019 00:31:26 -0700 (PDT)
+        bh=kNInSqUn4WDWmrev/DGpAq4x5sDdoX62DrJXr09cvjw=;
+        b=rmXG2vNclVnEpBG5sEOqDXnflaMaoBMSjn/jq3z2hu9VDnsXjs7hM7rdMu8mYadBm3
+         5Od34O7oU5m8RwJGYyfTXH6qqF+C2UaHIBo/rcuRDPi+XkPuTI82V20AfKMHkPQHaI9k
+         nlyrSohRxM5UtA0Q7Eq/R/QYj1nP+F5je65yZHb78PUfB4zdOrgflV87RLR4lSeb94Tw
+         POSivbd2CpTA4Ox/Vb56evPYI3drq3PyUm7+OfAVXXehb0g+ohojvIK89feXs/53CvEh
+         Y1QguV3aISn82ojMEKXzHE6jWDtqMQPDdmgD0daJ+J6V+EqhMHy4klvImC7InhrfXKAy
+         rS8Q==
+X-Gm-Message-State: APjAAAXghfP2455G3VrxKMcxb2BDiOPZINEvZHWryrNzu6uVxkZo4Sjs
+        HYK5s297Vd1ZJzI90B96jptD5yyt
+X-Google-Smtp-Source: APXvYqyS/ZOdZyQBt23i/Ny9YU4DXOJhHoelMm8EaVH/IOLXxFqYQbXQTpeZhai+6TCnVOxuPMfVag==
+X-Received: by 2002:a63:9a11:: with SMTP id o17mr11888265pge.434.1568619089041;
+        Mon, 16 Sep 2019 00:31:29 -0700 (PDT)
 Received: from bobo.local0.net ([203.63.189.78])
-        by smtp.gmail.com with ESMTPSA id 195sm12484964pfz.103.2019.09.16.00.31.23
+        by smtp.gmail.com with ESMTPSA id 195sm12484964pfz.103.2019.09.16.00.31.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Sep 2019 00:31:25 -0700 (PDT)
+        Mon, 16 Sep 2019 00:31:28 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>
-Subject: [PATCH v2 3/5] KVM: PPC: Book3S HV: Reuse kvmppc_inject_interrupt for async guest delivery
-Date:   Mon, 16 Sep 2019 17:31:06 +1000
-Message-Id: <20190916073108.3256-4-npiggin@gmail.com>
+Subject: [PATCH v2 4/5] KVM: PPC: Book3S HV: Implement LPCR[AIL]=3 mode for injected interrupts
+Date:   Mon, 16 Sep 2019 17:31:07 +1000
+Message-Id: <20190916073108.3256-5-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20190916073108.3256-1-npiggin@gmail.com>
 References: <20190916073108.3256-1-npiggin@gmail.com>
@@ -61,195 +61,43 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This consolidates the HV interrupt delivery logic into one place.
+kvmppc_inject_interrupt does not implement LPCR[AIL]!=0 modes, which
+can result in the guest receiving interrupts as if LPCR[AIL]=0
+contrary to the ISA.
+
+In practice, Linux guests cope with this deviation, but it should be
+fixed.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s.h            |  3 ++
- arch/powerpc/kvm/book3s_hv.c         | 43 ------------------
- arch/powerpc/kvm/book3s_hv_builtin.c | 68 ++++++++++++++++++++++------
- 3 files changed, 57 insertions(+), 57 deletions(-)
+ arch/powerpc/kvm/book3s_hv_builtin.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/arch/powerpc/kvm/book3s.h b/arch/powerpc/kvm/book3s.h
-index 2ef1311a2a13..3a4613985949 100644
---- a/arch/powerpc/kvm/book3s.h
-+++ b/arch/powerpc/kvm/book3s.h
-@@ -32,4 +32,7 @@ extern void kvmppc_emulate_tabort(struct kvm_vcpu *vcpu, int ra_val);
- static inline void kvmppc_emulate_tabort(struct kvm_vcpu *vcpu, int ra_val) {}
- #endif
- 
-+extern void kvmppc_set_msr_hv(struct kvm_vcpu *vcpu, u64 msr);
-+extern void kvmppc_inject_interrupt_hv(struct kvm_vcpu *vcpu, int vec, u64 srr1_flags);
-+
- #endif
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 0511c66d8bad..ed2eeda202b9 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -133,7 +133,6 @@ static inline bool nesting_enabled(struct kvm *kvm)
- /* If set, the threads on each CPU core have to be in the same MMU mode */
- static bool no_mixing_hpt_and_radix;
- 
--static void kvmppc_end_cede(struct kvm_vcpu *vcpu);
- static int kvmppc_hv_setup_htab_rma(struct kvm_vcpu *vcpu);
- 
- /*
-@@ -338,39 +337,6 @@ static void kvmppc_core_vcpu_put_hv(struct kvm_vcpu *vcpu)
- 	spin_unlock_irqrestore(&vcpu->arch.tbacct_lock, flags);
- }
- 
--static void kvmppc_inject_interrupt_hv(struct kvm_vcpu *vcpu, int vec, u64 srr1_flags)
--{
--	unsigned long msr, pc, new_msr, new_pc;
--
--	msr = kvmppc_get_msr(vcpu);
--	pc = kvmppc_get_pc(vcpu);
--	new_msr = vcpu->arch.intr_msr;
--	new_pc = vec;
--
--	/* If transactional, change to suspend mode on IRQ delivery */
--	if (MSR_TM_TRANSACTIONAL(msr))
--		new_msr |= MSR_TS_S;
--	else
--		new_msr |= msr & MSR_TS_MASK;
--
--	kvmppc_set_srr0(vcpu, pc);
--	kvmppc_set_srr1(vcpu, (msr & SRR1_MSR_BITS) | srr1_flags);
--	kvmppc_set_pc(vcpu, new_pc);
--	kvmppc_set_msr(vcpu, new_msr);
--}
--
--static void kvmppc_set_msr_hv(struct kvm_vcpu *vcpu, u64 msr)
--{
--	/*
--	 * Check for illegal transactional state bit combination
--	 * and if we find it, force the TS field to a safe state.
--	 */
--	if ((msr & MSR_TS_MASK) == MSR_TS_MASK)
--		msr &= ~MSR_TS_MASK;
--	vcpu->arch.shregs.msr = msr;
--	kvmppc_end_cede(vcpu);
--}
--
- static void kvmppc_set_pvr_hv(struct kvm_vcpu *vcpu, u32 pvr)
- {
- 	vcpu->arch.pvr = pvr;
-@@ -2465,15 +2431,6 @@ static void kvmppc_set_timer(struct kvm_vcpu *vcpu)
- 	vcpu->arch.timer_running = 1;
- }
- 
--static void kvmppc_end_cede(struct kvm_vcpu *vcpu)
--{
--	vcpu->arch.ceded = 0;
--	if (vcpu->arch.timer_running) {
--		hrtimer_try_to_cancel(&vcpu->arch.dec_timer);
--		vcpu->arch.timer_running = 0;
--	}
--}
--
- extern int __kvmppc_vcore_entry(void);
- 
- static void kvmppc_remove_runnable(struct kvmppc_vcore *vc,
 diff --git a/arch/powerpc/kvm/book3s_hv_builtin.c b/arch/powerpc/kvm/book3s_hv_builtin.c
-index 7c1909657b55..47b44d9b5c1f 100644
+index 47b44d9b5c1f..c73de4e875a5 100644
 --- a/arch/powerpc/kvm/book3s_hv_builtin.c
 +++ b/arch/powerpc/kvm/book3s_hv_builtin.c
-@@ -755,6 +755,57 @@ void kvmhv_p9_restore_lpcr(struct kvm_split_mode *sip)
- 	local_paca->kvm_hstate.kvm_split_mode = NULL;
- }
+@@ -792,6 +792,20 @@ static void inject_interrupt(struct kvm_vcpu *vcpu, int vec, u64 srr1_flags)
+ 	else
+ 		new_msr |= msr & MSR_TS_MASK;
  
-+static void kvmppc_end_cede(struct kvm_vcpu *vcpu)
-+{
-+	vcpu->arch.ceded = 0;
-+	if (vcpu->arch.timer_running) {
-+		hrtimer_try_to_cancel(&vcpu->arch.dec_timer);
-+		vcpu->arch.timer_running = 0;
-+	}
-+}
-+
-+void kvmppc_set_msr_hv(struct kvm_vcpu *vcpu, u64 msr)
-+{
 +	/*
-+	 * Check for illegal transactional state bit combination
-+	 * and if we find it, force the TS field to a safe state.
++	 * LPCR[AIL]=2 deliveries are not supported.
++	 *
++	 * AIL does not apply to SRESET, MCE, or HMI (which is never
++	 * delivered to the guest).
 +	 */
-+	if ((msr & MSR_TS_MASK) == MSR_TS_MASK)
-+		msr &= ~MSR_TS_MASK;
-+	vcpu->arch.shregs.msr = msr;
-+	kvmppc_end_cede(vcpu);
-+}
-+EXPORT_SYMBOL_GPL(kvmppc_set_msr_hv);
++	if (vec != BOOK3S_INTERRUPT_SYSTEM_RESET &&
++	    vec != BOOK3S_INTERRUPT_MACHINE_CHECK &&
++	    (vcpu->arch.vcore->lpcr & LPCR_AIL) == LPCR_AIL_3 &&
++	    (msr & (MSR_IR|MSR_DR)) == (MSR_IR|MSR_DR) ) {
++		new_msr |= MSR_IR | MSR_DR;
++		new_pc += 0xC000000000004000ULL;
++	}
 +
-+static void inject_interrupt(struct kvm_vcpu *vcpu, int vec, u64 srr1_flags)
-+{
-+	unsigned long msr, pc, new_msr, new_pc;
-+
-+	msr = kvmppc_get_msr(vcpu);
-+	pc = kvmppc_get_pc(vcpu);
-+	new_msr = vcpu->arch.intr_msr;
-+	new_pc = vec;
-+
-+	/* If transactional, change to suspend mode on IRQ delivery */
-+	if (MSR_TM_TRANSACTIONAL(msr))
-+		new_msr |= MSR_TS_S;
-+	else
-+		new_msr |= msr & MSR_TS_MASK;
-+
-+	kvmppc_set_srr0(vcpu, pc);
-+	kvmppc_set_srr1(vcpu, (msr & SRR1_MSR_BITS) | srr1_flags);
-+	kvmppc_set_pc(vcpu, new_pc);
-+	vcpu->arch.shregs.msr = new_msr;
-+	kvmppc_end_cede(vcpu);
-+}
-+
-+void kvmppc_inject_interrupt_hv(struct kvm_vcpu *vcpu, int vec, u64 srr1_flags)
-+{
-+	inject_interrupt(vcpu, vec, srr1_flags);
-+	kvmppc_end_cede(vcpu);
-+}
-+EXPORT_SYMBOL_GPL(kvmppc_inject_interrupt_hv);
-+
- /*
-  * Is there a PRIV_DOORBELL pending for the guest (on POWER9)?
-  * Can we inject a Decrementer or a External interrupt?
-@@ -762,7 +813,6 @@ void kvmhv_p9_restore_lpcr(struct kvm_split_mode *sip)
- void kvmppc_guest_entry_inject_int(struct kvm_vcpu *vcpu)
- {
- 	int ext;
--	unsigned long vec = 0;
- 	unsigned long lpcr;
- 
- 	/* Insert EXTERNAL bit into LPCR at the MER bit position */
-@@ -774,26 +824,16 @@ void kvmppc_guest_entry_inject_int(struct kvm_vcpu *vcpu)
- 
- 	if (vcpu->arch.shregs.msr & MSR_EE) {
- 		if (ext) {
--			vec = BOOK3S_INTERRUPT_EXTERNAL;
-+			inject_interrupt(vcpu, BOOK3S_INTERRUPT_EXTERNAL, 0);
- 		} else {
- 			long int dec = mfspr(SPRN_DEC);
- 			if (!(lpcr & LPCR_LD))
- 				dec = (int) dec;
- 			if (dec < 0)
--				vec = BOOK3S_INTERRUPT_DECREMENTER;
-+				inject_interrupt(vcpu,
-+					BOOK3S_INTERRUPT_DECREMENTER, 0);
- 		}
- 	}
--	if (vec) {
--		unsigned long msr, old_msr = vcpu->arch.shregs.msr;
--
--		kvmppc_set_srr0(vcpu, kvmppc_get_pc(vcpu));
--		kvmppc_set_srr1(vcpu, old_msr);
--		kvmppc_set_pc(vcpu, vec);
--		msr = vcpu->arch.intr_msr;
--		if (MSR_TM_ACTIVE(old_msr))
--			msr |= MSR_TS_S;
--		vcpu->arch.shregs.msr = msr;
--	}
- 
- 	if (vcpu->arch.doorbell_request) {
- 		mtspr(SPRN_DPDES, 1);
+ 	kvmppc_set_srr0(vcpu, pc);
+ 	kvmppc_set_srr1(vcpu, (msr & SRR1_MSR_BITS) | srr1_flags);
+ 	kvmppc_set_pc(vcpu, new_pc);
 -- 
 2.23.0
 
