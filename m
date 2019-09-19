@@ -2,108 +2,79 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ADA17B6F45
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Sep 2019 00:13:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C152B7008
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Sep 2019 02:23:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388402AbfIRWNk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 18 Sep 2019 18:13:40 -0400
-Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:33394 "EHLO
-        7.mo6.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388401AbfIRWNk (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 18 Sep 2019 18:13:40 -0400
-X-Greylist: delayed 4711 seconds by postgrey-1.27 at vger.kernel.org; Wed, 18 Sep 2019 18:13:39 EDT
-Received: from player758.ha.ovh.net (unknown [10.108.57.153])
-        by mo6.mail-out.ovh.net (Postfix) with ESMTP id DADA41E153B
-        for <kvm-ppc@vger.kernel.org>; Wed, 18 Sep 2019 22:55:06 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player758.ha.ovh.net (Postfix) with ESMTPSA id C6E4AA0042D8;
-        Wed, 18 Sep 2019 20:55:00 +0000 (UTC)
-Date:   Wed, 18 Sep 2019 22:54:59 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        Jiri Kosina <trivial@kernel.org>
-Subject: Re: [PATCH trivial] KVM: PPC: Remove superfluous check for non-zero
- return value
-Message-ID: <20190918225459.0f1091ad@bahia.lan>
-In-Reply-To: <20190918184436.5323298d@bahia.lan>
-References: <20190911195235.29048-1-thuth@redhat.com>
-        <20190918184436.5323298d@bahia.lan>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1730500AbfISAXf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 18 Sep 2019 20:23:35 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:59765 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728516AbfISAXf (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 18 Sep 2019 20:23:35 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 46YcyX5cBKz9sNf; Thu, 19 Sep 2019 10:23:32 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1568852612; bh=cu6MqzQ+Jjg6jBgAMHqPfsdtuEEEpXwelfg4ezvXdsY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Nt4NYXLQPNaOq5EaXwA6J6CUQqtE4sYHQnvkHZSOhCjqqWJ01CdAB4tfDaD7elmpm
+         n8+n+jy0vrYBX7bhjUejT61fggDfeR0cgCIUnTuqNkpIC0IXNlLj5BQyxdJITIPcBR
+         mnSFYsZrVTQqPYzswqowK1En17cvpVKAST5slijgNdV7bpZykh7hDKsvP4WJVNLb/9
+         Ol1XIqjO/OL2LCmIx/vGzkgBlQMKHpTE8RacF1q2tw33WNlisVf3Zmdf+cisE74bOX
+         ghUTBd1CuYuzqzcB8Zaw4KJe2JcyTf9IC7kOu6x2wrhVjXAyrW69MyKAvq+7wse73h
+         GRj1zPawfFkIQ==
+Date:   Thu, 19 Sep 2019 10:22:42 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 10/13] KVM: Provide common implementation for generic
+ dirty log functions
+Message-ID: <20190919002242.GA19503@blackberry>
+References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
+ <20190911185038.24341-11-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 11072662635729164594
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudekgdduheehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190911185038.24341-11-sean.j.christopherson@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, 18 Sep 2019 18:44:36 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> On Wed, 11 Sep 2019 21:52:35 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
+On Wed, Sep 11, 2019 at 11:50:35AM -0700, Sean Christopherson wrote:
+> Move the implementations of KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG
+> for CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT into common KVM code.
+> The arch specific implemenations are extremely similar, differing
+> only in whether the dirty log needs to be sync'd from hardware (x86)
+> and how the TLBs are flushed.  Add new arch hooks to handle sync
+> and TLB flush; the sync will also be used for non-generic dirty log
+> support in a future patch (s390).
 > 
-> > After the kfree()s haven been removed in the previous
-> > commit 9798f4ea71ea ("fix rollback when kvmppc_xive_create fails"),
-> > the code can be simplified even more to simply always "return ret"
-> > now.
-> > 
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> 
-> This looks like a good candidate for trivial, hence Cc'ing Jiri
-> and adding trivial keyword in subject.
-> 
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> 
+> The ulterior motive for providing a common implementation is to
+> eliminate the dependency between arch and common code with respect to
+> the memslot referenced by the dirty log, i.e. to make it obvious in the
+> code that the validity of the memslot is guaranteed, as a future patch
+> will rework memslot handling such that id_to_memslot() can return NULL.
 
-Oops, the patch is correct but there are some fixes that require
-the return 0 to stay around...
+I notice you add empty definitions of kvm_arch_sync_dirty_log() for
+PPC, both Book E and Book 3S.  Given that PPC doesn't select
+CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT, why is this necessary?
 
-https://patchwork.ozlabs.org/project/kvm-ppc/list/?series=129957
-
-> >  arch/powerpc/kvm/book3s_xive.c        | 5 +----
-> >  arch/powerpc/kvm/book3s_xive_native.c | 5 +----
-> >  2 files changed, 2 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> > index e3ba67095895..2f6f463fcdfb 100644
-> > --- a/arch/powerpc/kvm/book3s_xive.c
-> > +++ b/arch/powerpc/kvm/book3s_xive.c
-> > @@ -1986,10 +1986,7 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
-> >  
-> >  	xive->single_escalation = xive_native_has_single_escalation();
-> >  
-> > -	if (ret)
-> > -		return ret;
-> > -
-> > -	return 0;
-> > +	return ret;
-> >  }
-> >  
-> >  int kvmppc_xive_debug_show_queues(struct seq_file *m, struct kvm_vcpu *vcpu)
-> > diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> > index a998823f68a3..7a50772f26fe 100644
-> > --- a/arch/powerpc/kvm/book3s_xive_native.c
-> > +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> > @@ -1089,10 +1089,7 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
-> >  	xive->single_escalation = xive_native_has_single_escalation();
-> >  	xive->ops = &kvmppc_xive_native_ops;
-> >  
-> > -	if (ret)
-> > -		return ret;
-> > -
-> > -	return 0;
-> > +	return ret;
-> >  }
-> >  
-> >  /*
-> 
-
+Paul.
