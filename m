@@ -2,64 +2,89 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 38E92B775E
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Sep 2019 12:26:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AD29B8188
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Sep 2019 21:39:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389325AbfISK0C (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 19 Sep 2019 06:26:02 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:52283 "EHLO ozlabs.org"
+        id S2392384AbfISTjR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 19 Sep 2019 15:39:17 -0400
+Received: from mga07.intel.com ([134.134.136.100]:50290 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389206AbfISK0C (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 19 Sep 2019 06:26:02 -0400
-Received: by ozlabs.org (Postfix, from userid 1034)
-        id 46YtKg2dGGz9s4Y; Thu, 19 Sep 2019 20:25:57 +1000 (AEST)
-X-powerpc-patch-notification: thanks
-X-powerpc-patch-commit: 0cb0837f9db1a6ed5b764ef61dd5f1a314b8231a
-In-Reply-To: <20190911115746.12433-1-mpe@ellerman.id.au>
-To:     Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@ozlabs.org
-From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-Cc:     cai@lca.pw, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH 1/4] powerpc/kvm: Move kvm_tmp into .text, shrink to 64K
-Message-Id: <46YtKg2dGGz9s4Y@ozlabs.org>
-Date:   Thu, 19 Sep 2019 20:25:57 +1000 (AEST)
+        id S2392354AbfISTjR (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 19 Sep 2019 15:39:17 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Sep 2019 12:39:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,524,1559545200"; 
+   d="scan'208";a="217417278"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga002.fm.intel.com with ESMTP; 19 Sep 2019 12:39:15 -0700
+Date:   Thu, 19 Sep 2019 12:39:15 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 10/13] KVM: Provide common implementation for generic
+ dirty log functions
+Message-ID: <20190919193915.GC30495@linux.intel.com>
+References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
+ <20190911185038.24341-11-sean.j.christopherson@intel.com>
+ <20190919002242.GA19503@blackberry>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190919002242.GA19503@blackberry>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, 2019-09-11 at 11:57:43 UTC, Michael Ellerman wrote:
-> In some configurations of KVM, guests binary patch themselves to
-> avoid/reduce trapping into the hypervisor. For some instructions this
-> requires replacing one instruction with a sequence of instructions.
+On Thu, Sep 19, 2019 at 10:22:42AM +1000, Paul Mackerras wrote:
+> On Wed, Sep 11, 2019 at 11:50:35AM -0700, Sean Christopherson wrote:
+> > Move the implementations of KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG
+> > for CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT into common KVM code.
+> > The arch specific implemenations are extremely similar, differing
+> > only in whether the dirty log needs to be sync'd from hardware (x86)
+> > and how the TLBs are flushed.  Add new arch hooks to handle sync
+> > and TLB flush; the sync will also be used for non-generic dirty log
+> > support in a future patch (s390).
+> > 
+> > The ulterior motive for providing a common implementation is to
+> > eliminate the dependency between arch and common code with respect to
+> > the memslot referenced by the dirty log, i.e. to make it obvious in the
+> > code that the validity of the memslot is guaranteed, as a future patch
+> > will rework memslot handling such that id_to_memslot() can return NULL.
 > 
-> For those cases we need to write the sequence of instructions
-> somewhere and then patch the location of the original instruction to
-> branch to the sequence. That requires that the location of the
-> sequence be within 32MB of the original instruction.
-> 
-> The current solution for this is that we create a 1MB array in BSS,
-> write sequences into there, and then free the remainder of the array.
-> 
-> This has a few problems:
->  - it confuses kmemleak.
->  - it confuses lockdep.
->  - it requires mapping kvm_tmp executable, which can cause adjacent
->    areas to also be mapped executable if we're using 16M pages for the
->    linear mapping.
->  - the 32MB limit can be exceeded if the kernel is big enough,
->    especially with STRICT_KERNEL_RWX enabled, which then prevents the
->    patching from working at all.
-> 
-> We can fix all those problems by making kvm_tmp just a region of
-> regular .text. However currently it's 1MB in size, and we don't want
-> to waste 1MB of text. In practice however I only see ~30KB of kvm_tmp
-> being used even for an allyes_config. So shrink kvm_tmp to 64K, which
-> ought to be enough for everyone, and move it into .text.
-> 
-> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> I notice you add empty definitions of kvm_arch_sync_dirty_log() for
+> PPC, both Book E and Book 3S.  Given that PPC doesn't select
+> CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT, why is this necessary?
 
-Series applied to powerpc next.
+s390 has a non-empty kvm_arch_sync_dirty_log() but doesn't select
+CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT.  Patch 11/13 moves s390's call
+of kvm_arch_sync_dirty_log() from s390's kvm_vm_ioctl_get_dirty_log() into
+the common (but not "generic") kvm_get_dirty_log() so that it's obvious
+that kvm_vm_ioctl_get_dirty_log() and kvm_get_dirty_log() are operating on
+the same memslot, i.e. aren't independently querying id_to_memslot().
 
-https://git.kernel.org/powerpc/c/0cb0837f9db1a6ed5b764ef61dd5f1a314b8231a
-
-cheers
+I originally made kvm_arch_sync_dirty_log() opt-in with a __KVM_HAVE_ARCH
+macro, but the resulting #ifdeffery felt uglier than having PPC and ARM
+provide empty functions.
