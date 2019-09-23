@@ -2,220 +2,137 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B02FFBB83F
-	for <lists+kvm-ppc@lfdr.de>; Mon, 23 Sep 2019 17:44:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C67DBBB8C2
+	for <lists+kvm-ppc@lfdr.de>; Mon, 23 Sep 2019 17:58:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732658AbfIWPoP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 23 Sep 2019 11:44:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31184 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732192AbfIWPoP (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 23 Sep 2019 11:44:15 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8NFgmkX005700
-        for <kvm-ppc@vger.kernel.org>; Mon, 23 Sep 2019 11:44:14 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v6ytetyeg-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Mon, 23 Sep 2019 11:44:14 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <groug@kaod.org>;
-        Mon, 23 Sep 2019 16:44:12 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 23 Sep 2019 16:44:08 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8NFi7SY27918574
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Sep 2019 15:44:07 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F39C642045;
-        Mon, 23 Sep 2019 15:44:06 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8876942047;
-        Mon, 23 Sep 2019 15:44:06 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.22.84])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 23 Sep 2019 15:44:06 +0000 (GMT)
-Subject: [PATCH 6/6] KVM: PPC: Book3S HV: XIVE: Allow userspace to set the #
- of VPs
-From:   Greg Kurz <groug@kaod.org>
-To:     Paul Mackerras <paulus@ozlabs.org>
+        id S2387573AbfIWP6b (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 23 Sep 2019 11:58:31 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:53713 "EHLO
+        7.mo68.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387555AbfIWP6b (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 23 Sep 2019 11:58:31 -0400
+X-Greylist: delayed 499 seconds by postgrey-1.27 at vger.kernel.org; Mon, 23 Sep 2019 11:58:30 EDT
+Received: from player688.ha.ovh.net (unknown [10.109.159.248])
+        by mo68.mail-out.ovh.net (Postfix) with ESMTP id C50141440F7
+        for <kvm-ppc@vger.kernel.org>; Mon, 23 Sep 2019 17:50:09 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+        (Authenticated sender: clg@kaod.org)
+        by player688.ha.ovh.net (Postfix) with ESMTPSA id C3ADEA0DF651;
+        Mon, 23 Sep 2019 15:49:56 +0000 (UTC)
+Subject: Re: [PATCH 2/6] KVM: PPC: Book3S HV: XIVE: Set kvm->arch.xive when
+ VPs are allocated
+To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>
 Cc:     Michael Ellerman <mpe@ellerman.id.au>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
         David Gibson <david@gibson.dropbear.id.au>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?b?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Date:   Mon, 23 Sep 2019 17:44:06 +0200
-In-Reply-To: <156925341155.974393.11681611197111945710.stgit@bahia.lan>
 References: <156925341155.974393.11681611197111945710.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
+ <156925342310.974393.12235498904930019791.stgit@bahia.lan>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <10ba5a33-fe96-7672-3803-b4969056ac75@kaod.org>
+Date:   Mon, 23 Sep 2019 17:49:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19092315-0016-0000-0000-000002AFA2B1
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19092315-0017-0000-0000-0000331060C1
-Message-Id: <156925344605.974393.13942051061218979129.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-23_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909230148
+In-Reply-To: <156925342310.974393.12235498904930019791.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 16839240482170833853
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdekgdelfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Add a new attribute to both legacy and native XIVE KVM devices so that
-userspace can require less interrupt servers than the current default
-(KVM_MAX_VCPUS, 2048). This will allow to allocate less VPs in OPAL,
-and likely increase the number of VMs that can run with an in-kernel
-XIVE implementation.
+On 23/09/2019 17:43, Greg Kurz wrote:
+> If we cannot allocate the XIVE VPs in OPAL, the creation of a XIVE or
+> XICS-on-XIVE device is aborted as expected, but we leave kvm->arch.xive
+> set forever since the relase method isn't called in this case. Any
 
-Since the legacy XIVE KVM device is exposed to userspace through the
-XICS KVM API, a new attribute group is added to it for this purpose.
-While here, fix the syntax of the existing KVM_DEV_XICS_GRP_SOURCES
-in the XICS documentation.
+release
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- Documentation/virt/kvm/devices/xics.txt |   14 ++++++++++++--
- Documentation/virt/kvm/devices/xive.txt |    8 ++++++++
- arch/powerpc/include/uapi/asm/kvm.h     |    3 +++
- arch/powerpc/kvm/book3s_xive.c          |   10 ++++++++++
- arch/powerpc/kvm/book3s_xive_native.c   |    3 +++
- 5 files changed, 36 insertions(+), 2 deletions(-)
+> subsequent tentative to create a XIVE or XICS-on-XIVE for this VM will
+> thus always fail. This is a problem for QEMU since it destroys and
+> re-creates these devices when the VM is reset: the VM would be
+> restricted to using the emulated XIVE or XICS forever.
+> 
+> As an alternative to adding rollback, do not assign kvm->arch.xive before
+> making sure the XIVE VPs are allocated in OPAL.
+> 
+> Fixes: 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy' method by a 'release' method")
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-diff --git a/Documentation/virt/kvm/devices/xics.txt b/Documentation/virt/kvm/devices/xics.txt
-index 42864935ac5d..1cf9621f8341 100644
---- a/Documentation/virt/kvm/devices/xics.txt
-+++ b/Documentation/virt/kvm/devices/xics.txt
-@@ -3,9 +3,19 @@ XICS interrupt controller
- Device type supported: KVM_DEV_TYPE_XICS
- 
- Groups:
--  KVM_DEV_XICS_SOURCES
-+  1. KVM_DEV_XICS_GRP_SOURCES
-   Attributes: One per interrupt source, indexed by the source number.
- 
-+  2. KVM_DEV_XICS_GRP_CTRL
-+  Attributes:
-+    2.1 KVM_DEV_XICS_NR_SERVERS (write only)
-+  The kvm_device_attr.addr points to a __u32 value which is the number of
-+  interrupt server numbers (ie, highest possible vcpu id plus one).
-+  Errors:
-+    -EINVAL: Value greater than KVM_MAX_VCPUS.
-+    -EFAULT: Invalid user pointer for attr->addr.
-+    -EBUSY:  A vcpu is already connected to the device.
-+
- This device emulates the XICS (eXternal Interrupt Controller
- Specification) defined in PAPR.  The XICS has a set of interrupt
- sources, each identified by a 20-bit source number, and a set of
-@@ -38,7 +48,7 @@ least-significant end of the word:
- 
- Each source has 64 bits of state that can be read and written using
- the KVM_GET_DEVICE_ATTR and KVM_SET_DEVICE_ATTR ioctls, specifying the
--KVM_DEV_XICS_SOURCES attribute group, with the attribute number being
-+KVM_DEV_XICS_GRP_SOURCES attribute group, with the attribute number being
- the interrupt source number.  The 64 bit state word has the following
- bitfields, starting from the least-significant end of the word:
- 
-diff --git a/Documentation/virt/kvm/devices/xive.txt b/Documentation/virt/kvm/devices/xive.txt
-index 9a24a4525253..fd418b907d0e 100644
---- a/Documentation/virt/kvm/devices/xive.txt
-+++ b/Documentation/virt/kvm/devices/xive.txt
-@@ -78,6 +78,14 @@ the legacy interrupt mode, referred as XICS (POWER7/8).
-     migrating the VM.
-     Errors: none
- 
-+    1.3 KVM_DEV_XIVE_NR_SERVERS (write only)
-+    The kvm_device_attr.addr points to a __u32 value which is the number of
-+    interrupt server numbers (ie, highest possible vcpu id plus one).
-+    Errors:
-+      -EINVAL: Value greater than KVM_KVM_VCPUS.
-+      -EFAULT: Invalid user pointer for attr->addr.
-+      -EBUSY:  A vCPU is already connected to the device.
-+
-   2. KVM_DEV_XIVE_GRP_SOURCE (write only)
-   Initializes a new source in the XIVE device and mask it.
-   Attributes:
-diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/uapi/asm/kvm.h
-index b0f72dea8b11..264e266a85bf 100644
---- a/arch/powerpc/include/uapi/asm/kvm.h
-+++ b/arch/powerpc/include/uapi/asm/kvm.h
-@@ -667,6 +667,8 @@ struct kvm_ppc_cpu_char {
- 
- /* PPC64 eXternal Interrupt Controller Specification */
- #define KVM_DEV_XICS_GRP_SOURCES	1	/* 64-bit source attributes */
-+#define KVM_DEV_XICS_GRP_CTRL		2
-+#define   KVM_DEV_XICS_NR_SERVERS	1
- 
- /* Layout of 64-bit source attribute values */
- #define  KVM_XICS_DESTINATION_SHIFT	0
-@@ -683,6 +685,7 @@ struct kvm_ppc_cpu_char {
- #define KVM_DEV_XIVE_GRP_CTRL		1
- #define   KVM_DEV_XIVE_RESET		1
- #define   KVM_DEV_XIVE_EQ_SYNC		2
-+#define   KVM_DEV_XIVE_NR_SERVERS	3
- #define KVM_DEV_XIVE_GRP_SOURCE		2	/* 64-bit source identifier */
- #define KVM_DEV_XIVE_GRP_SOURCE_CONFIG	3	/* 64-bit source identifier */
- #define KVM_DEV_XIVE_GRP_EQ_CONFIG	4	/* 64-bit EQ identifier */
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index 4a333dcfddd8..c1901583e6c0 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -1905,6 +1905,11 @@ static int xive_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 	switch (attr->group) {
- 	case KVM_DEV_XICS_GRP_SOURCES:
- 		return xive_set_source(xive, attr->attr, attr->addr);
-+	case KVM_DEV_XICS_GRP_CTRL:
-+		switch (attr->attr) {
-+		case KVM_DEV_XICS_NR_SERVERS:
-+			return kvmppc_xive_set_nr_servers(xive, attr->addr);
-+		}
- 	}
- 	return -ENXIO;
- }
-@@ -1930,6 +1935,11 @@ static int xive_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 		    attr->attr < KVMPPC_XICS_NR_IRQS)
- 			return 0;
- 		break;
-+	case KVM_DEV_XICS_GRP_CTRL:
-+		switch (attr->attr) {
-+		case KVM_DEV_XICS_NR_SERVERS:
-+			return 0;
-+		}
- 	}
- 	return -ENXIO;
- }
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index 5e18364d52a9..8e954c5d5efb 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -921,6 +921,8 @@ static int kvmppc_xive_native_set_attr(struct kvm_device *dev,
- 			return kvmppc_xive_reset(xive);
- 		case KVM_DEV_XIVE_EQ_SYNC:
- 			return kvmppc_xive_native_eq_sync(xive);
-+		case KVM_DEV_XIVE_NR_SERVERS:
-+			return kvmppc_xive_set_nr_servers(xive, attr->addr);
- 		}
- 		break;
- 	case KVM_DEV_XIVE_GRP_SOURCE:
-@@ -960,6 +962,7 @@ static int kvmppc_xive_native_has_attr(struct kvm_device *dev,
- 		switch (attr->attr) {
- 		case KVM_DEV_XIVE_RESET:
- 		case KVM_DEV_XIVE_EQ_SYNC:
-+		case KVM_DEV_XIVE_NR_SERVERS:
- 			return 0;
- 		}
- 		break;
+
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+
+C.
+
+> ---
+>  arch/powerpc/kvm/book3s_xive.c        |   11 +++++------
+>  arch/powerpc/kvm/book3s_xive_native.c |    2 +-
+>  2 files changed, 6 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+> index cd2006bfcd3e..2ef43d037a4f 100644
+> --- a/arch/powerpc/kvm/book3s_xive.c
+> +++ b/arch/powerpc/kvm/book3s_xive.c
+> @@ -2006,6 +2006,10 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
+>  
+>  	pr_devel("Creating xive for partition\n");
+>  
+> +	/* Already there ? */
+> +	if (kvm->arch.xive)
+> +		return -EEXIST;
+> +
+>  	xive = kvmppc_xive_get_device(kvm, type);
+>  	if (!xive)
+>  		return -ENOMEM;
+> @@ -2014,12 +2018,6 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
+>  	xive->kvm = kvm;
+>  	mutex_init(&xive->lock);
+>  
+> -	/* Already there ? */
+> -	if (kvm->arch.xive)
+> -		ret = -EEXIST;
+> -	else
+> -		kvm->arch.xive = xive;
+> -
+>  	/* We use the default queue size set by the host */
+>  	xive->q_order = xive_native_default_eq_shift();
+>  	if (xive->q_order < PAGE_SHIFT)
+> @@ -2040,6 +2038,7 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
+>  		return ret;
+>  
+>  	dev->private = xive;
+> +	kvm->arch.xive = xive;
+>  	return 0;
+>  }
+>  
+> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+> index e9cbb42de424..84a354b90f60 100644
+> --- a/arch/powerpc/kvm/book3s_xive_native.c
+> +++ b/arch/powerpc/kvm/book3s_xive_native.c
+> @@ -1087,7 +1087,6 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
+>  
+>  	xive->dev = dev;
+>  	xive->kvm = kvm;
+> -	kvm->arch.xive = xive;
+>  	mutex_init(&xive->mapping_lock);
+>  	mutex_init(&xive->lock);
+>  
+> @@ -1109,6 +1108,7 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
+>  		return ret;
+>  
+>  	dev->private = xive;
+> +	kvm->arch.xive = xive;
+>  	return 0;
+>  }
+>  
+> 
 
