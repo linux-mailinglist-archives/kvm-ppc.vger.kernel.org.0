@@ -2,89 +2,124 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AD29B8188
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Sep 2019 21:39:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9019CBB830
+	for <lists+kvm-ppc@lfdr.de>; Mon, 23 Sep 2019 17:43:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392384AbfISTjR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 19 Sep 2019 15:39:17 -0400
-Received: from mga07.intel.com ([134.134.136.100]:50290 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392354AbfISTjR (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 19 Sep 2019 15:39:17 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Sep 2019 12:39:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,524,1559545200"; 
-   d="scan'208";a="217417278"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga002.fm.intel.com with ESMTP; 19 Sep 2019 12:39:15 -0700
-Date:   Thu, 19 Sep 2019 12:39:15 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1732523AbfIWPnl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 23 Sep 2019 11:43:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39094 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726922AbfIWPnl (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 23 Sep 2019 11:43:41 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8NFgkgN046302
+        for <kvm-ppc@vger.kernel.org>; Mon, 23 Sep 2019 11:43:40 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v70erh7c8-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Mon, 23 Sep 2019 11:43:40 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <groug@kaod.org>;
+        Mon, 23 Sep 2019 16:43:37 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 23 Sep 2019 16:43:33 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8NFhWS339125128
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Sep 2019 15:43:32 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 58E98A405B;
+        Mon, 23 Sep 2019 15:43:32 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFC5CA4060;
+        Mon, 23 Sep 2019 15:43:31 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.22.84])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 23 Sep 2019 15:43:31 +0000 (GMT)
+Subject: [PATCH 0/6] KVM: PPC: Book3S: HV: XIVE: Allocate less VPs in OPAL
+From:   Greg Kurz <groug@kaod.org>
 To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     James Hogan <jhogan@kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 10/13] KVM: Provide common implementation for generic
- dirty log functions
-Message-ID: <20190919193915.GC30495@linux.intel.com>
-References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
- <20190911185038.24341-11-sean.j.christopherson@intel.com>
- <20190919002242.GA19503@blackberry>
+        Radim =?utf-8?b?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Date:   Mon, 23 Sep 2019 17:43:31 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190919002242.GA19503@blackberry>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19092315-0028-0000-0000-000003A18D89
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092315-0029-0000-0000-000024639F7C
+Message-Id: <156925341155.974393.11681611197111945710.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-23_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=728 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909230148
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Sep 19, 2019 at 10:22:42AM +1000, Paul Mackerras wrote:
-> On Wed, Sep 11, 2019 at 11:50:35AM -0700, Sean Christopherson wrote:
-> > Move the implementations of KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG
-> > for CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT into common KVM code.
-> > The arch specific implemenations are extremely similar, differing
-> > only in whether the dirty log needs to be sync'd from hardware (x86)
-> > and how the TLBs are flushed.  Add new arch hooks to handle sync
-> > and TLB flush; the sync will also be used for non-generic dirty log
-> > support in a future patch (s390).
-> > 
-> > The ulterior motive for providing a common implementation is to
-> > eliminate the dependency between arch and common code with respect to
-> > the memslot referenced by the dirty log, i.e. to make it obvious in the
-> > code that the validity of the memslot is guaranteed, as a future patch
-> > will rework memslot handling such that id_to_memslot() can return NULL.
-> 
-> I notice you add empty definitions of kvm_arch_sync_dirty_log() for
-> PPC, both Book E and Book 3S.  Given that PPC doesn't select
-> CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT, why is this necessary?
+Each vCPU of a VM allocates a XIVE VP in OPAL which is associated with
+8 event queue (EQ) descriptors, one for each priority. A POWER9 socket
+can handle a maximum of 1M event queues.
 
-s390 has a non-empty kvm_arch_sync_dirty_log() but doesn't select
-CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT.  Patch 11/13 moves s390's call
-of kvm_arch_sync_dirty_log() from s390's kvm_vm_ioctl_get_dirty_log() into
-the common (but not "generic") kvm_get_dirty_log() so that it's obvious
-that kvm_vm_ioctl_get_dirty_log() and kvm_get_dirty_log() are operating on
-the same memslot, i.e. aren't independently querying id_to_memslot().
+The powernv platform allocates NR_CPUS (== 2048) VPs for the hypervisor,
+and each XIVE KVM device allocates KVM_MAX_VCPUS (== 2048) VPs. This
+means that on a bi-socket system, we can create at most:
 
-I originally made kvm_arch_sync_dirty_log() opt-in with a __KVM_HAVE_ARCH
-macro, but the resulting #ifdeffery felt uglier than having PPC and ARM
-provide empty functions.
+(2 * 1M) / (8 * 2048) - 1 == 127 XIVE KVM devices
+
+ie, start at most 127 VMs benefiting from an in-kernel interrupt
+controller. Subsequent VMs need to rely on a much slower userspace
+emulated XIVE or XICS device in QEMU.
+
+This is problematic as one can legitimately expect to start the same
+number of mono-cpu VMs as the number of HW threads available on the
+system, eg, 144 on a bi-socket POWER9 Witherspoon.
+
+This series allows QEMU to tell KVM how many interrupt servers are needed,
+which is likely less than 2048 with a typical VM, eg. it is only 256 for
+32 vCPUs with a guest's core stride of 8 and 1 thread per core.
+
+With this I could run ~500 SMP1 VMs on a Witherspoon system.
+
+Patches 1 to 3 are preliminary fixes (1 and 2 have already been posted
+but are provided for convenience).
+
+--
+Greg
+
+---
+
+Cédric Le Goater (1):
+      KVM: PPC: Book3S HV: XIVE: initialize private pointer when VPs are allocated
+
+Greg Kurz (5):
+      KVM: PPC: Book3S HV: XIVE: Set kvm->arch.xive when VPs are allocated
+      KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use
+      KVM: PPC: Book3S HV: XIVE: Compute the VP id in a common helper
+      KVM: PPC: Book3S HV: XIVE: Make VP block size configurable
+      KVM: PPC: Book3S HV: XIVE: Allow userspace to set the # of VPs
+
+
+ Documentation/virt/kvm/devices/xics.txt |   14 +++
+ Documentation/virt/kvm/devices/xive.txt |    8 ++
+ arch/powerpc/include/uapi/asm/kvm.h     |    3 +
+ arch/powerpc/kvm/book3s_xive.c          |  145 +++++++++++++++++++++++++------
+ arch/powerpc/kvm/book3s_xive.h          |   17 ++++
+ arch/powerpc/kvm/book3s_xive_native.c   |   49 +++++-----
+ 6 files changed, 179 insertions(+), 57 deletions(-)
+
