@@ -2,69 +2,153 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7563FBC199
-	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Sep 2019 08:11:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EE8EBC1B2
+	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Sep 2019 08:20:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438568AbfIXGLX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 24 Sep 2019 02:11:23 -0400
-Received: from ozlabs.org ([203.11.71.1]:52737 "EHLO ozlabs.org"
+        id S2391418AbfIXGUn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 24 Sep 2019 02:20:43 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:44233 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388254AbfIXGLX (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 24 Sep 2019 02:11:23 -0400
+        id S2387676AbfIXGUn (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 24 Sep 2019 02:20:43 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46crRY3Lxhz9sPJ; Tue, 24 Sep 2019 16:11:21 +1000 (AEST)
+        id 46crfJ3PvXz9sDB; Tue, 24 Sep 2019 16:20:40 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1569305481; bh=+d6v8WYT+viMPFD2AWLGwcmMQ+4R+NXR5ZEghf3P1oQ=;
+        t=1569306040; bh=zIUz0AqwzPQYcFgIkPZiOJd0EZVYEzrjLiQQNvFyYGg=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=aU6IZvHX7peJwFrvLpLb4d4Rq7NOx4C3Xfu5QMsFWUDXrPDzRxrR2xjsTGADYl0K8
-         MnaReMA1X0jD+ZyOKngJg4BXWfuS9k9w4+9nkxdM2Pt3RHPfUA4lcYGSF60z1z1m0o
-         4QKFtHjQb0zy/Uxqd89j9jTTobsIJqBO6c/uGSw7JNk2fjpdhUpHYSD/U1nbhJQri7
-         406r/sWU8/2YHhrmPYydnf8amrpG2UAy97Kv6LDfF7bBUe816SOdsb4IfXlQPaLHcS
-         pWYOEgJmja/x5psdPesNoZc59khZeuGEfvnwJ1y4C1utFwgVNWNCrmlbav5P6etkxB
-         ppyMrfzVUWFYQ==
-Date:   Tue, 24 Sep 2019 15:33:28 +1000
+        b=h51cmhb0Ei/K/eSdPWW+l0WfsPmZgAfkBSpCVoPjR2vP+IPUv2+wcX26DFEtp2m3O
+         OnbVIFAl03Kx0iZGHM6NzHesNTmbmP/X74o9eSfX9qe7MSxZajaeSff3w/mN8m7qrG
+         wJclw13kxEh1BNh82Hcw7KTiXXksdCXu6YqujC6pFE1SUhBoewp7a+1316gsTjdsvo
+         fhcVp8hnBqc9MlSiGS6ctxZagJjQ1v1oS80L8GFM7naQMoBEXiCj/xFEtAVShdX9la
+         KUuT+zVbFkcV4LqWeVypw6Ab5NpoFFDJn6BElAc59Bo6C3E98qQk6GRGOFDyXCOVUl
+         36UD7+qxaWh+A==
+Date:   Tue, 24 Sep 2019 16:20:20 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Greg Kurz <groug@kaod.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 3/6] KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already
- in use
-Message-ID: <20190924053328.GB7950@oak.ozlabs.ibm.com>
-References: <156925341155.974393.11681611197111945710.stgit@bahia.lan>
- <156925342885.974393.4930571278578115883.stgit@bahia.lan>
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] Fix LPCR[AIL]=3 implementation and reject
+Message-ID: <20190924062020.GA2642@oak.ozlabs.ibm.com>
+References: <20190916073108.3256-1-npiggin@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <156925342885.974393.4930571278578115883.stgit@bahia.lan>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190916073108.3256-1-npiggin@gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 05:43:48PM +0200, Greg Kurz wrote:
-> We currently prevent userspace to connect a new vCPU if we already have
-> one with the same vCPU id. This is good but unfortunately not enough,
-> because VP ids derive from the packed vCPU ids, and kvmppc_pack_vcpu_id()
-> can return colliding values. For examples, 348 stays unchanged since it
-> is < KVM_MAX_VCPUS, but it is also the packed value of 2392 when the
-> guest's core stride is 8. Nothing currently prevents userspace to connect
-> vCPUs with forged ids, that end up being associated to the same VP. This
-> confuses the irq layer and likely crashes the kernel:
-> 
-> [96631.670454] genirq: Flags mismatch irq 4161. 00010000 (kvm-1-2392) vs. 00010000 (kvm-1-348)
+On Mon, Sep 16, 2019 at 05:31:03PM +1000, Nicholas Piggin wrote:
+> This is an update of the series with comments addressed. Most of them
+> were relatively minor details except patch 3, which incorrectly added
+> end_cede to guest entry interrupt injection, now fixed.
 
-Have you seen a host kernel crash?  How hard would it be to exploit
-this, and would it just be a denial of service, or do you think it
-could be used to get a use-after-free in the kernel or something like
-that?
+With this series, compiling a pmac32_defconfig with PR KVM turned on,
+I get compile errors as follows:
 
-Also, does this patch depend on the patch 2 in this series?
+make[1]: Entering directory '/home/paulus/kernel/test-pmac-kvm'
+  Using /home/paulus/kernel/kvm as source for kernel
+  GEN     Makefile
+  CALL    /home/paulus/kernel/kvm/scripts/checksyscalls.sh
+<stdin>:1511:2: warning: #warning syscall clone3 not implemented [-Wcpp]
+  CALL    /home/paulus/kernel/kvm/scripts/atomic/check-atomics.sh
+  CHK     include/generated/compile.h
+  CALL    /home/paulus/kernel/kvm/arch/powerpc/kernel/prom_init_check.sh
+  CC [M]  arch/powerpc/kvm/book3s_pr.o
+In file included from /home/paulus/kernel/kvm/arch/powerpc/include/asm/processor.h:9:0,
+                 from /home/paulus/kernel/kvm/arch/powerpc/include/asm/thread_info.h:22,
+                 from /home/paulus/kernel/kvm/include/linux/thread_info.h:38,
+                 from /home/paulus/kernel/kvm/include/asm-generic/preempt.h:5,
+                 from ./arch/powerpc/include/generated/asm/preempt.h:1,
+                 from /home/paulus/kernel/kvm/include/linux/preempt.h:78,
+                 from /home/paulus/kernel/kvm/include/linux/hardirq.h:5,
+                 from /home/paulus/kernel/kvm/include/linux/kvm_host.h:7,
+                 from /home/paulus/kernel/kvm/arch/powerpc/kvm/book3s_pr.c:19:
+/home/paulus/kernel/kvm/arch/powerpc/kvm/book3s_pr.c: In function ‘kvmppc_inject_interrupt_pr’:
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:67:23: error: left shift count >= width of type [-Werror=shift-count-overflow]
+ #define __MASK(X) (1UL<<(X))
+                       ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:119:18: note: in expansion of macro ‘__MASK’
+ #define MSR_TS_T __MASK(MSR_TS_T_LG) /*  Transaction Transactional */
+                  ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:120:22: note: in expansion of macro ‘MSR_TS_T’
+ #define MSR_TS_MASK (MSR_TS_T | MSR_TS_S)   /* Transaction State bits */
+                      ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:122:41: note: in expansion of macro ‘MSR_TS_MASK’
+ #define MSR_TM_TRANSACTIONAL(x) (((x) & MSR_TS_MASK) == MSR_TS_T)
+                                         ^
+/home/paulus/kernel/kvm/arch/powerpc/kvm/book3s_pr.c:118:6: note: in expansion of macro ‘MSR_TM_TRANSACTIONAL’
+  if (MSR_TM_TRANSACTIONAL(msr))
+      ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:67:23: error: left shift count >= width of type [-Werror=shift-count-overflow]
+ #define __MASK(X) (1UL<<(X))
+                       ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:118:18: note: in expansion of macro ‘__MASK’
+ #define MSR_TS_S __MASK(MSR_TS_S_LG) /*  Transaction Suspended */
+                  ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:120:33: note: in expansion of macro ‘MSR_TS_S’
+ #define MSR_TS_MASK (MSR_TS_T | MSR_TS_S)   /* Transaction State bits */
+                                 ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:122:41: note: in expansion of macro ‘MSR_TS_MASK’
+ #define MSR_TM_TRANSACTIONAL(x) (((x) & MSR_TS_MASK) == MSR_TS_T)
+                                         ^
+/home/paulus/kernel/kvm/arch/powerpc/kvm/book3s_pr.c:118:6: note: in expansion of macro ‘MSR_TM_TRANSACTIONAL’
+  if (MSR_TM_TRANSACTIONAL(msr))
+      ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:67:23: error: left shift count >= width of type [-Werror=shift-count-overflow]
+ #define __MASK(X) (1UL<<(X))
+                       ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:119:18: note: in expansion of macro ‘__MASK’
+ #define MSR_TS_T __MASK(MSR_TS_T_LG) /*  Transaction Transactional */
+                  ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:122:57: note: in expansion of macro ‘MSR_TS_T’
+ #define MSR_TM_TRANSACTIONAL(x) (((x) & MSR_TS_MASK) == MSR_TS_T)
+                                                         ^
+/home/paulus/kernel/kvm/arch/powerpc/kvm/book3s_pr.c:118:6: note: in expansion of macro ‘MSR_TM_TRANSACTIONAL’
+  if (MSR_TM_TRANSACTIONAL(msr))
+      ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:67:23: error: left shift count >= width of type [-Werror=shift-count-overflow]
+ #define __MASK(X) (1UL<<(X))
+                       ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:118:18: note: in expansion of macro ‘__MASK’
+ #define MSR_TS_S __MASK(MSR_TS_S_LG) /*  Transaction Suspended */
+                  ^
+/home/paulus/kernel/kvm/arch/powerpc/kvm/book3s_pr.c:119:14: note: in expansion of macro ‘MSR_TS_S’
+   new_msr |= MSR_TS_S;
+              ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:67:23: error: left shift count >= width of type [-Werror=shift-count-overflow]
+ #define __MASK(X) (1UL<<(X))
+                       ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:119:18: note: in expansion of macro ‘__MASK’
+ #define MSR_TS_T __MASK(MSR_TS_T_LG) /*  Transaction Transactional */
+                  ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:120:22: note: in expansion of macro ‘MSR_TS_T’
+ #define MSR_TS_MASK (MSR_TS_T | MSR_TS_S)   /* Transaction State bits */
+                      ^
+/home/paulus/kernel/kvm/arch/powerpc/kvm/book3s_pr.c:121:20: note: in expansion of macro ‘MSR_TS_MASK’
+   new_msr |= msr & MSR_TS_MASK;
+                    ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:67:23: error: left shift count >= width of type [-Werror=shift-count-overflow]
+ #define __MASK(X) (1UL<<(X))
+                       ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:118:18: note: in expansion of macro ‘__MASK’
+ #define MSR_TS_S __MASK(MSR_TS_S_LG) /*  Transaction Suspended */
+                  ^
+/home/paulus/kernel/kvm/arch/powerpc/include/asm/reg.h:120:33: note: in expansion of macro ‘MSR_TS_S’
+ #define MSR_TS_MASK (MSR_TS_T | MSR_TS_S)   /* Transaction State bits */
+                                 ^
+/home/paulus/kernel/kvm/arch/powerpc/kvm/book3s_pr.c:121:20: note: in expansion of macro ‘MSR_TS_MASK’
+   new_msr |= msr & MSR_TS_MASK;
+                    ^
+cc1: all warnings being treated as errors
+make[3]: *** [/home/paulus/kernel/kvm/scripts/Makefile.build:274: arch/powerpc/kvm/book3s_pr.o] Error 1
+make[2]: *** [/home/paulus/kernel/kvm/scripts/Makefile.build:490: arch/powerpc/kvm] Error 2
+make[1]: *** [/home/paulus/kernel/kvm/Makefile:1079: arch/powerpc] Error 2
+make[1]: Leaving directory '/home/paulus/kernel/test-pmac-kvm'
+make: *** [Makefile:179: sub-make] Error 2
+
+I think this is attributable to patch 2 of your series.
 
 Paul.
