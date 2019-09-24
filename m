@@ -2,27 +2,27 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C3F5BC164
-	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Sep 2019 07:29:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7563FBC199
+	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Sep 2019 08:11:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406135AbfIXF3F (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 24 Sep 2019 01:29:05 -0400
-Received: from ozlabs.org ([203.11.71.1]:42677 "EHLO ozlabs.org"
+        id S2438568AbfIXGLX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 24 Sep 2019 02:11:23 -0400
+Received: from ozlabs.org ([203.11.71.1]:52737 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405894AbfIXF3F (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 24 Sep 2019 01:29:05 -0400
+        id S2388254AbfIXGLX (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 24 Sep 2019 02:11:23 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46cqVk6xkmz9sPD; Tue, 24 Sep 2019 15:29:02 +1000 (AEST)
+        id 46crRY3Lxhz9sPJ; Tue, 24 Sep 2019 16:11:21 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1569302942; bh=cWBrw3Zi/RPCvFYg3Lc2bR5LpJV2EEerbQDk5nDnjws=;
+        t=1569305481; bh=+d6v8WYT+viMPFD2AWLGwcmMQ+4R+NXR5ZEghf3P1oQ=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lsHOd319ouBslKv0bWFJtvzzImr1S6O0NLCnWmG+GyWfg2pTck+2Y3NuS4E0CVwlP
-         kXnqT54F182pmLGxgIx4KytqAGY9jUNTPe5EzqWqmxnSyNHHTM9AsFCIZLbpP9A2Of
-         BaoUHhbor8++OsLNA3sKLw8wlXZ/DUSlSPUKsl0BUauUVKt3pXiXEgG4E/sLU64La1
-         7gMYQXc2E7YBc8pw86aNwenMwogFvwLRNtjp82e7bc6jd+ViH2ATx6e1JljlZWZbMY
-         Rh9TJ1f7sqd+kU3mxQCJzKBjqXHnZDUTJSUMVDTCdEU4uNIvNnbyi07wdFgtVVGxcS
-         OUTB74fxWWagQ==
-Date:   Tue, 24 Sep 2019 15:28:55 +1000
+        b=aU6IZvHX7peJwFrvLpLb4d4Rq7NOx4C3Xfu5QMsFWUDXrPDzRxrR2xjsTGADYl0K8
+         MnaReMA1X0jD+ZyOKngJg4BXWfuS9k9w4+9nkxdM2Pt3RHPfUA4lcYGSF60z1z1m0o
+         4QKFtHjQb0zy/Uxqd89j9jTTobsIJqBO6c/uGSw7JNk2fjpdhUpHYSD/U1nbhJQri7
+         406r/sWU8/2YHhrmPYydnf8amrpG2UAy97Kv6LDfF7bBUe816SOdsb4IfXlQPaLHcS
+         pWYOEgJmja/x5psdPesNoZc59khZeuGEfvnwJ1y4C1utFwgVNWNCrmlbav5P6etkxB
+         ppyMrfzVUWFYQ==
+Date:   Tue, 24 Sep 2019 15:33:28 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
 To:     Greg Kurz <groug@kaod.org>
 Cc:     Michael Ellerman <mpe@ellerman.id.au>,
@@ -33,38 +33,38 @@ Cc:     Michael Ellerman <mpe@ellerman.id.au>,
         Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 1/6] KVM: PPC: Book3S HV: XIVE: initialize private
- pointer when VPs are allocated
-Message-ID: <20190924052855.GA7950@oak.ozlabs.ibm.com>
+Subject: Re: [PATCH 3/6] KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already
+ in use
+Message-ID: <20190924053328.GB7950@oak.ozlabs.ibm.com>
 References: <156925341155.974393.11681611197111945710.stgit@bahia.lan>
- <156925341736.974393.18379970954169086891.stgit@bahia.lan>
+ <156925342885.974393.4930571278578115883.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <156925341736.974393.18379970954169086891.stgit@bahia.lan>
+In-Reply-To: <156925342885.974393.4930571278578115883.stgit@bahia.lan>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 05:43:37PM +0200, Greg Kurz wrote:
-> From: Cédric Le Goater <clg@kaod.org>
+On Mon, Sep 23, 2019 at 05:43:48PM +0200, Greg Kurz wrote:
+> We currently prevent userspace to connect a new vCPU if we already have
+> one with the same vCPU id. This is good but unfortunately not enough,
+> because VP ids derive from the packed vCPU ids, and kvmppc_pack_vcpu_id()
+> can return colliding values. For examples, 348 stays unchanged since it
+> is < KVM_MAX_VCPUS, but it is also the packed value of 2392 when the
+> guest's core stride is 8. Nothing currently prevents userspace to connect
+> vCPUs with forged ids, that end up being associated to the same VP. This
+> confuses the irq layer and likely crashes the kernel:
 > 
-> Do not assign the device private pointer before making sure the XIVE
-> VPs are allocated in OPAL and test pointer validity when releasing
-> the device.
-> 
-> Fixes: 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy' method by a 'release' method")
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> [96631.670454] genirq: Flags mismatch irq 4161. 00010000 (kvm-1-2392) vs. 00010000 (kvm-1-348)
 
-What happens in the case where the OPAL allocation fails?  Does the
-host crash, or hang, or leak resources?  I presume that users can
-trigger the allocation failure just by starting a suitably large
-number of guests - is that right?  Is there an easier way?  I'm trying
-to work out whether this is urgently needed in 5.4 and the stable
-trees or not.
+Have you seen a host kernel crash?  How hard would it be to exploit
+this, and would it just be a denial of service, or do you think it
+could be used to get a use-after-free in the kernel or something like
+that?
+
+Also, does this patch depend on the patch 2 in this series?
 
 Paul.
