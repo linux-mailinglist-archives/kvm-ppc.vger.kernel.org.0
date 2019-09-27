@@ -2,109 +2,105 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E0D48BDDF2
-	for <lists+kvm-ppc@lfdr.de>; Wed, 25 Sep 2019 14:15:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45D28C04A2
+	for <lists+kvm-ppc@lfdr.de>; Fri, 27 Sep 2019 13:53:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405148AbfIYMOT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 25 Sep 2019 08:14:19 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:40637 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405481AbfIYMOS (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 25 Sep 2019 08:14:18 -0400
-Received: by mail-qt1-f194.google.com with SMTP id f7so1218187qtq.7
-        for <kvm-ppc@vger.kernel.org>; Wed, 25 Sep 2019 05:14:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=OVI5QcSzb1ogi/NUyHxPnF5WpljeLCICuHCH4hdkAkk=;
-        b=UBKXw+KB2suz9U44y3DYouGbrl88Nm90V8Wsw6X6eao3v1Q0ZOHIayVjqW+Ac3JAvt
-         BY6j3a/CYJYhIbLmMzgIGsa8RV2A3l9vXW8f9p1ttZxvLTVKnQLShFUp6JQlpw2y4Ekf
-         bDDPdMuQ5Wr7VcgyCJKxU/EoDJaxxx7EduDRntUPBHNNBjO0ib4vI0mGe0w0vT4jrR6s
-         q8B4JocD6DLLs3AjJKgk1eyUF9CgK4k2G0luzKUrOC9gCPk3JjFCP2aRbvrqJ1w0IgG3
-         a30U1ABEbjgWv6xsD/m/zZhSphCGVVOqzC/hWn/nfgEoVjLo+hUjSMo4uZJP5XYQ/n5q
-         p5ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=OVI5QcSzb1ogi/NUyHxPnF5WpljeLCICuHCH4hdkAkk=;
-        b=ZQDbxGctM6DQK6P/aF3pLPvOJ8lM84akVqs/WIX5L2alvcnsLBqxlJV4ofXzVgaKbH
-         gHja4r6MN8P3jnLaxejWKkPMtfy7L5A9Bwx8Y5b7RiEK/rZIVXy/1Ew/wcj18CDKxGgU
-         4go/pGQGDWg2KfpQ2m+8FYxZcX0noV6CrQsgtoezH0KSs1eF/wLLccG+DDx2i4fhbMt6
-         7hQ5+oyX1FXxky89SJMlqBXYmwaC1DscLU8ffY169d9B46upyr7h63vIJSV7IsPuk3cp
-         acHnjtHZ3MiAieDCgY4TWt5TQclznImdEnq4crCvgn/4phrErfGL+ZUAFK+KKLywC/6J
-         KINw==
-X-Gm-Message-State: APjAAAUqDUcngx3AINumXx5s/Wlbf8nx/eM+8V3pa5xWGp6fknA/9jSm
-        xXEQMSJ5ZX5eKz+oVthpydRtBQ==
-X-Google-Smtp-Source: APXvYqykvxxYrfpTCuPObZS7Ml2gjLGRZXElIM5Y2CTDjEL5CnkfFtmLsczbvBhS+BMu1uKuOdCYXw==
-X-Received: by 2002:a0c:a5a5:: with SMTP id z34mr6930777qvz.110.1569413657491;
-        Wed, 25 Sep 2019 05:14:17 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-223-10.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.223.10])
-        by smtp.gmail.com with ESMTPSA id h29sm3163953qtb.46.2019.09.25.05.14.16
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 25 Sep 2019 05:14:16 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1iD6BU-0006VE-9u; Wed, 25 Sep 2019 09:14:16 -0300
-Date:   Wed, 25 Sep 2019 09:14:16 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Bharata B Rao <bharata@linux.ibm.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-mm@kvack.org, paulus@au1.ibm.com,
-        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
-        linuxram@us.ibm.com, sukadev@linux.vnet.ibm.com,
-        cclaudio@linux.ibm.com, hch@lst.de
-Subject: Re: [PATCH v9 0/8] KVM: PPC: Driver to manage pages of secure guest
-Message-ID: <20190925121416.GB21150@ziepe.ca>
-References: <20190925050649.14926-1-bharata@linux.ibm.com>
+        id S1726163AbfI0Lxm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 27 Sep 2019 07:53:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25014 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725992AbfI0Lxm (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 27 Sep 2019 07:53:42 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8RBkmVj109927
+        for <kvm-ppc@vger.kernel.org>; Fri, 27 Sep 2019 07:53:41 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v9fey545d-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Fri, 27 Sep 2019 07:53:40 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <groug@kaod.org>;
+        Fri, 27 Sep 2019 12:53:38 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 27 Sep 2019 12:53:34 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8RBrXKQ24445092
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Sep 2019 11:53:33 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F326AAE057;
+        Fri, 27 Sep 2019 11:53:32 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 992F4AE055;
+        Fri, 27 Sep 2019 11:53:32 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.172.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Sep 2019 11:53:32 +0000 (GMT)
+Subject: [PATCH v2 0/6] KVM: PPC: Book3S: HV: XIVE: Allocate less VPs in OPAL
+From:   Greg Kurz <groug@kaod.org>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?b?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
+Date:   Fri, 27 Sep 2019 13:53:32 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190925050649.14926-1-bharata@linux.ibm.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19092711-4275-0000-0000-0000036BC507
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092711-4276-0000-0000-0000387E46F9
+Message-Id: <156958521220.1503771.2119482814236775333.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-27_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=330 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909270112
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Sep 25, 2019 at 10:36:41AM +0530, Bharata B Rao wrote:
-> [The main change in this version is the introduction of new
-> locking to prevent concurrent page-in and page-out calls. More
-> details about this are present in patch 2/8]
-> 
-> Hi,
-> 
-> A pseries guest can be run as a secure guest on Ultravisor-enabled
-> POWER platforms. On such platforms, this driver will be used to manage
-> the movement of guest pages between the normal memory managed by
-> hypervisor(HV) and secure memory managed by Ultravisor(UV).
-> 
-> Private ZONE_DEVICE memory equal to the amount of secure memory
-> available in the platform for running secure guests is created.
-> Whenever a page belonging to the guest becomes secure, a page from
-> this private device memory is used to represent and track that secure
-> page on the HV side. The movement of pages between normal and secure
-> memory is done via migrate_vma_pages(). The reverse movement is driven
-> via pagemap_ops.migrate_to_ram().
-> 
-> The page-in or page-out requests from UV will come to HV as hcalls and
-> HV will call back into UV via uvcalls to satisfy these page requests.
-> 
-> These patches are against hmm.git
-> (https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/log/?h=hmm)
-> 
-> plus
-> 
-> Claudio Carvalho's base ultravisor enablement patches that are present
-> in Michael Ellerman's tree
-> (https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git/log/?h=topic/ppc-kvm)
-> 
-> These patches along with Claudio's above patches are required to
-> run secure pseries guests on KVM. This patchset is based on hmm.git
-> because hmm.git has migrate_vma cleanup and not-device memremap_pages
-> patchsets that are required by this patchset.
+This brings some fixes and allows to start more VMs with an in-kernel
+XIVE or XICS-on-XIVE device.
 
-FWIW this is all merged to Linus now and will be in rc1
+Changes since v1 (https://patchwork.ozlabs.org/cover/1166099/):
+- drop a useless patch
+- add a patch to show VP ids in debugfs
+- update some changelogs
+- fix buggy check in patch 5
+- Cc: stable 
 
-Jason
+--
+Greg
+
+---
+
+Greg Kurz (6):
+      KVM: PPC: Book3S HV: XIVE: Set kvm->arch.xive when VPs are allocated
+      KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use
+      KVM: PPC: Book3S HV: XIVE: Show VP id in debugfs
+      KVM: PPC: Book3S HV: XIVE: Compute the VP id in a common helper
+      KVM: PPC: Book3S HV: XIVE: Make VP block size configurable
+      KVM: PPC: Book3S HV: XIVE: Allow userspace to set the # of VPs
+
+
+ Documentation/virt/kvm/devices/xics.txt |   14 +++
+ Documentation/virt/kvm/devices/xive.txt |    8 ++
+ arch/powerpc/include/uapi/asm/kvm.h     |    3 +
+ arch/powerpc/kvm/book3s_xive.c          |  142 ++++++++++++++++++++++++-------
+ arch/powerpc/kvm/book3s_xive.h          |   17 ++++
+ arch/powerpc/kvm/book3s_xive_native.c   |   40 +++------
+ 6 files changed, 167 insertions(+), 57 deletions(-)
+
