@@ -2,224 +2,188 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AFDFFC04B7
-	for <lists+kvm-ppc@lfdr.de>; Fri, 27 Sep 2019 13:54:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8CC6C07E4
+	for <lists+kvm-ppc@lfdr.de>; Fri, 27 Sep 2019 16:47:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727366AbfI0LyS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 27 Sep 2019 07:54:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15754 "EHLO
+        id S1727794AbfI0OrS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 27 Sep 2019 10:47:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18808 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727378AbfI0LyS (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 27 Sep 2019 07:54:18 -0400
+        by vger.kernel.org with ESMTP id S1727079AbfI0OrS (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 27 Sep 2019 10:47:18 -0400
 Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8RBn3wd002880
-        for <kvm-ppc@vger.kernel.org>; Fri, 27 Sep 2019 07:54:17 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v8y3b0ds0-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Fri, 27 Sep 2019 07:54:16 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <groug@kaod.org>;
-        Fri, 27 Sep 2019 12:54:13 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 27 Sep 2019 12:54:08 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8RBs7CE59506738
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8REiKbe009586;
+        Fri, 27 Sep 2019 10:46:37 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v8y3b53xk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Sep 2019 10:46:36 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x8REiTGK009898;
+        Fri, 27 Sep 2019 10:46:29 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v8y3b53s7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Sep 2019 10:46:29 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8REhmPi026728;
+        Fri, 27 Sep 2019 14:46:19 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma04dal.us.ibm.com with ESMTP id 2v5bg8f0un-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Sep 2019 14:46:19 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8REkHHj40042836
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Sep 2019 11:54:07 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B12AB11C058;
-        Fri, 27 Sep 2019 11:54:07 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4BEA211C052;
-        Fri, 27 Sep 2019 11:54:07 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.172.9])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Sep 2019 11:54:07 +0000 (GMT)
-Subject: [PATCH v2 6/6] KVM: PPC: Book3S HV: XIVE: Allow userspace to set
- the # of VPs
-From:   Greg Kurz <groug@kaod.org>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?b?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
-Date:   Fri, 27 Sep 2019 13:54:07 +0200
-In-Reply-To: <156958521220.1503771.2119482814236775333.stgit@bahia.lan>
-References: <156958521220.1503771.2119482814236775333.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
+        Fri, 27 Sep 2019 14:46:18 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DF156C6059;
+        Fri, 27 Sep 2019 14:46:17 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 23C33C605F;
+        Fri, 27 Sep 2019 14:46:09 +0000 (GMT)
+Received: from leobras.br.ibm.com (unknown [9.18.235.58])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Sep 2019 14:46:09 +0000 (GMT)
+Message-ID: <8fe1ee1abf52719e75902dc7d5cd1e91751eaba7.camel@linux.ibm.com>
+Subject: Re: [PATCH v3 00/11] Introduces new count-based method for
+ monitoring lockless pagetable walks
+From:   Leonardo Bras <leonardo@linux.ibm.com>
+To:     jhubbard@nvidia.com, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-mm@kvack.org
+Cc:     benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au,
+        arnd@arndb.de, aneesh.kumar@linux.ibm.com, christophe.leroy@c-s.fr,
+        akpm@linux-foundation.org, dan.j.williams@intel.com,
+        npiggin@gmail.com, mahesh@linux.vnet.ibm.com,
+        gregkh@linuxfoundation.org, tglx@linutronix.de,
+        ganeshgr@linux.ibm.com, allison@lohutok.net, rppt@linux.ibm.com,
+        yuehaibing@huawei.com, ira.weiny@intel.com, jgg@ziepe.ca,
+        keith.busch@intel.com
+Date:   Fri, 27 Sep 2019 11:46:04 -0300
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-0SqJjAld2WmMrSAcbuQn"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19092711-0012-0000-0000-000003514B8B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19092711-0013-0000-0000-0000218BE6CA
-Message-Id: <156958524691.1503771.2453080873820103723.stgit@bahia.lan>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-27_06:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909270112
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909270138
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Add a new attribute to both XIVE and XICS-on-XIVE KVM devices so that
-userspace can tell how many interrupt servers it needs. If a VM needs
-less than the current default of KVM_MAX_VCPUS (2048), we can allocate
-less VPs in OPAL. Combined with a core stride (VSMT) that matches the
-number of guest threads per core, this may substantially increases the
-number of VMs that can run concurrently with an in-kernel XIVE device.
 
-Since the legacy XIVE KVM device is exposed to userspace through the
-XICS KVM API, a new attribute group is added to it for this purpose.
-While here, fix the syntax of the existing KVM_DEV_XICS_GRP_SOURCES
-in the XICS documentation.
+--=-0SqJjAld2WmMrSAcbuQn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
----
-v2: - changelog update
----
- Documentation/virt/kvm/devices/xics.txt |   14 ++++++++++++--
- Documentation/virt/kvm/devices/xive.txt |    8 ++++++++
- arch/powerpc/include/uapi/asm/kvm.h     |    3 +++
- arch/powerpc/kvm/book3s_xive.c          |   10 ++++++++++
- arch/powerpc/kvm/book3s_xive_native.c   |    3 +++
- 5 files changed, 36 insertions(+), 2 deletions(-)
+John Hubbard <jhubbard@nvidia.com> writes:
 
-diff --git a/Documentation/virt/kvm/devices/xics.txt b/Documentation/virt/kvm/devices/xics.txt
-index 42864935ac5d..423332dda7bc 100644
---- a/Documentation/virt/kvm/devices/xics.txt
-+++ b/Documentation/virt/kvm/devices/xics.txt
-@@ -3,9 +3,19 @@ XICS interrupt controller
- Device type supported: KVM_DEV_TYPE_XICS
- 
- Groups:
--  KVM_DEV_XICS_SOURCES
-+  1. KVM_DEV_XICS_GRP_SOURCES
-   Attributes: One per interrupt source, indexed by the source number.
- 
-+  2. KVM_DEV_XICS_GRP_CTRL
-+  Attributes:
-+    2.1 KVM_DEV_XICS_NR_SERVERS (write only)
-+  The kvm_device_attr.addr points to a __u32 value which is the number of
-+  interrupt server numbers (ie, highest possible vcpu id plus one).
-+  Errors:
-+    -EINVAL: Value greater than KVM_MAX_VCPU_ID.
-+    -EFAULT: Invalid user pointer for attr->addr.
-+    -EBUSY:  A vcpu is already connected to the device.
-+
- This device emulates the XICS (eXternal Interrupt Controller
- Specification) defined in PAPR.  The XICS has a set of interrupt
- sources, each identified by a 20-bit source number, and a set of
-@@ -38,7 +48,7 @@ least-significant end of the word:
- 
- Each source has 64 bits of state that can be read and written using
- the KVM_GET_DEVICE_ATTR and KVM_SET_DEVICE_ATTR ioctls, specifying the
--KVM_DEV_XICS_SOURCES attribute group, with the attribute number being
-+KVM_DEV_XICS_GRP_SOURCES attribute group, with the attribute number being
- the interrupt source number.  The 64 bit state word has the following
- bitfields, starting from the least-significant end of the word:
- 
-diff --git a/Documentation/virt/kvm/devices/xive.txt b/Documentation/virt/kvm/devices/xive.txt
-index 9a24a4525253..f5d1d6b5af61 100644
---- a/Documentation/virt/kvm/devices/xive.txt
-+++ b/Documentation/virt/kvm/devices/xive.txt
-@@ -78,6 +78,14 @@ the legacy interrupt mode, referred as XICS (POWER7/8).
-     migrating the VM.
-     Errors: none
- 
-+    1.3 KVM_DEV_XIVE_NR_SERVERS (write only)
-+    The kvm_device_attr.addr points to a __u32 value which is the number of
-+    interrupt server numbers (ie, highest possible vcpu id plus one).
-+    Errors:
-+      -EINVAL: Value greater than KVM_MAX_VCPU_ID.
-+      -EFAULT: Invalid user pointer for attr->addr.
-+      -EBUSY:  A vCPU is already connected to the device.
-+
-   2. KVM_DEV_XIVE_GRP_SOURCE (write only)
-   Initializes a new source in the XIVE device and mask it.
-   Attributes:
-diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/uapi/asm/kvm.h
-index b0f72dea8b11..264e266a85bf 100644
---- a/arch/powerpc/include/uapi/asm/kvm.h
-+++ b/arch/powerpc/include/uapi/asm/kvm.h
-@@ -667,6 +667,8 @@ struct kvm_ppc_cpu_char {
- 
- /* PPC64 eXternal Interrupt Controller Specification */
- #define KVM_DEV_XICS_GRP_SOURCES	1	/* 64-bit source attributes */
-+#define KVM_DEV_XICS_GRP_CTRL		2
-+#define   KVM_DEV_XICS_NR_SERVERS	1
- 
- /* Layout of 64-bit source attribute values */
- #define  KVM_XICS_DESTINATION_SHIFT	0
-@@ -683,6 +685,7 @@ struct kvm_ppc_cpu_char {
- #define KVM_DEV_XIVE_GRP_CTRL		1
- #define   KVM_DEV_XIVE_RESET		1
- #define   KVM_DEV_XIVE_EQ_SYNC		2
-+#define   KVM_DEV_XIVE_NR_SERVERS	3
- #define KVM_DEV_XIVE_GRP_SOURCE		2	/* 64-bit source identifier */
- #define KVM_DEV_XIVE_GRP_SOURCE_CONFIG	3	/* 64-bit source identifier */
- #define KVM_DEV_XIVE_GRP_EQ_CONFIG	4	/* 64-bit EQ identifier */
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index 6c35b3d95986..66858b7d3c6b 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -1911,6 +1911,11 @@ static int xive_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 	switch (attr->group) {
- 	case KVM_DEV_XICS_GRP_SOURCES:
- 		return xive_set_source(xive, attr->attr, attr->addr);
-+	case KVM_DEV_XICS_GRP_CTRL:
-+		switch (attr->attr) {
-+		case KVM_DEV_XICS_NR_SERVERS:
-+			return kvmppc_xive_set_nr_servers(xive, attr->addr);
-+		}
- 	}
- 	return -ENXIO;
- }
-@@ -1936,6 +1941,11 @@ static int xive_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 		    attr->attr < KVMPPC_XICS_NR_IRQS)
- 			return 0;
- 		break;
-+	case KVM_DEV_XICS_GRP_CTRL:
-+		switch (attr->attr) {
-+		case KVM_DEV_XICS_NR_SERVERS:
-+			return 0;
-+		}
- 	}
- 	return -ENXIO;
- }
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index 8ab333eabeef..34bd123fa024 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -921,6 +921,8 @@ static int kvmppc_xive_native_set_attr(struct kvm_device *dev,
- 			return kvmppc_xive_reset(xive);
- 		case KVM_DEV_XIVE_EQ_SYNC:
- 			return kvmppc_xive_native_eq_sync(xive);
-+		case KVM_DEV_XIVE_NR_SERVERS:
-+			return kvmppc_xive_set_nr_servers(xive, attr->addr);
- 		}
- 		break;
- 	case KVM_DEV_XIVE_GRP_SOURCE:
-@@ -960,6 +962,7 @@ static int kvmppc_xive_native_has_attr(struct kvm_device *dev,
- 		switch (attr->attr) {
- 		case KVM_DEV_XIVE_RESET:
- 		case KVM_DEV_XIVE_EQ_SYNC:
-+		case KVM_DEV_XIVE_NR_SERVERS:
- 			return 0;
- 		}
- 		break;
+> Hi Leonardo,
+>
+> Thanks for adding linux-mm to CC for this next round of reviews. For the =
+benefit
+> of any new reviewers, I'd like to add that there are some issues that wer=
+e discovered
+> while reviewing the v2 patchset, that are not (yet) addressed in this v3 =
+series.
+
+> Since those issues are not listed in the cover letter above, I'll list th=
+em here
+
+Thanks for bringing that.
+The cover letter is a great place to put this info, I will keep that in
+mind for future patchsets.
+
+>
+> 1. The locking model requires a combination of disabling interrupts and
+> atomic counting and memory barriers, but
+>
+> 	a) some memory barriers are missing
+> 	(start/end_lockless_pgtbl_walk), and
+
+It seems that it works fine today because of the amount of intructions
+executed between the irq_disable / start_lockless_pgtbl_walk and where
+the THP collapse/split can happen. (It's very unlikely that it reorders
+that much).
+
+But I don't think it would be so bad to put a memory barrier after
+irq_disable just in case.
+
+> 	b) some cases (patch #8) fail to disable interrupts
+
+I have done some looking into that, and it seems that some uses of
+{start,end}_lockless_pgtbl_walk are unneeded, because they operate in
+(nested) guest pgd and I was told it's safe against THP split/collapse.
+
+In other uses, there is no interrupt disable because the function is
+called in real mode, with MSR_EE=3D0, and there we have instructions
+disabled, so there is no need to disable them again.
+
+>
+> ...so the synchronization appears to be inadequate. (And if it *is* adequ=
+ate, then
+> definitely we need the next item, to explain it.)
+
+
+>
+> 2. Documentation of the synchronization/locking model needs to exist, onc=
+e we
+> figure out the exact details of (1).
+
+I will add the missing doc in the code, so it may be easier to
+understand in the future.
+
+>
+> 3. Related to (1), I've asked to change things so that interrupt controls=
+ and=20
+> atomic inc/dec are in the same start/end calls--assuming, of course, that=
+ the
+> caller can tolerate that.=20
+
+I am not sure if it would be ok to use irq_{save,restore} in real mode,
+I will do some more reading of the docs before addressing this.=20
+>
+> 4. Please see the v2 series for any other details I've missed.
+>
+> thanks,
+> --=20
+> John Hubbard
+> NVIDIA
+>
+
+Thank you for helping, John!
+
+Best regards,
+Leonardo Bras
+
+--=-0SqJjAld2WmMrSAcbuQn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl2OIKwACgkQlQYWtz9S
+ttRybRAArvljWum/p1QDUJofop8oyMMy8mFrtADkUcj7l033ze/c1UL4xVoFGvwQ
+JjAv7Cz+5anu8KJ3OQy0RUpdKihQh603Mt5fp7Okt8/D3AnBcMgp3hnGvwBDs8l4
+OqU3pEjzAFhQRpi0vFzuDLzY6yZBlHhb7keU8FpY9AOVk1M7nVxAYgY5pWiPUTJB
+6bxcElXieVV811efuDvuP2i4HG8tjs0uO4i8l4Z7EhoLRSYo030UJ2lRuO83/eYG
+1GXxjhkYulE4V5uHJ3PaWmtzre5wvSMHFniZK7XF777UZ5gDDgbo/FjtmYZQmQPx
+vbOAxfZq3yVakztdgQxYi2YN9Lh2rWJzfeISnWhpLzGS+dvFnDqurLCUieyKk4A8
+whBV3OCBpfksUToZuStK6cv2FK/TyArYGBTgPTmLRHn8n4AKgh1DzN2M9YxQ28jd
+rsAsmal05v6GTWJu8w9fHhwtHUO0HWaygdJGVm483FqVHSCigIShnhqT6QfoZY9q
+t4DvkFU6htn7vTEVIsLZaOYdyMFsWIZqoItq3kE+FZdcdCBMuLDjP47IK4g0IFtg
+Yo04gfVicc35HAvJpHCluEwIkEH45KWfRwlcN9rArUYDSMHMYeKIu53d4Q5+eit5
+AtqqUn9C4uk9TWoz3ksrfi5waujwmUtAvDaiaMH78SaiQ9IhncY=
+=tj28
+-----END PGP SIGNATURE-----
+
+--=-0SqJjAld2WmMrSAcbuQn--
 
