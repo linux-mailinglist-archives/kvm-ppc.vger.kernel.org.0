@@ -2,117 +2,99 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BAACC0E97
-	for <lists+kvm-ppc@lfdr.de>; Sat, 28 Sep 2019 01:42:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBD4AC1EBC
+	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Sep 2019 12:14:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726321AbfI0Xme (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 27 Sep 2019 19:42:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24652 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725815AbfI0Xmd (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 27 Sep 2019 19:42:33 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8RNfiDU085571;
-        Fri, 27 Sep 2019 19:42:01 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v9umg8w8t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Sep 2019 19:42:01 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x8RNg1hs085952;
-        Fri, 27 Sep 2019 19:42:01 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v9umg8w8j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Sep 2019 19:42:00 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8RNePAk030822;
-        Fri, 27 Sep 2019 23:41:59 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma03wdc.us.ibm.com with ESMTP id 2v5bg7v7pr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Sep 2019 23:41:59 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8RNfx7F37159414
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Sep 2019 23:41:59 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1332B112069;
-        Fri, 27 Sep 2019 23:41:59 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DCD9D112063;
-        Fri, 27 Sep 2019 23:41:03 +0000 (GMT)
-Received: from LeoBras.aus.stglabs.ibm.com (unknown [9.18.235.58])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Sep 2019 23:41:03 +0000 (GMT)
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-mm@kvack.org
-Cc:     Leonardo Bras <leonardo@linux.ibm.com>,
+        id S1727025AbfI3KOl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 30 Sep 2019 06:14:41 -0400
+Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:49757 "EHLO
+        7.mo173.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726329AbfI3KOk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Sep 2019 06:14:40 -0400
+X-Greylist: delayed 388 seconds by postgrey-1.27 at vger.kernel.org; Mon, 30 Sep 2019 06:14:39 EDT
+Received: from player692.ha.ovh.net (unknown [10.109.160.76])
+        by mo173.mail-out.ovh.net (Postfix) with ESMTP id 18D8A11B190
+        for <kvm-ppc@vger.kernel.org>; Mon, 30 Sep 2019 12:08:10 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+        (Authenticated sender: clg@kaod.org)
+        by player692.ha.ovh.net (Postfix) with ESMTPSA id 3BA53A40CB9B;
+        Mon, 30 Sep 2019 10:07:55 +0000 (UTC)
+Subject: Re: [PATCH v2 3/6] KVM: PPC: Book3S HV: XIVE: Show VP id in debugfs
+To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
-        Christophe Leroy <christophe.leroy@c-s.fr>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
-        Allison Randal <allison@lohutok.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ganesh Goudar <ganeshgr@linux.ibm.com>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        YueHaibing <yuehaibing@huawei.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Keith Busch <keith.busch@intel.com>
-Subject: [PATCH v4 11/11] powerpc/mm/book3s64/pgtable: Uses counting method to skip serializing
-Date:   Fri, 27 Sep 2019 20:40:08 -0300
-Message-Id: <20190927234008.11513-12-leonardo@linux.ibm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190927234008.11513-1-leonardo@linux.ibm.com>
-References: <20190927234008.11513-1-leonardo@linux.ibm.com>
+        David Gibson <david@gibson.dropbear.id.au>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
+References: <156958521220.1503771.2119482814236775333.stgit@bahia.lan>
+ <156958522955.1503771.11724507735868652914.stgit@bahia.lan>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a164000d-284a-3ca7-a6b2-a5977a4b169f@kaod.org>
+Date:   Mon, 30 Sep 2019 12:07:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
+In-Reply-To: <156958522955.1503771.11724507735868652914.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-27_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=663 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909270206
+X-Ovh-Tracer-Id: 15278743213254937460
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgedvgddvudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Skips slow part of serialize_against_pte_lookup if there is no running
-lockless pagetable walk.
+On 27/09/2019 13:53, Greg Kurz wrote:
+> Print out the VP id of each connected vCPU, this allow to see:
+> - the VP block base in which OPAL encodes information that may be
+>   useful when debugging
+> - the packed vCPU id which may differ from the raw vCPU id if the
+>   latter is >= KVM_MAX_VCPUS (2048)
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
----
- arch/powerpc/mm/book3s64/pgtable.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/mm/book3s64/pgtable.c b/arch/powerpc/mm/book3s64/pgtable.c
-index 6ba6195bff1b..27966481f2a6 100644
---- a/arch/powerpc/mm/book3s64/pgtable.c
-+++ b/arch/powerpc/mm/book3s64/pgtable.c
-@@ -95,7 +95,8 @@ static void do_nothing(void *unused)
- void serialize_against_pte_lookup(struct mm_struct *mm)
- {
- 	smp_mb();
--	smp_call_function_many(mm_cpumask(mm), do_nothing, NULL, 1);
-+	if (running_lockless_pgtbl_walk(mm))
-+		smp_call_function_many(mm_cpumask(mm), do_nothing, NULL, 1);
- }
- 
- /*
--- 
-2.20.1
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+> ---
+>  arch/powerpc/kvm/book3s_xive.c        |    4 ++--
+>  arch/powerpc/kvm/book3s_xive_native.c |    4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+> index baa740815b3c..0b7859e40f66 100644
+> --- a/arch/powerpc/kvm/book3s_xive.c
+> +++ b/arch/powerpc/kvm/book3s_xive.c
+> @@ -2107,9 +2107,9 @@ static int xive_debug_show(struct seq_file *m, void *private)
+>  		if (!xc)
+>  			continue;
+>  
+> -		seq_printf(m, "cpu server %#x CPPR:%#x HWCPPR:%#x"
+> +		seq_printf(m, "cpu server %#x VP:%#x CPPR:%#x HWCPPR:%#x"
+>  			   " MFRR:%#x PEND:%#x h_xirr: R=%lld V=%lld\n",
+> -			   xc->server_num, xc->cppr, xc->hw_cppr,
+> +			   xc->server_num, xc->vp_id, xc->cppr, xc->hw_cppr,
+>  			   xc->mfrr, xc->pending,
+>  			   xc->stat_rm_h_xirr, xc->stat_vm_h_xirr);
+>  
+> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+> index ebb4215baf45..43a86858390a 100644
+> --- a/arch/powerpc/kvm/book3s_xive_native.c
+> +++ b/arch/powerpc/kvm/book3s_xive_native.c
+> @@ -1204,8 +1204,8 @@ static int xive_native_debug_show(struct seq_file *m, void *private)
+>  		if (!xc)
+>  			continue;
+>  
+> -		seq_printf(m, "cpu server %#x NSR=%02x CPPR=%02x IBP=%02x PIPR=%02x w01=%016llx w2=%08x\n",
+> -			   xc->server_num,
+> +		seq_printf(m, "cpu server %#x VP=%#x NSR=%02x CPPR=%02x IBP=%02x PIPR=%02x w01=%016llx w2=%08x\n",
+> +			   xc->server_num, xc->vp_id,
+>  			   vcpu->arch.xive_saved_state.nsr,
+>  			   vcpu->arch.xive_saved_state.cppr,
+>  			   vcpu->arch.xive_saved_state.ipb,
+> 
 
