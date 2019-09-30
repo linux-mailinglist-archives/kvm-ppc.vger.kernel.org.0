@@ -2,184 +2,179 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E0E5AC24D2
-	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Sep 2019 18:05:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90B03C2576
+	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Sep 2019 18:52:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732073AbfI3QFD convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm-ppc@lfdr.de>); Mon, 30 Sep 2019 12:05:03 -0400
-Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:46335 "EHLO
-        4.mo179.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732020AbfI3QFD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Sep 2019 12:05:03 -0400
-X-Greylist: delayed 4198 seconds by postgrey-1.27 at vger.kernel.org; Mon, 30 Sep 2019 12:05:02 EDT
-Received: from player794.ha.ovh.net (unknown [10.109.146.137])
-        by mo179.mail-out.ovh.net (Postfix) with ESMTP id 5B2DB143F08
-        for <kvm-ppc@vger.kernel.org>; Mon, 30 Sep 2019 14:29:35 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player794.ha.ovh.net (Postfix) with ESMTPSA id 67737A5A57C6;
-        Mon, 30 Sep 2019 12:29:22 +0000 (UTC)
-Date:   Mon, 30 Sep 2019 14:29:21 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2 4/6] KVM: PPC: Book3S HV: XIVE: Compute the VP id in
- a common helper
-Message-ID: <20190930142921.380e4e1b@bahia.w3ibm.bluemix.net>
-In-Reply-To: <fb6accd0-f3fa-d441-5892-516ed4118d3b@kaod.org>
-References: <156958521220.1503771.2119482814236775333.stgit@bahia.lan>
-        <156958523534.1503771.7854438316257986828.stgit@bahia.lan>
-        <fb6accd0-f3fa-d441-5892-516ed4118d3b@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Ovh-Tracer-Id: 17667339865624058251
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgedvgdegkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+        id S1729451AbfI3Qwk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 30 Sep 2019 12:52:40 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:55050 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726425AbfI3Qwk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Sep 2019 12:52:40 -0400
+Received: by mail-wm1-f65.google.com with SMTP id p7so238636wmp.4;
+        Mon, 30 Sep 2019 09:52:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=S4meV0NsaDpqLa7tBEXkvORH5DuiHJR7oObrl4NCVW4=;
+        b=ZKFO2GkolErFUr68Pj8DzLdvfmN6K47nQm/2ypFNwkvAju1BtuE3hjRdgIslfArdCz
+         tcSel3xQCWbcB9PQrXVWPcuH3PEHd/hwfhCl2SuSzh4zQFu09bkn5UKDvsSgV48XA3IQ
+         wTXguVJwJVOrG22nKLayzi1SKn+1HdpDfx2i0URglXV/jfSSRFtVyGVfpdOy0GnJLv/8
+         ojpfSrPFo/YhMqVgCF38LrBx2u/NPItz1UqQK0tl1bDKUayanqN5P+6FDgtaA2HKX/+X
+         XtEYy4zUAt+Z4GNZDpFuC7GDd3hlHw46kI7Ko829sHQc3p9iGotQePXO/DoNFEA0pNyZ
+         Qe2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=S4meV0NsaDpqLa7tBEXkvORH5DuiHJR7oObrl4NCVW4=;
+        b=An34awI32oh+EqjtLvtVntQq6PYzXZcsjDWTYLbVdcg/qRrvg39u33irWvTA+SShmp
+         SNs9l4sdM/4MjnrpHm5AgzpzgKF17BjctMHY3T+xYiDxkKFQWaEczl41gCxXVpO7+d/P
+         PHPHo0poOAOfmFnk0s7tDZvGSWP7RW+rMYVl/WvcyQWM6XaFKpDr+A0G3SYGqKb+4O+0
+         UkR+EfbpgWFq98caK21xI94Rae7otbamU9KmNa14gg10YWmYfe6rcR4JDo2Oh6No3mHk
+         upBgP1D7t8cVgrCLvCWiS8WD/ppa0PmnEbRS0XAe8QEzk1LZPaNCHeMSu+kOJeSFjdQW
+         eVxg==
+X-Gm-Message-State: APjAAAWASdhu/rXgrXRKEYlHa726Kgdr17VrARdDMHve3yyW/44exLCH
+        JDWwv7aUOMV/ZkNtQZU+6WM6YusH
+X-Google-Smtp-Source: APXvYqzCLsczViMIVb7X3HfOf7obZBubZ1E1KCxx7eCgHu7Vt1z3KtWGQvxR+kz+c/TU/OFIY2h5pw==
+X-Received: by 2002:a7b:c4c9:: with SMTP id g9mr141219wmk.150.1569862355607;
+        Mon, 30 Sep 2019 09:52:35 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id n22sm139924wmk.19.2019.09.30.09.52.34
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 30 Sep 2019 09:52:34 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     vkuznets@redhat.com, kvm-ppc@vger.kernel.org
+Subject: [PATCH] kvm: x86, powerpc: do not allow clearing largepages debugfs entry
+Date:   Mon, 30 Sep 2019 18:52:31 +0200
+Message-Id: <1569862351-19760-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, 30 Sep 2019 14:01:56 +0200
-Cédric Le Goater <clg@kaod.org> wrote:
+The largepages debugfs entry is incremented/decremented as shadow
+pages are created or destroyed.  Clearing it will result in an
+underflow, which is harmless to KVM but ugly (and could be
+misinterpreted by tools that use debugfs information), so make
+this particular statistic read-only.
 
-> On 27/09/2019 13:53, Greg Kurz wrote:
-> > Reduce code duplication by consolidating the checking of vCPU ids and VP
-> > ids to a common helper used by both legacy and native XIVE KVM devices.
-> > And explain the magic with a comment.
-> > 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> 
-> Looks fine. One question below,
-> 
-> > ---
-> >  arch/powerpc/kvm/book3s_xive.c        |   42 ++++++++++++++++++++++++++-------
-> >  arch/powerpc/kvm/book3s_xive.h        |    1 +
-> >  arch/powerpc/kvm/book3s_xive_native.c |   11 ++-------
-> >  3 files changed, 36 insertions(+), 18 deletions(-)
-> > 
-> > diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> > index 0b7859e40f66..d84da9f6ee88 100644
-> > --- a/arch/powerpc/kvm/book3s_xive.c
-> > +++ b/arch/powerpc/kvm/book3s_xive.c
-> > @@ -1211,6 +1211,37 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
-> >  	vcpu->arch.xive_vcpu = NULL;
-> >  }
-> >  
-> > +static bool kvmppc_xive_vcpu_id_valid(struct kvmppc_xive *xive, u32 cpu)
-> > +{
-> > +	/* We have a block of KVM_MAX_VCPUS VPs. We just need to check
-> > +	 * raw vCPU ids are below the expected limit for this guest's
-> > +	 * core stride ; kvmppc_pack_vcpu_id() will pack them down to an
-> > +	 * index that can be safely used to compute a VP id that belongs
-> > +	 * to the VP block.
-> > +	 */
-> > +	return cpu < KVM_MAX_VCPUS * xive->kvm->arch.emul_smt_mode;
-> > +}
-> > +
-> > +int kvmppc_xive_compute_vp_id(struct kvmppc_xive *xive, u32 cpu, u32 *vp)
-> > +{
-> > +	u32 vp_id;
-> > +
-> > +	if (!kvmppc_xive_vcpu_id_valid(xive, cpu)) {
-> > +		pr_devel("Out of bounds !\n");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	vp_id = kvmppc_xive_vp(xive, cpu);
-> > +	if (kvmppc_xive_vp_in_use(xive->kvm, vp_id)) {
-> > +		pr_devel("Duplicate !\n");
-> > +		return -EEXIST;
-> > +	}
-> > +
-> > +	*vp = vp_id;
-> > +
-> > +	return 0;
-> 
-> why not return vp_id ? and test for a negative value in callers.
-> 
+Cc: kvm-ppc@vger.kernel.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/powerpc/kvm/book3s.c |  8 ++++----
+ arch/x86/kvm/x86.c        |  6 +++---
+ include/linux/kvm_host.h  |  2 ++
+ virt/kvm/kvm_main.c       | 10 +++++++---
+ 4 files changed, 16 insertions(+), 10 deletions(-)
 
-Simpler code in the callers IMHO.
-
-> 
-> C.
-> 
-> > +}
-> > +
-> >  int kvmppc_xive_connect_vcpu(struct kvm_device *dev,
-> >  			     struct kvm_vcpu *vcpu, u32 cpu)
-> >  {
-> > @@ -1229,20 +1260,13 @@ int kvmppc_xive_connect_vcpu(struct kvm_device *dev,
-> >  		return -EPERM;
-> >  	if (vcpu->arch.irq_type != KVMPPC_IRQ_DEFAULT)
-> >  		return -EBUSY;
-> > -	if (cpu >= (KVM_MAX_VCPUS * vcpu->kvm->arch.emul_smt_mode)) {
-> > -		pr_devel("Out of bounds !\n");
-> > -		return -EINVAL;
-> > -	}
-> >  
-> >  	/* We need to synchronize with queue provisioning */
-> >  	mutex_lock(&xive->lock);
-> >  
-> > -	vp_id = kvmppc_xive_vp(xive, cpu);
-> > -	if (kvmppc_xive_vp_in_use(xive->kvm, vp_id)) {
-> > -		pr_devel("Duplicate !\n");
-> > -		r = -EEXIST;
-> > +	r = kvmppc_xive_compute_vp_id(xive, cpu, &vp_id);
-> > +	if (r)
-> >  		goto bail;
-> > -	}
-> >  
-> >  	xc = kzalloc(sizeof(*xc), GFP_KERNEL);
-> >  	if (!xc) {
-> > diff --git a/arch/powerpc/kvm/book3s_xive.h b/arch/powerpc/kvm/book3s_xive.h
-> > index fe3ed50e0818..90cf6ec35a68 100644
-> > --- a/arch/powerpc/kvm/book3s_xive.h
-> > +++ b/arch/powerpc/kvm/book3s_xive.h
-> > @@ -296,6 +296,7 @@ int kvmppc_xive_attach_escalation(struct kvm_vcpu *vcpu, u8 prio,
-> >  struct kvmppc_xive *kvmppc_xive_get_device(struct kvm *kvm, u32 type);
-> >  void xive_cleanup_single_escalation(struct kvm_vcpu *vcpu,
-> >  				    struct kvmppc_xive_vcpu *xc, int irq);
-> > +int kvmppc_xive_compute_vp_id(struct kvmppc_xive *xive, u32 cpu, u32 *vp);
-> >  
-> >  #endif /* CONFIG_KVM_XICS */
-> >  #endif /* _KVM_PPC_BOOK3S_XICS_H */
-> > diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> > index 43a86858390a..5bb480b2aafd 100644
-> > --- a/arch/powerpc/kvm/book3s_xive_native.c
-> > +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> > @@ -118,19 +118,12 @@ int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
-> >  		return -EPERM;
-> >  	if (vcpu->arch.irq_type != KVMPPC_IRQ_DEFAULT)
-> >  		return -EBUSY;
-> > -	if (server_num >= (KVM_MAX_VCPUS * vcpu->kvm->arch.emul_smt_mode)) {
-> > -		pr_devel("Out of bounds !\n");
-> > -		return -EINVAL;
-> > -	}
-> >  
-> >  	mutex_lock(&xive->lock);
-> >  
-> > -	vp_id = kvmppc_xive_vp(xive, server_num);
-> > -	if (kvmppc_xive_vp_in_use(xive->kvm, vp_id)) {
-> > -		pr_devel("Duplicate !\n");
-> > -		rc = -EEXIST;
-> > +	rc = kvmppc_xive_compute_vp_id(xive, server_num, &vp_id);
-> > +	if (rc)
-> >  		goto bail;
-> > -	}
-> >  
-> >  	xc = kzalloc(sizeof(*xc), GFP_KERNEL);
-> >  	if (!xc) {
-> > 
-> 
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index d7fcdfa7fee4..ec2547cc5ecb 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -36,8 +36,8 @@
+ #include "book3s.h"
+ #include "trace.h"
+ 
+-#define VM_STAT(x) offsetof(struct kvm, stat.x), KVM_STAT_VM
+-#define VCPU_STAT(x) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU
++#define VM_STAT(x, ...) offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__
++#define VCPU_STAT(x, ...) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__
+ 
+ /* #define EXIT_DEBUG */
+ 
+@@ -69,8 +69,8 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	{ "pthru_all",       VCPU_STAT(pthru_all) },
+ 	{ "pthru_host",      VCPU_STAT(pthru_host) },
+ 	{ "pthru_bad_aff",   VCPU_STAT(pthru_bad_aff) },
+-	{ "largepages_2M",    VM_STAT(num_2M_pages) },
+-	{ "largepages_1G",    VM_STAT(num_1G_pages) },
++	{ "largepages_2M",    VM_STAT(num_2M_pages, .mode = 0444) },
++	{ "largepages_1G",    VM_STAT(num_1G_pages, .mode = 0444) },
+ 	{ NULL }
+ };
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 180c7e88577a..8072acaaf028 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -92,8 +92,8 @@
+ static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
+ #endif
+ 
+-#define VM_STAT(x) offsetof(struct kvm, stat.x), KVM_STAT_VM
+-#define VCPU_STAT(x) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU
++#define VM_STAT(x, ...) offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__
++#define VCPU_STAT(x, ...) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__
+ 
+ #define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | \
+                                     KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
+@@ -212,7 +212,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	{ "mmu_cache_miss", VM_STAT(mmu_cache_miss) },
+ 	{ "mmu_unsync", VM_STAT(mmu_unsync) },
+ 	{ "remote_tlb_flush", VM_STAT(remote_tlb_flush) },
+-	{ "largepages", VM_STAT(lpages) },
++	{ "largepages", VM_STAT(lpages, .mode = 0444) },
+ 	{ "max_mmu_page_hash_collisions",
+ 		VM_STAT(max_mmu_page_hash_collisions) },
+ 	{ NULL }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index fcb46b3374c6..719fc3e15ea4 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1090,6 +1090,7 @@ enum kvm_stat_kind {
+ 
+ struct kvm_stat_data {
+ 	int offset;
++	int mode;
+ 	struct kvm *kvm;
+ };
+ 
+@@ -1097,6 +1098,7 @@ struct kvm_stats_debugfs_item {
+ 	const char *name;
+ 	int offset;
+ 	enum kvm_stat_kind kind;
++	int mode;
+ };
+ extern struct kvm_stats_debugfs_item debugfs_entries[];
+ extern struct dentry *kvm_debugfs_dir;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e6de3159e682..fd68fbe0a75d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -617,8 +617,9 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 
+ 		stat_data->kvm = kvm;
+ 		stat_data->offset = p->offset;
++		stat_data->mode = p->mode ? p->mode : 0644;
+ 		kvm->debugfs_stat_data[p - debugfs_entries] = stat_data;
+-		debugfs_create_file(p->name, 0644, kvm->debugfs_dentry,
++		debugfs_create_file(p->name, stat_data->mode, kvm->debugfs_dentry,
+ 				    stat_data, stat_fops_per_vm[p->kind]);
+ 	}
+ 	return 0;
+@@ -3929,7 +3930,9 @@ static int kvm_debugfs_open(struct inode *inode, struct file *file,
+ 	if (!refcount_inc_not_zero(&stat_data->kvm->users_count))
+ 		return -ENOENT;
+ 
+-	if (simple_attr_open(inode, file, get, set, fmt)) {
++	if (simple_attr_open(inode, file, get,
++			     stat_data->mode & S_IWUGO ? set : NULL,
++			     fmt)) {
+ 		kvm_put_kvm(stat_data->kvm);
+ 		return -ENOMEM;
+ 	}
+@@ -4177,7 +4180,8 @@ static void kvm_init_debug(void)
+ 
+ 	kvm_debugfs_num_entries = 0;
+ 	for (p = debugfs_entries; p->name; ++p, kvm_debugfs_num_entries++) {
+-		debugfs_create_file(p->name, 0644, kvm_debugfs_dir,
++		int mode = p->mode ? p->mode : 0644;
++		debugfs_create_file(p->name, mode, kvm_debugfs_dir,
+ 				    (void *)(long)p->offset,
+ 				    stat_fops[p->kind]);
+ 	}
+-- 
+1.8.3.1
 
