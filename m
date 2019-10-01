@@ -2,79 +2,83 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EDE9BC3F1B
-	for <lists+kvm-ppc@lfdr.de>; Tue,  1 Oct 2019 19:57:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67192C400B
+	for <lists+kvm-ppc@lfdr.de>; Tue,  1 Oct 2019 20:40:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731383AbfJAR5E (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 1 Oct 2019 13:57:04 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18508 "EHLO
+        id S1726289AbfJASkn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 1 Oct 2019 14:40:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23714 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725951AbfJAR5E (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 1 Oct 2019 13:57:04 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x91HqXqS091810;
-        Tue, 1 Oct 2019 13:56:35 -0400
+        by vger.kernel.org with ESMTP id S1726240AbfJASkn (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 1 Oct 2019 14:40:43 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x91IMMFM051038;
+        Tue, 1 Oct 2019 14:40:11 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vc9bgd7m5-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vc9y5n2y7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Oct 2019 13:56:35 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91HrgD1102759;
-        Tue, 1 Oct 2019 13:56:34 -0400
+        Tue, 01 Oct 2019 14:40:11 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91IO2K5054774;
+        Tue, 1 Oct 2019 14:40:10 -0400
 Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vc9bgd7kt-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vc9y5n2xs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Oct 2019 13:56:34 -0400
+        Tue, 01 Oct 2019 14:40:10 -0400
 Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91Hsvcl006471;
-        Tue, 1 Oct 2019 17:56:33 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma01dal.us.ibm.com with ESMTP id 2v9y59cnss-1
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91IdmKj024723;
+        Tue, 1 Oct 2019 18:40:09 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma01dal.us.ibm.com with ESMTP id 2v9y59d1gm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Oct 2019 17:56:33 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x91HuW1h53674482
+        Tue, 01 Oct 2019 18:40:09 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x91Ie7dl60293438
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 1 Oct 2019 17:56:32 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 525DEAC05B;
-        Tue,  1 Oct 2019 17:56:32 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 83046AC059;
-        Tue,  1 Oct 2019 17:56:28 +0000 (GMT)
+        Tue, 1 Oct 2019 18:40:07 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6D48EC6055;
+        Tue,  1 Oct 2019 18:40:07 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A702C605D;
+        Tue,  1 Oct 2019 18:40:03 +0000 (GMT)
 Received: from leobras.br.ibm.com (unknown [9.18.235.47])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue,  1 Oct 2019 17:56:28 +0000 (GMT)
-Message-ID: <2cebe169221ae9270963d4bc4fd8e43066745f98.camel@linux.ibm.com>
-Subject: Re: [PATCH v4 03/11] mm/gup: Applies counting method to monitor
- gup_pgd_range
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue,  1 Oct 2019 18:40:02 +0000 (GMT)
+Message-ID: <9cd8e83334047b9144133781be9abd25a5678f3d.camel@linux.ibm.com>
+Subject: Re: [PATCH v4 01/11] powerpc/mm: Adds counting method to monitor
+ lockless pgtable walks
 From:   Leonardo Bras <leonardo@linux.ibm.com>
 To:     John Hubbard <jhubbard@nvidia.com>, linuxppc-dev@lists.ozlabs.org,
         linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
         linux-arch@vger.kernel.org, linux-mm@kvack.org
-Cc:     Keith Busch <keith.busch@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
+Cc:     Dan Williams <dan.j.williams@intel.com>,
         Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
         YueHaibing <yuehaibing@huawei.com>,
         Nicholas Piggin <npiggin@gmail.com>,
         Mike Rapoport <rppt@linux.ibm.com>,
-        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
+        Keith Busch <keith.busch@intel.com>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Paul Mackerras <paulus@samba.org>,
         "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
         Ganesh Goudar <ganeshgr@linux.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
         Allison Randal <allison@lohutok.net>
-Date:   Tue, 01 Oct 2019 14:56:19 -0300
-In-Reply-To: <ce0a4110-9f83-36db-dc85-6a727d30d030@nvidia.com>
+Date:   Tue, 01 Oct 2019 15:39:59 -0300
+In-Reply-To: <8534727b-72ed-b974-219e-02155bcd17a8@nvidia.com>
 References: <20190927234008.11513-1-leonardo@linux.ibm.com>
-         <20190927234008.11513-4-leonardo@linux.ibm.com>
-         <ce0a4110-9f83-36db-dc85-6a727d30d030@nvidia.com>
+         <20190927234008.11513-2-leonardo@linux.ibm.com>
+         <4ff1e8e8-929b-9cfc-9bf8-ee88e34de888@nvidia.com>
+         <2533a13f226a6e1fab387669b6cced2aa8d2e129.camel@linux.ibm.com>
+         <48bf32ca-5d3e-5d69-4cd1-6720364a0d81@nvidia.com>
+         <673bcb94b7752e086cc4133fb6cceb24394c02c0.camel@linux.ibm.com>
+         <8534727b-72ed-b974-219e-02155bcd17a8@nvidia.com>
 Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-WOdEGhITyKTGCaqMIiwf"
+        protocol="application/pgp-signature"; boundary="=-UnsfXxKPo94uksuiKXvu"
 User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
 X-TM-AS-GCONF: 00
@@ -84,139 +88,185 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorit
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910010145
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910010148
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
---=-WOdEGhITyKTGCaqMIiwf
+--=-UnsfXxKPo94uksuiKXvu
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2019-09-30 at 14:51 -0700, John Hubbard wrote:
-> On 9/27/19 4:40 PM, Leonardo Bras wrote:
-> > As decribed, gup_pgd_range is a lockless pagetable walk. So, in order t=
-o
-> > monitor against THP split/collapse with the couting method, it's necess=
-ary
->=20
-> s/couting/counting/
->=20
-
-Thanks, fixed for v5.
-
-> > to bound it with {start,end}_lockless_pgtbl_walk.
+On Mon, 2019-09-30 at 14:47 -0700, John Hubbard wrote:
+> On 9/30/19 11:42 AM, Leonardo Bras wrote:
+> > On Mon, 2019-09-30 at 10:57 -0700, John Hubbard wrote:
+> > > > As I told before, there are cases where this function is called fro=
+m
+> > > > 'real mode' in powerpc, which doesn't disable irqs and may have a
+> > > > tricky behavior if we do. So, encapsulate the irq disable in this
+> > > > function can be a bad choice.
+> > >=20
+> > > You still haven't explained how this works in that case. So far, the
+> > > synchronization we've discussed has depended upon interrupt disabling
+> > > as part of the solution, in order to hold off page splitting and page
+> > > table freeing.
 > >=20
-> > There are dummy functions, so it is not going to add any overhead on ar=
-chs
-> > that don't use this method.
+> > The irqs are already disabled by another mechanism (hw): MSR_EE=3D0.
+> > So, serialize will work as expected.
+>=20
+> I get that they're disabled. But will this interlock with the code that
+> issues IPIs?? Because it's not just disabling interrupts that matters, bu=
+t
+> rather, synchronizing with the code (TLB flushing) that *happens* to=20
+> require issuing IPIs, which in turn interact with disabling interrupts.
+>=20
+> So I'm still not seeing how that could work here, unless there is somethi=
+ng
+> interesting about the smp_call_function_many() on ppc with MSR_EE=3D0 mod=
+e...?
+>=20
+
+I am failing to understand the issue.
+I mean, smp_call_function_many() will issue a IPI to each CPU in
+CPUmask and wait it to run before returning.=20
+If interrupts are disabled (either by MSR_EE=3D0 or local_irq_disable),
+the IPI will not run on that CPU, and the wait part will make sure to
+lock the thread until the interrupts are enabled again.=20
+
+Could you please point the issue there?
+
+> > > Simply skipping that means that an additional mechanism is required..=
+.which
+> > > btw might involve a new, ppc-specific routine, so maybe this is going=
+ to end
+> > > up pretty close to what I pasted in after all...
+> > > > Of course, if we really need that, we can add a bool parameter to t=
+he
+> > > > function to choose about disabling/enabling irqs.
+> > > > > * This is really a core mm function, so don't hide it away in arc=
+h layers.
+> > > > >     (If you're changing mm/ files, that's a big hint.)
+> > > >=20
+> > > > My idea here is to let the arch decide on how this 'register' is go=
+ing
+> > > > to work, as archs may have different needs (in powerpc for example,=
+ we
+> > > > can't always disable irqs, since we may be in realmode).
+>=20
+> Yes, the tension there is that a) some things are per-arch, and b) it's e=
+asy=20
+> to get it wrong. The commit below (d9101bfa6adc) is IMHO a perfect exampl=
+e of
+> that.
+>=20
+> So, I would like core mm/ functions that guide the way, but the interrupt
+> behavior complicates it. I think your original passing of just struct_mm
+> is probably the right balance, assuming that I'm wrong about interrupts.
+>=20
+
+I think, for the generic function, that including {en,dis}abling the
+interrupt is fine. I mean, if disabling the interrupt is the generic
+behavior, it's ok.=20
+I will just make sure to explain that the interrupt {en,dis}abling is
+part of the sync process. If an arch don't like it, it can write a
+specific function that does the sync in a better way. (and defining
+__HAVE_ARCH_LOCKLESS_PGTBL_WALK_COUNTER to ignore the generic function)
+
+In this case, the generic function would also include the ifdef'ed
+atomic inc and the memory barrier.=20
+
+>=20
+> > > > Maybe we can create a generic function instead of a dummy, and let =
+it
+> > > > be replaced in case the arch needs to do so.
+> > >=20
+> > > Yes, that might be what we need, if it turns out that ppc can't use t=
+his
+> > > approach (although let's see about that).
+> > >=20
 > >=20
-> > Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
-> > ---
-> >  mm/gup.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
+> > I initially used the dummy approach because I did not see anything like
+> > serialize in other archs.=20
 > >=20
-> > diff --git a/mm/gup.c b/mm/gup.c
-> > index 98f13ab37bac..7105c829cf44 100644
-> > --- a/mm/gup.c
-> > +++ b/mm/gup.c
-> > @@ -2325,6 +2325,7 @@ static bool gup_fast_permitted(unsigned long star=
-t, unsigned long end)
-> >  int __get_user_pages_fast(unsigned long start, int nr_pages, int write=
-,
-> >  			  struct page **pages)
-> >  {
-> > +	struct mm_struct *mm;
+> > I mean, even if I put some generic function here, if there is no
+> > function to use the 'lockless_pgtbl_walk_count', it becomes only a
+> > overhead.
+> >=20
 >=20
-> I don't think that this local variable adds any value, so let's not use i=
-t.
-> Similar point in a few other patches too.
-
-It avoids 1 deference of current->mm, it's a little performance gain.
-
+> Not really: the memory barrier is required in all cases, and this code
+> would be good I think:
 >=20
-> >  	unsigned long len, end;
-> >  	unsigned long flags;
-> >  	int nr =3D 0;
-> > @@ -2352,9 +2353,12 @@ int __get_user_pages_fast(unsigned long start, i=
-nt nr_pages, int write,
-> > =20
-> >  	if (IS_ENABLED(CONFIG_HAVE_FAST_GUP) &&
-> >  	    gup_fast_permitted(start, end)) {
-> > +		mm =3D current->mm;
-> > +		start_lockless_pgtbl_walk(mm);
-> >  		local_irq_save(flags);
-> >  		gup_pgd_range(start, end, write ? FOLL_WRITE : 0, pages, &nr);
-> >  		local_irq_restore(flags);
-> > +		end_lockless_pgtbl_walk(mm);
-> >  	}
-> > =20
-> >  	return nr;
-> > @@ -2404,6 +2408,7 @@ int get_user_pages_fast(unsigned long start, int =
-nr_pages,
-> >  			unsigned int gup_flags, struct page **pages)
-> >  {
-> >  	unsigned long addr, len, end;
-> > +	struct mm_struct *mm;
+> +void register_lockless_pgtable_walker(struct mm_struct *mm)
+> +{
+> +#ifdef LOCKLESS_PAGE_TABLE_WALK_TRACKING
+> +       atomic_inc(&mm->lockless_pgtbl_nr_walkers);
+> +#endif
+> +       /*
+> +        * This memory barrier pairs with any code that is either trying =
+to
+> +        * delete page tables, or split huge pages.
+> +        */
+> +       smp_mb();
+> +}
+> +EXPORT_SYMBOL_GPL(gup_fast_lock_acquire);
 >=20
-> Same here.
+> And this is the same as your original patch, with just a minor name chang=
+e:
 >=20
-> >  	int nr =3D 0, ret =3D 0;
-> > =20
-> >  	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM)))
-> > @@ -2421,9 +2426,12 @@ int get_user_pages_fast(unsigned long start, int=
- nr_pages,
-> > =20
-> >  	if (IS_ENABLED(CONFIG_HAVE_FAST_GUP) &&
-> >  	    gup_fast_permitted(start, end)) {
-> > +		mm =3D current->mm;
-> > +		start_lockless_pgtbl_walk(mm);
+> @@ -2341,9 +2395,11 @@ int __get_user_pages_fast(unsigned long start, int=
+ nr_pages, int write,
+> =20
+>         if (IS_ENABLED(CONFIG_HAVE_FAST_GUP) &&
+>             gup_fast_permitted(start, end)) {
+> +               register_lockless_pgtable_walker(current->mm);
+>                 local_irq_save(flags);
+>                 gup_pgd_range(start, end, write ? FOLL_WRITE : 0, pages, =
+&nr);
+>                 local_irq_restore(flags);
+> +               deregister_lockless_pgtable_walker(current->mm);
 >=20
-> Minor: I'd like to rename this register_lockless_pgtable_walker().
 >=20
-> >  		local_irq_disable();
-> >  		gup_pgd_range(addr, end, gup_flags, pages, &nr);
-> >  		local_irq_enable();
-> > +		end_lockless_pgtbl_walk(mm);
+> Btw, hopefully minor note: it also looks like there's a number of changes=
+ in the same=20
+> area that conflict, for example:
 >=20
-> ...and deregister_lockless_pgtable_walker().
+>     commit d9101bfa6adc ("powerpc/mm/mce: Keep irqs disabled during lockl=
+ess=20
+>          page table walk") <Aneesh Kumar K.V> (Thu, 19 Sep 2019)
+>=20
+> ...so it would be good to rebase this onto 5.4-rc1, now that that's here.
 >=20
 
-I have no problem changing the name, but I don't register/deregister
-are good terms for this.=20
-
-I would rather use start/finish, begin/end, and so on. Register sounds
-like something more complicated than what we are trying to achieve
-here.=20
+Yeap, agree. Already rebased on top of v5.4-rc1.
 
 >=20
 > thanks,
 
 Thank you!
 
---=-WOdEGhITyKTGCaqMIiwf
+--=-UnsfXxKPo94uksuiKXvu
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 Content-Transfer-Encoding: 7bit
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl2Tk0MACgkQlQYWtz9S
-ttSDXw//YSv3GiwCNDmsVJYOkdVFcj9OsgYOCNmhsQY5guIaKQj+/1//EG97F9yt
-PVnM+822c/fwYhTZgA9SQQRA0BYZ4LwU4eBiSjPemSX10vLznjt32E9JvACZkvFN
-mhkmdooGndyVd4pEJsYjJ8bMwGYHf4BXliXCOgGR0GfbXBvIe/GWV+pYRsrd9jnx
-Q1R8k4bCO9O2FKwtEOpCPNFQPn/4D+mxLwcOuKliFMe/XHCUjv7RIrJMV41N3epk
-H3O5S7ML1m7A4i496+vDJvWb3zBFdWb0nqHQ7sp4gM5x2RzIZODtayIBRFs8Dgvy
-602F5XVDxsSY3irS27+OTtRGhV2aE3lhdZeWIeJMWY7b00vZJASO8fZd9mkatBeS
-Dj56JTFDmKVtqh//4kJwSDZKz5+y3LRfqONXgeIL5M0Rthc5tm+3XRztOxSDKZw/
-N9wxJBmeVOonSR1ngdQVnKu3B5gyQDNrJCQdCBcqLTOVIVCMjHjyf6l/jZu7VNH5
-wESlZ/gwBZ2iJ4CG0YeF6ObMC7/UjsjVRdvH39oA+KwErMOWjMZi6CbdEdzUnFI9
-Jo4f1nZ3/1bVGbCxlaaDoQxtfThRPCk9CJiMoyTG19HB2T0mUImtOt0VIH5Y/bQu
-T7wDnek8r9G1HwB++kVRFYELvmzfP4YSiUPAEDTNPlHFup2phZQ=
-=JHbX
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl2TnX8ACgkQlQYWtz9S
+ttRifhAAmPtPB1RIc4lme5/Hg5KtBhs6AMuOvwhLnDNb1F/9ArPOgle8lH/3vgzr
+kkB5zwbTMbPTqO863MHUfmGe3ySVthmBVWUmFVyPbJ9tLxVYirYc4kXHP6b+Bt+L
+eP2uAZzyTiyEgZFqVArmyoTCnjKi/0EpDzKz3HLcNCMf1BrWFShR83zHt2WaGhcg
+CSbTAdNSmzHTjzJcp8i68Mm6YXh9EABeAuZBNzkcAiOW6BQR8IETNFXQnI2lGgio
+jgGFHC4NhS3FiwX50U7Ks107G64sB78YY79Qws732lNjiBB+wGsOnBnIyAHlQPKL
+ZaPDkzuhiXLmS+WbjDc6VwTqSjsvUbpRvPDsFC/fXmv7RZbMliP/OSozsi62O0p8
+UnF8mA3+ihr8wYxoZi0qcTfiZRvopxGNCSCdIFeSAa7XBRm8+5bI4CWFsozrLqXC
+FK0zBunozKpubMMvgum2ZwBhGx/HL9QgATaDXRdBKRSdjxXfCzFL/CfyB0trmVZA
+ioAKjOPBHcAI1DrO5B61rntDk59qlGsapxwMhI+c4TWkx9IMbcp2frRb1MSDDZRY
+lxmog/vD/mX2SxCSMnrvg14pKHBjq+6N+p0t/gwPdeKlfx8qW/Zw4Xgbb9hP5VZD
+93eqb6MPe1+MKpx7cNAyWQmE6RzoZ0HIX7GQnoCw384Kz2bPmCM=
+=ol9F
 -----END PGP SIGNATURE-----
 
---=-WOdEGhITyKTGCaqMIiwf--
+--=-UnsfXxKPo94uksuiKXvu--
 
