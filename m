@@ -2,170 +2,221 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D51CC268A
-	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Sep 2019 22:37:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDE9BC3F1B
+	for <lists+kvm-ppc@lfdr.de>; Tue,  1 Oct 2019 19:57:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729141AbfI3Ugq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 30 Sep 2019 16:36:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29744 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727885AbfI3Ugp (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Sep 2019 16:36:45 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8UId4Tb128798;
-        Mon, 30 Sep 2019 14:42:54 -0400
+        id S1731383AbfJAR5E (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 1 Oct 2019 13:57:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18508 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725951AbfJAR5E (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 1 Oct 2019 13:57:04 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x91HqXqS091810;
+        Tue, 1 Oct 2019 13:56:35 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2vbnbpvx6j-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vc9bgd7m5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Sep 2019 14:42:54 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x8UIdGG7129741;
-        Mon, 30 Sep 2019 14:42:53 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2vbnbpvx5w-1
+        Tue, 01 Oct 2019 13:56:35 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91HrgD1102759;
+        Tue, 1 Oct 2019 13:56:34 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vc9bgd7kt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Sep 2019 14:42:53 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8UIextj010451;
-        Mon, 30 Sep 2019 18:42:52 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma02wdc.us.ibm.com with ESMTP id 2v9y57w08c-1
+        Tue, 01 Oct 2019 13:56:34 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91Hsvcl006471;
+        Tue, 1 Oct 2019 17:56:33 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma01dal.us.ibm.com with ESMTP id 2v9y59cnss-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Sep 2019 18:42:52 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8UIgpxs59310430
+        Tue, 01 Oct 2019 17:56:33 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x91HuW1h53674482
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Sep 2019 18:42:51 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 54C7EBE056;
-        Mon, 30 Sep 2019 18:42:51 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D281EBE04F;
-        Mon, 30 Sep 2019 18:42:46 +0000 (GMT)
-Received: from leobras.br.ibm.com (unknown [9.18.235.58])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 30 Sep 2019 18:42:46 +0000 (GMT)
-Message-ID: <673bcb94b7752e086cc4133fb6cceb24394c02c0.camel@linux.ibm.com>
-Subject: Re: [PATCH v4 01/11] powerpc/mm: Adds counting method to monitor
- lockless pgtable walks
+        Tue, 1 Oct 2019 17:56:32 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 525DEAC05B;
+        Tue,  1 Oct 2019 17:56:32 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 83046AC059;
+        Tue,  1 Oct 2019 17:56:28 +0000 (GMT)
+Received: from leobras.br.ibm.com (unknown [9.18.235.47])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  1 Oct 2019 17:56:28 +0000 (GMT)
+Message-ID: <2cebe169221ae9270963d4bc4fd8e43066745f98.camel@linux.ibm.com>
+Subject: Re: [PATCH v4 03/11] mm/gup: Applies counting method to monitor
+ gup_pgd_range
 From:   Leonardo Bras <leonardo@linux.ibm.com>
 To:     John Hubbard <jhubbard@nvidia.com>, linuxppc-dev@lists.ozlabs.org,
         linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
         linux-arch@vger.kernel.org, linux-mm@kvack.org
-Cc:     Arnd Bergmann <arnd@arndb.de>,
+Cc:     Keith Busch <keith.busch@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         YueHaibing <yuehaibing@huawei.com>,
         Nicholas Piggin <npiggin@gmail.com>,
         Mike Rapoport <rppt@linux.ibm.com>,
-        Keith Busch <keith.busch@intel.com>,
+        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Paul Mackerras <paulus@samba.org>,
         "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
-        Allison Randal <allison@lohutok.net>,
-        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
         Ganesh Goudar <ganeshgr@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ira Weiny <ira.weiny@intel.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Dan Williams <dan.j.williams@intel.com>
-Date:   Mon, 30 Sep 2019 15:42:42 -0300
-In-Reply-To: <48bf32ca-5d3e-5d69-4cd1-6720364a0d81@nvidia.com>
+        Ira Weiny <ira.weiny@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Allison Randal <allison@lohutok.net>
+Date:   Tue, 01 Oct 2019 14:56:19 -0300
+In-Reply-To: <ce0a4110-9f83-36db-dc85-6a727d30d030@nvidia.com>
 References: <20190927234008.11513-1-leonardo@linux.ibm.com>
-         <20190927234008.11513-2-leonardo@linux.ibm.com>
-         <4ff1e8e8-929b-9cfc-9bf8-ee88e34de888@nvidia.com>
-         <2533a13f226a6e1fab387669b6cced2aa8d2e129.camel@linux.ibm.com>
-         <48bf32ca-5d3e-5d69-4cd1-6720364a0d81@nvidia.com>
+         <20190927234008.11513-4-leonardo@linux.ibm.com>
+         <ce0a4110-9f83-36db-dc85-6a727d30d030@nvidia.com>
 Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-9k3sG6ksgKhuBdahGQJu"
+        protocol="application/pgp-signature"; boundary="=-WOdEGhITyKTGCaqMIiwf"
 User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
 X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-30_11:,,
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-01_08:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909300166
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910010145
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
---=-9k3sG6ksgKhuBdahGQJu
+--=-WOdEGhITyKTGCaqMIiwf
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2019-09-30 at 10:57 -0700, John Hubbard wrote:
-> > As I told before, there are cases where this function is called from
-> > 'real mode' in powerpc, which doesn't disable irqs and may have a
-> > tricky behavior if we do. So, encapsulate the irq disable in this
-> > function can be a bad choice.
+On Mon, 2019-09-30 at 14:51 -0700, John Hubbard wrote:
+> On 9/27/19 4:40 PM, Leonardo Bras wrote:
+> > As decribed, gup_pgd_range is a lockless pagetable walk. So, in order t=
+o
+> > monitor against THP split/collapse with the couting method, it's necess=
+ary
 >=20
-> You still haven't explained how this works in that case. So far, the
-> synchronization we've discussed has depended upon interrupt disabling
-> as part of the solution, in order to hold off page splitting and page
-> table freeing.
+> s/couting/counting/
+>=20
 
-The irqs are already disabled by another mechanism (hw): MSR_EE=3D0.
-So, serialize will work as expected.
+Thanks, fixed for v5.
 
-> Simply skipping that means that an additional mechanism is required...whi=
-ch
-> btw might involve a new, ppc-specific routine, so maybe this is going to =
-end
-> up pretty close to what I pasted in after all...
-> > Of course, if we really need that, we can add a bool parameter to the
-> > function to choose about disabling/enabling irqs.
-> > > * This is really a core mm function, so don't hide it away in arch la=
-yers.
-> > >     (If you're changing mm/ files, that's a big hint.)
+> > to bound it with {start,end}_lockless_pgtbl_walk.
 > >=20
-> > My idea here is to let the arch decide on how this 'register' is going
-> > to work, as archs may have different needs (in powerpc for example, we
-> > can't always disable irqs, since we may be in realmode).
+> > There are dummy functions, so it is not going to add any overhead on ar=
+chs
+> > that don't use this method.
 > >=20
-> > Maybe we can create a generic function instead of a dummy, and let it
-> > be replaced in case the arch needs to do so.
+> > Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
+> > ---
+> >  mm/gup.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >=20
+> > diff --git a/mm/gup.c b/mm/gup.c
+> > index 98f13ab37bac..7105c829cf44 100644
+> > --- a/mm/gup.c
+> > +++ b/mm/gup.c
+> > @@ -2325,6 +2325,7 @@ static bool gup_fast_permitted(unsigned long star=
+t, unsigned long end)
+> >  int __get_user_pages_fast(unsigned long start, int nr_pages, int write=
+,
+> >  			  struct page **pages)
+> >  {
+> > +	struct mm_struct *mm;
 >=20
-> Yes, that might be what we need, if it turns out that ppc can't use this
-> approach (although let's see about that).
+> I don't think that this local variable adds any value, so let's not use i=
+t.
+> Similar point in a few other patches too.
+
+It avoids 1 deference of current->mm, it's a little performance gain.
+
+>=20
+> >  	unsigned long len, end;
+> >  	unsigned long flags;
+> >  	int nr =3D 0;
+> > @@ -2352,9 +2353,12 @@ int __get_user_pages_fast(unsigned long start, i=
+nt nr_pages, int write,
+> > =20
+> >  	if (IS_ENABLED(CONFIG_HAVE_FAST_GUP) &&
+> >  	    gup_fast_permitted(start, end)) {
+> > +		mm =3D current->mm;
+> > +		start_lockless_pgtbl_walk(mm);
+> >  		local_irq_save(flags);
+> >  		gup_pgd_range(start, end, write ? FOLL_WRITE : 0, pages, &nr);
+> >  		local_irq_restore(flags);
+> > +		end_lockless_pgtbl_walk(mm);
+> >  	}
+> > =20
+> >  	return nr;
+> > @@ -2404,6 +2408,7 @@ int get_user_pages_fast(unsigned long start, int =
+nr_pages,
+> >  			unsigned int gup_flags, struct page **pages)
+> >  {
+> >  	unsigned long addr, len, end;
+> > +	struct mm_struct *mm;
+>=20
+> Same here.
+>=20
+> >  	int nr =3D 0, ret =3D 0;
+> > =20
+> >  	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM)))
+> > @@ -2421,9 +2426,12 @@ int get_user_pages_fast(unsigned long start, int=
+ nr_pages,
+> > =20
+> >  	if (IS_ENABLED(CONFIG_HAVE_FAST_GUP) &&
+> >  	    gup_fast_permitted(start, end)) {
+> > +		mm =3D current->mm;
+> > +		start_lockless_pgtbl_walk(mm);
+>=20
+> Minor: I'd like to rename this register_lockless_pgtable_walker().
+>=20
+> >  		local_irq_disable();
+> >  		gup_pgd_range(addr, end, gup_flags, pages, &nr);
+> >  		local_irq_enable();
+> > +		end_lockless_pgtbl_walk(mm);
+>=20
+> ...and deregister_lockless_pgtable_walker().
 >=20
 
-I initially used the dummy approach because I did not see anything like
-serialize in other archs.=20
+I have no problem changing the name, but I don't register/deregister
+are good terms for this.=20
 
-I mean, even if I put some generic function here, if there is no
-function to use the 'lockless_pgtbl_walk_count', it becomes only a
-overhead.
+I would rather use start/finish, begin/end, and so on. Register sounds
+like something more complicated than what we are trying to achieve
+here.=20
 
 >=20
 > thanks,
 
 Thank you!
 
---=-9k3sG6ksgKhuBdahGQJu
+--=-WOdEGhITyKTGCaqMIiwf
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 Content-Transfer-Encoding: 7bit
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl2STKIACgkQlQYWtz9S
-ttSxFg//Uqx1dqwNpWXo7xp/0GswLDO2WKQanbx0Qg4JKCL09MHD8khl2E9vx4IF
-Icd6eXFRwYdzgdFfGKCCUpE9dEBMkT9zPeDS7tk8jhbZ57yJtXC3X3Pcx7j82bEO
-n1x5ZL2jrTEqoWL4oYegJmVi7zzdHiGJi0O31QDIp9YGFdxUn2lPUCNMaypuLs/u
-vejkf6DcmVUXCigXaxmT5NN85fDDUJxbph79+UXyEm6jy9Zuk+PSi3AgfmkCKftk
-RdyU8pmX875qMJQGvoOAIaX/GBavIFVvujG9x7HBeL26G0pdttO0b/1nt5A3thWi
-nx2y4jlfzoDvLhAfw4wsZ+zHQjzIIZlpdM1SaDseb5mNyR1+fpTPoqhsAtqcex6N
-+LdR2q+osgMfKpklWyAhSgJVIqvvtViBEqmA5Itg4JOzQD0xJwg27DJjTd0mBv1E
-za5iWYaUxBs4qw8W98gwSbw2lKgIRfKieKynDUwdSmq8GwjCSj7H9Iuvr/aQwGnm
-E8o41KiK7frirDuS6jxdBYPvA3mtUqqVCN3pXZKktEc3CrZSd9C/J7AR5b+UZJOi
-Umdeci9BnKsx2kFvCsrdcl6DEkmKELiVjJ+aDtZBbunKnwKtupCRE2UC4X2UE02y
-Z9Mdw6OCS6VH+s+ArHVohA6MNm8+5OzhJdZV4oHv/EO5esStUTM=
-=VegT
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl2Tk0MACgkQlQYWtz9S
+ttSDXw//YSv3GiwCNDmsVJYOkdVFcj9OsgYOCNmhsQY5guIaKQj+/1//EG97F9yt
+PVnM+822c/fwYhTZgA9SQQRA0BYZ4LwU4eBiSjPemSX10vLznjt32E9JvACZkvFN
+mhkmdooGndyVd4pEJsYjJ8bMwGYHf4BXliXCOgGR0GfbXBvIe/GWV+pYRsrd9jnx
+Q1R8k4bCO9O2FKwtEOpCPNFQPn/4D+mxLwcOuKliFMe/XHCUjv7RIrJMV41N3epk
+H3O5S7ML1m7A4i496+vDJvWb3zBFdWb0nqHQ7sp4gM5x2RzIZODtayIBRFs8Dgvy
+602F5XVDxsSY3irS27+OTtRGhV2aE3lhdZeWIeJMWY7b00vZJASO8fZd9mkatBeS
+Dj56JTFDmKVtqh//4kJwSDZKz5+y3LRfqONXgeIL5M0Rthc5tm+3XRztOxSDKZw/
+N9wxJBmeVOonSR1ngdQVnKu3B5gyQDNrJCQdCBcqLTOVIVCMjHjyf6l/jZu7VNH5
+wESlZ/gwBZ2iJ4CG0YeF6ObMC7/UjsjVRdvH39oA+KwErMOWjMZi6CbdEdzUnFI9
+Jo4f1nZ3/1bVGbCxlaaDoQxtfThRPCk9CJiMoyTG19HB2T0mUImtOt0VIH5Y/bQu
+T7wDnek8r9G1HwB++kVRFYELvmzfP4YSiUPAEDTNPlHFup2phZQ=
+=JHbX
 -----END PGP SIGNATURE-----
 
---=-9k3sG6ksgKhuBdahGQJu--
+--=-WOdEGhITyKTGCaqMIiwf--
 
