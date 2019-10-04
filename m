@@ -2,165 +2,125 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CF65CB15E
-	for <lists+kvm-ppc@lfdr.de>; Thu,  3 Oct 2019 23:40:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79463CB35B
+	for <lists+kvm-ppc@lfdr.de>; Fri,  4 Oct 2019 04:53:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389225AbfJCVkF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 3 Oct 2019 17:40:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48228 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389234AbfJCVkF (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 3 Oct 2019 17:40:05 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x93LY6QW095049;
-        Thu, 3 Oct 2019 17:38:54 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vdr8yhka7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Oct 2019 17:38:54 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x93LYAsl095218;
-        Thu, 3 Oct 2019 17:38:52 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vdr8yhk9n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Oct 2019 17:38:52 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x93LaZRU030836;
-        Thu, 3 Oct 2019 21:38:51 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma04dal.us.ibm.com with ESMTP id 2v9y58kdsw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Oct 2019 21:38:51 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x93Lcorl50135478
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 3 Oct 2019 21:38:50 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8AFACAC059;
-        Thu,  3 Oct 2019 21:38:50 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 37268AC05F;
-        Thu,  3 Oct 2019 21:38:44 +0000 (GMT)
-Received: from leobras.br.ibm.com (unknown [9.18.235.190])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu,  3 Oct 2019 21:38:44 +0000 (GMT)
-Message-ID: <4e9e864856fc165b5dea8119eade871bc0e6f019.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 00/11] Introduces new count-based method for tracking
- lockless pagetable walks
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     John Hubbard <jhubbard@nvidia.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Song Liu <songliubraving@fb.com>, Michal Hocko <mhocko@suse.com>,
-        "Dmitry V. Levin" <ldv@altlinux.org>,
-        Keith Busch <keith.busch@intel.com>, linux-mm@kvack.org,
-        Paul Mackerras <paulus@samba.org>,
-        Christoph Lameter <cl@linux.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        linux-arch@vger.kernel.org, Santosh Sivaraj <santosh@fossix.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
-        Jesper Dangaard Brouer <brouer@redhat.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        =?ISO-8859-1?Q?J=E9r=F4me?= Glisse <jglisse@redhat.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        kvm-ppc@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Reza Arbab <arbab@linux.ibm.com>,
-        Allison Randal <allison@lohutok.net>,
-        Christian Brauner <christian.brauner@ubuntu.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Souptick Joarder <jrdr.linux@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev@lists.ozlabs.org, Roman Gushchin <guro@fb.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Date:   Thu, 03 Oct 2019 18:38:40 -0300
-In-Reply-To: <99754d82-33c5-a54f-8607-b6bf151069d4@nvidia.com>
-References: <20191003013325.2614-1-leonardo@linux.ibm.com>
-         <20191003072952.GN4536@hirez.programming.kicks-ass.net>
-         <c46d6c7301314a2d998cffc47d69b404f2c26ad3.camel@linux.ibm.com>
-         <99754d82-33c5-a54f-8607-b6bf151069d4@nvidia.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-+T6TWqK4ZitmnubF89r5"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+        id S1731004AbfJDCxx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 3 Oct 2019 22:53:53 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:34015 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730309AbfJDCxw (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 3 Oct 2019 22:53:52 -0400
+Received: by mail-pl1-f196.google.com with SMTP id k7so2449249pll.1
+        for <kvm-ppc@vger.kernel.org>; Thu, 03 Oct 2019 19:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pw20gjwGyIvk4z43y2bV2DrT/I4s7wENPGMcRRJ5rbU=;
+        b=I+7X8PFymt8BYtwV6VPllwcWxilbTowRfL8xWjjgfRDnyc1vOoMFchC9SqBarrsgAm
+         6ghMr6iSAVYWfyXYZbtwpFaL5m10QOx0SvNLbUCf9yzu6zmtGnOMiZE/eqwVAxvT/ZlR
+         gnn2mvEePlMKHVn4PrCP+n8V7eYsHkjxVZBrZPDMjU4037JYe1NYNSKwe5OrcOgJb53m
+         wDUSQw+7WwmK/vaxvYN1EoaKjv/qX4ZZOP1m+OwAZdYXoRVhVKdPYKqVQ0LJOjC/2t3s
+         BSkFO5qdHDD9ZG/obz7Th/peMJBH7WXnmUwJvGCAEIdSzgKaM/Z6nBbDR9p4KMEnLiA4
+         kNrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pw20gjwGyIvk4z43y2bV2DrT/I4s7wENPGMcRRJ5rbU=;
+        b=M81kM+CA4mGSHgo9xEPcRQ2W8tWNrTT/11CQGha9/c2i0CHKLe8DW0cMN+BTfBRBx8
+         sv9sz9UZho4l17GwNbV7I6xQ3Ko/CcNfRVfytTdn9stmDH/JUaoX23DZmYtJA/NbiRDh
+         EjC5dwMcooixZY/tl+qvu0xvBd2F0FpjAeoCo067BFUQoBri3AtwR8nNrsdGWfpfKquT
+         e9SslKttJrdvxuceLYdxiIZsJLt43+36tvH+TkD+NPSCptI1dXMAiw4EVMP9pURpOHuS
+         Z+2kF5/dOf1so2v6GulWBKBLpYYLH3OGyC8ZksS0heWk2vcipQzrvpvJZtu/M7GlktGZ
+         qjPg==
+X-Gm-Message-State: APjAAAW44tdMlp6LX1tUaWDJ0QZYIPrFG8/8NrBvcWi7i45WyxsjLtK7
+        tFxvutl/Ww8LHjdEInLrNzc=
+X-Google-Smtp-Source: APXvYqz+Wnmy5oq8K1YLi07YGFVPhyMZPZ0qDgQMDHCzmadww+fy1WVnAmWycWvQyFJxrLfO/vp3nA==
+X-Received: by 2002:a17:902:ff18:: with SMTP id f24mr12839898plj.173.1570157632027;
+        Thu, 03 Oct 2019 19:53:52 -0700 (PDT)
+Received: from pasglop.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id d20sm6920181pfq.88.2019.10.03.19.53.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2019 19:53:51 -0700 (PDT)
+From:   Jordan Niethe <jniethe5@gmail.com>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     patch-notifications@ellerman.id.au, paulus@ozlabs.org,
+        alistair@popple.id.au, kvm-ppc@vger.kernel.org, aik@ozlabs.ru,
+        Jordan Niethe <jniethe5@gmail.com>
+Subject: [PATCH] powerpc/kvm: Fix kvmppc_vcore->in_guest value in kvmhv_switch_to_host
+Date:   Fri,  4 Oct 2019 12:53:17 +1000
+Message-Id: <20191004025317.19340-1-jniethe5@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-03_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910030173
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+kvmhv_switch_to_host() in arch/powerpc/kvm/book3s_hv_rmhandlers.S needs
+to set kvmppc_vcore->in_guest to 0 to signal secondary CPUs to continue.
+This happens after resetting the PCR. Before commit 13c7bb3c57dc
+("powerpc/64s: Set reserved PCR bits"), r0 would always be 0 before it
+was stored to kvmppc_vcore->in_guest. However because of this change in
+the commit:
 
---=-+T6TWqK4ZitmnubF89r5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        /* Reset PCR */
+        ld      r0, VCORE_PCR(r5)
+-       cmpdi   r0, 0
++       LOAD_REG_IMMEDIATE(r6, PCR_MASK)
++       cmpld   r0, r6
+        beq     18f
+-       li      r0, 0
+-       mtspr   SPRN_PCR, r0
++       mtspr   SPRN_PCR, r6
+ 18:
+        /* Signal secondary CPUs to continue */
+        stb     r0,VCORE_IN_GUEST(r5)
 
-On Thu, 2019-10-03 at 13:49 -0700, John Hubbard wrote:
-> Yes. And to clarify, I was assuming that the changes to mm/gup.c were=20
-> required in order to accomplish your goals. Given that assumption, I=20
-> wanted the generic code to be "proper", and that's what that feedback
-> is about.
+We are no longer comparing r0 against 0 and loading it with 0 if it
+contains something else. Hence when we store r0 to
+kvmppc_vcore->in_guest, it might not be 0.  This means that secondary
+CPUs will not be signalled to continue. Those CPUs get stuck and errors
+like the following are logged:
 
-You assumed right. On my counting approach it's necessary count all
-'lockless pagetable walks', including the ones in generic code.
+    KVM: CPU 1 seems to be stuck
+    KVM: CPU 2 seems to be stuck
+    KVM: CPU 3 seems to be stuck
+    KVM: CPU 4 seems to be stuck
+    KVM: CPU 5 seems to be stuck
+    KVM: CPU 6 seems to be stuck
+    KVM: CPU 7 seems to be stuck
 
-And, I think even without the counting approach, it was a good way
-focus this 'lockless pagetable walk' routine in a single place.
+This can be reproduced with:
+    $ for i in `seq 1 7` ; do chcpu -d $i ; done ;
+    $ taskset -c 0 qemu-system-ppc64 -smp 8,threads=8 \
+       -M pseries,accel=kvm,kvm-type=HV -m 1G -nographic -vga none \
+       -kernel vmlinux -initrd initrd.cpio.xz
 
->=20
-> Although the other questions about file-backed THP
-> make it sound like some rethinking across the board is required now.
+Fix by making sure r0 is 0 before storing it to kvmppc_vcore->in_guest.
 
-Yeap, I need to better understand how the file-backed THP problem
-works.
+Fixes: 13c7bb3c57dc ("powerpc/64s: Set reserved PCR bits")
+Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
+---
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
-
-Leonardo Br=C3=A1s
-
---=-+T6TWqK4ZitmnubF89r5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl2WamAACgkQlQYWtz9S
-ttT+5A//d6Der3cfKkY0anP/E6uyI6e77Kt+RWmN9+RuhxKKyMvN3vR0lOiAxvuE
-mr0LmRnING4Jsvhz54FB9xPIJzEH+5tPXrX9TkHYOFqQfkyvDtx8LaCHf+gN+xQx
-l2ukNHr6gqjA6Sb8eQEm0RKeiidLX6NPo03/OwiAWs44z+XofzyFuUa13VmE2+YE
-oe27ZXb/UsLlrO8rB7cG+DyGuRBTlivjCpDp+JEDkdRH8tePICRaAtV0nR+YxeA7
-4NiBcgM9ONQeJOKViKmWdqhC/2K2gVeSFE7WpidAUOrRUJR9FyFisZ7x8MKrW06f
-GRSRrSisMdvHlgbZHcT+n0tqNPcRzmGmTnkZ/nlnoM7w5qKgsMGIBOBYH5CW2FPg
-19xIRhUMX+ShhSPc8H8TIeaHxRmJrJYmnfib+MY4IZhrZmAUEqYDSnjzvypUSvFF
-HUly+f6MpQlOv+RHgi4BV/zdyO8ucaaSCMh2yGREJ5FEuDAEKm5AHz6RwtRMtoY0
-v8Y+7IEPVKPdV4sL8z5vfInKDeRU3FP0CPlKCKg6FcRvGNMGCEkP9ZtuzHxVb/Xs
-JNa3VDiiijvnu/tDsdNS/6aHLtANNlLvaNGAuESrxAJRFzziLN92i+RXMLBaQCZo
-/pZH9phCxN/HZly4uA7Ek1TbRKsNstB/CvsXTJBF91f6L7m0Awc=
-=4hRX
------END PGP SIGNATURE-----
-
---=-+T6TWqK4ZitmnubF89r5--
+diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+index 74a9cfe84aee..faebcbb8c4db 100644
+--- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
++++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+@@ -1921,6 +1921,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
+ 	mtspr	SPRN_PCR, r6
+ 18:
+ 	/* Signal secondary CPUs to continue */
++	li	r0, 0
+ 	stb	r0,VCORE_IN_GUEST(r5)
+ 19:	lis	r8,0x7fff		/* MAX_INT@h */
+ 	mtspr	SPRN_HDEC,r8
+-- 
+2.20.1
 
