@@ -2,127 +2,145 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E901DCB876
-	for <lists+kvm-ppc@lfdr.de>; Fri,  4 Oct 2019 12:38:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBE1CCB919
+	for <lists+kvm-ppc@lfdr.de>; Fri,  4 Oct 2019 13:30:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727513AbfJDKix (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 4 Oct 2019 06:38:53 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:45301 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725788AbfJDKix (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 4 Oct 2019 06:38:53 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 46l5vZ2Hgkz9sNw; Fri,  4 Oct 2019 20:38:50 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1570185530;
-        bh=6ZYAP3kzygIvshHZBkrCIgOhh+ZjXOmnm0g1aJ4p4m8=;
-        h=From:To:Cc:Subject:Date:From;
-        b=pb1FvXcOt4ClvFpDA07cag6IunhntVyApGw7VA/Srgc7/IJk+7VDMPZ/aZFvMP0cQ
-         qY7Dye93O1U0YS/u3RfoXe1htmaUixXK3320U0+MKYxxw9DnOz3EnRdrc4J0zTHoL4
-         CddYkk1Gg2ZuGuLLGDHI/kjgZNIdtGcQFv6nk9HQ=
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     lvivier@redhat.com, thuth@redhat.com
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, pbonzini@redhat.com,
-        rkrcmar@redhat.com, David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH] powerpc: Fix up RTAS invocation for new qemu versions
-Date:   Fri,  4 Oct 2019 20:38:44 +1000
-Message-Id: <20191004103844.32590-1-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
+        id S1728927AbfJDLaA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 4 Oct 2019 07:30:00 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:36116 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727254AbfJDLaA (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 4 Oct 2019 07:30:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=jWelrCDVOAXy8hN8VjR1adB6IyXBOt3/QtmJ/voDmTs=; b=nwkEEfEL12BnVaYLSfPhd2e2Ln
+        hB4i1gugq22rSMg1LCnlbu6Qno1BBRHFOYKFvZyD3L4tBd0085H+yAZ4MYaDWZ+eP9oY3o3MNjJjq
+        BEhzcevGCSW20rEaS/5saCafPoGFWaV5v3eJouN5tEsfE5BvsGSyxBqt1fERyo/REimJh4LSRmyaD
+        agnFLXltPj3p7qKpQ+/CtvR16C+KLJoJbaK2jrMk+LNGNWsTUGeC9qRmcCVlFJEUgAYK8Ay+xtxiS
+        yUMpUi4BK+2/uOCdWIDdObYgY4555aqt6UZIbyTTrJBxLdCN8KfntKpA4qSjahlZ1BSiE8ZrmsiCl
+        lZ0ESvGw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.2 #3 (Red Hat Linux))
+        id 1iGLlP-0005rP-Ht; Fri, 04 Oct 2019 11:28:47 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id DE8643013A4;
+        Fri,  4 Oct 2019 13:27:54 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 7BFF0203E50D2; Fri,  4 Oct 2019 13:28:44 +0200 (CEST)
+Date:   Fri, 4 Oct 2019 13:28:44 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Leonardo Bras <leonardo@linux.ibm.com>
+Cc:     Song Liu <songliubraving@fb.com>, Michal Hocko <mhocko@suse.com>,
+        "Dmitry V. Levin" <ldv@altlinux.org>,
+        Keith Busch <keith.busch@intel.com>, linux-mm@kvack.org,
+        Paul Mackerras <paulus@samba.org>,
+        Christoph Lameter <cl@linux.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Elena Reshetova <elena.reshetova@intel.com>,
+        linux-arch@vger.kernel.org, Santosh Sivaraj <santosh@fossix.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Jesper Dangaard Brouer <brouer@redhat.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        kvm-ppc@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Reza Arbab <arbab@linux.ibm.com>,
+        Allison Randal <allison@lohutok.net>,
+        Christian Brauner <christian.brauner@ubuntu.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Souptick Joarder <jrdr.linux@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev@lists.ozlabs.org, Roman Gushchin <guro@fb.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH v5 01/11] asm-generic/pgtable: Adds generic functions to
+ monitor lockless pgtable walks
+Message-ID: <20191004112844.GC19463@hirez.programming.kicks-ass.net>
+References: <20191003013325.2614-1-leonardo@linux.ibm.com>
+ <20191003013325.2614-2-leonardo@linux.ibm.com>
+ <20191003071145.GM4536@hirez.programming.kicks-ass.net>
+ <20191003115141.GJ4581@hirez.programming.kicks-ass.net>
+ <c46ba8cec981ad28383bb7b23161fb83ccda4a60.camel@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <c46ba8cec981ad28383bb7b23161fb83ccda4a60.camel@linux.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-In order to call RTAS functions on powerpc kvm-unit-tests relies on the
-RTAS blob supplied by qemu.  But new versions of qemu don't supply an RTAS
-blob: since the normal way for guests to get RTAS is to call the guest
-firmware's instantiate-rtas function, we now rely on that guest firmware
-to provide the RTAS code itself.
+On Thu, Oct 03, 2019 at 06:24:07PM -0300, Leonardo Bras wrote:
+> Hello Peter, thanks for the feedback!
+>=20
+> On Thu, 2019-10-03 at 13:51 +0200, Peter Zijlstra wrote:
+> > On Thu, Oct 03, 2019 at 09:11:45AM +0200, Peter Zijlstra wrote:
+> > > On Wed, Oct 02, 2019 at 10:33:15PM -0300, Leonardo Bras wrote:
+> > > > diff --git a/include/asm-generic/pgtable.h b/include/asm-generic/pg=
+table.h
+> > > > index 818691846c90..3043ea9812d5 100644
+> > > > --- a/include/asm-generic/pgtable.h
+> > > > +++ b/include/asm-generic/pgtable.h
+> > > > @@ -1171,6 +1171,64 @@ static inline bool arch_has_pfn_modify_check=
+(void)
+> > > >  #endif
+> > > >  #endif
+> > > > =20
+> > > > +#ifndef __HAVE_ARCH_LOCKLESS_PGTBL_WALK_CONTROL
+> > > > +static inline unsigned long begin_lockless_pgtbl_walk(struct mm_st=
+ruct *mm)
+> > > > +{
+> > > > +	unsigned long irq_mask;
+> > > > +
+> > > > +	if (IS_ENABLED(CONFIG_LOCKLESS_PAGE_TABLE_WALK_TRACKING))
+> > > > +		atomic_inc(&mm->lockless_pgtbl_walkers);
+> > >=20
+> > > This will not work for file backed THP. Also, this is a fairly serious
+> > > contention point all on its own.
+> >=20
+> > Kiryl says we have tmpfs-thp, this would be broken vs that, as would
+> > your (PowerPC) use of mm_cpumask() for that IPI.
+>=20
+> Could you please explain it?
+> I mean, why this breaks tmpfs-thp?
+> Also, why mm_cpumask() is also broken?
 
-But qemu-kvm-tests bypasses the usual guest firmware to just run itself,
-so we can't get the rtas blob from SLOF.
+Because shared pages are not bound by a mm; or does it not share the thp
+state between mappings?
 
-But.. in fact the RTAS blob under qemu is a bit of a sham anyway - it's
-a tiny wrapper that forwards the RTAS call to a hypercall.  So, we can
-just invoke that hypercall directly.
+> > And I still think all that wrong, you really shouldn't need to wait on
+> > munmap().
+>=20
+> That is something I need to better understand. I mean, before coming
+> with this patch, I thought exactly this: not serialize when on munmap.=20
+>=20
+> But on the way I was convinced it would not work on munmap. I need to
+> recall why, and if it was false to assume this, re-think the whole
+> solution.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- lib/powerpc/asm/hcall.h |  3 +++
- lib/powerpc/rtas.c      |  6 +++---
- powerpc/cstart64.S      | 20 ++++++++++++++++----
- 3 files changed, 22 insertions(+), 7 deletions(-)
-
-So.. "new versions of qemu" in this case means ones that incorporate
-the pull request I just sent today.
-
-diff --git a/lib/powerpc/asm/hcall.h b/lib/powerpc/asm/hcall.h
-index a8bd7e3..1173fea 100644
---- a/lib/powerpc/asm/hcall.h
-+++ b/lib/powerpc/asm/hcall.h
-@@ -24,6 +24,9 @@
- #define H_RANDOM		0x300
- #define H_SET_MODE		0x31C
- 
-+#define KVMPPC_HCALL_BASE	0xf000
-+#define KVMPPC_H_RTAS		(KVMPPC_HCALL_BASE + 0x0)
-+
- #ifndef __ASSEMBLY__
- /*
-  * hcall_have_broken_sc1 checks if we're on a host with a broken sc1.
-diff --git a/lib/powerpc/rtas.c b/lib/powerpc/rtas.c
-index 2e7e0da..41c0a24 100644
---- a/lib/powerpc/rtas.c
-+++ b/lib/powerpc/rtas.c
-@@ -46,9 +46,9 @@ void rtas_init(void)
- 	prop = fdt_get_property(dt_fdt(), node,
- 				"linux,rtas-entry", &len);
- 	if (!prop) {
--		printf("%s: /rtas/linux,rtas-entry: %s\n",
--				__func__, fdt_strerror(len));
--		abort();
-+		/* We don't have a qemu provided RTAS blob, enter_rtas
-+		 * will use H_RTAS directly */
-+		return;
- 	}
- 	data = (u32 *)prop->data;
- 	rtas_entry = (unsigned long)fdt32_to_cpu(*data);
-diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
-index ec673b3..972851f 100644
---- a/powerpc/cstart64.S
-+++ b/powerpc/cstart64.S
-@@ -121,13 +121,25 @@ halt:
- 
- .globl enter_rtas
- enter_rtas:
-+	LOAD_REG_ADDR(r11, rtas_entry)
-+	ld	r10, 0(r11)
-+
-+	cmpdi	r10,0
-+	bne	external_rtas
-+
-+	/* Use H_RTAS directly */
-+	mr	r4,r3
-+	lis	r3,KVMPPC_H_RTAS@h
-+	ori	r3,r3,KVMPPC_H_RTAS@l
-+	b	hcall
-+
-+external_rtas:
-+	/* Use external RTAS blob */
- 	mflr	r0
- 	std	r0, 16(r1)
- 
--	LOAD_REG_ADDR(r10, rtas_return_loc)
--	mtlr	r10
--	LOAD_REG_ADDR(r11, rtas_entry)
--	ld	r10, 0(r11)
-+	LOAD_REG_ADDR(r11, rtas_return_loc)
-+	mtlr	r11
- 
- 	mfmsr	r11
- 	LOAD_REG_IMMEDIATE(r9, RTAS_MSR_MASK)
--- 
-2.21.0
-
+And once you (re)figure it out, please write it down. It is a crucial
+bit of the puzzle and needs to be part of the Changelogs.
