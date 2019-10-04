@@ -2,142 +2,127 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B1D30CB35F
-	for <lists+kvm-ppc@lfdr.de>; Fri,  4 Oct 2019 04:59:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E901DCB876
+	for <lists+kvm-ppc@lfdr.de>; Fri,  4 Oct 2019 12:38:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730985AbfJDC7F (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 3 Oct 2019 22:59:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44182 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730309AbfJDC7E (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 3 Oct 2019 22:59:04 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x942MCA1102451
-        for <kvm-ppc@vger.kernel.org>; Thu, 3 Oct 2019 22:59:03 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vdm17gmk5-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Thu, 03 Oct 2019 22:59:02 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <alistair@popple.id.au>;
-        Fri, 4 Oct 2019 03:59:00 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 4 Oct 2019 03:58:57 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x942wuCG43450626
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 4 Oct 2019 02:58:56 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 467E5A4055;
-        Fri,  4 Oct 2019 02:58:56 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E8344A404D;
-        Fri,  4 Oct 2019 02:58:55 +0000 (GMT)
-Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  4 Oct 2019 02:58:55 +0000 (GMT)
-Received: from townsend.localnet (haven.au.ibm.com [9.192.254.114])
-        (using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ozlabs.au.ibm.com (Postfix) with ESMTPSA id 29A4BA01E9;
-        Fri,  4 Oct 2019 12:58:54 +1000 (AEST)
-From:   Alistair Popple <alistair@popple.id.au>
-To:     Jordan Niethe <jniethe5@gmail.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, patch-notifications@ellerman.id.au,
-        paulus@ozlabs.org, kvm-ppc@vger.kernel.org, aik@ozlabs.ru
-Subject: Re: [PATCH] powerpc/kvm: Fix kvmppc_vcore->in_guest value in kvmhv_switch_to_host
-Date:   Fri, 04 Oct 2019 12:58:54 +1000
-In-Reply-To: <20191004025317.19340-1-jniethe5@gmail.com>
-References: <20191004025317.19340-1-jniethe5@gmail.com>
+        id S1727513AbfJDKix (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 4 Oct 2019 06:38:53 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:45301 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725788AbfJDKix (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 4 Oct 2019 06:38:53 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 46l5vZ2Hgkz9sNw; Fri,  4 Oct 2019 20:38:50 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1570185530;
+        bh=6ZYAP3kzygIvshHZBkrCIgOhh+ZjXOmnm0g1aJ4p4m8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=pb1FvXcOt4ClvFpDA07cag6IunhntVyApGw7VA/Srgc7/IJk+7VDMPZ/aZFvMP0cQ
+         qY7Dye93O1U0YS/u3RfoXe1htmaUixXK3320U0+MKYxxw9DnOz3EnRdrc4J0zTHoL4
+         CddYkk1Gg2ZuGuLLGDHI/kjgZNIdtGcQFv6nk9HQ=
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     lvivier@redhat.com, thuth@redhat.com
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, pbonzini@redhat.com,
+        rkrcmar@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH] powerpc: Fix up RTAS invocation for new qemu versions
+Date:   Fri,  4 Oct 2019 20:38:44 +1000
+Message-Id: <20191004103844.32590-1-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-TM-AS-GCONF: 00
-x-cbid: 19100402-4275-0000-0000-0000036DDB79
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19100402-4276-0000-0000-00003880E3C2
-Message-Id: <1916396.0ElsYWBKjT@townsend>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-04_01:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=79 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910040018
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Reviewed-by: Alistair Popple <alistair@popple.id.au>
+In order to call RTAS functions on powerpc kvm-unit-tests relies on the
+RTAS blob supplied by qemu.  But new versions of qemu don't supply an RTAS
+blob: since the normal way for guests to get RTAS is to call the guest
+firmware's instantiate-rtas function, we now rely on that guest firmware
+to provide the RTAS code itself.
 
-On Friday, 4 October 2019 12:53:17 PM AEST Jordan Niethe wrote:
-> kvmhv_switch_to_host() in arch/powerpc/kvm/book3s_hv_rmhandlers.S needs
-> to set kvmppc_vcore->in_guest to 0 to signal secondary CPUs to continue.
-> This happens after resetting the PCR. Before commit 13c7bb3c57dc
-> ("powerpc/64s: Set reserved PCR bits"), r0 would always be 0 before it
-> was stored to kvmppc_vcore->in_guest. However because of this change in
-> the commit:
-> 
->         /* Reset PCR */
->         ld      r0, VCORE_PCR(r5)
-> -       cmpdi   r0, 0
-> +       LOAD_REG_IMMEDIATE(r6, PCR_MASK)
-> +       cmpld   r0, r6
->         beq     18f
-> -       li      r0, 0
-> -       mtspr   SPRN_PCR, r0
-> +       mtspr   SPRN_PCR, r6
->  18:
->         /* Signal secondary CPUs to continue */
->         stb     r0,VCORE_IN_GUEST(r5)
-> 
-> We are no longer comparing r0 against 0 and loading it with 0 if it
-> contains something else. Hence when we store r0 to
-> kvmppc_vcore->in_guest, it might not be 0.  This means that secondary
-> CPUs will not be signalled to continue. Those CPUs get stuck and errors
-> like the following are logged:
-> 
->     KVM: CPU 1 seems to be stuck
->     KVM: CPU 2 seems to be stuck
->     KVM: CPU 3 seems to be stuck
->     KVM: CPU 4 seems to be stuck
->     KVM: CPU 5 seems to be stuck
->     KVM: CPU 6 seems to be stuck
->     KVM: CPU 7 seems to be stuck
-> 
-> This can be reproduced with:
->     $ for i in `seq 1 7` ; do chcpu -d $i ; done ;
->     $ taskset -c 0 qemu-system-ppc64 -smp 8,threads=8 \
->        -M pseries,accel=kvm,kvm-type=HV -m 1G -nographic -vga none \
->        -kernel vmlinux -initrd initrd.cpio.xz
-> 
-> Fix by making sure r0 is 0 before storing it to kvmppc_vcore->in_guest.
-> 
-> Fixes: 13c7bb3c57dc ("powerpc/64s: Set reserved PCR bits")
-> Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
-> ---
->  arch/powerpc/kvm/book3s_hv_rmhandlers.S | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> index 74a9cfe84aee..faebcbb8c4db 100644
-> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> @@ -1921,6 +1921,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
->  	mtspr	SPRN_PCR, r6
->  18:
->  	/* Signal secondary CPUs to continue */
-> +	li	r0, 0
->  	stb	r0,VCORE_IN_GUEST(r5)
->  19:	lis	r8,0x7fff		/* MAX_INT@h */
->  	mtspr	SPRN_HDEC,r8
-> 
+But qemu-kvm-tests bypasses the usual guest firmware to just run itself,
+so we can't get the rtas blob from SLOF.
 
+But.. in fact the RTAS blob under qemu is a bit of a sham anyway - it's
+a tiny wrapper that forwards the RTAS call to a hypercall.  So, we can
+just invoke that hypercall directly.
 
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ lib/powerpc/asm/hcall.h |  3 +++
+ lib/powerpc/rtas.c      |  6 +++---
+ powerpc/cstart64.S      | 20 ++++++++++++++++----
+ 3 files changed, 22 insertions(+), 7 deletions(-)
 
+So.. "new versions of qemu" in this case means ones that incorporate
+the pull request I just sent today.
+
+diff --git a/lib/powerpc/asm/hcall.h b/lib/powerpc/asm/hcall.h
+index a8bd7e3..1173fea 100644
+--- a/lib/powerpc/asm/hcall.h
++++ b/lib/powerpc/asm/hcall.h
+@@ -24,6 +24,9 @@
+ #define H_RANDOM		0x300
+ #define H_SET_MODE		0x31C
+ 
++#define KVMPPC_HCALL_BASE	0xf000
++#define KVMPPC_H_RTAS		(KVMPPC_HCALL_BASE + 0x0)
++
+ #ifndef __ASSEMBLY__
+ /*
+  * hcall_have_broken_sc1 checks if we're on a host with a broken sc1.
+diff --git a/lib/powerpc/rtas.c b/lib/powerpc/rtas.c
+index 2e7e0da..41c0a24 100644
+--- a/lib/powerpc/rtas.c
++++ b/lib/powerpc/rtas.c
+@@ -46,9 +46,9 @@ void rtas_init(void)
+ 	prop = fdt_get_property(dt_fdt(), node,
+ 				"linux,rtas-entry", &len);
+ 	if (!prop) {
+-		printf("%s: /rtas/linux,rtas-entry: %s\n",
+-				__func__, fdt_strerror(len));
+-		abort();
++		/* We don't have a qemu provided RTAS blob, enter_rtas
++		 * will use H_RTAS directly */
++		return;
+ 	}
+ 	data = (u32 *)prop->data;
+ 	rtas_entry = (unsigned long)fdt32_to_cpu(*data);
+diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+index ec673b3..972851f 100644
+--- a/powerpc/cstart64.S
++++ b/powerpc/cstart64.S
+@@ -121,13 +121,25 @@ halt:
+ 
+ .globl enter_rtas
+ enter_rtas:
++	LOAD_REG_ADDR(r11, rtas_entry)
++	ld	r10, 0(r11)
++
++	cmpdi	r10,0
++	bne	external_rtas
++
++	/* Use H_RTAS directly */
++	mr	r4,r3
++	lis	r3,KVMPPC_H_RTAS@h
++	ori	r3,r3,KVMPPC_H_RTAS@l
++	b	hcall
++
++external_rtas:
++	/* Use external RTAS blob */
+ 	mflr	r0
+ 	std	r0, 16(r1)
+ 
+-	LOAD_REG_ADDR(r10, rtas_return_loc)
+-	mtlr	r10
+-	LOAD_REG_ADDR(r11, rtas_entry)
+-	ld	r10, 0(r11)
++	LOAD_REG_ADDR(r11, rtas_return_loc)
++	mtlr	r11
+ 
+ 	mfmsr	r11
+ 	LOAD_REG_IMMEDIATE(r9, RTAS_MSR_MASK)
+-- 
+2.21.0
 
