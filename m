@@ -2,170 +2,166 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CDCBD0D69
-	for <lists+kvm-ppc@lfdr.de>; Wed,  9 Oct 2019 13:12:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE700D175A
+	for <lists+kvm-ppc@lfdr.de>; Wed,  9 Oct 2019 20:11:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730398AbfJILMP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 9 Oct 2019 07:12:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34792 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727035AbfJILMP (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 9 Oct 2019 07:12:15 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7E1F92A09A1
-        for <kvm-ppc@vger.kernel.org>; Wed,  9 Oct 2019 11:12:14 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id m14so946704wru.17
-        for <kvm-ppc@vger.kernel.org>; Wed, 09 Oct 2019 04:12:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=X3f2+iJt/kBOoQ/oJmoBrarzOZ7jjd89Vg2qgN2ogok=;
-        b=GRo26W2ZJI8Dp8OEcor+w/ky/0Gj+aYGDgcOi5YhPNywiivIGrnIik3rRxHjmhzU1r
-         g7+WRNRqOqK0UqFGuEvfhq76oJqg3ZMS7CVaz472qrzYfzvpfwzpwESdUNzBABKponR+
-         NozC6DjNXWtbRwffHTSQrJ11g4RvscPWCqE7HocaVhDBGG+m0djblFBgM8mMPSEUdLHZ
-         flfRJslt2EF6kSbNc5Y/qTIkqf3vqRilu6eDIpB6spwthHvlk6DrY0V1mzyLozs68wOP
-         I9Z6TwFt+AtvJdlyXYxLGEQby/R95rToOdjJ4ONI+s8PH70xNWC3OMPRwrZUTQjxCaTe
-         7hQQ==
-X-Gm-Message-State: APjAAAUbM58IXE0zxWXtM79mFIl9fPbxGlsb/It5OlpLDEBlTO30xIDb
-        ty0u2zQIWzrXTODC4EFKC5Cwjqfng1tOvAKLEykeXr8Nhzs/XB1aFre1bLY0A2XLG7fwJhzH+JU
-        3GvU8x03CqPpEZqvNdA==
-X-Received: by 2002:adf:a50b:: with SMTP id i11mr2570511wrb.308.1570619533168;
-        Wed, 09 Oct 2019 04:12:13 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzyO89gJwaKwMu2RpHe0Krai3w8QzU0jhU+LRWK6y5nt/hHA3tMoL9yOqLtFkC4R3hKCKZOmg==
-X-Received: by 2002:adf:a50b:: with SMTP id i11mr2570491wrb.308.1570619532858;
-        Wed, 09 Oct 2019 04:12:12 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id j1sm4371734wrg.24.2019.10.09.04.12.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2019 04:12:12 -0700 (PDT)
-Subject: Re: [PATCH] powerpc: Fix up RTAS invocation for new qemu versions
-To:     Thomas Huth <thuth@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>, lvivier@redhat.com
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, rkrcmar@redhat.com
-References: <20191004103844.32590-1-david@gibson.dropbear.id.au>
- <07997795-3b64-5c85-e8a1-e9d81e57784e@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <db2c6aa6-4853-d2b4-3ee4-8603d19e4018@redhat.com>
-Date:   Wed, 9 Oct 2019 13:12:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1729883AbfJISLX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 9 Oct 2019 14:11:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50836 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728804AbfJISLW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 9 Oct 2019 14:11:22 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x99I9owp129875;
+        Wed, 9 Oct 2019 14:10:14 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vhjs9m70u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Oct 2019 14:10:13 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x99IA150131746;
+        Wed, 9 Oct 2019 14:10:12 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vhjs9m6mn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Oct 2019 14:10:12 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x99I5Y9f024475;
+        Wed, 9 Oct 2019 18:09:57 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma03dal.us.ibm.com with ESMTP id 2vejt7mrc4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Oct 2019 18:09:57 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x99I9ueU31654326
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Oct 2019 18:09:56 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 35CA0AC05B;
+        Wed,  9 Oct 2019 18:09:56 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 95788AC059;
+        Wed,  9 Oct 2019 18:09:46 +0000 (GMT)
+Received: from LeoBras (unknown [9.80.237.3])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Oct 2019 18:09:46 +0000 (GMT)
+Message-ID: <ebf5d7357f194debc3bd6e91e0a8da4202c87653.camel@linux.ibm.com>
+Subject: Re: [PATCH v5 01/11] asm-generic/pgtable: Adds generic functions to
+ monitor lockless pgtable walks
+From:   Leonardo Bras <leonardo@linux.ibm.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Song Liu <songliubraving@fb.com>, Michal Hocko <mhocko@suse.com>,
+        "Dmitry V. Levin" <ldv@altlinux.org>,
+        Keith Busch <keith.busch@intel.com>, linux-mm@kvack.org,
+        Paul Mackerras <paulus@samba.org>,
+        Christoph Lameter <cl@linux.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Elena Reshetova <elena.reshetova@intel.com>,
+        linux-arch@vger.kernel.org, Santosh Sivaraj <santosh@fossix.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Jesper Dangaard Brouer <brouer@redhat.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        =?ISO-8859-1?Q?J=E9r=F4me?= Glisse <jglisse@redhat.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        kvm-ppc@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Reza Arbab <arbab@linux.ibm.com>,
+        Allison Randal <allison@lohutok.net>,
+        Christian Brauner <christian.brauner@ubuntu.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Souptick Joarder <jrdr.linux@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev@lists.ozlabs.org, Roman Gushchin <guro@fb.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Date:   Wed, 09 Oct 2019 15:09:41 -0300
+In-Reply-To: <20191004112844.GC19463@hirez.programming.kicks-ass.net>
+References: <20191003013325.2614-1-leonardo@linux.ibm.com>
+         <20191003013325.2614-2-leonardo@linux.ibm.com>
+         <20191003071145.GM4536@hirez.programming.kicks-ass.net>
+         <20191003115141.GJ4581@hirez.programming.kicks-ass.net>
+         <c46ba8cec981ad28383bb7b23161fb83ccda4a60.camel@linux.ibm.com>
+         <20191004112844.GC19463@hirez.programming.kicks-ass.net>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-lwxk+g4NX3v4aiRY1x8z"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-In-Reply-To: <07997795-3b64-5c85-e8a1-e9d81e57784e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-09_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=830 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910090151
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 09/10/19 12:35, Thomas Huth wrote:
-> On 04/10/2019 12.38, David Gibson wrote:
->> In order to call RTAS functions on powerpc kvm-unit-tests relies on the
->> RTAS blob supplied by qemu.  But new versions of qemu don't supply an RTAS
->> blob: since the normal way for guests to get RTAS is to call the guest
->> firmware's instantiate-rtas function, we now rely on that guest firmware
->> to provide the RTAS code itself.
->>
->> But qemu-kvm-tests bypasses the usual guest firmware to just run itself,
-> 
-> s/qemu-kvm-tests/kvm-unit-tests/
-> 
->> so we can't get the rtas blob from SLOF.
->>
->> But.. in fact the RTAS blob under qemu is a bit of a sham anyway - it's
->> a tiny wrapper that forwards the RTAS call to a hypercall.  So, we can
->> just invoke that hypercall directly.
->>
->> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->> ---
->>  lib/powerpc/asm/hcall.h |  3 +++
->>  lib/powerpc/rtas.c      |  6 +++---
->>  powerpc/cstart64.S      | 20 ++++++++++++++++----
->>  3 files changed, 22 insertions(+), 7 deletions(-)
->>
->> So.. "new versions of qemu" in this case means ones that incorporate
->> the pull request I just sent today.
->>
->> diff --git a/lib/powerpc/asm/hcall.h b/lib/powerpc/asm/hcall.h
->> index a8bd7e3..1173fea 100644
->> --- a/lib/powerpc/asm/hcall.h
->> +++ b/lib/powerpc/asm/hcall.h
->> @@ -24,6 +24,9 @@
->>  #define H_RANDOM		0x300
->>  #define H_SET_MODE		0x31C
->>  
->> +#define KVMPPC_HCALL_BASE	0xf000
->> +#define KVMPPC_H_RTAS		(KVMPPC_HCALL_BASE + 0x0)
->> +
->>  #ifndef __ASSEMBLY__
->>  /*
->>   * hcall_have_broken_sc1 checks if we're on a host with a broken sc1.
->> diff --git a/lib/powerpc/rtas.c b/lib/powerpc/rtas.c
->> index 2e7e0da..41c0a24 100644
->> --- a/lib/powerpc/rtas.c
->> +++ b/lib/powerpc/rtas.c
->> @@ -46,9 +46,9 @@ void rtas_init(void)
->>  	prop = fdt_get_property(dt_fdt(), node,
->>  				"linux,rtas-entry", &len);
->>  	if (!prop) {
->> -		printf("%s: /rtas/linux,rtas-entry: %s\n",
->> -				__func__, fdt_strerror(len));
->> -		abort();
->> +		/* We don't have a qemu provided RTAS blob, enter_rtas
->> +		 * will use H_RTAS directly */
->> +		return;
->>  	}
->>  	data = (u32 *)prop->data;
->>  	rtas_entry = (unsigned long)fdt32_to_cpu(*data);
->> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
->> index ec673b3..972851f 100644
->> --- a/powerpc/cstart64.S
->> +++ b/powerpc/cstart64.S
->> @@ -121,13 +121,25 @@ halt:
->>  
->>  .globl enter_rtas
->>  enter_rtas:
->> +	LOAD_REG_ADDR(r11, rtas_entry)
->> +	ld	r10, 0(r11)
->> +
->> +	cmpdi	r10,0
->> +	bne	external_rtas
->> +
->> +	/* Use H_RTAS directly */
->> +	mr	r4,r3
->> +	lis	r3,KVMPPC_H_RTAS@h
->> +	ori	r3,r3,KVMPPC_H_RTAS@l
->> +	b	hcall
->> +
->> +external_rtas:
->> +	/* Use external RTAS blob */
->>  	mflr	r0
->>  	std	r0, 16(r1)
->>  
->> -	LOAD_REG_ADDR(r10, rtas_return_loc)
->> -	mtlr	r10
->> -	LOAD_REG_ADDR(r11, rtas_entry)
->> -	ld	r10, 0(r11)
->> +	LOAD_REG_ADDR(r11, rtas_return_loc)
->> +	mtlr	r11
->>  
->>  	mfmsr	r11
->>  	LOAD_REG_IMMEDIATE(r9, RTAS_MSR_MASK)
->>
-> 
-> With the typo in the commit message fixed:
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
-> Paolo, I currently don't have any other kvm-unit-test patches pending,
-> could you pick this up directly, please?
 
-Ok, thanks.
+--=-lwxk+g4NX3v4aiRY1x8z
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On Fri, 2019-10-04 at 13:28 +0200, Peter Zijlstra wrote:
+> > Could you please explain it?
+> > I mean, why this breaks tmpfs-thp?
+> > Also, why mm_cpumask() is also broken?
+>=20
+> Because shared pages are not bound by a mm; or does it not share the thp
+> state between mappings?
+
+By what I could understand, even though the memory is shared, the
+mapping may differ for different processes (i.e. the same physical
+memory that is mapped as a hugepage in process A can be mapped as a lot
+of smallpages in process B).
+
+Did I miss something here? =20
+
+> And once you (re)figure it out, please write it down. It is a crucial
+> bit of the puzzle and needs to be part of the Changelogs.
+
+I am still investing time studying this. More on this later :)
+
+Thanks!
+
+--=-lwxk+g4NX3v4aiRY1x8z
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl2eImUACgkQlQYWtz9S
+ttRfWhAA4tFyyNfL3tzIUMnu8uw6K7QisutRwYllutuFzPwBZqnh8+20uDzo8fp0
+eA/nbsP+kFkkBEjmx/jugDsXJnT3dpXW+E48iqr0HJpRBDbARAY6WA1qx26ETJHz
+c+MiB+agAJ2rfYAkE3FUEKVNZgyybhBhIlTuYhLvi1UWtqFIqncT5CA5OsgXFIU5
+vpJWMCFzDr/ZMWivf2bH06LlCTOIq85q+MzrPEKdxknUiG3U8nXKWgmbLeiqK/zt
+9soJaF83cDkrYCkko8vTAadVOS7KDgn+iwucU0DTsvB7NoJbrIJsSRl2+33DWoz1
+bD1cyw6yks+h+qFUjlq19Q6n6aVBy0em2uiIr7HNoYff5YIulrfsdcneNcwnp0Jv
+tzKOaCvajRE9PfH0bNyoWI9BSXNbY4RqcWnnwOWM2uPRNGUIUpoIJbWKl7VRKRuC
+t3ojliLkUWGvNkTMdFzg3XJl2+ZU05/o8UdXJ21pwhArJDkb6DmKZU4dMz9YQ9fc
+B38gZY1N8rthws2UgK1frOgHjUtzHuAkoo89aAnkQwVyQ6e61JfKTgxkb/0dabDs
+Gsn+Yd/b36oQK6jOxhsef+zTzawX0pWrq49dJzmB2wD4oyQl10I5JWFiSdboGGJs
+uItrX4TN3i1fvlsyVE0b4ZwM5Nwzzd8yC+cTXHTQJOAm8PWh5Vk=
+=xgUX
+-----END PGP SIGNATURE-----
+
+--=-lwxk+g4NX3v4aiRY1x8z--
 
