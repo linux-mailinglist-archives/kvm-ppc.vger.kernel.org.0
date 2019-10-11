@@ -2,76 +2,82 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D3B4FD2A64
-	for <lists+kvm-ppc@lfdr.de>; Thu, 10 Oct 2019 15:09:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ECA9D3AEA
+	for <lists+kvm-ppc@lfdr.de>; Fri, 11 Oct 2019 10:22:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387502AbfJJNJh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 10 Oct 2019 09:09:37 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45262 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733300AbfJJNJh (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 10 Oct 2019 09:09:37 -0400
-Received: by mail-wr1-f68.google.com with SMTP id r5so7791593wrm.12
-        for <kvm-ppc@vger.kernel.org>; Thu, 10 Oct 2019 06:09:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ub-ac-id.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=GO77O9NugfDMF3sM0pFxjAVwqVXEKORDEOteZl6SPpM=;
-        b=iJ+QKl0m3JEIdWTVcDoJ7wb/twesRJycWvgrJaOvxGsPbPgJJnruxRUY9vcaveTrjH
-         a1ZEKmcpPFv89x4SF6ytgLMFV9phO0VVm5ZcKaw1Dr7yMT4ykTvOJi38t0ORl4gJXbgm
-         NwdZymfpIT62j66r+5ahei721cyxIK4ot3luD2pdjWfF7Nx7sUEBCoHxT8EARHRCprz6
-         rKNgq1Bp0j3KjdTJi6xU559dr3clxbyF2iyn70qhnodZqM8CANsx1sh5R21V8EvnSKHA
-         ejjidIRJ9WVY6gmhBaDE8VF4UwPl+iUO4F4grr8bMl6DXu26bVTTr6GpJRqwaE/O9nBq
-         0huA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=GO77O9NugfDMF3sM0pFxjAVwqVXEKORDEOteZl6SPpM=;
-        b=jKV7HNCkK9RlN0WzxfpJ9UtyrKbIVJuOsQE0oOnYRccU2O0U8eFJ2NzQQF7O36KZq5
-         UJ4qxhV2l41OtYl+xxvPwFU9MYlQF3ZnqaFrP6sRdhKRY07jxRQliGS9RYVR+RYinetT
-         HZ3BhLOHL31CfCeAC7iM2DDoqgA85pPCqjbn+Po3ISlUfxgxwAL1If/2qUEAlljW5cnA
-         cn1UR2HVBpkkAuZIq0EQG8mYyfEipLiei/eaZbSCUN+k/3cqNGJFXwgjaYbjuKyyWYrJ
-         Apzp8tdkWabBq9gIVJ26o99h+7/J7JUdfzHeytrtYwRcoTSk2phaXh4PjJOpqVxteaXk
-         Yf1Q==
-X-Gm-Message-State: APjAAAVFo5H5J/MNld6PiAxbbUYnZkQCAEnJnUO6CKC7Xt0nh43m7fbi
-        oCfI8/UVwxpKn/cyv/f3XwXJ4oIEI2vq40e1j2eGgA==
-X-Google-Smtp-Source: APXvYqwCLi3tV3Ge9iLpvWfqa0rWI3DGIhcXnLY66lYX1k07kR1Ywt1ehc35EY/gwW8BGC7FA96egmVLk7ZF3Xg5KjI=
-X-Received: by 2002:a5d:5270:: with SMTP id l16mr4018576wrc.201.1570712974067;
- Thu, 10 Oct 2019 06:09:34 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:adf:efc4:0:0:0:0:0 with HTTP; Thu, 10 Oct 2019 06:09:33
- -0700 (PDT)
-Reply-To: sunrisefundingltd50@gmail.com
-From:   "Coryna Rizky Amelia, SST" <coryna_fk@ub.ac.id>
-Date:   Thu, 10 Oct 2019 14:09:33 +0100
-Message-ID: <CADotR_oWL61nWCVVw3CDA4a-OXY2NmYCtTwe+QXJUSkPRR4NfQ@mail.gmail.com>
-Subject: Apply For Financial investment at a lower rate 2%
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+        id S1726354AbfJKIWP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 11 Oct 2019 04:22:15 -0400
+Received: from ozlabs.org ([203.11.71.1]:59013 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727379AbfJKIWP (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 11 Oct 2019 04:22:15 -0400
+Received: by ozlabs.org (Postfix, from userid 1034)
+        id 46qLXg19TWz9sPk; Fri, 11 Oct 2019 19:22:10 +1100 (AEDT)
+X-powerpc-patch-notification: thanks
+X-powerpc-patch-commit: 7fe4e1176dfe47a243d8edd98d26abd11f91b042
+In-Reply-To: <20191004025317.19340-1-jniethe5@gmail.com>
+To:     Jordan Niethe <jniethe5@gmail.com>, linuxppc-dev@lists.ozlabs.org
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+Cc:     aik@ozlabs.ru, alistair@popple.id.au,
+        patch-notifications@ellerman.id.au, kvm-ppc@vger.kernel.org,
+        Jordan Niethe <jniethe5@gmail.com>
+Subject: Re: [PATCH] powerpc/kvm: Fix kvmppc_vcore->in_guest value in kvmhv_switch_to_host
+Message-Id: <46qLXg19TWz9sPk@ozlabs.org>
+Date:   Fri, 11 Oct 2019 19:22:10 +1100 (AEDT)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
--- 
-Hello,
+On Fri, 2019-10-04 at 02:53:17 UTC, Jordan Niethe wrote:
+> kvmhv_switch_to_host() in arch/powerpc/kvm/book3s_hv_rmhandlers.S needs
+> to set kvmppc_vcore->in_guest to 0 to signal secondary CPUs to continue.
+> This happens after resetting the PCR. Before commit 13c7bb3c57dc
+> ("powerpc/64s: Set reserved PCR bits"), r0 would always be 0 before it
+> was stored to kvmppc_vcore->in_guest. However because of this change in
+> the commit:
+> 
+>         /* Reset PCR */
+>         ld      r0, VCORE_PCR(r5)
+> -       cmpdi   r0, 0
+> +       LOAD_REG_IMMEDIATE(r6, PCR_MASK)
+> +       cmpld   r0, r6
+>         beq     18f
+> -       li      r0, 0
+> -       mtspr   SPRN_PCR, r0
+> +       mtspr   SPRN_PCR, r6
+>  18:
+>         /* Signal secondary CPUs to continue */
+>         stb     r0,VCORE_IN_GUEST(r5)
+> 
+> We are no longer comparing r0 against 0 and loading it with 0 if it
+> contains something else. Hence when we store r0 to
+> kvmppc_vcore->in_guest, it might not be 0.  This means that secondary
+> CPUs will not be signalled to continue. Those CPUs get stuck and errors
+> like the following are logged:
+> 
+>     KVM: CPU 1 seems to be stuck
+>     KVM: CPU 2 seems to be stuck
+>     KVM: CPU 3 seems to be stuck
+>     KVM: CPU 4 seems to be stuck
+>     KVM: CPU 5 seems to be stuck
+>     KVM: CPU 6 seems to be stuck
+>     KVM: CPU 7 seems to be stuck
+> 
+> This can be reproduced with:
+>     $ for i in `seq 1 7` ; do chcpu -d $i ; done ;
+>     $ taskset -c 0 qemu-system-ppc64 -smp 8,threads=8 \
+>        -M pseries,accel=kvm,kvm-type=HV -m 1G -nographic -vga none \
+>        -kernel vmlinux -initrd initrd.cpio.xz
+> 
+> Fix by making sure r0 is 0 before storing it to kvmppc_vcore->in_guest.
+> 
+> Fixes: 13c7bb3c57dc ("powerpc/64s: Set reserved PCR bits")
+> Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
 
-We are private lenders based in UK.
-Do you need a loan (credit) as soon as possible. Are you in search of
-money to solve your personal needs or finance your business venture,
-then get Your desired loan today! Consult us at Sunrise Funding Ltd.
+Applied to powerpc fixes, thanks.
 
-* We offer personal loan & huge capital loan at 2% interest rate to
-the general public both locally and internationally.
-* Credit amount range from $5,000.00 -- $500,000.00 and above.
-* Special $10,000,000.00 Loan offer for huge project also available.
-* Loan period of 6 months -- 10 years.
-* Loan is granted 24 hours after approval and accredited, directly in
-hand or bank account.
+https://git.kernel.org/powerpc/c/7fe4e1176dfe47a243d8edd98d26abd11f91b042
 
-Please note that you are advised to contact us for more details via
-the following e-mail address below;
-
-EMAIL : sunrisefundingltd50@gmail.com
-FIRM : Sunrise Funding Ltd UK.
+cheers
