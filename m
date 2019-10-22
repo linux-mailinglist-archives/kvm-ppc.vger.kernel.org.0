@@ -2,92 +2,97 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 227D8DF9FA
-	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Oct 2019 02:59:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50DB3DFA74
+	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Oct 2019 04:00:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730314AbfJVA70 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 21 Oct 2019 20:59:26 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:59211 "EHLO ozlabs.org"
+        id S2387479AbfJVB7o (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 21 Oct 2019 21:59:44 -0400
+Received: from mga14.intel.com ([192.55.52.115]:61590 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728741AbfJVA70 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 21 Oct 2019 20:59:26 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46xwBg2zFKz9sP4; Tue, 22 Oct 2019 11:59:23 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1571705963; bh=/cWbIec/NNOO7A8EUuS1mohPQfGpWIYlqrsIFTuM/wE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VPDqcNvlt+N+3yYNZ3kaNRA5/nn91jwwgZsz5VBUQhFdfGfe5IyPVR1n/WgP/zXF1
-         ZlRpCb/mGcUhrC1+sljrwMMoK68t50Yyr7Xyc4pxwRXOIL1DijZgbm8k/SQr2c84N1
-         m2SrwPxWhvQnH1C1TMtWkFCd9d8mK/kkhtebhjYiEuwbTn/3hsVa8WGshpa4Iz0bXu
-         R15JFAwW8TFs/TMKTiT9tJBIQ0XIFbGOjqsPKgYicyeACfoeJjYt1lSkxvGeGrdAzl
-         +gv/W+ZbDN0uA08nzcNZFvRibPay39Az4f328n4UDNZypgoLUdeNpu1LOoMd6elQfb
-         UJ6vhxIguWKRA==
-Date:   Tue, 22 Oct 2019 11:43:35 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Leonardo Bras <leonardo@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 2/3] powerpc/kvm/book3e: Replace current->mm by kvm->mm
-Message-ID: <20191022004335.GA30981@oak.ozlabs.ibm.com>
-References: <20190923212409.7153-1-leonardo@linux.ibm.com>
- <20190923212409.7153-3-leonardo@linux.ibm.com>
+        id S2387465AbfJVB7o (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 21 Oct 2019 21:59:44 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 18:59:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; 
+   d="scan'208";a="196293814"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
+  by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:42 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 16/45] KVM: MIPS: Use kvm_vcpu_cache to allocate vCPUs
+Date:   Mon, 21 Oct 2019 18:58:56 -0700
+Message-Id: <20191022015925.31916-17-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20191022015925.31916-1-sean.j.christopherson@intel.com>
+References: <20191022015925.31916-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190923212409.7153-3-leonardo@linux.ibm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 06:24:08PM -0300, Leonardo Bras wrote:
-> Given that in kvm_create_vm() there is:
-> kvm->mm = current->mm;
-> 
-> And that on every kvm_*_ioctl we have:
-> if (kvm->mm != current->mm)
-> 	return -EIO;
-> 
-> I see no reason to keep using current->mm instead of kvm->mm.
-> 
-> By doing so, we would reduce the use of 'global' variables on code, relying
-> more in the contents of kvm struct.
-> 
-> Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
-> ---
->  arch/powerpc/kvm/booke.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-> index be9a45874194..383108263af5 100644
-> --- a/arch/powerpc/kvm/booke.c
-> +++ b/arch/powerpc/kvm/booke.c
-> @@ -775,7 +775,7 @@ int kvmppc_vcpu_run(struct kvm_run *kvm_run, struct kvm_vcpu *vcpu)
->  	debug = current->thread.debug;
->  	current->thread.debug = vcpu->arch.dbg_reg;
->  
-> -	vcpu->arch.pgdir = current->mm->pgd;
-> +	vcpu->arch.pgdir = kvm->mm->pgd;
->  	kvmppc_fix_ee_before_entry();
->  
->  	ret = __kvmppc_vcpu_run(kvm_run, vcpu);
+For reasons unknown, MIPS configures the vCPU allocation cache but
+allocates vCPUs via kzalloc().  Allocate from the vCPU cache in
+preparation for moving vCPU allocation to common KVM code.
 
-With this patch, I get compile errors for Book E configs:
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/mips/kvm/mips.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-  CC      arch/powerpc/kvm/booke.o
-/home/paulus/kernel/kvm/arch/powerpc/kvm/booke.c: In function ‘kvmppc_vcpu_run’:
-/home/paulus/kernel/kvm/arch/powerpc/kvm/booke.c:778:21: error: ‘kvm’ undeclared (first use in this function)
-  vcpu->arch.pgdir = kvm->mm->pgd;
-                     ^
-/home/paulus/kernel/kvm/arch/powerpc/kvm/booke.c:778:21: note: each undeclared identifier is reported only once for each function it appears in
-make[3]: *** [/home/paulus/kernel/kvm/scripts/Makefile.build:266: arch/powerpc/kvm/booke.o] Error 1
-make[2]: *** [/home/paulus/kernel/kvm/scripts/Makefile.build:509: arch/powerpc/kvm] Error 2
-make[1]: *** [/home/paulus/kernel/kvm/Makefile:1649: arch/powerpc] Error 2
-make: *** [/home/paulus/kernel/kvm/Makefile:179: sub-make] Error 2
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 1109924560d8..5f985773417c 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -286,7 +286,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm, unsigned int id)
+ 	void *gebase, *p, *handler, *refill_start, *refill_end;
+ 	int i;
+ 
+-	struct kvm_vcpu *vcpu = kzalloc(sizeof(struct kvm_vcpu), GFP_KERNEL);
++	struct kvm_vcpu *vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
+ 
+ 	if (!vcpu) {
+ 		err = -ENOMEM;
+@@ -401,7 +401,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm, unsigned int id)
+ 	kvm_vcpu_uninit(vcpu);
+ 
+ out_free_cpu:
+-	kfree(vcpu);
++	kmem_cache_free(kvm_vcpu_cache, vcpu);
+ 
+ out:
+ 	return ERR_PTR(err);
+@@ -418,7 +418,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
+ 	kvm_mmu_free_memory_caches(vcpu);
+ 	kfree(vcpu->arch.guest_ebase);
+ 	kfree(vcpu->arch.kseg0_commpage);
+-	kfree(vcpu);
++	kmem_cache_free(kvm_vcpu_cache, vcpu);
+ }
+ 
+ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+-- 
+2.22.0
 
-It seems that you didn't compile-test this patch.
-
-Paul.
