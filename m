@@ -2,121 +2,71 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD1F2DFDB4
-	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Oct 2019 08:29:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65A1AE028B
+	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Oct 2019 13:12:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726160AbfJVG3s (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 22 Oct 2019 02:29:48 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:47039 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725788AbfJVG3r (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Oct 2019 02:29:47 -0400
-Received: by mail-ot1-f65.google.com with SMTP id 89so13170354oth.13
-        for <kvm-ppc@vger.kernel.org>; Mon, 21 Oct 2019 23:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kVuB3ZdcTD312TKFiKblRZFbqKpk6CiWqdGLygNSyYI=;
-        b=Kt8RFytrfhZZoo4M+/oorpPr26q0SJUIGT1ad0V21N9+zN85w4W6+ckVjDTUBlPKem
-         9BhJnufmd+S0x/PDNMwU/9jbEGeoBr17AF33tjrcAtsFL8hTKXat7oNMQfpdjaeuF/qK
-         A4GWmf0dFMu3BdkLwtFCxcUAxu6Tv/ODrnhUKicGjSnD9EFLEkTj4Cb7PMJBTtKtWfTI
-         8ozI+2RNmv2PINYhQrptvvBBrdW6ZxH7hTl6g/CwKdI2C4Ax2BrDfW6DMvfMAR55uNL4
-         +J+D5iQNyIyLzsNdds/TaAC6+D3RLo4GiU+GeQkjh+GLv58y/RfXQWDqmX5f4rwzjMJx
-         m/Ow==
+        id S1731902AbfJVLMO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 22 Oct 2019 07:12:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54756 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731899AbfJVLMO (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 22 Oct 2019 07:12:14 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 08CCD859FF
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Oct 2019 11:12:14 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id e25so8392620wra.9
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Oct 2019 04:12:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kVuB3ZdcTD312TKFiKblRZFbqKpk6CiWqdGLygNSyYI=;
-        b=pna9gQ+CJ5adNen8who+uQ0Pv49Vp8l1PcG8WkpB3YSuTXblr8L0hJQDLfoZPM9937
-         XPRCsvwajilwXeLP66nRDWHI9LhiYI9/IdgXOFg8qH2Pjtj+IsBqkMhoNCUsDGdUX5HS
-         31ZFieJuVyuQjLptM11FDuDr/91w3gfZDv9lvxtwXQZ0MBuKVE1aEAFGm6I04yl82Px4
-         p66gLAL/IK7x778bkcxojinKnzyHhTLd1cX5hPVe3cQytoiPvLb4S3rUPotTMgj+z41U
-         9xKbdDrQQbdMKDfT4moTzQSY+wqaA5CX9aWsiZZlPU5mSfGC7WJnsGV1o1rZawtHTjez
-         mPMg==
-X-Gm-Message-State: APjAAAVjDfrtBuDxBkMgUb46/eqdTnVhdrqzAonahJC2WN/gpAVC9sbg
-        0lAfvJqn0gJMnEYRaozDLei1h2+DydW6xz679Ks=
-X-Google-Smtp-Source: APXvYqzaxJrbzIMlPV3k+T7wY+FXiNPnEDMD07rPiY7Uh9rrYJMtaW2RPKKderc1uhnmHj42l57t1SwrmQcjoiLDf8M=
-X-Received: by 2002:a9d:1a5:: with SMTP id e34mr1442226ote.286.1571725786985;
- Mon, 21 Oct 2019 23:29:46 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=E2ZDL5MWE9Y90XTWLGswK0j9jGkUeLSj3bLCyP33D0Q=;
+        b=ANiy45vONhY0nmHz5XPNJQU7b3GcLbTAe088J4XlakhcQEhLDjFA6aMv7cNIUyYmcz
+         1phgj1xnlA2U0X7TPiL+biyPsWgjLGWK98JV7ZrOTB0+NnNyW2KoG3R9/9U+j4Kimml9
+         GIF2Ek6nN6IVdY4GVQcVS2YSmYt4stp5jatU4YSEhZDFdjgOFPI83/446q7GPt1POWMY
+         KscQSfighNc4eop5xLbZsZj9HDgJEWB30GuwuarfoFroWofAKueHYqhACHwQ7BaBzY/u
+         EMbyhwEWwGdRUHNO0BJ/jp+CI+vNMuJLXypXLqAYzXwPBrpGgSXYiSH5dy0AoROx/DTc
+         QBoQ==
+X-Gm-Message-State: APjAAAVpu5yuH/swPZR93GWAzDCgdIhlUilezN2S2vmQrRhQ+uVF1rZ9
+        rcgXOmdijSNowuHvYJ9Tnvd77XpigyG9H7WA/TlbmjQfqM6mI5d3S/D0juVnv+NrR+9aGvm2p/E
+        2vCCIZVwb/IdrVYveWg==
+X-Received: by 2002:a5d:4a82:: with SMTP id o2mr2963066wrq.186.1571742732656;
+        Tue, 22 Oct 2019 04:12:12 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzQSbg8nAWiZug0SQHMFaSialsyHY/264PzMng3CXcdBC7yG28gelCmJEgWfPnOeawwuhJb2w==
+X-Received: by 2002:a5d:4a82:: with SMTP id o2mr2963038wrq.186.1571742732282;
+        Tue, 22 Oct 2019 04:12:12 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c0e4:dcf4:b543:ce19? ([2001:b07:6468:f312:c0e4:dcf4:b543:ce19])
+        by smtp.gmail.com with ESMTPSA id g10sm3434511wrr.28.2019.10.22.04.12.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Oct 2019 04:12:11 -0700 (PDT)
+Subject: Re: [GIT PULL] Please pull my kvm-ppc-fixes-5.4-1 tag
+To:     Paul Mackerras <paulus@ozlabs.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+References: <20191021041941.GA17498@oak.ozlabs.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <03cfcf50-7802-56f2-0915-0d890f5d8e75@redhat.com>
+Date:   Tue, 22 Oct 2019 13:12:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190925050649.14926-1-bharata@linux.ibm.com> <20190925050649.14926-3-bharata@linux.ibm.com>
- <20191018030049.GA907@oak.ozlabs.ibm.com>
-In-Reply-To: <20191018030049.GA907@oak.ozlabs.ibm.com>
-From:   Bharata B Rao <bharata.rao@gmail.com>
-Date:   Tue, 22 Oct 2019 11:59:35 +0530
-Message-ID: <CAGZKiBqoxAvix3wrF2wuxTrikVCjY6PzD22pHsasew-F=P3KSg@mail.gmail.com>
-Subject: Re: [PATCH v9 2/8] KVM: PPC: Move pages between normal and secure memory
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Bharata B Rao <bharata@linux.ibm.com>, linuxram@us.ibm.com,
-        cclaudio@linux.ibm.com, kvm-ppc@vger.kernel.org,
-        linux-mm@kvack.org, jglisse@redhat.com,
-        Aneesh Kumar <aneesh.kumar@linux.vnet.ibm.com>,
-        paulus@au1.ibm.com, sukadev@linux.vnet.ibm.com,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191021041941.GA17498@oak.ozlabs.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Oct 18, 2019 at 8:31 AM Paul Mackerras <paulus@ozlabs.org> wrote:
->
-> On Wed, Sep 25, 2019 at 10:36:43AM +0530, Bharata B Rao wrote:
-> > Manage migration of pages betwen normal and secure memory of secure
-> > guest by implementing H_SVM_PAGE_IN and H_SVM_PAGE_OUT hcalls.
-> >
-> > H_SVM_PAGE_IN: Move the content of a normal page to secure page
-> > H_SVM_PAGE_OUT: Move the content of a secure page to normal page
-> >
-> > Private ZONE_DEVICE memory equal to the amount of secure memory
-> > available in the platform for running secure guests is created.
-> > Whenever a page belonging to the guest becomes secure, a page from
-> > this private device memory is used to represent and track that secure
-> > page on the HV side. The movement of pages between normal and secure
-> > memory is done via migrate_vma_pages() using UV_PAGE_IN and
-> > UV_PAGE_OUT ucalls.
->
-> As we discussed privately, but mentioning it here so there is a
-> record:  I am concerned about this structure
->
-> > +struct kvmppc_uvmem_page_pvt {
-> > +     unsigned long *rmap;
-> > +     struct kvm *kvm;
-> > +     unsigned long gpa;
-> > +};
->
-> which keeps a reference to the rmap.  The reference could become stale
-> if the memslot is deleted or moved, and nothing in the patch series
-> ensures that the stale references are cleaned up.
+On 21/10/19 06:19, Paul Mackerras wrote:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.4-1
 
-I will add code to release the device PFNs when memslot goes away. In
-fact the early versions of the patchset had this, but it subsequently
-got removed.
+Pulled, thanks.
 
->
-> If it is possible to do without the long-term rmap reference, and
-> instead find the rmap via the memslots (with the srcu lock held) each
-> time we need the rmap, that would be safer, I think, provided that we
-> can sort out the lock ordering issues.
-
-All paths except fault handler access rmap[] under srcu lock. Even in
-case of fault handler, for those faults induced by us (shared page
-handling, releasing device pfns), we do hold srcu lock. The difficult
-case is when we fault due to HV accessing a device page. In this case
-we come to fault hanler with mmap_sem already held and are not in a
-position to take kvm srcu lock as that would lead to lock order
-reversal. Given that we have pages mapped in still, I assume memslot
-can't go away while we access rmap[], so think we should be ok here.
-
-However if that sounds fragile, may be I can go back to my initial
-design where we weren't using rmap[] to store device PFNs. That will
-increase the memory usage but we give us an easy option to have
-per-guest mutex to protect concurrent page-ins/outs/faults.
-
-Regards,
-Bharata.
--- 
-http://raobharata.wordpress.com/
+Paolo
