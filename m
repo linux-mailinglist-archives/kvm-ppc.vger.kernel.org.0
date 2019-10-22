@@ -2,113 +2,166 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DAEBE05F1
-	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Oct 2019 16:05:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D254E064D
+	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Oct 2019 16:22:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389165AbfJVOE7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 22 Oct 2019 10:04:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44344 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389147AbfJVOE6 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 22 Oct 2019 10:04:58 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C6327BE020
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Oct 2019 14:04:57 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id s19so5966036wmj.0
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Oct 2019 07:04:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GRXx0prZyWf8Ie3WBmFM/bIRv9+8DKKzcw/xRf9RZ/k=;
-        b=BDWDtJJ6LEqofK2wUWG4SBDmZ/woSbFQ7ZcE0fyE9dG4fJyTL1zfaQrd+RHqQ1dMVS
-         wEHPmGL/adqzqrk+rnSq/1x5PdSLp8YPO8qEuF3ArQ729mIv9H/U8VNbRERsubIu7m7c
-         yTkURHX3gtXzZsROrITMjOHqpUUXhG0h3ja/keepQNz5UpWCifvCSkH4iAnInVUhLI75
-         ChPiOSA/BsviooAjiRJ1xZrw8W5MbhTLV+DkYFhd91kBoBmCAVmZ35iyBa5Y+xenVJQm
-         eekbgHcl/angzXRLFA72BFmU2tjcbnvMLF6lH1eU6tM05jkISGCqc0p6C7LDK4dbJCXx
-         CUIg==
-X-Gm-Message-State: APjAAAVJk8fVCYMJBYGDkQl4lNqMLmX/TUHSqrAJlaeF+ubc4IszpSo8
-        gwf3SabONMeKRzrnGnNAofHU/IoUsy9XNU0VV9wGWAST0PLS20p7sLx+vZuW5eFUnDgS8SirzE4
-        VAv1OcQ7K3xa3EMRTTA==
-X-Received: by 2002:a1c:7e57:: with SMTP id z84mr3319580wmc.84.1571753096257;
-        Tue, 22 Oct 2019 07:04:56 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwWqRcFVSe00YfZqVULXyrnOBOt0DAtwntm2KhRrr6N6A/cSYud38QIAc8/I73DEBmlFbuFZw==
-X-Received: by 2002:a1c:7e57:: with SMTP id z84mr3319555wmc.84.1571753095982;
-        Tue, 22 Oct 2019 07:04:55 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c0e4:dcf4:b543:ce19? ([2001:b07:6468:f312:c0e4:dcf4:b543:ce19])
-        by smtp.gmail.com with ESMTPSA id b196sm11755492wmd.24.2019.10.22.07.04.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2019 07:04:55 -0700 (PDT)
-Subject: Re: [PATCH v2 00/15] KVM: Dynamically size memslot arrays
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-References: <20191022003537.13013-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <129444cc-5211-5b60-15fc-0f0fe998f023@redhat.com>
-Date:   Tue, 22 Oct 2019 16:04:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727921AbfJVOW5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 22 Oct 2019 10:22:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54474 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725788AbfJVOW5 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Oct 2019 10:22:57 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9MEL0U1036619;
+        Tue, 22 Oct 2019 10:22:47 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vt36m0tb0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Oct 2019 10:22:46 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9MEKGIJ025328;
+        Tue, 22 Oct 2019 14:22:45 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma02dal.us.ibm.com with ESMTP id 2vqt47esgs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Oct 2019 14:22:45 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9MEMhRm60096864
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Oct 2019 14:22:44 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE8DBC6055;
+        Tue, 22 Oct 2019 14:22:43 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D0458C605A;
+        Tue, 22 Oct 2019 14:22:42 +0000 (GMT)
+Received: from leobras.br.ibm.com (unknown [9.18.235.46])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 22 Oct 2019 14:22:42 +0000 (GMT)
+Message-ID: <b5f2729e4a42a343c72fe003eaa813b1ca687425.camel@linux.ibm.com>
+Subject: Re: [PATCH 2/3] powerpc/kvm/book3e: Replace current->mm by kvm->mm
+From:   Leonardo Bras <leonardo@linux.ibm.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Date:   Tue, 22 Oct 2019 11:22:41 -0300
+In-Reply-To: <20191022004335.GA30981@oak.ozlabs.ibm.com>
+References: <20190923212409.7153-1-leonardo@linux.ibm.com>
+         <20190923212409.7153-3-leonardo@linux.ibm.com>
+         <20191022004335.GA30981@oak.ozlabs.ibm.com>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-uDADG7dX79Rc0jw4EvZC"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-In-Reply-To: <20191022003537.13013-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-22_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910220131
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 22/10/19 02:35, Sean Christopherson wrote:
-> The end goal of this series is to dynamically size the memslot array so
-> that KVM allocates memory based on the number of memslots in use, as
-> opposed to unconditionally allocating memory for the maximum number of
-> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
-> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
-> E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
-> the memory footprint from 90k to ~2.6k bytes.
-> 
-> The changes required to support dynamic sizing are relatively small,
-> e.g. are essentially contained in patches 12/13 and 13/13.  Patches 1-11
-> clean up the memslot code, which has gotten quite crusy, especially
-> __kvm_set_memory_region().  The clean up is likely not strictly necessary
-> to switch to dynamic sizing, but I didn't have a remotely reasonable
-> level of confidence in the correctness of the dynamic sizing without first
-> doing the clean up.
-> 
-> Testing, especially non-x86 platforms, would be greatly appreciated.  The
-> non-x86 changes are for all intents and purposes untested, e.g. I compile
-> tested pieces of the code by copying them into x86, but that's it.  In
-> theory, the vast majority of the functional changes are arch agnostic, in
-> theory...
-> 
-> v2:
->   - Split "Drop kvm_arch_create_memslot()" into three patches to move
->     minor functional changes to standalone patches [Janosch].
->   - Rebase to latest kvm/queue (f0574a1cea5b, "KVM: x86: fix ...")
->   - Collect an Acked-by and a Reviewed-by
 
-I only have some cosmetic changes on patches 14-15.  Let's wait for
-testing results.
+--=-uDADG7dX79Rc0jw4EvZC
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On Tue, 2019-10-22 at 11:43 +1100, Paul Mackerras wrote:
+> On Mon, Sep 23, 2019 at 06:24:08PM -0300, Leonardo Bras wrote:
+> > Given that in kvm_create_vm() there is:
+> > kvm->mm =3D current->mm;
+> >=20
+> > And that on every kvm_*_ioctl we have:
+> > if (kvm->mm !=3D current->mm)
+> > 	return -EIO;
+> >=20
+> > I see no reason to keep using current->mm instead of kvm->mm.
+> >=20
+> > By doing so, we would reduce the use of 'global' variables on code, rel=
+ying
+> > more in the contents of kvm struct.
+> >=20
+> > Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
+> > ---
+> >  arch/powerpc/kvm/booke.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+> > index be9a45874194..383108263af5 100644
+> > --- a/arch/powerpc/kvm/booke.c
+> > +++ b/arch/powerpc/kvm/booke.c
+> > @@ -775,7 +775,7 @@ int kvmppc_vcpu_run(struct kvm_run *kvm_run, struct=
+ kvm_vcpu *vcpu)
+> >  	debug =3D current->thread.debug;
+> >  	current->thread.debug =3D vcpu->arch.dbg_reg;
+> > =20
+> > -	vcpu->arch.pgdir =3D current->mm->pgd;
+> > +	vcpu->arch.pgdir =3D kvm->mm->pgd;
+> >  	kvmppc_fix_ee_before_entry();
+> > =20
+> >  	ret =3D __kvmppc_vcpu_run(kvm_run, vcpu);
+>=20
+> With this patch, I get compile errors for Book E configs:
+>=20
+>   CC      arch/powerpc/kvm/booke.o
+> /home/paulus/kernel/kvm/arch/powerpc/kvm/booke.c: In function =E2=80=98kv=
+mppc_vcpu_run=E2=80=99:
+> /home/paulus/kernel/kvm/arch/powerpc/kvm/booke.c:778:21: error: =E2=80=98=
+kvm=E2=80=99 undeclared (first use in this function)
+>   vcpu->arch.pgdir =3D kvm->mm->pgd;
+>                      ^
+> /home/paulus/kernel/kvm/arch/powerpc/kvm/booke.c:778:21: note: each undec=
+lared identifier is reported only once for each function it appears in
+> make[3]: *** [/home/paulus/kernel/kvm/scripts/Makefile.build:266: arch/po=
+werpc/kvm/booke.o] Error 1
+> make[2]: *** [/home/paulus/kernel/kvm/scripts/Makefile.build:509: arch/po=
+werpc/kvm] Error 2
+> make[1]: *** [/home/paulus/kernel/kvm/Makefile:1649: arch/powerpc] Error =
+2
+> make: *** [/home/paulus/kernel/kvm/Makefile:179: sub-make] Error 2
+>=20
+> It seems that you didn't compile-test this patch.
+>=20
+> Paul.
+
+Sorry Paul,=20
+I remember dealing with this before, but it looks like it was lost
+during git context/branch switching.=20
+
+I will make sure that doesn't happen again.
+A v2 will come soon, I will test it on travis.
+
+Best regards,
+Leonardo Bras
+
+
+--=-uDADG7dX79Rc0jw4EvZC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl2vELEACgkQlQYWtz9S
+ttQYbQ/9GHjl5o6WkdAHXy/P1i/KaQ4dwyVQ3VNELoLQUci98/B1WYo+dC6Vtdyb
+sSR89aHRh4mWRcR8/qGKWxZy1scK2MSuAQFeudnyRXbQGiiST4FktMGl6mIdywF6
+DrRKD3nnPKiF2zXAfy8z+HdXEIjEHT2OW+zgpu8CpQRR3kynbYeYSUzmzlf4RD2m
+5wQUNPRfO3fQMEmbVedNVlegzTJA6iBuL/jCtwnkzJjIc7zAHutqQ9CSSCHZr087
+2HPtGUgZ0MHDjJY4PoYD9d4nU/IgdTJk1TUTYOy1eDd1YwsVdNDqiuM1JliHInow
+m01uWdRYmctTD0yhU87JmkYsfTfX8SABIJs6pP3DuBkCikNKQoomIdiPik1x0Iu0
+iZCuIw2mTD0AL2LLEeKz2saurE9eqY0AhONoL3HxjW79n7w9uCaOHKhsMiW/NS2k
+k+5UuAwc1r4xgqGCnN+7Iy+qHCIYv3TSboYnZP8w6up1tJ2aS86n4odTEBAhDS53
+IJ6wmNfstwvnOyeVbniGpOUOWJogEYBnx/uIcE4arKGK8mtFMVyIpCRJisyqHt0n
+bSczgwmeEdhxLMlavWv2aooxioMXmawC39YFjTND998Fnpc1Sk5F3XpACpyl5AwW
+k+JQjPRbPKZDHQLc+j3aLIDT8pwANJPwX5RvudkNfbtEz4pgEME=
+=8F10
+-----END PGP SIGNATURE-----
+
+--=-uDADG7dX79Rc0jw4EvZC--
+
