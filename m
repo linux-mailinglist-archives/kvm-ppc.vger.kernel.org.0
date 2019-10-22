@@ -2,78 +2,121 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0289DFD1D
-	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Oct 2019 07:28:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD1F2DFDB4
+	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Oct 2019 08:29:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730370AbfJVF2W (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 22 Oct 2019 01:28:22 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38073 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727978AbfJVF2W (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 22 Oct 2019 01:28:22 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46y2904rn7z9sPh; Tue, 22 Oct 2019 16:28:20 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1571722100; bh=p2M3AQlqsAJqlOpYWOhdmQPpGs/Vwl78Ov4vHAcu7rA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=JnW7ire2Wv8jCrvNOuI3b35mX1NPHavxSEVxIE6mGTCiBomAgsOWEwAicj1K3JXvI
-         dxMZ5HlDJKqwI9043S02oVmTN2fn4jWQBJRRylN465fe2yeNw6L0pIQZjHkgo2SDzD
-         lo1upDGS1jVrS0aTEaKDox6Xslr1GQ1Yguw3rcv7GZg7SlmX2naaPyRnTTK5CgCRkU
-         Xz/DUSJgUbcw9lOofFP/fRf48AJgi9/p9YxZ70naYtnkRmQ5oH9+hQDS7Yp7YEUUdA
-         PsGuIYsDLniFmljesrP2vqwNDH9j7f19xVKEKbgMldhkiyZpriPPVo99xHtXJsiiqd
-         HX8aTFCh0tWbw==
-Date:   Tue, 22 Oct 2019 16:28:12 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Leonardo Bras <leonardo@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 1/3] powerpc/kvm/book3s: Replace current->mm by kvm->mm
-Message-ID: <20191022052812.GA22958@oak.ozlabs.ibm.com>
-References: <20190923212409.7153-1-leonardo@linux.ibm.com>
- <20190923212409.7153-2-leonardo@linux.ibm.com>
+        id S1726160AbfJVG3s (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 22 Oct 2019 02:29:48 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:47039 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725788AbfJVG3r (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Oct 2019 02:29:47 -0400
+Received: by mail-ot1-f65.google.com with SMTP id 89so13170354oth.13
+        for <kvm-ppc@vger.kernel.org>; Mon, 21 Oct 2019 23:29:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kVuB3ZdcTD312TKFiKblRZFbqKpk6CiWqdGLygNSyYI=;
+        b=Kt8RFytrfhZZoo4M+/oorpPr26q0SJUIGT1ad0V21N9+zN85w4W6+ckVjDTUBlPKem
+         9BhJnufmd+S0x/PDNMwU/9jbEGeoBr17AF33tjrcAtsFL8hTKXat7oNMQfpdjaeuF/qK
+         A4GWmf0dFMu3BdkLwtFCxcUAxu6Tv/ODrnhUKicGjSnD9EFLEkTj4Cb7PMJBTtKtWfTI
+         8ozI+2RNmv2PINYhQrptvvBBrdW6ZxH7hTl6g/CwKdI2C4Ax2BrDfW6DMvfMAR55uNL4
+         +J+D5iQNyIyLzsNdds/TaAC6+D3RLo4GiU+GeQkjh+GLv58y/RfXQWDqmX5f4rwzjMJx
+         m/Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kVuB3ZdcTD312TKFiKblRZFbqKpk6CiWqdGLygNSyYI=;
+        b=pna9gQ+CJ5adNen8who+uQ0Pv49Vp8l1PcG8WkpB3YSuTXblr8L0hJQDLfoZPM9937
+         XPRCsvwajilwXeLP66nRDWHI9LhiYI9/IdgXOFg8qH2Pjtj+IsBqkMhoNCUsDGdUX5HS
+         31ZFieJuVyuQjLptM11FDuDr/91w3gfZDv9lvxtwXQZ0MBuKVE1aEAFGm6I04yl82Px4
+         p66gLAL/IK7x778bkcxojinKnzyHhTLd1cX5hPVe3cQytoiPvLb4S3rUPotTMgj+z41U
+         9xKbdDrQQbdMKDfT4moTzQSY+wqaA5CX9aWsiZZlPU5mSfGC7WJnsGV1o1rZawtHTjez
+         mPMg==
+X-Gm-Message-State: APjAAAVjDfrtBuDxBkMgUb46/eqdTnVhdrqzAonahJC2WN/gpAVC9sbg
+        0lAfvJqn0gJMnEYRaozDLei1h2+DydW6xz679Ks=
+X-Google-Smtp-Source: APXvYqzaxJrbzIMlPV3k+T7wY+FXiNPnEDMD07rPiY7Uh9rrYJMtaW2RPKKderc1uhnmHj42l57t1SwrmQcjoiLDf8M=
+X-Received: by 2002:a9d:1a5:: with SMTP id e34mr1442226ote.286.1571725786985;
+ Mon, 21 Oct 2019 23:29:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190923212409.7153-2-leonardo@linux.ibm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20190925050649.14926-1-bharata@linux.ibm.com> <20190925050649.14926-3-bharata@linux.ibm.com>
+ <20191018030049.GA907@oak.ozlabs.ibm.com>
+In-Reply-To: <20191018030049.GA907@oak.ozlabs.ibm.com>
+From:   Bharata B Rao <bharata.rao@gmail.com>
+Date:   Tue, 22 Oct 2019 11:59:35 +0530
+Message-ID: <CAGZKiBqoxAvix3wrF2wuxTrikVCjY6PzD22pHsasew-F=P3KSg@mail.gmail.com>
+Subject: Re: [PATCH v9 2/8] KVM: PPC: Move pages between normal and secure memory
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     Bharata B Rao <bharata@linux.ibm.com>, linuxram@us.ibm.com,
+        cclaudio@linux.ibm.com, kvm-ppc@vger.kernel.org,
+        linux-mm@kvack.org, jglisse@redhat.com,
+        Aneesh Kumar <aneesh.kumar@linux.vnet.ibm.com>,
+        paulus@au1.ibm.com, sukadev@linux.vnet.ibm.com,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 06:24:07PM -0300, Leonardo Bras wrote:
-> Given that in kvm_create_vm() there is:
-> kvm->mm = current->mm;
-> 
-> And that on every kvm_*_ioctl we have:
-> if (kvm->mm != current->mm)
-> 	return -EIO;
-> 
-> I see no reason to keep using current->mm instead of kvm->mm.
-> 
-> By doing so, we would reduce the use of 'global' variables on code, relying
-> more in the contents of kvm struct.
+On Fri, Oct 18, 2019 at 8:31 AM Paul Mackerras <paulus@ozlabs.org> wrote:
+>
+> On Wed, Sep 25, 2019 at 10:36:43AM +0530, Bharata B Rao wrote:
+> > Manage migration of pages betwen normal and secure memory of secure
+> > guest by implementing H_SVM_PAGE_IN and H_SVM_PAGE_OUT hcalls.
+> >
+> > H_SVM_PAGE_IN: Move the content of a normal page to secure page
+> > H_SVM_PAGE_OUT: Move the content of a secure page to normal page
+> >
+> > Private ZONE_DEVICE memory equal to the amount of secure memory
+> > available in the platform for running secure guests is created.
+> > Whenever a page belonging to the guest becomes secure, a page from
+> > this private device memory is used to represent and track that secure
+> > page on the HV side. The movement of pages between normal and secure
+> > memory is done via migrate_vma_pages() using UV_PAGE_IN and
+> > UV_PAGE_OUT ucalls.
+>
+> As we discussed privately, but mentioning it here so there is a
+> record:  I am concerned about this structure
+>
+> > +struct kvmppc_uvmem_page_pvt {
+> > +     unsigned long *rmap;
+> > +     struct kvm *kvm;
+> > +     unsigned long gpa;
+> > +};
+>
+> which keeps a reference to the rmap.  The reference could become stale
+> if the memslot is deleted or moved, and nothing in the patch series
+> ensures that the stale references are cleaned up.
 
-This patch led to a crash on shutting down a VM, because of this hunk:
+I will add code to release the device PFNs when memslot goes away. In
+fact the early versions of the patchset had this, but it subsequently
+got removed.
 
-> diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-> index c4b606fe73eb..8069b35f2905 100644
-> --- a/arch/powerpc/kvm/book3s_64_vio.c
-> +++ b/arch/powerpc/kvm/book3s_64_vio.c
-> @@ -255,7 +255,7 @@ static int kvm_spapr_tce_release(struct inode *inode, struct file *filp)
->  
->  	kvm_put_kvm(stt->kvm);
->  
-> -	account_locked_vm(current->mm,
-> +	account_locked_vm(kvm->mm,
->  		kvmppc_stt_pages(kvmppc_tce_pages(stt->size)), false);
+>
+> If it is possible to do without the long-term rmap reference, and
+> instead find the rmap via the memslots (with the srcu lock held) each
+> time we need the rmap, that would be safer, I think, provided that we
+> can sort out the lock ordering issues.
 
-You are referencing kvm->mm after having done kvm_put_kvm a couple of
-lines earlier, which means that *kvm can be freed at the point where
-you use kvm->mm.  If you want to make this change you will need to
-move the kvm_put_kvm call to after the last use of it.
+All paths except fault handler access rmap[] under srcu lock. Even in
+case of fault handler, for those faults induced by us (shared page
+handling, releasing device pfns), we do hold srcu lock. The difficult
+case is when we fault due to HV accessing a device page. In this case
+we come to fault hanler with mmap_sem already held and are not in a
+position to take kvm srcu lock as that would lead to lock order
+reversal. Given that we have pages mapped in still, I assume memslot
+can't go away while we access rmap[], so think we should be ok here.
 
-I have dropped this patch for now.
+However if that sounds fragile, may be I can go back to my initial
+design where we weren't using rmap[] to store device PFNs. That will
+increase the memory usage but we give us an easy option to have
+per-guest mutex to protect concurrent page-ins/outs/faults.
 
-Paul.
+Regards,
+Bharata.
+-- 
+http://raobharata.wordpress.com/
