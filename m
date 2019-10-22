@@ -2,157 +2,78 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 46DE1DFAAD
-	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Oct 2019 04:01:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0289DFD1D
+	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Oct 2019 07:28:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387786AbfJVCAG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 21 Oct 2019 22:00:06 -0400
-Received: from mga14.intel.com ([192.55.52.115]:61636 "EHLO mga14.intel.com"
+        id S1730370AbfJVF2W (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 22 Oct 2019 01:28:22 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:38073 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387775AbfJVCAF (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 21 Oct 2019 22:00:05 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 19:00:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; 
-   d="scan'208";a="196294026"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 19:00:04 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 45/45] KVM: Move vcpu->run page allocation out of kvm_vcpu_init()
-Date:   Mon, 21 Oct 2019 18:59:25 -0700
-Message-Id: <20191022015925.31916-46-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20191022015925.31916-1-sean.j.christopherson@intel.com>
-References: <20191022015925.31916-1-sean.j.christopherson@intel.com>
+        id S1727978AbfJVF2W (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 22 Oct 2019 01:28:22 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 46y2904rn7z9sPh; Tue, 22 Oct 2019 16:28:20 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1571722100; bh=p2M3AQlqsAJqlOpYWOhdmQPpGs/Vwl78Ov4vHAcu7rA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JnW7ire2Wv8jCrvNOuI3b35mX1NPHavxSEVxIE6mGTCiBomAgsOWEwAicj1K3JXvI
+         dxMZ5HlDJKqwI9043S02oVmTN2fn4jWQBJRRylN465fe2yeNw6L0pIQZjHkgo2SDzD
+         lo1upDGS1jVrS0aTEaKDox6Xslr1GQ1Yguw3rcv7GZg7SlmX2naaPyRnTTK5CgCRkU
+         Xz/DUSJgUbcw9lOofFP/fRf48AJgi9/p9YxZ70naYtnkRmQ5oH9+hQDS7Yp7YEUUdA
+         PsGuIYsDLniFmljesrP2vqwNDH9j7f19xVKEKbgMldhkiyZpriPPVo99xHtXJsiiqd
+         HX8aTFCh0tWbw==
+Date:   Tue, 22 Oct 2019 16:28:12 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Leonardo Bras <leonardo@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH 1/3] powerpc/kvm/book3s: Replace current->mm by kvm->mm
+Message-ID: <20191022052812.GA22958@oak.ozlabs.ibm.com>
+References: <20190923212409.7153-1-leonardo@linux.ibm.com>
+ <20190923212409.7153-2-leonardo@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190923212409.7153-2-leonardo@linux.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Open code the allocation and freeing of the vcpu->run page in
-kvm_vm_ioctl_create_vcpu() and kvm_vcpu_destroy() respectively.  Doing
-so allows kvm_vcpu_init() to be a pure init function and eliminates
-kvm_vcpu_uninit() entirely.
+On Mon, Sep 23, 2019 at 06:24:07PM -0300, Leonardo Bras wrote:
+> Given that in kvm_create_vm() there is:
+> kvm->mm = current->mm;
+> 
+> And that on every kvm_*_ioctl we have:
+> if (kvm->mm != current->mm)
+> 	return -EIO;
+> 
+> I see no reason to keep using current->mm instead of kvm->mm.
+> 
+> By doing so, we would reduce the use of 'global' variables on code, relying
+> more in the contents of kvm struct.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- virt/kvm/kvm_main.c | 34 +++++++++++++---------------------
- 1 file changed, 13 insertions(+), 21 deletions(-)
+This patch led to a crash on shutting down a VM, because of this hunk:
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index c079b22032fa..e532c6e606c0 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -287,10 +287,8 @@ void kvm_reload_remote_mmus(struct kvm *kvm)
- 	kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
- }
- 
--static int kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
-+static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- {
--	struct page *page;
--
- 	mutex_init(&vcpu->mutex);
- 	vcpu->cpu = -1;
- 	vcpu->kvm = kvm;
-@@ -302,23 +300,11 @@ static int kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- 	vcpu->pre_pcpu = -1;
- 	INIT_LIST_HEAD(&vcpu->blocked_vcpu_list);
- 
--	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
--	if (!page)
--		return -ENOMEM;
--	vcpu->run = page_address(page);
--
- 	kvm_vcpu_set_in_spin_loop(vcpu, false);
- 	kvm_vcpu_set_dy_eligible(vcpu, false);
- 	vcpu->preempted = false;
- 	vcpu->ready = false;
- 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
--
--	return 0;
--}
--
--static void kvm_vcpu_uninit(struct kvm_vcpu *vcpu)
--{
--	free_page((unsigned long)vcpu->run);
- }
- 
- void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
-@@ -332,7 +318,7 @@ void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	 */
- 	put_pid(rcu_dereference_protected(vcpu->pid, 1));
- 
--	kvm_vcpu_uninit(vcpu);
-+	free_page((unsigned long)vcpu->run);
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_destroy);
-@@ -2636,6 +2622,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- {
- 	int r;
- 	struct kvm_vcpu *vcpu;
-+	struct page *page;
- 
- 	if (id >= KVM_MAX_VCPU_ID)
- 		return -EINVAL;
-@@ -2659,13 +2646,18 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 		goto vcpu_decrement;
- 	}
- 
--	r = kvm_vcpu_init(vcpu, kvm, id);
--	if (r)
-+	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
-+	if (!page) {
-+		r = -ENOMEM;
- 		goto vcpu_free;
-+	}
-+	vcpu->run = page_address(page);
-+
-+	kvm_vcpu_init(vcpu, kvm, id);
- 
- 	r = kvm_arch_vcpu_create(vcpu);
- 	if (r)
--		goto vcpu_uninit;
-+		goto vcpu_free_run_page;
- 
- 	kvm_create_vcpu_debugfs(vcpu);
- 
-@@ -2702,8 +2694,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 	mutex_unlock(&kvm->lock);
- 	debugfs_remove_recursive(vcpu->debugfs_dentry);
- 	kvm_arch_vcpu_destroy(vcpu);
--vcpu_uninit:
--	kvm_vcpu_uninit(vcpu);
-+vcpu_free_run_page:
-+	free_page((unsigned long)vcpu->run);
- vcpu_free:
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
- vcpu_decrement:
--- 
-2.22.0
+> diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
+> index c4b606fe73eb..8069b35f2905 100644
+> --- a/arch/powerpc/kvm/book3s_64_vio.c
+> +++ b/arch/powerpc/kvm/book3s_64_vio.c
+> @@ -255,7 +255,7 @@ static int kvm_spapr_tce_release(struct inode *inode, struct file *filp)
+>  
+>  	kvm_put_kvm(stt->kvm);
+>  
+> -	account_locked_vm(current->mm,
+> +	account_locked_vm(kvm->mm,
+>  		kvmppc_stt_pages(kvmppc_tce_pages(stt->size)), false);
 
+You are referencing kvm->mm after having done kvm_put_kvm a couple of
+lines earlier, which means that *kvm can be freed at the point where
+you use kvm->mm.  If you want to make this change you will need to
+move the kvm_put_kvm call to after the last use of it.
+
+I have dropped this patch for now.
+
+Paul.
