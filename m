@@ -2,93 +2,98 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A24B3E2A00
-	for <lists+kvm-ppc@lfdr.de>; Thu, 24 Oct 2019 07:38:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39378E2B47
+	for <lists+kvm-ppc@lfdr.de>; Thu, 24 Oct 2019 09:44:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391024AbfJXFio (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 24 Oct 2019 01:38:44 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:57085 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390925AbfJXFio (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 24 Oct 2019 01:38:44 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46zGJ169gXz9sPp; Thu, 24 Oct 2019 16:38:41 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1571895521; bh=Pvk4pjfud4nhWj0HS/7DHrPbxYicG2LOW+g9wM0CxM8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=t6OH7K7acC/K4mI4A05FoIBp8bV/pCbT+fl4WMecL+VzGDHWtyvpjKUEwzsPkvZkl
-         zu2ALcjEGJO/U9Z7DPZIhENE1CEiCsNazBtCLlMQG9bBxSZBxHv5Jntsl10zGTzgDm
-         k+S0umNnNBCQZPmlzGLzsR/Z0bSOGIjkcCTBZbLjS03IJT7zrRk58J311BKCGM1nDW
-         Ug5EzR4+nNuj3Z0v2ZRdE1v+EKiuxCYZtXmiDxxPGVKz+J8D1vQcGV0bskSVdN3LhT
-         z37ODJ2hKYVQE2dAcCJqHehYqMIqmzb6O6Ma3gsGnoEBcWdPsUBWt+ISWJxxzdf6c1
-         I/rPRObXjj+Sw==
-Date:   Thu, 24 Oct 2019 15:48:31 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 14/23] KVM: PPC: Book3S HV: Nested: Context switch slb
- for nested hpt guest
-Message-ID: <20191024044831.GB773@oak.ozlabs.ibm.com>
-References: <20190826062109.7573-1-sjitindarsingh@gmail.com>
- <20190826062109.7573-15-sjitindarsingh@gmail.com>
+        id S2407160AbfJXHoj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 24 Oct 2019 03:44:39 -0400
+Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:57174 "EHLO
+        4.mo173.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407157AbfJXHoj (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 24 Oct 2019 03:44:39 -0400
+Received: from player788.ha.ovh.net (unknown [10.108.35.103])
+        by mo173.mail-out.ovh.net (Postfix) with ESMTP id 0031411A31B
+        for <kvm-ppc@vger.kernel.org>; Thu, 24 Oct 2019 09:04:46 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
+        (Authenticated sender: groug@kaod.org)
+        by player788.ha.ovh.net (Postfix) with ESMTPSA id CA63BB4D6960;
+        Thu, 24 Oct 2019 07:04:07 +0000 (UTC)
+Date:   Thu, 24 Oct 2019 09:04:03 +0200
+From:   Greg Kurz <groug@kaod.org>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/45] KVM: PPC: Book3S HV: Uninit vCPU if vcore
+ creation fails
+Message-ID: <20191024090403.5e564e39@bahia.lan>
+In-Reply-To: <20191022015925.31916-2-sean.j.christopherson@intel.com>
+References: <20191022015925.31916-1-sean.j.christopherson@intel.com>
+        <20191022015925.31916-2-sean.j.christopherson@intel.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190826062109.7573-15-sjitindarsingh@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 5552375392181655889
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrledtgdduudefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Aug 26, 2019 at 04:21:00PM +1000, Suraj Jitindar Singh wrote:
-> A version 2 of the H_ENTER_NESTED hcall was added with an argument to
-> specify the slb entries which should be used to run the nested guest.
+On Mon, 21 Oct 2019 18:58:41 -0700
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+
+> Call kvm_vcpu_uninit() if vcore creation fails to avoid leaking any
+> resources allocated by kvm_vcpu_init(), i.e. the vcpu->run page.
 > 
-> Add support for this version of the hcall structures to
-> kvmhv_enter_nested_guest() and context switch the slb when the nested
-> guest being run is a hpt (hash page table) guest.
+> Fixes: 371fefd6f2dc4 ("KVM: PPC: Allow book3s_hv guests to use SMT processor modes")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  arch/powerpc/kvm/book3s_hv.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 709cf1fd4cf4..36abbe3c346d 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -2354,7 +2354,7 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_hv(struct kvm *kvm,
+>  	mutex_unlock(&kvm->lock);
+>  
+>  	if (!vcore)
+> -		goto free_vcpu;
+> +		goto uninit_vcpu;
+>  
+>  	spin_lock(&vcore->lock);
+>  	++vcore->num_threads;
+> @@ -2371,6 +2371,8 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_hv(struct kvm *kvm,
+>  
+>  	return vcpu;
+>  
+> +uninit_vcpu:
+> +	kvm_vcpu_uninit(vcpu);
+>  free_vcpu:
+>  	kmem_cache_free(kvm_vcpu_cache, vcpu);
+>  out:
 
-Question below...
-
-> @@ -307,6 +335,26 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->  	vcpu->arch.regs.msr = vcpu->arch.shregs.msr;
->  	saved_l1_regs = vcpu->arch.regs;
->  	kvmhv_save_hv_regs(vcpu, &saved_l1_hv);
-> +	/* if running hpt then context switch the slb in the vcpu struct */
-> +	if (!radix) {
-> +		slb_ptr = kvmppc_get_gpr(vcpu, 6);
-> +		l2_slb = kzalloc(sizeof(*l2_slb), GFP_KERNEL);
-> +		saved_l1_slb = kzalloc(sizeof(*saved_l1_slb), GFP_KERNEL);
-> +
-> +		if ((!l2_slb) || (!saved_l1_slb)) {
-> +			ret = H_HARDWARE;
-> +			goto out_free;
-> +		}
-> +		err = kvm_vcpu_read_guest(vcpu, slb_ptr, l2_slb,
-> +					  sizeof(struct guest_slb));
-> +		if (err) {
-> +			ret = H_PARAMETER;
-> +			goto out_free;
-> +		}
-> +		if (kvmppc_need_byteswap(vcpu))
-> +			byteswap_guest_slb(l2_slb);
-> +		kvmhv_save_guest_slb(vcpu, saved_l1_slb);
-
-Why are we bothering to save the SLB state of the L1 guest, which has
-to be a radix guest?  Won't the L1 SLB state always just have 0
-entries?
-
-> @@ -354,6 +409,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->  		vcpu->arch.shregs.msr |= MSR_TS_S;
->  	vc->tb_offset = saved_l1_hv.tb_offset;
->  	restore_hv_regs(vcpu, &saved_l1_hv);
-> +	if (!radix)
-> +		kvmhv_restore_guest_slb(vcpu, saved_l1_slb);
-
-Likewise here can't we just set vcpu->arch.slb_max and
-vcpu->arch.slb_nr to zero?
-
-Paul.
