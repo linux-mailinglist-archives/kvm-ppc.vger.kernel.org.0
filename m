@@ -2,140 +2,92 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D1971E4E20
-	for <lists+kvm-ppc@lfdr.de>; Fri, 25 Oct 2019 16:05:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FF15E513B
+	for <lists+kvm-ppc@lfdr.de>; Fri, 25 Oct 2019 18:30:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502382AbfJYN4Y (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 25 Oct 2019 09:56:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50696 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393547AbfJYN4W (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 25 Oct 2019 09:56:22 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 15F24222BD;
-        Fri, 25 Oct 2019 13:56:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572011781;
-        bh=Kng16m/t/WNxtUlNeRND0rxRsZYZ9Z4Lln/p1bnA7HM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ntNtq83ft2ZJ/1APDsZzioMitK0dAQuQUw71kTvH+XYmpQfc3O0A3UjQZusdCP4Vq
-         KTpatm7D1+uyQIHkmheBZ7hOANYi6RUrBlCw/t9E8x9aak360NJUHsVhWfbefdeSvq
-         U/gBpV/GOAdyesUYFNKRjWMuBPdWLzXNFK2P2+wI=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 4.19 11/37] KVM: PPC: Book3S HV: Fix lockdep warning when entering the guest
-Date:   Fri, 25 Oct 2019 09:55:35 -0400
-Message-Id: <20191025135603.25093-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191025135603.25093-1-sashal@kernel.org>
-References: <20191025135603.25093-1-sashal@kernel.org>
+        id S1726882AbfJYQap (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 25 Oct 2019 12:30:45 -0400
+Received: from inca-roads.misterjones.org ([213.251.177.50]:42492 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1733010AbfJYQao (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 25 Oct 2019 12:30:44 -0400
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iO2Tk-0008W8-Nd; Fri, 25 Oct 2019 18:30:20 +0200
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 25 Oct 2019 17:30:20 +0100
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <linux-mips@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
+        Christoffer Dall <christoffer.dall@arm.com>
+In-Reply-To: <20191024230744.14543-1-sean.j.christopherson@intel.com>
+References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
+Message-ID: <2fc05685467a01c2f1c2afeacefb2f68@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, jhogan@kernel.org, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, pbonzini@redhat.com, rkrcmar@redhat.com, david@redhat.com, cohuck@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+On 2019-10-25 00:07, Sean Christopherson wrote:
+> The end goal of this series is to dynamically size the memslot array 
+> so
+> that KVM allocates memory based on the number of memslots in use, as
+> opposed to unconditionally allocating memory for the maximum number 
+> of
+> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 
+> address
+> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
+> E.g. given a VM that uses a total of 30 memslots, dynamic sizing 
+> reduces
+> the memory footprint from 90k to ~2.6k bytes.
+>
+> The changes required to support dynamic sizing are relatively small,
+> e.g. are essentially contained in patches 14/15 and 15/15.  Patches 
+> 1-13
+> clean up the memslot code, which has gotten quite crusty, especially
+> __kvm_set_memory_region().  The clean up is likely not strictly 
+> necessary
+> to switch to dynamic sizing, but I didn't have a remotely reasonable
+> level of confidence in the correctness of the dynamic sizing without 
+> first
+> doing the clean up.
 
-[ Upstream commit 3309bec85e60d60d6394802cb8e183a4f4a72def ]
+I've finally found time to test this on a garden variety of arm64 
+boxes,
+and nothing caught fire. It surely must be doing something right!
 
-The trace_hardirqs_on() sets current->hardirqs_enabled and from here
-the lockdep assumes interrupts are enabled although they are remain
-disabled until the context switches to the guest. Consequent
-srcu_read_lock() checks the flags in rcu_lock_acquire(), observes
-disabled interrupts and prints a warning (see below).
+FWIW:
 
-This moves trace_hardirqs_on/off closer to __kvmppc_vcore_entry to
-prevent lockdep from being confused.
+Tested-by: Marc Zyngier <maz@kernel.org>
 
-DEBUG_LOCKS_WARN_ON(current->hardirqs_enabled)
-WARNING: CPU: 16 PID: 8038 at kernel/locking/lockdep.c:4128 check_flags.part.25+0x224/0x280
-[...]
-NIP [c000000000185b84] check_flags.part.25+0x224/0x280
-LR [c000000000185b80] check_flags.part.25+0x220/0x280
-Call Trace:
-[c000003fec253710] [c000000000185b80] check_flags.part.25+0x220/0x280 (unreliable)
-[c000003fec253780] [c000000000187ea4] lock_acquire+0x94/0x260
-[c000003fec253840] [c00800001a1e9768] kvmppc_run_core+0xa60/0x1ab0 [kvm_hv]
-[c000003fec253a10] [c00800001a1ed944] kvmppc_vcpu_run_hv+0x73c/0xec0 [kvm_hv]
-[c000003fec253ae0] [c00800001a1095dc] kvmppc_vcpu_run+0x34/0x48 [kvm]
-[c000003fec253b00] [c00800001a1056bc] kvm_arch_vcpu_ioctl_run+0x2f4/0x400 [kvm]
-[c000003fec253b90] [c00800001a0f3618] kvm_vcpu_ioctl+0x460/0x850 [kvm]
-[c000003fec253d00] [c00000000041c4f4] do_vfs_ioctl+0xe4/0x930
-[c000003fec253db0] [c00000000041ce04] ksys_ioctl+0xc4/0x110
-[c000003fec253e00] [c00000000041ce78] sys_ioctl+0x28/0x80
-[c000003fec253e20] [c00000000000b5a4] system_call+0x5c/0x70
-Instruction dump:
-419e0034 3d220004 39291730 81290000 2f890000 409e0020 3c82ffc6 3c62ffc5
-3884be70 386329c0 4bf6ea71 60000000 <0fe00000> 3c62ffc6 3863be90 4801273d
-irq event stamp: 1025
-hardirqs last  enabled at (1025): [<c00800001a1e9728>] kvmppc_run_core+0xa20/0x1ab0 [kvm_hv]
-hardirqs last disabled at (1024): [<c00800001a1e9358>] kvmppc_run_core+0x650/0x1ab0 [kvm_hv]
-softirqs last  enabled at (0): [<c0000000000f1210>] copy_process.isra.4.part.5+0x5f0/0x1d00
-softirqs last disabled at (0): [<0000000000000000>]           (null)
----[ end trace 31180adcc848993e ]---
-possible reason: unannotated irqs-off.
-irq event stamp: 1025
-hardirqs last  enabled at (1025): [<c00800001a1e9728>] kvmppc_run_core+0xa20/0x1ab0 [kvm_hv]
-hardirqs last disabled at (1024): [<c00800001a1e9358>] kvmppc_run_core+0x650/0x1ab0 [kvm_hv]
-softirqs last  enabled at (0): [<c0000000000f1210>] copy_process.isra.4.part.5+0x5f0/0x1d00
-softirqs last disabled at (0): [<0000000000000000>]           (null)
-
-Fixes: 8b24e69fc47e ("KVM: PPC: Book3S HV: Close race with testing for signals on guest entry", 2017-06-26)
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/powerpc/kvm/book3s_hv.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
-
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 3ae3e8d141e3e..dbfe32327212e 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -2993,25 +2993,26 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
- 		}
- 	}
- 
--	/*
--	 * Interrupts will be enabled once we get into the guest,
--	 * so tell lockdep that we're about to enable interrupts.
--	 */
--	trace_hardirqs_on();
--
- 	guest_enter_irqoff();
- 
- 	srcu_idx = srcu_read_lock(&vc->kvm->srcu);
- 
- 	this_cpu_disable_ftrace();
- 
-+	/*
-+	 * Interrupts will be enabled once we get into the guest,
-+	 * so tell lockdep that we're about to enable interrupts.
-+	 */
-+	trace_hardirqs_on();
-+
- 	trap = __kvmppc_vcore_entry();
- 
-+	trace_hardirqs_off();
-+
- 	this_cpu_enable_ftrace();
- 
- 	srcu_read_unlock(&vc->kvm->srcu, srcu_idx);
- 
--	trace_hardirqs_off();
- 	set_irq_happened(trap);
- 
- 	spin_lock(&vc->lock);
+         M.
 -- 
-2.20.1
-
+Jazz is not dead. It just smells funny...
