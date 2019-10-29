@@ -2,138 +2,47 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BAC94E7309
-	for <lists+kvm-ppc@lfdr.de>; Mon, 28 Oct 2019 15:00:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9CA3E87D6
+	for <lists+kvm-ppc@lfdr.de>; Tue, 29 Oct 2019 13:13:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389776AbfJ1N7i (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 28 Oct 2019 09:59:38 -0400
-Received: from foss.arm.com ([217.140.110.172]:40350 "EHLO foss.arm.com"
+        id S1730269AbfJ2MNx convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Tue, 29 Oct 2019 08:13:53 -0400
+Received: from s0090.ppsmtp.net ([91.90.154.91]:51478 "EHLO s0090.ppsmtp.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389745AbfJ1N7h (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 28 Oct 2019 09:59:37 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E145F4A7;
-        Mon, 28 Oct 2019 06:59:36 -0700 (PDT)
-Received: from e112269-lin.cambridge.arm.com (unknown [10.1.194.43])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C2A013F6C4;
-        Mon, 28 Oct 2019 06:59:33 -0700 (PDT)
-From:   Steven Price <steven.price@arm.com>
-To:     linux-mm@kvack.org
-Cc:     Steven Price <steven.price@arm.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Mark Rutland <Mark.Rutland@arm.com>,
-        "Liang, Kan" <kan.liang@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-Subject: [PATCH v14 06/22] powerpc: mm: Add p?d_leaf() definitions
-Date:   Mon, 28 Oct 2019 13:58:54 +0000
-Message-Id: <20191028135910.33253-7-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191028135910.33253-1-steven.price@arm.com>
-References: <20191028135910.33253-1-steven.price@arm.com>
+        id S1727082AbfJ2MNx (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 29 Oct 2019 08:13:53 -0400
+X-Greylist: delayed 19136 seconds by postgrey-1.27 at vger.kernel.org; Tue, 29 Oct 2019 08:13:51 EDT
+Received: from pps.filterd (s0090.ppsmtp.net [127.0.0.1])
+        by s0090.ppsmtp.net (8.16.0.27/8.16.0.27) with SMTP id x9T6h4GR016609;
+        Tue, 29 Oct 2019 07:54:21 +0100
+Received: from mail.schuetz.net ([212.185.169.233])
+        by s0090.ppsmtp.net with ESMTP id 2vx8bh8a08-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 29 Oct 2019 07:54:21 +0100
+Received: from julia02 (localhost [127.0.0.1])
+        by mail.schuetz.net (Postfix) with ESMTP id 917C820221A4;
+        Tue, 29 Oct 2019 07:52:54 +0100 (CET)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Dear Friend,
+To:     Recipients <infocarfer1@aim.com>
+From:   "Mr.R.C" <infocarfer1@aim.com>
+Date:   Tue, 29 Oct 2019 06:52:38 +0000
+Reply-To: infocarfer@aim.com
+X-TNEFEvaluated: 1
+Message-ID: <OFB6DE1564.0A7EAD44-ON882584A2.0025CD2E@schuetz.net>
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Description: Mail message body
+X-Proofpoint-ID: SID=2vx8bh8a08 QID=2vx8bh8a08-1
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-29_03:,,
+ signatures=0
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-walk_page_range() is going to be allowed to walk page tables other than
-those of user space. For this it needs to know when it has reached a
-'leaf' entry in the page tables. This information is provided by the
-p?d_leaf() functions/macros.
+Dear Friend,
 
-For powerpc pmd_large() already exists and does what we want, so hoist
-it out of the CONFIG_TRANSPARENT_HUGEPAGE condition and implement the
-other levels. Macros are used to provide the generic p?d_leaf() names.
-
-CC: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-CC: Paul Mackerras <paulus@samba.org>
-CC: Michael Ellerman <mpe@ellerman.id.au>
-CC: linuxppc-dev@lists.ozlabs.org
-CC: kvm-ppc@vger.kernel.org
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/powerpc/include/asm/book3s/64/pgtable.h | 30 ++++++++++++++------
- 1 file changed, 21 insertions(+), 9 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
-index b01624e5c467..3dd7b6f5edd0 100644
---- a/arch/powerpc/include/asm/book3s/64/pgtable.h
-+++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
-@@ -923,6 +923,12 @@ static inline int pud_present(pud_t pud)
- 	return !!(pud_raw(pud) & cpu_to_be64(_PAGE_PRESENT));
- }
- 
-+#define pud_leaf	pud_large
-+static inline int pud_large(pud_t pud)
-+{
-+	return !!(pud_raw(pud) & cpu_to_be64(_PAGE_PTE));
-+}
-+
- extern struct page *pud_page(pud_t pud);
- extern struct page *pmd_page(pmd_t pmd);
- static inline pte_t pud_pte(pud_t pud)
-@@ -966,6 +972,12 @@ static inline int pgd_present(pgd_t pgd)
- 	return !!(pgd_raw(pgd) & cpu_to_be64(_PAGE_PRESENT));
- }
- 
-+#define pgd_leaf	pgd_large
-+static inline int pgd_large(pgd_t pgd)
-+{
-+	return !!(pgd_raw(pgd) & cpu_to_be64(_PAGE_PTE));
-+}
-+
- static inline pte_t pgd_pte(pgd_t pgd)
- {
- 	return __pte_raw(pgd_raw(pgd));
-@@ -1133,6 +1145,15 @@ static inline bool pmd_access_permitted(pmd_t pmd, bool write)
- 	return pte_access_permitted(pmd_pte(pmd), write);
- }
- 
-+#define pmd_leaf	pmd_large
-+/*
-+ * returns true for pmd migration entries, THP, devmap, hugetlb
-+ */
-+static inline int pmd_large(pmd_t pmd)
-+{
-+	return !!(pmd_raw(pmd) & cpu_to_be64(_PAGE_PTE));
-+}
-+
- #ifdef CONFIG_TRANSPARENT_HUGEPAGE
- extern pmd_t pfn_pmd(unsigned long pfn, pgprot_t pgprot);
- extern pmd_t mk_pmd(struct page *page, pgprot_t pgprot);
-@@ -1159,15 +1180,6 @@ pmd_hugepage_update(struct mm_struct *mm, unsigned long addr, pmd_t *pmdp,
- 	return hash__pmd_hugepage_update(mm, addr, pmdp, clr, set);
- }
- 
--/*
-- * returns true for pmd migration entries, THP, devmap, hugetlb
-- * But compile time dependent on THP config
-- */
--static inline int pmd_large(pmd_t pmd)
--{
--	return !!(pmd_raw(pmd) & cpu_to_be64(_PAGE_PTE));
--}
--
- static inline pmd_t pmd_mknotpresent(pmd_t pmd)
- {
- 	return __pmd(pmd_val(pmd) & ~_PAGE_PRESENT);
--- 
-2.20.1
-
+I am Vice Chairman of Hang Seng Bank, I have Important Matter to Discuss with you concerning my late client, Died without a NEXT OF KIN. Send me your private email for full details information. email me at (infocarfer@aim.com)
+Mail:
+Regards
