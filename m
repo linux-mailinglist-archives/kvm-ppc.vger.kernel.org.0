@@ -2,137 +2,74 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E6EBEEC45B
-	for <lists+kvm-ppc@lfdr.de>; Fri,  1 Nov 2019 15:11:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B175EC5D1
+	for <lists+kvm-ppc@lfdr.de>; Fri,  1 Nov 2019 16:46:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728225AbfKAOKO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 1 Nov 2019 10:10:14 -0400
-Received: from foss.arm.com ([217.140.110.172]:35994 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727725AbfKAOKL (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 1 Nov 2019 10:10:11 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1ACFE31F;
-        Fri,  1 Nov 2019 07:10:11 -0700 (PDT)
-Received: from e112269-lin.cambridge.arm.com (e112269-lin.cambridge.arm.com [10.1.194.43])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ED5D93F718;
-        Fri,  1 Nov 2019 07:10:07 -0700 (PDT)
-From:   Steven Price <steven.price@arm.com>
-To:     Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
-Cc:     Steven Price <steven.price@arm.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Mark Rutland <Mark.Rutland@arm.com>,
-        "Liang, Kan" <kan.liang@linux.intel.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-Subject: [PATCH v15 06/23] powerpc: mm: Add p?d_leaf() definitions
-Date:   Fri,  1 Nov 2019 14:09:25 +0000
-Message-Id: <20191101140942.51554-7-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191101140942.51554-1-steven.price@arm.com>
-References: <20191101140942.51554-1-steven.price@arm.com>
+        id S1728983AbfKAPqA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 1 Nov 2019 11:46:00 -0400
+Received: from mail-il1-f193.google.com ([209.85.166.193]:37305 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728979AbfKAPqA (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 1 Nov 2019 11:46:00 -0400
+Received: by mail-il1-f193.google.com with SMTP id t9so6779692ils.4
+        for <kvm-ppc@vger.kernel.org>; Fri, 01 Nov 2019 08:45:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=jS5spAHkLQ6jXruZmR6Hfc0otf2ZvlnYa6I4swfa2tE=;
+        b=ip8hUDGYFNToPf0JY7UoMhaMkZjQrWLeOX+MzfaAYR/5UdYgdkzNuj+elT7IhUiwrW
+         vg68llvyNFWW0V7+FDdTXtT8gGRH6wwgSAQx/wW9sxbbqJM6ZKPDbuyEwbPuNai7n23S
+         p4wBoTDDX51lIW0wyi0CJHTHyYRjRcDoCdLFkjQAWtRcgFPvESJULvYCsIGQL8e4Z5Ch
+         XMeZVemnh9vk9kgSIZRectY0mgehpIkBY5QtqkxmYt1KrSVSsqURyFSSAMJkrPvU4pMk
+         uXK5SCOLbLnY+h1+KHpIELANHD8AtSOp0hvYLAcR0EvxWKk739Fm/wfE8PMzsZ1+5IRS
+         m7sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=jS5spAHkLQ6jXruZmR6Hfc0otf2ZvlnYa6I4swfa2tE=;
+        b=TKPTQ3/dnIBSrLu6dMHYvMkk6NZ2BhGA7XO/LjIr1L/C+vqp+Wln6hs8DQ08tJpidD
+         Y4tuBf3xph3ZEz59xp8OSRVJJW0aElfabfVPUxqky00nFJlY/JgROt7Dqjb34zjHETGA
+         S0I8fysJQNboepvk8JTzSh15F9MXBOTS1YginaZJd/9RdPRwBzRUwN02vr2sFpl11Wz/
+         sQWGuxZkffg2eW0i7xi3Eq3XdNVJrfu4+aqXxi5bPJzUeoBLNprNoPwHsbmLVCNS+RFu
+         xquqCBaFByimH189HiEPS4f/Npoz/iPtGQACqjsvPdgPStbgEpTNZRVk9wMMmGSnu+CS
+         emgQ==
+X-Gm-Message-State: APjAAAUEBP67AkM4/cAqBv1AuTf0xPlQBWywbzkEL9nyQSCstq3W/rjy
+        7N0hT/pOheW59/FYFRA1K2WXkW9mH9seSJlzqw==
+X-Google-Smtp-Source: APXvYqzmb+kqsWIQsk6AJPjd1Xdw4IxGP9KVFYjDzvesSiQwJul+QvWkXshctcxTVqvl0OT/J+Z+hjyBFxLIOOtPKKs=
+X-Received: by 2002:a92:5d49:: with SMTP id r70mr13391942ilb.257.1572623159576;
+ Fri, 01 Nov 2019 08:45:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a02:7749:0:0:0:0:0 with HTTP; Fri, 1 Nov 2019 08:45:59 -0700 (PDT)
+Reply-To: moneygram.1820@outlook.fr
+From:   "Mary Coster, I.M.F director-Benin" 
+        <info.zennitbankplcnigerian@gmail.com>
+Date:   Fri, 1 Nov 2019 16:45:59 +0100
+Message-ID: <CABHzvrmwJ002eiEaiK=88=5hPqQ1TNUwHHMm-tiw4Q6JPGw_bg@mail.gmail.com>
+Subject: Contact Money Gram international service-Benin to receive your
+ payment funds US$2.500,000 Million
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-walk_page_range() is going to be allowed to walk page tables other than
-those of user space. For this it needs to know when it has reached a
-'leaf' entry in the page tables. This information is provided by the
-p?d_leaf() functions/macros.
-
-For powerpc pmd_large() already exists and does what we want, so hoist
-it out of the CONFIG_TRANSPARENT_HUGEPAGE condition and implement the
-other levels. Macros are used to provide the generic p?d_leaf() names.
-
-CC: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-CC: Paul Mackerras <paulus@samba.org>
-CC: Michael Ellerman <mpe@ellerman.id.au>
-CC: linuxppc-dev@lists.ozlabs.org
-CC: kvm-ppc@vger.kernel.org
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/powerpc/include/asm/book3s/64/pgtable.h | 30 ++++++++++++++------
- 1 file changed, 21 insertions(+), 9 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
-index b01624e5c467..3dd7b6f5edd0 100644
---- a/arch/powerpc/include/asm/book3s/64/pgtable.h
-+++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
-@@ -923,6 +923,12 @@ static inline int pud_present(pud_t pud)
- 	return !!(pud_raw(pud) & cpu_to_be64(_PAGE_PRESENT));
- }
- 
-+#define pud_leaf	pud_large
-+static inline int pud_large(pud_t pud)
-+{
-+	return !!(pud_raw(pud) & cpu_to_be64(_PAGE_PTE));
-+}
-+
- extern struct page *pud_page(pud_t pud);
- extern struct page *pmd_page(pmd_t pmd);
- static inline pte_t pud_pte(pud_t pud)
-@@ -966,6 +972,12 @@ static inline int pgd_present(pgd_t pgd)
- 	return !!(pgd_raw(pgd) & cpu_to_be64(_PAGE_PRESENT));
- }
- 
-+#define pgd_leaf	pgd_large
-+static inline int pgd_large(pgd_t pgd)
-+{
-+	return !!(pgd_raw(pgd) & cpu_to_be64(_PAGE_PTE));
-+}
-+
- static inline pte_t pgd_pte(pgd_t pgd)
- {
- 	return __pte_raw(pgd_raw(pgd));
-@@ -1133,6 +1145,15 @@ static inline bool pmd_access_permitted(pmd_t pmd, bool write)
- 	return pte_access_permitted(pmd_pte(pmd), write);
- }
- 
-+#define pmd_leaf	pmd_large
-+/*
-+ * returns true for pmd migration entries, THP, devmap, hugetlb
-+ */
-+static inline int pmd_large(pmd_t pmd)
-+{
-+	return !!(pmd_raw(pmd) & cpu_to_be64(_PAGE_PTE));
-+}
-+
- #ifdef CONFIG_TRANSPARENT_HUGEPAGE
- extern pmd_t pfn_pmd(unsigned long pfn, pgprot_t pgprot);
- extern pmd_t mk_pmd(struct page *page, pgprot_t pgprot);
-@@ -1159,15 +1180,6 @@ pmd_hugepage_update(struct mm_struct *mm, unsigned long addr, pmd_t *pmdp,
- 	return hash__pmd_hugepage_update(mm, addr, pmdp, clr, set);
- }
- 
--/*
-- * returns true for pmd migration entries, THP, devmap, hugetlb
-- * But compile time dependent on THP config
-- */
--static inline int pmd_large(pmd_t pmd)
--{
--	return !!(pmd_raw(pmd) & cpu_to_be64(_PAGE_PTE));
--}
--
- static inline pmd_t pmd_mknotpresent(pmd_t pmd)
- {
- 	return __pmd(pmd_val(pmd) & ~_PAGE_PRESENT);
--- 
-2.20.1
-
+Attn Dear.
+Contact Money Gram international service-Benin to receive your payment
+funds US$2.500,000 Million approved this morning through the UN
+payment settlement organization.
+Contact Person, Mr. John Dave.
+Official Director.Money Gram-Benin
+Email: moneygram.1820@outlook.fr
+Telephone +229 62619517
+Once you get intouch with Mr. John Dave, Money Gram Director, send to
+him your address including your phone numbers. He will be sending the
+transfer to you  $5000.00 USD daily until you received your complete
+payment $2.5m from the office.
+Note,I have paid the whole service fees for you but only small money
+you been required to send to this office is $23.00 only via Money Gram
+transfer.
+God bless
+Mary Coster, I.M.F director-Benin
+m.coster@aol.com
