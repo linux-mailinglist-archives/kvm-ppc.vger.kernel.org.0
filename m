@@ -2,86 +2,137 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 42942EBA7D
-	for <lists+kvm-ppc@lfdr.de>; Fri,  1 Nov 2019 00:36:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6EBEEC45B
+	for <lists+kvm-ppc@lfdr.de>; Fri,  1 Nov 2019 15:11:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728074AbfJaXgz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 31 Oct 2019 19:36:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59314 "EHLO mx1.redhat.com"
+        id S1728225AbfKAOKO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 1 Nov 2019 10:10:14 -0400
+Received: from foss.arm.com ([217.140.110.172]:35994 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728345AbfJaXgz (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 31 Oct 2019 19:36:55 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 12F5385539
-        for <kvm-ppc@vger.kernel.org>; Thu, 31 Oct 2019 23:36:55 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id z9so4463797wrq.11
-        for <kvm-ppc@vger.kernel.org>; Thu, 31 Oct 2019 16:36:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4LJgE7uoxIgv6lOFWTa4lMXDWH86arAwN/3SBbtX42c=;
-        b=LMwdY0eINSqGHvYf6TSCbbwPLZBuQx5EexaQQxlDhRhfbhem6FFMCKYmPBCFr4kR9X
-         /UgW9PxmEppMb2sVlQ6hkWSfTv7bDzjD/QphJnlg2mMF4USe2TjHFWj/pdU25IbUuw6W
-         1PR0qNG8LHBao68Mt853qOrzS5co79h5asKCJILZRewNzYhf8KMdVrAxMY82O5ofrHca
-         LgzfiruBdZn362rvsSaHLfm9O3qGADadmIltNutaun8xZ2UnJKlvb10RNjfPCQmkkqhP
-         lKYe2+kEfXwwX5yEvM9VwprdKhbRHvVtVSX9LiJV+llVRX9p/TAV/T0mqd17kj+2DqOd
-         XziQ==
-X-Gm-Message-State: APjAAAW3WXc+cQ4oqMpjz3ICXIsOOh2LBXQFfXS3quTZumUC8vXOcdgA
-        BBNGhufqUXQBWnPnjV/kcfjS882ZbYcBaBSxK4KvBBP24dyvGddHFW/08HxeeUSpTkBJd9iAHp7
-        87Y1CqsAQ148g4JuvvA==
-X-Received: by 2002:a1c:1d41:: with SMTP id d62mr7465985wmd.32.1572565013602;
-        Thu, 31 Oct 2019 16:36:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxycS8wEB4d15ZosyhgQfZLFlZUbJ9aGHOZxYeJp6qJNPUEq3M8FNWBrhbLOmRzr7qE7Vkx8A==
-X-Received: by 2002:a1c:1d41:: with SMTP id d62mr7465969wmd.32.1572565013331;
-        Thu, 31 Oct 2019 16:36:53 -0700 (PDT)
-Received: from [192.168.20.72] (94.222.26.109.rev.sfr.net. [109.26.222.94])
-        by smtp.gmail.com with ESMTPSA id q14sm7476510wre.27.2019.10.31.16.36.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2019 16:36:52 -0700 (PDT)
-Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.5-1 tag
-To:     Paul Mackerras <paulus@ozlabs.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-References: <20191031111349.GA8045@blackberry>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f41d26fb-de5e-83d1-4ec6-11c66b93c076@redhat.com>
-Date:   Fri, 1 Nov 2019 00:36:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727725AbfKAOKL (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 1 Nov 2019 10:10:11 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1ACFE31F;
+        Fri,  1 Nov 2019 07:10:11 -0700 (PDT)
+Received: from e112269-lin.cambridge.arm.com (e112269-lin.cambridge.arm.com [10.1.194.43])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ED5D93F718;
+        Fri,  1 Nov 2019 07:10:07 -0700 (PDT)
+From:   Steven Price <steven.price@arm.com>
+To:     Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+Cc:     Steven Price <steven.price@arm.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        "Liang, Kan" <kan.liang@linux.intel.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
+Subject: [PATCH v15 06/23] powerpc: mm: Add p?d_leaf() definitions
+Date:   Fri,  1 Nov 2019 14:09:25 +0000
+Message-Id: <20191101140942.51554-7-steven.price@arm.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191101140942.51554-1-steven.price@arm.com>
+References: <20191101140942.51554-1-steven.price@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20191031111349.GA8045@blackberry>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 31/10/19 12:13, Paul Mackerras wrote:
-> Paolo or Radim,
-> 
-> Please do a pull from my kvm-ppc-next-5.5-1 tag to get a PPC KVM
-> update for v5.5.
-> 
-> Thanks,
-> Paul.
-> 
-> The following changes since commit 12ade69c1eb9958b13374edf5ef742ea20ccffde:
-> 
->   KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use (2019-10-15 16:09:11 +1100)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.5-1
+walk_page_range() is going to be allowed to walk page tables other than
+those of user space. For this it needs to know when it has reached a
+'leaf' entry in the page tables. This information is provided by the
+p?d_leaf() functions/macros.
 
-Pushed to kvm/queue for now.  It may take a couple days after I get
-back, before I test all the pending x86 patches and push out to kvm/next.
+For powerpc pmd_large() already exists and does what we want, so hoist
+it out of the CONFIG_TRANSPARENT_HUGEPAGE condition and implement the
+other levels. Macros are used to provide the generic p?d_leaf() names.
 
-Paolo
+CC: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+CC: Paul Mackerras <paulus@samba.org>
+CC: Michael Ellerman <mpe@ellerman.id.au>
+CC: linuxppc-dev@lists.ozlabs.org
+CC: kvm-ppc@vger.kernel.org
+Signed-off-by: Steven Price <steven.price@arm.com>
+---
+ arch/powerpc/include/asm/book3s/64/pgtable.h | 30 ++++++++++++++------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
+index b01624e5c467..3dd7b6f5edd0 100644
+--- a/arch/powerpc/include/asm/book3s/64/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
+@@ -923,6 +923,12 @@ static inline int pud_present(pud_t pud)
+ 	return !!(pud_raw(pud) & cpu_to_be64(_PAGE_PRESENT));
+ }
+ 
++#define pud_leaf	pud_large
++static inline int pud_large(pud_t pud)
++{
++	return !!(pud_raw(pud) & cpu_to_be64(_PAGE_PTE));
++}
++
+ extern struct page *pud_page(pud_t pud);
+ extern struct page *pmd_page(pmd_t pmd);
+ static inline pte_t pud_pte(pud_t pud)
+@@ -966,6 +972,12 @@ static inline int pgd_present(pgd_t pgd)
+ 	return !!(pgd_raw(pgd) & cpu_to_be64(_PAGE_PRESENT));
+ }
+ 
++#define pgd_leaf	pgd_large
++static inline int pgd_large(pgd_t pgd)
++{
++	return !!(pgd_raw(pgd) & cpu_to_be64(_PAGE_PTE));
++}
++
+ static inline pte_t pgd_pte(pgd_t pgd)
+ {
+ 	return __pte_raw(pgd_raw(pgd));
+@@ -1133,6 +1145,15 @@ static inline bool pmd_access_permitted(pmd_t pmd, bool write)
+ 	return pte_access_permitted(pmd_pte(pmd), write);
+ }
+ 
++#define pmd_leaf	pmd_large
++/*
++ * returns true for pmd migration entries, THP, devmap, hugetlb
++ */
++static inline int pmd_large(pmd_t pmd)
++{
++	return !!(pmd_raw(pmd) & cpu_to_be64(_PAGE_PTE));
++}
++
+ #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+ extern pmd_t pfn_pmd(unsigned long pfn, pgprot_t pgprot);
+ extern pmd_t mk_pmd(struct page *page, pgprot_t pgprot);
+@@ -1159,15 +1180,6 @@ pmd_hugepage_update(struct mm_struct *mm, unsigned long addr, pmd_t *pmdp,
+ 	return hash__pmd_hugepage_update(mm, addr, pmdp, clr, set);
+ }
+ 
+-/*
+- * returns true for pmd migration entries, THP, devmap, hugetlb
+- * But compile time dependent on THP config
+- */
+-static inline int pmd_large(pmd_t pmd)
+-{
+-	return !!(pmd_raw(pmd) & cpu_to_be64(_PAGE_PTE));
+-}
+-
+ static inline pmd_t pmd_mknotpresent(pmd_t pmd)
+ {
+ 	return __pmd(pmd_val(pmd) & ~_PAGE_PRESENT);
+-- 
+2.20.1
+
