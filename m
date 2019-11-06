@@ -2,115 +2,85 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F17AED837
-	for <lists+kvm-ppc@lfdr.de>; Mon,  4 Nov 2019 05:18:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C3D5F0E8C
+	for <lists+kvm-ppc@lfdr.de>; Wed,  6 Nov 2019 06:58:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727663AbfKDESb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 3 Nov 2019 23:18:31 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39966 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727267AbfKDESb (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 3 Nov 2019 23:18:31 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA44CsGG072166
-        for <kvm-ppc@vger.kernel.org>; Sun, 3 Nov 2019 23:18:30 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w24u1bxkf-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Sun, 03 Nov 2019 23:18:29 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <bharata@linux.ibm.com>;
-        Mon, 4 Nov 2019 04:18:28 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 4 Nov 2019 04:18:26 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA44IOsc51380264
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 4 Nov 2019 04:18:24 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D425852050;
-        Mon,  4 Nov 2019 04:18:24 +0000 (GMT)
-Received: from bharata.in.ibm.com (unknown [9.124.35.185])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B16CD52054;
-        Mon,  4 Nov 2019 04:18:22 +0000 (GMT)
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-mm@kvack.org
-Cc:     paulus@au1.ibm.com, aneesh.kumar@linux.vnet.ibm.com,
-        jglisse@redhat.com, cclaudio@linux.ibm.com, linuxram@us.ibm.com,
-        sukadev@linux.vnet.ibm.com, hch@lst.de,
-        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.ibm.com>
-Subject: [PATCH v10 8/8] KVM: PPC: Ultravisor: Add PPC_UV config option
-Date:   Mon,  4 Nov 2019 09:48:00 +0530
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191104041800.24527-1-bharata@linux.ibm.com>
+        id S1727678AbfKFF63 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 6 Nov 2019 00:58:29 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54929 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725616AbfKFF63 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 6 Nov 2019 00:58:29 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 477G6q0k0vz9sPF; Wed,  6 Nov 2019 16:58:26 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1573019907; bh=56y9/gEaDzQmeKp9iXKr2ut32/omIfnBdtSxBPQKzkQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YSGwBlFfFtQL4eL2wF4UIeyChrpdMx5L4IUbxmr/LjnZOVz2ZGoNtyB+yYlJ6NtA2
+         BeiWR2+BwJtRlAFJrHh8lmPqOVgoYHtG0PfPjtM+e0PeWvuqkDpPGr/usj1GDyfEfe
+         v1g/aAkoeln+bBZwG8gP542+NfUDHOPkANX9UwdtqbLw+Qk7muJ+fjhgRTTIashezE
+         YasQaF3hsR+LdzQHDsUrLk2WFEphkX6v8Sl/K5HoygKmAeqgteBfTNiOwlS/jcYEcs
+         yBeX2BAOvFfASn2EVcrYBWyqM7kW5RvCdTgYnw6cxkN0oc4oBVajsfezPoNdhnmrbm
+         SJqhWdJMjCEZw==
+Date:   Wed, 6 Nov 2019 15:30:58 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Bharata B Rao <bharata@linux.ibm.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-mm@kvack.org, paulus@au1.ibm.com,
+        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
+        cclaudio@linux.ibm.com, linuxram@us.ibm.com,
+        sukadev@linux.vnet.ibm.com, hch@lst.de
+Subject: Re: [PATCH v10 0/8] KVM: PPC: Driver to manage pages of secure guest
+Message-ID: <20191106043058.GA12069@oak.ozlabs.ibm.com>
 References: <20191104041800.24527-1-bharata@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19110404-0008-0000-0000-0000032A61A7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110404-0009-0000-0000-00004A49B555
-Message-Id: <20191104041800.24527-9-bharata@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-04_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1911040039
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191104041800.24527-1-bharata@linux.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Anshuman Khandual <khandual@linux.vnet.ibm.com>
+On Mon, Nov 04, 2019 at 09:47:52AM +0530, Bharata B Rao wrote:
+> Hi,
+> 
+> This is the next version of the patchset that adds required support
+> in the KVM hypervisor to run secure guests on PEF-enabled POWER platforms.
+> 
+> The major change in this version is about not using kvm.arch->rmap[]
+> array to store device PFNs, thus not depending on the memslot availability
+> to reach to the device PFN from the fault path. Instead of rmap[], we
+> now have a different array which gets created and destroyed along with
+> memslot creation and deletion. These arrays hang off from kvm.arch and
+> are arragned in a simple linked list for now. We could move to some other
+> data structure in future if walking of linked list becomes an overhead
+> due to large number of memslots.
 
-CONFIG_PPC_UV adds support for ultravisor.
+Thanks.  This is looking really close now.
 
-Signed-off-by: Anshuman Khandual <khandual@linux.vnet.ibm.com>
-Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-[ Update config help and commit message ]
-Signed-off-by: Claudio Carvalho <cclaudio@linux.ibm.com>
-Reviewed-by: Sukadev Bhattiprolu <sukadev@linux.ibm.com>
----
- arch/powerpc/Kconfig | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+> Other changes include:
+> 
+> - Rearranged/Merged/Cleaned up patches, removed all Acks/Reviewed-by since
+>   all the patches have changed.
+> - Added a new patch to support H_SVM_INIT_ABORT hcall (From Suka)
+> - Added KSM unmerge support so that VMAs that have device PFNs don't
+>   participate in KSM merging and eventually crash in KSM code.
+> - Release device pages during unplug (Paul) and ensure that memory
+>   hotplug and unplug works correctly.
+> - Let kvm-hv module to load on PEF-disabled platforms (Ram) when
+>   CONFIG_PPC_UV is enabled allowing regular non-secure guests
+>   to still run.
+> - Support guest reset when swithing to secure is in progress.
+> - Check if page is already secure in kvmppc_send_page_to_uv() before
+>   sending it to UV.
+> - Fixed sentinal for header file kvm_book3s_uvmem.h (Jason)
+> 
+> Now, all the dependencies required by this patchset are in powerpc/next
+> on which this patchset is based upon.
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index 3e56c9c2f16e..d7fef29b47c9 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -451,6 +451,23 @@ config PPC_TRANSACTIONAL_MEM
- 	help
- 	  Support user-mode Transactional Memory on POWERPC.
- 
-+config PPC_UV
-+	bool "Ultravisor support"
-+	depends on KVM_BOOK3S_HV_POSSIBLE
-+	select ZONE_DEVICE
-+	select DEV_PAGEMAP_OPS
-+	select DEVICE_PRIVATE
-+	select MEMORY_HOTPLUG
-+	select MEMORY_HOTREMOVE
-+	default n
-+	help
-+	  This option paravirtualizes the kernel to run in POWER platforms that
-+	  supports the Protected Execution Facility (PEF). On such platforms,
-+	  the ultravisor firmware runs at a privilege level above the
-+	  hypervisor.
-+
-+	  If unsure, say "N".
-+
- config LD_HEAD_STUB_CATCH
- 	bool "Reserve 256 bytes to cope with linker stubs in HEAD text" if EXPERT
- 	depends on PPC64
--- 
-2.21.0
+Can you tell me what patches that are in powerpc/next but not upstream
+this depends on?
 
+Paul.
