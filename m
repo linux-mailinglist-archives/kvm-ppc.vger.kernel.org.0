@@ -2,112 +2,72 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D6EB1F354F
-	for <lists+kvm-ppc@lfdr.de>; Thu,  7 Nov 2019 18:03:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A8572F6D89
+	for <lists+kvm-ppc@lfdr.de>; Mon, 11 Nov 2019 05:24:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389538AbfKGRDb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 7 Nov 2019 12:03:31 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50198 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730639AbfKGRDa (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 7 Nov 2019 12:03:30 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA7GsGSI072358;
-        Thu, 7 Nov 2019 12:03:15 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w4np3d4yh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Nov 2019 12:03:14 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xA7H2Vhv002177;
-        Thu, 7 Nov 2019 17:03:09 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma03dal.us.ibm.com with ESMTP id 2w41ukcqr1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Nov 2019 17:03:09 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA7H38Tl41550332
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Nov 2019 17:03:08 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 48B22AE062;
-        Thu,  7 Nov 2019 17:03:08 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1079FAE05C;
-        Thu,  7 Nov 2019 17:03:07 +0000 (GMT)
-Received: from LeoBras.br.ibm.com (unknown [9.18.235.40])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu,  7 Nov 2019 17:03:06 +0000 (GMT)
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org
-Cc:     Leonardo Bras <leonardo@linux.ibm.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: [PATCH v2 4/4] powerpc/kvm/e500: Replace current->mm by kvm->mm
-Date:   Thu,  7 Nov 2019 14:02:58 -0300
-Message-Id: <20191107170258.36379-5-leonardo@linux.ibm.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20191107170258.36379-1-leonardo@linux.ibm.com>
-References: <20191107170258.36379-1-leonardo@linux.ibm.com>
+        id S1726768AbfKKEYv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 10 Nov 2019 23:24:51 -0500
+Received: from ozlabs.org ([203.11.71.1]:60487 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726754AbfKKEYv (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sun, 10 Nov 2019 23:24:51 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 47BHpS2k5Nz9sQw; Mon, 11 Nov 2019 15:24:48 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1573446288; bh=nOjRCApbbLW3ygZm3Duw/OcFxSDsQlgMg9b2UyyPd2M=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=n2sIvMiPlwtkspPnzggF2f2pHlkVxKzwWV5++ePfcohaqzAz4TdGnSlvy/kpwkgle
+         e+GuFJEZTb8n2GC40b6OODmqjS0VA5HBBc/bkfw1mdeoI+tbG78HApErLIH/z/fmzW
+         W4AyBHx7crQsGTADwlAfs7Ig3d42vavbAyky11PfXEZXXuWPRl4Yx6ipOnHKyGzL/b
+         mYSxxU0P0K8x/FJ7/PFpPh3iHPGkPlhQGpxWrjZ5d70HSO4ob6i5KvQknpBHNftUyN
+         5VLnxWU1YOcTiaZYcdADpGOSz2GSkj1kO3AGt1xIOeD2xoZoOLybf/bvQPzfIEvUSz
+         5IoXEwLtzDzXQ==
+Date:   Mon, 11 Nov 2019 15:19:24 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Bharata B Rao <bharata@linux.ibm.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-mm@kvack.org, paulus@au1.ibm.com,
+        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
+        cclaudio@linux.ibm.com, linuxram@us.ibm.com,
+        sukadev@linux.vnet.ibm.com, hch@lst.de,
+        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Ram Pai <linuxram@linux.ibm.com>
+Subject: Re: [PATCH v10 7/8] KVM: PPC: Implement H_SVM_INIT_ABORT hcall
+Message-ID: <20191111041924.GA4017@oak.ozlabs.ibm.com>
+References: <20191104041800.24527-1-bharata@linux.ibm.com>
+ <20191104041800.24527-8-bharata@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-07_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=834 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911070159
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191104041800.24527-8-bharata@linux.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Given that in kvm_create_vm() there is:
-kvm->mm = current->mm;
+On Mon, Nov 04, 2019 at 09:47:59AM +0530, Bharata B Rao wrote:
+> From: Sukadev Bhattiprolu <sukadev@linux.ibm.com>
+> 
+> Implement the H_SVM_INIT_ABORT hcall which the Ultravisor can use to
+> abort an SVM after it has issued the H_SVM_INIT_START and before the
+> H_SVM_INIT_DONE hcalls. This hcall could be used when Ultravisor
+> encounters security violations or other errors when starting an SVM.
+> 
+> Note that this hcall is different from UV_SVM_TERMINATE ucall which
+> is used by HV to terminate/cleanup an SVM.
+> 
+> In case of H_SVM_INIT_ABORT, we should page-out all the pages back to
+> HV (i.e., we should not skip the page-out). Otherwise the VM's pages,
+> possibly including its text/data would be stuck in secure memory.
+> Since the SVM did not go secure, its MSR_S bit will be clear and the
+> VM wont be able to access its pages even to do a clean exit.
 
-And that on every kvm_*_ioctl we have:
-if (kvm->mm != current->mm)
-        return -EIO;
+It seems fragile to me to have one more transfer back into the
+ultravisor after this call.  Why does the UV need to do this call and
+then get control back again one more time?  Why can't the UV defer
+doing this call until it can do it without expecting to see a return
+from the hcall?  And if it does need to see a return from the hcall,
+what would happen if a malicious hypervisor doesn't do the return?
 
-I see no reason to keep using current->mm instead of kvm->mm.
-
-By doing so, we would reduce the use of 'global' variables on code, relying
-more in the contents of kvm struct.
-
-Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
----
- arch/powerpc/kvm/e500_mmu_host.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
-index 321db0fdb9db..425d13806645 100644
---- a/arch/powerpc/kvm/e500_mmu_host.c
-+++ b/arch/powerpc/kvm/e500_mmu_host.c
-@@ -355,9 +355,9 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
- 
- 	if (tlbsel == 1) {
- 		struct vm_area_struct *vma;
--		down_read(&current->mm->mmap_sem);
-+		down_read(&kvm->mm->mmap_sem);
- 
--		vma = find_vma(current->mm, hva);
-+		vma = find_vma(kvm->mm, hva);
- 		if (vma && hva >= vma->vm_start &&
- 		    (vma->vm_flags & VM_PFNMAP)) {
- 			/*
-@@ -441,7 +441,7 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
- 			tsize = max(BOOK3E_PAGESZ_4K, tsize & ~1);
- 		}
- 
--		up_read(&current->mm->mmap_sem);
-+		up_read(&kvm->mm->mmap_sem);
- 	}
- 
- 	if (likely(!pfnmap)) {
--- 
-2.23.0
-
+Paul.
