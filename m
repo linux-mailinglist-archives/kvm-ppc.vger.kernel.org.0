@@ -2,115 +2,153 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2C7FF6EC1
-	for <lists+kvm-ppc@lfdr.de>; Mon, 11 Nov 2019 07:55:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE803F712B
+	for <lists+kvm-ppc@lfdr.de>; Mon, 11 Nov 2019 10:49:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726793AbfKKGzh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 11 Nov 2019 01:55:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30994 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725812AbfKKGzh (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 11 Nov 2019 01:55:37 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAB6pqnh161941
-        for <kvm-ppc@vger.kernel.org>; Mon, 11 Nov 2019 01:55:35 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w5s554aae-1
+        id S1726954AbfKKJtf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 11 Nov 2019 04:49:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13074 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726957AbfKKJtf (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 11 Nov 2019 04:49:35 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAB9ks1K055345
+        for <kvm-ppc@vger.kernel.org>; Mon, 11 Nov 2019 04:49:33 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2w73uutyw8-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Mon, 11 Nov 2019 01:55:35 -0500
+        for <kvm-ppc@vger.kernel.org>; Mon, 11 Nov 2019 04:49:33 -0500
 Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <bharata@linux.ibm.com>;
-        Mon, 11 Nov 2019 06:55:33 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <groug@kaod.org>;
+        Mon, 11 Nov 2019 09:49:32 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 11 Nov 2019 06:55:30 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAB6tSXt62521470
+        Mon, 11 Nov 2019 09:49:28 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAB9nRvh35520728
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Nov 2019 06:55:28 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 98A44A406B;
-        Mon, 11 Nov 2019 06:55:28 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C994AA4065;
-        Mon, 11 Nov 2019 06:55:25 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.109.247.23])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 11 Nov 2019 06:55:25 +0000 (GMT)
-Date:   Mon, 11 Nov 2019 12:25:22 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
+        Mon, 11 Nov 2019 09:49:27 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 777474C059;
+        Mon, 11 Nov 2019 09:49:27 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 181CF4C044;
+        Mon, 11 Nov 2019 09:49:27 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.184.11])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 11 Nov 2019 09:49:27 +0000 (GMT)
+Subject: [PATCH] KVM: PPC: Book3S HV: XIVE: Free previous EQ page when
+ setting up a new one
+From:   Greg Kurz <groug@kaod.org>
 To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-mm@kvack.org, paulus@au1.ibm.com,
-        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
-        cclaudio@linux.ibm.com, linuxram@us.ibm.com,
-        sukadev@linux.vnet.ibm.com, hch@lst.de
-Subject: Re: [PATCH v10 6/8] KVM: PPC: Support reset of secure guest
-Reply-To: bharata@linux.ibm.com
-References: <20191104041800.24527-1-bharata@linux.ibm.com>
- <20191104041800.24527-7-bharata@linux.ibm.com>
- <20191111052806.GC4017@oak.ozlabs.ibm.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Lijun Pan <ljp@linux.ibm.com>,
+        Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 11 Nov 2019 10:49:26 +0100
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191111052806.GC4017@oak.ozlabs.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19111106-0028-0000-0000-000003B4CE29
+x-cbid: 19111109-4275-0000-0000-0000037CAF98
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111106-0029-0000-0000-00002477D4AF
-Message-Id: <20191111065522.GH21634@in.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-11_01:,,
+x-cbparentid: 19111109-4276-0000-0000-00003890081E
+Message-Id: <157346576671.818016.10401178701091199969.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-11_02:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911110066
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911110097
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Nov 11, 2019 at 04:28:06PM +1100, Paul Mackerras wrote:
-> On Mon, Nov 04, 2019 at 09:47:58AM +0530, Bharata B Rao wrote:
-> > Add support for reset of secure guest via a new ioctl KVM_PPC_SVM_OFF.
-> > This ioctl will be issued by QEMU during reset and includes the
-> > the following steps:
-> > 
-> > - Ask UV to terminate the guest via UV_SVM_TERMINATE ucall
-> > - Unpin the VPA pages so that they can be migrated back to secure
-> >   side when guest becomes secure again. This is required because
-> >   pinned pages can't be migrated.
-> 
-> Unpinning the VPA pages is normally handled during VM reset by QEMU
-> doing set_one_reg operations to set the values for the
-> KVM_REG_PPC_VPA_ADDR, KVM_REG_PPC_VPA_SLB and KVM_REG_PPC_VPA_DTL
-> pseudo-registers to zero.  Is there some reason why this isn't
-> happening for a secure VM, and if so, what is that reason?
-> If it is happening, then why do we need to unpin the pages explicitly
-> here?
+The EQ page is allocated by the guest and then passed to the hypervisor
+with the H_INT_SET_QUEUE_CONFIG hcall. A reference is taken on the page
+before handing it over to the HW. This reference is dropped either when
+the guest issues the H_INT_RESET hcall or when the KVM device is released.
+But, the guest can legitimately call H_INT_SET_QUEUE_CONFIG several times
+to reset the EQ (vCPU hot unplug) or set a new EQ (guest reboot). In both
+cases the EQ page reference is leaked. This is especially visible when
+the guest memory is backed with huge pages: start a VM up to the guest
+userspace, either reboot it or unplug a vCPU, quit QEMU. The leak is
+observed by comparing the value of HugePages_Free in /proc/meminfo before
+and after the VM is run.
 
-We were observing these VPA pages still remaining pinned during
-reset and hence subsequent paging-in of these pages were failing.
-Unpinning them fixed the problem.
+Note that the EQ reset path seems to be calling put_page() but this is
+done after xive_native_configure_queue() which clears the qpage field
+in the XIVE queue structure, ie. the put_page() block is a nop and the
+previous page pointer was just overwritten anyway. In the other case of
+configuring a new EQ page, nothing seems to be done to release the old
+one.
 
-I will investigate and get back on why exactly these pages weren't
-gettting unpinned normally as part of reset.
+Fix both cases by always calling put_page() on the existing EQ page in
+kvmppc_xive_native_set_queue_config(). This is a seemless change for the
+EQ reset case. However this causes xive_native_configure_queue() to be
+called twice for the new EQ page case: one time to reset the EQ and another
+time to configure the new page. This is needed because we cannot release
+the EQ page before calling xive_native_configure_queue() since it may still
+be used by the HW. We cannot modify xive_native_configure_queue() to drop
+the reference either because this function is also used by the XICS-on-XIVE
+device which requires free_pages() instead of put_page(). This isn't a big
+deal anyway since H_INT_SET_QUEUE_CONFIG isn't a hot path.
 
-> 
-> > - Reinitialize guest's partitioned scoped page tables. These are
-> >   freed when guest becomes secure (H_SVM_INIT_DONE)
-> 
-> It doesn't seem particularly useful to me to free the partition-scoped
-> page tables when the guest becomes secure, and it feels like it makes
-> things more fragile.  If you don't free them then, then you don't need
-> to reallocate them now.
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Cc: stable@vger.kernel.org # v5.2
+Fixes: 13ce3297c576 ("KVM: PPC: Book3S HV: XIVE: Add controls for the EQ configuration")
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ arch/powerpc/kvm/book3s_xive_native.c |   21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-Sure, I will not free them in the next version.
-
-Regards,
-Bharata.
+diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+index 34bd123fa024..8ab908d23dc2 100644
+--- a/arch/powerpc/kvm/book3s_xive_native.c
++++ b/arch/powerpc/kvm/book3s_xive_native.c
+@@ -570,10 +570,12 @@ static int kvmppc_xive_native_set_queue_config(struct kvmppc_xive *xive,
+ 		 __func__, server, priority, kvm_eq.flags,
+ 		 kvm_eq.qshift, kvm_eq.qaddr, kvm_eq.qtoggle, kvm_eq.qindex);
+ 
+-	/* reset queue and disable queueing */
+-	if (!kvm_eq.qshift) {
+-		q->guest_qaddr  = 0;
+-		q->guest_qshift = 0;
++	/*
++	 * Reset queue and disable queueing. It will be re-enabled
++	 * later on if the guest is configuring a new EQ page.
++	 */
++	if (q->guest_qshift) {
++		page = virt_to_page(q->qpage);
+ 
+ 		rc = xive_native_configure_queue(xc->vp_id, q, priority,
+ 						 NULL, 0, true);
+@@ -583,12 +585,13 @@ static int kvmppc_xive_native_set_queue_config(struct kvmppc_xive *xive,
+ 			return rc;
+ 		}
+ 
+-		if (q->qpage) {
+-			put_page(virt_to_page(q->qpage));
+-			q->qpage = NULL;
+-		}
++		put_page(page);
+ 
+-		return 0;
++		if (!kvm_eq.qshift) {
++			q->guest_qaddr  = 0;
++			q->guest_qshift = 0;
++			return 0;
++		}
+ 	}
+ 
+ 	/*
 
