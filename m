@@ -2,101 +2,79 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 31CE3FB8DD
-	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Nov 2019 20:29:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 342F7FB608
+	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Nov 2019 18:14:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726528AbfKMT34 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 13 Nov 2019 14:29:56 -0500
-Received: from 20.mo5.mail-out.ovh.net ([91.121.55.239]:35315 "EHLO
-        20.mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726120AbfKMT34 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 13 Nov 2019 14:29:56 -0500
-X-Greylist: delayed 7799 seconds by postgrey-1.27 at vger.kernel.org; Wed, 13 Nov 2019 14:29:55 EST
-Received: from player792.ha.ovh.net (unknown [10.108.57.188])
-        by mo5.mail-out.ovh.net (Postfix) with ESMTP id B247A259B10
-        for <kvm-ppc@vger.kernel.org>; Wed, 13 Nov 2019 18:00:53 +0100 (CET)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
-        (Authenticated sender: clg@kaod.org)
-        by player792.ha.ovh.net (Postfix) with ESMTPSA id B5E55C0CFAD3;
-        Wed, 13 Nov 2019 17:00:36 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] KVM: PPC: Book3S HV: XIVE: Fix potential page leak
- on error path
-To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Lijun Pan <ljp@linux.ibm.com>,
-        Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
-        Laurent Vivier <lvivier@redhat.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <157366357346.1026356.14522564753643067538.stgit@bahia.lan>
- <157366357929.1026356.18181561111939034621.stgit@bahia.lan>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e49f522e-c265-4f00-f6f8-57f8583e7d8a@kaod.org>
-Date:   Wed, 13 Nov 2019 18:00:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1726120AbfKMROT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 13 Nov 2019 12:14:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41936 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726115AbfKMROT (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 13 Nov 2019 12:14:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573665258;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=zhcr8sNl0s2v8uxJbO+Uz+hCh9MxWoYyED6dGzbOw1w=;
+        b=EcKeLq6eKFskvtReTS0egrsDJsIjz0GaUJbsdeJQ9TJbzKk+XQx8AnxwG7eVLVysSpx9Kf
+        5QLwg06xhiUvrac7pPTQv1To1ajKsuWfbOSGuhdeBywwwIQJGyKsivYVr+7EhHQjhiSI+R
+        QXYyu5L1RbEhEoNSREA7r/XwziM28AY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-123-vkQbVPXZPZOkKTJJrntAvg-1; Wed, 13 Nov 2019 12:14:17 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E798D184CC18;
+        Wed, 13 Nov 2019 17:14:15 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.74.10.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1823A5F761;
+        Wed, 13 Nov 2019 17:14:12 +0000 (UTC)
+From:   P J P <ppandit@redhat.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Reno Robert <renorobert@gmail.com>,
+        P J P <pjp@fedoraproject.org>
+Subject: [PATCH] kvm: mpic: extend active IRQ sources to 255
+Date:   Wed, 13 Nov 2019 22:42:08 +0530
+Message-Id: <20191113171208.8509-1-ppandit@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <157366357929.1026356.18181561111939034621.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 3946560650099067671
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefuddgleelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejledvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepkhhvmhdqphhptgesvhhgvghrrdhkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: vkQbVPXZPZOkKTJJrntAvg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 13/11/2019 17:46, Greg Kurz wrote:
-> We need to check the host page size is big enough to accomodate the
-> EQ. Let's do this before taking a reference on the EQ page to avoid
-> a potential leak if the check fails.
-> 
-> Cc: stable@vger.kernel.org # v5.2
-> Fixes: 13ce3297c576 ("KVM: PPC: Book3S HV: XIVE: Add controls for the EQ configuration")
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+From: P J P <pjp@fedoraproject.org>
 
+openpic_src_write sets interrupt level 'src->output' masked with
+ILR_INTTGT_MASK(=3D0xFF). It's then used to index 'dst->outputs_active'
+array. With NUM_INPUTS=3D3, it may lead to OOB array access.
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Reported-by: Reno Robert <renorobert@gmail.com>
+Signed-off-by: P J P <pjp@fedoraproject.org>
+---
+ arch/powerpc/kvm/mpic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> ---
->  arch/powerpc/kvm/book3s_xive_native.c |   13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> index 0e1fc5a16729..d83adb1e1490 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -630,12 +630,6 @@ static int kvmppc_xive_native_set_queue_config(struct kvmppc_xive *xive,
->  
->  	srcu_idx = srcu_read_lock(&kvm->srcu);
->  	gfn = gpa_to_gfn(kvm_eq.qaddr);
-> -	page = gfn_to_page(kvm, gfn);
-> -	if (is_error_page(page)) {
-> -		srcu_read_unlock(&kvm->srcu, srcu_idx);
-> -		pr_err("Couldn't get queue page %llx!\n", kvm_eq.qaddr);
-> -		return -EINVAL;
-> -	}
->  
->  	page_size = kvm_host_page_size(kvm, gfn);
->  	if (1ull << kvm_eq.qshift > page_size) {
-> @@ -644,6 +638,13 @@ static int kvmppc_xive_native_set_queue_config(struct kvmppc_xive *xive,
->  		return -EINVAL;
->  	}
->  
-> +	page = gfn_to_page(kvm, gfn);
-> +	if (is_error_page(page)) {
-> +		srcu_read_unlock(&kvm->srcu, srcu_idx);
-> +		pr_err("Couldn't get queue page %llx!\n", kvm_eq.qaddr);
-> +		return -EINVAL;
-> +	}
-> +
->  	qaddr = page_to_virt(page) + (kvm_eq.qaddr & ~PAGE_MASK);
->  	srcu_read_unlock(&kvm->srcu, srcu_idx);
->  
-> 
+diff --git a/arch/powerpc/kvm/mpic.c b/arch/powerpc/kvm/mpic.c
+index fe312c160d97..a5ae884d3891 100644
+--- a/arch/powerpc/kvm/mpic.c
++++ b/arch/powerpc/kvm/mpic.c
+@@ -103,7 +103,7 @@ static struct fsl_mpic_info fsl_mpic_42 =3D {
+ #define ILR_INTTGT_INT    0x00
+ #define ILR_INTTGT_CINT   0x01=09/* critical */
+ #define ILR_INTTGT_MCP    0x02=09/* machine check */
+-#define NUM_OUTPUTS       3
++#define NUM_OUTPUTS       0xff
+=20
+ #define MSIIR_OFFSET       0x140
+ #define MSIIR_SRS_SHIFT    29
+--=20
+2.21.0
 
