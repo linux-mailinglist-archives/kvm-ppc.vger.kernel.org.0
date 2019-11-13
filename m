@@ -2,39 +2,39 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B31E7FA411
-	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Nov 2019 03:16:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 520B1FA1E7
+	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Nov 2019 03:00:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728939AbfKMCNV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 12 Nov 2019 21:13:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51178 "EHLO mail.kernel.org"
+        id S1730471AbfKMCAU (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 12 Nov 2019 21:00:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55442 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728828AbfKMB5p (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 12 Nov 2019 20:57:45 -0500
+        id S1730469AbfKMCAT (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 12 Nov 2019 21:00:19 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 37838222D3;
-        Wed, 13 Nov 2019 01:57:44 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7782122467;
+        Wed, 13 Nov 2019 02:00:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573610265;
-        bh=kk9s2ECVWRZh6QKxhKPAVyCqzJNCNwA+1D7J7+tmnYg=;
+        s=default; t=1573610419;
+        bh=P+UQtROkCA51/TMMU3JLQRCuGXr6mCdR6xtD5hFuvU4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=S6N+cyd+zaB3G71Fbh4Y7MyGs6M3UdQrymbtpPAPHOc/4aAXn3bKD819x/TKWPabD
-         3L3t32aBlxTDkSXPJMObs1f+UDU3E8xNnFeJc5+2+w9qPhvEFkXj8OSFB9xz8i+Ese
-         LXO/dh+9V1am/boJWNi48DCDXGitqUZlNCiEGFsE=
+        b=n3+kqv5ltnrMobpiIp5BKI+BEX/PARISuZMrqyc6dFNrIa5Q7vP96kqQ6J93mD0T1
+         KfU/4Srz0FbTQdiLYEcIg3BlK7O7KgYD6+mke3Qzg24BLOB4w0IrTrZHBRkvUPZU2b
+         OZ7hxZK7XQkQcydhBT3BkysdnsF2SE07ObSMnp88=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Cameron Kaiser <spectre@floodgap.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 4.14 055/115] KVM: PPC: Book3S PR: Exiting split hack mode needs to fixup both PC and LR
-Date:   Tue, 12 Nov 2019 20:55:22 -0500
-Message-Id: <20191113015622.11592-55-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 29/68] KVM: PPC: Book3S PR: Exiting split hack mode needs to fixup both PC and LR
+Date:   Tue, 12 Nov 2019 20:58:53 -0500
+Message-Id: <20191113015932.12655-29-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191113015622.11592-1-sashal@kernel.org>
-References: <20191113015622.11592-1-sashal@kernel.org>
+In-Reply-To: <20191113015932.12655-1-sashal@kernel.org>
+References: <20191113015932.12655-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -65,10 +65,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index d38280b01ef08..1eda812499376 100644
+index 73c3c127d8584..209cad89a11a5 100644
 --- a/arch/powerpc/kvm/book3s.c
 +++ b/arch/powerpc/kvm/book3s.c
-@@ -79,8 +79,11 @@ void kvmppc_unfixup_split_real(struct kvm_vcpu *vcpu)
+@@ -78,8 +78,11 @@ void kvmppc_unfixup_split_real(struct kvm_vcpu *vcpu)
  {
  	if (vcpu->arch.hflags & BOOK3S_HFLAG_SPLIT_HACK) {
  		ulong pc = kvmppc_get_pc(vcpu);
