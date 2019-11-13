@@ -2,84 +2,112 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DCF5EF95A1
-	for <lists+kvm-ppc@lfdr.de>; Tue, 12 Nov 2019 17:27:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42C30F9F1E
+	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Nov 2019 01:14:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727181AbfKLQ1Y (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 12 Nov 2019 11:27:24 -0500
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:35089 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727069AbfKLQ1X (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 12 Nov 2019 11:27:23 -0500
-Received: by mail-ed1-f65.google.com with SMTP id r16so15439573edq.2
-        for <kvm-ppc@vger.kernel.org>; Tue, 12 Nov 2019 08:27:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=qNdulMghwGPBvmgJ8scwCvXDFRwh4jWCkPxL6qrSIjQ=;
-        b=WsNhISOt+hJkwbT7YN0D/1CAbxYs1x64PK9hVpM/9Lp0tdTDzA1sdtCfQ9ORQHddmu
-         SWw8MeBIFdqKCnfB+CTPjClScqjYAUa7xGNsH0xea1alpD0KKDb/71jlBRziY7Qd9qdx
-         KV0CvxkV5t6cSBUmoO5okM/7FYAgHCCesvlZyrCbTxeCe4tdDMsW85Doqmswx63GE7wZ
-         uYnLA+nQOsZqzuDT/yn8FPnBx5G04jDhrvGNcWr/+fINHW+iqGAPut6Np2TO1MBBWLIQ
-         mP8HdO9X3/9rvAsSXiTtY7np2QYRsalD3mhKoXcvIAmObokb1mwSJwDNBpAtw/Rzq2tr
-         tPFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=qNdulMghwGPBvmgJ8scwCvXDFRwh4jWCkPxL6qrSIjQ=;
-        b=H8+nVyDViK9RBxupKLbjdCckCTHDrVYxwWwfbITQpbgvU7S1Q0+x99TZ+YLaJaowO/
-         LS7ROHZJK+MRQDVdm188ExIplqhec8S2rpF1tFSdTDid5vxK+kYObZakBGDj3jt4mWbh
-         MenFfRVe08++fXzVfNyw5df81zgEQqokK9TaSR4sq2Xg+xc2yEctWML4jfZP1ZCcsmyQ
-         LlPo5W5XfGE9Sj5XjU/El3E/hcmiB3SvoC/peuZl2wYhtw+I2YvPnuL4O2Qm0i+a10oK
-         U7G17joLMufA6PZuRgtGWglXdtUm6y7qHJhW3wE9HwaCMydZ0YN0kwV0AAJhGmEFviEa
-         EaWQ==
-X-Gm-Message-State: APjAAAXUcs8iTdp8ApbcepTktguXdVPwQPPXlORAZ+JGSkU+Y9VdAPJg
-        iH1wHjlGULJ9XMlB1gmCnPkmTtDZdBLXIj6ue9U=
-X-Google-Smtp-Source: APXvYqyx6ZSP9pia1ghp0mGM0db9pMWKu3Ilw5isnMyYCLiKlWaoj5hSNiGZLYdu7/xruRv858z6c1CJ/zVYY273ryQ=
-X-Received: by 2002:a05:6402:142c:: with SMTP id c12mr33378742edx.96.1573576041909;
- Tue, 12 Nov 2019 08:27:21 -0800 (PST)
+        id S1726962AbfKMAOf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 12 Nov 2019 19:14:35 -0500
+Received: from ozlabs.org ([203.11.71.1]:43651 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726923AbfKMAOf (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 12 Nov 2019 19:14:35 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 47CQ8n24p7z9sQp; Wed, 13 Nov 2019 11:14:33 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1573604073; bh=eaKlwgdIJsn3cYx0pG4CKYUAolYzy7bggI3IJ4S28AA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tHOIFJ1aAXXPXE/f6Js+XN05su1cvwOOR8xTEilo5y6hTG2AXO/heOo4+hDJXY5Ad
+         Eir1KR4sScjbJRiF0dXzzck5iNHTv7hkB9TQwygDVpsYd7IsvyOOx0J/7S9iFrc02T
+         6iurluDgA9EI2/Whftfdvn8mlCBb8YfF2eezroDsREjyct5/Obv4SCDKWmODQlwp57
+         U5cIHsJyt5czMWTLjsEH8ulgxo6zAtyxWedJYvBjs8DhIQ2YURxk8uCbZvkq4Mg+ds
+         kKuuWN3HECgYTsAdNx4vbRijYZYf986wgAUJwJ686x8nf69Xc+rdrIH0PjZFUlaGOV
+         Ts5qUlizrz5mQ==
+Date:   Wed, 13 Nov 2019 11:14:27 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Ram Pai <linuxram@us.ibm.com>
+Cc:     Bharata B Rao <bharata@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-mm@kvack.org, paulus@au1.ibm.com,
+        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
+        cclaudio@linux.ibm.com, sukadev@linux.vnet.ibm.com, hch@lst.de,
+        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Ram Pai <linuxram@linux.ibm.com>
+Subject: Re: [PATCH v10 7/8] KVM: PPC: Implement H_SVM_INIT_ABORT hcall
+Message-ID: <20191113001427.GA17829@oak.ozlabs.ibm.com>
+References: <20191104041800.24527-1-bharata@linux.ibm.com>
+ <20191104041800.24527-8-bharata@linux.ibm.com>
+ <20191111041924.GA4017@oak.ozlabs.ibm.com>
+ <20191112010158.GB5159@oc0525413822.ibm.com>
+ <20191112053836.GB10885@oak.ozlabs.ibm.com>
+ <20191112075215.GD5159@oc0525413822.ibm.com>
+ <20191112113204.GA10178@blackberry>
+ <20191112144555.GE5159@oc0525413822.ibm.com>
 MIME-Version: 1.0
-Received: by 2002:a05:6402:1118:0:0:0:0 with HTTP; Tue, 12 Nov 2019 08:27:21
- -0800 (PST)
-Reply-To: walmart.b100263@gmail.com
-From:   "MS. MARYANNA B. THOMASON" <eco.bank1204@gmail.com>
-Date:   Tue, 12 Nov 2019 17:27:21 +0100
-Message-ID: <CAOE+jAB_cP8q9vvBDV62=BwoQhn_GcPJhAZsCyhMAnjxyg9-YA@mail.gmail.com>
-Subject: CONTACT WALMART TRANSFER To pick up $5000 sent to you this morning
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191112144555.GE5159@oc0525413822.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
- CONTACT WALMART TRANSFER To pick up $5000 sent to you this morning
+On Tue, Nov 12, 2019 at 06:45:55AM -0800, Ram Pai wrote:
+> On Tue, Nov 12, 2019 at 10:32:04PM +1100, Paul Mackerras wrote:
+> > On Mon, Nov 11, 2019 at 11:52:15PM -0800, Ram Pai wrote:
+> > > There is subtle problem removing that code from the assembly.
+> > > 
+> > > If the H_SVM_INIT_ABORT hcall returns to the ultravisor without clearing
+> > > kvm->arch.secure_guest, the hypervisor will continue to think that the
+> > > VM is a secure VM.   However the primary reason the H_SVM_INIT_ABORT
+> > > hcall was invoked, was to inform the Hypervisor that it should no longer
+> > > consider the VM as a Secure VM. So there is a inconsistency there.
+> > 
+> > Most of the checks that look at whether a VM is a secure VM use code
+> > like "if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE)".  Now
+> > since KVMPPC_SECURE_INIT_ABORT is 4, an if statement such as that will
+> > take the false branch once we have set kvm->arch.secure_guest to
+> > KVMPPC_SECURE_INIT_ABORT in kvmppc_h_svm_init_abort.  So in fact in
+> > most places we will treat the VM as a normal VM from then on.  If
+> > there are any places where we still need to treat the VM as a secure
+> > VM while we are processing the abort we can easily do that too.
+> 
+> Is the suggestion --  KVMPPC_SECURE_INIT_ABORT should never return back
+> to the Ultravisor?   Because removing that assembly code will NOT lead the
 
-Attn Dear Beneficiary.
-Happy to inform you,I have deposited your payment funds
-$10.500,000MillionUS DollarsWith Walmart international money
-transfers.
-Receive the Money with Walmart | MoneyGram service.
-Walmart partners with MoneyGram to allow customers
-easily receive money transfers abroad,
-Contact Walmart international money transfers office -Benin
-Receive your approval payment funds $10.500,000MillionUS Dollars
-HERE IS WALMART CONTACT INFORMATIONS.
-Contact person. Mrs. Mary Anderson,Dir. Walmart transfers-Benin
-Email: walmart.b100263@gmail.com
-Telephone. +229 68823234
-Text Her on this international phone line. (256) 284-4886
-Ask Mrs. Mary Anderson,Dir. Walmart transfers-Benin to send the transfer
-as i instructed.
-we agreed to keep sending the transfer to you $5000.00 daily.
-Until you received your total payment $10.500,000 from the office
-Once again,
-make sure you contact Mrs. Mary Anderson,Dir. Walmart transfers-Benin
-today including your infos.
-(1) Your  Full Name==============
-(2) house address=============
-(3) Your Phone Numbers=============
-Urgent to receive your transfer now without any further delay.
-Thanks
-MS. MARYANNA B. THOMASON
+No.  The suggestion is that vcpu->arch.secure_guest stays set to
+KVMPPC_SECURE_INIT_ABORT until userspace calls KVM_PPC_SVM_OFF.
+
+> Hypervisor back into the Ultravisor.  This is fine with the
+> ultravisor. But then the hypervisor will not know where to return to.
+> If it wants to return directly to the VM, it wont know to
+> which address. It will be in a limbo.
+> 
+> > 
+> > > This is fine, as long as the VM does not invoke any hcall or does not
+> > > receive any hypervisor-exceptions.  The moment either of those happen,
+> > > the control goes into the hypervisor, the hypervisor services
+> > > the exception/hcall and while returning, it will see that the
+> > > kvm->arch.secure_guest flag is set and **incorrectly** return
+> > > to the ultravisor through a UV_RETURN ucall.  Ultravisor will
+> > > not know what to do with it, because it does not consider that
+> > > VM as a Secure VM.  Bad things happen.
+> > 
+> > If bad things happen in the ultravisor because the hypervisor did
+> > something it shouldn't, then it's game over, you just lost, thanks for
+> > playing.  The ultravisor MUST be able to cope with bogus UV_RETURN
+> > calls for a VM that it doesn't consider to be a secure VM.  You need
+> > to work out how to handle such calls safely and implement that in the
+> > ultravisor.
+> 
+> Actually we do handle this gracefully in the ultravisor :). 
+> We just retun back to the hypervisor saying "sorry dont know what
+> to do with it, please handle it yourself".
+> 
+> However hypervisor would not know what to do with that return, and bad
+> things happen in the hypervisor.
+
+Right.  We need something after the "sc 2" to handle the case where
+the ultravisor returns with an error from the UV_RETURN.
+
+Paul.
