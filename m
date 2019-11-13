@@ -2,84 +2,119 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AE83AFA291
-	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Nov 2019 03:04:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 714AAFAA34
+	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Nov 2019 07:32:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729733AbfKMCE1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 12 Nov 2019 21:04:27 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58428 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730923AbfKMCCF (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 12 Nov 2019 21:02:05 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3C67420674;
-        Wed, 13 Nov 2019 02:02:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573610525;
-        bh=pWTdI8S1UQ1b52XHBqdaoaV7qebei0fVVdclrYBmvxg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=J074b9V+bldrNc4O7WXyBtecnzUrKEXPvCvMyIN1eZo/KkS6LngU56MoaCQ9podGs
-         C0nxHzjUf+vGLLYKSzpkOK6Y//8t9VCoKz43mVHxUrYnHcZppMnZ1Yxi2XFu8u7mJ2
-         oFEiA89oSqzF9g/wHLG23E9CNP12k3621T7sCWnY=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Cameron Kaiser <spectre@floodgap.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 4.4 21/48] KVM: PPC: Book3S PR: Exiting split hack mode needs to fixup both PC and LR
-Date:   Tue, 12 Nov 2019 21:01:04 -0500
-Message-Id: <20191113020131.13356-21-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191113020131.13356-1-sashal@kernel.org>
-References: <20191113020131.13356-1-sashal@kernel.org>
+        id S1725939AbfKMGcs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 13 Nov 2019 01:32:48 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49312 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725858AbfKMGcs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 13 Nov 2019 01:32:48 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAD6SXFS100443
+        for <kvm-ppc@vger.kernel.org>; Wed, 13 Nov 2019 01:32:47 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w88yydwp8-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Wed, 13 Nov 2019 01:32:46 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
+        Wed, 13 Nov 2019 06:32:44 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 13 Nov 2019 06:32:40 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAD6WdgV24510648
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Nov 2019 06:32:39 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E35C1A4059;
+        Wed, 13 Nov 2019 06:32:38 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5DC78A4053;
+        Wed, 13 Nov 2019 06:32:36 +0000 (GMT)
+Received: from oc0525413822.ibm.com (unknown [9.85.181.122])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 13 Nov 2019 06:32:36 +0000 (GMT)
+Date:   Tue, 12 Nov 2019 22:32:33 -0800
+From:   Ram Pai <linuxram@us.ibm.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     Bharata B Rao <bharata@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-mm@kvack.org, paulus@au1.ibm.com,
+        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
+        cclaudio@linux.ibm.com, sukadev@linux.vnet.ibm.com, hch@lst.de,
+        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Ram Pai <linuxram@linux.ibm.com>
+Subject: Re: [PATCH v10 7/8] KVM: PPC: Implement H_SVM_INIT_ABORT hcall
+Reply-To: Ram Pai <linuxram@us.ibm.com>
+References: <20191104041800.24527-1-bharata@linux.ibm.com>
+ <20191104041800.24527-8-bharata@linux.ibm.com>
+ <20191111041924.GA4017@oak.ozlabs.ibm.com>
+ <20191112010158.GB5159@oc0525413822.ibm.com>
+ <20191112053836.GB10885@oak.ozlabs.ibm.com>
+ <20191112075215.GD5159@oc0525413822.ibm.com>
+ <20191112113204.GA10178@blackberry>
+ <20191112144555.GE5159@oc0525413822.ibm.com>
+ <20191113001427.GA17829@oak.ozlabs.ibm.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191113001427.GA17829@oak.ozlabs.ibm.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-TM-AS-GCONF: 00
+x-cbid: 19111306-0028-0000-0000-000003B670B9
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111306-0029-0000-0000-0000247976B4
+Message-Id: <20191113063233.GF5159@oc0525413822.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-13_01:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911130057
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Cameron Kaiser <spectre@floodgap.com>
+On Wed, Nov 13, 2019 at 11:14:27AM +1100, Paul Mackerras wrote:
+> On Tue, Nov 12, 2019 at 06:45:55AM -0800, Ram Pai wrote:
+> > On Tue, Nov 12, 2019 at 10:32:04PM +1100, Paul Mackerras wrote:
+> > > On Mon, Nov 11, 2019 at 11:52:15PM -0800, Ram Pai wrote:
+> > > > There is subtle problem removing that code from the assembly.
+> > > > 
+> > > > If the H_SVM_INIT_ABORT hcall returns to the ultravisor without clearing
+> > > > kvm->arch.secure_guest, the hypervisor will continue to think that the
+> > > > VM is a secure VM.   However the primary reason the H_SVM_INIT_ABORT
+> > > > hcall was invoked, was to inform the Hypervisor that it should no longer
+> > > > consider the VM as a Secure VM. So there is a inconsistency there.
+> > > 
+> > > Most of the checks that look at whether a VM is a secure VM use code
+> > > like "if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE)".  Now
+> > > since KVMPPC_SECURE_INIT_ABORT is 4, an if statement such as that will
+> > > take the false branch once we have set kvm->arch.secure_guest to
+> > > KVMPPC_SECURE_INIT_ABORT in kvmppc_h_svm_init_abort.  So in fact in
+> > > most places we will treat the VM as a normal VM from then on.  If
+> > > there are any places where we still need to treat the VM as a secure
+> > > VM while we are processing the abort we can easily do that too.
+> > 
+> > Is the suggestion --  KVMPPC_SECURE_INIT_ABORT should never return back
+> > to the Ultravisor?   Because removing that assembly code will NOT lead the
+> 
+> No.  The suggestion is that vcpu->arch.secure_guest stays set to
+> KVMPPC_SECURE_INIT_ABORT until userspace calls KVM_PPC_SVM_OFF.
 
-[ Upstream commit 1006284c5e411872333967b1970c2ca46a9e225f ]
+In the fast_guest_return path, if it finds 
+(kvm->arch.secure_guest & KVMPPC_SECURE_INIT_ABORT) is true, should it return to
+UV or not?
 
-When an OS (currently only classic Mac OS) is running in KVM-PR and makes a
-linked jump from code with split hack addressing enabled into code that does
-not, LR is not correctly updated and reflects the previously munged PC.
+Ideally it should return back to the ultravisor the first time
+KVMPPC_SECURE_INIT_ABORT is set, and not than onwards.
 
-To fix this, this patch undoes the address munge when exiting split
-hack mode so that code relying on LR being a proper address will now
-execute. This does not affect OS X or other operating systems running
-on KVM-PR.
-
-Signed-off-by: Cameron Kaiser <spectre@floodgap.com>
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/powerpc/kvm/book3s.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 4aab1c9c83e1a..41ac54bfdfdd9 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -70,8 +70,11 @@ void kvmppc_unfixup_split_real(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu->arch.hflags & BOOK3S_HFLAG_SPLIT_HACK) {
- 		ulong pc = kvmppc_get_pc(vcpu);
-+		ulong lr = kvmppc_get_lr(vcpu);
- 		if ((pc & SPLIT_HACK_MASK) == SPLIT_HACK_OFFS)
- 			kvmppc_set_pc(vcpu, pc & ~SPLIT_HACK_MASK);
-+		if ((lr & SPLIT_HACK_MASK) == SPLIT_HACK_OFFS)
-+			kvmppc_set_lr(vcpu, lr & ~SPLIT_HACK_MASK);
- 		vcpu->arch.hflags &= ~BOOK3S_HFLAG_SPLIT_HACK;
- 	}
- }
--- 
-2.20.1
+RP
 
