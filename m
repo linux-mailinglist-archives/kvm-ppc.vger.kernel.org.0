@@ -2,37 +2,36 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 087D1FA5FF
-	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Nov 2019 03:26:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ACEE2FA583
+	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Nov 2019 03:23:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727834AbfKMC0F (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 12 Nov 2019 21:26:05 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38952 "EHLO mail.kernel.org"
+        id S1729131AbfKMCXS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 12 Nov 2019 21:23:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41898 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727784AbfKMBvV (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 12 Nov 2019 20:51:21 -0500
+        id S1728386AbfKMBwp (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 12 Nov 2019 20:52:45 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8F25322466;
-        Wed, 13 Nov 2019 01:51:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F10D320674;
+        Wed, 13 Nov 2019 01:52:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573609880;
-        bh=nJkBAQLBBkqX8QZJrgLlumKcXjkCQC5TSG3sVUz0Rm0=;
+        s=default; t=1573609964;
+        bh=pDr1sift67S8LRLwSaPY2s2L0AtsVnaKQz8TwC2QZ/4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=1HvkMZIz0bFiaQM+UFRgVcjZA/enNk9eUgscCjV/jYoszwQGTtiuZLZSScoa+p9fE
-         IRvsWxR7omOXOd8YL/GSCqgxyFjaib5E0F+l2P6hOr1wK9a2s/k4Bs0r6WVGQxqF1y
-         P9pQ1R+zAwno2kNA2ZzTm3FCEZ6/bodxV7f8ddm4=
+        b=Nv4IiM9NgIUNK3G+6sLxX+pqX1ecvXXluAe2w/8SP9npU2eFRXjnm2bPtBwf3J+Zi
+         PgG5So2S1mtpbEC+Ui0zN5SiVYnGyxsul1gKoCSc/1W4hNCOahdz/Zyuw4SDeQr/CU
+         2ynK8CQpL4BPsrIB8t/rUYckZVVANRr06L8t4K/A=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Michael Ellerman <mpe@ellerman.id.au>,
+Cc:     Cameron Kaiser <spectre@floodgap.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
         Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 4.19 042/209] KVM: PPC: Inform the userspace about TCE update failures
-Date:   Tue, 12 Nov 2019 20:47:38 -0500
-Message-Id: <20191113015025.9685-42-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 095/209] KVM: PPC: Book3S PR: Exiting split hack mode needs to fixup both PC and LR
+Date:   Tue, 12 Nov 2019 20:48:31 -0500
+Message-Id: <20191113015025.9685-95-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191113015025.9685-1-sashal@kernel.org>
 References: <20191113015025.9685-1-sashal@kernel.org>
@@ -45,85 +44,42 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+From: Cameron Kaiser <spectre@floodgap.com>
 
-[ Upstream commit f7960e299f13f069d6f3d4e157d91bfca2669677 ]
+[ Upstream commit 1006284c5e411872333967b1970c2ca46a9e225f ]
 
-We return H_TOO_HARD from TCE update handlers when we think that
-the next handler (realmode -> virtual mode -> user mode) has a chance to
-handle the request; H_HARDWARE/H_CLOSED otherwise.
+When an OS (currently only classic Mac OS) is running in KVM-PR and makes a
+linked jump from code with split hack addressing enabled into code that does
+not, LR is not correctly updated and reflects the previously munged PC.
 
-This changes the handlers to return H_TOO_HARD on every error giving
-the userspace an opportunity to handle any request or at least log
-them all.
+To fix this, this patch undoes the address munge when exiting split
+hack mode so that code relying on LR being a proper address will now
+execute. This does not affect OS X or other operating systems running
+on KVM-PR.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+Signed-off-by: Cameron Kaiser <spectre@floodgap.com>
+Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/powerpc/kvm/book3s_64_vio.c    | 8 ++++----
- arch/powerpc/kvm/book3s_64_vio_hv.c | 6 +++---
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ arch/powerpc/kvm/book3s.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-index 07a8004c3c237..65486c3d029b5 100644
---- a/arch/powerpc/kvm/book3s_64_vio.c
-+++ b/arch/powerpc/kvm/book3s_64_vio.c
-@@ -401,7 +401,7 @@ static long kvmppc_tce_iommu_do_unmap(struct kvm *kvm,
- 	long ret;
- 
- 	if (WARN_ON_ONCE(iommu_tce_xchg(tbl, entry, &hpa, &dir)))
--		return H_HARDWARE;
-+		return H_TOO_HARD;
- 
- 	if (dir == DMA_NONE)
- 		return H_SUCCESS;
-@@ -449,15 +449,15 @@ long kvmppc_tce_iommu_do_map(struct kvm *kvm, struct iommu_table *tbl,
- 		return H_TOO_HARD;
- 
- 	if (WARN_ON_ONCE(mm_iommu_ua_to_hpa(mem, ua, tbl->it_page_shift, &hpa)))
--		return H_HARDWARE;
-+		return H_TOO_HARD;
- 
- 	if (mm_iommu_mapped_inc(mem))
--		return H_CLOSED;
-+		return H_TOO_HARD;
- 
- 	ret = iommu_tce_xchg(tbl, entry, &hpa, &dir);
- 	if (WARN_ON_ONCE(ret)) {
- 		mm_iommu_mapped_dec(mem);
--		return H_HARDWARE;
-+		return H_TOO_HARD;
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index 281f074581a3b..cc05f346e0421 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -78,8 +78,11 @@ void kvmppc_unfixup_split_real(struct kvm_vcpu *vcpu)
+ {
+ 	if (vcpu->arch.hflags & BOOK3S_HFLAG_SPLIT_HACK) {
+ 		ulong pc = kvmppc_get_pc(vcpu);
++		ulong lr = kvmppc_get_lr(vcpu);
+ 		if ((pc & SPLIT_HACK_MASK) == SPLIT_HACK_OFFS)
+ 			kvmppc_set_pc(vcpu, pc & ~SPLIT_HACK_MASK);
++		if ((lr & SPLIT_HACK_MASK) == SPLIT_HACK_OFFS)
++			kvmppc_set_lr(vcpu, lr & ~SPLIT_HACK_MASK);
+ 		vcpu->arch.hflags &= ~BOOK3S_HFLAG_SPLIT_HACK;
  	}
- 
- 	if (dir != DMA_NONE)
-diff --git a/arch/powerpc/kvm/book3s_64_vio_hv.c b/arch/powerpc/kvm/book3s_64_vio_hv.c
-index eb8b11515a7ff..d258ed4ef77c3 100644
---- a/arch/powerpc/kvm/book3s_64_vio_hv.c
-+++ b/arch/powerpc/kvm/book3s_64_vio_hv.c
-@@ -300,10 +300,10 @@ static long kvmppc_rm_tce_iommu_do_map(struct kvm *kvm, struct iommu_table *tbl,
- 
- 	if (WARN_ON_ONCE_RM(mm_iommu_ua_to_hpa_rm(mem, ua, tbl->it_page_shift,
- 			&hpa)))
--		return H_HARDWARE;
-+		return H_TOO_HARD;
- 
- 	if (WARN_ON_ONCE_RM(mm_iommu_mapped_inc(mem)))
--		return H_CLOSED;
-+		return H_TOO_HARD;
- 
- 	ret = iommu_tce_xchg_rm(kvm->mm, tbl, entry, &hpa, &dir);
- 	if (ret) {
-@@ -501,7 +501,7 @@ long kvmppc_rm_h_put_tce_indirect(struct kvm_vcpu *vcpu,
- 
- 		rmap = (void *) vmalloc_to_phys(rmap);
- 		if (WARN_ON_ONCE_RM(!rmap))
--			return H_HARDWARE;
-+			return H_TOO_HARD;
- 
- 		/*
- 		 * Synchronize with the MMU notifier callbacks in
+ }
 -- 
 2.20.1
 
