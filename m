@@ -2,175 +2,181 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 322CFFC06E
-	for <lists+kvm-ppc@lfdr.de>; Thu, 14 Nov 2019 08:02:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9767AFCDFA
+	for <lists+kvm-ppc@lfdr.de>; Thu, 14 Nov 2019 19:44:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725852AbfKNHCh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 14 Nov 2019 02:02:37 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20268 "EHLO
+        id S1726549AbfKNSoR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 14 Nov 2019 13:44:17 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35604 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725601AbfKNHCh (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 14 Nov 2019 02:02:37 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAE6wN0U025689
-        for <kvm-ppc@vger.kernel.org>; Thu, 14 Nov 2019 02:02:36 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w8x2kpc44-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Thu, 14 Nov 2019 02:02:36 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
-        Thu, 14 Nov 2019 07:02:33 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 14 Nov 2019 07:02:30 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAE72SfB53411984
+        by vger.kernel.org with ESMTP id S1725976AbfKNSoR (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 14 Nov 2019 13:44:17 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAEIhiW5041171;
+        Thu, 14 Nov 2019 13:44:05 -0500
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w9bhcaasm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Nov 2019 13:44:05 -0500
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xAEIejrd014729;
+        Thu, 14 Nov 2019 18:44:08 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma01wdc.us.ibm.com with ESMTP id 2w5n373v2n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Nov 2019 18:44:08 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAEIi2jc40173880
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Nov 2019 07:02:29 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D13F711C06F;
-        Thu, 14 Nov 2019 07:02:28 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A994111C050;
-        Thu, 14 Nov 2019 07:02:25 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.85.181.122])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu, 14 Nov 2019 07:02:25 +0000 (GMT)
-Date:   Wed, 13 Nov 2019 23:02:22 -0800
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Bharata B Rao <bharata@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-mm@kvack.org, paulus@au1.ibm.com,
-        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
-        cclaudio@linux.ibm.com, sukadev@linux.vnet.ibm.com, hch@lst.de,
-        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
-        Ram Pai <linuxram@linux.ibm.com>
-Subject: Re: [PATCH v10 7/8] KVM: PPC: Implement H_SVM_INIT_ABORT hcall
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <20191112010158.GB5159@oc0525413822.ibm.com>
- <20191112053836.GB10885@oak.ozlabs.ibm.com>
- <20191112075215.GD5159@oc0525413822.ibm.com>
- <20191112113204.GA10178@blackberry>
- <20191112144555.GE5159@oc0525413822.ibm.com>
- <20191113001427.GA17829@oak.ozlabs.ibm.com>
- <20191113063233.GF5159@oc0525413822.ibm.com>
- <20191113211824.GA20535@blackberry>
- <20191113215042.GG5159@oc0525413822.ibm.com>
- <20191114050825.GB28382@oak.ozlabs.ibm.com>
+        Thu, 14 Nov 2019 18:44:03 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BF4C6BE05A;
+        Thu, 14 Nov 2019 18:44:02 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 87F83BE051;
+        Thu, 14 Nov 2019 18:44:01 +0000 (GMT)
+Received: from leobras.br.ibm.com (unknown [9.18.235.137])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Nov 2019 18:44:01 +0000 (GMT)
+Message-ID: <c792fdc629d87f452d4348d33ab179df01d42017.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 1/4] powerpc/kvm/book3s: Fixes possible 'use after
+ release' of kvm
+From:   Leonardo Bras <leonardo@linux.ibm.com>
+To:     Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date:   Thu, 14 Nov 2019 15:43:57 -0300
+In-Reply-To: <87mud13d4r.fsf@mpe.ellerman.id.au>
+References: <20191107170258.36379-1-leonardo@linux.ibm.com>
+         <20191107170258.36379-2-leonardo@linux.ibm.com>
+         <87mud13d4r.fsf@mpe.ellerman.id.au>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-zmSym6hLOrd0Lb87qEYc"
+User-Agent: Evolution 3.34.1 (3.34.1-1.fc31) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191114050825.GB28382@oak.ozlabs.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
 X-TM-AS-GCONF: 00
-x-cbid: 19111407-0008-0000-0000-0000032EE21E
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111407-0009-0000-0000-00004A4DEF1E
-Message-Id: <20191114070222.GH5159@oc0525413822.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-14_01:,,
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-14_05:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911140065
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911140157
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Nov 14, 2019 at 04:08:25PM +1100, Paul Mackerras wrote:
-> On Wed, Nov 13, 2019 at 01:50:42PM -0800, Ram Pai wrote:
-> > On Thu, Nov 14, 2019 at 08:18:24AM +1100, Paul Mackerras wrote:
-> > > On Tue, Nov 12, 2019 at 10:32:33PM -0800, Ram Pai wrote:
-> > > > On Wed, Nov 13, 2019 at 11:14:27AM +1100, Paul Mackerras wrote:
-> > > > > On Tue, Nov 12, 2019 at 06:45:55AM -0800, Ram Pai wrote:
-> > > > > > On Tue, Nov 12, 2019 at 10:32:04PM +1100, Paul Mackerras wrote:
-> > > > > > > On Mon, Nov 11, 2019 at 11:52:15PM -0800, Ram Pai wrote:
-> > > > > > > > There is subtle problem removing that code from the assembly.
-> > > > > > > > 
-> > > > > > > > If the H_SVM_INIT_ABORT hcall returns to the ultravisor without clearing
-> > > > > > > > kvm->arch.secure_guest, the hypervisor will continue to think that the
-> > > > > > > > VM is a secure VM.   However the primary reason the H_SVM_INIT_ABORT
-> > > > > > > > hcall was invoked, was to inform the Hypervisor that it should no longer
-> > > > > > > > consider the VM as a Secure VM. So there is a inconsistency there.
-> > > > > > > 
-> > > > > > > Most of the checks that look at whether a VM is a secure VM use code
-> > > > > > > like "if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE)".  Now
-> > > > > > > since KVMPPC_SECURE_INIT_ABORT is 4, an if statement such as that will
-> > > > > > > take the false branch once we have set kvm->arch.secure_guest to
-> > > > > > > KVMPPC_SECURE_INIT_ABORT in kvmppc_h_svm_init_abort.  So in fact in
-> > > > > > > most places we will treat the VM as a normal VM from then on.  If
-> > > > > > > there are any places where we still need to treat the VM as a secure
-> > > > > > > VM while we are processing the abort we can easily do that too.
-> > > > > > 
-> > > > > > Is the suggestion --  KVMPPC_SECURE_INIT_ABORT should never return back
-> > > > > > to the Ultravisor?   Because removing that assembly code will NOT lead the
-> > > > > 
-> > > > > No.  The suggestion is that vcpu->arch.secure_guest stays set to
-> > > > > KVMPPC_SECURE_INIT_ABORT until userspace calls KVM_PPC_SVM_OFF.
-> > > > 
-> > > > In the fast_guest_return path, if it finds 
-> > > > (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_ABORT) is true, should it return to
-> > > > UV or not?
-> > > > 
-> > > > Ideally it should return back to the ultravisor the first time
-> > > > KVMPPC_SECURE_INIT_ABORT is set, and not than onwards.
-> > > 
-> > > What is ideal about that behavior?  Why would that be a particularly
-> > > good thing to do?
-> > 
-> > It is following the rule -- "return back to the caller".
-> 
-> That doesn't address the question of why vcpu->arch.secure_guest
-> should be cleared at the point where we do that.
 
-Ok. here is the sequence that I expect to happen.
+--=-zmSym6hLOrd0Lb87qEYc
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
--------------------------------------------------------------------
-1) VM makes a ESM(Enter Secure Mode) ucall.
+On Tue, 2019-11-12 at 15:57 +1100, Michael Ellerman wrote:
+> Hi Leonardo,
 
-  1A) UV does the H_SVM_INIT_START hcall... the chit-chat between UV and HV happens
-	and somewhere in that chit-chat, UV decides that the ESM call
-	cannot be successfully completed.  Hence it calls
-	H_SVM_INIT_ABORT to inform the Hypervisor.
+Hello Micheal, thanks for the feedback!
 
-    1A_a) Hypervisor aborts the VM's transition and returns back to the ultravisor.
+>=20
+> Leonardo Bras <leonardo@linux.ibm.com> writes:
+> > Fixes a possible 'use after free' of kvm variable in
+> > kvm_vm_ioctl_create_spapr_tce, where it does a mutex_unlock(&kvm-
+> > >lock)
+> > after a kvm_put_kvm(kvm).
+>=20
+> There is no potential for an actual use after free here AFAICS.
+>=20
+> > diff --git a/arch/powerpc/kvm/book3s_64_vio.c
+> > b/arch/powerpc/kvm/book3s_64_vio.c
+> > index 5834db0a54c6..a402ead833b6 100644
+> > --- a/arch/powerpc/kvm/book3s_64_vio.c
+> > +++ b/arch/powerpc/kvm/book3s_64_vio.c
+>=20
+> The preceeding context is:
+>=20
+> 	mutex_lock(&kvm->lock);
+>=20
+> 	/* Check this LIOBN hasn't been previously allocated */
+> 	ret =3D 0;
+> 	list_for_each_entry(siter, &kvm->arch.spapr_tce_tables, list) {
+> 		if (siter->liobn =3D=3D args->liobn) {
+> 			ret =3D -EBUSY;
+> 			break;
+> 		}
+> 	}
+>=20
+> 	kvm_get_kvm(kvm);
+> 	if (!ret)
+> 		ret =3D anon_inode_getfd("kvm-spapr-tce",
+> &kvm_spapr_tce_fops,
+> 				       stt, O_RDWR | O_CLOEXEC);
+>=20
+> > @@ -316,14 +316,13 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm
+> > *kvm,
+> > =20
+> >  	if (ret >=3D 0)
+> >  		list_add_rcu(&stt->list, &kvm->arch.spapr_tce_tables);
+> > -	else
+> > -		kvm_put_kvm(kvm);
+> > =20
+> >  	mutex_unlock(&kvm->lock);
+> > =20
+> >  	if (ret >=3D 0)
+> >  		return ret;
+> > =20
+> > +	kvm_put_kvm(kvm);
+> >  	kfree(stt);
+> >   fail_acct:
+> >  	account_locked_vm(current->mm, kvmppc_stt_pages(npages),
+> > false);
+>=20
+> If the kvm_put_kvm() you've moved actually caused the last reference
+> to
+> be dropped that would mean that our caller had passed us a kvm struct
+> without holding a reference to it, and that would be a bug in our
+> caller.
+>=20
 
-  1B) UV cleans up the state of the VM on its side and returns
-    	back to the VM, with failure.  VM is still in a normal VM state.
-	Its MSR(S) is still 0.
+So, there is no chance that between this function's kvm_get_kvm() and=20
+kvm_put_kvm(), another thread can decrease this reference counter?
 
-2) VM gets a HDEC exception.
+> Or put another way, it would mean the mutex_lock() above could
+> already
+> be operating on a freed kvm struct.
+>=20
+> The kvm_get_kvm() prior to the anon_inode_getfd() is to account for
+> the
+> reference that's held by the `stt` struct, and dropped in
+> kvm_spapr_tce_release().
+>=20
+> So although this patch isn't wrong, the explanation is not accurate.
+>=20
+> cheers
 
-   2A) Hypervisor receives that HDEC exception. It handles the exception
-   	and returns back to the VM.
--------------------------------------------------------------------
+Kind regards
 
-If you agree with the above sequence than, the patch needs all the proposed changes.
+--=-zmSym6hLOrd0Lb87qEYc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
 
+-----BEGIN PGP SIGNATURE-----
 
-At step (1A_a) and step (2A),  the hypervisor is faced with the question
-	--  Where should the control be returned to?
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl3NoG0ACgkQlQYWtz9S
+ttT2MBAAw0s38wOkqRjRWeoZ0TV3qd7Gkqzy4gGKHiDNL82fHh6O6X4JSLTYP11u
+co3J9O1jORkIG7AAHQh68iiGJZY6MB5ZUJkUsn3XVH2gMWcQ/547HpcgCCMkrL8k
+keCqL7CKz5B7WxKK+8daUvMaTPAY5AaSEOHIHG/In4vEeHuUWJEgBN60tGxvhc1m
+7VIEBySrLqKeAgs70rThjBVaqg+66SbLZb7ToVIcoRu3Jc/3O4HHG+f6SnD3tqDM
+E3BrLge33ZTBt32TdKyogJ6RMUC+SXQXbXfUeNwjXuQIkH3D/zekc31o1GjcenCU
+Sv0z3Bmcgz2av0FxrA36K7Ch8Mgcnt7Yk5oHwF76kzOMSYyZMw9mJgTwrOHUsxnQ
+pH73v2e9ol1vDD+bdqkGBpusQae25A3/CDLZPXKvRdSqyaaI3yhwNMJ4deh8Glix
+bMpjCaUO+Q1o+VuhujYvmB7+tDYSEjWhOgo7m4yuffBu/MDtbaMkbkuqm66mrqrf
+3582+Kxt8nEWePhyVBKuJTC+IBqqZEIFO7VCR/XPnac7dYhIOUug4hj2QuYuMStF
+Bgsqa9pPIECX07kZR4LUVaEfV+uKadq5DcbdAhfR6NlFBgrJn+XBiuCSIalD7G3D
+bC6v7rRE4tjEoO12FYm165cYeD8I30YqLqkR7/z5OmbB9KkSAj8=
+=alk4
+-----END PGP SIGNATURE-----
 
-  for step 1A_a it has to return to the UV, and for step 2A it has to
-  return to the VM. In other words the control has to **return back to
-  the caller**.
-
-
-It certainly has to rely on the vcpu->arch.secure_guest flag to do so.
-If any flag in vcpu->arch.secure_guest is set, it has to return to 
-UV.  Otherwise it has to return to VM.
-
-This is the reason, the proposed patch in the fast_guest_return path
-looks at the vcpu->arch.secure_guest. If it finds any flag set, it
-returns to UV. However before returning to UV, it also clears all the
-flags if  H_SVM_INIT_ABORT is set. This is to ensure that HV does not
-return to the wrong place; i.e to UV, but returns to the VM at step 2A.
-
-RP
+--=-zmSym6hLOrd0Lb87qEYc--
 
