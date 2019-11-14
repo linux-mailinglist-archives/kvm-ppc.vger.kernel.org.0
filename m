@@ -2,171 +2,101 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1458EFBEF8
+	by mail.lfdr.de (Postfix) with ESMTP id 7E8DCFBEF9
 	for <lists+kvm-ppc@lfdr.de>; Thu, 14 Nov 2019 06:08:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725838AbfKNFIa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 14 Nov 2019 00:08:30 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:33867 "EHLO ozlabs.org"
+        id S1725852AbfKNFIb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 14 Nov 2019 00:08:31 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:41369 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725440AbfKNFIa (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        id S1725807AbfKNFIa (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
         Thu, 14 Nov 2019 00:08:30 -0500
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 47D8dR2cqzz9sNT; Thu, 14 Nov 2019 16:08:27 +1100 (AEDT)
+        id 47D8dR40m4z9s7T; Thu, 14 Nov 2019 16:08:27 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1573708107; bh=p6shdsFGA+Mt3rC6QY+JMFnpJ9Vvy/PGW13T7kQhVR4=;
+        t=1573708107; bh=kPRYQtgfmwdv40EbuZcqeYZToO/RlWVUa8XfGajWvEI=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BqT3vL+OGTmVG6XcYOfXIpYiUGAB6LUw9xl8knY5g0RdwHx30L63ZNHk/kZWUgD4p
-         J78EBD2MyFT1VED9gkZBYsgZWC+w7+ZREdpYYwUAIKxerBCRXFgqurYysFjkZeeVI7
-         08jKM0dD44HBrVqwGsuV/f7V3iMP8I99eW0WDLzgvdVQdPwNksLrN+QYE/3ISBMPPQ
-         9+9opeM+Uj4C18nJgb5h4oNSmqTYo+CGI3G0vxy/fmnnF677FIGIzJYVMkmbQQN1hf
-         fVorjDiCin49KFVIQ8nvBBM7Xlq40hwfYw+bRCQpTnl0g0/6ScnhYux315VHTK2pyX
-         BhU5b88eC4kTQ==
-Date:   Thu, 14 Nov 2019 16:07:38 +1100
+        b=A85mzLCe/m8AOIXYfoAJDqpK70LNQTu2NI6GpcGjIrL25sgnKF4HZRCR3kxRgBTf0
+         G172C2juWrJytAFkuaI+uojelB+dtpIJod2mwqc6bXxz5pU2EbAwmg0m4QNXU2clFC
+         RDi0G4X+NjFnbjSk0g0YYXLGkjQDO1DMhXRKTSKGoPtCi+ueh2/hkbx+89sDFfLkZ6
+         HDL8rgIVAUeLPPowCl2fFbLv/u6yq0hhN57mTIl+TYgTxH3zcFaVwGlCWdBMs1vjn9
+         PfySVcQ910QyGD55HBHYIqO6ldJ2Nk64IK6NM/MF46bZWK22t6sZrm8aU2Q9l2vR2y
+         xs13pE6bm/PlA==
+Date:   Thu, 14 Nov 2019 16:08:25 +1100
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Bharata B Rao <bharata@linux.ibm.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+To:     Ram Pai <linuxram@us.ibm.com>
+Cc:     Bharata B Rao <bharata@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
         linux-mm@kvack.org, paulus@au1.ibm.com,
         aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
-        cclaudio@linux.ibm.com, linuxram@us.ibm.com,
-        sukadev@linux.vnet.ibm.com, hch@lst.de
-Subject: Re: [PATCH v10 6/8] KVM: PPC: Support reset of secure guest
-Message-ID: <20191114050738.GA28382@oak.ozlabs.ibm.com>
-References: <20191104041800.24527-1-bharata@linux.ibm.com>
- <20191104041800.24527-7-bharata@linux.ibm.com>
- <20191112053434.GA10885@oak.ozlabs.ibm.com>
- <20191113152908.GI21634@in.ibm.com>
+        cclaudio@linux.ibm.com, sukadev@linux.vnet.ibm.com, hch@lst.de,
+        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Ram Pai <linuxram@linux.ibm.com>
+Subject: Re: [PATCH v10 7/8] KVM: PPC: Implement H_SVM_INIT_ABORT hcall
+Message-ID: <20191114050825.GB28382@oak.ozlabs.ibm.com>
+References: <20191111041924.GA4017@oak.ozlabs.ibm.com>
+ <20191112010158.GB5159@oc0525413822.ibm.com>
+ <20191112053836.GB10885@oak.ozlabs.ibm.com>
+ <20191112075215.GD5159@oc0525413822.ibm.com>
+ <20191112113204.GA10178@blackberry>
+ <20191112144555.GE5159@oc0525413822.ibm.com>
+ <20191113001427.GA17829@oak.ozlabs.ibm.com>
+ <20191113063233.GF5159@oc0525413822.ibm.com>
+ <20191113211824.GA20535@blackberry>
+ <20191113215042.GG5159@oc0525413822.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191113152908.GI21634@in.ibm.com>
+In-Reply-To: <20191113215042.GG5159@oc0525413822.ibm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Nov 13, 2019 at 08:59:08PM +0530, Bharata B Rao wrote:
-> On Tue, Nov 12, 2019 at 04:34:34PM +1100, Paul Mackerras wrote:
-> > On Mon, Nov 04, 2019 at 09:47:58AM +0530, Bharata B Rao wrote:
-> > [snip]
-> > > @@ -5442,6 +5471,64 @@ static int kvmhv_store_to_eaddr(struct kvm_vcpu *vcpu, ulong *eaddr, void *ptr,
-> > >  	return rc;
-> > >  }
-> > >  
-> > > +/*
-> > > + *  IOCTL handler to turn off secure mode of guest
-> > > + *
-> > > + * - Issue ucall to terminate the guest on the UV side
-> > > + * - Unpin the VPA pages (Enables these pages to be migrated back
-> > > + *   when VM becomes secure again)
-> > > + * - Recreate partition table as the guest is transitioning back to
-> > > + *   normal mode
-> > > + * - Release all device pages
-> > > + */
-> > > +static int kvmhv_svm_off(struct kvm *kvm)
-> > > +{
-> > > +	struct kvm_vcpu *vcpu;
-> > > +	int srcu_idx;
-> > > +	int ret = 0;
-> > > +	int i;
-> > > +
-> > > +	if (!(kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START))
-> > > +		return ret;
-> > > +
+On Wed, Nov 13, 2019 at 01:50:42PM -0800, Ram Pai wrote:
+> On Thu, Nov 14, 2019 at 08:18:24AM +1100, Paul Mackerras wrote:
+> > On Tue, Nov 12, 2019 at 10:32:33PM -0800, Ram Pai wrote:
+> > > On Wed, Nov 13, 2019 at 11:14:27AM +1100, Paul Mackerras wrote:
+> > > > On Tue, Nov 12, 2019 at 06:45:55AM -0800, Ram Pai wrote:
+> > > > > On Tue, Nov 12, 2019 at 10:32:04PM +1100, Paul Mackerras wrote:
+> > > > > > On Mon, Nov 11, 2019 at 11:52:15PM -0800, Ram Pai wrote:
+> > > > > > > There is subtle problem removing that code from the assembly.
+> > > > > > > 
+> > > > > > > If the H_SVM_INIT_ABORT hcall returns to the ultravisor without clearing
+> > > > > > > kvm->arch.secure_guest, the hypervisor will continue to think that the
+> > > > > > > VM is a secure VM.   However the primary reason the H_SVM_INIT_ABORT
+> > > > > > > hcall was invoked, was to inform the Hypervisor that it should no longer
+> > > > > > > consider the VM as a Secure VM. So there is a inconsistency there.
+> > > > > > 
+> > > > > > Most of the checks that look at whether a VM is a secure VM use code
+> > > > > > like "if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE)".  Now
+> > > > > > since KVMPPC_SECURE_INIT_ABORT is 4, an if statement such as that will
+> > > > > > take the false branch once we have set kvm->arch.secure_guest to
+> > > > > > KVMPPC_SECURE_INIT_ABORT in kvmppc_h_svm_init_abort.  So in fact in
+> > > > > > most places we will treat the VM as a normal VM from then on.  If
+> > > > > > there are any places where we still need to treat the VM as a secure
+> > > > > > VM while we are processing the abort we can easily do that too.
+> > > > > 
+> > > > > Is the suggestion --  KVMPPC_SECURE_INIT_ABORT should never return back
+> > > > > to the Ultravisor?   Because removing that assembly code will NOT lead the
+> > > > 
+> > > > No.  The suggestion is that vcpu->arch.secure_guest stays set to
+> > > > KVMPPC_SECURE_INIT_ABORT until userspace calls KVM_PPC_SVM_OFF.
+> > > 
+> > > In the fast_guest_return path, if it finds 
+> > > (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_ABORT) is true, should it return to
+> > > UV or not?
+> > > 
+> > > Ideally it should return back to the ultravisor the first time
+> > > KVMPPC_SECURE_INIT_ABORT is set, and not than onwards.
 > > 
-> > A further comment on this code: it should check that no vcpus are
-> > running and fail if any are running, and it should prevent any vcpus
-> > from running until the function is finished, using code like that in
-> > kvmhv_configure_mmu().  That is, it should do something like this:
-> > 
-> > 	mutex_lock(&kvm->arch.mmu_setup_lock);
-> > 	mmu_was_ready = kvm->arch.mmu_ready;
-> > 	if (kvm->arch.mmu_ready) {
-> > 		kvm->arch.mmu_ready = 0;
-> > 		/* order mmu_ready vs. vcpus_running */
-> > 		smp_mb();
-> > 		if (atomic_read(&kvm->arch.vcpus_running)) {
-> > 			kvm->arch.mmu_ready = 1;
-> > 			ret = -EBUSY;
-> > 			goto out_unlock;
-> > 		}
-> > 	}
-> > 
-> > and then after clearing kvm->arch.secure_guest below:
-> > 
-> > > +	srcu_idx = srcu_read_lock(&kvm->srcu);
-> > > +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> > > +		struct kvm_memory_slot *memslot;
-> > > +		struct kvm_memslots *slots = __kvm_memslots(kvm, i);
-> > > +
-> > > +		if (!slots)
-> > > +			continue;
-> > > +
-> > > +		kvm_for_each_memslot(memslot, slots) {
-> > > +			kvmppc_uvmem_drop_pages(memslot, kvm, true);
-> > > +			uv_unregister_mem_slot(kvm->arch.lpid, memslot->id);
-> > > +		}
-> > > +	}
-> > > +	srcu_read_unlock(&kvm->srcu, srcu_idx);
-> > > +
-> > > +	ret = uv_svm_terminate(kvm->arch.lpid);
-> > > +	if (ret != U_SUCCESS) {
-> > > +		ret = -EINVAL;
-> > > +		goto out;
-> > > +	}
-> > > +
-> > > +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> > > +		spin_lock(&vcpu->arch.vpa_update_lock);
-> > > +		unpin_vpa_reset(kvm, &vcpu->arch.dtl);
-> > > +		unpin_vpa_reset(kvm, &vcpu->arch.slb_shadow);
-> > > +		unpin_vpa_reset(kvm, &vcpu->arch.vpa);
-> > > +		spin_unlock(&vcpu->arch.vpa_update_lock);
-> > > +	}
-> > > +
-> > > +	ret = kvmppc_reinit_partition_table(kvm);
-> > > +	if (ret)
-> > > +		goto out;
-> > > +
-> > > +	kvm->arch.secure_guest = 0;
-> > 
-> > you need to do:
-> > 
-> > 	kvm->arch.mmu_ready = mmu_was_ready;
-> >  out_unlock:
-> > 	mutex_unlock(&kvm->arch.mmu_setup_lock);
-> > 
-> > > +out:
-> > > +	return ret;
-> > > +}
-> > > +
-> > 
-> > With that extra check in place, it should be safe to unpin the vpas if
-> > there is a good reason to do so.  ("Userspace has some bug that we
-> > haven't found" isn't a good reason to do so.)
+> > What is ideal about that behavior?  Why would that be a particularly
+> > good thing to do?
 > 
-> QEMU indeed does set_one_reg to reset the VPAs but that only marks
-> the VPA update as pending. The actual unpinning happens when vcpu
-> gets to run after reset at which time the VPAs are updated after
-> any unpinning (if required)
-> 
-> When secure guest reboots, vpu 0 gets to run and does unpin its
-> VPA pages and then proceeds with switching to secure. Here UV
-> tries to page-in all the guest pages, including the still pinned
-> VPA pages corresponding to other vcpus which haven't had a chance
-> to run till now. They are all still pinned and hence page-in fails.
-> 
-> To prevent this, we have to explicitly unpin the VPA pages during
-> this svm off ioctl. This will ensure that SMP secure guest is able
-> to reboot correctly.
+> It is following the rule -- "return back to the caller".
 
-OK, that makes sense.  Please put a comment in the code explaining
-this briefly.
-
-> So I will incorporate the code chunk you have shown above to fail
-> if any vcpu is running and prevent any vcpu from running when
-> we unpin VPAs from this ioctl.
-
-Sounds good.
+That doesn't address the question of why vcpu->arch.secure_guest
+should be cleared at the point where we do that.
 
 Paul.
