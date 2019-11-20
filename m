@@ -2,80 +2,81 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 61C55101943
-	for <lists+kvm-ppc@lfdr.de>; Tue, 19 Nov 2019 07:20:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC98E1031A0
+	for <lists+kvm-ppc@lfdr.de>; Wed, 20 Nov 2019 03:33:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726230AbfKSGU3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 19 Nov 2019 01:20:29 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:35438 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725815AbfKSGU2 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 19 Nov 2019 01:20:28 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id BE2B87CCBDD3710A776F;
-        Tue, 19 Nov 2019 14:20:26 +0800 (CST)
-Received: from huawei.com (10.90.53.225) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Tue, 19 Nov 2019
- 14:20:16 +0800
-From:   zhengbin <zhengbin13@huawei.com>
-To:     <paulus@ozlabs.org>, <benh@kernel.crashing.org>,
-        <mpe@ellerman.id.au>, <kvm-ppc@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>
-CC:     <zhengbin13@huawei.com>
-Subject: [PATCH] KVM: PPC: Remove set but not used variable 'ra','rs','rt'
-Date:   Tue, 19 Nov 2019 14:27:40 +0800
-Message-ID: <1574144860-22954-1-git-send-email-zhengbin13@huawei.com>
-X-Mailer: git-send-email 2.7.4
+        id S1727545AbfKTCdt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 19 Nov 2019 21:33:49 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35133 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727264AbfKTCds (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 19 Nov 2019 21:33:48 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 47HmwB74drz9sPW; Wed, 20 Nov 2019 13:33:46 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1574217226; bh=lv/P09pKDJB1dOVrKwXuQmohaFy+eBFJXd3MEgXRBH0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MOE9brDV/wIAREGaelDw7VlbBoQJT4lxdlTK0nk6lu+uJ2wG+fVKqsMJEfboI6/M8
+         b6aJF/MERyiuOA4KXPo5hjILAwgq4njyL3lqvD5jwzlToYWjDb7bWsUOWIsjVGCOnB
+         zy4TBJeeJJfifR6iT7kBJrCWV1ESDpMd91VH6SSC94GPsdddcMGFAY1G4pikKr7si1
+         WQV7QGMKwhNI2qX2V8bWmtH+tW7USxtDmeGdhlhxdfxMWr8xlE/1R8tOhGLUJ+fEDy
+         TFN1hJQ9m7rWgHjxsiFJeIKXjZxMkQ9G1j0NwLWAQFF9c8ByWwZ+63U8cS7aW82n2F
+         VeWFMIv/M+GZg==
+Date:   Wed, 20 Nov 2019 13:33:34 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     P J P <ppandit@redhat.com>
+Cc:     kvm-ppc@vger.kernel.org, Reno Robert <renorobert@gmail.com>,
+        P J P <pjp@fedoraproject.org>
+Subject: Re: [PATCH v2] kvm: mpic: limit active IRQ sources to NUM_OUTPUTS
+Message-ID: <20191120023334.GA24617@oak.ozlabs.ibm.com>
+References: <20191115050620.21360-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191115050620.21360-1-ppandit@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Fixes gcc '-Wunused-but-set-variable' warning:
+On Fri, Nov 15, 2019 at 10:36:20AM +0530, P J P wrote:
+> From: P J P <pjp@fedoraproject.org>
+> 
+> openpic_src_write sets interrupt level 'src->output' masked with
+> ILR_INTTGT_MASK(=0xFF). It's then used to index 'dst->outputs_active'
+> array. With NUM_OUTPUTS=3, it may lead to OOB array access. Limit
+> active IRQ sources to < NUM_OUTPUTS.
+> 
+> Reported-by: Reno Robert <renorobert@gmail.com>
+> Signed-off-by: P J P <pjp@fedoraproject.org>
+> ---
+>  arch/powerpc/kvm/mpic.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Update v2: limit IRQ sources to NUM_OUTPUTS
+>   -> https://www.spinics.net/lists/kvm-ppc/msg16554.html
+> 
+> diff --git a/arch/powerpc/kvm/mpic.c b/arch/powerpc/kvm/mpic.c
+> index fe312c160d97..fe4afd54c6e7 100644
+> --- a/arch/powerpc/kvm/mpic.c
+> +++ b/arch/powerpc/kvm/mpic.c
+> @@ -628,7 +628,7 @@ static inline void write_IRQreg_ilr(struct openpic *opp, int n_IRQ,
+>  	if (opp->flags & OPENPIC_FLAG_ILR) {
+>  		struct irq_source *src = &opp->src[n_IRQ];
+> 
+> -		src->output = val & ILR_INTTGT_MASK;
+> +		src->output = val % NUM_OUTPUTS;
 
-arch/powerpc/kvm/emulate_loadstore.c: In function kvmppc_emulate_loadstore:
-arch/powerpc/kvm/emulate_loadstore.c:87:6: warning: variable ra set but not used [-Wunused-but-set-variable]
-arch/powerpc/kvm/emulate_loadstore.c: In function kvmppc_emulate_loadstore:
-arch/powerpc/kvm/emulate_loadstore.c:87:10: warning: variable rs set but not used [-Wunused-but-set-variable]
-arch/powerpc/kvm/emulate_loadstore.c: In function kvmppc_emulate_loadstore:
-arch/powerpc/kvm/emulate_loadstore.c:87:14: warning: variable rt set but not used [-Wunused-but-set-variable]
+Still not right, I'm afraid, since it could leave src->output set to
+3, which would lead to an out-of-bounds array access.  I think it
+needs to be
 
-They are not used since commit 2b33cb585f94 ("KVM: PPC: Reimplement
-LOAD_FP/STORE_FP instruction mmio emulation with analyse_instr() input")
+	if (val < NUM_OUTPUTS)
+		src->output = val;
+	else
+		src->output = ILR_INTTGT_INT;
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: zhengbin <zhengbin13@huawei.com>
----
- arch/powerpc/kvm/emulate_loadstore.c | 5 -----
- 1 file changed, 5 deletions(-)
+or something like that.
 
-diff --git a/arch/powerpc/kvm/emulate_loadstore.c b/arch/powerpc/kvm/emulate_loadstore.c
-index 2e496eb..1139bc5 100644
---- a/arch/powerpc/kvm/emulate_loadstore.c
-+++ b/arch/powerpc/kvm/emulate_loadstore.c
-@@ -73,7 +73,6 @@ int kvmppc_emulate_loadstore(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_run *run = vcpu->run;
- 	u32 inst;
--	int ra, rs, rt;
- 	enum emulation_result emulated = EMULATE_FAIL;
- 	int advance = 1;
- 	struct instruction_op op;
-@@ -85,10 +84,6 @@ int kvmppc_emulate_loadstore(struct kvm_vcpu *vcpu)
- 	if (emulated != EMULATE_DONE)
- 		return emulated;
-
--	ra = get_ra(inst);
--	rs = get_rs(inst);
--	rt = get_rt(inst);
--
- 	vcpu->arch.mmio_vsx_copy_nums = 0;
- 	vcpu->arch.mmio_vsx_offset = 0;
- 	vcpu->arch.mmio_copy_type = KVMPPC_VSX_COPY_NONE;
---
-2.7.4
-
+Paul.
