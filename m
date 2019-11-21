@@ -2,72 +2,70 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9313F1045EE
-	for <lists+kvm-ppc@lfdr.de>; Wed, 20 Nov 2019 22:41:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C67F1049C1
+	for <lists+kvm-ppc@lfdr.de>; Thu, 21 Nov 2019 05:57:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725956AbfKTVlZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 20 Nov 2019 16:41:25 -0500
-Received: from ozlabs.org ([203.11.71.1]:50449 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725819AbfKTVlZ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 20 Nov 2019 16:41:25 -0500
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 47JGNL4R52z9sPL; Thu, 21 Nov 2019 08:41:22 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1574286082; bh=li28Y2sth80VfkG4EiuioZVPlrdAcRu4bfanliPF3AA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=vghJJ6xWEvBviZ86HqyMMrdijKDTbzNLi3bqNoUtS2d9XG0brpg3r20IIk8pz+azd
-         TlyaY5Bax0D7Qoq7fBo6FAUvZYn5AZX3yN6MyRV3SHWR2DCngrBcw4FhOyCSyTbsLr
-         5LbVqBuA05TWVjDhL6sW90ywLKg0je/YmucQowbX6ESguC+v67Uqu362f+cFttc1sn
-         V6fYPPJexnlF9/kq9gULZn9Pm7m7oxWwVJ0tQZPTej1vXKE8RTGWwlQ30iQ0LhcjVO
-         AKTmahLeqZg+W1yrrF41q2wvJz10wE4k+QBnmx+vsYKyNYu9J+FdC+Wmub183XfOV3
-         8v8bpP+4ZoGkw==
-Date:   Thu, 21 Nov 2019 08:41:19 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     P J P <ppandit@redhat.com>
-Cc:     kvm-ppc@vger.kernel.org, Reno Robert <renorobert@gmail.com>
+        id S1726165AbfKUE5y (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 20 Nov 2019 23:57:54 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51579 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725854AbfKUE5y (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 20 Nov 2019 23:57:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574312273;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Yv0X/nVIYvnkcCQB7VwrmBY+75939CQRr75Nan6lnI4=;
+        b=Yfi/qSzxJIkQbnyomcNd5XWfpZ1r084OyXkh3nyML2bK7RgmYpLhFSS0mDxF9mZv77j0tS
+        q3kAvURWYAEchKkrfzm0yGEjGPpst+odpdrL+CnrL4VHP/OS/jCcftOQSNTywMVGSW0jAn
+        xRRpd3njJEK8JiWofXVv4aQmx9u0ROo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-_IeSMIl9PlW7GFhP47eI9Q-1; Wed, 20 Nov 2019 23:57:11 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C51D1005509;
+        Thu, 21 Nov 2019 04:57:10 +0000 (UTC)
+Received: from kaapi (unknown [10.74.10.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A06A360BF7;
+        Thu, 21 Nov 2019 04:57:08 +0000 (UTC)
+Date:   Thu, 21 Nov 2019 10:27:04 +0530 (IST)
+From:   P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To:     Paul Mackerras <paulus@ozlabs.org>
+cc:     kvm-ppc@vger.kernel.org, Reno Robert <renorobert@gmail.com>
 Subject: Re: [PATCH v2] kvm: mpic: limit active IRQ sources to NUM_OUTPUTS
-Message-ID: <20191120214119.GA12722@blackberry>
-References: <20191115050620.21360-1-ppandit@redhat.com>
- <20191120023334.GA24617@oak.ozlabs.ibm.com>
- <nycvar.YSQ.7.76.1911201625080.24911@xnncv>
+In-Reply-To: <20191120214119.GA12722@blackberry>
+Message-ID: <nycvar.YSQ.7.76.1911211023470.11913@xnncv>
+References: <20191115050620.21360-1-ppandit@redhat.com> <20191120023334.GA24617@oak.ozlabs.ibm.com> <nycvar.YSQ.7.76.1911201625080.24911@xnncv> <20191120214119.GA12722@blackberry>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <nycvar.YSQ.7.76.1911201625080.24911@xnncv>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: _IeSMIl9PlW7GFhP47eI9Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Nov 20, 2019 at 04:30:32PM +0530, P J P wrote:
-> +-- On Wed, 20 Nov 2019, Paul Mackerras wrote --+
-> | Still not right, I'm afraid, since it could leave src->output set to
-> | 3, which would lead to an out-of-bounds array access.  I think it
-> | needs to be
-> 
-> ===
-> #include <stdio.h>
-> 
-> int
-> main (int argc, char *argv[])
-> {   
->     int i = 0;
-> 
->     for (i = 0; i < 1024; i++) {
->         printf ("%d: %d\n", i, i % 0x3);
->     }
-> 
->     return 0;
-> }
-> 
-> -> https://paste.centos.org/view/fb14b3cf
-> ===
-> 
-> It does not seem to set it to 0x3. When a no is divisible by 0x3, 
-> 'src->output' will be set to zero(0).
+  Hello Paul,
 
-You're right, I misread the '%' as '&'.
++-- On Thu, 21 Nov 2019, Paul Mackerras wrote --+
+| > It does not seem to set it to 0x3. When a no is divisible by 0x3,=20
+| > 'src->output' will be set to zero(0).
+|=20
+| You're right, I misread the '%' as '&'.
 
-Paul.
+Considering E500 is mostly used for SoC/Embedded systems. It is not clear i=
+f=20
+this issue can be misused from a guest running on PPC E500 platform.
+
+...wdyt?
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+
