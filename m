@@ -2,138 +2,101 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C07910A3FB
-	for <lists+kvm-ppc@lfdr.de>; Tue, 26 Nov 2019 19:14:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EDBA10A69F
+	for <lists+kvm-ppc@lfdr.de>; Tue, 26 Nov 2019 23:36:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725990AbfKZSOH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 26 Nov 2019 13:14:07 -0500
-Received: from mga01.intel.com ([192.55.52.88]:35839 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725870AbfKZSOH (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 26 Nov 2019 13:14:07 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Nov 2019 10:14:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,246,1571727600"; 
-   d="scan'208";a="211493575"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga006.jf.intel.com with ESMTP; 26 Nov 2019 10:14:06 -0800
-Date:   Tue, 26 Nov 2019 10:14:06 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Leonardo Bras <leonardo@linux.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paul Mackerras <paulus@ozlabs.org>,
+        id S1726504AbfKZWg5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 26 Nov 2019 17:36:57 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27598 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726232AbfKZWg5 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 Nov 2019 17:36:57 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAQMX26s057546;
+        Tue, 26 Nov 2019 17:36:43 -0500
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2whcxpr31n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Nov 2019 17:36:42 -0500
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xAQMYrGQ013272;
+        Tue, 26 Nov 2019 22:36:41 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma04wdc.us.ibm.com with ESMTP id 2wevd77a5d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Nov 2019 22:36:41 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAQMafvx55116208
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Nov 2019 22:36:41 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 590C3AC05B;
+        Tue, 26 Nov 2019 22:36:41 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3C769AC060;
+        Tue, 26 Nov 2019 22:36:40 +0000 (GMT)
+Received: from LeoBras.aus.stglabs.ibm.com (unknown [9.18.235.137])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 26 Nov 2019 22:36:40 +0000 (GMT)
+From:   Leonardo Bras <leonardo@linux.ibm.com>
+To:     Paul Mackerras <paulus@ozlabs.org>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH 1/1] powerpc/kvm/book3s: Fixes possible 'use after
- release' of kvm
-Message-ID: <20191126181406.GC22233@linux.intel.com>
-References: <20191126175212.377171-1-leonardo@linux.ibm.com>
+        Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Leonardo Bras <leonardo@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/2] Replace current->mm by kvm->mm on powerpc/kvm
+Date:   Tue, 26 Nov 2019 19:36:29 -0300
+Message-Id: <20191126223631.389779-1-leonardo@linux.ibm.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191126175212.377171-1-leonardo@linux.ibm.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-26_07:2019-11-26,2019-11-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ suspectscore=2 spamscore=0 phishscore=0 mlxlogscore=606 bulkscore=0
+ priorityscore=1501 impostorscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911260191
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Nov 26, 2019 at 02:52:12PM -0300, Leonardo Bras wrote:
-> Fixes a possible 'use after free' of kvm variable.
-> It does use mutex_unlock(&kvm->lock) after possible freeing a variable
-> with kvm_put_kvm(kvm).
+Replace current->mm by kvm->mm on powerpc/kvm
 
-Moving the calls to kvm_put_kvm() to the end of the functions doesn't
-actually fix a use-after-free.  In these flows, the reference being
-released is a borrowed reference that KVM takes on behalf of the entity it
-is creating, e.g. device, vcpu, or spapr tce.  The caller of these create
-helpers must also hold its own reference to @kvm on top of the borrowed
-reference, i.e. these kvm_put_kvm() calls will never free @kvm (assuming
-there are no refcounting bugs elsewhere in KVM).
+By replacing, we would reduce the use of 'global' current on code,
+relying more in the contents of kvm struct.
 
-If one these kvm_put_kvm() calls did unexpectedly free @kvm (due to a bug
-somewhere else), KVM would still hit a use-after-free scenario as the
-caller still thinks @kvm is valid.  Currently, this would only happen on a
-subsequent ioctl() on the caller's file descriptor (which holds a pointer
-to @kvm), as the callers of these functions don't directly dereference
-@kvm after the functions return.  But, not deferencing @kvm isn't deliberate
-or functionally required, it's just how the code happens to be written.
+On code, I found that in kvm_create_vm() there is:
+kvm->mm = current->mm;
 
-The intent of adding kvm_put_kvm_no_destroy() was primarily to document
-that under no circumstance should the to-be-put reference be the *last*
-reference to @kvm.  Moving the call to kvm_put_kvm{_no_destroy}() doesn't
-change that
+And that on every kvm_*_ioctl we have tests like that:
+if (kvm->mm != current->mm)
+        return -EIO;
 
-> Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
-> ---
->  arch/powerpc/kvm/book3s_64_vio.c | 3 +--
->  virt/kvm/kvm_main.c              | 8 ++++----
->  2 files changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-> index 5834db0a54c6..a402ead833b6 100644
-> --- a/arch/powerpc/kvm/book3s_64_vio.c
-> +++ b/arch/powerpc/kvm/book3s_64_vio.c
-> @@ -316,14 +316,13 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
->  
->  	if (ret >= 0)
->  		list_add_rcu(&stt->list, &kvm->arch.spapr_tce_tables);
-> -	else
-> -		kvm_put_kvm(kvm);
->  
->  	mutex_unlock(&kvm->lock);
->  
->  	if (ret >= 0)
->  		return ret;
->  
-> +	kvm_put_kvm(kvm);
->  	kfree(stt);
->   fail_acct:
->  	account_locked_vm(current->mm, kvmppc_stt_pages(npages), false);
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 13efc291b1c7..f37089b60d09 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2744,10 +2744,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->  	/* Now it's all set up, let userspace reach it */
->  	kvm_get_kvm(kvm);
->  	r = create_vcpu_fd(vcpu);
-> -	if (r < 0) {
-> -		kvm_put_kvm(kvm);
-> +	if (r < 0)
->  		goto unlock_vcpu_destroy;
-> -	}
->  
->  	kvm->vcpus[atomic_read(&kvm->online_vcpus)] = vcpu;
->  
-> @@ -2771,6 +2769,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->  	mutex_lock(&kvm->lock);
->  	kvm->created_vcpus--;
->  	mutex_unlock(&kvm->lock);
-> +	if (r < 0)
-> +		kvm_put_kvm(kvm);
->  	return r;
->  }
->  
-> @@ -3183,10 +3183,10 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
->  	kvm_get_kvm(kvm);
->  	ret = anon_inode_getfd(ops->name, &kvm_device_fops, dev, O_RDWR | O_CLOEXEC);
->  	if (ret < 0) {
-> -		kvm_put_kvm(kvm);
->  		mutex_lock(&kvm->lock);
->  		list_del(&dev->vm_node);
->  		mutex_unlock(&kvm->lock);
-> +		kvm_put_kvm(kvm);
->  		ops->destroy(dev);
->  		return ret;
->  	}
-> -- 
-> 2.23.0
-> 
+So this change would be safe.
+
+---
+Changes since v2:
+- Rebased on torvalds/master and updated the remaining patches.
+
+Changes since v1:
+- Fixes possible 'use after free' on kvm_spapr_tce_release (from v1)
+- Fixes possible 'use after free' on kvm_vm_ioctl_create_spapr_tce
+- Fixes undeclared variable error
+
+
+Leonardo Bras (2):
+  powerpc/kvm/book3s: Replace current->mm by kvm->mm
+  powerpc/kvm/book3e: Replace current->mm by kvm->mm
+
+ arch/powerpc/kvm/book3s_64_mmu_hv.c |  4 ++--
+ arch/powerpc/kvm/book3s_64_vio.c    | 10 ++++++----
+ arch/powerpc/kvm/book3s_hv.c        | 10 +++++-----
+ arch/powerpc/kvm/booke.c            |  2 +-
+ 4 files changed, 14 insertions(+), 12 deletions(-)
+
+-- 
+2.23.0
+
