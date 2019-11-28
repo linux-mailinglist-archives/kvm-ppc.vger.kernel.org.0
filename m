@@ -2,139 +2,107 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9953310CDA4
-	for <lists+kvm-ppc@lfdr.de>; Thu, 28 Nov 2019 18:16:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D828910CFF2
+	for <lists+kvm-ppc@lfdr.de>; Fri, 29 Nov 2019 00:25:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726656AbfK1RQW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 28 Nov 2019 12:16:22 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60758 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726587AbfK1RQW (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 28 Nov 2019 12:16:22 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xASHCG5O189865;
-        Thu, 28 Nov 2019 12:16:08 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wjah6rh8a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Nov 2019 12:16:08 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xASHCGQe189854;
-        Thu, 28 Nov 2019 12:16:07 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wjah6rh7u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Nov 2019 12:16:07 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xASHFa3l000649;
-        Thu, 28 Nov 2019 17:16:06 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma03dal.us.ibm.com with ESMTP id 2wevd7b1j5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Nov 2019 17:16:06 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xASHG5og32833932
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Nov 2019 17:16:05 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4ECD7BE053;
-        Thu, 28 Nov 2019 17:16:05 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 626A6BE04F;
-        Thu, 28 Nov 2019 17:16:03 +0000 (GMT)
-Received: from leobras.br.ibm.com (unknown [9.18.235.137])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Nov 2019 17:16:03 +0000 (GMT)
-Message-ID: <263e73be1047014ad3b6c0ae28d57db4b9dea970.camel@linux.ibm.com>
-Subject: Re: [PATCH 1/1] powerpc/kvm/book3s: Fixes possible 'use after
- release' of kvm
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Date:   Thu, 28 Nov 2019 14:15:59 -0300
-In-Reply-To: <f3750cf8-88fc-cae7-1cfb-cb4b86b44704@redhat.com>
-References: <20191126175212.377171-1-leonardo@linux.ibm.com>
-         <f3750cf8-88fc-cae7-1cfb-cb4b86b44704@redhat.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-l7jjVAuSfdlX1zRYI3pK"
-User-Agent: Evolution 3.34.1 (3.34.1-1.fc31) 
+        id S1726648AbfK1XZf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 28 Nov 2019 18:25:35 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51507 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726653AbfK1XZe (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 28 Nov 2019 18:25:34 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 47PDJq27m4z9sR2; Fri, 29 Nov 2019 10:25:31 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1574983531; bh=K3rUI3oKvNc9LFGK8LZbyA4UxPK1ZJoyUWkTY87H/ik=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WyMBBKeJv/k/CHoDeakagEbM8YYsaz919gFs2XU5OSL0FYebH4r7KtDuVVajxaDRO
+         yUyASs6jPL4YcliuQUGTaSgK3EvHVpZVkPmS6pVcjT779Ss0cGp9ZD+Lp9tbgwLcyT
+         19+5fVSkZLHFKDPOUB2SXFEIy+JfjWCY/PolSluVbb69LK8j1tAuQU6S8wA8e6ZhSG
+         lPg8aBeEX6kPw0bJPma410yHfo6f7NP/MMIWHlqs9h5tYNdAV4oW7a44eVCmnmgdZs
+         OaBm+wmIdefUeNQAjDlctLGfvhpt7vi9nVdrH8x5vJOaUo0gEjHekYE3OODhwuyvQ6
+         gcntLNyW3149w==
+Date:   Fri, 29 Nov 2019 10:25:28 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+Subject: [GIT PULL v2] Please pull my kvm-ppc-uvmem-5.5-2 tag
+Message-ID: <20191128232528.GA12171@oak.ozlabs.ibm.com>
+References: <20191126052455.GA2922@oak.ozlabs.ibm.com>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-28_05:2019-11-28,2019-11-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- mlxscore=0 suspectscore=0 impostorscore=0 clxscore=1015 bulkscore=0
- adultscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911280146
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191126052455.GA2922@oak.ozlabs.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Paolo,
 
---=-l7jjVAuSfdlX1zRYI3pK
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Bharata has corrected the issue identified by Hugh Dickins, so please
+do a pull from my kvm-ppc-uvmem-5.5-2 tag.
 
-On Wed, 2019-11-27 at 17:40 +0100, Paolo Bonzini wrote:
-> > diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s=
-_64_vio.c
-> > index 5834db0a54c6..a402ead833b6 100644
-> > --- a/arch/powerpc/kvm/book3s_64_vio.c
-> > +++ b/arch/powerpc/kvm/book3s_64_vio.c
-> > @@ -316,14 +316,13 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kv=
-m,
-> >  =20
-> >        if (ret >=3D 0)
-> >                list_add_rcu(&stt->list, &kvm->arch.spapr_tce_tables);
-> > -     else
-> > -             kvm_put_kvm(kvm);
-> >  =20
-> >        mutex_unlock(&kvm->lock);
-> >  =20
-> >        if (ret >=3D 0)
-> >                return ret;
-> >  =20
-> > +     kvm_put_kvm(kvm);
-> >        kfree(stt);
-> >    fail_acct:
-> >        account_locked_vm(current->mm, kvmppc_stt_pages(npages), false);
+This adds code to manage the movement of pages for a secure KVM guest
+between normal memory managed by the host kernel and secure memory
+managed by the ultravisor, on Power systems with Protected Execution
+Facility hardware and firmware.  Secure memory is not accessible to
+the host kernel and is represented as device memory using the
+ZONE_DEVICE facility.
 
-Paul, do you think this change is still valid as it 'makes the code
-clearer', as said by Paolo before? I would write a new commit message
-to match the change.
+Thanks,
+Paul.
 
-Best regards,
-Leonardo
+The following changes since commit 96710247298df52a4b8150a62a6fe87083093ff3:
 
---=-l7jjVAuSfdlX1zRYI3pK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+  Merge tag 'kvm-ppc-next-5.5-2' of git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc into HEAD (2019-11-25 11:29:05 +0100)
 
------BEGIN PGP SIGNATURE-----
+are available in the Git repository at:
 
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl3gAM8ACgkQlQYWtz9S
-ttTDJg//eBwp87AJa/nFXJRNohYve3mIdddUz+1Er3k4cXhuW3HWbrickBI+w+GM
-5s3kXIywUHeAEPFuaqhCxDvM3YHf9cXbKUSO+vYipwnukAAx6xlrQA8squ0CuKKm
-Njbz4qBf9crM7lkH9S8vEFTvC46dUrClfPcdvQTPw0jPCknIPzpW9RdwjbJUC7q/
-Woc0XfHhmvgwMHKI3Q1e7FEDIxYKZHDbvGhI2RN/+ROIvnsLcx/kdzrNE0LyhKfj
-hCfCfQ0i5LZwmUMh7bdGVb8qxuItuEMifrWZWjq0tly/KE0/1IrvRzWLG6uW4sTF
-gLRskMN2TQ3pAKHgTzqanYYkkBqh2VUTcPh6beVQP4qnSMzuEMR+AxA08NO1m2HQ
-s7l1GSiAVI+ae72YMUA8jcjoxnrcxKB+R5S39ZEXpoxoIsfYrx3QAiaBo2CyOrZL
-vD77YCthDMQ8Js4dINh4MMRgf0m95Pn4pD2BX5nD1L0NHHtD2paEayTapmBStaPR
-pBU9oTtajHcV7Fpo4Hq29Vj1Zl+Nbj101CnJknCoLy/7xT3Z5MnVHw3lYBAoN+hK
-sDG/XCfkWQ9+YkGda3LTjW2CxaTXHvpi2Y2BO2iHyULEZUZ+t8zyutd1v0pc6BiV
-lxjBZ9fbmQTQVOqWdueea85C7HVz/p7dohqQnwVLmCuMzCwB+cQ=
-=Kgb4
------END PGP SIGNATURE-----
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-uvmem-5.5-2
 
---=-l7jjVAuSfdlX1zRYI3pK--
+for you to fetch changes up to 013a53f2d25a9fa9b9e1f70f5baa3f56e3454052:
 
+  powerpc: Ultravisor: Add PPC_UV config option (2019-11-28 17:02:40 +1100)
+
+----------------------------------------------------------------
+KVM: Add support for secure guests under the Protected Execution
+Framework (PEF) Ultravisor on POWER.
+
+This enables secure memory to be represented as device memory,
+which provides a way for the host to keep track of which pages of a
+secure guest have been moved into secure memory managed by the
+ultravisor and are no longer accessible by the host, and manage
+movement of pages between secure and normal memory.
+
+----------------------------------------------------------------
+Anshuman Khandual (1):
+      powerpc: Ultravisor: Add PPC_UV config option
+
+Bharata B Rao (6):
+      mm: ksm: Export ksm_madvise()
+      KVM: PPC: Book3S HV: Support for running secure guests
+      KVM: PPC: Book3S HV: Shared pages support for secure guests
+      KVM: PPC: Book3S HV: Radix changes for secure guest
+      KVM: PPC: Book3S HV: Handle memory plug/unplug to secure VM
+      KVM: PPC: Book3S HV: Support reset of secure guest
+
+ Documentation/virt/kvm/api.txt              |  18 +
+ arch/powerpc/Kconfig                        |  17 +
+ arch/powerpc/include/asm/hvcall.h           |   9 +
+ arch/powerpc/include/asm/kvm_book3s_uvmem.h |  74 +++
+ arch/powerpc/include/asm/kvm_host.h         |   6 +
+ arch/powerpc/include/asm/kvm_ppc.h          |   1 +
+ arch/powerpc/include/asm/ultravisor-api.h   |   6 +
+ arch/powerpc/include/asm/ultravisor.h       |  36 ++
+ arch/powerpc/kvm/Makefile                   |   3 +
+ arch/powerpc/kvm/book3s_64_mmu_radix.c      |  25 +
+ arch/powerpc/kvm/book3s_hv.c                | 143 +++++
+ arch/powerpc/kvm/book3s_hv_uvmem.c          | 785 ++++++++++++++++++++++++++++
+ arch/powerpc/kvm/powerpc.c                  |  12 +
+ include/uapi/linux/kvm.h                    |   1 +
+ mm/ksm.c                                    |   1 +
+ 15 files changed, 1137 insertions(+)
+ create mode 100644 arch/powerpc/include/asm/kvm_book3s_uvmem.h
+ create mode 100644 arch/powerpc/kvm/book3s_hv_uvmem.c
