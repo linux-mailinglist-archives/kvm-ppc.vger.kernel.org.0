@@ -2,74 +2,67 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD5C610CCD2
-	for <lists+kvm-ppc@lfdr.de>; Thu, 28 Nov 2019 17:29:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9953310CDA4
+	for <lists+kvm-ppc@lfdr.de>; Thu, 28 Nov 2019 18:16:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726520AbfK1Q3K (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 28 Nov 2019 11:29:10 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57682 "EHLO
+        id S1726656AbfK1RQW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 28 Nov 2019 12:16:22 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60758 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726510AbfK1Q3K (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 28 Nov 2019 11:29:10 -0500
+        by vger.kernel.org with ESMTP id S1726587AbfK1RQW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 28 Nov 2019 12:16:22 -0500
 Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xASGQeHX168002;
-        Thu, 28 Nov 2019 11:29:05 -0500
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xASHCG5O189865;
+        Thu, 28 Nov 2019 12:16:08 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wjah6qc8g-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wjah6rh8a-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Nov 2019 11:29:05 -0500
+        Thu, 28 Nov 2019 12:16:08 -0500
 Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xASGQvHX169335;
-        Thu, 28 Nov 2019 11:29:04 -0500
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wjah6qc80-1
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xASHCGQe189854;
+        Thu, 28 Nov 2019 12:16:07 -0500
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wjah6rh7u-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Nov 2019 11:29:04 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xASGQgIc010162;
-        Thu, 28 Nov 2019 16:29:03 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma03wdc.us.ibm.com with ESMTP id 2wevd6xvqn-1
+        Thu, 28 Nov 2019 12:16:07 -0500
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xASHFa3l000649;
+        Thu, 28 Nov 2019 17:16:06 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma03dal.us.ibm.com with ESMTP id 2wevd7b1j5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Nov 2019 16:29:03 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xASGT28545744420
+        Thu, 28 Nov 2019 17:16:06 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xASHG5og32833932
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Nov 2019 16:29:02 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 80291AC066;
-        Thu, 28 Nov 2019 16:29:02 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 62BA5AC05B;
-        Thu, 28 Nov 2019 16:29:01 +0000 (GMT)
+        Thu, 28 Nov 2019 17:16:05 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4ECD7BE053;
+        Thu, 28 Nov 2019 17:16:05 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 626A6BE04F;
+        Thu, 28 Nov 2019 17:16:03 +0000 (GMT)
 Received: from leobras.br.ibm.com (unknown [9.18.235.137])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Nov 2019 16:29:01 +0000 (GMT)
-Message-ID: <45e643bce58e0f7c9646bb6c548c4e9f026f1fa8.camel@linux.ibm.com>
-Subject: Re: [PATCH] KVM: Add separate helper for putting borrowed reference
- to kvm
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 28 Nov 2019 17:16:03 +0000 (GMT)
+Message-ID: <263e73be1047014ad3b6c0ae28d57db4b9dea970.camel@linux.ibm.com>
+Subject: Re: [PATCH 1/1] powerpc/kvm/book3s: Fixes possible 'use after
+ release' of kvm
 From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Thu, 28 Nov 2019 13:29:00 -0300
-In-Reply-To: <20191128010001.GJ22227@linux.intel.com>
-References: <de313d549a5ae773aad6bbf04c20b395bea7811f.camel@linux.ibm.com>
-         <20191126171416.GA22233@linux.intel.com>
-         <0009c6c1bb635098fa68cb6db6414634555039fe.camel@linux.ibm.com>
-         <e1a4218f-2a70-3de3-1403-dbebf8a8abdf@redhat.com>
-         <bfa563e6a584bd85d3abe953ca088281dc0e167b.camel@linux.ibm.com>
-         <6beeff56-7676-5dfd-a578-1732730f8963@redhat.com>
-         <adcfe1b4c5b36b3c398a5d456da9543e0390cba3.camel@linux.ibm.com>
-         <20191127194757.GI22227@linux.intel.com>
-         <103b290917221baa10194c27c8e35b9803f3cafa.camel@linux.ibm.com>
-         <41fe3962ce1f1d5f61db5f5c28584f68ad66b2b1.camel@linux.ibm.com>
-         <20191128010001.GJ22227@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Date:   Thu, 28 Nov 2019 14:15:59 -0300
+In-Reply-To: <f3750cf8-88fc-cae7-1cfb-cb4b86b44704@redhat.com>
+References: <20191126175212.377171-1-leonardo@linux.ibm.com>
+         <f3750cf8-88fc-cae7-1cfb-cb4b86b44704@redhat.com>
 Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-lkoTnqA1IktRvD8hYwr4"
+        protocol="application/pgp-signature"; boundary="=-l7jjVAuSfdlX1zRYI3pK"
 User-Agent: Evolution 3.34.1 (3.34.1-1.fc31) 
 MIME-Version: 1.0
 X-TM-AS-GCONF: 00
@@ -77,63 +70,71 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-28_05:2019-11-28,2019-11-28 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
  mlxscore=0 suspectscore=0 impostorscore=0 clxscore=1015 bulkscore=0
- adultscore=0 priorityscore=1501 mlxlogscore=997 phishscore=0
+ adultscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
  lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911280138
+ engine=8.12.0-1910280000 definitions=main-1911280146
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
---=-lkoTnqA1IktRvD8hYwr4
+--=-l7jjVAuSfdlX1zRYI3pK
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2019-11-27 at 17:00 -0800, Sean Christopherson wrote:
-> > Sorry, I missed some information on above example.=20
-> > Suppose on that example that the reorder changes take place so that
-> > kvm_put_kvm{,_no_destroy}() always happens after the last usage of kvm
-> > (in the same syscall, let's say).
->=20
-> That can't happen, because the ioctl() holds a reference to KVM via its
-> file descriptor for /dev/kvm, and ioctl() in turn prevents the fd from
-> being closed.
->=20
-> > Before T1 and T2, refcount =3D 1;
->=20
-> This is what's impossible.  T1 must have an existing reference to get
-> into the ioctl(), and that reference cannot be dropped until the ioctl()
-> completes (and by completes I mean returns to userspace). Assuming no
-> other bugs, i.e. T2 has its own reference, then refcount >=3D 2.
->=20
+On Wed, 2019-11-27 at 17:40 +0100, Paolo Bonzini wrote:
+> > diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s=
+_64_vio.c
+> > index 5834db0a54c6..a402ead833b6 100644
+> > --- a/arch/powerpc/kvm/book3s_64_vio.c
+> > +++ b/arch/powerpc/kvm/book3s_64_vio.c
+> > @@ -316,14 +316,13 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kv=
+m,
+> >  =20
+> >        if (ret >=3D 0)
+> >                list_add_rcu(&stt->list, &kvm->arch.spapr_tce_tables);
+> > -     else
+> > -             kvm_put_kvm(kvm);
+> >  =20
+> >        mutex_unlock(&kvm->lock);
+> >  =20
+> >        if (ret >=3D 0)
+> >                return ret;
+> >  =20
+> > +     kvm_put_kvm(kvm);
+> >        kfree(stt);
+> >    fail_acct:
+> >        account_locked_vm(current->mm, kvmppc_stt_pages(npages), false);
 
-Thanks for explaining, I think I get it now.
+Paul, do you think this change is still valid as it 'makes the code
+clearer', as said by Paolo before? I would write a new commit message
+to match the change.
 
 Best regards,
-Leonardo Bras
+Leonardo
 
---=-lkoTnqA1IktRvD8hYwr4
+--=-l7jjVAuSfdlX1zRYI3pK
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 Content-Transfer-Encoding: 7bit
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl3f9cwACgkQlQYWtz9S
-ttQiShAAmAyXr/SVVcZnPHuqz3y4cJ53nMVktdEAtF8U0z3IdztHygSaR/fDLJh7
-l9gbD8FHe5Q5mm/cJ22GvZBpi1UJZfq0PZkc9X6h8laGCoBB3hZROkKTyPdeIxD2
-1OaisVXrjDi6F/Y9NgRfwhtYdja7MrDEXhzxfcvHf2wylukYIQ58AaZd2f/zgD/X
-1Br2XHdKZrKb59MUr4zjWr4v5mNn3Irt16MmdCeZeW5WKiPWvfNPgDSeJhsWWhvH
-TudyzCickYAn+uOu91BCwzX6oiKRhhWmacI7OB6fByypGaP36yLCxmfyzgIDAvsL
-BSS7eqCbVFN5x/fSqwHTfXobnTGiLLGJJAzRxsZ6pECitcEgDlyHVg4I3n1nmktV
-Dsvg2efxVwdhADXesl1d6G3UO51g0vkz4doRq2T+EvONdCp9zpjR6FmpjNQo3VVu
-jtCfKGayQA3stSSB8iPXllAQ1AhwfqApCmSlRciH5+st2C9GTqocEGWnrxbwAsx4
-+6ukeybJxv/bFE568gMvulVUIsLGxQi0Hm2TliyqxTKvhv6Fi8StnP+zo0koquuC
-IKk4KfpkMHpcwG39X3IYH0tTJW7NFZKR/FBrTN9D6CazZJLvB2RmUmX01C+1d+hq
-sEbfMtyt7TBruoiT4wrPTEV36FQN+nhKBLFzDH22GYT5xy3aPdQ=
-=/1KK
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl3gAM8ACgkQlQYWtz9S
+ttTDJg//eBwp87AJa/nFXJRNohYve3mIdddUz+1Er3k4cXhuW3HWbrickBI+w+GM
+5s3kXIywUHeAEPFuaqhCxDvM3YHf9cXbKUSO+vYipwnukAAx6xlrQA8squ0CuKKm
+Njbz4qBf9crM7lkH9S8vEFTvC46dUrClfPcdvQTPw0jPCknIPzpW9RdwjbJUC7q/
+Woc0XfHhmvgwMHKI3Q1e7FEDIxYKZHDbvGhI2RN/+ROIvnsLcx/kdzrNE0LyhKfj
+hCfCfQ0i5LZwmUMh7bdGVb8qxuItuEMifrWZWjq0tly/KE0/1IrvRzWLG6uW4sTF
+gLRskMN2TQ3pAKHgTzqanYYkkBqh2VUTcPh6beVQP4qnSMzuEMR+AxA08NO1m2HQ
+s7l1GSiAVI+ae72YMUA8jcjoxnrcxKB+R5S39ZEXpoxoIsfYrx3QAiaBo2CyOrZL
+vD77YCthDMQ8Js4dINh4MMRgf0m95Pn4pD2BX5nD1L0NHHtD2paEayTapmBStaPR
+pBU9oTtajHcV7Fpo4Hq29Vj1Zl+Nbj101CnJknCoLy/7xT3Z5MnVHw3lYBAoN+hK
+sDG/XCfkWQ9+YkGda3LTjW2CxaTXHvpi2Y2BO2iHyULEZUZ+t8zyutd1v0pc6BiV
+lxjBZ9fbmQTQVOqWdueea85C7HVz/p7dohqQnwVLmCuMzCwB+cQ=
+=Kgb4
 -----END PGP SIGNATURE-----
 
---=-lkoTnqA1IktRvD8hYwr4--
+--=-l7jjVAuSfdlX1zRYI3pK--
 
