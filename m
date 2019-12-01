@@ -2,80 +2,89 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DBBD10D990
-	for <lists+kvm-ppc@lfdr.de>; Fri, 29 Nov 2019 19:20:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AFEF10E2ED
+	for <lists+kvm-ppc@lfdr.de>; Sun,  1 Dec 2019 19:17:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726985AbfK2SUc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 29 Nov 2019 13:20:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43573 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727120AbfK2SUc (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 29 Nov 2019 13:20:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575051631;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3RzJvSlB/rfjy8jfdIVuXjQ5PpaWo8u1a5rnrJhVFPI=;
-        b=YiTHj+ABOay1NfI2wARJGmdZXWOGAkJ0sXkcXOzF4PyJjB2zwNpK9hHlY3ZPlSeO4y1aTx
-        c9nq+YAF7mkklMi+1lNXKhIqMm+iXiyA+CQ2Bs4vsY0wTLA1xsaZhot2EcbeY90yh2SU8F
-        Va8DTBTp1hMo28E0BAEH0eiuy30wlHE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-lGvlDXanPeOFcMQip0PuqA-1; Fri, 29 Nov 2019 13:20:29 -0500
-Received: by mail-wr1-f69.google.com with SMTP id q6so15947118wrv.11
-        for <kvm-ppc@vger.kernel.org>; Fri, 29 Nov 2019 10:20:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3RzJvSlB/rfjy8jfdIVuXjQ5PpaWo8u1a5rnrJhVFPI=;
-        b=QTvxg7yQKd0bcibnle7JZAYnHCIVMNq40qrOpoMyt8Aw0sPPbDEi8kpGLZq4EdSilt
-         dTVVZthYMgUFRUGCRC0jK3emaTq56DB8vEoT8lMANP4qyPqyGbXfAEjye+AFNx1S4kqQ
-         hfDylWQbbcPWGf+AY+3xzb9Ab7x6E6XHBKXC9PFE09g1/J5crLb4nRwR+KPA3N+Hryks
-         4yTYNOtH2PZ1wveOq4qMwfKQoA/BIVepgL9xNng4ObdKXmhqv9GLzvzKykAYYINA4DVM
-         aAet5LwH8E7GoMGtF/zUlu8HRWiw22IRGZa6gfi5N5wL5CB8bAv7V9koDoqdDMIMO3aY
-         Zbrw==
-X-Gm-Message-State: APjAAAU9b/Rc8F3G0Hj2tan94/mv7bu3RJdPrVk5lZ2GlHTA9Sb9D+eP
-        cm3KDSy2/tNMcwc5Ru57nbAhI5aTDBVpO9bfpO/pFDK/61JJ9qtY65pzv1qm7QrJe0+0U9QQYML
-        RCJ+iPBUIkwclryFqQQ==
-X-Received: by 2002:a05:6000:12c9:: with SMTP id l9mr21563820wrx.304.1575051628226;
-        Fri, 29 Nov 2019 10:20:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx8E3ISRX1T2z8HQmp+PdaIrBNIJ9SYct+UrLVrq0/rqXXkSpqXcyBLTRTYHsfQ5TzYkCty1A==
-X-Received: by 2002:a05:6000:12c9:: with SMTP id l9mr21563796wrx.304.1575051627946;
-        Fri, 29 Nov 2019 10:20:27 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:56e1:adff:fed9:caf0? ([2001:b07:6468:f312:56e1:adff:fed9:caf0])
-        by smtp.gmail.com with ESMTPSA id x13sm13853120wmc.19.2019.11.29.10.20.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Nov 2019 10:20:27 -0800 (PST)
-Subject: Re: [GIT PULL v2] Please pull my kvm-ppc-uvmem-5.5-2 tag
-To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
-References: <20191126052455.GA2922@oak.ozlabs.ibm.com>
- <20191128232528.GA12171@oak.ozlabs.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <91f667ee-0464-35f2-31cd-0bc661bf9edc@redhat.com>
-Date:   Fri, 29 Nov 2019 19:20:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1727308AbfLASRW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 1 Dec 2019 13:17:22 -0500
+Received: from mtax.cdmx.gob.mx ([187.141.35.197]:15919 "EHLO mtax.cdmx.gob.mx"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726155AbfLASRW (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sun, 1 Dec 2019 13:17:22 -0500
+X-Greylist: delayed 6471 seconds by postgrey-1.27 at vger.kernel.org; Sun, 01 Dec 2019 13:17:20 EST
+X-NAI-Header: Modified by McAfee Email Gateway (4500)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cdmx.gob.mx; s=72359050-3965-11E6-920A-0192F7A2F08E;
+        t=1575217586; h=DKIM-Filter:X-Virus-Scanned:
+         Content-Type:MIME-Version:Content-Transfer-Encoding:
+         Content-Description:Subject:To:From:Date:Message-Id:
+         X-AnalysisOut:X-AnalysisOut:X-AnalysisOut:
+         X-AnalysisOut:X-AnalysisOut:X-SAAS-TrackingID:
+         X-NAI-Spam-Flag:X-NAI-Spam-Threshold:X-NAI-Spam-Score:
+         X-NAI-Spam-Rules:X-NAI-Spam-Version; bh=M
+        8rWdUYQ57RAYAgTWJQ4Rsch0kO0UXllaAVDzocOs4
+        8=; b=KDl8gEdOv3NyQCy+cDv7q8gf6KymTejyHcTWOxoiIXbP
+        Rg47Dto0WISLkuY26V7CHdq6rGSBA3e5oL/D8CaqLWcIx9qHpr
+        NdVTxLWL/47b6AiysDqKzWNdD/Uq0Ez2gftZoquYKCzmWnBI05
+        SM5wMYmRXpSGGbdhJLxQeFbM2FA=
+Received: from cdmx.gob.mx (correo.cdmx.gob.mx [10.250.108.150]) by mtax.cdmx.gob.mx with smtp
+        (TLS: TLSv1/SSLv3,256bits,ECDHE-RSA-AES256-GCM-SHA384)
+         id 217f_5f9e_2116886c_8a17_4e99_a950_4ee8f719aa7e;
+        Sun, 01 Dec 2019 10:26:25 -0600
+Received: from localhost (localhost [127.0.0.1])
+        by cdmx.gob.mx (Postfix) with ESMTP id 0DD3E1E24EF;
+        Sun,  1 Dec 2019 10:18:12 -0600 (CST)
+Received: from cdmx.gob.mx ([127.0.0.1])
+        by localhost (cdmx.gob.mx [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id TLIIdhXNbJrw; Sun,  1 Dec 2019 10:18:11 -0600 (CST)
+Received: from localhost (localhost [127.0.0.1])
+        by cdmx.gob.mx (Postfix) with ESMTP id 139AD1E21C2;
+        Sun,  1 Dec 2019 10:13:00 -0600 (CST)
+DKIM-Filter: OpenDKIM Filter v2.9.2 cdmx.gob.mx 139AD1E21C2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cdmx.gob.mx;
+        s=72359050-3965-11E6-920A-0192F7A2F08E; t=1575216780;
+        bh=M8rWdUYQ57RAYAgTWJQ4Rsch0kO0UXllaAVDzocOs48=;
+        h=Content-Type:MIME-Version:Content-Transfer-Encoding:Subject:To:
+         From:Date:Message-Id;
+        b=RU+ipuaWBY+ulpWxzrywtxbkOeYQKQYbR85oY4HYdjDOLKU0TUebMrQteH7NqiV46
+         7k7DrRLZj7nOb4QPRwTVDyoJZvMpNuDtI3d42XhmUiXXFtrz4is2Y0tTpTjWurlf2x
+         ZngEHYACarU4PnCmI1iainz4bSfhvFD4F7zX8Fjk=
+X-Virus-Scanned: amavisd-new at cdmx.gob.mx
+Received: from cdmx.gob.mx ([127.0.0.1])
+        by localhost (cdmx.gob.mx [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id UQIWVnI1JI1p; Sun,  1 Dec 2019 10:13:00 -0600 (CST)
+Received: from [192.168.0.104] (unknown [188.125.168.160])
+        by cdmx.gob.mx (Postfix) with ESMTPSA id 7CA6C1E27DD;
+        Sun,  1 Dec 2019 10:04:21 -0600 (CST)
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <20191128232528.GA12171@oak.ozlabs.ibm.com>
-Content-Language: en-US
-X-MC-Unique: lGvlDXanPeOFcMQip0PuqA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: Congratulations
+To:     Recipients <aac-styfe@cdmx.gob.mx>
+From:   "Bishop Johnr" <aac-styfe@cdmx.gob.mx>
+Date:   Sun, 01 Dec 2019 17:04:14 +0100
+Message-Id: <20191201160421.7CA6C1E27DD@cdmx.gob.mx>
+X-AnalysisOut: [v=2.2 cv=R5pzIZZX c=1 sm=1 tr=0 p=6K-Ig8iNAUou4E5wYCEA:9 p]
+X-AnalysisOut: [=zRI05YRXt28A:10 a=T6zFoIZ12MK39YzkfxrL7A==:117 a=9152RP8M]
+X-AnalysisOut: [6GQqDhC/mI/QXQ==:17 a=8nJEP1OIZ-IA:10 a=pxVhFHJ0LMsA:10 a=]
+X-AnalysisOut: [pGLkceISAAAA:8 a=wPNLvfGTeEIA:10 a=M8O0W8wq6qAA:10 a=Ygvjr]
+X-AnalysisOut: [iKHvHXA2FhpO6d-:22]
+X-SAAS-TrackingID: 0b9e3ed5.0.72334550.00-2388.121910714.s12p02m001.mxlogic.net
+X-NAI-Spam-Flag: NO
+X-NAI-Spam-Threshold: 3
+X-NAI-Spam-Score: -5000
+X-NAI-Spam-Rules: 1 Rules triggered
+        WHITELISTED=-5000
+X-NAI-Spam-Version: 2.3.0.9418 : core <6686> : inlines <7165> : streams
+ <1840193> : uri <2949749>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 29/11/19 00:25, Paul Mackerras wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-uvmem-5.5-2
+Money was donated to you by Mr and Mrs Allen and Violet Large, just contact=
+ them with this email for more information =
 
-Pulled, thanks.
 
-Paolo
-
+EMail: allenandvioletlargeaward@gmail.com
