@@ -2,89 +2,186 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AFEF10E2ED
-	for <lists+kvm-ppc@lfdr.de>; Sun,  1 Dec 2019 19:17:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 901BF10E370
+	for <lists+kvm-ppc@lfdr.de>; Sun,  1 Dec 2019 21:25:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727308AbfLASRW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 1 Dec 2019 13:17:22 -0500
-Received: from mtax.cdmx.gob.mx ([187.141.35.197]:15919 "EHLO mtax.cdmx.gob.mx"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726155AbfLASRW (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sun, 1 Dec 2019 13:17:22 -0500
-X-Greylist: delayed 6471 seconds by postgrey-1.27 at vger.kernel.org; Sun, 01 Dec 2019 13:17:20 EST
-X-NAI-Header: Modified by McAfee Email Gateway (4500)
+        id S1726800AbfLAUZG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 1 Dec 2019 15:25:06 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:37906 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726519AbfLAUZG (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 1 Dec 2019 15:25:06 -0500
+Received: by mail-ot1-f67.google.com with SMTP id z25so29269677oti.5
+        for <kvm-ppc@vger.kernel.org>; Sun, 01 Dec 2019 12:25:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cdmx.gob.mx; s=72359050-3965-11E6-920A-0192F7A2F08E;
-        t=1575217586; h=DKIM-Filter:X-Virus-Scanned:
-         Content-Type:MIME-Version:Content-Transfer-Encoding:
-         Content-Description:Subject:To:From:Date:Message-Id:
-         X-AnalysisOut:X-AnalysisOut:X-AnalysisOut:
-         X-AnalysisOut:X-AnalysisOut:X-SAAS-TrackingID:
-         X-NAI-Spam-Flag:X-NAI-Spam-Threshold:X-NAI-Spam-Score:
-         X-NAI-Spam-Rules:X-NAI-Spam-Version; bh=M
-        8rWdUYQ57RAYAgTWJQ4Rsch0kO0UXllaAVDzocOs4
-        8=; b=KDl8gEdOv3NyQCy+cDv7q8gf6KymTejyHcTWOxoiIXbP
-        Rg47Dto0WISLkuY26V7CHdq6rGSBA3e5oL/D8CaqLWcIx9qHpr
-        NdVTxLWL/47b6AiysDqKzWNdD/Uq0Ez2gftZoquYKCzmWnBI05
-        SM5wMYmRXpSGGbdhJLxQeFbM2FA=
-Received: from cdmx.gob.mx (correo.cdmx.gob.mx [10.250.108.150]) by mtax.cdmx.gob.mx with smtp
-        (TLS: TLSv1/SSLv3,256bits,ECDHE-RSA-AES256-GCM-SHA384)
-         id 217f_5f9e_2116886c_8a17_4e99_a950_4ee8f719aa7e;
-        Sun, 01 Dec 2019 10:26:25 -0600
-Received: from localhost (localhost [127.0.0.1])
-        by cdmx.gob.mx (Postfix) with ESMTP id 0DD3E1E24EF;
-        Sun,  1 Dec 2019 10:18:12 -0600 (CST)
-Received: from cdmx.gob.mx ([127.0.0.1])
-        by localhost (cdmx.gob.mx [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id TLIIdhXNbJrw; Sun,  1 Dec 2019 10:18:11 -0600 (CST)
-Received: from localhost (localhost [127.0.0.1])
-        by cdmx.gob.mx (Postfix) with ESMTP id 139AD1E21C2;
-        Sun,  1 Dec 2019 10:13:00 -0600 (CST)
-DKIM-Filter: OpenDKIM Filter v2.9.2 cdmx.gob.mx 139AD1E21C2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cdmx.gob.mx;
-        s=72359050-3965-11E6-920A-0192F7A2F08E; t=1575216780;
-        bh=M8rWdUYQ57RAYAgTWJQ4Rsch0kO0UXllaAVDzocOs48=;
-        h=Content-Type:MIME-Version:Content-Transfer-Encoding:Subject:To:
-         From:Date:Message-Id;
-        b=RU+ipuaWBY+ulpWxzrywtxbkOeYQKQYbR85oY4HYdjDOLKU0TUebMrQteH7NqiV46
-         7k7DrRLZj7nOb4QPRwTVDyoJZvMpNuDtI3d42XhmUiXXFtrz4is2Y0tTpTjWurlf2x
-         ZngEHYACarU4PnCmI1iainz4bSfhvFD4F7zX8Fjk=
-X-Virus-Scanned: amavisd-new at cdmx.gob.mx
-Received: from cdmx.gob.mx ([127.0.0.1])
-        by localhost (cdmx.gob.mx [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id UQIWVnI1JI1p; Sun,  1 Dec 2019 10:13:00 -0600 (CST)
-Received: from [192.168.0.104] (unknown [188.125.168.160])
-        by cdmx.gob.mx (Postfix) with ESMTPSA id 7CA6C1E27DD;
-        Sun,  1 Dec 2019 10:04:21 -0600 (CST)
-Content-Type: text/plain; charset="iso-8859-1"
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=I2Yj7WZ2eIVwURYWTRsAO1/HJqcoGDPFFh90G05uVz8=;
+        b=e5+HC7eJOsGBzcln7aLNMNBn17SkFrz5U9QjsFhZ/57uKHwF8+/NkDgMV2dr/dMgOl
+         dDY/fiuGIgvmp6dkQv06uTLpteR5VrkWQNcPheAlBG21Q8GM+bScfbvqr8fs1WrGVvpU
+         oeWLf0C3LwK1s3EyNDjXWVQU3jZV3lAUKoG6qxtXFs/75KuVHD3cifSDN7qAndu7z2EK
+         1OwET0lv1W7gwZfcIkej0uPqPF2jTL3ofI+AqzSWpj8EL1bj78Udp7delfgCuOFkA+VY
+         Nz17I4oZ3/NYbd9EtcjOBzWliSBtrj/wC+M20ld5u+zHJY0oarKARDGcH+ui5wTnHV3F
+         tvHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=I2Yj7WZ2eIVwURYWTRsAO1/HJqcoGDPFFh90G05uVz8=;
+        b=ndAo/Wne/hPj8ToHhD/82735uJJkMaw/g3T3ndifm/jbOZuVKg/nml/tjlFxD/QvDH
+         dWlc196pYyP0ahcDSER30otgHDyk8uj8Amt36cx1JJy+oyqz1WapRmMHXPEtqmAp0LHz
+         hzXTh2IkpPots9Rd1B2XYxN5i53VPB15PM+bzDB7rcff+XR94Q7jNOL67W0OL9N0dIrK
+         OHI3wV6yZEI8kmK4ljomB2fMnyKdQOgWqT1r9c/34pPJzAIyZgiolTolCCGts7YuVswk
+         Z8M7CeOcbhUGqTTOyQJU0QyY0uKy2x4fjjVyGEuzRPqDHeZEQ1Kz86K64w25DCSMuw4H
+         aXHg==
+X-Gm-Message-State: APjAAAXQ2jqdqn5NlSeywWZSuXTEb8gyHqDz8H+B++ZmfReCqxJ3iTEZ
+        DQ3k8X3U0fOJ2KSoiGoZGuIfkA==
+X-Google-Smtp-Source: APXvYqy3gEoj/BYRE+hfQFJKRq+lli+tF2ElHGDIgZhyLlcZAp823TGVvFyHVeUl1QExPaJaAGDOaA==
+X-Received: by 2002:a05:6830:20cf:: with SMTP id z15mr1710826otq.277.1575231904769;
+        Sun, 01 Dec 2019 12:25:04 -0800 (PST)
+Received: from eggly.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id l12sm10004554oth.76.2019.12.01.12.25.02
+        (version=TLS1 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Sun, 01 Dec 2019 12:25:03 -0800 (PST)
+Date:   Sun, 1 Dec 2019 12:24:50 -0800 (PST)
+From:   Hugh Dickins <hughd@google.com>
+X-X-Sender: hugh@eggly.anvils
+To:     Bharata B Rao <bharata@linux.ibm.com>
+cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-mm@kvack.org, paulus@au1.ibm.com,
+        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
+        cclaudio@linux.ibm.com, linuxram@us.ibm.com,
+        sukadev@linux.vnet.ibm.com, hch@lst.de,
+        Hugh Dickins <hughd@google.com>
+Subject: Re: [PATCH v11 0/7] KVM: PPC: Driver to manage pages of secure
+ guest
+In-Reply-To: <20191128050411.GF23438@in.ibm.com>
+Message-ID: <alpine.LSU.2.11.1912011214180.1410@eggly.anvils>
+References: <20191125030631.7716-1-bharata@linux.ibm.com> <20191128050411.GF23438@in.ibm.com>
+User-Agent: Alpine 2.11 (LSU 23 2013-08-11)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Congratulations
-To:     Recipients <aac-styfe@cdmx.gob.mx>
-From:   "Bishop Johnr" <aac-styfe@cdmx.gob.mx>
-Date:   Sun, 01 Dec 2019 17:04:14 +0100
-Message-Id: <20191201160421.7CA6C1E27DD@cdmx.gob.mx>
-X-AnalysisOut: [v=2.2 cv=R5pzIZZX c=1 sm=1 tr=0 p=6K-Ig8iNAUou4E5wYCEA:9 p]
-X-AnalysisOut: [=zRI05YRXt28A:10 a=T6zFoIZ12MK39YzkfxrL7A==:117 a=9152RP8M]
-X-AnalysisOut: [6GQqDhC/mI/QXQ==:17 a=8nJEP1OIZ-IA:10 a=pxVhFHJ0LMsA:10 a=]
-X-AnalysisOut: [pGLkceISAAAA:8 a=wPNLvfGTeEIA:10 a=M8O0W8wq6qAA:10 a=Ygvjr]
-X-AnalysisOut: [iKHvHXA2FhpO6d-:22]
-X-SAAS-TrackingID: 0b9e3ed5.0.72334550.00-2388.121910714.s12p02m001.mxlogic.net
-X-NAI-Spam-Flag: NO
-X-NAI-Spam-Threshold: 3
-X-NAI-Spam-Score: -5000
-X-NAI-Spam-Rules: 1 Rules triggered
-        WHITELISTED=-5000
-X-NAI-Spam-Version: 2.3.0.9418 : core <6686> : inlines <7165> : streams
- <1840193> : uri <2949749>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Money was donated to you by Mr and Mrs Allen and Violet Large, just contact=
- them with this email for more information =
+On Thu, 28 Nov 2019, Bharata B Rao wrote:
+> On Mon, Nov 25, 2019 at 08:36:24AM +0530, Bharata B Rao wrote:
+> > Hi,
+> > 
+> > This is the next version of the patchset that adds required support
+> > in the KVM hypervisor to run secure guests on PEF-enabled POWER platforms.
+> > 
+> 
+> Here is a fix for the issue Hugh identified with the usage of ksm_madvise()
+> in this patchset. It applies on top of this patchset.
 
+It looks correct to me, and I hope will not spoil your performance in any
+way that matters.  But I have to say, the patch would be so much clearer,
+if you just named your bool "downgraded" instead of "downgrade".
 
-EMail: allenandvioletlargeaward@gmail.com
+Hugh
+
+> ----
+> 
+> From 8a4d769bf4c61f921c79ce68923be3c403bd5862 Mon Sep 17 00:00:00 2001
+> From: Bharata B Rao <bharata@linux.ibm.com>
+> Date: Thu, 28 Nov 2019 09:31:54 +0530
+> Subject: [PATCH 1/1] KVM: PPC: Book3S HV: Take write mmap_sem when calling
+>  ksm_madvise
+> 
+> In order to prevent the device private pages (that correspond to
+> pages of secure guest) from participating in KSM merging, H_SVM_PAGE_IN
+> calls ksm_madvise() under read version of mmap_sem. However ksm_madvise()
+> needs to be under write lock, fix this.
+> 
+> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+> ---
+>  arch/powerpc/kvm/book3s_hv_uvmem.c | 29 ++++++++++++++++++++---------
+>  1 file changed, 20 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> index f24ac3cfb34c..2de264fc3156 100644
+> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> @@ -46,11 +46,10 @@
+>   *
+>   * Locking order
+>   *
+> - * 1. srcu_read_lock(&kvm->srcu) - Protects KVM memslots
+> - * 2. down_read(&kvm->mm->mmap_sem) - find_vma, migrate_vma_pages and helpers
+> - * 3. mutex_lock(&kvm->arch.uvmem_lock) - protects read/writes to uvmem slots
+> - *					  thus acting as sync-points
+> - *					  for page-in/out
+> + * 1. kvm->srcu - Protects KVM memslots
+> + * 2. kvm->mm->mmap_sem - find_vma, migrate_vma_pages and helpers, ksm_madvise
+> + * 3. kvm->arch.uvmem_lock - protects read/writes to uvmem slots thus acting
+> + *			     as sync-points for page-in/out
+>   */
+>  
+>  /*
+> @@ -344,7 +343,7 @@ static struct page *kvmppc_uvmem_get_page(unsigned long gpa, struct kvm *kvm)
+>  static int
+>  kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
+>  		   unsigned long end, unsigned long gpa, struct kvm *kvm,
+> -		   unsigned long page_shift)
+> +		   unsigned long page_shift, bool *downgrade)
+>  {
+>  	unsigned long src_pfn, dst_pfn = 0;
+>  	struct migrate_vma mig;
+> @@ -360,8 +359,15 @@ kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
+>  	mig.src = &src_pfn;
+>  	mig.dst = &dst_pfn;
+>  
+> +	/*
+> +	 * We come here with mmap_sem write lock held just for
+> +	 * ksm_madvise(), otherwise we only need read mmap_sem.
+> +	 * Hence downgrade to read lock once ksm_madvise() is done.
+> +	 */
+>  	ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
+>  			  MADV_UNMERGEABLE, &vma->vm_flags);
+> +	downgrade_write(&kvm->mm->mmap_sem);
+> +	*downgrade = true;
+>  	if (ret)
+>  		return ret;
+>  
+> @@ -456,6 +462,7 @@ unsigned long
+>  kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
+>  		     unsigned long flags, unsigned long page_shift)
+>  {
+> +	bool downgrade = false;
+>  	unsigned long start, end;
+>  	struct vm_area_struct *vma;
+>  	int srcu_idx;
+> @@ -476,7 +483,7 @@ kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
+>  
+>  	ret = H_PARAMETER;
+>  	srcu_idx = srcu_read_lock(&kvm->srcu);
+> -	down_read(&kvm->mm->mmap_sem);
+> +	down_write(&kvm->mm->mmap_sem);
+>  
+>  	start = gfn_to_hva(kvm, gfn);
+>  	if (kvm_is_error_hva(start))
+> @@ -492,12 +499,16 @@ kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
+>  	if (!vma || vma->vm_start > start || vma->vm_end < end)
+>  		goto out_unlock;
+>  
+> -	if (!kvmppc_svm_page_in(vma, start, end, gpa, kvm, page_shift))
+> +	if (!kvmppc_svm_page_in(vma, start, end, gpa, kvm, page_shift,
+> +				&downgrade))
+>  		ret = H_SUCCESS;
+>  out_unlock:
+>  	mutex_unlock(&kvm->arch.uvmem_lock);
+>  out:
+> -	up_read(&kvm->mm->mmap_sem);
+> +	if (downgrade)
+> +		up_read(&kvm->mm->mmap_sem);
+> +	else
+> +		up_write(&kvm->mm->mmap_sem);
+>  	srcu_read_unlock(&kvm->srcu, srcu_idx);
+>  	return ret;
+>  }
+> -- 
+> 2.21.0
