@@ -2,186 +2,110 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 901BF10E370
-	for <lists+kvm-ppc@lfdr.de>; Sun,  1 Dec 2019 21:25:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BC3710F255
+	for <lists+kvm-ppc@lfdr.de>; Mon,  2 Dec 2019 22:48:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726800AbfLAUZG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 1 Dec 2019 15:25:06 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:37906 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726519AbfLAUZG (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 1 Dec 2019 15:25:06 -0500
-Received: by mail-ot1-f67.google.com with SMTP id z25so29269677oti.5
-        for <kvm-ppc@vger.kernel.org>; Sun, 01 Dec 2019 12:25:05 -0800 (PST)
+        id S1726195AbfLBVsC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 2 Dec 2019 16:48:02 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:38351 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725835AbfLBVsC (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 2 Dec 2019 16:48:02 -0500
+Received: by mail-io1-f66.google.com with SMTP id u24so1193556iob.5;
+        Mon, 02 Dec 2019 13:48:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:in-reply-to:message-id:references
-         :user-agent:mime-version;
-        bh=I2Yj7WZ2eIVwURYWTRsAO1/HJqcoGDPFFh90G05uVz8=;
-        b=e5+HC7eJOsGBzcln7aLNMNBn17SkFrz5U9QjsFhZ/57uKHwF8+/NkDgMV2dr/dMgOl
-         dDY/fiuGIgvmp6dkQv06uTLpteR5VrkWQNcPheAlBG21Q8GM+bScfbvqr8fs1WrGVvpU
-         oeWLf0C3LwK1s3EyNDjXWVQU3jZV3lAUKoG6qxtXFs/75KuVHD3cifSDN7qAndu7z2EK
-         1OwET0lv1W7gwZfcIkej0uPqPF2jTL3ofI+AqzSWpj8EL1bj78Udp7delfgCuOFkA+VY
-         Nz17I4oZ3/NYbd9EtcjOBzWliSBtrj/wC+M20ld5u+zHJY0oarKARDGcH+ui5wTnHV3F
-         tvHw==
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=3Ms8zlHQJK2hwaXeaP4qZ/hAYQme4ETl6wKmDCNALCA=;
+        b=aMsbcC4Boq/giplL1LvjNzNBE+1LBRESfzKVlx8v/rJ8ZA1f1TfzFCbI/1pyLvj7jb
+         x9S9ns7eF1jmYnTJVc7GRhmF8r0NqpE965lqqet+5wZy7VSPzuQgNp6PKqYCFdw5YzMJ
+         5u66QwYZn4FL+qtUb3Gq7V2U43QhwBY5ZWHRmGpxPEPZe/taKcsjeu7gMTFMBAFgToOY
+         LsINb6Xc+n985se0ivH0CStK1cS5N5a56+Sz2KJr+3xsOFx2IaygvfmFPPLglthTqEf1
+         Pe4tNmjK2BBFO3cjGljF30P2uuZYG6BVs49kQkJ25sILR5M4TEQN3gU5xQedhpMhzERX
+         u9Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
-         :references:user-agent:mime-version;
-        bh=I2Yj7WZ2eIVwURYWTRsAO1/HJqcoGDPFFh90G05uVz8=;
-        b=ndAo/Wne/hPj8ToHhD/82735uJJkMaw/g3T3ndifm/jbOZuVKg/nml/tjlFxD/QvDH
-         dWlc196pYyP0ahcDSER30otgHDyk8uj8Amt36cx1JJy+oyqz1WapRmMHXPEtqmAp0LHz
-         hzXTh2IkpPots9Rd1B2XYxN5i53VPB15PM+bzDB7rcff+XR94Q7jNOL67W0OL9N0dIrK
-         OHI3wV6yZEI8kmK4ljomB2fMnyKdQOgWqT1r9c/34pPJzAIyZgiolTolCCGts7YuVswk
-         Z8M7CeOcbhUGqTTOyQJU0QyY0uKy2x4fjjVyGEuzRPqDHeZEQ1Kz86K64w25DCSMuw4H
-         aXHg==
-X-Gm-Message-State: APjAAAXQ2jqdqn5NlSeywWZSuXTEb8gyHqDz8H+B++ZmfReCqxJ3iTEZ
-        DQ3k8X3U0fOJ2KSoiGoZGuIfkA==
-X-Google-Smtp-Source: APXvYqy3gEoj/BYRE+hfQFJKRq+lli+tF2ElHGDIgZhyLlcZAp823TGVvFyHVeUl1QExPaJaAGDOaA==
-X-Received: by 2002:a05:6830:20cf:: with SMTP id z15mr1710826otq.277.1575231904769;
-        Sun, 01 Dec 2019 12:25:04 -0800 (PST)
-Received: from eggly.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id l12sm10004554oth.76.2019.12.01.12.25.02
-        (version=TLS1 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sun, 01 Dec 2019 12:25:03 -0800 (PST)
-Date:   Sun, 1 Dec 2019 12:24:50 -0800 (PST)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@eggly.anvils
-To:     Bharata B Rao <bharata@linux.ibm.com>
-cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-mm@kvack.org, paulus@au1.ibm.com,
-        aneesh.kumar@linux.vnet.ibm.com, jglisse@redhat.com,
-        cclaudio@linux.ibm.com, linuxram@us.ibm.com,
-        sukadev@linux.vnet.ibm.com, hch@lst.de,
-        Hugh Dickins <hughd@google.com>
-Subject: Re: [PATCH v11 0/7] KVM: PPC: Driver to manage pages of secure
- guest
-In-Reply-To: <20191128050411.GF23438@in.ibm.com>
-Message-ID: <alpine.LSU.2.11.1912011214180.1410@eggly.anvils>
-References: <20191125030631.7716-1-bharata@linux.ibm.com> <20191128050411.GF23438@in.ibm.com>
-User-Agent: Alpine 2.11 (LSU 23 2013-08-11)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=3Ms8zlHQJK2hwaXeaP4qZ/hAYQme4ETl6wKmDCNALCA=;
+        b=r6LsuHjKE6ltgVlAAJjzZjIclT/yxLYj3/ahlUcVSPTE/stRr21AFn79JiDm+cNDUK
+         rG8jMP2hErEaHeqyyvq77kwTxQeqyH2Am0KefV2vS6GMTOiBLVvDuC2Rj6YlSqry+KBH
+         6dDjWxDfpvm4IgLbp0KrUY8a8g67SrlvtcbEkOE7ZbII70I0anmfqSrV0Q4GrnV/MyQ1
+         y6hf/PUObZMAz/HnS/1vqgnXyPb2+iSLEi6+oYaP9Jdd42DJa3XtDULIqplMwwuDjmKm
+         hEop8c3ukI8a6NrvP1ksq/mrcmg3rhS1OM3EhCk6sbXR1HpuB+xAd2aWNMKKVLbw/uVU
+         6Paw==
+X-Gm-Message-State: APjAAAU4P5JLLIdqsfsHMuW9uI3Ug/5GYHk2FPjFZ8zyAtjRuRhiU+zv
+        2KIy/xsr0utlrKX2FFOFReMEj9c6ahjYaoEOJ+LUiiCo
+X-Google-Smtp-Source: APXvYqwoT5huCFrp42VNz1qNPTyyuAKGHcl/c3UforoZ8JkonNQxmRCDNFvLxknzveYZ8LKoRYlvFtJdZ4POHYDXfzc=
+X-Received: by 2002:a02:1d04:: with SMTP id 4mr2255009jaj.48.1575323281611;
+ Mon, 02 Dec 2019 13:48:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+From:   Wayne Li <waynli329@gmail.com>
+Date:   Mon, 2 Dec 2019 21:47:50 +0000
+Message-ID: <CAM2K0nqWjaPB3gFD4m6DjciJUCpix4MaGr0hZkp20PxObtL1Zw@mail.gmail.com>
+Subject: KVM Kernel Module not being built for Yocto Kernel
+To:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, 28 Nov 2019, Bharata B Rao wrote:
-> On Mon, Nov 25, 2019 at 08:36:24AM +0530, Bharata B Rao wrote:
-> > Hi,
-> > 
-> > This is the next version of the patchset that adds required support
-> > in the KVM hypervisor to run secure guests on PEF-enabled POWER platforms.
-> > 
-> 
-> Here is a fix for the issue Hugh identified with the usage of ksm_madvise()
-> in this patchset. It applies on top of this patchset.
+Dear KVM community,
 
-It looks correct to me, and I hope will not spoil your performance in any
-way that matters.  But I have to say, the patch would be so much clearer,
-if you just named your bool "downgraded" instead of "downgrade".
+First of all I'd like mention I've posted this question on the Yocto
+mailing list as well as the KVM mailing list because my question has
+huge ties to the bitbake process (a concept related to the Yocto
+project).  Though I believe I'm mainly addressing the KVM community
+because my problem is more directly related to the intricacies of the
+KVM build process.
 
-Hugh
+So I am trying to build the kvm-kmod from source and I'm running into
+an issue where the compilation doesn't produce any kernel modules.
+But before I describe my issue and question any further, here's a
+little background information on my current endeavour.
 
-> ----
-> 
-> From 8a4d769bf4c61f921c79ce68923be3c403bd5862 Mon Sep 17 00:00:00 2001
-> From: Bharata B Rao <bharata@linux.ibm.com>
-> Date: Thu, 28 Nov 2019 09:31:54 +0530
-> Subject: [PATCH 1/1] KVM: PPC: Book3S HV: Take write mmap_sem when calling
->  ksm_madvise
-> 
-> In order to prevent the device private pages (that correspond to
-> pages of secure guest) from participating in KSM merging, H_SVM_PAGE_IN
-> calls ksm_madvise() under read version of mmap_sem. However ksm_madvise()
-> needs to be under write lock, fix this.
-> 
-> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-> ---
->  arch/powerpc/kvm/book3s_hv_uvmem.c | 29 ++++++++++++++++++++---------
->  1 file changed, 20 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> index f24ac3cfb34c..2de264fc3156 100644
-> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> @@ -46,11 +46,10 @@
->   *
->   * Locking order
->   *
-> - * 1. srcu_read_lock(&kvm->srcu) - Protects KVM memslots
-> - * 2. down_read(&kvm->mm->mmap_sem) - find_vma, migrate_vma_pages and helpers
-> - * 3. mutex_lock(&kvm->arch.uvmem_lock) - protects read/writes to uvmem slots
-> - *					  thus acting as sync-points
-> - *					  for page-in/out
-> + * 1. kvm->srcu - Protects KVM memslots
-> + * 2. kvm->mm->mmap_sem - find_vma, migrate_vma_pages and helpers, ksm_madvise
-> + * 3. kvm->arch.uvmem_lock - protects read/writes to uvmem slots thus acting
-> + *			     as sync-points for page-in/out
->   */
->  
->  /*
-> @@ -344,7 +343,7 @@ static struct page *kvmppc_uvmem_get_page(unsigned long gpa, struct kvm *kvm)
->  static int
->  kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
->  		   unsigned long end, unsigned long gpa, struct kvm *kvm,
-> -		   unsigned long page_shift)
-> +		   unsigned long page_shift, bool *downgrade)
->  {
->  	unsigned long src_pfn, dst_pfn = 0;
->  	struct migrate_vma mig;
-> @@ -360,8 +359,15 @@ kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
->  	mig.src = &src_pfn;
->  	mig.dst = &dst_pfn;
->  
-> +	/*
-> +	 * We come here with mmap_sem write lock held just for
-> +	 * ksm_madvise(), otherwise we only need read mmap_sem.
-> +	 * Hence downgrade to read lock once ksm_madvise() is done.
-> +	 */
->  	ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
->  			  MADV_UNMERGEABLE, &vma->vm_flags);
-> +	downgrade_write(&kvm->mm->mmap_sem);
-> +	*downgrade = true;
->  	if (ret)
->  		return ret;
->  
-> @@ -456,6 +462,7 @@ unsigned long
->  kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
->  		     unsigned long flags, unsigned long page_shift)
->  {
-> +	bool downgrade = false;
->  	unsigned long start, end;
->  	struct vm_area_struct *vma;
->  	int srcu_idx;
-> @@ -476,7 +483,7 @@ kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
->  
->  	ret = H_PARAMETER;
->  	srcu_idx = srcu_read_lock(&kvm->srcu);
-> -	down_read(&kvm->mm->mmap_sem);
-> +	down_write(&kvm->mm->mmap_sem);
->  
->  	start = gfn_to_hva(kvm, gfn);
->  	if (kvm_is_error_hva(start))
-> @@ -492,12 +499,16 @@ kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
->  	if (!vma || vma->vm_start > start || vma->vm_end < end)
->  		goto out_unlock;
->  
-> -	if (!kvmppc_svm_page_in(vma, start, end, gpa, kvm, page_shift))
-> +	if (!kvmppc_svm_page_in(vma, start, end, gpa, kvm, page_shift,
-> +				&downgrade))
->  		ret = H_SUCCESS;
->  out_unlock:
->  	mutex_unlock(&kvm->arch.uvmem_lock);
->  out:
-> -	up_read(&kvm->mm->mmap_sem);
-> +	if (downgrade)
-> +		up_read(&kvm->mm->mmap_sem);
-> +	else
-> +		up_write(&kvm->mm->mmap_sem);
->  	srcu_read_unlock(&kvm->srcu, srcu_idx);
->  	return ret;
->  }
-> -- 
-> 2.21.0
+My goal right now is to get KVM to work on a T4240RDB running on a
+Yocto-based kernel.  For those of you who don't know what a Yocto
+kernel is, it is a kernel that you can build/customize yourself using
+a program called bitbake.  Anyway, the KVM kernel modules are supposed
+to be included in the Yocto kernel by default but they aren't there.
+And no tweaking of the configuration for the bitbake process to build
+the Yocto kernel has made the KVM kernel modules appear in the kernel
+(I've tried pretty much everything!  Just search my name in the Yocto
+mailing list archive haha...).  So my final solution was to download
+the kvm-kmod source code and write a custom recipe to bitbake it into
+the kernel module (in layman terms this means I just download the code
+and write a "recipe" to tell bitbake how to compile the kvm-kmod
+source code and insert the output files into the kernel).  Here's the
+recipe that I wrote for this:
+
+LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://COPYING;md5=c616d0e7924e9e78ee192d99a3b26fbd"
+
+inherit module
+
+SRC_URI = "file:///homead/QorIQ-SDK-V2.0-20160527-yocto/sources/meta-virtualization/recipes-kernel/kvm-kmodule/kvm-kmod-3.10.21.tar.bz2"
+
+S = "${WORKDIR}/kvm-kmod-3.10.21"
+
+do_configure() {
+    ./configure --arch=ppc64
+--kerneldir=/homead/QorIQ-SDK-V2.0-20160527-yocto/build_t4240rdb-64b/tmp/work/t4240rdb_64b-fsl-linux/kernel-devsrc/1.0-r0/image/usr/src/kernel
+}
+
+FILES_${PN} += "/lib/modules/4.1.8-rt8+gbd51baf"
+
+Anyway when I run "bitbake kvm-kmod", it runs fine with no errors.
+This runs the recipe I wrote (I conveniently named my recipe kvm-kmod)
+which runs the configure file present in the kvm-kmod source code and
+then runs make.  In other words I ran make on the kvm-kmod source code
+with no errors.  But the problem is there is no kvm.ko or anything
+like that anywhere in my project code.
+
+Compiling the kvm-kmod source code is supposed to produce kvm kernel
+modules right?  I mean kvm-kmod literally stands for kvm kernel
+module?  Could I have forgotten to do something when building the
+kvm-kmod source code?  Or maybe my problem has something to do with my
+recipe?  Let me know your thoughts.
+
+-Thanks!, Wayne Li
