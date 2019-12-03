@@ -2,110 +2,65 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BC3710F255
-	for <lists+kvm-ppc@lfdr.de>; Mon,  2 Dec 2019 22:48:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1386C10F4C0
+	for <lists+kvm-ppc@lfdr.de>; Tue,  3 Dec 2019 03:01:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726195AbfLBVsC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 2 Dec 2019 16:48:02 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38351 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725835AbfLBVsC (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 2 Dec 2019 16:48:02 -0500
-Received: by mail-io1-f66.google.com with SMTP id u24so1193556iob.5;
-        Mon, 02 Dec 2019 13:48:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=3Ms8zlHQJK2hwaXeaP4qZ/hAYQme4ETl6wKmDCNALCA=;
-        b=aMsbcC4Boq/giplL1LvjNzNBE+1LBRESfzKVlx8v/rJ8ZA1f1TfzFCbI/1pyLvj7jb
-         x9S9ns7eF1jmYnTJVc7GRhmF8r0NqpE965lqqet+5wZy7VSPzuQgNp6PKqYCFdw5YzMJ
-         5u66QwYZn4FL+qtUb3Gq7V2U43QhwBY5ZWHRmGpxPEPZe/taKcsjeu7gMTFMBAFgToOY
-         LsINb6Xc+n985se0ivH0CStK1cS5N5a56+Sz2KJr+3xsOFx2IaygvfmFPPLglthTqEf1
-         Pe4tNmjK2BBFO3cjGljF30P2uuZYG6BVs49kQkJ25sILR5M4TEQN3gU5xQedhpMhzERX
-         u9Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=3Ms8zlHQJK2hwaXeaP4qZ/hAYQme4ETl6wKmDCNALCA=;
-        b=r6LsuHjKE6ltgVlAAJjzZjIclT/yxLYj3/ahlUcVSPTE/stRr21AFn79JiDm+cNDUK
-         rG8jMP2hErEaHeqyyvq77kwTxQeqyH2Am0KefV2vS6GMTOiBLVvDuC2Rj6YlSqry+KBH
-         6dDjWxDfpvm4IgLbp0KrUY8a8g67SrlvtcbEkOE7ZbII70I0anmfqSrV0Q4GrnV/MyQ1
-         y6hf/PUObZMAz/HnS/1vqgnXyPb2+iSLEi6+oYaP9Jdd42DJa3XtDULIqplMwwuDjmKm
-         hEop8c3ukI8a6NrvP1ksq/mrcmg3rhS1OM3EhCk6sbXR1HpuB+xAd2aWNMKKVLbw/uVU
-         6Paw==
-X-Gm-Message-State: APjAAAU4P5JLLIdqsfsHMuW9uI3Ug/5GYHk2FPjFZ8zyAtjRuRhiU+zv
-        2KIy/xsr0utlrKX2FFOFReMEj9c6ahjYaoEOJ+LUiiCo
-X-Google-Smtp-Source: APXvYqwoT5huCFrp42VNz1qNPTyyuAKGHcl/c3UforoZ8JkonNQxmRCDNFvLxknzveYZ8LKoRYlvFtJdZ4POHYDXfzc=
-X-Received: by 2002:a02:1d04:: with SMTP id 4mr2255009jaj.48.1575323281611;
- Mon, 02 Dec 2019 13:48:01 -0800 (PST)
+        id S1725957AbfLCCB1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 2 Dec 2019 21:01:27 -0500
+Received: from ozlabs.org ([203.11.71.1]:46703 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725941AbfLCCB1 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 2 Dec 2019 21:01:27 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 47RlZs373Nz9sPL; Tue,  3 Dec 2019 13:01:25 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1575338485; bh=Z6g4P0kR+Lg+jlbqbIwnOiPZH4g0NSoRsPlrdMM7fKE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SDDFe2OdZq8eVHSJtT+Y5e2lBTNlv7yciWKq/NK4/0VyZPwQ0QCb5B8I0/4Oj8c3t
+         AH+rE4NBzRbBS3ptx7dJ6yMxEQC6E6szdJmAKcMeC0oTgz/LSdtXiw6nU/0RxxTHeh
+         D7xVntyWFtAao18ZjE50CK5lbypwytrM/JpDDbPC/99EqEap5jY0Z5RfDiwDkXBott
+         lA3d2lpJ7klcpZCTRGYso2hEnupQcKsZzIT7xEKloA6+E1q0kqsubD1GYH66Uwux05
+         mF/7tyxumgyO62ZmZJDFV2mLvOzzWwHVqbdq55LQ4aSJFQcG3dTtfjS/Dz+ShwcZjZ
+         B0yrscbv1xOOA==
+Date:   Tue, 3 Dec 2019 13:01:21 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Wayne Li <waynli329@gmail.com>
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
+Subject: Re: KVM Kernel Module not being built for Yocto Kernel
+Message-ID: <20191203020121.GA14683@oak.ozlabs.ibm.com>
+References: <CAM2K0nqWjaPB3gFD4m6DjciJUCpix4MaGr0hZkp20PxObtL1Zw@mail.gmail.com>
 MIME-Version: 1.0
-From:   Wayne Li <waynli329@gmail.com>
-Date:   Mon, 2 Dec 2019 21:47:50 +0000
-Message-ID: <CAM2K0nqWjaPB3gFD4m6DjciJUCpix4MaGr0hZkp20PxObtL1Zw@mail.gmail.com>
-Subject: KVM Kernel Module not being built for Yocto Kernel
-To:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAM2K0nqWjaPB3gFD4m6DjciJUCpix4MaGr0hZkp20PxObtL1Zw@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Dear KVM community,
+On Mon, Dec 02, 2019 at 09:47:50PM +0000, Wayne Li wrote:
+> Dear KVM community,
+> 
+> First of all I'd like mention I've posted this question on the Yocto
+> mailing list as well as the KVM mailing list because my question has
+> huge ties to the bitbake process (a concept related to the Yocto
+> project).  Though I believe I'm mainly addressing the KVM community
+> because my problem is more directly related to the intricacies of the
+> KVM build process.
+> 
+> So I am trying to build the kvm-kmod from source and I'm running into
+> an issue where the compilation doesn't produce any kernel modules.
+> But before I describe my issue and question any further, here's a
+> little background information on my current endeavour.
+> 
+> My goal right now is to get KVM to work on a T4240RDB running on a
+> Yocto-based kernel.
 
-First of all I'd like mention I've posted this question on the Yocto
-mailing list as well as the KVM mailing list because my question has
-huge ties to the bitbake process (a concept related to the Yocto
-project).  Though I believe I'm mainly addressing the KVM community
-because my problem is more directly related to the intricacies of the
-KVM build process.
+So... what kernel version are you using?
 
-So I am trying to build the kvm-kmod from source and I'm running into
-an issue where the compilation doesn't produce any kernel modules.
-But before I describe my issue and question any further, here's a
-little background information on my current endeavour.
+What sub-architecture is the T4240RDB?
 
-My goal right now is to get KVM to work on a T4240RDB running on a
-Yocto-based kernel.  For those of you who don't know what a Yocto
-kernel is, it is a kernel that you can build/customize yourself using
-a program called bitbake.  Anyway, the KVM kernel modules are supposed
-to be included in the Yocto kernel by default but they aren't there.
-And no tweaking of the configuration for the bitbake process to build
-the Yocto kernel has made the KVM kernel modules appear in the kernel
-(I've tried pretty much everything!  Just search my name in the Yocto
-mailing list archive haha...).  So my final solution was to download
-the kvm-kmod source code and write a custom recipe to bitbake it into
-the kernel module (in layman terms this means I just download the code
-and write a "recipe" to tell bitbake how to compile the kvm-kmod
-source code and insert the output files into the kernel).  Here's the
-recipe that I wrote for this:
+What kernel config options are you trying to turn on?
 
-LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=c616d0e7924e9e78ee192d99a3b26fbd"
-
-inherit module
-
-SRC_URI = "file:///homead/QorIQ-SDK-V2.0-20160527-yocto/sources/meta-virtualization/recipes-kernel/kvm-kmodule/kvm-kmod-3.10.21.tar.bz2"
-
-S = "${WORKDIR}/kvm-kmod-3.10.21"
-
-do_configure() {
-    ./configure --arch=ppc64
---kerneldir=/homead/QorIQ-SDK-V2.0-20160527-yocto/build_t4240rdb-64b/tmp/work/t4240rdb_64b-fsl-linux/kernel-devsrc/1.0-r0/image/usr/src/kernel
-}
-
-FILES_${PN} += "/lib/modules/4.1.8-rt8+gbd51baf"
-
-Anyway when I run "bitbake kvm-kmod", it runs fine with no errors.
-This runs the recipe I wrote (I conveniently named my recipe kvm-kmod)
-which runs the configure file present in the kvm-kmod source code and
-then runs make.  In other words I ran make on the kvm-kmod source code
-with no errors.  But the problem is there is no kvm.ko or anything
-like that anywhere in my project code.
-
-Compiling the kvm-kmod source code is supposed to produce kvm kernel
-modules right?  I mean kvm-kmod literally stands for kvm kernel
-module?  Could I have forgotten to do something when building the
-kvm-kmod source code?  Or maybe my problem has something to do with my
-recipe?  Let me know your thoughts.
-
--Thanks!, Wayne Li
+Paul.
