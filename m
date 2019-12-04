@@ -2,95 +2,190 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EDFB111B74
-	for <lists+kvm-ppc@lfdr.de>; Tue,  3 Dec 2019 23:14:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DB3C1137FB
+	for <lists+kvm-ppc@lfdr.de>; Thu,  5 Dec 2019 00:06:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727782AbfLCWOe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 3 Dec 2019 17:14:34 -0500
-Received: from mga01.intel.com ([192.55.52.88]:19309 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727502AbfLCWOe (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 3 Dec 2019 17:14:34 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Dec 2019 14:14:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,275,1571727600"; 
-   d="scan'208";a="201159390"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga007.jf.intel.com with ESMTP; 03 Dec 2019 14:14:33 -0800
-Date:   Tue, 3 Dec 2019 14:14:33 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
-Message-ID: <20191203221433.GK19877@linux.intel.com>
-References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
+        id S1728011AbfLDXGO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 4 Dec 2019 18:06:14 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:45122 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727116AbfLDXGN (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 4 Dec 2019 18:06:13 -0500
+Received: by mail-pg1-f195.google.com with SMTP id b9so198962pgk.12
+        for <kvm-ppc@vger.kernel.org>; Wed, 04 Dec 2019 15:06:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gHjbdz8YjglfRyBOQRN/xcfeVAsHrq3SRybElugHfXs=;
+        b=WOgaivyjec8eNc7t/z/69gcnZ/tfy4hJffPd8m2IrtyDPvRQr3G2j6nG07CG2TGoCX
+         Rzy2HnJ1Vs9kLN1fjNjV+eC0+eUCM7aXHvsTlvWAQRuSvZBLkDsnY32o/CcYgvAoyBYM
+         X7Q6VtONRRCMXZA6dDXObNbnIqoy5LaInC9VGt/JGCEoO+PYJau48csR6XcRjgA/uu/X
+         gMWFzqZ4d2lemYk55mInJlQYdtHBTbXElcfBSlnfrmuo9SOWrcpMRIWzekgOfYvjI9+l
+         r5bjLVS4UNCzoqIxMvHpt7UNmePvP6+GJXzw8Gp7Og0QAPOfOoJXs47HhAIh2G4RsUHl
+         4FYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gHjbdz8YjglfRyBOQRN/xcfeVAsHrq3SRybElugHfXs=;
+        b=sVPssE7XSymch8L5ER2UWM+Dj/kO0Fnzo5EKbMRrruvzMuBaHOgukZU2lnaR5GY6fd
+         pBWkVwfSY292r6vgzEaV+SowKNjvZOXO26XZzUjiwyVtieumkNvjvvlNHbXLyUJa/GrK
+         gYoHdvYPgOS4YP3KwQwyauwyaRxfYsrSGWZHtYj41IqXPV65IAnjttH5P8xQlJyQ76jE
+         6/XNr4mV7m7iYNaOSuYAsaDVUkZNPHLjBxsAjC4dn1ulo0J9ijKLpVca4cM3aX8Jsy0G
+         ZPvcu3tPk5qwCoOcvzuNGSfFMkltvdPoqXuR8cJ4SoaFtspYHReQISfPmEsqx2iZXJwD
+         00rQ==
+X-Gm-Message-State: APjAAAVbLXvDzv2ziwGxKccCA56lepnxEi2X0oGzRTAUfzCnB78cTDVb
+        8WsSvVESw+5o86J2NDXzdQM=
+X-Google-Smtp-Source: APXvYqxs4dYZg/KwhQ5UGxhF1Q5lBhQQd8YBuClZ4a8U+GLRMeiPsj79W6q9+SVIHYLExSq5nxObhQ==
+X-Received: by 2002:a63:fc5d:: with SMTP id r29mr6184652pgk.282.1575500772790;
+        Wed, 04 Dec 2019 15:06:12 -0800 (PST)
+Received: from sol.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id j28sm8672575pgb.36.2019.12.04.15.06.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2019 15:06:12 -0800 (PST)
+From:   Jordan Niethe <jniethe5@gmail.com>
+To:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
+Cc:     oohall@gmail.com, Jordan Niethe <jniethe5@gmail.com>
+Subject: [PATCH v2] powerpc/mm: Remove kvm radix prefetch workaround for Power9 DD2.2
+Date:   Thu,  5 Dec 2019 10:05:19 +1100
+Message-Id: <20191204230519.5987-1-jniethe5@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191024230744.14543-1-sean.j.christopherson@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Oct 24, 2019 at 04:07:29PM -0700, Sean Christopherson wrote:
-> The end goal of this series is to dynamically size the memslot array so
-> that KVM allocates memory based on the number of memslots in use, as
-> opposed to unconditionally allocating memory for the maximum number of
-> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
-> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
-> E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
-> the memory footprint from 90k to ~2.6k bytes.
-> 
-> The changes required to support dynamic sizing are relatively small,
-> e.g. are essentially contained in patches 14/15 and 15/15.  Patches 1-13
-> clean up the memslot code, which has gotten quite crusty, especially
-> __kvm_set_memory_region().  The clean up is likely not strictly necessary
-> to switch to dynamic sizing, but I didn't have a remotely reasonable
-> level of confidence in the correctness of the dynamic sizing without first
-> doing the clean up.
-> 
-> Christoffer, I added your Tested-by to the patches that I was confident
-> would be fully tested based on the desription of what you tested.  Let me
-> know if you disagree with any of 'em.
-> 
-> v3:
->   - Fix build errors on PPC and MIPS due to missed params during
->     refactoring [kbuild test robot].
->   - Rename the helpers for update_memslots() and add comments describing
->     the new algorithm and how it interacts with searching [Paolo].
->   - Remove the unnecessary and obnoxious warning regarding memslots being
->     a flexible array [Paolo].
->   - Fix typos in the changelog of patch 09/15 [Christoffer].
->   - Collect tags [Christoffer].
-> 
-> v2:
->   - Split "Drop kvm_arch_create_memslot()" into three patches to move
->     minor functional changes to standalone patches [Janosch].
->   - Rebase to latest kvm/queue (f0574a1cea5b, "KVM: x86: fix ...")
->   - Collect an Acked-by and a Reviewed-by
+Commit a25bd72badfa ("powerpc/mm/radix: Workaround prefetch issue with
+KVM") introduced a number of workarounds as coming out of a guest with
+the mmu enabled would make the cpu would start running in hypervisor
+state with the PID value from the guest. The cpu will then start
+prefetching for the hypervisor with that PID value.
 
-Paolo, do you want me to rebase this to the latest kvm/queue?
+In Power9 DD2.2 the cpu behaviour was modified to fix this. When
+accessing Quadrant 0 in hypervisor mode with LPID != 0 prefetching will
+not be performed. This means that we can get rid of the workarounds for
+Power9 DD2.2 and later revisions. Add a new cpu feature
+CPU_FTR_P9_RADIX_PREFETCH_BUG to indicate if the workarounds are needed.
+
+Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
+---
+v2: Use a cpu feature instead of open coding the PVR check
+---
+ arch/powerpc/include/asm/cputable.h      |  6 ++++--
+ arch/powerpc/kernel/dt_cpu_ftrs.c        | 13 ++++++++-----
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S  |  2 ++
+ arch/powerpc/mm/book3s64/radix_pgtable.c |  6 +++++-
+ arch/powerpc/mm/book3s64/radix_tlb.c     |  3 +++
+ 5 files changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/cputable.h b/arch/powerpc/include/asm/cputable.h
+index cf00ff0d121d..944a39c4c3a0 100644
+--- a/arch/powerpc/include/asm/cputable.h
++++ b/arch/powerpc/include/asm/cputable.h
+@@ -212,6 +212,7 @@ static inline void cpu_feature_keys_init(void) { }
+ #define CPU_FTR_P9_TLBIE_STQ_BUG	LONG_ASM_CONST(0x0000400000000000)
+ #define CPU_FTR_P9_TIDR			LONG_ASM_CONST(0x0000800000000000)
+ #define CPU_FTR_P9_TLBIE_ERAT_BUG	LONG_ASM_CONST(0x0001000000000000)
++#define CPU_FTR_P9_RADIX_PREFETCH_BUG	LONG_ASM_CONST(0x0002000000000000)
+ 
+ #ifndef __ASSEMBLY__
+ 
+@@ -459,8 +460,9 @@ static inline void cpu_feature_keys_init(void) { }
+ 	    CPU_FTR_DBELL | CPU_FTR_HAS_PPR | CPU_FTR_ARCH_207S | \
+ 	    CPU_FTR_TM_COMP | CPU_FTR_ARCH_300 | CPU_FTR_PKEY | \
+ 	    CPU_FTR_P9_TLBIE_STQ_BUG | CPU_FTR_P9_TLBIE_ERAT_BUG | CPU_FTR_P9_TIDR)
+-#define CPU_FTRS_POWER9_DD2_0 CPU_FTRS_POWER9
+-#define CPU_FTRS_POWER9_DD2_1 (CPU_FTRS_POWER9 | CPU_FTR_POWER9_DD2_1)
++#define CPU_FTRS_POWER9_DD2_0 CPU_FTRS_POWER9 | CPU_FTR_P9_RADIX_PREFETCH_BUG
++#define CPU_FTRS_POWER9_DD2_1 (CPU_FTRS_POWER9 | CPU_FTR_P9_RADIX_PREFETCH_BUG | \
++			       CPU_FTR_POWER9_DD2_1)
+ #define CPU_FTRS_POWER9_DD2_2 (CPU_FTRS_POWER9 | CPU_FTR_POWER9_DD2_1 | \
+ 			       CPU_FTR_P9_TM_HV_ASSIST | \
+ 			       CPU_FTR_P9_TM_XER_SO_BUG)
+diff --git a/arch/powerpc/kernel/dt_cpu_ftrs.c b/arch/powerpc/kernel/dt_cpu_ftrs.c
+index 180b3a5d1001..182b4047c1ef 100644
+--- a/arch/powerpc/kernel/dt_cpu_ftrs.c
++++ b/arch/powerpc/kernel/dt_cpu_ftrs.c
+@@ -727,17 +727,20 @@ static __init void cpufeatures_cpu_quirks(void)
+ 	/*
+ 	 * Not all quirks can be derived from the cpufeatures device tree.
+ 	 */
+-	if ((version & 0xffffefff) == 0x004e0200)
+-		; /* DD2.0 has no feature flag */
+-	else if ((version & 0xffffefff) == 0x004e0201)
++	if ((version & 0xffffefff) == 0x004e0200) {
++		/* DD2.0 has no feature flag */
++		cur_cpu_spec->cpu_features |= CPU_FTR_P9_RADIX_PREFETCH_BUG;
++	} else if ((version & 0xffffefff) == 0x004e0201) {
+ 		cur_cpu_spec->cpu_features |= CPU_FTR_POWER9_DD2_1;
+-	else if ((version & 0xffffefff) == 0x004e0202) {
++		cur_cpu_spec->cpu_features |= CPU_FTR_P9_RADIX_PREFETCH_BUG;
++	} else if ((version & 0xffffefff) == 0x004e0202) {
+ 		cur_cpu_spec->cpu_features |= CPU_FTR_P9_TM_HV_ASSIST;
+ 		cur_cpu_spec->cpu_features |= CPU_FTR_P9_TM_XER_SO_BUG;
+ 		cur_cpu_spec->cpu_features |= CPU_FTR_POWER9_DD2_1;
+-	} else if ((version & 0xffff0000) == 0x004e0000)
++	} else if ((version & 0xffff0000) == 0x004e0000) {
+ 		/* DD2.1 and up have DD2_1 */
+ 		cur_cpu_spec->cpu_features |= CPU_FTR_POWER9_DD2_1;
++	}
+ 
+ 	if ((version & 0xffff0000) == 0x004e0000) {
+ 		cur_cpu_spec->cpu_features &= ~(CPU_FTR_DAWR);
+diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+index faebcbb8c4db..72b08bb17200 100644
+--- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
++++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+@@ -1793,6 +1793,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
+ 	tlbsync
+ 	ptesync
+ 
++BEGIN_FTR_SECTION
+ 	/* Radix: Handle the case where the guest used an illegal PID */
+ 	LOAD_REG_ADDR(r4, mmu_base_pid)
+ 	lwz	r3, VCPU_GUEST_PID(r9)
+@@ -1822,6 +1823,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
+ 	addi	r7,r7,0x1000
+ 	bdnz	1b
+ 	ptesync
++END_FTR_SECTION_IFSET(CPU_FTR_P9_RADIX_PREFETCH_BUG)
+ 
+ 2:
+ #endif /* CONFIG_PPC_RADIX_MMU */
+diff --git a/arch/powerpc/mm/book3s64/radix_pgtable.c b/arch/powerpc/mm/book3s64/radix_pgtable.c
+index 6ee17d09649c..25cd2a5a6f9f 100644
+--- a/arch/powerpc/mm/book3s64/radix_pgtable.c
++++ b/arch/powerpc/mm/book3s64/radix_pgtable.c
+@@ -336,7 +336,11 @@ static void __init radix_init_pgtable(void)
+ 	}
+ 
+ 	/* Find out how many PID bits are supported */
+-	if (cpu_has_feature(CPU_FTR_HVMODE)) {
++	if (!cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG)) {
++		if (!mmu_pid_bits)
++			mmu_pid_bits = 20;
++		mmu_base_pid = 1;
++	} else if (cpu_has_feature(CPU_FTR_HVMODE)) {
+ 		if (!mmu_pid_bits)
+ 			mmu_pid_bits = 20;
+ #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+diff --git a/arch/powerpc/mm/book3s64/radix_tlb.c b/arch/powerpc/mm/book3s64/radix_tlb.c
+index 67af871190c6..d3ab36b33650 100644
+--- a/arch/powerpc/mm/book3s64/radix_tlb.c
++++ b/arch/powerpc/mm/book3s64/radix_tlb.c
+@@ -1221,6 +1221,9 @@ extern void radix_kvm_prefetch_workaround(struct mm_struct *mm)
+ 	if (unlikely(pid == MMU_NO_CONTEXT))
+ 		return;
+ 
++	if (!cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
++		return;
++
+ 	/*
+ 	 * If this context hasn't run on that CPU before and KVM is
+ 	 * around, there's a slim chance that the guest on another
+-- 
+2.20.1
+
