@@ -2,239 +2,189 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BB653113EC8
-	for <lists+kvm-ppc@lfdr.de>; Thu,  5 Dec 2019 10:55:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91BF0114B5B
+	for <lists+kvm-ppc@lfdr.de>; Fri,  6 Dec 2019 04:17:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729165AbfLEJyx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 5 Dec 2019 04:54:53 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:50434 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729402AbfLEJyx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 5 Dec 2019 04:54:53 -0500
-Received: by mail-wm1-f68.google.com with SMTP id p9so2940735wmg.0;
-        Thu, 05 Dec 2019 01:54:51 -0800 (PST)
+        id S1726245AbfLFDRw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 5 Dec 2019 22:17:52 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:35995 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726076AbfLFDRw (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 5 Dec 2019 22:17:52 -0500
+Received: by mail-pg1-f196.google.com with SMTP id k3so1915702pgc.3
+        for <kvm-ppc@vger.kernel.org>; Thu, 05 Dec 2019 19:17:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DQAhGy9NIgRWmctc8n8PEHCVr8wavboJn+39LOkMnnE=;
-        b=hac7YA/61scaeO1ZPDjnWRMzcy75dsYruAt43uzR4MuSNEz5hLw5EdT0z6Pk1oKaf2
-         fTx/UHnJFbfc4yz5OxSDaux8zk2LpeT53fJ2LG+/5yqQgpjOTz3h53GTnIdVAcTKJu7t
-         xG/FEOdrDW23jBF3o46Cmb8RLZ0MeIO1x8zWgY8AzwOkcpJXe8WvLpubqc2McKiHLLNr
-         eXSDqObg1oCx4MHRo8Iua/WzAIC2j2e4ETJSFvHsUBnEfO5ALS1gU+pCdLNKtcDPo9fg
-         ea2NuzaE3VVvgcbVAosn8fyIucElmMVU0IXGeAX739GIzKDJD5KlcSees5Ss3hDd40c5
-         9IwQ==
+        h=from:to:cc:subject:date:message-id;
+        bh=gkGpgdPUBIiEgGfl9znwx+fNhWGwOTyCZKNW1OnKDWI=;
+        b=NivpDNQqCm6+EHJQmbuS/r1/mFkX+QMB85cqTZmH3QLdFI57wW85OXpUIBlMFDay8g
+         WwWRn1/IpUw9upaWXLXCD2O6DodzNh7LtVFEwarx8JaHaaI4qIbKKwaXSUdAz0XviS+d
+         jGSem92P4JX+DrukV5ycbO7XV77KRvx9qTNeENSyM4ukp3Pxz9tLYOqyZctfFFdnrNEv
+         4zA2Tk58DS19NJwLBytaz09Ua5+TUUWINQoc782tRMOHbx2/SBIC1fN1CEDBL1hGPldC
+         SMbFcTE1KCxAj7MpqpRa9VbjB+A5Pibd0NRW/dmkLi5e2Szhy3KUrHp5alWIWcqu12lA
+         GauQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DQAhGy9NIgRWmctc8n8PEHCVr8wavboJn+39LOkMnnE=;
-        b=hF73vov5gw6rh9rLXvUqvE2eengLL8UZdDKPKSNZIjb8anHpRibYxP+NQPai7ddkoU
-         0y/n0M8lHMqOlyuQ3yjqxdR6RoRksjIL+/qAUUTiAcBLlTRzYUfUPf/aLucOVjjUoupV
-         crzEDFJ9Spp3cqWynF57/Cj+ITn1JLidFjSDH4D+v2walAToRDkD3rUnLwIRrRYbc0Kc
-         FoMJN6OzvGTWySCdo0egpWRHT9hs6buvv0Hst0kYTRkh2K+RC8bTenqJK8qVqmy0M/ZB
-         3dkY2jF+HdTdVbBimHIzDHuArW+MkW4jlyFUPsZM76nqiakTMGRo2CIHLNRsR5e4pkpS
-         4Urg==
-X-Gm-Message-State: APjAAAXCoAznZsNjRacC2bEQ3E4kZuJ7YDEZCYJH8U8vk0uNuwfWUaoz
-        p+mDtOpcuAeGsZJdqSiFEgE=
-X-Google-Smtp-Source: APXvYqx3wMGWvFWz+VWzb3/gBJ7AfPMRQqK+25vc1Q2imL/LDYGpX95tPaj1m7INL2O5Ql2/5WubRg==
-X-Received: by 2002:a05:600c:282:: with SMTP id 2mr3954319wmk.73.1575539690435;
-        Thu, 05 Dec 2019 01:54:50 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net. [88.21.103.182])
-        by smtp.gmail.com with ESMTPSA id u26sm9723665wmj.9.2019.12.05.01.54.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Dec 2019 01:54:49 -0800 (PST)
-Subject: Re: [PATCH v3 08/15] KVM: Move setting of memslot into helper routine
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>
-References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
- <20191024230744.14543-9-sean.j.christopherson@intel.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a606c931-ffeb-95e9-79eb-df68fed7af65@amsat.org>
-Date:   Thu, 5 Dec 2019 10:54:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <20191024230744.14543-9-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=gkGpgdPUBIiEgGfl9znwx+fNhWGwOTyCZKNW1OnKDWI=;
+        b=lUDggN+MsOwjL+mSCIKiFcTPdfow0oleLK6S75W/l9BciB2OVHtwDC9cK2nwEZ21Oi
+         J9KyQWZwrKcxq2eGoPzZeOuyhlBrcMKXBl43O2aKfrde/ZHBjqHU7ery2DqmzCasmyIM
+         5psGv2XVVysSH9rD+x7qGAI0yX31l9KoT1VUzTEvMYbpLm1MFpmDF7jjVQ+CWF4kkFCz
+         sHCLYtmcXNMw0YP1/zm0NeCX++2P/d1jdY7UF0oPGAc3ihbLsglsqulRBY0X7kLn2QGe
+         doC/oqTccVFhRbbYXoRYxmUCaulMylE/2fy6v3EH4j5MUCi/GD73oYRkJG9fzTME9BwE
+         YuQA==
+X-Gm-Message-State: APjAAAX8PHKdrRbg9MIGYpEs91CzT1QSsyvvDxx+SHDwMl/r+pdBDej/
+        eI/dhzQ3bDeNwdmIZh+c+M2eT34f+Ds=
+X-Google-Smtp-Source: APXvYqw3FP4Rmg1+rXKd9S+wTKwCfh/HU6E8rrdBG+sheEXPvtpHSKiE2LV22En6hpK/QqzGopSyMQ==
+X-Received: by 2002:a62:fb0e:: with SMTP id x14mr12535849pfm.194.1575602271386;
+        Thu, 05 Dec 2019 19:17:51 -0800 (PST)
+Received: from tee480.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id o3sm1072635pju.13.2019.12.05.19.17.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Dec 2019 19:17:50 -0800 (PST)
+From:   Jordan Niethe <jniethe5@gmail.com>
+To:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
+Cc:     oohall@gmail.com, mpe@ellerman.id.au,
+        Jordan Niethe <jniethe5@gmail.com>
+Subject: [PATCH v3] powerpc/mm: Remove kvm radix prefetch workaround for Power9 DD2.2
+Date:   Fri,  6 Dec 2019 14:17:22 +1100
+Message-Id: <20191206031722.25781-1-jniethe5@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 10/25/19 1:07 AM, Sean Christopherson wrote:
-> Split out the core functionality of setting a memslot into a separate
-> helper in preparation for moving memslot deletion into its own routine.
-> 
-> Tested-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->   virt/kvm/kvm_main.c | 106 ++++++++++++++++++++++++++------------------
->   1 file changed, 63 insertions(+), 43 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index e2f47d60f696..860de4fadce6 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -920,6 +920,66 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
->   	return old_memslots;
->   }
->   
-> +static int kvm_set_memslot(struct kvm *kvm,
-> +			   const struct kvm_userspace_memory_region *mem,
-> +			   const struct kvm_memory_slot *old,
-> +			   struct kvm_memory_slot *new, int as_id,
-> +			   enum kvm_mr_change change)
-> +{
-> +	struct kvm_memory_slot *slot;
-> +	struct kvm_memslots *slots;
-> +	int r;
-> +
-> +	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
-> +	if (!slots)
-> +		return -ENOMEM;
-> +	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
-> +
-> +	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
-> +		/*
-> +		 * Note, the INVALID flag needs to be in the appropriate entry
-> +		 * in the freshly allocated memslots, not in @old or @new.
-> +		 */
-> +		slot = id_to_memslot(slots, old->id);
-> +		slot->flags |= KVM_MEMSLOT_INVALID;
-> +
-> +		/*
-> +		 * We can re-use the old memslots, the only difference from the
-> +		 * newly installed memslots is the invalid flag, which will get
-> +		 * dropped by update_memslots anyway.  We'll also revert to the
-> +		 * old memslots if preparing the new memory region fails.
-> +		 */
-> +		slots = install_new_memslots(kvm, as_id, slots);
-> +
-> +		/* From this point no new shadow pages pointing to a deleted,
-> +		 * or moved, memslot will be created.
-> +		 *
-> +		 * validation of sp->gfn happens in:
-> +		 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
-> +		 *	- kvm_is_visible_gfn (mmu_check_roots)
-> +		 */
-> +		kvm_arch_flush_shadow_memslot(kvm, slot);
-> +	}
-> +
-> +	r = kvm_arch_prepare_memory_region(kvm, new, mem, change);
-> +	if (r)
-> +		goto out_slots;
-> +
-> +	update_memslots(slots, new, change);
-> +	slots = install_new_memslots(kvm, as_id, slots);
-> +
-> +	kvm_arch_commit_memory_region(kvm, mem, old, new, change);
-> +
-> +	kvfree(slots);
-> +	return 0;
-> +
-> +out_slots:
-> +	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
-> +		slots = install_new_memslots(kvm, as_id, slots);
-> +	kvfree(slots);
-> +	return r;
-> +}
-> +
->   /*
->    * Allocate some memory and give it an address in the guest physical address
->    * space.
-> @@ -936,7 +996,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
->   	unsigned long npages;
->   	struct kvm_memory_slot *slot;
->   	struct kvm_memory_slot old, new;
-> -	struct kvm_memslots *slots;
->   	int as_id, id;
->   	enum kvm_mr_change change;
->   
-> @@ -1023,58 +1082,19 @@ int __kvm_set_memory_region(struct kvm *kvm,
->   			return r;
->   	}
->   
-> -	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
-> -	if (!slots) {
-> -		r = -ENOMEM;
-> -		goto out_bitmap;
-> -	}
-> -	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
-> -
-> -	if ((change == KVM_MR_DELETE) || (change == KVM_MR_MOVE)) {
-> -		slot = id_to_memslot(slots, id);
-> -		slot->flags |= KVM_MEMSLOT_INVALID;
-> -
-> -		/*
-> -		 * We can re-use the old memslots, the only difference from the
-> -		 * newly installed memslots is the invalid flag, which will get
-> -		 * dropped by update_memslots anyway.  We'll also revert to the
-> -		 * old memslots if preparing the new memory region fails.
-> -		 */
-> -		slots = install_new_memslots(kvm, as_id, slots);
-> -
-> -		/* From this point no new shadow pages pointing to a deleted,
-> -		 * or moved, memslot will be created.
-> -		 *
-> -		 * validation of sp->gfn happens in:
-> -		 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
-> -		 *	- kvm_is_visible_gfn (mmu_check_roots)
-> -		 */
-> -		kvm_arch_flush_shadow_memslot(kvm, slot);
-> -	}
-> -
-> -	r = kvm_arch_prepare_memory_region(kvm, &new, mem, change);
-> -	if (r)
-> -		goto out_slots;
-> -
->   	/* actual memory is freed via old in kvm_free_memslot below */
->   	if (change == KVM_MR_DELETE) {
->   		new.dirty_bitmap = NULL;
->   		memset(&new.arch, 0, sizeof(new.arch));
->   	}
->   
-> -	update_memslots(slots, &new, change);
-> -	slots = install_new_memslots(kvm, as_id, slots);
-> -
-> -	kvm_arch_commit_memory_region(kvm, mem, &old, &new, change);
-> +	r = kvm_set_memslot(kvm, mem, &old, &new, as_id, change);
-> +	if (r)
-> +		goto out_bitmap;
->   
->   	kvm_free_memslot(kvm, &old, &new);
-> -	kvfree(slots);
->   	return 0;
->   
-> -out_slots:
-> -	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
-> -		slots = install_new_memslots(kvm, as_id, slots);
-> -	kvfree(slots);
->   out_bitmap:
->   	if (new.dirty_bitmap && !old.dirty_bitmap)
->   		kvm_destroy_dirty_bitmap(&new);
-> 
+Commit a25bd72badfa ("powerpc/mm/radix: Workaround prefetch issue with
+KVM") introduced a number of workarounds as coming out of a guest with
+the mmu enabled would make the cpu would start running in hypervisor
+state with the PID value from the guest. The cpu will then start
+prefetching for the hypervisor with that PID value.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+In Power9 DD2.2 the cpu behaviour was modified to fix this. When
+accessing Quadrant 0 in hypervisor mode with LPID != 0 prefetching will
+not be performed. This means that we can get rid of the workarounds for
+Power9 DD2.2 and later revisions. Add a new cpu feature
+CPU_FTR_P9_RADIX_PREFETCH_BUG to indicate if the workarounds are needed.
+
+Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
+---
+v2: Use a cpu feature instead of open coding the PVR check
+v3: Put parentheses around CPU_FTRS_POWER9_DD2_0 value
+---
+ arch/powerpc/include/asm/cputable.h      |  7 +++++--
+ arch/powerpc/kernel/dt_cpu_ftrs.c        | 13 ++++++++-----
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S  |  2 ++
+ arch/powerpc/mm/book3s64/radix_pgtable.c |  6 +++++-
+ arch/powerpc/mm/book3s64/radix_tlb.c     |  3 +++
+ 5 files changed, 23 insertions(+), 8 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/cputable.h b/arch/powerpc/include/asm/cputable.h
+index cf00ff0d121d..40a4d3c6fd99 100644
+--- a/arch/powerpc/include/asm/cputable.h
++++ b/arch/powerpc/include/asm/cputable.h
+@@ -212,6 +212,7 @@ static inline void cpu_feature_keys_init(void) { }
+ #define CPU_FTR_P9_TLBIE_STQ_BUG	LONG_ASM_CONST(0x0000400000000000)
+ #define CPU_FTR_P9_TIDR			LONG_ASM_CONST(0x0000800000000000)
+ #define CPU_FTR_P9_TLBIE_ERAT_BUG	LONG_ASM_CONST(0x0001000000000000)
++#define CPU_FTR_P9_RADIX_PREFETCH_BUG	LONG_ASM_CONST(0x0002000000000000)
+ 
+ #ifndef __ASSEMBLY__
+ 
+@@ -459,8 +460,10 @@ static inline void cpu_feature_keys_init(void) { }
+ 	    CPU_FTR_DBELL | CPU_FTR_HAS_PPR | CPU_FTR_ARCH_207S | \
+ 	    CPU_FTR_TM_COMP | CPU_FTR_ARCH_300 | CPU_FTR_PKEY | \
+ 	    CPU_FTR_P9_TLBIE_STQ_BUG | CPU_FTR_P9_TLBIE_ERAT_BUG | CPU_FTR_P9_TIDR)
+-#define CPU_FTRS_POWER9_DD2_0 CPU_FTRS_POWER9
+-#define CPU_FTRS_POWER9_DD2_1 (CPU_FTRS_POWER9 | CPU_FTR_POWER9_DD2_1)
++#define CPU_FTRS_POWER9_DD2_0 (CPU_FTRS_POWER9 | CPU_FTR_P9_RADIX_PREFETCH_BUG)
++#define CPU_FTRS_POWER9_DD2_1 (CPU_FTRS_POWER9 | \
++			       CPU_FTR_P9_RADIX_PREFETCH_BUG | \
++			       CPU_FTR_POWER9_DD2_1)
+ #define CPU_FTRS_POWER9_DD2_2 (CPU_FTRS_POWER9 | CPU_FTR_POWER9_DD2_1 | \
+ 			       CPU_FTR_P9_TM_HV_ASSIST | \
+ 			       CPU_FTR_P9_TM_XER_SO_BUG)
+diff --git a/arch/powerpc/kernel/dt_cpu_ftrs.c b/arch/powerpc/kernel/dt_cpu_ftrs.c
+index 180b3a5d1001..182b4047c1ef 100644
+--- a/arch/powerpc/kernel/dt_cpu_ftrs.c
++++ b/arch/powerpc/kernel/dt_cpu_ftrs.c
+@@ -727,17 +727,20 @@ static __init void cpufeatures_cpu_quirks(void)
+ 	/*
+ 	 * Not all quirks can be derived from the cpufeatures device tree.
+ 	 */
+-	if ((version & 0xffffefff) == 0x004e0200)
+-		; /* DD2.0 has no feature flag */
+-	else if ((version & 0xffffefff) == 0x004e0201)
++	if ((version & 0xffffefff) == 0x004e0200) {
++		/* DD2.0 has no feature flag */
++		cur_cpu_spec->cpu_features |= CPU_FTR_P9_RADIX_PREFETCH_BUG;
++	} else if ((version & 0xffffefff) == 0x004e0201) {
+ 		cur_cpu_spec->cpu_features |= CPU_FTR_POWER9_DD2_1;
+-	else if ((version & 0xffffefff) == 0x004e0202) {
++		cur_cpu_spec->cpu_features |= CPU_FTR_P9_RADIX_PREFETCH_BUG;
++	} else if ((version & 0xffffefff) == 0x004e0202) {
+ 		cur_cpu_spec->cpu_features |= CPU_FTR_P9_TM_HV_ASSIST;
+ 		cur_cpu_spec->cpu_features |= CPU_FTR_P9_TM_XER_SO_BUG;
+ 		cur_cpu_spec->cpu_features |= CPU_FTR_POWER9_DD2_1;
+-	} else if ((version & 0xffff0000) == 0x004e0000)
++	} else if ((version & 0xffff0000) == 0x004e0000) {
+ 		/* DD2.1 and up have DD2_1 */
+ 		cur_cpu_spec->cpu_features |= CPU_FTR_POWER9_DD2_1;
++	}
+ 
+ 	if ((version & 0xffff0000) == 0x004e0000) {
+ 		cur_cpu_spec->cpu_features &= ~(CPU_FTR_DAWR);
+diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+index faebcbb8c4db..72b08bb17200 100644
+--- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
++++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+@@ -1793,6 +1793,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
+ 	tlbsync
+ 	ptesync
+ 
++BEGIN_FTR_SECTION
+ 	/* Radix: Handle the case where the guest used an illegal PID */
+ 	LOAD_REG_ADDR(r4, mmu_base_pid)
+ 	lwz	r3, VCPU_GUEST_PID(r9)
+@@ -1822,6 +1823,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
+ 	addi	r7,r7,0x1000
+ 	bdnz	1b
+ 	ptesync
++END_FTR_SECTION_IFSET(CPU_FTR_P9_RADIX_PREFETCH_BUG)
+ 
+ 2:
+ #endif /* CONFIG_PPC_RADIX_MMU */
+diff --git a/arch/powerpc/mm/book3s64/radix_pgtable.c b/arch/powerpc/mm/book3s64/radix_pgtable.c
+index 6ee17d09649c..25cd2a5a6f9f 100644
+--- a/arch/powerpc/mm/book3s64/radix_pgtable.c
++++ b/arch/powerpc/mm/book3s64/radix_pgtable.c
+@@ -336,7 +336,11 @@ static void __init radix_init_pgtable(void)
+ 	}
+ 
+ 	/* Find out how many PID bits are supported */
+-	if (cpu_has_feature(CPU_FTR_HVMODE)) {
++	if (!cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG)) {
++		if (!mmu_pid_bits)
++			mmu_pid_bits = 20;
++		mmu_base_pid = 1;
++	} else if (cpu_has_feature(CPU_FTR_HVMODE)) {
+ 		if (!mmu_pid_bits)
+ 			mmu_pid_bits = 20;
+ #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+diff --git a/arch/powerpc/mm/book3s64/radix_tlb.c b/arch/powerpc/mm/book3s64/radix_tlb.c
+index 67af871190c6..d3ab36b33650 100644
+--- a/arch/powerpc/mm/book3s64/radix_tlb.c
++++ b/arch/powerpc/mm/book3s64/radix_tlb.c
+@@ -1221,6 +1221,9 @@ extern void radix_kvm_prefetch_workaround(struct mm_struct *mm)
+ 	if (unlikely(pid == MMU_NO_CONTEXT))
+ 		return;
+ 
++	if (!cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
++		return;
++
+ 	/*
+ 	 * If this context hasn't run on that CPU before and KVM is
+ 	 * around, there's a slim chance that the guest on another
+-- 
+2.20.1
+
