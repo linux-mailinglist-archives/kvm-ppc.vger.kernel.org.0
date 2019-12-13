@@ -2,99 +2,109 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EACCB11E1D2
-	for <lists+kvm-ppc@lfdr.de>; Fri, 13 Dec 2019 11:20:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CFAE11EA26
+	for <lists+kvm-ppc@lfdr.de>; Fri, 13 Dec 2019 19:27:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725890AbfLMKUt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 13 Dec 2019 05:20:49 -0500
-Received: from ozlabs.org ([203.11.71.1]:54155 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725793AbfLMKUt (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 13 Dec 2019 05:20:49 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 47Z6BK1R6Hz9sPc;
-        Fri, 13 Dec 2019 21:20:40 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1576232441;
-        bh=Ypcl+ICBinTZEpBKKJzx2m7ZdyJ3T7k/hC8ux4i5AD0=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=PiEcT286n4Tq4Sqq3gPFKnuR36mkJco+IzdfvrIEe7RUB1frkF4PZNzvCPyJTUc9U
-         +2MUyWJJCUB8NX9GRp4ALlDphq7nWtn1L7zArxrq48W4qHOnf/X4oqymzEIAoyNxgT
-         uFJvHZncGnGUsM6Tm3XlSh+vIphhUIrIzD3/hyv5tN3n4KoJCOzre+vlx9AxMJclhv
-         RUkqTx/cWBG/uZWUJXvJrQdj3SLr9Sza2OGD2XnceEf4ZTGqYdX28of8o1lNZtO3Pm
-         55D7VQtdl8kUprNLLtTuz1EYLAALAaMDEqv6uNha+Mh7st/YGqTeTWwiDV2/DplX3f
-         LLxhjjtxNqRWQ==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Ram Pai <linuxram@us.ibm.com>, kvm-ppc@vger.kernel.org,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH kernel 1/3] powerpc/pseries/iommu: Use dma_iommu_ops for Secure VM.
-In-Reply-To: <20191213084537.27306-2-aik@ozlabs.ru>
-References: <20191213084537.27306-1-aik@ozlabs.ru> <20191213084537.27306-2-aik@ozlabs.ru>
-Date:   Fri, 13 Dec 2019 21:20:38 +1100
-Message-ID: <87sgloo7bd.fsf@mpe.ellerman.id.au>
+        id S1728755AbfLMS1w (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 13 Dec 2019 13:27:52 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:34659 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726404AbfLMS1w (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 13 Dec 2019 13:27:52 -0500
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1ifpdD-0001O7-Ur; Fri, 13 Dec 2019 19:25:40 +0100
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH 0/7] KVM: arm/arm64: Help VMs dying quicker
+Date:   Fri, 13 Dec 2019 18:24:56 +0000
+Message-Id: <20191213182503.14460-1-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, jhogan@kernel.org, paulus@ozlabs.org, pbonzini@redhat.com, rkrcmar@redhat.com, sean.j.christopherson@intel.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+[Yes, the subject is deliberately provocative!]
 
-> From: Ram Pai <linuxram@us.ibm.com>
->
-> Commit edea902c1c1e ("powerpc/pseries/iommu: Don't use dma_iommu_ops on
-> 		secure guests")
-> disabled dma_iommu_ops path, for secure VMs. Disabling dma_iommu_ops
-> path for secure VMs, helped enable dma_direct path.  This enabled
-> support for bounce-buffering through SWIOTLB.  However it fails to
-> operate when IOMMU is enabled, since I/O pages are not TCE mapped.
->
-> Reenable dma_iommu_ops path for pseries Secure VMs.  It handles all
-> cases including, TCE mapping I/O pages, in the presence of a
-> IOMMU.
->
-> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Having recently played with large, memory intensive, and very short lived
+VMs, I have realised that we spend a substantial amount of time cleaning up
+when a VM has terminated.
 
-This seems like it should have a Fixes tag?
+It turns out that 99% of the overhead is due to the unnecessary cache
+cleaning that we perform when pages get unmapped from Stage-2, which
+only serves a single purpose: to make the page visible to a non-coherent
+IO subsystem when the page is being swapped out.
 
-cheers
+It would make sense to drop these cache maintenance operations when
+userspace is either unmapping a VMA or simply exiting. Detecting the
+latter is easy, as KVM calls kvm_arch_flush_shadow_all(). The unmap
+case is harder, or at least it was until 5.2 gained the MMU notifier
+event, which allows subsystems to find out about the reason of an
+change in the page tables.
 
-> diff --git a/arch/powerpc/platforms/pseries/iommu.c b/arch/powerpc/platforms/pseries/iommu.c
-> index 6ba081dd61c9..df7db33ca93b 100644
-> --- a/arch/powerpc/platforms/pseries/iommu.c
-> +++ b/arch/powerpc/platforms/pseries/iommu.c
-> @@ -36,7 +36,6 @@
->  #include <asm/udbg.h>
->  #include <asm/mmzone.h>
->  #include <asm/plpar_wrappers.h>
-> -#include <asm/svm.h>
->  
->  #include "pseries.h"
->  
-> @@ -1320,15 +1319,7 @@ void iommu_init_early_pSeries(void)
->  	of_reconfig_notifier_register(&iommu_reconfig_nb);
->  	register_memory_notifier(&iommu_mem_nb);
->  
-> -	/*
-> -	 * Secure guest memory is inacessible to devices so regular DMA isn't
-> -	 * possible.
-> -	 *
-> -	 * In that case keep devices' dma_map_ops as NULL so that the generic
-> -	 * DMA code path will use SWIOTLB to bounce buffers for DMA.
-> -	 */
-> -	if (!is_secure_guest())
-> -		set_pci_dma_ops(&dma_iommu_ops);
-> +	set_pci_dma_ops(&dma_iommu_ops);
->  }
->  
->  static int __init disable_multitce(char *str)
-> -- 
-> 2.17.1
+And it turns out we can do even better: We can also avoid invalidating
+individual page mappings if we're tearing down the VM altogether, and
+replace it with a single TLBI VMALL, which will be much lighter on the
+whole system (specially if your interconnect is a bit flimsy).
+
+With the above, terminating a 64GB VM that has most of its memory
+mapped at S2 goes from several seconds (I've seen up to 12s) to less
+than a second on my D05. In general, multi-socket systems seem to
+benefit from this more than single socket machines (based on a
+non-representative sample of 4 random machines I have access to).
+
+The first patch affects most architectures, as it changes one of the
+core architecture hooks (in a fairly mechanical way). The rest is
+definitely ARM-specific.
+
+Marc Zyngier (7):
+  KVM: Pass mmu_notifier_range down to kvm_unmap_hva_range()
+  KVM: arm/arm64: Pass flags along Stage-2 unmapping functions
+  KVM: arm/arm64: Condition cache maintenance on unmap with a flag
+  KVM: arm/arm64: Condition TLB maintenance on unmap with a flag
+  KVM: arm/arm64: Elide both CMOs and TBLIs on freeing the whole Stage-2
+  KVM: arm/arm64: Elide CMOs when retrying a block mapping
+  KVM: arm/arm64: Elide CMOs when unmapping a range
+
+ arch/arm/include/asm/kvm_host.h     |  2 +-
+ arch/arm64/include/asm/kvm_host.h   |  2 +-
+ arch/mips/include/asm/kvm_host.h    |  2 +-
+ arch/mips/kvm/mmu.c                 |  6 +-
+ arch/powerpc/include/asm/kvm_host.h |  2 +-
+ arch/powerpc/kvm/book3s.c           |  5 +-
+ arch/powerpc/kvm/e500_mmu_host.c    |  4 +-
+ arch/x86/include/asm/kvm_host.h     |  3 +-
+ arch/x86/kvm/mmu/mmu.c              |  5 +-
+ arch/x86/kvm/x86.c                  |  4 +-
+ include/linux/kvm_host.h            |  2 +-
+ virt/kvm/arm/mmu.c                  | 97 +++++++++++++++++++----------
+ virt/kvm/kvm_main.c                 |  7 +--
+ 13 files changed, 88 insertions(+), 53 deletions(-)
+
+-- 
+2.20.1
+
