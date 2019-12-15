@@ -2,77 +2,217 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 45D0211F70D
-	for <lists+kvm-ppc@lfdr.de>; Sun, 15 Dec 2019 10:49:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D92E911F72B
+	for <lists+kvm-ppc@lfdr.de>; Sun, 15 Dec 2019 11:28:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726094AbfLOJtH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 15 Dec 2019 04:49:07 -0500
-Received: from bahamut-sn.mc.pp.se ([213.115.244.39]:36736 "EHLO
-        bahamut.mc.pp.se" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726089AbfLOJtH (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 15 Dec 2019 04:49:07 -0500
-Received: from hakua (hakua [192.168.42.40])
-        by bahamut.mc.pp.se (Postfix) with SMTP id 93E90A3C06;
-        Sun, 15 Dec 2019 10:49:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mc.pp.se; s=hedgehog;
-        t=1576403345; bh=yXGLwjD345CaXg2lBpjGZKcFu4vIc+N91onoyvmmduE=;
-        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:
-         Content-Transfer-Encoding; b=URDw7iSxJu6Yyo3fpVZI4EBw6FZk55bLqggfE
-        o1BF+nKuH4V8ggByY+L7H7+P1kJyuJzyCqVCP0qjbZ8H/m6tU5tCdtOEDO+a8CWQ8uX
-        tGNdprpYlA7EAAP9Mhg1Ikwvwf+sKUiDNLkGv4AjZhYMF9wEfSfBBdXQEvi/upaTGLA
-        =
-Received: by hakua (sSMTP sendmail emulation); Sun, 15 Dec 2019 10:49:04 +0100
-From:   "Marcus Comstedt" <marcus@mc.pp.se>
-To:     kvm-ppc@vger.kernel.org
-Cc:     Marcus Comstedt <marcus@mc.pp.se>
-Subject: [PATCH] KVM: PPC: Book3S HV: Fix regression on big endian hosts
-Date:   Sun, 15 Dec 2019 10:49:00 +0100
-Message-Id: <20191215094900.46740-1-marcus@mc.pp.se>
-X-Mailer: git-send-email 2.23.0
+        id S1726078AbfLOK2D (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 15 Dec 2019 05:28:03 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:57743 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726061AbfLOK2D (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 15 Dec 2019 05:28:03 -0500
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
+        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+        (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1igR7x-0007eF-3A; Sun, 15 Dec 2019 11:27:53 +0100
+Date:   Sun, 15 Dec 2019 10:27:51 +0000
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     kvm-ppc@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        kvm@vger.kernel.org, James Hogan <jhogan@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, linux-mips@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH 1/7] KVM: Pass mmu_notifier_range down to
+ kvm_unmap_hva_range()
+Message-ID: <20191215102751.197b7d81@why>
+In-Reply-To: <20191213182503.14460-2-maz@kernel.org>
+References: <20191213182503.14460-1-maz@kernel.org>
+        <20191213182503.14460-2-maz@kernel.org>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvm-ppc@vger.kernel.org, wanpengli@tencent.com, kvm@vger.kernel.org, jhogan@kernel.org, joro@8bytes.org, linux-mips@vger.kernel.org, sean.j.christopherson@intel.com, paulus@ozlabs.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, vkuznets@redhat.com, kvmarm@lists.cs.columbia.edu, jmattson@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-VCPU_CR is the offset of arch.regs.ccr in kvm_vcpu.
-arch/powerpc/include/asm/kvm_host.h defines arch.regs as a struct
-pt_regs, and arch/powerpc/include/asm/ptrace.h defines the ccr field
-of pt_regs as "unsigned long ccr".  Since unsigned long is 64 bits, a
-64-bit load needs to be used to load it, unless an endianness specific
-correction offset is added to access the desired subpart.  In this
-case there is no reason to _not_ use a 64 bit load though.
+On Fri, 13 Dec 2019 18:24:57 +0000
+Marc Zyngier <maz@kernel.org> wrote:
 
-Signed-off-by: Marcus Comstedt <marcus@mc.pp.se>
----
-This was tested on 5.4.3 on a Talos II (POWER9 Nimbus DD2.2)
+> kvm_unmap_hva_range() is currently passed both start and end
+> fields from the mmu_notifier_range structure. As this struct
+> now contains important information about the reason of the
+> unmap (the event field), replace the start/end parameters
+> with the range struct, and update all architectures.
+> 
+> No functionnal change.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm/include/asm/kvm_host.h     | 2 +-
+>  arch/arm64/include/asm/kvm_host.h   | 2 +-
+>  arch/mips/include/asm/kvm_host.h    | 2 +-
+>  arch/mips/kvm/mmu.c                 | 6 ++++--
+>  arch/powerpc/include/asm/kvm_host.h | 2 +-
+>  arch/powerpc/kvm/book3s.c           | 5 +++--
+>  arch/powerpc/kvm/e500_mmu_host.c    | 4 ++--
+>  arch/x86/include/asm/kvm_host.h     | 3 ++-
+>  arch/x86/kvm/mmu/mmu.c              | 5 +++--
+>  arch/x86/kvm/x86.c                  | 4 ++--
+>  include/linux/kvm_host.h            | 2 +-
+>  virt/kvm/arm/mmu.c                  | 8 ++++----
+>  virt/kvm/kvm_main.c                 | 7 +++----
+>  13 files changed, 28 insertions(+), 24 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 556cd818eccf..621c71594499 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -276,7 +276,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  
+>  #define KVM_ARCH_WANT_MMU_NOTIFIER
+>  int kvm_unmap_hva_range(struct kvm *kvm,
+> -			unsigned long start, unsigned long end);
+> +			const struct mmu_notifier_range *range);
+>  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
+>  
+>  unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index c61260cf63c5..dd850f5e81e3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -441,7 +441,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  
+>  #define KVM_ARCH_WANT_MMU_NOTIFIER
+>  int kvm_unmap_hva_range(struct kvm *kvm,
+> -			unsigned long start, unsigned long end);
+> +			const struct mmu_notifier_range *range);
+>  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
+>  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
+>  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+> index 41204a49cf95..0ed065870f1b 100644
+> --- a/arch/mips/include/asm/kvm_host.h
+> +++ b/arch/mips/include/asm/kvm_host.h
+> @@ -935,7 +935,7 @@ enum kvm_mips_fault_result kvm_trap_emul_gva_fault(struct kvm_vcpu *vcpu,
+>  
+>  #define KVM_ARCH_WANT_MMU_NOTIFIER
+>  int kvm_unmap_hva_range(struct kvm *kvm,
+> -			unsigned long start, unsigned long end);
+> +			const struct mmu_notifier_range *range);
+>  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
+>  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
+>  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+> diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
+> index 7dad7a293eae..32ef868258b9 100644
+> --- a/arch/mips/kvm/mmu.c
+> +++ b/arch/mips/kvm/mmu.c
+> @@ -518,9 +518,11 @@ static int kvm_unmap_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+>  	return 1;
+>  }
+>  
+> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
+> +int kvm_unmap_hva_range(struct kvm *kvm,
+> +			const struct mmu_notifier_range *range)
+>  {
+> -	handle_hva_to_gpa(kvm, start, end, &kvm_unmap_hva_handler, NULL);
+> +	handle_hva_to_gpa(kvm, range->start, range->end,
+> +			  &kvm_unmap_hva_handler, NULL);
+>  
+>  	kvm_mips_callbacks->flush_shadow_all(kvm);
+>  	return 0;
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index 0a398f2321c2..8cef585e0abe 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -58,7 +58,7 @@
+>  #define KVM_ARCH_WANT_MMU_NOTIFIER
+>  
+>  extern int kvm_unmap_hva_range(struct kvm *kvm,
+> -			       unsigned long start, unsigned long end);
+> +			       const struct mmu_notifier_range *range);
+>  extern int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
+>  extern int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+>  extern int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
+> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+> index 58a59ee998e2..a1529a0dd656 100644
+> --- a/arch/powerpc/kvm/book3s.c
+> +++ b/arch/powerpc/kvm/book3s.c
+> @@ -842,9 +842,10 @@ void kvmppc_core_commit_memory_region(struct kvm *kvm,
+>  	kvm->arch.kvm_ops->commit_memory_region(kvm, mem, old, new, change);
+>  }
+>  
+> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
+> +int kvm_unmap_hva_range(struct kvm *kvm,
+> +			const struct mmu_notifier_range *range)
+>  {
+> -	return kvm->arch.kvm_ops->unmap_hva_range(kvm, start, end);
+> +	return kvm->arch.kvm_ops->unmap_hva_range(kvm, range->start, range->end);
+>  }
+>  
+>  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
+> diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
+> index 425d13806645..5a7211901063 100644
+> --- a/arch/powerpc/kvm/e500_mmu_host.c
+> +++ b/arch/powerpc/kvm/e500_mmu_host.c
+> @@ -734,10 +734,10 @@ static int kvm_unmap_hva(struct kvm *kvm, unsigned long hva)
+>  	return 0;
+>  }
+>  
+> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
+> +int kvm_unmap_hva_range(struct kvm *kvm, const struct mmu_notifier_range *range)
+>  {
+>  	/* kvm_unmap_hva flushes everything anyways */
+> -	kvm_unmap_hva(kvm, start);
+> +	kvm_unmap_hva(kvm, range->start);
+>  
+>  	return 0;
+>  }
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index b79cd6aa4075..c479fa845d72 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1569,7 +1569,8 @@ asmlinkage void kvm_spurious_fault(void);
+>  	_ASM_EXTABLE(666b, 667b)
+>  
+>  #define KVM_ARCH_WANT_MMU_NOTIFIER
+> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end);
+> +int kvm_unmap_hva_range(struct kvm *kvm,
+> +			const struct mmu_notifier_range *range);
+>  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
+>  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+>  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 6f92b40d798c..86831be07c17 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2040,9 +2040,10 @@ static int kvm_handle_hva(struct kvm *kvm, unsigned long hva,
+>  	return kvm_handle_hva_range(kvm, hva, hva + 1, data, handler);
+>  }
+>  
+> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
+> +int kvm_unmap_hva_range(struct kvm *kvm,
+> +			const struct mmu_notifier_range *range);
+>  {
+> -	return kvm_handle_hva_range(kvm, start, end, 0, kvm_unmap_rmapp);
+> +	return kvm_handle_hva_range(kvm, range->start, range->end, 0, kvm_unmap_rmapp);
+>  }
 
- arch/powerpc/kvm/book3s_hv_rmhandlers.S | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+As kindly pointed out by the kbuild robot, this doesn't even compile...
+I've fixed it locally, incorporating Suzuki's feedback at the same time.
 
-diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index 0496e66aaa56..c6fbbd29bd87 100644
---- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-+++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -1117,7 +1117,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
- 	ld	r7, VCPU_GPR(R7)(r4)
- 	bne	ret_to_ultra
- 
--	lwz	r0, VCPU_CR(r4)
-+	ld	r0, VCPU_CR(r4)
- 	mtcr	r0
- 
- 	ld	r0, VCPU_GPR(R0)(r4)
-@@ -1137,7 +1137,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
-  *   R3 = UV_RETURN
-  */
- ret_to_ultra:
--	lwz	r0, VCPU_CR(r4)
-+	ld	r0, VCPU_CR(r4)
- 	mtcr	r0
- 
- 	ld	r0, VCPU_GPR(R3)(r4)
+	M.
 -- 
-2.23.0
-
+Jazz is not dead. It just smells funny...
