@@ -2,286 +2,77 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AD78811F559
-	for <lists+kvm-ppc@lfdr.de>; Sun, 15 Dec 2019 03:12:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45D0211F70D
+	for <lists+kvm-ppc@lfdr.de>; Sun, 15 Dec 2019 10:49:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726948AbfLOCM3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 14 Dec 2019 21:12:29 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41004 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726783AbfLOCM2 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 14 Dec 2019 21:12:28 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBF2CBDv044260;
-        Sat, 14 Dec 2019 21:12:11 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2wvsj0h4d6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 14 Dec 2019 21:12:11 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBF2AkZi017689;
-        Sun, 15 Dec 2019 02:12:10 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma02wdc.us.ibm.com with ESMTP id 2wvqc5qspa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 15 Dec 2019 02:12:10 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBF2CAlZ45875568
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 15 Dec 2019 02:12:10 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B538124053;
-        Sun, 15 Dec 2019 02:12:10 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1F009124052;
-        Sun, 15 Dec 2019 02:12:10 +0000 (GMT)
-Received: from suka-w540.localdomain (unknown [9.70.94.45])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Sun, 15 Dec 2019 02:12:10 +0000 (GMT)
-Received: by suka-w540.localdomain (Postfix, from userid 1000)
-        id 97DF32E210B; Sat, 14 Dec 2019 18:12:08 -0800 (PST)
-Date:   Sat, 14 Dec 2019 18:12:08 -0800
-From:   Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Paul Mackerras <paulus@ozlabs.org>, linuxram@us.ibm.com,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        kvm-ppc@vger.kernel.org, linux-mm@kvack.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH V3 2/2] KVM: PPC: Implement H_SVM_INIT_ABORT hcall
-Message-ID: <20191215021208.GB27378@us.ibm.com>
-References: <20191215021104.GA27378@us.ibm.com>
+        id S1726094AbfLOJtH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 15 Dec 2019 04:49:07 -0500
+Received: from bahamut-sn.mc.pp.se ([213.115.244.39]:36736 "EHLO
+        bahamut.mc.pp.se" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726089AbfLOJtH (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 15 Dec 2019 04:49:07 -0500
+Received: from hakua (hakua [192.168.42.40])
+        by bahamut.mc.pp.se (Postfix) with SMTP id 93E90A3C06;
+        Sun, 15 Dec 2019 10:49:04 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mc.pp.se; s=hedgehog;
+        t=1576403345; bh=yXGLwjD345CaXg2lBpjGZKcFu4vIc+N91onoyvmmduE=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:
+         Content-Transfer-Encoding; b=URDw7iSxJu6Yyo3fpVZI4EBw6FZk55bLqggfE
+        o1BF+nKuH4V8ggByY+L7H7+P1kJyuJzyCqVCP0qjbZ8H/m6tU5tCdtOEDO+a8CWQ8uX
+        tGNdprpYlA7EAAP9Mhg1Ikwvwf+sKUiDNLkGv4AjZhYMF9wEfSfBBdXQEvi/upaTGLA
+        =
+Received: by hakua (sSMTP sendmail emulation); Sun, 15 Dec 2019 10:49:04 +0100
+From:   "Marcus Comstedt" <marcus@mc.pp.se>
+To:     kvm-ppc@vger.kernel.org
+Cc:     Marcus Comstedt <marcus@mc.pp.se>
+Subject: [PATCH] KVM: PPC: Book3S HV: Fix regression on big endian hosts
+Date:   Sun, 15 Dec 2019 10:49:00 +0100
+Message-Id: <20191215094900.46740-1-marcus@mc.pp.se>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191215021104.GA27378@us.ibm.com>
-X-Operating-System: Linux 2.0.32 on an i486
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-14_07:2019-12-13,2019-12-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=2 mlxscore=0
- priorityscore=1501 phishscore=0 malwarescore=0 bulkscore=0 adultscore=0
- impostorscore=0 spamscore=0 mlxlogscore=999 lowpriorityscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912150019
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+VCPU_CR is the offset of arch.regs.ccr in kvm_vcpu.
+arch/powerpc/include/asm/kvm_host.h defines arch.regs as a struct
+pt_regs, and arch/powerpc/include/asm/ptrace.h defines the ccr field
+of pt_regs as "unsigned long ccr".  Since unsigned long is 64 bits, a
+64-bit load needs to be used to load it, unless an endianness specific
+correction offset is added to access the desired subpart.  In this
+case there is no reason to _not_ use a 64 bit load though.
 
-Implement the H_SVM_INIT_ABORT hcall which the Ultravisor can use to
-abort an SVM after it has issued the H_SVM_INIT_START and before the
-H_SVM_INIT_DONE hcalls. This hcall could be used when Ultravisor
-encounters security violations or other errors when starting an SVM.
-
-Note that this hcall is different from UV_SVM_TERMINATE ucall which
-is used by HV to terminate/cleanup an VM that has becore secure.
-
-The H_SVM_INIT_ABORT should basically undo operations that were done
-since the H_SVM_INIT_START hcall - i.e page-out all the VM pages back
-to normal memory, and terminate the SVM.
-
-(If we do not bring the pages back to normal memory, the text/data
-of the VM would be stuck in secure memory and since the SVM did not
-go secure, its MSR_S bit will be clear and the VM wont be able to
-access its pages even to do a clean exit).
-
-Based on patches and discussion with Paul Mackerras, Ram Pai and
-Bharata Rao.
-
-Signed-off-by: Ram Pai <linuxram@linux.ibm.com>
-Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.ibm.com>
-Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+Signed-off-by: Marcus Comstedt <marcus@mc.pp.se>
 ---
-Changelog[v3]:
-	- Rather than pass the NIP/MSR as parameters, load them into
-	  SRR0/SRR1 (like we do with other registers) and terminate
-	  the VM after paging out pages
-	- Move the code to add a skip_page_out parameter into a
-	  separate patch.
+This was tested on 5.4.3 on a Talos II (POWER9 Nimbus DD2.2)
 
-Changelog[v2]:
-	[Paul Mackerras] avoid returning to UV "one last time" after
-	the state is cleaned up.  So, we now have H_SVM_INIT_ABORT:
-	- take the VM's NIP/MSR register states as parameters
-	- inherit the state of other registers as at UV_ESM call.
-	After cleaning up the partial state, HV uses these to return
-	directly to the VM with a failed UV_ESM call.
----
- Documentation/powerpc/ultravisor.rst        | 57 +++++++++++++++++++++
- arch/powerpc/include/asm/hvcall.h           |  1 +
- arch/powerpc/include/asm/kvm_book3s_uvmem.h |  6 +++
- arch/powerpc/include/asm/kvm_host.h         |  1 +
- arch/powerpc/kvm/book3s_hv.c                |  3 ++
- arch/powerpc/kvm/book3s_hv_uvmem.c          | 24 +++++++++
- 6 files changed, 92 insertions(+)
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/powerpc/ultravisor.rst b/Documentation/powerpc/ultravisor.rst
-index 730854f73830..8c114c071bfa 100644
---- a/Documentation/powerpc/ultravisor.rst
-+++ b/Documentation/powerpc/ultravisor.rst
-@@ -948,6 +948,63 @@ Use cases
-     up its internal state for this virtual machine.
+diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+index 0496e66aaa56..c6fbbd29bd87 100644
+--- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
++++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+@@ -1117,7 +1117,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
+ 	ld	r7, VCPU_GPR(R7)(r4)
+ 	bne	ret_to_ultra
  
+-	lwz	r0, VCPU_CR(r4)
++	ld	r0, VCPU_CR(r4)
+ 	mtcr	r0
  
-+H_SVM_INIT_ABORT
-+----------------
-+
-+    Abort the process of securing an SVM.
-+
-+Syntax
-+~~~~~~
-+
-+.. code-block:: c
-+
-+	uint64_t hypercall(const uint64_t H_SVM_INIT_ABORT)
-+
-+Return values
-+~~~~~~~~~~~~~
-+
-+    One of the following values:
-+
-+	* H_PARAMETER 		on successfully cleaning up the state,
-+				Hypervisor will return this value to the
-+				**guest**, to indicate that the underlying
-+				UV_ESM ultracall failed.
-+
-+	* H_UNSUPPORTED		if called from the wrong context (e.g. from
-+				an SVM or before an H_SVM_INIT_START hypercall).
-+
-+Description
-+~~~~~~~~~~~
-+
-+    Abort the process of securing a virtual machine. This call must
-+    be made after a prior call to ``H_SVM_INIT_START`` hypercall and
-+    before a call to ``H_SVM_INIT_DONE``.
-+
-+    On entry into this hypercall the non-volatile GPRs and FPRs are
-+    expected to contain the values they had at the time the VM issued
-+    the UV_ESM ultracall. Further ``SRR0`` is expected to contain the
-+    address of the instruction after the ``UV_ESM`` ultracall and ``SRR1``
-+    the MSR value with which to return to the VM.
-+
-+    This hypercall will cleanup any partial state that was established for
-+    the VM since the prior ``H_SVM_INIT_START`` hypercall, including paging
-+    out pages that were paged-into secure memory, and issue the
-+    ``UV_SVM_TERMINATE`` ultracall to terminate the VM.
-+
-+    After the partial state is cleaned up, control returns to the VM
-+    (**not Ultravisor**), at the address specified in ``SRR0`` with the
-+    MSR values set to the value in ``SRR1``.
-+
-+Use cases
-+~~~~~~~~~
-+
-+    If after a successful call to ``H_SVM_INIT_START``, the Ultravisor
-+    encounters an error while securing a virtual machine, either due
-+    to lack of resources or because the VM's security information could
-+    not be validated, Ultravisor informs the Hypervisor about it.
-+    Hypervisor should use this call to clean up any internal state for
-+    this virtual machine and return to the VM.
-+
- H_SVM_PAGE_IN
- -------------
+ 	ld	r0, VCPU_GPR(R0)(r4)
+@@ -1137,7 +1137,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
+  *   R3 = UV_RETURN
+  */
+ ret_to_ultra:
+-	lwz	r0, VCPU_CR(r4)
++	ld	r0, VCPU_CR(r4)
+ 	mtcr	r0
  
-diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
-index 13bd870609c3..e90c073e437e 100644
---- a/arch/powerpc/include/asm/hvcall.h
-+++ b/arch/powerpc/include/asm/hvcall.h
-@@ -350,6 +350,7 @@
- #define H_SVM_PAGE_OUT		0xEF04
- #define H_SVM_INIT_START	0xEF08
- #define H_SVM_INIT_DONE		0xEF0C
-+#define H_SVM_INIT_ABORT	0xEF14
- 
- /* Values for 2nd argument to H_SET_MODE */
- #define H_SET_MODE_RESOURCE_SET_CIABR		1
-diff --git a/arch/powerpc/include/asm/kvm_book3s_uvmem.h b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-index 3cf8425b9838..5a9834e0e2d1 100644
---- a/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-+++ b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-@@ -19,6 +19,7 @@ unsigned long kvmppc_h_svm_page_out(struct kvm *kvm,
- unsigned long kvmppc_h_svm_init_start(struct kvm *kvm);
- unsigned long kvmppc_h_svm_init_done(struct kvm *kvm);
- int kvmppc_send_page_to_uv(struct kvm *kvm, unsigned long gfn);
-+unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm);
- void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
- 			     struct kvm *kvm, bool skip_page_out);
- #else
-@@ -62,6 +63,11 @@ static inline unsigned long kvmppc_h_svm_init_done(struct kvm *kvm)
- 	return H_UNSUPPORTED;
- }
- 
-+static inline unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm)
-+{
-+	return H_UNSUPPORTED;
-+}
-+
- static inline int kvmppc_send_page_to_uv(struct kvm *kvm, unsigned long gfn)
- {
- 	return -EFAULT;
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 577ca95fac7c..8310c0407383 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -278,6 +278,7 @@ struct kvm_resize_hpt;
- /* Flag values for kvm_arch.secure_guest */
- #define KVMPPC_SECURE_INIT_START 0x1 /* H_SVM_INIT_START has been called */
- #define KVMPPC_SECURE_INIT_DONE  0x2 /* H_SVM_INIT_DONE completed */
-+#define KVMPPC_SECURE_INIT_ABORT 0x4 /* H_SVM_INIT_ABORT issued */
- 
- struct kvm_arch {
- 	unsigned int lpid;
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 66d5312be16b..1b22f2c7ad1b 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -1099,6 +1099,9 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 	case H_SVM_INIT_DONE:
- 		ret = kvmppc_h_svm_init_done(vcpu->kvm);
- 		break;
-+	case H_SVM_INIT_ABORT:
-+		ret = kvmppc_h_svm_init_abort(vcpu->kvm);
-+		break;
- 
- 	default:
- 		return RESUME_HOST;
-diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-index 9a5bbad7d87e..f7df8c327468 100644
---- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-+++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-@@ -287,6 +287,30 @@ void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
- 	}
- }
- 
-+unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm)
-+{
-+	int i;
-+
-+	if (!(kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START))
-+		return H_UNSUPPORTED;
-+
-+	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-+		struct kvm_memory_slot *memslot;
-+		struct kvm_memslots *slots = __kvm_memslots(kvm, i);
-+
-+		if (!slots)
-+			continue;
-+
-+		kvm_for_each_memslot(memslot, slots)
-+			kvmppc_uvmem_drop_pages(memslot, kvm, false);
-+	}
-+
-+	kvm->arch.secure_guest = 0;
-+	uv_svm_terminate(kvm->arch.lpid);
-+
-+	return H_PARAMETER;
-+}
-+
- /*
-  * Get a free device PFN from the pool
-  *
+ 	ld	r0, VCPU_GPR(R3)(r4)
 -- 
-2.17.2
+2.23.0
 
