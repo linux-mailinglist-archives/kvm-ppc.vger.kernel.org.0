@@ -2,217 +2,97 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D92E911F72B
-	for <lists+kvm-ppc@lfdr.de>; Sun, 15 Dec 2019 11:28:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7490B11FD38
+	for <lists+kvm-ppc@lfdr.de>; Mon, 16 Dec 2019 04:29:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726078AbfLOK2D (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 15 Dec 2019 05:28:03 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:57743 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726061AbfLOK2D (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 15 Dec 2019 05:28:03 -0500
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
-        (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1igR7x-0007eF-3A; Sun, 15 Dec 2019 11:27:53 +0100
-Date:   Sun, 15 Dec 2019 10:27:51 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     kvm-ppc@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        kvm@vger.kernel.org, James Hogan <jhogan@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, linux-mips@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH 1/7] KVM: Pass mmu_notifier_range down to
- kvm_unmap_hva_range()
-Message-ID: <20191215102751.197b7d81@why>
-In-Reply-To: <20191213182503.14460-2-maz@kernel.org>
-References: <20191213182503.14460-1-maz@kernel.org>
-        <20191213182503.14460-2-maz@kernel.org>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1726618AbfLPD3X (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 15 Dec 2019 22:29:23 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43314 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726528AbfLPD3X (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 15 Dec 2019 22:29:23 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBG3RLLb104734
+        for <kvm-ppc@vger.kernel.org>; Sun, 15 Dec 2019 22:29:22 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wvv8vyg2r-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Sun, 15 Dec 2019 22:29:22 -0500
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <bharata@linux.ibm.com>;
+        Mon, 16 Dec 2019 03:29:19 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 16 Dec 2019 03:29:16 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBG3TFQl61800468
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Dec 2019 03:29:15 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6BB4D42042;
+        Mon, 16 Dec 2019 03:29:15 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 17ADC42045;
+        Mon, 16 Dec 2019 03:29:14 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.199.46.216])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 16 Dec 2019 03:29:13 +0000 (GMT)
+Date:   Mon, 16 Dec 2019 08:59:11 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@ozlabs.org>, linuxram@us.ibm.com,
+        kvm-ppc@vger.kernel.org, linux-mm@kvack.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH V3 2/2] KVM: PPC: Implement H_SVM_INIT_ABORT hcall
+Reply-To: bharata@linux.ibm.com
+References: <20191215021104.GA27378@us.ibm.com>
+ <20191215021208.GB27378@us.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvm-ppc@vger.kernel.org, wanpengli@tencent.com, kvm@vger.kernel.org, jhogan@kernel.org, joro@8bytes.org, linux-mips@vger.kernel.org, sean.j.christopherson@intel.com, paulus@ozlabs.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, vkuznets@redhat.com, kvmarm@lists.cs.columbia.edu, jmattson@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191215021208.GB27378@us.ibm.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-TM-AS-GCONF: 00
+x-cbid: 19121603-0012-0000-0000-000003753716
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121603-0013-0000-0000-000021B11B34
+Message-Id: <20191216032911.GA25495@in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-15_07:2019-12-13,2019-12-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 lowpriorityscore=0 mlxlogscore=513 impostorscore=0
+ clxscore=1015 mlxscore=0 phishscore=0 spamscore=0 malwarescore=0
+ bulkscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912160029
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, 13 Dec 2019 18:24:57 +0000
-Marc Zyngier <maz@kernel.org> wrote:
+On Sat, Dec 14, 2019 at 06:12:08PM -0800, Sukadev Bhattiprolu wrote:
+> +unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm)
+> +{
+> +	int i;
+> +
+> +	if (!(kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START))
+> +		return H_UNSUPPORTED;
+> +
+> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> +		struct kvm_memory_slot *memslot;
+> +		struct kvm_memslots *slots = __kvm_memslots(kvm, i);
+> +
+> +		if (!slots)
+> +			continue;
+> +
+> +		kvm_for_each_memslot(memslot, slots)
+> +			kvmppc_uvmem_drop_pages(memslot, kvm, false);
+> +	}
 
-> kvm_unmap_hva_range() is currently passed both start and end
-> fields from the mmu_notifier_range structure. As this struct
-> now contains important information about the reason of the
-> unmap (the event field), replace the start/end parameters
-> with the range struct, and update all architectures.
-> 
-> No functionnal change.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm/include/asm/kvm_host.h     | 2 +-
->  arch/arm64/include/asm/kvm_host.h   | 2 +-
->  arch/mips/include/asm/kvm_host.h    | 2 +-
->  arch/mips/kvm/mmu.c                 | 6 ++++--
->  arch/powerpc/include/asm/kvm_host.h | 2 +-
->  arch/powerpc/kvm/book3s.c           | 5 +++--
->  arch/powerpc/kvm/e500_mmu_host.c    | 4 ++--
->  arch/x86/include/asm/kvm_host.h     | 3 ++-
->  arch/x86/kvm/mmu/mmu.c              | 5 +++--
->  arch/x86/kvm/x86.c                  | 4 ++--
->  include/linux/kvm_host.h            | 2 +-
->  virt/kvm/arm/mmu.c                  | 8 ++++----
->  virt/kvm/kvm_main.c                 | 7 +++----
->  13 files changed, 28 insertions(+), 24 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 556cd818eccf..621c71594499 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -276,7 +276,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
->  int kvm_unmap_hva_range(struct kvm *kvm,
-> -			unsigned long start, unsigned long end);
-> +			const struct mmu_notifier_range *range);
->  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
->  
->  unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index c61260cf63c5..dd850f5e81e3 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -441,7 +441,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
->  int kvm_unmap_hva_range(struct kvm *kvm,
-> -			unsigned long start, unsigned long end);
-> +			const struct mmu_notifier_range *range);
->  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
->  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
->  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-> index 41204a49cf95..0ed065870f1b 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -935,7 +935,7 @@ enum kvm_mips_fault_result kvm_trap_emul_gva_fault(struct kvm_vcpu *vcpu,
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
->  int kvm_unmap_hva_range(struct kvm *kvm,
-> -			unsigned long start, unsigned long end);
-> +			const struct mmu_notifier_range *range);
->  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
->  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
->  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
-> diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
-> index 7dad7a293eae..32ef868258b9 100644
-> --- a/arch/mips/kvm/mmu.c
-> +++ b/arch/mips/kvm/mmu.c
-> @@ -518,9 +518,11 @@ static int kvm_unmap_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
->  	return 1;
->  }
->  
-> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
-> +int kvm_unmap_hva_range(struct kvm *kvm,
-> +			const struct mmu_notifier_range *range)
->  {
-> -	handle_hva_to_gpa(kvm, start, end, &kvm_unmap_hva_handler, NULL);
-> +	handle_hva_to_gpa(kvm, range->start, range->end,
-> +			  &kvm_unmap_hva_handler, NULL);
->  
->  	kvm_mips_callbacks->flush_shadow_all(kvm);
->  	return 0;
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-> index 0a398f2321c2..8cef585e0abe 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -58,7 +58,7 @@
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
->  
->  extern int kvm_unmap_hva_range(struct kvm *kvm,
-> -			       unsigned long start, unsigned long end);
-> +			       const struct mmu_notifier_range *range);
->  extern int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
->  extern int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
->  extern int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-> index 58a59ee998e2..a1529a0dd656 100644
-> --- a/arch/powerpc/kvm/book3s.c
-> +++ b/arch/powerpc/kvm/book3s.c
-> @@ -842,9 +842,10 @@ void kvmppc_core_commit_memory_region(struct kvm *kvm,
->  	kvm->arch.kvm_ops->commit_memory_region(kvm, mem, old, new, change);
->  }
->  
-> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
-> +int kvm_unmap_hva_range(struct kvm *kvm,
-> +			const struct mmu_notifier_range *range)
->  {
-> -	return kvm->arch.kvm_ops->unmap_hva_range(kvm, start, end);
-> +	return kvm->arch.kvm_ops->unmap_hva_range(kvm, range->start, range->end);
->  }
->  
->  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
-> diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
-> index 425d13806645..5a7211901063 100644
-> --- a/arch/powerpc/kvm/e500_mmu_host.c
-> +++ b/arch/powerpc/kvm/e500_mmu_host.c
-> @@ -734,10 +734,10 @@ static int kvm_unmap_hva(struct kvm *kvm, unsigned long hva)
->  	return 0;
->  }
->  
-> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
-> +int kvm_unmap_hva_range(struct kvm *kvm, const struct mmu_notifier_range *range)
->  {
->  	/* kvm_unmap_hva flushes everything anyways */
-> -	kvm_unmap_hva(kvm, start);
-> +	kvm_unmap_hva(kvm, range->start);
->  
->  	return 0;
->  }
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index b79cd6aa4075..c479fa845d72 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1569,7 +1569,8 @@ asmlinkage void kvm_spurious_fault(void);
->  	_ASM_EXTABLE(666b, 667b)
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
-> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end);
-> +int kvm_unmap_hva_range(struct kvm *kvm,
-> +			const struct mmu_notifier_range *range);
->  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
->  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
->  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 6f92b40d798c..86831be07c17 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2040,9 +2040,10 @@ static int kvm_handle_hva(struct kvm *kvm, unsigned long hva,
->  	return kvm_handle_hva_range(kvm, hva, hva + 1, data, handler);
->  }
->  
-> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
-> +int kvm_unmap_hva_range(struct kvm *kvm,
-> +			const struct mmu_notifier_range *range);
->  {
-> -	return kvm_handle_hva_range(kvm, start, end, 0, kvm_unmap_rmapp);
-> +	return kvm_handle_hva_range(kvm, range->start, range->end, 0, kvm_unmap_rmapp);
->  }
+You need to hold srcu_read_lock(&kvm->srcu) here.
 
-As kindly pointed out by the kbuild robot, this doesn't even compile...
-I've fixed it locally, incorporating Suzuki's feedback at the same time.
+Regards,
+Bharata.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
