@@ -2,125 +2,173 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 59146123864
-	for <lists+kvm-ppc@lfdr.de>; Tue, 17 Dec 2019 22:07:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96EE71238E9
+	for <lists+kvm-ppc@lfdr.de>; Tue, 17 Dec 2019 22:56:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726992AbfLQVHf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 17 Dec 2019 16:07:35 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9298 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726634AbfLQVHf (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 17 Dec 2019 16:07:35 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBHKw0Li045694;
-        Tue, 17 Dec 2019 16:07:22 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wy46cvduj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Dec 2019 16:07:22 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBHL7CWf003720;
-        Tue, 17 Dec 2019 21:07:21 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma02dal.us.ibm.com with ESMTP id 2wvqc6qgy6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Dec 2019 21:07:21 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBHL7KOV51511682
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Dec 2019 21:07:20 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6632EAE05F;
-        Tue, 17 Dec 2019 21:07:20 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 118F0AE063;
-        Tue, 17 Dec 2019 21:07:19 +0000 (GMT)
-Received: from LeoBras.aus.stglabs.ibm.com (unknown [9.18.235.137])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 17 Dec 2019 21:07:18 +0000 (GMT)
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     Paul Mackerras <paulus@ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Leonardo Bras <leonardo@linux.ibm.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        farosas@linux.ibm.com, aik@ozlabs.ru
-Subject: [PATCH 1/1] kvm/book3s_64: Fixes crash caused by not cleaning vhost IOTLB
-Date:   Tue, 17 Dec 2019 18:06:58 -0300
-Message-Id: <20191217210658.73144-1-leonardo@linux.ibm.com>
-X-Mailer: git-send-email 2.23.0
+        id S1726296AbfLQV4p (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 17 Dec 2019 16:56:45 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33786 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725870AbfLQV4p (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 17 Dec 2019 16:56:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576619804;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hSE8d84YfV0TRBuqIE3TvHfXXVwzC5/7L6224fyao4A=;
+        b=TyFN2mCy66oR/wZAmMKycpSF0VNnilonBvpsR66HwJ5gvDEtcLkQZYGrBPMKKse4+9EQ3g
+        1hk6e8qLxKmmWIHM4TylWUr5x2MF/+83Tlex6XvCLhVdkzaoAulrGWmfd4PtQEh1jiCaBe
+        BDBiy8lMRsvLWrGvhQ9g62jHb583GGA=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-3s7pELR8N3OiE68vVKNS3g-1; Tue, 17 Dec 2019 16:56:43 -0500
+X-MC-Unique: 3s7pELR8N3OiE68vVKNS3g-1
+Received: by mail-qk1-f197.google.com with SMTP id s9so7807266qkg.21
+        for <kvm-ppc@vger.kernel.org>; Tue, 17 Dec 2019 13:56:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=hSE8d84YfV0TRBuqIE3TvHfXXVwzC5/7L6224fyao4A=;
+        b=KPm1Rw2a6Zh5D+M86lt84RJK7zw0e8dOJHm8Y1vdZvG2EIen1RAlJN8MGVBaLNd1Sp
+         l6D+JcVudYkc1hp1cmyWF3KM9fVnO18uDnnCpkoeyOxr+n1tOwfm0QCUvW+wAuPuru6b
+         XeUOAKCvGUsLYJpe66qHaSZbGhwHVu6uriECddkFw9iXZr8GQ+qXHm70xgHsfBOE9wCP
+         2bOk1uLufEt0dSHsvrjJkOBP1zgpddWff+ADcskBtamJvOA1/sWMhnoo7DN6xZp2mSQI
+         ObXd1CiwPccE1lxNNwVxmVx/wZ25t+gLnsZZYzE+trHD+yaC8EdjcCuEBVJJpxKQpwb0
+         q8ig==
+X-Gm-Message-State: APjAAAXvAJFtd8fhsuktNLzyAztvgxr6NwyonPDjH/6hgf050qaeVNX0
+        i4sXVSaX/M5X0vkLYnScuy4LKLlApTf4hsf6TBK4cqEUUyEUv7eDxwnVAg/WkyNqaqYYT1lihRQ
+        AnQdXBdqZvoE4zg/ddQ==
+X-Received: by 2002:a05:6214:707:: with SMTP id b7mr6932315qvz.97.1576619803184;
+        Tue, 17 Dec 2019 13:56:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxkJVTx6R82PYxH8CBMYAk4P1dJ5EjDAy6gossam+XsRnSgvrFRKTM01bOCNWxLxn1nVLa7oA==
+X-Received: by 2002:a05:6214:707:: with SMTP id b7mr6932279qvz.97.1576619802834;
+        Tue, 17 Dec 2019 13:56:42 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id t198sm7534281qke.6.2019.12.17.13.56.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Dec 2019 13:56:41 -0800 (PST)
+Date:   Tue, 17 Dec 2019 16:56:40 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v4 01/19] KVM: x86: Allocate new rmap and large page
+ tracking when moving memslot
+Message-ID: <20191217215640.GI7258@xz-x1>
+References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
+ <20191217204041.10815-2-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-17_04:2019-12-17,2019-12-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- suspectscore=2 mlxlogscore=999 spamscore=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 bulkscore=0 clxscore=1015 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912170168
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191217204041.10815-2-sean.j.christopherson@intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Fixes a bug that happens when a virtual machine is created without DDW,
-with vhost supporting a virtio-net device.
+On Tue, Dec 17, 2019 at 12:40:23PM -0800, Sean Christopherson wrote:
+> Reallocate a rmap array and recalcuate large page compatibility when
+> moving an existing memslot to correctly handle the alignment properties
+> of the new memslot.  The number of rmap entries required at each level
+> is dependent on the alignment of the memslot's base gfn with respect to
+> that level, e.g. moving a large-page aligned memslot so that it becomes
+> unaligned will increase the number of rmap entries needed at the now
+> unaligned level.
+> 
+> Not updating the rmap array is the most obvious bug, as KVM accesses
+> garbage data beyond the end of the rmap.  KVM interprets the bad data as
+> pointers, leading to non-canonical #GPs, unexpected #PFs, etc...
+> 
+>   general protection fault: 0000 [#1] SMP
+>   CPU: 0 PID: 1909 Comm: move_memory_reg Not tainted 5.4.0-rc7+ #139
+>   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+>   RIP: 0010:rmap_get_first+0x37/0x50 [kvm]
+>   Code: <48> 8b 3b 48 85 ff 74 ec e8 6c f4 ff ff 85 c0 74 e3 48 89 d8 5b c3
+>   RSP: 0018:ffffc9000021bbc8 EFLAGS: 00010246
+>   RAX: ffff00617461642e RBX: ffff00617461642e RCX: 0000000000000012
+>   RDX: ffff88827400f568 RSI: ffffc9000021bbe0 RDI: ffff88827400f570
+>   RBP: 0010000000000000 R08: ffffc9000021bd00 R09: ffffc9000021bda8
+>   R10: ffffc9000021bc48 R11: 0000000000000000 R12: 0030000000000000
+>   R13: 0000000000000000 R14: ffff88827427d700 R15: ffffc9000021bce8
+>   FS:  00007f7eda014700(0000) GS:ffff888277a00000(0000) knlGS:0000000000000000
+>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>   CR2: 00007f7ed9216ff8 CR3: 0000000274391003 CR4: 0000000000162eb0
+>   Call Trace:
+>    kvm_mmu_slot_set_dirty+0xa1/0x150 [kvm]
+>    __kvm_set_memory_region.part.64+0x559/0x960 [kvm]
+>    kvm_set_memory_region+0x45/0x60 [kvm]
+>    kvm_vm_ioctl+0x30f/0x920 [kvm]
+>    do_vfs_ioctl+0xa1/0x620
+>    ksys_ioctl+0x66/0x70
+>    __x64_sys_ioctl+0x16/0x20
+>    do_syscall_64+0x4c/0x170
+>    entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>   RIP: 0033:0x7f7ed9911f47
+>   Code: <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 21 6f 2c 00 f7 d8 64 89 01 48
+>   RSP: 002b:00007ffc00937498 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+>   RAX: ffffffffffffffda RBX: 0000000001ab0010 RCX: 00007f7ed9911f47
+>   RDX: 0000000001ab1350 RSI: 000000004020ae46 RDI: 0000000000000004
+>   RBP: 000000000000000a R08: 0000000000000000 R09: 00007f7ed9214700
+>   R10: 00007f7ed92149d0 R11: 0000000000000246 R12: 00000000bffff000
+>   R13: 0000000000000003 R14: 00007f7ed9215000 R15: 0000000000000000
+>   Modules linked in: kvm_intel kvm irqbypass
+>   ---[ end trace 0c5f570b3358ca89 ]---
+> 
+> The disallow_lpage tracking is more subtle.  Failure to update results
+> in KVM creating large pages when it shouldn't, either due to stale data
+> or again due to indexing beyond the end of the metadata arrays, which
+> can lead to memory corruption and/or leaking data to guest/userspace.
+> 
+> Note, the arrays for the old memslot are freed by the unconditional call
+> to kvm_free_memslot() in __kvm_set_memory_region().
+> 
+> Fixes: 05da45583de9b ("KVM: MMU: large page support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-In this scenario, an IOMMU with 32-bit DMA window will possibly map
-IOVA's to different memory addresses.
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-As the code works today, H_STUFF_TCE hypercall will be dealt only with
-kvm code, which does not invalidate the IOTLB entry in vhost, meaning
-that at some point, and old entry can cause an access to a previous
-memory address that IOVA pointed.
+I think the error-prone part is:
 
-Example:
-- virtio-net passes IOVA N to vhost, which point to M1
-- vhost tries IOTLB, but miss
-- vhost translates IOVA N and stores result to IOTLB
-- vhost writes to M1
-- (some IOMMU usage)
-- virtio-net passes IOVA N to vhost, which now points to M2
-- vhost tries IOTLB, and translates IOVA N to M1
-- vhost writes to M1 <error, should write to M2>
+	new = old = *slot;
 
-The reason why this error was not so evident, is probably because the
-IOTLB was small enough to almost always miss at the point an IOVA was
-reused. Raising the IOTLB size to 32k (which is a module parameter that
-defaults to 2k) is enough to reproduce the bug in +90% of the runs.
-It usually takes less than 10 seconds of netperf to cause this bug
-to happen.
+Where IMHO it would be better if we only copy pointers explicitly when
+under control, rather than blindly copying all the pointers in the
+structure which even contains sub-structures.
 
-A few minutes after reproducing this bug, the guest usually crash.
+For example, I see PPC has this:
 
-Fixing this bug involves cleaning a IOVA entry from IOTLB.
-The guest kernel trigger this by doing a H_STUFF_TCE hypercall with
-tce_value == 0.
+struct kvm_arch_memory_slot {
+#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+	unsigned long *rmap;
+#endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
+};
 
-This change fixes this bug by returning H_TOO_HARD on kvmppc_h_stuff_tce
-when tce_value == 0, which causes kvm to let qemu deal with this.
-In this case, qemu does free the vhost IOTLB entry, which fixes the bug.
+I started to look into HV code of it a bit, then I see...
 
-Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_64_vio.c | 3 +++
- 1 file changed, 3 insertions(+)
+ - kvm_arch_create_memslot(kvmppc_core_create_memslot_hv) init slot->arch.rmap,
+ - kvm_arch_flush_shadow_memslot(kvmppc_core_flush_memslot_hv) didn't free it,
+ - kvm_arch_prepare_memory_region(kvmppc_core_prepare_memory_region_hv) is nop.
 
-diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-index 883a66e76638..841eff3f6392 100644
---- a/arch/powerpc/kvm/book3s_64_vio.c
-+++ b/arch/powerpc/kvm/book3s_64_vio.c
-@@ -710,6 +710,9 @@ long kvmppc_h_stuff_tce(struct kvm_vcpu *vcpu,
- 	if (ret != H_SUCCESS)
- 		return ret;
- 
-+	if (tce_value == 0)
-+		return H_TOO_HARD;
-+
- 	/* Check permission bits only to allow userspace poison TCE for debug */
- 	if (tce_value & (TCE_PCI_WRITE | TCE_PCI_READ))
- 		return H_PARAMETER;
+So Does it have similar issue?
+
 -- 
-2.23.0
+Peter Xu
 
