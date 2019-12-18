@@ -2,33 +2,32 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 043C4124DFF
-	for <lists+kvm-ppc@lfdr.de>; Wed, 18 Dec 2019 17:40:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3278B125058
+	for <lists+kvm-ppc@lfdr.de>; Wed, 18 Dec 2019 19:11:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727504AbfLRQkA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 18 Dec 2019 11:40:00 -0500
-Received: from mga07.intel.com ([134.134.136.100]:30982 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727124AbfLRQkA (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 18 Dec 2019 11:40:00 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 08:39:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; 
-   d="scan'208";a="205898318"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2019 08:39:59 -0800
-Date:   Wed, 18 Dec 2019 08:39:59 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
+        id S1727031AbfLRSLM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 18 Dec 2019 13:11:12 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:44619 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726960AbfLRSLM (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 18 Dec 2019 13:11:12 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1ihdmZ-0007pw-8W; Wed, 18 Dec 2019 19:10:47 +0100
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v4 00/19] KVM: Dynamically size memslot arrays
+X-PHP-Originating-Script: 0:main.inc
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 18 Dec 2019 18:10:47 +0000
+From:   Marc Zyngier <maz@kernel.org>
 Cc:     James Hogan <jhogan@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
         David Hildenbrand <david@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -38,57 +37,70 @@ Cc:     James Hogan <jhogan@kernel.org>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        <linux-mips@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
         Christoffer Dall <christoffer.dall@arm.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v4 19/19] KVM: selftests: Add test for
- KVM_SET_USER_MEMORY_REGION
-Message-ID: <20191218163958.GC25201@linux.intel.com>
+        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+In-Reply-To: <20191217204041.10815-1-sean.j.christopherson@intel.com>
 References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
- <20191217204041.10815-20-sean.j.christopherson@intel.com>
- <f962fafb-3956-746f-d077-3dbcefaae7c8@de.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f962fafb-3956-746f-d077-3dbcefaae7c8@de.ibm.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Message-ID: <3a6b03cc1300bc3cffd3904e22c09478@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, jhogan@kernel.org, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, pbonzini@redhat.com, david@redhat.com, cohuck@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, f4bug@amsat.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Dec 18, 2019 at 12:39:43PM +0100, Christian Borntraeger wrote:
-> 
-> On 17.12.19 21:40, Sean Christopherson wrote:
-> > Add a KVM selftest to test moving the base gfn of a userspace memory
-> > region.  The test is primarily targeted at x86 to verify its memslot
-> > metadata is correctly updated, but also provides basic functionality
-> > coverage on other architectures.
-> > +static void *vcpu_worker(void *data)
-> > +{
-> > +	struct kvm_vm *vm = data;
-> > +	struct kvm_run *run;
-> > +	struct ucall uc;
-> > +	uint64_t cmd;
-> > +
-> > +	/*
-> > +	 * Loop until the guest is done.  Re-enter the guest on all MMIO exits,
-> > +	 * which will occur if the guest attempts to access a memslot while it
-> > +	 * is being moved.
-> > +	 */
-> > +	run = vcpu_state(vm, VCPU_ID);
-> > +	do {
-> > +		vcpu_run(vm, VCPU_ID);
-> > +	} while (run->exit_reason == KVM_EXIT_MMIO);
-> > +
-> > +	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-> > +		    "Unexpected exit reason = %d", run->exit_reason);
-> 
-> 
-> This will also not work for s390. Maybe just make this test x86 specific for now?
+On 2019-12-17 20:40, Sean Christopherson wrote:
+> The end goal of this series is to dynamically size the memslot array 
+> so
+> that KVM allocates memory based on the number of memslots in use, as
+> opposed to unconditionally allocating memory for the maximum number 
+> of
+> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 
+> address
+> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
+> E.g. given a VM that uses a total of 30 memslots, dynamic sizing 
+> reduces
+> the memory footprint from 90k to ~2.6k bytes.
+>
+> The changes required to support dynamic sizing are relatively small,
+> e.g. are essentially contained in patches 17/19 and 18/19.
+>
+> Patches 2-16 clean up the memslot code, which has gotten quite 
+> crusty,
+> especially __kvm_set_memory_region().  The clean up is likely not 
+> strictly
+> necessary to switch to dynamic sizing, but I didn't have a remotely
+> reasonable level of confidence in the correctness of the dynamic 
+> sizing
+> without first doing the clean up.
+>
+> The only functional change in v4 is the addition of an x86-specific 
+> bug
+> fix in x86's handling of KVM_MR_MOVE.  The bug fix is not directly 
+> related
+> to dynamically allocating memslots, but it has subtle and hidden 
+> conflicts
+> with the cleanup patches, and the fix is higher priority than 
+> anything
+> else in the series, i.e. should be merged first.
+>
+> On non-x86 architectures, v3 and v4 should be functionally 
+> equivalent,
+> the only non-x86 change in v4 is the dropping of a "const" in
+> kvm_arch_commit_memory_region().
 
-Doh, that's obvious in hindsight.  I think the basic premise is also
-broken on arm64 as it returns -EFAULT on is_error_noslot_pfn(pfn).  So
-yeah, x86 only for now :-(
+Gave it another go on top of 5.5-rc2 on an arm64 box, and nothing
+exploded. So thumbs up from me.
+
+Thanks,
+
+        M.
+-- 
+Jazz is not dead. It just smells funny...
