@@ -2,72 +2,59 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2956D123EB7
-	for <lists+kvm-ppc@lfdr.de>; Wed, 18 Dec 2019 06:11:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22D27123F2D
+	for <lists+kvm-ppc@lfdr.de>; Wed, 18 Dec 2019 06:36:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725818AbfLRFLk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 18 Dec 2019 00:11:40 -0500
-Received: from ozlabs.org ([203.11.71.1]:51191 "EHLO ozlabs.org"
+        id S1726696AbfLRFgh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 18 Dec 2019 00:36:37 -0500
+Received: from ozlabs.org ([203.11.71.1]:36267 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725797AbfLRFLk (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 18 Dec 2019 00:11:40 -0500
+        id S1725985AbfLRFgh (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 18 Dec 2019 00:36:37 -0500
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 47d35Q0Hx6z9sRl; Wed, 18 Dec 2019 16:11:37 +1100 (AEDT)
+        id 47d3fC0xHGz9sS9; Wed, 18 Dec 2019 16:36:34 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1576645898; bh=93N8VOo8SCifT0RoMTSN2PKiLco93mZr6cUDSYI7iGY=;
-        h=Date:From:To:Subject:From;
-        b=Sf+V97fQIP+xjVTfXjs7QkPY6KUzLk6WUv1oXQAOBYy6EjkoxncqrxBgGe8uyoqlO
-         zOHjE/FaRl3eVq1L0RC82EYbBbDI3TSkYmR3ehw59Ux9gptGj06yuK8nepILjhsXQP
-         OrplO34urCMEM1VWcqzH12kTWwvEP6YLzPguMCznTb4EDf5W7SKrI7n3QsZ/XJbBkS
-         QkvYcuSYaiiUZAw3cPpQEwoVzFFaUYkunNGIMGAEqA0blCcrC5FtZZAj9B3vvvjGWy
-         Xotr5chWd51m+6TB3oyyGN9jkq73n0jqo783Hk4dMccFwZtcoRG9/6/MbAaXllELIG
-         mMvqpTcqK2dGA==
-Date:   Wed, 18 Dec 2019 16:11:30 +1100
+        t=1576647395; bh=arBhEw9NZmuhyzR9ri9+gjUXrFXvq5epgRZxiP5ucNg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NhDElDY9zmVJkVePcXc133bDxJpq78JWTKjRkTXTN6bvZxBcOMs/hpys48N9ukgp5
+         7nr87BGLpPTjupTI3yUT9v/j+7oL4tN9jKYRu6RkJmW/tKHKcDW1YYaHFcfDBJ0RTs
+         DibDDbf0taAlwZgPKYksGt895RCWB/0WCHTEGK6d4quXaHvrclxZt2LnGZsI25Ey/F
+         G2m0THpYmB1CcvqPc2Bo2kI0b9cFWAonDWr7INs1X+72+hxT97NUjLcpbAlCQHdol8
+         mCEqVeLIlhnEieHqyFkljrQlMYO+C6I2s9mKYosevnS/8uLY6sIDh5mlbdEHavlrAA
+         H6IEgkuH1/f/A==
+Date:   Wed, 18 Dec 2019 16:32:50 +1100
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Subject: [PATCH] KVM: PPC: Book3S HV: Don't do ultravisor calls on systems
- without ultravisor
-Message-ID: <20191218051130.GA29890@oak.ozlabs.ibm.com>
+To:     Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>, linuxram@us.ibm.com,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        kvm-ppc@vger.kernel.org, linux-mm@kvack.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH V3 1/2] KVM: PPC: Add skip_page_out parameter
+Message-ID: <20191218053250.GB29890@oak.ozlabs.ibm.com>
+References: <20191215021104.GA27378@us.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20191215021104.GA27378@us.ibm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Commit 22945688acd4 ("KVM: PPC: Book3S HV: Support reset of secure
-guest") added a call to uv_svm_terminate, which is an ultravisor
-call, without any check that the guest is a secure guest or even that
-the system has an ultravisor.  On a system without an ultravisor,
-the ultracall will degenerate to a hypercall, but since we are not
-in KVM guest context, the hypercall will get treated as a system
-call, which could have random effects depending on what happens to
-be in r0, and could also corrupt the current task's kernel stack.
-Hence this adds a test for the guest being a secure guest before
-doing uv_svm_terminate().
+On Sat, Dec 14, 2019 at 06:11:04PM -0800, Sukadev Bhattiprolu wrote:
+> 
+> This patch is based on Bharata's v11 KVM patches for secure guests:
+> https://lists.ozlabs.org/pipermail/linuxppc-dev/2019-November/200918.html
+> ---
+> 
+> From: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+> Date: Fri, 13 Dec 2019 15:06:16 -0600
+> Subject: [PATCH V3 1/2] KVM: PPC: Add skip_page_out parameter
+> 
+> Add 'skip_page_out' parameter to kvmppc_uvmem_drop_pages() which will
+> be needed in a follow-on patch that implements H_SVM_INIT_ABORT hcall.
+> 
+> Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.ibm.com>
 
-Fixes: 22945688acd4 ("KVM: PPC: Book3S HV: Support reset of secure guest")
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
----
- arch/powerpc/kvm/book3s_hv.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index dc53578193ee..6ff3f896d908 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4983,7 +4983,8 @@ static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
- 		if (nesting_enabled(kvm))
- 			kvmhv_release_all_nested(kvm);
- 		kvm->arch.process_table = 0;
--		uv_svm_terminate(kvm->arch.lpid);
-+		if (kvm->arch.secure_guest)
-+			uv_svm_terminate(kvm->arch.lpid);
- 		kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
- 	}
- 
--- 
-2.20.1
-
+Reviewed-by: Paul Mackerras <paulus@ozlabs.org>
