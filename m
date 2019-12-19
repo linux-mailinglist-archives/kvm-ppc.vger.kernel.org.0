@@ -2,100 +2,72 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 709D612581E
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Dec 2019 00:58:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D822125865
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Dec 2019 01:19:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726463AbfLRX6C (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 18 Dec 2019 18:58:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18680 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726518AbfLRX6B (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 18 Dec 2019 18:58:01 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBINvuS5092246;
-        Wed, 18 Dec 2019 18:57:56 -0500
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2wyt31ejtn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Dec 2019 18:57:56 -0500
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBINv0E6022240;
-        Wed, 18 Dec 2019 23:57:55 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma05wdc.us.ibm.com with ESMTP id 2wvqc6hmd1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Dec 2019 23:57:55 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBINvtGx50921966
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Dec 2019 23:57:55 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 54562112062;
-        Wed, 18 Dec 2019 23:57:55 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3898E112061;
-        Wed, 18 Dec 2019 23:57:55 +0000 (GMT)
-Received: from suka-w540.localdomain (unknown [9.70.94.45])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Dec 2019 23:57:55 +0000 (GMT)
-Received: by suka-w540.localdomain (Postfix, from userid 1000)
-        id 921DF2E0ED7; Wed, 18 Dec 2019 15:57:53 -0800 (PST)
-Date:   Wed, 18 Dec 2019 15:57:53 -0800
-From:   Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
-        Paul Mackerras <paulus@ozlabs.org>, linuxram@us.ibm.com,
-        bauerman@linux.ibm.com, andmike@linux.ibm.com,
-        linuxppc-dev@ozlabs.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH 1/2] powerpc/pseries/svm: Don't access some SPRs
-Message-ID: <20191218235753.GA12285@us.ibm.com>
-References: <20191218043048.3400-1-sukadev@linux.ibm.com>
- <875zidoqok.fsf@mpe.ellerman.id.au>
+        id S1726559AbfLSATW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 18 Dec 2019 19:19:22 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:50811 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726463AbfLSATW (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 18 Dec 2019 19:19:22 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 47dXYh2zFLz9sPh; Thu, 19 Dec 2019 11:19:20 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1576714760; bh=zDFPOp5nfTe9y2XdAgtTDk1OYIJnpIlIJMAWmNX76Rs=;
+        h=Date:From:To:Cc:Subject:From;
+        b=QPXN2QO89XnH+U6Igy7bOrJWBozpChUM+Wfy1iWU17v9LnKwNUDPwiIJ6RdsQ6UDU
+         0dVpA3TDAPB379FbLFETgcaMriAGXc6QdxOdLISkVhXDDOQjyB5PsJg1qggTpjLG3n
+         2NkzffxNyh3l+6xNAPkomM4cZNw88a9Ui5ofcIfFI9TQ0TiQFgt67D4irpjlRUhuHd
+         EUy4Ew0JUrO7StTViV3GYagW726jQvmjqU11dnYGh7ifz9f5Gc4HfXGa/8VTodJ5Nb
+         s7PAww+V/uN6m/iRZZua2LMIEkQHrNx7oE78quTyj1zyHbr3WmXTI8u/PdV91sgPmt
+         lgRRVXFVoP3CA==
+Date:   Thu, 19 Dec 2019 11:19:12 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org
+Subject: [GIT PULL] Please pull my kvm-ppc-fixes-5.5-1 tag
+Message-ID: <20191219001912.GA12288@blackberry>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <875zidoqok.fsf@mpe.ellerman.id.au>
-X-Operating-System: Linux 2.0.32 on an i486
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-18_08:2019-12-17,2019-12-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- spamscore=0 clxscore=1011 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 adultscore=0 mlxlogscore=839 mlxscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912180177
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Michael Ellerman [mpe@ellerman.id.au] wrote:
-> 
-> eg. here.
-> 
-> This is the fast path of context switch.
-> 
-> That expands to:
-> 
-> 	if (!(mfmsr() & MSR_S))
-> 		asm volatile("mfspr %0, SPRN_BESCR" : "=r" (rval));
-> 	if (!(mfmsr() & MSR_S))
-> 		asm volatile("mfspr %0, SPRN_EBBHR" : "=r" (rval));
-> 	if (!(mfmsr() & MSR_S))
-> 		asm volatile("mfspr %0, SPRN_EBBRR" : "=r" (rval));
-> 
+Paolo,
 
-Yes, should have optimized this at least :-)
-> 
-> If the Ultravisor is going to disable EBB and BHRB then we need new
-> CPU_FTR bits for those, and the code that accesses those registers
-> needs to be put behind cpu_has_feature(EBB) etc.
-
-Will try the cpu_has_feature(). Would it be ok to use a single feature
-bit, like UV or make it per-register group as that could need more
-feature bits?
+Please do a pull from my kvm-ppc-fixes-5.5-1 to get one commit which
+should go in 5.5.  It fixes a regression introduced in my last pull,
+which added an ultravisor call even on systems without an ultravisor.
 
 Thanks,
+Paul.
 
-Sukadev
+The following changes since commit 7d73710d9ca2564f29d291d0b3badc09efdf25e9:
+
+  kvm: vmx: Stop wasting a page for guest_msrs (2019-12-04 12:23:27 +0100)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.5-1
+
+for you to fetch changes up to d89c69f42bf0fe42d1f52ea9b3dca15b1ade7601:
+
+  KVM: PPC: Book3S HV: Don't do ultravisor calls on systems without ultravisor (2019-12-18 15:46:34 +1100)
+
+----------------------------------------------------------------
+PPC KVM fix for 5.5
+
+- Fix a bug where we try to do an ultracall on a system without an
+  ultravisor.
+
+----------------------------------------------------------------
+Paul Mackerras (1):
+      KVM: PPC: Book3S HV: Don't do ultravisor calls on systems without ultravisor
+
+ arch/powerpc/kvm/book3s_hv.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
