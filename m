@@ -2,107 +2,134 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 360B91263DC
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Dec 2019 14:46:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89181126DF5
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Dec 2019 20:28:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726754AbfLSNqX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 19 Dec 2019 08:46:23 -0500
-Received: from foss.arm.com ([217.140.110.172]:38852 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726695AbfLSNqX (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 19 Dec 2019 08:46:23 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E151131B;
-        Thu, 19 Dec 2019 05:46:22 -0800 (PST)
-Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A8C063F6CF;
-        Thu, 19 Dec 2019 05:46:20 -0800 (PST)
-Subject: Re: [PATCH 7/7] KVM: arm/arm64: Elide CMOs when unmapping a range
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Hogan <jhogan@kernel.org>,
+        id S1727177AbfLST2w (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 19 Dec 2019 14:28:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30581 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727198AbfLST2w (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 19 Dec 2019 14:28:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576783731;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vAIxDhFZG4KNnWbcoM1z/eNh1hoZhidyKE5sG/UkD5w=;
+        b=PFHb9ppAZSdrztzN13AkJXfJwoQ4HSUioSSeXLQYd1I6WwVi74SRjdBcWFfaprsyLpqZrx
+        7fHiuZ1lBmwi7PBidNlFEv6Bg2/gXdNBvK2u2D5YtknNCz41xYPos9aReo8fAXZ7lU1BHL
+        nSiqfJu8QSBS3SnXFsyFIlfUDzdDets=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-22-7KuzwdpAO0uhdJbA8J3gpA-1; Thu, 19 Dec 2019 14:28:48 -0500
+X-MC-Unique: 7KuzwdpAO0uhdJbA8J3gpA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B2CA18FF698;
+        Thu, 19 Dec 2019 19:28:45 +0000 (UTC)
+Received: from gondolin (ovpn-117-134.ams2.redhat.com [10.36.117.134])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 01C375DA70;
+        Thu, 19 Dec 2019 19:28:37 +0000 (UTC)
+Date:   Thu, 19 Dec 2019 20:28:35 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20191213182503.14460-1-maz@kernel.org>
- <20191213182503.14460-8-maz@kernel.org>
- <0c832b27-7041-a6c8-31c0-d71a25c6f5b8@arm.com>
- <de462fe29fb40fb1644e6a071e6c0c69@www.loen.fr>
-From:   James Morse <james.morse@arm.com>
-Message-ID: <01c9439f-0de1-78ca-632b-f662876cc4a1@arm.com>
-Date:   Thu, 19 Dec 2019 13:46:19 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v2 24/45] KVM: Add kvm_arch_vcpu_precreate() to handle
+ pre-allocation issues
+Message-ID: <20191219202835.06fc6f2f.cohuck@redhat.com>
+In-Reply-To: <20191218215530.2280-25-sean.j.christopherson@intel.com>
+References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
+        <20191218215530.2280-25-sean.j.christopherson@intel.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <de462fe29fb40fb1644e6a071e6c0c69@www.loen.fr>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi Marc,
+On Wed, 18 Dec 2019 13:55:09 -0800
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
-On 18/12/2019 15:30, Marc Zyngier wrote:
-> On 2019-12-18 15:07, James Morse wrote:
->> On 13/12/2019 18:25, Marc Zyngier wrote:
->>> If userspace issues a munmap() on a set of pages, there is no
->>> expectation that the pages are cleaned to the PoC.
-
->>> So let's
->>> not do more work than strictly necessary, and set the magic
->>> flag that avoids CMOs in this case.
->>
->> I think this assumes the pages went from anonymous->free, so no-one
->> cares about the contents.
->>
->> If the pages are backed by a file, won't dirty pages will still get
->> written back before the page is free? (e.g. EFI flash 'file' mmap()ed in)
+> Add a pre-allocation arch hook to handle checks that are currently done
+> by arch specific code prior to allocating the vCPU object.  This paves
+> the way for moving the allocation to common KVM code.
 > 
-> I believe so. Is that a problem?
-
-If we skipped the dcache maintenance on unmap, when the the dirty page is later reclaimed
-the clean+stale lines are written back to the file. File-backed dirty pages will stick
-around in the page cache in the hope someone else needs them.
-
-This would happen for a guest:device-mapping that is written to, but is actually backed by
-a mmap()d file. I think the EFI flash emulation does exactly this.
-
-
->> What if this isn't the only mapping of the page? Can't it be swapped
->> out from another VMA? (tenuous example, poor man's memory mirroring?)
+> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/mips/kvm/mips.c       |  5 +++++
+>  arch/powerpc/kvm/powerpc.c |  5 +++++
+>  arch/s390/kvm/kvm-s390.c   | 12 ++++++++----
+>  arch/x86/kvm/x86.c         | 14 +++++++++-----
+>  include/linux/kvm_host.h   |  1 +
+>  virt/kvm/arm/arm.c         | 21 +++++++++++----------
+>  virt/kvm/kvm_main.c        |  4 ++++
+>  7 files changed, 43 insertions(+), 19 deletions(-)
 > 
-> Swap-out wouldn't trigger this code path, as it would use a different
-> MMU notifier event (MMU_NOTIFY_CLEAR vs MMU_NOTIFY_UNMAP), I believe.
 
-This was a half thought-through special case of the above. The sequence would be:
+(...)
 
-VM-A and VM-B both share a mapping of $page.
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index d9e6bf3d54f0..57c6838dff37 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3035,15 +3035,19 @@ int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
+>  	return rc;
+>  }
+>  
+> +int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+> +{
+> +	if (!kvm_is_ucontrol(kvm) && !sca_can_add_vcpu(kvm, id))
+> +		return -EINVAL;
+> +	return 0;
+> +}
+> +
+>  struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+>  				      unsigned int id)
+>  {
+>  	struct kvm_vcpu *vcpu;
+>  	struct sie_page *sie_page;
+> -	int rc = -EINVAL;
+> -
+> -	if (!kvm_is_ucontrol(kvm) && !sca_can_add_vcpu(kvm, id))
+> -		goto out;
+> +	int rc;
 
-1. VM-A writes to $page through a device mapping
-2. The kernel unmaps $page from VM-A for swap. KVM does the maintenance
+You might want to make this
 
-3. VM-B writes to $page through a device mapping
-4. VM-B exits, KVM skips the maintenance, $page may have clean+stale lines
+int rc = -ENOMEM;
 
-5. Swap finds no further mappings, and writes $page and its clean+stale lines to disk.
+instead.
 
-Two VMs with a shared mapping is the 'easy' example. I think you just need a second
-mapping for this to happen: it means the page isn't really free after the VM has exited.
+>  
+>  	rc = -ENOMEM;
+>  
 
+(...)
 
+Regardless,
 
-Thanks,
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-James
