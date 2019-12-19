@@ -2,138 +2,107 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B34012612E
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Dec 2019 12:49:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 360B91263DC
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Dec 2019 14:46:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726692AbfLSLtW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 19 Dec 2019 06:49:22 -0500
-Received: from ozlabs.org ([203.11.71.1]:48213 "EHLO ozlabs.org"
+        id S1726754AbfLSNqX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 19 Dec 2019 08:46:23 -0500
+Received: from foss.arm.com ([217.140.110.172]:38852 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726668AbfLSLtW (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 19 Dec 2019 06:49:22 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 47dqsn6T0bz9sPh;
-        Thu, 19 Dec 2019 22:49:17 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1576756159;
-        bh=m3hY81qHO7a2k47hLHQcsNjq4SjyZd/McTsEzivltVw=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=iVZiuTv82Xx6PBD5+ZkMNAHxtQgm3Q8T7MvtNs5BQ/Le5rVoL5jtfTowsYTNg6zVk
-         TQZdB+LeRGDQrwAbrTTCxlT5yq8GuZA/I4SebmZX3Bg8hOSBhFEd9ESk5kE7CQG6Ef
-         e6EdNhWAzinbIMDQEnBy+i+JXbxM8SUzfIqLg7aN6HNm50Myep5JO24puwgEs1WWPZ
-         beWQBPCIBFxfuPhkxyvdgQxbgUTdVp/+dbBMhA0uJICJaCHly3aGbeXexWvcQcSJR2
-         iCQIGMzx3cHbUs952puh+OX3lMc8+K44Q5rTMLMhn8ZR61R4Ri2WUTdlL0Y1fzqZpg
-         g1ifRi2FGLkTA==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Steven Price <steven.price@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
-Cc:     Steven Price <steven.price@arm.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Mark Rutland <Mark.Rutland@arm.com>,
-        "Liang\, Kan" <kan.liang@linux.intel.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH v17 06/23] powerpc: mm: Add p?d_leaf() definitions
-In-Reply-To: <20191218162402.45610-7-steven.price@arm.com>
-References: <20191218162402.45610-1-steven.price@arm.com> <20191218162402.45610-7-steven.price@arm.com>
-Date:   Thu, 19 Dec 2019 22:49:16 +1100
-Message-ID: <877e2smt6r.fsf@mpe.ellerman.id.au>
+        id S1726695AbfLSNqX (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 19 Dec 2019 08:46:23 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E151131B;
+        Thu, 19 Dec 2019 05:46:22 -0800 (PST)
+Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A8C063F6CF;
+        Thu, 19 Dec 2019 05:46:20 -0800 (PST)
+Subject: Re: [PATCH 7/7] KVM: arm/arm64: Elide CMOs when unmapping a range
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20191213182503.14460-1-maz@kernel.org>
+ <20191213182503.14460-8-maz@kernel.org>
+ <0c832b27-7041-a6c8-31c0-d71a25c6f5b8@arm.com>
+ <de462fe29fb40fb1644e6a071e6c0c69@www.loen.fr>
+From:   James Morse <james.morse@arm.com>
+Message-ID: <01c9439f-0de1-78ca-632b-f662876cc4a1@arm.com>
+Date:   Thu, 19 Dec 2019 13:46:19 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <de462fe29fb40fb1644e6a071e6c0c69@www.loen.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Steven Price <steven.price@arm.com> writes:
-> walk_page_range() is going to be allowed to walk page tables other than
-> those of user space. For this it needs to know when it has reached a
-> 'leaf' entry in the page tables. This information is provided by the
-> p?d_leaf() functions/macros.
->
-> For powerpc p?d_is_leaf() functions already exist. Export them using the
-> new p?d_leaf() name.
->
-> CC: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> CC: Paul Mackerras <paulus@samba.org>
-> CC: Michael Ellerman <mpe@ellerman.id.au>
-> CC: linuxppc-dev@lists.ozlabs.org
-> CC: kvm-ppc@vger.kernel.org
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/powerpc/include/asm/book3s/64/pgtable.h | 3 +++
->  1 file changed, 3 insertions(+)
+Hi Marc,
 
-We have fallback versions of our pmd_is_leaf() etc. in
-arch/powerpc/include/asm/pgtable.h, eg:
+On 18/12/2019 15:30, Marc Zyngier wrote:
+> On 2019-12-18 15:07, James Morse wrote:
+>> On 13/12/2019 18:25, Marc Zyngier wrote:
+>>> If userspace issues a munmap() on a set of pages, there is no
+>>> expectation that the pages are cleaned to the PoC.
 
-#ifndef pmd_is_leaf
-#define pmd_is_leaf pmd_is_leaf
-static inline bool pmd_is_leaf(pmd_t pmd)
-{
-	return false;
-}
-#endif
+>>> So let's
+>>> not do more work than strictly necessary, and set the magic
+>>> flag that avoids CMOs in this case.
+>>
+>> I think this assumes the pages went from anonymous->free, so no-one
+>> cares about the contents.
+>>
+>> If the pages are backed by a file, won't dirty pages will still get
+>> written back before the page is free? (e.g. EFI flash 'file' mmap()ed in)
+> 
+> I believe so. Is that a problem?
 
-Because we support several different MMUs and most of them don't need to
-do anything.
+If we skipped the dcache maintenance on unmap, when the the dirty page is later reclaimed
+the clean+stale lines are written back to the file. File-backed dirty pages will stick
+around in the page cache in the hope someone else needs them.
 
-So we could put the compatibility #defines to your names along with the
-fallback versions in asm/pgtable.h, rather than in
-asm/book3s/64/pgtable.h
-
-But I see you also have fallbacks for your versions, so it probably
-doesn't matter either way.
-
-So I'm OK with this version, unless you think there's a compelling
-reason to do the compatibility #defines in our asm/pgtable.h
-
-Acked-by: Michael Ellerman <mpe@ellerman.id.au>
-
-cheers
+This would happen for a guest:device-mapping that is written to, but is actually backed by
+a mmap()d file. I think the EFI flash emulation does exactly this.
 
 
-> diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
-> index b01624e5c467..201a69e6a355 100644
-> --- a/arch/powerpc/include/asm/book3s/64/pgtable.h
-> +++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
-> @@ -1355,18 +1355,21 @@ static inline bool is_pte_rw_upgrade(unsigned long old_val, unsigned long new_va
->   * Like pmd_huge() and pmd_large(), but works regardless of config options
->   */
->  #define pmd_is_leaf pmd_is_leaf
-> +#define pmd_leaf pmd_is_leaf
->  static inline bool pmd_is_leaf(pmd_t pmd)
->  {
->  	return !!(pmd_raw(pmd) & cpu_to_be64(_PAGE_PTE));
->  }
->  
->  #define pud_is_leaf pud_is_leaf
-> +#define pud_leaf pud_is_leaf
->  static inline bool pud_is_leaf(pud_t pud)
->  {
->  	return !!(pud_raw(pud) & cpu_to_be64(_PAGE_PTE));
->  }
->  
->  #define pgd_is_leaf pgd_is_leaf
-> +#define pgd_leaf pgd_is_leaf
->  static inline bool pgd_is_leaf(pgd_t pgd)
->  {
->  	return !!(pgd_raw(pgd) & cpu_to_be64(_PAGE_PTE));
-> -- 
-> 2.20.1
+>> What if this isn't the only mapping of the page? Can't it be swapped
+>> out from another VMA? (tenuous example, poor man's memory mirroring?)
+> 
+> Swap-out wouldn't trigger this code path, as it would use a different
+> MMU notifier event (MMU_NOTIFY_CLEAR vs MMU_NOTIFY_UNMAP), I believe.
+
+This was a half thought-through special case of the above. The sequence would be:
+
+VM-A and VM-B both share a mapping of $page.
+
+1. VM-A writes to $page through a device mapping
+2. The kernel unmaps $page from VM-A for swap. KVM does the maintenance
+
+3. VM-B writes to $page through a device mapping
+4. VM-B exits, KVM skips the maintenance, $page may have clean+stale lines
+
+5. Swap finds no further mappings, and writes $page and its clean+stale lines to disk.
+
+Two VMs with a shared mapping is the 'easy' example. I think you just need a second
+mapping for this to happen: it means the page isn't really free after the VM has exited.
+
+
+
+Thanks,
+
+James
