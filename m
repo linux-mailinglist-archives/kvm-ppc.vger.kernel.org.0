@@ -2,72 +2,97 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D822125865
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Dec 2019 01:19:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68361126036
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Dec 2019 12:00:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726559AbfLSATW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 18 Dec 2019 19:19:22 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:50811 "EHLO ozlabs.org"
+        id S1726652AbfLSLAC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 19 Dec 2019 06:00:02 -0500
+Received: from ozlabs.org ([203.11.71.1]:52745 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726463AbfLSATW (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 18 Dec 2019 19:19:22 -0500
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 47dXYh2zFLz9sPh; Thu, 19 Dec 2019 11:19:20 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1576714760; bh=zDFPOp5nfTe9y2XdAgtTDk1OYIJnpIlIJMAWmNX76Rs=;
-        h=Date:From:To:Cc:Subject:From;
-        b=QPXN2QO89XnH+U6Igy7bOrJWBozpChUM+Wfy1iWU17v9LnKwNUDPwiIJ6RdsQ6UDU
-         0dVpA3TDAPB379FbLFETgcaMriAGXc6QdxOdLISkVhXDDOQjyB5PsJg1qggTpjLG3n
-         2NkzffxNyh3l+6xNAPkomM4cZNw88a9Ui5ofcIfFI9TQ0TiQFgt67D4irpjlRUhuHd
-         EUy4Ew0JUrO7StTViV3GYagW726jQvmjqU11dnYGh7ifz9f5Gc4HfXGa/8VTodJ5Nb
-         s7PAww+V/uN6m/iRZZua2LMIEkQHrNx7oE78quTyj1zyHbr3WmXTI8u/PdV91sgPmt
-         lgRRVXFVoP3CA==
-Date:   Thu, 19 Dec 2019 11:19:12 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org
-Subject: [GIT PULL] Please pull my kvm-ppc-fixes-5.5-1 tag
-Message-ID: <20191219001912.GA12288@blackberry>
+        id S1726713AbfLSLAC (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 19 Dec 2019 06:00:02 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 47dpmv6hY7z9sP6;
+        Thu, 19 Dec 2019 21:59:59 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1576753200;
+        bh=9DgfDxZL5lACm7q7lGR4p4NUM1XFDLiTxKkghwiemps=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=nz2yMamR5Xe2QWdPYkhMRyh1CLRDqCncJ11UYMCTNVa6Z1vwdydd0jwDzncIfjdNM
+         uvcKQFa2ebttLB5XOxJBvwJvT3YgyPrftUyHKq0BkRd1Iiz8ptA+EhdwnNcrirA8ER
+         pFM3s9AowbxXPc2MrfHr4Li/S0aaFCHO4tURaczvt8YNzfDeC5J89U7tovNhmau9Vj
+         7h/NdRE+O+7jvSTGY8RHQbthsZw+kURqLXwCrXfdEl1A4UCrUoFGrjkDsbo+LWvBwT
+         5k9tWXTMbDyGc3co/jU/rcLFdhoEMXqIVFnRkvx2QRsXtXi8Pp1X3QzUEqhSgJJVbL
+         ++utJbTOL+kYQ==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+Cc:     Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Paul Mackerras <paulus@ozlabs.org>, linuxram@us.ibm.com,
+        bauerman@linux.ibm.com, andmike@linux.ibm.com,
+        linuxppc-dev@ozlabs.org, kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH 1/2] powerpc/pseries/svm: Don't access some SPRs
+In-Reply-To: <20191218235753.GA12285@us.ibm.com>
+References: <20191218043048.3400-1-sukadev@linux.ibm.com> <875zidoqok.fsf@mpe.ellerman.id.au> <20191218235753.GA12285@us.ibm.com>
+Date:   Thu, 19 Dec 2019 21:59:57 +1100
+Message-ID: <87immcmvgy.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paolo,
+Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com> writes:
+> Michael Ellerman [mpe@ellerman.id.au] wrote:
+>> 
+>> eg. here.
+>> 
+>> This is the fast path of context switch.
+>> 
+>> That expands to:
+>> 
+>> 	if (!(mfmsr() & MSR_S))
+>> 		asm volatile("mfspr %0, SPRN_BESCR" : "=r" (rval));
+>> 	if (!(mfmsr() & MSR_S))
+>> 		asm volatile("mfspr %0, SPRN_EBBHR" : "=r" (rval));
+>> 	if (!(mfmsr() & MSR_S))
+>> 		asm volatile("mfspr %0, SPRN_EBBRR" : "=r" (rval));
+>> 
+>
+> Yes, should have optimized this at least :-)
+>> 
+>> If the Ultravisor is going to disable EBB and BHRB then we need new
+>> CPU_FTR bits for those, and the code that accesses those registers
+>> needs to be put behind cpu_has_feature(EBB) etc.
+>
+> Will try the cpu_has_feature(). Would it be ok to use a single feature
+> bit, like UV or make it per-register group as that could need more
+> feature bits?
 
-Please do a pull from my kvm-ppc-fixes-5.5-1 to get one commit which
-should go in 5.5.  It fixes a regression introduced in my last pull,
-which added an ultravisor call even on systems without an ultravisor.
+We already have a number of places using is_secure_guest():
 
-Thanks,
-Paul.
+  arch/powerpc/include/asm/mem_encrypt.h: return is_secure_guest();
+  arch/powerpc/include/asm/mem_encrypt.h: return is_secure_guest();
+  arch/powerpc/include/asm/svm.h:#define get_dtl_cache_ctor()     (is_secure_guest() ? dtl_cache_ctor : NULL)
+  arch/powerpc/kernel/machine_kexec_64.c: if (is_secure_guest() && !(image->preserve_context ||
+  arch/powerpc/kernel/paca.c:     if (is_secure_guest())
+  arch/powerpc/kernel/sysfs.c:    return sprintf(buf, "%u\n", is_secure_guest());
+  arch/powerpc/platforms/pseries/iommu.c: if (!is_secure_guest())
+  arch/powerpc/platforms/pseries/smp.c:   if (cpu_has_feature(CPU_FTR_DBELL) && !is_secure_guest())
+  arch/powerpc/platforms/pseries/svm.c:   if (!is_secure_guest())
 
-The following changes since commit 7d73710d9ca2564f29d291d0b3badc09efdf25e9:
 
-  kvm: vmx: Stop wasting a page for guest_msrs (2019-12-04 12:23:27 +0100)
+Which could all (or mostly) be converted to use a cpu_has_feature(CPU_FTR_SVM).
 
-are available in the git repository at:
+So yeah I guess it makes sense to do that, create a CPU_FTR_SVM and set
+it early in boot based on MSR_S.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.5-1
+You could argue it's a firmware feature, so should be FW_FEATURE_SVM,
+but we don't use jump_labels for firmware features so they're not as
+nice for hot-path code like register switching. Also the distinction
+between CPU and firmware features is a bit arbitrary.
 
-for you to fetch changes up to d89c69f42bf0fe42d1f52ea9b3dca15b1ade7601:
-
-  KVM: PPC: Book3S HV: Don't do ultravisor calls on systems without ultravisor (2019-12-18 15:46:34 +1100)
-
-----------------------------------------------------------------
-PPC KVM fix for 5.5
-
-- Fix a bug where we try to do an ultracall on a system without an
-  ultravisor.
-
-----------------------------------------------------------------
-Paul Mackerras (1):
-      KVM: PPC: Book3S HV: Don't do ultravisor calls on systems without ultravisor
-
- arch/powerpc/kvm/book3s_hv.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+cheers
