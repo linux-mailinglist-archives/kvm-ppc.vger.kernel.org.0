@@ -2,151 +2,175 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A7C3127A43
-	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Dec 2019 12:53:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 19222128011
+	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Dec 2019 16:53:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727191AbfLTLxt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 20 Dec 2019 06:53:49 -0500
-Received: from foss.arm.com ([217.140.110.172]:49922 "EHLO foss.arm.com"
+        id S1727388AbfLTPxb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 20 Dec 2019 10:53:31 -0500
+Received: from mga11.intel.com ([192.55.52.93]:27731 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727177AbfLTLxt (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 20 Dec 2019 06:53:49 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 395A030E;
-        Fri, 20 Dec 2019 03:53:48 -0800 (PST)
-Received: from [10.1.194.52] (e112269-lin.cambridge.arm.com [10.1.194.52])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 567D63F719;
-        Fri, 20 Dec 2019 03:53:45 -0800 (PST)
-Subject: Re: [PATCH v17 06/23] powerpc: mm: Add p?d_leaf() definitions
-To:     Michael Ellerman <mpe@ellerman.id.au>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
-Cc:     Mark Rutland <Mark.Rutland@arm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Paul Mackerras <paulus@samba.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>,
-        "Liang, Kan" <kan.liang@linux.intel.com>, x86@kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>, kvm-ppc@vger.kernel.org,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-arm-kernel@lists.infradead.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
-        linuxppc-dev@lists.ozlabs.org
-References: <20191218162402.45610-1-steven.price@arm.com>
- <20191218162402.45610-7-steven.price@arm.com>
- <877e2smt6r.fsf@mpe.ellerman.id.au>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <e99a9857-e9f4-588a-ad12-4d5f3a9de739@arm.com>
-Date:   Fri, 20 Dec 2019 11:53:44 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1727359AbfLTPxb (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 20 Dec 2019 10:53:31 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Dec 2019 07:53:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,336,1571727600"; 
+   d="scan'208";a="222513815"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga001.fm.intel.com with ESMTP; 20 Dec 2019 07:53:30 -0800
+Date:   Fri, 20 Dec 2019 07:53:30 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v2 30/45] KVM: Move vcpu alloc and init invocation to
+ common code
+Message-ID: <20191220155330.GA21021@linux.intel.com>
+References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
+ <20191218215530.2280-31-sean.j.christopherson@intel.com>
+ <20191220103325.34fc2bf0.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <877e2smt6r.fsf@mpe.ellerman.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191220103325.34fc2bf0.cohuck@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 19/12/2019 11:49, Michael Ellerman wrote:
-> Steven Price <steven.price@arm.com> writes:
->> walk_page_range() is going to be allowed to walk page tables other than
->> those of user space. For this it needs to know when it has reached a
->> 'leaf' entry in the page tables. This information is provided by the
->> p?d_leaf() functions/macros.
->>
->> For powerpc p?d_is_leaf() functions already exist. Export them using the
->> new p?d_leaf() name.
->>
->> CC: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> CC: Paul Mackerras <paulus@samba.org>
->> CC: Michael Ellerman <mpe@ellerman.id.au>
->> CC: linuxppc-dev@lists.ozlabs.org
->> CC: kvm-ppc@vger.kernel.org
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  arch/powerpc/include/asm/book3s/64/pgtable.h | 3 +++
->>  1 file changed, 3 insertions(+)
+On Fri, Dec 20, 2019 at 10:33:25AM +0100, Cornelia Huck wrote:
+> On Wed, 18 Dec 2019 13:55:15 -0800
+> Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+> > +int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> >  {
+> > -	struct kvm_vcpu *vcpu;
+> >  	struct sie_page *sie_page;
+> >  	int rc;
+> >  
+> > -	rc = -ENOMEM;
+> > -
+> > -	vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
+> > -	if (!vcpu)
+> > -		goto out;
+> > -
+> > -	rc = kvm_vcpu_init(vcpu, kvm, id);
+> > -	if (rc)
+> > -		goto out_free_cpu;
+> > -
+> > -	rc = -ENOMEM;
+> > -
+> >  	BUILD_BUG_ON(sizeof(struct sie_page) != 4096);
+> >  	sie_page = (struct sie_page *) get_zeroed_page(GFP_KERNEL);
+> >  	if (!sie_page)
+> > -		goto out_uninit_vcpu;
+> > +		return -ENOMEM;
+> >  
+> >  	vcpu->arch.sie_block = &sie_page->sie_block;
+> >  	vcpu->arch.sie_block->itdba = (unsigned long) &sie_page->itdb;
+> > @@ -3087,15 +3070,11 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+> >  		 vcpu->arch.sie_block);
+> >  	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
+> >  
+> > -	return vcpu;
+> > +	return 0;
+> > +
+> >  out_free_sie_block:
+> >  	free_page((unsigned long)(vcpu->arch.sie_block));
+> > -out_uninit_vcpu:
+> > -	kvm_vcpu_uninit(vcpu);
+> > -out_free_cpu:
+> > -	kmem_cache_free(kvm_vcpu_cache, vcpu);
+> > -out:
+> > -	return ERR_PTR(rc);
+> > +	return rc;
 > 
-> We have fallback versions of our pmd_is_leaf() etc. in
-> arch/powerpc/include/asm/pgtable.h, eg:
-> 
-> #ifndef pmd_is_leaf
-> #define pmd_is_leaf pmd_is_leaf
-> static inline bool pmd_is_leaf(pmd_t pmd)
-> {
-> 	return false;
-> }
-> #endif
-> 
-> Because we support several different MMUs and most of them don't need to
-> do anything.
-> 
-> So we could put the compatibility #defines to your names along with the
-> fallback versions in asm/pgtable.h, rather than in
-> asm/book3s/64/pgtable.h
-> 
-> But I see you also have fallbacks for your versions, so it probably
-> doesn't matter either way.
-> 
-> So I'm OK with this version, unless you think there's a compelling
-> reason to do the compatibility #defines in our asm/pgtable.h
+> This is getting a bit hard to follow across the patches, but I think rc
+> is now only set for ucontrol guests. So this looks correct right now,
+> but feels a bit brittle... should we maybe init rc to 0 and always
+> return rc instead?
 
-I was thinking that (assuming this series actually gets merged this
-time), the p?d_is_leaf() versions could be removed and replaced by
-p?d_leaf() in the future. Since the fallbacks are in the asm-generic
-code it makes sense for the pmd_leaf() definitions to be next to the
-non-fallback versions.
+Yes, but only for a few patches until kvm_s390_vcpu_setup() is introduced,
+at which point @rc is unconditionally set at the end.
 
-> Acked-by: Michael Ellerman <mpe@ellerman.id.au>
+        rc = kvm_s390_vcpu_setup(vcpu);
+        if (rc)
+                goto out_free_ucontrol_gmap;
+        return 0;
 
-Thanks!
+My personal preference is to use "return 0;" when the return is known to
+be zero as it makes the success path obvious at a glance.  I also didn't
+want to intialize @rc at he beginning because then the sie_page allocation
+would look a bit funky:
 
-Steve
+	int rc = 0;
 
-> cheers
-> 
-> 
->> diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
->> index b01624e5c467..201a69e6a355 100644
->> --- a/arch/powerpc/include/asm/book3s/64/pgtable.h
->> +++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
->> @@ -1355,18 +1355,21 @@ static inline bool is_pte_rw_upgrade(unsigned long old_val, unsigned long new_va
->>   * Like pmd_huge() and pmd_large(), but works regardless of config options
->>   */
->>  #define pmd_is_leaf pmd_is_leaf
->> +#define pmd_leaf pmd_is_leaf
->>  static inline bool pmd_is_leaf(pmd_t pmd)
->>  {
->>  	return !!(pmd_raw(pmd) & cpu_to_be64(_PAGE_PTE));
->>  }
->>  
->>  #define pud_is_leaf pud_is_leaf
->> +#define pud_leaf pud_is_leaf
->>  static inline bool pud_is_leaf(pud_t pud)
->>  {
->>  	return !!(pud_raw(pud) & cpu_to_be64(_PAGE_PTE));
->>  }
->>  
->>  #define pgd_is_leaf pgd_is_leaf
->> +#define pgd_leaf pgd_is_leaf
->>  static inline bool pgd_is_leaf(pgd_t pgd)
->>  {
->>  	return !!(pgd_raw(pgd) & cpu_to_be64(_PAGE_PTE));
->> -- 
->> 2.20.1
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+        BUILD_BUG_ON(sizeof(struct sie_page) != 4096);
+        sie_page = (struct sie_page *) get_zeroed_page(GFP_KERNEL);
+        if (!sie_page)
+                return -ENOMEM;
 
+
+An alternative would be to init @rc to -ENOMEM:
+
+        int rc = -ENOMEM;
+
+        BUILD_BUG_ON(sizeof(struct sie_page) != 4096);
+        sie_page = (struct sie_page *) get_zeroed_page(GFP_KERNEL);
+        if (!sie_page)
+                return rc;
+
+This would be my preference if you'd prefer to init @rc right away,
+especially if  __kvm_ucontrol_vcpu_init() is open coded here (discussion
+in patch 35, "KVM: s390: Manually invoke vcpu setup during 
+kvm_arch_vcpu_create()", e.g.:
+
+        int rc = -ENOMEM;
+
+        BUILD_BUG_ON(sizeof(struct sie_page) != 4096);
+        sie_page = (struct sie_page *) get_zeroed_page(GFP_KERNEL);
+        if (!sie_page)
+                return rc;
+
+	...
+
+        if (kvm_is_ucontrol(vcpu->kvm)) {
+                vcpu->arch.gmap = gmap_create(current->mm, -1UL);
+                if (!vcpu->arch.gmap)
+                        goto out_free_sie_block;
+                vcpu->arch.gmap->private = vcpu->kvm;
+        }
+
+        VM_EVENT(kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK", id, vcpu,
+                 vcpu->arch.sie_block);
+        trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
+
+        rc = kvm_s390_vcpu_setup(vcpu);
+        if (rc)
+                goto out_free_ucontrol_gmap;
+        return 0;
+
+out_free_ucontrol_gmap:
+        if (kvm_is_ucontrol(vcpu->kvm))
+                gmap_remove(vcpu->arch.gmap);
+out_free_sie_block:
+        free_page((unsigned long)(vcpu->arch.sie_block));
+        return rc;
