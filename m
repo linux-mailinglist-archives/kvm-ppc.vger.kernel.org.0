@@ -2,213 +2,170 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 875BE1273FF
-	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Dec 2019 04:35:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48B9B127839
+	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Dec 2019 10:33:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727128AbfLTDfx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 19 Dec 2019 22:35:53 -0500
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:35859 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726986AbfLTDfw (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 19 Dec 2019 22:35:52 -0500
-Received: by mail-pj1-f65.google.com with SMTP id n59so3507028pjb.1
-        for <kvm-ppc@vger.kernel.org>; Thu, 19 Dec 2019 19:35:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=UmQnWafOdRpZ6qRbt/GsBhbNrsVsnOzntGu8doafqRE=;
-        b=JNHICVJW4CcUNzuNkAWHrzQkEyZkAKrKN/AhbVR3AD0zZNAb5ZRAW5zGuAXdWsqTV/
-         dU7RUN29AHrl8RQTgYZMS4cY9+xeRbT8fbuMtk8GUmiEzAILVEne5x8VhC53CjvkqRLE
-         IZNGv5WDUZHaczCi2YTDzhaf4mzRWEDVPwSl/sdv5jmDKEw47qd2RPmwz6h82m1vFLOs
-         hoVVm/CUxD1jcVYwqX7IzXQckmz27cEzvYN7Cz/C0UPuSJLj/XreoIEk3Y9dVW9gaCo/
-         /y+uUc2yCCJ7v7aAtECIAhx8TtCC4irO8iEYrFnJN1sQipUC9r+3nh+HIvcnG05MWf4G
-         lu7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=UmQnWafOdRpZ6qRbt/GsBhbNrsVsnOzntGu8doafqRE=;
-        b=Y+CrHF4Awy5rWPQ/zwHfNQ/g4ltlVp9m49/pUBAvwjKs7+gC+D5QLTb3U14OhrJ2a0
-         QixErxg69Wxai1AIAyMa02kFrpNSvEJIz2oQLK0uhOqQ5kYgFZc4Bi+4aDI+YT7sBiTt
-         p6tuB5OyvCwpOv9Q6cle1p40tsNQpxVNsssWvDgcjPQ00nDKwE0K0uWZege8TlXUfGdW
-         wS3GXtL0U+Ai+0ybwgJXw5q5XFAeOewrGZoDKQl2joPTYm2cTAzsygzwxiWGzkRv7h4C
-         m8ZIdQpq993N73y1nLmG1ULhbaTMt9/XPltkyangQ7Xsn3db/oap73B8UEh34aWG1HlJ
-         RsUA==
-X-Gm-Message-State: APjAAAUx/Fiq0JiKIZn26ea9xRw0N4yNFNBSEEaZF1UjY0oVWZf+zlEZ
-        6NywGyChPnXISUspxE6jrEtZUM9rwsA=
-X-Google-Smtp-Source: APXvYqyKwTb5d2hmGkBRV/Olzs4TAb/PIxvDaeqrezActoskJlcYt23H7RQzXEvplVTPv+Q1ZG7rTQ==
-X-Received: by 2002:a17:902:bcc9:: with SMTP id o9mr3764161pls.127.1576812951909;
-        Thu, 19 Dec 2019 19:35:51 -0800 (PST)
-Received: from [10.61.2.175] ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id i9sm10443231pfd.166.2019.12.19.19.35.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Dec 2019 19:35:51 -0800 (PST)
-Subject: Re: [PATCH 1/1] kvm/book3s_64: Fixes crash caused by not cleaning
- vhost IOTLB
-To:     Leonardo Bras <leonardo@linux.ibm.com>,
+        id S1727433AbfLTJdr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 20 Dec 2019 04:33:47 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22379 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727283AbfLTJdo (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 20 Dec 2019 04:33:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576834422;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kARvpg6EeSn47uf+HJvOWWm63eTYV3jwqH0aHeRURHY=;
+        b=KoEe95fXnH3+7rYUbP5Hts1DNLWdfbNzptZwkKz2TRf2ARuv2Kj6C3PfBIF5D5C4MleZbj
+        ljBUto9BjwrkUvIZDoZyQHGHU7XupKqHT7UrTi25AT2KCzsey2jJXMnfSj4yTq7vb9CfZX
+        v02eH6fh8zjJ9iQ8/niHvCplbCniFL4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-euuv6RBAMwGCsT-Q338LuQ-1; Fri, 20 Dec 2019 04:33:41 -0500
+X-MC-Unique: euuv6RBAMwGCsT-Q338LuQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 444D1911EB;
+        Fri, 20 Dec 2019 09:33:38 +0000 (UTC)
+Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 82CC560BF3;
+        Fri, 20 Dec 2019 09:33:27 +0000 (UTC)
+Date:   Fri, 20 Dec 2019 10:33:25 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, farosas@linux.ibm.com,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Alex Williamson <alex.williamson@redhat.com>
-References: <20191217210658.73144-1-leonardo@linux.ibm.com>
- <be0c0f8f-3c8e-acd1-c6a2-479f6bd3c373@ozlabs.ru>
- <0c598160a866318e1fa672afdb07d3ee762c2ac1.camel@linux.ibm.com>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <085aba63-b6c4-00f4-3a5f-bd158d91fd3e@ozlabs.ru>
-Date:   Fri, 20 Dec 2019 14:35:46 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v2 30/45] KVM: Move vcpu alloc and init invocation to
+ common code
+Message-ID: <20191220103325.34fc2bf0.cohuck@redhat.com>
+In-Reply-To: <20191218215530.2280-31-sean.j.christopherson@intel.com>
+References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
+        <20191218215530.2280-31-sean.j.christopherson@intel.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <0c598160a866318e1fa672afdb07d3ee762c2ac1.camel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Wed, 18 Dec 2019 13:55:15 -0800
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
+> Now that all architectures tightly couple vcpu allocation/free with the
+> mandatory calls to kvm_{un}init_vcpu(), move the sequences verbatim to
+> common KVM code.
+> 
+> Move both allocation and initialization in a single patch to eliminate
+> thrash in arch specific code.  The bisection benefits of moving the two
+> pieces in separate patches is marginal at best, whereas the odds of
+> introducing a transient arch specific bug are non-zero.
+> 
+> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/mips/kvm/mips.c       | 33 ++++++---------------------------
+>  arch/powerpc/kvm/powerpc.c | 27 ++++-----------------------
+>  arch/s390/kvm/kvm-s390.c   | 31 +++++--------------------------
+>  arch/x86/kvm/x86.c         | 28 ++--------------------------
+>  include/linux/kvm_host.h   |  2 +-
+>  virt/kvm/arm/arm.c         | 29 ++---------------------------
+>  virt/kvm/kvm_main.c        | 21 ++++++++++++++++++---
+>  7 files changed, 38 insertions(+), 133 deletions(-)
 
-On 19/12/2019 10:28, Leonardo Bras wrote:
-> On Wed, 2019-12-18 at 15:53 +1100, Alexey Kardashevskiy wrote:
->> H_STUFF_TCE is always called with 0. Well, may be some AIX somewhere
->> calls it with a value other than zero, and I probably saw some other
->> value somewhere but in QEMU/KVM case it is 0 so you effectively disable
->> in-kernel acceleration of H_STUFF_TCE which is
->> undesirable.
->>
-> 
-> Thanks for the feedback!
-> 
->> For now we should disable in-kernel H_STUFF_TCE/... handlers in QEMU
->> just like we do for VFIO for older host kernels:
->>
->> https://git.qemu.org/?p=qemu.git;a=blob;f=hw/ppc/spapr_iommu.c;h=3d3bcc86496a5277d62f7855fbb09c013c015f27;hb=HEAD#l208
+(...)
+
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 8543d338a06a..2ed76584ebd9 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2530,9 +2530,6 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	if (vcpu->kvm->arch.use_cmma)
+>  		kvm_s390_vcpu_unsetup_cmma(vcpu);
+>  	free_page((unsigned long)(vcpu->arch.sie_block));
+> -
+> -	kvm_vcpu_uninit(vcpu);
+> -	kmem_cache_free(kvm_vcpu_cache, vcpu);
+>  }
 >  
-> I am still reading into this temporary solution, I could still not
-> understand how it works.
-> 
->> I am not sure what a proper solution would be, something like an eventfd
->> and KVM's kvmppc_h_stuff_tce() signaling vhost that the latter needs to
->> invalidate iotlbs. Or we can just say that we do not allow KVM
->> acceleration if there is vhost+iommu on the same liobn (== vPHB, pretty
->> much). Thanks,
-> 
-> I am not used to eventfd, but i agree it's a valid solution to talk to
-> QEMU and then use it to send a message via /dev/vhost.
-> KVM -> QEMU -> vhost
-> 
-> But I can't get my mind out of another solution: doing it in
-> kernelspace.  I am not sure how that would work, though.
-> 
-> If I could understand correctly, there is a vhost IOTLB per vhost_dev,
-> and H_STUFF_TCE is not called in 64-bit DMA case (for tce_value == 0
-> case, at least), which makes sense, given it doesn't need to invalidate
-> entries on IOTLB.
-> 
-> So, we would need to somehow replace `return H_TOO_HARD` in this patch
-> with code that could call vhost_process_iotlb_msg() with
-> VHOST_IOTLB_INVALIDATE.
-> 
-> For that, I would need to know what are the vhost_dev's of that
-> process, which I don't know if it's possible to do currently (or safe
-> at all).
-> 
-> I am thinking of linking all vhost_dev's with a list (list.h) that
-> could be searched, comparing `mm_struct *` of the calling task with all
-> vhost_dev's, and removing the entry of all IOTLB that hits.
-> 
-> Not sure if that's the best approach to find the related vhost_dev's.
-> 
-> What do you think?
+>  static void kvm_free_vcpus(struct kvm *kvm)
+> @@ -3014,29 +3011,15 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+>  	return 0;
+>  }
+>  
+> -struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+> -				      unsigned int id)
+> +int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_vcpu *vcpu;
+>  	struct sie_page *sie_page;
+>  	int rc;
+>  
+> -	rc = -ENOMEM;
+> -
+> -	vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
+> -	if (!vcpu)
+> -		goto out;
+> -
+> -	rc = kvm_vcpu_init(vcpu, kvm, id);
+> -	if (rc)
+> -		goto out_free_cpu;
+> -
+> -	rc = -ENOMEM;
+> -
+>  	BUILD_BUG_ON(sizeof(struct sie_page) != 4096);
+>  	sie_page = (struct sie_page *) get_zeroed_page(GFP_KERNEL);
+>  	if (!sie_page)
+> -		goto out_uninit_vcpu;
+> +		return -ENOMEM;
+>  
+>  	vcpu->arch.sie_block = &sie_page->sie_block;
+>  	vcpu->arch.sie_block->itdba = (unsigned long) &sie_page->itdb;
+> @@ -3087,15 +3070,11 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+>  		 vcpu->arch.sie_block);
+>  	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
+>  
+> -	return vcpu;
+> +	return 0;
+> +
+>  out_free_sie_block:
+>  	free_page((unsigned long)(vcpu->arch.sie_block));
+> -out_uninit_vcpu:
+> -	kvm_vcpu_uninit(vcpu);
+> -out_free_cpu:
+> -	kmem_cache_free(kvm_vcpu_cache, vcpu);
+> -out:
+> -	return ERR_PTR(rc);
+> +	return rc;
 
+This is getting a bit hard to follow across the patches, but I think rc
+is now only set for ucontrol guests. So this looks correct right now,
+but feels a bit brittle... should we maybe init rc to 0 and always
+return rc instead?
 
-As discussed in slack, we need to do the same thing we do with physical
-devices when we invalidate hardware IOMMU translation caches via
-tbl->it_ops->tce_kill. The problem to solve now is how we tell KVM/PPC
-about vhost/iotlb (is there an fd?), something similar to the existing
-KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE. I guess x86 handles all the mappings
-in QEMU and therefore they do not have this problem. Thanks,
+>  }
+>  
+>  int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
 
+Otherwise, looks good.
 
--- 
-Alexey
