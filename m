@@ -2,101 +2,52 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BE45D12FE00
-	for <lists+kvm-ppc@lfdr.de>; Fri,  3 Jan 2020 21:37:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20723131C65
+	for <lists+kvm-ppc@lfdr.de>; Tue,  7 Jan 2020 00:33:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727917AbgACUhh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 3 Jan 2020 15:37:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61188 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727894AbgACUhg (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 3 Jan 2020 15:37:36 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 003KbWXf127808
-        for <kvm-ppc@vger.kernel.org>; Fri, 3 Jan 2020 15:37:33 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2x9dr6j4es-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Fri, 03 Jan 2020 15:37:32 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
-        Fri, 3 Jan 2020 20:37:22 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 3 Jan 2020 20:37:18 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 003KbH9n39190900
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Jan 2020 20:37:17 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66AAFA405F;
-        Fri,  3 Jan 2020 20:37:17 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 89413A405C;
-        Fri,  3 Jan 2020 20:37:15 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.80.213.131])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri,  3 Jan 2020 20:37:15 +0000 (GMT)
-Date:   Fri, 3 Jan 2020 12:37:12 -0800
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Sukadev Bhattiprolu <sukadev@linux.ibm.com>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@ozlabs.org>, bharata@linux.ibm.com,
-        linuxppc-dev@ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH v4 2/2] KVM: PPC: Implement H_SVM_INIT_ABORT hcall
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <20191219215146.27278-1-sukadev@linux.ibm.com>
- <20191219215146.27278-2-sukadev@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191219215146.27278-2-sukadev@linux.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-x-cbid: 20010320-0012-0000-0000-0000037A4AAB
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20010320-0013-0000-0000-000021B65F2B
-Message-Id: <20200103203712.GG5556@oc0525413822.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2020-01-03_06:2020-01-02,2020-01-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=828 adultscore=0 mlxscore=0 malwarescore=0 suspectscore=0
- spamscore=0 bulkscore=0 phishscore=0 priorityscore=1501 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001030187
+        id S1727067AbgAFXdY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 6 Jan 2020 18:33:24 -0500
+Received: from ozlabs.org ([203.11.71.1]:35085 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726858AbgAFXdU (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 6 Jan 2020 18:33:20 -0500
+Received: by ozlabs.org (Postfix, from userid 1034)
+        id 47sBdp41NSz9sRf; Tue,  7 Jan 2020 10:33:18 +1100 (AEDT)
+X-powerpc-patch-notification: thanks
+X-powerpc-patch-commit: d862b44133b7a1d7de25288e09eabf4df415e971
+In-Reply-To: <20191216041924.42318-2-aik@ozlabs.ru>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Michael Anderson <andmike@linux.ibm.com>,
+        Ram Pai <linuxram@us.ibm.com>, kvm-ppc@vger.kernel.org,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH kernel v2 1/4] Revert "powerpc/pseries/iommu: Don't use dma_iommu_ops on secure guests"
+Message-Id: <47sBdp41NSz9sRf@ozlabs.org>
+Date:   Tue,  7 Jan 2020 10:33:18 +1100 (AEDT)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Dec 19, 2019 at 01:51:46PM -0800, Sukadev Bhattiprolu wrote:
-> Implement the H_SVM_INIT_ABORT hcall which the Ultravisor can use to
-> abort an SVM after it has issued the H_SVM_INIT_START and before the
-> H_SVM_INIT_DONE hcalls. This hcall could be used when Ultravisor
-> encounters security violations or other errors when starting an SVM.
+On Mon, 2019-12-16 at 04:19:21 UTC, Alexey Kardashevskiy wrote:
+> From: Ram Pai <linuxram@us.ibm.com>
 > 
-..snip..
+> This reverts commit edea902c1c1efb855f77e041f9daf1abe7a9768a.
+> 
+> At the time the change allowed direct DMA ops for secure VMs; however
+> since then we switched on using SWIOTLB backed with IOMMU (direct mapping)
+> and to make this work, we need dma_iommu_ops which handles all cases
+> including TCE mapping I/O pages in the presence of an IOMMU.
+> 
+> Fixes: edea902c1c1e ("powerpc/pseries/iommu: Don't use dma_iommu_ops on secure guests")
+> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+> [aik: added "revert" and "fixes:"]
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-> +unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm)
-> +{
-> +	int srcu_idx;
-> +	struct kvm_memory_slot *memslot;
-> +
-> +	/*
-> +	 * Expect to be called only after INIT_START and before INIT_DONE.
-> +	 * If INIT_DONE was completed, use normal VM termination sequence.
-> +	 */
-> +	if (!(kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START) ||
-> +			(kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE))
-> +		return H_UNSUPPORTED;
+Series applied to powerpc next, thanks.
 
-Ah.. this version has already incorporated my prior comment! I should
-have reviewed your v4 version first.
+https://git.kernel.org/powerpc/c/d862b44133b7a1d7de25288e09eabf4df415e971
 
-One small comment.. H_STATE is a better return code than H_UNSUPPORTED.
-
-RP
-
+cheers
