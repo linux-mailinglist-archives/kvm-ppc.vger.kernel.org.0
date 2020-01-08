@@ -2,78 +2,128 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D53E133029
-	for <lists+kvm-ppc@lfdr.de>; Tue,  7 Jan 2020 20:57:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4805D134D36
+	for <lists+kvm-ppc@lfdr.de>; Wed,  8 Jan 2020 21:27:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728764AbgAGT47 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 7 Jan 2020 14:56:59 -0500
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:34479 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728358AbgAGT46 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 7 Jan 2020 14:56:58 -0500
-Received: by mail-ed1-f68.google.com with SMTP id l8so655852edw.1
-        for <kvm-ppc@vger.kernel.org>; Tue, 07 Jan 2020 11:56:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=lUsTd9lJYwK928kai9reachpHe0HC9Hv8/gDLGwtaBI=;
-        b=gXd3vUocGbgukuThgNIl5wz2SqAMw2R7EWi8flnzi9mlf3i57t5uKsyonYZjiIk7Dl
-         E1wc78eN9sLw8iLkQE2Tqrl1hexrfq66wKHeG07gIv60ImOCfg7OT2iy6liuBaH3KHTe
-         ba8M0xoANam7D8mvAyBupZB9eyT0FWqyrqNdCLTb9jW1iQwpeANbmnYqODWJwcQ8s0Q/
-         hVTMIDFheIzj59v0bus0xAcqui/3Pvzz72Lt2ETf3SkB/BHqtZSW4kewPRWTc8lP2/5u
-         +u9iay9Ucbmm353bgC50oCwc6/Q3Hy1toacxZZ3rK7EKRYndgMnB4w2/+AZUAzTZiQK1
-         l9QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=lUsTd9lJYwK928kai9reachpHe0HC9Hv8/gDLGwtaBI=;
-        b=UU45S1aFMMuhAZ28J600kkLJn5WjrTVIfiTYYoxJQTnUcxBhfQQ3aodam+bBJKtEAi
-         uloqoA/IUaTMWKQ/g3ftvHGaj53Xayp7YyOFhTiFSltpgJ7mgmNaxL6zu2+4FQhlrm11
-         NBiTXOXPeJFsk8J9fYrG6LPd6lqcg67/Poe6X3wciKaobQkaxuV/DngmbX0fCNa5Hp/j
-         tLAOY+seogooW2/eRO+A07FWrJ14KHvLswVZ8aqDNxv0D/QXOmbbkpX8U7Mjdl6nNMTl
-         0SQadDV5s8rkMsGs5uvcZe9EpnvVb0oyzBCFJKc8QJr7HsFF3jTVY/ZJA4BVxGNbngKk
-         1EIQ==
-X-Gm-Message-State: APjAAAUcV0/sOmRBoQD0JDfxYDnHNzc0fkd8fJjYcASCuzrJestToekD
-        AlMY1gz67wpwCM4egQ7Jrn00I2WvVcj1Qb5vOgA=
-X-Google-Smtp-Source: APXvYqyVWamR9s6S2qa/PeaVDdPnH+rYJ+CkUJHafh5UeOXDoDBgEKnE4iopJUqVOYsi86HyiSGVn4x6DcVgzBergww=
-X-Received: by 2002:a17:906:2894:: with SMTP id o20mr1118525ejd.199.1578427016973;
- Tue, 07 Jan 2020 11:56:56 -0800 (PST)
+        id S1726390AbgAHU1F (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 8 Jan 2020 15:27:05 -0500
+Received: from mga01.intel.com ([192.55.52.88]:57134 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725446AbgAHU1F (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 8 Jan 2020 15:27:05 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 12:27:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; 
+   d="scan'208";a="211658348"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:04 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Barret Rhoden <brho@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Zeng <jason.zeng@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>
+Subject: [PATCH 00/14] KVM: x86/mmu: Huge page fixes, cleanup, and DAX
+Date:   Wed,  8 Jan 2020 12:24:34 -0800
+Message-Id: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Received: by 2002:a17:906:72c6:0:0:0:0 with HTTP; Tue, 7 Jan 2020 11:56:56
- -0800 (PST)
-Reply-To: dhlexpresscouriercompany.nyusa@gmail.com
-From:   "Dr. William Johnson" <currency1000000@gmail.com>
-Date:   Tue, 7 Jan 2020 20:56:56 +0100
-Message-ID: <CAPqfnSEUbCQa_q55vjZTYnnu_JfKghq_5EchPoVW0HziF6c3xw@mail.gmail.com>
-Subject: contact Dhl office New York to receive your Prepaid ATM Master Card
- worth $15.8Million US DOLLARS now.
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-ATTN Dear Beneficiary.
-Goodnews
-I have Registered your Prepaid ATM Master Card
-worth $15.800,000.00 US DOLLARS with Courier company
-asigned to deliver it to you today.
-So contact Dhl office New York to receive your Prepaid ATM Master Card
-worth $15.8Million US DOLLARS now.
-Contact Person: Mrs. Mary Michael, Director, DHL Courier Company-NY USA. 10218
-Email. dhlexpresscouriercompany.nyusa@gmail.com
-Call the office +(202) 890-8752
-Rec-Confirmed your mailing address to the office as I listed below.
-Your Full Name--------------
-House Address-----------
-Your working Phone Number----------------
-ID copy-------------------------
-Sex-----------------------------
-Note,delivery fee to your address is only $25.00. send it to this
-company urgent on itunes card today so that DHL will deliver this
-Prepaid ATM Master Card to you today according to our finally
-agreement.
-Thanks for coperations,
-Dr. William Johnson
+This series is a mix of bug fixes, cleanup and new support in KVM's
+handling of huge pages.  The series initially stemmed from a syzkaller
+bug report[1], which is fixed by patch 02, "mm: thp: KVM: Explicitly
+check for THP when populating secondary MMU".
+
+While investigating options for fixing the syzkaller bug, I realized KVM
+could reuse the approach from Barret's series to enable huge pages for DAX
+mappings in KVM[2] for all types of huge mappings, i.e. walk the host page
+tables instead of querying metadata (patches 05 - 09).
+
+Walking the host page tables sidesteps the issues with refcounting and
+identifying THP mappings (in theory), and using a common method for
+identifying huge mappings should improve (haven't actually measured) KVM's
+overall page fault latency by eliminating the vma lookup that is currently
+used to identify HugeTLB mappings.  Eliminating the HugeTLB specific code
+also allows for additional cleanup (patches 10 - 13).
+
+Testing the page walk approach revealed several pre-existing bugs that
+are included here (patches 01, 03 and 04) because the changes interact
+with the rest of the series, e.g. without the read-only memslots fix,
+walking the host page tables without explicitly filtering out HugeTLB
+mappings would pick up read-only memslots and introduce a completely
+unintended functional change.
+
+Lastly, with the page walk infrastructure in place, supporting DAX-based
+huge mappings becomes a trivial change (patch 14).
+
+Based on kvm/queue, commit e41a90be9659 ("KVM: x86/mmu: WARN if root_hpa
+is invalid when handling a page fault")
+
+Paolo, assuming I understand your workflow, patch 01 can be squashed with
+the buggy commit as it's still sitting in kvm/queue.
+
+[1] https://lkml.kernel.org/r/0000000000003cffc30599d3d1a0@google.com
+[2] https://lkml.kernel.org/r/20191212182238.46535-1-brho@google.com
+
+Sean Christopherson (14):
+  KVM: x86/mmu: Enforce max_level on HugeTLB mappings
+  mm: thp: KVM: Explicitly check for THP when populating secondary MMU
+  KVM: Use vcpu-specific gva->hva translation when querying host page
+    size
+  KVM: Play nice with read-only memslots when querying host page size
+  x86/mm: Introduce lookup_address_in_mm()
+  KVM: x86/mmu: Refactor THP adjust to prep for changing query
+  KVM: x86/mmu: Walk host page tables to find THP mappings
+  KVM: x86/mmu: Drop level optimization from fast_page_fault()
+  KVM: x86/mmu: Rely on host page tables to find HugeTLB mappings
+  KVM: x86/mmu: Remove obsolete gfn restoration in FNAME(fetch)
+  KVM: x86/mmu: Zap any compound page when collapsing sptes
+  KVM: x86/mmu: Fold max_mapping_level() into kvm_mmu_hugepage_adjust()
+  KVM: x86/mmu: Remove lpage_is_disallowed() check from set_spte()
+  KVM: x86/mmu: Use huge pages for DAX-backed files
+
+ arch/powerpc/kvm/book3s_xive_native.c |   2 +-
+ arch/x86/include/asm/pgtable_types.h  |   4 +
+ arch/x86/kvm/mmu/mmu.c                | 208 ++++++++++----------------
+ arch/x86/kvm/mmu/paging_tmpl.h        |  29 +---
+ arch/x86/mm/pageattr.c                |  11 ++
+ include/linux/huge_mm.h               |   6 +
+ include/linux/kvm_host.h              |   3 +-
+ mm/huge_memory.c                      |  11 ++
+ virt/kvm/arm/mmu.c                    |   8 +-
+ virt/kvm/kvm_main.c                   |  24 ++-
+ 10 files changed, 145 insertions(+), 161 deletions(-)
+
+-- 
+2.24.1
+
