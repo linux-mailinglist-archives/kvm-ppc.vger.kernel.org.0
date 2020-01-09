@@ -2,28 +2,53 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC7A0134D50
-	for <lists+kvm-ppc@lfdr.de>; Wed,  8 Jan 2020 21:27:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3210D13615A
+	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jan 2020 20:47:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727408AbgAHU1M (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 8 Jan 2020 15:27:12 -0500
-Received: from mga06.intel.com ([134.134.136.31]:45246 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727388AbgAHU1L (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 8 Jan 2020 15:27:11 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 12:27:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; 
-   d="scan'208";a="211658401"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:07 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        id S1732170AbgAITrq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 9 Jan 2020 14:47:46 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:46340 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731867AbgAITrq (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 9 Jan 2020 14:47:46 -0500
+Received: by mail-pg1-f194.google.com with SMTP id z124so3684460pgb.13
+        for <kvm-ppc@vger.kernel.org>; Thu, 09 Jan 2020 11:47:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=tOr15WETxbkLw/hVhIIJI77xVs+gy+a9H8+1jFpIRfc=;
+        b=cG0QOwda3n2lMKGGwl2gvG+FY0g5k14CGaWhbv4nmRcoT2JX4qtut3O08AYJiZSsJ1
+         cr8cRqsI97d5/bOkzP8tKl3Tt9qtR5JvXtPKrWUCiPl4DV38hUy0eNUJDkm8kHbJEuBE
+         yaFZx1vNucRxrssnQpATjd86jpNCMGp+2Uyc8U06zuHuUL2AoQcrnZJ+y884oRxt8t+n
+         VRC8uxlGUAtadaiER22t+8Zb5vtrFxei+x4QHt8BHfVM01jX4dRRdZl9Mv3Dje2YTVYW
+         tV4Ihp6XBYA3izk3Ms3j7QY4sBnbwek7lIwiWDhHQ5xPFFbll2klVlmKSmR8wUaYCyZ9
+         y5qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tOr15WETxbkLw/hVhIIJI77xVs+gy+a9H8+1jFpIRfc=;
+        b=fDHkPlwlIVQ4ngDPb9Uvj2cdaFtT1c2fZZQYsGJCw0WkLNiKj6rLsF5Oql7s7lDDNQ
+         2Mb0ZywXsjsRhzrIrZoY+wMmaeKCcZdl8Jjc0jdWAu+ZkX3L0CRz+sgpl5v12lvzJ0vD
+         FAf2IJO+G2/W6Z/2YI0bbNApXo97xmYCT7Qz0v/Ob4rphz+gFsi35GUemnay4i7p/PJD
+         G34/seedMvFtKR3GvTafYfiMI2EMD4G63V6Gdgeu7VgN6tM0dUfGEm7B3uu8BCKz8H4H
+         8opITpDy6z5nJO/fWTebbU+4WjcEh43Wz6wF4D0qhFSfbY+WELih/s1/DEkqXiKJEVpp
+         BFZw==
+X-Gm-Message-State: APjAAAWB5HnqwxZNz5wWPxgRHx1ZZ/3wVAA1MI460ktz5ExixDlxa+HC
+        rJGKv24JwrDsRuGYVezhAJmwXw==
+X-Google-Smtp-Source: APXvYqzh23zJ0M/6YUkb1gak5IeC/b1rxGMe/2+na8ui5AM37mG7vNvlQ/Y50JVkaXV8dlCW2yJyFQ==
+X-Received: by 2002:a62:e30f:: with SMTP id g15mr235672pfh.124.1578599265739;
+        Thu, 09 Jan 2020 11:47:45 -0800 (PST)
+Received: from gnomeregan01.cam.corp.google.com ([2620:15c:6:14:50b7:ffca:29c4:6488])
+        by smtp.googlemail.com with ESMTPSA id z130sm8572761pgz.6.2020.01.09.11.47.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jan 2020 11:47:44 -0800 (PST)
+Subject: Re: [PATCH 00/14] KVM: x86/mmu: Huge page fixes, cleanup, and DAX
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -42,83 +67,46 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
         Andrea Arcangeli <aarcange@redhat.com>,
         Dan Williams <dan.j.williams@intel.com>,
-        Barret Rhoden <brho@google.com>,
         David Hildenbrand <david@redhat.com>,
         Jason Zeng <jason.zeng@intel.com>,
         Dave Jiang <dave.jiang@intel.com>,
         Liran Alon <liran.alon@oracle.com>,
         linux-nvdimm <linux-nvdimm@lists.01.org>
-Subject: [PATCH 14/14] KVM: x86/mmu: Use huge pages for DAX-backed files
-Date:   Wed,  8 Jan 2020 12:24:48 -0800
-Message-Id: <20200108202448.9669-15-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
 References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+From:   Barret Rhoden <brho@google.com>
+Message-ID: <e3e12d17-32e4-84ad-94da-91095d999238@google.com>
+Date:   Thu, 9 Jan 2020 14:47:41 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Walk the host page tables to identify hugepage mappings for ZONE_DEVICE
-pfns, i.e. DAX pages.  Explicitly query kvm_is_zone_device_pfn() when
-deciding whether or not to bother walking the host page tables, as DAX
-pages do not set up the head/tail infrastructure, i.e. will return false
-for PageCompound() even when using huge pages.
+Hi -
 
-Zap ZONE_DEVICE sptes when disabling dirty logging, e.g. if live
-migration fails, to allow KVM to rebuild large pages for DAX-based
-mappings.  Presumably DAX favors large pages, and worst case scenario is
-a minor performance hit as KVM will need to re-fault all DAX-based
-pages.
+On 1/8/20 3:24 PM, Sean Christopherson wrote:
+> This series is a mix of bug fixes, cleanup and new support in KVM's
+> handling of huge pages.  The series initially stemmed from a syzkaller
+> bug report[1], which is fixed by patch 02, "mm: thp: KVM: Explicitly
+> check for THP when populating secondary MMU".
+> 
+> While investigating options for fixing the syzkaller bug, I realized KVM
+> could reuse the approach from Barret's series to enable huge pages for DAX
+> mappings in KVM[2] for all types of huge mappings, i.e. walk the host page
+> tables instead of querying metadata (patches 05 - 09).
 
-Suggested-by: Barret Rhoden <brho@google.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Jason Zeng <jason.zeng@intel.com>
-Cc: Dave Jiang <dave.jiang@intel.com>
-Cc: Liran Alon <liran.alon@oracle.com>
-Cc: linux-nvdimm <linux-nvdimm@lists.01.org>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/mmu/mmu.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Thanks, Sean.  I tested this patch series out, and it works for me. 
+(Huge KVM mappings of a DAX file, etc.).
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1e4e0ac169a7..324e1919722f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3250,7 +3250,7 @@ static int host_pfn_mapping_level(struct kvm_vcpu *vcpu, gfn_t gfn,
- 		     PT_DIRECTORY_LEVEL != (int)PG_LEVEL_2M ||
- 		     PT_PDPE_LEVEL != (int)PG_LEVEL_1G);
- 
--	if (!PageCompound(pfn_to_page(pfn)))
-+	if (!PageCompound(pfn_to_page(pfn)) && !kvm_is_zone_device_pfn(pfn))
- 		return PT_PAGE_TABLE_LEVEL;
- 
- 	/*
-@@ -3282,8 +3282,7 @@ static int kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
- 	if (unlikely(max_level == PT_PAGE_TABLE_LEVEL))
- 		return PT_PAGE_TABLE_LEVEL;
- 
--	if (is_error_noslot_pfn(pfn) || kvm_is_reserved_pfn(pfn) ||
--	    kvm_is_zone_device_pfn(pfn))
-+	if (is_error_noslot_pfn(pfn) || kvm_is_reserved_pfn(pfn))
- 		return PT_PAGE_TABLE_LEVEL;
- 
- 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-@@ -5910,8 +5909,8 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 		 * mapping if the indirect sp has level = 1.
- 		 */
- 		if (sp->role.direct && !kvm_is_reserved_pfn(pfn) &&
--		    !kvm_is_zone_device_pfn(pfn) &&
--		    PageCompound(pfn_to_page(pfn))) {
-+		    (kvm_is_zone_device_pfn(pfn) ||
-+		     PageCompound(pfn_to_page(pfn)))) {
- 			pte_list_remove(rmap_head, sptep);
- 
- 			if (kvm_available_flush_tlb_with_range())
--- 
-2.24.1
+Thanks,
+
+Barret
+
+
 
