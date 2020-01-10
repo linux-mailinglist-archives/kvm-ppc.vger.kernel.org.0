@@ -2,83 +2,144 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3990D136238
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jan 2020 22:05:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 563D3136686
+	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Jan 2020 06:20:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728072AbgAIVFo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 9 Jan 2020 16:05:44 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:55732 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728052AbgAIVFo (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 9 Jan 2020 16:05:44 -0500
-Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1ipez7-0008OC-Ij; Thu, 09 Jan 2020 22:04:53 +0100
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id 0AA1A105BCE; Thu,  9 Jan 2020 22:04:53 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Barret Rhoden <brho@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Zeng <jason.zeng@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>
-Subject: Re: [PATCH 05/14] x86/mm: Introduce lookup_address_in_mm()
-In-Reply-To: <20200108202448.9669-6-sean.j.christopherson@intel.com>
-References: <20200108202448.9669-1-sean.j.christopherson@intel.com> <20200108202448.9669-6-sean.j.christopherson@intel.com>
-Date:   Thu, 09 Jan 2020 22:04:53 +0100
-Message-ID: <871rs8batm.fsf@nanos.tec.linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+        id S1726633AbgAJFUF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 10 Jan 2020 00:20:05 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36292 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726384AbgAJFUF (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 10 Jan 2020 00:20:05 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00A5Cq0M087575;
+        Fri, 10 Jan 2020 00:19:59 -0500
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xea2k5tc8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Jan 2020 00:19:59 -0500
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00A5ICPP027645;
+        Fri, 10 Jan 2020 05:20:05 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma01wdc.us.ibm.com with ESMTP id 2xajb73w5e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Jan 2020 05:20:05 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00A5Jw6C40108330
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Jan 2020 05:19:58 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F572124054;
+        Fri, 10 Jan 2020 05:19:58 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D6542124053;
+        Fri, 10 Jan 2020 05:19:57 +0000 (GMT)
+Received: from suka-w540.usor.ibm.com (unknown [9.70.94.45])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 10 Jan 2020 05:19:57 +0000 (GMT)
+From:   Sukadev Bhattiprolu <sukadev@linux.ibm.com>
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@ozlabs.org>, linuxram@us.ibm.com
+Cc:     linuxppc-dev@ozlabs.org, kvm-ppc@vger.kernel.org
+Subject: [PATCH v3 1/2] powerpc/pseries/svm: Use FW_FEATURE to detect SVM
+Date:   Thu,  9 Jan 2020 21:19:56 -0800
+Message-Id: <20200110051957.31714-1-sukadev@linux.ibm.com>
+X-Mailer: git-send-email 2.17.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-10_01:2020-01-10,2020-01-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 clxscore=1015 priorityscore=1501
+ mlxlogscore=999 impostorscore=0 lowpriorityscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001100045
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+Use FW_FEATURE_SVM to detect a secure guest (SVM). This would be
+more efficient than calling mfmsr() frequently.
 
-> diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
-> index b5e49e6bac63..400ac8da75e8 100644
-> --- a/arch/x86/include/asm/pgtable_types.h
-> +++ b/arch/x86/include/asm/pgtable_types.h
-> @@ -561,6 +561,10 @@ static inline void update_page_count(int level, unsigned long pages) { }
->  extern pte_t *lookup_address(unsigned long address, unsigned int *level);
->  extern pte_t *lookup_address_in_pgd(pgd_t *pgd, unsigned long address,
->  				    unsigned int *level);
-> +
-> +struct mm_struct;
-> +pte_t *lookup_address_in_mm(struct mm_struct *mm, unsigned long address,
-> +			    unsigned int *level);
+Suggested-by: Michael Ellerman <mpe@ellerman.id.au>
+Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.ibm.com>
+---
+ arch/powerpc/include/asm/firmware.h       | 3 ++-
+ arch/powerpc/include/asm/svm.h            | 6 +++++-
+ arch/powerpc/kernel/paca.c                | 6 +++++-
+ arch/powerpc/platforms/pseries/firmware.c | 3 +++
+ 4 files changed, 15 insertions(+), 3 deletions(-)
 
-Please keep the file consistent and use extern even if not required.
+diff --git a/arch/powerpc/include/asm/firmware.h b/arch/powerpc/include/asm/firmware.h
+index b3e214a97f3a..23cffcec8a55 100644
+--- a/arch/powerpc/include/asm/firmware.h
++++ b/arch/powerpc/include/asm/firmware.h
+@@ -51,6 +51,7 @@
+ #define FW_FEATURE_BLOCK_REMOVE ASM_CONST(0x0000001000000000)
+ #define FW_FEATURE_PAPR_SCM 	ASM_CONST(0x0000002000000000)
+ #define FW_FEATURE_ULTRAVISOR	ASM_CONST(0x0000004000000000)
++#define FW_FEATURE_SVM		ASM_CONST(0x0000008000000000)
+ 
+ #ifndef __ASSEMBLY__
+ 
+@@ -69,7 +70,7 @@ enum {
+ 		FW_FEATURE_TYPE1_AFFINITY | FW_FEATURE_PRRN |
+ 		FW_FEATURE_HPT_RESIZE | FW_FEATURE_DRMEM_V2 |
+ 		FW_FEATURE_DRC_INFO | FW_FEATURE_BLOCK_REMOVE |
+-		FW_FEATURE_PAPR_SCM | FW_FEATURE_ULTRAVISOR,
++		FW_FEATURE_PAPR_SCM | FW_FEATURE_ULTRAVISOR | FW_FEATURE_SVM,
+ 	FW_FEATURE_PSERIES_ALWAYS = 0,
+ 	FW_FEATURE_POWERNV_POSSIBLE = FW_FEATURE_OPAL | FW_FEATURE_ULTRAVISOR,
+ 	FW_FEATURE_POWERNV_ALWAYS = 0,
+diff --git a/arch/powerpc/include/asm/svm.h b/arch/powerpc/include/asm/svm.h
+index 85580b30aba4..1d056c70fa87 100644
+--- a/arch/powerpc/include/asm/svm.h
++++ b/arch/powerpc/include/asm/svm.h
+@@ -10,9 +10,13 @@
+ 
+ #ifdef CONFIG_PPC_SVM
+ 
++/*
++ * Note that this is not usable in early boot - before FW
++ * features were probed
++ */
+ static inline bool is_secure_guest(void)
+ {
+-	return mfmsr() & MSR_S;
++	return firmware_has_feature(FW_FEATURE_SVM);
+ }
+ 
+ void dtl_cache_ctor(void *addr);
+diff --git a/arch/powerpc/kernel/paca.c b/arch/powerpc/kernel/paca.c
+index 949eceb254d8..3cba33a99549 100644
+--- a/arch/powerpc/kernel/paca.c
++++ b/arch/powerpc/kernel/paca.c
+@@ -120,7 +120,11 @@ static struct lppaca * __init new_lppaca(int cpu, unsigned long limit)
+ 	if (early_cpu_has_feature(CPU_FTR_HVMODE))
+ 		return NULL;
+ 
+-	if (is_secure_guest())
++	/*
++	 * Firmware features may not have been probed yet, so check
++	 * MSR rather than FW_FEATURE_SVM in is_secure_guest().
++	 */
++	if (mfmsr() & MSR_S)
+ 		lp = alloc_shared_lppaca(LPPACA_SIZE, 0x400, limit, cpu);
+ 	else
+ 		lp = alloc_paca_data(LPPACA_SIZE, 0x400, limit, cpu);
+diff --git a/arch/powerpc/platforms/pseries/firmware.c b/arch/powerpc/platforms/pseries/firmware.c
+index d4a8f1702417..c98527fb4937 100644
+--- a/arch/powerpc/platforms/pseries/firmware.c
++++ b/arch/powerpc/platforms/pseries/firmware.c
+@@ -175,4 +175,7 @@ static int __init probe_fw_features(unsigned long node, const char *uname, int
+ void __init pseries_probe_fw_features(void)
+ {
+ 	of_scan_flat_dt(probe_fw_features, NULL);
++
++	if (mfmsr() & MSR_S)
++		powerpc_firmware_features |= FW_FEATURE_SVM;
+ }
+-- 
+2.17.2
 
-Other than that:
-
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
