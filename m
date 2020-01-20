@@ -2,62 +2,98 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D1ECE141FA0
-	for <lists+kvm-ppc@lfdr.de>; Sun, 19 Jan 2020 19:45:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BFBA614220E
+	for <lists+kvm-ppc@lfdr.de>; Mon, 20 Jan 2020 04:34:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728516AbgASSpT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 19 Jan 2020 13:45:19 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:41127 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727372AbgASSpS (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 19 Jan 2020 13:45:18 -0500
-Received: by mail-il1-f194.google.com with SMTP id f10so25481836ils.8
-        for <kvm-ppc@vger.kernel.org>; Sun, 19 Jan 2020 10:45:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=/o+CA7VDRA7UR3HGeT8+/tYzwEnOXwq5B8ZHP2/HeYc=;
-        b=CnLTfbHB8KoaVBZLeFQ7ORIls5uO9NgxS0qa/FxHhDvi+R+J7Buf9p3iBNahW2hmTv
-         Ek86ZAJJ0N+nwtm0oAbM74ZHeJGW3uxwlSTnSlMeE7//uzRaPDp+fgfB7A2TfJeIix4a
-         zvk+bHy/C+NrYN7iCyPXIXQ7KLo9SQrmXcOm/ZflcxsorZ1L0JfvvI2GcyxCmdJXJ1zp
-         PrjCPAwXerOpJ6F9jCfVFPUTLBN3kybWHbZVTjoZud0eZ/o+BY/hm707hJh8wvtGVl7R
-         +jH4A2e5RNSdwMwK/kLkLM5z3+PdnA22OwVckSNOzVCLxcrTZ+GAcVoLaV/FQHgmap1P
-         wH3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=/o+CA7VDRA7UR3HGeT8+/tYzwEnOXwq5B8ZHP2/HeYc=;
-        b=o48WWSGHIHibXi+X7hkJr4PHjA2bG+rpMoC/2mDPw0a5/44p55Z6DpLWfYbVZVH0ZW
-         kv9wKHcAUNpB0Ekd+M9elsXIiKdsWIHR4ABd/yPNgB40EBLQQkVB5SEdVftDyhMvaAkd
-         lKhgogzCW1r4GjeIDQwc3Nce94F4I6UYBAr4Xoz/06rG/FbmX/NryZdpZt1l9Fdcpi+l
-         WoYqoZAi2U/In+7OBoxZAV+XV+lTAT47/OGWPZapaVH24P6ja9VSp5HXMezNKll+F1LC
-         osYMVKOFSIaMzw6VMj1n1LOMfiM26fHHJQmVGu37964AObza7NSPxoJMXCWHa4fUL6u8
-         1imw==
-X-Gm-Message-State: APjAAAV7j0uAvZUf/BQA6YL9X3uA7f2aaQwEdDqUrGQTAzb37nHYHCSE
-        Qt8zhJFC5Pvr1p8Tx81hqTv+cSYR9poWtPDcCiQ=
-X-Google-Smtp-Source: APXvYqwKSSNfA6XQhSe8xLQmhPOZ5zMxgPKIiOKwNbbBetVQfiX5IUYIdZdCusySf1mdiQwkilz/3AeIELdrN8e/kFY=
-X-Received: by 2002:a92:8307:: with SMTP id f7mr7362169ild.183.1579459518365;
- Sun, 19 Jan 2020 10:45:18 -0800 (PST)
+        id S1729021AbgATDeM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 19 Jan 2020 22:34:12 -0500
+Received: from ozlabs.org ([203.11.71.1]:37193 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729011AbgATDeM (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sun, 19 Jan 2020 22:34:12 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 481HMj02PMz9sRK; Mon, 20 Jan 2020 14:34:08 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1579491249; bh=Bx1QENbI/taNJYozRF14LNd8JjoLRwCSpGh5bRXaoZc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BalvDW2whNPsvCmtISkbOhDMpZauUgvHl09Uaty2WElwJ6Cza+b4DeHGcnUNwOLV3
+         g6DRm1DMzCI/vBJ1PlZfghThTKRiDTXm/9cEYl1gDtPWzG4q+29NKYsabkOFnLKJZW
+         pu7HnKn8KFD4ACQ0z1wJAaZ09+iERSqPxVmZuqJ9tVnb3xT4AbRscYT7AxP5jHVWa0
+         3Gb0VAa6x9zDA27RPpRqnF9yfWp6Q9n39W6+HvqOjYYy/h9z34BptPYaZs8RzgPLLz
+         x8CTvY8aTo7+f8KU7v7y459Sv+srWbj2FDlNPNQXb3Ix1Y7vabAiDRVuXNEoR2XexB
+         QTFYCAbB5+mEg==
+Date:   Mon, 20 Jan 2020 13:57:16 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v2 01/45] KVM: PPC: Book3S HV: Uninit vCPU if vcore
+ creation fails
+Message-ID: <20200120025716.GA14307@blackberry>
+References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
+ <20191218215530.2280-2-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Received: by 2002:a02:95c8:0:0:0:0:0 with HTTP; Sun, 19 Jan 2020 10:45:18
- -0800 (PST)
-Reply-To: favordens@email.com
-From:   Favor Desmond <contecindy5@gmail.com>
-Date:   Sun, 19 Jan 2020 18:45:18 +0000
-Message-ID: <CAOfCPNwXQOBA_mpzZtb4RyjVohKo4rd8c9vfu_6vbqYEZUyd6w@mail.gmail.com>
-Subject: HELLO
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218215530.2280-2-sean.j.christopherson@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hello Dear
-Greetings to you,I am Favor Desmond from Ivory coast currently living
-in  Togo Republic,I would like to know you more, so that i can tell
-you little amount myself and my photo, email address is
-favordens@email.com
-Thanks
-Favor
+On Wed, Dec 18, 2019 at 01:54:46PM -0800, Sean Christopherson wrote:
+> Call kvm_vcpu_uninit() if vcore creation fails to avoid leaking any
+> resources allocated by kvm_vcpu_init(), i.e. the vcpu->run page.
+> 
+> Fixes: 371fefd6f2dc4 ("KVM: PPC: Allow book3s_hv guests to use SMT processor modes")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/powerpc/kvm/book3s_hv.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index dc53578193ee..d07d2f5273e5 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -2368,7 +2368,7 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_hv(struct kvm *kvm,
+>  	mutex_unlock(&kvm->lock);
+>  
+>  	if (!vcore)
+> -		goto free_vcpu;
+> +		goto uninit_vcpu;
+>  
+>  	spin_lock(&vcore->lock);
+>  	++vcore->num_threads;
+> @@ -2385,6 +2385,8 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_hv(struct kvm *kvm,
+>  
+>  	return vcpu;
+>  
+> +uninit_vcpu:
+> +	kvm_vcpu_uninit(vcpu);
+>  free_vcpu:
+>  	kmem_cache_free(kvm_vcpu_cache, vcpu);
+>  out:
+> -- 
+> 2.24.1
+
+Looks correct.
+
+Acked-by: Paul Mackerras <paulus@ozlabs.org>
