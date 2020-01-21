@@ -2,58 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 05088144035
-	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Jan 2020 16:10:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDABB144049
+	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Jan 2020 16:12:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729052AbgAUPKp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 21 Jan 2020 10:10:45 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25205 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727255AbgAUPKo (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Jan 2020 10:10:44 -0500
+        id S1727508AbgAUPM4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 21 Jan 2020 10:12:56 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31387 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728811AbgAUPM4 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Jan 2020 10:12:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579619444;
+        s=mimecast20190719; t=1579619575;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dLNqv137Ty3zBX/5Bsp+2Ypr44jpbB2i9ogizbwLSF8=;
-        b=D+3rhBDokrgj8pSQCX3LLld74t04jHdPgp1dCzOanI/juk3cBEseM0Osp41+2eyZgqyatn
-        Uf+A4Rkw80Nhm5U3+IJTYnEinfk2MbQHtbGIAMNOsTIV6S8Yskq2Nsn3dRVpmYzST2TqBD
-        CUhRHnK9EAsMWQVo19+F+Kn9YPX0p+0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-LjybKeqqP12aku9kW8EsUQ-1; Tue, 21 Jan 2020 10:10:33 -0500
-X-MC-Unique: LjybKeqqP12aku9kW8EsUQ-1
-Received: by mail-wm1-f72.google.com with SMTP id t16so734139wmt.4
-        for <kvm-ppc@vger.kernel.org>; Tue, 21 Jan 2020 07:10:32 -0800 (PST)
+        bh=bu/iMoYfYBgd5jXQviUDjY/CFaD1fKEaBQDIzi7DS7k=;
+        b=d03V+NNbwDAzbtz9CSnilOjPjOhh3OLD5C2Hd9nY014CwZUOgl1CR+DuZJinDiMw8o/6Kf
+        IqFT4b8zqmg/WqdbEpSpXqqnAWyngWuLBnevXOe33oTNfaemXM6ulRkKtABlXC3RFosHCi
+        MLB+n22AES15BjXHpD4ofD9LZ/0CZnw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-369-k_wx4FnvOKui55qDSIjVjQ-1; Tue, 21 Jan 2020 10:12:51 -0500
+X-MC-Unique: k_wx4FnvOKui55qDSIjVjQ-1
+Received: by mail-wm1-f71.google.com with SMTP id p2so736063wma.3
+        for <kvm-ppc@vger.kernel.org>; Tue, 21 Jan 2020 07:12:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=dLNqv137Ty3zBX/5Bsp+2Ypr44jpbB2i9ogizbwLSF8=;
-        b=EtCx4l+b3shK6hhp6IGgqNrBIHQdmapEG80108l5+tg8X6faPRaVMP+IlhsXxY6AW5
-         8qHIWuEwIj9OaJwvdnRfWunmmlufYSttJsGIbLO4CSTOXtV5ziouRcYkRG7gVs9p4VcX
-         s5IlhyLvX3mUZVxOjbV2ZRHy6ALWpvc70cbBnjOD33L+nvnp8brcQqjwnADUBnkORGPV
-         kEcpnIx3QZVSUIFFZvWw9pB3Amuue9nIDXYE89Y0Sb5emEz/limO5vEmv7/V3QWaDmbJ
-         yUmMG2JEVE3Nb/AhULRx1YmTk1FfADUjsUFX95ZiWWB6p9fQLAp9NLpTRpkiquyX0ADW
-         tymw==
-X-Gm-Message-State: APjAAAU0uiriPzKHwZyf+3bse4PHLMug6JqxNWG27UQjqzpqkck6tpOI
-        J0c89obwEfT9YtqUsqpAPFobvQLgpDCmnDVBnrqjaNaC9UgRRp3QfXMdpBixDfi8BVL8Rnhzf55
-        yeYZIgjOUnCO/tLz4qQ==
-X-Received: by 2002:a5d:484d:: with SMTP id n13mr5658192wrs.420.1579619431917;
-        Tue, 21 Jan 2020 07:10:31 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxxEyxfwVY/ROHiQo6nFEJMG0NaKySaBG+B/YnTEdUCo5yvn8VFW7mI2ukJg01QncMPDMI9zQ==
-X-Received: by 2002:a5d:484d:: with SMTP id n13mr5658133wrs.420.1579619431579;
-        Tue, 21 Jan 2020 07:10:31 -0800 (PST)
+        bh=bu/iMoYfYBgd5jXQviUDjY/CFaD1fKEaBQDIzi7DS7k=;
+        b=REBFUOUr0/eov5wXbtl2tKlzulnHDipByLVfoggPkbyXGhQC18e4rVv2JOWip36QeX
+         IjKhGUDRpdT35g8r83y8bX1kC/QruUons9PtgSKaDyjheDj7T1ZNqz+T+TN0MLLs4bDq
+         speAH+q5dBEAyiUxkDIJp4SxPM1fcG3dE1yX4vLc4ySmoADtwe6WcHKkzu5nQOfYBLVS
+         RpVyY2/WN0FRZmdK3nI2Sb7xWH/ZsGwzVFuBJ3WqCdfAjqAHPuNMLDhC5oyx2tkip3Es
+         7xNaGiLDcaaTC3n31+fQ4jKtw5CZ36V9fPHNcQdbk7iNKIYJJ1gmOO3TBVBGW1U3Ouc/
+         NMFg==
+X-Gm-Message-State: APjAAAXhMlDWgaq+rFhyfIFMtXfk1kFU+D+74OQEnGA9BNYo1xKO05Fw
+        6COdmljuHnX4bOSdkHSO/IwymS2nAHNC19pq5h5I8cd/fiSRGdEReGwSC3qudjs5m+veCoI+TIN
+        Khj8x/w1gD+cYAKQ8tQ==
+X-Received: by 2002:a1c:1dd7:: with SMTP id d206mr5000188wmd.5.1579619569958;
+        Tue, 21 Jan 2020 07:12:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx3W9/IFqNtFmh53Y8FuFyZdMe+4NHjz+xYUeI++YvzTVDVuRT0IkPp6ekS3qHgnEBSwWauFA==
+X-Received: by 2002:a1c:1dd7:: with SMTP id d206mr5000170wmd.5.1579619569664;
+        Tue, 21 Jan 2020 07:12:49 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
-        by smtp.gmail.com with ESMTPSA id h2sm53828069wrv.66.2020.01.21.07.10.30
+        by smtp.gmail.com with ESMTPSA id b16sm54711240wrj.23.2020.01.21.07.12.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2020 07:10:31 -0800 (PST)
-Subject: Re: [PATCH 00/14] KVM: x86/mmu: Huge page fixes, cleanup, and DAX
-To:     Barret Rhoden <brho@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
+        Tue, 21 Jan 2020 07:12:49 -0800 (PST)
+Subject: Re: [PATCH 12/14] KVM: x86/mmu: Fold max_mapping_level() into
+ kvm_mmu_hugepage_adjust()
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -73,48 +73,75 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
         Andrea Arcangeli <aarcange@redhat.com>,
         Dan Williams <dan.j.williams@intel.com>,
+        Barret Rhoden <brho@google.com>,
         David Hildenbrand <david@redhat.com>,
         Jason Zeng <jason.zeng@intel.com>,
         Dave Jiang <dave.jiang@intel.com>,
         Liran Alon <liran.alon@oracle.com>,
         linux-nvdimm <linux-nvdimm@lists.01.org>
 References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
- <e3e12d17-32e4-84ad-94da-91095d999238@google.com>
+ <20200108202448.9669-13-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d7d0801b-79be-a5e7-a376-abd92b5c09b2@redhat.com>
-Date:   Tue, 21 Jan 2020 16:10:30 +0100
+Message-ID: <52cf5d90-5e65-4878-b214-7e1809224688@redhat.com>
+Date:   Tue, 21 Jan 2020 16:12:46 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <e3e12d17-32e4-84ad-94da-91095d999238@google.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200108202448.9669-13-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 09/01/20 20:47, Barret Rhoden wrote:
-> Hi -
-> 
-> On 1/8/20 3:24 PM, Sean Christopherson wrote:
->> This series is a mix of bug fixes, cleanup and new support in KVM's
->> handling of huge pages.  The series initially stemmed from a syzkaller
->> bug report[1], which is fixed by patch 02, "mm: thp: KVM: Explicitly
->> check for THP when populating secondary MMU".
->>
->> While investigating options for fixing the syzkaller bug, I realized KVM
->> could reuse the approach from Barret's series to enable huge pages for
->> DAX
->> mappings in KVM[2] for all types of huge mappings, i.e. walk the host
->> page
->> tables instead of querying metadata (patches 05 - 09).
-> 
-> Thanks, Sean.  I tested this patch series out, and it works for me.
-> (Huge KVM mappings of a DAX file, etc.).
+On 08/01/20 21:24, Sean Christopherson wrote:
+> -	level = host_pfn_mapping_level(vcpu, gfn, pfn);
+> +	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+> +	if (!memslot_valid_for_gpte(slot, true))
+> +		return PT_PAGE_TABLE_LEVEL;
 
-Queued, thanks.
+Following up on my remark to patch 7, this can also use
+gfn_to_memslot_dirty_bitmap.
 
 Paolo
+
+> +
+> +	max_level = min(max_level, kvm_x86_ops->get_lpage_level());
+> +	for ( ; max_level > PT_PAGE_TABLE_LEVEL; max_level--) {
+> +		if (!__mmu_gfn_lpage_is_disallowed(gfn, max_level, slot))
+> +			break;
+> +	}
+> +
+> +	if (max_level == PT_PAGE_TABLE_LEVEL)
+> +		return PT_PAGE_TABLE_LEVEL;
+> +
+> +	level = host_pfn_mapping_level(vcpu, gfn, pfn, slot);
+>  	if (level == PT_PAGE_TABLE_LEVEL)
+>  		return level;
+>  
+> @@ -4182,8 +4172,6 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  	if (lpage_disallowed)
+>  		max_level = PT_PAGE_TABLE_LEVEL;
+>  
+> -	max_level = max_mapping_level(vcpu, gfn, max_level);
+> -
+>  	if (fast_page_fault(vcpu, gpa, error_code))
+>  		return RET_PF_RETRY;
+>  
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 0560982eda8b..ea174d85700a 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -817,8 +817,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>  	else
+>  		max_level = walker.level;
+>  
+> -	max_level = max_mapping_level(vcpu, walker.gfn, max_level);
+> -
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	smp_rmb();
+>  
+> 
 
