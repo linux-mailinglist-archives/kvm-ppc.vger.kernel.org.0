@@ -2,174 +2,139 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 835A2143BD0
-	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Jan 2020 12:12:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C2B8143F6E
+	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Jan 2020 15:24:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729508AbgAULMW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 21 Jan 2020 06:12:22 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36338 "EHLO
+        id S1728896AbgAUOYk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 21 Jan 2020 09:24:40 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53001 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729526AbgAULMR (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Jan 2020 06:12:17 -0500
+        by vger.kernel.org with ESMTP id S1726968AbgAUOYh (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Jan 2020 09:24:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579605135;
+        s=mimecast20190719; t=1579616676;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SUmH5ZMutw7kgyRL+tUGBiFKuqlrQTYA6wv/vKtVsig=;
-        b=G7q5fiYD8qM//M4chYV+u63PkL2+2H1NDaYxxyu3QvlCGDtgItUkg4h3izASndIhSYJ6zw
-        x77zfKjrWLAsyd8yNcg3Hxt6Kj/R+iFwu0p5CMTQOZBze1LaA/AHaNSInXk5Mkqy24ex+p
-        K6Kdsb/2yc+ZXGBK2lzUZhg9v+tMsMg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-BH6_QheeO9KyfLWN4UIV3g-1; Tue, 21 Jan 2020 06:12:13 -0500
-X-MC-Unique: BH6_QheeO9KyfLWN4UIV3g-1
-Received: by mail-wr1-f69.google.com with SMTP id z15so1174864wrw.0
-        for <kvm-ppc@vger.kernel.org>; Tue, 21 Jan 2020 03:12:13 -0800 (PST)
+        bh=iietA04mTbBj3y8KEP1nE87RzCPxCIolbi4wDz4ohvY=;
+        b=gEcewj+6vNDNPjxB+44kCmZ+rItN4DxLbT80VCVg8+N8fu2PTt+twUsu1wDr/D0rhQ+htq
+        pjrJwChUdeFVogbZrrFU7UQuydVQ40ZrMocDW15OSzZa/GxCcaxL9c20F/SiGJtea9qG74
+        GschU2NtrPgdD7YCRnE/Wc71nDtcVvs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-5bTGxkalMmitIL9zCHhK9Q-1; Tue, 21 Jan 2020 09:24:35 -0500
+X-MC-Unique: 5bTGxkalMmitIL9zCHhK9Q-1
+Received: by mail-wm1-f71.google.com with SMTP id o24so427957wmh.0
+        for <kvm-ppc@vger.kernel.org>; Tue, 21 Jan 2020 06:24:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=SUmH5ZMutw7kgyRL+tUGBiFKuqlrQTYA6wv/vKtVsig=;
-        b=lm1ijWfDi2vxeNU1xuS9LFk0onJnAsRwf8rKfb4s+RD9QXKL3woAP+N51n102FCDET
-         qgHc99M1lnufmeOAfe1AmoCkHxJq0DSjGmhbo23J+FgGZ32whQrLwW8LIKqjSt83zetM
-         1wd8ao3s13BhGbYbN9jij2H4gV+rNOPRsUVCYs09Dxe7AYFj69w2ICZh1pmcBuTzzvti
-         ZMbcbrYdGpdtu9aVkYYoRimf9EUQp2hNGh5P6VuuvH96iHYmTsbJxCSIl8JmtPlL433B
-         WoNoBprq13AVhe5so/+xNImZ0vusKfGHRaoAsm/ijUs7vewp3OVV4I2eq9p3r4W/GYM+
-         ENkQ==
-X-Gm-Message-State: APjAAAXAovVwxNBM2zHGCzxKmN+lkAnzHThekxklWWawuQQo/ap/E/GW
-        PF13JZHo0D2QW9+wdzubTgJBaOjQHYi0i+s2twYcVu78qXVQer3XQjjYIS2bcJuyrFtwTrTWQ4M
-        UsL2oEMvS5luDMMOIbA==
-X-Received: by 2002:a05:6000:11c9:: with SMTP id i9mr4806236wrx.164.1579605131966;
-        Tue, 21 Jan 2020 03:12:11 -0800 (PST)
-X-Google-Smtp-Source: APXvYqypfAKKGH/a848HhEdWp/8kNPn20JC8kc1fEqjae+lABJTb9oaxjSSRLWrYZHNDzVwQwM45Kg==
-X-Received: by 2002:a05:6000:11c9:: with SMTP id i9mr4806191wrx.164.1579605131619;
-        Tue, 21 Jan 2020 03:12:11 -0800 (PST)
+        bh=iietA04mTbBj3y8KEP1nE87RzCPxCIolbi4wDz4ohvY=;
+        b=mlxHNyxG9FgQBUcMri5jTtoeZPj8Cy87tqFHfiTKb56doFHyNRK7TOX2jOkZ63ePeZ
+         fOLOoMywI7dN1u+npBqzUkJK0IwDOb/3EWSwkZ0OGL7DvpQAZE8RSawMKePrVhcFzAvE
+         rBm/yRnwfEQhyMEOoXDrORwX3syu4a4Y0VnlsA4jQFjkkL02sY7dQDZnkn4KGBYjqZaM
+         HatA99WUMM9nPAVeqRddLLazdfQkz9tFpcb1RCXWX1i38uGt3NULwduDN2ajaywreasH
+         3MW3OGLflXo0sxdV/p7uNPE8mbJ1LRIf6H+g+yfVNXoZzuhzDtDwXFbtxmTEvHAclvRl
+         kVPQ==
+X-Gm-Message-State: APjAAAXw+5agHZbaSt3g2SMjijvkqMogqV50Q57JJmvqHgdEXD+3aGxM
+        JqEjQq3f1m0M55D7wL0tnSOcTXfsZnRK9Gui/ul/eIVj5m91XNf012oDtHWSrI7rqTh6unoep1s
+        zXnStyqCfZQ5RGqVrtw==
+X-Received: by 2002:a5d:4d06:: with SMTP id z6mr5440101wrt.339.1579616673969;
+        Tue, 21 Jan 2020 06:24:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyTZsEeiVXo1aYXs9MoGNtX19umLmm3R/ZbsXqxiGO2rVQCtL37lQcA37U+6PdsUBw/nSKlMg==
+X-Received: by 2002:a5d:4d06:: with SMTP id z6mr5440056wrt.339.1579616673641;
+        Tue, 21 Jan 2020 06:24:33 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
-        by smtp.gmail.com with ESMTPSA id z8sm51076203wrq.22.2020.01.21.03.12.09
+        by smtp.gmail.com with ESMTPSA id m3sm51279088wrs.53.2020.01.21.06.24.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2020 03:12:11 -0800 (PST)
-Subject: Re: [PATCH v2 41/45] KVM: PPC: Move all vcpu init code into
- kvm_arch_vcpu_create()
-To:     Paul Mackerras <paulus@ozlabs.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
+        Tue, 21 Jan 2020 06:24:33 -0800 (PST)
+Subject: Re: [PATCH 04/14] KVM: Play nice with read-only memslots when
+ querying host page size
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Greg Kurz <groug@kaod.org>
-References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
- <20191218215530.2280-42-sean.j.christopherson@intel.com>
- <20200120034658.GD14307@blackberry>
+        syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Barret Rhoden <brho@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Zeng <jason.zeng@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>
+References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+ <20200108202448.9669-5-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d3d465b0-6a45-c754-0538-1e4d1e130357@redhat.com>
-Date:   Tue, 21 Jan 2020 12:12:09 +0100
+Message-ID: <2c091d40-8e32-1e55-2eff-27a4b43e0674@redhat.com>
+Date:   Tue, 21 Jan 2020 15:24:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200120034658.GD14307@blackberry>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200108202448.9669-5-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 20/01/20 04:46, Paul Mackerras wrote:
-> On Wed, Dec 18, 2019 at 01:55:26PM -0800, Sean Christopherson wrote:
->> Fold init() into create() now that the two are called back-to-back by
->> common KVM code (kvm_vcpu_init() calls kvm_arch_vcpu_init() as its last
->> action, and kvm_vm_ioctl_create_vcpu() calls kvm_arch_vcpu_create()
->> immediately thereafter).  Rinse and repeat for kvm_arch_vcpu_uninit()
->> and kvm_arch_vcpu_destroy().  This paves the way for removing
->> kvm_arch_vcpu_{un}init() entirely.
->>
->> Note, calling kvmppc_mmu_destroy() if kvmppc_core_vcpu_create() fails
->> may or may not be necessary.  Move it along with the more obvious call
->> to kvmppc_subarch_vcpu_uninit() so as not to inadvertantly introduce a
->> functional change and/or bug.
->>
->> No functional change intended.
->>
->> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> This doesn't compile.  I get:
-> 
->   CC [M]  arch/powerpc/kvm/powerpc.o
-> /home/paulus/kernel/kvm/arch/powerpc/kvm/powerpc.c: In function ‘kvm_arch_vcpu_create’:
-> /home/paulus/kernel/kvm/arch/powerpc/kvm/powerpc.c:733:34: error: ‘kvmppc_decrementer_wakeup’ undeclared (first use in this function)
->   vcpu->arch.dec_timer.function = kvmppc_decrementer_wakeup;
->                                   ^
-> /home/paulus/kernel/kvm/arch/powerpc/kvm/powerpc.c:733:34: note: each undeclared identifier is reported only once for each function it appears in
-> /home/paulus/kernel/kvm/arch/powerpc/kvm/powerpc.c: At top level:
-> /home/paulus/kernel/kvm/arch/powerpc/kvm/powerpc.c:794:29: warning: ‘kvmppc_decrementer_wakeup’ defined but not used [-Wunused-function]
->  static enum hrtimer_restart kvmppc_decrementer_wakeup(struct hrtimer *timer)
->                              ^
-> make[3]: *** [/home/paulus/kernel/kvm/scripts/Makefile.build:266: arch/powerpc/kvm/powerpc.o] Error 1
-> 
-> The problem is that kvmppc_decrementer_wakeup() is a static function
-> defined in this file (arch/powerpc/kvm/powerpc.c) after
-> kvm_arch_vcpu_create() but before kvm_arch_vcpu_init().  You need a
-> forward static declaration of kvmppc_decrementer_wakeup() before
-> kvm_arch_vcpu_create(), or else move one or other function.
-> 
-> Paul.
+On 08/01/20 21:24, Sean Christopherson wrote:
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 5f7f06824c2b..d9aced677ddd 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1418,15 +1418,23 @@ EXPORT_SYMBOL_GPL(kvm_is_visible_gfn);
+>  
+>  unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn)
+>  {
+> +	struct kvm_memory_slot *slot;
+>  	struct vm_area_struct *vma;
+>  	unsigned long addr, size;
+>  
+>  	size = PAGE_SIZE;
+>  
+> -	addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
+> -	if (kvm_is_error_hva(addr))
+> +	/*
+> +	 * Manually do the equivalent of kvm_vcpu_gfn_to_hva() to avoid the
+> +	 * "writable" check in __gfn_to_hva_many(), which will always fail on
+> +	 * read-only memslots due to gfn_to_hva() assuming writes.
+> +	 */
+> +	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+> +	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
+>  		return PAGE_SIZE;
+>  
+> +	addr = __gfn_to_hva_memslot(slot, gfn);
+> +
+>  	down_read(&current->mm->mmap_sem);
+>  	vma = find_vma(current->mm, addr);
+>  	if (!vma)
 > 
 
-Squashed:
+Even simpler: use kvm_vcpu_gfn_to_hva_prot
 
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 91cf94d4191e..4fbf8690b8c5 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -725,6 +725,16 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
- 	return 0;
- }
- 
-+static enum hrtimer_restart kvmppc_decrementer_wakeup(struct hrtimer *timer)
-+{
-+	struct kvm_vcpu *vcpu;
-+
-+	vcpu = container_of(timer, struct kvm_vcpu, arch.dec_timer);
-+	kvmppc_decrementer_func(vcpu);
-+
-+	return HRTIMER_NORESTART;
-+}
-+
- int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- {
- 	int err;
-@@ -791,16 +801,6 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
- 	return kvmppc_core_pending_dec(vcpu);
- }
- 
--static enum hrtimer_restart kvmppc_decrementer_wakeup(struct hrtimer *timer)
--{
--	struct kvm_vcpu *vcpu;
--
--	vcpu = container_of(timer, struct kvm_vcpu, arch.dec_timer);
--	kvmppc_decrementer_func(vcpu);
--
--	return HRTIMER_NORESTART;
--}
--
- int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
- {
- 	return 0;
+-	addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
++	addr = kvm_vcpu_gfn_to_hva_prot(vcpu, gfn, NULL);
+
+"You are in a maze of twisty little functions, all alike".
 
 Paolo
 
