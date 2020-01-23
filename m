@@ -2,84 +2,77 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2FA5144C15
-	for <lists+kvm-ppc@lfdr.de>; Wed, 22 Jan 2020 07:54:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1C08147822
+	for <lists+kvm-ppc@lfdr.de>; Fri, 24 Jan 2020 06:28:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725911AbgAVGyu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 22 Jan 2020 01:54:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6456 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725877AbgAVGyt (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 22 Jan 2020 01:54:49 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00M6lXvC058173
-        for <kvm-ppc@vger.kernel.org>; Wed, 22 Jan 2020 01:54:49 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xp3u6r0gv-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Wed, 22 Jan 2020 01:54:49 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <kamalesh@linux.vnet.ibm.com>;
-        Wed, 22 Jan 2020 06:54:43 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 22 Jan 2020 06:54:40 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00M6scVq42991928
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Jan 2020 06:54:38 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D2BB2A4051;
-        Wed, 22 Jan 2020 06:54:38 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 18F56A4059;
-        Wed, 22 Jan 2020 06:54:38 +0000 (GMT)
-Received: from JAVRIS.in.ibm.com (unknown [9.124.31.197])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 22 Jan 2020 06:54:37 +0000 (GMT)
-Subject: Re: [PATCH FIX] KVM: PPC: Book3S HV: Release lock on page-out failure
- path
-To:     Bharata B Rao <bharata@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-Cc:     paulus@au1.ibm.com
-References: <20200122045542.3527-1-bharata@linux.ibm.com>
-From:   Kamalesh Babulal <kamalesh@linux.vnet.ibm.com>
-Date:   Wed, 22 Jan 2020 12:24:36 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1729904AbgAXF2C (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 24 Jan 2020 00:28:02 -0500
+Received: from dexter.tse.jus.br ([187.29.147.30]:59932 "EHLO
+        dexter.tse.jus.br" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729740AbgAXF2C (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 Jan 2020 00:28:02 -0500
+X-Greylist: delayed 14402 seconds by postgrey-1.27 at vger.kernel.org; Fri, 24 Jan 2020 00:27:59 EST
+X-AuditID: c0a8cb02-a77ff70000000ac3-c8-5e29f71a5a79
+Received: from zimbra.tre-am.jus.br (zimbra.tre-am.gov.br [10.22.41.16])
+        by dexter.tse.jus.br (Mail) with SMTP id 63.F9.02755.A17F92E5; Thu, 23 Jan 2020 17:42:18 -0200 (-02)
+To:     undisclosed-recipients:;
+Received: from localhost (zimbra.tre-am.jus.br [127.0.0.1])
+        by zimbra.tre-am.jus.br (Postfix) with ESMTP id 8EDB06985151;
+        Thu, 23 Jan 2020 16:42:08 -0400 (-04)
+Received: from zimbra.tre-am.jus.br ([127.0.0.1])
+        by localhost (zimbra.tre-am.jus.br [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id 4dwxcHnXLigX; Thu, 23 Jan 2020 16:42:08 -0400 (-04)
+Received: from localhost (zimbra.tre-am.jus.br [127.0.0.1])
+        by zimbra.tre-am.jus.br (Postfix) with ESMTP id 55AE6698514E;
+        Thu, 23 Jan 2020 16:42:08 -0400 (-04)
+X-Virus-Scanned: amavisd-new at zimbra.tre-am.jus.br
+Received: from zimbra.tre-am.jus.br ([127.0.0.1])
+        by localhost (zimbra.tre-am.jus.br [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 75nmCotGI2JP; Thu, 23 Jan 2020 16:42:08 -0400 (-04)
+Received: from zimbra.tre-am.jus.br (zimbra.tre-am.jus.br [127.0.0.1])
+        by zimbra.tre-am.jus.br (Postfix) with ESMTP id ED6FF698514C;
+        Thu, 23 Jan 2020 16:42:07 -0400 (-04)
+Date:   Thu, 23 Jan 2020 16:42:07 -0400 (AMT)
+From:   Mrs Radka <igor.santos@tre-am.jus.br>
+Reply-To: atanasovaradka01@hotmail.com
+Message-ID: <529746376.55678.1579812127959.JavaMail.zimbra@tre-am.jus.br>
+Subject: Bitte lesen Sie den 24-01-2019
 MIME-Version: 1.0
-In-Reply-To: <20200122045542.3527-1-bharata@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20012206-0016-0000-0000-000002DF9519
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012206-0017-0000-0000-000033423F23
-Message-Id: <8211e2c3-7e40-a4df-0b67-cb45ca3f108b@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-17_05:2020-01-16,2020-01-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- adultscore=0 mlxlogscore=492 lowpriorityscore=0 mlxscore=0 spamscore=0
- malwarescore=0 priorityscore=1501 impostorscore=0 suspectscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001220061
+X-Originating-IP: [149.140.81.151]
+X-Mailer: Zimbra 8.8.8_GA_2096 (zclient/8.8.8_GA_2096)
+Thread-Index: MfeiKkuPIPEnrc5a1R+UOqnTguzW+Q==
+Thread-Topic: Bitte lesen Sie den 24-01-2019
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Ue0xTZxTfd+9te61cvRSKd0U20xEQUdC9cszmIyZkl5hNtyybWTKk0Ksg
+        D01bFHRTwPmqiCAIWihRyiZW5eWyIlStBQcqAgIDg1GjVEUd+JgDFDp2bwvSf07O/f3O9zvn
+        d74vl8Rl5VIFGZ+s4zTJqkSlWEpI/ULoBYrhkKiFhqe+8OhUPgbWsTERGHteYpBfjoHpgFkC
+        z8sOILiWmyEG0/FBCeyzVkmguX4UB2duAFTv+w/B7Y4cBK+yT4ph53AA3Hf2SuCs4RuwlX0A
+        Rc3XCbib0YrD2X4+G8zJF0FTWaYI7F23EDjvWSRQ+vsxnih6REDXvUcY9OdnSWDUeVkEJ4sv
+        ImgwGXCoHTCLIK+nXgwHRm5gUG74TQwvqmZA19B7kHe+RQR/vwyFjt7dOAw4tkDWExpab4ZC
+        Q3WWCOr+bcHh4qWZYHnTiSD7+DYYMTcRyz9k2ypfI9ZUc1HMOh0423VlL8H2ZbWIWWvnfoI9
+        UvAHYmvaDknY/TWjGFuk7xSxt5/1Ifb51TyMPbcnB2f7CteydptVwtZl9mCrA3+Qfq7mEuM3
+        c5rwpdHSuNJbg/imKyj1dvOYOB2dRno0jWToj5lXzeOYHklJGV2JmAuOBkIgfOnZjLGoT+Qm
+        TIipNJZNVF1CjHW40HXcxfSZlk5KNbU1ThU5h84S7o8KxOh31bp0CTqUab1b7Tot5vPs8ruE
+        WymIySo04HpEkhQdyaRflwuwDx3MdF/okQg5RXszV446XOU4j4+VdODu/H3GMlCMu4dQMu3j
+        /RJ3/ikztKcYue2EMbllhRJ3Pp851ZqF5yC5wUPW4CFr8JA9hnAz8lZzqfwjDdNpubANKdqw
+        GE0N4l+rrfwaVovO7BwIsyOaREovitwREiUTqTZr05LsaCWJKeUURPDQjJiN6rQ4lTZurSYl
+        kdMqfamr78yLklFv4ZiUxASlgqpEPOrzFk3mtmgTOR3f2o4YEuePoe94NUqtStvKaTa6xezI
+        nySUsyhDYMWPMnq9SsclcNwmTjPJRpMkvW/00AukIJI3JnNKhvIm+C7eGm49l7ouPlE3Wcpr
+        XAvg5WlPxjVYAEUaecLPk/CcDSOn2RFLevEDluOCL+0mVZI2fv2Erg/V7OSPe02iLs13KYcA
+        yibBKb2raAfZ21hSipPVl4VocUWb1cTHB+YyPj4+J8SeZ+d/xWUuU4pZVLhgihbU4lKS33pS
+        +FGz2oOjZDM9CKG9YjbVfZhvL/fApyZ4giL46/ShMgQzXvwPasqLjPIRxp4+AbqsMFS3cJve
+        E5inDsu/AV9qy/wgYSk6lc5zKav0QcJSJtCJpXwpgLJJcEpKkY5hSJ+9vKEk0xRbtKLOtz56
+        esOqujVtPxmL/Zahj3aLHKcDt8fNrYj51peQD91fqP7ryNzvz1xXraIbGznFvIH+OdHzb0RY
+        ljw8YZu294JSOiIvGLkTrq5dfFheXLXAVp1X0+nM2Tq9K1gWKZUYV/pnHPGPVWNdh9vN0X/+
+        oiY7tzcbK5PufPKz5WAkLgbb0Y41SY7c2KPhT9F4iz5h0fKqviL/h6vb2YhMYvabhA3d/wws
+        q305WJlabA1VBz+/Sa/LKwyJvdVan/Yk0uLsLUh9/FWs8Rwjip1hsuYOL6FGD1V0b3uBj48U
+        rGia8/Vn2buc2YqSB6/vLDYP5+Lpc058ISpVEto41aJ5uEar+h8uHYVyOwYAAA==
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 1/22/20 10:25 AM, Bharata B Rao wrote:
-> When migrate_vma_setup() fails in kvmppc_svm_page_out(),
-> release kvm->arch.uvmem_lock before returning.
-> 
-> Fixes: ca9f4942670 ("KVM: PPC: Book3S HV: Support for running secure guests")
-> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
 
-Reviewed-by: Kamalesh Babulal <kamalesh@linux.vnet.ibm.com>
 
--- 
-Kamalesh
-
+  Ich bin Frau ATANASOVA RADKA. Es ist wichtig, dass Sie mit mir Kontakt aufnehmen. Ich habe einen Vorschlag, den Sie machen werden Erw&auml;gen. Kontaktieren Sie mich per: atanasovaradka01@hotmail.com
