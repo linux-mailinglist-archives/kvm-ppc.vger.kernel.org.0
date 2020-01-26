@@ -2,77 +2,143 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B1C08147822
-	for <lists+kvm-ppc@lfdr.de>; Fri, 24 Jan 2020 06:28:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D448414988C
+	for <lists+kvm-ppc@lfdr.de>; Sun, 26 Jan 2020 04:03:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729904AbgAXF2C (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 24 Jan 2020 00:28:02 -0500
-Received: from dexter.tse.jus.br ([187.29.147.30]:59932 "EHLO
-        dexter.tse.jus.br" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729740AbgAXF2C (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 Jan 2020 00:28:02 -0500
-X-Greylist: delayed 14402 seconds by postgrey-1.27 at vger.kernel.org; Fri, 24 Jan 2020 00:27:59 EST
-X-AuditID: c0a8cb02-a77ff70000000ac3-c8-5e29f71a5a79
-Received: from zimbra.tre-am.jus.br (zimbra.tre-am.gov.br [10.22.41.16])
-        by dexter.tse.jus.br (Mail) with SMTP id 63.F9.02755.A17F92E5; Thu, 23 Jan 2020 17:42:18 -0200 (-02)
-To:     undisclosed-recipients:;
-Received: from localhost (zimbra.tre-am.jus.br [127.0.0.1])
-        by zimbra.tre-am.jus.br (Postfix) with ESMTP id 8EDB06985151;
-        Thu, 23 Jan 2020 16:42:08 -0400 (-04)
-Received: from zimbra.tre-am.jus.br ([127.0.0.1])
-        by localhost (zimbra.tre-am.jus.br [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 4dwxcHnXLigX; Thu, 23 Jan 2020 16:42:08 -0400 (-04)
-Received: from localhost (zimbra.tre-am.jus.br [127.0.0.1])
-        by zimbra.tre-am.jus.br (Postfix) with ESMTP id 55AE6698514E;
-        Thu, 23 Jan 2020 16:42:08 -0400 (-04)
-X-Virus-Scanned: amavisd-new at zimbra.tre-am.jus.br
-Received: from zimbra.tre-am.jus.br ([127.0.0.1])
-        by localhost (zimbra.tre-am.jus.br [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 75nmCotGI2JP; Thu, 23 Jan 2020 16:42:08 -0400 (-04)
-Received: from zimbra.tre-am.jus.br (zimbra.tre-am.jus.br [127.0.0.1])
-        by zimbra.tre-am.jus.br (Postfix) with ESMTP id ED6FF698514C;
-        Thu, 23 Jan 2020 16:42:07 -0400 (-04)
-Date:   Thu, 23 Jan 2020 16:42:07 -0400 (AMT)
-From:   Mrs Radka <igor.santos@tre-am.jus.br>
-Reply-To: atanasovaradka01@hotmail.com
-Message-ID: <529746376.55678.1579812127959.JavaMail.zimbra@tre-am.jus.br>
-Subject: Bitte lesen Sie den 24-01-2019
+        id S1729019AbgAZDCa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 25 Jan 2020 22:02:30 -0500
+Received: from mail-yw1-f66.google.com ([209.85.161.66]:39789 "EHLO
+        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728842AbgAZDC3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 25 Jan 2020 22:02:29 -0500
+Received: by mail-yw1-f66.google.com with SMTP id h126so3053739ywc.6;
+        Sat, 25 Jan 2020 19:02:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=tII4AVx3br1wrYA9rc56+ZdNuhnFX5KM9kteNOyiS3I=;
+        b=lJIXcxbgCpGMRp6Zhvk2vdNUDh4nIe7voMjfHZxQXifoDNtapG1wg1VPXaJ/D5W50V
+         q++Qs7815rrRcG1L7K91MxNz42/vCV917pKz+9tZLTxiAmjfYanj20HwdKQydpmE8KjY
+         tDlpYmVMQWyr6MwKAd9+zqXhUsPdYj3bwOgycRD9kcbZ7EYqcByFtvK6zRrCsz/VBjJ4
+         sLYwOcJ//TFJvb61wypLOyUvG/FePeJawpqNadA7y+xAnoGeTbtGKwBUIsWjy4E82OvC
+         duMEH8TkUvPKoMimw74utO6UXNSMWYG5NgjQfg1fKhnGS4Nb7D9RTS+nENdf6YceeAf7
+         20Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=tII4AVx3br1wrYA9rc56+ZdNuhnFX5KM9kteNOyiS3I=;
+        b=nFs3ztBonP22UgjL/6bpK5IK+UQmQDL20BrN+rhxSZ0nD8nC8DY8XI5GEqzU7Ze7Jk
+         RLie6Kr+HD1jK/BGr380jmR0/S1UJyFCkRqWeGm84gBZgRj2D8ANx2q68uK41bLHzdub
+         uMzxD8BGWohht2h8YWc1Yeb6fd37N33ylyKVOgb4T1VDc55XmQzfBgRCr5XCNGvX41C7
+         MbdFcy+VFLeKuCOkeWfRV255y5Wgd2vnEzp4G07reMiSV7nIPmsjC8Z1qvGj3sK0qHi0
+         YMQf0nO0gXU28tRATaYdGn2hgNpLVD2eOWIop02+WK9nAdrbb7VJ7tZwCoROnp/wmso/
+         q0Mg==
+X-Gm-Message-State: APjAAAWuTudVSUJUL1ZSrFmY4oTFCyjDZ8EJ+l7VFKUMm7yfZU7xfjTG
+        vpUHZ3aXLgTQY7Yq/WmDV2I=
+X-Google-Smtp-Source: APXvYqxidmu1wxYikxWGAWqi1KWvgtfYYggyQy+ED7b5j1UZ0or2nxTKdnePwrdbB9N0a8F2AlDozg==
+X-Received: by 2002:a0d:d8c2:: with SMTP id a185mr7623650ywe.337.1580007748730;
+        Sat, 25 Jan 2020 19:02:28 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id s3sm4845031ywf.22.2020.01.25.19.02.27
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sat, 25 Jan 2020 19:02:28 -0800 (PST)
+Date:   Sat, 25 Jan 2020 19:02:26 -0800
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v2 30/45] KVM: Move vcpu alloc and init invocation to
+ common code
+Message-ID: <20200126030226.GA7167@roeck-us.net>
+References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
+ <20191218215530.2280-31-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [149.140.81.151]
-X-Mailer: Zimbra 8.8.8_GA_2096 (zclient/8.8.8_GA_2096)
-Thread-Index: MfeiKkuPIPEnrc5a1R+UOqnTguzW+Q==
-Thread-Topic: Bitte lesen Sie den 24-01-2019
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Ue0xTZxTfd+9te61cvRSKd0U20xEQUdC9cszmIyZkl5hNtyybWTKk0Ksg
-        D01bFHRTwPmqiCAIWihRyiZW5eWyIlStBQcqAgIDg1GjVEUd+JgDFDp2bwvSf07O/f3O9zvn
-        d74vl8Rl5VIFGZ+s4zTJqkSlWEpI/ULoBYrhkKiFhqe+8OhUPgbWsTERGHteYpBfjoHpgFkC
-        z8sOILiWmyEG0/FBCeyzVkmguX4UB2duAFTv+w/B7Y4cBK+yT4ph53AA3Hf2SuCs4RuwlX0A
-        Rc3XCbib0YrD2X4+G8zJF0FTWaYI7F23EDjvWSRQ+vsxnih6REDXvUcY9OdnSWDUeVkEJ4sv
-        ImgwGXCoHTCLIK+nXgwHRm5gUG74TQwvqmZA19B7kHe+RQR/vwyFjt7dOAw4tkDWExpab4ZC
-        Q3WWCOr+bcHh4qWZYHnTiSD7+DYYMTcRyz9k2ypfI9ZUc1HMOh0423VlL8H2ZbWIWWvnfoI9
-        UvAHYmvaDknY/TWjGFuk7xSxt5/1Ifb51TyMPbcnB2f7CteydptVwtZl9mCrA3+Qfq7mEuM3
-        c5rwpdHSuNJbg/imKyj1dvOYOB2dRno0jWToj5lXzeOYHklJGV2JmAuOBkIgfOnZjLGoT+Qm
-        TIipNJZNVF1CjHW40HXcxfSZlk5KNbU1ThU5h84S7o8KxOh31bp0CTqUab1b7Tot5vPs8ruE
-        WymIySo04HpEkhQdyaRflwuwDx3MdF/okQg5RXszV446XOU4j4+VdODu/H3GMlCMu4dQMu3j
-        /RJ3/ikztKcYue2EMbllhRJ3Pp851ZqF5yC5wUPW4CFr8JA9hnAz8lZzqfwjDdNpubANKdqw
-        GE0N4l+rrfwaVovO7BwIsyOaREovitwREiUTqTZr05LsaCWJKeUURPDQjJiN6rQ4lTZurSYl
-        kdMqfamr78yLklFv4ZiUxASlgqpEPOrzFk3mtmgTOR3f2o4YEuePoe94NUqtStvKaTa6xezI
-        nySUsyhDYMWPMnq9SsclcNwmTjPJRpMkvW/00AukIJI3JnNKhvIm+C7eGm49l7ouPlE3Wcpr
-        XAvg5WlPxjVYAEUaecLPk/CcDSOn2RFLevEDluOCL+0mVZI2fv2Erg/V7OSPe02iLs13KYcA
-        yibBKb2raAfZ21hSipPVl4VocUWb1cTHB+YyPj4+J8SeZ+d/xWUuU4pZVLhgihbU4lKS33pS
-        +FGz2oOjZDM9CKG9YjbVfZhvL/fApyZ4giL46/ShMgQzXvwPasqLjPIRxp4+AbqsMFS3cJve
-        E5inDsu/AV9qy/wgYSk6lc5zKav0QcJSJtCJpXwpgLJJcEpKkY5hSJ+9vKEk0xRbtKLOtz56
-        esOqujVtPxmL/Zahj3aLHKcDt8fNrYj51peQD91fqP7ryNzvz1xXraIbGznFvIH+OdHzb0RY
-        ljw8YZu294JSOiIvGLkTrq5dfFheXLXAVp1X0+nM2Tq9K1gWKZUYV/pnHPGPVWNdh9vN0X/+
-        oiY7tzcbK5PufPKz5WAkLgbb0Y41SY7c2KPhT9F4iz5h0fKqviL/h6vb2YhMYvabhA3d/wws
-        q305WJlabA1VBz+/Sa/LKwyJvdVan/Yk0uLsLUh9/FWs8Rwjip1hsuYOL6FGD1V0b3uBj48U
-        rGia8/Vn2buc2YqSB6/vLDYP5+Lpc058ISpVEto41aJ5uEar+h8uHYVyOwYAAA==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218215530.2280-31-sean.j.christopherson@intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Wed, Dec 18, 2019 at 01:55:15PM -0800, Sean Christopherson wrote:
+> Now that all architectures tightly couple vcpu allocation/free with the
+> mandatory calls to kvm_{un}init_vcpu(), move the sequences verbatim to
+> common KVM code.
+> 
+> Move both allocation and initialization in a single patch to eliminate
+> thrash in arch specific code.  The bisection benefits of moving the two
+> pieces in separate patches is marginal at best, whereas the odds of
+> introducing a transient arch specific bug are non-zero.
+> 
+> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
+[ ... ]
 
-  Ich bin Frau ATANASOVA RADKA. Es ist wichtig, dass Sie mit mir Kontakt aufnehmen. Ich habe einen Vorschlag, den Sie machen werden Erw&auml;gen. Kontaktieren Sie mich per: atanasovaradka01@hotmail.com
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 8543d338a06a..2ed76584ebd9 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+>  
+
+[ ... ]
+
+> -struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+> -				      unsigned int id)
+                                      ^^^^^^^^^^^^^^^
+> +int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_vcpu *vcpu;
+>  	struct sie_page *sie_page;
+>  	int rc;
+>  
+> -	rc = -ENOMEM;
+> -
+> -	vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
+> -	if (!vcpu)
+> -		goto out;
+> -
+> -	rc = kvm_vcpu_init(vcpu, kvm, id);
+> -	if (rc)
+> -		goto out_free_cpu;
+> -
+> -	rc = -ENOMEM;
+> -
+>  	BUILD_BUG_ON(sizeof(struct sie_page) != 4096);
+>  	sie_page = (struct sie_page *) get_zeroed_page(GFP_KERNEL);
+>  	if (!sie_page)
+> -		goto out_uninit_vcpu;
+> +		return -ENOMEM;
+>  
+>  	vcpu->arch.sie_block = &sie_page->sie_block;
+>  	vcpu->arch.sie_block->itdba = (unsigned long) &sie_page->itdb;
+> @@ -3087,15 +3070,11 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+>  		 vcpu->arch.sie_block);
+>  	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
+                                   ^^^
+
+For extensive changes like this, wouldn't it be desirable to at least
+compile test it ?
+
+Guenter
