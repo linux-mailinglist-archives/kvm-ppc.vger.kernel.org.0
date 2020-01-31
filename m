@@ -2,63 +2,45 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5F2114D637
-	for <lists+kvm-ppc@lfdr.de>; Thu, 30 Jan 2020 06:44:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DCC514EC4A
+	for <lists+kvm-ppc@lfdr.de>; Fri, 31 Jan 2020 13:06:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725847AbgA3FoQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 30 Jan 2020 00:44:16 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54220 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725798AbgA3FoP (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 30 Jan 2020 00:44:15 -0500
+        id S1728484AbgAaMGm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 31 Jan 2020 07:06:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57999 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728374AbgAaMGl (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 31 Jan 2020 07:06:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580363054;
+        s=mimecast20190719; t=1580472401;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=b8PEF8AVAWODPDupJea+4sWEJHHfwQkjaA/7qcZmag4=;
-        b=Y6R00qTGMkNZUDTi9Bjzix9BllX0aNbcel38FTI/KrI0Gy8ohOqOO1Bo+f8ANxQ1udmsI+
-        9gc93iPBE/sR02iBoU12Jc/3Qc6eX62uUl1dMn9j+vUyG+JNRIzIuJRkCkDUz+nQ7AQlt3
-        2i8of8hMPtwPYKMTBmpP5X7h+dsdlcs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-0bBigFh6MZ2tMCGu_XBPEw-1; Thu, 30 Jan 2020 00:44:12 -0500
-X-MC-Unique: 0bBigFh6MZ2tMCGu_XBPEw-1
-Received: by mail-wr1-f70.google.com with SMTP id t3so1198537wrm.23
-        for <kvm-ppc@vger.kernel.org>; Wed, 29 Jan 2020 21:44:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=b8PEF8AVAWODPDupJea+4sWEJHHfwQkjaA/7qcZmag4=;
-        b=D6H28OY3ivP3W/YEWYpHDJkmoTmM2JdJn8W6jS2QgR9TjT6+C6qQCo1elzP907GZ/n
-         P5XMhrRjuE8hrQkarcgjJeRcX2hl+Y2nZDorXLM5e/mA0LX39u++GLRhFJqsGXCN6az3
-         Xy8PXesDiPoGrzJXD5F6YPLj3JNBguvV+rqFwH14G8SD9EQshgpz23FuftsXuD12dQIo
-         NlRb2EmdW+2Q2EsK67geEeVNgF189Yjp14zlLbExPm2X2h80XgfT2k9PBxHg5TwmV4lr
-         LMhFSOPOLu4UqZHIHkv2OeZ1RylGUhtu23TEtkMQh4DKjbOrnS4Wzd3tKItjn57szICH
-         f1jw==
-X-Gm-Message-State: APjAAAUy1ezt66+/xD1cHdNEsI6yAFBOy3uw/E9kYMhNtQVKR4IoLChG
-        TIR23z84pbsCXCVNVSjSeKYqcZILQ44CutMq9RFHY+9rfPM0im671kYo4Ug8Y/MnU2xD9rrXMV4
-        TKs+X4Vxbxjf6/5h30g==
-X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr3175375wmi.21.1580363051239;
-        Wed, 29 Jan 2020 21:44:11 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxvrtUyXEqgq8iYKVpAB/LAj4fC31bOc+VOTWRDvsFWxjJ6sWsl8qJGadVTcya+7iE6vbimVA==
-X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr3175335wmi.21.1580363050959;
-        Wed, 29 Jan 2020 21:44:10 -0800 (PST)
-Received: from [10.1.251.141] ([80.188.125.198])
-        by smtp.gmail.com with ESMTPSA id 4sm4795049wmg.22.2020.01.29.21.44.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jan 2020 21:44:10 -0800 (PST)
-Subject: Re: [PATCH 5/5] KVM: x86: Set kvm_x86_ops only after
- ->hardware_setup() completes
+        bh=O8Za+S+RT8N2UwLMl2kq7dZ6BHikmL9Pgno023mZKr8=;
+        b=FNOhNJEBcvCYTW3H9XXRq3pr0djOxSNGvOyyLHA7HQl5CWyIwtje7m+w4lOCskh0UwxqeN
+        g58/76vBqQtcSql6Vy0Dc9zbzFWF8k/rlj50Eu2poAoEdXGw2d1/hiP3XlElnT5jVH8uXo
+        Kly5JkzQo463fmWRY/cQV+Jvt8pAvwg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-136-Ih36PAVQOHGA5sgccpxLOw-1; Fri, 31 Jan 2020 07:06:36 -0500
+X-MC-Unique: Ih36PAVQOHGA5sgccpxLOw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 738599275B;
+        Fri, 31 Jan 2020 12:06:33 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 46DCC5C3FA;
+        Fri, 31 Jan 2020 12:06:18 +0000 (UTC)
+Date:   Fri, 31 Jan 2020 13:06:15 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -69,31 +51,69 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         linux-mips@vger.kernel.org, kvm@vger.kernel.org,
         kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/5] KVM: Pass kvm_init()'s opaque param to additional
+ arch funcs
+Message-ID: <20200131130615.3b21b28d.cohuck@redhat.com>
+In-Reply-To: <20200130001023.24339-2-sean.j.christopherson@intel.com>
 References: <20200130001023.24339-1-sean.j.christopherson@intel.com>
- <20200130001023.24339-6-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <44e0c550-7dcc-bfed-07c4-907e61d476a1@redhat.com>
-Date:   Thu, 30 Jan 2020 06:44:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        <20200130001023.24339-2-sean.j.christopherson@intel.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200130001023.24339-6-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 30/01/20 01:10, Sean Christopherson wrote:
-> Set kvm_x86_ops with the vendor's ops only after ->hardware_setup()
-> completes to "prevent" using kvm_x86_ops before they are ready, i.e. to
-> generate a null pointer fault instead of silently consuming unconfigured
-> state.
+On Wed, 29 Jan 2020 16:10:19 -0800
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
-What about even copying kvm_x86_ops by value, so that they can be
-accessed with "kvm_x86_ops.callback()" and save one memory access?
+> Pass @opaque to kvm_arch_hardware_setup() and
+> kvm_arch_check_processor_compat() to allow architecture specific code to
+> reference @opaque without having to stash it away in a temporary global
+> variable.  This will enable x86 to separate its vendor specific callback
+> ops, which are passed via @opaque, into "init" and "runtime" ops without
+> having to stash away the "init" ops.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/mips/kvm/mips.c       |  4 ++--
+>  arch/powerpc/kvm/powerpc.c |  4 ++--
+>  arch/s390/kvm/kvm-s390.c   |  4 ++--
+>  arch/x86/kvm/x86.c         |  4 ++--
+>  include/linux/kvm_host.h   |  4 ++--
+>  virt/kvm/arm/arm.c         |  4 ++--
+>  virt/kvm/kvm_main.c        | 18 ++++++++++++++----
+>  7 files changed, 26 insertions(+), 16 deletions(-)
 
-Paolo
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index eb3709d55139..5ad252defa54 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4345,14 +4345,22 @@ struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void)
+>          return &kvm_running_vcpu;
+>  }
+>  
+> -static void check_processor_compat(void *rtn)
+> +struct kvm_cpu_compat_check {
+> +	void *opaque;
+> +	int *ret;
+> +};
+> +
+> +static void check_processor_compat(void *data)
+>  {
+> -	*(int *)rtn = kvm_arch_check_processor_compat();
+> +	struct kvm_cpu_compat_check *c = data;
+> +
+> +	*c->ret = kvm_arch_check_processor_compat(c->opaque);
+>  }
+
+This function also looks better now :)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Tested-by: Cornelia Huck <cohuck@redhat.com> #s390
 
