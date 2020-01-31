@@ -2,45 +2,32 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DCC514EC4A
-	for <lists+kvm-ppc@lfdr.de>; Fri, 31 Jan 2020 13:06:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B948814F270
+	for <lists+kvm-ppc@lfdr.de>; Fri, 31 Jan 2020 19:55:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728484AbgAaMGm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 31 Jan 2020 07:06:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57999 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728374AbgAaMGl (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 31 Jan 2020 07:06:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580472401;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=O8Za+S+RT8N2UwLMl2kq7dZ6BHikmL9Pgno023mZKr8=;
-        b=FNOhNJEBcvCYTW3H9XXRq3pr0djOxSNGvOyyLHA7HQl5CWyIwtje7m+w4lOCskh0UwxqeN
-        g58/76vBqQtcSql6Vy0Dc9zbzFWF8k/rlj50Eu2poAoEdXGw2d1/hiP3XlElnT5jVH8uXo
-        Kly5JkzQo463fmWRY/cQV+Jvt8pAvwg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-Ih36PAVQOHGA5sgccpxLOw-1; Fri, 31 Jan 2020 07:06:36 -0500
-X-MC-Unique: Ih36PAVQOHGA5sgccpxLOw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 738599275B;
-        Fri, 31 Jan 2020 12:06:33 +0000 (UTC)
-Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 46DCC5C3FA;
-        Fri, 31 Jan 2020 12:06:18 +0000 (UTC)
-Date:   Fri, 31 Jan 2020 13:06:15 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
+        id S1726206AbgAaSzf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 31 Jan 2020 13:55:35 -0500
+Received: from mga18.intel.com ([134.134.136.126]:30623 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725939AbgAaSze (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 31 Jan 2020 13:55:34 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Jan 2020 10:55:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,386,1574150400"; 
+   d="scan'208";a="253419672"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga004.fm.intel.com with ESMTP; 31 Jan 2020 10:55:32 -0800
+Date:   Fri, 31 Jan 2020 10:55:32 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -51,69 +38,31 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         linux-mips@vger.kernel.org, kvm@vger.kernel.org,
         kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/5] KVM: Pass kvm_init()'s opaque param to additional
- arch funcs
-Message-ID: <20200131130615.3b21b28d.cohuck@redhat.com>
-In-Reply-To: <20200130001023.24339-2-sean.j.christopherson@intel.com>
+Subject: Re: [PATCH 5/5] KVM: x86: Set kvm_x86_ops only after
+ ->hardware_setup() completes
+Message-ID: <20200131185531.GB18946@linux.intel.com>
 References: <20200130001023.24339-1-sean.j.christopherson@intel.com>
-        <20200130001023.24339-2-sean.j.christopherson@intel.com>
-Organization: Red Hat GmbH
+ <20200130001023.24339-6-sean.j.christopherson@intel.com>
+ <44e0c550-7dcc-bfed-07c4-907e61d476a1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <44e0c550-7dcc-bfed-07c4-907e61d476a1@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, 29 Jan 2020 16:10:19 -0800
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-
-> Pass @opaque to kvm_arch_hardware_setup() and
-> kvm_arch_check_processor_compat() to allow architecture specific code to
-> reference @opaque without having to stash it away in a temporary global
-> variable.  This will enable x86 to separate its vendor specific callback
-> ops, which are passed via @opaque, into "init" and "runtime" ops without
-> having to stash away the "init" ops.
+On Thu, Jan 30, 2020 at 06:44:09AM +0100, Paolo Bonzini wrote:
+> On 30/01/20 01:10, Sean Christopherson wrote:
+> > Set kvm_x86_ops with the vendor's ops only after ->hardware_setup()
+> > completes to "prevent" using kvm_x86_ops before they are ready, i.e. to
+> > generate a null pointer fault instead of silently consuming unconfigured
+> > state.
 > 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/mips/kvm/mips.c       |  4 ++--
->  arch/powerpc/kvm/powerpc.c |  4 ++--
->  arch/s390/kvm/kvm-s390.c   |  4 ++--
->  arch/x86/kvm/x86.c         |  4 ++--
->  include/linux/kvm_host.h   |  4 ++--
->  virt/kvm/arm/arm.c         |  4 ++--
->  virt/kvm/kvm_main.c        | 18 ++++++++++++++----
->  7 files changed, 26 insertions(+), 16 deletions(-)
+> What about even copying kvm_x86_ops by value, so that they can be
+> accessed with "kvm_x86_ops.callback()" and save one memory access?
 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index eb3709d55139..5ad252defa54 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4345,14 +4345,22 @@ struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void)
->          return &kvm_running_vcpu;
->  }
->  
-> -static void check_processor_compat(void *rtn)
-> +struct kvm_cpu_compat_check {
-> +	void *opaque;
-> +	int *ret;
-> +};
-> +
-> +static void check_processor_compat(void *data)
->  {
-> -	*(int *)rtn = kvm_arch_check_processor_compat();
-> +	struct kvm_cpu_compat_check *c = data;
-> +
-> +	*c->ret = kvm_arch_check_processor_compat(c->opaque);
->  }
-
-This function also looks better now :)
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Tested-by: Cornelia Huck <cohuck@redhat.com> #s390
-
+Oooh, I like that idea.  And {svm,vmx}_x86_ops could be marked __initdata
+to save a few bytes and force all the runtime stuff through kvm_x86_ops.
