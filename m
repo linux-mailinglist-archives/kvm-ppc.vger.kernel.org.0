@@ -2,1140 +2,213 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C57614FD6F
-	for <lists+kvm-ppc@lfdr.de>; Sun,  2 Feb 2020 15:04:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D618153A79
+	for <lists+kvm-ppc@lfdr.de>; Wed,  5 Feb 2020 22:50:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726877AbgBBOEB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 2 Feb 2020 09:04:01 -0500
-Received: from mail-eopbgr1300041.outbound.protection.outlook.com ([40.107.130.41]:19755
-        "EHLO APC01-HK2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726814AbgBBOEB (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sun, 2 Feb 2020 09:04:01 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VAJmPy+xaO0J5H5ijPA3PvOmTeeHp8ABgZOdPv7hubd9LWD0KYlNZ4yCFjCwYywbUQa+nlu7jf4plYixme5ATlzsr50+u42Qs6/BBAxWCyRqvcOabBX1HfEjVpa0zkLNXTC4zGfSlbsZ97f0RniNPlWOIaLbWEokH7caMd2EPWnBi0Zf6JLRqk0XFLnrZoiSnAopUyl2rmNycSW+24bJhFnlTjf0QaMYDMVJMz+RdruK9P2P8w0GnmxzVh8nNVMZAoGovwsT9gMWeIwL5T23HgdKcSA5pg0soTdFNGzsMXnigIStizvsFgD96bBUtKHqq/MMfib/X9J1jdTcp9biGw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ktWfz3RcUITO+t+j/UfBfyqaPTg2laqOimc9ICNWwxQ=;
- b=eJZoTEHWqsp0cynWEAMUA6AQJHvmk8qdpXDGXyeLJueVX6eGTPDwuUfaOLcH7C6Xez34dA21z+7FGCgwff4Z1EEUkuMC7AqT0FXKFrWYy2ZyYKvymIPqPr4u1pOZ9s+x1CqqnEilDYmA9eFt7GSK1Af8sbc3vp/v1H/aV4FhOQzu9n3i8HYOQ+vvfDMllHs9KJSg9C1vNZG3qJ3RgrdSReDM9sg4yVZlEyTMi5Ft7ERox4yhVWa4/fglh5cdlsNGacgwY3ld7axT8SGGj8x7Zu2FuweoUatp9EGjFaf0nxUgG8EZPweojfKYGeezeMTna1/7YxJsvXNAOpTNljCVLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=teo-en-ming-corp.com; dmarc=pass action=none
- header.from=teo-en-ming-corp.com; dkim=pass header.d=teo-en-ming-corp.com;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=teoenmingcorp.onmicrosoft.com; s=selector2-teoenmingcorp-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ktWfz3RcUITO+t+j/UfBfyqaPTg2laqOimc9ICNWwxQ=;
- b=Su9WcvgyvE3OioCFmXFro7VzrMXF99LILc5/XPs323poBwwPK+KQKmaTQLjyP9U5vfiMFsHHgM5hR9w5df7DgLah/jYnxdbFBY4nI3Aw0s35kvD/mXfguKJDLHAF8cT/EJdlruCbAb5/sTxhxV+Jyhd4KBUbKUoGaCOKEQYLoIg=
-Received: from SG2PR01MB2141.apcprd01.prod.exchangelabs.com (10.170.143.19) by
- SG2PR01MB2568.apcprd01.prod.exchangelabs.com (20.177.168.86) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.30; Sun, 2 Feb 2020 14:03:47 +0000
-Received: from SG2PR01MB2141.apcprd01.prod.exchangelabs.com
- ([fe80::81e9:67b1:74eb:2853]) by SG2PR01MB2141.apcprd01.prod.exchangelabs.com
- ([fe80::81e9:67b1:74eb:2853%3]) with mapi id 15.20.2686.031; Sun, 2 Feb 2020
- 14:03:46 +0000
-From:   Turritopsis Dohrnii Teo En Ming <ceo@teo-en-ming-corp.com>
-To:     "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>
-CC:     Turritopsis Dohrnii Teo En Ming <ceo@teo-en-ming-corp.com>
-Subject: Teo En Ming's Guide to GPU/VGA Passthrough of NVidia GeForce GTX1650
- to Windows 10 Virtual Machine using Linux KVM on Ubuntu 18.04.3 LTS Desktop
- Edition
-Thread-Topic: Teo En Ming's Guide to GPU/VGA Passthrough of NVidia GeForce
- GTX1650 to Windows 10 Virtual Machine using Linux KVM on Ubuntu 18.04.3 LTS
- Desktop Edition
-Thread-Index: AdXZjoAIoapwBPdsTnOaXK2tvX53Nw==
-Date:   Sun, 2 Feb 2020 14:03:46 +0000
-Message-ID: <SG2PR01MB2141FA6AC37426C03FD7050587010@SG2PR01MB2141.apcprd01.prod.exchangelabs.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=ceo@teo-en-ming-corp.com; 
-x-originating-ip: [118.189.211.120]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 425bea4b-0814-46db-3006-08d7a7e8b8be
-x-ms-traffictypediagnostic: SG2PR01MB2568:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SG2PR01MB25686560435382E7FAE9F3CF87010@SG2PR01MB2568.apcprd01.prod.exchangelabs.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0301360BF5
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(6029001)(39830400003)(366004)(396003)(376002)(136003)(346002)(189003)(199004)(966005)(71200400001)(7696005)(45080400002)(26005)(5660300002)(4326008)(186003)(508600001)(6916009)(30864003)(66574012)(86362001)(8676002)(107886003)(9686003)(55016002)(66946007)(64756008)(66446008)(2906002)(66556008)(81166006)(81156014)(76116006)(66476007)(16799955002)(33656002)(8936002)(6506007)(316002)(52536014)(21314003)(559001)(579004)(569006);DIR:OUT;SFP:1101;SCL:1;SRVR:SG2PR01MB2568;H:SG2PR01MB2141.apcprd01.prod.exchangelabs.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: teo-en-ming-corp.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: e1RZoFhsoBpPFIWxzPupi6QCz5xm3L8wAR9TyklLyTyuzLFVx4MO8U5n7EwEJdUfndw8TBrummXTAmnxfE19aAl5m575MJug0Rp+EUjc2kwnBjTEwgiEe6i0ovySt5XFZRpIz1//Zottj+5KEO7KIuK2RPDeuq+Fkd8vlEVpviDmabw6kKQxuVSxI5M+CA+DA22IORCt7frU1zQdfWEUWFen10IBRvhRTbGiXtze1JHNCwyHoI6bm2YsUMR+4+6wGb74WLPE8i3ERBigDTfbWlYJYouKQZTkGylf/kuLu0GgiEr7dh5SUibsVNAVrYOhBRaKElCvAZzMuoF0hev1x1so3ysHEaQ6v08CPZ5C3/EM2eiekaNgKivlZznjdgQAVt/kfK1Lh44gYbvY6203CttEXGbDy71AWPhQ7dgOmPZ0VdnrW9BXyae88+EKxaC85aJdRBqMx6Nd+/CqElZqP97n85ffalxl07AHwKz0m6Hq8DC2M9J6QOSY+OHKxPEvb9pKlm8ka66YwnWFCEUUBAHBW5YHoFig9yrnN9bHl2SUt8iGDq9b7uT5bp0n1h2Rol0RNLxIeARmdlspWkBqbg==
-x-ms-exchange-antispam-messagedata: GHjFZwh68FQUQ9iF2RufsQGwoHPXqFWjwWy1/iTVGCadX25KGfMYNe88CVqip3Eef3DDHbbEWUBxi42kla2gvwyfvSa5llpduqOpGKZjhmPlM/EJA7C/ZFUS2ZLfGOJBBjRGMBAPG92dhE7BLs2ZUQ==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        id S1727033AbgBEVuA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 5 Feb 2020 16:50:00 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32958 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727234AbgBEVuA (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 5 Feb 2020 16:50:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580939399;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hzR+kWwgje3yUYdtQN4kRBB1wzrOCH+ul+GIZRQLQpQ=;
+        b=NL01Rj01J/O/Qms2wKtxyJQc/bG0G+dtnQuc0neQdovh3NGe5gNVE/PgXVkPBdlqRCeXYE
+        dRTLI7rfgcQt+NEx9jMwwYOcerRz50qnLdHgFu6JC8LR1y8JMWeexZx297HqmUidqUUhBf
+        y0wrnwL2KGP53x8QIYEN+pSb6+y3PoY=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-_wbI-bNFOzqF6OFUpfkuyw-1; Wed, 05 Feb 2020 16:49:56 -0500
+X-MC-Unique: _wbI-bNFOzqF6OFUpfkuyw-1
+Received: by mail-qk1-f199.google.com with SMTP id m13so2243595qka.9
+        for <kvm-ppc@vger.kernel.org>; Wed, 05 Feb 2020 13:49:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hzR+kWwgje3yUYdtQN4kRBB1wzrOCH+ul+GIZRQLQpQ=;
+        b=qOFJkXqFldNPbyTlWPVA1thqYcZEGMZ7gTYUyqqzptGviUHj4x4XJHKZ5QgqDQZqCm
+         WEWgHyJ/+Cy5HI+MlDn2V8V7a9PrHgvfz7rCfdky59ot5k39vOU7SE6ajcAJhB5DZEvk
+         37plXX1n4/uz3YGmJKIRi0dhOP1t/jN3/Vw/6D1emJFwYEmKgXbvvJ77pq/E93KLYjMf
+         gnB7Cq5TRbdXh/CmdbthsayOtTAqJ0vVNPGN1NS0SACLJM9Fnf3jg5N0TMEIrW8Z8ge+
+         6rXTO72FSmZ61cEwsBKr+5DH8jf2tOcENRQuC0GgaZdZ8woynG0IX0qR+bcFtnvZluUF
+         3SvA==
+X-Gm-Message-State: APjAAAWUdzTygC9sI8xbXHd7+r8suHEo8PCJL7EkXif8JtAncGJEBaVC
+        feeU8cgG/HKJffLamWGMLvuaOq9rdIIUtpgl5hG4gsrDhvQz6pB+vOuTqUgJn1k+2WqKfeQpzhy
+        bWUulfjcY9aKYDQ3upA==
+X-Received: by 2002:ac8:3886:: with SMTP id f6mr34654886qtc.160.1580939396250;
+        Wed, 05 Feb 2020 13:49:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy5rpTfXYiWMOZY+w99nw37RTfo9i89EWpQ1VoSvOcWQbgR5Y78NjhhnEKvcMCS6bstDLPhlA==
+X-Received: by 2002:ac8:3886:: with SMTP id f6mr34654854qtc.160.1580939395875;
+        Wed, 05 Feb 2020 13:49:55 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+        by smtp.gmail.com with ESMTPSA id x11sm472147qkf.50.2020.02.05.13.49.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2020 13:49:55 -0800 (PST)
+Date:   Wed, 5 Feb 2020 16:49:52 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 01/19] KVM: x86: Allocate new rmap and large page
+ tracking when moving memslot
+Message-ID: <20200205214952.GD387680@xz-x1>
+References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
+ <20200121223157.15263-2-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-X-OriginatorOrg: teo-en-ming-corp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 425bea4b-0814-46db-3006-08d7a7e8b8be
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Feb 2020 14:03:46.7519
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 23b3f6ae-c453-4b93-aec9-f17508e5885c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pSqg4YaKOpAmFnz73o0n2NA6iKUCOhIxPnBTrGDhMFjwRUMzc2SmrSqqyfZge7ADcz8vCnW5BdycwKtEQQhu70g8SBbN+aKhRU/x0+cUA/8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2PR01MB2568
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200121223157.15263-2-sean.j.christopherson@intel.com>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Primary Subject: Teo En Ming's Guide to GPU/VGA Passthrough of NVidia GeFor=
-ce GTX1650 to Windows 10 Virtual Machine using Linux KVM on Ubuntu 18.04.3 =
-LTS Desktop Edition
-
-Secondary Subject: Mr. Turritopsis Dohrnii Teo En Ming's Linux KVM GPU Pass=
-through Project, Started 1st Feb 2020 Saturday late night before midnight a=
-nd completed
-on 2nd Feb 2020 Sunday at 9:21 PM Singapore Time
-
-PUBLISHED 2ND FEB 2020 SUNDAY AT 9:30 PM SINGAPORE TIME (VERSION 1.0)
-
-REFERENCE
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Heiko Sieger's blog: Running Windows 10 on Linux using KVM with VGA Passthr=
-ough
-
-Link: https://heiko-sieger.info/running-windows-10-on-linux-using-kvm-with-=
-vga-passthrough/
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-I am following Heiko Sieger's guide because I think it is very well written=
- and very well explained. Good job!
-
-I need to come up with this guide for myself because the home desktop compu=
-ter which I have is specific and unique to me.
-
-Turritopsis Dohrnii Teo En Ming's home desktop computer technical specifica=
-tions:
-
-[1] Processor: AMD Ryzen 3 3200G with Radeon Vega 8 Graphics, 4 Cores, 4 Th=
-reads, 4.0 GHz Max Boost, 3.6 GHz Base
-[2] Motherboard: Gigabyte B450M DS3H rev 1.0 Socket AM4 (BIOS Version: F41,=
- BIOS Date: 07/22/2019, BIOS ID: 8A16BG05)
-[3] Memory: 8 GB Transcend DDR4-2666
-[4] Integrated Graphics Device (IGD): AMD Radeon Vega 8 Graphics (for Linux=
- host)
-[5] Discrete GPU on PCIe Slot 1: MSI GeForce GTX1650 Ventus XS OC Edition 4=
- GB GDDR5 (for Windows 10 version 1709 virtual machine)
-[6] Solid State Disk (SSD): 256 GB Transcend SSD (bare-metal Windows 10 ver=
-sion 1909 installation)
-[7] Harddisk (HDD): Seagate Barracude 1 TB 3.5" Internal SATA (for installi=
-ng Ubuntu 18.04.3 LTS Desktop Edition host)
-
-DETAILED INSTRUCTIONS
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Download ubuntu-18.04.3-desktop-amd64.iso from ubuntu.com (official website=
-) and burn it to a USB thumb drive using Universal USB Installer 1.9.9.0=20
-from Pendrivelinux.com
-
-Reboot computer.
-
-Press DELETE to go into BIOS Setup.
-
-Use the CLASSIC BIOS Interface.
-
-Peripherals > Initial Display Output: IGD Video (Onboard Graphics)
-
-M.I.T. > Advanced Frequency Settings > Advanced CPU Settings > SVM Mode: En=
-abled
-
-BIOS > Storage Boot Option Control: UEFI Only
-
-BIOS > Other PCI Device ROM Priority: UEFI Only
-
-Save BIOS settings and Exit.
-
-Press F12 to go into Boot Menu.
-
-Select the USB thumb drive containing Ubuntu 18.04.3 LTS (UEFI).
-
-Select "Try Ubuntu without installing".
-
-Double click "Install Ubuntu 18.04.3 LTS".
-
-Welcome: English
-
-Keyboard layout: English (US)
-
-Select "Normal installation".
-
-Uncheck "Download updates while installing Ubuntu".
-
-Uncheck "Install third-party software for graphics and Wi-Fi hardware and a=
-dditional media formats".
-
-Select "Erase disk and install Ubuntu".
-
-Uncheck "Encrypt the new Ubuntu installation for security".
-
-Uncheck "Use LVM with the new Ubuntu installation".
-
-Select drive: SCSI1 (0,0,0) (sda) - 1.0 TB ATA ST1000DM010-2EP1 (Seagate Ba=
-rracuda).
-
-Click Install Now.
-
-Write the changes to disks? Continue.
-
-Where are you? Singapore.
-
-Your name: Turritopsis Dohrnii Teo En Ming
-
-Your computer's name: ubuntu18043
-
-Pick a username: teo-en-ming
-
-Installation Complete: Click Restart Now.
-
-Press F12 to go into Boot Menu.
-
-Select ubuntu (Seagate 1 TB HDD).
-
-Linux command: sudo nano /etc/default/grub
-
-Contents of file:
-
-# If you change this file, run 'update-grub' afterwards to update
-# /boot/grub/grub.cfg.
-# For full documentation of the options in this file, see:
-#   info -f grub -n 'Simple configuration'
-
-GRUB_DEFAULT=3D0
-GRUB_TIMEOUT_STYLE=3Dhidden
-GRUB_TIMEOUT=3D10
-GRUB_DISTRIBUTOR=3D`lsb_release -i -s 2> /dev/null || echo Debian`
-GRUB_CMDLINE_LINUX_DEFAULT=3D"quiet splash amd_iommu=3Don"
-GRUB_CMDLINE_LINUX=3D""
-
-# Uncomment to enable BadRAM filtering, modify to suit your needs
-# This works with Linux (no patch required) and with any kernel that obtain=
-s
-# the memory map information from GRUB (GNU Mach, kernel of FreeBSD ...)
-#GRUB_BADRAM=3D"0x01234567,0xfefefefe,0x89abcdef,0xefefefef"
-
-# Uncomment to disable graphical terminal (grub-pc only)
-#GRUB_TERMINAL=3Dconsole
-
-# The resolution used on graphical terminal
-# note that you can use only modes which your graphic card supports via VBE
-# you can see them in real GRUB with the command `vbeinfo'
-#GRUB_GFXMODE=3D640x480
-
-# Uncomment if you don't want GRUB to pass "root=3DUUID=3Dxxx" parameter to=
- Linux
-#GRUB_DISABLE_LINUX_UUID=3Dtrue
-
-# Uncomment to disable generation of recovery mode menu entries
-#GRUB_DISABLE_RECOVERY=3D"true"
-
-# Uncomment to get a beep at grub start
-#GRUB_INIT_TUNE=3D"480 440 1"
-
-Linux command: sudo update-grub
-
-Output:
-
-Sourcing file `/etc/default/grub'
-Generating grub configuration file ...
-Found linux image: /boot/vmlinuz-5.3.0-28-generic
-Found initrd image: /boot/initrd.img-5.3.0-28-generic
-Found linux image: /boot/vmlinuz-5.0.0-23-generic
-Found initrd image: /boot/initrd.img-5.0.0-23-generic
-Found Windows Boot Manager on /dev/sdc2@/efi/Microsoft/Boot/bootmgfw.efi
-Adding boot menu entry for EFI firmware configuration
-done
-
-
-Reboot the computer.
-
-Linux command: sudo reboot
-
-Linux command: dmesg | grep AMD-Vi
-
-Output:
-
-[    0.572129] pci 0000:00:00.2: AMD-Vi: Unable to write to IOMMU perf coun=
-ter.
-[    0.576192] pci 0000:00:00.2: AMD-Vi: Found IOMMU cap 0x40
-[    0.576193] pci 0000:00:00.2: AMD-Vi: Extended features (0x4f77ef22294ad=
-a):
-[    0.576195] AMD-Vi: Interrupt remapping enabled
-[    0.576195] AMD-Vi: Virtual APIC enabled
-[    0.576368] AMD-Vi: Lazy IO/TLB flushing enabled
-[   10.432967] AMD-Vi: AMD IOMMUv2 driver by Joerg Roedel <jroedel@suse.de>
-
-
-Linux command: cat /proc/cpuinfo | grep svm
-
-Output:
-
-flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat =
-pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtsc=
-p lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pn=
-i pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx=
- f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignss=
-e 3dnowprefetch osvw skinit wdt tce topoext perfctr_core perfctr_nb bpext p=
-erfctr_llc mwaitx cpb hw_pstate sme ssbd sev ibpb vmmcall fsgsbase bmi1 avx=
-2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 xsave=
-s clzero irperf xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale vmcb_=
-clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmloa=
-d vgif overflow_recov succor smca
-flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat =
-pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtsc=
-p lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pn=
-i pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx=
- f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignss=
-e 3dnowprefetch osvw skinit wdt tce topoext perfctr_core perfctr_nb bpext p=
-erfctr_llc mwaitx cpb hw_pstate sme ssbd sev ibpb vmmcall fsgsbase bmi1 avx=
-2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 xsave=
-s clzero irperf xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale vmcb_=
-clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmloa=
-d vgif overflow_recov succor smca
-flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat =
-pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtsc=
-p lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pn=
-i pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx=
- f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignss=
-e 3dnowprefetch osvw skinit wdt tce topoext perfctr_core perfctr_nb bpext p=
-erfctr_llc mwaitx cpb hw_pstate sme ssbd sev ibpb vmmcall fsgsbase bmi1 avx=
-2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 xsave=
-s clzero irperf xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale vmcb_=
-clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmloa=
-d vgif overflow_recov succor smca
-flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat =
-pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtsc=
-p lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pn=
-i pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx=
- f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignss=
-e 3dnowprefetch osvw skinit wdt tce topoext perfctr_core perfctr_nb bpext p=
-erfctr_llc mwaitx cpb hw_pstate sme ssbd sev ibpb vmmcall fsgsbase bmi1 avx=
-2 smep bmi2 rdseed adx smap clflushopt sha_ni xsaveopt xsavec xgetbv1 xsave=
-s clzero irperf xsaveerptr arat npt lbrv svm_lock nrip_save tsc_scale vmcb_=
-clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmloa=
-d vgif overflow_recov succor smca
-
-
-Linux command: sudo apt install qemu-kvm qemu-utils seabios ovmf hugepages =
-cpu-checker
-
-
-Linux command: lspci | grep VGA
-
-Output:
-
-01:00.0 VGA compatible controller: NVIDIA Corporation Device 1f82 (rev a1)
-07:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] P=
-icasso (rev c9)
-
-
-Linux command: lspci -nn | grep 01:00.
-
-Output:
-
-01:00.0 VGA compatible controller [0300]: NVIDIA Corporation Device [10de:1=
-f82] (rev a1)
-01:00.1 Audio device [0403]: NVIDIA Corporation Device [10de:10fa] (rev a1)
-
-
-Bus numbers of NVidia GeForce GTX1650 GPU:
-
-01:00.0
-01:00.1
-
-
-PCI IDs of NVidia GeForce GTX1650 GPU:
-
-10de:1f82
-10de:10fa
-
-Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
-e | sort --version-sort
-
-Output:
-
-/sys/kernel/iommu_groups/7/devices/0000:01:00.0
-/sys/kernel/iommu_groups/7/devices/0000:01:00.1
-
-IOMMU Group: 7
-
-Linux command: lsusb
-
-Output:
-
-Bus 001 Device 005: ID 0603:00f2 Novatek Microelectronics Corp. Keyboard (L=
-abtec Ultra Flat Keyboard)
-Bus 001 Device 004: ID 056e:0107 Elecom Co., Ltd (wireless optical mouse)
-
-Linux command: cat /sys/bus/pci/devices/0000:01:00.0/modalias
-
-Output:
-
-pci:v000010DEd00001F82sv00001462sd00008D92bc03sc00i00
-
-Linux command: cat /sys/bus/pci/devices/0000:01:00.1/modalias
-
-Output:
-
-pci:v000010DEd000010FAsv00001462sd00008D92bc04sc03i00
-
-Linux command: sudo nano /etc/modprobe.d/local.conf
-
-Contents of file:
-
-alias pci:v000010DEd00001F82sv00001462sd00008D92bc03sc00i00 vfio-pci
-alias pci:v000010DEd000010FAsv00001462sd00008D92bc04sc03i00 vfio-pci
-options vfio-pci ids=3D10de:1f82,10de:10fa
-options vfio-pci disable_vga=3D1
-
-Linux command: sudo nano /etc/modprobe.d/kvm.conf
-
-Contents of file:
-
-options kvm ignore_msrs=3D1
-
-Linux command: sudo nano /etc/initramfs-tools/modules
-
-Contents of file:
-
-vfio
-vfio_iommu_type1
-vfio_pci
-vfio_virqfd
-vhost-net
-
-Linux command: sudo update-initramfs -u
-
-Output:
-
-update-initramfs: Generating /boot/initrd.img-5.3.0-28-generic
-
-I will configure bridge networking much later, after GPU Passthrough is suc=
-cessful. GPU Passthrough is top priority. I must get it to work first.
-
-REFERENCE
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Link: https://heiko-sieger.info/define-a-network-bridge-using-ubuntus-linux=
--mints-network-manager-application/
-
-Download the latest VFIO drivers from https://fedorapeople.org/groups/virt/=
-virtio-win/direct-downloads/latest-virtio/virtio-win.iso
-
-Linux command: fallocate -l 250G /home/teo-en-ming/win10.img
-
-Linux command: kvm-ok
-
-Output:
-
-INFO: /dev/kvm exists
-KVM acceleration can be used
-
-Linux command: lsmod | grep kvm
-
-Output:
-
-kvm_amd                94208  0
-ccp                    86016  1 kvm_amd
-kvm                   651264  1 kvm_amd
-irqbypass              16384  1 kvm
-
-Reboot the computer.
-
-Linux command: sudo reboot
-
-Linux command: lsmod | grep kvm
-
-Output:
-
-kvm_amd                94208  0
-ccp                    86016  1 kvm_amd
-kvm                   651264  1 kvm_amd
-irqbypass              16384  2 vfio_pci,kvm
-
-Linux command: lsmod | grep vfio
-
-Output:
-
-vfio_pci               49152  0
-irqbypass              16384  2 vfio_pci,kvm
-vfio_virqfd            16384  1 vfio_pci
-vfio_iommu_type1       28672  0
-vfio                   32768  2 vfio_iommu_type1,vfio_pci
-
-
-Linux command: qemu-system-x86_64 --version
-
-Output:
-
-QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.21)
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-Linux command: lspci -kn | grep -A 2 01:00
-
-Output:
-
-01:00.0 0300: 10de:1f82 (rev a1)
-	Subsystem: 1462:8d92
-	Kernel driver in use: vfio-pci
---
-01:00.1 0403: 10de:10fa (rev a1)
-	Subsystem: 1462:8d92
-	Kernel driver in use: vfio-pci
-
-Kernel driver in use is vfio-pci. It worked!
-
-Linux command: dmesg | grep VFIO
-
-Output:
-
-[    2.808675] VFIO - User Level meta-driver version: 0.3
-
-Create Script to Start Windows 10 Virtual Machine with GPU Passthrough
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Linux command: sudo nano windows10vm.sh
-
-Contents of file:
-
-#!/bin/bash
-
-vmname=3D"windows10vm"
-
-if ps -ef | grep qemu-system-x86_64 | grep -q multifunction=3Don; then
-echo "A passthrough VM is already running." &
-exit 1
-
-else
-
-# use pulseaudio
-export QEMU_AUDIO_DRV=3Dpa
-export QEMU_PA_SAMPLES=3D8192
-export QEMU_AUDIO_TIMER_PERIOD=3D99
-export QEMU_PA_SERVER=3D/run/user/1000/pulse/native
-
-cp /usr/share/OVMF/OVMF_VARS.fd /tmp/my_vars.fd
-
-qemu-system-x86_64 \
--name $vmname,process=3D$vmname \
--machine type=3Dpc,accel=3Dkvm \
--cpu host,kvm=3Doff \
--smp 3,sockets=3D1,cores=3D3,threads=3D1 \
--m 4G \
--balloon none \
--rtc clock=3Dhost,base=3Dlocaltime \
--serial none \
--parallel none \
--soundhw hda \
--usb \
--device usb-host,vendorid=3D0x0603,productid=3D0x00f2 \
--device usb-host,vendorid=3D0x056e,productid=3D0x0107 \
--device vfio-pci,host=3D01:00.0,multifunction=3Don \
--device vfio-pci,host=3D01:00.1 \
--drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/OVMF/OVMF_CODE.f=
-d \
--drive if=3Dpflash,format=3Draw,file=3D/tmp/my_vars.fd \
--boot order=3Ddc \
--drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/teo-en=
--ming/win10.img \
--drive file=3D/home/teo-en-ming/win10-1709.iso,index=3D1,media=3Dcdrom \
--drive file=3D/home/teo-en-ming/Downloads/virtio-win-0.1.173.iso,index=3D2,=
-media=3Dcdrom=20
-#-netdev type=3Dtap,id=3Dnet0,ifname=3Dvmtap0,vhost=3Don \
-#-device virtio-net-pci,netdev=3Dnet0,mac=3D00:16:3e:00:01:01
-#-vga none \
-#-nographic \
-
-exit 0
-fi
-
-
-
-Linux command: sudo chmod +x windows10vm.sh
-
-Linux command: sudo ./windows10vm.sh
-
-
-
-Temporarily paused doing work at 2:41 AM in the morning on 2nd Feb 2020 Sun=
-day.
-
-Instructions for AMD Ryzen platforms
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Link: https://forums.linuxmint.com/viewtopic.php?f=3D231&t=3D212692&p=3D134=
-0482#p1340482
-
-Linux command: sudo add-apt-repository ppa:jacob/virtualisation
-
-Uninstall qemu 2.11.1.
-
-Linux command: sudo apt-get remove qemu-kvm qemu-utils
-
-Install qemu 2.12
-
-Linux command: sudo apt install qemu-kvm qemu-utils
-
-ERROR: Windows 10 virtual machine keeps showing BSOD with IRQL NOT LESS OR =
-EQUAL Stop Code.
-By the way, I am able to see the Tiano Core screen.=20
-No matter what variables I play with in the shell script to start Windows 1=
-0 VM,=20
-I always get BSOD IRQL NOT LESS OR EQUAL Stop Code. I am running out of opt=
-ions already.
-Please give me suggestions.
-
-Questions
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-[1] Is MSI GeForce GTX1650 4 GB GDDR5 GPU not supported by Linux KVM for GP=
-U Passthrough?
-
-[2] Do I need to upgrade the BIOS of my Gigabyte B450M DS3H Socket AM4 moth=
-erboard? I fear bricking my motherboard. It is a risky operation.
-
-[3] Are there any other workarounds that I have to do for AMD Ryzen 3000 se=
-ries platform, in order to get GPU Passthrough to work?
-
-I am looking forward to your replies.
-
-Thank you very much!
-
-Stopped troubleshooting at 5.19 AM Singapore Time on 2 Feb 2020 Sunday and =
-went to sleep.
-
-Resumed troubleshooting at around 12 noon Singapore Time on 2 Feb 2020 Sund=
-ay.
-
-Upgraded motherboard BIOS to version F50 using Q-Flash.
-
-Linux command: sudo ./windows10vm.sh
-
-Output:
-
-qemu-system-x86_64: -balloon none: warning: This option is deprecated. Use =
-'--device virtio-balloon' to enable the balloon device.
-qemu-system-x86_64: -device vfio-pci,host=3D01:00.0,multifunction=3Don: vfi=
-o error: 0000:01:00.0: group 0 is not viable
-Please ensure all devices within the iommu_group are bound to their vfio bu=
-s driver.
-
-Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
-e | sort --version-sort
-
-Output:
-
-/sys/kernel/iommu_groups/0/devices/0000:00:01.0
-/sys/kernel/iommu_groups/0/devices/0000:00:01.1
-/sys/kernel/iommu_groups/0/devices/0000:00:01.2
-/sys/kernel/iommu_groups/0/devices/0000:01:00.0
-/sys/kernel/iommu_groups/0/devices/0000:01:00.1
-/sys/kernel/iommu_groups/0/devices/0000:02:00.0
-/sys/kernel/iommu_groups/0/devices/0000:02:00.1
-/sys/kernel/iommu_groups/0/devices/0000:02:00.2
-/sys/kernel/iommu_groups/0/devices/0000:03:00.0
-/sys/kernel/iommu_groups/0/devices/0000:03:01.0
-/sys/kernel/iommu_groups/0/devices/0000:03:04.0
-/sys/kernel/iommu_groups/0/devices/0000:05:00.0
-/sys/kernel/iommu_groups/0/devices/0000:06:00.0
-/sys/kernel/iommu_groups/1/devices/0000:00:08.0
-/sys/kernel/iommu_groups/1/devices/0000:00:08.1
-/sys/kernel/iommu_groups/1/devices/0000:00:08.2
-/sys/kernel/iommu_groups/1/devices/0000:07:00.0
-/sys/kernel/iommu_groups/1/devices/0000:07:00.1
-/sys/kernel/iommu_groups/1/devices/0000:07:00.2
-/sys/kernel/iommu_groups/1/devices/0000:07:00.3
-/sys/kernel/iommu_groups/1/devices/0000:07:00.4
-/sys/kernel/iommu_groups/1/devices/0000:07:00.6
-/sys/kernel/iommu_groups/1/devices/0000:08:00.0
-/sys/kernel/iommu_groups/2/devices/0000:00:14.0
-/sys/kernel/iommu_groups/2/devices/0000:00:14.3
-/sys/kernel/iommu_groups/3/devices/0000:00:18.0
-/sys/kernel/iommu_groups/3/devices/0000:00:18.1
-/sys/kernel/iommu_groups/3/devices/0000:00:18.2
-/sys/kernel/iommu_groups/3/devices/0000:00:18.3
-/sys/kernel/iommu_groups/3/devices/0000:00:18.4
-/sys/kernel/iommu_groups/3/devices/0000:00:18.5
-/sys/kernel/iommu_groups/3/devices/0000:00:18.6
-/sys/kernel/iommu_groups/3/devices/0000:00:18.7
-
-Linux command: sudo apt install inxi
-
-Linux command: inxi -S
-
-Output:
-
-System:    Host: ubuntu18043 Kernel: 5.3.0-28-generic x86_64 bits: 64 Deskt=
-op: Gnome 3.28.4
-           Distro: Ubuntu 18.04.3 LTS
-
-REFERENCE
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Link: https://phoenixnap.com/kb/how-to-update-kernel-ubuntu
-
-Linux command: sudo apt-add-repository ppa:teejee2008/ppa
-
-Linux command: sudo apt-get update
-
-Linux command: sudo apt-get install ukuu
-
-Linux command: sudo ukuu-gtk
-
-Ukuu: Ubuntu Kernel Update Utility
-
-Installed Linux kernel 5.5.1 using Ukuu.
-
-Linux command: uname -a
-
-Output:
-
-Linux ubuntu18043 5.5.1-050501-generic #202002011032 SMP Sat Feb 1 10:34:22=
- UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
-
-Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
-e | sort --version-sort
-
-/sys/kernel/iommu_groups/0/devices/0000:00:01.0
-/sys/kernel/iommu_groups/0/devices/0000:00:01.1
-/sys/kernel/iommu_groups/0/devices/0000:00:01.2
-/sys/kernel/iommu_groups/0/devices/0000:01:00.0
-/sys/kernel/iommu_groups/0/devices/0000:01:00.1
-/sys/kernel/iommu_groups/0/devices/0000:02:00.0
-/sys/kernel/iommu_groups/0/devices/0000:02:00.1
-/sys/kernel/iommu_groups/0/devices/0000:02:00.2
-/sys/kernel/iommu_groups/0/devices/0000:03:00.0
-/sys/kernel/iommu_groups/0/devices/0000:03:01.0
-/sys/kernel/iommu_groups/0/devices/0000:03:04.0
-/sys/kernel/iommu_groups/0/devices/0000:05:00.0
-/sys/kernel/iommu_groups/0/devices/0000:06:00.0
-/sys/kernel/iommu_groups/1/devices/0000:00:08.0
-/sys/kernel/iommu_groups/1/devices/0000:00:08.1
-/sys/kernel/iommu_groups/1/devices/0000:00:08.2
-/sys/kernel/iommu_groups/1/devices/0000:07:00.0
-/sys/kernel/iommu_groups/1/devices/0000:07:00.1
-/sys/kernel/iommu_groups/1/devices/0000:07:00.2
-/sys/kernel/iommu_groups/1/devices/0000:07:00.3
-/sys/kernel/iommu_groups/1/devices/0000:07:00.4
-/sys/kernel/iommu_groups/1/devices/0000:07:00.6
-/sys/kernel/iommu_groups/1/devices/0000:08:00.0
-/sys/kernel/iommu_groups/2/devices/0000:00:14.0
-/sys/kernel/iommu_groups/2/devices/0000:00:14.3
-/sys/kernel/iommu_groups/3/devices/0000:00:18.0
-/sys/kernel/iommu_groups/3/devices/0000:00:18.1
-/sys/kernel/iommu_groups/3/devices/0000:00:18.2
-/sys/kernel/iommu_groups/3/devices/0000:00:18.3
-/sys/kernel/iommu_groups/3/devices/0000:00:18.4
-/sys/kernel/iommu_groups/3/devices/0000:00:18.5
-/sys/kernel/iommu_groups/3/devices/0000:00:18.6
-/sys/kernel/iommu_groups/3/devices/0000:00:18.7
-
-REFERENCE
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-https://queuecumber.gitlab.io/linux-acs-override/
-
-Linux command: cd Downloads
-
-Linux command: unzip artifacts.zip
-
-Linux command: sudo dpkg -i linux-headers-5.4.10-acso_5.4.10-acso-1_amd64.d=
-eb
-
-Linux command: sudo dpkg -i linux-image-5.4.10-acso_5.4.10-acso-1_amd64.deb
-
-Linux command: sudo dpkg -i linux-libc-dev_5.4.10-acso-1_amd64.deb
-
-Linux command: sudo reboot
-
-Linux command: uname -a
-
-Output:
-
-Linux ubuntu18043 5.4.10-acso #1 SMP Thu Jan 9 10:30:12 UTC 2020 x86_64 x86=
-_64 x86_64 GNU/Linux
-
-Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
-e | sort --version-sort
-
-Output:
-
-/sys/kernel/iommu_groups/0/devices/0000:00:01.0
-/sys/kernel/iommu_groups/0/devices/0000:00:01.1
-/sys/kernel/iommu_groups/0/devices/0000:00:01.2
-/sys/kernel/iommu_groups/0/devices/0000:01:00.0
-/sys/kernel/iommu_groups/0/devices/0000:01:00.1
-/sys/kernel/iommu_groups/0/devices/0000:02:00.0
-/sys/kernel/iommu_groups/0/devices/0000:02:00.1
-/sys/kernel/iommu_groups/0/devices/0000:02:00.2
-/sys/kernel/iommu_groups/0/devices/0000:03:00.0
-/sys/kernel/iommu_groups/0/devices/0000:03:01.0
-/sys/kernel/iommu_groups/0/devices/0000:03:04.0
-/sys/kernel/iommu_groups/0/devices/0000:05:00.0
-/sys/kernel/iommu_groups/0/devices/0000:06:00.0
-/sys/kernel/iommu_groups/1/devices/0000:00:08.0
-/sys/kernel/iommu_groups/1/devices/0000:00:08.1
-/sys/kernel/iommu_groups/1/devices/0000:00:08.2
-/sys/kernel/iommu_groups/1/devices/0000:07:00.0
-/sys/kernel/iommu_groups/1/devices/0000:07:00.1
-/sys/kernel/iommu_groups/1/devices/0000:07:00.2
-/sys/kernel/iommu_groups/1/devices/0000:07:00.3
-/sys/kernel/iommu_groups/1/devices/0000:07:00.4
-/sys/kernel/iommu_groups/1/devices/0000:07:00.6
-/sys/kernel/iommu_groups/1/devices/0000:08:00.0
-/sys/kernel/iommu_groups/2/devices/0000:00:14.0
-/sys/kernel/iommu_groups/2/devices/0000:00:14.3
-/sys/kernel/iommu_groups/3/devices/0000:00:18.0
-/sys/kernel/iommu_groups/3/devices/0000:00:18.1
-/sys/kernel/iommu_groups/3/devices/0000:00:18.2
-/sys/kernel/iommu_groups/3/devices/0000:00:18.3
-/sys/kernel/iommu_groups/3/devices/0000:00:18.4
-/sys/kernel/iommu_groups/3/devices/0000:00:18.5
-/sys/kernel/iommu_groups/3/devices/0000:00:18.6
-/sys/kernel/iommu_groups/3/devices/0000:00:18.7
-
-Shifted GTX1650 GPU from PCIe Slot 1 to PCIe Slot 2
-
-Linux Command: lspci | grep VGA
-
-Output:
-
-05:00.0 VGA compatible controller: NVIDIA Corporation Device 1f82 (rev a1)
-06:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] P=
-icasso (rev c9)
-
-Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
-e | sort --version-sort
-
-Output:
-
-/sys/kernel/iommu_groups/0/devices/0000:00:01.0
-/sys/kernel/iommu_groups/0/devices/0000:00:01.2
-/sys/kernel/iommu_groups/0/devices/0000:01:00.0
-/sys/kernel/iommu_groups/0/devices/0000:01:00.1
-/sys/kernel/iommu_groups/0/devices/0000:01:00.2
-/sys/kernel/iommu_groups/0/devices/0000:02:00.0
-/sys/kernel/iommu_groups/0/devices/0000:02:01.0
-/sys/kernel/iommu_groups/0/devices/0000:02:04.0
-/sys/kernel/iommu_groups/0/devices/0000:04:00.0
-/sys/kernel/iommu_groups/0/devices/0000:05:00.0
-/sys/kernel/iommu_groups/0/devices/0000:05:00.1
-/sys/kernel/iommu_groups/1/devices/0000:00:08.0
-/sys/kernel/iommu_groups/1/devices/0000:00:08.1
-/sys/kernel/iommu_groups/1/devices/0000:00:08.2
-/sys/kernel/iommu_groups/1/devices/0000:06:00.0
-/sys/kernel/iommu_groups/1/devices/0000:06:00.1
-/sys/kernel/iommu_groups/1/devices/0000:06:00.2
-/sys/kernel/iommu_groups/1/devices/0000:06:00.3
-/sys/kernel/iommu_groups/1/devices/0000:06:00.4
-/sys/kernel/iommu_groups/1/devices/0000:06:00.6
-/sys/kernel/iommu_groups/1/devices/0000:07:00.0
-/sys/kernel/iommu_groups/2/devices/0000:00:14.0
-/sys/kernel/iommu_groups/2/devices/0000:00:14.3
-/sys/kernel/iommu_groups/3/devices/0000:00:18.0
-/sys/kernel/iommu_groups/3/devices/0000:00:18.1
-/sys/kernel/iommu_groups/3/devices/0000:00:18.2
-/sys/kernel/iommu_groups/3/devices/0000:00:18.3
-/sys/kernel/iommu_groups/3/devices/0000:00:18.4
-/sys/kernel/iommu_groups/3/devices/0000:00:18.5
-/sys/kernel/iommu_groups/3/devices/0000:00:18.6
-/sys/kernel/iommu_groups/3/devices/0000:00:18.7
-
-No improvement. Shift GTX1650 GPU back to PCIe slot 1.
-
-Downgraded motherboard bios to version F42h using Q-flash.
-
-Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
-e | sort --version-sort
-
-Output:
-
-/sys/kernel/iommu_groups/0/devices/0000:00:01.0
-/sys/kernel/iommu_groups/0/devices/0000:00:01.1
-/sys/kernel/iommu_groups/0/devices/0000:00:01.2
-/sys/kernel/iommu_groups/0/devices/0000:01:00.0
-/sys/kernel/iommu_groups/0/devices/0000:01:00.1
-/sys/kernel/iommu_groups/0/devices/0000:02:00.0
-/sys/kernel/iommu_groups/0/devices/0000:02:00.1
-/sys/kernel/iommu_groups/0/devices/0000:02:00.2
-/sys/kernel/iommu_groups/0/devices/0000:03:00.0
-/sys/kernel/iommu_groups/0/devices/0000:03:01.0
-/sys/kernel/iommu_groups/0/devices/0000:03:04.0
-/sys/kernel/iommu_groups/0/devices/0000:05:00.0
-/sys/kernel/iommu_groups/0/devices/0000:06:00.0
-/sys/kernel/iommu_groups/1/devices/0000:00:08.0
-/sys/kernel/iommu_groups/1/devices/0000:00:08.1
-/sys/kernel/iommu_groups/1/devices/0000:00:08.2
-/sys/kernel/iommu_groups/1/devices/0000:07:00.0
-/sys/kernel/iommu_groups/1/devices/0000:07:00.1
-/sys/kernel/iommu_groups/1/devices/0000:07:00.2
-/sys/kernel/iommu_groups/1/devices/0000:07:00.3
-/sys/kernel/iommu_groups/1/devices/0000:07:00.4
-/sys/kernel/iommu_groups/1/devices/0000:07:00.6
-/sys/kernel/iommu_groups/1/devices/0000:08:00.0
-/sys/kernel/iommu_groups/2/devices/0000:00:14.0
-/sys/kernel/iommu_groups/2/devices/0000:00:14.3
-/sys/kernel/iommu_groups/3/devices/0000:00:18.0
-/sys/kernel/iommu_groups/3/devices/0000:00:18.1
-/sys/kernel/iommu_groups/3/devices/0000:00:18.2
-/sys/kernel/iommu_groups/3/devices/0000:00:18.3
-/sys/kernel/iommu_groups/3/devices/0000:00:18.4
-/sys/kernel/iommu_groups/3/devices/0000:00:18.5
-/sys/kernel/iommu_groups/3/devices/0000:00:18.6
-/sys/kernel/iommu_groups/3/devices/0000:00:18.7
-
-Downgraded motherboard BIOS to version F41 using Q-Flash.
-
-Linux command: lspci | grep VGA
-
-Output:
-
-01:00.0 VGA compatible controller: NVIDIA Corporation Device 1f82 (rev a1)
-07:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] P=
-icasso (rev c9)
-
-Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
-e | sort --version-sort
-
-Output:
-
-/sys/kernel/iommu_groups/0/devices/0000:00:01.0
-/sys/kernel/iommu_groups/1/devices/0000:00:01.1
-/sys/kernel/iommu_groups/2/devices/0000:00:01.2
-/sys/kernel/iommu_groups/3/devices/0000:00:08.0
-/sys/kernel/iommu_groups/4/devices/0000:00:08.1
-/sys/kernel/iommu_groups/5/devices/0000:00:14.0
-/sys/kernel/iommu_groups/5/devices/0000:00:14.3
-/sys/kernel/iommu_groups/6/devices/0000:00:18.0
-/sys/kernel/iommu_groups/6/devices/0000:00:18.1
-/sys/kernel/iommu_groups/6/devices/0000:00:18.2
-/sys/kernel/iommu_groups/6/devices/0000:00:18.3
-/sys/kernel/iommu_groups/6/devices/0000:00:18.4
-/sys/kernel/iommu_groups/6/devices/0000:00:18.5
-/sys/kernel/iommu_groups/6/devices/0000:00:18.6
-/sys/kernel/iommu_groups/6/devices/0000:00:18.7
-/sys/kernel/iommu_groups/7/devices/0000:01:00.0
-/sys/kernel/iommu_groups/7/devices/0000:01:00.1
-/sys/kernel/iommu_groups/8/devices/0000:02:00.0
-/sys/kernel/iommu_groups/8/devices/0000:02:00.1
-/sys/kernel/iommu_groups/8/devices/0000:02:00.2
-/sys/kernel/iommu_groups/8/devices/0000:03:00.0
-/sys/kernel/iommu_groups/8/devices/0000:03:01.0
-/sys/kernel/iommu_groups/8/devices/0000:03:04.0
-/sys/kernel/iommu_groups/8/devices/0000:05:00.0
-/sys/kernel/iommu_groups/8/devices/0000:06:00.0
-/sys/kernel/iommu_groups/9/devices/0000:07:00.0
-/sys/kernel/iommu_groups/10/devices/0000:07:00.1
-/sys/kernel/iommu_groups/10/devices/0000:07:00.2
-/sys/kernel/iommu_groups/10/devices/0000:07:00.3
-/sys/kernel/iommu_groups/10/devices/0000:07:00.4
-/sys/kernel/iommu_groups/10/devices/0000:07:00.6
-
-Conclusion:=20
-Motherboard BIOS version F41 is still the best. BIOS versions F42h and F50 =
-don't work at all.
-With BIOS version F41, the IOMMU group is 7. Within IOMMU group 7, only NVI=
-DIA GTX1650 GPU exists.
-With BIOS versions F42h and F50, the IOMMU group is 0 and there are too man=
-y devices within this group (cannot work).
-
-Using Linux kernel 5.5.1 encountered some problem.
-
-Linux command: sudo ./windows10vm.sh
-
-Output:
-
-qemu-system-x86_64: -balloon none: warning: This option is deprecated. Use =
-'--device virtio-balloon' to enable the balloon device.
-qemu-system-x86_64: -device vfio-pci,host=3D01:00.0,multifunction=3Don: vfi=
-o error: 0000:01:00.0: failed to open /dev/vfio/7: No such file or director=
-y
-
-Any changes in /etc/modprobe.d require you to update the initramfs. Enter a=
-t the command line:
-
-Linux command: sudo update-initramfs -u
-
-Linux command: sudo reboot
-
-Linux command: sudo update-grub
-
-Linux command: sudo reboot
-
-Linux kernel 5.5.1 is still having some issues with loading vfio-pci kernel=
- module.
-
-Falling back to Linux kernel 5.3.0.
-
-Checked. Linux kernel 5.3.0 has no issues. Use Linux kernel 5.3.0 all the w=
-ay.
-
-However, Windows 10 virtual machine still giving me BSOD with IRQL NOT LESS=
- OR EQUAL Stop Code.
-
-2 Feb 2020 Sunday 5 PM Singapore Time: I am very lost. I don't know what to=
- do next. Some experts please help.
-
-Thank you very much.
-
-Resumed troubleshooting at 8.17 PM Singapore Time on 2 Feb 2020 Sunday.
-
-REFERENCE
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Discussion Thread: Gpu passthrough vfio blue screen
-
-Link: https://forum.level1techs.com/t/gpu-passthrough-vfio-blue-screen/1328=
-08
-
-According to this discussion thread, any Windows 10 version 1803 and above =
-will result in a BSOD with IRQL NOT LESS OR EQUAL Stop Code
-during installation of the Windows 10 virtual machine.
-
-I am going to download Windows 10 version 1709 from the following download =
-link.
-
-Link: https://tb.rg-adguard.net/public.php
-
-Please remember to boot up Ubuntu 18.04.3 LTS Desktop Edition host using Li=
-nux Kernel 5.3.0 and not Linux Kernel 5.5.1, which doesn't work at all.
-
-Start Windows 10 version 1709 virtual machine with GPU Passthrough
-
-Linux command: sudo ./windows10vm.sh
-
-Windows 10 version 1709 virtual machine completed installation successfully=
-.
-
-During the installation of Windows 10 version 1709 virtual machine, it woul=
-d not be able to find any virtual harddisk.
-Simply install the virtio driver and Windows 10 version 1709 virtual machin=
-e will be able to detect the virtual harddisk of 250 GB.
-
-Windows 10 version 1709 virtual machine completed installation successfully=
-.
-
-My Windows 10 version 1709 virtual machine already has an internet connecti=
-on. So I will not be configuring bridged networking at the moment.
-
-Device Manager > Display adapters > NVIDIA GeForce GTX 1650
-
-NVIDIA GeForce GTX 1650: This device is working properly.
-
-Congratulations to myself! Teo En Ming has successfully passed through MSI =
-GeForce GTX 1650 4 GB GDDR5 GPU to Windows 10 version 1709 virtual machine
-using Linux KVM on Ubuntu 18.04.3 LTS Desktop Edition host with a 5.3.0 Lin=
-ux Kernel.
-
-I am going to do photo editing and 4K UHD video rendering in this Windows 1=
-0 1709 virtual machine with GPU Passthrough.
-
-Confirmed Working Script to Start Windows 10 Virtual Machine with GPU Passt=
-hrough
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-
-#!/bin/bash
-
-vmname=3D"windows10vm"
-
-if ps -ef | grep qemu-system-x86_64 | grep -q multifunction=3Don; then
-echo "A passthrough VM is already running." &
-exit 1
-
-else
-
-# use pulseaudio
-export QEMU_AUDIO_DRV=3Dpa
-export QEMU_PA_SAMPLES=3D8192
-export QEMU_AUDIO_TIMER_PERIOD=3D99
-export QEMU_PA_SERVER=3D/run/user/1000/pulse/native
-
-cp /usr/share/OVMF/OVMF_VARS.fd /tmp/my_vars.fd
-
-qemu-system-x86_64 \
--name $vmname,process=3D$vmname \
--machine type=3Dpc,accel=3Dkvm \
--cpu host,kvm=3Doff \
--smp 3,sockets=3D1,cores=3D3,threads=3D1 \
--m 4G \
--balloon none \
--rtc clock=3Dhost,base=3Dlocaltime \
--serial none \
--parallel none \
--soundhw hda \
--usb \
--device usb-host,vendorid=3D0x0603,productid=3D0x00f2 \
--device usb-host,vendorid=3D0x056e,productid=3D0x0107 \
--device vfio-pci,host=3D01:00.0,multifunction=3Don \
--device vfio-pci,host=3D01:00.1 \
--drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/OVMF/OVMF_CODE.f=
-d \
--drive if=3Dpflash,format=3Draw,file=3D/tmp/my_vars.fd \
--boot order=3Ddc \
--drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D/home/teo-en=
--ming/win10.img \
--drive file=3D/home/teo-en-ming/win10-1709.iso,index=3D1,media=3Dcdrom \
--drive file=3D/home/teo-en-ming/Downloads/virtio-win-0.1.173.iso,index=3D2,=
-media=3Dcdrom=20
-#-netdev type=3Dtap,id=3Dnet0,ifname=3Dvmtap0,vhost=3Don \
-#-device virtio-net-pci,netdev=3Dnet0,mac=3D00:16:3e:00:01:01
-#-vga none \
-#-nographic \
-
-exit 0
-fi
-
------END OF TURRITOPSIS DOHRNII TEO EN MING'S GUIDE-----
-
-
-
-
-
-
-
------BEGIN EMAIL SIGNATURE-----
-
-The Gospel for all Targeted Individuals (TIs):
-
-[The New York Times] Microwave Weapons Are Prime Suspect in Ills of
-U.S. Embassy Workers
-
-Link:=A0https://www.nytimes.com/2018/09/01/science/sonic-attack-cuba-microw=
-ave.html
-
-***************************************************************************=
-*****************
-
-Singaporean Mr. Turritopsis Dohrnii Teo En Ming's Academic
-Qualifications as at 14 Feb 2019 and refugee seeking attempts at the United=
- Nations Refugee Agency Bangkok (21 Mar 2017), in Taiwan (5 Aug 2019) and A=
-ustralia (25 Dec 2019 to 9 Jan 2020):
-
-[1]=A0https://tdtemcerts.wordpress.com/
-
-[2]=A0https://tdtemcerts.blogspot.sg/
-
-[3]=A0https://www.scribd.com/user/270125049/Teo-En-Ming
-
------END EMAIL SIGNATURE-----
+On Tue, Jan 21, 2020 at 02:31:39PM -0800, Sean Christopherson wrote:
+> Reallocate a rmap array and recalcuate large page compatibility when
+> moving an existing memslot to correctly handle the alignment properties
+> of the new memslot.  The number of rmap entries required at each level
+> is dependent on the alignment of the memslot's base gfn with respect to
+> that level, e.g. moving a large-page aligned memslot so that it becomes
+> unaligned will increase the number of rmap entries needed at the now
+> unaligned level.
+> 
+> Not updating the rmap array is the most obvious bug, as KVM accesses
+> garbage data beyond the end of the rmap.  KVM interprets the bad data as
+> pointers, leading to non-canonical #GPs, unexpected #PFs, etc...
+> 
+>   general protection fault: 0000 [#1] SMP
+>   CPU: 0 PID: 1909 Comm: move_memory_reg Not tainted 5.4.0-rc7+ #139
+>   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+>   RIP: 0010:rmap_get_first+0x37/0x50 [kvm]
+>   Code: <48> 8b 3b 48 85 ff 74 ec e8 6c f4 ff ff 85 c0 74 e3 48 89 d8 5b c3
+>   RSP: 0018:ffffc9000021bbc8 EFLAGS: 00010246
+>   RAX: ffff00617461642e RBX: ffff00617461642e RCX: 0000000000000012
+>   RDX: ffff88827400f568 RSI: ffffc9000021bbe0 RDI: ffff88827400f570
+>   RBP: 0010000000000000 R08: ffffc9000021bd00 R09: ffffc9000021bda8
+>   R10: ffffc9000021bc48 R11: 0000000000000000 R12: 0030000000000000
+>   R13: 0000000000000000 R14: ffff88827427d700 R15: ffffc9000021bce8
+>   FS:  00007f7eda014700(0000) GS:ffff888277a00000(0000) knlGS:0000000000000000
+>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>   CR2: 00007f7ed9216ff8 CR3: 0000000274391003 CR4: 0000000000162eb0
+>   Call Trace:
+>    kvm_mmu_slot_set_dirty+0xa1/0x150 [kvm]
+>    __kvm_set_memory_region.part.64+0x559/0x960 [kvm]
+>    kvm_set_memory_region+0x45/0x60 [kvm]
+>    kvm_vm_ioctl+0x30f/0x920 [kvm]
+>    do_vfs_ioctl+0xa1/0x620
+>    ksys_ioctl+0x66/0x70
+>    __x64_sys_ioctl+0x16/0x20
+>    do_syscall_64+0x4c/0x170
+>    entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>   RIP: 0033:0x7f7ed9911f47
+>   Code: <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 21 6f 2c 00 f7 d8 64 89 01 48
+>   RSP: 002b:00007ffc00937498 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+>   RAX: ffffffffffffffda RBX: 0000000001ab0010 RCX: 00007f7ed9911f47
+>   RDX: 0000000001ab1350 RSI: 000000004020ae46 RDI: 0000000000000004
+>   RBP: 000000000000000a R08: 0000000000000000 R09: 00007f7ed9214700
+>   R10: 00007f7ed92149d0 R11: 0000000000000246 R12: 00000000bffff000
+>   R13: 0000000000000003 R14: 00007f7ed9215000 R15: 0000000000000000
+>   Modules linked in: kvm_intel kvm irqbypass
+>   ---[ end trace 0c5f570b3358ca89 ]---
+> 
+> The disallow_lpage tracking is more subtle.  Failure to update results
+> in KVM creating large pages when it shouldn't, either due to stale data
+> or again due to indexing beyond the end of the metadata arrays, which
+> can lead to memory corruption and/or leaking data to guest/userspace.
+> 
+> Note, the arrays for the old memslot are freed by the unconditional call
+> to kvm_free_memslot() in __kvm_set_memory_region().
+
+If __kvm_set_memory_region() failed, I think the old memslot will be
+kept and the new memslot will be freed instead?
+
+> 
+> Fixes: 05da45583de9b ("KVM: MMU: large page support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4c30ebe74e5d..1953c71c52f2 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9793,6 +9793,13 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+>  {
+>  	int i;
+>  
+> +	/*
+> +	 * Clear out the previous array pointers for the KVM_MR_MOVE case.  The
+> +	 * old arrays will be freed by __kvm_set_memory_region() if installing
+> +	 * the new memslot is successful.
+> +	 */
+> +	memset(&slot->arch, 0, sizeof(slot->arch));
+
+I actually gave r-b on this patch but it was lost... And then when I
+read it again I start to confuse on why we need to set these to zeros.
+Even if they're not zeros, iiuc kvm_free_memslot() will compare each
+of the array pointer and it will only free the changed pointers, then
+it looks fine even without zeroing?
+
+> +
+>  	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
+>  		struct kvm_lpage_info *linfo;
+>  		unsigned long ugfn;
+> @@ -9867,6 +9874,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>  				const struct kvm_userspace_memory_region *mem,
+>  				enum kvm_mr_change change)
+>  {
+> +	if (change == KVM_MR_MOVE)
+> +		return kvm_arch_create_memslot(kvm, memslot,
+> +					       mem->memory_size >> PAGE_SHIFT);
+> +
+
+Instead of calling kvm_arch_create_memslot() explicitly again here,
+can it be replaced by below?
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 72b45f491692..85a7b02fd752 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1144,7 +1144,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+                new.dirty_bitmap = NULL;
+ 
+        r = -ENOMEM;
+-       if (change == KVM_MR_CREATE) {
++       if (change == KVM_MR_CREATE || change == KVM_MR_MOVE) {
+                new.userspace_addr = mem->userspace_addr;
+ 
+                if (kvm_arch_create_memslot(kvm, &new, npages))
+
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.24.1
+> 
+
+-- 
+Peter Xu
 
