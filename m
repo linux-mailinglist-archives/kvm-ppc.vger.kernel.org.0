@@ -2,132 +2,121 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F26C153D96
-	for <lists+kvm-ppc@lfdr.de>; Thu,  6 Feb 2020 04:26:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58C39153E01
+	for <lists+kvm-ppc@lfdr.de>; Thu,  6 Feb 2020 06:05:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727594AbgBFD0G (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 5 Feb 2020 22:26:06 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10276 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727474AbgBFD0G (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 5 Feb 2020 22:26:06 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0163EM4O118249;
-        Wed, 5 Feb 2020 22:25:36 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyphx1566-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Feb 2020 22:25:36 -0500
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0163LKY9016276;
-        Wed, 5 Feb 2020 22:25:35 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyphx155m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Feb 2020 22:25:35 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0163Blmv019116;
-        Thu, 6 Feb 2020 03:25:34 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02wdc.us.ibm.com with ESMTP id 2xykc9hw66-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 Feb 2020 03:25:34 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0163PXtR29163848
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 6 Feb 2020 03:25:33 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7EA70AE05F;
-        Thu,  6 Feb 2020 03:25:33 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 350F1AE05C;
-        Thu,  6 Feb 2020 03:25:24 +0000 (GMT)
-Received: from LeoBras (unknown [9.85.163.250])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu,  6 Feb 2020 03:25:23 +0000 (GMT)
-Message-ID: <760c238043196e0628c8c0eff48a8e938ef539ba.camel@linux.ibm.com>
-Subject: Re: [PATCH v6 02/11] mm/gup: Use functions to track lockless pgtbl
- walks on gup_pgd_range
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@c-s.fr>,
-        Steven Price <steven.price@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
-        Balbir Singh <bsingharora@gmail.com>,
-        Reza Arbab <arbab@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Allison Randal <allison@lohutok.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Michal Suchanek <msuchanek@suse.de>
-Cc:     linux-arch@vger.kernel.org, linux-mm@kvack.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-Date:   Thu, 06 Feb 2020 00:25:18 -0300
-In-Reply-To: <20200206030900.147032-3-leonardo@linux.ibm.com>
-References: <20200206030900.147032-1-leonardo@linux.ibm.com>
-         <20200206030900.147032-3-leonardo@linux.ibm.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-5TGq9qc6jmgO8SfflYEA"
-User-Agent: Evolution 3.34.3 (3.34.3-1.fc31) 
+        id S1725860AbgBFFFV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 6 Feb 2020 00:05:21 -0500
+Received: from mga05.intel.com ([192.55.52.43]:37740 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725792AbgBFFFU (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 6 Feb 2020 00:05:20 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2020 21:05:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,408,1574150400"; 
+   d="scan'208";a="254987822"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga004.fm.intel.com with ESMTP; 05 Feb 2020 21:05:19 -0800
+Date:   Wed, 5 Feb 2020 21:05:19 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 01/19] KVM: x86: Allocate new rmap and large page
+ tracking when moving memslot
+Message-ID: <20200206050518.GA9401@linux.intel.com>
+References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
+ <20200121223157.15263-2-sean.j.christopherson@intel.com>
+ <20200205214952.GD387680@xz-x1>
+ <20200205235533.GA7631@linux.intel.com>
+ <20200206020031.GJ387680@xz-x1>
+ <20200206021714.GB7631@linux.intel.com>
+ <20200206025858.GK387680@xz-x1>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-05_06:2020-02-04,2020-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 mlxscore=0 clxscore=1015 suspectscore=0 phishscore=0
- mlxlogscore=918 lowpriorityscore=0 malwarescore=0 adultscore=0 bulkscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002060023
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200206025858.GK387680@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Wed, Feb 05, 2020 at 09:58:58PM -0500, Peter Xu wrote:
+> On Wed, Feb 05, 2020 at 06:17:15PM -0800, Sean Christopherson wrote:
+> > On Wed, Feb 05, 2020 at 09:00:31PM -0500, Peter Xu wrote:
+> > > On Wed, Feb 05, 2020 at 03:55:33PM -0800, Sean Christopherson wrote:
+> > > > On Wed, Feb 05, 2020 at 04:49:52PM -0500, Peter Xu wrote:
+> > > > > Instead of calling kvm_arch_create_memslot() explicitly again here,
+> > > > > can it be replaced by below?
+> > > > > 
+> > > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > > > index 72b45f491692..85a7b02fd752 100644
+> > > > > --- a/virt/kvm/kvm_main.c
+> > > > > +++ b/virt/kvm/kvm_main.c
+> > > > > @@ -1144,7 +1144,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> > > > >                 new.dirty_bitmap = NULL;
+> > > > >  
+> > > > >         r = -ENOMEM;
+> > > > > -       if (change == KVM_MR_CREATE) {
+> > > > > +       if (change == KVM_MR_CREATE || change == KVM_MR_MOVE) {
+> > > > >                 new.userspace_addr = mem->userspace_addr;
+> > > > >  
+> > > > >                 if (kvm_arch_create_memslot(kvm, &new, npages))
+> > > > 
+> > > > No, because other architectures don't need to re-allocate new metadata on
+> > > > MOVE and rely on __kvm_set_memory_region() to copy @arch from old to new,
+> > > > e.g. see kvmppc_core_create_memslot_hv().
+> > > 
+> > > Yes it's only required in x86, but iiuc it also will still work for
+> > > ppc?  Say, in that case ppc won't copy @arch from old to new, and
+> > > kvmppc_core_free_memslot_hv() will free the old, however it should
+> > > still work.
+> > 
+> > No, calling kvm_arch_create_memslot() for MOVE will result in PPC leaking
+> > memory due to overwriting slot->arch.rmap with a new allocation.
+> 
+> Why?  For the MOVE case, kvm_arch_create_memslot() will create a new
+> rmap for the "new" memslot.  If the whole procedure succeeded,
+> kvm_free_memslot() will free the old rmap.  If it failed,
+> kvm_free_memslot() will free the new rmap if !NULL.  Looks fine?
 
---=-5TGq9qc6jmgO8SfflYEA
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Oh, I see what you're suggesting.   Please god no.
 
-On Thu, 2020-02-06 at 00:08 -0300, Leonardo Bras wrote:
->                 gup_pgd_range(addr, end, gup_flags, pages, &nr);
-> -               local_irq_enable();
-> +               end_lockless_pgtbl_walk(IRQS_ENABLED);
->                 ret =3D nr;
->         }
-> =20
+This is a bug fix that needs to be backported to stable.  Arbitrarily
+changing PPC behavior is a bad idea, especially since I don't know squat
+about the PPC rmap behavior.
 
-Just noticed IRQS_ENABLED is not available on other archs than ppc64.
-I will fix this for v7.
+If it happens to fix a PPC rmap bug, then PPC should get an explicit fix.
+If it's not a bug fix, then at best it is a minor performance hit due to an
+extra allocation and the need to refill the rmap.  Worst case scenario it
+breaks PPC.
 
---=-5TGq9qc6jmgO8SfflYEA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+And unless this were a temporary change, which would be silly, I would have
+to carry forward the change into "KVM: PPC: Move memslot memory allocation
+into prepare_memory_region()", and again, I don't know squat about PPC.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl47hx4ACgkQlQYWtz9S
-ttTS9w/9E7lK8J1xIstn8wQNOKb6Mpalq1gAoAMSwEKVsxtJCgv5GQoVzfi83uzh
-s6Qq+5ydWu172eeRW66NmQaespclUattqesFf5qhvVnLGpwTbGSPlSF0IWzKr7s9
-ofzcAbyqaDh6+DTOestPd3ADSlUZ4HWxOKc5XSi5TyHX0RP9JK/gu26hdvr9oHDI
-ZU16OrdCAecYyE7/hKY0a+VGRsyZVab3VBWy/6EJdo9Z8bNc/aquHQQ+RkdaB3M/
-VtA1A0NUOBcbu+tFKG3Q2yzPQb9/5Ob7m5uG2Oa2f3huyk8FOXySioH4qUHqZAuB
-8bZIrD49y3YXZ9sFF4b4eqyDyeutnHAoMa/FBuMPmQW/diiFKhSIvLsiEz4gu1B9
-jn04+n0wrnV8wXxe3xUEQ6ooxhCY6UmNSIjlXOewvk/j2E37mZIdaPY5Bx6GlDBM
-MSXHfcN2LtpRH1FTqH8tZvwYf7JdkspVbbBipLrr8Ba8fGZ3fKcnfIIaOSRd1tvE
-uTHEgfICZKnzXxPM/tpI3n5kx7PbB6hPFDdtvjA1Vyq3tuA295qNF5fkEmTkvzmg
-swZfIo4OEGyw3Oh+jsK0PH646dK6jkD17Q7Fe81+BF7uYygxdxBptKUj/GJEnqfU
-3ZEFP0bpEMV17eoArkTN5eP4CNvd1VRWagVtnNLWS44WlNvdOxc=
-=i1Uf
------END PGP SIGNATURE-----
-
---=-5TGq9qc6jmgO8SfflYEA--
-
+I also don't want to effectively introduce a misnamed function, even if
+only temporarily, e.g. it's kvm_arch_create_memslot(), not
+kvm_arch_create_or_move_memslot(), because the whole flow gets reworked a
+few patches later.
