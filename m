@@ -2,272 +2,240 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 346BC153D0F
-	for <lists+kvm-ppc@lfdr.de>; Thu,  6 Feb 2020 03:59:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FAFF153D4F
+	for <lists+kvm-ppc@lfdr.de>; Thu,  6 Feb 2020 04:10:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727722AbgBFC7H (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 5 Feb 2020 21:59:07 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56199 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727415AbgBFC7H (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 5 Feb 2020 21:59:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580957946;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=elrfXvAvFe9N2hMUG5HMqPNblHdCzzwkwPDHkqMX4vs=;
-        b=g1HXzvEQAggaweXuj1yuLnIDWZmtm1s5HTdpgV30gbQrA9wWudbBbKaqlzr8Xvm0fkhoJy
-        C3yGJkgPN7gbuIiGSPzUB1r9yunmV9X2tPeYb1tcnVRAF5qDd2LL8cmTzZI1mItrBvR1ga
-        hSYwCq0kS+dgCJS8xBllvBzi3Vb7gAY=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-xBX6YJtfOxOsu327cZbXQw-1; Wed, 05 Feb 2020 21:59:04 -0500
-X-MC-Unique: xBX6YJtfOxOsu327cZbXQw-1
-Received: by mail-qt1-f198.google.com with SMTP id y3so2860569qti.15
-        for <kvm-ppc@vger.kernel.org>; Wed, 05 Feb 2020 18:59:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=elrfXvAvFe9N2hMUG5HMqPNblHdCzzwkwPDHkqMX4vs=;
-        b=ktMHZbPebb6Puca3wjfBLDU6THyWCBPA6rLfdV5pdfjnjiGAdijcTcRNVNhWEWAhSP
-         Ay6CEM2r0Gm5MCcqQ+QiBrUjqtk+5LkS1+e0fmH5cIaROF1ws/L7pidaRH3vIqyglXP9
-         0qkfv8ghivSIoM4lccnMJbFx6EIZKJSFPpI/Ub1ISp1VbMwWj8O60P4snCVZDIm4RKLm
-         q1Ba4XSbwcwcy45SHnpiP5vFFLzgZjf5mGJVjNPOuuLHPOc9XUh9CSJwpdclUq0j6LCt
-         CW4H22nVw+8Xa5hEm6TMcMDPfNXqT/nW+wiH4/owFHZB1Rjv9odlfZLTkQrJT9eJnWO1
-         DyIg==
-X-Gm-Message-State: APjAAAXxGT1EXx1rLc3LoXRTYISx+8pxLg5txmrOR45OClqya7zUxUo2
-        Q5v6WBmswLOg7DfVuBtDaA+debzAkRFaN6eaIHz741EEActSgRwq7FyICgoYqDBQTnX+PGoagYc
-        DuLxdWevYa1e7/PbTKA==
-X-Received: by 2002:ad4:4434:: with SMTP id e20mr629677qvt.157.1580957942589;
-        Wed, 05 Feb 2020 18:59:02 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwRefmCuC5EkrvnBISCbt0OMK+7Pg2aDUhgdS94eihOXUTCefpmLLHm+a79iObj3JseFjw0PA==
-X-Received: by 2002:ad4:4434:: with SMTP id e20mr629652qvt.157.1580957942224;
-        Wed, 05 Feb 2020 18:59:02 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
-        by smtp.gmail.com with ESMTPSA id y26sm915791qtv.28.2020.02.05.18.58.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2020 18:59:01 -0800 (PST)
-Date:   Wed, 5 Feb 2020 21:58:58 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v5 01/19] KVM: x86: Allocate new rmap and large page
- tracking when moving memslot
-Message-ID: <20200206025858.GK387680@xz-x1>
-References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
- <20200121223157.15263-2-sean.j.christopherson@intel.com>
- <20200205214952.GD387680@xz-x1>
- <20200205235533.GA7631@linux.intel.com>
- <20200206020031.GJ387680@xz-x1>
- <20200206021714.GB7631@linux.intel.com>
+        id S1727787AbgBFDKL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 5 Feb 2020 22:10:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34874 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727572AbgBFDKK (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 5 Feb 2020 22:10:10 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01639AVg027642;
+        Wed, 5 Feb 2020 22:09:33 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhpygyty-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 05 Feb 2020 22:09:33 -0500
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01639Wm8028517;
+        Wed, 5 Feb 2020 22:09:32 -0500
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhpygytm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 05 Feb 2020 22:09:32 -0500
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01636Ymi008757;
+        Thu, 6 Feb 2020 03:09:31 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma01dal.us.ibm.com with ESMTP id 2xykc947p8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Feb 2020 03:09:31 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01639TuG41615622
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 6 Feb 2020 03:09:29 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A0002BE051;
+        Thu,  6 Feb 2020 03:09:29 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B2DB4BE04F;
+        Thu,  6 Feb 2020 03:09:13 +0000 (GMT)
+Received: from LeoBras.aus.stglabs.ibm.com (unknown [9.85.163.250])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu,  6 Feb 2020 03:09:13 +0000 (GMT)
+From:   Leonardo Bras <leonardo@linux.ibm.com>
+To:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@c-s.fr>,
+        Steven Price <steven.price@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Leonardo Bras <leonardo@linux.ibm.com>,
+        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
+        Balbir Singh <bsingharora@gmail.com>,
+        Reza Arbab <arbab@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Allison Randal <allison@lohutok.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Michal Suchanek <msuchanek@suse.de>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH v6 00/11] Introduces new functions for tracking lockless pagetable walks
+Date:   Thu,  6 Feb 2020 00:08:49 -0300
+Message-Id: <20200206030900.147032-1-leonardo@linux.ibm.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200206021714.GB7631@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-05_06:2020-02-04,2020-02-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 mlxscore=0 phishscore=0 suspectscore=0 spamscore=0
+ bulkscore=0 lowpriorityscore=0 mlxlogscore=966 clxscore=1011 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002060022
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Feb 05, 2020 at 06:17:15PM -0800, Sean Christopherson wrote:
-> On Wed, Feb 05, 2020 at 09:00:31PM -0500, Peter Xu wrote:
-> > On Wed, Feb 05, 2020 at 03:55:33PM -0800, Sean Christopherson wrote:
-> > > On Wed, Feb 05, 2020 at 04:49:52PM -0500, Peter Xu wrote:
-> > > > On Tue, Jan 21, 2020 at 02:31:39PM -0800, Sean Christopherson wrote:
-> > > > > Reallocate a rmap array and recalcuate large page compatibility when
-> > > > > moving an existing memslot to correctly handle the alignment properties
-> > > > > of the new memslot.  The number of rmap entries required at each level
-> > > > > is dependent on the alignment of the memslot's base gfn with respect to
-> > > > > that level, e.g. moving a large-page aligned memslot so that it becomes
-> > > > > unaligned will increase the number of rmap entries needed at the now
-> > > > > unaligned level.
-> > > > > 
-> > > > > Not updating the rmap array is the most obvious bug, as KVM accesses
-> > > > > garbage data beyond the end of the rmap.  KVM interprets the bad data as
-> > > > > pointers, leading to non-canonical #GPs, unexpected #PFs, etc...
-> > > > > 
-> > > > >   general protection fault: 0000 [#1] SMP
-> > > > >   CPU: 0 PID: 1909 Comm: move_memory_reg Not tainted 5.4.0-rc7+ #139
-> > > > >   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
-> > > > >   RIP: 0010:rmap_get_first+0x37/0x50 [kvm]
-> > > > >   Code: <48> 8b 3b 48 85 ff 74 ec e8 6c f4 ff ff 85 c0 74 e3 48 89 d8 5b c3
-> > > > >   RSP: 0018:ffffc9000021bbc8 EFLAGS: 00010246
-> > > > >   RAX: ffff00617461642e RBX: ffff00617461642e RCX: 0000000000000012
-> > > > >   RDX: ffff88827400f568 RSI: ffffc9000021bbe0 RDI: ffff88827400f570
-> > > > >   RBP: 0010000000000000 R08: ffffc9000021bd00 R09: ffffc9000021bda8
-> > > > >   R10: ffffc9000021bc48 R11: 0000000000000000 R12: 0030000000000000
-> > > > >   R13: 0000000000000000 R14: ffff88827427d700 R15: ffffc9000021bce8
-> > > > >   FS:  00007f7eda014700(0000) GS:ffff888277a00000(0000) knlGS:0000000000000000
-> > > > >   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > >   CR2: 00007f7ed9216ff8 CR3: 0000000274391003 CR4: 0000000000162eb0
-> > > > >   Call Trace:
-> > > > >    kvm_mmu_slot_set_dirty+0xa1/0x150 [kvm]
-> > > > >    __kvm_set_memory_region.part.64+0x559/0x960 [kvm]
-> > > > >    kvm_set_memory_region+0x45/0x60 [kvm]
-> > > > >    kvm_vm_ioctl+0x30f/0x920 [kvm]
-> > > > >    do_vfs_ioctl+0xa1/0x620
-> > > > >    ksys_ioctl+0x66/0x70
-> > > > >    __x64_sys_ioctl+0x16/0x20
-> > > > >    do_syscall_64+0x4c/0x170
-> > > > >    entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > > > >   RIP: 0033:0x7f7ed9911f47
-> > > > >   Code: <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 21 6f 2c 00 f7 d8 64 89 01 48
-> > > > >   RSP: 002b:00007ffc00937498 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> > > > >   RAX: ffffffffffffffda RBX: 0000000001ab0010 RCX: 00007f7ed9911f47
-> > > > >   RDX: 0000000001ab1350 RSI: 000000004020ae46 RDI: 0000000000000004
-> > > > >   RBP: 000000000000000a R08: 0000000000000000 R09: 00007f7ed9214700
-> > > > >   R10: 00007f7ed92149d0 R11: 0000000000000246 R12: 00000000bffff000
-> > > > >   R13: 0000000000000003 R14: 00007f7ed9215000 R15: 0000000000000000
-> > > > >   Modules linked in: kvm_intel kvm irqbypass
-> > > > >   ---[ end trace 0c5f570b3358ca89 ]---
-> > > > > 
-> > > > > The disallow_lpage tracking is more subtle.  Failure to update results
-> > > > > in KVM creating large pages when it shouldn't, either due to stale data
-> > > > > or again due to indexing beyond the end of the metadata arrays, which
-> > > > > can lead to memory corruption and/or leaking data to guest/userspace.
-> > > > > 
-> > > > > Note, the arrays for the old memslot are freed by the unconditional call
-> > > > > to kvm_free_memslot() in __kvm_set_memory_region().
-> > > > 
-> > > > If __kvm_set_memory_region() failed, I think the old memslot will be
-> > > > kept and the new memslot will be freed instead?
-> > > 
-> > > This is referring to a successful MOVE operation to note that zeroing @arch
-> > > in kvm_arch_create_memslot() won't leak memory.
-> > > 
-> > > > > 
-> > > > > Fixes: 05da45583de9b ("KVM: MMU: large page support")
-> > > > > Cc: stable@vger.kernel.org
-> > > > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > > > ---
-> > > > >  arch/x86/kvm/x86.c | 11 +++++++++++
-> > > > >  1 file changed, 11 insertions(+)
-> > > > > 
-> > > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > > index 4c30ebe74e5d..1953c71c52f2 100644
-> > > > > --- a/arch/x86/kvm/x86.c
-> > > > > +++ b/arch/x86/kvm/x86.c
-> > > > > @@ -9793,6 +9793,13 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
-> > > > >  {
-> > > > >  	int i;
-> > > > >  
-> > > > > +	/*
-> > > > > +	 * Clear out the previous array pointers for the KVM_MR_MOVE case.  The
-> > > > > +	 * old arrays will be freed by __kvm_set_memory_region() if installing
-> > > > > +	 * the new memslot is successful.
-> > > > > +	 */
-> > > > > +	memset(&slot->arch, 0, sizeof(slot->arch));
-> > > > 
-> > > > I actually gave r-b on this patch but it was lost... And then when I
-> > > > read it again I start to confuse on why we need to set these to zeros.
-> > > > Even if they're not zeros, iiuc kvm_free_memslot() will compare each
-> > > > of the array pointer and it will only free the changed pointers, then
-> > > > it looks fine even without zeroing?
-> > > 
-> > > It's for the failure path, the out_free label, which blindy calls kvfree()
-> > > and relies on un-allocated pointers being NULL.  If @arch isn't zeroed, the
-> > > failure path will free metadata from the previous memslot.
-> > 
-> > IMHO it won't, because kvm_free_memslot() will only free metadata if
-> > the pointer changed.  So:
-> > 
-> >   - For succeeded kvcalloc(), the pointer will change in the new slot,
-> >     so kvm_free_memslot() will free it,
-> > 
-> >   - For failed kvcalloc(), the pointer will be NULL, so
-> >     kvm_free_memslot() will skip it,
-> 
-> No.  The out_free path iterates over all possible entries and would free
-> pointers from the old memslot.  It's still be wrong even if the very last
-> kcalloc() failed as that allocation is captured in a local variable and
-> only propagated to lpage_info on success.
-> 
-> out_free:
-> 	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
-> 		kvfree(slot->arch.rmap[i]);
-> 		slot->arch.rmap[i] = NULL;
-> 		if (i == 0)
-> 			continue;
-> 
-> 		kvfree(slot->arch.lpage_info[i - 1]);
-> 		slot->arch.lpage_info[i - 1] = NULL;
-> 	}
-> 	return -ENOMEM;
+Patches 1-2: Introduces new arch-generic functions to use before
+and after lockless pagetable walks, instead of local_irq_*, and
+applies them to generic code. It makes lockless pagetable walks
+more explicit and improves documentation about it.
 
-Ah right.  These discussion does also prove that simplify the slot
-free path is good, because it's easy to get confused. :)
+Patches 3-9: Introduces a powerpc-specific version of the above
+functions with the option to not touch irq config. Then apply them
+to all powerpc code that do lockless pagetable walks.
 
-> 
-> >   - For untouched pointer, it'll be the same as the old, so
-> >     kvm_free_memslot() will skip it as well.
-> > 
-> > > 
-> > > > > +
-> > > > >  	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
-> > > > >  		struct kvm_lpage_info *linfo;
-> > > > >  		unsigned long ugfn;
-> > > > > @@ -9867,6 +9874,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> > > > >  				const struct kvm_userspace_memory_region *mem,
-> > > > >  				enum kvm_mr_change change)
-> > > > >  {
-> > > > > +	if (change == KVM_MR_MOVE)
-> > > > > +		return kvm_arch_create_memslot(kvm, memslot,
-> > > > > +					       mem->memory_size >> PAGE_SHIFT);
-> > > > > +
-> > > > 
-> > > > Instead of calling kvm_arch_create_memslot() explicitly again here,
-> > > > can it be replaced by below?
-> > > > 
-> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > > index 72b45f491692..85a7b02fd752 100644
-> > > > --- a/virt/kvm/kvm_main.c
-> > > > +++ b/virt/kvm/kvm_main.c
-> > > > @@ -1144,7 +1144,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> > > >                 new.dirty_bitmap = NULL;
-> > > >  
-> > > >         r = -ENOMEM;
-> > > > -       if (change == KVM_MR_CREATE) {
-> > > > +       if (change == KVM_MR_CREATE || change == KVM_MR_MOVE) {
-> > > >                 new.userspace_addr = mem->userspace_addr;
-> > > >  
-> > > >                 if (kvm_arch_create_memslot(kvm, &new, npages))
-> > > 
-> > > No, because other architectures don't need to re-allocate new metadata on
-> > > MOVE and rely on __kvm_set_memory_region() to copy @arch from old to new,
-> > > e.g. see kvmppc_core_create_memslot_hv().
-> > 
-> > Yes it's only required in x86, but iiuc it also will still work for
-> > ppc?  Say, in that case ppc won't copy @arch from old to new, and
-> > kvmppc_core_free_memslot_hv() will free the old, however it should
-> > still work.
-> 
-> No, calling kvm_arch_create_memslot() for MOVE will result in PPC leaking
-> memory due to overwriting slot->arch.rmap with a new allocation.
+Patches 10-11: Introduces a percpu counting method to keep track of
+the lockless page table walks, then uses this info to reduce the
+waiting time on serialize_against_pte_lookup().
 
-Why?  For the MOVE case, kvm_arch_create_memslot() will create a new
-rmap for the "new" memslot.  If the whole procedure succeeded,
-kvm_free_memslot() will free the old rmap.  If it failed,
-kvm_free_memslot() will free the new rmap if !NULL.  Looks fine?
+Use case:
+
+If a process (qemu) with a lot of CPUs (128) try to munmap() a large
+chunk of memory (496GB) mapped with THP, it takes an average of 275
+seconds, which can cause a lot of problems to the load (in qemu case,
+the guest will lock for this time).
+
+Trying to find the source of this bug, I found out most of this time is
+spent on serialize_against_pte_lookup(). This function will take a lot
+of time in smp_call_function_many() if there is more than a couple CPUs
+running the user process. Since it has to happen to all THP mapped, it
+will take a very long time for large amounts of memory.
+
+By the docs, serialize_against_pte_lookup() is needed in order to avoid
+pmd_t to pte_t casting inside find_current_mm_pte(), or any lockless
+pagetable walk, to happen concurrently with THP splitting/collapsing.
+
+It does so by calling a do_nothing() on each CPU in mm->cpu_bitmap[],
+after interrupts are re-enabled.
+Since, interrupts are (usually) disabled during lockless pagetable
+walk, and serialize_against_pte_lookup will only return after
+interrupts are enabled, it is protected.
+
+Percpu count-based method:
+
+So, by what I could understand, if there is no lockless pagetable walk
+running on given cpu, there is no need to call
+serialize_against_pte_lookup() there.
+
+To reduce the cost of running serialize_against_pte_lookup(), I
+propose a percpu-counter that keeps track of how many
+lockless pagetable walks are currently running on each cpu, and if there
+is none, just skip smp_call_function_many() for that cpu.
+
+- Every percpu-counter can be changed only by it's own CPU
+- It makes use of the original memory barrier in the functions
+- Any counter can be read by any CPU
+
+Due to not locking nor using atomic variables, the impact on the
+lockless pagetable walk is intended to be minimum.
+
+The related functions are:
+begin_lockless_pgtbl_walk()
+        Insert before starting any lockless pgtable walk
+end_lockless_pgtbl_walk()
+        Insert after the end of any lockless pgtable walk
+        (Mostly after the ptep is last used)
+
+Results:
+
+On my workload (qemu), I could see munmap's time reduction from 275
+seconds to 430ms.
+
+Bonus:
+
+I documented some lockless pagetable walks in which it's not
+necessary to keep track, given they work on init_mm or guest pgd.
+
+Also fixed some misplaced local_irq_{restore, enable}.
+
+Changes since v5:
+ Changed counting approach from atomic variables to percpu variables
+ Counting method only affects powepc, arch-generic only toggle irqs
+ Changed commit order, so the counting method is introduced at the end
+ Removed config option, always enabled in powerpc
+ Rebased on top of v5.5
+ Link: http://patchwork.ozlabs.org/project/linuxppc-dev/list/?series=133907
+
+Changes since v4:
+ Rebased on top of v5.4-rc1
+ Declared real generic functions instead of dummies
+ start_lockless_pgtbl_walk renamed to begin_lockless_pgtbl_walk
+ Interrupt {dis,en}able is now inside of {begin,end}_lockless_pgtbl_walk
+ Power implementation has option to not {dis,en}able interrupt
+ More documentation inside the funtions.
+ Some irq masks variables renamed
+ Removed some proxy mm_structs
+ Few typos fixed
+ Link: http://patchwork.ozlabs.org/project/linuxppc-dev/list/?series=133015
+
+Changes since v3:
+ Explain (comments) why some lockless pgtbl walks don't need
+	local_irq_disable (real mode + MSR_EE=0)
+ Explain (comments) places where counting method is not needed (guest pgd,
+	which is not touched by THP)
+ Fixes some misplaced local_irq_restore()
+ Link: http://patchwork.ozlabs.org/project/linuxppc-dev/list/?series=132417
+
+Changes since v2:
+ Rebased to v5.3
+ Adds support on __get_user_pages_fast
+ Adds usage decription to *_lockless_pgtbl_walk()
+ Better style to dummy functions
+ Link: http://patchwork.ozlabs.org/project/linuxppc-dev/list/?series=131839
+
+Changes since v1:
+ Isolated atomic operations in functions *_lockless_pgtbl_walk()
+ Fixed behavior of decrementing before last ptep was used
+ Link: http://patchwork.ozlabs.org/patch/1163093/
+
+Special thanks for:
+Aneesh Kumar, Nick Piggin, Paul Mackerras, Michael Ellerman, Fabiano Rosas,
+Dipankar Sarma and Oliver O'Halloran.
+
+
+Leonardo Bras (11):
+  asm-generic/pgtable: Adds generic functions to track lockless pgtable
+    walks
+  mm/gup: Use functions to track lockless pgtbl walks on gup_pgd_range
+  powerpc/mm: Adds arch-specificic functions to track lockless pgtable
+    walks
+  powerpc/mce_power: Use functions to track lockless pgtbl walks
+  powerpc/perf: Use functions to track lockless pgtbl walks
+  powerpc/mm/book3s64/hash: Use functions to track lockless pgtbl walks
+  powerpc/kvm/e500: Use functions to track lockless pgtbl walks
+  powerpc/kvm/book3s_hv: Use functions to track lockless pgtbl walks
+  powerpc/kvm/book3s_64: Use functions to track lockless pgtbl walks
+  powerpc/mm: Adds counting method to track lockless pagetable walks
+  powerpc/mm/book3s64/pgtable: Uses counting method to skip serializing
+
+ arch/powerpc/include/asm/book3s/64/pgtable.h |   6 +
+ arch/powerpc/kernel/mce_power.c              |   6 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c          |   6 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c       |  34 +++++-
+ arch/powerpc/kvm/book3s_64_vio_hv.c          |   6 +-
+ arch/powerpc/kvm/book3s_hv_nested.c          |  22 +++-
+ arch/powerpc/kvm/book3s_hv_rm_mmu.c          |  28 +++--
+ arch/powerpc/kvm/e500_mmu_host.c             |   9 +-
+ arch/powerpc/mm/book3s64/hash_tlb.c          |   6 +-
+ arch/powerpc/mm/book3s64/hash_utils.c        |  27 +++--
+ arch/powerpc/mm/book3s64/pgtable.c           | 120 ++++++++++++++++++-
+ arch/powerpc/perf/callchain.c                |   6 +-
+ include/asm-generic/pgtable.h                |  51 ++++++++
+ mm/gup.c                                     |  10 +-
+ 14 files changed, 288 insertions(+), 49 deletions(-)
 
 -- 
-Peter Xu
+2.24.1
 
