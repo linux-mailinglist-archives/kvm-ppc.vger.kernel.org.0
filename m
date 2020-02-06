@@ -2,54 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 011DD1549AF
-	for <lists+kvm-ppc@lfdr.de>; Thu,  6 Feb 2020 17:51:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A0D0154B9B
+	for <lists+kvm-ppc@lfdr.de>; Thu,  6 Feb 2020 20:06:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727847AbgBFQv2 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 6 Feb 2020 11:51:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54965 "EHLO
+        id S1727698AbgBFTGt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 6 Feb 2020 14:06:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40608 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727684AbgBFQv1 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 6 Feb 2020 11:51:27 -0500
+        with ESMTP id S1727788AbgBFTGt (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 6 Feb 2020 14:06:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581007886;
+        s=mimecast20190719; t=1581016008;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=6wEZC2xS1ICrNAGJ+8QI1N9zsFW9IzwC/0IJCgjt8nk=;
-        b=gaaCIzUwm6c6ZdkYvtuk98nQ1d6ZjmA8g+y4IC2Iq7LXgRtzn4xbYJL/IZexI6wzVeQcn3
-        +i3RVY2U8JX+K6BFBYum9bmGzHfWRXbgEOSHfPC2DCDaLUP+whV91vs64p3i8SZ18AI0C6
-        /rxUHxAFfVdI3+/6FyvR5Mm3jS7NmrE=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-lgSax7P6PaqfD2_tUJjxFw-1; Thu, 06 Feb 2020 11:51:21 -0500
-X-MC-Unique: lgSax7P6PaqfD2_tUJjxFw-1
-Received: by mail-qt1-f200.google.com with SMTP id l25so4262700qtu.0
-        for <kvm-ppc@vger.kernel.org>; Thu, 06 Feb 2020 08:51:21 -0800 (PST)
+        bh=vFP4U5ATaHC0RXndwUcuwuU/AxffnBhPUu6Oesq1zsE=;
+        b=CMig0ZJZRaAqHlsnvjVsEx+MtxpPk1YT3y+XGps0s9Cep+i9cLmG3DlHH0yKMMLPKiRZ3M
+        eNDUCltDDuXwem3fJCR2Q5ZopVAkI88Notwq1/oPhcWp3qfH9uNYerOVhaWrrGBNDjrgyD
+        /UQWaWdZZbZO+jjyoz0M6+cy1Zq9Tqc=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-127-mj4dSiYgOVWjo5-xDOkxDw-1; Thu, 06 Feb 2020 14:06:46 -0500
+X-MC-Unique: mj4dSiYgOVWjo5-xDOkxDw-1
+Received: by mail-qt1-f198.google.com with SMTP id c10so4514401qtk.18
+        for <kvm-ppc@vger.kernel.org>; Thu, 06 Feb 2020 11:06:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=6wEZC2xS1ICrNAGJ+8QI1N9zsFW9IzwC/0IJCgjt8nk=;
-        b=CO6Ra3PKMOwYHuNnN66qKIiWu41slGwBx4l39O2hRlQzk6rLsVAzYZ2X1JjjJzUh0e
-         j9yIwZ0wyz0D9rfkKDViU64rWjLhxufIjvalV1msNq/KPtH8wy+kjNSr5hBqMqG3kYl/
-         r6RDsjnETwDBi8NZRzJ5xeVklCDOvRTPhEg37UeMPeC5sY+utZrIUbKRNjeX9QVU2pe4
-         2hIdhaF78eS+vgHsvtMiY2FIvzjF9hXVU+G30cx99FNrwEbu3z20x3Ul/RJx0WhDjrrk
-         8HIfrkwC/ZsaalA+7a/Q8ZUNtsBwmrdE/pbxa16GSs7NUH6Pn4OjPsdoaHd4HH/xroBp
-         60IQ==
-X-Gm-Message-State: APjAAAXcEifp89o9Ne5usMeEPcu5qgbh5cNjADcz1E48zWLpTpETkK2v
-        H+X+3zzwTYpjlr4lNrbGH/B8NnWupx4uInHMDHK41/rpKVsmSLIlocsaAMHXED9kWkz5ttvsdzv
-        Jzu9Fd57i1L8wPFq5ww==
-X-Received: by 2002:a0c:ed22:: with SMTP id u2mr3142535qvq.13.1581007880666;
-        Thu, 06 Feb 2020 08:51:20 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx/jX2RKvHGf3JDTGGU+D3o2LP4p21Bk3Kl7+mbxJpFhXmYhA374b5M6RMOGMp7RFtjxv6e0g==
-X-Received: by 2002:a0c:ed22:: with SMTP id u2mr3142516qvq.13.1581007880314;
-        Thu, 06 Feb 2020 08:51:20 -0800 (PST)
+        bh=vFP4U5ATaHC0RXndwUcuwuU/AxffnBhPUu6Oesq1zsE=;
+        b=U0q2N2UlUiqLboeTvZXTtS2c+Qb9XbabuKsnb4dAzjC1+5jDbIdcZNmdsZUyjmS7Qq
+         Q/5MEQZ4eGDYLvp+wBNsluh6p68EW3eAEfMIq7lcESzk/z4hz7/bcLYFsVyyWkualuTE
+         OGy8hVpuPlRpFmqgO77rN6jaZ/btiRR0fMdc2QSaaliDYDwJTrJP6Z0ots3NA1OEZA+0
+         sBHowNv3ymx29qwWn4ygkyxko1GzTOZ987lqRfhe24qNpNCd6VI7z1gCxyPpzvMrOF+q
+         U8ZQdyoIVTSTawYg8kdeM5L1L3T+AxaxSaSA1IzR9BJOkX0Vs51Jf9pb1WiRLVGgqt+s
+         s/yg==
+X-Gm-Message-State: APjAAAXDOa7VWBy2xFhmOpr241AdrcTgD9c0pUEVQNrRKzf+O+k4AdMo
+        a0EIE9Bx30tk2LQbHj3UYKOC0xfw2xyrXoBs5YSxGVscj8RybH0h+iekKgxBhzsQqliVuvGlqO5
+        cJQktH/q9Wrj2NhjKuQ==
+X-Received: by 2002:a37:9d8c:: with SMTP id g134mr3831597qke.128.1581016005752;
+        Thu, 06 Feb 2020 11:06:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwcm5P+4dPwvjCn12J5PDi86Wcm35+8jmeWD2jbAE2DUKQO5334DVnipyStraLYLoHf0dGJ6w==
+X-Received: by 2002:a37:9d8c:: with SMTP id g134mr3831559qke.128.1581016005447;
+        Thu, 06 Feb 2020 11:06:45 -0800 (PST)
 Received: from xz-x1 ([2607:9880:19c8:32::2])
-        by smtp.gmail.com with ESMTPSA id v10sm1058913qtj.26.2020.02.06.08.51.17
+        by smtp.gmail.com with ESMTPSA id m27sm111381qta.21.2020.02.06.11.06.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2020 08:51:19 -0800 (PST)
-Date:   Thu, 6 Feb 2020 11:51:16 -0500
+        Thu, 06 Feb 2020 11:06:44 -0800 (PST)
+Date:   Thu, 6 Feb 2020 14:06:41 -0500
 From:   Peter Xu <peterx@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -70,76 +70,48 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
         Christoffer Dall <christoffer.dall@arm.com>,
         Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v5 12/19] KVM: Move memslot deletion to helper function
-Message-ID: <20200206165116.GE695333@xz-x1>
+Subject: Re: [PATCH v5 14/19] KVM: Clean up local variable usage in
+ __kvm_set_memory_region()
+Message-ID: <20200206190641.GA700495@xz-x1>
 References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
- <20200121223157.15263-13-sean.j.christopherson@intel.com>
- <20200206161415.GA695333@xz-x1>
- <20200206162818.GD13067@linux.intel.com>
+ <20200121223157.15263-15-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200206162818.GD13067@linux.intel.com>
+In-Reply-To: <20200121223157.15263-15-sean.j.christopherson@intel.com>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Feb 06, 2020 at 08:28:18AM -0800, Sean Christopherson wrote:
-> On Thu, Feb 06, 2020 at 11:14:15AM -0500, Peter Xu wrote:
-> > On Tue, Jan 21, 2020 at 02:31:50PM -0800, Sean Christopherson wrote:
-> > > Move memslot deletion into its own routine so that the success path for
-> > > other memslot updates does not need to use kvm_free_memslot(), i.e. can
-> > > explicitly destroy the dirty bitmap when necessary.  This paves the way
-> > > for dropping @dont from kvm_free_memslot(), i.e. all callers now pass
-> > > NULL for @dont.
-> > > 
-> > > Add a comment above the code to make a copy of the existing memslot
-> > > prior to deletion, it is not at all obvious that the pointer will become
-> > > stale during sorting and/or installation of new memslots.
-> > 
-> > Could you help explain a bit on this explicit comment?  I can follow
-> > up with the patch itself which looks all correct to me, but I failed
-> > to catch what this extra comment wants to emphasize...
-> 
-> It's tempting to write the code like this (I know, because I did it):
-> 
-> 	if (!mem->memory_size)
-> 		return kvm_delete_memslot(kvm, mem, slot, as_id);
-> 
-> 	new = *slot;
-> 
-> Where @slot is a pointer to the memslot to be deleted.  At first, second,
-> and third glances, this seems perfectly sane.
-> 
-> The issue is that slot was pulled from struct kvm_memslots.memslots, e.g.
-> 
-> 	slot = &slots->memslots[index];
-> 
-> Note that slots->memslots holds actual "struct kvm_memory_slot" objects,
-> not pointers to slots.  When update_memslots() sorts the slots, it swaps
-> the actual slot objects, not pointers.  I.e. after update_memslots(), even
-> though @slot points at the same address, it's could be pointing at a
-> different slot.  As a result kvm_free_memslot() in kvm_delete_memslot()
-> will free the dirty page info and arch-specific points for some random
-> slot, not the intended slot, and will set npages=0 for that random slot.
+On Tue, Jan 21, 2020 at 02:31:52PM -0800, Sean Christopherson wrote:
 
-Ah I see, thanks.  Another alternative is we move the "old = *slot"
-copy into kvm_delete_memslot(), which could be even clearer imo.
-However I'm not sure whether it's a good idea to drop the test-by for
-this.  Considering that comment change should not affect it, would you
-mind enrich the comment into something like this (or anything better)?
+[...]
 
-/*
- * Make a full copy of the old memslot, the pointer will become stale
- * when the memslots are re-sorted by update_memslots() in
- * kvm_delete_memslot(), while to make the kvm_free_memslot() work as
- * expected later on, we still need the cached memory slot.
- */
+> @@ -1101,52 +1099,55 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
+>  		return -EINVAL;
+>  
+> -	slot = id_to_memslot(__kvm_memslots(kvm, as_id), id);
+> -	base_gfn = mem->guest_phys_addr >> PAGE_SHIFT;
+> -	npages = mem->memory_size >> PAGE_SHIFT;
+> -
+> -	if (npages > KVM_MEM_MAX_NR_PAGES)
+> -		return -EINVAL;
+> -
+>  	/*
+>  	 * Make a full copy of the old memslot, the pointer will become stale
+>  	 * when the memslots are re-sorted by update_memslots().
+>  	 */
+> -	old = *slot;
+> +	tmp = id_to_memslot(__kvm_memslots(kvm, as_id), id);
+> +	old = *tmp;
+> +	tmp = NULL;
 
-In all cases:
+Shall we keep this chunk to the patch where it will be used?  Other
+than that, it looks good to me.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Thanks,
 
 -- 
 Peter Xu
