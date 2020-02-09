@@ -2,182 +2,169 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C9910156244
-	for <lists+kvm-ppc@lfdr.de>; Sat,  8 Feb 2020 02:29:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13730156A2E
+	for <lists+kvm-ppc@lfdr.de>; Sun,  9 Feb 2020 13:56:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726995AbgBHB3j (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 7 Feb 2020 20:29:39 -0500
-Received: from mga17.intel.com ([192.55.52.151]:12331 "EHLO mga17.intel.com"
+        id S1727704AbgBIM4W (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 9 Feb 2020 07:56:22 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44616 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726743AbgBHB3j (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 7 Feb 2020 20:29:39 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 17:29:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,415,1574150400"; 
-   d="scan'208";a="280139370"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by FMSMGA003.fm.intel.com with ESMTP; 07 Feb 2020 17:29:38 -0800
-Date:   Fri, 7 Feb 2020 17:29:38 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S1727514AbgBIM4W (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sun, 9 Feb 2020 07:56:22 -0500
+Received: from localhost (unknown [38.98.37.135])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E6F9720733;
+        Sun,  9 Feb 2020 12:56:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1581252981;
+        bh=wEuQkILbzCrkndaHaGMt/QtlgcEM66cBemstNp3v6fc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=q0pvgGxmXPCg+rjYkFKJt2HyuXWgGZhiT7YOmln8fKJBzYM12o/J5X1vbWBzh0oeF
+         Lq/3rIDWIZgfAtdZxifVETZ/neuldW0mlzsYEYkBkP6uqbgHtUa1VwGzmeUklx18du
+         uCFghsuR0sqpWrr+L2oCz8XA374intx0hYUB0BqE=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v5 15/19] KVM: Provide common implementation for generic
- dirty log functions
-Message-ID: <20200208012938.GC15581@linux.intel.com>
-References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
- <20200121223157.15263-16-sean.j.christopherson@intel.com>
- <20200206200200.GC700495@xz-x1>
- <20200206212120.GF13067@linux.intel.com>
- <20200206214106.GG700495@xz-x1>
- <20200207194532.GK2401@linux.intel.com>
- <20200208001832.GA823968@xz-x1>
- <20200208004233.GA15581@linux.intel.com>
- <20200208005334.GB823968@xz-x1>
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org
+Subject: [PATCH 2/6] powerpc: kvm: no need to check return value of debugfs_create functions
+Date:   Sun,  9 Feb 2020 11:58:57 +0100
+Message-Id: <20200209105901.1620958-2-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.25.0
+In-Reply-To: <20200209105901.1620958-1-gregkh@linuxfoundation.org>
+References: <20200209105901.1620958-1-gregkh@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200208005334.GB823968@xz-x1>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Feb 07, 2020 at 07:53:34PM -0500, Peter Xu wrote:
-> On Fri, Feb 07, 2020 at 04:42:33PM -0800, Sean Christopherson wrote:
-> > On Fri, Feb 07, 2020 at 07:18:32PM -0500, Peter Xu wrote:
-> > > On Fri, Feb 07, 2020 at 11:45:32AM -0800, Sean Christopherson wrote:
-> > > > +Vitaly for HyperV
-> > > > 
-> > > > On Thu, Feb 06, 2020 at 04:41:06PM -0500, Peter Xu wrote:
-> > > > > On Thu, Feb 06, 2020 at 01:21:20PM -0800, Sean Christopherson wrote:
-> > > > > > On Thu, Feb 06, 2020 at 03:02:00PM -0500, Peter Xu wrote:
-> > > > > > > But that matters to this patch because if MIPS can use
-> > > > > > > kvm_flush_remote_tlbs(), then we probably don't need this
-> > > > > > > arch-specific hook any more and we can directly call
-> > > > > > > kvm_flush_remote_tlbs() after sync dirty log when flush==true.
-> > > > > > 
-> > > > > > Ya, the asid_flush_mask in kvm_vz_flush_shadow_all() is the only thing
-> > > > > > that prevents calling kvm_flush_remote_tlbs() directly, but I have no
-> > > > > > clue as to the important of that code.
-> > > > > 
-> > > > > As said above I think the x86 lockdep is really not necessary, then
-> > > > > considering MIPS could be the only one that will use the new hook
-> > > > > introduced in this patch...  Shall we figure that out first?
-> > > > 
-> > > > So I prepped a follow-up patch to make kvm_arch_dirty_log_tlb_flush() a
-> > > > MIPS-only hook and use kvm_flush_remote_tlbs() directly for arm and x86,
-> > > > but then I realized x86 *has* a hook to do a precise remote TLB flush.
-> > > > There's even an existing kvm_flush_remote_tlbs_with_address() call on a
-> > > > memslot, i.e. this exact scenario.  So arguably, x86 should be using the
-> > > > more precise flush and should keep kvm_arch_dirty_log_tlb_flush().
-> > > > 
-> > > > But, the hook is only used when KVM is running as an L1 on top of HyperV,
-> > > > and I assume dirty logging isn't used much, if at all, for L1 KVM on
-> > > > HyperV?
-> > > > 
-> > > > I see three options:
-> > > > 
-> > > >   1. Make kvm_arch_dirty_log_tlb_flush() MIPS-only and call
-> > > >      kvm_flush_remote_tlbs() directly for arm and x86.  Add comments to
-> > > >      explain when an arch should implement kvm_arch_dirty_log_tlb_flush().
-> > > > 
-> > > >   2. Change x86 to use kvm_flush_remote_tlbs_with_address() when flushing
-> > > >      a memslot after the dirty log is grabbed by userspace.
-> > > > 
-> > > >   3. Keep the resulting code as is, but add a comment in x86's
-> > > >      kvm_arch_dirty_log_tlb_flush() to explain why it uses
-> > > >      kvm_flush_remote_tlbs() instead of the with_address() variant.
-> > > > 
-> > > > I strongly prefer to (2) or (3), but I'll defer to Vitaly as to which of
-> > > > those is preferable.
-> > > > 
-> > > > I don't like (1) because (a) it requires more lines code (well comments),
-> > > > to explain why kvm_flush_remote_tlbs() is the default, and (b) it would
-> > > > require even more comments, which would be x86-specific in generic KVM,
-> > > > to explain why x86 doesn't use its with_address() flush, or we'd lost that
-> > > > info altogether.
-> > > > 
-> > > 
-> > > I proposed the 4th solution here:
-> > > 
-> > > https://lore.kernel.org/kvm/20200207223520.735523-1-peterx@redhat.com/
-> > > 
-> > > I'm not sure whether that's acceptable, but if it can, then we can
-> > > drop the kvm_arch_dirty_log_tlb_flush() hook, or even move on to
-> > > per-slot tlb flushing.
-> > 
-> > This effectively is per-slot TLB flushing, it just has a different name.
-> > I.e. s/kvm_arch_dirty_log_tlb_flush/kvm_arch_flush_remote_tlbs_memslot.
-> > I'm not opposed to that name change.  And on second and third glance, I
-> > probably prefer it.  That would more or less follow the naming of
-> > kvm_arch_flush_shadow_all() and kvm_arch_flush_shadow_memslot().
-> 
-> Note that the major point of the above patchset is not about doing tlb
-> flush per-memslot or globally.  It's more about whether we can provide
-> a common entrance for TLB flushing.  Say, after that series, we should
-> be able to flush TLB on all archs (majorly, including MIPS) as:
-> 
->   kvm_flush_remote_tlbs(kvm);
-> 
-> And with the same idea we can also introduce the ranged version.
-> 
-> > 
-> > I don't want to go straight to kvm_arch_flush_remote_tlb_with_address()
-> > because that loses the important distinction (on x86) that slots_lock is
-> > expected to be held.
-> 
-> Sorry I'm still puzzled on why that lockdep is so important and
-> special for x86...  For example, what if we move that lockdep to the
-> callers of the kvm_arch_dirty_log_tlb_flush() calls so it protects
-> even more arch (where we do get/clear dirty log)?  IMHO the callers
-> must be with the slots_lock held anyways no matter for x86 or not.
+When calling debugfs functions, there is no need to ever check the
+return value.  The function can work or not, but the code logic should
+never do something different based on this.
 
+Because of this cleanup, we get to remove a few fields in struct
+kvm_arch that are now unused.
 
-Following the breadcrumbs leads to the comment in
-kvm_mmu_slot_remove_write_access(), which says:
+Cc: Paul Mackerras <paulus@ozlabs.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: kvm-ppc@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/powerpc/include/asm/kvm_host.h    |  3 ---
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  5 ++---
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  5 ++---
+ arch/powerpc/kvm/book3s_hv.c           |  9 ++-------
+ arch/powerpc/kvm/timing.c              | 13 +++----------
+ 5 files changed, 9 insertions(+), 26 deletions(-)
 
-        /*
-         * kvm_mmu_slot_remove_write_access() and kvm_vm_ioctl_get_dirty_log()
-         * which do tlb flush out of mmu-lock should be serialized by
-         * kvm->slots_lock otherwise tlb flush would be missed.
-         */
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 6e8b8ffd06ad..877f8aa2bc1e 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -308,8 +308,6 @@ struct kvm_arch {
+ 	pgd_t *pgtable;
+ 	u64 process_table;
+ 	struct dentry *debugfs_dir;
+-	struct dentry *htab_dentry;
+-	struct dentry *radix_dentry;
+ 	struct kvm_resize_hpt *resize_hpt; /* protected by kvm->lock */
+ #endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
+ #ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
+@@ -830,7 +828,6 @@ struct kvm_vcpu_arch {
+ 	struct kvmhv_tb_accumulator cede_time;	/* time napping inside guest */
+ 
+ 	struct dentry *debugfs_dir;
+-	struct dentry *debugfs_timings;
+ #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+ };
+ 
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index 6c372f5c61b6..8b4eac0c9dcd 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -2138,9 +2138,8 @@ static const struct file_operations debugfs_htab_fops = {
+ 
+ void kvmppc_mmu_debugfs_init(struct kvm *kvm)
+ {
+-	kvm->arch.htab_dentry = debugfs_create_file("htab", 0400,
+-						    kvm->arch.debugfs_dir, kvm,
+-						    &debugfs_htab_fops);
++	debugfs_create_file("htab", 0400, kvm->arch.debugfs_dir, kvm,
++			    &debugfs_htab_fops);
+ }
+ 
+ void kvmppc_mmu_book3s_hv_init(struct kvm_vcpu *vcpu)
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 803940d79b73..1d75ed684b53 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -1376,9 +1376,8 @@ static const struct file_operations debugfs_radix_fops = {
+ 
+ void kvmhv_radix_debugfs_init(struct kvm *kvm)
+ {
+-	kvm->arch.radix_dentry = debugfs_create_file("radix", 0400,
+-						     kvm->arch.debugfs_dir, kvm,
+-						     &debugfs_radix_fops);
++	debugfs_create_file("radix", 0400, kvm->arch.debugfs_dir, kvm,
++			    &debugfs_radix_fops);
+ }
+ 
+ int kvmppc_radix_init(void)
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 2cefd071b848..33be4d93248a 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -2258,14 +2258,9 @@ static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
+ 	struct kvm *kvm = vcpu->kvm;
+ 
+ 	snprintf(buf, sizeof(buf), "vcpu%u", id);
+-	if (IS_ERR_OR_NULL(kvm->arch.debugfs_dir))
+-		return;
+ 	vcpu->arch.debugfs_dir = debugfs_create_dir(buf, kvm->arch.debugfs_dir);
+-	if (IS_ERR_OR_NULL(vcpu->arch.debugfs_dir))
+-		return;
+-	vcpu->arch.debugfs_timings =
+-		debugfs_create_file("timings", 0444, vcpu->arch.debugfs_dir,
+-				    vcpu, &debugfs_timings_ops);
++	debugfs_create_file("timings", 0444, vcpu->arch.debugfs_dir, vcpu,
++			    &debugfs_timings_ops);
+ }
+ 
+ #else /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+diff --git a/arch/powerpc/kvm/timing.c b/arch/powerpc/kvm/timing.c
+index bfe4f106cffc..8e4791c6f2af 100644
+--- a/arch/powerpc/kvm/timing.c
++++ b/arch/powerpc/kvm/timing.c
+@@ -207,19 +207,12 @@ static const struct file_operations kvmppc_exit_timing_fops = {
+ void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu, unsigned int id)
+ {
+ 	static char dbg_fname[50];
+-	struct dentry *debugfs_file;
+ 
+ 	snprintf(dbg_fname, sizeof(dbg_fname), "vm%u_vcpu%u_timing",
+ 		 current->pid, id);
+-	debugfs_file = debugfs_create_file(dbg_fname, 0666,
+-					kvm_debugfs_dir, vcpu,
+-					&kvmppc_exit_timing_fops);
+-
+-	if (!debugfs_file) {
+-		printk(KERN_ERR"%s: error creating debugfs file %s\n",
+-			__func__, dbg_fname);
+-		return;
+-	}
++	debugfs_create_file(dbg_fname, 0666, kvm_debugfs_dir, vcpu,
++			    &kvmppc_exit_timing_fops);
++
+ 
+ 	vcpu->arch.debugfs_exit_timing = debugfs_file;
+ }
+-- 
+2.25.0
 
-I.e. write-protecting a memslot and grabbing the dirty log for the memslot
-need to be serialized.  It's quite obvious *now* that get_dirty_log() holds
-slots_lock, but the purpose of lockdep assertions isn't just to verify the
-current functionality, it's to help ensure the correctness for future code
-and to document assumptions in the code.
-
-Digging deeper, there are four functions, all related to dirty logging, in
-the x86 mmu that basically open code what x86's
-kvm_arch_flush_remote_tlbs_memslot() would look like if it uses the range
-based flushing.
-
-Unless it's functionally incorrect (Vitaly?), going with option (2) and
-naming the hook kvm_arch_flush_remote_tlbs_memslot() seems like the obvious
-choice, e.g. the final cleanup gives this diff stat:
-
- arch/x86/kvm/mmu/mmu.c | 34 +++++++++-------------------------
- 1 file changed, 9 insertions(+), 25 deletions(-)
