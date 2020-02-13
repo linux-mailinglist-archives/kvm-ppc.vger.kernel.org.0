@@ -2,151 +2,211 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E252715C132
-	for <lists+kvm-ppc@lfdr.de>; Thu, 13 Feb 2020 16:16:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 759F415CB74
+	for <lists+kvm-ppc@lfdr.de>; Thu, 13 Feb 2020 20:56:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727163AbgBMPQs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 13 Feb 2020 10:16:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35396 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725781AbgBMPQs (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 13 Feb 2020 10:16:48 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01DF0Kdu086762;
-        Thu, 13 Feb 2020 10:16:36 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y4j87jdvg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Feb 2020 10:16:36 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01DFBwjX009980;
-        Thu, 13 Feb 2020 15:16:35 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma04dal.us.ibm.com with ESMTP id 2y1mm8q647-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Feb 2020 15:16:35 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01DFGYqX13959984
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Feb 2020 15:16:34 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6ABDE112063;
-        Thu, 13 Feb 2020 15:16:34 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1427B112062;
-        Thu, 13 Feb 2020 15:16:34 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.41.166.54])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Feb 2020 15:16:33 +0000 (GMT)
-From:   Gustavo Romero <gromero@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org, paulus@ozlabs.org
-Cc:     gromero@linux.ibm.com, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH] KVM: PPC: Book3S HV: Treat unrecognized TM instructions as illegal
-Date:   Thu, 13 Feb 2020 10:15:32 -0500
-Message-Id: <20200213151532.12559-1-gromero@linux.ibm.com>
-X-Mailer: git-send-email 2.17.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-13_05:2020-02-12,2020-02-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=978
- impostorscore=0 priorityscore=1501 spamscore=0 adultscore=0 mlxscore=0
- malwarescore=0 phishscore=0 clxscore=1011 lowpriorityscore=0
- suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002130119
+        id S1728354AbgBMT4E (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 13 Feb 2020 14:56:04 -0500
+Received: from mga03.intel.com ([134.134.136.65]:51558 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728295AbgBMT4E (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 13 Feb 2020 14:56:04 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Feb 2020 11:56:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,437,1574150400"; 
+   d="scan'208";a="234218810"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga003.jf.intel.com with ESMTP; 13 Feb 2020 11:56:02 -0800
+Date:   Thu, 13 Feb 2020 11:56:02 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
+        kvm-ppc@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 01/35] mm:gup/writeback: add callbacks for inaccessible
+ pages
+Message-ID: <20200213195602.GD18610@linux.intel.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-2-borntraeger@de.ibm.com>
+ <28792269-e053-ac70-a344-45612ee5c729@de.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28792269-e053-ac70-a344-45612ee5c729@de.ibm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On P9 DD2.2 due to a CPU defect some TM instructions need to be emulated by
-KVM. This is handled at first by the hardware raising a softpatch interrupt
-when certain TM instructions that need KVM assistance are executed in the
-guest. Some TM instructions, although not defined in the Power ISA, might
-raise a softpatch interrupt. For instance, 'tresume.' instruction as
-defined in the ISA must have bit 31 set (1), but an instruction that
-matches 'tresume.' OP and XO opcodes but has bit 31 not set (0), like
-0x7cfe9ddc, also raises a softpatch interrupt, for example, if a code
-like the following is executed in the guest it will raise a softpatch
-interrupt just like a 'tresume.' when the TM facility is enabled:
+On Mon, Feb 10, 2020 at 06:27:04PM +0100, Christian Borntraeger wrote:
+> CC Marc Zyngier for KVM on ARM.  Marc, see below. Will there be any
+> use for this on KVM/ARM in the future?
+> 
+> CC Sean Christopherson/Tom Lendacky. Any obvious use case for Intel/AMD
+> to have a callback before a page is used for I/O?
 
-int main() { asm("tabort. 0; .long 0x7cfe9ddc;"); }
+Yes?
 
-Currently in such a case KVM throws a complete trace like the following:
+> Andrew (or other mm people) any chance to get an ACK for this change?
+> I could then carry that via s390 or KVM tree. Or if you want to carry
+> that yourself I can send an updated version (we need to kind of 
+> synchronize that Linus will pull the KVM changes after the mm changes).
+> 
+> Andrea asked if others would benefit from this, so here are some more
+> information about this (and I can also put this into the patch
+> description).  So we have talked to the POWER folks. They do not use
+> the standard normal memory management, instead they have a hard split
+> between secure and normal memory. The secure memory  is the handled by
+> the hypervisor as device memory and the ultravisor and the hypervisor
+> move this forth and back when needed.
+> 
+> On s390 there is no *separate* pool of physical pages that are secure.
+> Instead, *any* physical page can be marked as secure or not, by
+> setting a bit in a per-page data structure that hardware uses to stop
+> unauthorized access.  (That bit is under control of the ultravisor.)
+> 
+> Note that one side effect of this strategy is that the decision
+> *which* secure pages to encrypt and then swap out is actually done by
+> the hypervisor, not the ultravisor.  In our case, the hypervisor is
+> Linux/KVM, so we're using the regular Linux memory management scheme
+> (active/inactive LRU lists etc.) to make this decision.  The advantage
+> is that the Ultravisor code does not need to itself implement any
+> memory management code, making it a lot simpler.
 
-[345523.705984] WARNING: CPU: 24 PID: 64413 at arch/powerpc/kvm/book3s_hv_tm.c:211 kvmhv_p9_tm_emulation+0x68/0x620 [kvm_hv]
-[345523.705985] Modules linked in: kvm_hv(E) xt_conntrack ipt_REJECT nf_reject_ipv4 xt_tcpudp ip6table_mangle ip6table_nat
-iptable_mangle iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ebtable_filter ebtables ip6table_filter
-ip6_tables iptable_filter bridge stp llc sch_fq_codel ipmi_powernv at24 vmx_crypto ipmi_devintf ipmi_msghandler
-ibmpowernv uio_pdrv_genirq kvm opal_prd uio leds_powernv ib_iser rdma_cm iw_cm ib_cm ib_core iscsi_tcp libiscsi_tcp
-libiscsi scsi_transport_iscsi ip_tables x_tables autofs4 btrfs blake2b_generic zstd_compress raid10 raid456
-async_raid6_recov async_memcpy async_pq async_xor async_tx libcrc32c xor raid6_pq raid1 raid0 multipath linear tg3
-crct10dif_vpmsum crc32c_vpmsum ipr [last unloaded: kvm_hv]
-[345523.706030] CPU: 24 PID: 64413 Comm: CPU 0/KVM Tainted: G        W   E     5.5.0+ #1
-[345523.706031] NIP:  c0080000072cb9c0 LR: c0080000072b5e80 CTR: c0080000085c7850
-[345523.706034] REGS: c000000399467680 TRAP: 0700   Tainted: G        W   E      (5.5.0+)
-[345523.706034] MSR:  900000010282b033 <SF,HV,VEC,VSX,EE,FP,ME,IR,DR,RI,LE,TM[E]>  CR: 24022428  XER: 00000000
-[345523.706042] CFAR: c0080000072b5e7c IRQMASK: 0
-                GPR00: c0080000072b5e80 c000000399467910 c0080000072db500 c000000375ccc720
-                GPR04: c000000375ccc720 00000003fbec0000 0000a10395dda5a6 0000000000000000
-                GPR08: 000000007cfe9ddc 7cfe9ddc000005dc 7cfe9ddc7c0005dc c0080000072cd530
-                GPR12: c0080000085c7850 c0000003fffeb800 0000000000000001 00007dfb737f0000
-                GPR16: c0002001edcca558 0000000000000000 0000000000000000 0000000000000001
-                GPR20: c000000001b21258 c0002001edcca558 0000000000000018 0000000000000000
-                GPR24: 0000000001000000 ffffffffffffffff 0000000000000001 0000000000001500
-                GPR28: c0002001edcc4278 c00000037dd80000 800000050280f033 c000000375ccc720
-[345523.706062] NIP [c0080000072cb9c0] kvmhv_p9_tm_emulation+0x68/0x620 [kvm_hv]
-[345523.706065] LR [c0080000072b5e80] kvmppc_handle_exit_hv.isra.53+0x3e8/0x798 [kvm_hv]
-[345523.706066] Call Trace:
-[345523.706069] [c000000399467910] [c000000399467940] 0xc000000399467940 (unreliable)
-[345523.706071] [c000000399467950] [c000000399467980] 0xc000000399467980
-[345523.706075] [c0000003994679f0] [c0080000072bd1c4] kvmhv_run_single_vcpu+0xa1c/0xb80 [kvm_hv]
-[345523.706079] [c000000399467ac0] [c0080000072bd8e0] kvmppc_vcpu_run_hv+0x5b8/0xb00 [kvm_hv]
-[345523.706087] [c000000399467b90] [c0080000085c93cc] kvmppc_vcpu_run+0x34/0x48 [kvm]
-[345523.706095] [c000000399467bb0] [c0080000085c582c] kvm_arch_vcpu_ioctl_run+0x244/0x420 [kvm]
-[345523.706101] [c000000399467c40] [c0080000085b7498] kvm_vcpu_ioctl+0x3d0/0x7b0 [kvm]
-[345523.706105] [c000000399467db0] [c0000000004adf9c] ksys_ioctl+0x13c/0x170
-[345523.706107] [c000000399467e00] [c0000000004adff8] sys_ioctl+0x28/0x80
-[345523.706111] [c000000399467e20] [c00000000000b278] system_call+0x5c/0x68
-[345523.706112] Instruction dump:
-[345523.706114] 419e0390 7f8a4840 409d0048 6d497c00 2f89075d 419e021c 6d497c00 2f8907dd
-[345523.706119] 419e01c0 6d497c00 2f8905dd 419e00a4 <0fe00000> 38210040 38600000 ebc1fff0
+Disclaimer: I'm not familiar with s390 guest page faults or UV.  I tried
+to give myself a crash course, apologies if I'm way out in left field...
 
-and then treats the executed instruction as 'nop' whilst it should actually
-be treated as an illegal instruction since it's not defined by the ISA.
+AIUI, pages will first be added to a secure guest by converting a normal,
+non-secure page to secure and stuffing it into the guest page tables.  To
+swap a page from a secure guest, arch_make_page_accessible() will be called
+to encrypt the page in place so that it can be accessed by the untrusted
+kernel/VMM and written out to disk.  And to fault the page back in, on s390
+a secure guest access to a non-secure page will generate a page fault with
+a dedicated type.  That fault routes directly to
+do_non_secure_storage_access(), which converts the page to secure and thus
+makes it re-accessible to the guest.
 
-This commit changes the handling of the case above by treating the
-unrecognized TM instructions that can raise a softpatch but are not
-defined in the ISA as illegal ones instead of as 'nop' and by gently
-reporting it to the host instead of throwing a trace.
+That all sounds sane and usable for Intel.
 
-Signed-off-by: Gustavo Romero <gromero@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_hv_tm.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+My big question is the follow/get flows, more on that below.
 
-diff --git a/arch/powerpc/kvm/book3s_hv_tm.c b/arch/powerpc/kvm/book3s_hv_tm.c
-index 0db937497169..d342a9e11298 100644
---- a/arch/powerpc/kvm/book3s_hv_tm.c
-+++ b/arch/powerpc/kvm/book3s_hv_tm.c
-@@ -3,6 +3,8 @@
-  * Copyright 2017 Paul Mackerras, IBM Corp. <paulus@au1.ibm.com>
-  */
- 
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
- #include <linux/kvm_host.h>
- 
- #include <asm/kvm_ppc.h>
-@@ -208,6 +210,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
- 	}
- 
- 	/* What should we do here? We didn't recognize the instruction */
--	WARN_ON_ONCE(1);
-+	kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
-+	pr_warn_ratelimited("Unrecognized TM-related instruction %#x for emulation", instr);
-+
- 	return RESUME_GUEST;
- }
--- 
-2.17.1
+> However, in the end this is why we need the hook into Linux memory
+> management: once Linux has decided to swap a page out, we need to get
+> a chance to tell the Ultravisor to "export" the page (i.e., encrypt
+> its contents and mark it no longer secure).
+> 
+> As outlined below this should be a no-op for anybody not opting in.
+> 
+> Christian                                   
+> 
+> On 07.02.20 12:39, Christian Borntraeger wrote:
+> > From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > 
+> > With the introduction of protected KVM guests on s390 there is now a
+> > concept of inaccessible pages. These pages need to be made accessible
+> > before the host can access them.
+> > 
+> > While cpu accesses will trigger a fault that can be resolved, I/O
+> > accesses will just fail.  We need to add a callback into architecture
+> > code for places that will do I/O, namely when writeback is started or
+> > when a page reference is taken.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> > ---
+> >  include/linux/gfp.h | 6 ++++++
+> >  mm/gup.c            | 2 ++
+> >  mm/page-writeback.c | 1 +
+> >  3 files changed, 9 insertions(+)
+> > 
+> > diff --git a/include/linux/gfp.h b/include/linux/gfp.h
+> > index e5b817cb86e7..be2754841369 100644
+> > --- a/include/linux/gfp.h
+> > +++ b/include/linux/gfp.h
+> > @@ -485,6 +485,12 @@ static inline void arch_free_page(struct page *page, int order) { }
+> >  #ifndef HAVE_ARCH_ALLOC_PAGE
+> >  static inline void arch_alloc_page(struct page *page, int order) { }
+> >  #endif
+> > +#ifndef HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
+> > +static inline int arch_make_page_accessible(struct page *page)
+> > +{
+> > +	return 0;
+> > +}
+> > +#endif
+> >  
+> >  struct page *
+> >  __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order, int preferred_nid,
+> > diff --git a/mm/gup.c b/mm/gup.c
+> > index 7646bf993b25..a01262cd2821 100644
+> > --- a/mm/gup.c
+> > +++ b/mm/gup.c
+> > @@ -257,6 +257,7 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+> >  			page = ERR_PTR(-ENOMEM);
+> >  			goto out;
+> >  		}
+> > +		arch_make_page_accessible(page);
 
+As Will pointed out, the return value definitely needs to be checked, there
+will undoubtedly be scenarios where the page cannot be made accessible.
+
+What is the use case for calling arch_make_page_accessible() in the follow()
+and gup() paths?  Live migration is the only thing that comes to mind, and
+for live migration I would expect you would want to keep the secure guest
+running when copying pages to the target, i.e. use pre-copy.  That would
+conflict with converting the page in place.  Rather, migration would use a
+separate dedicated path to copy the encrypted contents of the secure page to
+a completely different page, and send *that* across the wire so that the
+guest can continue accessing the original page.
+
+Am I missing a need to do this for the swap/reclaim case?  Or is there a
+completely different use case I'm overlooking?
+
+Tangentially related, hooks here could be quite useful for sanity checking
+the kernel/KVM and/or debugging kernel/KVM bugs.  Would it make sense to
+pass a param to arch_make_page_accessible() to provide some information as
+to why the page needs to be made accessible?
+
+> >  	}
+> >  	if (flags & FOLL_TOUCH) {
+> >  		if ((flags & FOLL_WRITE) &&
+> > @@ -1870,6 +1871,7 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+> >  
+> >  		VM_BUG_ON_PAGE(compound_head(page) != head, page);
+> >  
+> > +		arch_make_page_accessible(page);
+> >  		SetPageReferenced(page);
+> >  		pages[*nr] = page;
+> >  		(*nr)++;
+> > diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> > index 2caf780a42e7..0f0bd14571b1 100644
+> > --- a/mm/page-writeback.c
+> > +++ b/mm/page-writeback.c
+> > @@ -2806,6 +2806,7 @@ int __test_set_page_writeback(struct page *page, bool keep_write)
+> >  		inc_lruvec_page_state(page, NR_WRITEBACK);
+> >  		inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+> >  	}
+> > +	arch_make_page_accessible(page);
+> >  	unlock_page_memcg(page);
+> 
+> As outlined by Ulrich, we can move the callback after the unlock.
+> 
+> >  	return ret;
+> >  
+> > 
+> 
