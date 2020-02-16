@@ -2,148 +2,172 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C3711603A6
-	for <lists+kvm-ppc@lfdr.de>; Sun, 16 Feb 2020 11:46:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6581E16070E
+	for <lists+kvm-ppc@lfdr.de>; Sun, 16 Feb 2020 23:57:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726283AbgBPKqO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 16 Feb 2020 05:46:14 -0500
-Received: from pegase1.c-s.fr ([93.17.236.30]:16289 "EHLO pegase1.c-s.fr"
+        id S1726036AbgBPW5h (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 16 Feb 2020 17:57:37 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:52881 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725951AbgBPKqO (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sun, 16 Feb 2020 05:46:14 -0500
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 48L3gh69Lpz9tyMB;
-        Sun, 16 Feb 2020 11:46:08 +0100 (CET)
-Authentication-Results: localhost; dkim=pass
-        reason="1024-bit key; insecure key"
-        header.d=c-s.fr header.i=@c-s.fr header.b=RMQrDTHX; dkim-adsp=pass;
-        dkim-atps=neutral
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id 0F5rpVhkSbpS; Sun, 16 Feb 2020 11:46:08 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 48L3gh3dBjz9tyM9;
-        Sun, 16 Feb 2020 11:46:08 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
-        t=1581849968; bh=puEVphfmlLbrWTO3mdDB17WkluHf49q+nkCLHU1WEPk=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=RMQrDTHXiSIvSNdSJIUAuTLTwTBfKbldAHrwtZjJ0BW+ZG7c0EUq537f7BNPK+LIN
-         e+qzSqPhQUdW5m9f0ovUN5sc2R9fpgjJRx6JMSfOyIGDK3OikFgbqf4WNmfnjBWb14
-         Yj8xq1+79SXISvpVp+Jg6Y8NZ4c+QrYGyIAwuT0U=
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 63ADD8B784;
-        Sun, 16 Feb 2020 11:46:10 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id GYiIMEW0V5j7; Sun, 16 Feb 2020 11:46:10 +0100 (CET)
-Received: from [192.168.4.90] (unknown [192.168.4.90])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 992958B755;
-        Sun, 16 Feb 2020 11:45:59 +0100 (CET)
-Subject: Re: [PATCH v2 00/13] mm: remove __ARCH_HAS_5LEVEL_HACK
-To:     Russell King - ARM Linux admin <linux@armlinux.org.uk>,
-        Mike Rapoport <rppt@kernel.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Brian Cain <bcain@codeaurora.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Guan Xuetao <gxt@pku.edu.cn>,
-        James Morse <james.morse@arm.com>,
-        Jonas Bonn <jonas@southpole.se>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Ley Foon Tan <ley.foon.tan@intel.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Rich Felker <dalias@libc.org>,
-        Stafford Horne <shorne@gmail.com>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Tony Luck <tony.luck@intel.com>, Will Deacon <will@kernel.org>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-        linux-sh@vger.kernel.org, nios2-dev@lists.rocketboards.org,
-        openrisc@lists.librecores.org,
-        uclinux-h8-devel@lists.sourceforge.jp,
-        Mike Rapoport <rppt@linux.ibm.com>
-References: <20200216081843.28670-1-rppt@kernel.org>
- <20200216082230.GV25745@shell.armlinux.org.uk>
-From:   Christophe Leroy <christophe.leroy@c-s.fr>
-Message-ID: <d6691709-30ce-4d28-0b7b-34f1fa3b4e6f@c-s.fr>
-Date:   Sun, 16 Feb 2020 11:45:59 +0100
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726020AbgBPW5h (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sun, 16 Feb 2020 17:57:37 -0500
+Received: from neuling.org (localhost [127.0.0.1])
+        by ozlabs.org (Postfix) with ESMTP id 48LMvb4P0Tz9sPK;
+        Mon, 17 Feb 2020 09:57:31 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=neuling.org;
+        s=201811; t=1581893853;
+        bh=47iPtZB29ez9xFzB4y1kZcIk8WPBYdTElVrZIIEogoc=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=Bjtn96LklFKzxIYxw/UvR2pu1DuZ7j7eVV81qXVeEl731OMosL0c3ybcMaGc6RLoT
+         DGI54Yw25zA5SAqwguKn9660Y4msdcH1ZKPqb94130PaA9XLF83WyelqqHEEMjZ1wX
+         ktlTjNO2rG+AP1uccGtOWGGh0w6jJ9NTXHhvQsko/ZSiNt8NRyRPEfhra7l7FBL8p4
+         TXZueIhGHoO8BpZce12Lba9Q+t4nBo+g3l+IzsdvIy/gpTMS+mqQk6mVfGa+1cMEvl
+         8DTBHdrcjNSNJc2186dlTdHUy4yPDKZAG7CUI9Q8n3GJaIWZljNntqhY53Q3Yctr17
+         kJK7ANtDIHp9g==
+Received: by neuling.org (Postfix, from userid 1000)
+        id 57F542C01ED; Mon, 17 Feb 2020 09:57:31 +1100 (AEDT)
+Message-ID: <0af9715a2bf58ea79d9f5c8f9b279c2ae865a7bc.camel@neuling.org>
+Subject: Re: Kernel (little-endian) crashing on POWER8 on heavy PowerKVM load
+From:   Michael Neuling <mikey@neuling.org>
+To:     John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+        linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@samba.org>,
+        kvm-ppc <kvm-ppc@vger.kernel.org>
+Cc:     Anatoly Pugachev <matorola@gmail.com>,
+        "debian-powerpc@lists.debian.org" <debian-powerpc@lists.debian.org>,
+        James Clarke <jrtc27@debian.org>,
+        Gustavo Bueno Romero <gromero@br.ibm.com>
+Date:   Mon, 17 Feb 2020 09:57:31 +1100
+In-Reply-To: <975e7dec-4330-cdb7-16b9-0269372f63d2@physik.fu-berlin.de>
+References: <975e7dec-4330-cdb7-16b9-0269372f63d2@physik.fu-berlin.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.34.3 (3.34.3-1.fc31) 
 MIME-Version: 1.0
-In-Reply-To: <20200216082230.GV25745@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Paulus,
+
+Something below for you I think
 
 
-Le 16/02/2020 à 09:22, Russell King - ARM Linux admin a écrit :
-> On Sun, Feb 16, 2020 at 10:18:30AM +0200, Mike Rapoport wrote:
->> From: Mike Rapoport <rppt@linux.ibm.com>
->>
->> Hi,
->>
->> These patches convert several architectures to use page table folding and
->> remove __ARCH_HAS_5LEVEL_HACK along with include/asm-generic/5level-fixup.h.
->>
->> The changes are mostly about mechanical replacement of pgd accessors with p4d
->> ones and the addition of higher levels to page table traversals.
->>
->> All the patches were sent separately to the respective arch lists and
->> maintainers hence the "v2" prefix.
-> 
-> You fail to explain why this change which adds 488 additional lines of
-> code is desirable.
-> 
+> We have an IBM POWER server (8247-42L) running Linux kernel 5.4.13 on Deb=
+ian unstable
+> hosting a big-endian ppc64 virtual machine running the same kernel in big=
+-endian
+> mode.
+>=20
+> When building OpenJDK-11 on the big-endian VM, the testsuite crashes the =
+*host* system
+> with the following kernel backtrace. The problem reproduces both with ker=
+nel 4.19.98
+> as well as 5.4.13.
+>=20
+> Backtrace has been attached at the end of this mail.
+>=20
+> Thanks,
+> Adrian
+>=20
+> watson login: [17667518570.438744] BUG: Unable to handle kernel data acce=
+ss at 0xc000000002bfd038
+> [17667518570.438772] Faulting instruction address: 0xc00000000017a778
+> [17667518570.438777] BUG: Unable to handle kernel data access at 0xc00000=
+07f9070c08
+> [17667518570.438781] Faulting instruction address: 0xc0000000002659a0
+> [17667518570.438785] BUG: Unable to handle kernel data access at 0xc00000=
+07f9070c08
+> [17667518570.438789] Faulting instruction address: 0xc0000000002659a0
+> [17667518570.438793] BUG: Unable to handle kernel data access at 0xc00000=
+07f9070c08
+> [17667518570.438797] Faulting instruction address: 0xc0000000002659a0
+> [17667518570.438801] BUG: Unable to handle kernel data access at 0xc00000=
+07f9070c08
+> [17667518570.438804] Faulting instruction address: 0xc0000000002659a0
+> [17667518570.438808] BUG: Unable to handle kernel data access at 0xc00000=
+07f9070c08
 
-The purpose of the series, ie droping a HACK, is worth it.
+<snip>
 
-However looking at the powerpc patch I have the feeling that this series 
-goes behind its purpose.
+> [17667518570.439197] BUG: Unable to handle kernel data access at 0xc00000=
+07f9070c08
+> [ 8142.397983]  async_memcpy(E) async_pq(E) async_xor(E) async_tx(E) xor(=
+E) raid6_pq(E) libcrc32c(E) crc32c_generic(E)
+> [17667518570.439207] Faulting instruction address: 0xc0000000002659a0
+> [ 8142.397992]  raid1(E) raid0(E) multipath(E) linear(E) md_mod(E) xhci_p=
+ci(E) xhci_hcd(E)
+> [17667518570.439215] Thread overran stack, or stack corrupted
+> [ 8142.398000]  e1000e(E) usbcore(E) ptp(E) pps_core(E) ipr(E) usb_common=
+(E)
+> [ 8142.398011] CPU: 48 PID: 2571 Comm: CPU 0/KVM Tainted: G            E =
+    5.4.0-0.bpo.3-powerpc64le #1 Debian 5.4.13-1~bpo10+1
+> [ 8142.398014] NIP:  c000000fe3117a00 LR: c000000000196b9c CTR: c000000fe=
+3117a00
+> [17667518570.439234] BUG: Unable to handle kernel data access at 0xc00000=
+07f9070c08
+> [ 8142.398026] REGS: c000000fe315f4c0 TRAP: 0400   Tainted: G            =
+E      (5.4.0-0.bpo.3-powerpc64le Debian 5.4.13-1~bpo10+1)
+> [17667518570.439243] Faulting instruction address: 0xc0000000002659a0
+> [17667518570.439245] Thread overran stack, or stack corrupted
+> [ 8142.398038] MSR:  9000000010009033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR: 2844=
+8484  XER: 00000000
+> [ 8142.398046] CFAR: c000000000196b98 IRQMASK: 1=20
+> [ 8142.398046] GPR00: c000000000196e0c c000000fe315f750 c0000000012e0800 =
+c000000fe31179c0=20
+> [ 8142.398046] GPR04: 0000000000000003 0000000000000000 0000000000000000 =
+0000000000000000=20
+> [ 8142.398046] GPR08: c000000fe315f7f0 c000000fe3117a00 0000000080000030 =
+c0080000082bcd80=20
+> [ 8142.398046] GPR12: c000000fe3117a00 c000000fffff5a00 0000000000000000 =
+0000000000000008=20
+> [ 8142.398046] GPR16: c0000000013a5c18 c000000ff1035e00 c000000fe315f8e8 =
+0000000000000001=20
+> [ 8142.398046] GPR20: 0000000000000000 c000000fe315f8e8 c000000fe31179c0 =
+0000000000000000=20
+> [ 8142.398046] GPR24: c000000fe315f7f0 0000000000000001 0000000000000000 =
+0000000000000003=20
+> [ 8142.398046] GPR28: 0000000000000000 c000000fedc6e750 0000000000000010 =
+c000000fe311f8d0=20
+> [ 8142.398079] NIP [c000000fe3117a00] 0xc000000fe3117a00
+> [ 8142.398087] LR [c000000000196b9c] __wake_up_common+0xcc/0x290
+> [17667518570.439321] BUG: Unable to handle kernel data access at 0xc00000=
+07f9070c08
+> [ 8142.398109] Call Trace:
+> [17667518570.439328] Faulting instruction address: 0xc0000000002659a0
+> [17667518570.439330] Thread overran stack, or stack corrupted
+> [ 8142.398122] [c000000fe315f750] [c000000000196b9c] __wake_up_common+0xc=
+c/0x290 (unreliable)
+> [ 8142.398127] [c000000fe315f7d0] [c000000000196e0c] __wake_up_common_loc=
+k+0xac/0x110
+> [ 8142.398134] [c000000fe315f850] [c0080000082a9760] kvmppc_run_core+0x12=
+f8/0x18c0 [kvm_hv]
+> [ 8142.398140] [c000000fe315fa10] [c0080000082acf14] kvmppc_vcpu_run_hv+0=
+x62c/0xb20 [kvm_hv]
+> [ 8142.398149] [c000000fe315fae0] [c0080000081098cc] kvmppc_vcpu_run+0x34=
+/0x48 [kvm]
+> [ 8142.398158] [c000000fe315fb00] [c00800000810587c] kvm_arch_vcpu_ioctl_=
+run+0x2f4/0x400 [kvm]
+> [ 8142.398166] [c000000fe315fb90] [c0080000080f7ac8] kvm_vcpu_ioctl+0x340=
+/0x7d0 [kvm]
+> [ 8142.398172] [c000000fe315fd00] [c000000000445410] do_vfs_ioctl+0xe0/0x=
+ac0
+> [ 8142.398176] [c000000fe315fdb0] [c000000000445eb4] ksys_ioctl+0xc4/0x11=
+0
+> [ 8142.398180] [c000000fe315fe00] [c000000000445f28] sys_ioctl+0x28/0x80
+> [ 8142.398184] [c000000fe315fe20] [c00000000000b9c8] system_call+0x5c/0x6=
+8
+> [ 8142.398186] Instruction dump:
+> [17667518570.439406] BUG: Unable to handle kernel data access at 0xc00000=
+07f9070c08
+> [ 8142.398196] XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXX=
+XXXX XXXXXXXX=20
+> [ 8142.398200] XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXX=
+XXXX XXXXXXXX=20
+> [ 8142.398206] ---[ end trace 10787fb41cbf2532 ]---
 
-The number additional lines could be deeply reduced I think if we limit 
-the patches to the strict minimum, ie just do things like below instead 
-of adding lots of handling of useless levels.
 
-Instead of doing things like:
+Something you can look at?
 
--	pud = NULL;
-+	p4d = NULL;
-  	if (pgd_present(*pgd))
--		pud = pud_offset(pgd, gpa);
-+		p4d = p4d_offset(pgd, gpa);
-+	else
-+		new_p4d = p4d_alloc_one(kvm->mm, gpa);
-+
-+	pud = NULL;
-+	if (p4d_present(*p4d))
-+		pud = pud_offset(p4d, gpa);
-  	else
-  		new_pud = pud_alloc_one(kvm->mm, gpa);
+Mikey
 
-It could be limited to:
-
-  	if (pgd_present(*pgd))
--		pud = pud_offset(pgd, gpa);
-+		pud = pud_offset(p4d_offset(pgd, gpa), gpa);
-  	else
-  		new_pud = pud_alloc_one(kvm->mm, gpa);
-
-
-Christophe
