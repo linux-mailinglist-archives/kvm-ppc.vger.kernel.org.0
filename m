@@ -2,43 +2,40 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6581E16070E
-	for <lists+kvm-ppc@lfdr.de>; Sun, 16 Feb 2020 23:57:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97BC7160799
+	for <lists+kvm-ppc@lfdr.de>; Mon, 17 Feb 2020 02:07:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726036AbgBPW5h (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 16 Feb 2020 17:57:37 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:52881 "EHLO ozlabs.org"
+        id S1726222AbgBQBHf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 16 Feb 2020 20:07:35 -0500
+Received: from ozlabs.org ([203.11.71.1]:58143 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726020AbgBPW5h (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sun, 16 Feb 2020 17:57:37 -0500
+        id S1726177AbgBQBHf (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sun, 16 Feb 2020 20:07:35 -0500
 Received: from neuling.org (localhost [127.0.0.1])
-        by ozlabs.org (Postfix) with ESMTP id 48LMvb4P0Tz9sPK;
-        Mon, 17 Feb 2020 09:57:31 +1100 (AEDT)
+        by ozlabs.org (Postfix) with ESMTP id 48LQnb69zTz9sRR;
+        Mon, 17 Feb 2020 12:07:31 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=neuling.org;
-        s=201811; t=1581893853;
-        bh=47iPtZB29ez9xFzB4y1kZcIk8WPBYdTElVrZIIEogoc=;
+        s=201811; t=1581901651;
+        bh=WEcfIDVJGfgJza321c+Rz8OPuNVAg2LyKvpfwGHblIw=;
         h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=Bjtn96LklFKzxIYxw/UvR2pu1DuZ7j7eVV81qXVeEl731OMosL0c3ybcMaGc6RLoT
-         DGI54Yw25zA5SAqwguKn9660Y4msdcH1ZKPqb94130PaA9XLF83WyelqqHEEMjZ1wX
-         ktlTjNO2rG+AP1uccGtOWGGh0w6jJ9NTXHhvQsko/ZSiNt8NRyRPEfhra7l7FBL8p4
-         TXZueIhGHoO8BpZce12Lba9Q+t4nBo+g3l+IzsdvIy/gpTMS+mqQk6mVfGa+1cMEvl
-         8DTBHdrcjNSNJc2186dlTdHUy4yPDKZAG7CUI9Q8n3GJaIWZljNntqhY53Q3Yctr17
-         kJK7ANtDIHp9g==
+        b=R7SjS+hbI1lLJju7KtVeEZiKINXq2oLRXVIUuFuSLQfUL2C1k9bFsPGg+wCDyF4aC
+         H8rr4U6P2Phdl/R6Yqt2ggMduNWb5UQWAIR4pinwQj3cQgvQcWQVm3zxvLEz/1qy8p
+         O7MWRtAa5GTF3b5I3YwdKJrVGb/X2cNpLB8g5a5JAEtNd/Uf19B4SUzlYPCaH0Lorr
+         mDxCqiNUt49a78sVZCqVhBpOewW5BsSWz/BfQzooOrHqzEy7k5DWuk/71J5bS1UEB9
+         nc9cShomC3gOFQe1kX9q3wO2c8NtTly2KNymH+X0D3XREITosA2ppwFVdblffoLaYO
+         OBNNoZMpPS3dQ==
 Received: by neuling.org (Postfix, from userid 1000)
-        id 57F542C01ED; Mon, 17 Feb 2020 09:57:31 +1100 (AEDT)
-Message-ID: <0af9715a2bf58ea79d9f5c8f9b279c2ae865a7bc.camel@neuling.org>
-Subject: Re: Kernel (little-endian) crashing on POWER8 on heavy PowerKVM load
+        id CA23F2C01FE; Mon, 17 Feb 2020 12:07:31 +1100 (AEDT)
+Message-ID: <29b136e15c2f04f783b54ec98552d1a6009234db.camel@neuling.org>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Treat unrecognized TM instructions
+ as illegal
 From:   Michael Neuling <mikey@neuling.org>
-To:     John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-        linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@samba.org>,
-        kvm-ppc <kvm-ppc@vger.kernel.org>
-Cc:     Anatoly Pugachev <matorola@gmail.com>,
-        "debian-powerpc@lists.debian.org" <debian-powerpc@lists.debian.org>,
-        James Clarke <jrtc27@debian.org>,
-        Gustavo Bueno Romero <gromero@br.ibm.com>
-Date:   Mon, 17 Feb 2020 09:57:31 +1100
-In-Reply-To: <975e7dec-4330-cdb7-16b9-0269372f63d2@physik.fu-berlin.de>
-References: <975e7dec-4330-cdb7-16b9-0269372f63d2@physik.fu-berlin.de>
+To:     Gustavo Romero <gromero@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+        paulus@ozlabs.org
+Cc:     linuxppc-dev@lists.ozlabs.org
+Date:   Mon, 17 Feb 2020 12:07:31 +1100
+In-Reply-To: <20200213151532.12559-1-gromero@linux.ibm.com>
+References: <20200213151532.12559-1-gromero@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.34.3 (3.34.3-1.fc31) 
@@ -48,126 +45,145 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paulus,
-
-Something below for you I think
-
-
-> We have an IBM POWER server (8247-42L) running Linux kernel 5.4.13 on Deb=
-ian unstable
-> hosting a big-endian ppc64 virtual machine running the same kernel in big=
--endian
-> mode.
+On Thu, 2020-02-13 at 10:15 -0500, Gustavo Romero wrote:
+> On P9 DD2.2 due to a CPU defect some TM instructions need to be emulated =
+by
+> KVM. This is handled at first by the hardware raising a softpatch interru=
+pt
+> when certain TM instructions that need KVM assistance are executed in the
+> guest. Some TM instructions, although not defined in the Power ISA, might
+> raise a softpatch interrupt. For instance, 'tresume.' instruction as
+> defined in the ISA must have bit 31 set (1), but an instruction that
+> matches 'tresume.' OP and XO opcodes but has bit 31 not set (0), like
+> 0x7cfe9ddc, also raises a softpatch interrupt, for example, if a code
+> like the following is executed in the guest it will raise a softpatch
+> interrupt just like a 'tresume.' when the TM facility is enabled:
 >=20
-> When building OpenJDK-11 on the big-endian VM, the testsuite crashes the =
-*host* system
-> with the following kernel backtrace. The problem reproduces both with ker=
-nel 4.19.98
-> as well as 5.4.13.
+> int main() { asm("tabort. 0; .long 0x7cfe9ddc;"); }
 >=20
-> Backtrace has been attached at the end of this mail.
+> Currently in such a case KVM throws a complete trace like the following:
 >=20
-> Thanks,
-> Adrian
+> [345523.705984] WARNING: CPU: 24 PID: 64413 at arch/powerpc/kvm/book3s_hv=
+_tm.c:211 kvmhv_p9_tm_emulation+0x68/0x620 [kvm_hv]
+> [345523.705985] Modules linked in: kvm_hv(E) xt_conntrack ipt_REJECT nf_r=
+eject_ipv4 xt_tcpudp ip6table_mangle ip6table_nat
+> iptable_mangle iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_i=
+pv4 ebtable_filter ebtables ip6table_filter
+> ip6_tables iptable_filter bridge stp llc sch_fq_codel ipmi_powernv at24 v=
+mx_crypto ipmi_devintf ipmi_msghandler
+> ibmpowernv uio_pdrv_genirq kvm opal_prd uio leds_powernv ib_iser rdma_cm =
+iw_cm ib_cm ib_core iscsi_tcp libiscsi_tcp
+> libiscsi scsi_transport_iscsi ip_tables x_tables autofs4 btrfs blake2b_ge=
+neric zstd_compress raid10 raid456
+> async_raid6_recov async_memcpy async_pq async_xor async_tx libcrc32c xor =
+raid6_pq raid1 raid0 multipath linear tg3
+> crct10dif_vpmsum crc32c_vpmsum ipr [last unloaded: kvm_hv]
+> [345523.706030] CPU: 24 PID: 64413 Comm: CPU 0/KVM Tainted: G        W   =
+E     5.5.0+ #1
+> [345523.706031] NIP:  c0080000072cb9c0 LR: c0080000072b5e80 CTR: c0080000=
+085c7850
+> [345523.706034] REGS: c000000399467680 TRAP: 0700   Tainted: G        W  =
+ E      (5.5.0+)
+> [345523.706034] MSR:  900000010282b033 <SF,HV,VEC,VSX,EE,FP,ME,IR,DR,RI,L=
+E,TM[E]>  CR: 24022428  XER: 00000000
+> [345523.706042] CFAR: c0080000072b5e7c IRQMASK: 0
+>                 GPR00: c0080000072b5e80 c000000399467910 c0080000072db500=
+ c000000375ccc720
+>                 GPR04: c000000375ccc720 00000003fbec0000 0000a10395dda5a6=
+ 0000000000000000
+>                 GPR08: 000000007cfe9ddc 7cfe9ddc000005dc 7cfe9ddc7c0005dc=
+ c0080000072cd530
+>                 GPR12: c0080000085c7850 c0000003fffeb800 0000000000000001=
+ 00007dfb737f0000
+>                 GPR16: c0002001edcca558 0000000000000000 0000000000000000=
+ 0000000000000001
+>                 GPR20: c000000001b21258 c0002001edcca558 0000000000000018=
+ 0000000000000000
+>                 GPR24: 0000000001000000 ffffffffffffffff 0000000000000001=
+ 0000000000001500
+>                 GPR28: c0002001edcc4278 c00000037dd80000 800000050280f033=
+ c000000375ccc720
+> [345523.706062] NIP [c0080000072cb9c0] kvmhv_p9_tm_emulation+0x68/0x620 [=
+kvm_hv]
+> [345523.706065] LR [c0080000072b5e80] kvmppc_handle_exit_hv.isra.53+0x3e8=
+/0x798 [kvm_hv]
+> [345523.706066] Call Trace:
+> [345523.706069] [c000000399467910] [c000000399467940] 0xc000000399467940 =
+(unreliable)
+> [345523.706071] [c000000399467950] [c000000399467980] 0xc000000399467980
+> [345523.706075] [c0000003994679f0] [c0080000072bd1c4] kvmhv_run_single_vc=
+pu+0xa1c/0xb80 [kvm_hv]
+> [345523.706079] [c000000399467ac0] [c0080000072bd8e0] kvmppc_vcpu_run_hv+=
+0x5b8/0xb00 [kvm_hv]
+> [345523.706087] [c000000399467b90] [c0080000085c93cc] kvmppc_vcpu_run+0x3=
+4/0x48 [kvm]
+> [345523.706095] [c000000399467bb0] [c0080000085c582c] kvm_arch_vcpu_ioctl=
+_run+0x244/0x420 [kvm]
+> [345523.706101] [c000000399467c40] [c0080000085b7498] kvm_vcpu_ioctl+0x3d=
+0/0x7b0 [kvm]
+> [345523.706105] [c000000399467db0] [c0000000004adf9c] ksys_ioctl+0x13c/0x=
+170
+> [345523.706107] [c000000399467e00] [c0000000004adff8] sys_ioctl+0x28/0x80
+> [345523.706111] [c000000399467e20] [c00000000000b278] system_call+0x5c/0x=
+68
+> [345523.706112] Instruction dump:
+> [345523.706114] 419e0390 7f8a4840 409d0048 6d497c00 2f89075d 419e021c 6d4=
+97c00 2f8907dd
+> [345523.706119] 419e01c0 6d497c00 2f8905dd 419e00a4 <0fe00000> 38210040 3=
+8600000 ebc1fff0
 >=20
-> watson login: [17667518570.438744] BUG: Unable to handle kernel data acce=
-ss at 0xc000000002bfd038
-> [17667518570.438772] Faulting instruction address: 0xc00000000017a778
-> [17667518570.438777] BUG: Unable to handle kernel data access at 0xc00000=
-07f9070c08
-> [17667518570.438781] Faulting instruction address: 0xc0000000002659a0
-> [17667518570.438785] BUG: Unable to handle kernel data access at 0xc00000=
-07f9070c08
-> [17667518570.438789] Faulting instruction address: 0xc0000000002659a0
-> [17667518570.438793] BUG: Unable to handle kernel data access at 0xc00000=
-07f9070c08
-> [17667518570.438797] Faulting instruction address: 0xc0000000002659a0
-> [17667518570.438801] BUG: Unable to handle kernel data access at 0xc00000=
-07f9070c08
-> [17667518570.438804] Faulting instruction address: 0xc0000000002659a0
-> [17667518570.438808] BUG: Unable to handle kernel data access at 0xc00000=
-07f9070c08
+> and then treats the executed instruction as 'nop' whilst it should actual=
+ly
+> be treated as an illegal instruction since it's not defined by the ISA.
 
-<snip>
+The ISA has this:=20
 
-> [17667518570.439197] BUG: Unable to handle kernel data access at 0xc00000=
-07f9070c08
-> [ 8142.397983]  async_memcpy(E) async_pq(E) async_xor(E) async_tx(E) xor(=
-E) raid6_pq(E) libcrc32c(E) crc32c_generic(E)
-> [17667518570.439207] Faulting instruction address: 0xc0000000002659a0
-> [ 8142.397992]  raid1(E) raid0(E) multipath(E) linear(E) md_mod(E) xhci_p=
-ci(E) xhci_hcd(E)
-> [17667518570.439215] Thread overran stack, or stack corrupted
-> [ 8142.398000]  e1000e(E) usbcore(E) ptp(E) pps_core(E) ipr(E) usb_common=
-(E)
-> [ 8142.398011] CPU: 48 PID: 2571 Comm: CPU 0/KVM Tainted: G            E =
-    5.4.0-0.bpo.3-powerpc64le #1 Debian 5.4.13-1~bpo10+1
-> [ 8142.398014] NIP:  c000000fe3117a00 LR: c000000000196b9c CTR: c000000fe=
-3117a00
-> [17667518570.439234] BUG: Unable to handle kernel data access at 0xc00000=
-07f9070c08
-> [ 8142.398026] REGS: c000000fe315f4c0 TRAP: 0400   Tainted: G            =
-E      (5.4.0-0.bpo.3-powerpc64le Debian 5.4.13-1~bpo10+1)
-> [17667518570.439243] Faulting instruction address: 0xc0000000002659a0
-> [17667518570.439245] Thread overran stack, or stack corrupted
-> [ 8142.398038] MSR:  9000000010009033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR: 2844=
-8484  XER: 00000000
-> [ 8142.398046] CFAR: c000000000196b98 IRQMASK: 1=20
-> [ 8142.398046] GPR00: c000000000196e0c c000000fe315f750 c0000000012e0800 =
-c000000fe31179c0=20
-> [ 8142.398046] GPR04: 0000000000000003 0000000000000000 0000000000000000 =
-0000000000000000=20
-> [ 8142.398046] GPR08: c000000fe315f7f0 c000000fe3117a00 0000000080000030 =
-c0080000082bcd80=20
-> [ 8142.398046] GPR12: c000000fe3117a00 c000000fffff5a00 0000000000000000 =
-0000000000000008=20
-> [ 8142.398046] GPR16: c0000000013a5c18 c000000ff1035e00 c000000fe315f8e8 =
-0000000000000001=20
-> [ 8142.398046] GPR20: 0000000000000000 c000000fe315f8e8 c000000fe31179c0 =
-0000000000000000=20
-> [ 8142.398046] GPR24: c000000fe315f7f0 0000000000000001 0000000000000000 =
-0000000000000003=20
-> [ 8142.398046] GPR28: 0000000000000000 c000000fedc6e750 0000000000000010 =
-c000000fe311f8d0=20
-> [ 8142.398079] NIP [c000000fe3117a00] 0xc000000fe3117a00
-> [ 8142.398087] LR [c000000000196b9c] __wake_up_common+0xcc/0x290
-> [17667518570.439321] BUG: Unable to handle kernel data access at 0xc00000=
-07f9070c08
-> [ 8142.398109] Call Trace:
-> [17667518570.439328] Faulting instruction address: 0xc0000000002659a0
-> [17667518570.439330] Thread overran stack, or stack corrupted
-> [ 8142.398122] [c000000fe315f750] [c000000000196b9c] __wake_up_common+0xc=
-c/0x290 (unreliable)
-> [ 8142.398127] [c000000fe315f7d0] [c000000000196e0c] __wake_up_common_loc=
-k+0xac/0x110
-> [ 8142.398134] [c000000fe315f850] [c0080000082a9760] kvmppc_run_core+0x12=
-f8/0x18c0 [kvm_hv]
-> [ 8142.398140] [c000000fe315fa10] [c0080000082acf14] kvmppc_vcpu_run_hv+0=
-x62c/0xb20 [kvm_hv]
-> [ 8142.398149] [c000000fe315fae0] [c0080000081098cc] kvmppc_vcpu_run+0x34=
-/0x48 [kvm]
-> [ 8142.398158] [c000000fe315fb00] [c00800000810587c] kvm_arch_vcpu_ioctl_=
-run+0x2f4/0x400 [kvm]
-> [ 8142.398166] [c000000fe315fb90] [c0080000080f7ac8] kvm_vcpu_ioctl+0x340=
-/0x7d0 [kvm]
-> [ 8142.398172] [c000000fe315fd00] [c000000000445410] do_vfs_ioctl+0xe0/0x=
-ac0
-> [ 8142.398176] [c000000fe315fdb0] [c000000000445eb4] ksys_ioctl+0xc4/0x11=
-0
-> [ 8142.398180] [c000000fe315fe00] [c000000000445f28] sys_ioctl+0x28/0x80
-> [ 8142.398184] [c000000fe315fe20] [c00000000000b9c8] system_call+0x5c/0x6=
-8
-> [ 8142.398186] Instruction dump:
-> [17667518570.439406] BUG: Unable to handle kernel data access at 0xc00000=
-07f9070c08
-> [ 8142.398196] XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXX=
-XXXX XXXXXXXX=20
-> [ 8142.398200] XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXXXXXX XXXX=
-XXXX XXXXXXXX=20
-> [ 8142.398206] ---[ end trace 10787fb41cbf2532 ]---
+   1.3.3 Reserved Fields, Reserved Values, and Reserved SPRs
 
+   Reserved fields in instructions are ignored by the pro-
+   cessor.
 
-Something you can look at?
+Hence the hardware will ignore reserved bits. For example executing your li=
+ttle
+program on P8 just exits normally with 0x7cfe9ddc being executed as a NOP.
+
+Hence, we should NOP this, not generate an illegal.
 
 Mikey
+
+> This commit changes the handling of the case above by treating the
+> unrecognized TM instructions that can raise a softpatch but are not
+> defined in the ISA as illegal ones instead of as 'nop' and by gently
+> reporting it to the host instead of throwing a trace.
+>=20
+> Signed-off-by: Gustavo Romero <gromero@linux.ibm.com>
+> ---
+>  arch/powerpc/kvm/book3s_hv_tm.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/arch/powerpc/kvm/book3s_hv_tm.c b/arch/powerpc/kvm/book3s_hv=
+_tm.c
+> index 0db937497169..d342a9e11298 100644
+> --- a/arch/powerpc/kvm/book3s_hv_tm.c
+> +++ b/arch/powerpc/kvm/book3s_hv_tm.c
+> @@ -3,6 +3,8 @@
+>   * Copyright 2017 Paul Mackerras, IBM Corp. <paulus@au1.ibm.com>
+>   */
+> =20
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+>  #include <linux/kvm_host.h>
+> =20
+>  #include <asm/kvm_ppc.h>
+> @@ -208,6 +210,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
+>  	}
+> =20
+>  	/* What should we do here? We didn't recognize the instruction */
+> -	WARN_ON_ONCE(1);
+> +	kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
+> +	pr_warn_ratelimited("Unrecognized TM-related instruction %#x for emulat=
+ion", instr);
+> +
+>  	return RESUME_GUEST;
+>  }
 
