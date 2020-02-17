@@ -2,167 +2,175 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B026161C80
-	for <lists+kvm-ppc@lfdr.de>; Mon, 17 Feb 2020 21:56:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7503161CB1
+	for <lists+kvm-ppc@lfdr.de>; Mon, 17 Feb 2020 22:14:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729602AbgBQU4e (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 17 Feb 2020 15:56:34 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16542 "EHLO
+        id S1729450AbgBQVOm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 17 Feb 2020 16:14:42 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59618 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727332AbgBQU4e (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 17 Feb 2020 15:56:34 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01HKs5qa128250;
-        Mon, 17 Feb 2020 15:55:58 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y6e2eksny-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Feb 2020 15:55:58 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01HKtvTY131496;
-        Mon, 17 Feb 2020 15:55:57 -0500
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y6e2eksnn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Feb 2020 15:55:57 -0500
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01HKtuKf019357;
-        Mon, 17 Feb 2020 20:55:56 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma05wdc.us.ibm.com with ESMTP id 2y6896cn7s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Feb 2020 20:55:56 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01HKtuc442664230
+        by vger.kernel.org with ESMTP id S1729937AbgBQVOm (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 17 Feb 2020 16:14:42 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01HLDwOU106318
+        for <kvm-ppc@vger.kernel.org>; Mon, 17 Feb 2020 16:14:41 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y6cu266hd-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Mon, 17 Feb 2020 16:14:41 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 17 Feb 2020 21:14:39 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 17 Feb 2020 21:14:34 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01HLEWxE54132852
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 17 Feb 2020 20:55:56 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 070CA112061;
-        Mon, 17 Feb 2020 20:55:56 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C7D81112063;
-        Mon, 17 Feb 2020 20:55:52 +0000 (GMT)
-Received: from leobras.br.ibm.com (unknown [9.18.235.152])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 17 Feb 2020 20:55:52 +0000 (GMT)
-Message-ID: <d0789485cc353a99e19c2d2ca4b5a628a33a312d.camel@linux.ibm.com>
-Subject: Re: [PATCH v6 02/11] mm/gup: Use functions to track lockless pgtbl
- walks on gup_pgd_range
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     John Hubbard <jhubbard@nvidia.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Arnd Bergmann <arnd@arndb.de>,
+        Mon, 17 Feb 2020 21:14:32 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 87616A405C;
+        Mon, 17 Feb 2020 21:14:32 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 993FDA4054;
+        Mon, 17 Feb 2020 21:14:31 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.10.11])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 17 Feb 2020 21:14:31 +0000 (GMT)
+Subject: Re: [PATCH 01/35] mm:gup/writeback: add callbacks for inaccessible
+ pages
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@c-s.fr>,
-        Steven Price <steven.price@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
-        Balbir Singh <bsingharora@gmail.com>,
-        Reza Arbab <arbab@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Allison Randal <allison@lohutok.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Michal Suchanek <msuchanek@suse.de>
-Cc:     linux-arch@vger.kernel.org, linux-mm@kvack.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-Date:   Mon, 17 Feb 2020 17:55:49 -0300
-In-Reply-To: <0c2f5a89-4890-fd84-6a6d-e470ba110399@nvidia.com>
-References: <20200206030900.147032-1-leonardo@linux.ibm.com>
-         <20200206030900.147032-3-leonardo@linux.ibm.com>
-         <760c238043196e0628c8c0eff48a8e938ef539ba.camel@linux.ibm.com>
-         <0c2f5a89-4890-fd84-6a6d-e470ba110399@nvidia.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-KK5vvDthaVYFFka5IIPv"
-User-Agent: Evolution 3.34.3 (3.34.3-1.fc31) 
+        Marc Zyngier <maz@kernel.org>, KVM <kvm@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
+        kvm-ppc@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-2-borntraeger@de.ibm.com>
+ <28792269-e053-ac70-a344-45612ee5c729@de.ibm.com>
+ <20200213195602.GD18610@linux.intel.com>
+ <e2c41b25-6d6d-6685-3450-2e3e8d84efd1@de.ibm.com>
+ <6da2e3d0-a2be-18d2-3548-b546052d14e3@amd.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Mon, 17 Feb 2020 22:14:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <6da2e3d0-a2be-18d2-3548-b546052d14e3@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
+x-cbid: 20021721-0028-0000-0000-000003DBE1C3
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021721-0029-0000-0000-000024A0E8D4
+Message-Id: <695952e7-62a9-14f0-68ce-fb41593eb4a3@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-17_12:2020-02-17,2020-02-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 mlxscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
- impostorscore=0 phishscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002170170
+ definitions=2020-02-17_13:2020-02-17,2020-02-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 mlxscore=0 suspectscore=0 bulkscore=0 spamscore=0
+ lowpriorityscore=0 impostorscore=0 adultscore=0 clxscore=1015
+ mlxlogscore=928 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2001150001 definitions=main-2002170174
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
---=-KK5vvDthaVYFFka5IIPv
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hello John, comments inline;
+On 17.02.20 21:55, Tom Lendacky wrote:
+[...]
 
-On Fri, 2020-02-07 at 14:54 -0800, John Hubbard wrote:
-> On 2/5/20 7:25 PM, Leonardo Bras wrote:
-> > On Thu, 2020-02-06 at 00:08 -0300, Leonardo Bras wrote:
-> > >                 gup_pgd_range(addr, end, gup_flags, pages, &nr);
-> > > -               local_irq_enable();
-> > > +               end_lockless_pgtbl_walk(IRQS_ENABLED);
-> > >                 ret =3D nr;
-> > >         }
-> > > =20
-> >=20
-> > Just noticed IRQS_ENABLED is not available on other archs than ppc64.
-> > I will fix this for v7.
-> >=20
->=20
-> What's the fix going to look like, approximately?
+>>> What is the use case for calling arch_make_page_accessible() in the follow()
+>>> and gup() paths?  Live migration is the only thing that comes to mind, and
+>>> for live migration I would expect you would want to keep the secure guest
+>>> running when copying pages to the target, i.e. use pre-copy.  That would
+>>> conflict with converting the page in place.  Rather, migration would use a
+>>> separate dedicated path to copy the encrypted contents of the secure page to
+>>> a completely different page, and send *that* across the wire so that the
+>>> guest can continue accessing the original page.
+>>> Am I missing a need to do this for the swap/reclaim case?  Or is there a
+>>> completely different use case I'm overlooking?
+>>
+>> This is actually to protect the host against a malicious user space. For 
+>> example a bad QEMU could simply start direct I/O on such protected memory.
+>> We do not want userspace to be able to trigger I/O errors and thus we
+>> implemented the logic to "whenever somebody accesses that page (gup) or
+>> doing I/O, make sure that this page can be accessed. When the guest tries
+>> to access that page we will wait in the page fault handler for writeback to
+>> have finished and for the page_ref to be the expected value.
+> 
+> So in this case, when the guest tries to access the page, the page may now
+> be corrupted because I/O was allowed to be done to it? Or will the I/O
+> have been blocked in some way, but without generating the I/O error?
 
-I am not sure what is the best approach yet.=20
+No the I/O would be blocked by the hardware. Thats why we encrypt and export
+the page for I/O usage. As soon as the refcount drops to the expected value
+the guest can access its (unchanged) content after the import. the import
+would check the hash etc. so no corruption of the guest state in any case.
+(apart from denial of service, which is always possible)
+If we would not have these hooks a malicious user could trigger I/O (which 
+would be blocked) but the blocked I/O would generate an I/O error. And this
+could bring trouble to some device drivers. And we want to avoid that.
 
-1. On irq_mask =3D=3D 0, always enable irq on end_lockless_pgtbl_walk().
-   Not sure how bat would that affect other archs.
+In other words: the hardware/firmware will ensure guest integrity.But host
+integrity (kernel vs userspace) must be enforced by the host kernel as usual
+and this is one part of it.
 
-2. Add another function like end_lockless_pgtbl_walk_irqen() that
-always enables IRQ.
-
-3. Add another parameter in end_lockless_pgtbl_walk(), so that caller
-can choose ii IRQ must be enabled.
-
-Also, not sure if internal_get_user_pages_fast() can possibly be called
-with IRQ disabled, and then return with it enabled. Maybe just
-saving/restoring should be fine.
-
-Other suggestions are welcome.
-
->=20
->=20
-> thanks,
-
-Best regards,
-
-Leonardo Bras
-
---=-KK5vvDthaVYFFka5IIPv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl5K/dUACgkQlQYWtz9S
-ttSomhAAti45bC0hpcyFr3ix4l0vnXi071xBs+ZLvF+V2qK1wpmBPe1ke3hfm45y
-7rd5whdeNR8cPfsXPKwerT1oB7rJXhiGQa5Vt1pNlvFXVKs+IBZr+S7JAJjIFxW+
-nPHLV4LaOnkRgg8p1tusLTJXXkPD/PYBqVu5vwWk4cI/uXmO6MjQ9ARPpc0bQYUY
-Ds8v/GoaVuGn1kf2YVIUtJlQSF2gdKAxUnTh6hmUXcwpB0Ao3tKeE+4bESkipSRg
-vlJ3aJpi72K160R3b+UwGjHLAixSsRr3pSvkqKU/B2lUEaJO99mu01NWR/X4OtVc
-8h1+tgjwjZSiIa0DJfwn44beonO8oHFTE1VpmZMxpwVMoRxVUvzIrhuDaLfKlSIE
-dlbKs43NjTvwQu5RScWqDR5u2w6q7LLXtCoLbq9JDDOf8kt9GX6SOp3NLopWqY4x
-/BSh0UYIkBlBCAY/LXdNL1C0D8g/h8MpoOyxyKzsmZQmgLJPEtDq/Gqkdsf4jtBq
-E3Ma6KYyl0wTfbQtp7iNERDukt0R2j8+meZ5ad2WUJ7GujVCp/S8ky+88jLB8eNx
-o96tDhPvhT0VBcfIrGsnAnE1CyJFgFiBF4k7Xwi7To6z5teTWfhc5z6mDfBgVH1l
-lhtHrLkT3aJxP48InKKPe7TMb2ghIzHMy9bSC1AaIgEW5zxzr8A=
-=UpXg
------END PGP SIGNATURE-----
-
---=-KK5vvDthaVYFFka5IIPv--
+But thanks for the clarification that you do not need those hooks.
 
