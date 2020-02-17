@@ -2,215 +2,138 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F6AA161654
-	for <lists+kvm-ppc@lfdr.de>; Mon, 17 Feb 2020 16:39:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9209161C53
+	for <lists+kvm-ppc@lfdr.de>; Mon, 17 Feb 2020 21:33:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728000AbgBQPju (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 17 Feb 2020 10:39:50 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52715 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728103AbgBQPju (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 17 Feb 2020 10:39:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581953988;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jKEw/9LD4IB/V5V6URoGZRoG+mly6ja1ybw5s5Rs0Gw=;
-        b=ISFR4S7u1dCY66RN3q24NIT9PXAaw4AeSlWo/iAOkN3KpW6hChHG0Mz03NxkQLfJNyAU83
-        sYOG3LwRFJojqRHMq5JOekRgQXAqYKNHd10mucuPV11qgwNWLB966EcrEQ2zfdGw1AFgek
-        eZOJQhCaNhaduGCoKZ9UcW10mDsV2Lw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329-inYGWWkdMLi23dX3VhfI2Q-1; Mon, 17 Feb 2020 10:39:43 -0500
-X-MC-Unique: inYGWWkdMLi23dX3VhfI2Q-1
-Received: by mail-wr1-f69.google.com with SMTP id w17so9148644wrr.9
-        for <kvm-ppc@vger.kernel.org>; Mon, 17 Feb 2020 07:39:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=jKEw/9LD4IB/V5V6URoGZRoG+mly6ja1ybw5s5Rs0Gw=;
-        b=DVhYGILhz8iscBikTtrjTydU4J83hmJA2TU0OpcfdyO2Vjt/RrL9fXc6XKSzFZfHJS
-         kfQTBHCF9tlJyDHOEp7k/44MfTHIaRBzNU83TcOk6Mfk7wDIyOsB8gXBtWllkxYlL81x
-         QXcGZSFHZLL53Q+KwrBMzzobEOuEWL23Wu2REVB5TEjoX0heyh3wbTICaFHShl3SJ4Sw
-         MpV9n523KbEQX0SGSH1xvK8l8RJ8y5LIVOM9huEtTCYxGR6vgUQ56lofCisjG+ACcIj6
-         XcmDcPeQTsKIZiueuMpVkDQPdnkN5zpPeS/N8lzMW/Tzoj+MjFppg0Fmj7Vrvbkw5g9S
-         0NVA==
-X-Gm-Message-State: APjAAAUqevWIw5O4a/k599CYBHMXBdwR/UW8gF/Qc0oD3voGv1tV79Gu
-        2Giu/wEh+EriRaync/K17ihm7rQEFfXASYzb5Eq2Chpe0sYXF+UviVU378zUL9ipisPlijA6KmF
-        EpRA6nacIhfwSml/kUA==
-X-Received: by 2002:a1c:f009:: with SMTP id a9mr22758260wmb.73.1581953981722;
-        Mon, 17 Feb 2020 07:39:41 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw3F+p2TnTlGe9QutjrXQ9bs2FRZYLz6SXUgX3NY1Zh+sHedC61NY/0mD2N7zoHzN71kac2NA==
-X-Received: by 2002:a1c:f009:: with SMTP id a9mr22758229wmb.73.1581953981434;
-        Mon, 17 Feb 2020 07:39:41 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id x10sm1402119wrv.60.2020.02.17.07.39.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2020 07:39:40 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v5 15/19] KVM: Provide common implementation for generic dirty log functions
-In-Reply-To: <20200208012938.GC15581@linux.intel.com>
-References: <20200121223157.15263-1-sean.j.christopherson@intel.com> <20200121223157.15263-16-sean.j.christopherson@intel.com> <20200206200200.GC700495@xz-x1> <20200206212120.GF13067@linux.intel.com> <20200206214106.GG700495@xz-x1> <20200207194532.GK2401@linux.intel.com> <20200208001832.GA823968@xz-x1> <20200208004233.GA15581@linux.intel.com> <20200208005334.GB823968@xz-x1> <20200208012938.GC15581@linux.intel.com>
-Date:   Mon, 17 Feb 2020 16:39:39 +0100
-Message-ID: <87sgj99q9w.fsf@vitty.brq.redhat.com>
+        id S1727332AbgBQUdX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 17 Feb 2020 15:33:23 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11384 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726704AbgBQUdW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 17 Feb 2020 15:33:22 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01HKUCgs037248;
+        Mon, 17 Feb 2020 15:32:41 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y6dnt08fx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Feb 2020 15:32:41 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01HKUJ43038101;
+        Mon, 17 Feb 2020 15:32:41 -0500
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y6dnt08fc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Feb 2020 15:32:41 -0500
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01HKPSse024151;
+        Mon, 17 Feb 2020 20:32:40 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma03wdc.us.ibm.com with ESMTP id 2y68964j7v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Feb 2020 20:32:40 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01HKWeOV7406178
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Feb 2020 20:32:40 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1A311AE05C;
+        Mon, 17 Feb 2020 20:32:40 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A18AAE05F;
+        Mon, 17 Feb 2020 20:32:37 +0000 (GMT)
+Received: from leobras.br.ibm.com (unknown [9.18.235.152])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 17 Feb 2020 20:32:36 +0000 (GMT)
+Message-ID: <e09b8921d1aade7b9d2aace43fc357bdcd1001bd.camel@linux.ibm.com>
+Subject: Re: [PATCH v6 03/11] powerpc/mm: Adds arch-specificic functions to
+ track lockless pgtable walks
+From:   Leonardo Bras <leonardo@linux.ibm.com>
+To:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Steven Price <steven.price@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>,
+        Balbir Singh <bsingharora@gmail.com>,
+        Reza Arbab <arbab@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Allison Randal <allison@lohutok.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Michal Suchanek <msuchanek@suse.de>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-mm@kvack.org
+Date:   Mon, 17 Feb 2020 17:32:33 -0300
+In-Reply-To: <efcf780cee767d0f4b06b56e216725c6bd8d60d4.camel@linux.ibm.com>
+References: <20200206030900.147032-1-leonardo@linux.ibm.com>
+         <20200206030900.147032-4-leonardo@linux.ibm.com>
+         <1311ce1c-7e5a-f7c4-2ab2-c03e124ca1c1@c-s.fr>
+         <efcf780cee767d0f4b06b56e216725c6bd8d60d4.camel@linux.ibm.com>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-rjDDfaEpQyTkTpCEQ2uL"
+User-Agent: Evolution 3.34.3 (3.34.3-1.fc31) 
 MIME-Version: 1.0
-Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-17_12:2020-02-17,2020-02-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
+ malwarescore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
+ adultscore=0 suspectscore=0 mlxscore=0 phishscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002170168
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> On Fri, Feb 07, 2020 at 07:53:34PM -0500, Peter Xu wrote:
->> On Fri, Feb 07, 2020 at 04:42:33PM -0800, Sean Christopherson wrote:
->> > On Fri, Feb 07, 2020 at 07:18:32PM -0500, Peter Xu wrote:
->> > > On Fri, Feb 07, 2020 at 11:45:32AM -0800, Sean Christopherson wrote:
->> > > > +Vitaly for HyperV
->> > > > 
->> > > > On Thu, Feb 06, 2020 at 04:41:06PM -0500, Peter Xu wrote:
->> > > > > On Thu, Feb 06, 2020 at 01:21:20PM -0800, Sean Christopherson wrote:
->> > > > > > On Thu, Feb 06, 2020 at 03:02:00PM -0500, Peter Xu wrote:
->> > > > > > > But that matters to this patch because if MIPS can use
->> > > > > > > kvm_flush_remote_tlbs(), then we probably don't need this
->> > > > > > > arch-specific hook any more and we can directly call
->> > > > > > > kvm_flush_remote_tlbs() after sync dirty log when flush==true.
->> > > > > > 
->> > > > > > Ya, the asid_flush_mask in kvm_vz_flush_shadow_all() is the only thing
->> > > > > > that prevents calling kvm_flush_remote_tlbs() directly, but I have no
->> > > > > > clue as to the important of that code.
->> > > > > 
->> > > > > As said above I think the x86 lockdep is really not necessary, then
->> > > > > considering MIPS could be the only one that will use the new hook
->> > > > > introduced in this patch...  Shall we figure that out first?
->> > > > 
->> > > > So I prepped a follow-up patch to make kvm_arch_dirty_log_tlb_flush() a
->> > > > MIPS-only hook and use kvm_flush_remote_tlbs() directly for arm and x86,
->> > > > but then I realized x86 *has* a hook to do a precise remote TLB flush.
->> > > > There's even an existing kvm_flush_remote_tlbs_with_address() call on a
->> > > > memslot, i.e. this exact scenario.  So arguably, x86 should be using the
->> > > > more precise flush and should keep kvm_arch_dirty_log_tlb_flush().
->> > > > 
->> > > > But, the hook is only used when KVM is running as an L1 on top of HyperV,
->> > > > and I assume dirty logging isn't used much, if at all, for L1 KVM on
->> > > > HyperV?
->> > > > 
->> > > > I see three options:
->> > > > 
->> > > >   1. Make kvm_arch_dirty_log_tlb_flush() MIPS-only and call
->> > > >      kvm_flush_remote_tlbs() directly for arm and x86.  Add comments to
->> > > >      explain when an arch should implement kvm_arch_dirty_log_tlb_flush().
->> > > > 
->> > > >   2. Change x86 to use kvm_flush_remote_tlbs_with_address() when flushing
->> > > >      a memslot after the dirty log is grabbed by userspace.
->> > > > 
->> > > >   3. Keep the resulting code as is, but add a comment in x86's
->> > > >      kvm_arch_dirty_log_tlb_flush() to explain why it uses
->> > > >      kvm_flush_remote_tlbs() instead of the with_address() variant.
->> > > > 
->> > > > I strongly prefer to (2) or (3), but I'll defer to Vitaly as to which of
->> > > > those is preferable.
->> > > > 
->> > > > I don't like (1) because (a) it requires more lines code (well comments),
->> > > > to explain why kvm_flush_remote_tlbs() is the default, and (b) it would
->> > > > require even more comments, which would be x86-specific in generic KVM,
->> > > > to explain why x86 doesn't use its with_address() flush, or we'd lost that
->> > > > info altogether.
->> > > > 
->> > > 
->> > > I proposed the 4th solution here:
->> > > 
->> > > https://lore.kernel.org/kvm/20200207223520.735523-1-peterx@redhat.com/
->> > > 
->> > > I'm not sure whether that's acceptable, but if it can, then we can
->> > > drop the kvm_arch_dirty_log_tlb_flush() hook, or even move on to
->> > > per-slot tlb flushing.
->> > 
->> > This effectively is per-slot TLB flushing, it just has a different name.
->> > I.e. s/kvm_arch_dirty_log_tlb_flush/kvm_arch_flush_remote_tlbs_memslot.
->> > I'm not opposed to that name change.  And on second and third glance, I
->> > probably prefer it.  That would more or less follow the naming of
->> > kvm_arch_flush_shadow_all() and kvm_arch_flush_shadow_memslot().
->> 
->> Note that the major point of the above patchset is not about doing tlb
->> flush per-memslot or globally.  It's more about whether we can provide
->> a common entrance for TLB flushing.  Say, after that series, we should
->> be able to flush TLB on all archs (majorly, including MIPS) as:
->> 
->>   kvm_flush_remote_tlbs(kvm);
->> 
->> And with the same idea we can also introduce the ranged version.
->> 
->> > 
->> > I don't want to go straight to kvm_arch_flush_remote_tlb_with_address()
->> > because that loses the important distinction (on x86) that slots_lock is
->> > expected to be held.
->> 
->> Sorry I'm still puzzled on why that lockdep is so important and
->> special for x86...  For example, what if we move that lockdep to the
->> callers of the kvm_arch_dirty_log_tlb_flush() calls so it protects
->> even more arch (where we do get/clear dirty log)?  IMHO the callers
->> must be with the slots_lock held anyways no matter for x86 or not.
->
->
-> Following the breadcrumbs leads to the comment in
-> kvm_mmu_slot_remove_write_access(), which says:
->
->         /*
->          * kvm_mmu_slot_remove_write_access() and kvm_vm_ioctl_get_dirty_log()
->          * which do tlb flush out of mmu-lock should be serialized by
->          * kvm->slots_lock otherwise tlb flush would be missed.
->          */
->
-> I.e. write-protecting a memslot and grabbing the dirty log for the memslot
-> need to be serialized.  It's quite obvious *now* that get_dirty_log() holds
-> slots_lock, but the purpose of lockdep assertions isn't just to verify the
-> current functionality, it's to help ensure the correctness for future code
-> and to document assumptions in the code.
->
-> Digging deeper, there are four functions, all related to dirty logging, in
-> the x86 mmu that basically open code what x86's
-> kvm_arch_flush_remote_tlbs_memslot() would look like if it uses the range
-> based flushing.
->
-> Unless it's functionally incorrect (Vitaly?), going with option (2) and
-> naming the hook kvm_arch_flush_remote_tlbs_memslot() seems like the obvious
-> choice, e.g. the final cleanup gives this diff stat:
+--=-rjDDfaEpQyTkTpCEQ2uL
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-(I apologize again for not replying in time)
+On Fri, 2020-02-07 at 01:38 -0300, Leonardo Bras wrote:
+> > Why not make them static inline just like the generic ones ?
+> >=20
+>=20
+> Sure, can be done.  It would save some function calls.
+> For that I will define the per-cpu variable in .c and declare it in .h
+> All new function can be moved to .h, while changing adding the inline
+> modifier.
 
-I think this is a valid approach and your option (2) would also be my
-choice. I also don't think there's going to be a problem when (if)
-Hyper-V adds support for PML (eVMCSv2?).
+Just tried doing that, but percpu stuff relies in paca definitions, and
+this ends up creating some cyclic dependencies.
 
->
->  arch/x86/kvm/mmu/mmu.c | 34 +++++++++-------------------------
->  1 file changed, 9 insertions(+), 25 deletions(-)
->
+I could try to change that, but the amount of change is big and
+probably should be dealt in another patchset.
 
-Looks nice :-)
+--=-rjDDfaEpQyTkTpCEQ2uL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
 
--- 
-Vitaly
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl5K+GEACgkQlQYWtz9S
+ttRsOg//QbdkYtnYqYavQzv828W7A3KiHEHqK77HtlTbJXOE5Vj9aU05HPZJp9XT
+ck/HXYupAIcMq+qJ8tNQKbu0zHCHxQ4dk7BPRM8RP4dp/bDOGGXqmvJG0toVtumX
+mTiJKUSaq7JeacS8xsx7hNZvLvHea/zagFha49BvLj6QajY+GU+CrpMJoaX1o/pc
+2mWKJfpLvacLQBQGfKC+t81VKHZC2K2BWpGyS7/MLEw120/n+KQHqaekMcgSaqVU
+lngRVDm4dHEZUZbOXjM3tyceMCTp5xTNv9+pS2friqkfXTomMS5ZuSW1O0i/A28m
+0TBWXC+kcQq+Bi1IxIqEPYQ3xab6/Xoba11GWD1qzBiUwd/3Xg30bAB9LYJXMwiD
+outVyh5BO6w8oSp1q5iHmt3raJLNTYYlG/SZzZCsCKXHr3EALNZvByETJ2j/oGdJ
+dbpPDOxmE2jbWMtIBhdjRFBmfmAGCTgRLpCq0hngNPm2sdQTmr9+B5UcWNzJjuks
+j1lDiMHOle78bT7GTYifJjVZrgBiB/JuToqBVzBIEgOBcGXiUXGUaDHgpNjKtH9d
+MtbmDODl9st9czyK/edN39eHlz4jfK+Z87ZJQVZz93bEjaRI6pRbqgiTVudWGdMN
+TISNtFVMgBbLWmgi8HOfs0zz4naMfcorqOhsTIi95qM8ygfs98s=
+=rEX5
+-----END PGP SIGNATURE-----
+
+--=-rjDDfaEpQyTkTpCEQ2uL--
 
