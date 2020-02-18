@@ -2,116 +2,124 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 56CAD1634C6
-	for <lists+kvm-ppc@lfdr.de>; Tue, 18 Feb 2020 22:23:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78FCC16378B
+	for <lists+kvm-ppc@lfdr.de>; Wed, 19 Feb 2020 00:54:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726352AbgBRVXz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 18 Feb 2020 16:23:55 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25892 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726339AbgBRVXy (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 18 Feb 2020 16:23:54 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01ILKSDH097838;
-        Tue, 18 Feb 2020 16:23:45 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y6dnu41sv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Feb 2020 16:23:45 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01ILN8GD001767;
-        Tue, 18 Feb 2020 21:23:44 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma02dal.us.ibm.com with ESMTP id 2y6896mny0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Feb 2020 21:23:44 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01ILNiRk48234944
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Feb 2020 21:23:44 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B74D112062;
-        Tue, 18 Feb 2020 21:23:44 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 76F69112061;
-        Tue, 18 Feb 2020 21:23:42 +0000 (GMT)
-Received: from oc6336877782.ibm.com (unknown [9.85.161.208])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Feb 2020 21:23:42 +0000 (GMT)
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Treat unrecognized TM instructions
- as illegal
-To:     Segher Boessenkool <segher@kernel.crashing.org>,
-        Michael Neuling <mikey@neuling.org>
-Cc:     Gustavo Romero <gromero@linux.ibm.com>, kvm-ppc@vger.kernel.org,
-        paulus@ozlabs.org, linuxppc-dev@lists.ozlabs.org
-References: <20200213151532.12559-1-gromero@linux.ibm.com>
- <29b136e15c2f04f783b54ec98552d1a6009234db.camel@neuling.org>
- <20200217055712.GS22482@gate.crashing.org>
- <1752a0c735a455c5d3ca09209f5a52748c8f7116.camel@neuling.org>
- <20200217073743.GT22482@gate.crashing.org>
-From:   Gustavo Romero <gromero@linux.vnet.ibm.com>
-Message-ID: <30664862-ede5-16c3-6215-ade0b660bb58@linux.vnet.ibm.com>
-Date:   Tue, 18 Feb 2020 18:23:41 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+        id S1727635AbgBRXyj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 18 Feb 2020 18:54:39 -0500
+Received: from mga04.intel.com ([192.55.52.120]:40044 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726641AbgBRXyj (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 18 Feb 2020 18:54:39 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Feb 2020 15:54:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,458,1574150400"; 
+   d="scan'208";a="224313154"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by orsmga007.jf.intel.com with ESMTP; 18 Feb 2020 15:54:38 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/9] KVM: Move x86 init ops to separate struct
+Date:   Tue, 18 Feb 2020 15:54:28 -0800
+Message-Id: <20200218235437.20533-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <20200217073743.GT22482@gate.crashing.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-18_07:2020-02-18,2020-02-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=598 clxscore=1015
- malwarescore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
- adultscore=0 suspectscore=0 mlxscore=0 phishscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002180139
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi,
+The non-x86 part of this series is wholly contained in patch 01.  Compared
+to other recent kvm-wide changes, this one is very straightforward (famous
+last words).
 
-On 02/17/2020 04:37 AM, Segher Boessenkool wrote:
-> On Mon, Feb 17, 2020 at 05:23:07PM +1100, Michael Neuling wrote:
->>>> Hence, we should NOP this, not generate an illegal.
->>>
->>> It is not a reserved bit.
->>>
->>> The IMC entry for it matches op1=011111 op2=1////01110 presumably, which
->>> catches all TM instructions and nothing else (bits 0..5 and bits 21..30).
->>> That does not look at bit 31, the softpatch handler has to deal with this.
->>>
->>> Some TM insns have bit 31 as 1 and some have it as /.  All instructions
->>> with a "." in the mnemonic have bit 31 is 1, all other have it reserved.
->>> The tables in appendices D, E, F show tend. and tsr. as having it
->>> reserved, which contradicts the individual instruction description (and
->>> does not make much sense).  (Only tcheck has /, everything else has 1;
->>> everything else has a mnemonic with a dot, and does write CR0 always).
->>
->> Wow, interesting.
->>
->> P8 seems to be treating 31 as a reserved bit (with the table definition rather
->> than the individual instruction description). I'm inclined to match P8 even
->> though it's inconsistent with the dot mnemonic as you say.
-> 
-> "The POWER8 core ignores the state of reserved bits in the instructions
-> (denoted by “///” in the instruction definition) and executes the
-> instruction normally. Software should set these bits to ‘0’ per the
-> Power ISA." (p8 UM, 3.1.1.3; same in the p9 UM).
+Like a few other architectures, e.g. PPC, x86 uses a set of global hooks
+to call back into vendor code on demand.  A handlful of the x86 hooks are
+used only within the scope of kvm_init().  This series moves the init-only
+hooks to a separate struct, partly to clean up the code a bit, but mainly
+so that the runtime hooks can be made available only after the x86 vendor
+has completed its ->hardware_setup().  While working on a different series
+I spent a fair bit of time scratching my as to why a kvm_x86_ops wasn't
+working, and eventually realized VMX's callback wasn't "ready" because the
+vmcs_config hadn't yet been populated.
 
-For the records, I've sent a v2 addressing Mikey's comments:
+Due to lack of a cross-compiling setup, the non-x86 changes in patch 01
+are untested.
 
-https://lists.ozlabs.org/pipermail/linuxppc-dev/2020-February/204502.html
+The SVM changes in patch 02 are fairly well tested, e.g. fudged things
+enough to ensure KVM didn't explode on a null pointer.
 
-or
+Patch 05 is a bit scary as a rogue dereference of kvm_x86_ops before
+->hardware_setup() will crash KVM (maybe the kernel?).  I didn't find any
+obvious ways to use kvm_x86_ops on AMD, and tested on a few different
+Intel CPUs, so I'm reasonably confident that there are no existing
+violations.
 
-https://marc.info/?l=kvm-ppc&m=158206045520038&w=2
+v2:
+  - Rebase to kvm/queue, 2c2787938512 ("KVM: selftests: Stop ...")
+  - Collect tags. [Cornelia]
+  - Add a patch to make kvm_x86_ops its own instance and copy
+    {vmx,svm}_x86_ops by value, which saves a memory access on every
+    invocation of a kvm_x86_ops hook. [Paolo]
+  - Add patches to tag {vmx,svm}_x86_ops as __initdata after they're
+    copied by value.
 
-Thanks for the review.
+Sean Christopherson (9):
+  KVM: Pass kvm_init()'s opaque param to additional arch funcs
+  KVM: x86: Move init-only kvm_x86_ops to separate struct
+  KVM: VMX: Move hardware_setup() definition below vmx_x86_ops
+  KVM: VMX: Configure runtime hooks using vmx_x86_ops
+  KVM: x86: Set kvm_x86_ops only after ->hardware_setup() completes
+  KVM: x86: Copy kvm_x86_ops by value to eliminate layer of indirection
+  KVM: x86: Drop __exit from kvm_x86_ops' hardware_unsetup()
+  KVM: VMX: Annotate vmx_x86_ops as __initdata
+  KVM: SVM: Annotate svm_x86_ops as __initdata
 
+ arch/mips/kvm/mips.c            |   4 +-
+ arch/powerpc/kvm/powerpc.c      |   4 +-
+ arch/s390/kvm/kvm-s390.c        |   4 +-
+ arch/x86/include/asm/kvm_host.h |  35 +--
+ arch/x86/kvm/cpuid.c            |  24 +-
+ arch/x86/kvm/hyperv.c           |   8 +-
+ arch/x86/kvm/kvm_cache_regs.h   |  10 +-
+ arch/x86/kvm/lapic.c            |  30 +--
+ arch/x86/kvm/mmu.h              |   4 +-
+ arch/x86/kvm/mmu/mmu.c          |  38 ++--
+ arch/x86/kvm/pmu.c              |  30 +--
+ arch/x86/kvm/pmu.h              |   2 +-
+ arch/x86/kvm/svm.c              |  21 +-
+ arch/x86/kvm/trace.h            |   4 +-
+ arch/x86/kvm/vmx/nested.c       |  17 +-
+ arch/x86/kvm/vmx/nested.h       |   3 +-
+ arch/x86/kvm/vmx/pmu_intel.c    |   2 +-
+ arch/x86/kvm/vmx/vmx.c          | 353 +++++++++++++++--------------
+ arch/x86/kvm/x86.c              | 384 ++++++++++++++++----------------
+ arch/x86/kvm/x86.h              |   4 +-
+ include/linux/kvm_host.h        |   4 +-
+ virt/kvm/arm/arm.c              |   4 +-
+ virt/kvm/kvm_main.c             |  18 +-
+ 23 files changed, 519 insertions(+), 488 deletions(-)
 
-Best regards,
-Gustavo
+-- 
+2.24.1
+
