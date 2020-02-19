@@ -2,37 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CB404163E32
-	for <lists+kvm-ppc@lfdr.de>; Wed, 19 Feb 2020 08:52:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BCDC164049
+	for <lists+kvm-ppc@lfdr.de>; Wed, 19 Feb 2020 10:23:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726636AbgBSHwH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 19 Feb 2020 02:52:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57624 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726213AbgBSHwH (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 19 Feb 2020 02:52:07 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3803C21D56;
-        Wed, 19 Feb 2020 07:52:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582098726;
-        bh=DXyXsIYD/jYMp5sCM+tq/z3Z1WPUdlaBaxmFssTcyyk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=puwrlXZUSL5xRYpx2wIoU8h9QkrBUiVtzWPTGdxijB1ZcG7ShYLc1DOiSySfjK+GW
-         iB3x43EXqv5h/6X5wzz9ixQpc0i8haradG6gGPu6McnsLLpgCy1vVtxOrh8qgcKxUA
-         2//XNmC5oXIrYiWGmSYvuSPoToXrOrCwIrzErJug=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j4K9M-006RyY-FM; Wed, 19 Feb 2020 07:52:04 +0000
-Date:   Wed, 19 Feb 2020 07:52:02 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
+        id S1726297AbgBSJXY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 19 Feb 2020 04:23:24 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:38275 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726605AbgBSJXX (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 Feb 2020 04:23:23 -0500
+Received: by mail-lj1-f195.google.com with SMTP id w1so26267424ljh.5
+        for <kvm-ppc@vger.kernel.org>; Wed, 19 Feb 2020 01:23:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cogentembedded-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=VYACtOJzFbdHHzYAV0uoJeRPRBCCx7IkeDn63MpNOyk=;
+        b=CCiBJDOQ5P0k1bJLD9sFKDMpZF6oQoNIKRBF2hY/zXle6ThFUJbx+Uw8FDu0XhSKfM
+         OuqwMUedhFw6kO9+gKhw/6icCcP+A1cD3RRqIU+Ltyo+5MXfiNboB6NEenFFQkECXJSw
+         HlqWyXSXGIYk7hjq0bEsC0KfXWoorwMeFCYx5lS9L+O2m1PrE/Mxpv9BiEvaaYuzmkCO
+         7KkriufHpAT98/br77i3qzpcE9ZZG4qN3h5EIF9lJTl/9rGRYzUQHtq41R/8I0ruZ9VH
+         WItNmhMtbZVQ9Byk+iw+zfqs7wj3lJgUVGnUyEJC4J7jpW874hnI2f7thaU/GlZFqFVm
+         rVTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VYACtOJzFbdHHzYAV0uoJeRPRBCCx7IkeDn63MpNOyk=;
+        b=e6SCY8Dt2EdOHqaVUN13vaMEU6u45mx3H5kHx5w5HyyvC+ccOeMmrweS3+e9/78ooo
+         ont1NStIIbjsnAeE6QmfGN1vY8diy2UOQqpN1+XsK5hRB+JtNLzCe122kGl/ODrBxwJj
+         vTJvoWfzlpHWbLXiyK+DYy3m9rznalBfdbGxi3JoH19R3yV18j34IMJK7OJ+tFTkXYzV
+         2iHKXiGLX/o9UwDklW/vcdn3jGtH6M/JlhkDW9yFoxlo/ZsFgAQHQq+FcwEcPfqMIyea
+         NZbuZg9+sClKjyA1pLRfaxV7+vELLtCPq/4IVZZSWy1oo1GCyr6n43OyAA8Ti/3Lz/Bo
+         F5EA==
+X-Gm-Message-State: APjAAAXL6iApWK/JWpX6A4ifpEh/Mu2wzEEn5O3CshgmKcyAVf78X8Na
+        x2n6ZC92xwXecHu+Z1TLwca9Yw==
+X-Google-Smtp-Source: APXvYqwYpw0gDCHzJar4JQhf+hD+uQHtynXxiIGrOaO+rkxoRcCGQ2R/zdsyaYtZedMgWq+L5SluAA==
+X-Received: by 2002:a2e:b044:: with SMTP id d4mr14981358ljl.159.1582104201028;
+        Wed, 19 Feb 2020 01:23:21 -0800 (PST)
+Received: from ?IPv6:2a00:1fa0:26e:a51f:ed1d:2717:41f:4f76? ([2a00:1fa0:26e:a51f:ed1d:2717:41f:4f76])
+        by smtp.gmail.com with ESMTPSA id q26sm843539lfp.85.2020.02.19.01.23.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Feb 2020 01:23:20 -0800 (PST)
+Subject: Re: [PATCH v6 21/22] KVM: x86/mmu: Use ranged-based TLB flush for
+ dirty log memslot flush
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
@@ -40,51 +57,51 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-mips@vger.kernel.org, kvm@vger.kernel.org,
         kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/9] KVM: Pass kvm_init()'s opaque param to
- additional arch funcs
-Message-ID: <20200219075202.1a6ed865@why>
-In-Reply-To: <20200218235437.20533-2-sean.j.christopherson@intel.com>
-References: <20200218235437.20533-1-sean.j.christopherson@intel.com>
-        <20200218235437.20533-2-sean.j.christopherson@intel.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20200218210736.16432-1-sean.j.christopherson@intel.com>
+ <20200218210736.16432-22-sean.j.christopherson@intel.com>
+From:   Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Message-ID: <fdb72ab9-18d4-5719-2863-78cde4e97fae@cogentembedded.com>
+Date:   Wed, 19 Feb 2020 12:22:58 +0300
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200218210736.16432-22-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, pbonzini@redhat.com, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, 18 Feb 2020 15:54:29 -0800
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+Hello!
 
-> Pass @opaque to kvm_arch_hardware_setup() and
-> kvm_arch_check_processor_compat() to allow architecture specific code to
-> reference @opaque without having to stash it away in a temporary global
-> variable.  This will enable x86 to separate its vendor specific callback
-> ops, which are passed via @opaque, into "init" and "runtime" ops without
-> having to stash away the "init" ops.
+On 19.02.2020 0:07, Sean Christopherson wrote:
+
+> Use the with_address() variant to when performing a TLB flush for a
+                                  ^^ is it really needed here?
+
+> specific memslot via kvm_arch_flush_remote_tlbs_memslot(), i.e. when
+> flushing after clearing dirty bits during KVM_{GET,CLEAR}_DIRTY_LOG.
+> This aligns all dirty log memslot-specific TLB flushes to use the
+> with_address() variant and paves the way for consolidating the relevant
+> code.
 > 
-> No functional change intended.
+> Note, moving to the with_address() variant only affects functionality
+> when running as a HyperV guest.
 > 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Tested-by: Cornelia Huck <cohuck@redhat.com> #s390
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+[...]
 
-Acked-by: Marc Zyngier <maz@kernel.org>
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+MBR, Sergei
