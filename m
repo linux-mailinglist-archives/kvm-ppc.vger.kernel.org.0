@@ -2,136 +2,85 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2B5416453A
-	for <lists+kvm-ppc@lfdr.de>; Wed, 19 Feb 2020 14:24:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 30C7016484F
+	for <lists+kvm-ppc@lfdr.de>; Wed, 19 Feb 2020 16:18:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727108AbgBSNYm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 19 Feb 2020 08:24:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33228 "EHLO mail.kernel.org"
+        id S1726784AbgBSPSP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 19 Feb 2020 10:18:15 -0500
+Received: from mga04.intel.com ([192.55.52.120]:22682 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726671AbgBSNYm (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 19 Feb 2020 08:24:42 -0500
-Received: from hump (unknown [147.67.241.226])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 02D8B24654;
-        Wed, 19 Feb 2020 13:24:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582118681;
-        bh=WeK8iDiz+u7KGQl8xdyYvIuPvj8pRW13k3gZGmGmUOU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CrDKTg0KsoKO1U07yyagx89/mJ6hieOjLuM/lo6w3mB9Y9R+aQAidXZSv/ywuM3au
-         r4bYkFE2ZGGFM/SSIBeOb3LJun+6yquvbVIUq2PH+U+U65CCtHToRoSUxXZ4LnlfNf
-         XO/4CZv966+4qxBk+L+tbRqcMNDfbzR2x3+83oH0=
-Date:   Wed, 19 Feb 2020 14:24:20 +0100
-From:   Mike Rapoport <rppt@kernel.org>
-To:     Christophe Leroy <christophe.leroy@c-s.fr>
-Cc:     linux-kernel@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Brian Cain <bcain@codeaurora.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Guan Xuetao <gxt@pku.edu.cn>,
+        id S1726691AbgBSPSP (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 19 Feb 2020 10:18:15 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Feb 2020 07:18:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,459,1574150400"; 
+   d="scan'208";a="235919620"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga003.jf.intel.com with ESMTP; 19 Feb 2020 07:18:14 -0800
+Date:   Wed, 19 Feb 2020 07:18:14 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
-        Jonas Bonn <jonas@southpole.se>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Ley Foon Tan <ley.foon.tan@intel.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Rich Felker <dalias@libc.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Stafford Horne <shorne@gmail.com>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Tony Luck <tony.luck@intel.com>, Will Deacon <will@kernel.org>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-        linux-sh@vger.kernel.org, nios2-dev@lists.rocketboards.org,
-        openrisc@lists.librecores.org,
-        uclinux-h8-devel@lists.sourceforge.jp,
-        Mike Rapoport <rppt@linux.ibm.com>
-Subject: Re: [PATCH v2 07/13] powerpc: add support for folded p4d page tables
-Message-ID: <20200219132420.GA5559@hump>
-References: <20200216081843.28670-1-rppt@kernel.org>
- <20200216081843.28670-8-rppt@kernel.org>
- <5b7c3929-5833-8ceb-85c8-a8e92e6a138e@c-s.fr>
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Peter Xu <peterx@redhat.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v6 21/22] KVM: x86/mmu: Use ranged-based TLB flush for
+ dirty log memslot flush
+Message-ID: <20200219151814.GC15888@linux.intel.com>
+References: <20200218210736.16432-1-sean.j.christopherson@intel.com>
+ <20200218210736.16432-22-sean.j.christopherson@intel.com>
+ <fdb72ab9-18d4-5719-2863-78cde4e97fae@cogentembedded.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5b7c3929-5833-8ceb-85c8-a8e92e6a138e@c-s.fr>
+In-Reply-To: <fdb72ab9-18d4-5719-2863-78cde4e97fae@cogentembedded.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Feb 19, 2020 at 01:07:55PM +0100, Christophe Leroy wrote:
+On Wed, Feb 19, 2020 at 12:22:58PM +0300, Sergei Shtylyov wrote:
+> Hello!
 > 
-> Le 16/02/2020 à 09:18, Mike Rapoport a écrit :
-> > diff --git a/arch/powerpc/mm/ptdump/ptdump.c b/arch/powerpc/mm/ptdump/ptdump.c
-> > index 206156255247..7bd4b81d5b5d 100644
-> > --- a/arch/powerpc/mm/ptdump/ptdump.c
-> > +++ b/arch/powerpc/mm/ptdump/ptdump.c
-> > @@ -277,9 +277,9 @@ static void walk_pmd(struct pg_state *st, pud_t *pud, unsigned long start)
-> >   	}
-> >   }
-> > -static void walk_pud(struct pg_state *st, pgd_t *pgd, unsigned long start)
-> > +static void walk_pud(struct pg_state *st, p4d_t *p4d, unsigned long start)
-> >   {
-> > -	pud_t *pud = pud_offset(pgd, 0);
-> > +	pud_t *pud = pud_offset(p4d, 0);
-> >   	unsigned long addr;
-> >   	unsigned int i;
-> > @@ -293,6 +293,22 @@ static void walk_pud(struct pg_state *st, pgd_t *pgd, unsigned long start)
-> >   	}
-> >   }
-> > +static void walk_p4d(struct pg_state *st, pgd_t *pgd, unsigned long start)
-> > +{
-> > +	p4d_t *p4d = p4d_offset(pgd, 0);
-> > +	unsigned long addr;
-> > +	unsigned int i;
-> > +
-> > +	for (i = 0; i < PTRS_PER_P4D; i++, p4d++) {
-> > +		addr = start + i * P4D_SIZE;
-> > +		if (!p4d_none(*p4d) && !p4d_is_leaf(*p4d))
-> > +			/* p4d exists */
-> > +			walk_pud(st, p4d, addr);
-> > +		else
-> > +			note_page(st, addr, 2, p4d_val(*p4d));
+> On 19.02.2020 0:07, Sean Christopherson wrote:
 > 
-> Level 2 is already used by walk_pud().
-> 
-> I think you have to increment the level used in walk_pud() and walk_pmd()
-> and walk_pte()
+> >Use the with_address() variant to when performing a TLB flush for a
+>                                  ^^ is it really needed here?
 
-Thanks for catching this!
-I'll fix the numbers in the next version.
- 
-> > +	}
-> > +}
-> > +
-> >   static void walk_pagetables(struct pg_state *st)
-> >   {
-> >   	unsigned int i;
-> > @@ -306,7 +322,7 @@ static void walk_pagetables(struct pg_state *st)
-> >   	for (i = pgd_index(addr); i < PTRS_PER_PGD; i++, pgd++, addr += PGDIR_SIZE) {
-> >   		if (!pgd_none(*pgd) && !pgd_is_leaf(*pgd))
-> >   			/* pgd exists */
-> > -			walk_pud(st, pgd, addr);
-> > +			walk_p4d(st, pgd, addr);
-> >   		else
-> >   			note_page(st, addr, 1, pgd_val(*pgd));
-> >   	}
-> 
-> Christophe
+Doh, thanks.  The subject also has a typo, it should be "range-based", not
+"ranged-based".
 
--- 
-Sincerely yours,
-Mike.
+> >specific memslot via kvm_arch_flush_remote_tlbs_memslot(), i.e. when
+> >flushing after clearing dirty bits during KVM_{GET,CLEAR}_DIRTY_LOG.
+> >This aligns all dirty log memslot-specific TLB flushes to use the
+> >with_address() variant and paves the way for consolidating the relevant
+> >code.
+> >
+> >Note, moving to the with_address() variant only affects functionality
+> >when running as a HyperV guest.
+> >
+> >Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> >Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> [...]
+> 
+> MBR, Sergei
