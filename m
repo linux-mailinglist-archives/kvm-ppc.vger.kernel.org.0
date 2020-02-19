@@ -2,106 +2,189 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BCDC164049
-	for <lists+kvm-ppc@lfdr.de>; Wed, 19 Feb 2020 10:23:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 270D21643EF
+	for <lists+kvm-ppc@lfdr.de>; Wed, 19 Feb 2020 13:08:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726297AbgBSJXY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 19 Feb 2020 04:23:24 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:38275 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726605AbgBSJXX (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 Feb 2020 04:23:23 -0500
-Received: by mail-lj1-f195.google.com with SMTP id w1so26267424ljh.5
-        for <kvm-ppc@vger.kernel.org>; Wed, 19 Feb 2020 01:23:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=VYACtOJzFbdHHzYAV0uoJeRPRBCCx7IkeDn63MpNOyk=;
-        b=CCiBJDOQ5P0k1bJLD9sFKDMpZF6oQoNIKRBF2hY/zXle6ThFUJbx+Uw8FDu0XhSKfM
-         OuqwMUedhFw6kO9+gKhw/6icCcP+A1cD3RRqIU+Ltyo+5MXfiNboB6NEenFFQkECXJSw
-         HlqWyXSXGIYk7hjq0bEsC0KfXWoorwMeFCYx5lS9L+O2m1PrE/Mxpv9BiEvaaYuzmkCO
-         7KkriufHpAT98/br77i3qzpcE9ZZG4qN3h5EIF9lJTl/9rGRYzUQHtq41R/8I0ruZ9VH
-         WItNmhMtbZVQ9Byk+iw+zfqs7wj3lJgUVGnUyEJC4J7jpW874hnI2f7thaU/GlZFqFVm
-         rVTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VYACtOJzFbdHHzYAV0uoJeRPRBCCx7IkeDn63MpNOyk=;
-        b=e6SCY8Dt2EdOHqaVUN13vaMEU6u45mx3H5kHx5w5HyyvC+ccOeMmrweS3+e9/78ooo
-         ont1NStIIbjsnAeE6QmfGN1vY8diy2UOQqpN1+XsK5hRB+JtNLzCe122kGl/ODrBxwJj
-         vTJvoWfzlpHWbLXiyK+DYy3m9rznalBfdbGxi3JoH19R3yV18j34IMJK7OJ+tFTkXYzV
-         2iHKXiGLX/o9UwDklW/vcdn3jGtH6M/JlhkDW9yFoxlo/ZsFgAQHQq+FcwEcPfqMIyea
-         NZbuZg9+sClKjyA1pLRfaxV7+vELLtCPq/4IVZZSWy1oo1GCyr6n43OyAA8Ti/3Lz/Bo
-         F5EA==
-X-Gm-Message-State: APjAAAXL6iApWK/JWpX6A4ifpEh/Mu2wzEEn5O3CshgmKcyAVf78X8Na
-        x2n6ZC92xwXecHu+Z1TLwca9Yw==
-X-Google-Smtp-Source: APXvYqwYpw0gDCHzJar4JQhf+hD+uQHtynXxiIGrOaO+rkxoRcCGQ2R/zdsyaYtZedMgWq+L5SluAA==
-X-Received: by 2002:a2e:b044:: with SMTP id d4mr14981358ljl.159.1582104201028;
-        Wed, 19 Feb 2020 01:23:21 -0800 (PST)
-Received: from ?IPv6:2a00:1fa0:26e:a51f:ed1d:2717:41f:4f76? ([2a00:1fa0:26e:a51f:ed1d:2717:41f:4f76])
-        by smtp.gmail.com with ESMTPSA id q26sm843539lfp.85.2020.02.19.01.23.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Feb 2020 01:23:20 -0800 (PST)
-Subject: Re: [PATCH v6 21/22] KVM: x86/mmu: Use ranged-based TLB flush for
- dirty log memslot flush
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        id S1726788AbgBSMH7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 19 Feb 2020 07:07:59 -0500
+Received: from pegase1.c-s.fr ([93.17.236.30]:63773 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726495AbgBSMH7 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 19 Feb 2020 07:07:59 -0500
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 48MxLg3psQz9v9Dt;
+        Wed, 19 Feb 2020 13:07:55 +0100 (CET)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=XonlV0Z+; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id AFyfJZVf4xTO; Wed, 19 Feb 2020 13:07:55 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 48MxLg2Kzcz9v9Ds;
+        Wed, 19 Feb 2020 13:07:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1582114075; bh=SUPm/xbOXqzg/7rTrLgpDJn6K3q1CABhJDtHqKqTUfA=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=XonlV0Z+kSYp9DXtpHiZkNHEHxFMw6PZijdFfIFeuIK/K+RCtqkXv0VtzGY+2wuZu
+         xOicb9401xVMMs8rHDmTPmm6KlS2ffHsw+cSbAZdq3j0YAum02eQePHOFl9npiNl8S
+         akY+ce7GONPJifLUkacYEEGeIusgoWWVvfKmbJes=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 8CDA98B83F;
+        Wed, 19 Feb 2020 13:07:56 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id ix2R2LHOLPeo; Wed, 19 Feb 2020 13:07:56 +0100 (CET)
+Received: from [172.25.230.102] (po15451.idsi0.si.c-s.fr [172.25.230.102])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id B4B6E8B837;
+        Wed, 19 Feb 2020 13:07:55 +0100 (CET)
+Subject: Re: [PATCH v2 07/13] powerpc: add support for folded p4d page tables
+To:     Mike Rapoport <rppt@kernel.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Brian Cain <bcain@codeaurora.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Guan Xuetao <gxt@pku.edu.cn>,
         James Morse <james.morse@arm.com>,
+        Jonas Bonn <jonas@southpole.se>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Ley Foon Tan <ley.foon.tan@intel.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Rich Felker <dalias@libc.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Stafford Horne <shorne@gmail.com>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Peter Xu <peterx@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20200218210736.16432-1-sean.j.christopherson@intel.com>
- <20200218210736.16432-22-sean.j.christopherson@intel.com>
-From:   Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Message-ID: <fdb72ab9-18d4-5719-2863-78cde4e97fae@cogentembedded.com>
-Date:   Wed, 19 Feb 2020 12:22:58 +0300
-User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:68.0) Gecko/20100101
+        Tony Luck <tony.luck@intel.com>, Will Deacon <will@kernel.org>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
+        linux-sh@vger.kernel.org, nios2-dev@lists.rocketboards.org,
+        openrisc@lists.librecores.org,
+        uclinux-h8-devel@lists.sourceforge.jp,
+        Mike Rapoport <rppt@linux.ibm.com>
+References: <20200216081843.28670-1-rppt@kernel.org>
+ <20200216081843.28670-8-rppt@kernel.org>
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+Message-ID: <5b7c3929-5833-8ceb-85c8-a8e92e6a138e@c-s.fr>
+Date:   Wed, 19 Feb 2020 13:07:55 +0100
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200218210736.16432-22-sean.j.christopherson@intel.com>
+In-Reply-To: <20200216081843.28670-8-rppt@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hello!
 
-On 19.02.2020 0:07, Sean Christopherson wrote:
 
-> Use the with_address() variant to when performing a TLB flush for a
-                                  ^^ is it really needed here?
-
-> specific memslot via kvm_arch_flush_remote_tlbs_memslot(), i.e. when
-> flushing after clearing dirty bits during KVM_{GET,CLEAR}_DIRTY_LOG.
-> This aligns all dirty log memslot-specific TLB flushes to use the
-> with_address() variant and paves the way for consolidating the relevant
-> code.
+Le 16/02/2020 à 09:18, Mike Rapoport a écrit :
+> From: Mike Rapoport <rppt@linux.ibm.com>
 > 
-> Note, moving to the with_address() variant only affects functionality
-> when running as a HyperV guest.
+> Implement primitives necessary for the 4th level folding, add walks of p4d
+> level where appropriate and replace 5level-fixup.h with pgtable-nop4d.h.
 > 
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-[...]
+> Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+> Tested-by: Christophe Leroy <christophe.leroy@c-s.fr> # 8xx and 83xx
+> ---
+>   arch/powerpc/include/asm/book3s/32/pgtable.h  |  1 -
+>   arch/powerpc/include/asm/book3s/64/hash.h     |  4 +-
+>   arch/powerpc/include/asm/book3s/64/pgalloc.h  |  4 +-
+>   arch/powerpc/include/asm/book3s/64/pgtable.h  | 58 ++++++++++--------
+>   arch/powerpc/include/asm/book3s/64/radix.h    |  6 +-
+>   arch/powerpc/include/asm/nohash/32/pgtable.h  |  1 -
+>   arch/powerpc/include/asm/nohash/64/pgalloc.h  |  2 +-
+>   .../include/asm/nohash/64/pgtable-4k.h        | 32 +++++-----
+>   arch/powerpc/include/asm/nohash/64/pgtable.h  |  6 +-
+>   arch/powerpc/include/asm/pgtable.h            |  8 +++
+>   arch/powerpc/kvm/book3s_64_mmu_radix.c        | 59 ++++++++++++++++---
+>   arch/powerpc/lib/code-patching.c              |  7 ++-
+>   arch/powerpc/mm/book3s32/mmu.c                |  2 +-
+>   arch/powerpc/mm/book3s32/tlb.c                |  4 +-
+>   arch/powerpc/mm/book3s64/hash_pgtable.c       |  4 +-
+>   arch/powerpc/mm/book3s64/radix_pgtable.c      | 19 ++++--
+>   arch/powerpc/mm/book3s64/subpage_prot.c       |  6 +-
+>   arch/powerpc/mm/hugetlbpage.c                 | 28 +++++----
+>   arch/powerpc/mm/kasan/kasan_init_32.c         |  8 +--
+>   arch/powerpc/mm/mem.c                         |  4 +-
+>   arch/powerpc/mm/nohash/40x.c                  |  4 +-
+>   arch/powerpc/mm/nohash/book3e_pgtable.c       | 15 +++--
+>   arch/powerpc/mm/pgtable.c                     | 25 +++++++-
+>   arch/powerpc/mm/pgtable_32.c                  | 28 +++++----
+>   arch/powerpc/mm/pgtable_64.c                  | 10 ++--
+>   arch/powerpc/mm/ptdump/hashpagetable.c        | 20 ++++++-
+>   arch/powerpc/mm/ptdump/ptdump.c               | 22 ++++++-
+>   arch/powerpc/xmon/xmon.c                      | 17 +++++-
+>   28 files changed, 284 insertions(+), 120 deletions(-)
+> 
+> diff --git a/arch/powerpc/mm/ptdump/ptdump.c b/arch/powerpc/mm/ptdump/ptdump.c
+> index 206156255247..7bd4b81d5b5d 100644
+> --- a/arch/powerpc/mm/ptdump/ptdump.c
+> +++ b/arch/powerpc/mm/ptdump/ptdump.c
+> @@ -277,9 +277,9 @@ static void walk_pmd(struct pg_state *st, pud_t *pud, unsigned long start)
+>   	}
+>   }
+>   
+> -static void walk_pud(struct pg_state *st, pgd_t *pgd, unsigned long start)
+> +static void walk_pud(struct pg_state *st, p4d_t *p4d, unsigned long start)
+>   {
+> -	pud_t *pud = pud_offset(pgd, 0);
+> +	pud_t *pud = pud_offset(p4d, 0);
+>   	unsigned long addr;
+>   	unsigned int i;
+>   
+> @@ -293,6 +293,22 @@ static void walk_pud(struct pg_state *st, pgd_t *pgd, unsigned long start)
+>   	}
+>   }
+>   
+> +static void walk_p4d(struct pg_state *st, pgd_t *pgd, unsigned long start)
+> +{
+> +	p4d_t *p4d = p4d_offset(pgd, 0);
+> +	unsigned long addr;
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < PTRS_PER_P4D; i++, p4d++) {
+> +		addr = start + i * P4D_SIZE;
+> +		if (!p4d_none(*p4d) && !p4d_is_leaf(*p4d))
+> +			/* p4d exists */
+> +			walk_pud(st, p4d, addr);
+> +		else
+> +			note_page(st, addr, 2, p4d_val(*p4d));
 
-MBR, Sergei
+Level 2 is already used by walk_pud().
+
+I think you have to increment the level used in walk_pud() and 
+walk_pmd() and walk_pte()
+
+> +	}
+> +}
+> +
+>   static void walk_pagetables(struct pg_state *st)
+>   {
+>   	unsigned int i;
+> @@ -306,7 +322,7 @@ static void walk_pagetables(struct pg_state *st)
+>   	for (i = pgd_index(addr); i < PTRS_PER_PGD; i++, pgd++, addr += PGDIR_SIZE) {
+>   		if (!pgd_none(*pgd) && !pgd_is_leaf(*pgd))
+>   			/* pgd exists */
+> -			walk_pud(st, pgd, addr);
+> +			walk_p4d(st, pgd, addr);
+>   		else
+>   			note_page(st, addr, 1, pgd_val(*pgd));
+>   	}
+
+Christophe
