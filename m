@@ -2,128 +2,148 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DA1F716661C
-	for <lists+kvm-ppc@lfdr.de>; Thu, 20 Feb 2020 19:19:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3C971669FF
+	for <lists+kvm-ppc@lfdr.de>; Thu, 20 Feb 2020 22:40:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728173AbgBTSTw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 20 Feb 2020 13:19:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33498 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727553AbgBTSTw (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 20 Feb 2020 13:19:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582222790;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=obxVXBYRAmnOA1SZMlmZvsbkXpHvqTIQ+TOcUb8T0eE=;
-        b=f8omgFQB9GzQzdxcDTW8LnHGq6Ld/yx7A63SUasM1KNAZgQ6U458fuIObp4DItlgVHIg5q
-        KG/V/LdVA5vZWWdfp6TVVqR+jUoHFa6YZjvsbkARKwyXNKznd4iZXOSQSpz0/lsUR0ZIQu
-        ZgYJPepu1UHiLSfxI3P34896BmPMCTs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-otoHWshVPT-jZMjRZUw8mQ-1; Thu, 20 Feb 2020 13:19:46 -0500
-X-MC-Unique: otoHWshVPT-jZMjRZUw8mQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F5E51005510;
-        Thu, 20 Feb 2020 18:19:44 +0000 (UTC)
-Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 43BA386E0D;
-        Thu, 20 Feb 2020 18:19:43 +0000 (UTC)
-Date:   Thu, 20 Feb 2020 11:19:42 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     linuxppc-dev@lists.ozlabs.org,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, Alistair Popple <alistair@popple.id.au>
-Subject: Re: [PATCH kernel 5/5] vfio/spapr_tce: Advertise and allow a huge
- DMA windows at 4GB
-Message-ID: <20200220111942.2b53414a@w520.home>
-In-Reply-To: <20200218073650.16149-6-aik@ozlabs.ru>
-References: <20200218073650.16149-1-aik@ozlabs.ru>
-        <20200218073650.16149-6-aik@ozlabs.ru>
+        id S1727786AbgBTVkQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 20 Feb 2020 16:40:16 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40432 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726670AbgBTVkP (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 20 Feb 2020 16:40:15 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01KLSZWK049642;
+        Thu, 20 Feb 2020 16:40:05 -0500
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y9sbutp19-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Feb 2020 16:40:05 -0500
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01KLe4ZX025121;
+        Thu, 20 Feb 2020 21:40:04 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma04wdc.us.ibm.com with ESMTP id 2y6896yyyx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Feb 2020 21:40:04 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01KLe3ci55116174
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Feb 2020 21:40:03 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 51E5F78064;
+        Thu, 20 Feb 2020 21:40:03 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E93FC78067;
+        Thu, 20 Feb 2020 21:40:01 +0000 (GMT)
+Received: from oc6336877782.ibm.com (unknown [9.18.235.171])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 20 Feb 2020 21:40:01 +0000 (GMT)
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Treat TM-related invalid form
+ instructions on P9 like the valid ones
+To:     Leonardo Bras <leonardo@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+        paulus@ozlabs.org
+Cc:     linuxppc-dev@lists.ozlabs.org, segher@kernel.crashing.org,
+        mikey@neuling.org
+References: <20200218211324.23045-1-gromero@linux.ibm.com>
+ <b19a8b0cb1ad8275458df16142756b30f8b288b7.camel@linux.ibm.com>
+From:   Gustavo Romero <gromero@linux.vnet.ibm.com>
+Message-ID: <0b2174c9-dd72-c978-4410-73d358ab13d2@linux.vnet.ibm.com>
+Date:   Thu, 20 Feb 2020 18:40:01 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <b19a8b0cb1ad8275458df16142756b30f8b288b7.camel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-20_17:2020-02-19,2020-02-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ mlxscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 adultscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002200157
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, 18 Feb 2020 18:36:50 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+Hi Leonardo,
 
-> So far the only option for a big 64big DMA window was a window located
-> at 0x800.0000.0000.0000 (1<<59) which creates problems for devices
-> supporting smaller DMA masks.
+Thanks a lot for the review.
+
+On 02/20/2020 02:51 PM, Leonardo Bras wrote:
+>> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+>> +
 > 
-> This exploits a POWER9 PHB option to allow the second DMA window to map
-> at 0 and advertises it with a 4GB offset to avoid overlap with
-> the default 32bit window.
+> Could not see where is this used.
+
+This is used by pr_warn_ratelimited() below so the module name is printed before
+the message, for instance:
+
+[531454.670909] kvm_hv: Unrecognized TM-related instruction 0x7c00075c for emulation
+
+
+>>   #include <linux/kvm_host.h>
+>>
+>>   #include <asm/kvm_ppc.h>
+>> @@ -44,7 +46,18 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
+>>   	u64 newmsr, bescr;
+>>   	int ra, rs;
+>>
+>> -	switch (instr & 0xfc0007ff) {
+>> +	/*
+>> +	 * rfid, rfebb, and mtmsrd encode bit 31 = 0 since it's a reserved bit
+>> +	 * in these instructions, so masking bit 31 out doesn't change these
+>> +	 * instructions. For treclaim., tsr., and trechkpt. instructions if bit
+>> +	 * 31 = 0 then they are per ISA invalid forms, however P9 UM, in section
+>> +	 * 4.6.10 Book II Invalid Forms, informs specifically that ignoring bit
+>> +	 * 31 is an acceptable way to handle these invalid forms that have
+>> +	 * bit 31 = 0. Moreover, for emulation purposes both forms (w/ and wo/
+>> +	 * bit 31 set) can generate a softpatch interrupt. Hence both forms
+>> +	 * are handled below for these instructions so they behave the same way.
+>> +	 */
+>> +	switch (instr & PO_XOP_OPCODE_MASK) {
+>>
+> <SNIP>
+>> -	case PPC_INST_TRECHKPT:
+>> +	/* ignore bit 31, see comment above */
+>> +	case (PPC_INST_TRECHKPT & PO_XOP_OPCODE_MASK):
+>>   		/* XXX do we need to check for PR=0 here? */
+>>   		/* check for TM disabled in the HFSCR or MSR */
+>>   		if (!(vcpu->arch.hfscr & HFSCR_TM)) {
+>> @@ -208,6 +224,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
+>>   	}
+>>
 > 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->  include/uapi/linux/vfio.h           |  2 ++
->  drivers/vfio/vfio_iommu_spapr_tce.c | 10 ++++++++--
->  2 files changed, 10 insertions(+), 2 deletions(-)
+> Seems good, using the same flag to mask out bit 31 of these macros.
+> They are used only in a few places, and I think removing the macro bit
+> would be ok, but I think your way is better to keep it documented.
 > 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 9e843a147ead..c7f89d47335a 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -831,9 +831,11 @@ struct vfio_iommu_spapr_tce_info {
->  	__u32 argsz;
->  	__u32 flags;
->  #define VFIO_IOMMU_SPAPR_INFO_DDW	(1 << 0)	/* DDW supported */
-> +#define VFIO_IOMMU_SPAPR_INFO_DDW_START	(1 << 1)	/* DDW offset */
->  	__u32 dma32_window_start;	/* 32 bit window start (bytes) */
->  	__u32 dma32_window_size;	/* 32 bit window size (bytes) */
->  	struct vfio_iommu_spapr_tce_ddw_info ddw;
-> +	__u64 dma64_window_start;
->  };
->  
->  #define VFIO_IOMMU_SPAPR_TCE_GET_INFO	_IO(VFIO_TYPE, VFIO_BASE + 12)
-> diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
-> index 16b3adc508db..4f22be3c4aa2 100644
-> --- a/drivers/vfio/vfio_iommu_spapr_tce.c
-> +++ b/drivers/vfio/vfio_iommu_spapr_tce.c
-> @@ -691,7 +691,7 @@ static long tce_iommu_create_window(struct tce_container *container,
->  	container->tables[num] = tbl;
->  
->  	/* Return start address assigned by platform in create_table() */
-> -	*start_addr = tbl->it_offset << tbl->it_page_shift;
-> +	*start_addr = tbl->it_dmaoff << tbl->it_page_shift;
->  
->  	return 0;
->  
-> @@ -842,7 +842,13 @@ static long tce_iommu_ioctl(void *iommu_data,
->  			info.ddw.levels = table_group->max_levels;
->  		}
->  
-> -		ddwsz = offsetofend(struct vfio_iommu_spapr_tce_info, ddw);
-> +		ddwsz = offsetofend(struct vfio_iommu_spapr_tce_info,
-> +				dma64_window_start);
+> I just noticed that there is a similar function that uses PPC_INST_TSR:
+> kvmhv_p9_tm_emulation_early @ arch/powerpc/kvm/book3s_hv_tm_builtin.c.
+> Wouldn't it need to be changed as well?
 
-This breaks existing users, now they no longer get the ddw struct
-unless their argsz also includes the new dma64 window field.
+oh! you're right, I forgot that one. I'll send a v3.
 
-> +
-> +		if (info.argsz >= ddwsz) {
-> +			info.flags |= VFIO_IOMMU_SPAPR_INFO_DDW_START;
-> +			info.dma64_window_start = table_group->tce64_start;
-> +		}
 
-This is inconsistent with ddw where we set the flag regardless of
-argsz, but obviously only provide the field to the user if they've
-provided room for it.  Thanks,
+>>   	/* What should we do here? We didn't recognize the instruction */
+>> -	WARN_ON_ONCE(1);
+>> +	kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
+>> +	pr_warn_ratelimited("Unrecognized TM-related instruction %#x for emulation", instr);
+>> +
+>>   	return RESUME_GUEST;
+>>   }
+> 
+> I suppose this is the right thing to do, but I think it would be better
+> to give this change it's own patch.
+> 
+> What do you think?
 
-Alex
+I think it's sufficiently self-contained and trivial to be in the same file and
+to be in a single commit.
 
->  
->  		if (info.argsz >= ddwsz)
->  			minsz = ddwsz;
 
+Best regards,
+Gustavo
