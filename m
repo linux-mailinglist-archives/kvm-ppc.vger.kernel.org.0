@@ -2,136 +2,89 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AFCA016A237
-	for <lists+kvm-ppc@lfdr.de>; Mon, 24 Feb 2020 10:26:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A141D16EAD9
+	for <lists+kvm-ppc@lfdr.de>; Tue, 25 Feb 2020 17:09:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727307AbgBXJ0r (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 24 Feb 2020 04:26:47 -0500
-Received: from mail-vi1eur05on2073.outbound.protection.outlook.com ([40.107.21.73]:16580
-        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727240AbgBXJ0r (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 24 Feb 2020 04:26:47 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eLhB7iH5YDJQd/UPqkLrfmxKIxhuOEeRo6o8Gcea5ND0iEi6k7xi2hbTiBGcZD6y9L8ZIeZ7GxgbKqzuCARa7/dxorkh2FV0tXrKJ8Ra3ueH2QOrhQR2BVB9ND61nTS6hiqe52Hw857jN0gmuASJvbtl52mlJGUcpB2VhpnKZ3Dqw7UEFFnx46aiueqYaDFc9MbpOdSY7X8GibnhUFK14SWvLTiaNrgW0TRlPxoyU6EH2PvLqam6QUHSR+kw1fqJbcKG+OWGwxp35cemaWPZDxuu4U7JyGfSybZXsBGdp7BbXCLhaHHQ+/HKYILfLsUnsj5/tYpZ96zDQo9S5zqmXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tmGwAKElI2u+A0z/EETBIou5ic5kIe13D9NL0wb7U2M=;
- b=CGZrT9/zeWLslICwnV47CvnyCi4tEwQUvjqq4frvluTbtOh5IsXbUWZuRHjfuSArjnFQ7V8qGqVtI2g+xSErDkkqpOSMvLUpueUfM/Y9a9cvMUxhhRbsXuIIRghZMWr0aoiTyBh0F+ZkCM8+Y3hBx6wkGKIKjlk/4z7TKSRnyf7C+/w9hY+f31izRZKM57PBovCQDJhle01mAgeJWMacphqeZc477gRYs6vLNoJsWtMM5xovPP/PM0OZc9LqnyZrXo8PTjlcKfMmfh2jHrdSdSA+MTMjrhYqLuJajloIZjDMLL7d3s9hytgzdiyLTjnyRxL1AizGgpggJZlBlsKWag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 188.184.36.50) smtp.rcpttodomain=kernel.org smtp.mailfrom=cern.ch;
- dmarc=bestguesspass action=none header.from=cern.ch; dkim=none (message not
- signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cern.onmicrosoft.com;
- s=selector2-cern-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tmGwAKElI2u+A0z/EETBIou5ic5kIe13D9NL0wb7U2M=;
- b=treHLM/wuTE3F8KbK3ygj/ORGGmbE9HBEQqYgWyAmRwvSPW5jnP+JZ60wkplYx3/8FOYO8MRW3svCyvPlLsPYQKPlKNIaLUHO55uV6xCD9MQs9BFPL7WD+jRjhSKWoD25d/Kj3n/1EbzSGqtTHjsNsdj0qDL4wKrkQGEOj305CA=
-Received: from AM0PR06CA0026.eurprd06.prod.outlook.com (2603:10a6:208:ab::39)
- by HE1PR0601MB2617.eurprd06.prod.outlook.com (2603:10a6:3:4c::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.22; Mon, 24 Feb
- 2020 09:26:42 +0000
-Received: from VE1EUR02FT030.eop-EUR02.prod.protection.outlook.com
- (2a01:111:f400:7e06::205) by AM0PR06CA0026.outlook.office365.com
- (2603:10a6:208:ab::39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.18 via Frontend
- Transport; Mon, 24 Feb 2020 09:26:42 +0000
-Authentication-Results: spf=pass (sender IP is 188.184.36.50)
- smtp.mailfrom=cern.ch; kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=bestguesspass action=none
- header.from=cern.ch;
-Received-SPF: Pass (protection.outlook.com: domain of cern.ch designates
- 188.184.36.50 as permitted sender) receiver=protection.outlook.com;
- client-ip=188.184.36.50; helo=cernmxgwlb4.cern.ch;
-Received: from cernmxgwlb4.cern.ch (188.184.36.50) by
- VE1EUR02FT030.mail.protection.outlook.com (10.152.12.127) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.2750.18 via Frontend Transport; Mon, 24 Feb 2020 09:26:41 +0000
-Received: from cernfe04.cern.ch (188.184.36.41) by cernmxgwlb4.cern.ch
- (188.184.36.50) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 24 Feb
- 2020 10:26:40 +0100
-Received: from pcbe13614.localnet (2001:1458:202:121::100:40) by smtp.cern.ch
- (2001:1458:201:66::100:14) with Microsoft SMTP Server (TLS) id 14.3.487.0;
- Mon, 24 Feb 2020 10:26:38 +0100
-From:   Federico Vaga <federico.vaga@cern.ch>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Reply-To: <federico.vaga@cern.ch>
-CC:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, <linux-arch@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <dri-devel@lists.freedesktop.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
-        <linux-unionfs@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>
-Subject: Re: [PATCH 3/7] docs: fix broken references to text files
-Date:   Mon, 24 Feb 2020 10:26:39 +0100
-Message-ID: <3929512.qvrp2sLpzG@pcbe13614>
-In-Reply-To: <5cfeed6df208b74913312a1c97235ee615180f91.1582361737.git.mchehab+huawei@kernel.org>
-References: <cover.1582361737.git.mchehab+huawei@kernel.org> <5cfeed6df208b74913312a1c97235ee615180f91.1582361737.git.mchehab+huawei@kernel.org>
+        id S1731024AbgBYQJ3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 25 Feb 2020 11:09:29 -0500
+Received: from mail-il1-f170.google.com ([209.85.166.170]:42190 "EHLO
+        mail-il1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729206AbgBYQJ3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 25 Feb 2020 11:09:29 -0500
+Received: by mail-il1-f170.google.com with SMTP id x2so1789115ila.9;
+        Tue, 25 Feb 2020 08:09:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=bBxq4NlVT2GPfEQHH0hn7IMMrqDvaebxrDPcHRUCmVQ=;
+        b=PeFnmIXiaQXXC1hZoM2/FOQBtn4LarKDEsvjyiZrpzK8iw4E2UVlU4HH6GpvmSJ0y7
+         QJn1ZR4PP1964p1H5cLyiT0sKiJNQzovc3IPNX8n5g5gEAQN50Sp9zfCmJhIFMvtagof
+         dTtLM0YWVOjwcEiqJzXm+hYalT96GGAe9+EF5qKCKZl+iguohVhoKoAcIoQ08OQkEMxA
+         ALEa/qUjspBz+wPiwYccxf1fDZ+xoNAhzOwMH4wQw3bhA58gt14q6Yij9EybV4l2j/4J
+         C1kQywJDY+v3PgdSk8tdMIuLKv2ei3cbYw5GgUfa6qNnzg0zifB/9r/myR49kD5J54xQ
+         gKjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=bBxq4NlVT2GPfEQHH0hn7IMMrqDvaebxrDPcHRUCmVQ=;
+        b=X72hpqH4SRIzYikUDSw0G6covFB+QA4x6OOij2Er9InLESR9/jweXL3xk4q3cPCvdz
+         IEZXLREG/GpubAJhVVYfS5N29nBbm6iCkQQ4ZwGmKBLOBb7OiEVOz52BTLHgRzq3MRgx
+         zAqEhGKTo6HjfZoNjqntRDZ8jsQywwwBrcZuasjmjWEQsqeG9PZu4sSlSmD8r2Uzxk6i
+         SwjeS5dBeYM5HcZaMdRQ7BOamQrLrZN3jiiEkSqfKodlyrKzbFgmvo9MOJp88LwRC2HB
+         sFLveWSGGujUWVHptpIZCrRNyvEFtwbfFPaQAQQVSaueWR7l0+Pyn/sYOZi7/belSSeb
+         guxw==
+X-Gm-Message-State: APjAAAUzw+24T2KQ9TIFTqBHVh3heNjdyuRKvvvFpWVifabwwj+KmEeV
+        DIxsrayOqkCW6PTZd1s92rMqXHZmNUXajtbWm9dn935D
+X-Google-Smtp-Source: APXvYqzihMF67D637iOTQRASMq8d5Y/DQGqcGg8S2RvIEt9WmGR4Nnm1bzUynkgr5HxgldJSaZFAARvggtgly0kO3Zo=
+X-Received: by 2002:a92:b749:: with SMTP id c9mr67810506ilm.143.1582646968592;
+ Tue, 25 Feb 2020 08:09:28 -0800 (PST)
 MIME-Version: 1.0
+From:   Wayne Li <waynli329@gmail.com>
+Date:   Tue, 25 Feb 2020 10:09:17 -0600
+Message-ID: <CAM2K0nreUP-zW2pJaH7tWSHHQn7WWeUDoeH_HM99wysgOHANXw@mail.gmail.com>
+Subject: Problem with virtual to physical memory translation when KVM is enabled.
+To:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
+Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+        QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-Originating-IP: [2001:1458:202:121::100:40]
-X-EOPAttributedMessage: 0
-X-Forefront-Antispam-Report: CIP:188.184.36.50;IPV:;CTRY:CH;EFV:NLI;SFV:NSPM;SFS:(10009020)(376002)(39860400002)(136003)(346002)(396003)(199004)(189003)(186003)(9686003)(16526019)(33716001)(26005)(2906002)(478600001)(9576002)(426003)(8676002)(44832011)(3450700001)(336012)(246002)(53546011)(8936002)(7416002)(4326008)(86362001)(7636002)(356004)(70206006)(316002)(54906003)(70586007)(5660300002)(39026012);DIR:OUT;SFP:1101;SCL:1;SRVR:HE1PR0601MB2617;H:cernmxgwlb4.cern.ch;FPR:;SPF:Pass;LANG:en;PTR:cernmx11.cern.ch;A:1;MX:1;
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 07a24c03-738e-4624-7506-08d7b90ba88c
-X-MS-TrafficTypeDiagnostic: HE1PR0601MB2617:
-X-Microsoft-Antispam-PRVS: <HE1PR0601MB2617DD6A6BADE420AB7F4408EFEC0@HE1PR0601MB2617.eurprd06.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
-X-Forefront-PRVS: 032334F434
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0qIX6XFVupoujn6tnMIXACZrhD5q3UXodzvYwqyh0hsK1Lsu+/pJ+LkIjl/NeexA/acueRAQl6tWpe3CFd900UWE/3Dp2zl9mkWVMfYl1qYpVkPmqLAGWnMEDEKi64JQPs3cOzEfTL3WjHbAxZ5gqNC3mLax0dvKusUdgcmqXKLya466pUHPmvk05PkmAw4VpLa35W1pVnc1avg4zQD+W+XccjzAi6cB/jeg95xVwyZEdY7wigcHbjHbZjeUw5bGbym667i307aOvjm5Vli7k+a11ZX1tZ2pjiiBWvLEYzJaJJQ2pSEH9ApQf6ZUYQ5f7TlyJmnEtMyipzP+fXgRIINxHtYghfwKLsQ7Fb2NPkqtE2mY/QN0LGNAE519BJMKJ2V6htEDDIZVXfSjSq9NkQg4un3jbv63EjF6kc6RkQ3fn2TRPhmkbiqtoHaEDIQdUEz7oStS5w1dmTB8Bw7vHuPaRBQq1lv0uJabtpvDjKCWQdNtDjiBIr3Z5wRpVLzv
-X-OriginatorOrg: cern.ch
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2020 09:26:41.7248
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 07a24c03-738e-4624-7506-08d7b90ba88c
-X-MS-Exchange-CrossTenant-Id: c80d3499-4a40-4a8c-986e-abce017d6b19
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=c80d3499-4a40-4a8c-986e-abce017d6b19;Ip=[188.184.36.50];Helo=[cernmxgwlb4.cern.ch]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0601MB2617
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Saturday, February 22, 2020 10:00:03 AM CET Mauro Carvalho Chehab wrote:
-> Several references got broken due to txt to ReST conversion.
->=20
-> Several of them can be automatically fixed with:
->=20
-> 	scripts/documentation-file-ref-check --fix
->=20
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
+Dear KVM list members,
 
+We developed a virtual machine using the QEMU code.  This virtual
+machine emulates a certain custom-made computer that runs on a certain
+military platform.  All I can tell you about this virtual machine is
+that it emulates a computer that has an e5500 processor.  Currently I
+am running this virtual machine on a T4240-RDB which has a PowerPC
+e6500 processor.
 
->  26) If any ioctl's are added by the patch, then also update
-> -    ``Documentation/ioctl/ioctl-number.rst``.
-> +    ``Documentation/userspace-api/ioctl/ioctl-number.rst``.
->=20
->  27) If your modified source code depends on or uses any of the kernel
->      APIs or features that are related to the following ``Kconfig`` symbo=
-ls,
-> diff --git a/Documentation/translations/it_IT/process/submit-checklist.rst
-> b/Documentation/translations/it_IT/process/submit-checklist.rst index
-> 995ee69fab11..3e575502690f 100644
-> --- a/Documentation/translations/it_IT/process/submit-checklist.rst
-> +++ b/Documentation/translations/it_IT/process/submit-checklist.rst
-> @@ -117,7 +117,7 @@ sottomissione delle patch, in particolare
->      sorgenti che ne spieghi la logica: cosa fanno e perch=E9.
->=20
->  25) Se la patch aggiunge nuove chiamate ioctl, allora aggiornate
-> -    ``Documentation/ioctl/ioctl-number.rst``.
-> +    ``Documentation/userspace-api/ioctl/ioctl-number.rst``.
+Anyway, right now I=E2=80=99m trying to get this virtual machine working wi=
+th
+KVM enabled.  But the problem I=E2=80=99m having is the VM doesn=E2=80=99t =
+do anything
+after the KVM_RUN ioctl call is made (NIP doesn=E2=80=99t progress and no
+registers change).  What seems to be the problem is the VM doesn=E2=80=99t =
+run
+the instruction that=E2=80=99s supposed to be retrieved from the virtual
+address 0xFFFF_FFFC.   When KVM isn=E2=80=99t enabled and the VM is running
+using TCG (tiny code generator), a branch instruction to 0xFFFF_F700
+is retrieved from the virtual address 0xFFFF_FFFC and the VM kicks off
+running from there.
 
+So what could be causing this problem?  I=E2=80=99m guessing it has somethi=
+ng
+to do with the translation lookaside buffers (TLBs)?  But the
+translation between virtual and physical memory clearly works when KVM
+isn=E2=80=99t enabled.  So what could cause this to stop working when KVM i=
+s
+enabled?  Or maybe I=E2=80=99m not understanding something right and missin=
+g
+what the problem actually is?  Let me know your thoughts.
 
-Acked-By: Federico Vaga <federico.vaga@vaga.pv.it>
-
-
-
+-Thanks, Wayne Li
