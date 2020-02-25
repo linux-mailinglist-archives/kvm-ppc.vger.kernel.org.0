@@ -2,52 +2,56 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A141D16EAD9
-	for <lists+kvm-ppc@lfdr.de>; Tue, 25 Feb 2020 17:09:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9609216EB19
+	for <lists+kvm-ppc@lfdr.de>; Tue, 25 Feb 2020 17:16:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731024AbgBYQJ3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 25 Feb 2020 11:09:29 -0500
-Received: from mail-il1-f170.google.com ([209.85.166.170]:42190 "EHLO
-        mail-il1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729206AbgBYQJ3 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 25 Feb 2020 11:09:29 -0500
-Received: by mail-il1-f170.google.com with SMTP id x2so1789115ila.9;
-        Tue, 25 Feb 2020 08:09:29 -0800 (PST)
+        id S1730345AbgBYQQ4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 25 Feb 2020 11:16:56 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:37893 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728051AbgBYQQ4 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 25 Feb 2020 11:16:56 -0500
+Received: by mail-ot1-f66.google.com with SMTP id z9so38676oth.5
+        for <kvm-ppc@vger.kernel.org>; Tue, 25 Feb 2020 08:16:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=bBxq4NlVT2GPfEQHH0hn7IMMrqDvaebxrDPcHRUCmVQ=;
-        b=PeFnmIXiaQXXC1hZoM2/FOQBtn4LarKDEsvjyiZrpzK8iw4E2UVlU4HH6GpvmSJ0y7
-         QJn1ZR4PP1964p1H5cLyiT0sKiJNQzovc3IPNX8n5g5gEAQN50Sp9zfCmJhIFMvtagof
-         dTtLM0YWVOjwcEiqJzXm+hYalT96GGAe9+EF5qKCKZl+iguohVhoKoAcIoQ08OQkEMxA
-         ALEa/qUjspBz+wPiwYccxf1fDZ+xoNAhzOwMH4wQw3bhA58gt14q6Yij9EybV4l2j/4J
-         C1kQywJDY+v3PgdSk8tdMIuLKv2ei3cbYw5GgUfa6qNnzg0zifB/9r/myR49kD5J54xQ
-         gKjQ==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=hlv8glY/nETgRGQM3JrX7U+aqQLACOo8EtOJKWLyg2o=;
+        b=pvmjF/YK/Llxj+KwQTKvFsDg33CBSxEkGh+RZmGNIHEKerUVTdAvcuUFYvXqpYL9+r
+         lTArS0BYMJ/EA5azo0fl3vcMyZcK+zSUb7g+j1ySKdseWpQlcvmWlz8CF3iueT4dgByv
+         807h3wLRfTDkU81vYKTM06rHLWXODWUPSfjOUmFuhu541V6ArRppRXhXBOXfUrvUCnPq
+         Mpt8rUP4A3TJnwG7gAqUvU7ctZexojhvKWMY66MgVU0qMeIYIlKxrC9qeaj3b0aAbwEv
+         f+Zj+t0k03vMYQz8Gr8tuY3cXljzjhe1UqtEO6T74nigH8FDdpJT7UfibHPu/3YIEfcX
+         gQLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=bBxq4NlVT2GPfEQHH0hn7IMMrqDvaebxrDPcHRUCmVQ=;
-        b=X72hpqH4SRIzYikUDSw0G6covFB+QA4x6OOij2Er9InLESR9/jweXL3xk4q3cPCvdz
-         IEZXLREG/GpubAJhVVYfS5N29nBbm6iCkQQ4ZwGmKBLOBb7OiEVOz52BTLHgRzq3MRgx
-         zAqEhGKTo6HjfZoNjqntRDZ8jsQywwwBrcZuasjmjWEQsqeG9PZu4sSlSmD8r2Uzxk6i
-         SwjeS5dBeYM5HcZaMdRQ7BOamQrLrZN3jiiEkSqfKodlyrKzbFgmvo9MOJp88LwRC2HB
-         sFLveWSGGujUWVHptpIZCrRNyvEFtwbfFPaQAQQVSaueWR7l0+Pyn/sYOZi7/belSSeb
-         guxw==
-X-Gm-Message-State: APjAAAUzw+24T2KQ9TIFTqBHVh3heNjdyuRKvvvFpWVifabwwj+KmEeV
-        DIxsrayOqkCW6PTZd1s92rMqXHZmNUXajtbWm9dn935D
-X-Google-Smtp-Source: APXvYqzihMF67D637iOTQRASMq8d5Y/DQGqcGg8S2RvIEt9WmGR4Nnm1bzUynkgr5HxgldJSaZFAARvggtgly0kO3Zo=
-X-Received: by 2002:a92:b749:: with SMTP id c9mr67810506ilm.143.1582646968592;
- Tue, 25 Feb 2020 08:09:28 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=hlv8glY/nETgRGQM3JrX7U+aqQLACOo8EtOJKWLyg2o=;
+        b=troRWalIi21QL2kxTxef/R6uZzS+jzJ2bAuluDRxhCnS6F608bBhr6Ro5SL3tfhrOK
+         5aFubav2yEZIkbGC29APGPaDlm06/xEjbMxnoxlPWg9CwjneIJsYsPwJsfq2pvoNkr+e
+         3XhOzju44zIlKkwZDAEUsA+T+wJTPaKk7bR5Sj874pyrRfaC3kfaobMpUOS/oczGabKs
+         pgRESD9h7I1+h+cneK6UdzhFQ32wEQCFOfCIELYpeX2TY7KmLTFgWRlL6E7d/KOJ9f7v
+         HOf+9b6W1dQR4RzqYaOdh1RniJ136Bue9iUC+qvr/PCu8K8gF67g2jZm1MX+pgEMlMjz
+         F/lw==
+X-Gm-Message-State: APjAAAUJaXMxktxhscNHXMFUP1kxsqbeUJq1eTMpLk03N3DQ3WPqs2qX
+        BfnHKdsad7h/MKWNvophC6rBVL6S5yojPwlvIHmsWQ==
+X-Google-Smtp-Source: APXvYqwrQZAseC96mjkcu4WFviym/5+i8KWdLsn7ZJyRU6pF2+Hzhyqk2VMhlES5mY819yutsnfzMFQTlFmo0u79KhE=
+X-Received: by 2002:a05:6830:13da:: with SMTP id e26mr42364907otq.97.1582647415115;
+ Tue, 25 Feb 2020 08:16:55 -0800 (PST)
 MIME-Version: 1.0
-From:   Wayne Li <waynli329@gmail.com>
-Date:   Tue, 25 Feb 2020 10:09:17 -0600
-Message-ID: <CAM2K0nreUP-zW2pJaH7tWSHHQn7WWeUDoeH_HM99wysgOHANXw@mail.gmail.com>
-Subject: Problem with virtual to physical memory translation when KVM is enabled.
-To:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
-        QEMU Developers <qemu-devel@nongnu.org>
+References: <CAM2K0nreUP-zW2pJaH7tWSHHQn7WWeUDoeH_HM99wysgOHANXw@mail.gmail.com>
+In-Reply-To: <CAM2K0nreUP-zW2pJaH7tWSHHQn7WWeUDoeH_HM99wysgOHANXw@mail.gmail.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Tue, 25 Feb 2020 16:16:43 +0000
+Message-ID: <CAFEAcA84xCMzUNfYNBNR8ShA58aor_rbYTq7jnmsLQqhvbOH8w@mail.gmail.com>
+Subject: Re: Problem with virtual to physical memory translation when KVM is enabled.
+To:     Wayne Li <waynli329@gmail.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>, kvm-ppc <kvm-ppc@vger.kernel.org>,
+        qemu-ppc <qemu-ppc@nongnu.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        David Gibson <david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-ppc-owner@vger.kernel.org
@@ -55,36 +59,26 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Dear KVM list members,
+On Tue, 25 Feb 2020 at 16:10, Wayne Li <waynli329@gmail.com> wrote:
+> So what could be causing this problem?  I=E2=80=99m guessing it has somet=
+hing
+> to do with the translation lookaside buffers (TLBs)?  But the
+> translation between virtual and physical memory clearly works when KVM
+> isn=E2=80=99t enabled.  So what could cause this to stop working when KVM=
+ is
+> enabled?
 
-We developed a virtual machine using the QEMU code.  This virtual
-machine emulates a certain custom-made computer that runs on a certain
-military platform.  All I can tell you about this virtual machine is
-that it emulates a computer that has an e5500 processor.  Currently I
-am running this virtual machine on a T4240-RDB which has a PowerPC
-e6500 processor.
+When you're not using KVM, virtual-to-physical lookups are
+done using QEMU's emulation code that emulates the MMU.
+When you are using KVM, virtual-to-physical lookups
+are done entirely using the host CPU (except for corner
+cases like when we come out of the kernel and the user
+does things with the gdb debug stub). So all the page
+tables and other guest setup of the MMU had better match
+what the host CPU expects. (I don't know how big the
+differences between e5500 and e6500 MMU are or whether
+the PPC architecture/KVM supports emulating the one on
+the other: some PPC expert will probably be able to tell you.)
 
-Anyway, right now I=E2=80=99m trying to get this virtual machine working wi=
-th
-KVM enabled.  But the problem I=E2=80=99m having is the VM doesn=E2=80=99t =
-do anything
-after the KVM_RUN ioctl call is made (NIP doesn=E2=80=99t progress and no
-registers change).  What seems to be the problem is the VM doesn=E2=80=99t =
-run
-the instruction that=E2=80=99s supposed to be retrieved from the virtual
-address 0xFFFF_FFFC.   When KVM isn=E2=80=99t enabled and the VM is running
-using TCG (tiny code generator), a branch instruction to 0xFFFF_F700
-is retrieved from the virtual address 0xFFFF_FFFC and the VM kicks off
-running from there.
-
-So what could be causing this problem?  I=E2=80=99m guessing it has somethi=
-ng
-to do with the translation lookaside buffers (TLBs)?  But the
-translation between virtual and physical memory clearly works when KVM
-isn=E2=80=99t enabled.  So what could cause this to stop working when KVM i=
-s
-enabled?  Or maybe I=E2=80=99m not understanding something right and missin=
-g
-what the problem actually is?  Let me know your thoughts.
-
--Thanks, Wayne Li
+thanks
+-- PMM
