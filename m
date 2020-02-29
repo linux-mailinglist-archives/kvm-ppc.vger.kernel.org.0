@@ -2,64 +2,64 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C243174583
-	for <lists+kvm-ppc@lfdr.de>; Sat, 29 Feb 2020 08:28:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4890B174593
+	for <lists+kvm-ppc@lfdr.de>; Sat, 29 Feb 2020 08:54:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726671AbgB2H2A (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 29 Feb 2020 02:28:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37588 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725747AbgB2H2A (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 29 Feb 2020 02:28:00 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01T7PnO4058219
-        for <kvm-ppc@vger.kernel.org>; Sat, 29 Feb 2020 02:27:58 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2yepy3885c-1
+        id S1726783AbgB2Hyg (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 29 Feb 2020 02:54:36 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22512 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725747AbgB2Hyg (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 29 Feb 2020 02:54:36 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01T7oDUL063393
+        for <kvm-ppc@vger.kernel.org>; Sat, 29 Feb 2020 02:54:35 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yfhqmjn3d-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Sat, 29 Feb 2020 02:27:58 -0500
+        for <kvm-ppc@vger.kernel.org>; Sat, 29 Feb 2020 02:54:35 -0500
 Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
-        Sat, 29 Feb 2020 07:27:56 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Sat, 29 Feb 2020 07:54:33 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Sat, 29 Feb 2020 07:27:54 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01T7RqWL38863196
+        Sat, 29 Feb 2020 07:54:30 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01T7rVak47120764
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 29 Feb 2020 07:27:52 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8F27AA4062;
-        Sat, 29 Feb 2020 07:27:52 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 26274A4054;
-        Sat, 29 Feb 2020 07:27:50 +0000 (GMT)
+        Sat, 29 Feb 2020 07:53:31 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D4389AE045;
+        Sat, 29 Feb 2020 07:54:28 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0AE7EAE055;
+        Sat, 29 Feb 2020 07:54:26 +0000 (GMT)
 Received: from oc0525413822.ibm.com (unknown [9.85.192.224])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sat, 29 Feb 2020 07:27:49 +0000 (GMT)
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sat, 29 Feb 2020 07:54:25 +0000 (GMT)
 From:   Ram Pai <linuxram@us.ibm.com>
-To:     kvm-ppc@vger.kernel.org
+To:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
 Cc:     mpe@ellerman.id.au, bauerman@linux.ibm.com, andmike@linux.ibm.com,
         sukadev@linux.vnet.ibm.com, aik@ozlabs.ru, paulus@ozlabs.org,
         groug@kaod.org, clg@fr.ibm.com, david@gibson.dropbear.id.au,
         linuxram@us.ibm.com
 Subject: [RFC PATCH v1] powerpc/prom_init: disable XIVE in Secure VM.
-Date:   Fri, 28 Feb 2020 23:27:21 -0800
+Date:   Fri, 28 Feb 2020 23:54:04 -0800
 X-Mailer: git-send-email 1.8.3.1
 X-TM-AS-GCONF: 00
-x-cbid: 20022907-0012-0000-0000-0000038B5F51
+x-cbid: 20022907-0020-0000-0000-000003AEAF4F
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022907-0013-0000-0000-000021C80DE3
-Message-Id: <1582961241-23806-1-git-send-email-linuxram@us.ibm.com>
+x-cbparentid: 20022907-0021-0000-0000-00002206D51E
+Message-Id: <1582962844-26333-1-git-send-email-linuxram@us.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-29_01:2020-02-28,2020-02-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=29 mlxscore=0 spamscore=0 mlxlogscore=675 bulkscore=0
- malwarescore=0 priorityscore=1501 clxscore=1011 adultscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002290054
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
+ priorityscore=1501 clxscore=1015 lowpriorityscore=0 bulkscore=0
+ impostorscore=0 malwarescore=0 mlxscore=0 suspectscore=18 mlxlogscore=753
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002290057
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
@@ -77,6 +77,7 @@ through qemu option "ic-mode=xive", simply abort. Otherwise default to
 XICS.
 
 Cc: kvm-ppc@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
 Cc: Michael Ellerman <mpe@ellerman.id.au>
 Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 Cc: Michael Anderson <andmike@linux.ibm.com>
