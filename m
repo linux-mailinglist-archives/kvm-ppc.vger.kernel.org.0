@@ -2,93 +2,87 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24FD817683F
-	for <lists+kvm-ppc@lfdr.de>; Tue,  3 Mar 2020 00:32:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FEA0176AB3
+	for <lists+kvm-ppc@lfdr.de>; Tue,  3 Mar 2020 03:44:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726755AbgCBXcw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 2 Mar 2020 18:32:52 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:59513 "EHLO ozlabs.org"
+        id S1726954AbgCCCoG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 2 Mar 2020 21:44:06 -0500
+Received: from ozlabs.org ([203.11.71.1]:48135 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726728AbgCBXcw (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 2 Mar 2020 18:32:52 -0500
+        id S1726928AbgCCCoG (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 2 Mar 2020 21:44:06 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 48WbzQ1TRmz9sSM; Tue,  3 Mar 2020 10:32:50 +1100 (AEDT)
+        id 48WhD34rSfz9sSL; Tue,  3 Mar 2020 13:44:03 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1583191970;
-        bh=MFn7h1ABzuznlHRfe/7NuiIWmZMsu94D60+9MIMCwEI=;
+        d=gibson.dropbear.id.au; s=201602; t=1583203443;
+        bh=BaltiYEh6lHSqfGvxVak8CgajS73EwyljG1wWU8xKFk=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fOL3ol6ddTUTQSICV7waezwPEvUm2UllHgl8WQF1pmp5+23sFbJnLJMgmxPApIF9T
-         EGrWW5i6K8fQjOLvpntWIqZstzEJmJpJ5GdM1czCDb5vYGpsjhCxX6me/kokDBYORR
-         rOiab3IvCclFKoKSNZQfC/9cd0Fns1mJugqGK97E=
-Date:   Tue, 3 Mar 2020 10:32:40 +1100
+        b=Bpg019NP1/sr+bU2jd6N3G2DWbNDjZga2Xv4qcsJKPatGmoolYczcmns/S2x7ZYKy
+         SU5AAPy0vqT2jjMdc0PnSR+C8I6553ZVJXKa5dgbKSkQY5RtroRdo7Khsovjeq+2Eu
+         YUoI/POLQdhKqOonC7hXW5rgGHRL1MrsCm3Uwv3k=
+Date:   Tue, 3 Mar 2020 13:39:32 +1100
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Ram Pai <linuxram@us.ibm.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        mpe@ellerman.id.au, bauerman@linux.ibm.com, andmike@linux.ibm.com,
-        sukadev@linux.vnet.ibm.com, aik@ozlabs.ru, paulus@ozlabs.org,
-        groug@kaod.org, clg@fr.ibm.com
-Subject: Re: [RFC PATCH v1] powerpc/prom_init: disable XIVE in Secure VM.
-Message-ID: <20200302233240.GB35885@umbus.fritz.box>
-References: <1582962844-26333-1-git-send-email-linuxram@us.ibm.com>
+To:     Peter Maydell <peter.maydell@linaro.org>
+Cc:     Wayne Li <waynli329@gmail.com>, kvm-devel <kvm@vger.kernel.org>,
+        kvm-ppc <kvm-ppc@vger.kernel.org>,
+        qemu-ppc <qemu-ppc@nongnu.org>,
+        QEMU Developers <qemu-devel@nongnu.org>
+Subject: Re: Problem with virtual to physical memory translation when KVM is
+ enabled.
+Message-ID: <20200303023932.GC35885@umbus.fritz.box>
+References: <CAM2K0nreUP-zW2pJaH7tWSHHQn7WWeUDoeH_HM99wysgOHANXw@mail.gmail.com>
+ <CAFEAcA84xCMzUNfYNBNR8ShA58aor_rbYTq7jnmsLQqhvbOH8w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
+        protocol="application/pgp-signature"; boundary="1ccMZA6j1vT5UqiK"
 Content-Disposition: inline
-In-Reply-To: <1582962844-26333-1-git-send-email-linuxram@us.ibm.com>
+In-Reply-To: <CAFEAcA84xCMzUNfYNBNR8ShA58aor_rbYTq7jnmsLQqhvbOH8w@mail.gmail.com>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
---dc+cDN39EJAMEtIO
-Content-Type: text/plain; charset=us-ascii
+--1ccMZA6j1vT5UqiK
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 28, 2020 at 11:54:04PM -0800, Ram Pai wrote:
-> XIVE is not correctly enabled for Secure VM in the KVM Hypervisor yet.
+On Tue, Feb 25, 2020 at 04:16:43PM +0000, Peter Maydell wrote:
+> On Tue, 25 Feb 2020 at 16:10, Wayne Li <waynli329@gmail.com> wrote:
+> > So what could be causing this problem?  I=E2=80=99m guessing it has som=
+ething
+> > to do with the translation lookaside buffers (TLBs)?  But the
+> > translation between virtual and physical memory clearly works when KVM
+> > isn=E2=80=99t enabled.  So what could cause this to stop working when K=
+VM is
+> > enabled?
 >=20
-> Hence Secure VM, must always default to XICS interrupt controller.
->=20
-> If XIVE is requested through kernel command line option "xive=3Don",
-> override and turn it off.
->=20
-> If XIVE is the only supported platform interrupt controller; specified
-> through qemu option "ic-mode=3Dxive", simply abort. Otherwise default to
-> XICS.
+> When you're not using KVM, virtual-to-physical lookups are
+> done using QEMU's emulation code that emulates the MMU.
+> When you are using KVM, virtual-to-physical lookups
+> are done entirely using the host CPU (except for corner
+> cases like when we come out of the kernel and the user
+> does things with the gdb debug stub). So all the page
+> tables and other guest setup of the MMU had better match
+> what the host CPU expects. (I don't know how big the
+> differences between e5500 and e6500 MMU are or whether
+> the PPC architecture/KVM supports emulating the one on
+> the other: some PPC expert will probably be able to tell you.)
 
-Uh... the discussion thread here seems to have gotten oddly off
-track.  So, to try to clean up some misunderstandings on both sides:
+Well, sort of.  Including things like KVM-PR, things get complicated.
+But in any case, the resposibility for translation lies somewhere
+between the cpu itself and the KVM code - qemu is not involved.
 
-  1) The guest is the main thing that knows that it will be in secure
-     mode, so it's reasonable for it to conditionally use XIVE based
-     on that.
+Depending on exactly what the host's MMU looks like and what it has in
+the way of virtualization features, that might make it impossible to
+run a guest expecting a substantially different cpu model from the
+host's.
 
-  2) The mechanism by which we do it here isn't quite right.  Here the
-     guest is checking itself that the host only allows XIVE, but we
-     can't do XIVE and is panic()ing.  Instead, in the SVM case we
-     should force support->xive to false, and send that in the CAS
-     request to the host.  We expect the host to just terminate
-     us because of the mismatch, but this will interact better with
-     host side options setting policy for panic states and the like.
-     Essentially an SVM kernel should behave like an old kernel with
-     no XIVE support at all, at least w.r.t. the CAS irq mode flags.
-
-  3) Although there are means by which the hypervisor can kind of know
-     a guest is in secure mode, there's not really an "svm=3Don" option
-     on the host side.  For the most part secure mode is based on
-     discussion directly between the guest and the ultravisor with
-     almost no hypervisor intervention.
-
-  4) I'm guessing the problem with XIVE in SVM mode is that XIVE needs
-     to write to event queues in guest memory, which would have to be
-     explicitly shared for secure mode.  That's true whether it's KVM
-     or qemu accessing the guest memory, so kernel_irqchip=3Don/off is
-     entirely irrelevant.
-
-  5) All the above said, having to use XICS is pretty crappy.  You
-     should really get working on XIVE support for secure VMs.
+Unfortunately, I'm not really at all familiar with the Freescale
+parts, and even less with the KVM implementation for them.  It doesn't
+surprise me that there are substantial bugs there, but I wouldn't
+realy now where to begin to fix them.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -96,24 +90,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---dc+cDN39EJAMEtIO
+--1ccMZA6j1vT5UqiK
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5dl5UACgkQbDjKyiDZ
-s5IdcBAAk8vR8o1rRAjpvuUwpmjQOgcIcmrKGPlv5xb7XV0NBMn05dyd95rvqdv1
-ZkIRVlg7kPGIJJbdMifIHRGHasB7bpcVdWU8h4gJ2isjoy7ddVMFUSn5RJ76cahl
-4GSpJn67kVtOngTmg6yYEOWZeZU8E/OC3iFM+r2dbprxrxKZg+cVQllNQyEo6tDe
-3EMQKsUt1VJs36Y63HRqsWyivzUmmeiqZESWo0fgCJAnaa5C1i76GHJRL5ZS/dcs
-keyDoa3A2sBnpqUZtN6hzMSkAwooh78h+vsL/utKzbL/8TUY6Us8Da7dJlpp0D+h
-vCfRG8UTlVhBSDK7tEC6EhOou1eEKnwC4h1FJ4yyZxw98ukeAGcLruJ0t7O9YwK2
-2sZnKzorYTOAetlRa8wXlXZttR0BaPz2V5/KrpMeIgq+lXiM2x7jNjHCjbVOo9Qw
-KqUJtopeTBXVbzJIWhNhWr4rZLhXZIg2cJzBqMVV0smDCCMiBO8/zb3NZe7WN3OW
-Yp+RxrT3+vhRiHPpb4TD3R2725DulVglB7dRU0TBuZWBLrfkSpspSa6zgEEDEnz6
-VhVaWSrD6d3pti2c5GS7zKfyATueCpq1A2wJS54k9jJl/y26rmDAz/ky4haIMBvW
-NL8d7pt+PlIXwi0ZF0NHr8mr5XE4gf3Qt1MNPpkRo5yaLoEK8YA=
-=FpzO
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5dw2IACgkQbDjKyiDZ
+s5IK7g//dSOwpQdEGi2arNEycf3azjajh4sBmMPEOHpTQ73sPD3ChSQ0+PnCNfbJ
+ApnfemamUHGfKX5FaOn8+NnSXnUAe7xYXWOojZAX8k5F2deBJifphPkxIKAKHldd
+GWusFDgTixZmc0OthSk3dXYQVCgG8LPU2ImVzUkgTlsWR76/i/w8OY8/hoY65ZQU
+erh6wAph3YzkW6VLr+SsEWlrerb/GyC7fhZUklwfBZ98ZjuBl5I6v5S6xbbQJ/Bm
+OHLnbVyMNu5OQoY4IH1tgo+wu2t0QiD1ZvYMCkrgKTtcqdEr1k3U2UWEglh/RgfC
+QcsUt93llEX8mZV0W/hrC4b3YOxBkQ83beDJE3LN8UKKmBaqEAE9FsN/tcM10teI
+AH4XqXwbOM1vOFEuEh0bJYy/2Zs/drigbXEH4KrCZsgkU6uqcxJ179m2cnLoNSu0
+mvO4+MDg9krXBI449J4rpAyM+uVQnn0xZzXSTh/ntaeP14XDcI3i2BwGlPjM7SMM
+A37rngxrQMokeHqsr3PIgJDXwWwP5VjQcjC+HcKMIdzUvkHM09eDJ1Njvzbn5A4/
+UU8QU1UHZJLiw6ZC8qT/vZQYreH8jVBG+epfl3W1d/Ze1TN2yyBsDsP9lEdvtwII
+I/+FgsvNexcG4gTAprXV7UQnW+KGWV8dIQWcz/RP4s14mmp+nZE=
+=/Qev
 -----END PGP SIGNATURE-----
 
---dc+cDN39EJAMEtIO--
+--1ccMZA6j1vT5UqiK--
