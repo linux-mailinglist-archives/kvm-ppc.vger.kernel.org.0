@@ -2,134 +2,103 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D6E7F17A8F5
-	for <lists+kvm-ppc@lfdr.de>; Thu,  5 Mar 2020 16:36:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2434817B2F2
+	for <lists+kvm-ppc@lfdr.de>; Fri,  6 Mar 2020 01:28:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727131AbgCEPgL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 5 Mar 2020 10:36:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13040 "EHLO
+        id S1726209AbgCFA2v (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 5 Mar 2020 19:28:51 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43548 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727077AbgCEPgL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 5 Mar 2020 10:36:11 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 025FZreH020749
-        for <kvm-ppc@vger.kernel.org>; Thu, 5 Mar 2020 10:36:10 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2yjx056gum-1
+        by vger.kernel.org with ESMTP id S1726173AbgCFA2v (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 5 Mar 2020 19:28:51 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0260Kx2w110369
+        for <kvm-ppc@vger.kernel.org>; Thu, 5 Mar 2020 19:28:50 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yhr4kvjb8-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Thu, 05 Mar 2020 10:36:10 -0500
+        for <kvm-ppc@vger.kernel.org>; Thu, 05 Mar 2020 19:28:49 -0500
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <clg@fr.ibm.com>;
-        Thu, 5 Mar 2020 15:36:08 -0000
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <gromero@linux.ibm.com>;
+        Fri, 6 Mar 2020 00:28:48 -0000
 Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 5 Mar 2020 15:36:05 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 025Fa4gk33096092
+        Fri, 6 Mar 2020 00:28:46 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0260SjND38666658
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 Mar 2020 15:36:04 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5266BAE05A;
-        Thu,  5 Mar 2020 15:36:04 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DBE06AE053;
-        Thu,  5 Mar 2020 15:36:03 +0000 (GMT)
-Received: from [9.101.4.25] (unknown [9.101.4.25])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  5 Mar 2020 15:36:03 +0000 (GMT)
-To:     Ram Pai <linuxram@us.ibm.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-Cc:     Greg Kurz <groug@kaod.org>, linuxppc-dev@lists.ozlabs.org,
-        kvm-ppc@vger.kernel.org, mpe@ellerman.id.au,
-        bauerman@linux.ibm.com, andmike@linux.ibm.com,
-        sukadev@linux.vnet.ibm.com, aik@ozlabs.ru, paulus@ozlabs.org
-References: <1582962844-26333-1-git-send-email-linuxram@us.ibm.com>
- <20200302233240.GB35885@umbus.fritz.box>
- <8f0c3d41-d1f9-7e6d-276b-b95238715979@fr.ibm.com>
- <20200303170205.GA5416@oc0525413822.ibm.com>
- <20200303184520.632be270@bahia.home>
- <20200303185645.GB5416@oc0525413822.ibm.com>
- <20200304115948.7b2dfe10@bahia.home>
- <20200304153727.GH5416@oc0525413822.ibm.com>
- <08269906-db11-b80c-0e67-777ab0aaa9bd@fr.ibm.com>
- <20200304235545.GE593957@umbus.fritz.box>
- <20200305151530.GJ5416@oc0525413822.ibm.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@fr.ibm.com>
-Date:   Thu, 5 Mar 2020 16:36:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <20200305151530.GJ5416@oc0525413822.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        Fri, 6 Mar 2020 00:28:45 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4F39011C050;
+        Fri,  6 Mar 2020 00:28:45 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EF83911C04A;
+        Fri,  6 Mar 2020 00:28:44 +0000 (GMT)
+Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  6 Mar 2020 00:28:44 +0000 (GMT)
+Received: from bran.ozlabs.ibm.com (haven.au.ibm.com [9.192.254.114])
+        by ozlabs.au.ibm.com (Postfix) with ESMTP id 06BA3A011F;
+        Fri,  6 Mar 2020 11:28:40 +1100 (AEDT)
+Received: from oc6336877782.ibm.com (gustavo.ozlabs.ibm.com [10.61.2.143])
+        by bran.ozlabs.ibm.com (Postfix) with ESMTP id CDA25E00FA;
+        Fri,  6 Mar 2020 11:28:43 +1100 (AEDT)
+From:   Gustavo Romero <gromero@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     paulus@ozlabs.org, linuxppc-dev@lists.ozlabs.org,
+        Gustavo Romero <gromero@linux.ibm.com>
+Subject: [PATCH] KVM: PPC: Book3S HV: Fix typos in comments
+Date:   Fri,  6 Mar 2020 11:26:36 +1100
+X-Mailer: git-send-email 1.8.3.1
 X-TM-AS-GCONF: 00
-x-cbid: 20030515-0016-0000-0000-000002ED8157
+x-cbid: 20030600-0012-0000-0000-0000038D99C6
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030515-0017-0000-0000-00003350D5AF
-Message-Id: <e4bb44b1-2bf6-6488-0a4d-ed95ac944e71@fr.ibm.com>
-Subject: RE: [RFC PATCH v1] powerpc/prom_init: disable XIVE in Secure VM.
+x-cbparentid: 20030600-0013-0000-0000-000021CA5A91
+Message-Id: <1583454396-1424-1-git-send-email-gromero@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-03-05_05:2020-03-05,2020-03-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- mlxscore=0 lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0
- clxscore=1015 suspectscore=0 mlxlogscore=949 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003050100
+ definitions=2020-03-05_08:2020-03-05,2020-03-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
+ mlxscore=0 phishscore=0 mlxlogscore=792 suspectscore=1 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 spamscore=0 adultscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003060000
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 3/5/20 4:15 PM, Ram Pai wrote:
-> On Thu, Mar 05, 2020 at 10:55:45AM +1100, David Gibson wrote:
->> On Wed, Mar 04, 2020 at 04:56:09PM +0100, Cédric Le Goater wrote:
->>> [ ... ]
->>>
->>>> (1) applied the patch which shares the EQ-page with the hypervisor.
->>>> (2) set "kernel_irqchip=off"
->>>> (3) set "ic-mode=xive"
->>>
->>> you don't have to set the interrupt mode. xive should be negotiated
->>> by default.
->>>
->>>> (4) set "svm=on" on the kernel command line.
->>>> (5) no changes to the hypervisor and ultravisor.
->>>>
->>>> And Boom it works!.   So you were right.
->>>
->>> Excellent.
->>>  
->>>> I am sending out the patch for (1) above ASAP.
->>>
->>> Next step, could you please try to do the same with the TIMA and ESB pfn ?
->>> and use KVM.
->>
->> I'm a bit confused by this.  Aren't the TIMA and ESB pages essentially
->> IO pages, rather than memory pages from the guest's point of view?  I
->> assume only memory pages are protected with PEF - I can't even really
->> see what protecting an IO page would even mean.
-> 
-> It means, that the hypervisor and qemu cannot access the addresses used
-> to access the I/O pages. It can only be accessed by Ultravisor and the
-> SVM.
-> 
-> As it stands today, those pages are accessible from the hypervisor
-> and not from the SVM or the ultravisor.
-> 
-> To make it work, we need to enable acccess to those pages from the SVM
-> and from the ultravisor.  One thing I am not clear is should we block
-> access to those pages from the hypervisor. If yes, than there is no> good way to do that, without hardware help.  If no, than those GPA pages
-> can be shared, so that hypervisor/ultravisor/qemu/SVM can all access
-> those pages.
+Fix typos found in comments about the parameter passed
+through r5 to kvmppc_{save,restore}_tm_hv functions.
 
-They are shared.
+Signed-off-by: Gustavo Romero <gromero@linux.ibm.com>
+---
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-KVM will also access them, at interrupt creation, device reset and 
-passthrough. QEMU will use them to mask on/off the interrupts in
-case of guest migration or machine stop/continue. 
-
-C.
+diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+index dbc2fec..a55dbe8 100644
+--- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
++++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+@@ -3121,7 +3121,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ALTIVEC)
+  * Save transactional state and TM-related registers.
+  * Called with r3 pointing to the vcpu struct and r4 containing
+  * the guest MSR value.
+- * r5 is non-zero iff non-volatile register state needs to be maintained.
++ * r5 is non-zero if non-volatile register state needs to be maintained.
+  * If r5 == 0, this can modify all checkpointed registers, but
+  * restores r1 and r2 before exit.
+  */
+@@ -3194,7 +3194,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_P9_TM_XER_SO_BUG)
+  * Restore transactional state and TM-related registers.
+  * Called with r3 pointing to the vcpu struct
+  * and r4 containing the guest MSR value.
+- * r5 is non-zero iff non-volatile register state needs to be maintained.
++ * r5 is non-zero if non-volatile register state needs to be maintained.
+  * This potentially modifies all checkpointed registers.
+  * It restores r1 and r2 from the PACA.
+  */
+-- 
+1.8.3.1
 
