@@ -2,133 +2,140 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 60838180C48
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Mar 2020 00:24:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3E6D180F85
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Mar 2020 06:13:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727484AbgCJXYi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 10 Mar 2020 19:24:38 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:52947 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726411AbgCJXYi (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 10 Mar 2020 19:24:38 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 48cWCJ6NCXz9sQt; Wed, 11 Mar 2020 10:15:08 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1583882108;
-        bh=LU+M/j1oFo4YOaesD6PB/F2sxcmAD0EZ1H7Ku/nYSKM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pB/s3JpulXmmgkjcelkuqzbC6v+wGqaCNc8D+GXgrKo86NM5ExD4XxAQH440yuLt6
-         p9wwYJR333kOjdUU58fNtBefRp6vIr4eymIyh0jfqQgWch//LOzh4eTWetYHuTpSs/
-         gpp8vbCuKvwiVK1zZk+rtGiI/vjRdglA3+DlJPII=
-Date:   Wed, 11 Mar 2020 10:05:57 +1100
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@ozlabs.org,
-        Paul Mackerras <paulus@ozlabs.org>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix H_CEDE return code for nested
- guests
-Message-ID: <20200310230557.GP660117@umbus.fritz.box>
-References: <20200310211128.17672-1-mdroth@linux.vnet.ibm.com>
+        id S1726032AbgCKFNk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Mar 2020 01:13:40 -0400
+Received: from smtprelay0124.hostedemail.com ([216.40.44.124]:36214 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725813AbgCKFNk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Mar 2020 01:13:40 -0400
+X-Greylist: delayed 419 seconds by postgrey-1.27 at vger.kernel.org; Wed, 11 Mar 2020 01:13:40 EDT
+Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
+        by smtpgrave08.hostedemail.com (Postfix) with ESMTP id CB82D18006CD0
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Mar 2020 05:07:16 +0000 (UTC)
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay05.hostedemail.com (Postfix) with ESMTP id 76A3B18063C8E;
+        Wed, 11 Mar 2020 05:07:15 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Spam-Summary: 50,0,0,,d41d8cd98f00b204,joe@perches.com,,RULES_HIT:41:355:379:541:800:960:967:969:973:982:988:989:1260:1311:1314:1345:1359:1437:1515:1534:1543:1711:1730:1747:1777:1792:2196:2199:2393:2525:2560:2563:2682:2685:2859:2902:2933:2937:2939:2942:2945:2947:2951:2954:3022:3138:3139:3140:3141:3142:3354:3865:3866:3867:3934:3936:3938:3941:3944:3947:3950:3953:3956:3959:4321:4605:5007:6119:6261:7903:9025:9036:10004:10848:11026:11473:11657:11658:11914:12043:12296:12297:12438:12555:12679:12895:12986:13255:13894:14096:14181:14394:14721:21080:21433:21627:21811:21939:30054,0,RBL:none,CacheIP:none,Bayesian:0.5,0.5,0.5,Netcheck:none,DomainCache:0,MSF:not bulk,SPF:,MSBL:0,DNSBL:none,Custom_rules:0:0:0,LFtime:1,LUA_SUMMARY:none
+X-HE-Tag: trade07_221c65ba4ee3b
+X-Filterd-Recvd-Size: 4145
+Received: from joe-laptop.perches.com (unknown [47.151.143.254])
+        (Authenticated sender: joe@perches.com)
+        by omf16.hostedemail.com (Postfix) with ESMTPA;
+        Wed, 11 Mar 2020 05:07:14 +0000 (UTC)
+From:   Joe Perches <joe@perches.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: [PATCH -next 016/491] KERNEL VIRTUAL MACHINE FOR POWERPC (KVM/powerpc): Use fallthrough;
+Date:   Tue, 10 Mar 2020 21:51:30 -0700
+Message-Id: <37a5342c67e1b68b9ad06aca8da245b0ff409692.1583896348.git.joe@perches.com>
+X-Mailer: git-send-email 2.24.0
+In-Reply-To: <cover.1583896344.git.joe@perches.com>
+References: <cover.1583896344.git.joe@perches.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="FbmEh7Ek6NM6xKh/"
-Content-Disposition: inline
-In-Reply-To: <20200310211128.17672-1-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Convert the various uses of fallthrough comments to fallthrough;
 
---FbmEh7Ek6NM6xKh/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Done via script
+Link: https://lore.kernel.org/lkml/b56602fcf79f849e733e7b521bb0e17895d390fa.1582230379.git.joe.com/
 
-On Tue, Mar 10, 2020 at 04:11:28PM -0500, Michael Roth wrote:
-> The h_cede_tm kvm-unit-test currently fails when run inside an L1 guest
-> via the guest/nested hypervisor.
->=20
->   ./run-tests.sh -v
->   ...
->   TESTNAME=3Dh_cede_tm TIMEOUT=3D90s ACCEL=3D ./powerpc/run powerpc/tm.el=
-f -smp 2,threads=3D2 -machine cap-htm=3Don -append "h_cede_tm"
->   FAIL h_cede_tm (2 tests, 1 unexpected failures)
->=20
-> While the test relates to transactional memory instructions, the actual
-> failure is due to the return code of the H_CEDE hypercall, which is
-> reported as 224 instead of 0. This happens even when no TM instructions
-> are issued.
->=20
-> 224 is the value placed in r3 to execute a hypercall for H_CEDE, and r3
-> is where the caller expects the return code to be placed upon return.
->=20
-> In the case of guest running under a nested hypervisor, issuing H_CEDE
-> causes a return from H_ENTER_NESTED. In this case H_CEDE is
-> specially-handled immediately rather than later in
-> kvmppc_pseries_do_hcall() as with most other hcalls, but we forget to
-> set the return code for the caller, hence why kvm-unit-test sees the
-> 224 return code and reports an error.
->=20
-> Guest kernels generally don't check the return value of H_CEDE, so
-> that likely explains why this hasn't caused issues outside of
-> kvm-unit-tests so far.
->=20
-> Fix this by setting r3 to 0 after we finish processing the H_CEDE.
->=20
-> RHBZ: 1778556
->=20
-> Fixes: 4bad77799fed ("KVM: PPC: Book3S HV: Handle hypercalls correctly wh=
-en nested")
-> Cc: linuxppc-dev@ozlabs.org
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Paul Mackerras <paulus@ozlabs.org>
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Joe Perches <joe@perches.com>
+---
+ arch/powerpc/kvm/book3s_32_mmu.c | 2 +-
+ arch/powerpc/kvm/book3s_64_mmu.c | 2 +-
+ arch/powerpc/kvm/book3s_pr.c     | 2 +-
+ arch/powerpc/kvm/booke.c         | 6 +++---
+ arch/powerpc/kvm/powerpc.c       | 1 -
+ 5 files changed, 6 insertions(+), 7 deletions(-)
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+diff --git a/arch/powerpc/kvm/book3s_32_mmu.c b/arch/powerpc/kvm/book3s_32_mmu.c
+index f21e734..3fbd57 100644
+--- a/arch/powerpc/kvm/book3s_32_mmu.c
++++ b/arch/powerpc/kvm/book3s_32_mmu.c
+@@ -234,7 +234,7 @@ static int kvmppc_mmu_book3s_32_xlate_pte(struct kvm_vcpu *vcpu, gva_t eaddr,
+ 				case 2:
+ 				case 6:
+ 					pte->may_write = true;
+-					/* fall through */
++					fallthrough;
+ 				case 3:
+ 				case 5:
+ 				case 7:
+diff --git a/arch/powerpc/kvm/book3s_64_mmu.c b/arch/powerpc/kvm/book3s_64_mmu.c
+index 5991332..26b8b2 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu.c
++++ b/arch/powerpc/kvm/book3s_64_mmu.c
+@@ -311,7 +311,7 @@ static int kvmppc_mmu_book3s_64_xlate(struct kvm_vcpu *vcpu, gva_t eaddr,
+ 	case 2:
+ 	case 6:
+ 		gpte->may_write = true;
+-		/* fall through */
++		fallthrough;
+ 	case 3:
+ 	case 5:
+ 	case 7:
+diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
+index 729a0f..7db3695 100644
+--- a/arch/powerpc/kvm/book3s_pr.c
++++ b/arch/powerpc/kvm/book3s_pr.c
+@@ -740,7 +740,7 @@ int kvmppc_handle_pagefault(struct kvm_run *run, struct kvm_vcpu *vcpu,
+ 		    (vcpu->arch.hflags & BOOK3S_HFLAG_SPLIT_HACK) &&
+ 		    ((pte.raddr & SPLIT_HACK_MASK) == SPLIT_HACK_OFFS))
+ 			pte.raddr &= ~SPLIT_HACK_MASK;
+-		/* fall through */
++		fallthrough;
+ 	case MSR_IR:
+ 		vcpu->arch.mmu.esid_to_vsid(vcpu, eaddr >> SID_SHIFT, &vsid);
+ 
+diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+index 7b27604..be47815 100644
+--- a/arch/powerpc/kvm/booke.c
++++ b/arch/powerpc/kvm/booke.c
+@@ -421,11 +421,11 @@ static int kvmppc_booke_irqprio_deliver(struct kvm_vcpu *vcpu,
+ 	case BOOKE_IRQPRIO_DATA_STORAGE:
+ 	case BOOKE_IRQPRIO_ALIGNMENT:
+ 		update_dear = true;
+-		/* fall through */
++		fallthrough;
+ 	case BOOKE_IRQPRIO_INST_STORAGE:
+ 	case BOOKE_IRQPRIO_PROGRAM:
+ 		update_esr = true;
+-		/* fall through */
++		fallthrough;
+ 	case BOOKE_IRQPRIO_ITLB_MISS:
+ 	case BOOKE_IRQPRIO_SYSCALL:
+ 	case BOOKE_IRQPRIO_FP_UNAVAIL:
+@@ -459,7 +459,7 @@ static int kvmppc_booke_irqprio_deliver(struct kvm_vcpu *vcpu,
+ 	case BOOKE_IRQPRIO_DECREMENTER:
+ 	case BOOKE_IRQPRIO_FIT:
+ 		keep_irq = true;
+-		/* fall through */
++		fallthrough;
+ 	case BOOKE_IRQPRIO_EXTERNAL:
+ 	case BOOKE_IRQPRIO_DBELL:
+ 		allowed = vcpu->arch.shared->msr & MSR_EE;
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 1af96fb5..c242a79 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -525,7 +525,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_PPC_GUEST_DEBUG_SSTEP:
+-		/* fall through */
+ 	case KVM_CAP_PPC_PAIRED_SINGLES:
+ 	case KVM_CAP_PPC_OSI:
+ 	case KVM_CAP_PPC_GET_PVINFO:
+-- 
+2.24.0
 
-> ---
->  arch/powerpc/kvm/book3s_hv.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 2cefd071b848..c0c43a733830 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -3616,6 +3616,7 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64=
- time_limit,
->  		if (trap =3D=3D BOOK3S_INTERRUPT_SYSCALL && !vcpu->arch.nested &&
->  		    kvmppc_get_gpr(vcpu, 3) =3D=3D H_CEDE) {
->  			kvmppc_nested_cede(vcpu);
-> +			kvmppc_set_gpr(vcpu, 3, 0);
->  			trap =3D 0;
->  		}
->  	} else {
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---FbmEh7Ek6NM6xKh/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5oHVIACgkQbDjKyiDZ
-s5JwMA//eU73d+waNd47ydy7VR5a4Ch1jj0NvhreVqCm/BGmojxQ5HAhKhdegq2P
-v9DUTT3fVyrp+HjH6tvUO+pGA0N7YtsX5/QBspYMQIoY5jypDyXmgh525aZDKlir
-r5Qypc9tc0DrhJATJE4oeBaYfsnQMWzTlS3AgmVCuRCh2/QnHwagDt/2HQDwORk0
-eHqx0uf5PV/vuFOTAXuLnfdua6O5/8TEE1lc3mBLQnkBNEuIdPPYiKd8+fFH5D0g
-YMp8YhJ0DF/lq93uqKUo53UK8sCHk+vFyQvopSJ4cRGmQeEN66vo6y7sD5q+9NKu
-U+K/i4aWhX9owLEBZ7BAAWmhmn3QJobKl5kPuRcxJVK+QTJytZnzOFpV2imfZu6e
-5xldw9EabJrSQWwijWyoz7+fCIUGodwgDd9+yB87VzZj8uhef0G5h71PuVZFkChp
-X/oaeZBjLG7Bvh5zudXc51prXndhSaNpyEzwm1QWQWwSs04+rd5wVrrRPM7xDfor
-y/qCy9CLwnUhkTK0+UmLyWA/9MPB4icuFIqMedbOedBwFjRHDMp5TNUqGcsaC18g
-AM7Z5FVjBSKAgjDIoRSs1Ri/nMC1VGTR2/qmeQWUifxBpsJyvC+jJ1lwUqqrGeRp
-fqv05mHLQDv2j3c9vdYySEVNHiq+U1w6ko45yUSXuoh55GoP80o=
-=VrOw
------END PGP SIGNATURE-----
-
---FbmEh7Ek6NM6xKh/--
