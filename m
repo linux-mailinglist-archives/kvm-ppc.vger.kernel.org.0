@@ -2,128 +2,149 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 68734186043
-	for <lists+kvm-ppc@lfdr.de>; Sun, 15 Mar 2020 23:38:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FE5E18670A
+	for <lists+kvm-ppc@lfdr.de>; Mon, 16 Mar 2020 09:53:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729280AbgCOWiH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 15 Mar 2020 18:38:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55148 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729275AbgCOWiH (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 15 Mar 2020 18:38:07 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02FMXqxv107830
-        for <kvm-ppc@vger.kernel.org>; Sun, 15 Mar 2020 18:38:06 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2yrus5b00f-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Sun, 15 Mar 2020 18:38:06 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
-        Sun, 15 Mar 2020 22:38:04 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Sun, 15 Mar 2020 22:38:00 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02FMawwF44826954
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 15 Mar 2020 22:36:58 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 475F0AE06F;
-        Sun, 15 Mar 2020 22:37:59 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A04EEAE073;
-        Sun, 15 Mar 2020 22:37:56 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.80.222.34])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sun, 15 Mar 2020 22:37:56 +0000 (GMT)
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+        id S1730260AbgCPIx5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 16 Mar 2020 04:53:57 -0400
+Received: from 7.mo179.mail-out.ovh.net ([46.105.61.94]:57542 "EHLO
+        7.mo179.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730218AbgCPIx5 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 16 Mar 2020 04:53:57 -0400
+Received: from player694.ha.ovh.net (unknown [10.110.208.220])
+        by mo179.mail-out.ovh.net (Postfix) with ESMTP id 90F06157D3F
+        for <kvm-ppc@vger.kernel.org>; Mon, 16 Mar 2020 09:34:03 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+        (Authenticated sender: clg@kaod.org)
+        by player694.ha.ovh.net (Postfix) with ESMTPSA id 35843105DF5BB;
+        Mon, 16 Mar 2020 08:33:45 +0000 (UTC)
+Subject: Re: [RFC PATCH v1] powerpc/XIVE: SVM: share the event-queue page with
+ the Hypervisor.
+To:     Ram Pai <linuxram@us.ibm.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
 Cc:     mpe@ellerman.id.au, bauerman@linux.ibm.com, andmike@linux.ibm.com,
         sukadev@linux.vnet.ibm.com, aik@ozlabs.ru, paulus@ozlabs.org,
-        groug@kaod.org, clg@fr.ibm.com, david@gibson.dropbear.id.au
-Subject: [RFC PATCH v1] powerpc/XIVE: SVM: share the event-queue page with the Hypervisor.
-Date:   Sun, 15 Mar 2020 15:37:32 -0700
-X-Mailer: git-send-email 1.8.3.1
-X-TM-AS-GCONF: 00
-x-cbid: 20031522-0008-0000-0000-0000035DBEA1
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031522-0009-0000-0000-00004A7F0FD7
-Message-Id: <1584311852-15471-1-git-send-email-linuxram@us.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-03-15_04:2020-03-12,2020-03-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 clxscore=1015 priorityscore=1501 mlxscore=0
- adultscore=0 phishscore=0 mlxlogscore=991 malwarescore=0 bulkscore=0
- spamscore=0 suspectscore=48 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2003020000 definitions=main-2003150121
+        groug@kaod.org, david@gibson.dropbear.id.au
+References: <1584311852-15471-1-git-send-email-linuxram@us.ibm.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a0f72ede-4f1b-34df-b0d3-4f71944faa25@kaod.org>
+Date:   Mon, 16 Mar 2020 09:33:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <1584311852-15471-1-git-send-email-linuxram@us.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 4177933080325229542
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudefvddggeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehkvhhmqdhpphgtsehvghgvrhdrkhgvrhhnvghlrdhorhhg
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-XIVE interrupt controller maintains a Event-Queue(EQ) page. This page is
-used to communicate events with the Hypervisor/Qemu. In Secure-VM,
-unless a page is shared with the Hypervisor, the Hypervisor will
-not be able to read/write to that page.
+( Please use clg@kaod.org. I hardly use clg@fr.ibm.com.)
 
-Explicitly share the EQ page with the Hypervisor, and unshare it
-during cleanup.  This enables SVM to use XIVE.
+On 3/15/20 11:37 PM, Ram Pai wrote:
+> XIVE interrupt controller maintains a Event-Queue(EQ) page. This page is
+> used to communicate events with the Hypervisor/Qemu.
 
-(NOTE: If the Hypervisor/Ultravisor is unable to target interrupts
- directly to Secure VM, use "kernel_irqchip=off" on the qemu command
- line).
+Here is an alternative for the above :
 
-Cc: kvm-ppc@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Cc: Michael Anderson <andmike@linux.ibm.com>
-Cc: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Cc: Greg Kurz <groug@kaod.org>
-Cc: Cedric Le Goater <clg@fr.ibm.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: Ram Pai <linuxram@us.ibm.com>
----
- arch/powerpc/sysdev/xive/spapr.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+    XIVE interrupt controller use an Event Queue (EQ) to enqueue event 
+    notifications when an exception occurs. The EQ is a single memory page 
+    provided by the O/S defining a circular buffer, one per server and 
+    priority couple.
 
-diff --git a/arch/powerpc/sysdev/xive/spapr.c b/arch/powerpc/sysdev/xive/spapr.c
-index 55dc61c..608b52f 100644
---- a/arch/powerpc/sysdev/xive/spapr.c
-+++ b/arch/powerpc/sysdev/xive/spapr.c
-@@ -26,6 +26,8 @@
- #include <asm/xive.h>
- #include <asm/xive-regs.h>
- #include <asm/hvcall.h>
-+#include <asm/svm.h>
-+#include <asm/ultravisor.h>
+    On baremetal, the EQ page is configured with an OPAL call. On pseries,
+    an extra hop is necessary and the guest OS uses the hcall 
+    H_INT_SET_QUEUE_CONFIG to configure the XIVE interrupt controller. 
+
+> In Secure-VM, unless a page is shared with the Hypervisor, 
+> the Hypervisor will not be able to read/write to that page.
+
+This is a bit confusing to me as no software is involved when delivering 
+the interrupt to the guest. When you are referring to the "Hypervisor", 
+is it software and hardware ?  
+
+If so, I would say:
+
+    The XIVE controller being Hypervisor privileged, it will not be 
+    allowed to enqueue event notifications for a Secure VM unless  
+    the EQ pages are in the shared page pool.
+
+> Explicitly share the EQ page with the Hypervisor, and unshare it
+> during cleanup.  This enables SVM to use XIVE.
+
+yes but KVM also needs support for the TIMA and ESB page fault handlers. 
+
+> (NOTE: If the Hypervisor/Ultravisor is unable to target interrupts
+>  directly to Secure VM, use "kernel_irqchip=off" on the qemu command
+>  line).
+
+So, I would say here :
+
+   Hypervisor/Ultravisor still requires support for the TIMA and ESB page 
+   fault handlers. Until this is complete, QEMU can use the emulated XIVE
+   device for Secure VMs, option "kernel_irqchip=off" on the QEMU pseries 
+   machine.
+
+The rest looks good to me.
+
+Thanks,
+
+C. 
+
  
- #include "xive-internal.h"
- 
-@@ -501,6 +503,9 @@ static int xive_spapr_configure_queue(u32 target, struct xive_q *q, u8 prio,
- 		rc = -EIO;
- 	} else {
- 		q->qpage = qpage;
-+		if (is_secure_guest())
-+			uv_share_page(PHYS_PFN(qpage_phys),
-+					1 << xive_alloc_order(order));
- 	}
- fail:
- 	return rc;
-@@ -534,6 +539,8 @@ static void xive_spapr_cleanup_queue(unsigned int cpu, struct xive_cpu *xc,
- 		       hw_cpu, prio);
- 
- 	alloc_order = xive_alloc_order(xive_queue_shift);
-+	if (is_secure_guest())
-+		uv_unshare_page(PHYS_PFN(__pa(q->qpage)), 1 << alloc_order);
- 	free_pages((unsigned long)q->qpage, alloc_order);
- 	q->qpage = NULL;
- }
--- 
-1.8.3.1
+> Cc: kvm-ppc@vger.kernel.org
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+> Cc: Michael Anderson <andmike@linux.ibm.com>
+> Cc: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+> Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Cc: Paul Mackerras <paulus@ozlabs.org>
+> Cc: Greg Kurz <groug@kaod.org>
+> Cc: Cedric Le Goater <clg@fr.ibm.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+> ---
+>  arch/powerpc/sysdev/xive/spapr.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/powerpc/sysdev/xive/spapr.c b/arch/powerpc/sysdev/xive/spapr.c
+> index 55dc61c..608b52f 100644
+> --- a/arch/powerpc/sysdev/xive/spapr.c
+> +++ b/arch/powerpc/sysdev/xive/spapr.c
+> @@ -26,6 +26,8 @@
+>  #include <asm/xive.h>
+>  #include <asm/xive-regs.h>
+>  #include <asm/hvcall.h>
+> +#include <asm/svm.h>
+> +#include <asm/ultravisor.h>
+> 
+>  #include "xive-internal.h"
+> 
+> @@ -501,6 +503,9 @@ static int xive_spapr_configure_queue(u32 target, struct xive_q *q, u8 prio,
+>  		rc = -EIO;
+>  	} else {
+>  		q->qpage = qpage;
+> +		if (is_secure_guest())
+> +			uv_share_page(PHYS_PFN(qpage_phys),
+> +					1 << xive_alloc_order(order));
+>  	}
+>  fail:
+>  	return rc;
+> @@ -534,6 +539,8 @@ static void xive_spapr_cleanup_queue(unsigned int cpu, struct xive_cpu *xc,
+>  		       hw_cpu, prio);
+> 
+>  	alloc_order = xive_alloc_order(xive_queue_shift);
+> +	if (is_secure_guest())
+> +		uv_unshare_page(PHYS_PFN(__pa(q->qpage)), 1 << alloc_order);
+>  	free_pages((unsigned long)q->qpage, alloc_order);
+>  	q->qpage = NULL;
+>  }
+> 
 
