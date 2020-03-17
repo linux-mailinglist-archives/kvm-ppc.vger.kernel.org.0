@@ -2,61 +2,102 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40043188305
-	for <lists+kvm-ppc@lfdr.de>; Tue, 17 Mar 2020 13:09:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 487A5188378
+	for <lists+kvm-ppc@lfdr.de>; Tue, 17 Mar 2020 13:16:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726575AbgCQMJP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 17 Mar 2020 08:09:15 -0400
-Received: from sonic307-2.consmr.mail.ne1.yahoo.com ([66.163.190.121]:34149
-        "EHLO sonic307-2.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726717AbgCQMJP (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 17 Mar 2020 08:09:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1584446954; bh=kcevCRoll2+Bsa3FDERpIV72LVcB1A4YV1b5N2AWYBk=; h=Date:From:Reply-To:Subject:References:From:Subject; b=Rrbbl+lM61hZyf9c3JU3tad348/wC0rOJwEr5gQRL0rlhaLClQXTSp3OnqVJK6fQ7fur4yl3NBdmqehvK3pll+nCQWr1uf+fjEZr6KPSHYouVBbaolzgBW0/yNDr/VEUuOn5l4acACf1cwr1Y3fZwl/62Qo/yv1tE08FmnGmK5iwR6+8WSdROSFmXJVjm81FK+ML/ErXZZUPsmKW1GGu4qmuOrMyVAyQYBgIunmqBWL29cEbS+tHyhCiLnypUT8VMcwFVaYM9h1P7FDMc8SOt2ee5KPeFBvFaMiBZKmvxeEuIJIxSbP8SHTeztsqaEVoylC/DOfbHr+VDKxBAISd9g==
-X-YMail-OSG: t2pjGGUVM1kIKYq1Zp3_kkeUyzT4O0Q332.E8w7MbiE2rkt4VUZCbhvg4MYYgao
- _8Suik9VHsy8mwx5i3ITvP2GRvswFmqne0BQigVcHJN_JlQ.jR0q2I2F9p2ftXLPVj0R_Bb83Vyv
- 73llJpPkiO6WzRVkYmVZXVYYb5mC.aDG_Aji2wPUHBbVhl3.NhYpYEyH3Nuzu4afCu9ASmXBcyjS
- xtsdoqMJV1fRI..vZNNrDFewsKV5oThTArSeLQTBdN.gsWahkgJH8nGdRRk3Jj05hEvPagkn_oWz
- 9OiefMrwluoFF3crQHWAPqDSJtKAGz2rb9HL7lA.YcnLBuFE3TGsHg3oOuCnKF1hwtSy4VuXebPP
- Kppw6O7p.n_6Bg5U5_iMS4TJMC549w0iPEwRJbqyr_ed7rTSyf3fCqrXiVLEBUbqa_qadstqzyC6
- zLlMiXoM9FovWOjItNnqqtdIFy2Vg_uAKcy4ofibShpUqAwmyOl5F50sO3zlE6rU8QgDS2RQJmrr
- gzchTgYv.Ly_fQWJUPHtaeYm4xZiskCGzefT1EIR2VLsBsTkkxIsWtIrs6vDYXqjgns9C.ojGLw4
- 5hddiHwobj88qvMEimRcvQqi0SLsxPZ6uqrSmZ6ZdJVESZtavT08eAsHE5MR_IOxwcwqyOafIW.B
- ulW8HISl8hF63yipztV7pxJkzoHFEYzw6d.f1baU9...IaKDasCoGw34z22Zb.f.rlo.LO1EjfH_
- mN4bYLGSiuHZuU2zhaBnv.LaruVFnFa5AfUcrwmR8P4WmR0ba1t_XHKQbtv0g9SguPRMLA22OSzM
- eCM4SvsO1jxr.vzgUB5lPvE9_sXFInrxgmHvYBFqGqcn68hv60JovQd7osQCaGzayt3sDfZmkFvV
- pNqv0XhO4BDYnc0ltwpYmxm_30VsZWsg14O9FD0WH4YfgVhNeijpN7UKsvY0mgz8gE_BiCL6atPe
- 64u0ZcM44fbyqiRv1ocqHJDv6BcoME0gdKlbHmyRR0Hl.Atg1gYM_zuwHDFDhC.ksrAPrrqX1_Rk
- TrNU0z2svaPxfGqbh83SRzgohQx461n6PzMmrNSwE21wxV3oetyWeYQprFb7FMnx4f5t5kFd0rjO
- wMONTbuY2o_idkdtux6P486bQvC.a9OPBB2AXr8oC.3BQuUelBFYC8UhozGlkSumqlzpsyb7tOA3
- WX3AGjcYbXu7k7VuaMRC4L0kFTRpAtMkNTaG5cibM5xkzuQ32XNO8kzPEADp3qODQpFrrCx9SZpJ
- RX55CIpE6Vzbz7iwiAajrZaMIuIbxE1F0BvAF1pxC0YjNP.JExyfUPxsxEjf2jTKNVDO4GAJMjvN
- RqPBGdQZmxbDksuG1um22QpXn0bb_Ew--
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ne1.yahoo.com with HTTP; Tue, 17 Mar 2020 12:09:14 +0000
-Date:   Tue, 17 Mar 2020 12:07:13 +0000 (UTC)
-From:   Stephen Li <stenn7@gabg.net>
-Reply-To: stephli947701@gmail.com
-Message-ID: <2078071840.1852905.1584446833663@mail.yahoo.com>
-Subject: REF
+        id S1726057AbgCQMPk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 17 Mar 2020 08:15:40 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:39700 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725957AbgCQMPk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 17 Mar 2020 08:15:40 -0400
+Received: by mail-qt1-f193.google.com with SMTP id f17so15831021qtq.6
+        for <kvm-ppc@vger.kernel.org>; Tue, 17 Mar 2020 05:15:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=embLdYCC+n7Oc9s6Q8ZHyjDJLIa4kBbr1h9BCOMYbH4=;
+        b=SQzUEb66s7EkVHhGjTvINACKhElAAylB3fP+JIE5uJtINxUSWP+viORRExV6sx6htD
+         HpVjFFlfhYosV5Dtv6arQkz6yiV2Baf2i4b1LfAOirqSi7orDhzKcNalylzPx3FE1iin
+         oP+wLU4hopi4dKyJTpvXWz51qQrzPAGcS4kKz84+9KAoAC2yW49o3KG6agUJaN37k6yK
+         HuepGzVyNECsPyMpp1CtLxq1h9Taueop5kQtr0Zv8iKdXRs41vSS5Kb4H/Sh9sxSVbBi
+         Mn9h5qwb5Z+4eSnt+xfXYW9HjJYHq+hghoj++xGbpVpzLV1xGx/h/5X4aTndQ1jk78Xd
+         Y1OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=embLdYCC+n7Oc9s6Q8ZHyjDJLIa4kBbr1h9BCOMYbH4=;
+        b=qyY3nWTwNxD6InYHIFuDqjuadULxpVeAD4HNM1M0Fauz3FrqSnc1uy2dpXeIFI7lv0
+         KB9mBmKXVMxWBAYz1QFfjuVA/Du99WUesVI1s8vfeqR7UACqPyJRzbtaZCdDZ0OYbkpO
+         pTTOHktoCrwOIoFjyxKhJTWd7hycPPPbPp8iXmLrGiXFajy9cgfA+zjd9FXYC6dQtITx
+         7IxEfnFGeMGryx+TPKWO7LX4CK1K9XDhJb9Ir4D68ItG2ylHkoerWdKuhSJ97Kba5yac
+         0S9+53x7IKk6rP6I7T/0WLurb8FbiJ7zrxm0HEOxDKNukfwDVGH+dAHt/Yfvyv0sYzBE
+         +mLg==
+X-Gm-Message-State: ANhLgQ1YSCkn6qSLq3Sjbcrj0CSPzFWwA1jDglF+sJLSfn0Q+3fo8XkW
+        NmKhexgt8CUWUihZE3l0j1lSqQ==
+X-Google-Smtp-Source: ADFU+vsrbs1FMDMvrBo9cu5QRVB0IZzDlkTw1XDG3EBbGMsL3EdtYUQXQDIyFHCwplMScIrZT+xPIg==
+X-Received: by 2002:aed:2ba2:: with SMTP id e31mr4988796qtd.286.1584447338651;
+        Tue, 17 Mar 2020 05:15:38 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id k13sm2042705qtm.11.2020.03.17.05.15.38
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 17 Mar 2020 05:15:38 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jEB8C-00012L-NV; Tue, 17 Mar 2020 09:15:36 -0300
+Date:   Tue, 17 Mar 2020 09:15:36 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Ralph Campbell <rcampbell@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Jerome Glisse <jglisse@redhat.com>, kvm-ppc@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        nouveau@lists.freedesktop.org, linux-mm@kvack.org
+Subject: Re: [PATCH 3/4] mm: simplify device private page handling in
+ hmm_range_fault
+Message-ID: <20200317121536.GQ20941@ziepe.ca>
+References: <20200316193216.920734-1-hch@lst.de>
+ <20200316193216.920734-4-hch@lst.de>
+ <7256f88d-809e-4aba-3c46-a223bd8cc521@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <2078071840.1852905.1584446833663.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.15342 YMailNodin Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7256f88d-809e-4aba-3c46-a223bd8cc521@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Mon, Mar 16, 2020 at 03:49:51PM -0700, Ralph Campbell wrote:
+> 
+> On 3/16/20 12:32 PM, Christoph Hellwig wrote:
+> > Remove the code to fault device private pages back into system memory
+> > that has never been used by any driver.  Also replace the usage of the
+> > HMM_PFN_DEVICE_PRIVATE flag in the pfns array with a simple
+> > is_device_private_page check in nouveau.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> 
+> Getting rid of HMM_PFN_DEVICE_PRIVATE seems reasonable to me since a driver can
+> look at the struct page but what if a driver needs to fault in a page from
+> another device's private memory? Should it call handle_mm_fault()?
 
+Isn't that what this series basically does?
 
-Greetings,
-I was searching through a local business directory when I found your
-profile. I am Soliciting On-Behalf of my private client who is
-interested in having a serious business investment in your country. If
-you have a valid business, investment or project he can invest
-back to me for more details. Your swift response is highly needed.
-Sincerely
-Stephen Li
-Please response back to me with is my private email below for more details
-stephli947701@gmail.com
+The dev_private_owner is set to the type of pgmap the device knows how
+to handle, and everything else is automatically faulted for the
+device.
+
+If the device does not know how to handle device_private then it sets
+dev_private_owner to NULL and it never gets device_private pfns.
+
+Since the device_private pfn cannot be dma mapped, drivers must have
+explicit support for them.
+
+Jason
