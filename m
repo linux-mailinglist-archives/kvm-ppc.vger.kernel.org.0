@@ -2,74 +2,94 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CFD43187687
-	for <lists+kvm-ppc@lfdr.de>; Tue, 17 Mar 2020 01:10:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48751187944
+	for <lists+kvm-ppc@lfdr.de>; Tue, 17 Mar 2020 06:31:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733040AbgCQAKs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 16 Mar 2020 20:10:48 -0400
-Received: from mail.uic.edu.hk ([61.143.62.86]:46687 "EHLO umgp.uic.edu.hk"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1733019AbgCQAKr (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 16 Mar 2020 20:10:47 -0400
-X-IronPort-AV: E=Sophos;i="5.43,368,1503331200"; 
-   d="scan'208";a="17242154"
-Received: from unknown (HELO zpmail.uic.edu.hk) ([192.168.111.249])
-  by umgp.uic.edu.hk with ESMTP; 17 Mar 2020 08:10:45 +0800
-Received: from zpmail.uic.edu.hk (localhost [127.0.0.1])
-        by zpmail.uic.edu.hk (Postfix) with ESMTPS id 9AFDA41C0567;
-        Tue, 17 Mar 2020 08:10:44 +0800 (CST)
-Received: from localhost (localhost [127.0.0.1])
-        by zpmail.uic.edu.hk (Postfix) with ESMTP id E747F41C0957;
-        Tue, 17 Mar 2020 08:10:43 +0800 (CST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zpmail.uic.edu.hk E747F41C0957
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uic.edu.hk;
-        s=6465647E-9D7B-11E8-B17B-42130C7FA3B9; t=1584403844;
-        bh=Wn2BcVyAdGxyDvB/5AnVfCr/iJTzisyuX4dwKssec6E=;
-        h=Date:From:Message-ID:MIME-Version;
-        b=Wr01idGFpLptPiBLm5PFfVX+aTNYjqHm6anPKDeIy4U0pwLGSZ5uiLZkPZmZuPsvE
-         jIu82SMDkFnAZ1picooyQQzcS174MCBnmmeGrA1HLL5HwCUVqWLRQJ6F7n/dEbCp1Z
-         h9G8egrEhGipDOUop8Au92LWrVihibpFReiYYUCP2PUw5zMVj9M9BrZbBsW/WKUk0E
-         5xaw0OuaQzNV+/d+a+rYfJePf2PWtl4HlduEkoLxh0y8c/gB/AmOqWKoMFrZ4Zwy7h
-         u6NOmHqjs3lhNcO0gKsbiwDlPLcTS8GI72U1QZ1Lebg1UCG1++p2wbe7wlg+Y9PjzM
-         2uyRUVz9sM5Dw==
-Received: from zpmail.uic.edu.hk ([127.0.0.1])
-        by localhost (zpmail.uic.edu.hk [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id S2WBlP-nuasS; Tue, 17 Mar 2020 08:10:43 +0800 (CST)
-Received: from zpmail.uic.edu.hk (zpmail.uic.edu.hk [192.168.111.249])
-        by zpmail.uic.edu.hk (Postfix) with ESMTP id 5169C41C0567;
-        Tue, 17 Mar 2020 08:10:38 +0800 (CST)
-Date:   Tue, 17 Mar 2020 08:10:38 +0800 (CST)
-From:   David Ibe <ylawrence@uic.edu.hk>
-Reply-To: David Ibe <davidibe718@gmail.com>
-Message-ID: <823530439.63694938.1584403838226.JavaMail.zimbra@uic.edu.hk>
-Subject: 
+        id S1725876AbgCQFbe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 17 Mar 2020 01:31:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25202 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725468AbgCQFbe (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 17 Mar 2020 01:31:34 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02H5Ut6W074471
+        for <kvm-ppc@vger.kernel.org>; Tue, 17 Mar 2020 01:31:32 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2yrr6tq3j1-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Tue, 17 Mar 2020 01:31:32 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <bharata@linux.ibm.com>;
+        Tue, 17 Mar 2020 05:31:30 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 17 Mar 2020 05:31:26 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02H5VPA557016414
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Mar 2020 05:31:25 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 78A77A4059;
+        Tue, 17 Mar 2020 05:31:25 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8A39BA4051;
+        Tue, 17 Mar 2020 05:31:23 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.199.32.136])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 17 Mar 2020 05:31:23 +0000 (GMT)
+Date:   Tue, 17 Mar 2020 11:01:21 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Jerome Glisse <jglisse@redhat.com>, kvm-ppc@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        nouveau@lists.freedesktop.org, linux-mm@kvack.org
+Subject: Re: ensure device private pages have an owner v2
+Reply-To: bharata@linux.ibm.com
+References: <20200316193216.920734-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [192.168.111.160]
-X-Mailer: Zimbra 8.8.15_GA_3829 (ZimbraWebClient - GC80 (Win)/8.8.15_GA_3829)
-Thread-Index: MdVyMl4Wyg6wtPZiBXOue762XG1upg==
-Thread-Topic: 
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200316193216.920734-1-hch@lst.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-TM-AS-GCONF: 00
+x-cbid: 20031705-4275-0000-0000-000003AD96C0
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031705-4276-0000-0000-000038C2BE9E
+Message-Id: <20200317053121.GA22538@in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-16_11:2020-03-12,2020-03-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ phishscore=0 clxscore=1011 malwarescore=0 lowpriorityscore=0 mlxscore=0
+ mlxlogscore=943 adultscore=0 impostorscore=0 priorityscore=1501
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003170022
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Mon, Mar 16, 2020 at 08:32:12PM +0100, Christoph Hellwig wrote:
+> When acting on device private mappings a driver needs to know if the
+> device (or other entity in case of kvmppc) actually owns this private
+> mapping.  This series adds an owner field and converts the migrate_vma
+> code over to check it.  I looked into doing the same for
+> hmm_range_fault, but as far as I can tell that code has never been
+> wired up to actually work for device private memory, so instead of
+> trying to fix some unused code the second patch just remove the code.
+> We can add it back once we have a working and fully tested code, and
+> then should pass the expected owner in the hmm_range structure.
 
+Boot-tested a pseries secure guest with this change (1/4 and 2/4 only)
 
-Good Day,                
+So Tested-by: Bharata B Rao <bharata@linux.ibm.com> for the above
+two patches.
 
-I am Mr. David Ibe, I work with the International Standards on Auditing, I have seen on records, that several times people has divert your funds into their own personal accounts.
+Regards,
+Bharata.
 
-Now I am writing to you in respect of the amount which I have been able to send to you through our International United Nations accredited and approved Diplomat, who has arrived Africa, I want you to know that the diplomat would deliver the funds which I have packaged as a diplomatic compensation to you and the amount in the consignment is  $10,000,000.00 United State Dollars.
-
-I did not disclose the contents to the diplomat, but I told him that it is your compensation from the Auditing Corporate Governance and Stewardship, Auditing and Assurance Standards Board. I want you to know that these funds would help with your financial status as I have seen in records that you have spent a lot trying to receive these funds and I am not demanding so much from you but only 30% for my stress and logistics.
-
-I would like you to get back to me with your personal contact details, so that I can give you the contact information's of the diplomat who has arrived Africa and has been waiting to get your details so that he can proceed with the delivery to you.
-
-Yours Sincerely,
-Kindly forward your details to: mrdavidibe966@gmail.com
-Mr. David Ibe
-International Auditor,
-Corporate Governance and Stewardship
