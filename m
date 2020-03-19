@@ -2,167 +2,217 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 02F1B18AB7D
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Mar 2020 04:58:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F66D18ABCF
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Mar 2020 05:33:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727032AbgCSD6E (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 18 Mar 2020 23:58:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5586 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727031AbgCSD6D (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 18 Mar 2020 23:58:03 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02J3WgXp081704;
-        Wed, 18 Mar 2020 23:57:48 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2yu98tyf14-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Mar 2020 23:57:48 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02J3ok1s144739;
-        Wed, 18 Mar 2020 23:57:48 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2yu98tyf0y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Mar 2020 23:57:48 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02J3v0n5000836;
-        Thu, 19 Mar 2020 03:57:47 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma02dal.us.ibm.com with ESMTP id 2yrpw6y0ku-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Mar 2020 03:57:47 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02J3vkMb3080932
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Mar 2020 03:57:46 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A2CFA112063;
-        Thu, 19 Mar 2020 03:57:46 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4D64F112062;
-        Thu, 19 Mar 2020 03:57:43 +0000 (GMT)
-Received: from skywalker.ibmuc.com (unknown [9.199.34.213])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Mar 2020 03:57:43 +0000 (GMT)
-From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-To:     linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-Cc:     npiggin@gmail.com, paulus@ozlabs.org, leonardo@linux.ibm.com,
-        kirill@shutemov.name,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-Subject: [PATCH v2 22/22] powerpc/mm/book3s64: Fix MADV_DONTNEED and parallel page fault race
-Date:   Thu, 19 Mar 2020 09:26:09 +0530
-Message-Id: <20200319035609.158654-23-aneesh.kumar@linux.ibm.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200319035609.158654-1-aneesh.kumar@linux.ibm.com>
-References: <20200319035609.158654-1-aneesh.kumar@linux.ibm.com>
+        id S1725787AbgCSEdK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 19 Mar 2020 00:33:10 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:36817 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725768AbgCSEdK (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 19 Mar 2020 00:33:10 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 48jYtV5Ly0z9sSM; Thu, 19 Mar 2020 15:33:06 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1584592386; bh=QAywpI3JOjIIEUTy46Gfhm93J1pIzZ8maKY0VqoIB8k=;
+        h=Date:From:To:Cc:Subject:From;
+        b=q3+vPPVHAr7M76upYnV+slNMg4FMb0q3It1nUOv0AXZln4DYvSJLAEfoCkkzo+6kQ
+         984QRjlUMIAfhAAcI+tnYupptPT5aEMY2TLgI9qh9xgyhARFfkUwXlhElphX8UHgeC
+         aCTyDbyQYzf3OJT4bosANZmvKI9jdxSvmmFKlJ6ycT4jbJcjijAUzCqlv122ahbxPw
+         UMpzcNwvx2HNw7wPjkXgavG7E7Rk0MtxO6wJVNLA07i7L5Gix7J/wAKOZpFB6J9Clv
+         SW2gtCB2aQwJAfOfRkO6lF5DwJhjgaiwmXVDMGeZQdJdA00OabsWCrq2ctVaOpHINu
+         V7o5tb8rHCpxg==
+Date:   Thu, 19 Mar 2020 15:33:01 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Ram Pai <linuxram@us.ibm.com>
+Subject: [PATCH] KVM: PPC: Book3S HV: Add a capability for enabling secure
+ guests
+Message-ID: <20200319043301.GA13052@blackberry>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-18_10:2020-03-18,2020-03-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- adultscore=0 mlxlogscore=999 suspectscore=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003190013
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-MADV_DONTNEED holds mmap_sem in read mode and that implies a
-parallel page fault is possible and the kernel can end up with a level 1 PTE
-entry (THP entry) converted to a level 0 PTE entry without flushing
-the THP TLB entry.
+At present, on Power systems with Protected Execution Facility
+hardware and an ultravisor, a KVM guest can transition to being a
+secure guest at will.  Userspace (QEMU) has no way of knowing
+whether a host system is capable of running secure guests.  This
+will present a problem in future when the ultravisor is capable of
+migrating secure guests from one host to another, because
+virtualization management software will have no way to ensure that
+secure guests only run in domains where all of the hosts can
+support secure guests.
 
-Most architectures including POWER have issues with kernel instantiating a level
-0 PTE entry while holding level 1 TLB entries.
+This adds a VM capability which has two functions: (a) userspace
+can query it to find out whether the host can support secure guests,
+and (b) userspace can enable it for a guest, which allows that
+guest to become a secure guest.  If userspace does not enable it,
+KVM will return an error when the ultravisor does the hypercall
+that indicates that the guest is starting to transition to a
+secure guest.  The ultravisor will then abort the transition and
+the guest will terminate.
 
-The code sequence I am looking at is
-
-down_read(mmap_sem)                         down_read(mmap_sem)
-
-zap_pmd_range()
- zap_huge_pmd()
-  pmd lock held
-  pmd_cleared
-  table details added to mmu_gather
-  pmd_unlock()
-                                         insert a level 0 PTE entry()
-
-tlb_finish_mmu().
-
-Fix this by forcing a tlb flush before releasing pmd lock if this is
-not a fullmm invalidate. We can safely skip this invalidate for
-task exit case (fullmm invalidate) because in that case we are sure
-there can be no parallel fault handlers.
-
-This do change the Qemu guest RAM del/unplug time as below
-
-128 core, 496GB guest:
-
-Without patch:
-munmap start: timer = 196449 ms, PID=6681
-munmap finish: timer = 196488 ms, PID=6681 - delta = 39ms
-
-With patch:
-munmap start: timer = 196345 ms, PID=6879
-munmap finish: timer = 196714 ms, PID=6879 - delta = 369ms
-
-Signed-off-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
 ---
- arch/powerpc/include/asm/book3s/64/pgtable.h |  5 +++++
- arch/powerpc/mm/book3s64/pgtable.c           | 18 ++++++++++++++++++
- 2 files changed, 23 insertions(+)
+Note, only compile-tested.  Ram, please test.
 
-diff --git a/arch/powerpc/include/asm/book3s/64/pgtable.h b/arch/powerpc/include/asm/book3s/64/pgtable.h
-index 89eb7b350df8..e98cb141d490 100644
---- a/arch/powerpc/include/asm/book3s/64/pgtable.h
-+++ b/arch/powerpc/include/asm/book3s/64/pgtable.h
-@@ -1265,6 +1265,11 @@ static inline pmd_t pmdp_collapse_flush(struct vm_area_struct *vma,
- }
- #define pmdp_collapse_flush pmdp_collapse_flush
+ Documentation/virt/kvm/api.rst      | 17 +++++++++++++++++
+ arch/powerpc/include/asm/kvm_host.h |  1 +
+ arch/powerpc/include/asm/kvm_ppc.h  |  1 +
+ arch/powerpc/kvm/book3s_hv.c        | 13 +++++++++++++
+ arch/powerpc/kvm/book3s_hv_uvmem.c  |  4 ++++
+ arch/powerpc/kvm/powerpc.c          | 13 +++++++++++++
+ include/uapi/linux/kvm.h            |  1 +
+ 7 files changed, 50 insertions(+)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 158d118..a925500 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -5779,6 +5779,23 @@ it hard or impossible to use it correctly.  The availability of
+ KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 signals that those bugs are fixed.
+ Userspace should not try to use KVM_CAP_MANUAL_DIRTY_LOG_PROTECT.
  
-+#define __HAVE_ARCH_PMDP_HUGE_GET_AND_CLEAR_FULL
-+pmd_t pmdp_huge_get_and_clear_full(struct vm_area_struct *vma,
-+				   unsigned long addr,
-+				   pmd_t *pmdp, int full);
++7.19 KVM_CAP_PPC_SECURE_GUEST
++------------------------------
 +
- #define __HAVE_ARCH_PGTABLE_DEPOSIT
- static inline void pgtable_trans_huge_deposit(struct mm_struct *mm,
- 					      pmd_t *pmdp, pgtable_t pgtable)
-diff --git a/arch/powerpc/mm/book3s64/pgtable.c b/arch/powerpc/mm/book3s64/pgtable.c
-index 93fc3be41ed9..fefdc7d41040 100644
---- a/arch/powerpc/mm/book3s64/pgtable.c
-+++ b/arch/powerpc/mm/book3s64/pgtable.c
-@@ -112,6 +112,24 @@ pmd_t pmdp_invalidate(struct vm_area_struct *vma, unsigned long address,
- 	return __pmd(old_pmd);
++:Architectures: ppc
++
++This capability indicates that KVM is running on a host that has
++ultravisor firmware and thus can support a secure guest.  On such a
++system, a guest can ask the ultravisor to make it a secure guest,
++one whose memory is inaccessible to the host except for pages which
++are explicitly requested to be shared with the host.  The ultravisor
++notifies KVM when a guest requests to become a secure guest, and KVM
++has the opportunity to veto the transition.
++
++If present, this capability can be enabled for a VM, meaning that KVM
++will allow the transition to secure guest mode.  Otherwise KVM will
++veto the transition.
++
+ 8. Other capabilities.
+ ======================
+ 
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 6e8b8ff..f99b433 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -303,6 +303,7 @@ struct kvm_arch {
+ 	u8 radix;
+ 	u8 fwnmi_enabled;
+ 	u8 secure_guest;
++	u8 svm_enabled;
+ 	bool threads_indep;
+ 	bool nested_enable;
+ 	pgd_t *pgtable;
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index 406ec46..0733618 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -316,6 +316,7 @@ struct kvmppc_ops {
+ 			       int size);
+ 	int (*store_to_eaddr)(struct kvm_vcpu *vcpu, ulong *eaddr, void *ptr,
+ 			      int size);
++	int (*enable_svm)(struct kvm *kvm);
+ 	int (*svm_off)(struct kvm *kvm);
+ };
+ 
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index fbc55a1..36da720 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -5423,6 +5423,18 @@ static void unpin_vpa_reset(struct kvm *kvm, struct kvmppc_vpa *vpa)
  }
  
-+pmd_t pmdp_huge_get_and_clear_full(struct vm_area_struct *vma,
-+				   unsigned long addr, pmd_t *pmdp, int full)
+ /*
++ * Enable a guest to become a secure VM.
++ * Called when the KVM_CAP_PPC_SECURE_GUEST capability is enabled.
++ */
++static int kvmhv_enable_svm(struct kvm *kvm)
 +{
-+	pmd_t pmd;
-+	VM_BUG_ON(addr & ~HPAGE_PMD_MASK);
-+	VM_BUG_ON((pmd_present(*pmdp) && !pmd_trans_huge(*pmdp) &&
-+		   !pmd_devmap(*pmdp)) || !pmd_present(*pmdp));
-+	pmd = pmdp_huge_get_and_clear(vma->vm_mm, addr, pmdp);
-+	/*
-+	 * if it not a fullmm flush, then we can possibly end up converting
-+	 * this PMD pte entry to a regular level 0 PTE by a parallel page fault.
-+	 * Make sure we flush the tlb in this case.
-+	 */
-+	if (!full)
-+		flush_pmd_tlb_range(vma, addr, addr + HPAGE_PMD_SIZE);
-+	return pmd;
++	if (!firmware_has_feature(FW_FEATURE_ULTRAVISOR))
++		return -EINVAL;
++	kvm->arch.svm_enabled = 1;
++	return 0;
 +}
 +
- static pmd_t pmd_set_protbits(pmd_t pmd, pgprot_t pgprot)
- {
- 	return __pmd(pmd_val(pmd) | pgprot_val(pgprot));
++/*
+  *  IOCTL handler to turn off secure mode of guest
+  *
+  * - Release all device pages
+@@ -5543,6 +5555,7 @@ static struct kvmppc_ops kvm_ops_hv = {
+ 	.enable_nested = kvmhv_enable_nested,
+ 	.load_from_eaddr = kvmhv_load_from_eaddr,
+ 	.store_to_eaddr = kvmhv_store_to_eaddr,
++	.enable_svm = kvmhv_enable_svm,
+ 	.svm_off = kvmhv_svm_off,
+ };
+ 
+diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+index 79b1202..2ad999f 100644
+--- a/arch/powerpc/kvm/book3s_hv_uvmem.c
++++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+@@ -216,6 +216,10 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+ 	if (!kvm_is_radix(kvm))
+ 		return H_UNSUPPORTED;
+ 
++	/* NAK the transition to secure if not enabled */
++	if (!kvm->arch.svm_enabled)
++		return H_AUTHORITY;
++
+ 	srcu_idx = srcu_read_lock(&kvm->srcu);
+ 	slots = kvm_memslots(kvm);
+ 	kvm_for_each_memslot(memslot, slots) {
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 62ee66d..c32e6cc2 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -670,6 +670,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		     (hv_enabled && cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST));
+ 		break;
+ #endif
++#if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_UV)
++	case KVM_CAP_PPC_SECURE_GUEST:
++		r = hv_enabled && !!firmware_has_feature(FW_FEATURE_ULTRAVISOR);
++		break;
++#endif
+ 	default:
+ 		r = 0;
+ 		break;
+@@ -2170,6 +2175,14 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		r = kvm->arch.kvm_ops->enable_nested(kvm);
+ 		break;
+ #endif
++#if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_UV)
++	case KVM_CAP_PPC_SECURE_GUEST:
++		r = -EINVAL;
++		if (!is_kvmppc_hv_enabled(kvm) || !kvm->arch.kvm_ops->enable_svm)
++			break;
++		r = kvm->arch.kvm_ops->enable_svm(kvm);
++		break;
++#endif
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 5e6234c..428c7dd 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1016,6 +1016,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_INJECT_EXT_DABT 178
+ #define KVM_CAP_S390_VCPU_RESETS 179
+ #define KVM_CAP_S390_PROTECTED 180
++#define KVM_CAP_PPC_SECURE_GUEST 181
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
-2.24.1
+2.7.4
 
