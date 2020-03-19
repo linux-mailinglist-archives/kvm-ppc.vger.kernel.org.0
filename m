@@ -2,76 +2,224 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E48FC18AA49
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Mar 2020 02:24:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4539E18AB4F
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Mar 2020 04:56:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726623AbgCSBYX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 18 Mar 2020 21:24:23 -0400
-Received: from smtprelay0117.hostedemail.com ([216.40.44.117]:52480 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726596AbgCSBYX (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 18 Mar 2020 21:24:23 -0400
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay02.hostedemail.com (Postfix) with ESMTP id 246F82C6D;
-        Thu, 19 Mar 2020 01:24:22 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Spam-Summary: 50,0,0,,d41d8cd98f00b204,joe@perches.com,,RULES_HIT:41:355:379:599:800:960:967:973:982:988:989:1260:1277:1311:1313:1314:1345:1359:1437:1515:1516:1518:1534:1540:1593:1594:1711:1730:1747:1777:1792:2110:2393:2525:2553:2560:2563:2682:2685:2828:2859:2902:2933:2937:2939:2942:2945:2947:2951:2954:3022:3138:3139:3140:3141:3142:3352:3622:3865:3866:3867:3870:3871:3872:3873:3874:3934:3936:3938:3941:3944:3947:3950:3953:3956:3959:4250:4321:5007:7522:7903:9025:10004:10400:10848:11232:11658:11914:12043:12297:12438:12555:12740:12760:12895:12986:13019:13069:13161:13229:13255:13311:13357:13439:14096:14097:14181:14659:14721:21080:21433:21627:21811:21939:30054:30070:30089:30090:30091,0,RBL:none,CacheIP:none,Bayesian:0.5,0.5,0.5,Netcheck:none,DomainCache:0,MSF:not bulk,SPF:,MSBL:0,DNSBL:none,Custom_rules:0:0:0,LFtime:1,LUA_SUMMARY:none
-X-HE-Tag: fork59_8ba5e05ec15f
-X-Filterd-Recvd-Size: 1916
-Received: from XPS-9350 (unknown [172.58.27.183])
-        (Authenticated sender: joe@perches.com)
-        by omf18.hostedemail.com (Postfix) with ESMTPA;
-        Thu, 19 Mar 2020 01:24:19 +0000 (UTC)
-Message-ID: <7584d7937f4bb929beb0b9f5e80523653297676d.camel@perches.com>
-Subject: Re: [PATCH -next 016/491] KERNEL VIRTUAL MACHINE FOR POWERPC
- (KVM/powerpc): Use fallthrough;
-From:   Joe Perches <joe@perches.com>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Date:   Wed, 18 Mar 2020 18:22:29 -0700
-In-Reply-To: <20200319011840.GA5033@blackberry>
-References: <cover.1583896344.git.joe@perches.com>
-         <37a5342c67e1b68b9ad06aca8da245b0ff409692.1583896348.git.joe@perches.com>
-         <20200319011840.GA5033@blackberry>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.34.1-2 
+        id S1726666AbgCSD4a (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 18 Mar 2020 23:56:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5406 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726596AbgCSD4a (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 18 Mar 2020 23:56:30 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02J3YDF8119321;
+        Wed, 18 Mar 2020 23:56:18 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2yu96fqhpd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Mar 2020 23:56:18 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02J3YLcX119751;
+        Wed, 18 Mar 2020 23:56:18 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2yu96fqhp8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Mar 2020 23:56:18 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02J3ttvB028862;
+        Thu, 19 Mar 2020 03:56:17 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma01wdc.us.ibm.com with ESMTP id 2yrpw6nmru-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Mar 2020 03:56:17 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02J3uHx926149242
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Mar 2020 03:56:17 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EA85F112062;
+        Thu, 19 Mar 2020 03:56:16 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 89E68112064;
+        Thu, 19 Mar 2020 03:56:13 +0000 (GMT)
+Received: from skywalker.ibmuc.com (unknown [9.199.34.213])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 19 Mar 2020 03:56:13 +0000 (GMT)
+From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+To:     linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org
+Cc:     npiggin@gmail.com, paulus@ozlabs.org, leonardo@linux.ibm.com,
+        kirill@shutemov.name,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+Subject: [PATCH v2 00/22] Avoid IPI while updating page table entries.
+Date:   Thu, 19 Mar 2020 09:25:47 +0530
+Message-Id: <20200319035609.158654-1-aneesh.kumar@linux.ibm.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-18_10:2020-03-18,2020-03-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
+ malwarescore=0 suspectscore=2 adultscore=0 priorityscore=1501 spamscore=0
+ phishscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003190013
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, 2020-03-19 at 12:18 +1100, Paul Mackerras wrote:
-> On Tue, Mar 10, 2020 at 09:51:30PM -0700, Joe Perches wrote:
-> > Convert the various uses of fallthrough comments to fallthrough;
-> > 
-> > Done via script
-> > Link: https://lore.kernel.org/lkml/b56602fcf79f849e733e7b521bb0e17895d390fa.1582230379.git.joe.com/
-> > 
-> > Signed-off-by: Joe Perches <joe@perches.com>
-> 
-> The subject line should look like "KVM: PPC: Use fallthrough".
-
-There's no way to generate a subject line like that via a script
-so far as I can tell.
-
-> Apart from that,
-> 
-> Acked-by: Paul Mackerras <paulus@ozlabs.org>
-> 
-> How are these patches going upstream?  Do you want me to take this via
-> my tree?
-
-If you want.
-
-Ideally, these changes would go in treewide via a script run
-by Linus at an -rc1, but if the change is OK with you, it'd
-be fine to have you apply it now.
-
-cheers, Joe
+Problem Summary:
+Slow termination of KVM guest with large guest RAM config due to a large number
+of IPIs that were caused by clearing level 1 PTE entries (THP) entries.
+This is shown in the stack trace below.
 
 
+- qemu-system-ppc  [kernel.vmlinux]            [k] smp_call_function_many
+   - smp_call_function_many
+      - 36.09% smp_call_function_many
+           serialize_against_pte_lookup
+           radix__pmdp_huge_get_and_clear
+           zap_huge_pmd
+           unmap_page_range
+           unmap_vmas
+           unmap_region
+           __do_munmap
+           __vm_munmap
+           sys_munmap
+          system_call
+           __munmap
+           qemu_ram_munmap
+           qemu_anon_ram_free
+           reclaim_ramblock
+           call_rcu_thread
+           qemu_thread_start
+           start_thread
+           __clone
+
+Why we need to do IPI when clearing PMD entries:
+This was added as part of commit: 13bd817bb884 ("powerpc/thp: Serialize pmd clear against a linux page table walk")
+
+serialize_against_pte_lookup makes sure that all parallel lockless page table
+walk completes before we convert a PMD pte entry to regular pmd entry.
+We end up doing that conversion in the below scenarios
+
+1) __split_huge_zero_page_pmd
+2) do_huge_pmd_wp_page_fallback
+3) MADV_DONTNEED running parallel to page faults.
+
+local_irq_disable and lockless page table walk:
+
+The lockless page table walk work with the assumption that we can dereference
+the page table contents without holding a lock. For this to work, we need to
+make sure we read the page table contents atomically and page table pages are
+not going to be freed/released while we are walking the
+table pages. We can achieve by using a rcu based freeing for page table pages or
+if the architecture implements broadcast tlbie, we can block the IPI as we walk the
+page table pages.
+
+To support both the above framework, lockless page table walk is done with
+irq disabled instead of rcu_read_lock()
+
+We do have two interface for lockless page table walk, gup fast and __find_linux_pte.
+This patch series makes __find_linux_pte table walk safe against the conversion of PMD PTE
+to regular PMD.
+
+gup fast:
+
+gup fast is already safe against THP split because kernel now differentiate between a pmd
+split and a compound page split. gup fast can run parallel to a pmd split and we prevent
+a parallel gup fast to a hugepage split, by freezing the page refcount and failing the
+speculative page ref increment.
+
+
+Similar to how gup is safe against parallel pmd split, this patch series updates the
+__find_linux_pte callers to be safe against a parallel pmd split. We do that by enforcing
+the following rules.
+
+1) Don't reload the pte value, because that can be updated in parallel.
+2) Code should be able to work with a stale PTE value and not the recent one. ie,
+the pte value that we are looking at may not be the latest value in the page table.
+3) Before looking at pte value check for _PAGE_PTE bit. We now do this as part of pte_present()
+check.
+
+Performance:
+
+This speeds up Qemu guest RAM del/unplug time as below
+128 core, 496GB guest:
+
+Without patch:
+munmap start: timer = 13162 ms, PID=7684
+munmap finish: timer = 95312 ms, PID=7684 - delta = 82150 ms
+
+With patch (upto removing IPI)
+munmap start: timer = 196449 ms, PID=6681
+munmap finish: timer = 196488 ms, PID=6681 - delta = 39ms
+
+With patch (with adding the tlb invalidate in pmdp_huge_get_and_clear_full)
+munmap start: timer = 196345 ms, PID=6879
+munmap finish: timer = 196714 ms, PID=6879 - delta = 369ms
+
+Changes from V1:
+* Update commit messages
+* Qemu Performance numbers
+
+Aneesh Kumar K.V (22):
+  powerpc/pkeys: Avoid using lockless page table walk
+  powerpc/pkeys: Check vma before returning key fault error to the user
+  powerpc/mm/hash64: use _PAGE_PTE when checking for pte_present
+  powerpc/hash64: Restrict page table lookup using init_mm with
+    __flush_hash_table_range
+  powerpc/book3s64/hash: Use the pte_t address from the caller
+  powerpc/mce: Don't reload pte val in addr_to_pfn
+  powerpc/perf/callchain: Use __get_user_pages_fast in
+    read_user_stack_slow
+  powerpc/kvm/book3s: switch from raw_spin_*lock to arch_spin_lock.
+  powerpc/kvm/book3s: Add helper to walk partition scoped linux page
+    table.
+  powerpc/kvm/nested: Add helper to walk nested shadow linux page table.
+  powerpc/kvm/book3s: Use kvm helpers to walk shadow or secondary table
+  powerpc/kvm/book3s: Add helper for host page table walk
+  powerpc/kvm/book3s: Use find_kvm_host_pte in page fault handler
+  powerpc/kvm/book3s: Use find_kvm_host_pte in h_enter
+  powerpc/kvm/book3s: use find_kvm_host_pte in pute_tce functions
+  powerpc/kvm/book3s: Avoid using rmap to protect parallel page table
+    update.
+  powerpc/kvm/book3s: use find_kvm_host_pte in
+    kvmppc_book3s_instantiate_page
+  powerpc/kvm/book3s: Use find_kvm_host_pte in kvmppc_get_hpa
+  powerpc/kvm/book3s: Use pte_present instead of opencoding
+    _PAGE_PRESENT check
+  powerpc/mm/book3s64: Avoid sending IPI on clearing PMD
+  mm: change pmdp_huge_get_and_clear_full take vm_area_struct as arg
+  powerpc/mm/book3s64: Fix MADV_DONTNEED and parallel page fault race
+
+ arch/powerpc/include/asm/book3s/64/pgtable.h  | 20 +++--
+ .../include/asm/book3s/64/tlbflush-hash.h     |  3 +-
+ arch/powerpc/include/asm/kvm_book3s.h         |  2 +-
+ arch/powerpc/include/asm/kvm_book3s_64.h      | 34 ++++++++-
+ arch/powerpc/include/asm/mmu.h                |  9 ---
+ arch/powerpc/kernel/mce_power.c               | 14 ++--
+ arch/powerpc/kernel/pci_64.c                  |  2 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c           | 12 ++-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        | 40 +++++-----
+ arch/powerpc/kvm/book3s_64_vio_hv.c           | 64 ++++++++--------
+ arch/powerpc/kvm/book3s_hv_nested.c           | 37 ++++++---
+ arch/powerpc/kvm/book3s_hv_rm_mmu.c           | 58 +++++---------
+ arch/powerpc/mm/book3s64/hash_pgtable.c       | 11 ---
+ arch/powerpc/mm/book3s64/hash_tlb.c           | 16 +---
+ arch/powerpc/mm/book3s64/hash_utils.c         | 62 ++++-----------
+ arch/powerpc/mm/book3s64/pgtable.c            | 24 ++++--
+ arch/powerpc/mm/book3s64/radix_pgtable.c      | 19 ++---
+ arch/powerpc/mm/fault.c                       | 75 +++++++++++++------
+ arch/powerpc/perf/callchain.c                 | 53 ++++++-------
+ arch/s390/include/asm/pgtable.h               |  4 +-
+ include/asm-generic/pgtable.h                 |  4 +-
+ mm/huge_memory.c                              |  4 +-
+ 22 files changed, 280 insertions(+), 287 deletions(-)
+
+-- 
+2.24.1
 
