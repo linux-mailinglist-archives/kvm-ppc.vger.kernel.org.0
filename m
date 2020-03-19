@@ -2,93 +2,226 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 933D818B295
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Mar 2020 12:50:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77BA418BD05
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Mar 2020 17:48:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbgCSLuc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 19 Mar 2020 07:50:32 -0400
-Received: from mail-qt1-f177.google.com ([209.85.160.177]:42710 "EHLO
-        mail-qt1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726188AbgCSLuc (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 19 Mar 2020 07:50:32 -0400
-Received: by mail-qt1-f177.google.com with SMTP id g16so1447024qtp.9
-        for <kvm-ppc@vger.kernel.org>; Thu, 19 Mar 2020 04:50:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=lBTUj1y9VtUDCn4ytJFEQ/eoQI6G7k2EQxvY7AJpV3c=;
-        b=Q9ERC6iPr6C3r4Aftx8b5gwyrS/P6NkAng74KreczcNsHr53jWHlVKuPvCBBh0StdU
-         b7wzRK/4QaptzavqQqjoxQtuj+QaqaBcHLAt+n2RM2aODrw/YIvYJOcY6oY/jhXWMdNl
-         gFsDyu8l5L6Q4p5/Vec/nQL4ZF96TI6lmJ+GksJOA5nnA/U56BWjdrmmQuHmwq16PEgF
-         vEDyKh6pD2UZZlm0QaUjZJg9ezYYrp/3bLf3kWlZYm9kIylqHOwtEoZBn6QJwP79CInq
-         PaTsPCn3AYjQRE8u84qlU4iAzPC4kAqGszh17G2RZLFuZX+xqHCLjAuidtRaW2LMrHIM
-         4mJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=lBTUj1y9VtUDCn4ytJFEQ/eoQI6G7k2EQxvY7AJpV3c=;
-        b=LgGUGJnMBa+B50o6AFHoaMB7bwJabq2gLXdafv7tX8f7GrdchcNStjYNb/oTxzyx6+
-         B6WwXSpVjsXAiJLYEsd5lVGPrUFJCxPXzHHmqbKJwk5Y6E+gKsovdJjwAmbg6SrJsnOT
-         7p16lC3uYhRuzCMvA6iGt5hyx0vqTR5eGS9ouDsyFneE7ab1jWPdtjhc//MGIB4ue12Z
-         n3On1S2u7+70itr7Ja2AD6HF955lulMGtaZGNkWrhEPzCFRF6m3QHc/X6S6Maao5yyj7
-         HHkIY+05ee7cmQ3DigiPPzozm/o3qYbXIt/rDyEsnnwylxGFF52TBBxLDPJFF1+tgT7c
-         Ogdw==
-X-Gm-Message-State: ANhLgQ3EuKhvRcM4ZyXpgzw+nkI27sIYtfweXwq79mVwaXh3H7ZjAsC9
-        Lded4q4298NvHSbxabKw/dmq/w==
-X-Google-Smtp-Source: ADFU+vsIVebb1InTyDcl4fZPuH+UAvQ5tH6FZmi6I4UE9Qq4JBH+2FeGy/XT9qJsD57BNhHjEf5qDA==
-X-Received: by 2002:ac8:24a7:: with SMTP id s36mr2441422qts.357.1584618629621;
-        Thu, 19 Mar 2020 04:50:29 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id h138sm1339362qke.86.2020.03.19.04.50.28
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 19 Mar 2020 04:50:28 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jEtgx-0004ip-P2; Thu, 19 Mar 2020 08:50:27 -0300
-Date:   Thu, 19 Mar 2020 08:50:27 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        Jerome Glisse <jglisse@redhat.com>, kvm-ppc@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        nouveau@lists.freedesktop.org, linux-mm@kvack.org
-Subject: Re: ensure device private pages have an owner v2
-Message-ID: <20200319115027.GI20941@ziepe.ca>
-References: <20200316193216.920734-1-hch@lst.de>
- <20200319002849.GG20941@ziepe.ca>
- <20200319071633.GA32522@lst.de>
+        id S1727302AbgCSQsb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 19 Mar 2020 12:48:31 -0400
+Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:58851 "EHLO
+        5.mo2.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727212AbgCSQsa (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 19 Mar 2020 12:48:30 -0400
+X-Greylist: delayed 596 seconds by postgrey-1.27 at vger.kernel.org; Thu, 19 Mar 2020 12:48:29 EDT
+Received: from player756.ha.ovh.net (unknown [10.110.208.120])
+        by mo2.mail-out.ovh.net (Postfix) with ESMTP id 642841CECB9
+        for <kvm-ppc@vger.kernel.org>; Thu, 19 Mar 2020 17:30:12 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
+        (Authenticated sender: groug@kaod.org)
+        by player756.ha.ovh.net (Postfix) with ESMTPSA id 8E596FC4FAA2;
+        Thu, 19 Mar 2020 16:30:07 +0000 (UTC)
+Date:   Thu, 19 Mar 2020 17:30:00 +0100
+From:   Greg Kurz <groug@kaod.org>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Ram Pai <linuxram@us.ibm.com>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Add a capability for enabling
+ secure guests
+Message-ID: <20200319173000.20e10c7b@bahia.lan>
+In-Reply-To: <20200319043301.GA13052@blackberry>
+References: <20200319043301.GA13052@blackberry>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200319071633.GA32522@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 11390729361711405499
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudefledgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejheeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepkhhvmhdqphhptgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Mar 19, 2020 at 08:16:33AM +0100, Christoph Hellwig wrote:
-> On Wed, Mar 18, 2020 at 09:28:49PM -0300, Jason Gunthorpe wrote:
-> > > Changes since v1:
-> > >  - split out the pgmap->owner addition into a separate patch
-> > >  - check pgmap->owner is set for device private mappings
-> > >  - rename the dev_private_owner field in struct migrate_vma to src_owner
-> > >  - refuse to migrate private pages if src_owner is not set
-> > >  - keep the non-fault device private handling in hmm_range_fault
-> > 
-> > I'm happy enough to take this, did you have plans for a v3?
+On Thu, 19 Mar 2020 15:33:01 +1100
+Paul Mackerras <paulus@ozlabs.org> wrote:
+
+> At present, on Power systems with Protected Execution Facility
+> hardware and an ultravisor, a KVM guest can transition to being a
+> secure guest at will.  Userspace (QEMU) has no way of knowing
+> whether a host system is capable of running secure guests.  This
+> will present a problem in future when the ultravisor is capable of
+> migrating secure guests from one host to another, because
+> virtualization management software will have no way to ensure that
+> secure guests only run in domains where all of the hosts can
+> support secure guests.
 > 
-> I think the only open question is if merging 3 and 4 might make sense.
-> It's up to you if you want it resent that way or not.
+> This adds a VM capability which has two functions: (a) userspace
+> can query it to find out whether the host can support secure guests,
+> and (b) userspace can enable it for a guest, which allows that
+> guest to become a secure guest.  If userspace does not enable it,
+> KVM will return an error when the ultravisor does the hypercall
+> that indicates that the guest is starting to transition to a
+> secure guest.  The ultravisor will then abort the transition and
+> the guest will terminate.
+> 
+> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+> ---
 
-Now that I understand that amdgpu doesn't set the 'do not return
-device_private pages' flag, I think the split is fine, I'll grab it as
-is then today
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Thanks,
-Jason
+Is someone working on wiring this up in QEMU ?
+
+> Note, only compile-tested.  Ram, please test.
+> 
+>  Documentation/virt/kvm/api.rst      | 17 +++++++++++++++++
+>  arch/powerpc/include/asm/kvm_host.h |  1 +
+>  arch/powerpc/include/asm/kvm_ppc.h  |  1 +
+>  arch/powerpc/kvm/book3s_hv.c        | 13 +++++++++++++
+>  arch/powerpc/kvm/book3s_hv_uvmem.c  |  4 ++++
+>  arch/powerpc/kvm/powerpc.c          | 13 +++++++++++++
+>  include/uapi/linux/kvm.h            |  1 +
+>  7 files changed, 50 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 158d118..a925500 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5779,6 +5779,23 @@ it hard or impossible to use it correctly.  The availability of
+>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 signals that those bugs are fixed.
+>  Userspace should not try to use KVM_CAP_MANUAL_DIRTY_LOG_PROTECT.
+>  
+> +7.19 KVM_CAP_PPC_SECURE_GUEST
+> +------------------------------
+> +
+> +:Architectures: ppc
+> +
+> +This capability indicates that KVM is running on a host that has
+> +ultravisor firmware and thus can support a secure guest.  On such a
+> +system, a guest can ask the ultravisor to make it a secure guest,
+> +one whose memory is inaccessible to the host except for pages which
+> +are explicitly requested to be shared with the host.  The ultravisor
+> +notifies KVM when a guest requests to become a secure guest, and KVM
+> +has the opportunity to veto the transition.
+> +
+> +If present, this capability can be enabled for a VM, meaning that KVM
+> +will allow the transition to secure guest mode.  Otherwise KVM will
+> +veto the transition.
+> +
+>  8. Other capabilities.
+>  ======================
+>  
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index 6e8b8ff..f99b433 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -303,6 +303,7 @@ struct kvm_arch {
+>  	u8 radix;
+>  	u8 fwnmi_enabled;
+>  	u8 secure_guest;
+> +	u8 svm_enabled;
+>  	bool threads_indep;
+>  	bool nested_enable;
+>  	pgd_t *pgtable;
+> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+> index 406ec46..0733618 100644
+> --- a/arch/powerpc/include/asm/kvm_ppc.h
+> +++ b/arch/powerpc/include/asm/kvm_ppc.h
+> @@ -316,6 +316,7 @@ struct kvmppc_ops {
+>  			       int size);
+>  	int (*store_to_eaddr)(struct kvm_vcpu *vcpu, ulong *eaddr, void *ptr,
+>  			      int size);
+> +	int (*enable_svm)(struct kvm *kvm);
+>  	int (*svm_off)(struct kvm *kvm);
+>  };
+>  
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index fbc55a1..36da720 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -5423,6 +5423,18 @@ static void unpin_vpa_reset(struct kvm *kvm, struct kvmppc_vpa *vpa)
+>  }
+>  
+>  /*
+> + * Enable a guest to become a secure VM.
+> + * Called when the KVM_CAP_PPC_SECURE_GUEST capability is enabled.
+> + */
+> +static int kvmhv_enable_svm(struct kvm *kvm)
+> +{
+> +	if (!firmware_has_feature(FW_FEATURE_ULTRAVISOR))
+> +		return -EINVAL;
+> +	kvm->arch.svm_enabled = 1;
+> +	return 0;
+> +}
+> +
+> +/*
+>   *  IOCTL handler to turn off secure mode of guest
+>   *
+>   * - Release all device pages
+> @@ -5543,6 +5555,7 @@ static struct kvmppc_ops kvm_ops_hv = {
+>  	.enable_nested = kvmhv_enable_nested,
+>  	.load_from_eaddr = kvmhv_load_from_eaddr,
+>  	.store_to_eaddr = kvmhv_store_to_eaddr,
+> +	.enable_svm = kvmhv_enable_svm,
+>  	.svm_off = kvmhv_svm_off,
+>  };
+>  
+> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> index 79b1202..2ad999f 100644
+> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> @@ -216,6 +216,10 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>  	if (!kvm_is_radix(kvm))
+>  		return H_UNSUPPORTED;
+>  
+> +	/* NAK the transition to secure if not enabled */
+> +	if (!kvm->arch.svm_enabled)
+> +		return H_AUTHORITY;
+> +
+>  	srcu_idx = srcu_read_lock(&kvm->srcu);
+>  	slots = kvm_memslots(kvm);
+>  	kvm_for_each_memslot(memslot, slots) {
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index 62ee66d..c32e6cc2 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -670,6 +670,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  		     (hv_enabled && cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST));
+>  		break;
+>  #endif
+> +#if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_UV)
+> +	case KVM_CAP_PPC_SECURE_GUEST:
+> +		r = hv_enabled && !!firmware_has_feature(FW_FEATURE_ULTRAVISOR);
+> +		break;
+> +#endif
+>  	default:
+>  		r = 0;
+>  		break;
+> @@ -2170,6 +2175,14 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = kvm->arch.kvm_ops->enable_nested(kvm);
+>  		break;
+>  #endif
+> +#if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_UV)
+> +	case KVM_CAP_PPC_SECURE_GUEST:
+> +		r = -EINVAL;
+> +		if (!is_kvmppc_hv_enabled(kvm) || !kvm->arch.kvm_ops->enable_svm)
+> +			break;
+> +		r = kvm->arch.kvm_ops->enable_svm(kvm);
+> +		break;
+> +#endif
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 5e6234c..428c7dd 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1016,6 +1016,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_ARM_INJECT_EXT_DABT 178
+>  #define KVM_CAP_S390_VCPU_RESETS 179
+>  #define KVM_CAP_S390_PROTECTED 180
+> +#define KVM_CAP_PPC_SECURE_GUEST 181
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+
