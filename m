@@ -2,106 +2,148 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E94EA18CF28
-	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Mar 2020 14:41:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C49A218D105
+	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Mar 2020 15:36:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726971AbgCTNlM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 20 Mar 2020 09:41:12 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:46812 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726843AbgCTNlM (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 20 Mar 2020 09:41:12 -0400
-Received: by mail-qt1-f195.google.com with SMTP id t13so4834358qtn.13
-        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 06:41:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=rSXMnA8Bh+EyZeJfpwZeazUxxET567SafNKmRBbaqJE=;
-        b=IRiBcy01pez/c8Esw6ABdeGlubYq6UBTvnqE08m54TPmYJSk0iZY8NRy4Imfi9RCkq
-         pgYtuxDrHqPgjM1o0KyPLUcQQOMmsp/8AwWKrGmPWY2V2zTpecXI1Hmww1TRzifRUqv1
-         DX4dzAVbSR13Fo7jjIz8YUYee5enxM6pJW/X6pJz59lxOjUg+6nvHnnEaT8pcTz55OMt
-         jRul4tANsV8+/6/1gFaPw67m4l9Hc++lvsRpUhKs8JRwfn579xSKiU2xI9uEr0dnW7Fr
-         mnPY+dq6nTjmuQ5ZDgFDKjScE6rkcwbkGcsH6sXXBgbbcYl+h27ZHv6LeQTB09f7WjYe
-         iTaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=rSXMnA8Bh+EyZeJfpwZeazUxxET567SafNKmRBbaqJE=;
-        b=F3YYhu7RD5/3Wniw6bnfmcEmSbr2bK18u00dtESJhQ5iFJdgXbWV+ABrI9+g5dsIPq
-         PsFy7VjAiQt4XCmSdxbasZ59uByttJ7CMKjUa3DYM74WfYiZNCtOsQ9JfZpcbpJe1OSq
-         A0FOpqSUoa5xqXPwccEu60NQa4o+c8sgngYexCK+ACb28NmFXm298J6JCPmgFMxPKmH3
-         1/AK4Rmv1kDJvUEE1EWqlpWW5qvIgl8aNMgBoRZ0kDfbopwk/RPFRYROp/8L85b1hPbU
-         xoy8JpbbaGNCGPF7sxvy1BGPMZTrQToAj5jD1Skk5Wrob1bJZpGn2jPh0KnRs0988zgt
-         SU/g==
-X-Gm-Message-State: ANhLgQ3YUA2imLZkr6spJ+wHewzFK9eQCBoBfx+ziyQJF9ZaY8xEO4kA
-        0JpHAZd9mL7zN6YS/YyI83olhw==
-X-Google-Smtp-Source: ADFU+vuEJLxLBoH+558rgkm+/X3kgiU5w6V/n0Oh7c+Ro7Jb1c7KonYggFNpdI58VU/1xg85hzcxdQ==
-X-Received: by 2002:ac8:4782:: with SMTP id k2mr8138084qtq.1.1584711670687;
-        Fri, 20 Mar 2020 06:41:10 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id p23sm4024398qkm.39.2020.03.20.06.41.09
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 20 Mar 2020 06:41:10 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jFHtd-0007xE-Gf; Fri, 20 Mar 2020 10:41:09 -0300
-Date:   Fri, 20 Mar 2020 10:41:09 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        Jerome Glisse <jglisse@redhat.com>, kvm-ppc@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        nouveau@lists.freedesktop.org, linux-mm@kvack.org
-Subject: Re: [PATCH 4/4] mm: check the device private page owner in
- hmm_range_fault
-Message-ID: <20200320134109.GA30230@ziepe.ca>
-References: <20200316193216.920734-1-hch@lst.de>
- <20200316193216.920734-5-hch@lst.de>
+        id S1727351AbgCTOgP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 20 Mar 2020 10:36:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55280 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726997AbgCTOgP (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 20 Mar 2020 10:36:15 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02KEXgY8038736
+        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 10:36:14 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yua3xhbw8-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 10:36:13 -0400
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <ldufour@linux.ibm.com>;
+        Fri, 20 Mar 2020 14:36:11 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 20 Mar 2020 14:36:08 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02KEZ6H634996734
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 20 Mar 2020 14:35:06 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 88622AE05D;
+        Fri, 20 Mar 2020 14:36:07 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 14320AE051;
+        Fri, 20 Mar 2020 14:36:07 +0000 (GMT)
+Received: from pomme.local (unknown [9.145.63.10])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 20 Mar 2020 14:36:06 +0000 (GMT)
+Subject: Re: [PATCH 2/2] KVM: PPC: Book3S HV: H_SVM_INIT_START must call
+ UV_RETURN
+To:     bharata@linux.ibm.com
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+References: <20200320102643.15516-1-ldufour@linux.ibm.com>
+ <20200320102643.15516-3-ldufour@linux.ibm.com>
+ <20200320112403.GG26049@in.ibm.com>
+From:   Laurent Dufour <ldufour@linux.ibm.com>
+Date:   Fri, 20 Mar 2020 15:36:05 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200316193216.920734-5-hch@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200320112403.GG26049@in.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20032014-0012-0000-0000-000003948596
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20032014-0013-0000-0000-000021D16F34
+Message-Id: <f6a71da6-6363-8cba-8215-78b23a046443@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-20_04:2020-03-20,2020-03-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=3 spamscore=0
+ phishscore=0 priorityscore=1501 clxscore=1015 impostorscore=0 adultscore=0
+ malwarescore=0 bulkscore=0 mlxscore=0 mlxlogscore=999 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003200059
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Mar 16, 2020 at 08:32:16PM +0100, Christoph Hellwig wrote:
-> diff --git a/mm/hmm.c b/mm/hmm.c
-> index cfad65f6a67b..b75b3750e03d 100644
-> +++ b/mm/hmm.c
-> @@ -216,6 +216,14 @@ int hmm_vma_handle_pmd(struct mm_walk *walk, unsigned long addr,
->  		unsigned long end, uint64_t *pfns, pmd_t pmd);
->  #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
->  
-> +static inline bool hmm_is_device_private_entry(struct hmm_range *range,
-> +		swp_entry_t entry)
-> +{
-> +	return is_device_private_entry(entry) &&
-> +		device_private_entry_to_page(entry)->pgmap->owner ==
-> +		range->dev_private_owner;
-> +}
+Le 20/03/2020 à 12:24, Bharata B Rao a écrit :
+> On Fri, Mar 20, 2020 at 11:26:43AM +0100, Laurent Dufour wrote:
+>> When the call to UV_REGISTER_MEM_SLOT is failing, for instance because
+>> there is not enough free secured memory, the Hypervisor (HV) has to call
+>> UV_RETURN to report the error to the Ultravisor (UV). Then the UV will call
+>> H_SVM_INIT_ABORT to abort the securing phase and go back to the calling VM.
+>>
+>> If the kvm->arch.secure_guest is not set, in the return path rfid is called
+>> but there is no valid context to get back to the SVM since the Hcall has
+>> been routed by the Ultravisor.
+>>
+>> Move the setting of kvm->arch.secure_guest earlier in
+>> kvmppc_h_svm_init_start() so in the return path, UV_RETURN will be called
+>> instead of rfid.
+>>
+>> Cc: Bharata B Rao <bharata@linux.ibm.com>
+>> Cc: Paul Mackerras <paulus@ozlabs.org>
+>> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>> Cc: Michael Ellerman <mpe@ellerman.id.au>
+>> Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
+>> ---
+>>   arch/powerpc/kvm/book3s_hv_uvmem.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+>> index 79b1202b1c62..68dff151315c 100644
+>> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+>> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+>> @@ -209,6 +209,8 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>>   	int ret = H_SUCCESS;
+>>   	int srcu_idx;
+>>   
+>> +	kvm->arch.secure_guest = KVMPPC_SECURE_INIT_START;
+>> +
+>>   	if (!kvmppc_uvmem_bitmap)
+>>   		return H_UNSUPPORTED;
+>>   
+>> @@ -233,7 +235,6 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>>   			goto out;
+>>   		}
+>>   	}
+>> -	kvm->arch.secure_guest |= KVMPPC_SECURE_INIT_START;
+> 
+> There is an assumption that memory slots would have been registered with UV
+> if KVMPPC_SECURE_INIT_START has been done. KVM_PPC_SVM_OFF ioctl will skip
+> unregistration and other steps during reboot if KVMPPC_SECURE_INIT_START
+> hasn't been done.
+> 
+> Have you checked if that path isn't affected by this change?
 
-Thinking about this some more, does the locking work out here?
+I checked that and didn't find any issue there.
 
-hmm_range_fault() runs with mmap_sem in read, and does not lock any of
-the page table levels.
+My only concern was that block:
+	kvm_for_each_vcpu(i, vcpu, kvm) {
+		spin_lock(&vcpu->arch.vpa_update_lock);
+		unpin_vpa_reset(kvm, &vcpu->arch.dtl);
+		unpin_vpa_reset(kvm, &vcpu->arch.slb_shadow);
+		unpin_vpa_reset(kvm, &vcpu->arch.vpa);
+		spin_unlock(&vcpu->arch.vpa_update_lock);
+	}
 
-So it relies on accessing stale pte data being safe, and here we
-introduce for the first time a page pointer dereference and a pgmap
-dereference without any locking/refcounting.
+But that seems to be safe.
 
-The get_dev_pagemap() worked on the PFN and obtained a refcount, so it
-created safety.
+However I'm not a familiar with the KVM's code, do you think an additional 
+KVMPPC_SECURE_INIT_* value needed here?
 
-Is there some tricky reason this is safe, eg a DEVICE_PRIVATE page
-cannot be removed from the vma without holding mmap_sem in write or
-something?
+Thanks,
+Laurent.
 
-Jason
+
+
+
