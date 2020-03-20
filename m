@@ -2,134 +2,117 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 653EC18CDD7
-	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Mar 2020 13:23:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EA8018CE3E
+	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Mar 2020 13:58:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726896AbgCTMXI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 20 Mar 2020 08:23:08 -0400
-Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:43892 "EHLO
-        6.mo173.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726893AbgCTMXH (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 20 Mar 2020 08:23:07 -0400
-Received: from player728.ha.ovh.net (unknown [10.108.35.131])
-        by mo173.mail-out.ovh.net (Postfix) with ESMTP id A67C113600D
-        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 13:23:05 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player728.ha.ovh.net (Postfix) with ESMTPSA id 060EF108AE6BD;
-        Fri, 20 Mar 2020 12:22:49 +0000 (UTC)
-Date:   Fri, 20 Mar 2020 13:22:48 +0100
-From:   Greg Kurz <groug@kaod.org>
-To:     Laurent Dufour <ldufour@linux.ibm.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Bharata B Rao <bharata@linux.ibm.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 1/2] KVM: PPC: Book3S HV: check caller of H_SVM_* Hcalls
-Message-ID: <20200320132248.44b81b3b@bahia.lan>
-In-Reply-To: <20200320102643.15516-2-ldufour@linux.ibm.com>
-References: <20200320102643.15516-1-ldufour@linux.ibm.com>
-        <20200320102643.15516-2-ldufour@linux.ibm.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1726814AbgCTM64 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 20 Mar 2020 08:58:56 -0400
+Received: from mail-qv1-f68.google.com ([209.85.219.68]:34881 "EHLO
+        mail-qv1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727279AbgCTM6Q (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 20 Mar 2020 08:58:16 -0400
+Received: by mail-qv1-f68.google.com with SMTP id q73so2865947qvq.2
+        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 05:58:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=7tshdo6c8ufpkvS21qNDq3o1JI++3fGdgC9NNzUitoU=;
+        b=IvTQLQxfTudOZo6mQWXcw0MoAViFLghOoPbxW/9yZkUMgOiZ4Pv9Z04Csj2TJq5vca
+         qb/NOPGNHtZJ6s24cM+QRSb5JuK21NJyav0y6/cJqE7vqjvLZeiPQwWPggHqBJHigTLB
+         ymmND/5GQ89u7BiyP07RYIjAcCIa+vFjUpz4zOgJSTVCkcudYccK0vOVEQgM0fc99dpd
+         Vs62xPG18t0GhZadO3Oap9mTCctOwTr0CiUfvnOTXVINl2qtmYv1/+hwvSX1r+r/EA1v
+         Ke5XvA9K39riwOsICVFnrILW1mFcLwADDE6udlfAI2AZmQRk3mQ4NBUc46ebi+QLcJNF
+         7/Tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=7tshdo6c8ufpkvS21qNDq3o1JI++3fGdgC9NNzUitoU=;
+        b=PNUsqVSUqwgBPv2afALW7/AffhSss3exL3o2ZPUW0k7JP9TsxJhtw06JPiRw9zvS45
+         QKv0JCMEtoAfmgJATsY2XU3iDyD6Ja2EOk/erEoqvtS4ups1XA6lS3FkAMZ+P2QfNXry
+         VP/jsKA+WVDvOuG9Vs2Q0JC5r5vEZcXQY/cYU04pzFGvjh9mWOfJIpL0P9ROgNgebLUW
+         Umpt6/6tmjVvQtMI5KePNuoE1rn0+upzQv2G9gsjBQ+0OjyqwUR+xZ/XJ2Qlw+n92o27
+         FHuNHZHo3TwDdAhBBx7lEZZGy2vnUXwAwmnK1edE3pru3zPk2yoU1kB90/rrzaeW78OJ
+         +8Bg==
+X-Gm-Message-State: ANhLgQ1pSuZU15LuDjVTt1zwxWJFCh/YnN/nJ7kJ91qvYobkjA5cYWdh
+        4o9X02enUGZnRR5FJFBYUMAJMA==
+X-Google-Smtp-Source: ADFU+vvR+3vAV1p7d+fDNfmTEDRX1I6s0r0r+8MeuA2PAqUC3MBTAsQJGe+LIm8TG0FJxBXCYdsOGw==
+X-Received: by 2002:a0c:ec02:: with SMTP id y2mr7683694qvo.171.1584709095500;
+        Fri, 20 Mar 2020 05:58:15 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id y15sm4157894qky.33.2020.03.20.05.58.13
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 20 Mar 2020 05:58:14 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jFHE5-0007Cq-2w; Fri, 20 Mar 2020 09:58:13 -0300
+Date:   Fri, 20 Mar 2020 09:58:13 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Ralph Campbell <rcampbell@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Jerome Glisse <jglisse@redhat.com>, kvm-ppc@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        nouveau@lists.freedesktop.org, linux-mm@kvack.org
+Subject: Re: [PATCH 3/4] mm: simplify device private page handling in
+ hmm_range_fault
+Message-ID: <20200320125813.GQ20941@ziepe.ca>
+References: <20200316193216.920734-4-hch@lst.de>
+ <7256f88d-809e-4aba-3c46-a223bd8cc521@nvidia.com>
+ <20200317121536.GQ20941@ziepe.ca>
+ <20200317122445.GA11662@lst.de>
+ <20200317122813.GA11866@lst.de>
+ <20200317124755.GR20941@ziepe.ca>
+ <20200317125955.GA12847@lst.de>
+ <24fca825-3b0f-188f-bcf2-fadcf3a9f05a@nvidia.com>
+ <20200320001428.GA9199@ziepe.ca>
+ <8d549ef6-14ae-7055-58c8-d56de8bf4ba6@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13089993795129285060
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeguddgfeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepkhhvmhdqphhptgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8d549ef6-14ae-7055-58c8-d56de8bf4ba6@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, 20 Mar 2020 11:26:42 +0100
-Laurent Dufour <ldufour@linux.ibm.com> wrote:
+On Thu, Mar 19, 2020 at 06:33:04PM -0700, Ralph Campbell wrote:
 
-> The Hcall named H_SVM_* are reserved to the Ultravisor. However, nothing
-> prevent a malicious VM or SVM to call them. This could lead to weird result
-> and should be filtered out.
+> > > +		.default_flags = dmirror_hmm_flags[HMM_PFN_VALID] |
+> > > +				(write ? dmirror_hmm_flags[HMM_PFN_WRITE] : 0),
+> > > +		.dev_private_owner = dmirror->mdevice,
+> > > +	};
+> > > +	int ret = 0;
+> > 
+> > > +static int dmirror_snapshot(struct dmirror *dmirror,
+> > > +			    struct hmm_dmirror_cmd *cmd)
+> > > +{
+> > > +	struct mm_struct *mm = dmirror->mm;
+> > > +	unsigned long start, end;
+> > > +	unsigned long size = cmd->npages << PAGE_SHIFT;
+> > > +	unsigned long addr;
+> > > +	unsigned long next;
+> > > +	uint64_t pfns[64];
+> > > +	unsigned char perm[64];
+> > > +	char __user *uptr;
+> > > +	struct hmm_range range = {
+> > > +		.pfns = pfns,
+> > > +		.flags = dmirror_hmm_flags,
+> > > +		.values = dmirror_hmm_values,
+> > > +		.pfn_shift = DPT_SHIFT,
+> > > +		.pfn_flags_mask = ~0ULL,
+> > 
+> > Same here, especially since this is snapshot
+> > 
+> > Jason
 > 
-> Checking the Secure bit of the calling MSR ensure that the call is coming
-> from either the Ultravisor or a SVM. But any system call made from a SVM
-> are going through the Ultravisor, and the Ultravisor should filter out
-> these malicious call. This way, only the Ultravisor is able to make such a
-> Hcall.
+> Actually, snapshot ignores pfn_flags_mask and default_flags.
 
-"Ultravisor should filter" ? And what if it doesn't (eg. because of a bug) ?
+Yes, so no reason to set them to not 0..
 
-Shouldn't we also check the HV bit of the calling MSR as well to
-disambiguate SVM and UV ?
-
-> 
-> Cc: Bharata B Rao <bharata@linux.ibm.com>
-> Cc: Paul Mackerras <paulus@ozlabs.org>
-> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
-> ---
->  arch/powerpc/kvm/book3s_hv.c | 32 +++++++++++++++++++++-----------
->  1 file changed, 21 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 33be4d93248a..43773182a737 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -1074,25 +1074,35 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
->  					 kvmppc_get_gpr(vcpu, 6));
->  		break;
->  	case H_SVM_PAGE_IN:
-> -		ret = kvmppc_h_svm_page_in(vcpu->kvm,
-> -					   kvmppc_get_gpr(vcpu, 4),
-> -					   kvmppc_get_gpr(vcpu, 5),
-> -					   kvmppc_get_gpr(vcpu, 6));
-> +		ret = H_UNSUPPORTED;
-> +		if (kvmppc_get_srr1(vcpu) & MSR_S)
-> +			ret = kvmppc_h_svm_page_in(vcpu->kvm,
-> +						   kvmppc_get_gpr(vcpu, 4),
-> +						   kvmppc_get_gpr(vcpu, 5),
-> +						   kvmppc_get_gpr(vcpu, 6));
-
-If calling kvmppc_h_svm_page_in() produces a "weird result" when
-the MSR_S bit isn't set, then I think it should do the checking
-itself, ie. pass vcpu.
-
-This would also prevent adding that many lines in kvmppc_pseries_do_hcall()
-which is a big enough function already. The checking could be done in a
-helper in book3s_hv_uvmem.c and used by all UV specific hcalls.
-
->  		break;
->  	case H_SVM_PAGE_OUT:
-> -		ret = kvmppc_h_svm_page_out(vcpu->kvm,
-> -					    kvmppc_get_gpr(vcpu, 4),
-> -					    kvmppc_get_gpr(vcpu, 5),
-> -					    kvmppc_get_gpr(vcpu, 6));
-> +		ret = H_UNSUPPORTED;
-> +		if (kvmppc_get_srr1(vcpu) & MSR_S)
-> +			ret = kvmppc_h_svm_page_out(vcpu->kvm,
-> +						    kvmppc_get_gpr(vcpu, 4),
-> +						    kvmppc_get_gpr(vcpu, 5),
-> +						    kvmppc_get_gpr(vcpu, 6));
->  		break;
->  	case H_SVM_INIT_START:
-> -		ret = kvmppc_h_svm_init_start(vcpu->kvm);
-> +		ret = H_UNSUPPORTED;
-> +		if (kvmppc_get_srr1(vcpu) & MSR_S)
-> +			ret = kvmppc_h_svm_init_start(vcpu->kvm);
->  		break;
->  	case H_SVM_INIT_DONE:
-> -		ret = kvmppc_h_svm_init_done(vcpu->kvm);
-> +		ret = H_UNSUPPORTED;
-> +		if (kvmppc_get_srr1(vcpu) & MSR_S)
-> +			ret = kvmppc_h_svm_init_done(vcpu->kvm);
->  		break;
->  	case H_SVM_INIT_ABORT:
-> -		ret = kvmppc_h_svm_init_abort(vcpu->kvm);
-> +		ret = H_UNSUPPORTED;
-> +		if (kvmppc_get_srr1(vcpu) & MSR_S)
-> +			ret = kvmppc_h_svm_init_abort(vcpu->kvm);
->  		break;
->  
->  	default:
-
+Jason
