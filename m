@@ -2,90 +2,66 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9297D18CCDD
-	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Mar 2020 12:24:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 653EC18CDD7
+	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Mar 2020 13:23:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726955AbgCTLYP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 20 Mar 2020 07:24:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27660 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727210AbgCTLYO (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 20 Mar 2020 07:24:14 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02KB4Gkk099588
-        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 07:24:13 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2yu8btxrhg-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 07:24:13 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <bharata@linux.ibm.com>;
-        Fri, 20 Mar 2020 11:24:11 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 20 Mar 2020 11:24:08 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02KBN6Vw49217996
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 20 Mar 2020 11:23:06 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5BA3542045;
-        Fri, 20 Mar 2020 11:24:07 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0490042041;
-        Fri, 20 Mar 2020 11:24:06 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.85.95.122])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 20 Mar 2020 11:24:05 +0000 (GMT)
-Date:   Fri, 20 Mar 2020 16:54:03 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
+        id S1726896AbgCTMXI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 20 Mar 2020 08:23:08 -0400
+Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:43892 "EHLO
+        6.mo173.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726893AbgCTMXH (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 20 Mar 2020 08:23:07 -0400
+Received: from player728.ha.ovh.net (unknown [10.108.35.131])
+        by mo173.mail-out.ovh.net (Postfix) with ESMTP id A67C113600D
+        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 13:23:05 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
+        (Authenticated sender: groug@kaod.org)
+        by player728.ha.ovh.net (Postfix) with ESMTPSA id 060EF108AE6BD;
+        Fri, 20 Mar 2020 12:22:49 +0000 (UTC)
+Date:   Fri, 20 Mar 2020 13:22:48 +0100
+From:   Greg Kurz <groug@kaod.org>
 To:     Laurent Dufour <ldufour@linux.ibm.com>
 Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        kvm-ppc@vger.kernel.org, Bharata B Rao <bharata@linux.ibm.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
         Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 2/2] KVM: PPC: Book3S HV: H_SVM_INIT_START must call
- UV_RETURN
-Reply-To: bharata@linux.ibm.com
+Subject: Re: [PATCH 1/2] KVM: PPC: Book3S HV: check caller of H_SVM_* Hcalls
+Message-ID: <20200320132248.44b81b3b@bahia.lan>
+In-Reply-To: <20200320102643.15516-2-ldufour@linux.ibm.com>
 References: <20200320102643.15516-1-ldufour@linux.ibm.com>
- <20200320102643.15516-3-ldufour@linux.ibm.com>
+        <20200320102643.15516-2-ldufour@linux.ibm.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200320102643.15516-3-ldufour@linux.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-TM-AS-GCONF: 00
-x-cbid: 20032011-0008-0000-0000-0000036097F3
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032011-0009-0000-0000-00004A81F8F6
-Message-Id: <20200320112403.GG26049@in.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-20_02:2020-03-20,2020-03-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 bulkscore=0
- suspectscore=2 malwarescore=0 mlxlogscore=999 spamscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003200049
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13089993795129285060
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeguddgfeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepkhhvmhdqphhptgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Mar 20, 2020 at 11:26:43AM +0100, Laurent Dufour wrote:
-> When the call to UV_REGISTER_MEM_SLOT is failing, for instance because
-> there is not enough free secured memory, the Hypervisor (HV) has to call
-> UV_RETURN to report the error to the Ultravisor (UV). Then the UV will call
-> H_SVM_INIT_ABORT to abort the securing phase and go back to the calling VM.
+On Fri, 20 Mar 2020 11:26:42 +0100
+Laurent Dufour <ldufour@linux.ibm.com> wrote:
+
+> The Hcall named H_SVM_* are reserved to the Ultravisor. However, nothing
+> prevent a malicious VM or SVM to call them. This could lead to weird result
+> and should be filtered out.
 > 
-> If the kvm->arch.secure_guest is not set, in the return path rfid is called
-> but there is no valid context to get back to the SVM since the Hcall has
-> been routed by the Ultravisor.
-> 
-> Move the setting of kvm->arch.secure_guest earlier in
-> kvmppc_h_svm_init_start() so in the return path, UV_RETURN will be called
-> instead of rfid.
+> Checking the Secure bit of the calling MSR ensure that the call is coming
+> from either the Ultravisor or a SVM. But any system call made from a SVM
+> are going through the Ultravisor, and the Ultravisor should filter out
+> these malicious call. This way, only the Ultravisor is able to make such a
+> Hcall.
+
+"Ultravisor should filter" ? And what if it doesn't (eg. because of a bug) ?
+
+Shouldn't we also check the HV bit of the calling MSR as well to
+disambiguate SVM and UV ?
+
 > 
 > Cc: Bharata B Rao <bharata@linux.ibm.com>
 > Cc: Paul Mackerras <paulus@ozlabs.org>
@@ -93,35 +69,67 @@ On Fri, Mar 20, 2020 at 11:26:43AM +0100, Laurent Dufour wrote:
 > Cc: Michael Ellerman <mpe@ellerman.id.au>
 > Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
 > ---
->  arch/powerpc/kvm/book3s_hv_uvmem.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  arch/powerpc/kvm/book3s_hv.c | 32 +++++++++++++++++++++-----------
+>  1 file changed, 21 insertions(+), 11 deletions(-)
 > 
-> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> index 79b1202b1c62..68dff151315c 100644
-> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> @@ -209,6 +209,8 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
->  	int ret = H_SUCCESS;
->  	int srcu_idx;
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 33be4d93248a..43773182a737 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -1074,25 +1074,35 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+>  					 kvmppc_get_gpr(vcpu, 6));
+>  		break;
+>  	case H_SVM_PAGE_IN:
+> -		ret = kvmppc_h_svm_page_in(vcpu->kvm,
+> -					   kvmppc_get_gpr(vcpu, 4),
+> -					   kvmppc_get_gpr(vcpu, 5),
+> -					   kvmppc_get_gpr(vcpu, 6));
+> +		ret = H_UNSUPPORTED;
+> +		if (kvmppc_get_srr1(vcpu) & MSR_S)
+> +			ret = kvmppc_h_svm_page_in(vcpu->kvm,
+> +						   kvmppc_get_gpr(vcpu, 4),
+> +						   kvmppc_get_gpr(vcpu, 5),
+> +						   kvmppc_get_gpr(vcpu, 6));
+
+If calling kvmppc_h_svm_page_in() produces a "weird result" when
+the MSR_S bit isn't set, then I think it should do the checking
+itself, ie. pass vcpu.
+
+This would also prevent adding that many lines in kvmppc_pseries_do_hcall()
+which is a big enough function already. The checking could be done in a
+helper in book3s_hv_uvmem.c and used by all UV specific hcalls.
+
+>  		break;
+>  	case H_SVM_PAGE_OUT:
+> -		ret = kvmppc_h_svm_page_out(vcpu->kvm,
+> -					    kvmppc_get_gpr(vcpu, 4),
+> -					    kvmppc_get_gpr(vcpu, 5),
+> -					    kvmppc_get_gpr(vcpu, 6));
+> +		ret = H_UNSUPPORTED;
+> +		if (kvmppc_get_srr1(vcpu) & MSR_S)
+> +			ret = kvmppc_h_svm_page_out(vcpu->kvm,
+> +						    kvmppc_get_gpr(vcpu, 4),
+> +						    kvmppc_get_gpr(vcpu, 5),
+> +						    kvmppc_get_gpr(vcpu, 6));
+>  		break;
+>  	case H_SVM_INIT_START:
+> -		ret = kvmppc_h_svm_init_start(vcpu->kvm);
+> +		ret = H_UNSUPPORTED;
+> +		if (kvmppc_get_srr1(vcpu) & MSR_S)
+> +			ret = kvmppc_h_svm_init_start(vcpu->kvm);
+>  		break;
+>  	case H_SVM_INIT_DONE:
+> -		ret = kvmppc_h_svm_init_done(vcpu->kvm);
+> +		ret = H_UNSUPPORTED;
+> +		if (kvmppc_get_srr1(vcpu) & MSR_S)
+> +			ret = kvmppc_h_svm_init_done(vcpu->kvm);
+>  		break;
+>  	case H_SVM_INIT_ABORT:
+> -		ret = kvmppc_h_svm_init_abort(vcpu->kvm);
+> +		ret = H_UNSUPPORTED;
+> +		if (kvmppc_get_srr1(vcpu) & MSR_S)
+> +			ret = kvmppc_h_svm_init_abort(vcpu->kvm);
+>  		break;
 >  
-> +	kvm->arch.secure_guest = KVMPPC_SECURE_INIT_START;
-> +
->  	if (!kvmppc_uvmem_bitmap)
->  		return H_UNSUPPORTED;
->  
-> @@ -233,7 +235,6 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
->  			goto out;
->  		}
->  	}
-> -	kvm->arch.secure_guest |= KVMPPC_SECURE_INIT_START;
-
-There is an assumption that memory slots would have been registered with UV
-if KVMPPC_SECURE_INIT_START has been done. KVM_PPC_SVM_OFF ioctl will skip
-unregistration and other steps during reboot if KVMPPC_SECURE_INIT_START
-hasn't been done.
-
-Have you checked if that path isn't affected by this change?
-
-Regards,
-Bharata.
+>  	default:
 
