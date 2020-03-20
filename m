@@ -2,110 +2,103 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A9DB18C93A
-	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Mar 2020 09:52:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52F6318CB95
+	for <lists+kvm-ppc@lfdr.de>; Fri, 20 Mar 2020 11:27:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726954AbgCTIwH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 20 Mar 2020 04:52:07 -0400
-Received: from 2.mo69.mail-out.ovh.net ([178.33.251.80]:51823 "EHLO
-        2.mo69.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726232AbgCTIwH (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 20 Mar 2020 04:52:07 -0400
-Received: from player168.ha.ovh.net (unknown [10.108.57.53])
-        by mo69.mail-out.ovh.net (Postfix) with ESMTP id A0B4E89500
-        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 09:43:17 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player168.ha.ovh.net (Postfix) with ESMTPSA id E53BB109753FC;
-        Fri, 20 Mar 2020 08:43:12 +0000 (UTC)
-Date:   Fri, 20 Mar 2020 09:43:03 +0100
-From:   Greg Kurz <groug@kaod.org>
-To:     Fabiano Rosas <farosas@linux.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        paulus@ozlabs.org, bharata@linux.ibm.com
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Skip kvmppc_uvmem_free if
- Ultravisor is not supported
-Message-ID: <20200320094303.26143598@bahia.lan>
-In-Reply-To: <20200319225510.945603-1-farosas@linux.ibm.com>
-References: <20200319225510.945603-1-farosas@linux.ibm.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727101AbgCTK0w (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 20 Mar 2020 06:26:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38656 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726602AbgCTK0w (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 20 Mar 2020 06:26:52 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02KA8pnD011064
+        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 06:26:51 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yvq65y3pp-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Fri, 20 Mar 2020 06:26:51 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <ldufour@linux.ibm.com>;
+        Fri, 20 Mar 2020 10:26:48 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 20 Mar 2020 10:26:46 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02KAQj7p49348614
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 20 Mar 2020 10:26:45 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C229EA4054;
+        Fri, 20 Mar 2020 10:26:45 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 86143A405B;
+        Fri, 20 Mar 2020 10:26:45 +0000 (GMT)
+Received: from pomme.tlslab.ibm.com (unknown [9.145.123.35])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 20 Mar 2020 10:26:45 +0000 (GMT)
+From:   Laurent Dufour <ldufour@linux.ibm.com>
+To:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org
+Subject: [PATCH 0/2] Fix SVM hang at startup
+Date:   Fri, 20 Mar 2020 11:26:41 +0100
+X-Mailer: git-send-email 2.25.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 9377901800952142130
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudegtddguddviecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeeftdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrudeikedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehkvhhmqdhpphgtsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20032010-0016-0000-0000-000002F46A86
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20032010-0017-0000-0000-00003357F8CD
+Message-Id: <20200320102643.15516-1-ldufour@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-20_02:2020-03-20,2020-03-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 mlxlogscore=839 impostorscore=0 spamscore=0
+ phishscore=0 clxscore=1011 malwarescore=0 suspectscore=2 bulkscore=0
+ mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003200044
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, 19 Mar 2020 19:55:10 -0300
-Fabiano Rosas <farosas@linux.ibm.com> wrote:
+This series is fixing a SVM hang occurring when starting a SVM requiring
+more secure memory than available. The hang happens in the SVM when calling
+UV_ESM.
 
-> kvmppc_uvmem_init checks for Ultravisor support and returns early if
-> it is not present. Calling kvmppc_uvmem_free at module exit will cause
-> an Oops:
-> 
-> $ modprobe -r kvm-hv
-> 
->   Oops: Kernel access of bad area, sig: 11 [#1]
->   <snip>
->   NIP:  c000000000789e90 LR: c000000000789e8c CTR: c000000000401030
->   REGS: c000003fa7bab9a0 TRAP: 0300   Not tainted  (5.6.0-rc6-00033-g6c90b86a745a-dirty)
->   MSR:  9000000000009033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR: 24002282  XER: 00000000
->   CFAR: c000000000dae880 DAR: 0000000000000008 DSISR: 40000000 IRQMASK: 1
->   GPR00: c000000000789e8c c000003fa7babc30 c0000000016fe500 0000000000000000
->   GPR04: 0000000000000000 0000000000000006 0000000000000000 c000003faf205c00
->   GPR08: 0000000000000000 0000000000000001 000000008000002d c00800000ddde140
->   GPR12: c000000000401030 c000003ffffd9080 0000000000000001 0000000000000000
->   GPR16: 0000000000000000 0000000000000000 000000013aad0074 000000013aaac978
->   GPR20: 000000013aad0070 0000000000000000 00007fffd1b37158 0000000000000000
->   GPR24: 000000014fef0d58 0000000000000000 000000014fef0cf0 0000000000000001
->   GPR28: 0000000000000000 0000000000000000 c0000000018b2a60 0000000000000000
->   NIP [c000000000789e90] percpu_ref_kill_and_confirm+0x40/0x170
->   LR [c000000000789e8c] percpu_ref_kill_and_confirm+0x3c/0x170
->   Call Trace:
->   [c000003fa7babc30] [c000003faf2064d4] 0xc000003faf2064d4 (unreliable)
->   [c000003fa7babcb0] [c000000000400e8c] dev_pagemap_kill+0x6c/0x80
->   [c000003fa7babcd0] [c000000000401064] memunmap_pages+0x34/0x2f0
->   [c000003fa7babd50] [c00800000dddd548] kvmppc_uvmem_free+0x30/0x80 [kvm_hv]
->   [c000003fa7babd80] [c00800000ddcef18] kvmppc_book3s_exit_hv+0x20/0x78 [kvm_hv]
->   [c000003fa7babda0] [c0000000002084d0] sys_delete_module+0x1d0/0x2c0
->   [c000003fa7babe20] [c00000000000b9d0] system_call+0x5c/0x68
->   Instruction dump:
->   3fc2001b fb81ffe0 fba1ffe8 fbe1fff8 7c7f1b78 7c9c2378 3bde4560 7fc3f378
->   f8010010 f821ff81 486249a1 60000000 <e93f0008> 7c7d1b78 712a0002 40820084
->   ---[ end trace 5774ef4dc2c98279 ]---
-> 
-> So this patch checks if kvmppc_uvmem_init actually allocated anything
-> before running kvmppc_uvmem_free.
-> 
-> Fixes: ca9f4942670c ("KVM: PPC: Book3S HV: Support for running secure guests")
-> Reported-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
-> ---
+The following is happening:
 
-Thanks for the quick fix :)
+1. SVM calls UV_ESM
+2. Ultravisor (UV) calls H_SVM_INIT_START
+3. Hypervisor (HV) calls UV_REGISTER_MEM_SLOT
+4. UV returns error because there is not enough free secure memory
+5. HV enter the error path in kvmppc_h_svm_init_start()
+6. In the return path, since kvm->arch.secure_guest is not yet set hrfid is
+   called
+7. As the HV doesn't know the SVM calling context hrfid is jumping to
+   unknown address in the SVM leading to various expections.
 
-Tested-by: Greg Kurz <groug@kaod.org>
+This series fixes the setting of kvm->arch.secure_guest in
+kvmppc_h_svm_init_start() to ensure that UV_RETURN is called on the return
+path to get back to the UV.
 
->  arch/powerpc/kvm/book3s_hv_uvmem.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> index 79b1202b1c62..9d26614b2a77 100644
-> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> @@ -806,6 +806,9 @@ int kvmppc_uvmem_init(void)
->  
->  void kvmppc_uvmem_free(void)
->  {
-> +	if (!kvmppc_uvmem_bitmap)
-> +		return;
-> +
->  	memunmap_pages(&kvmppc_uvmem_pgmap);
->  	release_mem_region(kvmppc_uvmem_pgmap.res.start,
->  			   resource_size(&kvmppc_uvmem_pgmap.res));
+In addition to ensure that a malicious VM will not call UV reserved Hcall,
+a check of the Secure bit in the calling MSR is addded to reject such a
+call.
+
+It is assumed that the UV will filtered out such Hcalls made by a malicious
+SVM.
+
+Laurent Dufour (2):
+  KVM: PPC: Book3S HV: check caller of H_SVM_* Hcalls
+  KVM: PPC: Book3S HV: H_SVM_INIT_START must call UV_RETURN
+
+ arch/powerpc/kvm/book3s_hv.c       | 32 ++++++++++++++++++++----------
+ arch/powerpc/kvm/book3s_hv_uvmem.c |  3 ++-
+ 2 files changed, 23 insertions(+), 12 deletions(-)
+
+-- 
+2.25.2
 
