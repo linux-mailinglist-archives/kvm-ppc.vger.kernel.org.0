@@ -2,59 +2,59 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F09BE18DEBB
-	for <lists+kvm-ppc@lfdr.de>; Sat, 21 Mar 2020 09:20:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D5A118DEBE
+	for <lists+kvm-ppc@lfdr.de>; Sat, 21 Mar 2020 09:22:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728012AbgCUIUp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 21 Mar 2020 04:20:45 -0400
-Received: from verein.lst.de ([213.95.11.211]:51189 "EHLO verein.lst.de"
+        id S1728012AbgCUIWk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 21 Mar 2020 04:22:40 -0400
+Received: from verein.lst.de ([213.95.11.211]:51201 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727961AbgCUIUo (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sat, 21 Mar 2020 04:20:44 -0400
+        id S1727961AbgCUIWk (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sat, 21 Mar 2020 04:22:40 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id C3FCA68AFE; Sat, 21 Mar 2020 09:20:41 +0100 (CET)
-Date:   Sat, 21 Mar 2020 09:20:41 +0100
+        id D1BDB68AFE; Sat, 21 Mar 2020 09:22:36 +0100 (CET)
+Date:   Sat, 21 Mar 2020 09:22:36 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Ralph Campbell <rcampbell@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
+Cc:     Christoph Hellwig <hch@lst.de>,
         Dan Williams <dan.j.williams@intel.com>,
         Bharata B Rao <bharata@linux.ibm.com>,
         Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
         Ben Skeggs <bskeggs@redhat.com>,
         Jerome Glisse <jglisse@redhat.com>, kvm-ppc@vger.kernel.org,
         amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        nouveau@lists.freedesktop.org, linux-mm@kvack.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 3/4] mm: simplify device private page handling in
+        nouveau@lists.freedesktop.org, linux-mm@kvack.org
+Subject: Re: [PATCH 4/4] mm: check the device private page owner in
  hmm_range_fault
-Message-ID: <20200321082041.GA28613@lst.de>
-References: <7256f88d-809e-4aba-3c46-a223bd8cc521@nvidia.com> <20200317121536.GQ20941@ziepe.ca> <20200317122445.GA11662@lst.de> <20200317122813.GA11866@lst.de> <20200317124755.GR20941@ziepe.ca> <20200317125955.GA12847@lst.de> <24fca825-3b0f-188f-bcf2-fadcf3a9f05a@nvidia.com> <20200319181716.GK20941@ziepe.ca> <89e33770-a0ab-e1ec-d5e5-535edefd3fd3@nvidia.com> <20200320000345.GO20941@ziepe.ca>
+Message-ID: <20200321082236.GB28613@lst.de>
+References: <20200316193216.920734-1-hch@lst.de> <20200316193216.920734-5-hch@lst.de> <20200320134109.GA30230@ziepe.ca>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200320000345.GO20941@ziepe.ca>
+In-Reply-To: <20200320134109.GA30230@ziepe.ca>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Mar 19, 2020 at 09:03:45PM -0300, Jason Gunthorpe wrote:
-> > Should tests enable the feature or the feature enable the test?
-> > IMHO, if the feature is being compiled into the kernel, that should
-> > enable the menu item for the test. If the feature isn't selected,
-> > no need to test it :-)
+On Fri, Mar 20, 2020 at 10:41:09AM -0300, Jason Gunthorpe wrote:
+> Thinking about this some more, does the locking work out here?
 > 
-> I ment if DEVICE_PRIVATE should be a user selectable option at all, or
-> should it be turned on when a driver like nouveau is selected.
+> hmm_range_fault() runs with mmap_sem in read, and does not lock any of
+> the page table levels.
+> 
+> So it relies on accessing stale pte data being safe, and here we
+> introduce for the first time a page pointer dereference and a pgmap
+> dereference without any locking/refcounting.
+> 
+> The get_dev_pagemap() worked on the PFN and obtained a refcount, so it
+> created safety.
+> 
+> Is there some tricky reason this is safe, eg a DEVICE_PRIVATE page
+> cannot be removed from the vma without holding mmap_sem in write or
+> something?
 
-I don't think it should be user selectable.  This is an implementation
-detail users can't know about.
-
-> Is there some downside to enabling DEVICE_PRIVATE?
-
-The option itself adds a little more code to the core kernel, and
-introduces a few additional branches in core mm code.
-
-But more importantly it pulls in the whole pgmap infrastructure.
+I don't think there is any specific protection.  Let me see if we
+can throw in a get_dev_pagemap here - note that current mainline doesn't
+even use it for this path..
