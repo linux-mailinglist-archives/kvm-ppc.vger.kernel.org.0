@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AEF7618FE00
-	for <lists+kvm-ppc@lfdr.de>; Mon, 23 Mar 2020 20:47:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E54E318FE5E
+	for <lists+kvm-ppc@lfdr.de>; Mon, 23 Mar 2020 21:00:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726037AbgCWTrM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 23 Mar 2020 15:47:12 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:27813 "EHLO
+        id S1725912AbgCWUA6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 23 Mar 2020 16:00:58 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:50389 "EHLO
         us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725816AbgCWTrM (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 23 Mar 2020 15:47:12 -0400
+        by vger.kernel.org with ESMTP id S1725839AbgCWUA6 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 23 Mar 2020 16:00:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584992831;
+        s=mimecast20190719; t=1584993656;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=S9IrSlxfJapkU8CWMBvfg1IPzMz8/r3SznAfCQ6EPKg=;
-        b=Zduysw3BXOpqU1DMVZPPDCyEYUHg8H3684wmD+xBXRMqvkjZt0326YR2RD/1QFbf7IQthE
-        14HhnuwjIhTgBaSIcyJ5GHyUFK209hQT9CKQUZ4XeUaLFdzWZF3ZBhxSz703KgTodXgz51
-        113oncJdBT/xiJPNU+V6Chq0qPzdwvw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-7HMI2uInNNGiHLg14RqHrw-1; Mon, 23 Mar 2020 15:47:09 -0400
-X-MC-Unique: 7HMI2uInNNGiHLg14RqHrw-1
-Received: by mail-wm1-f70.google.com with SMTP id f185so243205wmf.8
-        for <kvm-ppc@vger.kernel.org>; Mon, 23 Mar 2020 12:47:09 -0700 (PDT)
+        bh=cY+H9r1hyt0W+F/eh6c6o3kR9Aied7i4vmIsTGqyvm8=;
+        b=bCuqD3sYav/rMPCtGTKmvRTbkWfGL+KXpOCXCfCiTeEhBXM9CZ0WIF/teLROpnsjgWdZ4U
+        frAMcZHC/7hTIYU+qebt/GOdNAVTS8ITKwVZmNGnl9Ss2kD87mV6FkHAeanZRuK6vLvbLl
+        mpMC6O2gDuG4tTDAc6t3sXjqnik1UuA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-412-hdpc6sDMMCmZVaDRrlH_HA-1; Mon, 23 Mar 2020 16:00:55 -0400
+X-MC-Unique: hdpc6sDMMCmZVaDRrlH_HA-1
+Received: by mail-wm1-f71.google.com with SMTP id w9so277678wmi.2
+        for <kvm-ppc@vger.kernel.org>; Mon, 23 Mar 2020 13:00:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=S9IrSlxfJapkU8CWMBvfg1IPzMz8/r3SznAfCQ6EPKg=;
-        b=rxc+6S6RKCqK0UF9fzmf4h4Bd+G7uzPCvAz3xYjahy+Y2A+h/U8NOzTqKUjaT6set7
-         zQOnL4zJaVgy5NMqybVctlW6XOjA7L4u1SKNEmDzLWPId3JOn/9w1ISUtJNUpdqY9VTH
-         lGSduHRNjCflBFGXdYaA/M40f3twYPbhXXVpPioZP91kH1uV7mU92N7srQDIsvRvyNvv
-         VgsKabHWyBLt0td2/RTCMMC2iQ9HgY9XWXEz1Si0IHenfVA8OVVxKp3u00qMJfE5LoJ2
-         taDFNCiWjxfxxRp6nMcM1el/mGCIgOg9LBua6GXe/9yS+knz6BHwNQsAicetu4UeLSjj
-         kIDA==
-X-Gm-Message-State: ANhLgQ0WJvQpQifZ58n8Ytd8M7hxpYF+57lVKkCnfJ2zCkChlluWHNtW
-        l2KUeI6OYXtHSouMZxLUr1330L1mzTY18Fa8NHQz0ZkB9eXNpWrTGE7jfo1BI4bBoMD+PNQPTiN
-        tEr23nDgSi1ebdXBOVg==
-X-Received: by 2002:a5d:674f:: with SMTP id l15mr13381436wrw.196.1584992828064;
-        Mon, 23 Mar 2020 12:47:08 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtUWmDK4thpwexQ8hdryAgmCprB22NosAirhPOI+x5C3asXpfwyOua+gaEuAwr0M9NrGpUzvQ==
-X-Received: by 2002:a5d:674f:: with SMTP id l15mr13381412wrw.196.1584992827855;
-        Mon, 23 Mar 2020 12:47:07 -0700 (PDT)
+        bh=cY+H9r1hyt0W+F/eh6c6o3kR9Aied7i4vmIsTGqyvm8=;
+        b=Lme89c2bVlu4ul9CohbGKqQDd4SMtPq7I5fgm7LyZlnVnWjKuZNQMs5T9K3HT85lsy
+         eBl6jZyorAI0ZHGOtRakh+ESCQM3kgu0HNu5GBFFvbM6c0heraq2vr+t3NzqZ9D/QgwT
+         8iBau5EzO+bIwb/pV2PvCXU+guQEaXpWVaBlbq+kZo+vrnROeXpy1zP3BN5SB2KNosGq
+         GfBZZpdK7Gu66CAmHvMcggzlzbShXCRnCR4q9OJoQ2fF6twU8FL8PgPnU0YXvzLk8tph
+         cGzLZP+McIkFtk5pnBMSX6qGnFC841laX06KiqgjPWOrA3Jzow0dVLy4HPgmWLbHVMW8
+         h/bQ==
+X-Gm-Message-State: ANhLgQ11RIG0OsdENGX3lt9o8x407n3Yv43XAt3LmIx6svQSsoHil3x6
+        XjmkbVWLCsmieKo2lrwppOQAaE5r5N8DaHK6j90ndRx7ribEHXMqi1dp+djfnVtQ3YB+D7pChMk
+        u6K1yXq3OnxEGdTOZqA==
+X-Received: by 2002:adf:f3c5:: with SMTP id g5mr26655824wrp.230.1584993653893;
+        Mon, 23 Mar 2020 13:00:53 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvXyqIbkkktOwq1/2ooUCj01kGPzulVzA6RfK1uS8wG/GOec0veo7shFCpnK1NWAqj8WTc9EQ==
+X-Received: by 2002:adf:f3c5:: with SMTP id g5mr26655802wrp.230.1584993653686;
+        Mon, 23 Mar 2020 13:00:53 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:24d8:ed40:c82a:8a01? ([2001:b07:6468:f312:24d8:ed40:c82a:8a01])
-        by smtp.gmail.com with ESMTPSA id a186sm756486wmh.33.2020.03.23.12.47.06
+        by smtp.gmail.com with ESMTPSA id 98sm25182715wrk.52.2020.03.23.13.00.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2020 12:47:07 -0700 (PDT)
-Subject: Re: [PATCH v3 2/9] KVM: x86: Move init-only kvm_x86_ops to separate
- struct
+        Mon, 23 Mar 2020 13:00:53 -0700 (PDT)
+Subject: Re: [PATCH v3 4/9] KVM: VMX: Configure runtime hooks using
+ vmx_x86_ops
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paul Mackerras <paulus@ozlabs.org>,
@@ -70,17 +70,15 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 References: <20200321202603.19355-1-sean.j.christopherson@intel.com>
- <20200321202603.19355-3-sean.j.christopherson@intel.com>
- <87lfnr9sqn.fsf@vitty.brq.redhat.com>
- <20200323152909.GE28711@linux.intel.com>
- <87o8sn82ef.fsf@vitty.brq.redhat.com>
+ <20200321202603.19355-5-sean.j.christopherson@intel.com>
+ <87ftdz9ryn.fsf@vitty.brq.redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <30b847cf-98db-145f-8aa0-a847146d5649@redhat.com>
-Date:   Mon, 23 Mar 2020 20:47:04 +0100
+Message-ID: <c7915319-8795-e466-e2df-478b1bf9734c@redhat.com>
+Date:   Mon, 23 Mar 2020 21:00:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <87o8sn82ef.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87ftdz9ryn.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -89,28 +87,26 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 23/03/20 17:24, Vitaly Kuznetsov wrote:
-> Sounds cool! (not sure that with only two implementations people won't
-> call it 'over-engineered' but cool). 
+On 23/03/20 13:27, Vitaly Kuznetsov wrote:
+>> -	kvm_x86_ops->check_nested_events = vmx_check_nested_events;
+>> -	kvm_x86_ops->get_nested_state = vmx_get_nested_state;
+>> -	kvm_x86_ops->set_nested_state = vmx_set_nested_state;
+>> -	kvm_x86_ops->get_vmcs12_pages = nested_get_vmcs12_pages;
+>> -	kvm_x86_ops->nested_enable_evmcs = nested_enable_evmcs;
+>> -	kvm_x86_ops->nested_get_evmcs_version = nested_get_evmcs_version;
+>> +	ops->check_nested_events = vmx_check_nested_events;
+>> +	ops->get_nested_state = vmx_get_nested_state;
+>> +	ops->set_nested_state = vmx_set_nested_state;
+>> +	ops->get_vmcs12_pages = nested_get_vmcs12_pages;
+>> +	ops->nested_enable_evmcs = nested_enable_evmcs;
+>> +	ops->nested_get_evmcs_version = nested_get_evmcs_version;
+> 
+> A lazy guy like me would appreciate 'ops' -> 'vmx_x86_ops' rename as it
+> would make 'git grep vmx_x86_ops' output more complete.
+> 
 
-Yes, something like
-
-#define KVM_X86_OP(name) .name = vmx_##name
-
-(svm_##name for svm.c) and then
-
-	KVM_X86_OP(check_nested_events)
-
-etc.
-
-> My personal wish would just be that
-> function names in function implementations are not auto-generated so
-> e.g. a simple 'git grep vmx_hardware_setup' works
-
-Yes, absolutely; the function names would still be written by hand.
+I would prefer even more a kvm_x86_ops.nested struct but I would be okay
+with a separate patch.
 
 Paolo
-
-> but the way how we
-> fill vmx_x86_ops in can be macroed I guess.
 
