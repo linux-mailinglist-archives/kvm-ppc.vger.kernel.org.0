@@ -2,111 +2,80 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E54E318FE5E
-	for <lists+kvm-ppc@lfdr.de>; Mon, 23 Mar 2020 21:00:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7ED8190318
+	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Mar 2020 01:55:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725912AbgCWUA6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 23 Mar 2020 16:00:58 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:50389 "EHLO
-        us-smtp-delivery-74.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725839AbgCWUA6 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 23 Mar 2020 16:00:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1584993656;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cY+H9r1hyt0W+F/eh6c6o3kR9Aied7i4vmIsTGqyvm8=;
-        b=bCuqD3sYav/rMPCtGTKmvRTbkWfGL+KXpOCXCfCiTeEhBXM9CZ0WIF/teLROpnsjgWdZ4U
-        frAMcZHC/7hTIYU+qebt/GOdNAVTS8ITKwVZmNGnl9Ss2kD87mV6FkHAeanZRuK6vLvbLl
-        mpMC6O2gDuG4tTDAc6t3sXjqnik1UuA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-hdpc6sDMMCmZVaDRrlH_HA-1; Mon, 23 Mar 2020 16:00:55 -0400
-X-MC-Unique: hdpc6sDMMCmZVaDRrlH_HA-1
-Received: by mail-wm1-f71.google.com with SMTP id w9so277678wmi.2
-        for <kvm-ppc@vger.kernel.org>; Mon, 23 Mar 2020 13:00:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cY+H9r1hyt0W+F/eh6c6o3kR9Aied7i4vmIsTGqyvm8=;
-        b=Lme89c2bVlu4ul9CohbGKqQDd4SMtPq7I5fgm7LyZlnVnWjKuZNQMs5T9K3HT85lsy
-         eBl6jZyorAI0ZHGOtRakh+ESCQM3kgu0HNu5GBFFvbM6c0heraq2vr+t3NzqZ9D/QgwT
-         8iBau5EzO+bIwb/pV2PvCXU+guQEaXpWVaBlbq+kZo+vrnROeXpy1zP3BN5SB2KNosGq
-         GfBZZpdK7Gu66CAmHvMcggzlzbShXCRnCR4q9OJoQ2fF6twU8FL8PgPnU0YXvzLk8tph
-         cGzLZP+McIkFtk5pnBMSX6qGnFC841laX06KiqgjPWOrA3Jzow0dVLy4HPgmWLbHVMW8
-         h/bQ==
-X-Gm-Message-State: ANhLgQ11RIG0OsdENGX3lt9o8x407n3Yv43XAt3LmIx6svQSsoHil3x6
-        XjmkbVWLCsmieKo2lrwppOQAaE5r5N8DaHK6j90ndRx7ribEHXMqi1dp+djfnVtQ3YB+D7pChMk
-        u6K1yXq3OnxEGdTOZqA==
-X-Received: by 2002:adf:f3c5:: with SMTP id g5mr26655824wrp.230.1584993653893;
-        Mon, 23 Mar 2020 13:00:53 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvXyqIbkkktOwq1/2ooUCj01kGPzulVzA6RfK1uS8wG/GOec0veo7shFCpnK1NWAqj8WTc9EQ==
-X-Received: by 2002:adf:f3c5:: with SMTP id g5mr26655802wrp.230.1584993653686;
-        Mon, 23 Mar 2020 13:00:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:24d8:ed40:c82a:8a01? ([2001:b07:6468:f312:24d8:ed40:c82a:8a01])
-        by smtp.gmail.com with ESMTPSA id 98sm25182715wrk.52.2020.03.23.13.00.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2020 13:00:53 -0700 (PDT)
-Subject: Re: [PATCH v3 4/9] KVM: VMX: Configure runtime hooks using
- vmx_x86_ops
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-References: <20200321202603.19355-1-sean.j.christopherson@intel.com>
- <20200321202603.19355-5-sean.j.christopherson@intel.com>
- <87ftdz9ryn.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c7915319-8795-e466-e2df-478b1bf9734c@redhat.com>
-Date:   Mon, 23 Mar 2020 21:00:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727032AbgCXAzr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 23 Mar 2020 20:55:47 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54251 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727031AbgCXAzr (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 23 Mar 2020 20:55:47 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 48mXqP2FhXz9sSJ; Tue, 24 Mar 2020 11:55:45 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1585011345; bh=LoDPTy8hotXOVNxAbYYkoDWHTyQTtTLTM+W7YwaCFqQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WkLFZ009uhYM/bD3ncmLk6wAuvUncEP6zj7yGZc+Ly5tPhpxlI/q8n0HkjPxIiLRl
+         r8tvEKgm0zkkntTWtzip2lvRCduiVnXS/EInxK0Ab20OJPU+NMFOREJkOGHBmqnpZA
+         710DKCqOZcYqE/o+zbYvF8sNhXd8wOXjqr7by/CX2r4SLQk4fwL07Uktw8QIe6tRKd
+         aYitSdz9++x2M7fEArmKUIu8X+bLqzCdRp4q9m3f0O40bDQpaIMsEGis9oOo4hZ/y1
+         QJo4PWmvAQFEqor4dl9ubPzD8FbYW/hJMEDVF4iu74c9NEt7dESqCGUiZyyv9wxYaL
+         zyOaiUWTJhncg==
+Date:   Tue, 24 Mar 2020 10:43:23 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Greg Kurz <groug@kaod.org>
+Cc:     Laurent Dufour <ldufour@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, Bharata B Rao <bharata@linux.ibm.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH 1/2] KVM: PPC: Book3S HV: check caller of H_SVM_* Hcalls
+Message-ID: <20200323234323.GA5604@blackberry>
+References: <20200320102643.15516-1-ldufour@linux.ibm.com>
+ <20200320102643.15516-2-ldufour@linux.ibm.com>
+ <20200320132248.44b81b3b@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <87ftdz9ryn.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200320132248.44b81b3b@bahia.lan>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 23/03/20 13:27, Vitaly Kuznetsov wrote:
->> -	kvm_x86_ops->check_nested_events = vmx_check_nested_events;
->> -	kvm_x86_ops->get_nested_state = vmx_get_nested_state;
->> -	kvm_x86_ops->set_nested_state = vmx_set_nested_state;
->> -	kvm_x86_ops->get_vmcs12_pages = nested_get_vmcs12_pages;
->> -	kvm_x86_ops->nested_enable_evmcs = nested_enable_evmcs;
->> -	kvm_x86_ops->nested_get_evmcs_version = nested_get_evmcs_version;
->> +	ops->check_nested_events = vmx_check_nested_events;
->> +	ops->get_nested_state = vmx_get_nested_state;
->> +	ops->set_nested_state = vmx_set_nested_state;
->> +	ops->get_vmcs12_pages = nested_get_vmcs12_pages;
->> +	ops->nested_enable_evmcs = nested_enable_evmcs;
->> +	ops->nested_get_evmcs_version = nested_get_evmcs_version;
+On Fri, Mar 20, 2020 at 01:22:48PM +0100, Greg Kurz wrote:
+> On Fri, 20 Mar 2020 11:26:42 +0100
+> Laurent Dufour <ldufour@linux.ibm.com> wrote:
 > 
-> A lazy guy like me would appreciate 'ops' -> 'vmx_x86_ops' rename as it
-> would make 'git grep vmx_x86_ops' output more complete.
+> > The Hcall named H_SVM_* are reserved to the Ultravisor. However, nothing
+> > prevent a malicious VM or SVM to call them. This could lead to weird result
+> > and should be filtered out.
+> > 
+> > Checking the Secure bit of the calling MSR ensure that the call is coming
+> > from either the Ultravisor or a SVM. But any system call made from a SVM
+> > are going through the Ultravisor, and the Ultravisor should filter out
+> > these malicious call. This way, only the Ultravisor is able to make such a
+> > Hcall.
 > 
+> "Ultravisor should filter" ? And what if it doesn't (eg. because of a bug) ?
+> 
+> Shouldn't we also check the HV bit of the calling MSR as well to
+> disambiguate SVM and UV ?
 
-I would prefer even more a kvm_x86_ops.nested struct but I would be okay
-with a separate patch.
+The trouble with doing that (checking the HV bit) is that KVM does not
+expect to see the HV bit set on an interrupt that occurred while we
+were in the guest, and if it is set, it indicates a serious problem,
+i.e. that an interrupt occurred while we were in the code that
+transitions from host context to guest context, or from guest context
+to host context.  In those cases we don't know how much of the
+transition has been completed and therefore whether we have guest
+values or host values in the CPU registers (GPRs, FPRs/VSRs, SPRs).
+If we do see HV set then KVM reports a severe error to userspace which
+should cause userspace to terminate the guest.
 
-Paolo
+Therefore the UV should *always* have the HV bit clear in HSRR1/SRR1
+when transitioning to KVM.
 
+Paul.
