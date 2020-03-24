@@ -2,103 +2,80 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 151D1190368
-	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Mar 2020 02:51:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF1721903B8
+	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Mar 2020 03:56:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727122AbgCXBvt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 23 Mar 2020 21:51:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41640 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727050AbgCXBvt (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 23 Mar 2020 21:51:49 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02O1XTRf134379
-        for <kvm-ppc@vger.kernel.org>; Mon, 23 Mar 2020 21:51:48 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ywdr5m00b-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Mon, 23 Mar 2020 21:51:47 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
-        Tue, 24 Mar 2020 01:51:44 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 24 Mar 2020 01:51:42 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02O1phVC45154306
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Mar 2020 01:51:43 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51C9342049;
-        Tue, 24 Mar 2020 01:51:43 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5BE942041;
-        Tue, 24 Mar 2020 01:51:41 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.85.223.94])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 24 Mar 2020 01:51:41 +0000 (GMT)
-Date:   Mon, 23 Mar 2020 18:51:38 -0700
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        David Gibson <david@gibson.dropbear.id.au>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <20200324005539.GB5604@blackberry>
+        id S1727209AbgCXC43 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 23 Mar 2020 22:56:29 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:34297 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727060AbgCXC43 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 23 Mar 2020 22:56:29 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 48mbVg1D2nz9sSH; Tue, 24 Mar 2020 13:56:26 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1585018587; bh=qcqkAGfatCcdaSF4JecPaLJRR36leDyxRC3RwY8oO3U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=b1S6P/UZ1s9Q7htiPyHTtAlm1CEfR6MJvQadZpArIv5YrDEMKNc+Zkd73fIwGD3IX
+         HS+zH7c5SS13rccwa7v0NYBzLVY/7uELpZMD5FFPUcmUbeTsU+AnsKET43qGKnS2S/
+         CKm3NjDvUrwZEG3zvZpY2VIEGBri+iCC2PPkeVctiVSUBdpdbI6EiOkwquLkXzLd7u
+         4V9/iAr9M6Z+E5X8kPkYCQrOBNg9Ri6Eszroac4IZGcxoTZ+VKnCj+Ooc3YZtt/MmY
+         4COXK9PBfN7EgldeacQ4ySFbgWaarKd2CSEL6OS5ZTSPJ1lISoAv4LO/qbkmEr46ty
+         bPHlD35Z1l10g==
+Date:   Tue, 24 Mar 2020 13:54:29 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Laurent Dufour <ldufour@linux.ibm.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH 0/2] Fix SVM hang at startup
+Message-ID: <20200324025429.GD5604@blackberry>
+References: <20200320102643.15516-1-ldufour@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200324005539.GB5604@blackberry>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-x-cbid: 20032401-0020-0000-0000-000003B9D7B0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20032401-0021-0000-0000-000022125608
-Message-Id: <20200324015138.GD5203@oc0525413822.ibm.com>
-Subject: Re:  [PATCH v2] KVM: PPC: Book3S HV: Add a capability for enabling secure
- guests
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-23_10:2020-03-23,2020-03-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- adultscore=0 impostorscore=0 lowpriorityscore=0 phishscore=0
- priorityscore=1501 clxscore=1015 suspectscore=0 mlxlogscore=999 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003240001
+In-Reply-To: <20200320102643.15516-1-ldufour@linux.ibm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 11:55:39AM +1100, Paul Mackerras wrote:
-> At present, on Power systems with Protected Execution Facility
-> hardware and an ultravisor, a KVM guest can transition to being a
-> secure guest at will.  Userspace (QEMU) has no way of knowing
-> whether a host system is capable of running secure guests.  This
-> will present a problem in future when the ultravisor is capable of
-> migrating secure guests from one host to another, because
-> virtualization management software will have no way to ensure that
-> secure guests only run in domains where all of the hosts can
-> support secure guests.
+On Fri, Mar 20, 2020 at 11:26:41AM +0100, Laurent Dufour wrote:
+> This series is fixing a SVM hang occurring when starting a SVM requiring
+> more secure memory than available. The hang happens in the SVM when calling
+> UV_ESM.
 > 
-> This adds a VM capability which has two functions: (a) userspace
-> can query it to find out whether the host can support secure guests,
-> and (b) userspace can enable it for a guest, which allows that
-> guest to become a secure guest.  If userspace does not enable it,
-> KVM will return an error when the ultravisor does the hypercall
-> that indicates that the guest is starting to transition to a
-> secure guest.  The ultravisor will then abort the transition and
-> the guest will terminate.
+> The following is happening:
 > 
-> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
-> ---
-> v2: Test that KVM uvmem code has initialized successfully as a
-> condition of reporting that we support secure guests.
+> 1. SVM calls UV_ESM
+> 2. Ultravisor (UV) calls H_SVM_INIT_START
+> 3. Hypervisor (HV) calls UV_REGISTER_MEM_SLOT
+> 4. UV returns error because there is not enough free secure memory
+> 5. HV enter the error path in kvmppc_h_svm_init_start()
+> 6. In the return path, since kvm->arch.secure_guest is not yet set hrfid is
+>    called
+> 7. As the HV doesn't know the SVM calling context hrfid is jumping to
+>    unknown address in the SVM leading to various expections.
+> 
+> This series fixes the setting of kvm->arch.secure_guest in
+> kvmppc_h_svm_init_start() to ensure that UV_RETURN is called on the return
+> path to get back to the UV.
+> 
+> In addition to ensure that a malicious VM will not call UV reserved Hcall,
+> a check of the Secure bit in the calling MSR is addded to reject such a
+> call.
+> 
+> It is assumed that the UV will filtered out such Hcalls made by a malicious
+> SVM.
+> 
+> Laurent Dufour (2):
+>   KVM: PPC: Book3S HV: check caller of H_SVM_* Hcalls
+>   KVM: PPC: Book3S HV: H_SVM_INIT_START must call UV_RETURN
+> 
+>  arch/powerpc/kvm/book3s_hv.c       | 32 ++++++++++++++++++++----------
+>  arch/powerpc/kvm/book3s_hv_uvmem.c |  3 ++-
+>  2 files changed, 23 insertions(+), 12 deletions(-)
 
-Reviewed-by: Ram Pai <linuxram@us.ibm.com>
+Thanks, series applied to my kvm-ppc-next branch.
 
-I will send test results along with the qemu patch from Fabiano in a day or
-two.
-
-RP
-
+Paul.
