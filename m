@@ -2,96 +2,103 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BBA8191845
-	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Mar 2020 18:59:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5B8E1918E6
+	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Mar 2020 19:22:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727495AbgCXR5F (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 24 Mar 2020 13:57:05 -0400
-Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:40644 "EHLO
-        7.mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727223AbgCXR5F (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 24 Mar 2020 13:57:05 -0400
-X-Greylist: delayed 12585 seconds by postgrey-1.27 at vger.kernel.org; Tue, 24 Mar 2020 13:57:04 EDT
-Received: from player697.ha.ovh.net (unknown [10.110.115.3])
-        by mo5.mail-out.ovh.net (Postfix) with ESMTP id 603FE274FEE
-        for <kvm-ppc@vger.kernel.org>; Tue, 24 Mar 2020 13:01:11 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player697.ha.ovh.net (Postfix) with ESMTPSA id 1D7B110BE91A8;
-        Tue, 24 Mar 2020 12:00:53 +0000 (UTC)
-Date:   Tue, 24 Mar 2020 13:00:52 +0100
-From:   Greg Kurz <groug@kaod.org>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Laurent Dufour <ldufour@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Bharata B Rao <bharata@linux.ibm.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 1/2] KVM: PPC: Book3S HV: check caller of H_SVM_* Hcalls
-Message-ID: <20200324130052.373fdf89@bahia.lan>
-In-Reply-To: <20200323234323.GA5604@blackberry>
-References: <20200320102643.15516-1-ldufour@linux.ibm.com>
-        <20200320102643.15516-2-ldufour@linux.ibm.com>
-        <20200320132248.44b81b3b@bahia.lan>
-        <20200323234323.GA5604@blackberry>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727501AbgCXSVF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 24 Mar 2020 14:21:05 -0400
+Received: from mga07.intel.com ([134.134.136.100]:33976 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727379AbgCXSVF (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 24 Mar 2020 14:21:05 -0400
+IronPort-SDR: YQ3IlUFAH0UZqrqfbHRQFKDbyJPAoPvGXPiPAD5m7KxpOAgbGtqmui7L6Ir88TyoRaoHDXx9Uj
+ Q7HOy6mgj47w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2020 11:20:50 -0700
+IronPort-SDR: y/USM2b3SPl0LjjMZJcqAmjb2PYOuW/QAtqFht1aEDTm2RWTprcUGxDRQvFy8adhtqpy78sfUX
+ 6Y7gyFMhw+XA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,301,1580803200"; 
+   d="scan'208";a="246803473"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga003.jf.intel.com with ESMTP; 24 Mar 2020 11:20:48 -0700
+Date:   Tue, 24 Mar 2020 11:20:48 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v4 19/19] KVM: selftests: Add test for
+ KVM_SET_USER_MEMORY_REGION
+Message-ID: <20200324182048.GF5998@linux.intel.com>
+References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
+ <20191217204041.10815-20-sean.j.christopherson@intel.com>
+ <f962fafb-3956-746f-d077-3dbcefaae7c8@de.ibm.com>
+ <20191218163958.GC25201@linux.intel.com>
+ <78b21097-52e4-b851-fc78-da3442fd0904@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 17764167258308712891
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudehuddgtdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepkhhvmhdqphhptgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <78b21097-52e4-b851-fc78-da3442fd0904@de.ibm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, 24 Mar 2020 10:43:23 +1100
-Paul Mackerras <paulus@ozlabs.org> wrote:
-
-> On Fri, Mar 20, 2020 at 01:22:48PM +0100, Greg Kurz wrote:
-> > On Fri, 20 Mar 2020 11:26:42 +0100
-> > Laurent Dufour <ldufour@linux.ibm.com> wrote:
-> > 
-> > > The Hcall named H_SVM_* are reserved to the Ultravisor. However, nothing
-> > > prevent a malicious VM or SVM to call them. This could lead to weird result
-> > > and should be filtered out.
-> > > 
-> > > Checking the Secure bit of the calling MSR ensure that the call is coming
-> > > from either the Ultravisor or a SVM. But any system call made from a SVM
-> > > are going through the Ultravisor, and the Ultravisor should filter out
-> > > these malicious call. This way, only the Ultravisor is able to make such a
-> > > Hcall.
-> > 
-> > "Ultravisor should filter" ? And what if it doesn't (eg. because of a bug) ?
-> > 
-> > Shouldn't we also check the HV bit of the calling MSR as well to
-> > disambiguate SVM and UV ?
+On Tue, Mar 24, 2020 at 10:43:07AM +0100, Christian Borntraeger wrote:
 > 
-> The trouble with doing that (checking the HV bit) is that KVM does not
-> expect to see the HV bit set on an interrupt that occurred while we
-> were in the guest, and if it is set, it indicates a serious problem,
-> i.e. that an interrupt occurred while we were in the code that
-> transitions from host context to guest context, or from guest context
-> to host context.  In those cases we don't know how much of the
-> transition has been completed and therefore whether we have guest
-> values or host values in the CPU registers (GPRs, FPRs/VSRs, SPRs).
-> If we do see HV set then KVM reports a severe error to userspace which
-> should cause userspace to terminate the guest.
+> On 18.12.19 17:39, Sean Christopherson wrote:
+> > On Wed, Dec 18, 2019 at 12:39:43PM +0100, Christian Borntraeger wrote:
+> >>
+> I started looking into this what it would cost to implement this on s390.
+> s390 is also returning EFAULT if no memory slot is available.
 > 
-> Therefore the UV should *always* have the HV bit clear in HSRR1/SRR1
-> when transitioning to KVM.
+> According to the doc this is not documented at all. So this part of the test
+>         vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+>         vm_vcpu_add(vm, VCPU_ID);
+>         /* Fails with ENOSPC because the MMU can't create pages (no slots). */
+>         TEST_ASSERT(_vcpu_run(vm, VCPU_ID) == -1 && errno == ENOSPC,
+>                     "Unexpected error code = %d", errno);
+>         kvm_vm_free(vm);
 > 
+> is actually just testing that the implementation for x86 does not change the error
+> from ENOSPC to something else.
 
-Indeed... thanks for the clarification. So I guess we'll just assume
-that the UV doesn't reflect these SVM specific hcalls if they happened
-to be issued by the guest then.
+It's even worse than that.  There error isn't directly due to no having
+a memslots, it occurs because the limit on number of pages in the MMU is
+zero.  On x86, that limit is automatically derived from the total size of
+memslots.
 
-Cheers,
+The selftest could add an explicit ioctl() call to manually override the
+number of allowed MMU pages, but that didn't seem any cleaner as it'd still
+rely on undocumented internal KVM behavior.
 
---
-Greg
+TL;DR: I'm not a huge fan of the code either.
 
-> Paul.
+> The question is: do we want to document the error for the "no memslot" case
+> and then change all existing platforms?
 
+At first blush, I like the idea of adding an explicit check in KVM_RUN to
+return an error if there isn't at least one usable memslot.  But, it'd be a
+little weird/kludgy on x86/VMX due to the existence of "private" memslots,
+i.e. the check should really fire on "no public memslots".  At that point,
+I'm not sure whether the well defined errno would be worth the extra code.
