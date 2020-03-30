@@ -2,46 +2,42 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F9F9193E9A
-	for <lists+kvm-ppc@lfdr.de>; Thu, 26 Mar 2020 13:07:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 806C21974E9
+	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Mar 2020 09:11:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728293AbgCZMGv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 26 Mar 2020 08:06:51 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:32995 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728296AbgCZMGu (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 26 Mar 2020 08:06:50 -0400
-Received: by ozlabs.org (Postfix, from userid 1034)
-        id 48p3cm5vJ1z9sSL; Thu, 26 Mar 2020 23:06:48 +1100 (AEDT)
-X-powerpc-patch-notification: thanks
-X-powerpc-patch-commit: 74bb84e5117146fa73eb9d01305975c53022b3c3
-In-Reply-To: <20200312074404.87293-1-aik@ozlabs.ru>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH kernel] powerpc/prom_init: Pass the "os-term" message to hypervisor
-Message-Id: <48p3cm5vJ1z9sSL@ozlabs.org>
-Date:   Thu, 26 Mar 2020 23:06:48 +1100 (AEDT)
+        id S1729197AbgC3HLH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 30 Mar 2020 03:11:07 -0400
+Received: from host201-96-61-217.static.arubacloud.com ([217.61.96.201]:43422
+        "EHLO mail.undorthemoure.gq" rhost-flags-OK-FAIL-OK-OK)
+        by vger.kernel.org with ESMTP id S1728685AbgC3HLH (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Mar 2020 03:11:07 -0400
+Received: by mail.undorthemoure.gq (Postfix, from userid 48)
+        id 11A05F9CDD; Sun, 29 Mar 2020 22:06:24 -0400 (EDT)
+To:     kvm-ppc@vger.kernel.org
+Subject: Request for catalog and price list
+X-PHP-Originating-Script: 0:dageds.php
+From:   Julian Smith <juliansmith2014@mail.ru>
+Reply-To: juliansmith2014@outlook.com
+MIME-Version: 1.0
+Content-Type:   text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Message-Id: <20200330020624.11A05F9CDD@mail.undorthemoure.gq>
+Date:   Sun, 29 Mar 2020 22:06:23 -0400 (EDT)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, 2020-03-12 at 07:44:04 UTC, Alexey Kardashevskiy wrote:
-> The "os-term" RTAS calls has one argument with a message address of
-> OS termination cause. rtas_os_term() already passes it but the recently
-> added prom_init's version of that missed it; it also does not fill args
-> correctly.
-> 
-> This passes the message address and initializes the number of arguments.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Hello friend,
 
-Applied to powerpc next, thanks.
+This is Julian Smith and i am purchasing manager from Sinara Group Co.,LTD in Russia.
+We are glad to know about your company from the web and we are interested in your products.
+Could you kindly send us your Latest catalog and price list for our trial order.
 
-https://git.kernel.org/powerpc/c/74bb84e5117146fa73eb9d01305975c53022b3c3
+Thanks and Best Regards,
 
-cheers
+Ms. Julian Smith
+Purchasing Manager
+Sinara Group Co.,LTD
+
+
