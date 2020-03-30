@@ -2,57 +2,67 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E10E197A09
-	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Mar 2020 13:00:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 377131979A5
+	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Mar 2020 12:52:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729649AbgC3LAA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 30 Mar 2020 07:00:00 -0400
-Received: from mail.11d01.mspz7.gob.ec ([190.152.145.91]:50910 "EHLO
-        mail.11d01.mspz7.gob.ec" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729547AbgC3LAA (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Mar 2020 07:00:00 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mail.11d01.mspz7.gob.ec (Postfix) with ESMTP id D8E4D2F6F4B2;
-        Mon, 30 Mar 2020 04:15:36 -0500 (-05)
-Received: from mail.11d01.mspz7.gob.ec ([127.0.0.1])
-        by localhost (mail.11d01.mspz7.gob.ec [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id Bbw4Ct1NtY8L; Mon, 30 Mar 2020 04:15:36 -0500 (-05)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.11d01.mspz7.gob.ec (Postfix) with ESMTP id 6D7272F6F4AF;
-        Mon, 30 Mar 2020 04:15:36 -0500 (-05)
-DKIM-Filter: OpenDKIM Filter v2.9.2 mail.11d01.mspz7.gob.ec 6D7272F6F4AF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=11d01.mspz7.gob.ec;
-        s=50CBC7E4-8BED-11E9-AF6C-F1A741A224D3; t=1585559736;
-        bh=cLQbOHa1aY+/FyDjaDQOZOnnnlZDxMu+rBX/cg5yps8=;
-        h=Content-Type:MIME-Version:Content-Transfer-Encoding:Subject:To:
-         From:Date:Reply-To:Message-Id;
-        b=O7I1uagbt87CGjd5rYBgZH3lJ5cp26pfKOCmD+peMtM6KVEA8f6K1WRVyEsfrYiWU
-         2znyb/TfshGUQmBRzzzkq4/luZ6cXCw/OuaEkZbIIFVNT5IRLvTME/SW3PlThx8ciN
-         uAQM84OP8yY9hcfq2mjiDA/BhiCli8QSahxkV/MY=
-X-Virus-Scanned: amavisd-new at 11d01.mspz7.gob.ec
-Received: from mail.11d01.mspz7.gob.ec ([127.0.0.1])
-        by localhost (mail.11d01.mspz7.gob.ec [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id FaaBhVzF4ldI; Mon, 30 Mar 2020 04:15:36 -0500 (-05)
-Received: from [10.121.152.251] (unknown [105.12.0.10])
-        by mail.11d01.mspz7.gob.ec (Postfix) with ESMTPSA id 142232F6F438;
-        Mon, 30 Mar 2020 04:15:25 -0500 (-05)
-Content-Type: text/plain; charset="iso-8859-1"
+        id S1726127AbgC3KwL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 30 Mar 2020 06:52:11 -0400
+Received: from mail-ua1-f68.google.com ([209.85.222.68]:34298 "EHLO
+        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729232AbgC3KwL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Mar 2020 06:52:11 -0400
+Received: by mail-ua1-f68.google.com with SMTP id d23so5847114uak.1
+        for <kvm-ppc@vger.kernel.org>; Mon, 30 Mar 2020 03:52:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=82B0OONv9gwbZlPp43NzThDz2fRV+KRFwafOQ16joDw=;
+        b=p/YPU2W2p3zN2fGwGg55Xw1I2cBwPePbhnojKmChlfzfgqC7p2SgqKAwiW7xZhzxvQ
+         Su62p5zsGNtvGI/f1PCBlOj+Mml4LKtopDWwMu6PiUY88BxT09Gt3mlehGcMs6d+DJjd
+         R9qU9ZMH6f4oaSmFlVzRqMGwHgC1aC4GMPH1OlOB/tRvfmlShTGbtre25BZMRbFV8Au7
+         1x8H5CyG0XcFey8hsxCVXqMWivkrKq4bNQL1fcKgsvKpQaalmb5OIFaCX+2taLyOPnIH
+         hrsaCe0Cqf06bpaUZeIytBJHpt4wGnvbOTmyYid0Iu5oZUzsgPPxkx3UUniA5S00LUUc
+         rclg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=82B0OONv9gwbZlPp43NzThDz2fRV+KRFwafOQ16joDw=;
+        b=ruajoHWB9WQWbvYVaMdCD7JW44d7BKRcTxDW97v/2yWKJun5C3zvYyhmv5GvWFXtkK
+         4bzLZoSHWCQu+D9j3AK6SybtfE5a2cO9wHQd7ZBXfwwwoySJemhr8p8E7DTVDHSHeKv8
+         wTdpgtp5qD4+/mjDh+pZpPhT93K+b5B+oaIXM76o3TrrYGl5ogMqiJJwFsDV6eu60lLZ
+         mEwnUJnP7AM5vh9chc+fwa3f+55Hj+hOl00PGrUqf2oKj0CnMqhRbSAIW6ef4CVI30Jw
+         DULWSiwn9M6ZtUw1ckE5uNoJkebVla+bbtXe82a/9a6A3hPeDNeMbjvhhEMNHxLWR4ll
+         A0EQ==
+X-Gm-Message-State: AGi0PuZa7rNrc3Ed6in9yhFVWVlW+1fSXtVDuwWqPvvejtqAiNbzkued
+        mhejEBhusueX8nIUJRfvJ/zlzLADsWQOvELjsEY=
+X-Google-Smtp-Source: APiQypI9o2zb4LPhpf6p/LvpYbWJYSblel4QZWZqISB27YJpRpwrU3eBw5HplKR4W9Y11xPbTgH+MJN8P/FF8nPBw7I=
+X-Received: by 2002:a9f:35c3:: with SMTP id u3mr7394107uad.140.1585565529607;
+ Mon, 30 Mar 2020 03:52:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: spende von 2.000.000,00 Euro
-To:     Recipients <luis.sanchez@11d01.mspz7.gob.ec>
-From:   "Manuel Franco" <luis.sanchez@11d01.mspz7.gob.ec>
-Date:   Mon, 30 Mar 2020 11:46:39 +0200
-Reply-To: manuelfrancospende11@gmail.com
-Message-Id: <20200330091526.142232F6F438@mail.11d01.mspz7.gob.ec>
+Received: by 2002:a67:c005:0:0:0:0:0 with HTTP; Mon, 30 Mar 2020 03:52:08
+ -0700 (PDT)
+Reply-To: maryalice00.12@postribe.com
+From:   Maryalice Williams <maryalicewilliams730@gmail.com>
+Date:   Mon, 30 Mar 2020 08:52:08 -0200
+Message-ID: <CAKwdjsrzDSUSvX_5Ho4NYsG0tNOfXJFm6gvXzUdrU4J_pxBimA@mail.gmail.com>
+Subject: Reply For More Details.
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Ich bin Manuel Franco, ich spende Ihnen 2.000.000,00 Euro. Kontaktieren Sie=
- mich jetzt, damit wir fortfahren k=F6nnen.
+-- 
+My dear,
 
-I am Manuel Franco, I donate to you 2,000,000.00 euros. Contact me now so w=
-e can proceed.
+I am Mrs Maryalice Williams, I want to send you donation of two
+million seven hundred thousand Dollars ($2.7M) for volunteer projects
+in your country due to my ill health that could not permit me. Kindly
+reply for more details, and also send me the following details, as per
+below, your full Name ..........,  Address...........,
+Age...............,  Occupation ...............
+
+Remain blessed,
+Mrs. Maryalice Williams.
