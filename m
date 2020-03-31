@@ -2,122 +2,243 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 89D3A1987D4
-	for <lists+kvm-ppc@lfdr.de>; Tue, 31 Mar 2020 01:08:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40406199606
+	for <lists+kvm-ppc@lfdr.de>; Tue, 31 Mar 2020 14:11:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729129AbgC3XIM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 30 Mar 2020 19:08:12 -0400
-Received: from ozlabs.org ([203.11.71.1]:40959 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728876AbgC3XIM (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 30 Mar 2020 19:08:12 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 48rp615krJz9sSL; Tue, 31 Mar 2020 10:08:09 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1585609689; bh=4mB0dTKGIFZrF/S4U8SltnbkLiTAXQnc0Jb+9Xsv14I=;
-        h=Date:From:To:Cc:Subject:From;
-        b=slqR33x2DFV0+U98bVjroBx0ay9EnhUN05j42E6GQpEnstfd9eJpkPJharNdf6THs
-         8zTYkQHLc/uk7j2pUxL/Ub4+dWypK8mdPURVTnCzFhEgnCoeUIjlH+c7YHJ8FKLvGY
-         AconRVi7UkL+3bK2QlJ6Mcry3F+trAj0gut0V+4QI5cP57TUB9aB4Isvln7ajCIcc/
-         vPEULj9HB+z/dkqdzggG11fkv5Dz3IAv4Z/iF8wL3YShZzfj1uQGaEdhV9dOu201q5
-         dBHbW6DQO4xbe6cqmQijd/gSix+mJ/q5kGMzJ3lifeNWb3sEPQyDGT1I0ca9UV8o0/
-         Y5sfJZozWaWDQ==
-Date:   Tue, 31 Mar 2020 10:08:02 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org
-Subject: [GIT PULL] Please pull my kvm-ppc-next-5.7-1 tag
-Message-ID: <20200330230802.GB27514@blackberry>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1730436AbgCaML1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 31 Mar 2020 08:11:27 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51968 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730418AbgCaML1 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 31 Mar 2020 08:11:27 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02VC3POd124808;
+        Tue, 31 Mar 2020 08:11:18 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30227w022j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Mar 2020 08:11:18 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02VC3YC1125257;
+        Tue, 31 Mar 2020 08:11:17 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30227w0225-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Mar 2020 08:11:17 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02VCAMKH005824;
+        Tue, 31 Mar 2020 12:11:16 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma01dal.us.ibm.com with ESMTP id 301x776t71-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Mar 2020 12:11:16 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02VCBFxi56295688
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 31 Mar 2020 12:11:15 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4226E6A054;
+        Tue, 31 Mar 2020 12:11:15 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8A6146A05A;
+        Tue, 31 Mar 2020 12:11:14 +0000 (GMT)
+Received: from sofia.ibm.com (unknown [9.85.71.250])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 31 Mar 2020 12:11:14 +0000 (GMT)
+Received: by sofia.ibm.com (Postfix, from userid 1000)
+        id 4EC072E33D2; Tue, 31 Mar 2020 17:41:10 +0530 (IST)
+From:   "Gautham R. Shenoy" <ego@linux.vnet.ibm.com>
+To:     Paul Mackerras <paulus@ozlabs.org>,
+        Michael Neuling <mikey@neuling.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+        Bharata B Rao <bharata@linux.ibm.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@ozlabs.org,
+        "Gautham R. Shenoy" <ego@linux.vnet.ibm.com>
+Subject: [RFC/PATCH  0/3] Add support for stop instruction inside KVM guest
+Date:   Tue, 31 Mar 2020 17:40:55 +0530
+Message-Id: <1585656658-1838-1-git-send-email-ego@linux.vnet.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-03-31_04:2020-03-31,2020-03-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 phishscore=0 malwarescore=0 mlxscore=0 bulkscore=0
+ impostorscore=0 spamscore=0 suspectscore=0 mlxlogscore=999
+ lowpriorityscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2003020000 definitions=main-2003310110
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paolo,
+From: "Gautham R. Shenoy" <ego@linux.vnet.ibm.com>
 
-Please do a pull from my kvm-ppc-next-5.7-1 tag to get a PPC KVM
-update for 5.7.
 
-Thanks,
-Paul.
+ *** RFC Only. Not intended for inclusion ************
+ 
+Motivation
+~~~~~~~~~~~~~~~
 
-The following changes since commit 1c482452d5db0f52e4e8eed95bd7314eec537d78:
+The POWER ISA v3.0 allows stop instruction to be executed from a Guest
+Kernel (HV=0,PR=0) context. If the hypervisor has cleared
+PSSCR[ESL|EC] bits, then the stop instruction thus executed will cause
+the vCPU thread to "pause", thereby donating its cycles to the other
+threads in the core until the paused thread is woken up by an
+interrupt. If the hypervisor has set the PSSCR[ESL|EC] bits, then
+execution of the "stop" instruction will raise a Hypervisor Facility
+Unavailable exception.
 
-  Merge tag 'kvm-s390-next-5.7-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2020-03-16 18:19:34 +0100)
+The stop idle state in the guest (henceforth referred to as stop0lite)
+when enabled
 
-are available in the git repository at:
+* has a very small wakeup latency (1-3us) comparable to that of
+  snooze and considerably better compared the Shared CEDE state
+  (25-30us).  Results are provided below for wakeup latency measured
+  by waking up an idle CPU in a given state using a timer as well as
+  using an IPI.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.7-1
+  ======================================================================
+  Wakeup Latency measured using a timer (in ns) [Lower is better]
+  ======================================================================
+  Idle state |  Nr samples |  Min    | Max    | Median | Avg   | Stddev|
+  ======================================================================
+  snooze     |   60        |  787    | 1059   |  938   | 937.4 | 42.27 |
+  ======================================================================
+  stop0lite  |   60        |  770    | 1182   |  948   | 946.4 | 67.41 |
+  ======================================================================
+  Shared CEDE|   60        | 9550    | 36694  | 29219  |28564.1|3545.9 |
+  ======================================================================
 
-for you to fetch changes up to 9a5788c615f52f6d7bf0b61986a632d4ec86791d:
+  ======================================================================
+  Wakeup Latency measured using a timer (in ns) [Lower is better]
+  ======================================================================
+  Idle state |  Nr samples |  Min    | Max    | Median | Avg   | Stddev|
+  ======================================================================
+  snooze     |   60        |  787    | 1059   |  938   | 937.4 | 42.27 |
+  ======================================================================
+  stop0lite  |   60        |  770    | 1182   |  948   | 946.4 | 67.41 |
+  ======================================================================
+  Shared CEDE|   60        | 9550    | 36694  | 29219  |28564.1|3545.9 |
+  ======================================================================
 
-  KVM: PPC: Book3S HV: Add a capability for enabling secure guests (2020-03-26 11:09:04 +1100)
+* provides an improved single threaded performance compared to snooze
+  since the idle state completely relinquishes the core cycles. The
+  single threaded performance is observed to be better even when
+  compared to "Shared CEDE", since in the latter case something else
+  can scheduled on the ceded CPU, while "stop0lite" doesn't give up
+  the CPU.
 
-----------------------------------------------------------------
-KVM PPC update for 5.7
+  On a KVM guest with smp 8,sockets=1,cores=2,threads=4 with vCPUs of
+  a vCore bound to a physical core, we run a single-threaded ebizzy
+  pinned to one of the guest vCPUs while the sibling vCPUs in the core
+  are idling. We enable only one guest idle state at a time to measure
+  the single-threaded performance benefit that the idle state provides
+  by giving up the core resources to the non-idle thread. we obtain
+  ~13% improvement in the throughput compared to that with "snooze"
+  and ~8% improvement in the throughput compared to "Shared CEDE".
+   
+   =======================================================================
+   | ebizzy records/s : [Higher the better]                              |
+   =======================================================================
+   |Idle state |  Nr    |  Min    | Max    | Median | Avg     | Stddev   |
+   |           |samples |         |        |        |         |          |
+   =======================================================================	   
+   |snooze     |   10   |  1378988| 1379358| 1379032|1379067.3|    113.47|
+   =======================================================================
+   |stop0lite  |   10   |  1561836| 1562058| 1561906|1561927.5|     81.87|
+   =======================================================================
+   |Shared CEDE|   10   |  1446584| 1447383| 1447037|1447009.0|    244.16|
+   =======================================================================
 
-* Add a capability for enabling secure guests under the Protected
-  Execution Framework ultravisor
+Is stop0lite a replacement for snooze ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Not yet. snooze is a polling state, and can respond much faster to a
+need_resched() compared to stop0lite which needs an IPI to wakeup from
+idle state. This can be seen in the results below:
 
-* Various bug fixes and cleanups.
+With the context_switch2 pipe test, we can see that with stop0lite,
+the number of context switches are 32.47% lesser than with
+snooze. This is due to the fact that snooze is a polling state which
+polls for TIF_NEED_RESCHED. Thus it does not require an interrupt to
+exit the state and start executing the scheduler code. However,
+stop0lite needs an IPI.
 
-----------------------------------------------------------------
-Fabiano Rosas (1):
-      KVM: PPC: Book3S HV: Skip kvmppc_uvmem_free if Ultravisor is not supported
+Compared to the "Shared CEDE" state, we see that with stop0lite, we
+have 82.7% improvement in the number of context switches. This is due
+to the low wakeup latency compared to Shared CEDE.
 
-Greg Kurz (3):
-      KVM: PPC: Book3S PR: Fix kernel crash with PR KVM
-      KVM: PPC: Book3S PR: Move kvmppc_mmu_init() into PR KVM
-      KVM: PPC: Kill kvmppc_ops::mmu_destroy() and kvmppc_mmu_destroy()
+======================================================================
+context switch2 : Number of context switches/s [Higher the better]
+======================================================================
+Idle state |  Nr    |  Min    | Max    | Median | Avg     | Stddev   |
+           |samples |         |        |        |         |          |
+======================================================================	   
+snooze     |  100   |   210480|  221578|  219860|219684.88|   1344.97|
+======================================================================
+stop0lite  |  100   |   146730|  150266|  148258|148331.70|    871.50|
+======================================================================
+Shared CEDE|  100   |    75812|   82792|   81232| 81187.16|    832.99|
+======================================================================
 
-Gustavo Romero (1):
-      KVM: PPC: Book3S HV: Treat TM-related invalid form instructions on P9 like the valid ones
 
-Joe Perches (1):
-      KVM: PPC: Use fallthrough;
+Is stop0lite a replacement for Shared CEDE ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+No. For longer idle durations, Shared CEDE is a better option compared
+to "stop0lite", both from a performance (CEDEd CPUs can be put into
+deeper idle states such as stop2, which can provide SMT folding
+benefits) and utilization (Hypervisor can utilize the idle CPUs for
+running something useful).
 
-Laurent Dufour (2):
-      KVM: PPC: Book3S HV: Check caller of H_SVM_* Hcalls
-      KVM: PPC: Book3S HV: H_SVM_INIT_START must call UV_RETURN
 
-Michael Ellerman (1):
-      KVM: PPC: Book3S HV: Use RADIX_PTE_INDEX_SIZE in Radix MMU code
+What this patch-set does:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The patchset has 3 patches
 
-Michael Roth (1):
-      KVM: PPC: Book3S HV: Fix H_CEDE return code for nested guests
+Patch 1: Allows the guest to run "stop" instruction without crashing
+         even if the hypervisor has set the PSSCR[ESL|EC] bits. This
+         is done by handling the Hypervisor Facility Unavailable
+         exception and incrementing the program counter by 4 bytes,
+         thus emulating the wakeup from a PSSCR[ESL = EC = 0] stop.
 
-Paul Mackerras (2):
-      KVM: PPC: Book3S HV: Use __gfn_to_pfn_memslot in HPT page fault handler
-      KVM: PPC: Book3S HV: Add a capability for enabling secure guests
+Patch 2: Clears the PSSCR[ESL|EC] bits unconditionally before
+         dispatching a vCPU, thereby allowing the vCPU to execute a
+         "stop" instruction.
 
- Documentation/virt/kvm/api.rst              |  17 ++++
- arch/powerpc/include/asm/kvm_asm.h          |   3 +
- arch/powerpc/include/asm/kvm_book3s_uvmem.h |   6 ++
- arch/powerpc/include/asm/kvm_host.h         |   1 +
- arch/powerpc/include/asm/kvm_ppc.h          |   4 +-
- arch/powerpc/kvm/book3s.c                   |   5 --
- arch/powerpc/kvm/book3s.h                   |   1 +
- arch/powerpc/kvm/book3s_32_mmu.c            |   2 +-
- arch/powerpc/kvm/book3s_32_mmu_host.c       |   2 +-
- arch/powerpc/kvm/book3s_64_mmu.c            |   2 +-
- arch/powerpc/kvm/book3s_64_mmu_host.c       |   2 +-
- arch/powerpc/kvm/book3s_64_mmu_hv.c         | 119 +++++++++++++---------------
- arch/powerpc/kvm/book3s_64_mmu_radix.c      |   2 +-
- arch/powerpc/kvm/book3s_hv.c                |  55 +++++++++----
- arch/powerpc/kvm/book3s_hv_tm.c             |  28 +++++--
- arch/powerpc/kvm/book3s_hv_tm_builtin.c     |  16 +++-
- arch/powerpc/kvm/book3s_hv_uvmem.c          |  19 ++++-
- arch/powerpc/kvm/book3s_pr.c                |   6 +-
- arch/powerpc/kvm/booke.c                    |  11 +--
- arch/powerpc/kvm/booke.h                    |   2 -
- arch/powerpc/kvm/e500.c                     |   1 -
- arch/powerpc/kvm/e500_mmu.c                 |   4 -
- arch/powerpc/kvm/e500mc.c                   |   1 -
- arch/powerpc/kvm/powerpc.c                  |  17 +++-
- include/uapi/linux/kvm.h                    |   1 +
- 25 files changed, 205 insertions(+), 122 deletions(-)
+Patch 3: Defines a cpuidle state for pseries guest named "stop0lite"
+         to be invoked by the cpuidle driver.
+
+
+What this patch-set does not do:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* It does not define an interface by which the guest discovers the
+  stop-capability. Should this be defined via device-tree?
+
+* It does address the problem of guest migration. i.e, a guest started
+  on a hypervisor which supports guest stop state, if migrated to a
+  hypervisor which does not support guest stop state will crash,
+  unless it has Patch 1 above.
+  
+
+I would like to seek feedback and comments with respect to how to go
+about implementing the issues that have not been addressed in this
+patchset.
+
+Gautham R. Shenoy (3):
+  powerpc/kvm: Handle H_FAC_UNAVAIL when guest executes stop.
+  pseries/kvm: Clear PSSCR[ESL|EC] bits before guest entry
+  cpuidle/pseries: Add stop0lite state
+
+ arch/powerpc/include/asm/reg.h          |  1 +
+ arch/powerpc/kvm/book3s_hv.c            |  8 ++++++--
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 25 +++++++++++++------------
+ drivers/cpuidle/cpuidle-pseries.c       | 27 +++++++++++++++++++++++++++
+ 4 files changed, 47 insertions(+), 14 deletions(-)
+
+-- 
+1.9.4
+
