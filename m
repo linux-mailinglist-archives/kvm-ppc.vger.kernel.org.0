@@ -2,143 +2,162 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EB266199616
-	for <lists+kvm-ppc@lfdr.de>; Tue, 31 Mar 2020 14:15:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E22971998DF
+	for <lists+kvm-ppc@lfdr.de>; Tue, 31 Mar 2020 16:47:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730464AbgCaMPG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 31 Mar 2020 08:15:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55812 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730598AbgCaMPG (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 31 Mar 2020 08:15:06 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02VC4iDn145240;
-        Tue, 31 Mar 2020 08:14:56 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 301yffnt0q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Mar 2020 08:14:56 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02VC7Jdh003034;
-        Tue, 31 Mar 2020 08:14:55 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 301yffnt0d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Mar 2020 08:14:55 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02VCEnnM017810;
-        Tue, 31 Mar 2020 12:14:54 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma03dal.us.ibm.com with ESMTP id 301x77eue3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Mar 2020 12:14:54 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02VCErXx38273512
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 Mar 2020 12:14:53 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3DC7913605D;
-        Tue, 31 Mar 2020 12:14:53 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A01BD13604F;
-        Tue, 31 Mar 2020 12:14:52 +0000 (GMT)
-Received: from sofia.ibm.com (unknown [9.85.71.250])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 31 Mar 2020 12:14:52 +0000 (GMT)
-Received: by sofia.ibm.com (Postfix, from userid 1000)
-        id 658172E33D2; Tue, 31 Mar 2020 17:44:47 +0530 (IST)
-Date:   Tue, 31 Mar 2020 17:44:47 +0530
-From:   Gautham R Shenoy <ego@linux.vnet.ibm.com>
-To:     "Gautham R. Shenoy" <ego@linux.vnet.ibm.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Michael Neuling <mikey@neuling.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@ozlabs.org
-Subject: Re: [RFC/PATCH  0/3] Add support for stop instruction inside KVM
- guest
-Message-ID: <20200331121447.GA1996@in.ibm.com>
-Reply-To: ego@linux.vnet.ibm.com
-References: <1585656658-1838-1-git-send-email-ego@linux.vnet.ibm.com>
+        id S1730105AbgCaOrl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 31 Mar 2020 10:47:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39020 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726595AbgCaOrk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 31 Mar 2020 10:47:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1585666059;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fD56lo2CzF0TkcUSB2i8bItoMn26OtVWGRYz4s2D9Zw=;
+        b=ASMj3fCjCoHEaQRbyNIzmzg4xIfMoC9vtZg5F4IztZHfvsXpeenS9xVY1NRVXH+s26JtD8
+        CH4l4bNFx7Wmm/zjLw+UPRONcNl/AQ9lpOc+9j5tFzIQlbaQoVR3RIUaa+n89BMHcH01yU
+        BJnBAPiQ4IVRV8C6t5YadXQArF1YLqE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-2P-DOOrpMum6xkZau00Eyg-1; Tue, 31 Mar 2020 10:47:37 -0400
+X-MC-Unique: 2P-DOOrpMum6xkZau00Eyg-1
+Received: by mail-wr1-f69.google.com with SMTP id e10so13166538wrm.2
+        for <kvm-ppc@vger.kernel.org>; Tue, 31 Mar 2020 07:47:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=fD56lo2CzF0TkcUSB2i8bItoMn26OtVWGRYz4s2D9Zw=;
+        b=msn4JTX68vSTZwRQBuBYLr8nhYFjSWFgwLXST4ie2KVyTNz2Sp8pme0rCcgH0Q8kKO
+         fbCvqveVX9SvXWui/MrxeIoSBODi4GcvaQRVigB6nJAJyS8oUB4gvltLqzAtcf603t8X
+         90J6AfH3RFx4gmb7RlgRrV3hyavuez02zN3Rll6GOIAKU09jFv4f5cHSygJih6lJOmxX
+         vCorb8ldXHdJZoWMpHnP4fKkAQqjxpAMiCc8DLZ+RK6to02Ohh8Z5gcVFX2K5lkgTULx
+         /CaU8xfW2Wj8Kq86gPPZlx6e4CpF/qzy6HOeNf6p4oNSrOwU4x/GQWtwIT5YQN5MI55W
+         XPng==
+X-Gm-Message-State: ANhLgQ1AZzCH9v8vgljmkTsCd1ZTmUGqxdW0GfEBTdYSc7JY7RLayB6F
+        8Xf3w6NlrBZsbiPmaYtcBdOY8L+JKwEJMq49/DFNKJQMgnaoTuA+FUrZNa4P8fKK9b4z9SRLgDG
+        EFtJANQHwsOK30y+HXw==
+X-Received: by 2002:a1c:9e16:: with SMTP id h22mr3760986wme.27.1585666055991;
+        Tue, 31 Mar 2020 07:47:35 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vv9UKQUyXBr2DyVJYnG+A1F4So9WE1o1E54eRR7FTTx5VsorxPuZbhF0pf6Moq2P1XJv5vwRA==
+X-Received: by 2002:a1c:9e16:: with SMTP id h22mr3760962wme.27.1585666055727;
+        Tue, 31 Mar 2020 07:47:35 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b55d:5ed2:8a41:41ea? ([2001:b07:6468:f312:b55d:5ed2:8a41:41ea])
+        by smtp.gmail.com with ESMTPSA id c18sm27178480wrx.5.2020.03.31.07.47.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Mar 2020 07:47:35 -0700 (PDT)
+Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.7-1 tag
+To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org
+References: <20200330230802.GB27514@blackberry>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a3f4815a-29f2-527e-208d-9196a2db15d8@redhat.com>
+Date:   Tue, 31 Mar 2020 16:47:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1585656658-1838-1-git-send-email-ego@linux.vnet.ibm.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-03-31_04:2020-03-31,2020-03-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 impostorscore=0 mlxscore=0 phishscore=0 clxscore=1015
- bulkscore=0 malwarescore=0 spamscore=0 mlxlogscore=776 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003310106
+In-Reply-To: <20200330230802.GB27514@blackberry>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Mar 31, 2020 at 05:40:55PM +0530, Gautham R. Shenoy wrote:
-> From: "Gautham R. Shenoy" <ego@linux.vnet.ibm.com>
+On 31/03/20 01:08, Paul Mackerras wrote:
+> Paolo,
 > 
+> Please do a pull from my kvm-ppc-next-5.7-1 tag to get a PPC KVM
+> update for 5.7.
 > 
->  *** RFC Only. Not intended for inclusion ************
+> Thanks,
+> Paul.
 > 
-> Motivation
-> ~~~~~~~~~~~~~~~
+> The following changes since commit 1c482452d5db0f52e4e8eed95bd7314eec537d78:
 > 
-> The POWER ISA v3.0 allows stop instruction to be executed from a Guest
-> Kernel (HV=0,PR=0) context. If the hypervisor has cleared
-> PSSCR[ESL|EC] bits, then the stop instruction thus executed will cause
-> the vCPU thread to "pause", thereby donating its cycles to the other
-> threads in the core until the paused thread is woken up by an
-> interrupt. If the hypervisor has set the PSSCR[ESL|EC] bits, then
-> execution of the "stop" instruction will raise a Hypervisor Facility
-> Unavailable exception.
+>   Merge tag 'kvm-s390-next-5.7-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2020-03-16 18:19:34 +0100)
 > 
-> The stop idle state in the guest (henceforth referred to as stop0lite)
-> when enabled
+> are available in the git repository at:
 > 
-> * has a very small wakeup latency (1-3us) comparable to that of
->   snooze and considerably better compared the Shared CEDE state
->   (25-30us).  Results are provided below for wakeup latency measured
->   by waking up an idle CPU in a given state using a timer as well as
->   using an IPI.
+>   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.7-1
 > 
->   ======================================================================
->   Wakeup Latency measured using a timer (in ns) [Lower is better]
->   ======================================================================
->   Idle state |  Nr samples |  Min    | Max    | Median | Avg   | Stddev|
->   ======================================================================
->   snooze     |   60        |  787    | 1059   |  938   | 937.4 | 42.27 |
->   ======================================================================
->   stop0lite  |   60        |  770    | 1182   |  948   | 946.4 | 67.41 |
->   ======================================================================
->   Shared CEDE|   60        | 9550    | 36694  | 29219  |28564.1|3545.9 |
->   ======================================================================
->
+> for you to fetch changes up to 9a5788c615f52f6d7bf0b61986a632d4ec86791d:
+> 
+>   KVM: PPC: Book3S HV: Add a capability for enabling secure guests (2020-03-26 11:09:04 +1100)
+> 
+> ----------------------------------------------------------------
+> KVM PPC update for 5.7
+> 
+> * Add a capability for enabling secure guests under the Protected
+>   Execution Framework ultravisor
+> 
+> * Various bug fixes and cleanups.
+> 
+> ----------------------------------------------------------------
+> Fabiano Rosas (1):
+>       KVM: PPC: Book3S HV: Skip kvmppc_uvmem_free if Ultravisor is not supported
+> 
+> Greg Kurz (3):
+>       KVM: PPC: Book3S PR: Fix kernel crash with PR KVM
+>       KVM: PPC: Book3S PR: Move kvmppc_mmu_init() into PR KVM
+>       KVM: PPC: Kill kvmppc_ops::mmu_destroy() and kvmppc_mmu_destroy()
+> 
+> Gustavo Romero (1):
+>       KVM: PPC: Book3S HV: Treat TM-related invalid form instructions on P9 like the valid ones
+> 
+> Joe Perches (1):
+>       KVM: PPC: Use fallthrough;
+> 
+> Laurent Dufour (2):
+>       KVM: PPC: Book3S HV: Check caller of H_SVM_* Hcalls
+>       KVM: PPC: Book3S HV: H_SVM_INIT_START must call UV_RETURN
+> 
+> Michael Ellerman (1):
+>       KVM: PPC: Book3S HV: Use RADIX_PTE_INDEX_SIZE in Radix MMU code
+> 
+> Michael Roth (1):
+>       KVM: PPC: Book3S HV: Fix H_CEDE return code for nested guests
+> 
+> Paul Mackerras (2):
+>       KVM: PPC: Book3S HV: Use __gfn_to_pfn_memslot in HPT page fault handler
+>       KVM: PPC: Book3S HV: Add a capability for enabling secure guests
+> 
+>  Documentation/virt/kvm/api.rst              |  17 ++++
+>  arch/powerpc/include/asm/kvm_asm.h          |   3 +
+>  arch/powerpc/include/asm/kvm_book3s_uvmem.h |   6 ++
+>  arch/powerpc/include/asm/kvm_host.h         |   1 +
+>  arch/powerpc/include/asm/kvm_ppc.h          |   4 +-
+>  arch/powerpc/kvm/book3s.c                   |   5 --
+>  arch/powerpc/kvm/book3s.h                   |   1 +
+>  arch/powerpc/kvm/book3s_32_mmu.c            |   2 +-
+>  arch/powerpc/kvm/book3s_32_mmu_host.c       |   2 +-
+>  arch/powerpc/kvm/book3s_64_mmu.c            |   2 +-
+>  arch/powerpc/kvm/book3s_64_mmu_host.c       |   2 +-
+>  arch/powerpc/kvm/book3s_64_mmu_hv.c         | 119 +++++++++++++---------------
+>  arch/powerpc/kvm/book3s_64_mmu_radix.c      |   2 +-
+>  arch/powerpc/kvm/book3s_hv.c                |  55 +++++++++----
+>  arch/powerpc/kvm/book3s_hv_tm.c             |  28 +++++--
+>  arch/powerpc/kvm/book3s_hv_tm_builtin.c     |  16 +++-
+>  arch/powerpc/kvm/book3s_hv_uvmem.c          |  19 ++++-
+>  arch/powerpc/kvm/book3s_pr.c                |   6 +-
+>  arch/powerpc/kvm/booke.c                    |  11 +--
+>  arch/powerpc/kvm/booke.h                    |   2 -
+>  arch/powerpc/kvm/e500.c                     |   1 -
+>  arch/powerpc/kvm/e500_mmu.c                 |   4 -
+>  arch/powerpc/kvm/e500mc.c                   |   1 -
+>  arch/powerpc/kvm/powerpc.c                  |  17 +++-
+>  include/uapi/linux/kvm.h                    |   1 +
+>  25 files changed, 205 insertions(+), 122 deletions(-)
+> 
 
-Posted two copies of Wakeup latency measured by timer. Here is the
-wakeup latency measured using an IPI.
+Pulled, thanks.
 
+Paolo
 
-======================================================================
-Wakeup latency measured using an IPI (in ns) [Lower is better]
-======================================================================
-Idle state |  Nr    |  Min    | Max    | Median | Avg     | Stddev   |
-           |samples |         |        |        |         |          |
-----------------------------------------------------------------------
-snooze     |   60   |     2089|    4228|    2259|  2342.31|    316.56|
-----------------------------------------------------------------------
-stop0lite  |   60   |     1947|    3674|    2653|  2610.57|    266.73|
-----------------------------------------------------------------------
-Shared CEDE|   60   |    20147|   36305|   21827| 26762.65|   6875.01|
-======================================================================
-
---
-Thanks and Regards
-gautham.
