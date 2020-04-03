@@ -2,236 +2,119 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AA47719F038
-	for <lists+kvm-ppc@lfdr.de>; Mon,  6 Apr 2020 08:03:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D87D919DDE6
+	for <lists+kvm-ppc@lfdr.de>; Fri,  3 Apr 2020 20:24:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726491AbgDFGDO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 6 Apr 2020 02:03:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25698 "EHLO
+        id S1728387AbgDCSYj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 3 Apr 2020 14:24:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39764 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726485AbgDFGDO (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 6 Apr 2020 02:03:14 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03663493033299;
-        Mon, 6 Apr 2020 02:03:04 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 306nhsgfd7-1
+        by vger.kernel.org with ESMTP id S1728364AbgDCSYj (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 3 Apr 2020 14:24:39 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 033HYaUU008830;
+        Fri, 3 Apr 2020 14:24:21 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 301yfk69kk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Apr 2020 02:03:03 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 036633Sm033205;
-        Mon, 6 Apr 2020 02:03:03 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 306nhsgf75-1
+        Fri, 03 Apr 2020 14:24:21 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 033IMqsI026873;
+        Fri, 3 Apr 2020 18:24:19 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma05wdc.us.ibm.com with ESMTP id 301x77k23p-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Apr 2020 02:03:03 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03662Gu4004748;
-        Mon, 6 Apr 2020 06:02:47 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma02wdc.us.ibm.com with ESMTP id 306hv65v9t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Apr 2020 06:02:46 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03662jX654985194
+        Fri, 03 Apr 2020 18:24:19 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 033IOJBh55312726
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 Apr 2020 06:02:45 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C027BBE059;
-        Mon,  6 Apr 2020 06:02:45 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A00FDBE051;
-        Mon,  6 Apr 2020 06:02:44 +0000 (GMT)
-Received: from sofia.ibm.com (unknown [9.199.47.48])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon,  6 Apr 2020 06:02:44 +0000 (GMT)
-Received: by sofia.ibm.com (Postfix, from userid 1000)
-        id 0E29C2E3225; Fri,  3 Apr 2020 15:01:04 +0530 (IST)
-Date:   Fri, 3 Apr 2020 15:01:03 +0530
-From:   Gautham R Shenoy <ego@linux.vnet.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     Bharata B Rao <bharata@linux.ibm.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        "Gautham R. Shenoy" <ego@linux.vnet.ibm.com>,
-        Michael Neuling <mikey@neuling.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linuxppc-dev@ozlabs.org
-Subject: Re: [RFC/PATCH  2/3] pseries/kvm: Clear PSSCR[ESL|EC] bits before
- guest entry
-Message-ID: <20200403093103.GA20293@in.ibm.com>
-Reply-To: ego@linux.vnet.ibm.com
-References: <1585656658-1838-1-git-send-email-ego@linux.vnet.ibm.com>
- <1585656658-1838-3-git-send-email-ego@linux.vnet.ibm.com>
- <1585880159.w3mc2nk6h3.astroid@bobo.none>
+        Fri, 3 Apr 2020 18:24:19 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3AA51AC060;
+        Fri,  3 Apr 2020 18:24:19 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 823BFAC05E;
+        Fri,  3 Apr 2020 18:24:16 +0000 (GMT)
+Received: from morokweng.localdomain (unknown [9.85.180.115])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Fri,  3 Apr 2020 18:24:16 +0000 (GMT)
+References: <1585211927-784-1-git-send-email-linuxram@us.ibm.com> <87r1x86pzw.fsf@morokweng.localdomain> <20200401053200.GE5903@oc0525413822.ibm.com>
+User-agent: mu4e 1.2.0; emacs 26.3
+From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To:     Ram Pai <linuxram@us.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au, andmike@linux.ibm.com,
+        sukadev@linux.vnet.ibm.com, aik@ozlabs.ru, paulus@ozlabs.org,
+        groug@kaod.org, clg@fr.ibm.com, david@gibson.dropbear.id.au
+Subject: Re: [PATCH v2] powerpc/XIVE: SVM: share the event-queue page with the Hypervisor.
+In-reply-to: <20200401053200.GE5903@oc0525413822.ibm.com>
+Date:   Fri, 03 Apr 2020 15:24:12 -0300
+Message-ID: <87pncobf77.fsf@morokweng.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1585880159.w3mc2nk6h3.astroid@bobo.none>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+Content-Type: text/plain
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-06_01:2020-04-03,2020-04-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- spamscore=0 phishscore=0 impostorscore=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 clxscore=1015 mlxlogscore=999 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060051
+ definitions=2020-04-03_14:2020-04-03,2020-04-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 impostorscore=0 mlxscore=0 phishscore=0 clxscore=1015
+ bulkscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004030145
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Apr 03, 2020 at 12:20:26PM +1000, Nicholas Piggin wrote:
-> Gautham R. Shenoy's on March 31, 2020 10:10 pm:
-> > From: "Gautham R. Shenoy" <ego@linux.vnet.ibm.com>
-> > 
-> > ISA v3.0 allows the guest to execute a stop instruction. For this, the
-> > PSSCR[ESL|EC] bits need to be cleared by the hypervisor before
-> > scheduling in the guest vCPU.
-> > 
-> > Currently we always schedule in a vCPU with PSSCR[ESL|EC] bits
-> > set. This patch changes the behaviour to enter the guest with
-> > PSSCR[ESL|EC] bits cleared. This is a RFC patch where we
-> > unconditionally clear these bits. Ideally this should be done
-> > conditionally on platforms where the guest stop instruction has no
-> > Bugs (starting POWER9 DD2.3).
-> 
-> How will guests know that they can use this facility safely after your
-> series? You need both DD2.3 and a patched KVM.
 
+Ram Pai <linuxram@us.ibm.com> writes:
 
-Yes, this is something that isn't addressed in this series (mentioned
-in the cover letter), which is a POC demonstrating that the stop0lite
-state in guest works.
+> On Tue, Mar 31, 2020 at 08:53:07PM -0300, Thiago Jung Bauermann wrote:
+>> 
+>> Hi Ram,
+>> 
+>> Ram Pai <linuxram@us.ibm.com> writes:
+>> 
+>> > diff --git a/arch/powerpc/sysdev/xive/spapr.c b/arch/powerpc/sysdev/xive/spapr.c
+>> > index 55dc61c..608b52f 100644
+>> > --- a/arch/powerpc/sysdev/xive/spapr.c
+>> > +++ b/arch/powerpc/sysdev/xive/spapr.c
+>> > @@ -26,6 +26,8 @@
+>> >  #include <asm/xive.h>
+>> >  #include <asm/xive-regs.h>
+>> >  #include <asm/hvcall.h>
+>> > +#include <asm/svm.h>
+>> > +#include <asm/ultravisor.h>
+>> >  
+>> >  #include "xive-internal.h"
+>> >  
+>> > @@ -501,6 +503,9 @@ static int xive_spapr_configure_queue(u32 target, struct xive_q *q, u8 prio,
+>> >  		rc = -EIO;
+>> >  	} else {
+>> >  		q->qpage = qpage;
+>> > +		if (is_secure_guest())
+>> > +			uv_share_page(PHYS_PFN(qpage_phys),
+>> > +					1 << xive_alloc_order(order));
+>> 
+>> If I understand this correctly, you're passing the number of bytes of
+>> the queue to uv_share_page(), but that ultracall expects the number of
+>> pages to be shared.
+>
+>
+> static inline u32 xive_alloc_order(u32 queue_shift)
+> {
+>         return (queue_shift > PAGE_SHIFT) ? (queue_shift - PAGE_SHIFT) : 0;
+> }
+>
+> xive_alloc_order(order) returns the order of PAGE_SIZE pages.
+> Hence the value passed to uv_shared_pages is the number of pages,
+> and not the number of bytes.
+>
+> BTW: I did verify through testing that it was indeed passing 1 page to the
+> uv_share_page().  
 
-However, to answer your question, this is the scheme that I had in
-mind :
+Ah, my mistake. I misunderstood the code. Sorry for the noise and thanks
+for clarifying.
 
-OPAL:
-   On Procs >= DD2.3 : we publish a dt-cpu-feature "idle-stop-guest"
-
-Hypervisor Kernel:
-    1. If "idle-stop-guest" dt-cpu-feature is discovered, then
-       we set bool enable_guest_stop = true;
-
-    2. During KVM guest entry, clear PSSCR[ESL|EC] iff
-       enable_guest_stop == true.
-
-    3. In kvm_vm_ioctl_check_extension(), for a new capability
-       KVM_CAP_STOP, return true iff enable_guest_top == true.
-
-QEMU:
-   Check with the hypervisor if KVM_CAP_STOP is present. If so,
-   indicate the presence to the guest via device tree.
-
-Guest Kernel:
-   Check for the presence of guest stop state support in
-   device-tree. If available, enable the stop0lite in the cpuidle
-   driver. 
-   
-
-We still have a challenge of migrating a guest which started on a
-hypervisor supporting guest stop state to a hypervisor without it.
-The target hypervisor should atleast have Patch 1 of this series, so
-that we don't crash the guest.
-
-> 
-> > 
-> > Signed-off-by: Gautham R. Shenoy <ego@linux.vnet.ibm.com>
-> > ---
-> >  arch/powerpc/kvm/book3s_hv.c            |  2 +-
-> >  arch/powerpc/kvm/book3s_hv_rmhandlers.S | 25 +++++++++++++------------
-> >  2 files changed, 14 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> > index cdb7224..36d059a 100644
-> > --- a/arch/powerpc/kvm/book3s_hv.c
-> > +++ b/arch/powerpc/kvm/book3s_hv.c
-> > @@ -3424,7 +3424,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
-> >  	mtspr(SPRN_IC, vcpu->arch.ic);
-> >  	mtspr(SPRN_PID, vcpu->arch.pid);
-> >  
-> > -	mtspr(SPRN_PSSCR, vcpu->arch.psscr | PSSCR_EC |
-> > +	mtspr(SPRN_PSSCR, (vcpu->arch.psscr  & ~(PSSCR_EC | PSSCR_ESL)) |
-> >  	      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
-> >  
-> >  	mtspr(SPRN_HFSCR, vcpu->arch.hfscr);
-> > diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> > index dbc2fec..c2daec3 100644
-> > --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> > +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> > @@ -823,6 +823,18 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
-> >  	mtspr	SPRN_PID, r7
-> >  	mtspr	SPRN_WORT, r8
-> >  BEGIN_FTR_SECTION
-> > +	/* POWER9-only registers */
-> > +	ld	r5, VCPU_TID(r4)
-> > +	ld	r6, VCPU_PSSCR(r4)
-> > +	lbz	r8, HSTATE_FAKE_SUSPEND(r13)
-> > +	lis 	r7, (PSSCR_EC | PSSCR_ESL)@h /* Allow guest to call stop */
-> > +	andc	r6, r6, r7
-> > +	rldimi	r6, r8, PSSCR_FAKE_SUSPEND_LG, 63 - PSSCR_FAKE_SUSPEND_LG
-> > +	ld	r7, VCPU_HFSCR(r4)
-> > +	mtspr	SPRN_TIDR, r5
-> > +	mtspr	SPRN_PSSCR, r6
-> > +	mtspr	SPRN_HFSCR, r7
-> > +FTR_SECTION_ELSE
-> 
-> Why did you move these around? Just because the POWER9 section became
-> larger than the other?
-
-Yes.
-
-> 
-> That's a real wart in the instruction patching implementation, I think
-> we can fix it by padding with nops in the macros.
-> 
-> Can you just add the additional required nops to the top branch without
-> changing them around for this patch, so it's easier to see what's going
-> on? The end result will be the same after patching. Actually changing
-> these around can have a slight unintended consequence in that code that
-> runs before features were patched will execute the IF code. Not a
-> problem here, but another reason why the instruction patching 
-> restriction is annoying.
-
-Sure, I will repost this patch with additional nops instead of
-moving them around.
-
-> 
-> Thanks,
-> Nick
-> 
-> >  	/* POWER8-only registers */
-> >  	ld	r5, VCPU_TCSCR(r4)
-> >  	ld	r6, VCPU_ACOP(r4)
-> > @@ -833,18 +845,7 @@ BEGIN_FTR_SECTION
-> >  	mtspr	SPRN_CSIGR, r7
-> >  	mtspr	SPRN_TACR, r8
-> >  	nop
-> > -FTR_SECTION_ELSE
-> > -	/* POWER9-only registers */
-> > -	ld	r5, VCPU_TID(r4)
-> > -	ld	r6, VCPU_PSSCR(r4)
-> > -	lbz	r8, HSTATE_FAKE_SUSPEND(r13)
-> > -	oris	r6, r6, PSSCR_EC@h	/* This makes stop trap to HV */
-> > -	rldimi	r6, r8, PSSCR_FAKE_SUSPEND_LG, 63 - PSSCR_FAKE_SUSPEND_LG
-> > -	ld	r7, VCPU_HFSCR(r4)
-> > -	mtspr	SPRN_TIDR, r5
-> > -	mtspr	SPRN_PSSCR, r6
-> > -	mtspr	SPRN_HFSCR, r7
-> > -ALT_FTR_SECTION_END_IFCLR(CPU_FTR_ARCH_300)
-> > +ALT_FTR_SECTION_END_IFSET(CPU_FTR_ARCH_300)
-> >  8:
-> >  
-> >  	ld	r5, VCPU_SPRG0(r4)
-> > -- 
-> > 1.9.4
-> > 
-> > 
-
---
-Thanks and Regards
-gautham.
+-- 
+Thiago Jung Bauermann
+IBM Linux Technology Center
