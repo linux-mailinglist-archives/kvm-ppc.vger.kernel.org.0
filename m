@@ -2,80 +2,197 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BEC911A061C
-	for <lists+kvm-ppc@lfdr.de>; Tue,  7 Apr 2020 07:10:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 283D91A0DB6
+	for <lists+kvm-ppc@lfdr.de>; Tue,  7 Apr 2020 14:34:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726744AbgDGFKx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 7 Apr 2020 01:10:53 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:46014 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726399AbgDGFKw (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 7 Apr 2020 01:10:52 -0400
-Received: by mail-vs1-f65.google.com with SMTP id x82so1381089vsc.12
-        for <kvm-ppc@vger.kernel.org>; Mon, 06 Apr 2020 22:10:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=38NlpNEbzNFWb7RFQtfvRASB+B576yw7dNc7pozf3pc=;
-        b=jGEH9pTzAG/uq++4Ep8ehhLA/rXjKbalxSRsTkkHYuWIZSD1GC9PxmK05dYSVlNS3v
-         7J8F+3EIMW1jV+gZ5EoXKMBm3F1CEB0l/EffkFl0gHKHdMS2fDu9gkN7pGepbBbKVZbJ
-         3ExYU97C50PGQVQDgMJ8U3pQ80fyAS4DaW/B84+oMsDTCbEVRh4vbRjvukW7WHCbNqZK
-         syCe+W0BfIl7P8EzZUNQ4xh/+kZAdS3MDz6cD/Qwh4B3EJYBePCYa5qaOl0NSYyH/m69
-         RTDulp2beYWqgO/DC9fy/InYeyb8ufXgbA9yr6FK66943mlL9XPXpvgBW/XUp6S5gbr+
-         SAsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=38NlpNEbzNFWb7RFQtfvRASB+B576yw7dNc7pozf3pc=;
-        b=UngOteGIjMyq6RvQwq2IJx/7hU1dRdA6AnzsRQ7IP+M8c5rS4GMK1cANKbwA+LGS6g
-         DkPjvzdQUyPZ2jqlXyLo/Qej1Ix1ncDov8XJ1iIaCtlLORnMsvEzEUJuq2ThSq4wpyN6
-         8Ry8zRl72jxBRmAZhWh4hT8SUQvJxlpEjD/aqtxQZ2xKige/8dnZhEFBcAXH3kQi9ITV
-         bY0fFGJZ0yhp8wjCi9qF68mqEHh0bVyjtqBwt+BxrUrLwQhsYBNW+hZsdoibwAcTZDMX
-         G9NxoQTUq6laBW6XpUrjJ1ePhJXVhYdhYi0NleFvU2852jxNaJ8xmqAU9P+XCgCpniId
-         WZmA==
-X-Gm-Message-State: AGi0PuZgPrD59TDYEJJvudUraPP6rFcEan1BJ3A+ShXEfsazXyFwPnIs
-        zk+ic9qg4yygTp/Yg1P9cNN8ttOh3rOHloXDEWc=
-X-Google-Smtp-Source: APiQypJ3jRqk70+ULYMEkJZiGYoDiwJi95rB2B5Gn/NZQwxjzqWQYdnpH/hV3V5erEZ9em4U2fdbYhLHlQFBruJB9nk=
-X-Received: by 2002:a67:fa85:: with SMTP id f5mr489706vsq.65.1586236251244;
- Mon, 06 Apr 2020 22:10:51 -0700 (PDT)
+        id S1728152AbgDGMeD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 7 Apr 2020 08:34:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51396 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728630AbgDGMeD (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 7 Apr 2020 08:34:03 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 037CW8Ze100298;
+        Tue, 7 Apr 2020 08:33:52 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3082ped3es-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Apr 2020 08:33:52 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 037CXSvW107181;
+        Tue, 7 Apr 2020 08:33:52 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3082ped3e9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Apr 2020 08:33:52 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 037CWWAV027363;
+        Tue, 7 Apr 2020 12:33:51 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma04dal.us.ibm.com with ESMTP id 306hv65yw5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Apr 2020 12:33:51 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 037CXnuE61473112
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Apr 2020 12:33:49 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D415EBE04F;
+        Tue,  7 Apr 2020 12:33:49 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2CB54BE053;
+        Tue,  7 Apr 2020 12:33:49 +0000 (GMT)
+Received: from sofia.ibm.com (unknown [9.102.0.81])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue,  7 Apr 2020 12:33:49 +0000 (GMT)
+Received: by sofia.ibm.com (Postfix, from userid 1000)
+        id E71D62E3231; Tue,  7 Apr 2020 18:03:44 +0530 (IST)
+Date:   Tue, 7 Apr 2020 18:03:44 +0530
+From:   Gautham R Shenoy <ego@linux.vnet.ibm.com>
+To:     Gautham R Shenoy <ego@linux.vnet.ibm.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
+        Michael Neuling <mikey@neuling.org>, kvm-ppc@vger.kernel.org,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        linuxppc-dev@ozlabs.org,
+        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [RFC/PATCH  2/3] pseries/kvm: Clear PSSCR[ESL|EC] bits before
+ guest entry
+Message-ID: <20200407123344.GA950@in.ibm.com>
+Reply-To: ego@linux.vnet.ibm.com
+References: <1585656658-1838-1-git-send-email-ego@linux.vnet.ibm.com>
+ <1585656658-1838-3-git-send-email-ego@linux.vnet.ibm.com>
+ <1585880159.w3mc2nk6h3.astroid@bobo.none>
+ <20200403093103.GA20293@in.ibm.com>
 MIME-Version: 1.0
-Received: by 2002:ab0:4929:0:0:0:0:0 with HTTP; Mon, 6 Apr 2020 22:10:50 -0700 (PDT)
-From:   SANDRA DEWI <dewisandra154@gmail.com>
-Date:   Tue, 7 Apr 2020 05:10:50 +0000
-Message-ID: <CABRVPWwbBkUVCTqKU6+z3SbX8cR_c5y-jOfWF1+k-bStVgxH-w@mail.gmail.com>
-Subject: whether this is your correct email address or not
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200403093103.GA20293@in.ibm.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-07_03:2020-04-07,2020-04-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ clxscore=1015 spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0
+ adultscore=0 mlxlogscore=999 suspectscore=0 bulkscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004070105
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Dear ,Pastor
+Hello Nicholas,
+
+On Fri, Apr 03, 2020 at 03:01:03PM +0530, Gautham R Shenoy wrote:
+> On Fri, Apr 03, 2020 at 12:20:26PM +1000, Nicholas Piggin wrote:
 
 
+[..snip..]
+> > > 
+> > > Signed-off-by: Gautham R. Shenoy <ego@linux.vnet.ibm.com>
+> > > ---
+> > >  arch/powerpc/kvm/book3s_hv.c            |  2 +-
+> > >  arch/powerpc/kvm/book3s_hv_rmhandlers.S | 25 +++++++++++++------------
+> > >  2 files changed, 14 insertions(+), 13 deletions(-)
+> > > 
+> > > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> > > index cdb7224..36d059a 100644
+> > > --- a/arch/powerpc/kvm/book3s_hv.c
+> > > +++ b/arch/powerpc/kvm/book3s_hv.c
+> > > @@ -3424,7 +3424,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+> > >  	mtspr(SPRN_IC, vcpu->arch.ic);
+> > >  	mtspr(SPRN_PID, vcpu->arch.pid);
+> > >  
+> > > -	mtspr(SPRN_PSSCR, vcpu->arch.psscr | PSSCR_EC |
+> > > +	mtspr(SPRN_PSSCR, (vcpu->arch.psscr  & ~(PSSCR_EC | PSSCR_ESL)) |
+> > >  	      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
+> > >  
+> > >  	mtspr(SPRN_HFSCR, vcpu->arch.hfscr);
+> > > diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> > > index dbc2fec..c2daec3 100644
+> > > --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> > > +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> > > @@ -823,6 +823,18 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
+> > >  	mtspr	SPRN_PID, r7
+> > >  	mtspr	SPRN_WORT, r8
+> > >  BEGIN_FTR_SECTION
+> > > +	/* POWER9-only registers */
+> > > +	ld	r5, VCPU_TID(r4)
+> > > +	ld	r6, VCPU_PSSCR(r4)
+> > > +	lbz	r8, HSTATE_FAKE_SUSPEND(r13)
+> > > +	lis 	r7, (PSSCR_EC | PSSCR_ESL)@h /* Allow guest to call stop */
+> > > +	andc	r6, r6, r7
+> > > +	rldimi	r6, r8, PSSCR_FAKE_SUSPEND_LG, 63 - PSSCR_FAKE_SUSPEND_LG
+> > > +	ld	r7, VCPU_HFSCR(r4)
+> > > +	mtspr	SPRN_TIDR, r5
+> > > +	mtspr	SPRN_PSSCR, r6
+> > > +	mtspr	SPRN_HFSCR, r7
+> > > +FTR_SECTION_ELSE
+> > 
+> > Why did you move these around? Just because the POWER9 section became
+> > larger than the other?
+> 
+> Yes.
+> 
+> > 
+> > That's a real wart in the instruction patching implementation, I think
+> > we can fix it by padding with nops in the macros.
+> > 
+> > Can you just add the additional required nops to the top branch without
+> > changing them around for this patch, so it's easier to see what's going
+> > on? The end result will be the same after patching. Actually changing
+> > these around can have a slight unintended consequence in that code that
+> > runs before features were patched will execute the IF code. Not a
+> > problem here, but another reason why the instruction patching 
+> > restriction is annoying.
+> 
+> Sure, I will repost this patch with additional nops instead of
+> moving them around.
+> 
 
-I have a client who is an oil business man and he made a fixed deposit
-of $26 million USD in my bank, where I am the director of the branch,
-My client died with his entire family in Jordanian
+Below is the same patch without rearranging the FTR_SECTION blocks,
+but with an extra nop. 
 
-50% of the fund will be for the church  for the work of God,the
-balance 50% we share it in the ratio of 50/50. Meaning 50% to you and
-50% for me
+---
+ arch/powerpc/kvm/book3s_hv.c            | 2 +-
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 4 +++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-intervention in the Syrian Civil War 2014 leaving behind no next of
-kin. I Propose to present you as next of kin to claim the funds, if
-interested reply me for full details and how we are to
-
-
-
-proceed to close this deal.
-
-
-
-
-Mrs. Sandra Dewi
-
-
-
-Email  mrsdewi@gmx.com
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index c52871c..efa7d3e 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3433,7 +3433,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	mtspr(SPRN_IC, vcpu->arch.ic);
+ 	mtspr(SPRN_PID, vcpu->arch.pid);
+ 
+-	mtspr(SPRN_PSSCR, vcpu->arch.psscr | PSSCR_EC |
++	mtspr(SPRN_PSSCR, (vcpu->arch.psscr  & ~(PSSCR_EC | PSSCR_ESL)) |
+ 	      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
+ 
+ 	mtspr(SPRN_HFSCR, vcpu->arch.hfscr);
+diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+index 780a499..83a69dc 100644
+--- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
++++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+@@ -833,12 +833,14 @@ BEGIN_FTR_SECTION
+ 	mtspr	SPRN_CSIGR, r7
+ 	mtspr	SPRN_TACR, r8
+ 	nop
++	nop
+ FTR_SECTION_ELSE
+ 	/* POWER9-only registers */
+ 	ld	r5, VCPU_TID(r4)
+ 	ld	r6, VCPU_PSSCR(r4)
+ 	lbz	r8, HSTATE_FAKE_SUSPEND(r13)
+-	oris	r6, r6, PSSCR_EC@h	/* This makes stop trap to HV */
++	lis 	r7, (PSSCR_EC | PSSCR_ESL)@h /* Allow guest to call stop */
++	andc	r6, r6, r7
+ 	rldimi	r6, r8, PSSCR_FAKE_SUSPEND_LG, 63 - PSSCR_FAKE_SUSPEND_LG
+ 	ld	r7, VCPU_HFSCR(r4)
+ 	mtspr	SPRN_TIDR, r5
+-- 
+Thanks and Regards
+gautham.
