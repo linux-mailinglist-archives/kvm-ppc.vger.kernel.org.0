@@ -2,272 +2,278 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 63DF81A6527
-	for <lists+kvm-ppc@lfdr.de>; Mon, 13 Apr 2020 12:26:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 637171A6777
+	for <lists+kvm-ppc@lfdr.de>; Mon, 13 Apr 2020 16:04:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728080AbgDMK0I (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 13 Apr 2020 06:26:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6234 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727833AbgDMK0H (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 Apr 2020 06:26:07 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03DA4Gag177095;
-        Mon, 13 Apr 2020 06:25:55 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 30b7gvb3qq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Apr 2020 06:25:55 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03DA4mLi179154;
-        Mon, 13 Apr 2020 06:25:55 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 30b7gvb3qk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Apr 2020 06:25:55 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03DAAvkx020918;
-        Mon, 13 Apr 2020 10:25:54 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma03wdc.us.ibm.com with ESMTP id 30b5h5ymkw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Apr 2020 10:25:54 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03DAPsm146858750
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Apr 2020 10:25:54 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EAC9228059;
-        Mon, 13 Apr 2020 10:25:53 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A4DE28058;
-        Mon, 13 Apr 2020 10:25:53 +0000 (GMT)
-Received: from sofia.ibm.com (unknown [9.199.63.84])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 13 Apr 2020 10:25:53 +0000 (GMT)
-Received: by sofia.ibm.com (Postfix, from userid 1000)
-        id 268E72E2DC4; Mon, 13 Apr 2020 15:55:49 +0530 (IST)
-Date:   Mon, 13 Apr 2020 15:55:49 +0530
-From:   Gautham R Shenoy <ego@linux.vnet.ibm.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     Gautham R Shenoy <ego@linux.vnet.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Michael Neuling <mikey@neuling.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
+        id S1730263AbgDMOEB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 13 Apr 2020 10:04:01 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34094 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730247AbgDMOEA (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 Apr 2020 10:04:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586786637;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=DMxjnALOO+13jpd4EXyv1/+VreDyJBNjIrO01oQGGFU=;
+        b=LllGleyit1IfVZMQ5DZY2OMkI+OxhklPPVCjm0deGUj2wOvNS5HY5jrzJBM3e5jF2mOy77
+        vciUMD9DbzgWgDxB+CTvTMvl2Kl/SDAuQT3t9ZUOlCmboXHOLMqrSrwYjyYl2jizwM8eys
+        YHjWE/NMhbfTmktYWoCnnvuKY6Pk9+w=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-489-fZyZmhD5OrqgS-L2AktGmg-1; Mon, 13 Apr 2020 10:03:55 -0400
+X-MC-Unique: fZyZmhD5OrqgS-L2AktGmg-1
+Received: by mail-wm1-f72.google.com with SMTP id w8so2701861wmk.5
+        for <kvm-ppc@vger.kernel.org>; Mon, 13 Apr 2020 07:03:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=DMxjnALOO+13jpd4EXyv1/+VreDyJBNjIrO01oQGGFU=;
+        b=KzcPQriQN/ZktNQEUToeHUuaus8ClhE63QKPB64fx/EsyD4DRHO3CH/RhnQRMeVJKg
+         duhFCMQpekOGJJZzEKKfU57Qd1FFOOxMtPPjerSmbIdqPJvRn6XTQnIRaROzt0AYjv/F
+         YzAZ5kAKxyIYnzKZ4I6g/H0n9UxdJQqt6Q7gkouVogV0Fd95OYrG1r4T/wNi3hpm8GU9
+         zcGWOLOWH6j7isgASQRzmWuqUoaqoKSmCK/s+GOYQZ2AMearTaTaSUU/azcMLiyeqxFQ
+         N8rZ+cETF3ToVYwP7eOIdW5Nz9EtuXZs+oSdrnb8FFR4Yglw9K+0h2jZvoOz95E0rsSt
+         IXlQ==
+X-Gm-Message-State: AGi0PubxPp1AlsiAHJPJVeA4kLsp6idLrhh5HfUO8wwdaYWcvLoauRhl
+        5MGTGKr0MTDU10DRpeo5QZqK+k6XhykgbInNV4oOCV0ypEHvR3YxbRI+/ottN2Xt23HkbBZ7tVc
+        35ov42Yxcf6ZyKqe1OQ==
+X-Received: by 2002:adf:fc4c:: with SMTP id e12mr18660277wrs.265.1586786634644;
+        Mon, 13 Apr 2020 07:03:54 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLRZJuELUsSHD7peAwU3uRWTiihVpgUEtD1l8rr9Jo5lHrC+5Swh69bNDnIpYlTippwc8wt9Q==
+X-Received: by 2002:adf:fc4c:: with SMTP id e12mr18660255wrs.265.1586786634361;
+        Mon, 13 Apr 2020 07:03:54 -0700 (PDT)
+Received: from emanuele-MacBookPro.redhat.com ([194.230.155.239])
+        by smtp.gmail.com with ESMTPSA id j10sm11726263wmi.18.2020.04.13.07.03.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Apr 2020 07:03:53 -0700 (PDT)
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
         kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linuxppc-dev@ozlabs.org
-Subject: Re: [RFC/PATCH  2/3] pseries/kvm: Clear PSSCR[ESL|EC] bits before
- guest entry
-Message-ID: <20200413102549.GA22532@in.ibm.com>
-Reply-To: ego@linux.vnet.ibm.com
-References: <1585656658-1838-1-git-send-email-ego@linux.vnet.ibm.com>
- <1585656658-1838-3-git-send-email-ego@linux.vnet.ibm.com>
- <1585880159.w3mc2nk6h3.astroid@bobo.none>
- <20200403093103.GA20293@in.ibm.com>
- <20200406095819.GC2945@umbus.fritz.box>
- <20200407132526.GB950@in.ibm.com>
- <20200408022957.GC44664@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200408022957.GC44664@umbus.fritz.box>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-13_03:2020-04-12,2020-04-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 clxscore=1015 malwarescore=0 mlxscore=0 impostorscore=0
- spamscore=0 lowpriorityscore=0 adultscore=0 phishscore=0 bulkscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004130079
+        linux-s390@vger.kernel.org
+Subject: [PATCH] kvm_host: unify VM_STAT and VCPU_STAT definitions in a single place
+Date:   Mon, 13 Apr 2020 16:03:32 +0200
+Message-Id: <20200413140332.22896-1-eesposit@redhat.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hello David,
+The macros VM_STAT and VCPU_STAT are redundantly implemented in multiple
+files, each used by a different architecure to initialize the debugfs
+entries for statistics. Since they all have the same purpose, they can be
+unified in a single common definition in include/linux/kvm_host.h
 
-On Wed, Apr 08, 2020 at 12:29:57PM +1000, David Gibson wrote:
-> On Tue, Apr 07, 2020 at 06:55:26PM +0530, Gautham R Shenoy wrote:
-> > Hello David,
-> > 
-> > On Mon, Apr 06, 2020 at 07:58:19PM +1000, David Gibson wrote:
-> > > On Fri, Apr 03, 2020 at 03:01:03PM +0530, Gautham R Shenoy wrote:
-> > > > On Fri, Apr 03, 2020 at 12:20:26PM +1000, Nicholas Piggin wrote:
-> > > > > Gautham R. Shenoy's on March 31, 2020 10:10 pm:
-> > > > > > From: "Gautham R. Shenoy" <ego@linux.vnet.ibm.com>
-> > > > > > 
-> > > > > > ISA v3.0 allows the guest to execute a stop instruction. For this, the
-> > > > > > PSSCR[ESL|EC] bits need to be cleared by the hypervisor before
-> > > > > > scheduling in the guest vCPU.
-> > > > > > 
-> > > > > > Currently we always schedule in a vCPU with PSSCR[ESL|EC] bits
-> > > > > > set. This patch changes the behaviour to enter the guest with
-> > > > > > PSSCR[ESL|EC] bits cleared. This is a RFC patch where we
-> > > > > > unconditionally clear these bits. Ideally this should be done
-> > > > > > conditionally on platforms where the guest stop instruction has no
-> > > > > > Bugs (starting POWER9 DD2.3).
-> > > > > 
-> > > > > How will guests know that they can use this facility safely after your
-> > > > > series? You need both DD2.3 and a patched KVM.
-> > > > 
-> > > > 
-> > > > Yes, this is something that isn't addressed in this series (mentioned
-> > > > in the cover letter), which is a POC demonstrating that the stop0lite
-> > > > state in guest works.
-> > > > 
-> > > > However, to answer your question, this is the scheme that I had in
-> > > > mind :
-> > > > 
-> > > > OPAL:
-> > > >    On Procs >= DD2.3 : we publish a dt-cpu-feature "idle-stop-guest"
-> > > > 
-> > > > Hypervisor Kernel:
-> > > >     1. If "idle-stop-guest" dt-cpu-feature is discovered, then
-> > > >        we set bool enable_guest_stop = true;
-> > > > 
-> > > >     2. During KVM guest entry, clear PSSCR[ESL|EC] iff
-> > > >        enable_guest_stop == true.
-> > > > 
-> > > >     3. In kvm_vm_ioctl_check_extension(), for a new capability
-> > > >        KVM_CAP_STOP, return true iff enable_guest_top == true.
-> > > > 
-> > > > QEMU:
-> > > >    Check with the hypervisor if KVM_CAP_STOP is present. If so,
-> > > >    indicate the presence to the guest via device tree.
-> > > 
-> > > Nack.  Presenting different capabilities to the guest depending on
-> > > host capabilities (rather than explicit options) is never ok.  It
-> > > means that depending on the system you start on you may or may not be
-> > > able to migrate to other systems that you're supposed to be able to,
-> > 
-> > I agree that blocking migration for the unavailability of this feature
-> > is not desirable. Could you point me to some other capabilities in KVM
-> > which have been implemented via explicit options?
-> 
-> TBH, most of the options for the 'pseries' machine type are in this
-> category: cap-vsx, cap-dfp, cap-htm, a bunch related to various
-> Spectre mitigations, cap-hpt-max-page-size (maximum page size for hash
-> guests), cap-nested-hv, cap-large-decr, cap-fwnmi, resize-hpt (HPT
-> resizing extension), ic-mode (which irq controllers are available to
-> the guest).
+Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+---
+ arch/arm64/kvm/guest.c    | 23 +++++++--------
+ arch/mips/kvm/mips.c      | 61 +++++++++++++++++++--------------------
+ arch/powerpc/kvm/book3s.c |  3 --
+ arch/powerpc/kvm/booke.c  |  3 --
+ arch/s390/kvm/kvm-s390.c  |  3 --
+ arch/x86/kvm/x86.c        |  3 --
+ include/linux/kvm_host.h  |  3 ++
+ 7 files changed, 43 insertions(+), 56 deletions(-)
 
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 23ebe51410f0..3e3aee8b37c0 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -29,20 +29,17 @@
+ 
+ #include "trace.h"
+ 
+-#define VM_STAT(x) { #x, offsetof(struct kvm, stat.x), KVM_STAT_VM }
+-#define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
+-
+ struct kvm_stats_debugfs_item debugfs_entries[] = {
+-	VCPU_STAT(halt_successful_poll),
+-	VCPU_STAT(halt_attempted_poll),
+-	VCPU_STAT(halt_poll_invalid),
+-	VCPU_STAT(halt_wakeup),
+-	VCPU_STAT(hvc_exit_stat),
+-	VCPU_STAT(wfe_exit_stat),
+-	VCPU_STAT(wfi_exit_stat),
+-	VCPU_STAT(mmio_exit_user),
+-	VCPU_STAT(mmio_exit_kernel),
+-	VCPU_STAT(exits),
++	{ "halt_successful_poll", VCPU_STAT(halt_successful_poll) },
++	{ "halt_attempted_poll", VCPU_STAT(halt_attempted_poll) },
++	{ "halt_poll_invalid", VCPU_STAT(halt_poll_invalid) },
++	{ "halt_wakeup", VCPU_STAT(halt_wakeup) },
++	{ "hvc_exit_stat", VCPU_STAT(hvc_exit_stat) },
++	{ "wfe_exit_stat", VCPU_STAT(wfe_exit_stat) },
++	{ "wfi_exit_stat", VCPU_STAT(wfi_exit_stat) },
++	{ "mmio_exit_user", VCPU_STAT(mmio_exit_user) },
++	{ "mmio_exit_kernel", VCPU_STAT(mmio_exit_kernel) },
++	{ "exits", VCPU_STAT(exits) },
+ 	{ NULL }
+ };
+ 
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 8f05dd0a0f4e..f14b93d02f02 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -39,40 +39,39 @@
+ #define VECTORSPACING 0x100	/* for EI/VI mode */
+ #endif
+ 
+-#define VCPU_STAT(x) offsetof(struct kvm_vcpu, stat.x)
+ struct kvm_stats_debugfs_item debugfs_entries[] = {
+-	{ "wait",	  VCPU_STAT(wait_exits),	 KVM_STAT_VCPU },
+-	{ "cache",	  VCPU_STAT(cache_exits),	 KVM_STAT_VCPU },
+-	{ "signal",	  VCPU_STAT(signal_exits),	 KVM_STAT_VCPU },
+-	{ "interrupt",	  VCPU_STAT(int_exits),		 KVM_STAT_VCPU },
+-	{ "cop_unusable", VCPU_STAT(cop_unusable_exits), KVM_STAT_VCPU },
+-	{ "tlbmod",	  VCPU_STAT(tlbmod_exits),	 KVM_STAT_VCPU },
+-	{ "tlbmiss_ld",	  VCPU_STAT(tlbmiss_ld_exits),	 KVM_STAT_VCPU },
+-	{ "tlbmiss_st",	  VCPU_STAT(tlbmiss_st_exits),	 KVM_STAT_VCPU },
+-	{ "addrerr_st",	  VCPU_STAT(addrerr_st_exits),	 KVM_STAT_VCPU },
+-	{ "addrerr_ld",	  VCPU_STAT(addrerr_ld_exits),	 KVM_STAT_VCPU },
+-	{ "syscall",	  VCPU_STAT(syscall_exits),	 KVM_STAT_VCPU },
+-	{ "resvd_inst",	  VCPU_STAT(resvd_inst_exits),	 KVM_STAT_VCPU },
+-	{ "break_inst",	  VCPU_STAT(break_inst_exits),	 KVM_STAT_VCPU },
+-	{ "trap_inst",	  VCPU_STAT(trap_inst_exits),	 KVM_STAT_VCPU },
+-	{ "msa_fpe",	  VCPU_STAT(msa_fpe_exits),	 KVM_STAT_VCPU },
+-	{ "fpe",	  VCPU_STAT(fpe_exits),		 KVM_STAT_VCPU },
+-	{ "msa_disabled", VCPU_STAT(msa_disabled_exits), KVM_STAT_VCPU },
+-	{ "flush_dcache", VCPU_STAT(flush_dcache_exits), KVM_STAT_VCPU },
++	{ "wait",	  VCPU_STAT(wait_exits) },
++	{ "cache",	  VCPU_STAT(cache_exits) },
++	{ "signal",	  VCPU_STAT(signal_exits) },
++	{ "interrupt",	  VCPU_STAT(int_exits) },
++	{ "cop_unusable", VCPU_STAT(cop_unusable_exits) },
++	{ "tlbmod",	  VCPU_STAT(tlbmod_exits) },
++	{ "tlbmiss_ld",	  VCPU_STAT(tlbmiss_ld_exits) },
++	{ "tlbmiss_st",	  VCPU_STAT(tlbmiss_st_exits) },
++	{ "addrerr_st",	  VCPU_STAT(addrerr_st_exits) },
++	{ "addrerr_ld",	  VCPU_STAT(addrerr_ld_exits) },
++	{ "syscall",	  VCPU_STAT(syscall_exits) },
++	{ "resvd_inst",	  VCPU_STAT(resvd_inst_exits) },
++	{ "break_inst",	  VCPU_STAT(break_inst_exits) },
++	{ "trap_inst",	  VCPU_STAT(trap_inst_exits) },
++	{ "msa_fpe",	  VCPU_STAT(msa_fpe_exits) },
++	{ "fpe",	  VCPU_STAT(fpe_exits) },
++	{ "msa_disabled", VCPU_STAT(msa_disabled_exits) },
++	{ "flush_dcache", VCPU_STAT(flush_dcache_exits) },
+ #ifdef CONFIG_KVM_MIPS_VZ
+-	{ "vz_gpsi",	  VCPU_STAT(vz_gpsi_exits),	 KVM_STAT_VCPU },
+-	{ "vz_gsfc",	  VCPU_STAT(vz_gsfc_exits),	 KVM_STAT_VCPU },
+-	{ "vz_hc",	  VCPU_STAT(vz_hc_exits),	 KVM_STAT_VCPU },
+-	{ "vz_grr",	  VCPU_STAT(vz_grr_exits),	 KVM_STAT_VCPU },
+-	{ "vz_gva",	  VCPU_STAT(vz_gva_exits),	 KVM_STAT_VCPU },
+-	{ "vz_ghfc",	  VCPU_STAT(vz_ghfc_exits),	 KVM_STAT_VCPU },
+-	{ "vz_gpa",	  VCPU_STAT(vz_gpa_exits),	 KVM_STAT_VCPU },
+-	{ "vz_resvd",	  VCPU_STAT(vz_resvd_exits),	 KVM_STAT_VCPU },
++	{ "vz_gpsi",	  VCPU_STAT(vz_gpsi_exits) },
++	{ "vz_gsfc",	  VCPU_STAT(vz_gsfc_exits) },
++	{ "vz_hc",	  VCPU_STAT(vz_hc_exits) },
++	{ "vz_grr",	  VCPU_STAT(vz_grr_exits) },
++	{ "vz_gva",	  VCPU_STAT(vz_gva_exits) },
++	{ "vz_ghfc",	  VCPU_STAT(vz_ghfc_exits) },
++	{ "vz_gpa",	  VCPU_STAT(vz_gpa_exits) },
++	{ "vz_resvd",	  VCPU_STAT(vz_resvd_exits) },
+ #endif
+-	{ "halt_successful_poll", VCPU_STAT(halt_successful_poll), KVM_STAT_VCPU },
+-	{ "halt_attempted_poll", VCPU_STAT(halt_attempted_poll), KVM_STAT_VCPU },
+-	{ "halt_poll_invalid", VCPU_STAT(halt_poll_invalid), KVM_STAT_VCPU },
+-	{ "halt_wakeup",  VCPU_STAT(halt_wakeup),	 KVM_STAT_VCPU },
++	{ "halt_successful_poll", VCPU_STAT(halt_successful_poll) },
++	{ "halt_attempted_poll", VCPU_STAT(halt_attempted_poll) },
++	{ "halt_poll_invalid", VCPU_STAT(halt_poll_invalid) },
++	{ "halt_wakeup",  VCPU_STAT(halt_wakeup) },
+ 	{NULL}
+ };
+ 
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index 5690a1f9b976..55cb728ba06e 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -36,9 +36,6 @@
+ #include "book3s.h"
+ #include "trace.h"
+ 
+-#define VM_STAT(x, ...) offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__
+-#define VCPU_STAT(x, ...) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__
+-
+ /* #define EXIT_DEBUG */
+ 
+ struct kvm_stats_debugfs_item debugfs_entries[] = {
+diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+index 6c18ea88fd25..fb8fa7060804 100644
+--- a/arch/powerpc/kvm/booke.c
++++ b/arch/powerpc/kvm/booke.c
+@@ -35,9 +35,6 @@
+ 
+ unsigned long kvmppc_booke_handlers;
+ 
+-#define VM_STAT(x) offsetof(struct kvm, stat.x), KVM_STAT_VM
+-#define VCPU_STAT(x) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU
+-
+ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	{ "mmio",       VCPU_STAT(mmio_exits) },
+ 	{ "sig",        VCPU_STAT(signal_exits) },
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 19a81024fe16..1a7bf8759750 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -57,9 +57,6 @@
+ #define VCPU_IRQS_MAX_BUF (sizeof(struct kvm_s390_irq) * \
+ 			   (KVM_MAX_VCPUS + LOCAL_IRQS))
+ 
+-#define VCPU_STAT(x) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU
+-#define VM_STAT(x) offsetof(struct kvm, stat.x), KVM_STAT_VM
+-
+ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	{ "userspace_handled", VCPU_STAT(exit_userspace) },
+ 	{ "exit_null", VCPU_STAT(exit_null) },
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b8124b562dea..fb035d304004 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -97,9 +97,6 @@ static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
+ 
+ static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
+ 
+-#define VM_STAT(x, ...) offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__
+-#define VCPU_STAT(x, ...) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__
+-
+ #define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | \
+                                     KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 6d58beb65454..e02d38c7fff1 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1130,6 +1130,9 @@ struct kvm_stats_debugfs_item {
+ #define KVM_DBGFS_GET_MODE(dbgfs_item)                                         \
+ 	((dbgfs_item)->mode ? (dbgfs_item)->mode : 0644)
+ 
++#define VM_STAT(x, ...) offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__
++#define VCPU_STAT(x, ...) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__
++
+ extern struct kvm_stats_debugfs_item debugfs_entries[];
+ extern struct dentry *kvm_debugfs_dir;
+ 
+-- 
+2.17.1
 
-Thanks. I will follow this suit.
-
-> 
-> > The ISA 3.0 allows the guest to execute the "stop" instruction.
-> 
-> So, this was a bug in DD2.2's implementation of the architecture?
-
-Yes, the previous versions could miss wakeup events when stop was
-executed in HV=0,PR=0 mode. So, the hypervisor had to block that.
-
-
-> 
-> > If the
-> > Hypervisor hasn't cleared the PSSCR[ESL|EC] then, guest executing the
-> > "stop" instruction in the causes a Hypervisor Facility Unavailable
-> > Exception, thus giving the hypervisor a chance to emulate the
-> > instruction. However, in the current code, when the hypervisor
-> > receives this exception, it sends a PROGKILL to the guest which
-> > results in crashing the guest.
-> > 
-> > Patch 1 of this series emulates wakeup from the "stop"
-> > instruction. Would the following scheme be ok?
-> > 
-> > OPAL:
-> > 	On Procs >= DD2.3 : we publish a dt-cpu-feature "idle-stop-guest"
-> > 
-> > Hypervisor Kernel:
-> > 
-> > 	   If "idle-stop-guest" dt feature is available, then, before
-> > 	   entering the guest, the hypervisor clears the PSSCR[EC|ESL]
-> > 	   bits allowing the guest to safely execute stop instruction.
-> > 
-> > 	   If "idle-stop-guest" dt feature is not available, then, the
-> > 	   Hypervisor sets the PSSCR[ESL|EC] bits, thereby causing a
-> > 	   guest "stop" instruction execution to trap back into the
-> > 	   hypervisor. We then emulate a wakeup from the stop
-> > 	   instruction (Patch 1 of this series).
-> > 
-> > Guest Kernel:
-> >       If (cpu_has_feature(CPU_FTR_ARCH_300)) only then use the
-> >       stop0lite cpuidle state.
-> > 
-> > This allows us to migrate the KVM guest across any POWER9
-> > Hypervisor. The minimal addition that the Hypervisor would need is
-> > Patch 1 of this series.
-> 
-> That could be workable.  Some caveats, though:
-> 
->  * How does the latency of the trap-and-emulate compare to the guest
->    using H_CEDE in the first place?  i.e. how big a negative impact
->    will this have for guests running on DD2.2 hosts?
-
-
-The wakeup latency of trap-and-emulated stop0lite (referred to as
-"stop0lite Emulated" in the tables below) the compares favorably
-compared to H_CEDE. It is in the order of 5-6us while the wakeup
-latency of H_CEDE is ~25-30us.
-
-======================================================================
-Wakeup Latency measured using a timer (in ns) [Lower is better]
-======================================================================
-Idle state |  Nr samples |  Min    | Max    | Median | Avg   | Stddev|
-----------------------------------------------------------------------
-snooze     |   60        |  787    | 1059   |  938   | 937.4 | 42.27 |
-----------------------------------------------------------------------
-stop0lite  |   60        |  770    | 1182   |  948   | 946.4 | 67.41 |
-----------------------------------------------------------------------
-stop0lite  |   60        | 2378    | 7659   | 5006   |5093.6 |1578.7 |  
-Emulated   |             |         |        |        |       |       |
-----------------------------------------------------------------------
-Shared CEDE|   60        | 9550    | 36694  | 29219  |28564.1|3545.9 |
-======================================================================
-
-
-======================================================================
-Wakeup latency measured using an IPI (in ns) [Lower is better]
-======================================================================
-Idle state |  Nr    |  Min    | Max    | Median | Avg     | Stddev   |
-           |samples |         |        |        |         |          |
-----------------------------------------------------------------------
-snooze     |   60   |     2089|    4228|    2259|  2342.31|    316.56|
-----------------------------------------------------------------------
-stop0lite  |   60   |     1947|    3674|    2653|  2610.57|    266.73|
-----------------------------------------------------------------------
-stop0lite  |   60   |     3580|    8154|    5596|  5644.95|   1368.44|
-Emulated   |        |         |        |        |         |          |
-----------------------------------------------------------------------
-Shared CEDE|   60   |    20147|   36305|   21827| 26762.65|   6875.01|
-======================================================================
-
-> 
->  * We'll only be able to enable this in a new qemu machine type
->    version (say, pseries-5.1.0).  Otherwise a guest could start
->    thinking it can use stop states, then be migrated to an older qemu
->    or host kernel without the support and crash.
-
-That makese sense. In fact in the case of not being able to backport
-Patch 1 to all the older hypervisor kernels, we will need a way of
-gating the guest from using stop-states and then migrating onto an
-older hypervisor kernel. Associating this with a new qemu machine type
-version should solve this problem, assuming that all the newer qemus
-will also be running on newer hypervisor kernels.
-
-
-
-> 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
-
---
-Thanks and Regards
-gautham.
