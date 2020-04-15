@@ -2,56 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08ADA1A9351
-	for <lists+kvm-ppc@lfdr.de>; Wed, 15 Apr 2020 08:36:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B22D21A9687
+	for <lists+kvm-ppc@lfdr.de>; Wed, 15 Apr 2020 10:31:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393554AbgDOGgX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 15 Apr 2020 02:36:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49888 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729019AbgDOGgU (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 15 Apr 2020 02:36:20 -0400
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F21EC061A0C;
-        Tue, 14 Apr 2020 23:36:20 -0700 (PDT)
-Received: by mail-ed1-x542.google.com with SMTP id ca21so3218372edb.7;
-        Tue, 14 Apr 2020 23:36:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:autocrypt:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ziy3CvjiTZBb7re9okjvNzQcGH3k+TOTS0/15gywnMU=;
-        b=qqWsPrEf0Ts6quEdGNgBCMsV+kOpY8DsnLT8o+GDgNvhTV7DBX8PBknwe8j0CFEmZX
-         jpltKjKxsibH1qtE9Pf+Yz7+KL62s7h7jGgyQlIBJ/TlhWE5yR2c4gr+7Tj1c78y1fr6
-         +Zrz2j6Hmf3jl/P4hZRQjAS6AYMTJfyK4LyMEMf53j3sfn38rtV0w5wPuRetHtwAIhxz
-         pWb4hDPYcN9P2BvtRDpRaqKHmXbtsK7GhxWOnwkikmDYVI0XvWIhVDDk0RLbEDIYG847
-         +cFNtefbyrNvpUo935pS2ws6qM5Vz4D5kiUbknZ6Gro0unFWFR9g7XFcFYGMgY7GmiKA
-         lYOA==
+        id S2437742AbgDOIaU (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 15 Apr 2020 04:30:20 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47039 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2441174AbgDOIaO (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 15 Apr 2020 04:30:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586939412;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bLmrOkcXJQ/8f3TsPjBB59Qp6PFUF6WHach7rOTidPU=;
+        b=FxA3WjYN4kwdXtLZDi2sc6x3ZU5WbK08q3wSXfSNfwlJh8I9JUucbr+Ky/O6lCU29tPkrD
+        suFFphuV76VWsPfkV4GzEkD9xxn1NDjo/VvCNFoYkitfcX3Rd5CyqWOe38G8lmreCdOdRd
+        C3uKHJGolCEP15tNQsJHXogFWrkxsOA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-448-tjgbTbToN3aulD1FRX6ljQ-1; Wed, 15 Apr 2020 04:30:10 -0400
+X-MC-Unique: tjgbTbToN3aulD1FRX6ljQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 14so4662315wmo.9
+        for <kvm-ppc@vger.kernel.org>; Wed, 15 Apr 2020 01:30:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=ziy3CvjiTZBb7re9okjvNzQcGH3k+TOTS0/15gywnMU=;
-        b=CFoQ1JtgeIGw7IYaMOaTBznq7Y8J36YqBr/207bsKGHrIn7OXpVnLROXXWeJVSQql2
-         PawT57o9CgoOgaHZh6s+Kb3K9jN0fV9fx+XLaQevXvC8vpAWrt6gFgcoYueZYTeWOoP/
-         uIkU5MlERoKdmnUKu+AsBEmhglNWsHH+csNGqxiG4GuaZuAvxXxzxMaF/7gRU03BsIfS
-         SkeWEOPPqD0jcziuStjSzD1L7nSibPuwgkoQKL/8mNi9gIS9xr9JJdX0r+kZWqhtxKBm
-         g/H7+pD3sDddLQBxGoXBGFbiMTyrJXYsjWLWIL1caq/hBqWwvwPYSVj1W7aaw0bPYUwQ
-         loLQ==
-X-Gm-Message-State: AGi0PuZDPIHPOeEDrwx+krYcf3GvUP5QxSeMPedLo5sfXVhRgS+fp1No
-        uX8S9Gbmci8X4ZqkF0HJEG4su4mFPfeNmw==
-X-Google-Smtp-Source: APiQypLBhzQGFSJJza9fhbUNOdf67Ws8AWLLrc2T019xWRRZvN78jvwPXZ4Cq/fMHCh3e7IoI3AkbQ==
-X-Received: by 2002:aa7:cf15:: with SMTP id a21mr15771536edy.349.1586932578974;
-        Tue, 14 Apr 2020 23:36:18 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net. [83.42.57.116])
-        by smtp.gmail.com with ESMTPSA id y10sm2423364ejm.3.2020.04.14.23.36.16
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bLmrOkcXJQ/8f3TsPjBB59Qp6PFUF6WHach7rOTidPU=;
+        b=ni/KC772jwuVY7aOFF6Tx1aYuud0yE8G3dZwKa3P7v6Zp9JJIYe1bFl4QPnnLu9Oy8
+         HnC/EVFzHDv34Fn+vW3PrVQXkb8lS27Ak8Tvg5oyzouHKId8KepLhhrnPr54B5yPutv9
+         waouQYGXxtuHqRkFNQvrpWW76piAzX596TXy3XzV8xxNHwPwRcoDvIB0e61X43kRBzq4
+         56s10ZtPTI3emgy/xdsSuPdfGD1u6NB8qfJqoQ+ImG75RGLxJx2Iv12F7BBM/dsz5cL1
+         VPLKBJz+Ooyuj9Xwk2dRNHKagMkzxwqBQ8NPV8gmweOTFGWMfDrWz7zvMLFv5SWOjA0c
+         TBkA==
+X-Gm-Message-State: AGi0PubKIqCtWe2hSI35ESu1GO7YxmotLupYXj4pHp6y3apPf2VFyc02
+        DnXkMOV8XNYyzUYl25UP/AjcKwVre+7Du5FVYCzBv9cYUL+lQGmj0WGvvVlXhavoF3/o3vbnI/j
+        2Qnry6AVbAJV5w3l4cQ==
+X-Received: by 2002:a1c:b445:: with SMTP id d66mr4126794wmf.187.1586939409339;
+        Wed, 15 Apr 2020 01:30:09 -0700 (PDT)
+X-Google-Smtp-Source: APiQypI1/GFDfyQOLK5J6+00PCnZPj8fmTN9rFZPV07c4zGKdQlKsQOx+NrwNSeq7rAzMZDiU7ufeQ==
+X-Received: by 2002:a1c:b445:: with SMTP id d66mr4126760wmf.187.1586939409106;
+        Wed, 15 Apr 2020 01:30:09 -0700 (PDT)
+Received: from localhost.localdomain ([194.230.155.238])
+        by smtp.gmail.com with ESMTPSA id g25sm8724053wmh.24.2020.04.15.01.30.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2020 23:36:18 -0700 (PDT)
+        Wed, 15 Apr 2020 01:30:08 -0700 (PDT)
 Subject: Re: [PATCH v2] kvm_host: unify VM_STAT and VCPU_STAT definitions in a
  single place
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
         kvm@vger.kernel.org
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
@@ -71,37 +73,15 @@ Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
         kvm-ppc@vger.kernel.org, linux-s390@vger.kernel.org
 References: <20200414155625.20559-1-eesposit@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <b479e7ff-4534-5ced-e19b-2a2914905a8b@amsat.org>
-Date:   Wed, 15 Apr 2020 08:36:15 +0200
+ <b479e7ff-4534-5ced-e19b-2a2914905a8b@amsat.org>
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Message-ID: <992ede27-3eae-f2da-ad38-1d3498853ad2@redhat.com>
+Date:   Wed, 15 Apr 2020 10:30:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200414155625.20559-1-eesposit@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <b479e7ff-4534-5ced-e19b-2a2914905a8b@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
@@ -109,83 +89,93 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 4/14/20 5:56 PM, Emanuele Giuseppe Esposito wrote:
-> The macros VM_STAT and VCPU_STAT are redundantly implemented in multiple
-> files, each used by a different architecure to initialize the debugfs
-> entries for statistics. Since they all have the same purpose, they can be
-> unified in a single common definition in include/linux/kvm_host.h
+
+
+On 4/15/20 8:36 AM, Philippe Mathieu-Daudé wrote:
+> On 4/14/20 5:56 PM, Emanuele Giuseppe Esposito wrote:
+>> The macros VM_STAT and VCPU_STAT are redundantly implemented in multiple
+>> files, each used by a different architecure to initialize the debugfs
+>> entries for statistics. Since they all have the same purpose, they can be
+>> unified in a single common definition in include/linux/kvm_host.h
+>>
+>> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+>> ---
+>>   arch/arm64/kvm/guest.c    |  23 ++---
+>>   arch/mips/kvm/mips.c      |  61 ++++++------
+>>   arch/powerpc/kvm/book3s.c |  61 ++++++------
+>>   arch/powerpc/kvm/booke.c  |  41 ++++----
+>>   arch/s390/kvm/kvm-s390.c  | 203 +++++++++++++++++++-------------------
+>>   arch/x86/kvm/x86.c        |  80 +++++++--------
+>>   include/linux/kvm_host.h  |   5 +
+>>   7 files changed, 231 insertions(+), 243 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>> index 23ebe51410f0..8417b200bec9 100644
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+>> @@ -29,20 +29,17 @@
+>>   
+>>   #include "trace.h"
+>>   
+>> -#define VM_STAT(x) { #x, offsetof(struct kvm, stat.x), KVM_STAT_VM }
+>> -#define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
+>> -
+>>   struct kvm_stats_debugfs_item debugfs_entries[] = {
+>> -	VCPU_STAT(halt_successful_poll),
+>> -	VCPU_STAT(halt_attempted_poll),
+>> -	VCPU_STAT(halt_poll_invalid),
+>> -	VCPU_STAT(halt_wakeup),
+>> -	VCPU_STAT(hvc_exit_stat),
+>> -	VCPU_STAT(wfe_exit_stat),
+>> -	VCPU_STAT(wfi_exit_stat),
+>> -	VCPU_STAT(mmio_exit_user),
+>> -	VCPU_STAT(mmio_exit_kernel),
+>> -	VCPU_STAT(exits),
+>> +	VCPU_STAT("halt_successful_poll", halt_successful_poll),
+>> +	VCPU_STAT("halt_attempted_poll", halt_attempted_poll),
+>> +	VCPU_STAT("halt_poll_invalid", halt_poll_invalid),
+>> +	VCPU_STAT("halt_wakeup", halt_wakeup),
+>> +	VCPU_STAT("hvc_exit_stat", hvc_exit_stat),
+>> +	VCPU_STAT("wfe_exit_stat", wfe_exit_stat),
+>> +	VCPU_STAT("wfi_exit_stat", wfi_exit_stat),
+>> +	VCPU_STAT("mmio_exit_user", mmio_exit_user),
+>> +	VCPU_STAT("mmio_exit_kernel", mmio_exit_kernel),
+>> +	VCPU_STAT("exits", exits),
+>>   	{ NULL }
+>>   };
 > 
-> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
-> ---
->  arch/arm64/kvm/guest.c    |  23 ++---
->  arch/mips/kvm/mips.c      |  61 ++++++------
->  arch/powerpc/kvm/book3s.c |  61 ++++++------
->  arch/powerpc/kvm/booke.c  |  41 ++++----
->  arch/s390/kvm/kvm-s390.c  | 203 +++++++++++++++++++-------------------
->  arch/x86/kvm/x86.c        |  80 +++++++--------
->  include/linux/kvm_host.h  |   5 +
->  7 files changed, 231 insertions(+), 243 deletions(-)
+> Patch easily reviewed with --word-diff.
 > 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 23ebe51410f0..8417b200bec9 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -29,20 +29,17 @@
->  
->  #include "trace.h"
->  
-> -#define VM_STAT(x) { #x, offsetof(struct kvm, stat.x), KVM_STAT_VM }
-> -#define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
-> -
->  struct kvm_stats_debugfs_item debugfs_entries[] = {
-> -	VCPU_STAT(halt_successful_poll),
-> -	VCPU_STAT(halt_attempted_poll),
-> -	VCPU_STAT(halt_poll_invalid),
-> -	VCPU_STAT(halt_wakeup),
-> -	VCPU_STAT(hvc_exit_stat),
-> -	VCPU_STAT(wfe_exit_stat),
-> -	VCPU_STAT(wfi_exit_stat),
-> -	VCPU_STAT(mmio_exit_user),
-> -	VCPU_STAT(mmio_exit_kernel),
-> -	VCPU_STAT(exits),
-> +	VCPU_STAT("halt_successful_poll", halt_successful_poll),
-> +	VCPU_STAT("halt_attempted_poll", halt_attempted_poll),
-> +	VCPU_STAT("halt_poll_invalid", halt_poll_invalid),
-> +	VCPU_STAT("halt_wakeup", halt_wakeup),
-> +	VCPU_STAT("hvc_exit_stat", hvc_exit_stat),
-> +	VCPU_STAT("wfe_exit_stat", wfe_exit_stat),
-> +	VCPU_STAT("wfi_exit_stat", wfi_exit_stat),
-> +	VCPU_STAT("mmio_exit_user", mmio_exit_user),
-> +	VCPU_STAT("mmio_exit_kernel", mmio_exit_kernel),
-> +	VCPU_STAT("exits", exits),
->  	{ NULL }
->  };
-
-Patch easily reviewed with --word-diff.
-
-[...]
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 6d58beb65454..2e6ead872957 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1130,6 +1130,11 @@ struct kvm_stats_debugfs_item {
->  #define KVM_DBGFS_GET_MODE(dbgfs_item)                                         \
->  	((dbgfs_item)->mode ? (dbgfs_item)->mode : 0644)
->  
-> +#define VM_STAT(n, x, ...) 													   \
-> +	{ n, offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__ }
-> +#define VCPU_STAT(n, x, ...)												   \
-
-Not sure while you use so many whitespaces here... (maybe Paolo can
-strip some when applying?).
-
-Otherwise it looks nicer that v1, thanks.
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> +	{ n, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__ }
-> +
->  extern struct kvm_stats_debugfs_item debugfs_entries[];
->  extern struct dentry *kvm_debugfs_dir;
->  
+> [...]
+>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> index 6d58beb65454..2e6ead872957 100644
+>> --- a/include/linux/kvm_host.h
+>> +++ b/include/linux/kvm_host.h
+>> @@ -1130,6 +1130,11 @@ struct kvm_stats_debugfs_item {
+>>   #define KVM_DBGFS_GET_MODE(dbgfs_item)                                         \
+>>   	((dbgfs_item)->mode ? (dbgfs_item)->mode : 0644)
+>>   
+>> +#define VM_STAT(n, x, ...) 													   \
+>> +	{ n, offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__ }
+>> +#define VCPU_STAT(n, x, ...)												   \
 > 
+> Not sure while you use so many whitespaces here... (maybe Paolo can
+> strip some when applying?).
+
+I honestly am not sure why it added few more spaces than I wanted, but 
+the idea was to follow the KVM_DBGFS_GET_MODE macro above and put the 
+backslash at the end of the line (80th char).
+
+> 
+> Otherwise it looks nicer that v1, thanks.
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+>> +	{ n, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__ }
+>> +
+>>   extern struct kvm_stats_debugfs_item debugfs_entries[];
+>>   extern struct dentry *kvm_debugfs_dir;
+>>   
+>>
+> 
+
