@@ -2,27 +2,27 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 028D61AA1F5
-	for <lists+kvm-ppc@lfdr.de>; Wed, 15 Apr 2020 14:58:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9897A1AA089
+	for <lists+kvm-ppc@lfdr.de>; Wed, 15 Apr 2020 14:32:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S370280AbgDOMsO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 15 Apr 2020 08:48:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34760 "EHLO mail.kernel.org"
+        id S369323AbgDOM2m (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 15 Apr 2020 08:28:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37406 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2408952AbgDOLnE (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 15 Apr 2020 07:43:04 -0400
+        id S2409130AbgDOLpH (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 15 Apr 2020 07:45:07 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DBB9220737;
-        Wed, 15 Apr 2020 11:43:02 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8F20D206A2;
+        Wed, 15 Apr 2020 11:45:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586950983;
-        bh=HJVDu28gY1/bAP0E/D5bAYl4WxLMLzNvno4dmyQIw/E=;
+        s=default; t=1586951106;
+        bh=ha+CAQ7iEhlPF52xa10ZLaHKRCJQ1ZS6XYdgwGYgaWw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GUsjGYYSA7PFGrQ71q4iLSe54PdeSDF8/M8IJaL+MdnB02mwJRw6D5aCdGuDc3WAJ
-         pSKizkrG/QhSOFguE2tSN8ktLArPpM/fV9Q9XHgHe19s6WE4f4KjjlH9tAJowSQ08j
-         fRXEnVCW5abwRDqNPEf2FoVnbgbWweNpBmLFBavU=
+        b=l/8fL2X6kdkDQlXB/dOQYmLiUx4eOSYfzzO2iaRV0tCsZP0iyOsbHytu+kPQ3xFT+
+         o4GxODXqBtazOZZ2hB4eNatocMF+/jd1NjA4dhhCm9SsykWxOpdHpcDSFWUgI0HFwP
+         w+XctRZ4CCSWbviuqTUhq2v5WsQh9rYDKmsfE9q8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Michael Roth <mdroth@linux.vnet.ibm.com>, linuxppc-dev@ozlabs.org,
@@ -30,12 +30,12 @@ Cc:     Michael Roth <mdroth@linux.vnet.ibm.com>, linuxppc-dev@ozlabs.org,
         Paul Mackerras <paulus@ozlabs.org>,
         Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 5.5 031/106] KVM: PPC: Book3S HV: Fix H_CEDE return code for nested guests
-Date:   Wed, 15 Apr 2020 07:41:11 -0400
-Message-Id: <20200415114226.13103-31-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 21/84] KVM: PPC: Book3S HV: Fix H_CEDE return code for nested guests
+Date:   Wed, 15 Apr 2020 07:43:38 -0400
+Message-Id: <20200415114442.14166-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200415114226.13103-1-sashal@kernel.org>
-References: <20200415114226.13103-1-sashal@kernel.org>
+In-Reply-To: <20200415114442.14166-1-sashal@kernel.org>
+References: <20200415114442.14166-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -93,10 +93,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index ef6aa63b071b3..a1d793b96d2b7 100644
+index 36abbe3c346df..e2183fed947d4 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3628,6 +3628,7 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+@@ -3623,6 +3623,7 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
  		if (trap == BOOK3S_INTERRUPT_SYSCALL && !vcpu->arch.nested &&
  		    kvmppc_get_gpr(vcpu, 3) == H_CEDE) {
  			kvmppc_nested_cede(vcpu);
