@@ -2,206 +2,160 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CDF451AD3E2
-	for <lists+kvm-ppc@lfdr.de>; Fri, 17 Apr 2020 03:00:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28F401AD416
+	for <lists+kvm-ppc@lfdr.de>; Fri, 17 Apr 2020 03:26:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728091AbgDQBAp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 16 Apr 2020 21:00:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51010 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725858AbgDQBAp (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 16 Apr 2020 21:00:45 -0400
-X-Greylist: delayed 76000 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 16 Apr 2020 18:00:45 PDT
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 663ACC061A0C;
-        Thu, 16 Apr 2020 18:00:45 -0700 (PDT)
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 493Hp22p84z9sRN; Fri, 17 Apr 2020 11:00:42 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1587085242;
-        bh=g1ERQ546dSK/iDMW/vYxYEg//1XoTyotxttCfMkrVjg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nfuuW22aTv5Z15ezeMLKG24F0NK/WIaRzA9pEnl6YeZIoRMNSHsrHTIENWaJm+v/y
-         rysf+XzfR1PJs5Y83K7zXL4c82mhHRPAyLLw+XtvglbTzwnw+LHNGzah11hglaA8lm
-         /WYJLFcQZUVeQFIrPX5NY0cH9c/WR1W0/JVSEBYk=
-Date:   Fri, 17 Apr 2020 10:47:28 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, groug@kaod.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Handle non-present PTEs in page
- fault functions
-Message-ID: <20200417004728.GB2102@umbus.fritz.box>
-References: <20200416050335.GB10545@blackberry>
- <a4e1bf29-af52-232e-d0d2-06206fa05fbe@kaod.org>
+        id S1725858AbgDQB0l (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 16 Apr 2020 21:26:41 -0400
+Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:47567 "EHLO
+        wout1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725800AbgDQB0j (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 16 Apr 2020 21:26:39 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.west.internal (Postfix) with ESMTP id D2C71633;
+        Thu, 16 Apr 2020 21:26:37 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Thu, 16 Apr 2020 21:26:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=russell.cc; h=
+        message-id:subject:from:to:cc:date:in-reply-to:references
+        :content-type:mime-version:content-transfer-encoding; s=fm1; bh=
+        YyORb9IBz9K3VedEbvxpxVFCoWtwyIDeBemcaew2SnU=; b=Id68iYAVxAhC3coY
+        VdtHQgoFriBjyW4wVW56qMkMgkYSM1mw3SDr4r5DmF8s8lOhUdFf0Gkr/cK3ONX4
+        kqcienVRMGlRGm3NH6HblGnRXtXMSJ7JyNOD0bnjbReRR1wR9jgeWrUilw9Y6i6b
+        tA4ButdTiQoVi6md8q1B9LvIvjOCIT6EOHIorlc5bKdyRJTEmFtF8Em38BzDJm8X
+        ETTivZvmHNo2lwYPt8mmi1ymZgxYoVs48CzKo0xZ35EDtRl+4JXKR3HfHkQFBFX/
+        hhIJnwAFuJ3+Al6srLFg3tDebVKW4gBh8rJjE9dw/1hOMbswDJq9ZREmWx2US8lz
+        BHbZqQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:content-type
+        :date:from:in-reply-to:message-id:mime-version:references
+        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; bh=YyORb9IBz9K3VedEbvxpxVFCoWtwyIDeBemcaew2S
+        nU=; b=mV8cjKDW6RhLjEOPebTmT39Dl9Mg3O4EhabORpccjfCDrdrM49p5cuxAC
+        zZ1xjAQpYqUZoBixz+uGVOyQfxA+/2FObY0MT1qNFX/g3d9+sKATmHNmYIBLh8fK
+        qYetxwL3NEp9Jxqz0X/vnZYOEE+Zh2Hqjm4mM6R8yXN0XxQYxGcmdVaPPSCi+qE8
+        d7HLtgQLf1EAitBwDUsMHIkAWvT/Wrno2hOMuwcpr8ORKroumbTCKW76xftqEJZs
+        M7nZp6+3UGhJrtwhSV7OfF8uO/762IV7ptCaOfazA4Uok3Jbm9+wALRVfgSTGMa3
+        g+pci2c0UNfbSuFDTXTh5qrMmzcOA==
+X-ME-Sender: <xms:yQWZXj0gSzRxSOrhZTntNlZjNbdjHf-Y7L6ADvwoKGj5rkxqGMXG6Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrfeeigdegiecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfg
+    hrlhcuvffnffculddutddmnecujfgurhepkffuhffvffgjfhgtfggggfesthejredttder
+    jeenucfhrhhomheptfhushhsvghllhcuvehurhhrvgihuceorhhushgtuhhrsehruhhssh
+    gvlhhlrdgttgeqnecukfhppeduvddurdeghedrvdduvddrvdefleenucevlhhushhtvghr
+    ufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehruhhstghurhesrhhushhsvg
+    hllhdrtggt
+X-ME-Proxy: <xmx:yQWZXnmnzqv6SYcVncDUsZk_eivJIGcqHZNP_Cdteu9DxKtBssuOZw>
+    <xmx:yQWZXsObGoUoJvBQ5zO6ErWhcPLFKSLldA9S9jhPuoqF1swANxgy5Q>
+    <xmx:yQWZXm5DwOGA6U1B8hQfI_LEXHdCsh0S6w8EQHvIQKEV-9OQZzJRRg>
+    <xmx:zQWZXs4lJlw96-_bXcryEAL7CzWaE-HfFSwLB6ZfMDrefDRCTUU7jw>
+Received: from crackle.ozlabs.ibm.com (ppp121-45-212-239.bras1.cbr2.internode.on.net [121.45.212.239])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 65539328005E;
+        Thu, 16 Apr 2020 21:26:30 -0400 (EDT)
+Message-ID: <b0b361092d2d7e38f753edee6dcd9222b4e388ce.camel@russell.cc>
+Subject: Re: [PATCH kernel v2 0/7] powerpc/powenv/ioda: Allow huge DMA
+ window at 4GB
+From:   Russell Currey <ruscur@russell.cc>
+To:     Oliver O'Halloran <oohall@gmail.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, KVM list <kvm@vger.kernel.org>,
+        Alistair Popple <alistair@popple.id.au>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Date:   Fri, 17 Apr 2020 11:26:27 +1000
+In-Reply-To: <CAOSf1CHgUsJ7jGokg6QD6cEDr4-o5hnyyyjRZ=YijsRY3T1sYA@mail.gmail.com>
+References: <20200323075354.93825-1-aik@ozlabs.ru>
+         <b512ac5e-dca5-4c08-8ea1-a636b887c0d0@ozlabs.ru>
+         <d5cac37a-8b32-cabf-e247-10e64f0110ab@ozlabs.ru>
+         <CAOSf1CGfjX9LGQ1GDSmxrzjnaWOM3mUvBu9_xe-L2umin9n66w@mail.gmail.com>
+         <CAOSf1CHgUsJ7jGokg6QD6cEDr4-o5hnyyyjRZ=YijsRY3T1sYA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.1 
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="U+BazGySraz5kW0T"
-Content-Disposition: inline
-In-Reply-To: <a4e1bf29-af52-232e-d0d2-06206fa05fbe@kaod.org>
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Thu, 2020-04-16 at 12:53 +1000, Oliver O'Halloran wrote:
+> On Thu, Apr 16, 2020 at 12:34 PM Oliver O'Halloran <oohall@gmail.com>
+> wrote:
+> > On Thu, Apr 16, 2020 at 11:27 AM Alexey Kardashevskiy <
+> > aik@ozlabs.ru> wrote:
+> > > Anyone? Is it totally useless or wrong approach? Thanks,
+> > 
+> > I wouldn't say it's either, but I still hate it.
+> > 
+> > The 4GB mode being per-PHB makes it difficult to use unless we
+> > force
+> > that mode on 100% of the time which I'd prefer not to do. Ideally
+> > devices that actually support 64bit addressing (which is most of
+> > them)
+> > should be able to use no-translate mode when possible since a) It's
+> > faster, and b) It frees up room in the TCE cache devices that
+> > actually
+> > need them. I know you've done some testing with 100G NICs and found
+> > the overhead was fine, but IMO that's a bad test since it's pretty
+> > much the best-case scenario since all the devices on the PHB are in
+> > the same PE. The PHB's TCE cache only hits when the TCE matches the
+> > DMA bus address and the PE number for the device so in a multi-PE
+> > environment there's a lot of potential for TCE cache trashing. If
+> > there was one or two PEs under that PHB it's probably not going to
+> > matter, but if you have an NVMe rack with 20 drives it starts to
+> > look
+> > a bit ugly.
+> > 
+> > That all said, it might be worth doing this anyway since we
+> > probably
+> > want the software infrastructure in place to take advantage of it.
+> > Maybe expand the command line parameters to allow it to be enabled
+> > on
+> > a per-PHB basis rather than globally.
+> 
+> Since we're on the topic
+> 
+> I've been thinking the real issue we have is that we're trying to
+> pick
+> an "optimal" IOMMU config at a point where we don't have enough
+> information to work out what's actually optimal. The IOMMU config is
+> done on a per-PE basis, but since PEs may contain devices with
+> different DMA masks (looking at you wierd AMD audio function) we're
+> always going to have to pick something conservative as the default
+> config for TVE#0 (64k, no bypass mapping) since the driver will tell
+> us what the device actually supports long after the IOMMU
+> configuation
+> is done. What we really want is to be able to have separate IOMMU
+> contexts for each device, or at the very least a separate context for
+> the crippled devices.
+> 
+> We could allow a per-device IOMMU context by extending the Master /
+> Slave PE thing to cover DMA in addition to MMIO. Right now we only
+> use
+> slave PEs when a device's MMIO BARs extend over multiple m64
+> segments.
+> When that happens an MMIO error causes the PHB to freezes the PE
+> corresponding to one of those segments, but not any of the others. To
+> present a single "PE" to the EEH core we check the freeze status of
+> each of the slave PEs when the EEH core does a PE status check and if
+> any of them are frozen, we freeze the rest of them too. When a driver
+> sets a limited DMA mask we could move that device to a seperate slave
+> PE so that it has it's own IOMMU context taylored to its DMA
+> addressing limits.
+> 
+> Thoughts?
 
---U+BazGySraz5kW0T
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+For what it's worth this sounds like a good idea to me, it just sounds
+tricky to implement.  You're adding another layer of complexity on top
+of EEH (well, making things look simple to the EEH core and doing your
+own freezing on top of it) in addition to the DMA handling.
 
-On Thu, Apr 16, 2020 at 10:07:49AM +0200, C=E9dric Le Goater wrote:
-> On 4/16/20 7:03 AM, Paul Mackerras wrote:
-> > Since cd758a9b57ee "KVM: PPC: Book3S HV: Use __gfn_to_pfn_memslot in HPT
-> > page fault handler", it's been possible in fairly rare circumstances to
-> > load a non-present PTE in kvmppc_book3s_hv_page_fault() when running a
-> > guest on a POWER8 host.
-> >=20
-> > Because that case wasn't checked for, we could misinterpret the non-pre=
-sent
-> > PTE as being a cache-inhibited PTE.  That could mismatch with the
-> > corresponding hash PTE, which would cause the function to fail with -EF=
-AULT
-> > a little further down.  That would propagate up to the KVM_RUN ioctl()
-> > generally causing the KVM userspace (usually qemu) to fall over.
-> >=20
-> > This addresses the problem by catching that case and returning to the g=
-uest
-> > instead, letting it fault again, and retrying the whole page fault from
-> > the beginning.
-> >=20
-> > For completeness, this fixes the radix page fault handler in the same
-> > way.  For radix this didn't cause any obvious misbehaviour, because we
-> > ended up putting the non-present PTE into the guest's partition-scoped
-> > page tables, leading immediately to another hypervisor data/instruction
-> > storage interrupt, which would go through the page fault path again
-> > and fix things up.
-> >=20
-> > Fixes: cd758a9b57ee "KVM: PPC: Book3S HV: Use __gfn_to_pfn_memslot in H=
-PT page fault handler"
-> > Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1820402
-> > Reported-by: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
->=20
-> I didn't see the reported issue with the current 5.7-rc1. Anyhow I gave
-> this patch a try on a P8 host and a P9 host with a radix guest and a hash=
-=20
-> guest (using rhel6). Passthrough is fine also.
->=20
-> Tested-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> The code looks correct,
->=20
-> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+If it works then great, just has a high potential to become a new bug
+haven.
 
-I ran my test case overnight with this patch for over 1000 iterations,
-without any apparent problems so
+> 
+> Oliver
 
-Tested-by: David Gibson <david@gibson.dropbear.id.au>
-
->=20
-> Thanks,
->=20
-> C.=20
->=20
->=20
-> > ---
-> > This is a reworked version of the patch David Gibson sent recently,
-> > with the fix applied to the radix case as well. The commit message
-> > is mostly stolen from David's patch.
-> >=20
-> >  arch/powerpc/kvm/book3s_64_mmu_hv.c    | 9 +++++----
-> >  arch/powerpc/kvm/book3s_64_mmu_radix.c | 9 +++++----
-> >  2 files changed, 10 insertions(+), 8 deletions(-)
-> >=20
-> > diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/boo=
-k3s_64_mmu_hv.c
-> > index 3aecec8..20b7dce 100644
-> > --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> > +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> > @@ -604,18 +604,19 @@ int kvmppc_book3s_hv_page_fault(struct kvm_run *r=
-un, struct kvm_vcpu *vcpu,
-> >  	 */
-> >  	local_irq_disable();
-> >  	ptep =3D __find_linux_pte(vcpu->arch.pgdir, hva, NULL, &shift);
-> > +	pte =3D __pte(0);
-> > +	if (ptep)
-> > +		pte =3D *ptep;
-> > +	local_irq_enable();
-> >  	/*
-> >  	 * If the PTE disappeared temporarily due to a THP
-> >  	 * collapse, just return and let the guest try again.
-> >  	 */
-> > -	if (!ptep) {
-> > -		local_irq_enable();
-> > +	if (!pte_present(pte)) {
-> >  		if (page)
-> >  			put_page(page);
-> >  		return RESUME_GUEST;
-> >  	}
-> > -	pte =3D *ptep;
-> > -	local_irq_enable();
-> >  	hpa =3D pte_pfn(pte) << PAGE_SHIFT;
-> >  	pte_size =3D PAGE_SIZE;
-> >  	if (shift)
-> > diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/=
-book3s_64_mmu_radix.c
-> > index 134fbc1..7bf94ba 100644
-> > --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-> > +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-> > @@ -815,18 +815,19 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcp=
-u *vcpu,
-> >  	 */
-> >  	local_irq_disable();
-> >  	ptep =3D __find_linux_pte(vcpu->arch.pgdir, hva, NULL, &shift);
-> > +	pte =3D __pte(0);
-> > +	if (ptep)
-> > +		pte =3D *ptep;
-> > +	local_irq_enable();
-> >  	/*
-> >  	 * If the PTE disappeared temporarily due to a THP
-> >  	 * collapse, just return and let the guest try again.
-> >  	 */
-> > -	if (!ptep) {
-> > -		local_irq_enable();
-> > +	if (!pte_present(pte)) {
-> >  		if (page)
-> >  			put_page(page);
-> >  		return RESUME_GUEST;
-> >  	}
-> > -	pte =3D *ptep;
-> > -	local_irq_enable();
-> > =20
-> >  	/* If we're logging dirty pages, always map single pages */
-> >  	large_enable =3D !(memslot->flags & KVM_MEM_LOG_DIRTY_PAGES);
-> >=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---U+BazGySraz5kW0T
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6Y/J8ACgkQbDjKyiDZ
-s5KeARAArge+EauSGPsWkcx5KJ/iOjUpSUSe5mHJXFyeD7zO+1qpwNVo0QIwKzGX
-aLQMtZ+t/rcs88mFkuXQG8aZyx4e3kD8WW8I0cFM8BvaKFLpoRb5JRSrd+hwa+Yd
-imn0LHe2UZlB5MFML9IV6zBFk0juz4mdxW9vYtLzIm1Icp2+u/t7k8iQyKNjvRKC
-p4EG5NI1rwRFT/vreArPc5EwtOAnAQlQpdijOc8uSCgJ60kqX1go4pMnmP8xK25t
-99vntr3jIIFY6C0rjRHh64mOClY3DW8b+0J6tEUKTQDV710mx1uvJJm/Oxwetxpk
-mefPm9FHtRfgpuMEO5nzovCfMlms6O4cQ7zsxHVt8LcUn4W8HuP4Od0HQv13Yfuh
-vbTjpEYUS1Ls+bh2DXbpSpGtlZY33FZN+adBxcYN+rOTlYXGKrkti2kGgjO1wGiE
-MpCEJx7VXgvpm2T9Q12DACTRT0uEIa9wwun2bTNepGTcQp35uX1HedjzWjNHxZu2
-Ou8RtC2zmVbauKk8UBlueqyqmHopcPPS72ef5AC9cHZSY0zyHrMC3lGvc0Pj5J3V
-+kAMpuYufu2+46aFkZZcHz2pzJnw072qqx7KuVX0wdMC0r+wDFL1ULvAS82EjDmu
-S0lWrvygkvL9zjSFcp2K+dCtU6TwAg2LJBVCdvV/Zw9jqWWvE54=
-=ivnP
------END PGP SIGNATURE-----
-
---U+BazGySraz5kW0T--
