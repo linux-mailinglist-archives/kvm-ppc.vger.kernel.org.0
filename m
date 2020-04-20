@@ -2,91 +2,74 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 891371B1896
-	for <lists+kvm-ppc@lfdr.de>; Mon, 20 Apr 2020 23:43:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17F261B1A52
+	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Apr 2020 01:53:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726039AbgDTVnT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 20 Apr 2020 17:43:19 -0400
-Received: from ms.lwn.net ([45.79.88.28]:53958 "EHLO ms.lwn.net"
+        id S1726697AbgDTXxJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 20 Apr 2020 19:53:09 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:56801 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725989AbgDTVnT (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 20 Apr 2020 17:43:19 -0400
-Received: from lwn.net (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 632E4823;
-        Mon, 20 Apr 2020 21:43:17 +0000 (UTC)
-Date:   Mon, 20 Apr 2020 15:43:16 -0600
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Rob Herring <robh@kernel.org>,
-        Maxime Ripard <maxime@cerno.tech>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Yuti Amonkar <yamonkar@cadence.com>,
-        devicetree@vger.kernel.org, linux-arch@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-rdma@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-crypto@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        freedreno@lists.freedesktop.org, linux-afs@lists.infradead.org,
-        ecryptfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
-        ocfs2-devel@oss.oracle.com, linux-pci@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-spi@vger.kernel.org,
-        Sandeep Maheswaram <sanm@codeaurora.org>,
-        Stephen Boyd <swboyd@chromium.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        linux-usb@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Matthias Brugger <mbrugger@suse.com>, netdev@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-rockchip@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net
-Subject: Re: [PATCH v2 00/33] Documentation fixes for Kernel 5.8
-Message-ID: <20200420154316.28e42905@lwn.net>
-In-Reply-To: <cover.1586881715.git.mchehab+huawei@kernel.org>
-References: <cover.1586881715.git.mchehab+huawei@kernel.org>
-Organization: LWN.net
+        id S1725989AbgDTXxJ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 20 Apr 2020 19:53:09 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 495k680rMFz9sSK; Tue, 21 Apr 2020 09:53:03 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1587426784; bh=4g/i2MGnTG6nJDseUfUwsw1dXEWqVewuevwTuwG5qgk=;
+        h=Date:From:To:Cc:Subject:From;
+        b=AAw+ol29IphyefKgOkTg7mgJkCBqOuFEFDhNrJ+knK0TX+o9mttp4ZHY+8q6TO2w8
+         ebHBXStg/TFfEUk1fpxqtc4W2Lu5MlYwvx/r7zfa2seqBUwxeAKNXZFGLkrPnRKQ0B
+         TBmHL5AYkCLTItwPzsNgefMG+r/M5WKibl9w045j3lkCk9FYmF2DAyYqWr8p/5gpGe
+         clM5pexpppqnhvdoEEP767YmaQPt1jD2uGyU8prUdq9Iq7sAJjp3elT3wgdeEOUqO7
+         FXzRNB8Y/QTc+fkkLc6TNb50F2f1XdkZudgp5JemyiGXjBQ402OB7On5hT63/kZ+ks
+         oGaXkmcrgNf4g==
+Date:   Tue, 21 Apr 2020 09:53:00 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Subject: [GIT PULL] Please pull my kvm-ppc-fixes-5.7-1 tag
+Message-ID: <20200420235300.GA7086@blackberry>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, 14 Apr 2020 18:48:26 +0200
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+Paolo,
 
-> Patches 1 to 5 contain changes to the documentation toolset:
-> 
-> - The first 3 patches help to reduce a lot the number of reported
->   kernel-doc issues, by making the tool more smart.
-> 
-> - Patches 4 and 5 are meant to partially address the PDF
->   build, with now requires Sphinx version 2.4 or upper.
-> 
-> The remaining patches fix broken references detected by
-> this tool:
-> 
->         ./scripts/documentation-file-ref-check
-> 
-> and address other random errors due to tags being mis-interpreted
-> or mis-used.
-> 
-> They are independent each other, but some may depend on
-> the kernel-doc improvements.
-> 
-> PS.: Due to the large number of C/C, I opted to keep a smaller
-> set of C/C at this first e-mail (only e-mails with "L:" tag from
-> MAINTAINERS file).
-
-OK, I've applied this set, minus #17 which was applied elsewhere.
+Please do a pull from my kvm-ppc-fixes-5.7-1 tag to get one commit
+which fixes a regression introduced in the 5.7 merge window by one of
+my patches.  It causes guests in HPT mode occasionally to get a
+spurious EFAULT error return from KVM_RUN, which tends to cause them
+to die.
 
 Thanks,
+Paul.
 
-jon
+The following changes since commit dbef2808af6c594922fe32833b30f55f35e9da6d:
+
+  KVM: VMX: fix crash cleanup when KVM wasn't used (2020-04-07 08:35:36 -0400)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.7-1
+
+for you to fetch changes up to ae49dedaa92b55258544aace7c585094b862ef79:
+
+  KVM: PPC: Book3S HV: Handle non-present PTEs in page fault functions (2020-04-21 09:23:41 +1000)
+
+----------------------------------------------------------------
+PPC KVM fix for 5.7
+
+- Fix a regression introduced in the last merge window, which results
+  in guests in HPT mode dying randomly.
+
+----------------------------------------------------------------
+Paul Mackerras (1):
+      KVM: PPC: Book3S HV: Handle non-present PTEs in page fault functions
+
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    | 9 +++++----
+ arch/powerpc/kvm/book3s_64_mmu_radix.c | 9 +++++----
+ 2 files changed, 10 insertions(+), 8 deletions(-)
