@@ -2,130 +2,90 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EF8B1B1EDE
-	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Apr 2020 08:35:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4577E1B2803
+	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Apr 2020 15:35:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726716AbgDUGfR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 21 Apr 2020 02:35:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60008 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726364AbgDUGfR (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Apr 2020 02:35:17 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF0F0C061A0F;
-        Mon, 20 Apr 2020 23:35:16 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id e8so5241551ilm.7;
-        Mon, 20 Apr 2020 23:35:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2GZ3FEJ4iPZ3+IRnrKx7fOdw1woztaKLuV+cLqPMCgY=;
-        b=QxMVyfDLq1hToJoggNoJE9N+v6mbWwed+u3yYFj/4mgX0rFsfe4Ip4Py9Dz0VTHclg
-         bqM/hQ5rFYOQQekWe+gAP6NTB3csVRytsir+sHfBjfeeIgCg30JjYsMcXuYLqshCa3bA
-         cK3NiW8ghX5rClE2iWcsA+vlfYQU7p2psMRScc7MHcYGKJbcth9mWYCKKxiXs6UOrlcK
-         QBSQxCd7tn5iQznHZnO+7lrzI30HYGB3FHg9wPyrH+kfLX/SdMCVQg5kgdz3cyHMUbQ8
-         6C49cuZzT3+hV2xB9xHikkzaG9j40Yi3bZX8/pJMpQeWAgtLQ/jSo7XctVH0Uxd/PA4F
-         FOqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2GZ3FEJ4iPZ3+IRnrKx7fOdw1woztaKLuV+cLqPMCgY=;
-        b=b4gfvENeSg3Sz8UmXhS2+z5DJOaBw9rfjb4YFbWsDRmLY8E6LLar/TNH5FdxHKdG4p
-         XMoQRCs39HBZv7gDcoIUv8EXqJ2vYYDpdTDJlwou28M9q0j26Xb/pKHQO1F2yP142LFN
-         ka37l2u64MVby4GCT7gKRpjiXCEcnVyvmacFuypfCCpx1Xmtizpo4daqu77/k34/+Z3D
-         4/o/B5d93KQpQkbkpUn3cXs/epbkXjMRL3MX6PQ5X/wKfG+LOna9p7ztQxyhfWQNv50j
-         1mzjAb0KMbG3ZXBiKyWh8xrKp6lt/1RBSMABFuxB0GEqTQW8xxOsVjvfdRff+DqTozW6
-         Fytg==
-X-Gm-Message-State: AGi0PuaJr/nKcZovVZkgLI9UHasgGnW2ehMx0rkyjpclWEswHOfjTw4X
-        AR0/l4ydYX2G/xE7iaALaZFbJqdtk7nHa2qdV8Q=
-X-Google-Smtp-Source: APiQypI0UjZj3RJkKhckLd67LZ5JWoeLzx1wDwHDSxBunlAoQ/EBiYhIkcP39F0zeF4gS3v76sDGDLlnUaj8mi5mmac=
-X-Received: by 2002:a92:7c01:: with SMTP id x1mr12131737ilc.122.1587450916283;
- Mon, 20 Apr 2020 23:35:16 -0700 (PDT)
+        id S1728868AbgDUNe7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 21 Apr 2020 09:34:59 -0400
+Received: from ozlabs.org ([203.11.71.1]:35695 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728864AbgDUNex (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 21 Apr 2020 09:34:53 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4964LH5jycz9sSY;
+        Tue, 21 Apr 2020 23:34:47 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1587476088;
+        bh=Y+z6/rcJIObmZtZ51xGieSwpLR256JCEweZeuezbpcY=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=KGVt1GTIlQZOPxOIid++1szONXTthboUOft5u/6EE6JysRPJ8O3iv3vAb+Ihm6B41
+         2cWtWSpLVTDTgAtQYInJePYFBXqa31pJ2H2LtW1YCjjhfeyYaK/1BOM/y63Ndfx61F
+         +2Z05AzNnKItYukVZO6EckdQVK/oQC5HjIxrJss7+2q0YTdpRwbANP94m9qVl1fBQH
+         ZxK5XTabGGImV8mfAnOERHQffGm8D4Z3DOHbFFwTqJqDf006IT8h5JTjmOh/FVjGNp
+         7M4aWACvFXqgMhLc59XWbdSFubep7HPt419o68jfI5bOs3y4XRQOzUN7zajxALFiDz
+         5g/ux86TtXjfA==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Laurent Dufour <ldufour@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     paulus@samba.org, linux-kernel@vger.kernel.org,
+        Alexey Kardashevskiy <aik@ozlabs.ru>, benh@kernel.crashing.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: read ibm,secure-memory nodes
+In-Reply-To: <20200416162715.45846-1-ldufour@linux.ibm.com>
+References: <20200416162715.45846-1-ldufour@linux.ibm.com>
+Date:   Tue, 21 Apr 2020 23:34:59 +1000
+Message-ID: <87k129gdx8.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-References: <20200323075354.93825-1-aik@ozlabs.ru> <b512ac5e-dca5-4c08-8ea1-a636b887c0d0@ozlabs.ru>
- <d5cac37a-8b32-cabf-e247-10e64f0110ab@ozlabs.ru> <CAOSf1CGfjX9LGQ1GDSmxrzjnaWOM3mUvBu9_xe-L2umin9n66w@mail.gmail.com>
- <CAOSf1CHgUsJ7jGokg6QD6cEDr4-o5hnyyyjRZ=YijsRY3T1sYA@mail.gmail.com>
- <b0b361092d2d7e38f753edee6dcd9222b4e388ce.camel@russell.cc>
- <9893c4db-057d-8e42-52fe-8241d6d90b5f@ozlabs.ru> <76718d0c46f4638a57fd2deeeed031143599d12d.camel@gmail.com>
- <8f317916-06be-ed25-4d9b-a8e2e993b112@ozlabs.ru>
-In-Reply-To: <8f317916-06be-ed25-4d9b-a8e2e993b112@ozlabs.ru>
-From:   "Oliver O'Halloran" <oohall@gmail.com>
-Date:   Tue, 21 Apr 2020 16:35:05 +1000
-Message-ID: <CAOSf1CG_qiR2HvSFVTbgTyqVmDt4+Oy60PNWY23K2ihHib1K7Q@mail.gmail.com>
-Subject: Re: [PATCH kernel v2 0/7] powerpc/powenv/ioda: Allow huge DMA window
- at 4GB
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     Russell Currey <ruscur@russell.cc>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, KVM list <kvm@vger.kernel.org>,
-        Alistair Popple <alistair@popple.id.au>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Apr 21, 2020 at 3:11 PM Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+Hi Laurent,
+
+Laurent Dufour <ldufour@linux.ibm.com> writes:
+> The newly introduced ibm,secure-memory nodes supersede the
+> ibm,uv-firmware's property secure-memory-ranges.
+
+Is either documented in a device tree binding document anywhere?
+
+cheers
+
+> Firmware will no more expose the secure-memory-ranges property so first
+> read the new one and if not found rollback to the older one.
 >
-> One example of a problem device is AMD GPU with 64bit video PCI function
-> and 32bit audio, no?
+> Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
+> ---
+>  arch/powerpc/kvm/book3s_hv_uvmem.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
 >
-> What PEs will they get assigned to now? Where will audio's MMIO go? It
-> cannot be the same 64bit MMIO segment, right? If so, it is a separate PE
-> already. If not, then I do not understand "we're free to assign whatever
-> PE number we want.
-
-The BARs stay in the same place and as far as MMIO is concerned
-nothing has changed. For MMIO the PHB uses the MMIO address to find a
-PE via the M64 BAR table, but for DMA it uses a *completely* different
-mechanism. Instead it takes the BDFN (included in the DMA packet
-header) and the Requester Translation Table (RTT) to map the BDFN to a
-PE. Normally you would configure the PHB so the same PE used for MMIO
-and DMA, but you don't have to.
-
-> > I think the key thing to realise is that we'd only be using the DMA-PE
-> > when a crippled DMA mask is set by the driver. In all other cases we
-> > can just use the "native PE" and when the driver unbinds we can de-
-> > allocate our DMA-PE and return the device to the PE containing it's
-> > MMIO BARs. I think we can keep things relatively sane that way and the
-> > real issue is detecting EEH events on the DMA-PE.
->
->
-> Oooor we could just have 1 DMA window (or, more precisely, a single
-> "TVE" as it is either window or bypass) per a PE and give every function
-> its own PE and create a window or a table when a device sets a DMA mask.
-> I feel I am missing something here though.
-
-Yes, we could do that, but do we want to?
-
-I was thinking we should try minimise the number of DMA-only PEs since
-it complicates the EEH freeze handling. When MMIO and DMA are mapped
-to the same PE an error on either will cause the hardware to stop
-both. When seperate PEs are used for DMA and MMIO you lose that
-atomicity. It's not a big deal if DMA is stopped and MMIO allowed
-since PAPR (sort-of) allows that, but having MMIO frozen with DMA
-unfrozen is a bit sketch.
-
-> >> For the time being, this patchset is good for:
-> >> 1. weird hardware which has limited DMA mask (this is why the patchset
-> >> was written in the first place)
-> >> 2. debug DMA by routing it via IOMMU (even when 4GB hack is not enabled).
-> >
-> > Sure, but it's still dependent on having firmware which supports the
-> > 4GB hack and I don't think that's in any offical firmware releases yet.
->
-> It's been a while :-/
-
-There's been no official FW releases with a skiboot that supports the
-phb get/set option opal calls so the only systems that can actually
-take advantage of it are our lab systems. It might still be useful for
-future systems, but I'd rather something that doesn't depend on FW
-support.
-
-
-Oliver
+> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> index 53b88cae3e73..ad950f8996e0 100644
+> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> @@ -735,6 +735,20 @@ static u64 kvmppc_get_secmem_size(void)
+>  	const __be32 *prop;
+>  	u64 size = 0;
+>  
+> +	/*
+> +	 * First try the new ibm,secure-memory nodes which supersede the
+> +	 * secure-memory-ranges property.
+> +	 * If we found somes, no need to read the deprecated one.
+> +	 */
+> +	for_each_compatible_node(np, NULL, "ibm,secure-memory") {
+> +		prop = of_get_property(np, "reg", &len);
+> +		if (!prop)
+> +			continue;
+> +		size += of_read_number(prop + 2, 2);
+> +	}
+> +	if (size)
+> +		return size;
+> +
+>  	np = of_find_compatible_node(NULL, NULL, "ibm,uv-firmware");
+>  	if (!np)
+>  		goto out;
+> -- 
+> 2.26.1
