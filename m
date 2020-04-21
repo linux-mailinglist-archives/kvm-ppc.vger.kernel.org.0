@@ -2,85 +2,108 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 407541B2843
-	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Apr 2020 15:44:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55BB91B2E74
+	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Apr 2020 19:39:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728904AbgDUNoJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 21 Apr 2020 09:44:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41620 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728865AbgDUNoI (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Apr 2020 09:44:08 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E183C061A10;
-        Tue, 21 Apr 2020 06:44:08 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id k6so404443iob.3;
-        Tue, 21 Apr 2020 06:44:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sPfBvq/n3vTz/kJ2DUkeMcpcV+Na4dhwXrNFcf9zH4c=;
-        b=fQyXbJZ4IBEWkP/bdhtRwYUJUyQ0QJnF1Bb8f3of8yxd8ucr8UU+FTlvyoiYxIWzxo
-         NQKQCkVQWRv76mDcDKhDZEfFfi6kYNzbPwa4HgPt8JvMoUxE3KpSFqDrZvK41gKybpJG
-         zaxKqxrkiLVmaK+94om70VgXPxkKyqWCnPqxEtgyaL1RLXcWyvmWw7wfVRqQmjdS43er
-         iMxuXXrsCwoFS6hAlymsfQfTCsXbO0HMd7M6M6CNNyk7t/Kjk2cOCszE7sfqEjBSZXW1
-         g1m21BNDn5VbS1z2vfpxWNC63rg7k/IjjF4j680C9GslztsSyKI7MOeXuHNz3AjuXc5r
-         I89Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sPfBvq/n3vTz/kJ2DUkeMcpcV+Na4dhwXrNFcf9zH4c=;
-        b=JtErP1bjzSuaWY+q4QTZyXerekqyJ2Ln8/kDFCTtOIcOc5Si4WKxPVlvTpFmmZT48P
-         jPsOycABMCm/cJYrP00jmSfi0YfDwXfBzDW+3IjyKgU9yyXLDu3smISMAdgjFNoQFJpU
-         D65J5mnicZ5ryOePAYFZHfWMKzQNv5o/V/LQB1IeQIiiwmCqFiETTA/nhZAqcGJfgkDb
-         u/3vuoa5uTbBfz9tFrm8BqLjSi234i3JXdavNpdwnaAlo536B/22QDZkvt24NmxSIj0h
-         mfaQnkzadGH+rs/1/NV1e8qP8xX7MFyNQNflM9PPkvyr36OfpjL/rpYnNx1UCvMB6i3Y
-         DYlw==
-X-Gm-Message-State: AGi0Puai63P1uw6ezGxz7WZlBMNGT+Vn4rtqfHXopF2NMWYH9AHGKcoC
-        hvdCjDgb/yU6CMtPbl2C4WP5bhhFH+yimj3O4p8=
-X-Google-Smtp-Source: APiQypImmMB49AgGl1BnBc0wcKFgqit9q6XYYifrmzA6W040jedeCZWXN8p6VY69AT0qDUZKGUxJdWq4qHdmn/56g6U=
-X-Received: by 2002:a05:6602:2cc4:: with SMTP id j4mr20392563iow.144.1587476647207;
- Tue, 21 Apr 2020 06:44:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200416162715.45846-1-ldufour@linux.ibm.com> <87k129gdx8.fsf@mpe.ellerman.id.au>
-In-Reply-To: <87k129gdx8.fsf@mpe.ellerman.id.au>
-From:   "Oliver O'Halloran" <oohall@gmail.com>
-Date:   Tue, 21 Apr 2020 23:43:56 +1000
-Message-ID: <CAOSf1CF2YEG1U_1XP_Vvk3Bn1RCiNa1DAKEbemWu00JimoPsUQ@mail.gmail.com>
+        id S1729234AbgDURju (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 21 Apr 2020 13:39:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59458 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725987AbgDURju (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Apr 2020 13:39:50 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03LHZH5o106524
+        for <kvm-ppc@vger.kernel.org>; Tue, 21 Apr 2020 13:39:38 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30gc2xdc1a-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Tue, 21 Apr 2020 13:39:38 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm-ppc@vger.kernel.org> from <ldufour@linux.ibm.com>;
+        Tue, 21 Apr 2020 18:38:52 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 21 Apr 2020 18:38:48 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03LHdV8u2883916
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Apr 2020 17:39:31 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CCB05A405B;
+        Tue, 21 Apr 2020 17:39:31 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7EDCEA4054;
+        Tue, 21 Apr 2020 17:39:31 +0000 (GMT)
+Received: from pomme.local (unknown [9.145.149.94])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 21 Apr 2020 17:39:31 +0000 (GMT)
 Subject: Re: [PATCH] KVM: PPC: Book3S HV: read ibm,secure-memory nodes
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Laurent Dufour <ldufour@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+To:     "Oliver O'Halloran" <oohall@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Cc:     kvm-ppc@vger.kernel.org,
         linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
         Alexey Kardashevskiy <aik@ozlabs.ru>,
         Paul Mackerras <paulus@samba.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20200416162715.45846-1-ldufour@linux.ibm.com>
+ <87k129gdx8.fsf@mpe.ellerman.id.au>
+ <CAOSf1CF2YEG1U_1XP_Vvk3Bn1RCiNa1DAKEbemWu00JimoPsUQ@mail.gmail.com>
+From:   Laurent Dufour <ldufour@linux.ibm.com>
+Date:   Tue, 21 Apr 2020 19:39:31 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <CAOSf1CF2YEG1U_1XP_Vvk3Bn1RCiNa1DAKEbemWu00JimoPsUQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20042117-4275-0000-0000-000003C4150D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20042117-4276-0000-0000-000038D99A6F
+Message-Id: <db211c9c-3e6c-761c-8c9f-4110d3c0fcbe@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-21_07:2020-04-21,2020-04-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ impostorscore=0 phishscore=0 spamscore=0 malwarescore=0 mlxlogscore=998
+ lowpriorityscore=0 suspectscore=0 bulkscore=0 clxscore=1015 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004210136
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Apr 21, 2020 at 11:37 PM Michael Ellerman <mpe@ellerman.id.au> wrote:
->
-> Hi Laurent,
->
-> Laurent Dufour <ldufour@linux.ibm.com> writes:
-> > The newly introduced ibm,secure-memory nodes supersede the
-> > ibm,uv-firmware's property secure-memory-ranges.
->
-> Is either documented in a device tree binding document anywhere?
->
-> cheers
->
-> > Firmware will no more expose the secure-memory-ranges property so first
-> > read the new one and if not found rollback to the older one.
+Le 21/04/2020 à 15:43, Oliver O'Halloran a écrit :
+> On Tue, Apr 21, 2020 at 11:37 PM Michael Ellerman <mpe@ellerman.id.au> wrote:
+>>
+>> Hi Laurent,
+>>
+>> Laurent Dufour <ldufour@linux.ibm.com> writes:
+>>> The newly introduced ibm,secure-memory nodes supersede the
+>>> ibm,uv-firmware's property secure-memory-ranges.
+>>
+>> Is either documented in a device tree binding document anywhere?
+>>
+>> cheers
+>>
+>>> Firmware will no more expose the secure-memory-ranges property so first
+>>> read the new one and if not found rollback to the older one.
+> 
+> There's some in Ryan's UV support series for skiboot:
+> 
+> https://patchwork.ozlabs.org/project/skiboot/patch/20200227204023.22125-2-grimm@linux.ibm.com/
+> 
+> ...which is also marked RFC. Cool.
 
-There's some in Ryan's UV support series for skiboot:
+Thanks Oliver for this pointer.
 
-https://patchwork.ozlabs.org/project/skiboot/patch/20200227204023.22125-2-grimm@linux.ibm.com/
+Yes this is an RFC but this documentation details the secure memory nodes 
+created by skiboot and parsed by this patch.
 
-...which is also marked RFC. Cool.
+Michael, is that enough for you?
 
-Oliver
+Laurent.
+
