@@ -2,144 +2,112 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E99221B8D6D
-	for <lists+kvm-ppc@lfdr.de>; Sun, 26 Apr 2020 09:27:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 379871B8FEA
+	for <lists+kvm-ppc@lfdr.de>; Sun, 26 Apr 2020 14:39:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726205AbgDZH1i (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 26 Apr 2020 03:27:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43004 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725847AbgDZH1i (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 26 Apr 2020 03:27:38 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03Q72E8j135098
-        for <kvm-ppc@vger.kernel.org>; Sun, 26 Apr 2020 03:27:37 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30mh9k6vn4-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Sun, 26 Apr 2020 03:27:37 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm-ppc@vger.kernel.org> from <linuxram@us.ibm.com>;
-        Sun, 26 Apr 2020 08:26:43 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Sun, 26 Apr 2020 08:26:40 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03Q7RTmh62783494
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 26 Apr 2020 07:27:29 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BBD4C5204E;
-        Sun, 26 Apr 2020 07:27:29 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.85.192.49])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 32DDB5204F;
-        Sun, 26 Apr 2020 07:27:27 +0000 (GMT)
-Date:   Sun, 26 Apr 2020 00:27:24 -0700
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     aik@ozlabs.ru, andmike@linux.ibm.com, groug@kaod.org,
-        sukadev@linux.vnet.ibm.com, bauerman@linux.ibm.com,
-        david@gibson.dropbear.id.au, clg@kaod.org, mpe@ellerman.id.au,
-        paulus@ozlabs.org
-Subject: [PATCH v3] powerpc/XIVE: SVM: share the event-queue page with the
- Hypervisor.
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <1585211927-784-1-git-send-email-linuxram@us.ibm.com>
- <20200426020518.GC5853@oc0525413822.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200426020518.GC5853@oc0525413822.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-x-cbid: 20042607-4275-0000-0000-000003C6422F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20042607-4276-0000-0000-000038DBD216
-Message-Id: <20200426072724.GB5865@oc0525413822.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-04-25_14:2020-04-24,2020-04-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- spamscore=0 malwarescore=0 adultscore=0 suspectscore=48 mlxlogscore=999
- impostorscore=0 lowpriorityscore=0 mlxscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004260060
+        id S1726150AbgDZMjO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 26 Apr 2020 08:39:14 -0400
+Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:48030 "EHLO
+        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726135AbgDZMjO (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 26 Apr 2020 08:39:14 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01355;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0TwgoYV6_1587904745;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0TwgoYV6_1587904745)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Sun, 26 Apr 2020 20:39:06 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+        mpe@ellerman.id.au, benh@kernel.crashing.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tianjia.zhang@linux.alibaba.com
+Subject: [PATCH v3 0/7] clean up redundant 'kvm_run' parameters
+Date:   Sun, 26 Apr 2020 20:38:58 +0800
+Message-Id: <20200426123905.8336-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-XIVE interrupt controller uses an Event Queue (EQ) to enqueue event
-notifications when an exception occurs. The EQ is a single memory page
-provided by the O/S defining a circular buffer, one per server and
-priority couple.
+In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+structure. Earlier than historical reasons, many kvm-related function
+parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
+This patch does a unified cleanup of these remaining redundant parameters.
 
-On baremetal, the EQ page is configured with an OPAL call. On pseries,
-an extra hop is necessary and the guest OS uses the hcall
-H_INT_SET_QUEUE_CONFIG to configure the XIVE interrupt controller.
+This series of patches has completely cleaned the architecture of
+arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
+the large number of modified codes, a separate patch is made for each
+platform. On the ppc platform, there is also a redundant structure
+pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
+separately.
 
-The XIVE controller being Hypervisor privileged, it will not be allowed
-to enqueue event notifications for a Secure VM unless the EQ pages are
-shared by the Secure VM.
-
-Hypervisor/Ultravisor still requires support for the TIMA and ESB page
-fault handlers. Until this is complete, QEMU can use the emulated XIVE
-device for Secure VMs, option "kernel_irqchip=off" on the QEMU pseries
-machine.
-
-Cc: kvm-ppc@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Cc: Michael Anderson <andmike@linux.ibm.com>
-Cc: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Cedric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-
-v3: fix a minor semantics in description.
-    and added reviewed-by from Cedric and Greg.
-v2: better description of the patch from Cedric.
 ---
- arch/powerpc/sysdev/xive/spapr.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+v3 change:
+  Keep the existing `vcpu->run` in the function body unchanged.
 
-diff --git a/arch/powerpc/sysdev/xive/spapr.c b/arch/powerpc/sysdev/xive/spapr.c
-index 55dc61c..608b52f 100644
---- a/arch/powerpc/sysdev/xive/spapr.c
-+++ b/arch/powerpc/sysdev/xive/spapr.c
-@@ -26,6 +26,8 @@
- #include <asm/xive.h>
- #include <asm/xive-regs.h>
- #include <asm/hvcall.h>
-+#include <asm/svm.h>
-+#include <asm/ultravisor.h>
- 
- #include "xive-internal.h"
- 
-@@ -501,6 +503,9 @@ static int xive_spapr_configure_queue(u32 target, struct xive_q *q, u8 prio,
- 		rc = -EIO;
- 	} else {
- 		q->qpage = qpage;
-+		if (is_secure_guest())
-+			uv_share_page(PHYS_PFN(qpage_phys),
-+					1 << xive_alloc_order(order));
- 	}
- fail:
- 	return rc;
-@@ -534,6 +539,8 @@ static void xive_spapr_cleanup_queue(unsigned int cpu, struct xive_cpu *xc,
- 		       hw_cpu, prio);
- 
- 	alloc_order = xive_alloc_order(xive_queue_shift);
-+	if (is_secure_guest())
-+		uv_unshare_page(PHYS_PFN(__pa(q->qpage)), 1 << alloc_order);
- 	free_pages((unsigned long)q->qpage, alloc_order);
- 	q->qpage = NULL;
- }
+v2 change:
+  s390 retains the original variable name and minimizes modification.
+
+Tianjia Zhang (7):
+  KVM: s390: clean up redundant 'kvm_run' parameters
+  KVM: arm64: clean up redundant 'kvm_run' parameters
+  KVM: PPC: Remove redundant kvm_run from vcpu_arch
+  KVM: PPC: clean up redundant 'kvm_run' parameters
+  KVM: PPC: clean up redundant kvm_run parameters in assembly
+  KVM: MIPS: clean up redundant 'kvm_run' parameters
+  KVM: MIPS: clean up redundant kvm_run parameters in assembly
+
+ arch/arm64/include/asm/kvm_coproc.h      |  12 +--
+ arch/arm64/include/asm/kvm_host.h        |  11 +--
+ arch/arm64/include/asm/kvm_mmu.h         |   2 +-
+ arch/arm64/kvm/handle_exit.c             |  36 +++----
+ arch/arm64/kvm/sys_regs.c                |  13 ++-
+ arch/mips/include/asm/kvm_host.h         |  32 +------
+ arch/mips/kvm/emulate.c                  |  59 ++++--------
+ arch/mips/kvm/entry.c                    |  15 +--
+ arch/mips/kvm/mips.c                     |  14 +--
+ arch/mips/kvm/trap_emul.c                | 114 ++++++++++-------------
+ arch/mips/kvm/vz.c                       |  26 ++----
+ arch/powerpc/include/asm/kvm_book3s.h    |  16 ++--
+ arch/powerpc/include/asm/kvm_host.h      |   1 -
+ arch/powerpc/include/asm/kvm_ppc.h       |  27 +++---
+ arch/powerpc/kvm/book3s.c                |   4 +-
+ arch/powerpc/kvm/book3s.h                |   2 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c      |  12 +--
+ arch/powerpc/kvm/book3s_64_mmu_radix.c   |   4 +-
+ arch/powerpc/kvm/book3s_emulate.c        |  10 +-
+ arch/powerpc/kvm/book3s_hv.c             |  64 ++++++-------
+ arch/powerpc/kvm/book3s_hv_nested.c      |  12 +--
+ arch/powerpc/kvm/book3s_interrupts.S     |  17 ++--
+ arch/powerpc/kvm/book3s_paired_singles.c |  72 +++++++-------
+ arch/powerpc/kvm/book3s_pr.c             |  33 ++++---
+ arch/powerpc/kvm/booke.c                 |  39 ++++----
+ arch/powerpc/kvm/booke.h                 |   8 +-
+ arch/powerpc/kvm/booke_emulate.c         |   2 +-
+ arch/powerpc/kvm/booke_interrupts.S      |   9 +-
+ arch/powerpc/kvm/bookehv_interrupts.S    |  10 +-
+ arch/powerpc/kvm/e500_emulate.c          |  15 ++-
+ arch/powerpc/kvm/emulate.c               |  10 +-
+ arch/powerpc/kvm/emulate_loadstore.c     |  32 +++----
+ arch/powerpc/kvm/powerpc.c               |  72 +++++++-------
+ arch/powerpc/kvm/trace_hv.h              |   6 +-
+ arch/s390/kvm/kvm-s390.c                 |  23 +++--
+ virt/kvm/arm/arm.c                       |   6 +-
+ virt/kvm/arm/mmio.c                      |  11 ++-
+ virt/kvm/arm/mmu.c                       |   5 +-
+ 38 files changed, 389 insertions(+), 467 deletions(-)
+
 -- 
-1.8.3.1
+2.17.1
 
