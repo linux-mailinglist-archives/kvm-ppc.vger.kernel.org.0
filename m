@@ -2,87 +2,124 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17D241C496C
-	for <lists+kvm-ppc@lfdr.de>; Tue,  5 May 2020 00:11:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF1721C4D0D
+	for <lists+kvm-ppc@lfdr.de>; Tue,  5 May 2020 06:15:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728125AbgEDWLV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 4 May 2020 18:11:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39820 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726338AbgEDWLV (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 4 May 2020 18:11:21 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 669A7C061A0E;
-        Mon,  4 May 2020 15:11:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description;
-        bh=Ke6Is75zTSCuovFahCnc7BTlhzg10jNaHS1gn8ns//o=; b=JDybFtusCmGEq91bmNnwoWCj+a
-        N0xxIbsYu5lQxZkzPmNDuU07PGvTPGCdW0vbPRO5yL9CyEBvYR1vtbAgXrtqw0hBFSByZmuXy1eOa
-        BV13lTYReOQhwPBCt6oCwd0okqW34ZMeppO7ul+DxlMT9qEZya+kLv/fyY5XjjSJAr4+XskBbUHkP
-        mPhZXNr8NsQlQubgAbiO0erlNn5pHycINxr2ibFLT8cB20zuIsAzAh/rYn7lMK6nibeLoyUg72TaC
-        rhhs1ncVZ9Po/A7mh6tw7ETaxX3a6Mq6QjZeYirrDtXuot86KgWihjeGnL68mEPitegVqvhOr0bO8
-        9WIr0pFg==;
-Received: from [2601:1c0:6280:3f0::19c2]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jVjIz-0001BJ-5H; Mon, 04 May 2020 22:11:17 +0000
-Subject: Re: [PATCH v2 2/5] stats_fs API: create, add and remove stats_fs
- sources and values
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        id S1725768AbgEEEPj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 5 May 2020 00:15:39 -0400
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:16300 "EHLO
+        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725272AbgEEEPj (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 5 May 2020 00:15:39 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R491e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04397;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0TxXItq5_1588652118;
+Received: from 30.27.236.135(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0TxXItq5_1588652118)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 05 May 2020 12:15:22 +0800
+Subject: Re: [PATCH v4 0/7] clean up redundant 'kvm_run' parameters
+To:     pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+        mpe@ellerman.id.au, benh@kernel.crashing.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
+        chenhuacai@gmail.com
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
         kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20200504110344.17560-1-eesposit@redhat.com>
- <20200504110344.17560-3-eesposit@redhat.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <9a4e7489-bac4-23dc-b612-73eb91babb6f@infradead.org>
-Date:   Mon, 4 May 2020 15:11:15 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <b660f6cb-a89b-2452-c15b-095add6413ec@linux.alibaba.com>
+Date:   Tue, 5 May 2020 12:15:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200504110344.17560-3-eesposit@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 5/4/20 4:03 AM, Emanuele Giuseppe Esposito wrote:
-> diff --git a/fs/Kconfig b/fs/Kconfig
-> index f08fbbfafd9a..1b0de0f19e96 100644
-> --- a/fs/Kconfig
-> +++ b/fs/Kconfig
-> @@ -328,4 +328,10 @@ source "fs/unicode/Kconfig"
->  config IO_WQ
->  	bool
->  
-> +config STATS_FS
-> +	bool "Statistics Filesystem"
-> +	help
-> +	  stats_fs is a virtual file system that provides counters and
-> +	  other statistics about the running kernel.
-> +
->  endmenu
+Paolo Bonzini, any opinion on this?
 
-Hi,
+Thanks and best,
+Tianjia
 
-This kconfig entry should be under (inside) "Pseudo filesystems",
-i.e., between 'menu "Pseudo filesystems"' and its corresponding
-"endmenu".
-
-Thanks.
--- 
-~Randy
-
+On 2020/4/27 12:35, Tianjia Zhang wrote:
+> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+> structure. For historical reasons, many kvm-related function parameters
+> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
+> patch does a unified cleanup of these remaining redundant parameters.
+> 
+> This series of patches has completely cleaned the architecture of
+> arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
+> the large number of modified codes, a separate patch is made for each
+> platform. On the ppc platform, there is also a redundant structure
+> pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
+> separately.
+> 
+> ---
+> v4 change:
+>    mips: fixes two errors in entry.c.
+> 
+> v3 change:
+>    Keep the existing `vcpu->run` in the function body unchanged.
+> 
+> v2 change:
+>    s390 retains the original variable name and minimizes modification.
+> 
+> Tianjia Zhang (7):
+>    KVM: s390: clean up redundant 'kvm_run' parameters
+>    KVM: arm64: clean up redundant 'kvm_run' parameters
+>    KVM: PPC: Remove redundant kvm_run from vcpu_arch
+>    KVM: PPC: clean up redundant 'kvm_run' parameters
+>    KVM: PPC: clean up redundant kvm_run parameters in assembly
+>    KVM: MIPS: clean up redundant 'kvm_run' parameters
+>    KVM: MIPS: clean up redundant kvm_run parameters in assembly
+> 
+>   arch/arm64/include/asm/kvm_coproc.h      |  12 +--
+>   arch/arm64/include/asm/kvm_host.h        |  11 +--
+>   arch/arm64/include/asm/kvm_mmu.h         |   2 +-
+>   arch/arm64/kvm/handle_exit.c             |  36 +++----
+>   arch/arm64/kvm/sys_regs.c                |  13 ++-
+>   arch/mips/include/asm/kvm_host.h         |  32 +------
+>   arch/mips/kvm/emulate.c                  |  59 ++++--------
+>   arch/mips/kvm/entry.c                    |  21 ++---
+>   arch/mips/kvm/mips.c                     |  14 +--
+>   arch/mips/kvm/trap_emul.c                | 114 ++++++++++-------------
+>   arch/mips/kvm/vz.c                       |  26 ++----
+>   arch/powerpc/include/asm/kvm_book3s.h    |  16 ++--
+>   arch/powerpc/include/asm/kvm_host.h      |   1 -
+>   arch/powerpc/include/asm/kvm_ppc.h       |  27 +++---
+>   arch/powerpc/kvm/book3s.c                |   4 +-
+>   arch/powerpc/kvm/book3s.h                |   2 +-
+>   arch/powerpc/kvm/book3s_64_mmu_hv.c      |  12 +--
+>   arch/powerpc/kvm/book3s_64_mmu_radix.c   |   4 +-
+>   arch/powerpc/kvm/book3s_emulate.c        |  10 +-
+>   arch/powerpc/kvm/book3s_hv.c             |  64 ++++++-------
+>   arch/powerpc/kvm/book3s_hv_nested.c      |  12 +--
+>   arch/powerpc/kvm/book3s_interrupts.S     |  17 ++--
+>   arch/powerpc/kvm/book3s_paired_singles.c |  72 +++++++-------
+>   arch/powerpc/kvm/book3s_pr.c             |  33 ++++---
+>   arch/powerpc/kvm/booke.c                 |  39 ++++----
+>   arch/powerpc/kvm/booke.h                 |   8 +-
+>   arch/powerpc/kvm/booke_emulate.c         |   2 +-
+>   arch/powerpc/kvm/booke_interrupts.S      |   9 +-
+>   arch/powerpc/kvm/bookehv_interrupts.S    |  10 +-
+>   arch/powerpc/kvm/e500_emulate.c          |  15 ++-
+>   arch/powerpc/kvm/emulate.c               |  10 +-
+>   arch/powerpc/kvm/emulate_loadstore.c     |  32 +++----
+>   arch/powerpc/kvm/powerpc.c               |  72 +++++++-------
+>   arch/powerpc/kvm/trace_hv.h              |   6 +-
+>   arch/s390/kvm/kvm-s390.c                 |  23 +++--
+>   virt/kvm/arm/arm.c                       |   6 +-
+>   virt/kvm/arm/mmio.c                      |  11 ++-
+>   virt/kvm/arm/mmu.c                       |   5 +-
+>   38 files changed, 392 insertions(+), 470 deletions(-)
+> 
