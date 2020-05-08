@@ -2,275 +2,183 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 705D01CA763
-	for <lists+kvm-ppc@lfdr.de>; Fri,  8 May 2020 11:44:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09CD51CB638
+	for <lists+kvm-ppc@lfdr.de>; Fri,  8 May 2020 19:44:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726678AbgEHJoP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 8 May 2020 05:44:15 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23654 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726325AbgEHJoO (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 May 2020 05:44:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588931052;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LB8B9nMZ801LTv0eYMRXac4vYEFLiAr6bD2XMw8FWro=;
-        b=fto2XrLhYQS1OeY4ZXg3l8QjOk3VlIJHntyeclM2afJdoNjGa3T5yMZXM5uyzZHqfHZq8A
-        3LJy5UOR/bwSBbpMnSWfjH+kPEZaNkhPXARAY4VwPuzIbLhaJNrzDt0tJseNV419cXT4ms
-        5B2VU7aPUAmBvqkja0/jMZwA9Q7Zo3U=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-CLkV1dh8OF6Pj-lcw4FXXw-1; Fri, 08 May 2020 05:44:11 -0400
-X-MC-Unique: CLkV1dh8OF6Pj-lcw4FXXw-1
-Received: by mail-wr1-f71.google.com with SMTP id 30so603481wrp.22
-        for <kvm-ppc@vger.kernel.org>; Fri, 08 May 2020 02:44:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LB8B9nMZ801LTv0eYMRXac4vYEFLiAr6bD2XMw8FWro=;
-        b=TpGDofIXQ1vi3gbjmS4kMZrTU2zy/J7S0AiJ39m5ObgsDgG8Vb1ghfmuvCdWsxHuUh
-         6O9/S8Ziq6z/T06e+kx+Em/bbamzy0CizHJSQBSiEItnl/daoM5s+iJv5/EuupUhPEvV
-         9N11uQsgP8aPXrqYf83duMDJeDnYCecFs5l/gntqd2Ny9m2AMdTPoS09XWMJ6AMfTwwQ
-         GluJNWOznCjCPWzhFC3xgVYJgAxL/HiPBHpryCbQV4cIT5oC8QPZEbNIZNOACGMEhRTP
-         ghg19HhsRgQ6zCAmZpfPlnNsqcnlZvQiu0/eSq3YN0PxcgtwKckQeSUZiE9RT+a+DXFr
-         1Y0Q==
-X-Gm-Message-State: AGi0PuaWpqgCwFBz8WH4tIpfDuJUxSS+BH2RjrcpzKdnHQt7uVs9JyCH
-        7za0N6CoSDPcZujScgmmFGJpWdCzs13+sWcjPniX4oSfbeY9oQnCHMUqALFztPK+eKhSP2mNzi8
-        9HSRtdo/K5BytkhleSQ==
-X-Received: by 2002:a5d:6107:: with SMTP id v7mr1883178wrt.270.1588931049114;
-        Fri, 08 May 2020 02:44:09 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJgPEJmExg9Eh0dPygYqOMxDwjDrVa8N6ORETYXOWrahJgijwXVH3Zlb8oI31fLimenfgopfg==
-X-Received: by 2002:a5d:6107:: with SMTP id v7mr1883147wrt.270.1588931048748;
-        Fri, 08 May 2020 02:44:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:20ea:bae4:47a7:31db? ([2001:b07:6468:f312:20ea:bae4:47a7:31db])
-        by smtp.gmail.com with ESMTPSA id d27sm2213073wra.30.2020.05.08.02.44.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 May 2020 02:44:08 -0700 (PDT)
-Subject: Re: [PATCH v2 0/5] Statsfs: a new ram-based file sytem for Linux
- kernel statistics
-To:     Jonathan Adams <jwadams@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20200504110344.17560-1-eesposit@redhat.com>
- <CA+VK+GN=iDhDV2ZDJbBsxrjZ3Qoyotk_L0DvsbwDVvqrpFZ8fQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <29982969-92f6-b6d0-aeae-22edb401e3ac@redhat.com>
-Date:   Fri, 8 May 2020 11:44:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1727118AbgEHRoN (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 8 May 2020 13:44:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47428 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726797AbgEHRoN (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 May 2020 13:44:13 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 048HZWAC120545;
+        Fri, 8 May 2020 13:42:43 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30vtveutta-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 08 May 2020 13:42:43 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 048HaDP7122403;
+        Fri, 8 May 2020 13:42:42 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30vtveutsc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 08 May 2020 13:42:42 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 048HeoYq020104;
+        Fri, 8 May 2020 17:42:40 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 30s0g5wvbw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 08 May 2020 17:42:40 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 048HgbZm43712600
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 8 May 2020 17:42:37 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BBCB542041;
+        Fri,  8 May 2020 17:42:37 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6EED54203F;
+        Fri,  8 May 2020 17:42:34 +0000 (GMT)
+Received: from linux.ibm.com (unknown [9.148.202.219])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri,  8 May 2020 17:42:34 +0000 (GMT)
+Date:   Fri, 8 May 2020 20:42:32 +0300
+From:   Mike Rapoport <rppt@linux.ibm.com>
+To:     Marek Szyprowski <m.szyprowski@samsung.com>
+Cc:     Mike Rapoport <rppt@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        linux-sh@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linux-mm@kvack.org, Paul Mackerras <paulus@samba.org>,
+        linux-hexagon@vger.kernel.org, Will Deacon <will@kernel.org>,
+        kvmarm@lists.cs.columbia.edu, Jonas Bonn <jonas@southpole.se>,
+        linux-arch@vger.kernel.org, Brian Cain <bcain@codeaurora.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Ley Foon Tan <ley.foon.tan@intel.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        uclinux-h8-devel@lists.sourceforge.jp,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Arnd Bergmann <arnd@arndb.de>, kvm-ppc@vger.kernel.org,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        openrisc@lists.librecores.org, Stafford Horne <shorne@gmail.com>,
+        Guan Xuetao <gxt@pku.edu.cn>,
+        linux-arm-kernel@lists.infradead.org,
+        Christophe Leroy <christophe.leroy@c-s.fr>,
+        Tony Luck <tony.luck@intel.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        linux-kernel@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        nios2-dev@lists.rocketboards.org, linuxppc-dev@lists.ozlabs.org,
+        =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Subject: Re: [PATCH v4 02/14] arm: add support for folded p4d page tables
+Message-ID: <20200508174232.GA759899@linux.ibm.com>
+References: <20200414153455.21744-1-rppt@kernel.org>
+ <20200414153455.21744-3-rppt@kernel.org>
+ <CGME20200507121658eucas1p240cf4a3e0fe5c22dda5ec4f72734149f@eucas1p2.samsung.com>
+ <39ba8a04-d6b5-649d-c289-0c8b27cb66c5@samsung.com>
+ <20200507161155.GE683243@linux.ibm.com>
+ <98229ab1-fbf8-0a89-c5d6-270c828799e7@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+VK+GN=iDhDV2ZDJbBsxrjZ3Qoyotk_L0DvsbwDVvqrpFZ8fQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <98229ab1-fbf8-0a89-c5d6-270c828799e7@samsung.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-08_15:2020-05-08,2020-05-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
+ suspectscore=1 spamscore=0 adultscore=0 bulkscore=0 priorityscore=1501
+ lowpriorityscore=0 phishscore=0 malwarescore=0 clxscore=1015
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005080144
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-[Answering for Emanuele because he's not available until Monday]
-
-On 07/05/20 19:45, Jonathan Adams wrote:
-> This is good work.  As David Rientjes mentioned, I'm currently investigating
-> a similar project, based on a google-internal debugfs-based FS we call
-> "metricfs".  It's
-> designed in a slightly different fashion than statsfs here is, and the
-> statistics exported are
-> mostly fed into our OpenTelemetry-like system.  We're motivated by
-> wanting an upstreamed solution, so that we can upstream the metrics we
-> create that are of general interest, and lower the overall rebasing
-> burden for our tree.
-
-Cool.  We included a public reading API exactly so that there could be
-other "frontends".  I was mostly thinking of BPF as an in-tree user, but
-your metricfs could definitely use the reading API.
-
->  - the 8/16/32/64 signed/unsigned integers seems like a wart, and the
-> built-in support to grab any offset from a structure doesn't seem like
-> much of an advantage. A simpler interface would be to just support an> "integer" (possibly signed/unsigned) type, which is always 64-bit, and
-> allow the caller to provide a function pointer to retrieve the value,
-> with one or two void *s cbargs.  Then the framework could provide an
-> offset-based callback (or callbacks) similar to the existing
-> functionality, and a similar one for per-CPU based statistics.  A
-> second "clear" callback could be optionally provided to allow for
-> statistics to be cleared, as in your current proposal.
-
-Ok, so basically splitting get_simple_value into many separate
-callbacks.  The callbacks would be in a struct like
-
-struct stats_fs_type {
-	uint64_t (*get)(struct stats_fs_value *, void *);
-	void (*clear)(struct stats_fs_value *, void *);
-	bool signed;
-}
-
-static uint64_t stats_fs_get_u8(struct stats_fs_value *val, void *base)
-{
-	return *((uint8_t *)(base + (uintptr_t)val->arg);
-}
-
-static void stats_fs_clear_u8(struct stats_fs_value *val, void *base)
-{
-	*((uint8_t *)(base + (uintptr_t)val->arg) = 0;
-}
-
-struct stats_fs_type stats_fs_type_u8 = {
-	stats_fs_get_u8,
-	stats_fs_clear_u8,
-	false
-};
-
-and custom types can be defined using "&(struct stats_fs_type) {...}".
-
->  - Beyond the statistic's type, one *very* useful piece of metadata
-> for telemetry tools is knowing whether a given statistic is
-> "cumulative" (an unsigned counter which is only ever increased), as
-> opposed to a floating value (like "amount of memory used").
-
-Good idea.  Also, clearing does not make sense for a floating value, so
-we can use cumulative/floating to get a default for the mode: KVM
-statistics for example are mostly cumulative and mode 644, except a few
-that are floating and those are all mode 444.  Therefore it makes sense
-to add cumulative/floating even before outputting it as metadata.
-
-> I'm more
-> concerned with getting the statistics model and capabilities right
-> from the beginning, because those are harder to adjust later.
-
-Agreed.
-
-> 1. Each metricfs metric can have one or two string or integer "keys".
-> If these exist, they expand the metric from a single value into a
-> multi-dimensional table. For example, we use this to report a hash
-> table we keep of functions calling "WARN()", in a 'warnings'
-> statistic:
+On Fri, May 08, 2020 at 08:53:27AM +0200, Marek Szyprowski wrote:
+> Hi Mike,
 > 
-> % cat .../warnings/values
-> x86_pmu_stop 1
-> %
->
-> Indicates that the x86_pmu_stop() function has had a WARN() fire once
-> since the system was booted.  If multiple functions have fired
-> WARN()s, they are listed in this table with their own counts. [1]  We
-> also use these to report per-CPU counters on a CPU-by-CPU basis:
+> On 07.05.2020 18:11, Mike Rapoport wrote:
+> > On Thu, May 07, 2020 at 02:16:56PM +0200, Marek Szyprowski wrote:
+> >> On 14.04.2020 17:34, Mike Rapoport wrote:
+> >>> From: Mike Rapoport <rppt@linux.ibm.com>
+> >>>
+> >>> Implement primitives necessary for the 4th level folding, add walks of p4d
+> >>> level where appropriate, and remove __ARCH_USE_5LEVEL_HACK.
+> >>>
+> >>> Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+> >> Today I've noticed that kexec is broken on ARM 32bit. Bisecting between
+> >> current linux-next and v5.7-rc1 pointed to this commit. I've tested this
+> >> on Odroid XU4 and Raspberry Pi4 boards. Here is the relevant log:
+> >>
+> >> # kexec --kexec-syscall -l zImage --append "$(cat /proc/cmdline)"
+> >> memory_range[0]:0x40000000..0xbe9fffff
+> >> memory_range[0]:0x40000000..0xbe9fffff
+> >> # kexec -e
+> >> kexec_core: Starting new kernel
+> >> 8<--- cut here ---
+> >> Unable to handle kernel paging request at virtual address c010f1f4
+> >> pgd = c6817793
+> >> [c010f1f4] *pgd=4000041e(bad)
+> >> Internal error: Oops: 80d [#1] PREEMPT ARM
+> >> Modules linked in:
+> >> CPU: 0 PID: 1329 Comm: kexec Tainted: G        W
+> >> 5.7.0-rc3-00127-g6cba81ed0f62 #611
+> >> Hardware name: Samsung Exynos (Flattened Device Tree)
+> >> PC is at machine_kexec+0x40/0xfc
+> > Any chance you have the debug info in this kernel?
+> > scripts/faddr2line would come handy here.
 > 
-> % cat .../irq_x86/NMI/values
-> 0 42
-> 1 18
-> ... one line per cpu
-> % cat .../rx_bytes/values
-> lo 501360681
-> eth0 1457631256
-
-These seem like two different things.
-
-The percpu and per-interface values are best represented as subordinate
-sources, one per CPU and one per interface.  For interfaces I would just
-use a separate directory, but it doesn't really make sense for CPUs.  So
-if we can cater for it in the model, it's better.  For example:
-
-- add a new argument to statsfs_create_source and statsfs_create_values
-that makes it not create directories and files respectively.
-
-- add a new "aggregate function" STATS_FS_LIST that directs the parent
-to build a table of all the simple values below it
-
-We can also add a helper statsfs_add_values_percpu that creates a new
-source for each CPU, I think.
-
-The warnings one instead is a real hash table.  It should be possible to
-implement it as some kind of customized aggregation, that is implemented
-in the client instead of coming from subordinate sources.  The
-presentation can then just use STATS_FS_LIST.  I don't see anything in
-the design that is a blocker.
-
-> 2.  We also export some metadata about each statistic.  For example,
-> the metadata for the NMI counter above looks like:
+> # ./scripts/faddr2line --list vmlinux machine_kexec+0x40
+> machine_kexec+0x40/0xf8:
 > 
-> % cat .../NMI/annotations
-> DESCRIPTION Non-maskable\ interrupts
-> CUMULATIVE
-> % cat .../NMI/fields
-> cpu value
-> int int
-> %
+> machine_kexec at arch/arm/kernel/machine_kexec.c:182
+>   177            reboot_code_buffer = 
+> page_address(image->control_code_page);
+>   178
+>   179            /* Prepare parameters for reboot_code_buffer*/
+>   180            set_kernel_text_rw();
+>   181            kexec_start_address = image->start;
+>  >182<           kexec_indirection_page = page_list;
+>   183            kexec_mach_type = machine_arch_type;
+>   184            kexec_boot_atags = image->arch.kernel_r2;
+>   185
+>   186            /* copy our kernel relocation code to the control code 
+> page */
+>   187            reboot_entry = fncpy(reboot_code_buffer,
 
-Good idea.  I would prefer per-directory dot-named files for this.  For
-example a hypothetical statsfs version of /proc/interrupts could be like
-this:
+Can you please try the patch below:
 
-$ cat /sys/kernel/stats/interrupts/.schema
-0                                          // Name
-CUMULATIVE                                 // Flags
-int:int                                    // Type(s)
-IR-IO-APIC    2-edge      timer            // Description
-...
-LOC
-CUMULATIVE
-int:int
-Local timer interrupts
-...
-$ cat /sys/kernel/stats/interrupts/LOC
-0 4286815
-1 4151572
-2 4199361
-3 4229248
+diff --git a/arch/arm/mm/init.c b/arch/arm/mm/init.c
+index 963b5284d284..f86b3d17928e 100644
+--- a/arch/arm/mm/init.c
++++ b/arch/arm/mm/init.c
+@@ -571,7 +571,7 @@ static inline void section_update(unsigned long addr, pmdval_t mask,
+ {
+ 	pmd_t *pmd;
+ 
+-	pmd = pmd_off_k(addr);
++	pmd = pmd_offset(pud_offset(p4d_offset(pgd_offset(mm, addr), addr), addr), addr);
+ 
+ #ifdef CONFIG_ARM_LPAE
+ 	pmd[0] = __pmd((pmd_val(pmd[0]) & mask) | prot);
 
-> 3. We have a (very few) statistics where the value itself is a string,
-> usually for device statuses.
+>  > ...
+> 
+> Best regards
+> -- 
+> Marek Szyprowski, PhD
+> Samsung R&D Institute Poland
+> 
 
-Maybe in addition to CUMULATIVE and FLOATING we can have ENUM
-properties, and a table to convert those enums to strings.  Aggregation
-could also be used to make a histogram out of enums in subordinate
-sources, e.g.
-
-$ cat /sys/kernel/stats/kvm/637-1/vcpu_state
-running 12
-uninitialized 0
-halted 4
-
-So in general I'd say the sources/values model holds up.  We certainly
-want to:
-
-- switch immediately to callbacks instead of the type constants (so that
-core statsfs code only does signed/unsigned)
-
-- add a field to distinguish cumulative and floating properties (and use
-it to determine the default file mode)
-
-- add a new argument to statsfs_create_source and statsfs_create_values
-that makes it not create directories and files respectively
-
-- add a new API to look for a statsfs_value recursively in all the
-subordinate sources, and pass the source/value pair to a callback
-function; and reimplement recursive aggregation and clear in terms of
-this function.
-
-> For our use cases, we generally don't both output a statistic and it's
-> aggregation from the kernel; either we sum up things in the kernel
-> (e.g. over a bunch of per-cpu or per-memcg counters) and only have the
-> result statistic, or we expect user-space to sum up the data if it's
-> interested.  The tabular form makes it pretty easy to do so (i.e. you
-> can use awk(1) to sum all of the per-cpu NMI counters).
-
-Yep, the above "not create a dentry" flag would handle the case where
-you sum things up in the kernel because the more fine grained counters
-would be overwhelming.
-
-Paolo
-
+-- 
+Sincerely yours,
+Mike.
