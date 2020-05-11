@@ -2,90 +2,154 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 794E31CD8B6
-	for <lists+kvm-ppc@lfdr.de>; Mon, 11 May 2020 13:43:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3BE21CDCDC
+	for <lists+kvm-ppc@lfdr.de>; Mon, 11 May 2020 16:16:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728502AbgEKLnd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 11 May 2020 07:43:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41614 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727873AbgEKLnd (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 11 May 2020 07:43:33 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A506C061A0E
-        for <kvm-ppc@vger.kernel.org>; Mon, 11 May 2020 04:43:33 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id 190so3755612qki.1
-        for <kvm-ppc@vger.kernel.org>; Mon, 11 May 2020 04:43:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lca.pw; s=google;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=HrZSofo3iZFTh2jWDrYHo1noV2+xdcUG6DMvzbqh4qg=;
-        b=kuJu9lu9imJ02yqGcj2fHwbhmZM1veTUhrSCepuKecNYH/uPA37AoMyqX/yCHUn5VA
-         FZSSXzKY5C3OW5DnkUF3nRZIj5kkoClPt5aobsr+m9VnLbcK7JewiiXWVn8cqNiVj445
-         CQ702HdJvr2MxDcU9cYWWzpZT+74rc/pN7N/uKAQz1s7b7p3ra5kdn74AUboxnpB9s27
-         n6YkYe2I0N/dIF06LHbxtvrTxZD4Bmkn9XS+qpa02lpiDSubXN09Hnz5hVSG4D7dBsyv
-         BXiY51kFI9ww0APazvLGzvsArPoumnWAldY7G/isso99zPnBy0QTgw9HXGXXkbaQ5VFl
-         QHaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=HrZSofo3iZFTh2jWDrYHo1noV2+xdcUG6DMvzbqh4qg=;
-        b=SVS1z8vgRvGoENZfyeZkMPEAGB5Yn6X7zdWtQyyN4pj9j/vDGlRGj1eKPcAycxxmQm
-         M1VkBJ9lAtqLiY8WoXsKi0dwjSon8WxDsFTNYbRtKlF9t7Pwpzczk0dSXmsENMOoozY2
-         vR2htiVnHfOWB4gTBLVKqlDGHdrm8ftryz8rSPp9myORHcS7Pub11UpQWFa1NlrR90na
-         +q3y11KKyNk16Cjk6UQFaxQA52AeKuRwZ0a7QcmkRwa0Kianh51lB2vBLoR3NFdRXxEp
-         r9Av2i93uNKnvzYTXL3oxNZeOkLM8IrYHJf7/XzNASo3ZRTyhZ2mD+jp8MugwsdpMjQ5
-         4R0A==
-X-Gm-Message-State: AGi0PuYWtK+PRHcj5HbPLUalMDzwFKWMeBMCrXBUUtqgcQ3tHeQkhlXA
-        jbyma3NOOwVd2wWSDpHaD5oh8cLZjk+KWQ==
-X-Google-Smtp-Source: APiQypLZGdZcXwPLwTgije5MzeISj5JWm75i71YFaAFtuioZHStvxhs3C3pSF0EnksEQ6BzGWvKnRw==
-X-Received: by 2002:a37:668b:: with SMTP id a133mr14285835qkc.488.1589197412193;
-        Mon, 11 May 2020 04:43:32 -0700 (PDT)
-Received: from [192.168.1.183] (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
-        by smtp.gmail.com with ESMTPSA id e23sm7670945qkm.63.2020.05.11.04.43.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 May 2020 04:43:31 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Qian Cai <cai@lca.pw>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH] powerpc/kvm: silence kmemleak false positives
-Date:   Mon, 11 May 2020 07:43:30 -0400
-Message-Id: <44807D44-98D9-431C-9266-08014C4B47F6@lca.pw>
-References: <87y2pybu38.fsf@mpe.ellerman.id.au>
-Cc:     paulus@ozlabs.org, benh@kernel.crashing.org,
-        catalin.marinas@arm.com, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-In-Reply-To: <87y2pybu38.fsf@mpe.ellerman.id.au>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-X-Mailer: iPhone Mail (17D50)
+        id S1730324AbgEKOQg (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 11 May 2020 10:16:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6610 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730158AbgEKOQg (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 11 May 2020 10:16:36 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04BDXD0a161500;
+        Mon, 11 May 2020 10:15:47 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30wrvrxy12-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 May 2020 10:15:47 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04BEB2Gc003182;
+        Mon, 11 May 2020 14:15:44 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 30wm55mhcy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 May 2020 14:15:44 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04BEFg6J62193780
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 11 May 2020 14:15:42 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E49024204B;
+        Mon, 11 May 2020 14:15:41 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C160C42045;
+        Mon, 11 May 2020 14:15:38 +0000 (GMT)
+Received: from linux.ibm.com (unknown [9.148.203.187])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 11 May 2020 14:15:38 +0000 (GMT)
+Date:   Mon, 11 May 2020 17:15:36 +0300
+From:   Mike Rapoport <rppt@linux.ibm.com>
+To:     Marek Szyprowski <m.szyprowski@samsung.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Mike Rapoport <rppt@kernel.org>, Rich Felker <dalias@libc.org>,
+        linux-ia64@vger.kernel.org,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        linux-sh@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linux-mm@kvack.org, Paul Mackerras <paulus@samba.org>,
+        linux-hexagon@vger.kernel.org, Will Deacon <will@kernel.org>,
+        kvmarm@lists.cs.columbia.edu, Jonas Bonn <jonas@southpole.se>,
+        linux-arch@vger.kernel.org, Brian Cain <bcain@codeaurora.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Ley Foon Tan <ley.foon.tan@intel.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        uclinux-h8-devel@lists.sourceforge.jp,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Arnd Bergmann <arnd@arndb.de>, kvm-ppc@vger.kernel.org,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        openrisc@lists.librecores.org, Stafford Horne <shorne@gmail.com>,
+        Guan Xuetao <gxt@pku.edu.cn>,
+        linux-arm-kernel@lists.infradead.org,
+        Christophe Leroy <christophe.leroy@c-s.fr>,
+        Tony Luck <tony.luck@intel.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        linux-kernel@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        nios2-dev@lists.rocketboards.org, linuxppc-dev@lists.ozlabs.org,
+        =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Subject: Re: [PATCH v4 02/14] arm: add support for folded p4d page tables
+Message-ID: <20200511141536.GB983798@linux.ibm.com>
+References: <20200414153455.21744-1-rppt@kernel.org>
+ <20200414153455.21744-3-rppt@kernel.org>
+ <CGME20200507121658eucas1p240cf4a3e0fe5c22dda5ec4f72734149f@eucas1p2.samsung.com>
+ <39ba8a04-d6b5-649d-c289-0c8b27cb66c5@samsung.com>
+ <20200507161155.GE683243@linux.ibm.com>
+ <98229ab1-fbf8-0a89-c5d6-270c828799e7@samsung.com>
+ <20200508174232.GA759899@linux.ibm.com>
+ <665dade8-727a-3318-6779-3998080da18f@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <665dade8-727a-3318-6779-3998080da18f@samsung.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-11_05:2020-05-11,2020-05-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ lowpriorityscore=0 mlxscore=0 priorityscore=1501 phishscore=0 bulkscore=0
+ mlxlogscore=999 clxscore=1015 impostorscore=0 suspectscore=1 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005110112
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Hi Marek,
 
+On Mon, May 11, 2020 at 08:36:41AM +0200, Marek Szyprowski wrote:
+> Hi Mike,
+> 
+> On 08.05.2020 19:42, Mike Rapoport wrote:
+> > On Fri, May 08, 2020 at 08:53:27AM +0200, Marek Szyprowski wrote:
+> >> On 07.05.2020 18:11, Mike Rapoport wrote:
+> >>> On Thu, May 07, 2020 at 02:16:56PM +0200, Marek Szyprowski wrote:
+> >>>> On 14.04.2020 17:34, Mike Rapoport wrote:
+> >>>>> From: Mike Rapoport <rppt@linux.ibm.com>
+> >>>>>
+> >>>>> Implement primitives necessary for the 4th level folding, add walks of p4d
+> >>>>> level where appropriate, and remove __ARCH_USE_5LEVEL_HACK.
+> >>>>>
+> >>>>> Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+> > Can you please try the patch below:
+> >
+> > diff --git a/arch/arm/mm/init.c b/arch/arm/mm/init.c
+> > index 963b5284d284..f86b3d17928e 100644
+> > --- a/arch/arm/mm/init.c
+> > +++ b/arch/arm/mm/init.c
+> > @@ -571,7 +571,7 @@ static inline void section_update(unsigned long addr, pmdval_t mask,
+> >   {
+> >   	pmd_t *pmd;
+> >   
+> > -	pmd = pmd_off_k(addr);
+> > +	pmd = pmd_offset(pud_offset(p4d_offset(pgd_offset(mm, addr), addr), addr), addr);
+> >   
+> >   #ifdef CONFIG_ARM_LPAE
+> >   	pmd[0] = __pmd((pmd_val(pmd[0]) & mask) | prot);
+> This fixes kexec issue! Thanks!
+> 
+> 
+> Feel free to add:
+> 
+> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Fixes: 218f1c390557 ("arm: add support for folded p4d page tables")
+> Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
 
-> On May 11, 2020, at 7:15 AM, Michael Ellerman <mpe@ellerman.id.au> wrote:
->=20
-> There is kmemleak_alloc_phys(), which according to the docs can be used
-> for tracking a phys address.
->=20
-> Did you try that?
+Thanks for testing!
 
-Caitlin, feel free to give your thoughts here.
+The patch is still in mmotm tree, so I don't think "Fixes" apply.
 
-My understanding is that it seems the doc is a bit misleading. kmemleak_allo=
-c_phys() is to allocate kmemleak objects for a physical address range, so  k=
-memleak could scan those memory pointers within for possible referencing oth=
-er memory. It was only used in memblock so far, but those new memory allocat=
-ions here contain no reference to other memory.
+Andrew, would you like me to send the fix as a formal patch or will pick
+it up as a fixup?
 
-In this case, we have already had kmemleak objects for those memory allocati=
-on. It is just that other pointers reference those memory by their physical a=
-ddress which is a known kmemleak limitation won=E2=80=99t be able to track t=
-he the connection. Thus, we always use kmemleak_ignore() to not reporting th=
-ose as leaks and don=E2=80=99t scan those because they do not contain other m=
-emory reference.=
+> Best regards
+> -- 
+> Marek Szyprowski, PhD
+> Samsung R&D Institute Poland
+> 
+
+-- 
+Sincerely yours,
+Mike.
