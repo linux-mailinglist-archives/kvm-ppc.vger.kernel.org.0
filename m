@@ -2,154 +2,184 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7618E1D15EB
-	for <lists+kvm-ppc@lfdr.de>; Wed, 13 May 2020 15:40:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0AF81D386E
+	for <lists+kvm-ppc@lfdr.de>; Thu, 14 May 2020 19:36:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388634AbgEMNje (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 13 May 2020 09:39:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56968 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388350AbgEMNjd (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 13 May 2020 09:39:33 -0400
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99A64C061A0E
-        for <kvm-ppc@vger.kernel.org>; Wed, 13 May 2020 06:39:32 -0700 (PDT)
-Received: by mail-qk1-x742.google.com with SMTP id b6so16197819qkh.11
-        for <kvm-ppc@vger.kernel.org>; Wed, 13 May 2020 06:39:32 -0700 (PDT)
+        id S1726035AbgENRgP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 14 May 2020 13:36:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36480 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725975AbgENRgP (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 14 May 2020 13:36:15 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8138AC061A0C
+        for <kvm-ppc@vger.kernel.org>; Thu, 14 May 2020 10:36:13 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id 4so1362864ilg.1
+        for <kvm-ppc@vger.kernel.org>; Thu, 14 May 2020 10:36:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lca.pw; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=XFXyl8bLGTgB36EioVmpcCnHThDdGncqsiu7Ha+l9Ck=;
-        b=G/AjTLfR29lUROPs7vr/JubE1o3ERsvq3GIxpEXg/6FSWKOZGnX/UGQQcX/n8lVw0B
-         fHGsnL+Lfm7YVzme+LYrVHFLtxPpW5P/nC3Rcun7ro/HuZw9IA1ThTI9Cv0Bd3XaPaOb
-         hfxs7LJ5S7XexlyfuZQe8kq9jQnT/x41r/7ch+b7VfEeWsJmq006VVWtqNHFgncF5Qsn
-         l13nizIigZl/8GX2AGztE44wnPM4n4lxORVaaiq0VfqtQnW5fgp3Rr5T/Oa+4yEjB0fx
-         yISMxpHi7KbbbtbliLwsmTHBlbLfVtA7Gxjz/N7tmyVxsp86FSmvO2ndcDF5wsna/ks2
-         h/3w==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=laayNMnmOVsy26th4W6U6fTp63iOfmzV8Vb77JU5OjI=;
+        b=mPqdiSifcuRBMG5EPyS7l9qsCIzwPKTczEG9bPI/UiTe4KjZsr4TADsF5d4qN1I1+b
+         UfC2tsMTtkz5tmVqI35Wx7fsq4ykek5JDOB/S27rZXnr77VBWjBaW2LPOGc3uxHaj59w
+         xKPZFquBPsORRYOCxrZi72WmXGJVEJw95smneUGO0yc11Atjg5j6uWGpcQFiyBqwDWvc
+         kApY9nSz0fg6GONFTPMTXBezB5H3IebBMs8n2/7xOyq4nhd8a+KkQOsedcSxmsgKqPb3
+         9/V6g72Jvw6Me4QKQZq9eWjrpZRKoK6iCygdJcgPyyrI2XIJ8EQUjPYoUS2eh9LWNR/o
+         aObQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=XFXyl8bLGTgB36EioVmpcCnHThDdGncqsiu7Ha+l9Ck=;
-        b=IAueEiHHFF0ITFOQxXGslW6EK6CDumj73onN4+iHRzpWAiQo4S0nh2j48ops5ANoWU
-         db1OMt6XB7Ahl8wzBSihn2nxkbYv/UPKhdSzRR91roNIpiqesJm8GweGBQoCAZfUJX4C
-         cufT5nQ+fq93DeT7RSh6Oz/uqCt6qsv3EYX4Gl3bED8XZsh7jIb4h+LQ6/k08lo1OaBl
-         hF/dSeKofKBUEeaG9TQmf0k7DkQRTn+SWJzj0hd8/la7FawmAsbAlNk32SBMHySpDQGK
-         /l5x2REghPT12v/o+G9lKbbofa/ep8prm92i13ZLfC2EipjU3ZqNu5IMmBh3E/REzppj
-         UXAQ==
-X-Gm-Message-State: AGi0PubSeH3MlMOawwTV9Groc2BazIJpntYrgcrOk/2niYvZeIVsK9MB
-        vVz/QLjStOFLB1zBGWl2YcxELg==
-X-Google-Smtp-Source: APiQypJIQ7dwxyjjoiFv01S4nCAvfLANCzyEfKoU8HTELxdOu2uR63fRzhoB7b8epU3HG++PT2s7MA==
-X-Received: by 2002:a37:b4c7:: with SMTP id d190mr24934971qkf.432.1589377171712;
-        Wed, 13 May 2020 06:39:31 -0700 (PDT)
-Received: from ovpn-66-156.rdu2.redhat.com (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
-        by smtp.gmail.com with ESMTPSA id h9sm4292783qtu.28.2020.05.13.06.39.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 13 May 2020 06:39:31 -0700 (PDT)
-From:   Qian Cai <cai@lca.pw>
-To:     paulus@ozlabs.org, mpe@ellerman.id.au
-Cc:     benh@kernel.crashing.org, catalin.marinas@arm.com,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, Qian Cai <cai@lca.pw>
-Subject: [PATCH] powerpc/kvm/radix: ignore kmemleak false positives
-Date:   Wed, 13 May 2020 09:39:15 -0400
-Message-Id: <20200513133915.1040-1-cai@lca.pw>
-X-Mailer: git-send-email 2.21.0 (Apple Git-122.2)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=laayNMnmOVsy26th4W6U6fTp63iOfmzV8Vb77JU5OjI=;
+        b=SSd/3cew+/dy9TfK38T3jDyK3ONzA7lgqEStyXcK6aoiMvc/nnWVwwpsWoKgZU440X
+         33g7VVehn9tcISCux5LmvxTa7cAaeZPuZruRKUrypk4u4dBFTJIAhESkLZC9oKJ1jQ/V
+         ayTNjdfRME9DqlOo2mM5nr3ui9jLy1g4wTPb1b4LttrMDaY5aATltgWejCOPR7sTlhQk
+         dKxAatsRXTRr91TXNKXEtRqaCnUgYs2O5d5YjLobeEOA0+JLLFD3aPUlT9yazSVai1ic
+         11dfwIBLjLcRxyMk9VPPg1BZvdVl+eJycOvNxF/OBGiLLIoGAWgnJrBM1JYV2Ze1jv2o
+         W4tQ==
+X-Gm-Message-State: AOAM531uzTjfw0T6cCflrNrwoH2Xc8h+zSbz57bKVdwgT0DWiMQYtQuv
+        qHsnI44HM+vq8tI33/FJj/O0Etk4b3FYOMWNRaSp
+X-Google-Smtp-Source: ABdhPJz0ppakynZnDNr1oGJklp9r+6+UsPiLnLzitHvsOzAq27IiH+96KfmBDqX4cg4cxp48dbrbcuA9lHjM0QZWX7k=
+X-Received: by 2002:a92:4a0d:: with SMTP id m13mr5529000ilf.98.1589477772346;
+ Thu, 14 May 2020 10:36:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200504110344.17560-1-eesposit@redhat.com> <CA+VK+GN=iDhDV2ZDJbBsxrjZ3Qoyotk_L0DvsbwDVvqrpFZ8fQ@mail.gmail.com>
+ <29982969-92f6-b6d0-aeae-22edb401e3ac@redhat.com> <CA+VK+GOccmwVov9Fx1eMZkzivBduWRuoyAuCRtjMfM4LemRkgw@mail.gmail.com>
+ <fe21094c-bdb0-b802-482e-72bc17e5232a@redhat.com>
+In-Reply-To: <fe21094c-bdb0-b802-482e-72bc17e5232a@redhat.com>
+From:   Jonathan Adams <jwadams@google.com>
+Date:   Thu, 14 May 2020 10:35:35 -0700
+Message-ID: <CA+VK+GOnVK23X+J-VVWUK6VVpkeVOvsmQAw=HAf89h_ksYM9Rg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/5] Statsfs: a new ram-based file sytem for Linux
+ kernel statistics
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-kvmppc_pmd_alloc() and kvmppc_pte_alloc() allocate some memory but then
-pud_populate() and pmd_populate() will use __pa() to reference the newly
-allocated memory.
+On Mon, May 11, 2020 at 10:34 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> Hi Jonathan, I think the remaining sticky point is this one:
 
-Since kmemleak is unable to track the physical memory resulting in false
-positives, silence those by using kmemleak_ignore().
+Apologies it took a couple days for me to respond; I wanted to finish
+evaluating our current usage to make sure I had a full picture; I'll
+summarize our state at the bottom.
 
-unreferenced object 0xc000201c382a1000 (size 4096):
- comm "qemu-kvm", pid 124828, jiffies 4295733767 (age 341.250s)
- hex dump (first 32 bytes):
-   c0 00 20 09 f4 60 03 87 c0 00 20 10 72 a0 03 87  .. ..`.... .r...
-   c0 00 20 0e 13 a0 03 87 c0 00 20 1b dc c0 03 87  .. ....... .....
- backtrace:
-   [<000000004cc2790f>] kvmppc_create_pte+0x838/0xd20 [kvm_hv]
-   kvmppc_pmd_alloc at arch/powerpc/kvm/book3s_64_mmu_radix.c:366
-   (inlined by) kvmppc_create_pte at arch/powerpc/kvm/book3s_64_mmu_radix.c:590
-   [<00000000d123c49a>] kvmppc_book3s_instantiate_page+0x2e0/0x8c0 [kvm_hv]
-   [<00000000bb549087>] kvmppc_book3s_radix_page_fault+0x1b4/0x2b0 [kvm_hv]
-   [<0000000086dddc0e>] kvmppc_book3s_hv_page_fault+0x214/0x12a0 [kvm_hv]
-   [<000000005ae9ccc2>] kvmppc_vcpu_run_hv+0xc5c/0x15f0 [kvm_hv]
-   [<00000000d22162ff>] kvmppc_vcpu_run+0x34/0x48 [kvm]
-   [<00000000d6953bc4>] kvm_arch_vcpu_ioctl_run+0x314/0x420 [kvm]
-   [<000000002543dd54>] kvm_vcpu_ioctl+0x33c/0x950 [kvm]
-   [<0000000048155cd6>] ksys_ioctl+0xd8/0x130
-   [<0000000041ffeaa7>] sys_ioctl+0x28/0x40
-   [<000000004afc4310>] system_call_exception+0x114/0x1e0
-   [<00000000fb70a873>] system_call_common+0xf0/0x278
-unreferenced object 0xc0002001f0c03900 (size 256):
- comm "qemu-kvm", pid 124830, jiffies 4295735235 (age 326.570s)
- hex dump (first 32 bytes):
-   c0 00 20 10 fa a0 03 87 c0 00 20 10 fa a1 03 87  .. ....... .....
-   c0 00 20 10 fa a2 03 87 c0 00 20 10 fa a3 03 87  .. ....... .....
- backtrace:
-   [<0000000023f675b8>] kvmppc_create_pte+0x854/0xd20 [kvm_hv]
-   kvmppc_pte_alloc at arch/powerpc/kvm/book3s_64_mmu_radix.c:356
-   (inlined by) kvmppc_create_pte at arch/powerpc/kvm/book3s_64_mmu_radix.c:593
-   [<00000000d123c49a>] kvmppc_book3s_instantiate_page+0x2e0/0x8c0 [kvm_hv]
-   [<00000000bb549087>] kvmppc_book3s_radix_page_fault+0x1b4/0x2b0 [kvm_hv]
-   [<0000000086dddc0e>] kvmppc_book3s_hv_page_fault+0x214/0x12a0 [kvm_hv]
-   [<000000005ae9ccc2>] kvmppc_vcpu_run_hv+0xc5c/0x15f0 [kvm_hv]
-   [<00000000d22162ff>] kvmppc_vcpu_run+0x34/0x48 [kvm]
-   [<00000000d6953bc4>] kvm_arch_vcpu_ioctl_run+0x314/0x420 [kvm]
-   [<000000002543dd54>] kvm_vcpu_ioctl+0x33c/0x950 [kvm]
-   [<0000000048155cd6>] ksys_ioctl+0xd8/0x130
-   [<0000000041ffeaa7>] sys_ioctl+0x28/0x40
-   [<000000004afc4310>] system_call_exception+0x114/0x1e0
-   [<00000000fb70a873>] system_call_common+0xf0/0x278
+> On 11/05/20 19:02, Jonathan Adams wrote:
+> > I think I'd characterize this slightly differently; we have a set of
+> > statistics which are essentially "in parallel":
+> >
+> >   - a variety of statistics, N CPUs they're available for, or
+> >   - a variety of statistics, N interfaces they're available for.
+> >   - a variety of statistics, N kvm object they're available for.
+> >
+> > Recreating a parallel hierarchy of statistics any time we add/subtract
+> > a CPU or interface seems like a lot of overhead.  Perhaps a better
+> > model would be some sort of "parameter enumn" (naming is hard;
+> > parameter set?), so when a CPU/network interface/etc is added you'd
+> > add its ID to the "CPUs" we know about, and at removal time you'd
+> > take it out; it would have an associated cbarg for the value getting
+> > callback.
+> >
+> >> Yep, the above "not create a dentry" flag would handle the case where
+> >> you sum things up in the kernel because the more fine grained counters
+> >> would be overwhelming.
+> >
+> > nodnod; or the callback could handle the sum itself.
+>
+> In general for statsfs we took a more explicit approach where each
+> addend in a sum is a separate stats_fs_source.  In this version of the
+> patches it's also a directory, but we'll take your feedback and add both
+> the ability to hide directories (first) and to list values (second).
+>
+> So, in the cases of interfaces and KVM objects I would prefer to keep
+> each addend separate.
 
-Signed-off-by: Qian Cai <cai@lca.pw>
----
- arch/powerpc/kvm/book3s_64_mmu_radix.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+This just feels like a lot of churn just to add a statistic or object;
+in your model, every time a KVM or VCPU is created, you create the N
+statistics, leading to N*M total objects.  As I was imagining it,
+you'd have:
 
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index aa12cd4078b3..bc6c1aa3d0e9 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -353,7 +353,13 @@ static struct kmem_cache *kvm_pmd_cache;
- 
- static pte_t *kvmppc_pte_alloc(void)
- {
--	return kmem_cache_alloc(kvm_pte_cache, GFP_KERNEL);
-+	pte_t *pte;
-+
-+	pte = kmem_cache_alloc(kvm_pte_cache, GFP_KERNEL);
-+	/* pmd_populate() will only reference _pa(pte). */
-+	kmemleak_ignore(pte);
-+
-+	return pte;
- }
- 
- static void kvmppc_pte_free(pte_t *ptep)
-@@ -363,7 +369,13 @@ static void kvmppc_pte_free(pte_t *ptep)
- 
- static pmd_t *kvmppc_pmd_alloc(void)
- {
--	return kmem_cache_alloc(kvm_pmd_cache, GFP_KERNEL);
-+	pmd_t *pmd;
-+
-+	pmd = kmem_cache_alloc(kvm_pmd_cache, GFP_KERNEL);
-+	/* pud_populate() will only reference _pa(pmd). */
-+	kmemleak_ignore(pmd);
-+
-+	return pmd;
- }
- 
- static void kvmppc_pmd_free(pmd_t *pmdp)
--- 
-2.21.0 (Apple Git-122.2)
+    A 'parameter enum' which maps names to object pointers and
+    A set of statistics which map a statfs path to {callback, cbarg,
+zero or more parameter enums}
 
+So adding a new KVM VCPU would just be "add an object to the KVM's
+VCPU parameter enum", and removing it would be the opposite, and a
+couple callbacks could handle basically all of the stats.   The only
+tricky part would be making sure the parameter enum value
+create/destroy and the callback calls are coordinated correctly.
+
+If you wanted stats for a particular VCPU, we could mark the overall
+directory as "include subdirs for VCPU parameter", and you'd
+automatically get one directory per VCPU, with the same set of stats
+in it, constrained to the single VCPU.  I could also imagine having an
+".agg_sum/{stata,statb,...}" to report using the aggregations you
+have, or a mode to say "stats in this directory are sums over the
+following VCPU parameter".
+
+> For CPUs that however would be pretty bad.  Many subsystems might
+> accumulate stats percpu for performance reason, which would then be
+> exposed as the sum (usually).  So yeah, native handling of percpu values
+> makes sense.  I think it should fit naturally into the same custom
+> aggregation framework as hash table keys, we'll see if there's any devil
+> in the details.
+>
+> Core kernel stats such as /proc/interrupts or /proc/stat are the
+> exception here, since individual per-CPU values can be vital for
+> debugging.  For those, creating a source per stat, possibly on-the-fly
+> at hotplug/hot-unplug time because NR_CPUS can be huge, would still be
+> my preferred way to do it.
+
+Our metricfs has basically two modes: report all per-CPU values (for
+the IPI counts etc; you pass a callback which takes a 'int cpu'
+argument) or a callback that sums over CPUs and reports the full
+value.  It also seems hard to have any subsystem with a per-CPU stat
+having to install a hotplug callback to add/remove statistics.
+
+In my model, a "CPU" parameter enum which is automatically kept
+up-to-date is probably sufficient for the "report all per-CPU values".
+
+Does this make sense to you?  I realize that this is a significant
+change to the model y'all are starting with; I'm willing to do the
+work to flesh it out.
+
+Thanks for your time,
+- Jonathan
+
+P.S.  Here's a summary of the types of statistics we use in metricfs
+in google, to give a little context:
+
+- integer values (single value per stat, source also a single value);
+a couple of these are boolean values exported as '0' or '1'.
+- per-CPU integer values, reported as a <cpuid, value> table
+- per-CPU integer values, summed and reported as an aggregate
+- single-value values, keys related to objects:
+    - many per-device (disk, network, etc) integer stats
+    - some per-device string data (version strings, UUIDs, and
+occasional statuses.)
+- a few histograms (usually counts by duration ranges)
+- the "function name" to count for the WARN statistic I mentioned.
+- A single statistic with two keys (for livepatch statistics; the
+value is the livepatch status as a string)
+
+Most of the stats with keys are "complete" (every key has a value),
+but there are several examples of statistics where only some of the
+possible keys have values, or (e.g. for networking statistics) only
+the keys visible to the reading process (e.g. in its namespaces) are
+included.
