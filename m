@@ -2,36 +2,53 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F5391D7691
-	for <lists+kvm-ppc@lfdr.de>; Mon, 18 May 2020 13:16:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 481E91D93E6
+	for <lists+kvm-ppc@lfdr.de>; Tue, 19 May 2020 12:01:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726919AbgERLQv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 18 May 2020 07:16:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55758 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726406AbgERLQv (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 18 May 2020 07:16:51 -0400
-X-Greylist: delayed 657 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 18 May 2020 04:16:51 PDT
-Received: from vps.dvp24.com (unknown [IPv6:2a02:348:36:5b8c::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58C01C061A0C;
-        Mon, 18 May 2020 04:16:51 -0700 (PDT)
-Received: from localhost ([127.0.0.1] helo=dvp24.com)
-        by vps.dvp24.com with esmtpa (Exim 4.77)
-        (envelope-from <abhay@dvp24.com>)
-        id 1jadZm-0006vo-DF; Mon, 18 May 2020 13:04:54 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Mon, 18 May 2020 12:04:54 +0100
-From:   pedro hills <abhay@dvp24.com>
+        id S1726121AbgESKB2 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 19 May 2020 06:01:28 -0400
+Received: from mail.padangpariamankab.go.id ([103.94.3.123]:21251 "EHLO
+        mail.padangpariamankab.go.id" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725911AbgESKB2 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 19 May 2020 06:01:28 -0400
+X-Greylist: delayed 4188 seconds by postgrey-1.27 at vger.kernel.org; Tue, 19 May 2020 06:01:27 EDT
 To:     undisclosed-recipients:;
-Subject: (DONATION) $2 Million Has Been Donated
-Reply-To: <pedrohills@outlook.es>
-Mail-Reply-To: <pedrohills@outlook.es>
-Message-ID: <3276f80722b7fd807b022e770a1e1653@dvp24.com>
-X-Sender: abhay@dvp24.com
-User-Agent: Roundcube Webmail/0.7.1
+Received: from localhost (localhost [127.0.0.1])
+        by mail.padangpariamankab.go.id (Postfix) with ESMTP id 029436E6478;
+        Tue, 19 May 2020 13:25:54 +0700 (WIB)
+Received: from mail.padangpariamankab.go.id ([127.0.0.1])
+        by localhost (mail.padangpariamankab.go.id [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id wrqIOWZ3ZHJF; Tue, 19 May 2020 13:25:53 +0700 (WIB)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.padangpariamankab.go.id (Postfix) with ESMTP id DF2386E6485;
+        Tue, 19 May 2020 13:25:52 +0700 (WIB)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.padangpariamankab.go.id DF2386E6485
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=padangpariamankab.go.id; s=D2C6CDEC-3607-11EA-BC8A-EEDE4AB8B776;
+        t=1589869553; bh=u3JbRufNQYofKf0bPqQgcicPQ3i/6ZfFLF+rs//GOEg=;
+        h=Date:From:Message-ID:MIME-Version;
+        b=Jirbk3guy0Rl9k5JGMTIob5w0XNzcMaJVLtag/ZZrDYwrUXBHt6IRAD3pE+W5qIoD
+         w+UmPYZNRrFyHkriw9mpK2fl+cnscGKwgXkHfC1OjgzTPzLfu4PppKGbHdpxzcIJV2
+         jFXt0uPy42i2D+76YA9CUARs3oEcyNq7Lr1T7JRA=
+X-Virus-Scanned: amavisd-new at padangpariamankab.go.id
+Received: from mail.padangpariamankab.go.id ([127.0.0.1])
+        by localhost (mail.padangpariamankab.go.id [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 9s7GEIz71ZrD; Tue, 19 May 2020 13:25:52 +0700 (WIB)
+Received: from mail.padangpariamankab.go.id (mail.padangpariamankab.go.id [103.94.3.123])
+        by mail.padangpariamankab.go.id (Postfix) with ESMTP id 056846E6476;
+        Tue, 19 May 2020 13:25:48 +0700 (WIB)
+Date:   Tue, 19 May 2020 13:25:47 +0700 (WIB)
+From:   rsud padang pariaman <rsud@padangpariamankab.go.id>
+Reply-To: info_innoxcapitalservicesolution@aol.com
+Message-ID: <61297544.3208.1589869547994.JavaMail.zimbra@padangpariamankab.go.id>
+Subject: 
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [103.94.3.123]
+X-Mailer: Zimbra 8.8.15_GA_3895 (zclient/8.8.15_GA_3895)
+Thread-Index: le4vc0TAiRm4NONHolxCZMIIUMp2EQ==
+Thread-Topic: 
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
@@ -39,18 +56,4 @@ X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
 
--- 
-$2 Million Has Been Donated To You,By PEDRO this is Real For More Info
-  Contact PEDRO immediately for your clame This Email:
-  pedrohills@outlook.es
-
-  Contact phone number +34632232897
-  Send Your Response To: pedrohills@outlook.es
-
-  2 Millionen US-Dollar wurden an Sie gespendet. Von PEDRO ist dies für
-weitere Informationen real
-  Wenden Sie sich umgehend an PEDRO. Diese E-Mail:
-  pedrohills@outlook.es
-
-  Kontakttelefonnummer +34632232897
-  Senden Sie Ihre Antwort an: pedrohills@outlook.es
+Wir bieten erschwingliche Darlehen zu 2% interessenten Preis, kontaktieren Sie uns noch heute.
