@@ -2,80 +2,280 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4B011DF600
-	for <lists+kvm-ppc@lfdr.de>; Sat, 23 May 2020 10:20:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31FC81DF842
+	for <lists+kvm-ppc@lfdr.de>; Sat, 23 May 2020 18:35:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387512AbgEWIUW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 23 May 2020 04:20:22 -0400
-Received: from sonic305-1.consmr.mail.bf2.yahoo.com ([74.6.133.40]:39616 "EHLO
-        sonic305-1.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387498AbgEWIUV (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 23 May 2020 04:20:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1590222020; bh=0kmsqXm9K+DyM/96L3DJNmWOe4qYy8f9mpn5lMuhelM=; h=Date:From:Reply-To:Subject:References:From:Subject; b=adc9omJJvak4rJeuKAd/rumUfBEcJTp2UoasSTkMpnn3kWJafSxCvDliqxR+X6Z36tf+HfZEEWuks0Uh75HxqbGxOp4cFPgqYOZJPfCfXeZJbHuacMqd3ypOuSlS9QvcKwKNof/XypGg0adys0TkJje2tDWstJJhhyFjnbtnx8ln1DYVAFF24t3rNefpiEy9BEO7dZmPVxEfwOnxT4kwD1qg/YLn1re9zQLJcvgJ6urBf3ROEoSt+BYeLAsxSa2eWmQHGntfxMhCWmliYpajW3mbQpiByA4Inv7MyQZRBf7gmpNnfgvI6Qacd+8u8eX/ck1l3vM3NLXf9VV4XkNp2A==
-X-YMail-OSG: 5HXfBkgVM1lddSPXBjMiVqtZJEPUQXWGEPPmBJPtf7vMvvNcGLmCTMBBSwrW454
- jgA0pb0n4jIrD1uFidcohXuKh9DYS7smcTkrmRpKziZckD2f0YPsytNy8XRCa.4QOyg5sW2sgI67
- RhJjqUL8PCF2PV1O8FsYnfJX2hyaZpfC_3E1_CWr6eG8JNUkFpW_7hD0IvnyU_P_aKeZ0klVRD7d
- NuXIdayu_cC0jx3WeWVW00q9A2FvcMgb4Gb5cahpx5k9TGtKGIDebz.CJ.S.HjS_Mov1uxM5xkF1
- E7itNUo6CdqakY4gyWTYKoh2nBuikL9xV6AQqGoWBMdi9VgFG4Sv3q2CELl4d_dwIZwQeMMFs0Jd
- UmfDrNgGliKu96Vr3BhSic8eSb1r6uaqapGuzbnHImd086RGbdy3MfTDTAL3Dc54CgZBKcnY6b4Z
- kKChFZyCuK3c5ZnUMeYP0nZZPjXNa8zLOrsa_fzJWtSfU8Eo5SPzi3LwxfSBMfZqKtHaeU4TsXW5
- qVl9aHYFju.BrHlEAdSb7FIvTeFJcu94Be22Yk8ZTTCJQ1FKh5gOLK2EmbpIOLOyix27gIRBf.cI
- sYMVhsAP20hT4.CYXzPD9P57EcsBJCNE1TAGj2fpbSqXKVxW4v_JnQXJX4PKuk8D2vDyyGWzMzpj
- buHkYzoA_AyhckY1CIz1TuRPwjT4B5jvbygLw7.cLaverNouX61ba_IH1j4sQ.2yEW_z2KqPjdr.
- zRLxJlwZNXmJwaZ_O49q8Rw1ZFjc758rkuJMVJq67gJPOj309l8btDXlfa2SF6YedKGkGHs8T1kZ
- fYy73bOXwfBEqzREL9iutFp0VTGcktavQt21kvxomV5CzQstLeMm31eAhjbqia9LOZLO29HbNhxx
- qj_mPk5YUm6oC9VNdDjmVslC6itrh6NXIYhs3n0E0yS4W_iD7QjEH3UBdf3e8O0dhFngWMJqiJ60
- JO1sEO5eC2vux_Kl1SoHG3M7jG5qUiSAlbouQiNky3MgtAc1WMJCSoHeGGj7Bn3TJQbExj6feYta
- dsIF2SNE8dMv2x.hGyrNvidXpO0LA7xPOwNRToKbyIv7sZLTMVtUasS8cMPOh7pXRrRH3cfxM1C5
- 9NgxkI4IdyuJrvKHaN1OU2E3SSh7d9L9pLoFZwoQqnjmydnb5sJv_JURwfe_VLEQKfZ_3micuWxW
- tuzrKcFHIwxere1Oiida1ZxtODsgHsN2rD6ZC8F4nY9Q4on3hxnrvWldBUvHuG589Z7jbEuDaKFE
- 1uCAClKvJjdyu0j5iiEAPxs7LkEAJL.ufMiOndnecABDzkVqmv80wCVKE8tx.My8A8LXCXbsbnUQ
- Iu_MH0ZmtZ.ShozGsT7SI1DrD3nAhOL3fLnRy6_Gjl74QsU.tcOKbRM7NzzPiADiZgRL4kA--
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic305.consmr.mail.bf2.yahoo.com with HTTP; Sat, 23 May 2020 08:20:20 +0000
-Date:   Sat, 23 May 2020 08:20:19 +0000 (UTC)
-From:   Mrs Doris Laboso <mrabraham.abrahim@gmail.com>
-Reply-To: mrsdoris.laboso1@gmail.com
-Message-ID: <218752893.2520168.1590222019676@mail.yahoo.com>
-Subject: Good day
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-References: <218752893.2520168.1590222019676.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.15960 YMailNodin Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:76.0) Gecko/20100101 Firefox/76.0
-To:     unlisted-recipients:; (no To-header on input)
+        id S1728141AbgEWQf3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 23 May 2020 12:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42324 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728044AbgEWQf3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 23 May 2020 12:35:29 -0400
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D827C061A0E;
+        Sat, 23 May 2020 09:35:29 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id x13so6618155pfn.11;
+        Sat, 23 May 2020 09:35:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=SPwvsl09hB2hY7vOwt/I7H2rDDPUmLEvYZeiYLVmTxA=;
+        b=awwC905DtOmsRxPl9VpH7xse2oOvoTCwphi2JL9ipFHZ1tJfd2S3NMEaTEM2Gtid7J
+         G5XUB+7fUbIm7nd4HHwIi7YjHrQTbTarVbq+mjfpH1d2MouOlJhT6ZYgmWbrhan+4tcK
+         mV7VS5kkri+kgMAFJEUD483avv0CzqKdHRTmU+6DzkWYspweoc6qfZs626ny01vuWKwX
+         eyatucxyWAEgDQ2tjtcOHP+neHco2CfvWPXtBor1Y4x/1YUI7L6RE/pmXnsuIofRXH/V
+         rxwLSQ96hZ8aciMBZ3t3Mx+Gm0Lec2sr0HwxytIAb7E8r2r1JTK9U4+anDWKzyypwA/A
+         u7Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=SPwvsl09hB2hY7vOwt/I7H2rDDPUmLEvYZeiYLVmTxA=;
+        b=PU9KJWebYft4nHuFxgJoLVzG2M4gZSkzIArg7frUs+7WX/8Qu3akOQslc8RfLwrEHR
+         GdTGl51Li5D9Ad1wzVZenWqD4O6HfCwQGCq0onN8GF2Hjtwi2J0IaVsMvbi5hL1RGMUA
+         urTySZw8lhnkfBooDrQoaeS3nlRDE3UPny6lRRTr2f4y+Y02K3190QamKBsWTlE3lRg9
+         uCV0LiUnXmhX5rlvE3gc5CNvreUO8ZayffqcCYRpRrSdnh42K6Ea61F0P2MuAAqD4ODc
+         YZyT7f546o0rHFwj5EoOJc3+ZLsKsMsZgS/M43mz9mwduEu5x00hjQT9apZnyeolHzLw
+         i1CQ==
+X-Gm-Message-State: AOAM530bj4JJ7BLYzm1bNONkRgrsO0mUIYUOLYA91a+EGTyQr/I9U6fR
+        cM1hkuidvOXCtPZq7P1gbGw=
+X-Google-Smtp-Source: ABdhPJw+IhCIgVWqU4NAcraQunQOd43jmSnfk7GPbMKu7X2WVjajeWatsEAUCznsi/qFfbfvnJ+yLg==
+X-Received: by 2002:a65:6496:: with SMTP id e22mr759651pgv.63.1590251728535;
+        Sat, 23 May 2020 09:35:28 -0700 (PDT)
+Received: from jordon-HP-15-Notebook-PC.domain.name ([122.166.90.90])
+        by smtp.gmail.com with ESMTPSA id b74sm8415460pga.31.2020.05.23.09.35.21
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 23 May 2020 09:35:27 -0700 (PDT)
+From:   Souptick Joarder <jrdr.linux@gmail.com>
+To:     paulus@ozlabs.org, mpe@ellerman.id.au, benh@kernel.crashing.org,
+        akpm@linux-foundation.org, peterz@infradead.org, mingo@redhat.com,
+        acme@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, namhyung@kernel.org,
+        pbonzini@redhat.com, sfr@canb.auug.org.au, rppt@linux.ibm.com,
+        msuchanek@suse.de, aneesh.kumar@linux.ibm.com
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        kvm@vger.kernel.org, Souptick Joarder <jrdr.linux@gmail.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: [linux-next RFC] mm/gup.c: Convert to use get_user_pages_fast_only()
+Date:   Sat, 23 May 2020 22:11:12 +0530
+Message-Id: <1590252072-2793-1-git-send-email-jrdr.linux@gmail.com>
+X-Mailer: git-send-email 1.9.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Good day and God bless you as you read this massage, I am by name Doris  La=
-boso am 27 years old girl from Kenya, yes my Mother was Late Mrs. Lorna Lab=
-oso the former Kenyan Assistant Minister of Home and affairs who was among =
-the plan that crash on board in the remote area of Kalong=E2=80=99s western=
- Kenya Read more about the crash with the below web site
+Renaming the API __get_user_pages_fast() to get_user_pages_
+fast_only() to align with pin_user_pages_fast_only().
 
-http://edition.cnn.com/2008/WORLD/africa/06/10/kenya.crash/index.html I am =
-constrained to contact you because of the maltreatment I am receiving from =
-my step mother. She planned to take away all my late mothers treasury and p=
-roperties from me since the unexpected death of my beloved mother. One day =
-I opened my mother brave case and secretly found out that my mother deposit=
-ed the sum of $ 27.5 million in BOA bank Burkina Faso with my name as the n=
-ext of kin, then I visited Burkina Faso to withdraw the money and take care=
- of myself and start a new life, on my arrival the Bank Director whom I mee=
-t in person Mr. Batish Zongo told me that my mother left an instruction to =
-the bank, that the money should be release to me only when I am married or =
-I present a trustee who will help me and invest the money overseas.
+As part of this we will get rid of write parameter.
+Instead caller will pass FOLL_WRITE to get_user_pages_fast_only().
+This will not change any existing functionality of the API.
 
-That is the reason why I am in search of a honest and reliable person who w=
-ill help me and stand as my trustee for the Bank to transfer the money to h=
-is account for me to come over and join you. It will be my great pleasure t=
-o compensate you with 30% of the money for your help and the balance shall =
-be my capital with your kind idea for me to invest under your control over =
-there in your country.
+All the callers are changed to pass FOLL_WRITE.
 
-As soon as I receive your positive response showing your interest I will se=
-nd you my picture's in my next mail and death certificate of my Mon and how=
- you will receive the money in your account.
+Updated the documentation of the API.
 
-Thanks and God bless you
-Sincerely Doris Laboso =20
+Signed-off-by: Souptick Joarder <jrdr.linux@gmail.com>
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Matthew Wilcox <willy@infradead.org>
+---
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
+ arch/powerpc/perf/callchain_64.c       |  2 +-
+ include/linux/mm.h                     |  4 ++--
+ kernel/events/core.c                   |  4 ++--
+ mm/gup.c                               | 29 ++++++++++++++++-------------
+ virt/kvm/kvm_main.c                    |  6 +++---
+ 7 files changed, 26 insertions(+), 23 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index 18aed97..34fc5c8 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -581,7 +581,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_run *run, struct kvm_vcpu *vcpu,
+ 	 * We always ask for write permission since the common case
+ 	 * is that the page is writable.
+ 	 */
+-	if (__get_user_pages_fast(hva, 1, 1, &page) == 1) {
++	if (get_user_pages_fast_only(hva, 1, FOLL_WRITE, &page) == 1) {
+ 		write_ok = true;
+ 	} else {
+ 		/* Call KVM generic code to do the slow-path check */
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 3248f78..3b6e342 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -795,7 +795,7 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcpu *vcpu,
+ 	 * is that the page is writable.
+ 	 */
+ 	hva = gfn_to_hva_memslot(memslot, gfn);
+-	if (!kvm_ro && __get_user_pages_fast(hva, 1, 1, &page) == 1) {
++	if (!kvm_ro && get_user_pages_fast_only(hva, 1, FOLL_WRITE, &page) == 1) {
+ 		upgrade_write = true;
+ 	} else {
+ 		unsigned long pfn;
+diff --git a/arch/powerpc/perf/callchain_64.c b/arch/powerpc/perf/callchain_64.c
+index 1bff896d..f719a74 100644
+--- a/arch/powerpc/perf/callchain_64.c
++++ b/arch/powerpc/perf/callchain_64.c
+@@ -32,7 +32,7 @@ int read_user_stack_slow(void __user *ptr, void *buf, int nb)
+ 	int nrpages;
+ 	void *kaddr;
+ 
+-	nrpages = __get_user_pages_fast(addr, 1, 1, &page);
++	nrpages = get_user_pages_fast_only(addr, 1, FOLL_WRITE, &page);
+ 	if (nrpages == 1) {
+ 		kaddr = page_address(page);
+ 
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 93d93bd..10a6758 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1817,8 +1817,8 @@ extern int mprotect_fixup(struct vm_area_struct *vma,
+ /*
+  * doesn't attempt to fault and will return short.
+  */
+-int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
+-			  struct page **pages);
++int get_user_pages_fast_only(unsigned long start, int nr_pages,
++			unsigned int gup_flags, struct page **pages);
+ int pin_user_pages_fast_only(unsigned long start, int nr_pages,
+ 			     unsigned int gup_flags, struct page **pages);
+ /*
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index c94eb27..81d6e73 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -6934,12 +6934,12 @@ static u64 perf_virt_to_phys(u64 virt)
+ 		 * Walking the pages tables for user address.
+ 		 * Interrupts are disabled, so it prevents any tear down
+ 		 * of the page tables.
+-		 * Try IRQ-safe __get_user_pages_fast first.
++		 * Try IRQ-safe get_user_pages_fast_only first.
+ 		 * If failed, leave phys_addr as 0.
+ 		 */
+ 		if (current->mm != NULL) {
+ 			pagefault_disable();
+-			if (__get_user_pages_fast(virt, 1, 0, &p) == 1)
++			if (get_user_pages_fast_only(virt, 1, 0, &p) == 1)
+ 				phys_addr = page_to_phys(p) + virt % PAGE_SIZE;
+ 			pagefault_enable();
+ 		}
+diff --git a/mm/gup.c b/mm/gup.c
+index 80f51a36..d8aabc0 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -2278,7 +2278,7 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+  * to be special.
+  *
+  * For a futex to be placed on a THP tail page, get_futex_key requires a
+- * __get_user_pages_fast implementation that can pin pages. Thus it's still
++ * get_user_pages_fast_only implementation that can pin pages. Thus it's still
+  * useful to have gup_huge_pmd even if we can't operate on ptes.
+  */
+ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+@@ -2683,7 +2683,7 @@ static inline void gup_pgd_range(unsigned long addr, unsigned long end,
+ 
+ #ifndef gup_fast_permitted
+ /*
+- * Check if it's allowed to use __get_user_pages_fast() for the range, or
++ * Check if it's allowed to use get_user_pages_fast_only() for the range, or
+  * we need to fall back to the slow version:
+  */
+ static bool gup_fast_permitted(unsigned long start, unsigned long end)
+@@ -2776,8 +2776,14 @@ static int internal_get_user_pages_fast(unsigned long start, int nr_pages,
+ 
+ 	return ret;
+ }
+-
+-/*
++/**
++ * get_user_pages_fast_only() - pin user pages in memory
++ * @start:      starting user address
++ * @nr_pages:   number of pages from start to pin
++ * @gup_flags:  flags modifying pin behaviour
++ * @pages:      array that receives pointers to the pages pinned.
++ *              Should be at least nr_pages long.
++ *
+  * Like get_user_pages_fast() except it's IRQ-safe in that it won't fall back to
+  * the regular GUP.
+  * Note a difference with get_user_pages_fast: this always returns the
+@@ -2786,8 +2792,8 @@ static int internal_get_user_pages_fast(unsigned long start, int nr_pages,
+  * If the architecture does not support this function, simply return with no
+  * pages pinned.
+  */
+-int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
+-			  struct page **pages)
++int get_user_pages_fast_only(unsigned long start, int nr_pages,
++			unsigned int gup_flags, struct page **pages)
+ {
+ 	int nr_pinned;
+ 	/*
+@@ -2797,10 +2803,7 @@ int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
+ 	 * FOLL_FAST_ONLY is required in order to match the API description of
+ 	 * this routine: no fall back to regular ("slow") GUP.
+ 	 */
+-	unsigned int gup_flags = FOLL_GET | FOLL_FAST_ONLY;
+-
+-	if (write)
+-		gup_flags |= FOLL_WRITE;
++	gup_flags = FOLL_GET | FOLL_FAST_ONLY;
+ 
+ 	nr_pinned = internal_get_user_pages_fast(start, nr_pages, gup_flags,
+ 						 pages);
+@@ -2815,7 +2818,7 @@ int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
+ 
+ 	return nr_pinned;
+ }
+-EXPORT_SYMBOL_GPL(__get_user_pages_fast);
++EXPORT_SYMBOL_GPL(get_user_pages_fast_only);
+ 
+ /**
+  * get_user_pages_fast() - pin user pages in memory
+@@ -2886,8 +2889,8 @@ int pin_user_pages_fast(unsigned long start, int nr_pages,
+ EXPORT_SYMBOL_GPL(pin_user_pages_fast);
+ 
+ /*
+- * This is the FOLL_PIN equivalent of __get_user_pages_fast(). Behavior is the
+- * same, except that this one sets FOLL_PIN instead of FOLL_GET.
++ * This is the FOLL_PIN equivalent of get_user_pages_fast_only(). Behavior
++ * is the same, except that this one sets FOLL_PIN instead of FOLL_GET.
+  *
+  * The API rules are the same, too: no negative values may be returned.
+  */
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index fc38d63..cec7919 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1750,7 +1750,7 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+ 	if (!(write_fault || writable))
+ 		return false;
+ 
+-	npages = __get_user_pages_fast(addr, 1, 1, page);
++	npages = get_user_pages_fast_only(addr, 1, FOLL_WRITE, page);
+ 	if (npages == 1) {
+ 		*pfn = page_to_pfn(page[0]);
+ 
+@@ -1791,7 +1791,7 @@ static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
+ 	if (unlikely(!write_fault) && writable) {
+ 		struct page *wpage;
+ 
+-		if (__get_user_pages_fast(addr, 1, 1, &wpage) == 1) {
++		if (get_user_pages_fast_only(addr, 1, FOLL_WRITE, &wpage) == 1) {
+ 			*writable = true;
+ 			put_page(page);
+ 			page = wpage;
+@@ -1998,7 +1998,7 @@ int gfn_to_page_many_atomic(struct kvm_memory_slot *slot, gfn_t gfn,
+ 	if (entry < nr_pages)
+ 		return 0;
+ 
+-	return __get_user_pages_fast(addr, nr_pages, 1, pages);
++	return get_user_pages_fast(addr, nr_pages, FOLL_WRITE, pages);
+ }
+ EXPORT_SYMBOL_GPL(gfn_to_page_many_atomic);
+ 
+-- 
+1.9.1
+
