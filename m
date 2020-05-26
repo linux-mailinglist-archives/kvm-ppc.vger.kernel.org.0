@@ -2,98 +2,234 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C7B11E1FF3
-	for <lists+kvm-ppc@lfdr.de>; Tue, 26 May 2020 12:41:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9B121E2069
+	for <lists+kvm-ppc@lfdr.de>; Tue, 26 May 2020 13:04:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731912AbgEZKlM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 26 May 2020 06:41:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731859AbgEZKlL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 May 2020 06:41:11 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A90EC03E97E;
-        Tue, 26 May 2020 03:41:11 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id a25so12222493ljp.3;
-        Tue, 26 May 2020 03:41:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1Ry+3smoc7mCp1uPcR5k/a7m1osHOU0G7CR8vXULZZQ=;
-        b=lOW+HXgzYB42cF/rhFtPrEV1DPp3z0Hcimy87m4EshA1FPzBMHRZg6ifPlxDGpwLaJ
-         t7NhZQD7jdSFRRWTIyGXaX4Btb+hsajfJrvgP9QoRe7M5a+jXAIkXcBIOVET15jEprXK
-         G94dJhAcGm88QDcosU8LybxInn1bd/YqidEIJR14HDh38uR5ntX/2G4oVZsCuoJI0S+o
-         KHsPbh3IgWU23MyKcZFTmovaqJ5PxxaqzbB9nRsPyW5kFTi0b4OtGvpQV+1i8hAjyqeK
-         0FyAdNRsuRZddDzsMTJ/Wo8zXD0RGt7SnppeeWspYbVceFkHJrF+89zayNmzIPXEuePH
-         +wIg==
+        id S2388933AbgEZLEK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 26 May 2020 07:04:10 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27879 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388728AbgEZLDs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 May 2020 07:03:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590491025;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=YiHC1jSZ9odIhljl+OEk0Z9XTPo94KqwVQ3mMvdqhCY=;
+        b=I1fjp5XgQW6FPaTls6PoNGs5V/mqK5DkHd2jHkW810kDdtPBYBylY+wB+LPqvzs565HYHR
+        r4Be4nWecOeR8kjnxVzClG2ieZLrbdx0DgwgSZqp/U8gqKOrbmE+q5jLEmFct6lPKhrWTN
+        e9WbXX/ovxy5eunR6qh1/eWk+RdQFWQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-0UZq7MdzN16rKcEp7pPXaw-1; Tue, 26 May 2020 07:03:44 -0400
+X-MC-Unique: 0UZq7MdzN16rKcEp7pPXaw-1
+Received: by mail-wm1-f71.google.com with SMTP id g194so955824wmg.0
+        for <kvm-ppc@vger.kernel.org>; Tue, 26 May 2020 04:03:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1Ry+3smoc7mCp1uPcR5k/a7m1osHOU0G7CR8vXULZZQ=;
-        b=NKTHa7gifOETxSdybcBq/yO8qOfT67ce8k45JM6BHb00OuvKeegKouNPtSJYBj+oxk
-         HRBDCA1wbf0DwdmqLkw2rmniwl4FXkwrXpEW213vzNrHqcMnxP9d0dqqafJ8hFUscBtH
-         3w1DrJYWspKRRmRVWXb9lEz3G4bGFapKGngcqFETe17UNH19EfGYgwq4/ALKkWMtiDwj
-         YTySFJFMgqtk86XtiZa+hbUEu68VslB5mlXryu8axrX18ouNo+YXtT/y5kB9OfG4d7mX
-         Fea7PV1HTWFoYSj6jlEz4MI2Z9gnQar0On/vB6E0Diu6VKnM+DyLEVxIJSy0EmFCzWy+
-         40Xg==
-X-Gm-Message-State: AOAM5317byTi+SW2AF8aJY9DlqHu5oEKW17kO8NFzBkp5oKVlHOI06to
-        4BBrYQLvcYYnT1GSrCtrZItB7/MzcEcLc4660JJ7Q1PK4LI=
-X-Google-Smtp-Source: ABdhPJyV5UNPT5wTZ5V1QRzvrkwK25GB+HGrijYwTV+7vkTwPuUSjO+tP4bYBkO+rleoRruyY3jfSDIh+hlPvjCFCSs=
-X-Received: by 2002:a2e:9087:: with SMTP id l7mr318222ljg.430.1590489669805;
- Tue, 26 May 2020 03:41:09 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=YiHC1jSZ9odIhljl+OEk0Z9XTPo94KqwVQ3mMvdqhCY=;
+        b=mpLMMfU4QVdjdwNHoSw8K5BfDgw4iL9F0HpGXtmRRbSfPIP5Ypd22GQ5bp10zBZ0Jj
+         pPdLwMnC8tsoNCHsA49q5tMcQgCoi87cE0ttUxyhc2EEpUQM4mJuqulySk717jzZ8iDm
+         SVkj3wbyHTwpOZJs5GDqFE0gIJHwQjEbXHvXDUITVaL4drlQ+quRPvwsPSp5GTHtrAAN
+         +B02P3mzVOj4A3bBRsBkwvnQ/gyQhHZU2g7F9DBmZhr1DmkTX1RcjxzPOJn6IRY/HDY4
+         2/fKU6Unf/2+LEwiVPsStV0WVnFT0uinJ5P9cAq6sbdwOfndfhVNyF7g9LcIFFGxEJsr
+         WDoQ==
+X-Gm-Message-State: AOAM533DPFy/Rn1p1cBqhtOIv8StZLfjDveI+Y/NPmwpnXQAjruU7NS2
+        o+pDWVRQS7qosY8ciVQZCmq/VL6FahJwhxBk1vXEuOgU9N00wLLIlLldtb24YtYXS4GbNDB8Dik
+        iqbWQAoyS5fWJ05JbKw==
+X-Received: by 2002:a7b:c8d6:: with SMTP id f22mr867250wml.108.1590491022771;
+        Tue, 26 May 2020 04:03:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy+r1rjVk/6TMhaP3IgReV3uZsywmdIrm1MH7nDDpPZhbJkQGL0WqDauUTDI+FV3ViYCaqhZA==
+X-Received: by 2002:a7b:c8d6:: with SMTP id f22mr867213wml.108.1590491022381;
+        Tue, 26 May 2020 04:03:42 -0700 (PDT)
+Received: from localhost.localdomain.com ([194.230.155.118])
+        by smtp.gmail.com with ESMTPSA id d6sm22928240wrj.90.2020.05.26.04.03.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 May 2020 04:03:31 -0700 (PDT)
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+        David Rientjes <rientjes@google.com>,
+        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: [PATCH v3 0/7] Statsfs: a new ram-based file system for Linux kernel statistics
+Date:   Tue, 26 May 2020 13:03:10 +0200
+Message-Id: <20200526110318.69006-1-eesposit@redhat.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-References: <1590396812-31277-1-git-send-email-jrdr.linux@gmail.com> <20200526075904.GE282305@thinks.paulus.ozlabs.org>
-In-Reply-To: <20200526075904.GE282305@thinks.paulus.ozlabs.org>
-From:   Souptick Joarder <jrdr.linux@gmail.com>
-Date:   Tue, 26 May 2020 16:10:43 +0530
-Message-ID: <CAFqt6zbC4scJypctv-cWZYyq0TJb0OmB0Fq22-L54KVyoTTruw@mail.gmail.com>
-Subject: Re: [linux-next PATCH] mm/gup.c: Convert to use get_user_{page|pages}_fast_only()
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, acme@kernel.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        jolsa@redhat.com, namhyung@kernel.org, pbonzini@redhat.com,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>, msuchanek@suse.de,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
-        kvm@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, May 26, 2020 at 1:29 PM Paul Mackerras <paulus@ozlabs.org> wrote:
->
-> On Mon, May 25, 2020 at 02:23:32PM +0530, Souptick Joarder wrote:
-> > API __get_user_pages_fast() renamed to get_user_pages_fast_only()
-> > to align with pin_user_pages_fast_only().
-> >
-> > As part of this we will get rid of write parameter.
-> > Instead caller will pass FOLL_WRITE to get_user_pages_fast_only().
-> > This will not change any existing functionality of the API.
-> >
-> > All the callers are changed to pass FOLL_WRITE.
-> >
-> > Also introduce get_user_page_fast_only(), and use it in a few
-> > places that hard-code nr_pages to 1.
-> >
-> > Updated the documentation of the API.
-> >
-> > Signed-off-by: Souptick Joarder <jrdr.linux@gmail.com>
->
-> The arch/powerpc/kvm bits look reasonable.
->
-> Reviewed-by: Paul Mackerras <paulus@ozlabs.org>
+There is currently no common way for Linux kernel subsystems to expose
+statistics to userspace shared throughout the Linux kernel; subsystems have
+to take care of gathering and displaying statistics by themselves, for
+example in the form of files in debugfs. For example KVM has its own code
+section that takes care of this in virt/kvm/kvm_main.c, where it sets up
+debugfs handlers for displaying values and aggregating them from various
+subfolders to obtain information about the system state (i.e. displaying
+the total number of exits, calculated by summing all exits of all cpus of
+all running virtual machines).
 
-Thanks Paul. This patch is merged through mm-tree.
-https://lore.kernel.org/kvm/1590396812-31277-1-git-send-email-jrdr.linux@gmail.com/
+Allowing each section of the kernel to do so has two disadvantages. First,
+it will introduce redundant code. Second, debugfs is anyway not the right
+place for statistics (for example it is affected by lockdown)
+
+In this patch series I introduce statsfs, a synthetic ram-based virtual
+filesystem that takes care of gathering and displaying statistics for the
+Linux kernel subsystems.
+
+The file system is mounted on /sys/kernel/stats and would be already used
+by kvm. Statsfs was initially introduced by Paolo Bonzini [1].
+
+Statsfs offers a generic and stable API, allowing any kind of
+directory/file organization and supporting multiple kind of aggregations
+(not only sum, but also average, max, min and count_zero) and data types
+(boolean, unsigned/signed and custom types). The implementation, which is
+a generalization of KVM’s debugfs statistics code, takes care of gathering
+and displaying information at run time; users only need to specify the
+values to be included in each source.
+
+Statsfs would also be a different mountpoint from debugfs, and would not
+suffer from limited access due to the security lock down patches. Its main
+function is to display each statistics as a file in the desired folder
+hierarchy defined through the API. Statsfs files can be read, and possibly
+cleared if their file mode allows it.
+
+Statsfs has two main components: the public API defined by
+include/linux/statsfs.h, and the virtual file system which should end up in
+/sys/kernel/stats.
+
+The API has two main elements, values and sources. Kernel subsystems like
+KVM can use the API to create a source, add child sources/values/aggregates
+and register it to the root source (that on the virtual fs would be
+/sys/kernel/statsfs).
+
+Sources are created via statsfs_source_create(), and each source becomes a
+directory in the file system. Sources form a parent-child relationship;
+root sources are added to the file system via statsfs_source_register().
+Every other source is added to or removed from a parent through the
+statsfs_source_add_subordinate and statsfs_source_remote_subordinate APIs.
+Once a source is created and added to the tree (via add_subordinate), it
+will be used to compute aggregate values in the parent source.
+A source can optionally be hidden from the filesystem
+but still considered in the aggregation operations if the corresponding
+flag is set during initialization.
+
+Values represent quantites that are gathered by the statsfs user. Examples
+of values include the number of vm exits of a given kind, the amount of
+memory used by some data structure, the length of the longest hash table
+chain, or anything like that. Values are defined with the
+statsfs_source_add_values function. Each value is defined by a struct
+statsfs_value; the same statsfs_value can be added to many different
+sources. A value can be considered "simple" if it fetches data from a
+user-provided location, or "aggregate" if it groups all values in the
+subordinates sources that include the same statsfs_value.
+Each value has a stats_fs_type pointer in order to allow the user to
+provide custom get and clear functions. The library, however, also
+exports default stats_fs_type structs for the standard types
+(all unsigned and signed types plus boolean).
+A value can also provide a show function, that takes care
+of displaying the value in a custom string format. This can be especially
+useful when displaying enums.
+
+For more information, please consult the kerneldoc documentation in patch 2
+and the sample uses in the kunit tests, KVM and networking.
+
+This series of patches is based on my previous series "libfs: group and
+simplify linux fs code" and the single patch sent to kvm "kvm_host: unify
+VM_STAT and VCPU_STAT definitions in a single place". The former simplifies
+code duplicated in debugfs and tracefs (from which statsfs is based on),
+the latter groups all macros definition for statistics in kvm in a single
+common file shared by all architectures.
+
+Patch 1 adds a new refcount and kref destructor wrappers that take a
+semaphore, as those are used later by statsfs. Patch 2 introduces the
+statsfs API, patch 3 provides extensive tests that can also be used as
+example on how to use the API and patch 4 adds the file system support.
+Finally, patch 5 provides a real-life example of statsfs usage in KVM,
+with patch 6 providing a concrete example of the show function and
+patch 7 another real-life example in the networking subsystem.
+
+[1] https://lore.kernel.org/kvm/5d6cdcb1-d8ad-7ae6-7351-3544e2fa366d@redhat.com/?fbclid=IwAR18LHJ0PBcXcDaLzILFhHsl3qpT3z2vlG60RnqgbpGYhDv7L43n0ZXJY8M
+
+Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+
+v2 -> v3 move kconfig entry in the pseudo filesystem menu, add
+documentation, get/clear function for value types, show function,
+floating/cumulative and hidden flags. Also added the netstat
+example
+
+Emanuele Giuseppe Esposito (7):
+  stats_fs API: create, add and remove stats_fs sources and values
+  documentation for stats_fs
+  kunit: tests for stats_fs API
+  stats_fs fs: virtual fs to show stats to the end-user
+  kvm_main: replace debugfs with stats_fs
+  [not for merge] kvm: example of stats_fs_value show function
+  [not for merge] netstats: example use of stats_fs API
+
+ Documentation/filesystems/index.rst    |    1 +
+ Documentation/filesystems/stats_fs.rst |  222 +++++
+ MAINTAINERS                            |    7 +
+ arch/arm64/kvm/Kconfig                 |    1 +
+ arch/arm64/kvm/guest.c                 |    2 +-
+ arch/mips/kvm/Kconfig                  |    1 +
+ arch/mips/kvm/mips.c                   |    2 +-
+ arch/powerpc/kvm/Kconfig               |    1 +
+ arch/powerpc/kvm/book3s.c              |   12 +-
+ arch/powerpc/kvm/booke.c               |    8 +-
+ arch/s390/kvm/Kconfig                  |    1 +
+ arch/s390/kvm/kvm-s390.c               |   16 +-
+ arch/x86/include/asm/kvm_host.h        |    2 +-
+ arch/x86/kvm/Kconfig                   |    1 +
+ arch/x86/kvm/Makefile                  |    2 +-
+ arch/x86/kvm/debugfs.c                 |   64 --
+ arch/x86/kvm/stats_fs.c                |  114 +++
+ arch/x86/kvm/x86.c                     |   11 +-
+ fs/Kconfig                             |   20 +
+ fs/Makefile                            |    1 +
+ fs/stats_fs/Makefile                   |    7 +
+ fs/stats_fs/inode.c                    |  461 ++++++++++
+ fs/stats_fs/internal.h                 |   34 +
+ fs/stats_fs/stats_fs-tests.c           | 1097 ++++++++++++++++++++++++
+ fs/stats_fs/stats_fs.c                 |  642 ++++++++++++++
+ fs/stats_fs/stub.c                     |   13 +
+ include/linux/kvm_host.h               |   45 +-
+ include/linux/netdevice.h              |    2 +
+ include/linux/stats_fs.h               |  381 ++++++++
+ include/uapi/linux/magic.h             |    1 +
+ net/Kconfig                            |    1 +
+ net/core/dev.c                         |   68 ++
+ tools/lib/api/fs/fs.c                  |   21 +
+ virt/kvm/arm/arm.c                     |    2 +-
+ virt/kvm/kvm_main.c                    |  317 +------
+ 35 files changed, 3193 insertions(+), 388 deletions(-)
+ create mode 100644 Documentation/filesystems/stats_fs.rst
+ delete mode 100644 arch/x86/kvm/debugfs.c
+ create mode 100644 arch/x86/kvm/stats_fs.c
+ create mode 100644 fs/stats_fs/Makefile
+ create mode 100644 fs/stats_fs/inode.c
+ create mode 100644 fs/stats_fs/internal.h
+ create mode 100644 fs/stats_fs/stats_fs-tests.c
+ create mode 100644 fs/stats_fs/stats_fs.c
+ create mode 100644 fs/stats_fs/stub.c
+ create mode 100644 include/linux/stats_fs.h
+
+-- 
+2.25.4
+
