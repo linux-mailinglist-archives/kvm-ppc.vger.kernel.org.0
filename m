@@ -2,109 +2,88 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A7AF1E296D
-	for <lists+kvm-ppc@lfdr.de>; Tue, 26 May 2020 19:51:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8E171E3295
+	for <lists+kvm-ppc@lfdr.de>; Wed, 27 May 2020 00:31:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388499AbgEZRvd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 26 May 2020 13:51:33 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59512 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388767AbgEZRvd (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 May 2020 13:51:33 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04QHWAvS079622;
-        Tue, 26 May 2020 13:51:21 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 317003e6h1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 May 2020 13:51:20 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04QHkM6F026874;
-        Tue, 26 May 2020 17:51:18 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04fra.de.ibm.com with ESMTP id 316uf8ajen-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 May 2020 17:51:18 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04QHpGS4852274
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 May 2020 17:51:16 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 599DC11C058;
-        Tue, 26 May 2020 17:51:16 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E6E1911C05C;
-        Tue, 26 May 2020 17:51:15 +0000 (GMT)
-Received: from pomme.local (unknown [9.145.18.233])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 26 May 2020 17:51:15 +0000 (GMT)
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: read ibm,secure-memory nodes
-From:   Laurent Dufour <ldufour@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        paulus@samba.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, linux-kernel@vger.kernel.org
-References: <20200416162715.45846-1-ldufour@linux.ibm.com>
-Message-ID: <09a71476-1e15-e49b-3536-dabed9d881c0@linux.ibm.com>
-Date:   Tue, 26 May 2020 19:51:15 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.0
+        id S2392086AbgEZWbd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 26 May 2020 18:31:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54538 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389482AbgEZWbd (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 26 May 2020 18:31:33 -0400
+Received: from kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net (unknown [163.114.132.6])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9454F20899;
+        Tue, 26 May 2020 22:31:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590532292;
+        bh=i/LsJ/7HDxl1uraGohIpTv1UEEpLZgqDBmcvFSkYrRs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=L1hQtRDvn7ylGIClnE51U8xDbKeptk9RRRcxjD8KvV0vnGtqXOx6okqH3wGQU2F4s
+         AMxHim9tkh3trTRi+/Dihhe2jPHiIQ7YHpjVMePw/F7mtxQxe5ipm41gvPbE0O1/f+
+         WqWQhzzVJGfznE1VeNIwnVlo+h9/gVYBJXg1JpOk=
+Date:   Tue, 26 May 2020 15:31:28 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+        David Rientjes <rientjes@google.com>,
+        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 0/7] Statsfs: a new ram-based file system for Linux
+ kernel statistics
+Message-ID: <20200526153128.448bfb43@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+In-Reply-To: <20200526110318.69006-1-eesposit@redhat.com>
+References: <20200526110318.69006-1-eesposit@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200416162715.45846-1-ldufour@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-05-26_02:2020-05-26,2020-05-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- cotscore=-2147483648 bulkscore=0 suspectscore=0 priorityscore=1501
- mlxlogscore=999 phishscore=0 impostorscore=0 mlxscore=0 spamscore=0
- adultscore=0 clxscore=1011 lowpriorityscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005260131
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paul, could you please take that patch?
+On Tue, 26 May 2020 13:03:10 +0200 Emanuele Giuseppe Esposito wrote:
+> There is currently no common way for Linux kernel subsystems to expose
+> statistics to userspace shared throughout the Linux kernel; subsystems have
+> to take care of gathering and displaying statistics by themselves, for
+> example in the form of files in debugfs. For example KVM has its own code
+> section that takes care of this in virt/kvm/kvm_main.c, where it sets up
+> debugfs handlers for displaying values and aggregating them from various
+> subfolders to obtain information about the system state (i.e. displaying
+> the total number of exits, calculated by summing all exits of all cpus of
+> all running virtual machines).
+> 
+> Allowing each section of the kernel to do so has two disadvantages. First,
+> it will introduce redundant code. Second, debugfs is anyway not the right
+> place for statistics (for example it is affected by lockdown)
+> 
+> In this patch series I introduce statsfs, a synthetic ram-based virtual
+> filesystem that takes care of gathering and displaying statistics for the
+> Linux kernel subsystems.
+> 
+> The file system is mounted on /sys/kernel/stats and would be already used
+> by kvm. Statsfs was initially introduced by Paolo Bonzini [1].
 
-Le 16/04/2020 à 18:27, Laurent Dufour a écrit :
-> The newly introduced ibm,secure-memory nodes supersede the
-> ibm,uv-firmware's property secure-memory-ranges.
-> 
-> Firmware will no more expose the secure-memory-ranges property so first
-> read the new one and if not found rollback to the older one.
-> 
-> Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
-> ---
->   arch/powerpc/kvm/book3s_hv_uvmem.c | 14 ++++++++++++++
->   1 file changed, 14 insertions(+)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> index 53b88cae3e73..ad950f8996e0 100644
-> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> @@ -735,6 +735,20 @@ static u64 kvmppc_get_secmem_size(void)
->   	const __be32 *prop;
->   	u64 size = 0;
-> 
-> +	/*
-> +	 * First try the new ibm,secure-memory nodes which supersede the
-> +	 * secure-memory-ranges property.
-> +	 * If we found somes, no need to read the deprecated one.
-> +	 */
-> +	for_each_compatible_node(np, NULL, "ibm,secure-memory") {
-> +		prop = of_get_property(np, "reg", &len);
-> +		if (!prop)
-> +			continue;
-> +		size += of_read_number(prop + 2, 2);
-> +	}
-> +	if (size)
-> +		return size;
-> +
->   	np = of_find_compatible_node(NULL, NULL, "ibm,uv-firmware");
->   	if (!np)
->   		goto out;
-> 
+What's the direct motivation for this work? Moving KVM stats out of
+debugfs?
+
+In my experience stats belong in the API used for creating/enumerating
+objects, statsfs sounds like going in the exact opposite direction -
+creating a parallel structure / hierarchy for exposing stats. I know
+nothing about KVM but are you sure all the info that has to be exposed
+will be stats?
+
+In case of networking we have the basic stats in sysfs, under the
+netdevice's kobject. But since we're not using sysfs much any more 
+for config, new stats are added in netlink APIs. Again - same APIs
+used for enumeration and config.
 
