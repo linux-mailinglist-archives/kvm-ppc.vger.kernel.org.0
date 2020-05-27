@@ -2,124 +2,114 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D99471E4FD4
-	for <lists+kvm-ppc@lfdr.de>; Wed, 27 May 2020 23:08:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 749141E4FF1
+	for <lists+kvm-ppc@lfdr.de>; Wed, 27 May 2020 23:17:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728653AbgE0VII (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 27 May 2020 17:08:08 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23595 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728546AbgE0VIC (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 May 2020 17:08:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590613680;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3sSNRFYrb0CdmbwXzPVaN6Wl+qrkOkjvYM/9vtvRcHo=;
-        b=KehVC76hKR5uuiiHQ9lUK2BXcIsTdHc/8PdUHPyGUpI4gUPed0mzDLpUoPFcoi+BPgit6n
-        j1l+cgfzjOiJgpV/JVph4Dn38Io6hwAdLIpUsZJ80bwG7+woQ/XV9qpAiqmlUhJnYVPEzw
-        DOK1m66arBlCNEVdS7M+Lm1KAp0ligk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-TXxW55GrOtGis4MDbGhiNw-1; Wed, 27 May 2020 17:07:59 -0400
-X-MC-Unique: TXxW55GrOtGis4MDbGhiNw-1
-Received: by mail-wr1-f71.google.com with SMTP id p10so1234551wrn.19
-        for <kvm-ppc@vger.kernel.org>; Wed, 27 May 2020 14:07:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3sSNRFYrb0CdmbwXzPVaN6Wl+qrkOkjvYM/9vtvRcHo=;
-        b=FYqx76rRVgq9BT3XxL9lACuaDTchqR9JtA2CBqVuF1gj26YAmWyAsLtXWkOdPumr/7
-         Ne59vmrOCtLiqhKuvdhpWgf4r+j9bV3oQMoVkUGcZLcurHSvRCnVzJ3NRjg3kuFyZLYf
-         0t8WlUNxyzEc5YWGkf99IlmNkbWcwnHrJlErGfhXvMpCOG9k5Y3S3EeERGgAovR7kxsc
-         TdaWubrDF3nobX9tx+uijZx/1S1ZUAxV5PgKJb+bj7D++/fRcV1h9U8LrWoUdGkskMXx
-         zQQRj6Kfl+5r0ZXkTxx4HDhVsVkTqWTlM66b2TyE8ielrz0ezVDL0IqyNQTXyIYZo9UB
-         XXPw==
-X-Gm-Message-State: AOAM532pMF5F5dztqlg841h+iSbhBzeXHKKMImGqb1KLzh7JPnhXUArp
-        jxuTMMFRWP2ifanY3Dyu8Tnr49PrajNcgZ6jDhlWrtSvzf2jTwFDftrrJc2cbClKh99QIMXkXZu
-        U2oU6FaIUig+FCZt/xg==
-X-Received: by 2002:adf:e908:: with SMTP id f8mr195571wrm.184.1590613676642;
-        Wed, 27 May 2020 14:07:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz/MqK9aixnJqSNydmC9tSwCyqyq7nI9EAoQtkXsEPNQuE8I0JoA6xnM6f4HETfKsks8bq+5g==
-X-Received: by 2002:adf:e908:: with SMTP id f8mr195551wrm.184.1590613676318;
-        Wed, 27 May 2020 14:07:56 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8? ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
-        by smtp.gmail.com with ESMTPSA id v27sm4074887wrv.81.2020.05.27.14.07.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2020 14:07:55 -0700 (PDT)
+        id S1726921AbgE0VRi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 27 May 2020 17:17:38 -0400
+Received: from vps0.lunn.ch ([185.16.172.187]:53148 "EHLO vps0.lunn.ch"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726482AbgE0VRi (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 27 May 2020 17:17:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+        s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=e7tiZMIiYuTbb+03A1KtQnZH+j3s8ttBBXpLw45dAS0=; b=6LlhV+r1K7qAycippK72vCEiPn
+        c0NM4ZjQCpKRVzGcyTa9buhlm2plrnI2+LoPj8rGLnzkAaEhBdDOH6GhSkIyt4RSrRmo2k/KhZwHP
+        m6wfFs/dCwrLP9yBfZx7nVTzQ9gsQi2SPB1cmp4AI3lsnCf4AM+6SZ+A19c0HtPu+LYk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.93)
+        (envelope-from <andrew@lunn.ch>)
+        id 1je3QV-003SEI-M8; Wed, 27 May 2020 23:17:27 +0200
+Date:   Wed, 27 May 2020 23:17:27 +0200
+From:   Andrew Lunn <andrew@lunn.ch>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Jonathan Adams <jwadams@google.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        David Rientjes <rientjes@google.com>,
+        linux-fsdevel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-arm-kernel@lists.infradead.org,
+        Jim Mattson <jmattson@google.com>
 Subject: Re: [PATCH v3 0/7] Statsfs: a new ram-based file system for Linux
  kernel statistics
-To:     Jakub Kicinski <kuba@kernel.org>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Jim Mattson <jmattson@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        David Rientjes <rientjes@google.com>,
-        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-        Andrew Lunn <andrew@lunn.ch>
+Message-ID: <20200527211727.GB818296@lunn.ch>
 References: <20200526110318.69006-1-eesposit@redhat.com>
- <20200526153128.448bfb43@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
- <6a754b40-b148-867d-071d-8f31c5c0d172@redhat.com>
- <20200527132321.54bcdf04@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <af2ba926-73bc-26c3-7ce7-bd45f657fd85@redhat.com>
-Date:   Wed, 27 May 2020 23:07:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200527132321.54bcdf04@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200526110318.69006-1-eesposit@redhat.com>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 27/05/20 22:23, Jakub Kicinski wrote:
-> On Wed, 27 May 2020 15:14:41 +0200 Emanuele Giuseppe Esposito wrote:
->> Regarding the config, as I said the idea is to gather multiple 
->> subsystems' statistics, therefore there wouldn't be a single 
->> configuration method like in netlink.
->> For example in kvm there are file descriptors for configuration, and 
->> creating them requires no privilege, contrary to the network interfaces.
->
-> Enumerating networking interfaces, addresses, and almost all of the
-> configuration requires no extra privilege. In fact I'd hope that
-> whatever daemon collects network stats doesn't run as root :)
+On Tue, May 26, 2020 at 01:03:10PM +0200, Emanuele Giuseppe Esposito wrote:
+> There is currently no common way for Linux kernel subsystems to expose
+> statistics to userspace shared throughout the Linux kernel; subsystems have
+> to take care of gathering and displaying statistics by themselves, for
+> example in the form of files in debugfs. For example KVM has its own code
+> section that takes care of this in virt/kvm/kvm_main.c, where it sets up
+> debugfs handlers for displaying values and aggregating them from various
+> subfolders to obtain information about the system state (i.e. displaying
+> the total number of exits, calculated by summing all exits of all cpus of
+> all running virtual machines).
 > 
-> I think enumerating objects is of primary importance, and statistics 
-> of those objects are subordinate.
+> Allowing each section of the kernel to do so has two disadvantages. First,
+> it will introduce redundant code. Second, debugfs is anyway not the right
+> place for statistics (for example it is affected by lockdown)
+> 
+> In this patch series I introduce statsfs, a synthetic ram-based virtual
+> filesystem that takes care of gathering and displaying statistics for the
+> Linux kernel subsystems.
+> 
+> The file system is mounted on /sys/kernel/stats and would be already used
+> by kvm. Statsfs was initially introduced by Paolo Bonzini [1].
+> 
+> Statsfs offers a generic and stable API, allowing any kind of
+> directory/file organization and supporting multiple kind of aggregations
+> (not only sum, but also average, max, min and count_zero) and data types
+> (boolean, unsigned/signed and custom types). The implementation, which is
+> a generalization of KVM’s debugfs statistics code, takes care of gathering
+> and displaying information at run time; users only need to specify the
+> values to be included in each source.
+> 
+> Statsfs would also be a different mountpoint from debugfs, and would not
+> suffer from limited access due to the security lock down patches. Its main
+> function is to display each statistics as a file in the desired folder
+> hierarchy defined through the API. Statsfs files can be read, and possibly
+> cleared if their file mode allows it.
+> 
+> Statsfs has two main components: the public API defined by
+> include/linux/statsfs.h, and the virtual file system which should end up in
+> /sys/kernel/stats.
+> 
 
-I see what you meant now.  statsfs can also be used to enumerate objects
-if one is so inclined (with the prototype in patch 7, for example, each
-network interface becomes a directory).
+Hi Emanuele
 
-> Again, I have little KVM knowledge, but BPF also uses a fd-based API,
-> and carries stats over the same syscall interface.
+> The API has two main elements, values and sources. Kernel subsystems like
+> KVM can use the API to create a source, add child sources/values/aggregates
+> and register it to the root source (that on the virtual fs would be
+> /sys/kernel/statsfs).
 
-Can BPF stats (for BPF scripts created by whatever process is running in
-the system) be collected by an external daemon that does not have access
-to the file descriptor?  For KVM it's of secondary importance to gather
-stats in the program; it can be nice to have and we are thinking of a
-way to export the stats over the fd-based API, but it's less useful than
-system-wide monitoring.  Perhaps this is a difference between the two.
+Another issue i see with networking is that statistic counters can be
+dynamic. They can come and go. One of the drivers i work on has extra
+statistics available when a fibre interface is used, compared to a
+copper interface. And this happens at run time. The netlink API has no
+problems with this. It is a snapshot of what counters are currently
+available. There is no state in the API.
 
-Another case where stats and configuration are separate is CPUs, where
-CPU enumeration is done in sysfs but statistics are exposed in various
-procfs files such as /proc/interrupts and /proc/stats.
+In my humble opinion, networking is unlikely to adopt your approach.
+You probably want to look around for other subsystems which have
+statistics, and see if you can cover their requirements, and get them
+on board.
 
-Thanks,
-
-Paolo
-
+   Andrew
