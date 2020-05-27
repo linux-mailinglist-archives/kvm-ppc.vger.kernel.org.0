@@ -2,115 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B7F21E3EE6
-	for <lists+kvm-ppc@lfdr.de>; Wed, 27 May 2020 12:24:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 689FA1E434A
+	for <lists+kvm-ppc@lfdr.de>; Wed, 27 May 2020 15:17:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727087AbgE0KYE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 27 May 2020 06:24:04 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:55399 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729781AbgE0KYE (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 27 May 2020 06:24:04 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 49X6PY4P1Nz9sSd; Wed, 27 May 2020 20:24:01 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1590575041; bh=VVcDtWS7h80i30YV0OfUbb0gXVwEngQnBUR9NRnRJfw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SOrOgp/DbKjCWGJEmRT4JHH1mKILqt9KgNoLKRh7rvKKj4Sqm5pO8lJRFcdvq48Dx
-         ti0b+Ccb8SsT3SEiyZJEIdbhrZXYdsNzNSgKeNo4N+EKbW8dQQBF337P0QR7YteV9U
-         iPxIQryP6Tw/BsbYPPrt04gydI+eiQ+y5YHCPXWSOFnoxtXkjQSLCuQaZJEHa7F4zB
-         xhiI86troJbVbYOsgC3jeUvLOf8GCA9xtK7iEso5K4fRndyendZe96buPSVrhqa14M
-         ZIpkw792NoWEERhAVMtpcKTKSqZ+VyLYwcDRu18FujuVnQ8Hrb0Ckiy8FDzJdQKpFP
-         Q1EAVfzYnGvwA==
-Date:   Wed, 27 May 2020 20:23:53 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Laurent Vivier <lvivier@redhat.com>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 4/4] KVM: PPC: Book3S HV: Flush guest mappings when
- turning dirty tracking on/off
-Message-ID: <20200527102353.GH293451@thinks.paulus.ozlabs.org>
-References: <20181212041430.GA22265@blackberry>
- <20181212041717.GE22265@blackberry>
- <58247760-00de-203d-a779-7fda3a739248@redhat.com>
- <20200506051217.GA24968@blackberry>
- <e7aae742-d189-2882-5c41-3dd993c029bb@redhat.com>
+        id S1730242AbgE0NRE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 27 May 2020 09:17:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33080 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730065AbgE0NRD (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 May 2020 09:17:03 -0400
+X-Greylist: delayed 443 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 27 May 2020 06:17:03 PDT
+Received: from msa13.plala.or.jp (msa13.plala.or.jp [IPv6:2400:7800:0:502e::13])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 29F6BC08C5C2;
+        Wed, 27 May 2020 06:17:03 -0700 (PDT)
+Received: from mwebp13 ([172.23.13.133]) by msa11.plala.or.jp with ESMTP
+          id <20200527130940.KSFD32305.msa11.plala.or.jp@mwebp13>;
+          Wed, 27 May 2020 22:09:40 +0900
+Date:   Wed, 27 May 2020 22:09:40 +0900
+From:   "Mrs.Judith Rice" <hamurafujimi@tmail.plala.or.jp>
+Reply-To: jonesevansje@gmail.com
+Message-ID: <20200527220940.C5BT6.807.root@mwebp13>
+Subject: Spende
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e7aae742-d189-2882-5c41-3dd993c029bb@redhat.com>
+Content-Type: text/plain; charset=iso-2022-jp
+Content-Transfer-Encoding: 7bit
+X-Priority: 3 (Normal)
+Sensitivity: Normal
+X-VirusScan: Outbound; mvir-ac11; Wed, 27 May 2020 22:09:40 +0900
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi Laurent,
+Attn:
 
-On Wed, May 06, 2020 at 10:24:48AM +0200, Laurent Vivier wrote:
-> On 06/05/2020 07:12, Paul Mackerras wrote:
-> > On Tue, Apr 28, 2020 at 05:57:59PM +0200, Laurent Vivier wrote:
-> >> On 12/12/2018 05:17, Paul Mackerras wrote:
-> >>> +	if (change == KVM_MR_FLAGS_ONLY && kvm_is_radix(kvm) &&
-> >>> +	    ((new->flags ^ old->flags) & KVM_MEM_LOG_DIRTY_PAGES))
-> >>> +		kvmppc_radix_flush_memslot(kvm, old);
-> >>>  }
-> >>
-> >> Hi,
-> >>
-> >> this part introduces a regression in QEMU test suite.
-> >>
-> >> We have the following warning in the host kernel log:
-> >>
-> > [snip]
-> >>
-> >> The problem is detected with the "migration-test" test program in qemu,
-> >> on a POWER9 host in radix mode with THP. It happens only the first time
-> >> the test program is run after loading kvm_hv. The warning is an explicit
-> >> detection [1] of a problem:
-> > 
-> > Yes, we found a valid PTE where we didn't expect there to be one.
+Es tut uns leid, dass wir Sie aufgrund eines Mismanagent of Beneficaries-Fonds von unseren ernannten Zonal Managern versp&#228;tet kontaktiert haben. Bitte beachten Sie, dass Sie qualifiziert sind, die Zahlung von 900.000,00 USD an der ATM-Karte mit neunhunderttausend Dollar zu erhalten.
 
-I have now managed to reproduce the problem locally, and I have an
-explanation for what's going on.  QEMU turns on dirty tracking for the
-memslot for the VM's RAM, and KVM flushes the mappings from the
-partition-scoped page table, and then proceeds to fill it up with 64k
-page mappings due to page faults as the VM runs.
+Als Entsch&#228;digung von WORLD BANK / IWF (Internationaler W&#228;hrungsfonds) f&#252;r die automatisch &#252;ber einen E-Mail-Wahlautomaten gezogenen, die in der Vergangenheit noch nicht abgeschlossene Transaktionen hatten.
 
-Then QEMU turns dirty tracking off, while the VM is still running.
-The new memslot, with the dirty tracking bit clear, becomes visible to
-page faults before we get to the kvmppc_core_commit_memory_region_hv()
-function.  Thus, page faults occurring during the interval between the
-calls to install_new_memslots() and kvm_arch_commit_memory_region()
-will decide to install a 2MB page if there is a THP on the host side.
-This will hit the case in kvmppc_create_pte() where it wants to
-install a 2MB leaf PTE but there is a page table pointer there
-already.  It calls kvmppc_unmap_free_pmd_entry_table(), which calls
-kvmppc_unmap_free_pte(), which finds the existing 64k PTEs and
-generates the warning.
+F&#252;r weitere Informationen kontaktieren Sie bitte Rev.EVANS JONES ( jonesevansje@gmail.com )
 
-Now, the code in kvmppc_unmap_free_pte() does the right thing, in that
-it calls kvmppc_unmap_pte to deal with the PTE it found.  The warning
-was just an attempt to catch code bugs rather than an indication of
-any immediate and obvious problem.  Since we now know of one situation
-where this can legitimately happen, I think we should just take out
-the WARN_ON_ONCE, along with the scary comment.  If people want to be
-more paranoid than that, we could add a check that the existing PTEs
-all map sub-pages of the 2MB page that we're about to map.
+Bitte senden Sie ihm Ihre pers&#246;nlichen Daten wie:
 
-There is another race which is possible, which is that when turning on
-dirty page tracking, a parallel page fault reads the memslot flags
-before the new memslots are installed, and inserts its PTE after
-kvmppc_core_commit_memory_region_hv has flushed the memslot.  In that
-case, we would have a 2MB PTE left over, which would result in coarser
-dirty tracking granularity for that 2MB page.  I think this would be
-very hard to hit in practice, and that having coarser dirty tracking
-granularity for one 2MB page of the VM would not cause any practical
-problem.
+Vollst&#228;ndiger Name:
+Wohnanschrift:
+Telefonnummer:
+Herkunftsland:
 
-That race could be closed by bumping the kvm->mmu_notifier_seq while
-the kvm->mmu_lock is held in kvmppc_radix_flush_memslot().
+Gr&#252;&#223;e,
+Mrs. Judith Rice
 
-Thoughts?
-
-Paul.
