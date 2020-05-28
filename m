@@ -2,161 +2,44 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5AB51E61C5
-	for <lists+kvm-ppc@lfdr.de>; Thu, 28 May 2020 15:08:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC5C71E7016
+	for <lists+kvm-ppc@lfdr.de>; Fri, 29 May 2020 01:13:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390185AbgE1NIy (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 28 May 2020 09:08:54 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29930 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390012AbgE1NIx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 28 May 2020 09:08:53 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04SD2jHI194739;
-        Thu, 28 May 2020 09:08:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=DDyT/2iGjdh/+dSX/wXPGaVtZtT2nP5xNp/QI7s5OkI=;
- b=bm9Aw5pgN3s3JQiAej4oL5OvSZ7IVvLZghFRuAFRY7RYhuvoIFtSZd/6XVuv9CrqngcF
- tnGhfjSLbNrfEJAn7EAwda4U/QECVKyvvZ1Yu6L7+6k6PCgNxJWD8kk00c9qANeD0QD6
- JJCqszHIFeFnHObJNgj/qHuraAtOl3b2zCC185W2nBHpf8HYoTprM8aMQzDg2FspLEkW
- B5RcHDY7tycqolN9fHSvHZbnAMgoCy3Wlt/QcKW+41MzoJiiNroXOExfqo3jEqxQtLTg
- Ad8vdqs+T2zNE/5+RoKDxMEQobdR1AnJ09f73rIgvqRpRwKlzpwslNOWCQW2VS1esCt+ Bw== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 319qns93da-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 May 2020 09:08:41 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04SD1llr030512;
-        Thu, 28 May 2020 13:08:38 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 316uf9203a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 May 2020 13:08:38 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04SD8aki55050374
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 May 2020 13:08:36 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 722934C059;
-        Thu, 28 May 2020 13:08:36 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 63A784C040;
-        Thu, 28 May 2020 13:08:35 +0000 (GMT)
-Received: from [9.85.101.128] (unknown [9.85.101.128])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 28 May 2020 13:08:35 +0000 (GMT)
-Subject: Re: [PATCH] powerpc/book3s64/kvm: Fix secondary page table walk
- warning during migration
-To:     Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        paulus@ozlabs.org
-Cc:     linuxppc-dev@lists.ozlabs.org
-References: <20200528080456.87797-1-aneesh.kumar@linux.ibm.com>
- <87a71sjk4o.fsf@mpe.ellerman.id.au>
-From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-Message-ID: <40a184eb-b6ae-6d74-503e-140f1b2a256c@linux.ibm.com>
-Date:   Thu, 28 May 2020 18:38:34 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S2391522AbgE1XNt convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Thu, 28 May 2020 19:13:49 -0400
+Received: from mail.bnv.gob.ve ([201.249.200.115]:52616 "EHLO
+        correo.bnv.gob.ve" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2389436AbgE1XNs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 28 May 2020 19:13:48 -0400
+Received: from localhost (localhost.bnv.gob.ve [127.0.0.1])
+        by correo.bnv.gob.ve (Postfix) with ESMTP id 3C04F38E3A0A;
+        Thu, 28 May 2020 14:31:04 -0400 (-04)
+Received: from correo.bnv.gob.ve ([127.0.0.1])
+        by localhost (correo.bnv.gob.ve [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id O7YEcgD3lGAF; Thu, 28 May 2020 14:31:04 -0400 (-04)
+Received: from localhost (localhost.bnv.gob.ve [127.0.0.1])
+        by correo.bnv.gob.ve (Postfix) with ESMTP id 2524538E41D7;
+        Thu, 28 May 2020 13:16:39 -0400 (-04)
+X-Virus-Scanned: amavisd-new at bnv.gob.ve
+Received: from correo.bnv.gob.ve ([127.0.0.1])
+        by localhost (correo.bnv.gob.ve [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id VSJ0j3t0DJm9; Thu, 28 May 2020 13:16:39 -0400 (-04)
+Received: from [10.19.23.127] (unknown [105.0.4.230])
+        by correo.bnv.gob.ve (Postfix) with ESMTPSA id EFF1138E066D;
+        Thu, 28 May 2020 12:29:19 -0400 (-04)
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <87a71sjk4o.fsf@mpe.ellerman.id.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-05-28_03:2020-05-28,2020-05-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- lowpriorityscore=0 mlxlogscore=999 adultscore=0 phishscore=0
- malwarescore=0 clxscore=1015 suspectscore=0 cotscore=-2147483648
- spamscore=0 priorityscore=1501 impostorscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005280087
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: Spende von 2.000.000,00 Euro
+To:     Recipients <manuel@info.com>
+From:   "manuel franco" <manuel@info.com>
+Date:   Thu, 28 May 2020 18:29:08 +0200
+Reply-To: manuelfrancospende11@gmail.com
+Message-Id: <20200528162919.EFF1138E066D@correo.bnv.gob.ve>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 5/28/20 6:23 PM, Michael Ellerman wrote:
-> "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com> writes:
->> This patch fix the below warning reported during migration.
->>
->>   find_kvm_secondary_pte called with kvm mmu_lock not held
->>   CPU: 23 PID: 5341 Comm: qemu-system-ppc Tainted: G        W         5.7.0-rc5-kvm-00211-g9ccf10d6d088 #432
->>   NIP:  c008000000fe848c LR: c008000000fe8488 CTR: 0000000000000000
->>   REGS: c000001e19f077e0 TRAP: 0700   Tainted: G        W          (5.7.0-rc5-kvm-00211-g9ccf10d6d088)
->>   MSR:  9000000000029033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR: 42222422  XER: 20040000
->>   CFAR: c00000000012f5ac IRQMASK: 0
->>   GPR00: c008000000fe8488 c000001e19f07a70 c008000000ffe200 0000000000000039
->>   GPR04: 0000000000000001 c000001ffc8b4900 0000000000018840 0000000000000007
->>   GPR08: 0000000000000003 0000000000000001 0000000000000007 0000000000000001
->>   GPR12: 0000000000002000 c000001fff6d9400 000000011f884678 00007fff70b70000
->>   GPR16: 00007fff7137cb90 00007fff7dcb4410 0000000000000001 0000000000000000
->>   GPR20: 000000000ffe0000 0000000000000000 0000000000000001 0000000000000000
->>   GPR24: 8000000000000000 0000000000000001 c000001e1f67e600 c000001e1fd82410
->>   GPR28: 0000000000001000 c000001e2e410000 0000000000000fff 0000000000000ffe
->>   NIP [c008000000fe848c] kvmppc_hv_get_dirty_log_radix+0x2e4/0x340 [kvm_hv]
->>   LR [c008000000fe8488] kvmppc_hv_get_dirty_log_radix+0x2e0/0x340 [kvm_hv]
->>   Call Trace:
->>   [c000001e19f07a70] [c008000000fe8488] kvmppc_hv_get_dirty_log_radix+0x2e0/0x340 [kvm_hv] (unreliable)
->>   [c000001e19f07b50] [c008000000fd42e4] kvm_vm_ioctl_get_dirty_log_hv+0x33c/0x3c0 [kvm_hv]
->>   [c000001e19f07be0] [c008000000eea878] kvm_vm_ioctl_get_dirty_log+0x30/0x50 [kvm]
->>   [c000001e19f07c00] [c008000000edc818] kvm_vm_ioctl+0x2b0/0xc00 [kvm]
->>   [c000001e19f07d50] [c00000000046e148] ksys_ioctl+0xf8/0x150
->>   [c000001e19f07da0] [c00000000046e1c8] sys_ioctl+0x28/0x80
->>   [c000001e19f07dc0] [c00000000003652c] system_call_exception+0x16c/0x240
->>   [c000001e19f07e20] [c00000000000d070] system_call_common+0xf0/0x278
->>   Instruction dump:
->>   7d3a512a 4200ffd0 7ffefb78 4bfffdc4 60000000 3c820000 e8848468 3c620000
->>   e86384a8 38840010 4800673d e8410018 <0fe00000> 4bfffdd4 60000000 60000000
->>
->> Signed-off-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
->> ---
->>   arch/powerpc/include/asm/kvm_book3s_64.h |  9 ++++++
->>   arch/powerpc/kvm/book3s_64_mmu_radix.c   | 35 ++++++++++++++++++++----
->>   2 files changed, 38 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/powerpc/include/asm/kvm_book3s_64.h b/arch/powerpc/include/asm/kvm_book3s_64.h
->> index c58e64a0a74f..cd5bad08b8d3 100644
->> --- a/arch/powerpc/include/asm/kvm_book3s_64.h
->> +++ b/arch/powerpc/include/asm/kvm_book3s_64.h
->> @@ -635,6 +635,15 @@ extern void kvmhv_remove_nest_rmap_range(struct kvm *kvm,
->>   				unsigned long gpa, unsigned long hpa,
->>   				unsigned long nbytes);
->>   
->> +static inline pte_t *__find_kvm_secondary_pte(struct kvm *kvm, unsigned long ea,
->> +					      unsigned *hshift)
->> +{
->> +	pte_t *pte;
->> +
->> +	pte = __find_linux_pte(kvm->arch.pgtable, ea, NULL, hshift);
->> +	return pte;
->> +}
-> 
-> Why not just open code this in the single caller?
-
-We could do that. But I though it is confusing and we want to avoid 
-using linux page table walker (__find_linux_pte()) directly from within 
-kvm code to walk partition scoped table.
-
-> 
-> Leaving it here someone will invariably decide to call it one day.
-> 
-
-I was looking at documenting it at the call site.  We can possibly add a 
-comment here explaining avoid calling this directly and if used should 
-have a  comments around explaining why it is safe.
-
-
-> If you think it's worth keeping then it should have a comment explaining
-> why it doesn't check the lock, and find_kvm_secondary_pte() should call
-> it no?
-> 
-
-Was trying to avoid that indirection. I guess we should add a comment 
-which suggest to avoid using __find_kvm_secondary_pte() and if used we 
-should ask for comment at the call site explaining why it is safe?
-
--aneesh
-
+Ich bin Manuel Franco, ich spende Ihnen 2.000.000,00 Euro. Nehmen Sie jetzt Kontakt mit mir auf, damit wir fortfahren können.
