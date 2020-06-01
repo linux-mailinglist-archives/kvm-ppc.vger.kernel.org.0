@@ -2,161 +2,81 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D0791E94FE
-	for <lists+kvm-ppc@lfdr.de>; Sun, 31 May 2020 04:28:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC2601E9C33
+	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Jun 2020 05:54:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729522AbgEaC2w (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 30 May 2020 22:28:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59662 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728867AbgEaC2v (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 30 May 2020 22:28:51 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04V22kuK175310;
-        Sat, 30 May 2020 22:28:38 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31bkc112qc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 30 May 2020 22:28:38 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04V2QGss026577;
-        Sun, 31 May 2020 02:28:36 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04fra.de.ibm.com with ESMTP id 31bf480m7d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 31 May 2020 02:28:36 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04V2SXFq58196016
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 31 May 2020 02:28:33 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BC054AE045;
-        Sun, 31 May 2020 02:28:33 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A7689AE051;
-        Sun, 31 May 2020 02:28:30 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.211.70.118])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sun, 31 May 2020 02:28:30 +0000 (GMT)
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        bharata@linux.ibm.com, aneesh.kumar@linux.ibm.com,
-        sukadev@linux.vnet.ibm.com, ldufour@linux.ibm.com,
-        bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
-        cclaudio@linux.ibm.com, linuxram@us.ibm.com
-Subject: [PATCH v1 4/4] KVM: PPC: Book3S HV: migrate hot plugged memory
-Date:   Sat, 30 May 2020 19:27:51 -0700
-Message-Id: <1590892071-25549-5-git-send-email-linuxram@us.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1590892071-25549-1-git-send-email-linuxram@us.ibm.com>
-References: <1590892071-25549-1-git-send-email-linuxram@us.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-05-30_21:2020-05-28,2020-05-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- cotscore=-2147483648 suspectscore=2 spamscore=0 bulkscore=0 phishscore=0
- clxscore=1015 lowpriorityscore=0 malwarescore=0 impostorscore=0
- mlxlogscore=999 mlxscore=0 adultscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005310010
+        id S1727953AbgFADyH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 31 May 2020 23:54:07 -0400
+Received: from hs-162.6.buanalintas.co.id ([223.165.6.162]:60350 "EHLO
+        mx.bestprofit-futures.co.id" rhost-flags-OK-FAIL-OK-OK)
+        by vger.kernel.org with ESMTP id S1727068AbgFADyG (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 31 May 2020 23:54:06 -0400
+X-Greylist: delayed 10132 seconds by postgrey-1.27 at vger.kernel.org; Sun, 31 May 2020 23:54:06 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by mx.bestprofit-futures.co.id (Postfix) with ESMTP id 2E5B8523105;
+        Mon,  1 Jun 2020 07:33:30 +0700 (WIB)
+Received: from mx.bestprofit-futures.co.id ([127.0.0.1])
+        by localhost (mx.bestprofit-futures.co.id [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id oDH9-iQtZuuB; Mon,  1 Jun 2020 07:33:29 +0700 (WIB)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.bestprofit-futures.co.id (Postfix) with ESMTP id 9C1E9523688;
+        Mon,  1 Jun 2020 07:33:29 +0700 (WIB)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mx.bestprofit-futures.co.id 9C1E9523688
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bestprofit-futures.co.id; s=4D3D1390-5211-11EA-8C0C-8C41A122B001;
+        t=1590971609; bh=zLTonXbKn6LYrnOZVETw9C2bepTvRzI70GQOlIiRCC0=;
+        h=MIME-Version:To:From:Date:Message-Id;
+        b=kZrP7kWMnjCZ0ehcR8n1gh5p9MHcLPaBo4YI0zcMDPtrVRgLyntZcLsFYVrS89o+z
+         yrpeKGUDBcaKrHtW9HBBNhberCRrHhUwJ6QcfJgKWZ11ULaNvH5riXYQI8mIQoqZLD
+         htZ454SDd+37eISkPq8fsbvfb1HfLlgDW/PJdugHQ+yoyecn/p2HfPruHFhEGKme54
+         V6HBhtARJ5MJpC1OpccjUCSnW1wwT4/1kXe1xKUt6Y9FcxNSyKyMyolOkGEhXhCR0D
+         rku4AkAth6r5SqXFDRpvk84/ih+zyk61xLMPYr4nr/VQBoLglsDfTlN2B+ErQ6YDY6
+         EAL6sK/2W7J7A==
+X-Virus-Scanned: amavisd-new at mx.bestprofit-futures.co.id
+Received: from mx.bestprofit-futures.co.id ([127.0.0.1])
+        by localhost (mx.bestprofit-futures.co.id [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id qkm10q1LSj0K; Mon,  1 Jun 2020 07:33:29 +0700 (WIB)
+Received: from [10.81.249.6] (unknown [105.8.6.41])
+        by mx.bestprofit-futures.co.id (Postfix) with ESMTPSA id 8AD4C5235DD;
+        Mon,  1 Jun 2020 07:33:21 +0700 (WIB)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: =?utf-8?q?Wohlt=C3=A4tigkeitsspende_von_2=2E000=2E000_Millionen_Euro?=
+To:     Recipients <yoshi@bestprofit-futures.co.id>
+From:   ''Tayeb Souami'' <yoshi@bestprofit-futures.co.id>
+Date:   Mon, 01 Jun 2020 02:33:13 +0200
+Reply-To: Tayebsouam.spende@gmail.com
+Message-Id: <20200601003321.8AD4C5235DD@mx.bestprofit-futures.co.id>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Laurent Dufour <ldufour@linux.ibm.com>
+Lieber Freund,
 
-When a memory slot is hot plugged to a SVM, GFNs associated with that
-memory slot automatically default to secure GFN. Hence migrate the
-PFNs associated with these GFNs to device-PFNs.
+Ich bin Herr Tayeb Souami, New Jersey, Vereinigte Staaten von Amerika, der =
+Mega-Gewinner von $ 315million In Mega Millions Jackpot, spende ich an 5 zu=
+f=C3=A4llige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Ma=
+il nach einem Spinball ausgew=C3=A4hlt.Ich habe den gr=C3=B6=C3=9Ften Teil =
+meines Verm=C3=B6gens auf eine Reihe von Wohlt=C3=A4tigkeitsorganisationen =
+und Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die =
+Summe von =E2=82=AC 2.000.000,00 an Sie als eine der ausgew=C3=A4hlten 5 zu=
+ spenden, um meine Gewinne zu =C3=BCberpr=C3=BCfen, sehen Sie bitte meine Y=
+ou Tube Seite unten.
 
-uv_migrate_mem_slot() is called to achieve that. It will not call
-UV_PAGE_IN since this request is ignored by the Ultravisor.
-NOTE: Ultravisor does not trust any page content provided by
-the Hypervisor, ones the VM turns secure.
+UHR MICH HIER: https://www.youtube.com/watch?v=3DZ6ui8ZDQ6Ks
 
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Bharata B Rao <bharata@linux.ibm.com>
-Cc: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-Cc: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-Cc: Laurent Dufour <ldufour@linux.ibm.com>
-Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Claudio Carvalho <cclaudio@linux.ibm.com>
-Cc: kvm-ppc@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-	(fixed merge conflicts. Modified the commit message)
-Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
----
- arch/powerpc/include/asm/kvm_book3s_uvmem.h |  4 ++++
- arch/powerpc/kvm/book3s_hv.c                | 11 +++++++----
- arch/powerpc/kvm/book3s_hv_uvmem.c          |  3 +--
- 3 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/kvm_book3s_uvmem.h b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-index f0c5708..2ec2e5afb 100644
---- a/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-+++ b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-@@ -23,6 +23,7 @@ unsigned long kvmppc_h_svm_page_out(struct kvm *kvm,
- void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
- 			     struct kvm *kvm, bool skip_page_out,
- 			     bool purge_gfn);
-+int uv_migrate_mem_slot(struct kvm *kvm, const struct kvm_memory_slot *memslot);
- #else
- static inline int kvmppc_uvmem_init(void)
- {
-@@ -78,5 +79,8 @@ static inline int kvmppc_send_page_to_uv(struct kvm *kvm, unsigned long gfn)
- kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
- 			struct kvm *kvm, bool skip_page_out,
- 			bool purge_gfn) { }
-+
-+static int uv_migrate_mem_slot(struct kvm *kvm,
-+		const struct kvm_memory_slot *memslot);
- #endif /* CONFIG_PPC_UV */
- #endif /* __ASM_KVM_BOOK3S_UVMEM_H__ */
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 4c62bfe..604d062 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4516,13 +4516,16 @@ static void kvmppc_core_commit_memory_region_hv(struct kvm *kvm,
- 	case KVM_MR_CREATE:
- 		if (kvmppc_uvmem_slot_init(kvm, new))
- 			return;
--		uv_register_mem_slot(kvm->arch.lpid,
--				     new->base_gfn << PAGE_SHIFT,
--				     new->npages * PAGE_SIZE,
--				     0, new->id);
-+		if (uv_register_mem_slot(kvm->arch.lpid,
-+					 new->base_gfn << PAGE_SHIFT,
-+					 new->npages * PAGE_SIZE,
-+					 0, new->id))
-+			return;
-+		uv_migrate_mem_slot(kvm, new);
- 		break;
- 	case KVM_MR_DELETE:
- 		uv_unregister_mem_slot(kvm->arch.lpid, old->id);
-+		kvmppc_uvmem_drop_pages(old, kvm, true, true);
- 		kvmppc_uvmem_slot_free(kvm, old);
- 		break;
- 	default:
-diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-index 36dda1d..1fa5f2a 100644
---- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-+++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-@@ -377,8 +377,7 @@ static int kvmppc_svm_migrate_page(struct vm_area_struct *vma,
- 	return ret;
- }
- 
--static int uv_migrate_mem_slot(struct kvm *kvm,
--		const struct kvm_memory_slot *memslot)
-+int uv_migrate_mem_slot(struct kvm *kvm, const struct kvm_memory_slot *memslot)
- {
- 	unsigned long gfn = memslot->base_gfn;
- 	unsigned long end;
--- 
-1.8.3.1
+Das ist dein Spendencode: [TS530342018]
 
+
+Antworten Sie mit dem SPENDE-CODE an diese
+
+ E-Mail:Tayebsouam.spende@gmail.com
+
+Ich hoffe, Sie und Ihre Familie gl=C3=BCcklich zu machen.
+
+Gr=C3=BC=C3=9Fe
+Herr Tayeb Souami
