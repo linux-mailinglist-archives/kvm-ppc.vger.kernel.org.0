@@ -2,184 +2,112 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 951361EAF72
-	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Jun 2020 21:06:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58F331EB265
+	for <lists+kvm-ppc@lfdr.de>; Tue,  2 Jun 2020 01:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727957AbgFATGO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 1 Jun 2020 15:06:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12250 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726125AbgFATGO (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Jun 2020 15:06:14 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 051J3o24102833;
-        Mon, 1 Jun 2020 15:05:46 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31bk5a6ybb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Jun 2020 15:05:46 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 051J007R029204;
-        Mon, 1 Jun 2020 19:05:43 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 31bf47vkrh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Jun 2020 19:05:43 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 051J5eJ315335634
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Jun 2020 19:05:41 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CD389A405B;
-        Mon,  1 Jun 2020 19:05:40 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 44BB8A405F;
-        Mon,  1 Jun 2020 19:05:38 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.211.66.157])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon,  1 Jun 2020 19:05:38 +0000 (GMT)
-Date:   Mon, 1 Jun 2020 12:05:35 -0700
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Bharata B Rao <bharata@linux.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
-        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
-        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com
-Subject: Re: [PATCH v1 3/4] KVM: PPC: Book3S HV: migrate remaining
- normal-GFNs to secure-GFNs in H_SVM_INIT_DONE
-Message-ID: <20200601190535.GA6925@oc0525413822.ibm.com>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <1590892071-25549-1-git-send-email-linuxram@us.ibm.com>
- <1590892071-25549-4-git-send-email-linuxram@us.ibm.com>
- <20200601115518.GA31382@in.ibm.com>
+        id S1725832AbgFAXyD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 1 Jun 2020 19:54:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36454 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725820AbgFAXyD (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Jun 2020 19:54:03 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C998CC05BD43;
+        Mon,  1 Jun 2020 16:54:02 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 49bX7s1DFzzB3tX; Tue,  2 Jun 2020 09:54:01 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1591055641; bh=BMCP+EQlTqcCkd9Maz03VQlqG+YysRAL2juaQXqp2n8=;
+        h=Date:From:To:Subject:From;
+        b=j+besacjEVeqcDAx0+D3PFTaPPFvoyQJvdLsWD0W6QnvKBoZKlhLjeZb08iuCSvnM
+         ggnOf/sP20MQDlwQC6bt6u7nQu9iBLpXchDum8A/jl086FRofiRFjvRmdnvHDBSuk5
+         don0i5mQbwWCS5P0qxfKF7Dtc7f/mh/DsHgS1/ob4owIAem9ccRsVDbgQk9Bk7p4ou
+         ru+arUQx7GfDTU575EE/rTuo2lsARUmxEnzKk1wB0kLfMo9kgkSbgtcKZjzsdqqKhY
+         OKQe/Mn9gk0ImmPsCk4adOAW1PibkSaCTqv5W5Be9BXtnrfux9zlD9fPRBn+XDQbSF
+         oOtwBvDkZgd8Q==
+Date:   Tue, 2 Jun 2020 09:53:57 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org
+Subject: [GIT PULL] Please pull my kvm-ppc-next-5.8-1 tag
+Message-ID: <20200601235357.GB428673@thinks.paulus.ozlabs.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200601115518.GA31382@in.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-01_12:2020-06-01,2020-06-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- malwarescore=0 bulkscore=0 suspectscore=0 mlxlogscore=999 clxscore=1015
- spamscore=0 cotscore=-2147483648 adultscore=0 priorityscore=1501
- impostorscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006010140
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Jun 01, 2020 at 05:25:18PM +0530, Bharata B Rao wrote:
-> On Sat, May 30, 2020 at 07:27:50PM -0700, Ram Pai wrote:
-> > H_SVM_INIT_DONE incorrectly assumes that the Ultravisor has explicitly
-> > called H_SVM_PAGE_IN for all secure pages.
-> 
-> I don't think that is quite true. HV doesn't assume anything about
-> secure pages by itself.
+Hi Paolo,
 
-Yes. Currently, it does not assume anything about secure pages.  But I am
-proposing that it should consider all pages (except the shared pages) as
-secure pages, when H_SVM_INIT_DONE is called.
+Please do a pull from my kvm-ppc-next-5.8-1 tag to get a PPC KVM
+update for 5.8.  It's a relatively small update this time.  Michael
+Ellerman also has some commits in his tree that touch
+arch/powerpc/kvm, but I have not merged them here because there are no
+merge conflicts, and so they can go to Linus via Michael's tree.
 
-In other words, HV should treat all pages; except shared pages, as
-secure pages once H_SVM_INIT_DONE is called. And this includes pages
-added subsequently through memory hotplug.
+Thanks,
+Paul.
 
-Yes. the Ultravisor can explicitly request the HV to move the pages
-individually.  But that will slow down the transition too significantly.
-It takes above 20min to transition them, for a SVM of size 100G.
+The following changes since commit 9d5272f5e36155bcead69417fd12e98624e7faef:
 
-With this proposed enhancement, the switch completes in a few seconds.
+  Merge tag 'noinstr-x86-kvm-2020-05-16' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip into HEAD (2020-05-20 03:40:09 -0400)
 
-> 
-> > These GFNs continue to be
-> > normal GFNs associated with normal PFNs; when infact, these GFNs should
-> > have been secure GFNs associated with device PFNs.
-> 
-> Transition to secure state is driven by SVM/UV and HV just responds to
-> hcalls by issuing appropriate uvcalls. SVM/UV is in the best position to
-> determine the required pages that need to be moved into secure side.
-> HV just responds to it and tracks such pages as device private pages.
-> 
-> If SVM/UV doesn't get in all the pages to secure side by the time
-> of H_SVM_INIT_DONE, the remaining pages are just normal (shared or
-> otherwise) pages as far as HV is concerned.  Why should HV assume that
-> SVM/UV didn't ask for a few pages and hence push those pages during
-> H_SVM_INIT_DONE?
+are available in the git repository at:
 
-By definition, SVM is a VM backed by secure pages.
-Hence all pages(except shared) must turn secure when a VM switches to SVM.
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.8-1
 
-UV is interested in only a certain pages for the VM, which it will
-request explicitly through H_SVM_PAGE_IN.  All other pages, need not
-be paged-in through UV_PAGE_IN.  They just need to be switched to
-device-pages.
+for you to fetch changes up to 11362b1befeadaae4d159a8cddcdaf6b8afe08f9:
 
-> 
-> I think UV should drive the movement of pages into secure side both
-> of boot-time SVM memory and hot-plugged memory. HV does memslot
-> registration uvcall when new memory is plugged in, UV should explicitly
-> get the required pages in at that time instead of expecting HV to drive
-> the same.
-> 
-> > +static int uv_migrate_mem_slot(struct kvm *kvm,
-> > +		const struct kvm_memory_slot *memslot)
-> > +{
-> > +	unsigned long gfn = memslot->base_gfn;
-> > +	unsigned long end;
-> > +	bool downgrade = false;
-> > +	struct vm_area_struct *vma;
-> > +	int i, ret = 0;
-> > +	unsigned long start = gfn_to_hva(kvm, gfn);
-> > +
-> > +	if (kvm_is_error_hva(start))
-> > +		return H_STATE;
-> > +
-> > +	end = start + (memslot->npages << PAGE_SHIFT);
-> > +
-> > +	down_write(&kvm->mm->mmap_sem);
-> > +
-> > +	mutex_lock(&kvm->arch.uvmem_lock);
-> > +	vma = find_vma_intersection(kvm->mm, start, end);
-> > +	if (!vma || vma->vm_start > start || vma->vm_end < end) {
-> > +		ret = H_STATE;
-> > +		goto out_unlock;
-> > +	}
-> > +
-> > +	ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
-> > +			  MADV_UNMERGEABLE, &vma->vm_flags);
-> > +	downgrade_write(&kvm->mm->mmap_sem);
-> > +	downgrade = true;
-> > +	if (ret) {
-> > +		ret = H_STATE;
-> > +		goto out_unlock;
-> > +	}
-> > +
-> > +	for (i = 0; i < memslot->npages; i++, ++gfn) {
-> > +		/* skip paged-in pages and shared pages */
-> > +		if (kvmppc_gfn_is_uvmem_pfn(gfn, kvm, NULL) ||
-> > +			kvmppc_gfn_is_uvmem_shared(gfn, kvm))
-> > +			continue;
-> > +
-> > +		start = gfn_to_hva(kvm, gfn);
-> > +		end = start + (1UL << PAGE_SHIFT);
-> > +		ret = kvmppc_svm_migrate_page(vma, start, end,
-> > +			(gfn << PAGE_SHIFT), kvm, PAGE_SHIFT, false);
-> > +
-> > +		if (ret)
-> > +			goto out_unlock;
-> > +	}
-> 
-> Is there a guarantee that the vma you got for the start address remains
-> valid for all the addresses till end in a memslot? If not, you should
-> re-get the vma for the current address in each iteration I suppose.
+  KVM: PPC: Book3S HV: Close race with page faults around memslot flushes (2020-05-28 10:56:42 +1000)
 
+----------------------------------------------------------------
+PPC KVM update for 5.8
 
-mm->mmap_sem  is the semaphore that guards the vma. right?  If that
-semaphore is held, can the vma change?
+- Updates and bug fixes for secure guest support
+- Other minor bug fixes and cleanups.
 
+----------------------------------------------------------------
+Chen Zhou (1):
+      KVM: PPC: Book3S HV: Remove redundant NULL check
 
-Thanks for your comments,
-RP
+Laurent Dufour (2):
+      KVM: PPC: Book3S HV: Read ibm,secure-memory nodes
+      KVM: PPC: Book3S HV: Relax check on H_SVM_INIT_ABORT
+
+Paul Mackerras (2):
+      KVM: PPC: Book3S HV: Remove user-triggerable WARN_ON
+      KVM: PPC: Book3S HV: Close race with page faults around memslot flushes
+
+Qian Cai (2):
+      KVM: PPC: Book3S HV: Ignore kmemleak false positives
+      KVM: PPC: Book3S: Fix some RCU-list locks
+
+Tianjia Zhang (2):
+      KVM: PPC: Remove redundant kvm_run from vcpu_arch
+      KVM: PPC: Clean up redundant 'kvm_run' parameters
+
+ arch/powerpc/include/asm/kvm_book3s.h    | 16 +++----
+ arch/powerpc/include/asm/kvm_host.h      |  1 -
+ arch/powerpc/include/asm/kvm_ppc.h       | 27 ++++++------
+ arch/powerpc/kvm/book3s.c                |  4 +-
+ arch/powerpc/kvm/book3s.h                |  2 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c      | 12 ++---
+ arch/powerpc/kvm/book3s_64_mmu_radix.c   | 36 +++++++++++----
+ arch/powerpc/kvm/book3s_64_vio.c         | 18 ++++++--
+ arch/powerpc/kvm/book3s_emulate.c        | 10 ++---
+ arch/powerpc/kvm/book3s_hv.c             | 75 +++++++++++++++++---------------
+ arch/powerpc/kvm/book3s_hv_nested.c      | 15 +++----
+ arch/powerpc/kvm/book3s_hv_uvmem.c       | 14 ++++++
+ arch/powerpc/kvm/book3s_paired_singles.c | 72 +++++++++++++++---------------
+ arch/powerpc/kvm/book3s_pr.c             | 30 ++++++-------
+ arch/powerpc/kvm/booke.c                 | 36 +++++++--------
+ arch/powerpc/kvm/booke.h                 |  8 +---
+ arch/powerpc/kvm/booke_emulate.c         |  2 +-
+ arch/powerpc/kvm/e500_emulate.c          | 15 +++----
+ arch/powerpc/kvm/emulate.c               | 10 ++---
+ arch/powerpc/kvm/emulate_loadstore.c     | 32 +++++++-------
+ arch/powerpc/kvm/powerpc.c               | 72 +++++++++++++++---------------
+ arch/powerpc/kvm/trace_hv.h              |  6 +--
+ 22 files changed, 276 insertions(+), 237 deletions(-)
