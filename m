@@ -2,122 +2,236 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A24071ED67D
-	for <lists+kvm-ppc@lfdr.de>; Wed,  3 Jun 2020 21:05:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DCDA1ED8F4
+	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Jun 2020 01:10:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725922AbgFCTFZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 3 Jun 2020 15:05:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35062 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725821AbgFCTFZ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 3 Jun 2020 15:05:25 -0400
-Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E2BA820663;
-        Wed,  3 Jun 2020 19:05:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591211124;
-        bh=Q/m5m0oN16XVkE9B8qyre3sjNLjlsvtMr3faOM5/GEY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=r0JH+r6+eneNzPkKh10OQRnG/QlntwU5Ile5RdgUbb4S95xZcMJwqqczR44dEoW5/
-         dXJbJhSARnLrJiGeqA21ANe/57CLpUdIlqiMBG6WT4nQbXPfCWGsOTxjBMHqOIWaG6
-         YrNwC3X4+y9pXx6gFBNVV3K2D741HNKSuj4FGwes=
-Date:   Wed, 3 Jun 2020 12:05:22 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Mike Rapoport <rppt@kernel.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Brian Cain <bcain@codeaurora.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christophe Leroy <christophe.leroy@c-s.fr>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Guan Xuetao <gxt@pku.edu.cn>,
-        James Morse <james.morse@arm.com>,
-        Jonas Bonn <jonas@southpole.se>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Ley Foon Tan <ley.foon.tan@intel.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Rich Felker <dalias@libc.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Stafford Horne <shorne@gmail.com>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Tony Luck <tony.luck@intel.com>, Will Deacon <will@kernel.org>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org,
-        nios2-dev@lists.rocketboards.org, openrisc@lists.librecores.org,
-        uclinux-h8-devel@lists.sourceforge.jp,
-        Mike Rapoport <rppt@linux.ibm.com>
-Subject: Re: [PATCH v4 08/14] powerpc: add support for folded p4d page
- tables
-Message-Id: <20200603120522.7646d56a23088416a7d3fc1a@linux-foundation.org>
-In-Reply-To: <20200414153455.21744-9-rppt@kernel.org>
-References: <20200414153455.21744-1-rppt@kernel.org>
-        <20200414153455.21744-9-rppt@kernel.org>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S1725951AbgFCXKv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 3 Jun 2020 19:10:51 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45574 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725876AbgFCXKv (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 3 Jun 2020 19:10:51 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 053N3IWK196366;
+        Wed, 3 Jun 2020 19:10:36 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31c541w3ng-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Jun 2020 19:10:36 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 053Msphb023229;
+        Wed, 3 Jun 2020 23:10:34 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma01fra.de.ibm.com with ESMTP id 31bf47umcs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Jun 2020 23:10:34 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 053NAVHm63701254
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 3 Jun 2020 23:10:31 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7656BAE055;
+        Wed,  3 Jun 2020 23:10:31 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 51232AE057;
+        Wed,  3 Jun 2020 23:10:28 +0000 (GMT)
+Received: from oc0525413822.ibm.com (unknown [9.163.3.67])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed,  3 Jun 2020 23:10:28 +0000 (GMT)
+Date:   Wed, 3 Jun 2020 16:10:25 -0700
+From:   Ram Pai <linuxram@us.ibm.com>
+To:     Bharata B Rao <bharata@linux.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
+        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
+        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
+        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
+        rcampbell@nvidia.com
+Subject: Re: [PATCH v1 3/4] KVM: PPC: Book3S HV: migrate remaining
+ normal-GFNs to secure-GFNs in H_SVM_INIT_DONE
+Message-ID: <20200603231025.GA5772@oc0525413822.ibm.com>
+Reply-To: Ram Pai <linuxram@us.ibm.com>
+References: <1590892071-25549-1-git-send-email-linuxram@us.ibm.com>
+ <1590892071-25549-4-git-send-email-linuxram@us.ibm.com>
+ <20200601115518.GA31382@in.ibm.com>
+ <20200601190535.GA6925@oc0525413822.ibm.com>
+ <20200602100639.GB31382@in.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200602100639.GB31382@in.ibm.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-03_13:2020-06-02,2020-06-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ mlxlogscore=999 cotscore=-2147483648 mlxscore=0 adultscore=0 spamscore=0
+ lowpriorityscore=0 suspectscore=0 malwarescore=0 phishscore=0 bulkscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006030172
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, 14 Apr 2020 18:34:49 +0300 Mike Rapoport <rppt@kernel.org> wrote:
+On Tue, Jun 02, 2020 at 03:36:39PM +0530, Bharata B Rao wrote:
+> On Mon, Jun 01, 2020 at 12:05:35PM -0700, Ram Pai wrote:
+> > On Mon, Jun 01, 2020 at 05:25:18PM +0530, Bharata B Rao wrote:
+> > > On Sat, May 30, 2020 at 07:27:50PM -0700, Ram Pai wrote:
+> > > > H_SVM_INIT_DONE incorrectly assumes that the Ultravisor has explicitly
+> > > > called H_SVM_PAGE_IN for all secure pages.
+> > > 
+> > > I don't think that is quite true. HV doesn't assume anything about
+> > > secure pages by itself.
+> > 
+> > Yes. Currently, it does not assume anything about secure pages.  But I am
+> > proposing that it should consider all pages (except the shared pages) as
+> > secure pages, when H_SVM_INIT_DONE is called.
+> 
+> Ok, then may be also add the proposed changes to H_SVM_INIT_DONE
+> documentation.
 
-> Implement primitives necessary for the 4th level folding, add walks of p4d
-> level where appropriate and replace 5level-fixup.h with pgtable-nop4d.h.
+ok.
 
-A bunch of new material just landed in linux-next/powerpc.
+> 
+> > 
+> > In other words, HV should treat all pages; except shared pages, as
+> > secure pages once H_SVM_INIT_DONE is called. And this includes pages
+> > added subsequently through memory hotplug.
+> 
+> So after H_SVM_INIT_DONE, if HV touches a secure page for any
+> reason and gets encrypted contents via page-out, HV drops the
+> device pfn at that time. So what state we would be in that case? We
+> have completed H_SVM_INIT_DONE, but still have a normal (but encrypted)
+> page in HV?
 
-The timing is awkward!  I trust this will be going into mainline during
-this merge window?  If not, please drop it and repull after -rc1.
+Good point.
 
-arch/powerpc/mm/ptdump/ptdump.c:walk_pagetables() was a problem. 
-Here's what I ended up with - please check.
+The corresponding GFN will continue to be a secure GFN. Just that its
+backing PFN is not a device-PFN, but a memory-PFN. Also that backing
+memory-PFN contains encrypted content.
 
-static void walk_pagetables(struct pg_state *st)
-{
-	unsigned int i;
-	unsigned long addr = st->start_address & PGDIR_MASK;
-	pgd_t *pgd = pgd_offset_k(addr);
+I will clarify this in the patch; about secure-GFN state.
 
-	/*
-	 * Traverse the linux pagetable structure and dump pages that are in
-	 * the hash pagetable.
-	 */
-	for (i = pgd_index(addr); i < PTRS_PER_PGD; i++, pgd++, addr += PGDIR_SIZE) {
-		p4d_t *p4d = p4d_offset(pgd, 0);
+> 
+> > 
+> > Yes. the Ultravisor can explicitly request the HV to move the pages
+> > individually.  But that will slow down the transition too significantly.
+> > It takes above 20min to transition them, for a SVM of size 100G.
+> > 
+> > With this proposed enhancement, the switch completes in a few seconds.
+> 
+> I think, many pages during initial switch and most pages for hotplugged
+> memory are zero pages, for which we don't anyway issue UV page-in calls.
+> So the 20min saving you are observing is purely due to hcall overhead?
 
-		if (pgd_none(*pgd) || pgd_is_leaf(*pgd))
-			note_page(st, addr, 1, p4d_val(*p4d), PGDIR_SIZE);
-		else if (is_hugepd(__hugepd(p4d_val(*p4d))))
-			walk_hugepd(st, (hugepd_t *)pgd, addr, PGDIR_SHIFT, 1);
-		else
-			/* pgd exists */
-			walk_pud(st, p4d, addr);
-	}
-}
+Apparently, that seems to be the case.
 
-Mike's series "mm: consolidate definitions of page table accessors"
-took quite a lot of damage as well.  Patches which needed rework as a
-result of this were:
+> 
+> How about extending H_SVM_PAGE_IN interface or a new hcall to request
+> multiple pages in one request?
+> 
+> Also, how about requesting for bigger page sizes (2M)? Ralph Campbell
+> had patches that added THP support for migrate_vma_* calls.
 
-powerpc-add-support-for-folded-p4d-page-tables-fix.patch
-mm-introduce-include-linux-pgtableh.patch
-mm-reorder-includes-after-introduction-of-linux-pgtableh.patch
-mm-pgtable-add-shortcuts-for-accessing-kernel-pmd-and-pte.patch
-mm-pgtable-add-shortcuts-for-accessing-kernel-pmd-and-pte-fix-2.patch
-mm-consolidate-pte_index-and-pte_offset_-definitions.patch
-mm-consolidate-pmd_index-and-pmd_offset-definitions.patch
-mm-consolidate-pud_index-and-pud_offset-definitions.patch
-mm-consolidate-pgd_index-and-pgd_offset_k-definitions.patch
+yes. that should give further boost. I think the API does not stop us
+from using that feature. Its the support on the Ultravisor side.
+Hopefully we will have contributions to the ultravisor once it is
+opensourced.
 
+> 
+> > 
+> > > 
+> > > > These GFNs continue to be
+> > > > normal GFNs associated with normal PFNs; when infact, these GFNs should
+> > > > have been secure GFNs associated with device PFNs.
+> > > 
+> > > Transition to secure state is driven by SVM/UV and HV just responds to
+> > > hcalls by issuing appropriate uvcalls. SVM/UV is in the best position to
+> > > determine the required pages that need to be moved into secure side.
+> > > HV just responds to it and tracks such pages as device private pages.
+> > > 
+> > > If SVM/UV doesn't get in all the pages to secure side by the time
+> > > of H_SVM_INIT_DONE, the remaining pages are just normal (shared or
+> > > otherwise) pages as far as HV is concerned.  Why should HV assume that
+> > > SVM/UV didn't ask for a few pages and hence push those pages during
+> > > H_SVM_INIT_DONE?
+> > 
+> > By definition, SVM is a VM backed by secure pages.
+> > Hence all pages(except shared) must turn secure when a VM switches to SVM.
+> > 
+> > UV is interested in only a certain pages for the VM, which it will
+> > request explicitly through H_SVM_PAGE_IN.  All other pages, need not
+> > be paged-in through UV_PAGE_IN.  They just need to be switched to
+> > device-pages.
+> > 
+> > > 
+> > > I think UV should drive the movement of pages into secure side both
+> > > of boot-time SVM memory and hot-plugged memory. HV does memslot
+> > > registration uvcall when new memory is plugged in, UV should explicitly
+> > > get the required pages in at that time instead of expecting HV to drive
+> > > the same.
+> > > 
+> > > > +static int uv_migrate_mem_slot(struct kvm *kvm,
+> > > > +		const struct kvm_memory_slot *memslot)
+> > > > +{
+> > > > +	unsigned long gfn = memslot->base_gfn;
+> > > > +	unsigned long end;
+> > > > +	bool downgrade = false;
+> > > > +	struct vm_area_struct *vma;
+> > > > +	int i, ret = 0;
+> > > > +	unsigned long start = gfn_to_hva(kvm, gfn);
+> > > > +
+> > > > +	if (kvm_is_error_hva(start))
+> > > > +		return H_STATE;
+> > > > +
+> > > > +	end = start + (memslot->npages << PAGE_SHIFT);
+> > > > +
+> > > > +	down_write(&kvm->mm->mmap_sem);
+> > > > +
+> > > > +	mutex_lock(&kvm->arch.uvmem_lock);
+> > > > +	vma = find_vma_intersection(kvm->mm, start, end);
+> > > > +	if (!vma || vma->vm_start > start || vma->vm_end < end) {
+> > > > +		ret = H_STATE;
+> > > > +		goto out_unlock;
+> > > > +	}
+> > > > +
+> > > > +	ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
+> > > > +			  MADV_UNMERGEABLE, &vma->vm_flags);
+> > > > +	downgrade_write(&kvm->mm->mmap_sem);
+> > > > +	downgrade = true;
+> > > > +	if (ret) {
+> > > > +		ret = H_STATE;
+> > > > +		goto out_unlock;
+> > > > +	}
+> > > > +
+> > > > +	for (i = 0; i < memslot->npages; i++, ++gfn) {
+> > > > +		/* skip paged-in pages and shared pages */
+> > > > +		if (kvmppc_gfn_is_uvmem_pfn(gfn, kvm, NULL) ||
+> > > > +			kvmppc_gfn_is_uvmem_shared(gfn, kvm))
+> > > > +			continue;
+> > > > +
+> > > > +		start = gfn_to_hva(kvm, gfn);
+> > > > +		end = start + (1UL << PAGE_SHIFT);
+> > > > +		ret = kvmppc_svm_migrate_page(vma, start, end,
+> > > > +			(gfn << PAGE_SHIFT), kvm, PAGE_SHIFT, false);
+> > > > +
+> > > > +		if (ret)
+> > > > +			goto out_unlock;
+> > > > +	}
+> > > 
+> > > Is there a guarantee that the vma you got for the start address remains
+> > > valid for all the addresses till end in a memslot? If not, you should
+> > > re-get the vma for the current address in each iteration I suppose.
+> > 
+> > 
+> > mm->mmap_sem  is the semaphore that guards the vma. right?  If that
+> > semaphore is held, can the vma change?
+> 
+> I am not sure if the vma you obtained would span the entire address range
+> in the memslot.
+
+will check.
+
+Thanks,
+RP
