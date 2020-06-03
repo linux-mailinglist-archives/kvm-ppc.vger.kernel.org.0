@@ -2,170 +2,101 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 378921ED0B6
-	for <lists+kvm-ppc@lfdr.de>; Wed,  3 Jun 2020 15:25:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5695D1ED125
+	for <lists+kvm-ppc@lfdr.de>; Wed,  3 Jun 2020 15:48:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725834AbgFCNZj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 3 Jun 2020 09:25:39 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41858 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725810AbgFCNZj (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 3 Jun 2020 09:25:39 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 053D4GO3046338;
-        Wed, 3 Jun 2020 09:25:28 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31e3kqgp56-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Jun 2020 09:25:27 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 053DKGN8007367;
-        Wed, 3 Jun 2020 13:25:25 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 31bf4804ba-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Jun 2020 13:25:25 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 053DPM2P13042014
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 3 Jun 2020 13:25:22 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6A31142041;
-        Wed,  3 Jun 2020 13:25:22 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 589CB42042;
-        Wed,  3 Jun 2020 13:25:19 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.211.130.237])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed,  3 Jun 2020 13:25:19 +0000 (GMT)
-Date:   Wed, 3 Jun 2020 06:25:16 -0700
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Laurent Dufour <ldufour@linux.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        bharata@linux.ibm.com, aneesh.kumar@linux.ibm.com,
-        sukadev@linux.vnet.ibm.com, bauerman@linux.ibm.com,
-        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com
-Subject: Re: [PATCH v1 4/4] KVM: PPC: Book3S HV: migrate hot plugged memory
-Message-ID: <20200603132516.GA5423@oc0525413822.ibm.com>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <1590892071-25549-1-git-send-email-linuxram@us.ibm.com>
- <1590892071-25549-5-git-send-email-linuxram@us.ibm.com>
- <1df25542-1977-fad4-c56d-b6b2c40a6852@linux.ibm.com>
+        id S1725867AbgFCNsL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 3 Jun 2020 09:48:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49980 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725834AbgFCNsK (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 3 Jun 2020 09:48:10 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 699CEC08C5C0
+        for <kvm-ppc@vger.kernel.org>; Wed,  3 Jun 2020 06:48:10 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id n23so2800925ljh.7
+        for <kvm-ppc@vger.kernel.org>; Wed, 03 Jun 2020 06:48:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
+        bh=H8rDQEJouwBJIElP/Vpqq+PrvTZxQQy2H7A/MvyMMB0=;
+        b=fcNX/6Sjh7rU2O1UCOh4ihlg1W/5qFT7wWlqVV4Opr4jP3xjrSRb/ngX/d+kJhLtse
+         4TZP5y670shGLb0KkuCfd3AVFnRbT2Kp9VnzFXoyQEbfPZAnWM2XjzF/IoZLOme4TXAn
+         p2Rqy6hs1PflYjQmb9eOji5xJ8FR1zKe/9atsIHSg12ziXN/CLU5iYiLtUltk7388blA
+         aLeRMcuvUn3hoJx4QESnNWkoKg/5EeqR3ljSZ597Vd9rqeAB2Z9hRoTmjMY9RGaTXioi
+         hnc+UJF0jSABnkK1fLsHR0Ti7pwC6fEdf6+A1ZLdStwCCXMew8waD/a8FXN0G954JBXr
+         StnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:sender:from:date
+         :message-id:subject:to;
+        bh=H8rDQEJouwBJIElP/Vpqq+PrvTZxQQy2H7A/MvyMMB0=;
+        b=Uu8XMdxDZsQyOgtBnpTVVdS+j8Fm7RDFhR6UsJxe+JxqXdG3m6Q5Gg3RJztJm/sYRZ
+         s9ZrksPUUdp6xxgkz9CLKw7iJelUvIWQzVDkDNYhvgDPFSUJXEXeoSqAc1JxYXUU8Y4W
+         qiDy35Uzmr9JiRHw1JAt8vWc96w3SUfuGwtzwXWofRuLFkOy9HCqrEZGNCnbnh0TjdOt
+         qNB6fMHSEo1fvkroxniP39id+9M28dVK7yw5VxAOW/hc/L3xOimFOJFZdYPSQaXemclO
+         prm2FCWEE4IwkEjg6tbxxGKYgC2s3olsBj0IXL688GLUkZZz5CPd1X2LvHtvbSnVbwke
+         tq8A==
+X-Gm-Message-State: AOAM532zXbbIlggk+MhulXa7AUZlbTZONbEXMgmO9pBL6wXkhPUfmyVH
+        /ZB8hy8e/QVuFzjBla9b2B+EYR+CGIx78QgVVOs=
+X-Google-Smtp-Source: ABdhPJyRwX6SVTRhQyaIk7xhIxBFsD6OwK3M/xjeG9BB3QnMjdocaohPz5+FBeMcToQ9vWwyk6mmFnHMNsCaEowkqWM=
+X-Received: by 2002:a05:651c:338:: with SMTP id b24mr268281ljp.87.1591192088884;
+ Wed, 03 Jun 2020 06:48:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1df25542-1977-fad4-c56d-b6b2c40a6852@linux.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-03_12:2020-06-02,2020-06-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- cotscore=-2147483648 bulkscore=0 clxscore=1015 suspectscore=2 mlxscore=0
- impostorscore=0 priorityscore=1501 lowpriorityscore=0 malwarescore=0
- phishscore=0 adultscore=0 mlxlogscore=999 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006030103
+Reply-To: susanjones.wife@gmail.com
+Received: by 2002:a19:a405:0:0:0:0:0 with HTTP; Wed, 3 Jun 2020 06:48:08 -0700 (PDT)
+From:   "Mrs.Susan Jones" <joneswife.susan@gmail.com>
+Date:   Wed, 3 Jun 2020 14:48:08 +0100
+X-Google-Sender-Auth: iJVkikTeapv9R2l4KGAJ6MvicS8
+Message-ID: <CALBhdBcPuo6FTja=Wj1Yhm7vjwzrr+QQsd+dhTh3et9Ld6MR2A@mail.gmail.com>
+Subject: HELLO: I AM MRS SUSAN JONES
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Jun 02, 2020 at 10:31:32AM +0200, Laurent Dufour wrote:
-> Le 31/05/2020 à 04:27, Ram Pai a écrit :
-> >From: Laurent Dufour <ldufour@linux.ibm.com>
-> >
-> >When a memory slot is hot plugged to a SVM, GFNs associated with that
-> >memory slot automatically default to secure GFN. Hence migrate the
-> >PFNs associated with these GFNs to device-PFNs.
-> >
-> >uv_migrate_mem_slot() is called to achieve that. It will not call
-> >UV_PAGE_IN since this request is ignored by the Ultravisor.
-> >NOTE: Ultravisor does not trust any page content provided by
-> >the Hypervisor, ones the VM turns secure.
-> >
-> >Cc: Paul Mackerras <paulus@ozlabs.org>
-> >Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> >Cc: Michael Ellerman <mpe@ellerman.id.au>
-> >Cc: Bharata B Rao <bharata@linux.ibm.com>
-> >Cc: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-> >Cc: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-> >Cc: Laurent Dufour <ldufour@linux.ibm.com>
-> >Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-> >Cc: David Gibson <david@gibson.dropbear.id.au>
-> >Cc: Claudio Carvalho <cclaudio@linux.ibm.com>
-> >Cc: kvm-ppc@vger.kernel.org
-> >Cc: linuxppc-dev@lists.ozlabs.org
-> >Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-> >	(fixed merge conflicts. Modified the commit message)
-> >Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
-> >---
-> >  arch/powerpc/include/asm/kvm_book3s_uvmem.h |  4 ++++
-> >  arch/powerpc/kvm/book3s_hv.c                | 11 +++++++----
-> >  arch/powerpc/kvm/book3s_hv_uvmem.c          |  3 +--
-> >  3 files changed, 12 insertions(+), 6 deletions(-)
-> >
-> >diff --git a/arch/powerpc/include/asm/kvm_book3s_uvmem.h b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-> >index f0c5708..2ec2e5afb 100644
-> >--- a/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-> >+++ b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-> >@@ -23,6 +23,7 @@ unsigned long kvmppc_h_svm_page_out(struct kvm *kvm,
-> >  void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
-> >  			     struct kvm *kvm, bool skip_page_out,
-> >  			     bool purge_gfn);
-> >+int uv_migrate_mem_slot(struct kvm *kvm, const struct kvm_memory_slot *memslot);
-> >  #else
-> >  static inline int kvmppc_uvmem_init(void)
-> >  {
-> >@@ -78,5 +79,8 @@ static inline int kvmppc_send_page_to_uv(struct kvm *kvm, unsigned long gfn)
-> >  kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
-> >  			struct kvm *kvm, bool skip_page_out,
-> >  			bool purge_gfn) { }
-> >+
-> >+static int uv_migrate_mem_slot(struct kvm *kvm,
-> >+		const struct kvm_memory_slot *memslot);
-> 
-> That line was not part of the patch I sent to you!
+-- 
+OUR GOLDEN OPPORTUNITY
 
-Your patch is rebased on top of my patches. This prototype declaration
-is for the ifndef CONFIG_PPC_UV   case.
+Hello Dear Friend,
 
-> 
-> 
-> >  #endif /* CONFIG_PPC_UV */
-> >  #endif /* __ASM_KVM_BOOK3S_UVMEM_H__ */
-> >diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> >index 4c62bfe..604d062 100644
-> >--- a/arch/powerpc/kvm/book3s_hv.c
-> >+++ b/arch/powerpc/kvm/book3s_hv.c
-> >@@ -4516,13 +4516,16 @@ static void kvmppc_core_commit_memory_region_hv(struct kvm *kvm,
-> >  	case KVM_MR_CREATE:
-> >  		if (kvmppc_uvmem_slot_init(kvm, new))
-> >  			return;
-> >-		uv_register_mem_slot(kvm->arch.lpid,
-> >-				     new->base_gfn << PAGE_SHIFT,
-> >-				     new->npages * PAGE_SIZE,
-> >-				     0, new->id);
-> >+		if (uv_register_mem_slot(kvm->arch.lpid,
-> >+					 new->base_gfn << PAGE_SHIFT,
-> >+					 new->npages * PAGE_SIZE,
-> >+					 0, new->id))
-> >+			return;
-> >+		uv_migrate_mem_slot(kvm, new);
-> >  		break;
-> >  	case KVM_MR_DELETE:
-> >  		uv_unregister_mem_slot(kvm->arch.lpid, old->id);
-> >+		kvmppc_uvmem_drop_pages(old, kvm, true, true);
-> 
-> Again that line has been changed from the patch I sent to you. The
-> last 'true' argument has nothing to do here.
+Complement of the day, i hope you are doing great today. However, I am
+Mrs.Susan Jones, an auditor with one of the new generation banks here
+in Burkina Faso.
 
-yes. i did add another parameter to kvmppc_uvmem_drop_pages() in my
-patch series. So had to adapt your patch to operate on top my mine.
-> 
-> Is that series really building?
+I am writing you this letter based on the latest development at my
+Department. i discovered some abandoned huge amount of money, Ten
+Million, Five hundred thousand  United States Dollars.($10.500.000).
+Now I am only contacting you as a foreigner because this money cannot
+be approved to a local bank account here, but can only be approved to
+any foreign account and foreign beneficiary because the money is in US
+dollars
 
-yes. it built for me.
+This will be  a legitimate transaction once you accept to build trust
+with me and follow simple instruction doing the transfer process,
+until the total sum transfer out of the bank here to your own bank
+account any where in the world, and I agreed to share the total money
+50/50 with you once you successful confirmed it in your bank account.
+But any expenses doing the transfer process will be deduct from the
+amount before sharing, If you are interested to work with me and
+provide a good receiving bank account, get back to me as soon as
+possible with the following details below.
 
-RP
+Your full name
+Your Profession
+Your direct mobile phone number
+Your Scanned International passport or any of your identity
+
+NOTE: PLEASE IT YOU ARE NOT INTERESTED DON'T BORDER TO RESPOND BACK TO
+AVOID TIME WASTED.
+
+As soon as I receive these data's, I will forward to you the
+application form which you will send to the bank for the claim and
+transfer of the fund into your bank account as the  new beneficial.
+
+I am waiting to hear from you soon
+
+Yours
+Mrs.Susan Jones
