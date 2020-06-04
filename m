@@ -2,117 +2,110 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BCAD1EDB36
-	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Jun 2020 04:31:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6427D1EE1CD
+	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Jun 2020 11:50:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726434AbgFDCbx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 3 Jun 2020 22:31:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54280 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726337AbgFDCbx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 3 Jun 2020 22:31:53 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05422U24059338;
-        Wed, 3 Jun 2020 22:31:42 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31dr0k1k21-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Jun 2020 22:31:42 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0542LObH031167;
-        Thu, 4 Jun 2020 02:31:40 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 31bf483ph4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Jun 2020 02:31:39 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0542ULK825952622
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 4 Jun 2020 02:30:21 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CA9CB52052;
-        Thu,  4 Jun 2020 02:31:36 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.199.52.252])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 817905204E;
-        Thu,  4 Jun 2020 02:31:34 +0000 (GMT)
-Date:   Thu, 4 Jun 2020 08:01:32 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     Ram Pai <linuxram@us.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
-        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
-        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
-        rcampbell@nvidia.com
-Subject: Re: [PATCH v1 3/4] KVM: PPC: Book3S HV: migrate remaining
- normal-GFNs to secure-GFNs in H_SVM_INIT_DONE
-Message-ID: <20200604023132.GC31382@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <1590892071-25549-1-git-send-email-linuxram@us.ibm.com>
- <1590892071-25549-4-git-send-email-linuxram@us.ibm.com>
- <20200601115518.GA31382@in.ibm.com>
- <20200601190535.GA6925@oc0525413822.ibm.com>
- <20200602100639.GB31382@in.ibm.com>
- <20200603231025.GA5772@oc0525413822.ibm.com>
-MIME-Version: 1.0
+        id S1728367AbgFDJu0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 4 Jun 2020 05:50:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38398 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728280AbgFDJu0 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Jun 2020 05:50:26 -0400
+Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B4AC08C5C1
+        for <kvm-ppc@vger.kernel.org>; Thu,  4 Jun 2020 02:50:25 -0700 (PDT)
+Received: by mail-qk1-x741.google.com with SMTP id s1so5317224qkf.9
+        for <kvm-ppc@vger.kernel.org>; Thu, 04 Jun 2020 02:50:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lca.pw; s=google;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=Kg6vPoyo+bqnNzeJ15v0h+k7UDJ+CL28zwznimZSCUE=;
+        b=iTjBd5guz5HISGo2ssTQ3kdQtGEPcHruUrD+LnAE3oz6ejT5z7/X/1k6Lyhf8TKx5b
+         ochOdOSIBb3h3Y16Pi6ii3tWoOJc7cfmg89ims3xh6+Jh8IhCFODcDigvdJUGn8PoFjT
+         EkTUAsSp67YsNdsVwVT1r5Vu+evKW2mO3OAUqZvAKH38vSPvlDik/Uz5OVTy8vUxXLlw
+         M32Z0qFp1SSOkv3GtQlbFiN4KDNE4Nike0Je9+qrq8Pcg7mXbqKBqHyIM6FNfuqeEz2s
+         6n7X6JWYsNnBUTnlr9W/I3IY3mmtryZOuLjZUJqh6MakrvWInHU4vUrvtFma0HR0YPjH
+         DA+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=Kg6vPoyo+bqnNzeJ15v0h+k7UDJ+CL28zwznimZSCUE=;
+        b=FoHJoxdS/jQvPJI+UJ80VRqynPIPb1VMTESIkYAuCRKcu5f2Nm9AHxk3icJi+ZakOG
+         QnCSuC5N4k2+Mzz181aiP75UBDqF+D1W5tlH2EPaTKg8edvKdIkas4O70GityRMmFxfk
+         5eydWee5NpEWRxgrpExuxik/y8+W3iQi0HiC9dqgXVq7R1P19XrsPTHNLjkpP558yhsL
+         Ss7bDBi7OIXteKD7vhOtLfd98AG5FxRWbIwwgY6qUFQKzEyKj3FSEDeKGZ9Cc8quDsab
+         aJ9ZgBEL1eQ+WDU+S/GlrmskCt87sDw6oqzMzUAeFKCk0UljvGwa3IcjaHxGD2pzm5Mz
+         kzmg==
+X-Gm-Message-State: AOAM531xG5htmpWTS3Tis12u9hf7RmEfkIOKl6CTHnJ+YkmIby31saAZ
+        uRDvtCm0G1Sn0ICZxYdZ/eFevQ==
+X-Google-Smtp-Source: ABdhPJxfD/CO+vni4AqlLMUrdeQZhzI4lfqDbPL9gDbqoVSPBGPQonJSf2x+4N4xRGOEhDNSqWev4g==
+X-Received: by 2002:a05:620a:1218:: with SMTP id u24mr3544315qkj.422.1591264224746;
+        Thu, 04 Jun 2020 02:50:24 -0700 (PDT)
+Received: from [192.168.1.183] (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
+        by smtp.gmail.com with ESMTPSA id k20sm4369904qtu.16.2020.06.04.02.50.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jun 2020 02:50:23 -0700 (PDT)
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200603231025.GA5772@oc0525413822.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-03_13:2020-06-02,2020-06-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- bulkscore=0 adultscore=0 impostorscore=0 cotscore=-2147483648 phishscore=0
- mlxlogscore=966 spamscore=0 priorityscore=1501 suspectscore=1
- lowpriorityscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006040009
+Content-Transfer-Encoding: quoted-printable
+From:   Qian Cai <cai@lca.pw>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH v4 08/14] powerpc: add support for folded p4d page tables
+Date:   Thu, 4 Jun 2020 05:50:23 -0400
+Message-Id: <F85B8F19-D717-411A-AFA8-466A02159F27@lca.pw>
+References: <20200603120522.7646d56a23088416a7d3fc1a@linux-foundation.org>
+Cc:     Mike Rapoport <rppt@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Brian Cain <bcain@codeaurora.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christophe Leroy <christophe.leroy@c-s.fr>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Guan Xuetao <gxt@pku.edu.cn>,
+        James Morse <James.Morse@arm.com>,
+        Jonas Bonn <jonas@southpole.se>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Ley Foon Tan <ley.foon.tan@intel.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Rich Felker <dalias@libc.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Stafford Horne <shorne@gmail.com>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Tony Luck <tony.luck@intel.com>, Will Deacon <will@kernel.org>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org,
+        nios2-dev@lists.rocketboards.org, openrisc@lists.librecores.org,
+        uclinux-h8-devel@lists.sourceforge.jp,
+        Mike Rapoport <rppt@linux.ibm.com>
+In-Reply-To: <20200603120522.7646d56a23088416a7d3fc1a@linux-foundation.org>
+To:     Andrew Morton <akpm@linux-foundation.org>
+X-Mailer: iPhone Mail (17F80)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Jun 03, 2020 at 04:10:25PM -0700, Ram Pai wrote:
-> On Tue, Jun 02, 2020 at 03:36:39PM +0530, Bharata B Rao wrote:
-> > On Mon, Jun 01, 2020 at 12:05:35PM -0700, Ram Pai wrote:
-> > > On Mon, Jun 01, 2020 at 05:25:18PM +0530, Bharata B Rao wrote:
-> > > > On Sat, May 30, 2020 at 07:27:50PM -0700, Ram Pai wrote:
-> > > > > H_SVM_INIT_DONE incorrectly assumes that the Ultravisor has explicitly
-> > > > > called H_SVM_PAGE_IN for all secure pages.
-> > > > 
-> > > > I don't think that is quite true. HV doesn't assume anything about
-> > > > secure pages by itself.
-> > > 
-> > > Yes. Currently, it does not assume anything about secure pages.  But I am
-> > > proposing that it should consider all pages (except the shared pages) as
-> > > secure pages, when H_SVM_INIT_DONE is called.
-> > 
-> > Ok, then may be also add the proposed changes to H_SVM_INIT_DONE
-> > documentation.
-> 
-> ok.
-> 
-> > 
-> > > 
-> > > In other words, HV should treat all pages; except shared pages, as
-> > > secure pages once H_SVM_INIT_DONE is called. And this includes pages
-> > > added subsequently through memory hotplug.
-> > 
-> > So after H_SVM_INIT_DONE, if HV touches a secure page for any
-> > reason and gets encrypted contents via page-out, HV drops the
-> > device pfn at that time. So what state we would be in that case? We
-> > have completed H_SVM_INIT_DONE, but still have a normal (but encrypted)
-> > page in HV?
-> 
-> Good point.
-> 
-> The corresponding GFN will continue to be a secure GFN. Just that its
-> backing PFN is not a device-PFN, but a memory-PFN. Also that backing
-> memory-PFN contains encrypted content.
-> 
-> I will clarify this in the patch; about secure-GFN state.
 
-I feel all this is complicating the states in HV and is avoidable
-if UV just issued page-in calls during memslot registration uvcall.
 
-Regards,
-Bharata.
+> On Jun 3, 2020, at 3:05 PM, Andrew Morton <akpm@linux-foundation.org> wrot=
+e:
+>=20
+> A bunch of new material just landed in linux-next/powerpc.
+>=20
+> The timing is awkward!  I trust this will be going into mainline during
+> this merge window?  If not, please drop it and repull after -rc1.
+
+I have noticed the same pattern over and over again, i.e., many powerpc new m=
+aterial has only shown up in linux-next for only a few days before sending f=
+or a pull request to Linus.
+
+There are absolutely no safe net for this kind of practice. The main problem=
+ is that Linus seems totally fine with it.=
