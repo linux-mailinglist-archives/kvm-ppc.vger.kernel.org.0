@@ -2,77 +2,67 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A59A1EE7DC
-	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Jun 2020 17:34:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE17D1EEAB7
+	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Jun 2020 20:58:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729544AbgFDPen (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 4 Jun 2020 11:34:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35368 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729035AbgFDPem (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Jun 2020 11:34:42 -0400
-Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F96EC08C5C0;
-        Thu,  4 Jun 2020 08:34:42 -0700 (PDT)
-Received: by mail-wr1-x442.google.com with SMTP id p5so6586897wrw.9;
-        Thu, 04 Jun 2020 08:34:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=D3By0h98qnolfLM0+QRpl2dqCpgdvgnNY+OucjDnKDY=;
-        b=vZt0DMCfoJUEXzeTrBICKPyqGfuBe7vx1mxfTRfe7AMZfEO9MgZiR1mPQATjGg7sos
-         L2gEppsjZRToGPjruQDj6PgcZ9k1LIUGD0iWIyOtnINMSac6a+7rCj3z4QC4lrZCdKFE
-         k2yM8OXoWQeV2IMPxu2sJJA6xUKeMYmYvndml0HnOewX3ksq8F1r9goi9s79mQpwsSIb
-         c5mAXaNTKzUmdLKel6x7irCbEI4DTv2oXtv/qN7Oxn1zzp0W/r8QazRbJWdm+blAf/6N
-         mqCzGRjWNAgSpkjxibd5bm0M9tIZAW+bPd5JKLWcPAMtTD2J+9FPsJ68L+Qr8Bw98u2/
-         uiog==
+        id S1728119AbgFDS6M (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 4 Jun 2020 14:58:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29979 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728476AbgFDS6M (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Jun 2020 14:58:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591297090;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ltc7AAOMOPUPkUttvlRhefl/zKjkU15T+NRuGo1EozI=;
+        b=AFPXnvtE6pegC5hFenIzgFjxHysipNz6D26fPI3UOX5zhEA5peqdraZwqvQJOJJhk+Qp4F
+        w1LY856EuVW0XcDCv9yksJovZzk+0UbFW4RLAJVx/GTab1GsQdr5QjSiqd+g67ojzc8/sR
+        EkTUfZD6pDqMSpYJfIiv9Vrsf2jTeR8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-a5CLpbHUMNymQKxdZB0vjw-1; Thu, 04 Jun 2020 14:58:08 -0400
+X-MC-Unique: a5CLpbHUMNymQKxdZB0vjw-1
+Received: by mail-wr1-f69.google.com with SMTP id w16so2772366wru.18
+        for <kvm-ppc@vger.kernel.org>; Thu, 04 Jun 2020 11:58:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=D3By0h98qnolfLM0+QRpl2dqCpgdvgnNY+OucjDnKDY=;
-        b=JZ8eG8tE4Lrj45800Q9lSdVl1iphQ/O0A/WBiZSX/qfUZrp9kuz9mx7Aas4wk9Cz2t
-         YOyhEGAOox3UiNgIhxGiEAdmW7/I6HpNeqd3ac3pf7rNg0bQSMSYM2OoJx6UDo0UrMhT
-         IODk77ghGzgKxAftTjwQDWJZcTMSBxjDQtlOKmdYnIHBeNr7DuFOpkeRD5sNTnD7QDMW
-         c66hlInF0eD4sknRVCkMOquRbw11MXQ6XFqsX+FDPbfLLc9Ix6P21O0X9JkCpZuCNoQ8
-         cMzt5mI8yG+KHkq896a/kZcL3/uZ/Pf1OayiCs2sbzNkK7lddWbrIhuV6t1jFQ1bFWE7
-         GH+w==
-X-Gm-Message-State: AOAM531sL81mAp0DcxfV/kkabS5Uu5LKAFtK6gzhHQqXxIpKx19EmvSx
-        J6WaYub0DBy0Omn3nc9kPcKtaZmjiMY=
-X-Google-Smtp-Source: ABdhPJxfqtpJqbRTF++Qa4Ke2KxsNtWe0xpkNWVokflegjt7JKKLmL/tz6wJQHjKWgmRMZK5uAnt/Q==
-X-Received: by 2002:adf:f0d2:: with SMTP id x18mr4926753wro.250.1591284880431;
-        Thu, 04 Jun 2020 08:34:40 -0700 (PDT)
-Received: from [192.168.8.102] ([194.230.155.251])
-        by smtp.gmail.com with ESMTPSA id q1sm7431317wmc.12.2020.06.04.08.34.38
+        bh=ltc7AAOMOPUPkUttvlRhefl/zKjkU15T+NRuGo1EozI=;
+        b=r5yInTQF/7zkztC8Lq38y71M6/Op7On3aGi1AH0SAVO77KCVHvd2cQfTkjdoZQaNAQ
+         Qp/NMgWFubiOSCmqR9IFUiZFnlxP1ldhvs8p2zo9sQBneLX2CZQe6cmHuHAVIDMgpV9u
+         2OW5CMfsT8WsdswDQwPgjk8cGP4TMNd2r+/o4kdjzqYR0Q8CANZQ2IpZozR9th8nKULa
+         70DMA2mTwfF346oyrur5KtNVwkMR8JNphrGZFi0lfw44mh+Md+/CNKMsCYCE+OtS2SxS
+         yHUzLmy/+9WYldWevLCYyzmuVfD566F4CUKXmbnAFbSZ+NnL84BImqxJo8RaW1iDeIuw
+         vXnA==
+X-Gm-Message-State: AOAM531rB4fioR7uwp/ld1kKT1JMw7dxlzz+GBkhHq8x3qINyp7nUFUm
+        3CZaBzXTNSup+Bl97dZsZeHVm6yesp9CIrS1sHlU1gdzl4GtlSxf1sBnUmv9Pdp7SF4156BiDGV
+        eK82Nu1KZMbTKvuCccA==
+X-Received: by 2002:adf:ef83:: with SMTP id d3mr5430080wro.145.1591297087322;
+        Thu, 04 Jun 2020 11:58:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw6Mh2tZEK9h1YhyPsdCcQG+RuzgRYNiaLHzFsWDjE7ghjh9VxuCSIkvZCInTNo/mgS+4OFpQ==
+X-Received: by 2002:adf:ef83:: with SMTP id d3mr5430071wro.145.1591297087081;
+        Thu, 04 Jun 2020 11:58:07 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb? ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
+        by smtp.gmail.com with ESMTPSA id u7sm9235367wrm.23.2020.06.04.11.58.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jun 2020 08:34:39 -0700 (PDT)
-Subject: Re: [PATCH v3 2/7] documentation for stats_fs
-To:     Randy Dunlap <rdunlap@infradead.org>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        David Rientjes <rientjes@google.com>,
-        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org
-References: <20200526110318.69006-1-eesposit@redhat.com>
- <20200526110318.69006-3-eesposit@redhat.com>
- <c9ddaed1-0efc-650b-6a51-ad5fc431af69@infradead.org>
-From:   Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Message-ID: <dcaab39e-6cd3-c6cf-1515-7067a8b0ed9f@gmail.com>
-Date:   Thu, 4 Jun 2020 17:34:37 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.1
+        Thu, 04 Jun 2020 11:58:06 -0700 (PDT)
+Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.8-1 tag
+To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org
+References: <20200601235357.GB428673@thinks.paulus.ozlabs.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <87d0e310-8714-0104-90ef-d4f82920f502@redhat.com>
+Date:   Thu, 4 Jun 2020 20:58:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <c9ddaed1-0efc-650b-6a51-ad5fc431af69@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200601235357.GB428673@thinks.paulus.ozlabs.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
@@ -80,148 +70,82 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi,
-
->> +
->> +The STATS_FS_HIDDEN attribute won't affect the aggregation, it will only
->> +block the creation of the files.
+On 02/06/20 01:53, Paul Mackerras wrote:
+> Hi Paolo,
 > 
-> Why does HIDDEN block the creation of files?  instead of their visibility?
-
-The file itself is used to allow the user to view the content of a 
-value. In order to make it hidden, the framework just doesn't create the 
-file.
-The structure is still present and considered in statsfs, however.
-
-Hidden in this case means not visible at all thus not created, not the 
-hidden file concept of dotted files (".filename")
-
+> Please do a pull from my kvm-ppc-next-5.8-1 tag to get a PPC KVM
+> update for 5.8.  It's a relatively small update this time.  Michael
+> Ellerman also has some commits in his tree that touch
+> arch/powerpc/kvm, but I have not merged them here because there are no
+> merge conflicts, and so they can go to Linus via Michael's tree.
 > 
->> +
->> +Add values to parent and child (also here order doesn't matter)::
->> +
->> +        struct kvm *base_ptr = kmalloc(..., sizeof(struct kvm));
->> +        ...
->> +        stats_fs_source_add_values(child_source, kvm_stats, base_ptr, 0);
->> +        stats_fs_source_add_values(parent_source, kvm_stats, NULL, STATS_FS_HIDDEN);
->> +
->> +``child_source`` will be a simple value, since it has a non-NULL base
->> +pointer, while ``parent_source`` will be an aggregate. During the adding
->> +phase, also values can optionally be marked as hidden, so that the folder
->> +and other values can be still shown.
->> +
->> +Of course the same ``struct stats_fs_value`` array can be also passed with a
->> +different base pointer, to represent the same value but in another instance
->> +of the kvm struct.
->> +
->> +Search:
->> +
->> +Fetch a value from the child source, returning the value
->> +pointed by ``(uint64_t *) base_ptr + kvm_stats[0].offset``::
->> +
->> +        uint64_t ret_child, ret_parent;
->> +
->> +        stats_fs_source_get_value(child_source, &kvm_stats[0], &ret_child);
->> +
->> +Fetch an aggregate value, searching all subsources of ``parent_source`` for
->> +the specified ``struct stats_fs_value``::
->> +
->> +        stats_fs_source_get_value(parent_source, &kvm_stats[0], &ret_parent);
->> +
->> +        assert(ret_child == ret_parent); // check expected result
->> +
->> +To make it more interesting, add another child::
->> +
->> +        struct stats_fs_source child_source2 = stats_fs_source_create(0, "child2");
->> +
->> +        stats_fs_source_add_subordinate(parent_source, child_source2);
->> +        // now  the structure is parent -> child1
->> +        //                              -> child2
+> Thanks,
+> Paul.
 > 
-> Is that the same as                 parent -> child1 -> child2
-> ?  It could almost be read as
->                                      parent -> child1
->                                      parent -> child2
-
-No the example in the documentation shows the relationship
-parent -> child1 and
-parent -> child2.
-It's not the same as
-parent -> child1 -> child2.
-In order to do the latter, one would need to do:
-
-stats_fs_source_add_subordinate(parent_source, child_source1);
-stats_fs_source_add_subordinate(child_source1, child_source2);
-
-Hope that this clarifies it.
-
+> The following changes since commit 9d5272f5e36155bcead69417fd12e98624e7faef:
 > 
-> Whichever it is, can you make it more explicit, please?
+>   Merge tag 'noinstr-x86-kvm-2020-05-16' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip into HEAD (2020-05-20 03:40:09 -0400)
 > 
+> are available in the git repository at:
 > 
->> +
->> +        struct kvm *other_base_ptr = kmalloc(..., sizeof(struct kvm));
->> +        ...
->> +        stats_fs_source_add_values(child_source2, kvm_stats, other_base_ptr, 0);
->> +
->> +Note that other_base_ptr points to another instance of kvm, so the struct
->> +stats_fs_value is the same but the address at which they point is not.
->> +
->> +Now get the aggregate value::
->> +
->> +        uint64_t ret_child, ret_child2, ret_parent;
->> +
->> +        stats_fs_source_get_value(child_source, &kvm_stats[0], &ret_child);
->> +        stats_fs_source_get_value(parent_source, &kvm_stats[0], &ret_parent);
->> +        stats_fs_source_get_value(child_source2, &kvm_stats[0], &ret_child2);
->> +
->> +        assert((ret_child + ret_child2) == ret_parent);
->> +
->> +Cleanup::
->> +
->> +        stats_fs_source_remove_subordinate(parent_source, child_source);
->> +        stats_fs_source_revoke(child_source);
->> +        stats_fs_source_put(child_source);
->> +
->> +        stats_fs_source_remove_subordinate(parent_source, child_source2);
->> +        stats_fs_source_revoke(child_source2);
->> +        stats_fs_source_put(child_source2);
->> +
->> +        stats_fs_source_put(parent_source);
->> +        kfree(other_base_ptr);
->> +        kfree(base_ptr);
->> +
->> +Calling stats_fs_source_revoke is very important, because it will ensure
+>   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.8-1
 > 
->             stats_fs_source_revoke()
+> for you to fetch changes up to 11362b1befeadaae4d159a8cddcdaf6b8afe08f9:
 > 
->> +that stats_fs will not access the data that were passed to
->> +stats_fs_source_add_value for this source.
->> +
->> +Because open files increase the reference count for a stats_fs_source, the
->> +source can end up living longer than the data that provides the values for
->> +the source.  Calling stats_fs_source_revoke just before the backing data
+>   KVM: PPC: Book3S HV: Close race with page faults around memslot flushes (2020-05-28 10:56:42 +1000)
 > 
->                          stats_fs_source_revoke()
+> ----------------------------------------------------------------
+> PPC KVM update for 5.8
 > 
->> +is freed avoids accesses to freed data structures. The sources will return
->> +0.
->> +
->> +This is not needed for the parent_source, since it just contains
->> +aggregates that would be 0 anyways if no matching child value exist.
->> +
->> +API Documentation
->> +=================
->> +
->> +.. kernel-doc:: include/linux/stats_fs.h
->> +   :export: fs/stats_fs/*.c
->> \ No newline at end of file
+> - Updates and bug fixes for secure guest support
+> - Other minor bug fixes and cleanups.
 > 
-> Please fix that. ^^^^^
+> ----------------------------------------------------------------
+> Chen Zhou (1):
+>       KVM: PPC: Book3S HV: Remove redundant NULL check
 > 
+> Laurent Dufour (2):
+>       KVM: PPC: Book3S HV: Read ibm,secure-memory nodes
+>       KVM: PPC: Book3S HV: Relax check on H_SVM_INIT_ABORT
 > 
-> Thanks for the documentation.
+> Paul Mackerras (2):
+>       KVM: PPC: Book3S HV: Remove user-triggerable WARN_ON
+>       KVM: PPC: Book3S HV: Close race with page faults around memslot flushes
+> 
+> Qian Cai (2):
+>       KVM: PPC: Book3S HV: Ignore kmemleak false positives
+>       KVM: PPC: Book3S: Fix some RCU-list locks
+> 
+> Tianjia Zhang (2):
+>       KVM: PPC: Remove redundant kvm_run from vcpu_arch
+>       KVM: PPC: Clean up redundant 'kvm_run' parameters
+> 
+>  arch/powerpc/include/asm/kvm_book3s.h    | 16 +++----
+>  arch/powerpc/include/asm/kvm_host.h      |  1 -
+>  arch/powerpc/include/asm/kvm_ppc.h       | 27 ++++++------
+>  arch/powerpc/kvm/book3s.c                |  4 +-
+>  arch/powerpc/kvm/book3s.h                |  2 +-
+>  arch/powerpc/kvm/book3s_64_mmu_hv.c      | 12 ++---
+>  arch/powerpc/kvm/book3s_64_mmu_radix.c   | 36 +++++++++++----
+>  arch/powerpc/kvm/book3s_64_vio.c         | 18 ++++++--
+>  arch/powerpc/kvm/book3s_emulate.c        | 10 ++---
+>  arch/powerpc/kvm/book3s_hv.c             | 75 +++++++++++++++++---------------
+>  arch/powerpc/kvm/book3s_hv_nested.c      | 15 +++----
+>  arch/powerpc/kvm/book3s_hv_uvmem.c       | 14 ++++++
+>  arch/powerpc/kvm/book3s_paired_singles.c | 72 +++++++++++++++---------------
+>  arch/powerpc/kvm/book3s_pr.c             | 30 ++++++-------
+>  arch/powerpc/kvm/booke.c                 | 36 +++++++--------
+>  arch/powerpc/kvm/booke.h                 |  8 +---
+>  arch/powerpc/kvm/booke_emulate.c         |  2 +-
+>  arch/powerpc/kvm/e500_emulate.c          | 15 +++----
+>  arch/powerpc/kvm/emulate.c               | 10 ++---
+>  arch/powerpc/kvm/emulate_loadstore.c     | 32 +++++++-------
+>  arch/powerpc/kvm/powerpc.c               | 72 +++++++++++++++---------------
+>  arch/powerpc/kvm/trace_hv.h              |  6 +--
+>  22 files changed, 276 insertions(+), 237 deletions(-)
 > 
 
-Thank you for the feedback,
-Emanuele
+Pulled, thanks.
+
+Paolo
+
