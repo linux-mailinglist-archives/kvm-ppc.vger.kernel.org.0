@@ -2,150 +2,359 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE17D1EEAB7
-	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Jun 2020 20:58:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4271B1EF49A
+	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Jun 2020 11:49:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728119AbgFDS6M (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 4 Jun 2020 14:58:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29979 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728476AbgFDS6M (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Jun 2020 14:58:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591297090;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ltc7AAOMOPUPkUttvlRhefl/zKjkU15T+NRuGo1EozI=;
-        b=AFPXnvtE6pegC5hFenIzgFjxHysipNz6D26fPI3UOX5zhEA5peqdraZwqvQJOJJhk+Qp4F
-        w1LY856EuVW0XcDCv9yksJovZzk+0UbFW4RLAJVx/GTab1GsQdr5QjSiqd+g67ojzc8/sR
-        EkTUfZD6pDqMSpYJfIiv9Vrsf2jTeR8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-a5CLpbHUMNymQKxdZB0vjw-1; Thu, 04 Jun 2020 14:58:08 -0400
-X-MC-Unique: a5CLpbHUMNymQKxdZB0vjw-1
-Received: by mail-wr1-f69.google.com with SMTP id w16so2772366wru.18
-        for <kvm-ppc@vger.kernel.org>; Thu, 04 Jun 2020 11:58:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ltc7AAOMOPUPkUttvlRhefl/zKjkU15T+NRuGo1EozI=;
-        b=r5yInTQF/7zkztC8Lq38y71M6/Op7On3aGi1AH0SAVO77KCVHvd2cQfTkjdoZQaNAQ
-         Qp/NMgWFubiOSCmqR9IFUiZFnlxP1ldhvs8p2zo9sQBneLX2CZQe6cmHuHAVIDMgpV9u
-         2OW5CMfsT8WsdswDQwPgjk8cGP4TMNd2r+/o4kdjzqYR0Q8CANZQ2IpZozR9th8nKULa
-         70DMA2mTwfF346oyrur5KtNVwkMR8JNphrGZFi0lfw44mh+Md+/CNKMsCYCE+OtS2SxS
-         yHUzLmy/+9WYldWevLCYyzmuVfD566F4CUKXmbnAFbSZ+NnL84BImqxJo8RaW1iDeIuw
-         vXnA==
-X-Gm-Message-State: AOAM531rB4fioR7uwp/ld1kKT1JMw7dxlzz+GBkhHq8x3qINyp7nUFUm
-        3CZaBzXTNSup+Bl97dZsZeHVm6yesp9CIrS1sHlU1gdzl4GtlSxf1sBnUmv9Pdp7SF4156BiDGV
-        eK82Nu1KZMbTKvuCccA==
-X-Received: by 2002:adf:ef83:: with SMTP id d3mr5430080wro.145.1591297087322;
-        Thu, 04 Jun 2020 11:58:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw6Mh2tZEK9h1YhyPsdCcQG+RuzgRYNiaLHzFsWDjE7ghjh9VxuCSIkvZCInTNo/mgS+4OFpQ==
-X-Received: by 2002:adf:ef83:: with SMTP id d3mr5430071wro.145.1591297087081;
-        Thu, 04 Jun 2020 11:58:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb? ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
-        by smtp.gmail.com with ESMTPSA id u7sm9235367wrm.23.2020.06.04.11.58.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jun 2020 11:58:06 -0700 (PDT)
-Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.8-1 tag
-To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-References: <20200601235357.GB428673@thinks.paulus.ozlabs.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <87d0e310-8714-0104-90ef-d4f82920f502@redhat.com>
-Date:   Thu, 4 Jun 2020 20:58:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726253AbgFEJsx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 5 Jun 2020 05:48:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57036 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726251AbgFEJsv (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Jun 2020 05:48:51 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0559XnlR104584;
+        Fri, 5 Jun 2020 05:48:37 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31f90393yk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 05:48:36 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0559apUv020103;
+        Fri, 5 Jun 2020 09:48:35 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma01fra.de.ibm.com with ESMTP id 31bf47vv6c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 09:48:34 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0559mVoL3539380
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 5 Jun 2020 09:48:31 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 90798A405B;
+        Fri,  5 Jun 2020 09:48:31 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C6BD2A404D;
+        Fri,  5 Jun 2020 09:48:30 +0000 (GMT)
+Received: from pomme.local (unknown [9.145.4.185])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  5 Jun 2020 09:48:30 +0000 (GMT)
+Subject: Re: [PATCH v1 2/4] KVM: PPC: Book3S HV: track shared GFNs of secure
+ VMs
+To:     Ram Pai <linuxram@us.ibm.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
+        bharata@linux.ibm.com, aneesh.kumar@linux.ibm.com,
+        sukadev@linux.vnet.ibm.com, bauerman@linux.ibm.com,
+        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com
+References: <1590892071-25549-1-git-send-email-linuxram@us.ibm.com>
+ <1590892071-25549-3-git-send-email-linuxram@us.ibm.com>
+From:   Laurent Dufour <ldufour@linux.ibm.com>
+Message-ID: <4e1a5f90-984a-129c-d336-98fc90019379@linux.ibm.com>
+Date:   Fri, 5 Jun 2020 11:48:30 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.8.1
 MIME-Version: 1.0
-In-Reply-To: <20200601235357.GB428673@thinks.paulus.ozlabs.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1590892071-25549-3-git-send-email-linuxram@us.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-05_02:2020-06-04,2020-06-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
+ spamscore=0 adultscore=0 bulkscore=0 malwarescore=0 cotscore=-2147483648
+ phishscore=0 suspectscore=2 impostorscore=0 lowpriorityscore=0
+ clxscore=1015 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006050074
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 02/06/20 01:53, Paul Mackerras wrote:
-> Hi Paolo,
+Le 31/05/2020 à 04:27, Ram Pai a écrit :
+> During the life of SVM, its GFNs can transition from secure to shared
+> state and vice-versa. Since the kernel does not track GFNs that are
+> shared, it is not possible to disambiguate a shared GFN from a GFN whose
+> PFN has not yet been migrated to a device-PFN.
 > 
-> Please do a pull from my kvm-ppc-next-5.8-1 tag to get a PPC KVM
-> update for 5.8.  It's a relatively small update this time.  Michael
-> Ellerman also has some commits in his tree that touch
-> arch/powerpc/kvm, but I have not merged them here because there are no
-> merge conflicts, and so they can go to Linus via Michael's tree.
+> The ability to identify a shared GFN is needed to skip migrating its PFN
+> to device PFN. This functionality is leveraged in a subsequent patch.
 > 
-> Thanks,
-> Paul.
+> Add the ability to identify the state of a GFN.
 > 
-> The following changes since commit 9d5272f5e36155bcead69417fd12e98624e7faef:
+> Cc: Paul Mackerras <paulus@ozlabs.org>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Bharata B Rao <bharata@linux.ibm.com>
+> Cc: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+> Cc: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+> Cc: Laurent Dufour <ldufour@linux.ibm.com>
+> Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Claudio Carvalho <cclaudio@linux.ibm.com>
+> Cc: kvm-ppc@vger.kernel.org
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Reviewed-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+> ---
+>   arch/powerpc/include/asm/kvm_book3s_uvmem.h |   6 +-
+>   arch/powerpc/kvm/book3s_64_mmu_radix.c      |   2 +-
+>   arch/powerpc/kvm/book3s_hv.c                |   2 +-
+>   arch/powerpc/kvm/book3s_hv_uvmem.c          | 115 ++++++++++++++++++++++++++--
+>   4 files changed, 113 insertions(+), 12 deletions(-)
 > 
->   Merge tag 'noinstr-x86-kvm-2020-05-16' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip into HEAD (2020-05-20 03:40:09 -0400)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.8-1
-> 
-> for you to fetch changes up to 11362b1befeadaae4d159a8cddcdaf6b8afe08f9:
-> 
->   KVM: PPC: Book3S HV: Close race with page faults around memslot flushes (2020-05-28 10:56:42 +1000)
-> 
-> ----------------------------------------------------------------
-> PPC KVM update for 5.8
-> 
-> - Updates and bug fixes for secure guest support
-> - Other minor bug fixes and cleanups.
-> 
-> ----------------------------------------------------------------
-> Chen Zhou (1):
->       KVM: PPC: Book3S HV: Remove redundant NULL check
-> 
-> Laurent Dufour (2):
->       KVM: PPC: Book3S HV: Read ibm,secure-memory nodes
->       KVM: PPC: Book3S HV: Relax check on H_SVM_INIT_ABORT
-> 
-> Paul Mackerras (2):
->       KVM: PPC: Book3S HV: Remove user-triggerable WARN_ON
->       KVM: PPC: Book3S HV: Close race with page faults around memslot flushes
-> 
-> Qian Cai (2):
->       KVM: PPC: Book3S HV: Ignore kmemleak false positives
->       KVM: PPC: Book3S: Fix some RCU-list locks
-> 
-> Tianjia Zhang (2):
->       KVM: PPC: Remove redundant kvm_run from vcpu_arch
->       KVM: PPC: Clean up redundant 'kvm_run' parameters
-> 
->  arch/powerpc/include/asm/kvm_book3s.h    | 16 +++----
->  arch/powerpc/include/asm/kvm_host.h      |  1 -
->  arch/powerpc/include/asm/kvm_ppc.h       | 27 ++++++------
->  arch/powerpc/kvm/book3s.c                |  4 +-
->  arch/powerpc/kvm/book3s.h                |  2 +-
->  arch/powerpc/kvm/book3s_64_mmu_hv.c      | 12 ++---
->  arch/powerpc/kvm/book3s_64_mmu_radix.c   | 36 +++++++++++----
->  arch/powerpc/kvm/book3s_64_vio.c         | 18 ++++++--
->  arch/powerpc/kvm/book3s_emulate.c        | 10 ++---
->  arch/powerpc/kvm/book3s_hv.c             | 75 +++++++++++++++++---------------
->  arch/powerpc/kvm/book3s_hv_nested.c      | 15 +++----
->  arch/powerpc/kvm/book3s_hv_uvmem.c       | 14 ++++++
->  arch/powerpc/kvm/book3s_paired_singles.c | 72 +++++++++++++++---------------
->  arch/powerpc/kvm/book3s_pr.c             | 30 ++++++-------
->  arch/powerpc/kvm/booke.c                 | 36 +++++++--------
->  arch/powerpc/kvm/booke.h                 |  8 +---
->  arch/powerpc/kvm/booke_emulate.c         |  2 +-
->  arch/powerpc/kvm/e500_emulate.c          | 15 +++----
->  arch/powerpc/kvm/emulate.c               | 10 ++---
->  arch/powerpc/kvm/emulate_loadstore.c     | 32 +++++++-------
->  arch/powerpc/kvm/powerpc.c               | 72 +++++++++++++++---------------
->  arch/powerpc/kvm/trace_hv.h              |  6 +--
->  22 files changed, 276 insertions(+), 237 deletions(-)
-> 
+> diff --git a/arch/powerpc/include/asm/kvm_book3s_uvmem.h b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
+> index 5a9834e..f0c5708 100644
+> --- a/arch/powerpc/include/asm/kvm_book3s_uvmem.h
+> +++ b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
+> @@ -21,7 +21,8 @@ unsigned long kvmppc_h_svm_page_out(struct kvm *kvm,
+>   int kvmppc_send_page_to_uv(struct kvm *kvm, unsigned long gfn);
+>   unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm);
+>   void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
+> -			     struct kvm *kvm, bool skip_page_out);
+> +			     struct kvm *kvm, bool skip_page_out,
+> +			     bool purge_gfn);
+>   #else
+>   static inline int kvmppc_uvmem_init(void)
+>   {
+> @@ -75,6 +76,7 @@ static inline int kvmppc_send_page_to_uv(struct kvm *kvm, unsigned long gfn)
+>   
+>   static inline void
+>   kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
+> -			struct kvm *kvm, bool skip_page_out) { }
+> +			struct kvm *kvm, bool skip_page_out,
+> +			bool purge_gfn) { }
+>   #endif /* CONFIG_PPC_UV */
+>   #endif /* __ASM_KVM_BOOK3S_UVMEM_H__ */
+> diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> index 803940d..3448459 100644
+> --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> @@ -1100,7 +1100,7 @@ void kvmppc_radix_flush_memslot(struct kvm *kvm,
+>   	unsigned int shift;
+>   
+>   	if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START)
+> -		kvmppc_uvmem_drop_pages(memslot, kvm, true);
+> +		kvmppc_uvmem_drop_pages(memslot, kvm, true, false);
 
-Pulled, thanks.
+Why purge_gfn is false here?
+That call function is called when dropping an hot plugged memslot.
+That's being said, when called by kvmppc_core_commit_memory_region_hv(), the mem 
+slot is then free by kvmppc_uvmem_slot_free() so that shared state will not 
+remain long but there is a window...
 
-Paolo
+>   
+>   	if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE)
+>   		return;
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 103d13e..4c62bfe 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -5467,7 +5467,7 @@ static int kvmhv_svm_off(struct kvm *kvm)
+>   			continue;
+>   
+>   		kvm_for_each_memslot(memslot, slots) {
+> -			kvmppc_uvmem_drop_pages(memslot, kvm, true);
+> +			kvmppc_uvmem_drop_pages(memslot, kvm, true, true);
+>   			uv_unregister_mem_slot(kvm->arch.lpid, memslot->id);
+>   		}
+>   	}
+> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> index ea4a1f1..2ef1e03 100644
+> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> @@ -99,14 +99,56 @@
+>   static DEFINE_SPINLOCK(kvmppc_uvmem_bitmap_lock);
+>   
+>   #define KVMPPC_UVMEM_PFN	(1UL << 63)
+> +#define KVMPPC_UVMEM_SHARED	(1UL << 62)
+> +#define KVMPPC_UVMEM_FLAG_MASK	(KVMPPC_UVMEM_PFN | KVMPPC_UVMEM_SHARED)
+> +#define KVMPPC_UVMEM_PFN_MASK	(~KVMPPC_UVMEM_FLAG_MASK)
+>   
+>   struct kvmppc_uvmem_slot {
+>   	struct list_head list;
+>   	unsigned long nr_pfns;
+>   	unsigned long base_pfn;
+> +	/*
+> +	 * pfns array has an entry for each GFN of the memory slot.
+> +	 *
+> +	 * The GFN can be in one of the following states.
+> +	 *
+> +	 * (a) Secure - The GFN is secure. Only Ultravisor can access it.
+> +	 * (b) Shared - The GFN is shared. Both Hypervisor and Ultravisor
+> +	 *		can access it.
+> +	 * (c) Normal - The GFN is a normal.  Only Hypervisor can access it.
+> +	 *
+> +	 * Secure GFN is associated with a devicePFN. Its pfn[] has
+> +	 * KVMPPC_UVMEM_PFN flag set, and has the value of the device PFN
+> +	 * KVMPPC_UVMEM_SHARED flag unset, and has the value of the device PFN
+> +	 *
+> +	 * Shared GFN is associated with a memoryPFN. Its pfn[] has
+> +	 * KVMPPC_UVMEM_SHARED flag set. But its KVMPPC_UVMEM_PFN is not set,
+> +	 * and there is no PFN value stored.
+> +	 *
+> +	 * Normal GFN is not associated with memoryPFN. Its pfn[] has
+> +	 * KVMPPC_UVMEM_SHARED and KVMPPC_UVMEM_PFN flag unset, and no PFN
+> +	 * value is stored.
+> +	 *
+> +	 * Any other combination of values in pfn[] leads to undefined
+> +	 * behavior.
+> +	 *
+> +	 * Life cycle of a GFN --
+> +	 *
+> +	 * ---------------------------------------------------------
+> +	 * |        |     Share	 |  Unshare | SVM	|slot      |
+> +	 * |	    |		 |	    | abort/	|flush	   |
+> +	 * |	    |		 |	    | terminate	|	   |
+> +	 * ---------------------------------------------------------
+> +	 * |        |            |          |           |          |
+> +	 * | Secure |     Shared | Secure   |Normal	|Secure    |
+> +	 * |        |            |          |           |          |
+> +	 * | Shared |     Shared | Secure   |Normal     |Shared    |
+> +	 * |        |            |          |           |          |
+> +	 * | Normal |     Shared | Secure   |Normal     |Normal    |
+> +	 * ---------------------------------------------------------
+> +	 */
+>   	unsigned long *pfns;
+>   };
+> -
+>   struct kvmppc_uvmem_page_pvt {
+>   	struct kvm *kvm;
+>   	unsigned long gpa;
+> @@ -175,7 +217,12 @@ static void kvmppc_uvmem_pfn_remove(unsigned long gfn, struct kvm *kvm)
+>   
+>   	list_for_each_entry(p, &kvm->arch.uvmem_pfns, list) {
+>   		if (gfn >= p->base_pfn && gfn < p->base_pfn + p->nr_pfns) {
+> -			p->pfns[gfn - p->base_pfn] = 0;
+> +			/*
+> +			 * Reset everything, but keep the KVMPPC_UVMEM_SHARED
+> +			 * flag intact.  A gfn continues to be shared or
+> +			 * unshared, with or without an associated device pfn.
+> +			 */
+> +			p->pfns[gfn - p->base_pfn] &= KVMPPC_UVMEM_SHARED;
+>   			return;
+>   		}
+>   	}
+> @@ -193,7 +240,7 @@ static bool kvmppc_gfn_is_uvmem_pfn(unsigned long gfn, struct kvm *kvm,
+>   			if (p->pfns[index] & KVMPPC_UVMEM_PFN) {
+>   				if (uvmem_pfn)
+>   					*uvmem_pfn = p->pfns[index] &
+> -						     ~KVMPPC_UVMEM_PFN;
+> +						     KVMPPC_UVMEM_PFN_MASK;
+>   				return true;
+>   			} else
+>   				return false;
+> @@ -202,6 +249,38 @@ static bool kvmppc_gfn_is_uvmem_pfn(unsigned long gfn, struct kvm *kvm,
+>   	return false;
+>   }
+>   
+> +static void kvmppc_gfn_uvmem_shared(unsigned long gfn, struct kvm *kvm,
+> +		bool set)
+> +{
+> +	struct kvmppc_uvmem_slot *p;
+> +
+> +	list_for_each_entry(p, &kvm->arch.uvmem_pfns, list) {
+> +		if (gfn >= p->base_pfn && gfn < p->base_pfn + p->nr_pfns) {
+> +			unsigned long index = gfn - p->base_pfn;
+> +
+> +			if (set)
+> +				p->pfns[index] |= KVMPPC_UVMEM_SHARED;
+> +			else
+> +				p->pfns[index] &= ~KVMPPC_UVMEM_SHARED;
+> +			return;
+> +		}
+> +	}
+> +}
+> +
+> +bool kvmppc_gfn_is_uvmem_shared(unsigned long gfn, struct kvm *kvm)
+> +{
+> +	struct kvmppc_uvmem_slot *p;
+> +
+> +	list_for_each_entry(p, &kvm->arch.uvmem_pfns, list) {
+> +		if (gfn >= p->base_pfn && gfn < p->base_pfn + p->nr_pfns) {
+> +			unsigned long index = gfn - p->base_pfn;
+> +
+> +			return (p->pfns[index] & KVMPPC_UVMEM_SHARED);
+> +		}
+> +	}
+> +	return false;
+> +}
+> +
+>   unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>   {
+>   	struct kvm_memslots *slots;
+> @@ -256,9 +335,13 @@ unsigned long kvmppc_h_svm_init_done(struct kvm *kvm)
+>    * is HV side fault on these pages. Next we *get* these pages, forcing
+>    * fault on them, do fault time migration to replace the device PTEs in
+>    * QEMU page table with normal PTEs from newly allocated pages.
+> + *
+> + * if @purge_gfn is set, cleanup any information related to each of
+> + * the GFNs associated with this memory slot.
+>    */
+>   void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
+> -			     struct kvm *kvm, bool skip_page_out)
+> +			     struct kvm *kvm, bool skip_page_out,
+> +			     bool purge_gfn)
+>   {
+>   	int i;
+>   	struct kvmppc_uvmem_page_pvt *pvt;
+> @@ -269,11 +352,22 @@ void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
+>   		struct page *uvmem_page;
+>   
+>   		mutex_lock(&kvm->arch.uvmem_lock);
+> +
+> +		if (purge_gfn) {
+> +			/*
+> +			 * cleanup the shared status of the GFN here.
+> +			 * Any device PFN associated with the GFN shall
+> +			 * be cleaned up later, in kvmppc_uvmem_page_free()
+> +			 * when the device PFN is actually disassociated
+> +			 * from the GFN.
+> +			 */
+> +			kvmppc_gfn_uvmem_shared(gfn, kvm, false);
+> +		}
+> +
+>   		if (!kvmppc_gfn_is_uvmem_pfn(gfn, kvm, &uvmem_pfn)) {
+>   			mutex_unlock(&kvm->arch.uvmem_lock);
+>   			continue;
+>   		}
+> -
+>   		uvmem_page = pfn_to_page(uvmem_pfn);
+>   		pvt = uvmem_page->zone_device_data;
+>   		pvt->skip_page_out = skip_page_out;
+> @@ -304,7 +398,7 @@ unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm)
+>   	srcu_idx = srcu_read_lock(&kvm->srcu);
+>   
+>   	kvm_for_each_memslot(memslot, kvm_memslots(kvm))
+> -		kvmppc_uvmem_drop_pages(memslot, kvm, false);
+> +		kvmppc_uvmem_drop_pages(memslot, kvm, false, true);
+>   
+>   	srcu_read_unlock(&kvm->srcu, srcu_idx);
+>   
+> @@ -470,8 +564,11 @@ static unsigned long kvmppc_share_page(struct kvm *kvm, unsigned long gpa,
+>   		goto retry;
+>   	}
+>   
+> -	if (!uv_page_in(kvm->arch.lpid, pfn << page_shift, gpa, 0, page_shift))
+> +	if (!uv_page_in(kvm->arch.lpid, pfn << page_shift, gpa, 0,
+> +				page_shift)) {
+> +		kvmppc_gfn_uvmem_shared(gfn, kvm, true);
+>   		ret = H_SUCCESS;
+> +	}
+>   	kvm_release_pfn_clean(pfn);
+>   	mutex_unlock(&kvm->arch.uvmem_lock);
+>   out:
+> @@ -527,8 +624,10 @@ unsigned long kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
+>   		goto out_unlock;
+>   
+>   	if (!kvmppc_svm_page_in(vma, start, end, gpa, kvm, page_shift,
+> -				&downgrade))
+> +				&downgrade)) {
+> +		kvmppc_gfn_uvmem_shared(gfn, kvm, false);
+>   		ret = H_SUCCESS;
+> +	}
+>   out_unlock:
+>   	mutex_unlock(&kvm->arch.uvmem_lock);
+>   out:
+> 
 
