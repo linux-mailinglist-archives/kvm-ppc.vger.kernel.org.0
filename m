@@ -2,54 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BD881F49C3
-	for <lists+kvm-ppc@lfdr.de>; Wed, 10 Jun 2020 00:58:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9595D1F49F0
+	for <lists+kvm-ppc@lfdr.de>; Wed, 10 Jun 2020 01:04:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728710AbgFIW6Q (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 9 Jun 2020 18:58:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60794 "EHLO
+        id S1729024AbgFIXD5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 9 Jun 2020 19:03:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729047AbgFIW5w (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 9 Jun 2020 18:57:52 -0400
-Received: from mail-ua1-x941.google.com (mail-ua1-x941.google.com [IPv6:2607:f8b0:4864:20::941])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7372DC00862E
-        for <kvm-ppc@vger.kernel.org>; Tue,  9 Jun 2020 15:57:47 -0700 (PDT)
-Received: by mail-ua1-x941.google.com with SMTP id w20so204229uaa.2
-        for <kvm-ppc@vger.kernel.org>; Tue, 09 Jun 2020 15:57:47 -0700 (PDT)
+        with ESMTP id S1729008AbgFIXDx (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 9 Jun 2020 19:03:53 -0400
+Received: from mail-vk1-xa42.google.com (mail-vk1-xa42.google.com [IPv6:2607:f8b0:4864:20::a42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51437C08C5C4
+        for <kvm-ppc@vger.kernel.org>; Tue,  9 Jun 2020 16:03:53 -0700 (PDT)
+Received: by mail-vk1-xa42.google.com with SMTP id e1so122500vkd.1
+        for <kvm-ppc@vger.kernel.org>; Tue, 09 Jun 2020 16:03:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Xl5EexOSop6lv+UL7XlaACYBiSImdbhXFtk47GA4aNo=;
-        b=jGKUzdkMHAPPrsDAO+KgKuAkBcwZtqhUNuimhvROzoJ9soMzQeLhFacPERf2F1XAt1
-         d2bGPLktS4oAbDypyJsO1bp4jOu+yrHrzisYt7q9+K1Hi0hoL3YOduunxwK7YD7Qt7z0
-         y3licW0I0Hm1qOPCUTKLoyKQp/3B2kLD9SN+DIFf4qUocN8tZ+JcyuvkpeJa+Nx5P9Na
-         1hfqO82s7cJ49zBil2iU4uF0YAvQfZ67+OT8TQ3PAwA47G7EZ666/1ojukkE3Jpdnxbt
-         eMot5sAzs9ckGI/LQ9GzRveHRIuIi8iCm7iWgocOAu+Hv9q8sX3vAn7FZhDyBYP80Kmo
-         spbg==
+        bh=QPEA53MpdF9ON3exFjCberFh9r4WY/+iX04WGFZFtXU=;
+        b=rwanDsZdo86Rv+vzZDRG+0C9QrHIbGQgfj2nwO+GiGBNVyLSExN93DGrkptklgs9I1
+         AC0cy3+rivR0wtaNSSV9u8U2CqWzAr9cwayr0OtE6O+jC2+BtUr9VjUb8UFNbXJkVAi1
+         WfJhopss4dvT37wHibefpDeELAXyANGodPwrJTtsn9yIlJTNlMVMXjXyhR/cP5akWDCP
+         mjbboyehlJjrEud3b556BAnXu9H3ea7lZqMAdBWMg65r0d3SNuuwYPZvv8rUlGOJMmVx
+         1rAQzDRF0wybOVz5i+mnG2dV7tbBHX6NxTZfN6sP+E0p5F7rIRZGBiMOtY3RefHOaxGa
+         MGfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Xl5EexOSop6lv+UL7XlaACYBiSImdbhXFtk47GA4aNo=;
-        b=mztuyPBNet4fB7iSXgwl/fyCxN4xD+3g/SNfrFawnd82MHf6l6hUHbyNK9PPsBbhWg
-         lCdIHsx7tdFZAHWRfAIpkPiZ1KKxR9lLEfg6tvQ6gFeM3Yf5B/mjNQeza55mRm6ej8nD
-         KeLpcVID4QjU0IW8VWvSqGRp1z0n5XPCZIrkHqsUZzb8IxvSrYuPqkDQiebKeCUiSsSc
-         Eo+2gSqN0swcheg1N7qSMNY3ShLaCW7vsJMFs9tPbWLhCAhALfwbwAlLF+B/O5hDwYfW
-         6SdfRpKnBU8WRhyEORVHw2UJWmJdnEGS6531muUiBEzBJN8+Ok/2hLs+GcTLeyRbWBs0
-         5M6g==
-X-Gm-Message-State: AOAM531b7C03K9hSmxzTJtBekAiofAoAek/G40hAkoCIZLiy9TlVyeO8
-        9CJvL1ILtTQczJUgVlPMT/Ym3hWoKiI8B6YaZCPqOg==
-X-Google-Smtp-Source: ABdhPJw+x8rHkvjQXtHjLxkujrakxTirbbawkFrKZAQkOg8tp5FX1PiZ/3qyVw3h4kYT7bC0/YyoJYi+dfxe0RsUL8o=
-X-Received: by 2002:ab0:70c9:: with SMTP id r9mr536687ual.15.1591743466435;
- Tue, 09 Jun 2020 15:57:46 -0700 (PDT)
+        bh=QPEA53MpdF9ON3exFjCberFh9r4WY/+iX04WGFZFtXU=;
+        b=SvDpCa/teIuEk+hHUy+/PS4mh9Y0Ta+ShtPT317WVDV59ZkG22JtxP4JQ7sMpJkbgD
+         1TdOCzjIHQ1fPkj17teXIcCzQpMjgAX2f4fdIj427XGLTmKsBYPbzVDw3veBfaJEXUTY
+         pDsODebwebrnqyRqEgbz58rjcBK8ixJcdWDWMdrq8gvJaYqQ6jBZL2Ld0bfmuwSQ5b/z
+         0RMgKl6yU2kPRa3vRF0QODHIBonWz756XItRbCpjcpWKZIbJI5t0UDvZiMt3LGKXwv7G
+         TxSKqzZG+lBjO+zUi0X2R5mgUQjdXBEmuajBLVKyc0XvVRDXhWLRNw99PbhuY2mDArjB
+         mAFQ==
+X-Gm-Message-State: AOAM530TTk6X8xGjQo5nOzdchO9++ZbOKZTbEW8zTlN1hleMOyCsO+tg
+        9K1FJDljJzFdtQEU+P9SiGI1BkEjzdVWqJ7Q5d8ciw==
+X-Google-Smtp-Source: ABdhPJwvz0K9ugkUS0zUu2sV6SC9xdH2ngcwyFlRhaY+EjhyMbUztSqGBkZnAcJGtcUe/roomwm1IuKpnHfl3gWMyfI=
+X-Received: by 2002:a1f:974d:: with SMTP id z74mr401275vkd.40.1591743831579;
+ Tue, 09 Jun 2020 16:03:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200605213853.14959-1-sean.j.christopherson@intel.com> <20200605213853.14959-5-sean.j.christopherson@intel.com>
-In-Reply-To: <20200605213853.14959-5-sean.j.christopherson@intel.com>
+References: <20200605213853.14959-1-sean.j.christopherson@intel.com> <20200605213853.14959-7-sean.j.christopherson@intel.com>
+In-Reply-To: <20200605213853.14959-7-sean.j.christopherson@intel.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 9 Jun 2020 15:57:35 -0700
-Message-ID: <CANgfPd8p=SzkWucGm=a-ajRMfYmY1sPjeXBeZ6cHeAviQg9pag@mail.gmail.com>
-Subject: Re: [PATCH 04/21] KVM: x86/mmu: Remove superfluous gotos from mmu_topup_memory_caches()
+Date:   Tue, 9 Jun 2020 16:03:40 -0700
+Message-ID: <CANgfPd9Y9P+-got9HmtrvChmwZBe-XOA0zSSLMsPCUKcuBv4aQ@mail.gmail.com>
+Subject: Re: [PATCH 06/21] KVM: x86/mmu: Move fast_page_fault() call above mmu_topup_memory_caches()
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -81,38 +81,40 @@ X-Mailing-List: kvm-ppc@vger.kernel.org
 On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
 <sean.j.christopherson@intel.com> wrote:
 >
-> Return errors directly from mmu_topup_memory_caches() instead of
-> branching to a label that does the same.
->
-> No functional change intended.
+> Avoid refilling the memory caches and potentially slow reclaim/swap when
+> handling a fast page fault, which does not need to allocate any new
+> objects.
 >
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Reviewed-by: Ben Gardon <bgardon@google.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 36c90f004ef4..ba70de24a5b0 100644
+> index 5e773564ab20..4b4c3234d623 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1100,13 +1100,11 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
->         r = mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
->                                    8 + PTE_PREFETCH_NUM);
->         if (r)
-> -               goto out;
-> +               return r;
->         r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache, 8);
->         if (r)
-> -               goto out;
-> -       r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache, 4);
-> -out:
-> -       return r;
-> +               return r;
-> +       return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache, 4);
->  }
+> @@ -4095,6 +4095,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>         if (page_fault_handle_page_track(vcpu, error_code, gfn))
+>                 return RET_PF_EMULATE;
 >
->  static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+> +       if (fast_page_fault(vcpu, gpa, error_code))
+> +               return RET_PF_RETRY;
+> +
+>         r = mmu_topup_memory_caches(vcpu);
+>         if (r)
+>                 return r;
+> @@ -4102,9 +4105,6 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>         if (lpage_disallowed)
+>                 max_level = PG_LEVEL_4K;
+>
+> -       if (fast_page_fault(vcpu, gpa, error_code))
+> -               return RET_PF_RETRY;
+> -
+>         mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>         smp_rmb();
+>
 > --
 > 2.26.0
 >
