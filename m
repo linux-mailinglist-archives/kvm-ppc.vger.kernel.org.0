@@ -2,97 +2,217 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2F281F1E9D
-	for <lists+kvm-ppc@lfdr.de>; Mon,  8 Jun 2020 19:54:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0BA51F3242
+	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Jun 2020 04:23:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729550AbgFHRyn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 8 Jun 2020 13:54:43 -0400
-Received: from 20.mo5.mail-out.ovh.net ([91.121.55.239]:36596 "EHLO
-        20.mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726097AbgFHRyn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Jun 2020 13:54:43 -0400
-X-Greylist: delayed 19195 seconds by postgrey-1.27 at vger.kernel.org; Mon, 08 Jun 2020 13:54:42 EDT
-Received: from player699.ha.ovh.net (unknown [10.110.103.129])
-        by mo5.mail-out.ovh.net (Postfix) with ESMTP id E97CF2856C9
-        for <kvm-ppc@vger.kernel.org>; Mon,  8 Jun 2020 13:57:25 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
-        (Authenticated sender: clg@kaod.org)
-        by player699.ha.ovh.net (Postfix) with ESMTPSA id E1AEA131F7A48;
-        Mon,  8 Jun 2020 11:57:18 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass (GARM-100R0039a28aace-0423-48ac-9d27-88d758f13fba,B6B0473EF73D0859AD85419D5DB97E88249038E4) smtp.auth=clg@kaod.org
-From:   =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Paul Mackerras <paulus@samba.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Subject: [PATCH] KVM: PPC: Book3S HV: increase KVMPPC_NR_LPIDS on POWER8 and POWER9
-Date:   Mon,  8 Jun 2020 13:57:14 +0200
-Message-Id: <20200608115714.1139735-1-clg@kaod.org>
-X-Mailer: git-send-email 2.25.4
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 2856689540546005937
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudehuddggeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffogggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeikeekleffteegleevveejheetuddviedvleejvedvueevtdfgieduieeviedugfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepkhhvmhdqphhptgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+        id S1726933AbgFICXd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 8 Jun 2020 22:23:33 -0400
+Received: from 107-174-27-60-host.colocrossing.com ([107.174.27.60]:35520 "EHLO
+        ozlabs.ru" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1726749AbgFICXd (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 8 Jun 2020 22:23:33 -0400
+X-Greylist: delayed 625 seconds by postgrey-1.27 at vger.kernel.org; Mon, 08 Jun 2020 22:23:33 EDT
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 35E39AE8000F;
+        Mon,  8 Jun 2020 22:10:16 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, kvm-ppc@vger.kernel.org,
+        Paul Mackerras <paulus@ozlabs.org>
+Subject: [PATCH kernel] KVM: PPC: Protect kvm_vcpu_read_guest with srcu locks
+Date:   Tue,  9 Jun 2020 12:12:29 +1000
+Message-Id: <20200609021230.103494-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-POWER8 and POWER9 have 12-bit LPIDs. Change LPID_RSVD to support up to
-(4096 - 2) guests on these processors. POWER7 is kept the same with a
-limitation of (1024 - 2), but it might be time to drop KVM support for
-POWER7.
+The kvm_vcpu_read_guest/kvm_vcpu_write_guest used for nested guests
+eventually call srcu_dereference_check to dereference a memslot and
+lockdep produces a warning as neither kvm->slots_lock nor
+kvm->srcu lock is held and kvm->users_count is above zero (>100 in fact).
 
-Tested with 2048 guests * 4 vCPUs on a witherspoon system with 512G
-RAM and a bit of swap.
+This wraps mentioned VCPU read/write helpers in srcu read lock/unlock as
+it is done in other places. This uses vcpu->srcu_idx when possible.
 
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
+These helpers are only used for nested KVM so this may explain why
+we did not see these before.
+
+Here is an example of a warning:
+
+=============================
+WARNING: suspicious RCU usage
+5.7.0-rc3-le_dma-bypass.3.2_a+fstn1 #897 Not tainted
+-----------------------------
+include/linux/kvm_host.h:633 suspicious rcu_dereference_check() usage!
+
+other info that might help us debug this:
+
+rcu_scheduler_active = 2, debug_locks = 1
+1 lock held by qemu-system-ppc/2752:
+ #0: c000200359016be0 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x144/0xd80 [kvm]
+
+stack backtrace:
+CPU: 80 PID: 2752 Comm: qemu-system-ppc Not tainted 5.7.0-rc3-le_dma-bypass.3.2_a+fstn1 #897
+Call Trace:
+[c0002003591ab240] [c000000000b23ab4] dump_stack+0x190/0x25c (unreliable)
+[c0002003591ab2b0] [c00000000023f954] lockdep_rcu_suspicious+0x140/0x164
+[c0002003591ab330] [c008000004a445f8] kvm_vcpu_gfn_to_memslot+0x4c0/0x510 [kvm]
+[c0002003591ab3a0] [c008000004a44c18] kvm_vcpu_read_guest+0xa0/0x180 [kvm]
+[c0002003591ab410] [c008000004ff9bd8] kvmhv_enter_nested_guest+0x90/0xb80 [kvm_hv]
+[c0002003591ab980] [c008000004fe07bc] kvmppc_pseries_do_hcall+0x7b4/0x1c30 [kvm_hv]
+[c0002003591aba10] [c008000004fe5d30] kvmppc_vcpu_run_hv+0x10a8/0x1a30 [kvm_hv]
+[c0002003591abae0] [c008000004a5d954] kvmppc_vcpu_run+0x4c/0x70 [kvm]
+[c0002003591abb10] [c008000004a56e54] kvm_arch_vcpu_ioctl_run+0x56c/0x7c0 [kvm]
+[c0002003591abba0] [c008000004a3ddc4] kvm_vcpu_ioctl+0x4ac/0xd80 [kvm]
+[c0002003591abd20] [c0000000006ebb58] ksys_ioctl+0x188/0x210
+[c0002003591abd70] [c0000000006ebc28] sys_ioctl+0x48/0xb0
+[c0002003591abdb0] [c000000000042764] system_call_exception+0x1d4/0x2e0
+[c0002003591abe20] [c00000000000cce8] system_call_common+0xe8/0x214
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- arch/powerpc/include/asm/reg.h      | 3 ++-
- arch/powerpc/kvm/book3s_64_mmu_hv.c | 8 ++++++--
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  4 ++++
+ arch/powerpc/kvm/book3s_hv_nested.c    | 30 ++++++++++++++++----------
+ arch/powerpc/kvm/book3s_rtas.c         |  2 ++
+ arch/powerpc/kvm/powerpc.c             |  5 ++++-
+ 4 files changed, 29 insertions(+), 12 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/reg.h
-index 88e6c78100d9..b70bbfb0ea3c 100644
---- a/arch/powerpc/include/asm/reg.h
-+++ b/arch/powerpc/include/asm/reg.h
-@@ -473,7 +473,8 @@
- #ifndef SPRN_LPID
- #define SPRN_LPID	0x13F	/* Logical Partition Identifier */
- #endif
--#define   LPID_RSVD	0x3ff		/* Reserved LPID for partn switching */
-+#define   LPID_RSVD_POWER7	0x3ff	/* Reserved LPID for partn switching */
-+#define   LPID_RSVD		0xfff	/* Reserved LPID for partn switching */
- #define	SPRN_HMER	0x150	/* Hypervisor maintenance exception reg */
- #define   HMER_DEBUG_TRIG	(1ul << (63 - 17)) /* Debug trigger */
- #define	SPRN_HMEER	0x151	/* Hyp maintenance exception enable reg */
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-index 18aed9775a3c..23035ab2ec50 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-@@ -260,11 +260,15 @@ int kvmppc_mmu_hv_init(void)
- 	if (!mmu_has_feature(MMU_FTR_LOCKLESS_TLBIE))
- 		return -EINVAL;
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index aa12cd4078b3..ef7fcc2e7c96 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -160,7 +160,9 @@ int kvmppc_mmu_walk_radix_tree(struct kvm_vcpu *vcpu, gva_t eaddr,
+ 			return -EINVAL;
+ 		/* Read the entry from guest memory */
+ 		addr = base + (index * sizeof(rpte));
++		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+ 		ret = kvm_read_guest(kvm, addr, &rpte, sizeof(rpte));
++		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+ 		if (ret) {
+ 			if (pte_ret_p)
+ 				*pte_ret_p = addr;
+@@ -236,7 +238,9 @@ int kvmppc_mmu_radix_translate_table(struct kvm_vcpu *vcpu, gva_t eaddr,
  
--	/* POWER7 has 10-bit LPIDs (12-bit in POWER8) */
- 	host_lpid = 0;
- 	if (cpu_has_feature(CPU_FTR_HVMODE))
- 		host_lpid = mfspr(SPRN_LPID);
--	rsvd_lpid = LPID_RSVD;
+ 	/* Read the table to find the root of the radix tree */
+ 	ptbl = (table & PRTB_MASK) + (table_index * sizeof(entry));
++	vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+ 	ret = kvm_read_guest(kvm, ptbl, &entry, sizeof(entry));
++	srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+index dc97e5be76f6..1d3ab6fb00a7 100644
+--- a/arch/powerpc/kvm/book3s_hv_nested.c
++++ b/arch/powerpc/kvm/book3s_hv_nested.c
+@@ -233,20 +233,21 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+ 
+ 	/* copy parameters in */
+ 	hv_ptr = kvmppc_get_gpr(vcpu, 4);
++	regs_ptr = kvmppc_get_gpr(vcpu, 5);
++	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 	err = kvm_vcpu_read_guest(vcpu, hv_ptr, &l2_hv,
+-				  sizeof(struct hv_guest_state));
++				  sizeof(struct hv_guest_state)) ||
++		kvm_vcpu_read_guest(vcpu, regs_ptr, &l2_regs,
++				    sizeof(struct pt_regs));
++	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+ 	if (err)
+ 		return H_PARAMETER;
 +
-+	/* POWER8 and above have 12-bit LPIDs (10-bit in POWER7) */
-+	if (cpu_has_feature(CPU_FTR_ARCH_207S))
-+		rsvd_lpid = LPID_RSVD;
-+	else
-+		rsvd_lpid = LPID_RSVD_POWER7;
+ 	if (kvmppc_need_byteswap(vcpu))
+ 		byteswap_hv_regs(&l2_hv);
+ 	if (l2_hv.version != HV_GUEST_STATE_VERSION)
+ 		return H_P2;
  
- 	kvmppc_init_lpid(rsvd_lpid + 1);
+-	regs_ptr = kvmppc_get_gpr(vcpu, 5);
+-	err = kvm_vcpu_read_guest(vcpu, regs_ptr, &l2_regs,
+-				  sizeof(struct pt_regs));
+-	if (err)
+-		return H_PARAMETER;
+ 	if (kvmppc_need_byteswap(vcpu))
+ 		byteswap_pt_regs(&l2_regs);
+ 	if (l2_hv.vcpu_token >= NR_CPUS)
+@@ -324,12 +325,12 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+ 		byteswap_hv_regs(&l2_hv);
+ 		byteswap_pt_regs(&l2_regs);
+ 	}
++	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 	err = kvm_vcpu_write_guest(vcpu, hv_ptr, &l2_hv,
+-				   sizeof(struct hv_guest_state));
+-	if (err)
+-		return H_AUTHORITY;
+-	err = kvm_vcpu_write_guest(vcpu, regs_ptr, &l2_regs,
++				   sizeof(struct hv_guest_state)) ||
++		kvm_vcpu_write_guest(vcpu, regs_ptr, &l2_regs,
+ 				   sizeof(struct pt_regs));
++	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+ 	if (err)
+ 		return H_AUTHORITY;
  
+@@ -509,12 +510,16 @@ long kvmhv_copy_tofrom_guest_nested(struct kvm_vcpu *vcpu)
+ 			goto not_found;
+ 
+ 		/* Write what was loaded into our buffer back to the L1 guest */
++		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 		rc = kvm_vcpu_write_guest(vcpu, gp_to, buf, n);
++		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+ 		if (rc)
+ 			goto not_found;
+ 	} else {
+ 		/* Load the data to be stored from the L1 guest into our buf */
++		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 		rc = kvm_vcpu_read_guest(vcpu, gp_from, buf, n);
++		srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+ 		if (rc)
+ 			goto not_found;
+ 
+@@ -549,9 +554,12 @@ static void kvmhv_update_ptbl_cache(struct kvm_nested_guest *gp)
+ 
+ 	ret = -EFAULT;
+ 	ptbl_addr = (kvm->arch.l1_ptcr & PRTB_MASK) + (gp->l1_lpid << 4);
+-	if (gp->l1_lpid < (1ul << ((kvm->arch.l1_ptcr & PRTS_MASK) + 8)))
++	if (gp->l1_lpid < (1ul << ((kvm->arch.l1_ptcr & PRTS_MASK) + 8))) {
++		int srcu_idx = srcu_read_lock(&kvm->srcu);
+ 		ret = kvm_read_guest(kvm, ptbl_addr,
+ 				     &ptbl_entry, sizeof(ptbl_entry));
++		srcu_read_unlock(&kvm->srcu, srcu_idx);
++	}
+ 	if (ret) {
+ 		gp->l1_gr_to_hr = 0;
+ 		gp->process_table = 0;
+diff --git a/arch/powerpc/kvm/book3s_rtas.c b/arch/powerpc/kvm/book3s_rtas.c
+index 26b25994c969..c5e677508d3b 100644
+--- a/arch/powerpc/kvm/book3s_rtas.c
++++ b/arch/powerpc/kvm/book3s_rtas.c
+@@ -229,7 +229,9 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
+ 	 */
+ 	args_phys = kvmppc_get_gpr(vcpu, 4) & KVM_PAM;
+ 
++	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 	rc = kvm_read_guest(vcpu->kvm, args_phys, &args, sizeof(args));
++	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+ 	if (rc)
+ 		goto fail;
+ 
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index e15166b0a16d..2c3a1c799e14 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -403,7 +403,10 @@ int kvmppc_ld(struct kvm_vcpu *vcpu, ulong *eaddr, int size, void *ptr,
+ 		return EMULATE_DONE;
+ 	}
+ 
+-	if (kvm_read_guest(vcpu->kvm, pte.raddr, ptr, size))
++	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
++	rc = kvm_read_guest(vcpu->kvm, pte.raddr, ptr, size);
++	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
++	if (rc)
+ 		return EMULATE_DO_MMIO;
+ 
+ 	return EMULATE_DONE;
 -- 
-2.25.4
+2.17.1
 
