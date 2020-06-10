@@ -2,154 +2,105 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A34B1F4A33
-	for <lists+kvm-ppc@lfdr.de>; Wed, 10 Jun 2020 01:56:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A2D71F5356
+	for <lists+kvm-ppc@lfdr.de>; Wed, 10 Jun 2020 13:35:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726038AbgFIX41 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 9 Jun 2020 19:56:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41682 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726033AbgFIX40 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 9 Jun 2020 19:56:26 -0400
-Received: from mail-ua1-x944.google.com (mail-ua1-x944.google.com [IPv6:2607:f8b0:4864:20::944])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80520C08C5C3
-        for <kvm-ppc@vger.kernel.org>; Tue,  9 Jun 2020 16:56:26 -0700 (PDT)
-Received: by mail-ua1-x944.google.com with SMTP id g44so221979uae.12
-        for <kvm-ppc@vger.kernel.org>; Tue, 09 Jun 2020 16:56:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4sxWZx3UI6VKLDq8Qy1UYUg5vtAHPMsTevThfv39TWA=;
-        b=WLpRcLXqwdVOvuMgwWkmR8Gr4lwaHRK/EF6daq2IMeFXYgWSJrphnkQvLEH+41LO0x
-         pBkEeJfVAEq/uryeN4HHM4Hb3NfdIqrrZcULOeMuMtGfZEKTK0JPggE4ybLNYEuiV0pp
-         hiSCdaRlAd+ayR3yLwkLqaPFRVUUau1KjcEyNNFF5lmfQTLhnmvgVGyA1JJV3qaW45Fh
-         jEN3gjAjfZpQCTtGPfowcu+cTV09P9OWMskURcxzz2UEuwU2bgMY7NSPvwSFJYRc6/bv
-         5cAINv0x9snM9p3flSgBPUFTJrC9TtnEnQ07K+dBbcgAeuIsCrM4zFy5fBTuIldM5yBs
-         xNEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4sxWZx3UI6VKLDq8Qy1UYUg5vtAHPMsTevThfv39TWA=;
-        b=VT9UTynihYR/uWNkI1vJqXXRrsjObVgsfxk45jx1iBNmp/v6b3+quZKi1Y44XPcL2D
-         gGnY1ft7HhYsfKQQU+fpHtsCwih1AWpaJ5/X7/+L38pgl2av6wez35HioiSMc1htMYF7
-         7xGKrrdPM+G+y88VFGrCnvTy3m+1wO6kTL0P4Wp+rrBCLAy3nSjYcrYF1PlDbvnJTPO9
-         wnXoPvHT8t5W8uJGzjF5ZtVL1bOJgYrwLNdJPPEqvBXlBHGsUt2L5wEqI+A2skMvnVbp
-         7ls371MEE3Z8HeeB09SUF5/eGLiP8cxd9hW2VYqG9vOwQ8H05jMFGmNr3s7ZtjYJXWEW
-         ScbQ==
-X-Gm-Message-State: AOAM532bXl5QTiZuREGMDleK2mgCZUR4+mm9FjCyX3WvhUZBXuyHH3tM
-        Y+gLtOhrcGNM/OfAnINUYebA4LrOqIXwJxRhz/m1tA==
-X-Google-Smtp-Source: ABdhPJyXAGLXljdkHhgQRDD2Vm3KO3b89VigddFLuju4QbS8KbKbayXYphsX76+lBqoc+5yPzGQnUDz7icYaQgNy+rs=
-X-Received: by 2002:ab0:6012:: with SMTP id j18mr679163ual.69.1591746985111;
- Tue, 09 Jun 2020 16:56:25 -0700 (PDT)
+        id S1728468AbgFJLfb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 10 Jun 2020 07:35:31 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.21]:13227 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728338AbgFJLf3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 10 Jun 2020 07:35:29 -0400
+X-Greylist: delayed 354 seconds by postgrey-1.27 at vger.kernel.org; Wed, 10 Jun 2020 07:35:29 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1591788928;
+        s=strato-dkim-0002; d=xenosoft.de;
+        h=In-Reply-To:Date:Message-ID:References:Cc:To:From:Subject:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=ppHyWkO8AGokDFVTFfSR/y0B8VZdaapRRYZ1XbHFeWo=;
+        b=bGwPgXeObMYw4UpapphAv6ouutm9sEn1k36V03L4VEOG1D3R1DhuBhzncvxaJrLFmk
+        3WKEOxmc8LJthF0sxqNe8OV7iUlZ6uwUb1/Zkl1aKIad2zJDkWedrs+Epn2vwuXw3d4p
+        Bf2OTLI7hhIMiKZ8vfMVM6gOo7dMObbBLB3HAnVaemacykmHylYa7BQla63YK+oJbDgo
+        OauUBcGDtPKR172/xNkUqEQMO6BWX/p9w3lv360ZQszXJQEED2LWgI9Yz+HvqxC799IO
+        4XBgaHoTj6dPXjkUXEpQEJXwuqprzzX7DmvyWp85cXwMUeu+11RWmyykFq2j2rzsUVW3
+        y5AA==
+X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHfJ+Dkjp5DdBJSrwuuqxvPhSI1Vi9hdbute3wuvmUTfEdg9AyQ=="
+X-RZG-CLASS-ID: mo00
+Received: from [IPv6:2a02:8109:89c0:ebfc:15f9:f3ba:c3bc:6875]
+        by smtp.strato.de (RZmta 46.9.1 AUTH)
+        with ESMTPSA id w06ffew5ABNSZgw
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Wed, 10 Jun 2020 13:23:28 +0200 (CEST)
+Subject: Re: PowerPC KVM-PR issue
+From:   Christian Zigotzky <chzigotzky@xenosoft.de>
+To:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Alexander Graf <agraf@suse.de>,
+        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>
+Cc:     Christian Zigotzky <info@xenosoft.de>,
+        Darren Stevens <darren@stevens-zone.net>,
+        "R.T.Dickinson" <rtd2@xtra.co.nz>
+References: <f7f1b233-6101-2316-7996-4654586b7d24@csgroup.eu>
+ <067BBAB3-19B6-42C6-AA9F-B9F14314255C@xenosoft.de>
+ <014e1268-dcce-61a3-8bcd-a06c43e0dfaf@csgroup.eu>
+ <7bf97562-3c6d-de73-6dbd-ccca275edc7b@xenosoft.de>
+ <87tuznq89p.fsf@linux.ibm.com>
+ <f2706f5f-62b8-9c52-08f4-59f91da48fa6@xenosoft.de>
+ <cf99a8c0-3bad-d089-de54-e02d3dba7f72@xenosoft.de>
+Message-ID: <7e859f68-9455-f98f-1fa3-071619fa1731@xenosoft.de>
+Date:   Wed, 10 Jun 2020 13:23:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200605213853.14959-1-sean.j.christopherson@intel.com> <20200605213853.14959-10-sean.j.christopherson@intel.com>
-In-Reply-To: <20200605213853.14959-10-sean.j.christopherson@intel.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 9 Jun 2020 16:56:13 -0700
-Message-ID: <CANgfPd_ftZ_fC0EEt=1nOoyc6Yi6Xo3TB4woY=tkHzXbjHk4aA@mail.gmail.com>
-Subject: Re: [PATCH 09/21] KVM: x86/mmu: Separate the memory caches for shadow
- pages and gfn arrays
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <cf99a8c0-3bad-d089-de54-e02d3dba7f72@xenosoft.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: de-DE
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
+On 10 June 2020 at 11:06 am, Christian Zigotzky wrote:
+> On 10 June 2020 at 00:18 am, Christian Zigotzky wrote:
+>> Hello,
+>>
+>> KVM-PR doesn't work anymore on my Nemo board [1]. I figured out that 
+>> the Git kernels and the kernel 5.7 are affected.
+>>
+>> Error message: Fienix kernel: kvmppc_exit_pr_progint: emulation at 
+>> 700 failed (00000000)
+>>
+>> I can boot virtual QEMU PowerPC machines with KVM-PR with the kernel 
+>> 5.6 without any problems on my Nemo board.
+>>
+>> I tested it with QEMU 2.5.0 and QEMU 5.0.0 today.
+>>
+>> Could you please check KVM-PR on your PowerPC machine?
+>>
+>> Thanks,
+>> Christian
+>>
+>> [1] https://en.wikipedia.org/wiki/AmigaOne_X1000
 >
-> Use separate caches for allocating shadow pages versus gfn arrays.  This
-> sets the stage for specifying __GFP_ZERO when allocating shadow pages
-> without incurring extra cost for gfn arrays.
+> I figured out that the PowerPC updates 5.7-1 [1] are responsible for 
+> the KVM-PR issue. Please test KVM-PR on your PowerPC machines and 
+> check the PowerPC updates 5.7-1 [1].
 >
-> No functional change intended.
+> Thanks
 >
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  3 ++-
->  arch/x86/kvm/mmu/mmu.c          | 15 ++++++++++-----
->  2 files changed, 12 insertions(+), 6 deletions(-)
+> [1] 
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d38c07afc356ddebaa3ed8ecb3f553340e05c969
 >
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 16347b050754..e7a427547557 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -636,7 +636,8 @@ struct kvm_vcpu_arch {
->         struct kvm_mmu *walk_mmu;
 >
->         struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
-> -       struct kvm_mmu_memory_cache mmu_page_cache;
-> +       struct kvm_mmu_memory_cache mmu_shadow_page_cache;
-> +       struct kvm_mmu_memory_cache mmu_gfn_array_cache;
->         struct kvm_mmu_memory_cache mmu_page_header_cache;
->
->         /*
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 451e0365e5dd..d245acece3cd 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1108,8 +1108,12 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
->                                    1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
->         if (r)
->                 return r;
-> -       r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
-> -                                  2 * PT64_ROOT_MAX_LEVEL);
-> +       r = mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
-> +                                  PT64_ROOT_MAX_LEVEL);
-> +       if (r)
-> +               return r;
-> +       r = mmu_topup_memory_cache(&vcpu->arch.mmu_gfn_array_cache,
-> +                                  PT64_ROOT_MAX_LEVEL);
->         if (r)
->                 return r;
->         return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
-> @@ -1119,7 +1123,8 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
->  static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
->  {
->         mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
-> -       mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-> +       mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
-> +       mmu_free_memory_cache(&vcpu->arch.mmu_gfn_array_cache);
->         mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
->  }
->
-> @@ -2096,9 +2101,9 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
->         struct kvm_mmu_page *sp;
->
->         sp = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
-> -       sp->spt = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_cache);
-> +       sp->spt = mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
->         if (!direct)
-> -               sp->gfns = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_cache);
-> +               sp->gfns = mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
->         set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
->
->         /*
-> --
-> 2.26.0
->
+I tested the latest Git kernel with Mac-on-Linux/KVM-PR today. 
+Unfortunately I can't use KVM-PR with MoL anymore because of this issue 
+(see screenshots [1]). Please check the PowerPC updates 5.7-1.
+
+Thanks
+
+[1]
+- 
+https://i.pinimg.com/originals/0c/b3/64/0cb364a40241fa2b7f297d4272bbb8b7.png
+- 
+https://i.pinimg.com/originals/9a/61/d1/9a61d170b1c9f514f7a78a3014ffd18f.png
+
