@@ -2,55 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C57111F5E28
-	for <lists+kvm-ppc@lfdr.de>; Thu, 11 Jun 2020 00:12:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70AEF1F5E42
+	for <lists+kvm-ppc@lfdr.de>; Thu, 11 Jun 2020 00:20:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726633AbgFJWMR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 10 Jun 2020 18:12:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50688 "EHLO
+        id S1726698AbgFJWUg (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 10 Jun 2020 18:20:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726531AbgFJWMQ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 10 Jun 2020 18:12:16 -0400
+        with ESMTP id S1726650AbgFJWUf (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 10 Jun 2020 18:20:35 -0400
 Received: from mail-vs1-xe44.google.com (mail-vs1-xe44.google.com [IPv6:2607:f8b0:4864:20::e44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91333C08C5C2
-        for <kvm-ppc@vger.kernel.org>; Wed, 10 Jun 2020 15:12:16 -0700 (PDT)
-Received: by mail-vs1-xe44.google.com with SMTP id c1so2236995vsc.11
-        for <kvm-ppc@vger.kernel.org>; Wed, 10 Jun 2020 15:12:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE71C03E96F
+        for <kvm-ppc@vger.kernel.org>; Wed, 10 Jun 2020 15:20:35 -0700 (PDT)
+Received: by mail-vs1-xe44.google.com with SMTP id o2so2289417vsr.0
+        for <kvm-ppc@vger.kernel.org>; Wed, 10 Jun 2020 15:20:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=8ql4vRpj/ZWF0M5dCwe9+ml5aQlV0lcOnQe3sK6ypzM=;
-        b=kTsXOfwbXO1Uvm6+8Wf5L/fmhgemJhOoPbGZtDXyP56sRmOUE+HA356ytHrF/MlXkQ
-         r+1fTsody5otxHns0nzVjZjMeQJj9WoPKXg0BPcii5S2Vq1Ayu70wHvn3U6G6RqrQBvC
-         jSu1p0ysxMxnJa2TzDGY4sLYXQnzRJLHj0xaUVf1zUO19aG6ujSzer2qXhNyA2X+cvfN
-         QNZYptdgi9zoEJS5toP3hYFMkkzdyd1H8EpsMi509eCk6JMhMyTb06cU3CaECg/JVl6m
-         tAYCYRdOo7EvNdkjSrQY9nVTNc4YUOIJmFbRZZ2waZnieyy4pcGkAdQQzGPlFugLlj6g
-         3d7w==
+        bh=gbYrwjkRNzZs52wtNe5b9ymrBledc5fgJdW/7CYMczg=;
+        b=QyyXrmeKJSKKc54VOXRhBA48lstvw0q3ctLwmRUmYvuniF6MaKqprw76G6WKeXgKXB
+         r/jbdUg8yJ7iw34oE1OWz0dWyMIlim7iHYcQtD67/ivBRy+I7B838Bxvx4JWOVUAxYN3
+         POzPLtPUSvRylefwwyiJnNCwZ28r+eFHCfQTlfjzukPMl52cDhRE0H8vA3A5R5qZ//vK
+         hyVJruxV9jjEt3XKZbDLdCyH9tLqObhgWfqQJpRCLqqkFBHz8EB0eQ7avKhqHHK0zYzj
+         RESHvTrXTKtZufFfvsuK5nk/vVANKcnKj1isrCHWI7ENKEYpAZgFY60ZfqvyNfgEDVAL
+         29Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=8ql4vRpj/ZWF0M5dCwe9+ml5aQlV0lcOnQe3sK6ypzM=;
-        b=s3Ydk/+hNV+ROdi8MCaQFg6ZlC7GkvW4BTSUHJpHvkg2ofidq2Bkn8DaxttBF9Vuca
-         x7FENz9WwAnLhC99hmIGVFMjh1Y5+84FlrtGyOdOo1LP5lenkpjEX6nDHZu+g0mGNyN8
-         uCINFQcc1E+wIsnHotd0d/oX87CEwfoBx1MfKoRAwPjlz/AIaTHYim3gCg7JvURa8Bh+
-         Ym1+m4eziOQKgUKzXQKuL3NWC10wnWtu4FY1tTn8J5Y/PE8iROpk1D9KnpbETbMuvBUP
-         yYaheI3i3JVjeYZ8FpnyXlSr9wEPU/R0fmqhhgltWJplBYVsCt5vdv52K0zTLDW02oj+
-         0PFg==
-X-Gm-Message-State: AOAM531IRZmA0zyXwIHiIDP1CmELIvmxgZ1LKxCvsADx1VJ2eyCIKanW
-        QbpOxcKdECa/p9Rl58fgfUKbGa6JfPBftauGqyeifA==
-X-Google-Smtp-Source: ABdhPJzdmghMx590xCu3q0oAa1Tiyl8Cd4txMWbr/Hdcmg3h07QCfUudu4lcAnLl2oYkxmlR4q6o6Uh/L8LMxNpv/bE=
-X-Received: by 2002:a67:f982:: with SMTP id b2mr4434307vsq.202.1591827135387;
- Wed, 10 Jun 2020 15:12:15 -0700 (PDT)
+        bh=gbYrwjkRNzZs52wtNe5b9ymrBledc5fgJdW/7CYMczg=;
+        b=hyC6JTWL/hy7sCA8stFEMONgKG5nxe4BBD6XejTyhTN7+tbxC/0Cf/qY5wLkNLhSfQ
+         u0mT99oR4vjBIeKmC1GkYc0nf6wMsYFnqpx+EujImxBbVSF7rVBwckN9rCcieeS7MN1Z
+         fM5+kMOo+vdP1PBnVHK4i/WKDCfOxsT2utmkygjUfrFToexaXtRf1kHZkRoL1uizb/kI
+         nzULhgVwNvwMPcq0ZezayaYpU9vTE4Lw8a846g7BdPAjOxch4XkwaaJOSwalVbrIH8OQ
+         RdofPXo5Dawum60h5w9zIjpNxWYSWmPmGlbVSdTZOVS2wUlK3DIxGdHALwD/gdMzLWDM
+         IjaA==
+X-Gm-Message-State: AOAM532npWMf59XRgWrjA2UxW+d1evUgqyG7aqfoDLCgkfdPGY+F7W9B
+        iHH0OtMPd/ihW0uERBgjNOMx4Y8Y01ZOxPq678KFrg==
+X-Google-Smtp-Source: ABdhPJzOjvq/kbEr1iPy17gDm6Y5SxC/Oi9n4y5NbS27Re14ZbRVe9raYSH+GiU0z+vIPd8N4LFp9am07TBNHW7Kx80=
+X-Received: by 2002:a67:d287:: with SMTP id z7mr4666597vsi.2.1591827633895;
+ Wed, 10 Jun 2020 15:20:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200605213853.14959-1-sean.j.christopherson@intel.com> <20200605213853.14959-6-sean.j.christopherson@intel.com>
-In-Reply-To: <20200605213853.14959-6-sean.j.christopherson@intel.com>
+References: <20200605213853.14959-1-sean.j.christopherson@intel.com> <20200605213853.14959-9-sean.j.christopherson@intel.com>
+In-Reply-To: <20200605213853.14959-9-sean.j.christopherson@intel.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 10 Jun 2020 15:12:04 -0700
-Message-ID: <CANgfPd8B5R9NRL5q_4v4xvvn_3Vo9N93Ms3EiUFANMzqAMedMw@mail.gmail.com>
-Subject: Re: [PATCH 05/21] KVM: x86/mmu: Try to avoid crashing KVM if a MMU
- memory cache is empty
+Date:   Wed, 10 Jun 2020 15:20:19 -0700
+Message-ID: <CANgfPd-19pam9sujfsk1pdrp8YhVft1+JAmSS=xgUULqXRyUDg@mail.gmail.com>
+Subject: Re: [PATCH 08/21] KVM: x86/mmu: Clean up the gorilla math in mmu_topup_memory_caches()
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -82,74 +81,66 @@ X-Mailing-List: kvm-ppc@vger.kernel.org
 On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
 <sean.j.christopherson@intel.com> wrote:
 >
-> Attempt to allocate a new object instead of crashing KVM (and likely the
-> kernel) if a memory cache is unexpectedly empty.  Use GFP_ATOMIC for the
-> allocation as the caches are used while holding mmu_lock.  The immediate
-> BUG_ON() makes the code unnecessarily explosive and led to confusing
-> minimums being used in the past, e.g. allocating 4 objects where 1 would
-> suffice.
+> Clean up the minimums in mmu_topup_memory_caches() to document the
+> driving mechanisms behind the minimums.  Now that encountering an empty
+> cache is unlikely to trigger BUG_ON(), it is less dangerous to be more
+> precise when defining the minimums.
+>
+> For rmaps, the logic is 1 parent PTE per level, plus a single rmap, and
+> prefetched rmaps.  The extra objects in the current '8 + PREFETCH'
+> minimum came about due to an abundance of paranoia in commit
+> c41ef344de212 ("KVM: MMU: increase per-vcpu rmap cache alloc size"),
+> i.e. it could have increased the minimum to 2 rmaps.  Furthermore, the
+> unexpected extra rmap case was killed off entirely by commits
+> f759e2b4c728c ("KVM: MMU: avoid pte_list_desc running out in
+> kvm_mmu_pte_write") and f5a1e9f89504f ("KVM: MMU: remove call to
+> kvm_mmu_pte_write from walk_addr").
+>
+> For the so called page cache, replace '8' with 2*PT64_ROOT_MAX_LEVEL.
+> The 2x multiplier is needed because the cache is used for both shadow
+> pages and gfn arrays for indirect MMUs.
+>
+> And finally, for page headers, replace '4' with PT64_ROOT_MAX_LEVEL.
+>
+> Note, KVM now supports 5-level paging, i.e. the old minimums that used a
+> baseline derived from 4-level paging were technically wrong.  But, KVM
+> always allocates roots in a separate flow, e.g. it's impossible in the
+> current implementation to actually need 5 new shadow pages in a single
+> flow.  Use PT64_ROOT_MAX_LEVEL unmodified instead of subtracting 1, as
+> the direct usage is likely more intuitive to uninformed readers, and the
+> inflated minimum is unlikely to affect functionality in practice.
 >
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 21 +++++++++++++++------
->  1 file changed, 15 insertions(+), 6 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 >
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index ba70de24a5b0..5e773564ab20 100644
+> index 4b4c3234d623..451e0365e5dd 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1060,6 +1060,15 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
->         local_irq_enable();
+> @@ -1103,14 +1103,17 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
+>  {
+>         int r;
+>
+> +       /* 1 rmap, 1 parent PTE per level, and the prefetched rmaps. */
+>         r = mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
+> -                                  8 + PTE_PREFETCH_NUM);
+> +                                  1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
+>         if (r)
+>                 return r;
+> -       r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache, 8);
+> +       r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
+> +                                  2 * PT64_ROOT_MAX_LEVEL);
+>         if (r)
+>                 return r;
+> -       return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache, 4);
+> +       return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
+> +                                     PT64_ROOT_MAX_LEVEL);
 >  }
 >
-> +static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
-> +                                              gfp_t gfp_flags)
-> +{
-> +       if (mc->kmem_cache)
-> +               return kmem_cache_zalloc(mc->kmem_cache, gfp_flags);
-> +       else
-> +               return (void *)__get_free_page(gfp_flags);
-> +}
-> +
->  static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
->  {
->         void *obj;
-> @@ -1067,10 +1076,7 @@ static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
->         if (mc->nobjs >= min)
->                 return 0;
->         while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
-> -               if (mc->kmem_cache)
-> -                       obj = kmem_cache_zalloc(mc->kmem_cache, GFP_KERNEL_ACCOUNT);
-> -               else
-> -                       obj = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
-> +               obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
->                 if (!obj)
->                         return mc->nobjs >= min ? 0 : -ENOMEM;
->                 mc->objects[mc->nobjs++] = obj;
-> @@ -1118,8 +1124,11 @@ static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
->  {
->         void *p;
->
-> -       BUG_ON(!mc->nobjs);
-> -       p = mc->objects[--mc->nobjs];
-> +       if (WARN_ON(!mc->nobjs))
-> +               p = mmu_memory_cache_alloc_obj(mc, GFP_ATOMIC | __GFP_ACCOUNT);
-Is an atomic allocation really necessary here? In most cases, when
-topping up the memory cache we are handing a guest page fault. This
-bug could also be removed by returning null if unable to allocate from
-the cache, and then re-trying the page fault in that case. I don't
-know if this is necessary to handle other, non-x86 architectures more
-easily, but I worry this could cause some unpleasantness if combined
-with some other bug or the host was in a low memory situation and then
-this consumed the atomic pool. Perhaps this is a moot point since we
-log a warning and consider the atomic allocation something of an
-error.
-> +       else
-> +               p = mc->objects[--mc->nobjs];
-> +       BUG_ON(!p);
->         return p;
->  }
->
+>  static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
 > --
 > 2.26.0
 >
