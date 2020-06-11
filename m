@@ -2,120 +2,173 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A652E1F6767
-	for <lists+kvm-ppc@lfdr.de>; Thu, 11 Jun 2020 14:03:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E14081F6A43
+	for <lists+kvm-ppc@lfdr.de>; Thu, 11 Jun 2020 16:47:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727787AbgFKMDu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 11 Jun 2020 08:03:50 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31696 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726954AbgFKMDt (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 11 Jun 2020 08:03:49 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05BC3YYF160965;
-        Thu, 11 Jun 2020 08:03:42 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31k27s6bjs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Jun 2020 08:03:39 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05BC0r4m000874;
-        Thu, 11 Jun 2020 12:02:08 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma02wdc.us.ibm.com with ESMTP id 31g2s8v99e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Jun 2020 12:02:08 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05BC26Om31785228
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Jun 2020 12:02:06 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E4CD76A051;
-        Thu, 11 Jun 2020 12:02:07 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 457706A05F;
-        Thu, 11 Jun 2020 12:02:06 +0000 (GMT)
-Received: from skywalker.ibmuc.com (unknown [9.199.62.196])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 11 Jun 2020 12:02:05 +0000 (GMT)
-From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-To:     paulus@ozlabs.org, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-Subject: [PATCH] powerpc/kvm/book3s64/nested: Fix kernel crash with nested kvm
-Date:   Thu, 11 Jun 2020 17:31:59 +0530
-Message-Id: <20200611120159.680284-1-aneesh.kumar@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
+        id S1728297AbgFKOrt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 11 Jun 2020 10:47:49 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.24]:27720 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728196AbgFKOrs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 11 Jun 2020 10:47:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1591886863;
+        s=strato-dkim-0002; d=xenosoft.de;
+        h=In-Reply-To:Date:Message-ID:References:Cc:To:From:Subject:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=txqK7zLBPTnofgZtcBMl5enqBRDV39VE4i3BgE8pw6I=;
+        b=GnQbj8UDdbSXfZY9Er2LUKZfCd5DlLhAlBnear/8gz4eXwcL+CyXjJ55DJq5xS2Jw/
+        c/dOLFOrZQUDRra3vmbYIYSdKbrQHgmDWIKTieSKFDbg/L2JrTjlOHRJFe8qJpKqJp/a
+        hdTPrbGEJ4xQ+WyAdWP1QScJSTspLqcq40y+gaqPjzluJEw5uXELYrms5eGx3RfLvAiw
+        ABVD2Z7g5OIFf6i/71A3z0TmOQ71Ltrb4xsuYIhekUex58VuWZvij3Ko6rt7QdJ0XWFQ
+        j4itMC5CMHB9okF2MlJQQSo3sAXHdQb9BqYpQPh++VO7MyAXkEWxEPle3w1Fv2afiJlK
+        FZpQ==
+X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHfJ+Dkjp5DdBJSrwuuqxvPhSI1Vi9hdbute3wuvmUTfEdg9AyQ=="
+X-RZG-CLASS-ID: mo00
+Received: from [IPv6:2a02:8109:89c0:ebfc:15f9:f3ba:c3bc:6875]
+        by smtp.strato.de (RZmta 46.10.4 AUTH)
+        with ESMTPSA id m08564w5BElR020
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Thu, 11 Jun 2020 16:47:27 +0200 (CEST)
+Subject: Re: PowerPC KVM-PR issue
+From:   Christian Zigotzky <chzigotzky@xenosoft.de>
+To:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, npiggin@gmail.com,
+        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>
+Cc:     Christian Zigotzky <info@xenosoft.de>,
+        Darren Stevens <darren@stevens-zone.net>,
+        "R.T.Dickinson" <rtd2@xtra.co.nz>
+References: <f7f1b233-6101-2316-7996-4654586b7d24@csgroup.eu>
+ <067BBAB3-19B6-42C6-AA9F-B9F14314255C@xenosoft.de>
+ <014e1268-dcce-61a3-8bcd-a06c43e0dfaf@csgroup.eu>
+ <7bf97562-3c6d-de73-6dbd-ccca275edc7b@xenosoft.de>
+ <87tuznq89p.fsf@linux.ibm.com>
+ <f2706f5f-62b8-9c52-08f4-59f91da48fa6@xenosoft.de>
+ <cf99a8c0-3bad-d089-de54-e02d3dba7f72@xenosoft.de>
+ <7e859f68-9455-f98f-1fa3-071619fa1731@xenosoft.de>
+Message-ID: <54082b17-31bb-f529-2e9e-b84c5a5aa9ec@xenosoft.de>
+Date:   Thu, 11 Jun 2020 16:47:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
+In-Reply-To: <7e859f68-9455-f98f-1fa3-071619fa1731@xenosoft.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-11_11:2020-06-10,2020-06-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- suspectscore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0
- adultscore=0 clxscore=1015 bulkscore=0 mlxlogscore=684 malwarescore=0
- impostorscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006110091
+Content-Language: de-DE
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-__pa() do check for addr value passed and if < PAGE_OFFSET
-results in BUG.
+On 10 June 2020 at 01:23 pm, Christian Zigotzky wrote:
+> On 10 June 2020 at 11:06 am, Christian Zigotzky wrote:
+>> On 10 June 2020 at 00:18 am, Christian Zigotzky wrote:
+>>> Hello,
+>>>
+>>> KVM-PR doesn't work anymore on my Nemo board [1]. I figured out that 
+>>> the Git kernels and the kernel 5.7 are affected.
+>>>
+>>> Error message: Fienix kernel: kvmppc_exit_pr_progint: emulation at 
+>>> 700 failed (00000000)
+>>>
+>>> I can boot virtual QEMU PowerPC machines with KVM-PR with the kernel 
+>>> 5.6 without any problems on my Nemo board.
+>>>
+>>> I tested it with QEMU 2.5.0 and QEMU 5.0.0 today.
+>>>
+>>> Could you please check KVM-PR on your PowerPC machine?
+>>>
+>>> Thanks,
+>>> Christian
+>>>
+>>> [1] https://en.wikipedia.org/wiki/AmigaOne_X1000
+>>
+>> I figured out that the PowerPC updates 5.7-1 [1] are responsible for 
+>> the KVM-PR issue. Please test KVM-PR on your PowerPC machines and 
+>> check the PowerPC updates 5.7-1 [1].
+>>
+>> Thanks
+>>
+>> [1] 
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d38c07afc356ddebaa3ed8ecb3f553340e05c969
+>>
+>>
+> I tested the latest Git kernel with Mac-on-Linux/KVM-PR today. 
+> Unfortunately I can't use KVM-PR with MoL anymore because of this 
+> issue (see screenshots [1]). Please check the PowerPC updates 5.7-1.
+>
+> Thanks
+>
+> [1]
+> - 
+> https://i.pinimg.com/originals/0c/b3/64/0cb364a40241fa2b7f297d4272bbb8b7.png
+> - 
+> https://i.pinimg.com/originals/9a/61/d1/9a61d170b1c9f514f7a78a3014ffd18f.png
+>
+Hi All,
 
- #define __pa(x)								\
-({									\
-	VIRTUAL_BUG_ON((unsigned long)(x) < PAGE_OFFSET);		\
-	(unsigned long)(x) & 0x0fffffffffffffffUL;			\
-})
+I bisected today because of the KVM-PR issue.
 
-kvmhv_copy_tofrom_guest_radix() use a NULL value for
-to/from to indicate direction of copy. Avoid calling __pa() if the
-value is NULL
+Result:
 
-kernel BUG at arch/powerpc/kvm/book3s_64_mmu_radix.c:43!
-cpu 0x70: Vector: 700 (Program Check) at [c0000018a2187360]
-    pc: c000000000161b30: __kvmhv_copy_tofrom_guest_radix+0x130/0x1f0
-    lr: c000000000161d5c: kvmhv_copy_from_guest_radix+0x3c/0x80
+9600f261acaaabd476d7833cec2dd20f2919f1a0 is the first bad commit
+commit 9600f261acaaabd476d7833cec2dd20f2919f1a0
+Author: Nicholas Piggin <npiggin@gmail.com>
+Date:   Wed Feb 26 03:35:21 2020 +1000
 
-....
+     powerpc/64s/exception: Move KVM test to common code
 
-[c0000018a2187670] c000000000161d5c kvmhv_copy_from_guest_radix+0x3c/0x80
-[c0000018a21876b0] c00000000014feb8 kvmhv_load_from_eaddr+0x48/0xc0
-[c0000018a21876e0] c000000000135828 kvmppc_ld+0x98/0x1e0
-[c0000018a2187780] c00000000013bc20 kvmppc_load_last_inst+0x50/0x90
-[c0000018a21877b0] c00000000015e9e8 kvmppc_hv_emulate_mmio+0x288/0x2b0
-[c0000018a2187810] c000000000164888 kvmppc_book3s_radix_page_fault+0xd8/0x2b0
-[c0000018a21878c0] c00000000015ed8c kvmppc_book3s_hv_page_fault+0x37c/0x1050
-[c0000018a2187a00] c00000000015a518 kvmppc_vcpu_run_hv+0xbb8/0x1080
-[c0000018a2187b20] c00000000013d204 kvmppc_vcpu_run+0x34/0x50
-[c0000018a2187b40] c00000000013949c kvm_arch_vcpu_ioctl_run+0x2fc/0x410
-[c0000018a2187bd0] c00000000012a2a4 kvm_vcpu_ioctl+0x2b4/0x8f0
-[c0000018a2187d50] c0000000005b12a4 ksys_ioctl+0xf4/0x150
-[c0000018a2187da0] c0000000005b1328 sys_ioctl+0x28/0x80
-[c0000018a2187dc0] c000000000030584 system_call_exception+0x104/0x1d0
-[c0000018a2187e20] c00000000000ca68 system_call_common+0xe8/0x214
+     This allows more code to be moved out of unrelocated regions. The
+     system call KVMTEST is changed to be open-coded and remain in the
+     tramp area to avoid having to move it to entry_64.S. The custom nature
+     of the system call entry code means the hcall case can be made more
+     streamlined than regular interrupt handlers.
 
-Signed-off-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_64_mmu_radix.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+     mpe: Incorporate fix from Nick:
 
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index 02219e28b1e4..84acb4769487 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -40,7 +40,8 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
- 	/* Can't access quadrants 1 or 2 in non-HV mode, call the HV to do it */
- 	if (kvmhv_on_pseries())
- 		return plpar_hcall_norets(H_COPY_TOFROM_GUEST, lpid, pid, eaddr,
--					  __pa(to), __pa(from), n);
-+					  (to != NULL) ? __pa(to): 0,
-+					  (from != NULL) ? __pa(from): 0, n);
- 
- 	quadrant = 1;
- 	if (!pid)
--- 
-2.26.2
+     Moving KVM test to the common entry code missed the case of HMI and
+     MCE, which do not do __GEN_COMMON_ENTRY (because they don't want to
+     switch to virt mode).
 
+     This means a MCE or HMI exception that is taken while KVM is running a
+     guest context will not be switched out of that context, and KVM won't
+     be notified. Found by running sigfuz in guest with patched host on
+     POWER9 DD2.3, which causes some TM related HMI interrupts (which are
+     expected and supposed to be handled by KVM).
+
+     This fix adds a __GEN_REALMODE_COMMON_ENTRY for those handlers to add
+     the KVM test. This makes them look a little more like other handlers
+     that all use __GEN_COMMON_ENTRY.
+
+     Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+     Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+     Link: 
+https://lore.kernel.org/r/20200225173541.1549955-13-npiggin@gmail.com
+
+:040000 040000 ec21cec22d165f8696d69532734cb2985d532cb0 
+87dd49a9cd7202ec79350e8ca26cea01f1dbd93d M    arch
+
+-----
+
+The following commit is the problem: powerpc/64s/exception: Move KVM 
+test to common code [1]
+
+These changes were included in the PowerPC updates 5.7-1. [2]
+
+Another test:
+
+git checkout d38c07afc356ddebaa3ed8ecb3f553340e05c969 (PowerPC updates 
+5.7-1 [2] ) -> KVM-PR doesn't work.
+
+After that: git revert d38c07afc356ddebaa3ed8ecb3f553340e05c969 -m 1 -> 
+KVM-PR works.
+
+Could you please check the first bad commit? [1]
+
+Thanks,
+Christian
+
+
+[1] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9600f261acaaabd476d7833cec2dd20f2919f1a0
+[2] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d38c07afc356ddebaa3ed8ecb3f553340e05c969
