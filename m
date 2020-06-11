@@ -2,119 +2,120 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B05EC1F6344
-	for <lists+kvm-ppc@lfdr.de>; Thu, 11 Jun 2020 10:06:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A652E1F6767
+	for <lists+kvm-ppc@lfdr.de>; Thu, 11 Jun 2020 14:03:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726729AbgFKIGw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 11 Jun 2020 04:06:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50658 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726720AbgFKIGw (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 11 Jun 2020 04:06:52 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E6D4A2074B;
-        Thu, 11 Jun 2020 08:06:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591862812;
-        bh=c0zbTaBdIyfBYHMbVLwq48idCED4RJbRflyqGdC0K5I=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=fM3iQGrBseiVVoOOA7lzVDDThz+MiyAGJ3OAf4hwCs1yjKcFgJ81l7yITe79GF4n2
-         LkKEwYH+yZmvNv/zMU0waQ1zKjn/HpTPXIk6SN6kvpC7KFpuaLuXBHg65vRQw68oAL
-         OLoKHtUw+jx/rmHTSOGST2f9KCACyq7jNQMYGoTc=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jjIEc-0021ee-Gz; Thu, 11 Jun 2020 09:06:50 +0100
+        id S1727787AbgFKMDu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 11 Jun 2020 08:03:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31696 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726954AbgFKMDt (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 11 Jun 2020 08:03:49 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05BC3YYF160965;
+        Thu, 11 Jun 2020 08:03:42 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31k27s6bjs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Jun 2020 08:03:39 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05BC0r4m000874;
+        Thu, 11 Jun 2020 12:02:08 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma02wdc.us.ibm.com with ESMTP id 31g2s8v99e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Jun 2020 12:02:08 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05BC26Om31785228
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Jun 2020 12:02:06 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E4CD76A051;
+        Thu, 11 Jun 2020 12:02:07 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 457706A05F;
+        Thu, 11 Jun 2020 12:02:06 +0000 (GMT)
+Received: from skywalker.ibmuc.com (unknown [9.199.62.196])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 11 Jun 2020 12:02:05 +0000 (GMT)
+From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+To:     paulus@ozlabs.org, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+Subject: [PATCH] powerpc/kvm/book3s64/nested: Fix kernel crash with nested kvm
+Date:   Thu, 11 Jun 2020 17:31:59 +0530
+Message-Id: <20200611120159.680284-1-aneesh.kumar@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 11 Jun 2020 09:06:50 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 00/21] KVM: Cleanup and unify kvm_mmu_memory_cache usage
-In-Reply-To: <20200605213853.14959-1-sean.j.christopherson@intel.com>
-References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <bedae60cc8a6c6c3b77b52e3d3c7bbe2@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, pbonzini@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, pfeiner@google.com, pshier@google.com, junaids@google.com, bgardon@google.com, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-11_11:2020-06-10,2020-06-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ suspectscore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0
+ adultscore=0 clxscore=1015 bulkscore=0 mlxlogscore=684 malwarescore=0
+ impostorscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006110091
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi Sean,
+__pa() do check for addr value passed and if < PAGE_OFFSET
+results in BUG.
 
-On 2020-06-05 22:38, Sean Christopherson wrote:
-> This series resurrects Christoffer Dall's series[1] to provide a common
-> MMU memory cache implementation that can be shared by x86, arm64 and 
-> MIPS.
-> 
-> It also picks up a suggested change from Ben Gardon[2] to clear shadow
-> page tables during initial allocation so as to avoid clearing entire
-> pages while holding mmu_lock.
-> 
-> The front half of the patches do house cleaning on x86's memory cache
-> implementation in preparation for moving it to common code, along with 
-> a
-> fair bit of cleanup on the usage.  The middle chunk moves the patches 
-> to
-> common KVM, and the last two chunks convert arm64 and MIPS to the 
-> common
-> implementation.
-> 
-> Cleanup aside, the notable difference from Christoffer and Ben's 
-> proposed
-> patches is to make __GFP_ZERO optional, e.g. to allow x86 to skip 
-> zeroing
-> for its gfns array and to provide line of sight for my
-> cannot-yet-be-discussed-in-detail use case for non-zero initialized 
-> shadow
-> page tables[3].
-> 
-> Tested on x86 only, no testing whatsoever on arm64 or MIPS.
+ #define __pa(x)								\
+({									\
+	VIRTUAL_BUG_ON((unsigned long)(x) < PAGE_OFFSET);		\
+	(unsigned long)(x) & 0x0fffffffffffffffUL;			\
+})
 
-I've given it a go on a small bunch of arm64 boxes, and nothing caught 
-fire!
-As Ben noticed, the series isn't bisectable (easily fixed) and there is 
-some
-nagging conflicts with the current state of mainline.
+kvmhv_copy_tofrom_guest_radix() use a NULL value for
+to/from to indicate direction of copy. Avoid calling __pa() if the
+value is NULL
 
-Overall, a very welcome cleanup. The only point of contention is the 
-change
-in allocation accounting on arm64, but there is an easy fix for that.
+kernel BUG at arch/powerpc/kvm/book3s_64_mmu_radix.c:43!
+cpu 0x70: Vector: 700 (Program Check) at [c0000018a2187360]
+    pc: c000000000161b30: __kvmhv_copy_tofrom_guest_radix+0x130/0x1f0
+    lr: c000000000161d5c: kvmhv_copy_from_guest_radix+0x3c/0x80
 
-Thanks,
+....
 
-         M.
+[c0000018a2187670] c000000000161d5c kvmhv_copy_from_guest_radix+0x3c/0x80
+[c0000018a21876b0] c00000000014feb8 kvmhv_load_from_eaddr+0x48/0xc0
+[c0000018a21876e0] c000000000135828 kvmppc_ld+0x98/0x1e0
+[c0000018a2187780] c00000000013bc20 kvmppc_load_last_inst+0x50/0x90
+[c0000018a21877b0] c00000000015e9e8 kvmppc_hv_emulate_mmio+0x288/0x2b0
+[c0000018a2187810] c000000000164888 kvmppc_book3s_radix_page_fault+0xd8/0x2b0
+[c0000018a21878c0] c00000000015ed8c kvmppc_book3s_hv_page_fault+0x37c/0x1050
+[c0000018a2187a00] c00000000015a518 kvmppc_vcpu_run_hv+0xbb8/0x1080
+[c0000018a2187b20] c00000000013d204 kvmppc_vcpu_run+0x34/0x50
+[c0000018a2187b40] c00000000013949c kvm_arch_vcpu_ioctl_run+0x2fc/0x410
+[c0000018a2187bd0] c00000000012a2a4 kvm_vcpu_ioctl+0x2b4/0x8f0
+[c0000018a2187d50] c0000000005b12a4 ksys_ioctl+0xf4/0x150
+[c0000018a2187da0] c0000000005b1328 sys_ioctl+0x28/0x80
+[c0000018a2187dc0] c000000000030584 system_call_exception+0x104/0x1d0
+[c0000018a2187e20] c00000000000ca68 system_call_common+0xe8/0x214
+
+Signed-off-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+---
+ arch/powerpc/kvm/book3s_64_mmu_radix.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 02219e28b1e4..84acb4769487 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -40,7 +40,8 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
+ 	/* Can't access quadrants 1 or 2 in non-HV mode, call the HV to do it */
+ 	if (kvmhv_on_pseries())
+ 		return plpar_hcall_norets(H_COPY_TOFROM_GUEST, lpid, pid, eaddr,
+-					  __pa(to), __pa(from), n);
++					  (to != NULL) ? __pa(to): 0,
++					  (from != NULL) ? __pa(from): 0, n);
+ 
+ 	quadrant = 1;
+ 	if (!pid)
 -- 
-Jazz is not dead. It just smells funny...
+2.26.2
+
