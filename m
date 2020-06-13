@@ -2,48 +2,52 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A4D91F7F2F
-	for <lists+kvm-ppc@lfdr.de>; Sat, 13 Jun 2020 00:50:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B53F1F8609
+	for <lists+kvm-ppc@lfdr.de>; Sun, 14 Jun 2020 02:37:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726501AbgFLWuJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 12 Jun 2020 18:50:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48460 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726377AbgFLWuC (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 12 Jun 2020 18:50:02 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5608EC03E96F
-        for <kvm-ppc@vger.kernel.org>; Fri, 12 Jun 2020 15:50:02 -0700 (PDT)
-Received: by ozlabs.org (Postfix, from userid 1034)
-        id 49kGBv0g0xz9sS8; Sat, 13 Jun 2020 08:49:58 +1000 (AEST)
-From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-Cc:     David Gibson <david@gibson.dropbear.id.au>,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
-        kvm-ppc@vger.kernel.org
-In-Reply-To: <20200611030559.75257-1-aik@ozlabs.ru>
-References: <20200611030559.75257-1-aik@ozlabs.ru>
-Subject: Re: [PATCH kernel] KVM: PPC: Fix nested guest RC bits update
-Message-Id: <159200220505.2257208.15959649065101000471.b4-ty@ellerman.id.au>
-Date:   Sat, 13 Jun 2020 08:49:58 +1000 (AEST)
+        id S1726873AbgFNAhM convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Sat, 13 Jun 2020 20:37:12 -0400
+Received: from 6-200-5-45.rpnnetprovedor.com.br ([45.5.200.6]:34459 "EHLO
+        srv01.rpnnetprovedor.com.br" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726272AbgFNAhM (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 13 Jun 2020 20:37:12 -0400
+X-Greylist: delayed 35444 seconds by postgrey-1.27 at vger.kernel.org; Sat, 13 Jun 2020 20:37:11 EDT
+Received: from [129.205.124.29] (helo=[10.222.49.232])
+        by srv01.rpnnetprovedor.com.br with esmtpa (Exim 4.92.2)
+        (envelope-from <pessina@info.com>)
+        id 1jk7Q8-00081t-3h; Sat, 13 Jun 2020 11:46:08 -0300
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: =?utf-8?q?HERZLICHEN_GL=C3=9CCKWUNSCH_=E2=82=AC_1=2C000=2E000=2C00_wurde_?=
+ =?utf-8?q?an_Sie_gespendet_?=
+To:     Recipients <pessina@info.com>
+From:   Stefano <pessina@info.com>
+Date:   Sat, 13 Jun 2020 07:45:19 -0700
+Reply-To: pessinastefa@gmail.com
+Message-Id: <E1jk7Q8-00081t-3h@srv01.rpnnetprovedor.com.br>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, 11 Jun 2020 13:05:59 +1000, Alexey Kardashevskiy wrote:
-> Before commit 6cdf30375f82 ("powerpc/kvm/book3s: Use kvm helpers
-> to walk shadow or secondary table") we called __find_linux_pte() with
-> a page table pointer from a kvm_nested_guest struct but
-> now we rely on kvmhv_find_nested() which takes an L1 LPID and returns
-> a kvm_nested_guest pointer, however we pass a L0 LPID there and
-> the L2 guest hangs.
-> 
-> [...]
+Hallo,
 
-Applied to powerpc/fixes.
+Ich bin Stefano Pessina, ein italienischer Wirtschaftsmagnat, Investor und
+Philanthrop der stellvertretende Vorsitzende Chief Executive Officer (CEO) und
+der größte Einzelaktionär der Walgreens Boots Alliance, den ich gegeben habe
+25 Prozent meines persönlichen Vermögens für wohltätige Zwecke
+weggeben Und ich habe mich auch verpflichtet
+den Rest von 25% in diesem Jahr 2020 an Personen zu verschenken, die ich habe
+beschlossen, Ihnen €1.000.000,00 (eine Million Euro) zu spenden Wenn
+Sie an meiner Spende interessiert sind, kontaktieren Sie mich bitte
+für mehr Informationen
 
-[1/1] KVM: PPC: Fix nested guest RC bits update
-      https://git.kernel.org/powerpc/c/e881bfaf5a5f409390973e076333281465f2b0d9
+Sie können auch mehr über mich über den unten stehenden Link lesen
 
-cheers
+https://en.wikipedia.org/wiki/Stefano_Pessina
+
+Herzlicher Gruss
+CEO Walgreens Boots Alliance
+Stefano Pessina
