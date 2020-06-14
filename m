@@ -2,52 +2,52 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BFD41F87B9
-	for <lists+kvm-ppc@lfdr.de>; Sun, 14 Jun 2020 10:50:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96ACC1F88D2
+	for <lists+kvm-ppc@lfdr.de>; Sun, 14 Jun 2020 14:53:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726853AbgFNIus (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 14 Jun 2020 04:50:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48030 "EHLO
+        id S1725815AbgFNMxX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 14 Jun 2020 08:53:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726755AbgFNIus (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 14 Jun 2020 04:50:48 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C77C0C03E969
-        for <kvm-ppc@vger.kernel.org>; Sun, 14 Jun 2020 01:50:46 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id s88so5744239pjb.5
-        for <kvm-ppc@vger.kernel.org>; Sun, 14 Jun 2020 01:50:46 -0700 (PDT)
+        with ESMTP id S1726925AbgFNMxW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 14 Jun 2020 08:53:22 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EF88C05BD43
+        for <kvm-ppc@vger.kernel.org>; Sun, 14 Jun 2020 05:53:22 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id ga6so5598677pjb.1
+        for <kvm-ppc@vger.kernel.org>; Sun, 14 Jun 2020 05:53:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:subject:to:cc:references:in-reply-to:mime-version
          :message-id:content-transfer-encoding;
-        bh=vUHnJvtjAA9b/hqeT4bmQJdbeQxtf290+54BQ+xeyG0=;
-        b=UdgvbWODXNSSd48DVQ9oZ4Jzpyo9kI4j91cijYtZVGKfTmGA0gzUmcMKOhISfmomfQ
-         wr1of0S07uoWzYWIhLczbWJ9aszw7Sz7oTmBqQl8L3Bh7dITQp92Z2oI/XqL6B1Uqdos
-         ZzqTzrRZ2wUu7ZdxBQSzUorvEB6S24+Vm27ZhpPFYEO5itGmN0gN9BzH51RXedFZ0p2b
-         5CeVkmh5Wq/gxW/OJX8KNgu7YRsms+Cy2DzpioA92fpIMnIGpFwqCoxBWJ1I59Go3LvN
-         me5l5waefmcXL8iUqbdPbfgmHeHl8FnPWW+7umr0ELLff1SKq30usyrqhdB0CWlM1Mos
-         owfg==
+        bh=fxTmvzsy9wvj3KEbvKzwNOZUShe0nJuOeB9o7dwzme0=;
+        b=CuxCUzpZIs7fIOwkS+d0veYN/C2mRnqAjGI/OHO0ymfYXalQjHkAmQnn/GARarZwWb
+         a2DgCtv4QplEMX3hFL2Wt435B/V0UvsZgIdQDZ83fOxsc44IpN6r0CkE0fYc1At+V4qw
+         VDX4TDMuy/fk8Z82t2Rqet2L/H/2eBShllikdq0kgOjTafIDRtc21V5Ch2amLMTdgslv
+         M2XS2zdAWeIAenIV6molAF5I4Ds/4ZV55mwo20MCZm4tQHlhlyJ/vom8yrGsLrxzquC+
+         c8EMKiJNLQEcar6uCzkLwrsoqvd/4atLLp25Pvr094V7pOvrmQmst9lHmgUSsPb8Zfpt
+         yQsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
          :mime-version:message-id:content-transfer-encoding;
-        bh=vUHnJvtjAA9b/hqeT4bmQJdbeQxtf290+54BQ+xeyG0=;
-        b=s/d8X5raBRgDSBaoxEG8/c56FDW9hxXVdeStPRXCWoFqXPtdvPww1lH18zTGapb35J
-         vqjFp17fv5kcYzeU1jkfjE2MGau11nEJsb2RR5JEVJd9fi1tVx/7TDj+unwmrjxLHgXQ
-         sPWKz0+T0aq1/P+YubfSg2O4EcU9QnpY8R14skk+4COIImYrAkW5FdojXR3JtKV8jhbZ
-         uP1xXR4VXebKh+ZIuF6//CiMz7WOu8lLqiYa6jtvF2OPMsNJD0Vqmby3ZN5QfWBdCPlD
-         H3k+3ECqIMD9uZTH5DDUYTupgBOc/D3210lZHXL6oxc2r6AlCm3/Jt6BVNeTe8oCntqO
-         0Z9g==
-X-Gm-Message-State: AOAM530x01hUq4fjs4DLfG5U30ztsKOER33qI1a4pTvrG/zUNm8Lnirn
-        SSKYuDC9pfo+CSAFwepKQrIOgQC8
-X-Google-Smtp-Source: ABdhPJxv16ba0b78rdEVJRTbPDEhU33cFlwrqcL4rAJTLh01RAEBHFUkAxzUnjNNxv+ilTDOCicfPw==
-X-Received: by 2002:a17:90a:c258:: with SMTP id d24mr6696613pjx.137.1592124646295;
-        Sun, 14 Jun 2020 01:50:46 -0700 (PDT)
+        bh=fxTmvzsy9wvj3KEbvKzwNOZUShe0nJuOeB9o7dwzme0=;
+        b=dtxAWnsKcKZxLCGAWpoXfR0kug7b871Mncxe1sfb0NVDA68wkS7T+nT+d5ekH8UoLF
+         EuWxX5+chGSK80aHzp1HCGEY+0/CivqkCJMsFnlNwhHH7GYS+dl7vrOPxFnxzzvehWMp
+         fU2B6fxiIAhgWWDHymUq32qlupA2OxkcwWR/TdbFoHKgRCiSj4/N2omJa0LBlU39Or3c
+         gC+UKJgCNxawFfEjUp2Tw/X3j7BJMsyIg9ipMkOFGSGDr3bGJmaR2SNYCP/7ixFD/Ei5
+         OT4mnmPPjfTrbSHV9+c0Lis08wsTliJ0f+w3Dt6F/a4EksRxd6/FPZSH2D3vD5adAgNU
+         mp8g==
+X-Gm-Message-State: AOAM533JlfZCLxwmyxhizwpq2qbzt3/JSFHu//9ZKTVdFSSWn+dmniDL
+        9KmEcHFJBz5FnD/IogpoeCo=
+X-Google-Smtp-Source: ABdhPJx/KqWmFlSJ1kcLuzCc9Tc64W6PECn3T6SHj7Sis8NxHqezmbF8VUmf6DdaB3OqOn2fcQfYQg==
+X-Received: by 2002:a17:902:7:: with SMTP id 7mr16820143pla.209.1592139201574;
+        Sun, 14 Jun 2020 05:53:21 -0700 (PDT)
 Received: from localhost (193-116-108-230.tpgi.com.au. [193.116.108.230])
-        by smtp.gmail.com with ESMTPSA id s26sm994664pga.80.2020.06.14.01.50.44
+        by smtp.gmail.com with ESMTPSA id 17sm11391410pfn.19.2020.06.14.05.53.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2020 01:50:45 -0700 (PDT)
-Date:   Sun, 14 Jun 2020 18:50:39 +1000
+        Sun, 14 Jun 2020 05:53:20 -0700 (PDT)
+Date:   Sun, 14 Jun 2020 22:53:13 +1000
 From:   Nicholas Piggin <npiggin@gmail.com>
 Subject: Re: PowerPC KVM-PR issue
 To:     Christian Zigotzky <chzigotzky@xenosoft.de>,
@@ -68,7 +68,7 @@ References: <f7f1b233-6101-2316-7996-4654586b7d24@csgroup.eu>
         <fffeb817-35e0-2562-b3cf-2fd476948c76@xenosoft.de>
 In-Reply-To: <fffeb817-35e0-2562-b3cf-2fd476948c76@xenosoft.de>
 MIME-Version: 1.0
-Message-Id: <1592124591.eoad6txb58.astroid@bobo.none>
+Message-Id: <1592139127.g2951cl0h6.astroid@bobo.none>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-ppc-owner@vger.kernel.org
@@ -223,8 +223,42 @@ t/?id=3Dd38c07afc356ddebaa3ed8ecb3f553340e05c969
 >=20
 > Please check the KVM-PR code.
 
-Hey, thanks for debugging it and reporting. I'm looking into it, will=20
-try to get a fix soon.
+Does this patch fix it for you?
 
-Thanks,
-Nick
+The CTR register reload in the KVM interrupt path used the wrong save
+area for SLB (and NMI) interrupts.
+
+Fixes: 9600f261acaaa ("powerpc/64s/exception: Move KVM test to common code"=
+)
+Reported-by: Christian Zigotzky <chzigotzky@xenosoft.de>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ arch/powerpc/kernel/exceptions-64s.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/powerpc/kernel/exceptions-64s.S b/arch/powerpc/kernel/exc=
+eptions-64s.S
+index e70ebb5c318c..fa080694e581 100644
+--- a/arch/powerpc/kernel/exceptions-64s.S
++++ b/arch/powerpc/kernel/exceptions-64s.S
+@@ -270,7 +270,7 @@ BEGIN_FTR_SECTION
+ END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
+ 	.endif
+=20
+-	ld	r10,PACA_EXGEN+EX_CTR(r13)
++	ld	r10,IAREA+EX_CTR(r13)
+ 	mtctr	r10
+ BEGIN_FTR_SECTION
+ 	ld	r10,IAREA+EX_PPR(r13)
+@@ -298,7 +298,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+=20
+ 	.if IKVM_SKIP
+ 89:	mtocrf	0x80,r9
+-	ld	r10,PACA_EXGEN+EX_CTR(r13)
++	ld	r10,IAREA+EX_CTR(r13)
+ 	mtctr	r10
+ 	ld	r9,IAREA+EX_R9(r13)
+ 	ld	r10,IAREA+EX_R10(r13)
+--=20
+2.23.0
+
