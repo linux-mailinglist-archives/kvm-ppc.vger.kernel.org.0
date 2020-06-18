@@ -2,98 +2,95 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD4791FE694
-	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Jun 2020 04:35:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C999C1FEE7A
+	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Jun 2020 11:19:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728462AbgFRBO0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 17 Jun 2020 21:14:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44010 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729306AbgFRBOU (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:14:20 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 70B6221D7B;
-        Thu, 18 Jun 2020 01:14:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592442860;
-        bh=4119TfJh7HOmQEmTcbn7FL6rRL/Yia1MnYpYqTvsjbU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=j+sgS5CZBC137IMf7BZfUXsoqLcBQX8N6OBBbrhIO5WX+iaf2yDU3lrp+QE+5fRL5
-         ZSsZhszA/F0ObWRgMAEDKMTl3thOxqMe3Pp03l7zswhs0hJQUNj+0XZKpHkLVLwB7B
-         UlcXZv4J1SvE3WlZ+LhdzDeFZPQuF/6pA/v76Vns=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Laurent Dufour <ldufour@linux.ibm.com>, Greg Kurz <groug@kaod.org>,
-        Ram Pai <linuxram@us.ibm.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 5.7 289/388] KVM: PPC: Book3S HV: Relax check on H_SVM_INIT_ABORT
-Date:   Wed, 17 Jun 2020 21:06:26 -0400
-Message-Id: <20200618010805.600873-289-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200618010805.600873-1-sashal@kernel.org>
-References: <20200618010805.600873-1-sashal@kernel.org>
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+        id S1729082AbgFRJTu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 18 Jun 2020 05:19:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45292 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728343AbgFRJTs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 18 Jun 2020 05:19:48 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05I925X9086015;
+        Thu, 18 Jun 2020 05:19:36 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31r4j9t308-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Jun 2020 05:19:36 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05I99pRc003671;
+        Thu, 18 Jun 2020 09:19:34 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 31r18v04wq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Jun 2020 09:19:34 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05I9JU2e63111480
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Jun 2020 09:19:30 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 906344203F;
+        Thu, 18 Jun 2020 09:19:30 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CB8B542042;
+        Thu, 18 Jun 2020 09:19:27 +0000 (GMT)
+Received: from oc0525413822.ibm.com (unknown [9.211.71.42])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Jun 2020 09:19:27 +0000 (GMT)
+From:   Ram Pai <linuxram@us.ibm.com>
+To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
+        bharata@linux.ibm.com, aneesh.kumar@linux.ibm.com,
+        sukadev@linux.vnet.ibm.com, ldufour@linux.ibm.com,
+        bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
+        cclaudio@linux.ibm.com, linuxram@us.ibm.com,
+        sathnaga@linux.vnet.ibm.com
+Subject: [PATCH v2 0/4] Migrate non-migrated pages of a SVM.
+Date:   Thu, 18 Jun 2020 02:19:01 -0700
+Message-Id: <1592471945-24786-1-git-send-email-linuxram@us.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-18_04:2020-06-17,2020-06-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=661
+ clxscore=1015 impostorscore=0 cotscore=-2147483648 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 suspectscore=0 spamscore=0 adultscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006180065
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Laurent Dufour <ldufour@linux.ibm.com>
+This patch series migrates the non-migrated pages of a SVM.
+This is required when the UV calls H_SVM_INIT_DONE, and
+when a memory-slot is hotplugged to a Secure VM.
 
-[ Upstream commit e3326ae3d59e443a379367c6936941d6ab55d316 ]
+Testing: Passed rigorous SVM reboot test using different
+	sized SVMs.
 
-The commit 8c47b6ff29e3 ("KVM: PPC: Book3S HV: Check caller of H_SVM_*
-Hcalls") added checks of secure bit of SRR1 to filter out the Hcall
-reserved to the Ultravisor.
+Changelog:
+	. fixed a bug observed by Bharata. Pages that
+	where paged-in and later paged-out must also be
+	skipped from migration during H_SVM_INIT_DONE.
 
-However, the Hcall H_SVM_INIT_ABORT is made by the Ultravisor passing the
-context of the VM calling UV_ESM. This allows the Hypervisor to return to
-the guest without going through the Ultravisor. Thus the Secure bit of SRR1
-is not set in that particular case.
+Laurent Dufour (1):
+  KVM: PPC: Book3S HV: migrate hot plugged memory
 
-In the case a regular VM is calling H_SVM_INIT_ABORT, this hcall will be
-filtered out in kvmppc_h_svm_init_abort() because kvm->arch.secure_guest is
-not set in that case.
+Ram Pai (3):
+  KVM: PPC: Book3S HV: Fix function definition in book3s_hv_uvmem.c
+  KVM: PPC: Book3S HV: track the state GFNs associated with secure VMs
+  KVM: PPC: Book3S HV: migrate remaining normal-GFNs to secure-GFNs in
+    H_SVM_INIT_DONE
 
-Fixes: 8c47b6ff29e3 ("KVM: PPC: Book3S HV: Check caller of H_SVM_* Hcalls")
-Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Ram Pai <linuxram@us.ibm.com>
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/powerpc/kvm/book3s_hv.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ Documentation/powerpc/ultravisor.rst        |   2 +
+ arch/powerpc/include/asm/kvm_book3s_uvmem.h |   8 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c      |   2 +-
+ arch/powerpc/kvm/book3s_hv.c                |  12 +-
+ arch/powerpc/kvm/book3s_hv_uvmem.c          | 449 ++++++++++++++++++++++------
+ 5 files changed, 368 insertions(+), 105 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 93493f0cbfe8..ee581cde4878 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -1099,9 +1099,14 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 			ret = kvmppc_h_svm_init_done(vcpu->kvm);
- 		break;
- 	case H_SVM_INIT_ABORT:
--		ret = H_UNSUPPORTED;
--		if (kvmppc_get_srr1(vcpu) & MSR_S)
--			ret = kvmppc_h_svm_init_abort(vcpu->kvm);
-+		/*
-+		 * Even if that call is made by the Ultravisor, the SSR1 value
-+		 * is the guest context one, with the secure bit clear as it has
-+		 * not yet been secured. So we can't check it here.
-+		 * Instead the kvm->arch.secure_guest flag is checked inside
-+		 * kvmppc_h_svm_init_abort().
-+		 */
-+		ret = kvmppc_h_svm_init_abort(vcpu->kvm);
- 		break;
- 
- 	default:
 -- 
-2.25.1
+1.8.3.1
 
