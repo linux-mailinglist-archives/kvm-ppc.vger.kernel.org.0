@@ -2,177 +2,140 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7B561FD242
-	for <lists+kvm-ppc@lfdr.de>; Wed, 17 Jun 2020 18:36:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 257AF1FE1EF
+	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Jun 2020 03:58:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726857AbgFQQgi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 17 Jun 2020 12:36:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50864 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726540AbgFQQgi (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 17 Jun 2020 12:36:38 -0400
-Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89102C06174E
-        for <kvm-ppc@vger.kernel.org>; Wed, 17 Jun 2020 09:36:37 -0700 (PDT)
-Received: by mail-vs1-xe43.google.com with SMTP id q2so1774853vsr.1
-        for <kvm-ppc@vger.kernel.org>; Wed, 17 Jun 2020 09:36:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=L8DsS6xxyGZ4X1I2BsfKE5F+wl5+Bc0v/Cbn7ErCR3k=;
-        b=eawpKQDd4c5bCWEDiwcn6BhRKGQcd5albFMeNaZdFKCB6O3sFwD2XAZx9LvvOYi87t
-         Zd0041rw93VndgUPf5lk4RuZlA8dXcSVTpu7VYahKPZdbqv05KKeJ7LnJttdizTtluT5
-         OYHgJdvNb8dH72kutypMPcXeLhyWIrRgMaS2iyuw/Lr6YD8+6DI8AvQtasmtlXDE9C7F
-         FLi5DWCcWK7BKjDne7sZg/HbVdCiwosxxGZDthxyWacUQng42CxceziSSSXk8BO1AWeN
-         BJDSiX2/zLffm0wAwppKnLGmoK/ndXvK8/qS5cg9IJUTWjiRKFGR6YFdm/zusqJzzUqC
-         dKQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=L8DsS6xxyGZ4X1I2BsfKE5F+wl5+Bc0v/Cbn7ErCR3k=;
-        b=FnGsmI9NZvnhx0O4mo3HX1jBVZRXniFTWou4e4TR6mcuygjk8dirdOU07bWNEP0WbF
-         MinVkoSPlVJtUCGdhhTLeSkFk05zucrVbvmgrWlXBFwxPILyjbJn7T6nx83y54d+iLeT
-         i5UDMUuhr857S5lm2iLXcBrCkso/6Y2hx0kwANDWQ/7SHe0GE5CQhJA6faOF844cYn6Q
-         jYVqyRHdlJSqmUPmuh+xMvKy7z7Xpt9Tq+Ho5jduEgRszzyibq033iFYWYEX418b1mIf
-         OAh+LDqRZ/7IIoxInGHMRBa0c6OnsBPBa3Y2ZgZuMg3IyXBKGd4retO+CE0q8VZq9cFW
-         53JQ==
-X-Gm-Message-State: AOAM531Nj/7+vLlIWGGlbPjBbBpLQk8Pj3sF+Vrte+3YAnmpamZjUHfk
-        CxPlBku33v3B9tSLTqCGLyxniZ67GDTGnPasTQaBBQ==
-X-Google-Smtp-Source: ABdhPJz7oaun07TMv+zayNnAIYVTbbeP778/fuG5Ll7911G7zeLD5BHbO9dbHYGezneDNySTtZXTodF2yXRXfDK1+ZE=
-X-Received: by 2002:a67:70c3:: with SMTP id l186mr6698034vsc.117.1592411796250;
- Wed, 17 Jun 2020 09:36:36 -0700 (PDT)
+        id S1731663AbgFRB6H (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 17 Jun 2020 21:58:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59834 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731319AbgFRBY6 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:24:58 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6851020776;
+        Thu, 18 Jun 2020 01:24:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592443498;
+        bh=fyKdcIju2LGznL7vutzomzOAhrC/XB3cyoAauWlJjgM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=j7gYXt44wJceCS5sPbFdI24T/oUDJcuTJ7/Xel1xXGE7kVKzP2URAmrbKV147MBCA
+         syF8GpiyFcRan2pZklOcsghi/0Wpyw7Vb4JgKPxvbv+ydtvPh5zbz4JE85u3e95zpT
+         F3JPBCSnTF2UJq6lZMrzJUsFrl8k1D6G4J8Wr4bE=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Qian Cai <cai@lca.pw>, Paul Mackerras <paulus@ozlabs.org>,
+        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH AUTOSEL 4.19 124/172] KVM: PPC: Book3S HV: Ignore kmemleak false positives
+Date:   Wed, 17 Jun 2020 21:21:30 -0400
+Message-Id: <20200618012218.607130-124-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200618012218.607130-1-sashal@kernel.org>
+References: <20200618012218.607130-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
- <20200605213853.14959-6-sean.j.christopherson@intel.com> <CANgfPd8B5R9NRL5q_4v4xvvn_3Vo9N93Ms3EiUFANMzqAMedMw@mail.gmail.com>
- <20200617005309.GA19540@linux.intel.com>
-In-Reply-To: <20200617005309.GA19540@linux.intel.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 17 Jun 2020 09:36:25 -0700
-Message-ID: <CANgfPd8xkEotTJQPkMOrJNLOLXb4+TOA06wqO16UPdk_icF8tw@mail.gmail.com>
-Subject: Re: [PATCH 05/21] KVM: x86/mmu: Try to avoid crashing KVM if a MMU
- memory cache is empty
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Jun 16, 2020 at 5:53 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Wed, Jun 10, 2020 at 03:12:04PM -0700, Ben Gardon wrote:
-> > On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> > >
-> > > Attempt to allocate a new object instead of crashing KVM (and likely the
-> > > kernel) if a memory cache is unexpectedly empty.  Use GFP_ATOMIC for the
-> > > allocation as the caches are used while holding mmu_lock.  The immediate
-> > > BUG_ON() makes the code unnecessarily explosive and led to confusing
-> > > minimums being used in the past, e.g. allocating 4 objects where 1 would
-> > > suffice.
-> > >
-> > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
-> > > ---
-> > >  arch/x86/kvm/mmu/mmu.c | 21 +++++++++++++++------
-> > >  1 file changed, 15 insertions(+), 6 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index ba70de24a5b0..5e773564ab20 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -1060,6 +1060,15 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
-> > >         local_irq_enable();
-> > >  }
-> > >
-> > > +static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
-> > > +                                              gfp_t gfp_flags)
-> > > +{
-> > > +       if (mc->kmem_cache)
-> > > +               return kmem_cache_zalloc(mc->kmem_cache, gfp_flags);
-> > > +       else
-> > > +               return (void *)__get_free_page(gfp_flags);
-> > > +}
-> > > +
-> > >  static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
-> > >  {
-> > >         void *obj;
-> > > @@ -1067,10 +1076,7 @@ static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
-> > >         if (mc->nobjs >= min)
-> > >                 return 0;
-> > >         while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
-> > > -               if (mc->kmem_cache)
-> > > -                       obj = kmem_cache_zalloc(mc->kmem_cache, GFP_KERNEL_ACCOUNT);
-> > > -               else
-> > > -                       obj = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
-> > > +               obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
-> > >                 if (!obj)
-> > >                         return mc->nobjs >= min ? 0 : -ENOMEM;
-> > >                 mc->objects[mc->nobjs++] = obj;
-> > > @@ -1118,8 +1124,11 @@ static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
-> > >  {
-> > >         void *p;
-> > >
-> > > -       BUG_ON(!mc->nobjs);
-> > > -       p = mc->objects[--mc->nobjs];
-> > > +       if (WARN_ON(!mc->nobjs))
-> > > +               p = mmu_memory_cache_alloc_obj(mc, GFP_ATOMIC | __GFP_ACCOUNT);
-> > Is an atomic allocation really necessary here? In most cases, when
-> > topping up the memory cache we are handing a guest page fault. This
-> > bug could also be removed by returning null if unable to allocate from
-> > the cache, and then re-trying the page fault in that case.
->
-> The whole point of these caches is to avoid having to deal with allocation
-> errors in the low level MMU paths, e.g. propagating an error up from
-> pte_list_add() would be a mess.
->
-> > I don't know if this is necessary to handle other, non-x86 architectures more
-> > easily, but I worry this could cause some unpleasantness if combined with
-> > some other bug or the host was in a low memory situation and then this
-> > consumed the atomic pool. Perhaps this is a moot point since we log a warning
-> > and consider the atomic allocation something of an error.
->
-> Yeah, it's the latter.  If we reach this point it's a guaranteed KVM bug.
-> Because it's likely that the caller holds a lock, triggering the BUG_ON()
-> has a high chance of hanging the system.  The idea is to take the path that
-> _may_ crash the kernel instead of killing the VM and more than likely
-> crashing the kernel.  And hopefully this code will never be exercised on a
-> production kernel.
+From: Qian Cai <cai@lca.pw>
 
-That makes sense to me. I agree it's definitely positive to replace a
-BUG_ON with something else.
+[ Upstream commit 0aca8a5575544bd21b3363058afb8f1e81505150 ]
 
->
-> > > +       else
-> > > +               p = mc->objects[--mc->nobjs];
-> > > +       BUG_ON(!p);
-> > >         return p;
-> > >  }
-> > >
-> > > --
-> > > 2.26.0
-> > >
+kvmppc_pmd_alloc() and kvmppc_pte_alloc() allocate some memory but then
+pud_populate() and pmd_populate() will use __pa() to reference the newly
+allocated memory.
+
+Since kmemleak is unable to track the physical memory resulting in false
+positives, silence those by using kmemleak_ignore().
+
+unreferenced object 0xc000201c382a1000 (size 4096):
+ comm "qemu-kvm", pid 124828, jiffies 4295733767 (age 341.250s)
+ hex dump (first 32 bytes):
+   c0 00 20 09 f4 60 03 87 c0 00 20 10 72 a0 03 87  .. ..`.... .r...
+   c0 00 20 0e 13 a0 03 87 c0 00 20 1b dc c0 03 87  .. ....... .....
+ backtrace:
+   [<000000004cc2790f>] kvmppc_create_pte+0x838/0xd20 [kvm_hv]
+   kvmppc_pmd_alloc at arch/powerpc/kvm/book3s_64_mmu_radix.c:366
+   (inlined by) kvmppc_create_pte at arch/powerpc/kvm/book3s_64_mmu_radix.c:590
+   [<00000000d123c49a>] kvmppc_book3s_instantiate_page+0x2e0/0x8c0 [kvm_hv]
+   [<00000000bb549087>] kvmppc_book3s_radix_page_fault+0x1b4/0x2b0 [kvm_hv]
+   [<0000000086dddc0e>] kvmppc_book3s_hv_page_fault+0x214/0x12a0 [kvm_hv]
+   [<000000005ae9ccc2>] kvmppc_vcpu_run_hv+0xc5c/0x15f0 [kvm_hv]
+   [<00000000d22162ff>] kvmppc_vcpu_run+0x34/0x48 [kvm]
+   [<00000000d6953bc4>] kvm_arch_vcpu_ioctl_run+0x314/0x420 [kvm]
+   [<000000002543dd54>] kvm_vcpu_ioctl+0x33c/0x950 [kvm]
+   [<0000000048155cd6>] ksys_ioctl+0xd8/0x130
+   [<0000000041ffeaa7>] sys_ioctl+0x28/0x40
+   [<000000004afc4310>] system_call_exception+0x114/0x1e0
+   [<00000000fb70a873>] system_call_common+0xf0/0x278
+unreferenced object 0xc0002001f0c03900 (size 256):
+ comm "qemu-kvm", pid 124830, jiffies 4295735235 (age 326.570s)
+ hex dump (first 32 bytes):
+   c0 00 20 10 fa a0 03 87 c0 00 20 10 fa a1 03 87  .. ....... .....
+   c0 00 20 10 fa a2 03 87 c0 00 20 10 fa a3 03 87  .. ....... .....
+ backtrace:
+   [<0000000023f675b8>] kvmppc_create_pte+0x854/0xd20 [kvm_hv]
+   kvmppc_pte_alloc at arch/powerpc/kvm/book3s_64_mmu_radix.c:356
+   (inlined by) kvmppc_create_pte at arch/powerpc/kvm/book3s_64_mmu_radix.c:593
+   [<00000000d123c49a>] kvmppc_book3s_instantiate_page+0x2e0/0x8c0 [kvm_hv]
+   [<00000000bb549087>] kvmppc_book3s_radix_page_fault+0x1b4/0x2b0 [kvm_hv]
+   [<0000000086dddc0e>] kvmppc_book3s_hv_page_fault+0x214/0x12a0 [kvm_hv]
+   [<000000005ae9ccc2>] kvmppc_vcpu_run_hv+0xc5c/0x15f0 [kvm_hv]
+   [<00000000d22162ff>] kvmppc_vcpu_run+0x34/0x48 [kvm]
+   [<00000000d6953bc4>] kvm_arch_vcpu_ioctl_run+0x314/0x420 [kvm]
+   [<000000002543dd54>] kvm_vcpu_ioctl+0x33c/0x950 [kvm]
+   [<0000000048155cd6>] ksys_ioctl+0xd8/0x130
+   [<0000000041ffeaa7>] sys_ioctl+0x28/0x40
+   [<000000004afc4310>] system_call_exception+0x114/0x1e0
+   [<00000000fb70a873>] system_call_common+0xf0/0x278
+
+Signed-off-by: Qian Cai <cai@lca.pw>
+Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/powerpc/kvm/book3s_64_mmu_radix.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 998f8d089ac7..df0f08cb821b 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -171,7 +171,13 @@ static struct kmem_cache *kvm_pmd_cache;
+ 
+ static pte_t *kvmppc_pte_alloc(void)
+ {
+-	return kmem_cache_alloc(kvm_pte_cache, GFP_KERNEL);
++	pte_t *pte;
++
++	pte = kmem_cache_alloc(kvm_pte_cache, GFP_KERNEL);
++	/* pmd_populate() will only reference _pa(pte). */
++	kmemleak_ignore(pte);
++
++	return pte;
+ }
+ 
+ static void kvmppc_pte_free(pte_t *ptep)
+@@ -187,7 +193,13 @@ static inline int pmd_is_leaf(pmd_t pmd)
+ 
+ static pmd_t *kvmppc_pmd_alloc(void)
+ {
+-	return kmem_cache_alloc(kvm_pmd_cache, GFP_KERNEL);
++	pmd_t *pmd;
++
++	pmd = kmem_cache_alloc(kvm_pmd_cache, GFP_KERNEL);
++	/* pud_populate() will only reference _pa(pmd). */
++	kmemleak_ignore(pmd);
++
++	return pmd;
+ }
+ 
+ static void kvmppc_pmd_free(pmd_t *pmdp)
+-- 
+2.25.1
+
