@@ -2,38 +2,38 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 257AF1FE1EF
-	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Jun 2020 03:58:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0DA51FE3F3
+	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Jun 2020 04:14:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731663AbgFRB6H (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 17 Jun 2020 21:58:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59834 "EHLO mail.kernel.org"
+        id S1730515AbgFRCOl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 17 Jun 2020 22:14:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53046 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731319AbgFRBY6 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:24:58 -0400
+        id S1730356AbgFRBUp (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:20:45 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6851020776;
-        Thu, 18 Jun 2020 01:24:57 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2B1A920CC7;
+        Thu, 18 Jun 2020 01:20:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592443498;
-        bh=fyKdcIju2LGznL7vutzomzOAhrC/XB3cyoAauWlJjgM=;
+        s=default; t=1592443244;
+        bh=lCLf/7txuOzO4w3g0o+tTyZgWWrmV82cU1jSdV72LV0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=j7gYXt44wJceCS5sPbFdI24T/oUDJcuTJ7/Xel1xXGE7kVKzP2URAmrbKV147MBCA
-         syF8GpiyFcRan2pZklOcsghi/0Wpyw7Vb4JgKPxvbv+ydtvPh5zbz4JE85u3e95zpT
-         F3JPBCSnTF2UJq6lZMrzJUsFrl8k1D6G4J8Wr4bE=
+        b=lizeebCytyRRmrbVu36FaeEL4wUMtscyCUDC5U9uPgHBq4G72G+mjpdm3j9VZJtLI
+         J/5t4o/3Or0UgjBPkkyLPHSrLw4iY/CR/qTP8SLRLAuI1lKRABhYeE+Q4BFHHU1Sqf
+         PTNMMqHJq//3FXvRMjx1TS9rIhW8qP6JCH55343U=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Qian Cai <cai@lca.pw>, Paul Mackerras <paulus@ozlabs.org>,
         Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 4.19 124/172] KVM: PPC: Book3S HV: Ignore kmemleak false positives
-Date:   Wed, 17 Jun 2020 21:21:30 -0400
-Message-Id: <20200618012218.607130-124-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 195/266] KVM: PPC: Book3S HV: Ignore kmemleak false positives
+Date:   Wed, 17 Jun 2020 21:15:20 -0400
+Message-Id: <20200618011631.604574-195-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200618012218.607130-1-sashal@kernel.org>
-References: <20200618012218.607130-1-sashal@kernel.org>
+In-Reply-To: <20200618011631.604574-1-sashal@kernel.org>
+References: <20200618011631.604574-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -103,10 +103,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index 998f8d089ac7..df0f08cb821b 100644
+index 2d415c36a61d..43b56f8f6beb 100644
 --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
 +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -171,7 +171,13 @@ static struct kmem_cache *kvm_pmd_cache;
+@@ -353,7 +353,13 @@ static struct kmem_cache *kvm_pmd_cache;
  
  static pte_t *kvmppc_pte_alloc(void)
  {
@@ -121,7 +121,7 @@ index 998f8d089ac7..df0f08cb821b 100644
  }
  
  static void kvmppc_pte_free(pte_t *ptep)
-@@ -187,7 +193,13 @@ static inline int pmd_is_leaf(pmd_t pmd)
+@@ -363,7 +369,13 @@ static void kvmppc_pte_free(pte_t *ptep)
  
  static pmd_t *kvmppc_pmd_alloc(void)
  {
