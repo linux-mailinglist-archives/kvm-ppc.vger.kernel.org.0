@@ -2,139 +2,127 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97CDF1FFC97
-	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Jun 2020 22:38:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A0951FFF9A
+	for <lists+kvm-ppc@lfdr.de>; Fri, 19 Jun 2020 03:16:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730297AbgFRUh7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 18 Jun 2020 16:37:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49278 "EHLO
+        id S1729038AbgFSBQr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 18 Jun 2020 21:16:47 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30686 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726478AbgFRUh7 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 18 Jun 2020 16:37:59 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05IKWJjo038864;
-        Thu, 18 Jun 2020 16:37:46 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31r6d0q8j5-1
+        by vger.kernel.org with ESMTP id S1728291AbgFSBQr (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 18 Jun 2020 21:16:47 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05J13WZA185906;
+        Thu, 18 Jun 2020 21:16:36 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31rg0rn1cw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Jun 2020 16:37:46 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05IKVlEV016429;
-        Thu, 18 Jun 2020 20:37:44 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 31quax9npy-1
+        Thu, 18 Jun 2020 21:16:36 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05J1Akdd021930;
+        Fri, 19 Jun 2020 01:16:33 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma05fra.de.ibm.com with ESMTP id 31r1kq0k8m-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Jun 2020 20:37:44 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05IKbedF43712598
+        Fri, 19 Jun 2020 01:16:33 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05J1GUQB65470876
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Jun 2020 20:37:40 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 612814C04E;
-        Thu, 18 Jun 2020 20:37:40 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 413A44C040;
-        Thu, 18 Jun 2020 20:37:37 +0000 (GMT)
+        Fri, 19 Jun 2020 01:16:30 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E3D80AE051;
+        Fri, 19 Jun 2020 01:16:29 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3B6C0AE045;
+        Fri, 19 Jun 2020 01:16:27 +0000 (GMT)
 Received: from oc0525413822.ibm.com (unknown [9.211.71.42])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu, 18 Jun 2020 20:37:37 +0000 (GMT)
-Date:   Thu, 18 Jun 2020 13:37:34 -0700
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 19 Jun 2020 01:16:26 +0000 (GMT)
+Date:   Thu, 18 Jun 2020 18:16:24 -0700
 From:   Ram Pai <linuxram@us.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
+To:     Laurent Dufour <ldufour@linux.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
         bharata@linux.ibm.com, aneesh.kumar@linux.ibm.com,
-        sukadev@linux.vnet.ibm.com, ldufour@linux.ibm.com,
-        bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
-        cclaudio@linux.ibm.com, sathnaga@linux.vnet.ibm.com
-Subject: Re: [PATCH v2 0/4] Migrate non-migrated pages of a SVM.
-Message-ID: <20200618203734.GA6772@oc0525413822.ibm.com>
+        sukadev@linux.vnet.ibm.com, bauerman@linux.ibm.com,
+        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
+        sathnaga@linux.vnet.ibm.com
+Subject: Re: [PATCH v2 2/4] KVM: PPC: Book3S HV: track the state GFNs
+ associated with secure VMs
+Message-ID: <20200619011624.GB6772@oc0525413822.ibm.com>
 Reply-To: Ram Pai <linuxram@us.ibm.com>
 References: <1592471945-24786-1-git-send-email-linuxram@us.ibm.com>
+ <1592471945-24786-3-git-send-email-linuxram@us.ibm.com>
+ <7f5aea68-0cc5-6ae5-c30e-eee60eff5a92@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1592471945-24786-1-git-send-email-linuxram@us.ibm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7f5aea68-0cc5-6ae5-c30e-eee60eff5a92@linux.ibm.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-18_15:2020-06-18,2020-06-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- adultscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0
- cotscore=-2147483648 spamscore=0 lowpriorityscore=0 phishscore=0
- bulkscore=0 priorityscore=1501 impostorscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006180152
+ definitions=2020-06-18_21:2020-06-18,2020-06-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 suspectscore=0 mlxscore=0 priorityscore=1501 phishscore=0
+ bulkscore=0 mlxlogscore=999 malwarescore=0 clxscore=1015 spamscore=0
+ cotscore=-2147483648 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006190004
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-I should have elaborated on the problem and the need for these patches.
+On Thu, Jun 18, 2020 at 03:31:06PM +0200, Laurent Dufour wrote:
+> Le 18/06/2020 à 11:19, Ram Pai a écrit :
+> >
 
-Explaining it here. Will add it to the series in next version.
+.snip..
 
--------------------------------------------------------------
+> >************************************************************************
+> >  1. States of a GFN
+> >     ---------------
+> >  The GFN can be in one of the following states.
+> >diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
 
-The time taken to switch a VM to Secure-VM, increases by the size of
-the VM.  A 100GB VM takes about 7minutes. This is unacceptable.  This
-linear increase is caused by a suboptimal behavior by the Ultravisor and
-the Hypervisor.  The Ultravisor unnecessarily migrates all the GFN of
-the VM from normal-memory to secure-memory. It has to just migrate the
-necessary and sufficient GFNs.
+...snip...
 
-However when the optimization is incorporated in the Ultravisor, the
-Hypervisor starts misbehaving. The Hypervisor has a inbuilt assumption
-that the Ultravisor will explicitly request to migrate, each and every
-GFN of the VM. If only necessary and sufficient GFNs are requested for
-migration, the Hypervisor continues to manage the rest of the GFNs are
-normal GFNs. This leads of memory corruption, manifested consistently
-when the SVM reboots.
-
-The same is true, when a memory slot is hotplugged into a SVM. The
-Hypervisor expects the ultravisor to request migration of all GFNs to
-secure-GFN.  But at the same time the hypervisor is unable to handle any
-H_SVM_PAGE_IN requests from the Ultravisor, done in the context of
-UV_REGISTER_MEM_SLOT ucall.  This problem manifests as random errors in
-the SVM, when a memory-slot is hotplugged.
-
-This patch series automatically migrates the non-migrated pages of a SVM,
-and thus solves the problem.
-
-------------------------------------------------------------------
-
-
-
-On Thu, Jun 18, 2020 at 02:19:01AM -0700, Ram Pai wrote:
-> This patch series migrates the non-migrated pages of a SVM.
-> This is required when the UV calls H_SVM_INIT_DONE, and
-> when a memory-slot is hotplugged to a Secure VM.
+> >index 803940d..3448459 100644
+> >--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> >+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> >@@ -1100,7 +1100,7 @@ void kvmppc_radix_flush_memslot(struct kvm *kvm,
+> >  	unsigned int shift;
+> >  	if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START)
+> >-		kvmppc_uvmem_drop_pages(memslot, kvm, true);
+> >+		kvmppc_uvmem_drop_pages(memslot, kvm, true, false);
 > 
-> Testing: Passed rigorous SVM reboot test using different
-> 	sized SVMs.
+> When reviewing the v1 of this series, I asked you the question about
+> the fact that the call here is made with purge_gfn = false. Your
+> answer was:
 > 
-> Changelog:
-> 	. fixed a bug observed by Bharata. Pages that
-> 	where paged-in and later paged-out must also be
-> 	skipped from migration during H_SVM_INIT_DONE.
+> >This function does not know, under what context it is called. Since
+> >its job is to just flush the memslot, it cannot assume anything
+> >about purging the pages in the memslot.
 > 
-> Laurent Dufour (1):
->   KVM: PPC: Book3S HV: migrate hot plugged memory
+> Indeed in the case of the memory hotplug operation, this function is
+> called to wipe the page from the secure device in the case the pages
+> are secured. In that case the purge is required. Indeed, I checked
+> the other call to kvmppc_radix_flush_memslot() in
+> kvmppc_core_flush_memslot_hv() and I cannot see why in that case too
+> purge_gfn should be false, especially when the memslot is reused as
+> detailed in __kvm_set_memory_region() around the call to
+> kvm_arch_flush_shadow_memslot().
 > 
-> Ram Pai (3):
->   KVM: PPC: Book3S HV: Fix function definition in book3s_hv_uvmem.c
->   KVM: PPC: Book3S HV: track the state GFNs associated with secure VMs
->   KVM: PPC: Book3S HV: migrate remaining normal-GFNs to secure-GFNs in
->     H_SVM_INIT_DONE
-> 
->  Documentation/powerpc/ultravisor.rst        |   2 +
->  arch/powerpc/include/asm/kvm_book3s_uvmem.h |   8 +-
->  arch/powerpc/kvm/book3s_64_mmu_radix.c      |   2 +-
->  arch/powerpc/kvm/book3s_hv.c                |  12 +-
->  arch/powerpc/kvm/book3s_hv_uvmem.c          | 449 ++++++++++++++++++++++------
->  5 files changed, 368 insertions(+), 105 deletions(-)
-> 
-> -- 
-> 1.8.3.1
+> I'm sorry to not have ask this earlier, but could you please elaborate on this?
 
--- 
-Ram Pai
+You are right. kvmppc_radix_flush_memslot() is getting called everytime with
+the intention of disassociating the memslot from that VM. Which implies,
+the memslot is intended to be deleted and possibly reused.
+
+I should be calling kvmppc_uvmem_drop_pages() with purge_gfn=true, here
+aswell.
+
+I expect some form of problem showing up in memhot-plug/unplug path.
+
+RP
+
