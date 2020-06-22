@@ -2,107 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9577B201E2B
-	for <lists+kvm-ppc@lfdr.de>; Sat, 20 Jun 2020 00:44:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D172F203BC0
+	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Jun 2020 18:02:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729532AbgFSWoe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 19 Jun 2020 18:44:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14688 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726900AbgFSWod (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 19 Jun 2020 18:44:33 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05JMXQUc086954;
-        Fri, 19 Jun 2020 18:44:23 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31rwwu71dj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Jun 2020 18:44:23 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JMYuM9018162;
-        Fri, 19 Jun 2020 22:44:21 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 31r1kq19ce-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Jun 2020 22:44:21 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05JMh0o353412330
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Jun 2020 22:43:00 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 26B6AAE089;
-        Fri, 19 Jun 2020 22:44:18 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B3F69AE05D;
-        Fri, 19 Jun 2020 22:44:14 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.211.71.42])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 19 Jun 2020 22:44:14 +0000 (GMT)
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        bharata@linux.ibm.com, aneesh.kumar@linux.ibm.com,
-        sukadev@linux.vnet.ibm.com, ldufour@linux.ibm.com,
-        bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
-        cclaudio@linux.ibm.com, linuxram@us.ibm.com,
-        sathnaga@linux.vnet.ibm.com
-Subject: [PATCH v3 4/4] KVM: PPC: Book3S HV: migrate hot plugged memory
-Date:   Fri, 19 Jun 2020 15:43:42 -0700
-Message-Id: <1592606622-29884-5-git-send-email-linuxram@us.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1592606622-29884-1-git-send-email-linuxram@us.ibm.com>
-References: <1592606622-29884-1-git-send-email-linuxram@us.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-19_22:2020-06-19,2020-06-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 impostorscore=0 mlxlogscore=999 cotscore=-2147483648
- clxscore=1015 mlxscore=0 malwarescore=0 adultscore=0 priorityscore=1501
- phishscore=0 bulkscore=0 suspectscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006190157
+        id S1729349AbgFVQCD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Jun 2020 12:02:03 -0400
+Received: from sonic309-21.consmr.mail.ne1.yahoo.com ([66.163.184.147]:35715
+        "EHLO sonic309-21.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729095AbgFVQCD (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Jun 2020 12:02:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1592841721; bh=cK2qy9Lv5SAgMg9nAvfVmkJPj46H3ss3vOVyjpHm6Nk=; h=Date:From:Reply-To:Subject:References:From:Subject; b=JTETxE5c4VmxIqxusG/RM2eZV8PITO2YLaM87qMBAwWlmjwgCfFCjcnhVxOi654t4AAaGy+DswWjZACYQOeTMxfVHdV/Dl5P3d+9N21+8wBw5o8gzzwm/hv0QwTvk/cj//k3ihNMycBm/3AdLWlwNV728ftYu/aaDrjc8/gwSfv5UB6lflw6wuybykHRKVc/s8Xpu2xuuQoaWtxU16aDxOis4gRStfiu1rJ77Vr7VO4c0E7mEpPNpc6FxDPoHo6cisKrXpgH3VNEhWHkcz1QMeX/B2Lp1IJKmMkKwVSNQiYIv3xuaZwFe+WWtXAMnE9xrXPybfPIaC4JdJGeckV+XQ==
+X-YMail-OSG: 1zAFrsAVM1kieiOh8ORK0wfUdGRM.NBHduuqOElv10XrE8lvj_a4MviekME1O5a
+ T4Wcgruti.Z9Eqe43ymrsOq1qsGz_yfNoRAP1jAwXMMF1pf0zwOd7d3jIzQf9YtQOWRH2yffK2sH
+ 6qjaiqXAM6qC2B9TUMJybztP1wQbDMbE_p8MFzqBOqbUr7a9m9XmUaJeVLMaQPEzFJ1P9SIRMWBj
+ WfeLRu4dDUKFq1..8jbIithwB2TQLa5J5Zvdsbu03JEAlCSAIRn4NlDsfljw3U39b3THsNBXa3lV
+ gxqbcTpSfPMonyZBgAIPrECaz1qg3fKXdhgsgiEKgt9vD__X7ZX1ItajZ3_0iDlRMNmv8SYQLKFY
+ rKF2GBcpFzwc6.pQClDNL.rcV7NHqv3VGTG9.0tH7daCi2XbOTJdYGYHqAF3B2MhiKtmGChn4zV4
+ Sxvhd1DT2bRnqEV1TiJ8_5TMRg_kEiepWzYIqlAafKE81uUdsP4M_iZXiXAsE9bZaUuZm8KNAo19
+ OrIHZMdF5cB1.3cpYIEeX.CVhTkSxtTFxaWQGU7aD_4SVBpSCkYqyP8WZIyG5wXoixcYGpi_nLFa
+ NOmGAxhHjg3G5GSQww5sbMu_biatBCf.Fot2kcGJNhB2jnNgPfMgNaPnhosGbZr8iDnSqA6ZWt0i
+ TIMjmAxmXK.2w1lJ.LuG13g6S0QBK1fihyDTguab4K.npiWk4qWwJU.NRKQWnlI8MgU8QBnQel5u
+ FtE.WmTZiVGoUmgMwoY38kIhzoGdirC9J9D3vJW7cwu8qITj.G4GuDnjkFo8I9kLoPHMuIkNNeOk
+ YV66rSFib224yxyqiWlWNRug95eYdQPDUcTL5PQtJ_IQz6xtj7ktGB.e.2tWnB8_xUWkN2nUheUt
+ dipCO0HpD.jNm5iyhkimDUjc_DCDbDrcX8cksnOqyROx_Qf.jJLgh58GrrnI3JG0wGq1QHMizaqQ
+ FLWdYe_jBOqKCxP6fSGF_uWvPKpEZb2.S9yK2kOUNb6vj_uB7Nvrd1lmA6o73g.FlMWozckFimbW
+ 8l03wdEN9JG2cbJVVQWyFlpMHB5GZYZIv6iUNRRPetvVKZqVtMyCQ71NXH_IUso68wYLvnTebgSf
+ TW5RTJ_tFQ03CDgzHtq2Onsn4oCqTboo7ExJoXketR_fKX4H4ryMUViCbO1h8CZRBWfA.JCd_Oq4
+ .hDwFLQ0cpwmKVOolr949Jb0x.7kaAGUrWrS2zmgiz117O0nwzzxlTUJmrq4qyTK6wKIRN13QJiY
+ QDpZPKyT8yjCiCxHIYpGJqQbZW1BOYDSz3oPVejZmENYbUHTb.vVYUfxSyAB7pMmNPA--
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic309.consmr.mail.ne1.yahoo.com with HTTP; Mon, 22 Jun 2020 16:02:01 +0000
+Date:   Mon, 22 Jun 2020 16:02:00 +0000 (UTC)
+From:   Karim Zakari <kariim1960z@gmail.com>
+Reply-To: kzakari04@gmail.com
+Message-ID: <1345703772.1867771.1592841720012@mail.yahoo.com>
+Subject: URGENT REPLY.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+References: <1345703772.1867771.1592841720012.ref@mail.yahoo.com>
+X-Mailer: WebService/1.1.16138 YMailNodin Mozilla/5.0 (Windows NT 6.1; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Laurent Dufour <ldufour@linux.ibm.com>
 
-When a memory slot is hot plugged to a SVM, PFNs associated with the
-GFNs in that slot must be migrated to the secure-PFNs, aka device-PFNs.
 
-kvmppc_uv_migrate_mem_slot() is called to accomplish this. UV_PAGE_IN
-ucall is skipped, since the ultravisor does not trust the content of
-those pages and hence ignores it.
+Good-Day Friend,
 
-Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
-Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-	[resolved conflicts, and modified the commit log]
----
- arch/powerpc/kvm/book3s_hv.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ Hope you are doing great Today. I have a proposed business deal worthy (US$16.5 Million Dollars) that will benefit both parties. This is legitimate' legal and your personality will not be compromised.
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 6717d24..fcea41c 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4531,10 +4531,12 @@ static void kvmppc_core_commit_memory_region_hv(struct kvm *kvm,
- 	case KVM_MR_CREATE:
- 		if (kvmppc_uvmem_slot_init(kvm, new))
- 			return;
--		uv_register_mem_slot(kvm->arch.lpid,
--				     new->base_gfn << PAGE_SHIFT,
--				     new->npages * PAGE_SIZE,
--				     0, new->id);
-+		if (uv_register_mem_slot(kvm->arch.lpid,
-+					 new->base_gfn << PAGE_SHIFT,
-+					 new->npages * PAGE_SIZE,
-+					 0, new->id))
-+			return;
-+		kvmppc_uv_migrate_mem_slot(kvm, new);
- 		break;
- 	case KVM_MR_DELETE:
- 		uv_unregister_mem_slot(kvm->arch.lpid, old->id);
--- 
-1.8.3.1
+Waiting for your response for more details, As you are willing to execute this business opportunity with me.
 
+Sincerely Yours,
+Mr. Karim Zakari.
