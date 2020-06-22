@@ -2,58 +2,127 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D172F203BC0
-	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Jun 2020 18:02:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 238AB203D42
+	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Jun 2020 18:57:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729349AbgFVQCD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 22 Jun 2020 12:02:03 -0400
-Received: from sonic309-21.consmr.mail.ne1.yahoo.com ([66.163.184.147]:35715
-        "EHLO sonic309-21.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729095AbgFVQCD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Jun 2020 12:02:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1592841721; bh=cK2qy9Lv5SAgMg9nAvfVmkJPj46H3ss3vOVyjpHm6Nk=; h=Date:From:Reply-To:Subject:References:From:Subject; b=JTETxE5c4VmxIqxusG/RM2eZV8PITO2YLaM87qMBAwWlmjwgCfFCjcnhVxOi654t4AAaGy+DswWjZACYQOeTMxfVHdV/Dl5P3d+9N21+8wBw5o8gzzwm/hv0QwTvk/cj//k3ihNMycBm/3AdLWlwNV728ftYu/aaDrjc8/gwSfv5UB6lflw6wuybykHRKVc/s8Xpu2xuuQoaWtxU16aDxOis4gRStfiu1rJ77Vr7VO4c0E7mEpPNpc6FxDPoHo6cisKrXpgH3VNEhWHkcz1QMeX/B2Lp1IJKmMkKwVSNQiYIv3xuaZwFe+WWtXAMnE9xrXPybfPIaC4JdJGeckV+XQ==
-X-YMail-OSG: 1zAFrsAVM1kieiOh8ORK0wfUdGRM.NBHduuqOElv10XrE8lvj_a4MviekME1O5a
- T4Wcgruti.Z9Eqe43ymrsOq1qsGz_yfNoRAP1jAwXMMF1pf0zwOd7d3jIzQf9YtQOWRH2yffK2sH
- 6qjaiqXAM6qC2B9TUMJybztP1wQbDMbE_p8MFzqBOqbUr7a9m9XmUaJeVLMaQPEzFJ1P9SIRMWBj
- WfeLRu4dDUKFq1..8jbIithwB2TQLa5J5Zvdsbu03JEAlCSAIRn4NlDsfljw3U39b3THsNBXa3lV
- gxqbcTpSfPMonyZBgAIPrECaz1qg3fKXdhgsgiEKgt9vD__X7ZX1ItajZ3_0iDlRMNmv8SYQLKFY
- rKF2GBcpFzwc6.pQClDNL.rcV7NHqv3VGTG9.0tH7daCi2XbOTJdYGYHqAF3B2MhiKtmGChn4zV4
- Sxvhd1DT2bRnqEV1TiJ8_5TMRg_kEiepWzYIqlAafKE81uUdsP4M_iZXiXAsE9bZaUuZm8KNAo19
- OrIHZMdF5cB1.3cpYIEeX.CVhTkSxtTFxaWQGU7aD_4SVBpSCkYqyP8WZIyG5wXoixcYGpi_nLFa
- NOmGAxhHjg3G5GSQww5sbMu_biatBCf.Fot2kcGJNhB2jnNgPfMgNaPnhosGbZr8iDnSqA6ZWt0i
- TIMjmAxmXK.2w1lJ.LuG13g6S0QBK1fihyDTguab4K.npiWk4qWwJU.NRKQWnlI8MgU8QBnQel5u
- FtE.WmTZiVGoUmgMwoY38kIhzoGdirC9J9D3vJW7cwu8qITj.G4GuDnjkFo8I9kLoPHMuIkNNeOk
- YV66rSFib224yxyqiWlWNRug95eYdQPDUcTL5PQtJ_IQz6xtj7ktGB.e.2tWnB8_xUWkN2nUheUt
- dipCO0HpD.jNm5iyhkimDUjc_DCDbDrcX8cksnOqyROx_Qf.jJLgh58GrrnI3JG0wGq1QHMizaqQ
- FLWdYe_jBOqKCxP6fSGF_uWvPKpEZb2.S9yK2kOUNb6vj_uB7Nvrd1lmA6o73g.FlMWozckFimbW
- 8l03wdEN9JG2cbJVVQWyFlpMHB5GZYZIv6iUNRRPetvVKZqVtMyCQ71NXH_IUso68wYLvnTebgSf
- TW5RTJ_tFQ03CDgzHtq2Onsn4oCqTboo7ExJoXketR_fKX4H4ryMUViCbO1h8CZRBWfA.JCd_Oq4
- .hDwFLQ0cpwmKVOolr949Jb0x.7kaAGUrWrS2zmgiz117O0nwzzxlTUJmrq4qyTK6wKIRN13QJiY
- QDpZPKyT8yjCiCxHIYpGJqQbZW1BOYDSz3oPVejZmENYbUHTb.vVYUfxSyAB7pMmNPA--
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic309.consmr.mail.ne1.yahoo.com with HTTP; Mon, 22 Jun 2020 16:02:01 +0000
-Date:   Mon, 22 Jun 2020 16:02:00 +0000 (UTC)
-From:   Karim Zakari <kariim1960z@gmail.com>
-Reply-To: kzakari04@gmail.com
-Message-ID: <1345703772.1867771.1592841720012@mail.yahoo.com>
-Subject: URGENT REPLY.
+        id S1729955AbgFVQ5c (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Jun 2020 12:57:32 -0400
+Received: from mga01.intel.com ([192.55.52.88]:43835 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729807AbgFVQ5b (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 22 Jun 2020 12:57:31 -0400
+IronPort-SDR: q/tRks1hscFs2MNhMH5PButSYmFl+L/ggYNHf5xZCioFe++saGujHG+dSjYINvaarLidUDkE4J
+ RhVk9bvYvtSg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="161896136"
+X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; 
+   d="scan'208";a="161896136"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2020 09:57:30 -0700
+IronPort-SDR: S4VEirMcNhQ2lH0bAVvJJDP7s7VRkd36rpU/H5Pu+0zC5Ty7uMfI7DemqqyQV4/pP77ANcjPYf
+ AXdGOcNkkbyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; 
+   d="scan'208";a="384580750"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga001.fm.intel.com with ESMTP; 22 Jun 2020 09:57:30 -0700
+Date:   Mon, 22 Jun 2020 09:57:30 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 14/21] KVM: Move x86's version of struct
+ kvm_mmu_memory_cache to common code
+Message-ID: <20200622165730.GD5150@linux.intel.com>
+References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
+ <20200605213853.14959-15-sean.j.christopherson@intel.com>
+ <CANgfPd_v31zC5-mKsT14hd7W=X2Pvg3RBPjn2d4tFSChdbsr3A@mail.gmail.com>
+ <CANgfPd-iH8AShSPPJiaDCxV1H76kfpTOQMZSMP_+nP3LoXbYBg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <1345703772.1867771.1592841720012.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.16138 YMailNodin Mozilla/5.0 (Windows NT 6.1; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd-iH8AShSPPJiaDCxV1H76kfpTOQMZSMP_+nP3LoXbYBg@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Wed, Jun 10, 2020 at 02:58:21PM -0700, Ben Gardon wrote:
+> On Wed, Jun 10, 2020 at 12:01 PM Ben Gardon <bgardon@google.com> wrote:
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index fb99e6776e27..8e8fea13b6c7 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -193,8 +193,6 @@ struct x86_exception;
+> > >  enum x86_intercept;
+> > >  enum x86_intercept_stage;
+> > >
+> > > -#define KVM_NR_MEM_OBJS 40
+> > > -
+> Oops I didn't catch this on my first read through, but in patch 16 in
+> this series I see some references to KVM_NR_MEM_OBJS being removed. As
+> a result I would not expect this patch to build. Other references to
+> this value should probably replaced with
+> KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE as well.
 
+This patch intentionally uses a different name for the #define (see below)
+so that the existing arm64 and MIPS declarations don't get picked up by
+common KVM code.  This is required so that arm64 and MIPS continue to use
+their versions of the cache implementation until they are converted to the
+common implementation later in the series, e.g. in patch 16 when the
+references to KVM_NR_MEM_OBJS are removed.
 
-Good-Day Friend,
+I confirmed the above (after sending v1) by compiling all non-x86 changes
+on arm64, MIPS, s390 and PPC to verify that this doesn't break bisection.
 
- Hope you are doing great Today. I have a proposed business deal worthy (US$16.5 Million Dollars) that will benefit both parties. This is legitimate' legal and your personality will not be compromised.
+> > >  #define KVM_NR_DB_REGS 4
+> > >
+> > >  #define DR6_BD         (1 << 13)
+> > > @@ -245,17 +243,6 @@ enum x86_intercept_stage;
+> > >
+> > >  struct kvm_kernel_irq_routing_entry;
 
-Waiting for your response for more details, As you are willing to execute this business opportunity with me.
+...
 
-Sincerely Yours,
-Mr. Karim Zakari.
+> > > +#ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+> > > +/*
+> > > + * Memory caches are used to preallocate memory ahead of various MMU flows,
+> > > + * e.g. page fault handlers.  Gracefully handling allocation failures deep in
+> > > + * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
+> > > + * holding MMU locks.  Note, these caches act more like prefetch buffers than
+> > > + * classical caches, i.e. objects are not returned to the cache on being freed.
+> > > + */
+> > > +struct kvm_mmu_memory_cache {
+> > > +       int nobjs;
+> > > +       gfp_t gfp_zero;
+> > > +       struct kmem_cache *kmem_cache;
+> > > +       void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
+> > > +};
+> > > +#endif
+> > > +
+> > > +
+> > >  #endif /* __KVM_TYPES_H__ */
+> > > --
+> > > 2.26.0
+> > >
