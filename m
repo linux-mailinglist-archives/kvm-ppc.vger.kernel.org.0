@@ -2,82 +2,136 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38398206A3D
-	for <lists+kvm-ppc@lfdr.de>; Wed, 24 Jun 2020 04:39:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E00682074DC
+	for <lists+kvm-ppc@lfdr.de>; Wed, 24 Jun 2020 15:47:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387982AbgFXCjs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 23 Jun 2020 22:39:48 -0400
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:56207 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387970AbgFXCjr (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 23 Jun 2020 22:39:47 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04427;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0U0YmjzJ_1592966379;
-Received: from 30.27.116.246(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U0YmjzJ_1592966379)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 24 Jun 2020 10:39:41 +0800
-Subject: Re: [PATCH v6 1/5] KVM: s390: clean up redundant 'kvm_run' parameters
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
-        mpe@ellerman.id.au, benh@kernel.crashing.org,
-        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
-        chenhuacai@gmail.com
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
- <20200623131418.31473-2-tianjia.zhang@linux.alibaba.com>
- <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <650c2193-5299-714e-92f4-75cbff319948@linux.alibaba.com>
-Date:   Wed, 24 Jun 2020 10:39:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S2391100AbgFXNri (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 24 Jun 2020 09:47:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43954 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389590AbgFXNrh (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 24 Jun 2020 09:47:37 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D1A5C061573
+        for <kvm-ppc@vger.kernel.org>; Wed, 24 Jun 2020 06:47:37 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id q15so2385199wmj.2
+        for <kvm-ppc@vger.kernel.org>; Wed, 24 Jun 2020 06:47:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lHfk96B0+ihglAFlrm1FT6zDDI3xWocJzEidZ1THNGo=;
+        b=tpf/dcq4PAzW3T54HKNZWmByjNJgL82k45veKEeoYnLdGkSoRmUdwKRSHvfBLDHOG9
+         FEP1fA1ZoqptL6kpfglTgJE1SIQOQRVDZgGpauAwOTppto0B5vDaQsixBq+xxkWeqHtP
+         xeENTkgnV8AZLBR/oycfN8ZuB3EZqbDUo3EhSS9zettNixoVNKhGPcHB21EvWNFgOb2+
+         C5XEZ+6hCIoGhCf8PEWc4/12oNrfC/o2W5x9YkuNlp3lVoe6vwltOgSl2pFpjVjUoBT5
+         zh0VaRnuyMm3j1ejVdDsdsnx+FI5hdkAHB5gVGJQTYaKnK7Lc5XwbCHBIxn2791yYQ8b
+         MVRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lHfk96B0+ihglAFlrm1FT6zDDI3xWocJzEidZ1THNGo=;
+        b=Wbi/XcfpWm4Q+LbTE1OFpQwHnGL4SMKxIKR/OJ08bhKhkGA1J/UxeubMY4Ofr4krXM
+         SPDcPZIbBj9udWSmlsxLp9cbvnw4T6zYykjnsMZvoPyGlK1Z+H7dDSNYjB5evXKBXILH
+         p5WhvO+x9PXaoBdg0tIWGvSLPMJRvbbfmzDikucwra5bQYdBUD5UAcz5rorC3YQJY4bq
+         IFDoE8Wtuw3W++jXGE4DxjAKdSrCGZ0+GPqEzOo/ryDsa/B/aEXtBanus9wt1PVkH9Oo
+         32CJ/dRFC9INrrexx8I32d9yJXbtLHD9rPDwDpG9Rcz2KKiV3lP/V3TTp/hYrfMBpCNG
+         3PeQ==
+X-Gm-Message-State: AOAM532km4CnPzlBE/VK4VfiKLj3TqvNWkqOWOJFtVkrgE8ma75X4l5q
+        rIpLzr4U1bTmUr3hc4Wtt+g=
+X-Google-Smtp-Source: ABdhPJzx6K1kek4etHgRf3uNsg3tPsTriU2IDEDRlnOtTzqm2BUNEFWMTc0jAGsTCRsYQMA+ql0v5g==
+X-Received: by 2002:a1c:154:: with SMTP id 81mr29460084wmb.23.1593006456220;
+        Wed, 24 Jun 2020 06:47:36 -0700 (PDT)
+Received: from bobo.ibm.com (61-68-186-125.tpgi.com.au. [61.68.186.125])
+        by smtp.gmail.com with ESMTPSA id h14sm11284298wrt.36.2020.06.24.06.47.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jun 2020 06:47:35 -0700 (PDT)
+From:   Nicholas Piggin <npiggin@gmail.com>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
+        Anton Blanchard <anton@linux.ibm.com>, kvm-ppc@vger.kernel.org
+Subject: [PATCH] powerpc/pseries: Use doorbells even if XIVE is available
+Date:   Wed, 24 Jun 2020 23:47:24 +1000
+Message-Id: <20200624134724.2343007-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+KVM supports msgsndp in guests by trapping and emulating the
+instruction, so it was decided to always use XIVE for IPIs if it is
+available. However on PowerVM systems, msgsndp can be used and gives
+better performance. On large systems, high XIVE interrupt rates can
+have sub-linear scaling, and using msgsndp can reduce the load on
+the interrupt controller.
 
+So switch to using core local doorbells even if XIVE is available.
+This reduces performance for KVM guests with an SMT topology by
+about 50% for ping-pong context switching between SMT vCPUs. An
+option vector (or dt-cpu-ftrs) could be defined to disable msgsndp
+to get KVM performance back.
 
-On 2020/6/23 23:31, Christian Borntraeger wrote:
-> 
-> 
-> On 23.06.20 15:14, Tianjia Zhang wrote:
->> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
->> structure. For historical reasons, many kvm-related function parameters
->> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
->> patch does a unified cleanup of these remaining redundant parameters.
->>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>   arch/s390/kvm/kvm-s390.c | 23 +++++++++++++++--------
->>   1 file changed, 15 insertions(+), 8 deletions(-)
-> 
-> Tinajia,
-> 
-> I have trouble seeing value in this particular patch. We add LOCs
-> without providing any noticable benefit. All other patches in this series at
-> least reduce the amount of code. So I would defer this to Paolo if he prefers
-> to have this way across all architectures.
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ arch/powerpc/platforms/pseries/smp.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-Yes, this is a full architecture optimization. Some of the architecture 
-optimization has been merged into the mainline. I think it is necessary 
-to unify this optimization. This is also the meaning of Paolo.
-You can refer to the email of the previous version:
-https://lkml.org/lkml/2020/4/27/16
+diff --git a/arch/powerpc/platforms/pseries/smp.c b/arch/powerpc/platforms/pseries/smp.c
+index 6891710833be..a737a2f87c67 100644
+--- a/arch/powerpc/platforms/pseries/smp.c
++++ b/arch/powerpc/platforms/pseries/smp.c
+@@ -188,13 +188,14 @@ static int pseries_smp_prepare_cpu(int cpu)
+ 	return 0;
+ }
+ 
++static void  (*cause_ipi_offcore)(int cpu) __ro_after_init;
++
+ static void smp_pseries_cause_ipi(int cpu)
+ {
+-	/* POWER9 should not use this handler */
+ 	if (doorbell_try_core_ipi(cpu))
+ 		return;
+ 
+-	icp_ops->cause_ipi(cpu);
++	cause_ipi_offcore(cpu);
+ }
+ 
+ static int pseries_cause_nmi_ipi(int cpu)
+@@ -222,10 +223,7 @@ static __init void pSeries_smp_probe_xics(void)
+ {
+ 	xics_smp_probe();
+ 
+-	if (cpu_has_feature(CPU_FTR_DBELL) && !is_secure_guest())
+-		smp_ops->cause_ipi = smp_pseries_cause_ipi;
+-	else
+-		smp_ops->cause_ipi = icp_ops->cause_ipi;
++	smp_ops->cause_ipi = icp_ops->cause_ipi;
+ }
+ 
+ static __init void pSeries_smp_probe(void)
+@@ -238,6 +236,18 @@ static __init void pSeries_smp_probe(void)
+ 		xive_smp_probe();
+ 	else
+ 		pSeries_smp_probe_xics();
++
++	/*
++	 * KVM emulates doorbells by reading the instruction, which
++	 * can't be done if the guest is secure. If a secure guest
++	 * runs under PowerVM, it could use msgsndp but would need a
++	 * way to distinguish.
++	 */
++	if (cpu_has_feature(CPU_FTR_DBELL) &&
++	    cpu_has_feature(CPU_FTR_SMT) && !is_secure_guest()) {
++		cause_ipi_offcore = smp_ops->cause_ipi;
++		smp_ops->cause_ipi = smp_pseries_cause_ipi;
++	}
+ }
+ 
+ static struct smp_ops_t pseries_smp_ops = {
+-- 
+2.23.0
 
-Thanks,
-Tianjia
