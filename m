@@ -2,190 +2,82 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 87BAA205A4E
-	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Jun 2020 20:10:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38398206A3D
+	for <lists+kvm-ppc@lfdr.de>; Wed, 24 Jun 2020 04:39:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732988AbgFWSJk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 23 Jun 2020 14:09:40 -0400
-Received: from 20.mo5.mail-out.ovh.net ([91.121.55.239]:42970 "EHLO
-        20.mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728916AbgFWSJk (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 23 Jun 2020 14:09:40 -0400
-Received: from player693.ha.ovh.net (unknown [10.108.57.95])
-        by mo5.mail-out.ovh.net (Postfix) with ESMTP id 754E7288A33
-        for <kvm-ppc@vger.kernel.org>; Tue, 23 Jun 2020 18:50:36 +0200 (CEST)
-Received: from kaod.org (lfbn-tou-1-921-245.w86-210.abo.wanadoo.fr [86.210.152.245])
-        (Authenticated sender: clg@kaod.org)
-        by player693.ha.ovh.net (Postfix) with ESMTPSA id D386013A38801;
-        Tue, 23 Jun 2020 16:50:28 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass (GARM-101G0046a9a02d6-4de9-4819-8928-acddee862ae7,EED1DA90FC9B795DFFB5AB62ED4F19E3D36D96F8) smtp.auth=clg@kaod.org
-From:   =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Subject: [PATCH] KVM: PPC: Book3S HV: Use feature flag CPU_FTR_P9_TIDR when accessing TIDR
-Date:   Tue, 23 Jun 2020 18:50:27 +0200
-Message-Id: <20200623165027.271215-1-clg@kaod.org>
-X-Mailer: git-send-email 2.25.4
+        id S2387982AbgFXCjs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 23 Jun 2020 22:39:48 -0400
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:56207 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387970AbgFXCjr (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 23 Jun 2020 22:39:47 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04427;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0U0YmjzJ_1592966379;
+Received: from 30.27.116.246(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U0YmjzJ_1592966379)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 24 Jun 2020 10:39:41 +0800
+Subject: Re: [PATCH v6 1/5] KVM: s390: clean up redundant 'kvm_run' parameters
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+        mpe@ellerman.id.au, benh@kernel.crashing.org,
+        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
+        chenhuacai@gmail.com
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
+ <20200623131418.31473-2-tianjia.zhang@linux.alibaba.com>
+ <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <650c2193-5299-714e-92f4-75cbff319948@linux.alibaba.com>
+Date:   Wed, 24 Jun 2020 10:39:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 3664804199253838769
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudekhedgjeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpefhvffufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhephfdvfeeguedthedvleffgeekveeiiedvveegvefhudfhffdtieekueelfeeiheeunecuffhomhgrihhnpehrmhhhrghnughlvghrshdrshgsnecukfhppedtrddtrddtrddtpdekiedrvddutddrudehvddrvdegheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileefrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepkhhvmhdqphhptgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+In-Reply-To: <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The TIDR register is only available on POWER9 systems and code
-accessing this register is not always protected by the CPU_FTR_P9_TIDR
-flag. Fix that to make sure POWER10 systems won't use it as TIDR has
-been removed.
 
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
----
- arch/powerpc/kvm/book3s_hv.c            | 23 +++++++++++++++++------
- arch/powerpc/kvm/book3s_hv_rmhandlers.S | 16 ++++++++++++----
- 2 files changed, 29 insertions(+), 10 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index d64a2dc1ccca..3e5410f27a2a 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -1755,7 +1755,10 @@ static int kvmppc_get_one_reg_hv(struct kvm_vcpu *vcpu, u64 id,
- 		*val = get_reg_val(id, vcpu->arch.wort);
- 		break;
- 	case KVM_REG_PPC_TIDR:
--		*val = get_reg_val(id, vcpu->arch.tid);
-+		if (cpu_has_feature(CPU_FTR_P9_TIDR))
-+			*val = get_reg_val(id, vcpu->arch.tid);
-+		else
-+			r = -ENXIO;
- 		break;
- 	case KVM_REG_PPC_PSSCR:
- 		*val = get_reg_val(id, vcpu->arch.psscr);
-@@ -1972,7 +1975,10 @@ static int kvmppc_set_one_reg_hv(struct kvm_vcpu *vcpu, u64 id,
- 		vcpu->arch.wort = set_reg_val(id, *val);
- 		break;
- 	case KVM_REG_PPC_TIDR:
--		vcpu->arch.tid = set_reg_val(id, *val);
-+		if (cpu_has_feature(CPU_FTR_P9_TIDR))
-+			vcpu->arch.tid = set_reg_val(id, *val);
-+		else
-+			r = -ENXIO;
- 		break;
- 	case KVM_REG_PPC_PSSCR:
- 		vcpu->arch.psscr = set_reg_val(id, *val) & PSSCR_GUEST_VIS;
-@@ -3526,13 +3532,15 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- {
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
- 	unsigned long host_dscr = mfspr(SPRN_DSCR);
--	unsigned long host_tidr = mfspr(SPRN_TIDR);
-+	unsigned long host_tidr;
- 	unsigned long host_iamr = mfspr(SPRN_IAMR);
- 	unsigned long host_amr = mfspr(SPRN_AMR);
- 	s64 dec;
- 	u64 tb;
- 	int trap, save_pmu;
- 
-+	if (cpu_has_feature(CPU_FTR_P9_TIDR))
-+		host_tidr = mfspr(SPRN_TIDR);
- 	dec = mfspr(SPRN_DEC);
- 	tb = mftb();
- 	if (dec < 512)
-@@ -3579,7 +3587,8 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
- 	mtspr(SPRN_BESCR, vcpu->arch.bescr);
- 	mtspr(SPRN_WORT, vcpu->arch.wort);
--	mtspr(SPRN_TIDR, vcpu->arch.tid);
-+	if (cpu_has_feature(CPU_FTR_P9_TIDR))
-+		mtspr(SPRN_TIDR, vcpu->arch.tid);
- 	mtspr(SPRN_DAR, vcpu->arch.shregs.dar);
- 	mtspr(SPRN_DSISR, vcpu->arch.shregs.dsisr);
- 	mtspr(SPRN_AMR, vcpu->arch.amr);
-@@ -3653,7 +3662,8 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
- 	vcpu->arch.bescr = mfspr(SPRN_BESCR);
- 	vcpu->arch.wort = mfspr(SPRN_WORT);
--	vcpu->arch.tid = mfspr(SPRN_TIDR);
-+	if (cpu_has_feature(CPU_FTR_P9_TIDR))
-+		vcpu->arch.tid = mfspr(SPRN_TIDR);
- 	vcpu->arch.amr = mfspr(SPRN_AMR);
- 	vcpu->arch.uamor = mfspr(SPRN_UAMOR);
- 	vcpu->arch.dscr = mfspr(SPRN_DSCR);
-@@ -3662,7 +3672,8 @@ int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	mtspr(SPRN_WORT, 0);
- 	mtspr(SPRN_UAMOR, 0);
- 	mtspr(SPRN_DSCR, host_dscr);
--	mtspr(SPRN_TIDR, host_tidr);
-+	if (cpu_has_feature(CPU_FTR_P9_TIDR))
-+		mtspr(SPRN_TIDR, host_tidr);
- 	mtspr(SPRN_IAMR, host_iamr);
- 	mtspr(SPRN_PSPB, 0);
- 
-diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index 71943892c81c..64e454656749 100644
---- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-+++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -697,9 +697,11 @@ kvmppc_got_guest:
- 	/* Save host values of some registers */
- BEGIN_FTR_SECTION
- 	mfspr	r5, SPRN_TIDR
-+	std	r5, STACK_SLOT_TID(r1)
-+END_FTR_SECTION_IFSET(CPU_FTR_P9_TIDR)
-+BEGIN_FTR_SECTION
- 	mfspr	r6, SPRN_PSSCR
- 	mfspr	r7, SPRN_PID
--	std	r5, STACK_SLOT_TID(r1)
- 	std	r6, STACK_SLOT_PSSCR(r1)
- 	std	r7, STACK_SLOT_PID(r1)
- 	mfspr	r5, SPRN_HFSCR
-@@ -835,13 +837,15 @@ BEGIN_FTR_SECTION
- 	nop
- FTR_SECTION_ELSE
- 	/* POWER9-only registers */
-+BEGIN_FTR_SECTION_NESTED(96);
- 	ld	r5, VCPU_TID(r4)
-+	mtspr	SPRN_TIDR, r5
-+END_FTR_SECTION_NESTED_IFSET(CPU_FTR_P9_TIDR, 96)
- 	ld	r6, VCPU_PSSCR(r4)
- 	lbz	r8, HSTATE_FAKE_SUSPEND(r13)
- 	oris	r6, r6, PSSCR_EC@h	/* This makes stop trap to HV */
- 	rldimi	r6, r8, PSSCR_FAKE_SUSPEND_LG, 63 - PSSCR_FAKE_SUSPEND_LG
- 	ld	r7, VCPU_HFSCR(r4)
--	mtspr	SPRN_TIDR, r5
- 	mtspr	SPRN_PSSCR, r6
- 	mtspr	SPRN_HFSCR, r7
- ALT_FTR_SECTION_END_IFCLR(CPU_FTR_ARCH_300)
-@@ -1637,9 +1641,11 @@ BEGIN_FTR_SECTION
- 	std	r7, VCPU_CSIGR(r9)
- 	std	r8, VCPU_TACR(r9)
- FTR_SECTION_ELSE
-+BEGIN_FTR_SECTION_NESTED(96);
- 	mfspr	r5, SPRN_TIDR
--	mfspr	r6, SPRN_PSSCR
- 	std	r5, VCPU_TID(r9)
-+END_FTR_SECTION_NESTED_IFSET(CPU_FTR_P9_TIDR, 96)
-+	mfspr	r6, SPRN_PSSCR
- 	rldicl	r6, r6, 4, 50		/* r6 &= PSSCR_GUEST_VIS */
- 	rotldi	r6, r6, 60
- 	std	r6, VCPU_PSSCR(r9)
-@@ -1771,9 +1777,11 @@ BEGIN_FTR_SECTION
- END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
- BEGIN_FTR_SECTION
- 	ld	r5, STACK_SLOT_TID(r1)
-+	mtspr	SPRN_TIDR, r5
-+END_FTR_SECTION_IFSET(CPU_FTR_P9_TIDR)
-+BEGIN_FTR_SECTION
- 	ld	r6, STACK_SLOT_PSSCR(r1)
- 	ld	r7, STACK_SLOT_PID(r1)
--	mtspr	SPRN_TIDR, r5
- 	mtspr	SPRN_PSSCR, r6
- 	mtspr	SPRN_PID, r7
- END_FTR_SECTION_IFSET(CPU_FTR_ARCH_300)
--- 
-2.25.4
+On 2020/6/23 23:31, Christian Borntraeger wrote:
+> 
+> 
+> On 23.06.20 15:14, Tianjia Zhang wrote:
+>> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+>> structure. For historical reasons, many kvm-related function parameters
+>> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
+>> patch does a unified cleanup of these remaining redundant parameters.
+>>
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>   arch/s390/kvm/kvm-s390.c | 23 +++++++++++++++--------
+>>   1 file changed, 15 insertions(+), 8 deletions(-)
+> 
+> Tinajia,
+> 
+> I have trouble seeing value in this particular patch. We add LOCs
+> without providing any noticable benefit. All other patches in this series at
+> least reduce the amount of code. So I would defer this to Paolo if he prefers
+> to have this way across all architectures.
 
+Yes, this is a full architecture optimization. Some of the architecture 
+optimization has been merged into the mainline. I think it is necessary 
+to unify this optimization. This is also the meaning of Paolo.
+You can refer to the email of the previous version:
+https://lkml.org/lkml/2020/4/27/16
+
+Thanks,
+Tianjia
