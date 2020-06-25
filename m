@@ -2,172 +2,265 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 473C5209814
-	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Jun 2020 03:11:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCB98209C24
+	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Jun 2020 11:44:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388810AbgFYBLb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 24 Jun 2020 21:11:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37130 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388789AbgFYBLb (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 24 Jun 2020 21:11:31 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F41FAC061573
-        for <kvm-ppc@vger.kernel.org>; Wed, 24 Jun 2020 18:11:30 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 49shmb69B8z9s1x;
-        Thu, 25 Jun 2020 11:11:27 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1593047487;
-        bh=RQIyenxXQbHYMtHUjOJ2lug8ouzp2KuX35Kw7NZyeo8=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=kJmcxXCWM8MFuc4Ml75Dgq+t4B7yQJ5nmGrgklDwpv0w5QyX/V4lmk9Ap6GOMt2nz
-         Rg9ldgciNUeufuQgv9E4KPsLVQZFfPXQUaCx/TvEjyPrXej+lJ74pmWWAC60ttgYUZ
-         oPtcxTpuHXFvG2fWsX0mT0PCI2J1fF9bj006Y7AFve7Aj4lhtT4ooNqncwxReBZqmO
-         hk//6Tojc4PkCLEgJUbEph3/qd2TbTF6MWqmyOdbAw3Fr5r08GRFFXA4CHBESNYm7L
-         RxZDT0brNuJsYc7nA/Q3adMSU7OncD+oa1+HzaeYOCZkSqRG88yQjheK1brq0sYV/D
-         cm86zTCQdng4g==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     Anton Blanchard <anton@linux.ibm.com>, kvm-ppc@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] powerpc/pseries: Use doorbells even if XIVE is available
-In-Reply-To: <20200624134724.2343007-1-npiggin@gmail.com>
-References: <20200624134724.2343007-1-npiggin@gmail.com>
-Date:   Thu, 25 Jun 2020 11:11:57 +1000
-Message-ID: <87r1u4aqzm.fsf@mpe.ellerman.id.au>
+        id S2390531AbgFYJoL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 25 Jun 2020 05:44:11 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.22]:33002 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389894AbgFYJoK (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 25 Jun 2020 05:44:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1593078246;
+        s=strato-dkim-0002; d=xenosoft.de;
+        h=In-Reply-To:Date:Message-ID:References:Cc:To:From:Subject:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=U5hW8PSiYp6ibfmgdHJypypSFgg4FeKJydkPDRlhgnw=;
+        b=RiWNhCuQzsuwdoYp+GyWer0LxAk+60riAA4RRw/7RsF/tk8PJNtTLTRcckxK07yvw2
+        29x/+QzI0Q2Hu/9VBzgBRY0hmmIIoHkPZB38p4EaRzcPpWgtVnEtj1KoY75uMMyC+HI+
+        VUizBJI+aKDu1NQ3ji4FMriRzU9OsKJNK9VItO5RQwIMsoOSjUx3tLWAgr7RDS1GvEC7
+        WpjZoMIEdqa2UzfUWZlC1HJckjdkEJ1R/6NeZYKrj1l929jvCxoh/f52ZKYRhcqgWXV/
+        /Cood7umYPzqVQGZX1pQ5tMeMhY0fklJMP2ReJmCG9ZIFKPNR33YaenHPh6R7CfmTvPZ
+        5tjA==
+X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHfJ+Dkjp5DdBJSrwuuqxvPhSI1Vi9hdbute3wuvmUTfEdg9AyQ=="
+X-RZG-CLASS-ID: mo00
+Received: from [IPv6:2a02:8109:89c0:ebfc:15f9:f3ba:c3bc:6875]
+        by smtp.strato.de (RZmta 46.10.5 AUTH)
+        with ESMTPSA id 60686ew5P9c15xE
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Thu, 25 Jun 2020 11:38:01 +0200 (CEST)
+Subject: Re: PowerPC KVM-PR issue
+From:   Christian Zigotzky <chzigotzky@xenosoft.de>
+To:     Nicholas Piggin <npiggin@gmail.com>,
+        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Cc:     Darren Stevens <darren@stevens-zone.net>,
+        Christian Zigotzky <info@xenosoft.de>,
+        "R.T.Dickinson" <rtd2@xtra.co.nz>,
+        mad skateman <madskateman@gmail.com>
+References: <f7f1b233-6101-2316-7996-4654586b7d24@csgroup.eu>
+ <067BBAB3-19B6-42C6-AA9F-B9F14314255C@xenosoft.de>
+ <014e1268-dcce-61a3-8bcd-a06c43e0dfaf@csgroup.eu>
+ <7bf97562-3c6d-de73-6dbd-ccca275edc7b@xenosoft.de>
+ <87tuznq89p.fsf@linux.ibm.com>
+ <f2706f5f-62b8-9c52-08f4-59f91da48fa6@xenosoft.de>
+ <cf99a8c0-3bad-d089-de54-e02d3dba7f72@xenosoft.de>
+ <7e859f68-9455-f98f-1fa3-071619fa1731@xenosoft.de>
+ <54082b17-31bb-f529-2e9e-b84c5a5aa9ec@xenosoft.de>
+ <fffeb817-35e0-2562-b3cf-2fd476948c76@xenosoft.de>
+ <1592139127.g2951cl0h6.astroid@bobo.none>
+ <e253e916-7f50-f1df-fed1-57d14baa38e6@xenosoft.de>
+ <292cba7f-ca2b-efb0-db3d-ecd7ee5f1fad@xenosoft.de>
+Message-ID: <370689a0-5434-f480-21db-b8927ed35ae1@xenosoft.de>
+Date:   Thu, 25 Jun 2020 11:38:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <292cba7f-ca2b-efb0-db3d-ecd7ee5f1fad@xenosoft.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: de-DE
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
-> KVM supports msgsndp in guests by trapping and emulating the
-> instruction, so it was decided to always use XIVE for IPIs if it is
-> available. However on PowerVM systems, msgsndp can be used and gives
-> better performance. On large systems, high XIVE interrupt rates can
-> have sub-linear scaling, and using msgsndp can reduce the load on
-> the interrupt controller.
+On 15 June 2020 at 01:39 pm, Christian Zigotzky wrote:
+> On 14 June 2020 at 04:52 pm, Christian Zigotzky wrote:
+>> On 14 June 2020 at 02:53 pm, Nicholas Piggin wrote:
+>>> Excerpts from Christian Zigotzky's message of June 12, 2020 11:01 pm:
+>>>> On 11 June 2020 at 04:47 pm, Christian Zigotzky wrote:
+>>>>> On 10 June 2020 at 01:23 pm, Christian Zigotzky wrote:
+>>>>>> On 10 June 2020 at 11:06 am, Christian Zigotzky wrote:
+>>>>>>> On 10 June 2020 at 00:18 am, Christian Zigotzky wrote:
+>>>>>>>> Hello,
+>>>>>>>>
+>>>>>>>> KVM-PR doesn't work anymore on my Nemo board [1]. I figured out
+>>>>>>>> that the Git kernels and the kernel 5.7 are affected.
+>>>>>>>>
+>>>>>>>> Error message: Fienix kernel: kvmppc_exit_pr_progint: emulation at
+>>>>>>>> 700 failed (00000000)
+>>>>>>>>
+>>>>>>>> I can boot virtual QEMU PowerPC machines with KVM-PR with the
+>>>>>>>> kernel 5.6 without any problems on my Nemo board.
+>>>>>>>>
+>>>>>>>> I tested it with QEMU 2.5.0 and QEMU 5.0.0 today.
+>>>>>>>>
+>>>>>>>> Could you please check KVM-PR on your PowerPC machine?
+>>>>>>>>
+>>>>>>>> Thanks,
+>>>>>>>> Christian
+>>>>>>>>
+>>>>>>>> [1] https://en.wikipedia.org/wiki/AmigaOne_X1000
+>>>>>>> I figured out that the PowerPC updates 5.7-1 [1] are responsible 
+>>>>>>> for
+>>>>>>> the KVM-PR issue. Please test KVM-PR on your PowerPC machines and
+>>>>>>> check the PowerPC updates 5.7-1 [1].
+>>>>>>>
+>>>>>>> Thanks
+>>>>>>>
+>>>>>>> [1]
+>>>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d38c07afc356ddebaa3ed8ecb3f553340e05c969 
+>>>>>>>
+>>>>>>>
+>>>>>>>
+>>>>>> I tested the latest Git kernel with Mac-on-Linux/KVM-PR today.
+>>>>>> Unfortunately I can't use KVM-PR with MoL anymore because of this
+>>>>>> issue (see screenshots [1]). Please check the PowerPC updates 5.7-1.
+>>>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>>> [1]
+>>>>>> -
+>>>>>> https://i.pinimg.com/originals/0c/b3/64/0cb364a40241fa2b7f297d4272bbb8b7.png 
+>>>>>>
+>>>>>> -
+>>>>>> https://i.pinimg.com/originals/9a/61/d1/9a61d170b1c9f514f7a78a3014ffd18f.png 
+>>>>>>
+>>>>>>
+>>>>> Hi All,
+>>>>>
+>>>>> I bisected today because of the KVM-PR issue.
+>>>>>
+>>>>> Result:
+>>>>>
+>>>>> 9600f261acaaabd476d7833cec2dd20f2919f1a0 is the first bad commit
+>>>>> commit 9600f261acaaabd476d7833cec2dd20f2919f1a0
+>>>>> Author: Nicholas Piggin <npiggin@gmail.com>
+>>>>> Date:   Wed Feb 26 03:35:21 2020 +1000
+>>>>>
+>>>>>      powerpc/64s/exception: Move KVM test to common code
+>>>>>
+>>>>>      This allows more code to be moved out of unrelocated regions. 
+>>>>> The
+>>>>>      system call KVMTEST is changed to be open-coded and remain in 
+>>>>> the
+>>>>>      tramp area to avoid having to move it to entry_64.S. The custom
+>>>>> nature
+>>>>>      of the system call entry code means the hcall case can be 
+>>>>> made more
+>>>>>      streamlined than regular interrupt handlers.
+>>>>>
+>>>>>      mpe: Incorporate fix from Nick:
+>>>>>
+>>>>>      Moving KVM test to the common entry code missed the case of 
+>>>>> HMI and
+>>>>>      MCE, which do not do __GEN_COMMON_ENTRY (because they don't 
+>>>>> want to
+>>>>>      switch to virt mode).
+>>>>>
+>>>>>      This means a MCE or HMI exception that is taken while KVM is
+>>>>> running a
+>>>>>      guest context will not be switched out of that context, and 
+>>>>> KVM won't
+>>>>>      be notified. Found by running sigfuz in guest with patched 
+>>>>> host on
+>>>>>      POWER9 DD2.3, which causes some TM related HMI interrupts 
+>>>>> (which are
+>>>>>      expected and supposed to be handled by KVM).
+>>>>>
+>>>>>      This fix adds a __GEN_REALMODE_COMMON_ENTRY for those 
+>>>>> handlers to add
+>>>>>      the KVM test. This makes them look a little more like other 
+>>>>> handlers
+>>>>>      that all use __GEN_COMMON_ENTRY.
+>>>>>
+>>>>>      Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>>>>>      Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+>>>>>      Link:
+>>>>> https://lore.kernel.org/r/20200225173541.1549955-13-npiggin@gmail.com
+>>>>>
+>>>>> :040000 040000 ec21cec22d165f8696d69532734cb2985d532cb0
+>>>>> 87dd49a9cd7202ec79350e8ca26cea01f1dbd93d M    arch
+>>>>>
+>>>>> -----
+>>>>>
+>>>>> The following commit is the problem: powerpc/64s/exception: Move KVM
+>>>>> test to common code [1]
+>>>>>
+>>>>> These changes were included in the PowerPC updates 5.7-1. [2]
+>>>>>
+>>>>> Another test:
+>>>>>
+>>>>> git checkout d38c07afc356ddebaa3ed8ecb3f553340e05c969 (PowerPC 
+>>>>> updates
+>>>>> 5.7-1 [2] ) -> KVM-PR doesn't work.
+>>>>>
+>>>>> After that: git revert d38c07afc356ddebaa3ed8ecb3f553340e05c969 -m 1
+>>>>> -> KVM-PR works.
+>>>>>
+>>>>> Could you please check the first bad commit? [1]
+>>>>>
+>>>>> Thanks,
+>>>>> Christian
+>>>>>
+>>>>>
+>>>>> [1]
+>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9600f261acaaabd476d7833cec2dd20f2919f1a0 
+>>>>>
+>>>>> [2]
+>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d38c07afc356ddebaa3ed8ecb3f553340e05c969 
+>>>>>
+>>>> Hi All,
+>>>>
+>>>> I tried to revert the __GEN_REALMODE_COMMON_ENTRY fix for the 
+>>>> latest Git
+>>>> kernel and for the stable kernel 5.7.2 but without any success. There
+>>>> was lot of restructuring work during the kernel 5.7 development 
+>>>> time in
+>>>> the PowerPC area so it isn't possible reactivate the old code. That
+>>>> means we have lost the whole KVM-PR support. I also reported this 
+>>>> issue
+>>>> to Alexander Graf two days ago. He wrote: "Howdy :). It looks pretty
+>>>> broken. Have you ever made a bisect to see where the problem comes 
+>>>> from?"
+>>>>
+>>>> Please check the KVM-PR code.
+>>> Does this patch fix it for you?
+>>>
+>>> The CTR register reload in the KVM interrupt path used the wrong save
+>>> area for SLB (and NMI) interrupts.
+>>>
+>>> Fixes: 9600f261acaaa ("powerpc/64s/exception: Move KVM test to 
+>>> common code")
+>>> Reported-by: Christian Zigotzky <chzigotzky@xenosoft.de>
+>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>>> ---
+>>>   arch/powerpc/kernel/exceptions-64s.S | 4 ++--
+>>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/arch/powerpc/kernel/exceptions-64s.S 
+>>> b/arch/powerpc/kernel/exceptions-64s.S
+>>> index e70ebb5c318c..fa080694e581 100644
+>>> --- a/arch/powerpc/kernel/exceptions-64s.S
+>>> +++ b/arch/powerpc/kernel/exceptions-64s.S
+>>> @@ -270,7 +270,7 @@ BEGIN_FTR_SECTION
+>>>   END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
+>>>       .endif
+>>>   -    ld    r10,PACA_EXGEN+EX_CTR(r13)
+>>> +    ld    r10,IAREA+EX_CTR(r13)
+>>>       mtctr    r10
+>>>   BEGIN_FTR_SECTION
+>>>       ld    r10,IAREA+EX_PPR(r13)
+>>> @@ -298,7 +298,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+>>>         .if IKVM_SKIP
+>>>   89:    mtocrf    0x80,r9
+>>> -    ld    r10,PACA_EXGEN+EX_CTR(r13)
+>>> +    ld    r10,IAREA+EX_CTR(r13)
+>>>       mtctr    r10
+>>>       ld    r9,IAREA+EX_R9(r13)
+>>>       ld    r10,IAREA+EX_R10(r13)
+>> Many thanks for the fix! I will test it with the RC1 tomorrow.
+>>
+>> -- Christian
 >
-> So switch to using core local doorbells even if XIVE is available.
-> This reduces performance for KVM guests with an SMT topology by
-> about 50% for ping-pong context switching between SMT vCPUs.
+> It works! :-) Thanks a lot! Screenshot: 
+> https://i.pinimg.com/originals/5d/5f/e5/5d5fe584db474dc88bcc641450b2a7e0.png
+>
+> -- Christian
 
-You have to take explicit steps to configure KVM in that way with qemu.
-eg. "qemu .. -smp 8" will give you 8 SMT1 CPUs by default.
+Just for info: I successfully tested KVM-PR with the stable kernel 5.7.6 
+and with the RC2 of kernel 5.8 today. Thanks a lot for fixing the issue.
 
-> An option vector (or dt-cpu-ftrs) could be defined to disable msgsndp
-> to get KVM performance back.
-
-Qemu/KVM populates /proc/device-tree/hypervisor, so we *could* look at
-that. Though adding PowerVM/KVM specific hacks is obviously a very
-slippery slope.
-
-> diff --git a/arch/powerpc/platforms/pseries/smp.c b/arch/powerpc/platforms/pseries/smp.c
-> index 6891710833be..a737a2f87c67 100644
-> --- a/arch/powerpc/platforms/pseries/smp.c
-> +++ b/arch/powerpc/platforms/pseries/smp.c
-> @@ -188,13 +188,14 @@ static int pseries_smp_prepare_cpu(int cpu)
->  	return 0;
->  }
->  
-> +static void  (*cause_ipi_offcore)(int cpu) __ro_after_init;
-> +
->  static void smp_pseries_cause_ipi(int cpu)
-
-This is static so the name could be more descriptive, it doesn't need
-the "smp_pseries" prefix.
-
->  {
-> -	/* POWER9 should not use this handler */
->  	if (doorbell_try_core_ipi(cpu))
->  		return;
-
-Seems like it would be worth making that static inline so we can avoid
-the function call overhead.
-
-> -	icp_ops->cause_ipi(cpu);
-> +	cause_ipi_offcore(cpu);
->  }
->  
->  static int pseries_cause_nmi_ipi(int cpu)
-> @@ -222,10 +223,7 @@ static __init void pSeries_smp_probe_xics(void)
->  {
->  	xics_smp_probe();
->  
-> -	if (cpu_has_feature(CPU_FTR_DBELL) && !is_secure_guest())
-> -		smp_ops->cause_ipi = smp_pseries_cause_ipi;
-> -	else
-> -		smp_ops->cause_ipi = icp_ops->cause_ipi;
-> +	smp_ops->cause_ipi = icp_ops->cause_ipi;
->  }
->  
->  static __init void pSeries_smp_probe(void)
-> @@ -238,6 +236,18 @@ static __init void pSeries_smp_probe(void)
-
-The comment just above here says:
-
-		/*
-		 * Don't use P9 doorbells when XIVE is enabled. IPIs
-		 * using MMIOs should be faster
-		 */
->  		xive_smp_probe();
-
-Which is no longer true.
-
->  	else
->  		pSeries_smp_probe_xics();
-
-I think you should just fold this in, it would make the logic slightly
-easier to follow.
-
-> +	/*
-> +	 * KVM emulates doorbells by reading the instruction, which
-> +	 * can't be done if the guest is secure. If a secure guest
-> +	 * runs under PowerVM, it could use msgsndp but would need a
-> +	 * way to distinguish.
-> +	 */
-
-It's not clear what it needs to distinguish: That it's running under
-PowerVM and therefore *can* use msgsndp even though it's secure.
-
-Also the comment just talks about the is_secure_guest() test, which is
-not obvious on first reading.
-
-> +	if (cpu_has_feature(CPU_FTR_DBELL) &&
-> +	    cpu_has_feature(CPU_FTR_SMT) && !is_secure_guest()) {
-> +		cause_ipi_offcore = smp_ops->cause_ipi;
-> +		smp_ops->cause_ipi = smp_pseries_cause_ipi;
-> +	}
-
-Because we're at the tail of the function I think this would be clearer
-if it used early returns, eg:
-
-	// If the CPU doesn't have doorbells then we must use xics/xive
-	if (!cpu_has_feature(CPU_FTR_DBELL))
-        	return;
-
-	// If the CPU doesn't have SMT then doorbells don't help us
-	if (!cpu_has_feature(CPU_FTR_SMT))
-        	return;
-
-	// Secure guests can't use doorbells because ...
-	if (!is_secure_guest()
-        	return;
-
-	/*
-         * Otherwise we want to use doorbells for sibling threads and
-         * xics/xive for IPIs off the core, because it performs better
-         * on large systems ...
-         */
-        cause_ipi_offcore = smp_ops->cause_ipi;
-	smp_ops->cause_ipi = smp_pseries_cause_ipi;
-}
-
-
-cheers
+-- Christian
