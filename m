@@ -2,89 +2,126 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 10C6920C46B
-	for <lists+kvm-ppc@lfdr.de>; Sat, 27 Jun 2020 23:54:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EA1C20C8EB
+	for <lists+kvm-ppc@lfdr.de>; Sun, 28 Jun 2020 18:12:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726067AbgF0Vyi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 27 Jun 2020 17:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49372 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726356AbgF0Vyf (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 27 Jun 2020 17:54:35 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5462AC08C5DF
-        for <kvm-ppc@vger.kernel.org>; Sat, 27 Jun 2020 14:54:34 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id e22so9580063edq.8
-        for <kvm-ppc@vger.kernel.org>; Sat, 27 Jun 2020 14:54:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=hDm0J70xfMLbVvceQHwxPddZCp69UMTk2d0jtKg2a8s=;
-        b=PYwOu/B9Zh1rGzZM903Cpprywb83FCHUtNAUuiOO0o6zs6WHjlze2LXOC3hVAaGqcP
-         lg7H4pa9zGY5Ifm/Occ0RSYzXURL4hgFya6cts8HRx910s07nHPIQwuHOvC3CwSKWut7
-         W7lHESSwdkUYp3mu8F/+ONYut3Xpn3qtWv5jbLpGSjBshJ6ekhTBSCO1eoCC+HE4g/pN
-         3Oq9TtTNO3vJkKpqsqb3C/rPMy7fWmWmLKFmTu0RNDEBF2l3QJGtADAOwr4WGY+PWDtj
-         ZF9Zp08l9P41yL3JuvQth6+fpngrtjfi+iLA8IyUin9bEaOUirNwHBVJYrXrLbKq6R8z
-         N31g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=hDm0J70xfMLbVvceQHwxPddZCp69UMTk2d0jtKg2a8s=;
-        b=VURHnU0cTu3EBMUPgC6UczmxA2X9LH62mxQ/W6/L3lvPh141UZYgvQJVDhredbWsB3
-         yujtHtfrfzYWRlRr4AEO4csXOHMzgLiHRpZuxMFN9lhAZREhajt/LbUCdIZmpnrx7gyW
-         Nnlwy0PcnOYwWo4Wvz/9d+nsAYOSl2Hx9JN4E7VBzHHHFLqfSKf1PYEa0pOzylBYjtIl
-         PW0g888RHsUrZLzsh/2s2CC1iVTqWEKLq+ktzz9ESC8sEKt06xLWFyRzrJL7ddP+fIKU
-         EN8xf5ZVPD0eBXRGekY5h0WRzMVuM1TZp3ra9BeKiy/nHQzs0VbuECYKrSBjS2Q/tQ+T
-         J1IA==
-X-Gm-Message-State: AOAM531mIAhhbCcy8M8EOQ4ZyAg01HpZWz4Oa6yNQJmuMXN59nKpBam8
-        CgHNG/pAk4OZmSj4OY/7YzHnIp76wJ6HQQup2uY=
-X-Google-Smtp-Source: ABdhPJy7OcR58Wulf3SrU9Hht/iHCkUTpvI0mqyV7myFOjn+5WspC4moqDhEDDIlhUbuX6rLtkz2lPM5XKvW/5XrhRs=
-X-Received: by 2002:a50:ee84:: with SMTP id f4mr9900212edr.183.1593294872387;
- Sat, 27 Jun 2020 14:54:32 -0700 (PDT)
+        id S1726007AbgF1QMN (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 28 Jun 2020 12:12:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31552 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726002AbgF1QMM (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 28 Jun 2020 12:12:12 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05SG39VW175324;
+        Sun, 28 Jun 2020 12:11:59 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31x2m7xatx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 28 Jun 2020 12:11:59 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05SG7eIj031558;
+        Sun, 28 Jun 2020 16:11:57 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma05fra.de.ibm.com with ESMTP id 31wwr88net-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 28 Jun 2020 16:11:56 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05SGBrks35586218
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 28 Jun 2020 16:11:53 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D0528A4053;
+        Sun, 28 Jun 2020 16:11:53 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AA88BA4040;
+        Sun, 28 Jun 2020 16:11:51 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.85.74.221])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Sun, 28 Jun 2020 16:11:51 +0000 (GMT)
+Date:   Sun, 28 Jun 2020 21:41:49 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     Ram Pai <linuxram@us.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
+        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
+        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
+        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
+        sathnaga@linux.vnet.ibm.com
+Subject: Re: [PATCH v3 0/4] Migrate non-migrated pages of a SVM.
+Message-ID: <20200628161149.GA27215@in.ibm.com>
+Reply-To: bharata@linux.ibm.com
+References: <1592606622-29884-1-git-send-email-linuxram@us.ibm.com>
 MIME-Version: 1.0
-Received: by 2002:a50:2842:0:0:0:0:0 with HTTP; Sat, 27 Jun 2020 14:54:31
- -0700 (PDT)
-Reply-To: un.org@i.ua
-From:   helen <info.isaacgeorge@gmail.com>
-Date:   Sat, 27 Jun 2020 22:54:31 +0100
-Message-ID: <CAABX3N8zm7a58jU5g8fzjfpsKNf48aUsUHECRV0m9PDLWU814A@mail.gmail.com>
-Subject: 
-To:     zhang@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1592606622-29884-1-git-send-email-linuxram@us.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-28_11:2020-06-26,2020-06-28 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 malwarescore=0 suspectscore=1 mlxlogscore=943
+ phishscore=0 bulkscore=0 mlxscore=0 priorityscore=1501
+ cotscore=-2147483648 clxscore=1015 spamscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006280120
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-MONEY-GRAM TRANSFERRED PAYMENT INFO:
+On Fri, Jun 19, 2020 at 03:43:38PM -0700, Ram Pai wrote:
+> The time taken to switch a VM to Secure-VM, increases by the size of the VM.  A
+> 100GB VM takes about 7minutes. This is unacceptable.  This linear increase is
+> caused by a suboptimal behavior by the Ultravisor and the Hypervisor.  The
+> Ultravisor unnecessarily migrates all the GFN of the VM from normal-memory to
+> secure-memory. It has to just migrate the necessary and sufficient GFNs.
+> 
+> However when the optimization is incorporated in the Ultravisor, the Hypervisor
+> starts misbehaving. The Hypervisor has a inbuilt assumption that the Ultravisor
+> will explicitly request to migrate, each and every GFN of the VM. If only
+> necessary and sufficient GFNs are requested for migration, the Hypervisor
+> continues to manage the remaining GFNs as normal GFNs. This leads of memory
+> corruption, manifested consistently when the SVM reboots.
+> 
+> The same is true, when a memory slot is hotplugged into a SVM. The Hypervisor
+> expects the ultravisor to request migration of all GFNs to secure-GFN.  But at
+> the same time, the hypervisor is unable to handle any H_SVM_PAGE_IN requests
+> from the Ultravisor, done in the context of UV_REGISTER_MEM_SLOT ucall.  This
+> problem manifests as random errors in the SVM, when a memory-slot is
+> hotplugged.
+> 
+> This patch series automatically migrates the non-migrated pages of a SVM,
+>      and thus solves the problem.
 
-Below is the sender=E2=80=99s information
+So this is what I understand as the objective of this patchset:
 
+1. Getting all the pages into the secure memory right when the guest
+   transitions into secure mode is expensive. Ultravisor wants to just get
+   the necessary and sufficient pages in and put the onus on the Hypervisor
+   to mark the remaining pages (w/o actual page-in) as secure during
+   H_SVM_INIT_DONE.
+2. During H_SVM_INIT_DONE, you want a way to differentiate the pages that
+   are already secure from the pages that are shared and that are paged-out.
+   For this you are introducing all these new states in HV.
 
+UV knows about the shared GFNs and maintains the state of the same. Hence
+let HV send all the pages (minus already secured pages) via H_SVM_PAGE_IN
+and if UV finds any shared pages in them, let it fail the uv-page-in call.
+Then HV can fail the migration for it  and the page continues to remain
+shared. With this, you don't need to maintain a state for secured GFN in HV.
 
-1. MG. REFERENCE NO#: 36360857
+In the unlikely case of sending a paged-out page to UV during
+H_SVM_INIT_DONE, let the page-in succeed and HV will fault on it again
+if required. With this, you don't need a state in HV to identify a
+paged-out-but-encrypted state.
 
-2. SENDER'S NAME: Johnson Williams
+Doesn't the above work? If so, we can avoid all those extra states
+in HV. That way HV can continue to differentiate only between two types
+of pages: secure and not-secure. The rest of the states (shared,
+paged-out-encrypted) actually belong to SVM/UV and let UV take care of
+them.
 
-3. AMOUNT TO PICKUP: US$10,000
+Or did I miss something?
 
-
-
-Go to any Money Gram office near you and pick up the payment Track the
-
-Reference Number by visiting and click the link below
-
-(https://secure.moneygram.com/embed/track) and enter the Reference
-
-Number: 36360857 and the Last Name: Williams, you will find the payment
-
-available for pickup instantly.
-
-Yours Sincerely,
-
-Mrs. Helen Marvis
-United Nations Liaison Office
-Directorate for International Payments
+Regards,
+Bharata.
