@@ -2,129 +2,334 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 912CD20DE21
-	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Jun 2020 23:52:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EEE120E573
+	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Jun 2020 00:07:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731300AbgF2UWz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 29 Jun 2020 16:22:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11096 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732576AbgF2TZc (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Jun 2020 15:25:32 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05TJ3Xeg043662;
-        Mon, 29 Jun 2020 15:25:21 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31x1rv25u3-1
+        id S1729436AbgF2VhH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 29 Jun 2020 17:37:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26776 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728403AbgF2Skj (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Jun 2020 14:40:39 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05T8X909168789;
+        Mon, 29 Jun 2020 04:48:24 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31ybntjymu-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 29 Jun 2020 15:25:21 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05TJJpVY014429;
-        Mon, 29 Jun 2020 19:25:19 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 31wwr899kq-1
+        Mon, 29 Jun 2020 04:48:23 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05T8eO9X029171;
+        Mon, 29 Jun 2020 08:48:22 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma01fra.de.ibm.com with ESMTP id 31wyyas349-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 29 Jun 2020 19:25:18 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05TJPGgg11010472
+        Mon, 29 Jun 2020 08:48:21 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05T8mIfn61734922
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Jun 2020 19:25:16 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F198C42041;
-        Mon, 29 Jun 2020 19:25:15 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 29F4042047;
-        Mon, 29 Jun 2020 19:25:13 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.163.34.71])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 29 Jun 2020 19:25:12 +0000 (GMT)
-Date:   Mon, 29 Jun 2020 12:25:10 -0700
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Bharata B Rao <bharata@linux.ibm.com>
+        Mon, 29 Jun 2020 08:48:19 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D41D652054;
+        Mon, 29 Jun 2020 08:48:18 +0000 (GMT)
+Received: from pomme.local (unknown [9.145.167.117])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3FF4B52050;
+        Mon, 29 Jun 2020 08:48:18 +0000 (GMT)
+Subject: Re: [PATCH v3 3/4] KVM: PPC: Book3S HV: migrate remaining normal-GFNs
+ to secure-GFNs in H_SVM_INIT_DONE
+To:     bharata@linux.ibm.com, Ram Pai <linuxram@us.ibm.com>
 Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
         aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
-        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
-        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
-        sathnaga@linux.vnet.ibm.com
-Subject: Re: [PATCH v3 0/4] Migrate non-migrated pages of a SVM.
-Message-ID: <20200629192510.GD6772@oc0525413822.ibm.com>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
+        bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
+        cclaudio@linux.ibm.com, sathnaga@linux.vnet.ibm.com
 References: <1592606622-29884-1-git-send-email-linuxram@us.ibm.com>
- <20200628161149.GA27215@in.ibm.com>
- <20200629015330.GC27215@in.ibm.com>
+ <1592606622-29884-4-git-send-email-linuxram@us.ibm.com>
+ <20200628162047.GB27215@in.ibm.com>
+From:   Laurent Dufour <ldufour@linux.ibm.com>
+Message-ID: <3d9c08dc-397e-e144-27be-f88e4641b976@linux.ibm.com>
+Date:   Mon, 29 Jun 2020 10:48:18 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200629015330.GC27215@in.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20200628162047.GB27215@in.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-06-29_21:2020-06-29,2020-06-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- cotscore=-2147483648 lowpriorityscore=0 phishscore=0 spamscore=0
- bulkscore=0 adultscore=0 mlxlogscore=999 suspectscore=0 clxscore=1015
- malwarescore=0 mlxscore=0 impostorscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006290120
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-29_07:2020-06-26,2020-06-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ bulkscore=0 priorityscore=1501 malwarescore=0 spamscore=0 adultscore=0
+ clxscore=1015 impostorscore=0 mlxlogscore=999 phishscore=0 suspectscore=2
+ cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006290057
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Jun 29, 2020 at 07:23:30AM +0530, Bharata B Rao wrote:
-> On Sun, Jun 28, 2020 at 09:41:53PM +0530, Bharata B Rao wrote:
-> > On Fri, Jun 19, 2020 at 03:43:38PM -0700, Ram Pai wrote:
-> > > The time taken to switch a VM to Secure-VM, increases by the size of the VM.  A
-> > > 100GB VM takes about 7minutes. This is unacceptable.  This linear increase is
-> > > caused by a suboptimal behavior by the Ultravisor and the Hypervisor.  The
-> > > Ultravisor unnecessarily migrates all the GFN of the VM from normal-memory to
-> > > secure-memory. It has to just migrate the necessary and sufficient GFNs.
-> > > 
-> > > However when the optimization is incorporated in the Ultravisor, the Hypervisor
-> > > starts misbehaving. The Hypervisor has a inbuilt assumption that the Ultravisor
-> > > will explicitly request to migrate, each and every GFN of the VM. If only
-> > > necessary and sufficient GFNs are requested for migration, the Hypervisor
-> > > continues to manage the remaining GFNs as normal GFNs. This leads of memory
-> > > corruption, manifested consistently when the SVM reboots.
-> > > 
-> > > The same is true, when a memory slot is hotplugged into a SVM. The Hypervisor
-> > > expects the ultravisor to request migration of all GFNs to secure-GFN.  But at
-> > > the same time, the hypervisor is unable to handle any H_SVM_PAGE_IN requests
-> > > from the Ultravisor, done in the context of UV_REGISTER_MEM_SLOT ucall.  This
-> > > problem manifests as random errors in the SVM, when a memory-slot is
-> > > hotplugged.
-> > > 
-> > > This patch series automatically migrates the non-migrated pages of a SVM,
-> > >      and thus solves the problem.
-> > 
-> > So this is what I understand as the objective of this patchset:
-> > 
-> > 1. Getting all the pages into the secure memory right when the guest
-> >    transitions into secure mode is expensive. Ultravisor wants to just get
-> >    the necessary and sufficient pages in and put the onus on the Hypervisor
-> >    to mark the remaining pages (w/o actual page-in) as secure during
-> >    H_SVM_INIT_DONE.
-> > 2. During H_SVM_INIT_DONE, you want a way to differentiate the pages that
-> >    are already secure from the pages that are shared and that are paged-out.
-> >    For this you are introducing all these new states in HV.
-> > 
-> > UV knows about the shared GFNs and maintains the state of the same. Hence
-> > let HV send all the pages (minus already secured pages) via H_SVM_PAGE_IN
-> > and if UV finds any shared pages in them, let it fail the uv-page-in call.
-> > Then HV can fail the migration for it  and the page continues to remain
-> > shared. With this, you don't need to maintain a state for secured GFN in HV.
-> > 
-> > In the unlikely case of sending a paged-out page to UV during
-> > H_SVM_INIT_DONE, let the page-in succeed and HV will fault on it again
-> > if required. With this, you don't need a state in HV to identify a
-> > paged-out-but-encrypted state.
-> > 
-> > Doesn't the above work?
+Le 28/06/2020 à 18:20, Bharata B Rao a écrit :
+> On Fri, Jun 19, 2020 at 03:43:41PM -0700, Ram Pai wrote:
+>> H_SVM_INIT_DONE incorrectly assumes that the Ultravisor has explicitly
 > 
-> I see that you want to infact skip the uv-page-in calls from H_SVM_INIT_DONE.
-> So that would need the extra states in HV which you are proposing here.
+> As noted in the last iteration, can you reword the above please?
+> I don't see it as an incorrect assumption, but see it as extension of
+> scope now :-)
+> 
+>> called H_SVM_PAGE_IN for all secure pages. These GFNs continue to be
+>> normal GFNs associated with normal PFNs; when infact, these GFNs should
+>> have been secure GFNs, associated with device PFNs.
+>>
+>> Move all the PFNs associated with the SVM's GFNs, to secure-PFNs, in
+>> H_SVM_INIT_DONE. Skip the GFNs that are already Paged-in or Shared
+>> through H_SVM_PAGE_IN, or Paged-in followed by a Paged-out through
+>> UV_PAGE_OUT.
+>>
+>> Cc: Paul Mackerras <paulus@ozlabs.org>
+>> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>> Cc: Michael Ellerman <mpe@ellerman.id.au>
+>> Cc: Bharata B Rao <bharata@linux.ibm.com>
+>> Cc: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+>> Cc: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+>> Cc: Laurent Dufour <ldufour@linux.ibm.com>
+>> Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+>> Cc: David Gibson <david@gibson.dropbear.id.au>
+>> Cc: Claudio Carvalho <cclaudio@linux.ibm.com>
+>> Cc: kvm-ppc@vger.kernel.org
+>> Cc: linuxppc-dev@lists.ozlabs.org
+>> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+>> ---
+>>   Documentation/powerpc/ultravisor.rst        |   2 +
+>>   arch/powerpc/include/asm/kvm_book3s_uvmem.h |   2 +
+>>   arch/powerpc/kvm/book3s_hv_uvmem.c          | 154 +++++++++++++++++++++++-----
+>>   3 files changed, 132 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/Documentation/powerpc/ultravisor.rst b/Documentation/powerpc/ultravisor.rst
+>> index 363736d..3bc8957 100644
+>> --- a/Documentation/powerpc/ultravisor.rst
+>> +++ b/Documentation/powerpc/ultravisor.rst
+>> @@ -933,6 +933,8 @@ Return values
+>>   	* H_UNSUPPORTED		if called from the wrong context (e.g.
+>>   				from an SVM or before an H_SVM_INIT_START
+>>   				hypercall).
+>> +	* H_STATE		if the hypervisor could not successfully
+>> +                                transition the VM to Secure VM.
+>>   
+>>   Description
+>>   ~~~~~~~~~~~
+>> diff --git a/arch/powerpc/include/asm/kvm_book3s_uvmem.h b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
+>> index 5a9834e..b9cd7eb 100644
+>> --- a/arch/powerpc/include/asm/kvm_book3s_uvmem.h
+>> +++ b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
+>> @@ -22,6 +22,8 @@ unsigned long kvmppc_h_svm_page_out(struct kvm *kvm,
+>>   unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm);
+>>   void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
+>>   			     struct kvm *kvm, bool skip_page_out);
+>> +int kvmppc_uv_migrate_mem_slot(struct kvm *kvm,
+>> +			const struct kvm_memory_slot *memslot);
+>>   #else
+>>   static inline int kvmppc_uvmem_init(void)
+>>   {
+>> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+>> index c8c0290..449e8a7 100644
+>> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+>> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+>> @@ -93,6 +93,7 @@
+>>   #include <asm/ultravisor.h>
+>>   #include <asm/mman.h>
+>>   #include <asm/kvm_ppc.h>
+>> +#include <asm/kvm_book3s_uvmem.h>
+>>   
+>>   static struct dev_pagemap kvmppc_uvmem_pgmap;
+>>   static unsigned long *kvmppc_uvmem_bitmap;
+>> @@ -339,6 +340,21 @@ static bool kvmppc_gfn_is_uvmem_pfn(unsigned long gfn, struct kvm *kvm,
+>>   	return false;
+>>   }
+>>   
+>> +/* return true, if the GFN is a shared-GFN, or a secure-GFN */
+>> +bool kvmppc_gfn_has_transitioned(unsigned long gfn, struct kvm *kvm)
+>> +{
+>> +	struct kvmppc_uvmem_slot *p;
+>> +
+>> +	list_for_each_entry(p, &kvm->arch.uvmem_pfns, list) {
+>> +		if (gfn >= p->base_pfn && gfn < p->base_pfn + p->nr_pfns) {
+>> +			unsigned long index = gfn - p->base_pfn;
+>> +
+>> +			return (p->pfns[index] & KVMPPC_GFN_FLAG_MASK);
+>> +		}
+>> +	}
+>> +	return false;
+>> +}
+>> +
+>>   unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>>   {
+>>   	struct kvm_memslots *slots;
+>> @@ -379,12 +395,31 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>>   
+>>   unsigned long kvmppc_h_svm_init_done(struct kvm *kvm)
+>>   {
+>> +	struct kvm_memslots *slots;
+>> +	struct kvm_memory_slot *memslot;
+>> +	int srcu_idx;
+>> +	long ret = H_SUCCESS;
+>> +
+>>   	if (!(kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START))
+>>   		return H_UNSUPPORTED;
+>>   
+>> +	/* migrate any unmoved normal pfn to device pfns*/
+>> +	srcu_idx = srcu_read_lock(&kvm->srcu);
+>> +	slots = kvm_memslots(kvm);
+>> +	kvm_for_each_memslot(memslot, slots) {
+>> +		ret = kvmppc_uv_migrate_mem_slot(kvm, memslot);
+>> +		if (ret) {
+>> +			ret = H_STATE;
+>> +			goto out;
+>> +		}
+>> +	}
+>> +
+>>   	kvm->arch.secure_guest |= KVMPPC_SECURE_INIT_DONE;
+>>   	pr_info("LPID %d went secure\n", kvm->arch.lpid);
+>> -	return H_SUCCESS;
+>> +
+>> +out:
+>> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
+>> +	return ret;
+>>   }
+>>   
+>>   /*
+>> @@ -505,12 +540,14 @@ static struct page *kvmppc_uvmem_get_page(unsigned long gpa, struct kvm *kvm)
+>>   }
+>>   
+>>   /*
+>> - * Alloc a PFN from private device memory pool and copy page from normal
+>> - * memory to secure memory using UV_PAGE_IN uvcall.
+>> + * Alloc a PFN from private device memory pool. If @pagein is true,
+>> + * copy page from normal memory to secure memory using UV_PAGE_IN uvcall.
+>>    */
+>> -static int kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
+>> -		   unsigned long end, unsigned long gpa, struct kvm *kvm,
+>> -		   unsigned long page_shift, bool *downgrade)
+>> +static int kvmppc_svm_migrate_page(struct vm_area_struct *vma,
+>> +		unsigned long start,
+>> +		unsigned long end, unsigned long gpa, struct kvm *kvm,
+>> +		unsigned long page_shift,
+>> +		bool pagein)
+>>   {
+>>   	unsigned long src_pfn, dst_pfn = 0;
+>>   	struct migrate_vma mig;
+>> @@ -526,18 +563,6 @@ static int kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
+>>   	mig.src = &src_pfn;
+>>   	mig.dst = &dst_pfn;
+>>   
+>> -	/*
+>> -	 * We come here with mmap_sem write lock held just for
+>> -	 * ksm_madvise(), otherwise we only need read mmap_sem.
+>> -	 * Hence downgrade to read lock once ksm_madvise() is done.
+>> -	 */
+> 
+> Can you please retain this comment? This explains why we take write lock
+> and then downgrade.
+> 
+>> -	ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
+>> -			  MADV_UNMERGEABLE, &vma->vm_flags);
+>> -	downgrade_write(&kvm->mm->mmap_sem);
+>> -	*downgrade = true;
+> 
+> When I introduced this variable, there was a suggestion to rename it
+> to "downgraded", but we were a bit late then. When you are touching
+> this now, can you rename it appropriately?
+> 
+>> -	if (ret)
+>> -		return ret;
+>> -
+>>   	ret = migrate_vma_setup(&mig);
+>>   	if (ret)
+>>   		return ret;
+>> @@ -553,11 +578,16 @@ static int kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
+>>   		goto out_finalize;
+>>   	}
+>>   
+>> -	pfn = *mig.src >> MIGRATE_PFN_SHIFT;
+>> -	spage = migrate_pfn_to_page(*mig.src);
+>> -	if (spage)
+>> -		uv_page_in(kvm->arch.lpid, pfn << page_shift, gpa, 0,
+>> -			   page_shift);
+>> +	if (pagein) {
+>> +		pfn = *mig.src >> MIGRATE_PFN_SHIFT;
+>> +		spage = migrate_pfn_to_page(*mig.src);
+>> +		if (spage) {
+>> +			ret = uv_page_in(kvm->arch.lpid, pfn << page_shift,
+>> +					gpa, 0, page_shift);
+>> +			if (ret)
+>> +				goto out_finalize;
+>> +		}
+>> +	}
+>>   
+>>   	*mig.dst = migrate_pfn(page_to_pfn(dpage)) | MIGRATE_PFN_LOCKED;
+>>   	migrate_vma_pages(&mig);
+>> @@ -566,6 +596,66 @@ static int kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
+>>   	return ret;
+>>   }
+>>   
+>> +int kvmppc_uv_migrate_mem_slot(struct kvm *kvm,
+>> +		const struct kvm_memory_slot *memslot)
+>> +{
+>> +	unsigned long gfn = memslot->base_gfn;
+>> +	unsigned long end;
+>> +	bool downgrade = false;
+>> +	struct vm_area_struct *vma;
+>> +	int i, ret = 0;
+>> +	unsigned long start = gfn_to_hva(kvm, gfn);
+>> +
+>> +	if (kvm_is_error_hva(start))
+>> +		return H_STATE;
+>> +
+>> +	end = start + (memslot->npages << PAGE_SHIFT);
+>> +
+>> +	down_write(&kvm->mm->mmap_sem);
+>> +
+>> +	mutex_lock(&kvm->arch.uvmem_lock);
+>> +	vma = find_vma_intersection(kvm->mm, start, end);
+>> +	if (!vma || vma->vm_start > start || vma->vm_end < end) {
+>> +		ret = H_STATE;
+>> +		goto out_unlock;
+>> +	}
+>> +
+>> +	ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
+>> +			  MADV_UNMERGEABLE, &vma->vm_flags);
+>> +	downgrade_write(&kvm->mm->mmap_sem);
+>> +	downgrade = true;
+>> +	if (ret) {
+>> +		ret = H_STATE;
+>> +		goto out_unlock;
+>> +	}
+>> +
+>> +	for (i = 0; i < memslot->npages; i++, ++gfn) {
+>> +		/*
+>> +		 * skip GFNs that have already tranistioned.
+>> +		 * paged-in GFNs, shared GFNs, paged-in GFNs
+>> +		 * that were later paged-out.
+>> +		 */
+>> +		if (kvmppc_gfn_has_transitioned(gfn, kvm))
+>> +			continue;
+>> +
+>> +		start = gfn_to_hva(kvm, gfn);
+>> +		end = start + (1UL << PAGE_SHIFT);
+>> +		ret = kvmppc_svm_migrate_page(vma, start, end,
+>> +			(gfn << PAGE_SHIFT), kvm, PAGE_SHIFT, false);
+>> +
+> 
+> As I said last time, you are assuming that the vma that you obtained
+> in the beginning actually spans the entire memslot range. This might
+> be true as you haven't found any issues during testing, but I feel it
+> is better if there is no such implicit assumption in the code here.
 
-Yes. I want to skip to speed up the overall ESM switch.
+I agree that assumptions are sometimes not good for future work, but here the 
+mmap_sem is held, and the VMA's boundaries have already been checked, so how 
+could the VMA not spans over the memslot's range?
 
-RP
+Am I missing something?
+
+Cheers,
+Laurent.
