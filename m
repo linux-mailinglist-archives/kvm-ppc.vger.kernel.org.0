@@ -2,92 +2,68 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A1BA20F06F
-	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Jun 2020 10:26:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03ED720F0B2
+	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Jun 2020 10:44:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731014AbgF3I0Q (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 30 Jun 2020 04:26:16 -0400
-Received: from ozlabs.org ([203.11.71.1]:49507 "EHLO ozlabs.org"
+        id S1731634AbgF3IoC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 30 Jun 2020 04:44:02 -0400
+Received: from smtp3.sd73.bc.ca ([142.24.50.246]:43744 "EHLO smtp3.sd73.bc.ca"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727059AbgF3I0Q (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 30 Jun 2020 04:26:16 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 49wy9y650Xz9sR4; Tue, 30 Jun 2020 18:26:14 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1593505574; bh=JbOYm2XV+atwgocCfiD7EFquDxzd1zUoFHSLuxojxvc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Bdc3UNQK5NBUOHQw7ss2AdD1micdJVbavu7gcDloFI6Lljs882WfVaYGdVz7ngIAe
-         xmHIVLcG94NVEWkPQ1vDB8onPqrXXUpTeT8GhRb6MCYyPKWtx57TQnbBD1/VxVSrYk
-         zQGWAO4bKpQvA/ujp7IKZ03uHWF6UTqCR0zOUJ/ReS+HsnFaF7gxgL/l1uTWEQgW5W
-         HiNTPahpWc+Qq/V8vT+2Uwdwt0/3QF8TiY06RsGH9eJyN1rEWjT71YmnnPLjid1vgq
-         qM/K+7sCsQzDn46HdQkNuciK+JnHkNq4xgr33zBdaaM2St8vHGPmmtI1h545uOiFj4
-         tvnam+sbO41LA==
-Date:   Tue, 30 Jun 2020 18:26:07 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     Anton Blanchard <anton@linux.ibm.com>,
-        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 3/3] powerpc/pseries: Add KVM guest doorbell restrictions
-Message-ID: <20200630082607.GB618342@thinks.paulus.ozlabs.org>
-References: <20200627150428.2525192-1-npiggin@gmail.com>
- <20200627150428.2525192-4-npiggin@gmail.com>
- <20200630022713.GA618342@thinks.paulus.ozlabs.org>
- <1593495049.cacw882re0.astroid@bobo.none>
+        id S1731633AbgF3IoC (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 30 Jun 2020 04:44:02 -0400
+X-Greylist: delayed 2766 seconds by postgrey-1.27 at vger.kernel.org; Tue, 30 Jun 2020 04:44:02 EDT
+Received: from smtp.sd73.bc.ca (smtp.sd73.bc.ca [10.10.10.14])
+        by smtp3.sd73.bc.ca (Postfix) with ESMTP id D5C7065D01;
+        Tue, 30 Jun 2020 00:46:25 -0700 (PDT)
+Received: from zimbra2.sd73.bc.ca (zimbra.sd73.bc.ca [10.10.10.7])
+        by smtp.sd73.bc.ca (Postfix) with ESMTP id CD181E03FC;
+        Tue, 30 Jun 2020 00:45:42 -0700 (PDT)
+Received: from zimbra2.sd73.bc.ca (localhost [127.0.0.1])
+        by zimbra2.sd73.bc.ca (Postfix) with ESMTPS id BE15E5C1412026;
+        Tue, 30 Jun 2020 00:38:51 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by zimbra2.sd73.bc.ca (Postfix) with ESMTP id 7429F5C162793E;
+        Tue, 30 Jun 2020 00:38:51 -0700 (PDT)
+Received: from zimbra2.sd73.bc.ca ([127.0.0.1])
+        by localhost (zimbra2.sd73.bc.ca [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 7sLFoEjm078Y; Tue, 30 Jun 2020 00:38:51 -0700 (PDT)
+Received: from zimbra2.sd73.bc.ca (zimbra3.sd73.bc.ca [10.10.10.7])
+        by zimbra2.sd73.bc.ca (Postfix) with ESMTP id 2BB845C19188CB;
+        Tue, 30 Jun 2020 00:38:50 -0700 (PDT)
+Date:   Tue, 30 Jun 2020 00:38:50 -0700 (PDT)
+From:   charles jackson <lisa.petel@sd73.bc.ca>
+Reply-To: charles jackson <charlesjacksonjr001@gmail.com>
+Message-ID: <896019974.67030338.1593502730031.JavaMail.zimbra@zimbra.sd73.bc.ca>
+Subject: =?UTF-8?Q?=5BPossible_Spam=5D_Covid?= =?UTF-8?Q?_19_Wohlt=C3=A4tigkeitsfon?= =?UTF-8?Q?ds?=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1593495049.cacw882re0.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.10.10.90]
+X-Mailer: Zimbra 8.6.0_GA_1242 (zclient/8.6.0_GA_1242)
+Thread-Topic: Covid 19 =?utf-8?Q?Wohlt=C3=A4tigkeitsfonds?=
+Thread-Index: sEIJfYftsjm+PyIo9SDrGUZNF0q0+Q==
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Jun 30, 2020 at 03:35:08PM +1000, Nicholas Piggin wrote:
-> Excerpts from Paul Mackerras's message of June 30, 2020 12:27 pm:
-> > On Sun, Jun 28, 2020 at 01:04:28AM +1000, Nicholas Piggin wrote:
-> >> KVM guests have certain restrictions and performance quirks when
-> >> using doorbells. This patch tests for KVM environment in doorbell
-> >> setup, and optimises IPI performance:
-> >> 
-> >>  - PowerVM guests may now use doorbells even if they are secure.
-> >> 
-> >>  - KVM guests no longer use doorbells if XIVE is available.
-> > 
-> > It seems, from the fact that you completely remove
-> > kvm_para_available(), that you perhaps haven't tried building with
-> > CONFIG_KVM_GUEST=y.
-> 
-> It's still there and builds:
 
-OK, good, I missed that.
 
-> static inline int kvm_para_available(void)
-> {
->         return IS_ENABLED(CONFIG_KVM_GUEST) && is_kvm_guest();
-> }
-> 
-> but...
-> 
-> > Somewhat confusingly, that option is not used or
-> > needed when building for a PAPR guest (i.e. the "pseries" platform)
-> > but is used on non-IBM platforms using the "epapr" hypervisor
-> > interface.
-> 
-> ... is_kvm_guest() returns false on !PSERIES now.
-
-And therefore kvm_para_available() returns false on all the platforms
-where the code that depends on it could actually be used.
-
-It's not correct to assume that !PSERIES means not a KVM guest.
-
-> Not intended
-> to break EPAPR. I'm not sure of a good way to share this between
-> EPAPR and PSERIES, I might just make a copy of it but I'll see.
-
-OK, so you're doing a new version?
-
-Regards,
-Paul.
+-- 
+Hallo
+ 
+ Ich bin Charles W. Jackson aus North Carolina, Vereinigte Staaten von Amerika, und ich bin der Gewinner des Mega-Millionen-Jackpots von 344 Millionen US-Dollar. Ich spende die Summe von 2.000.000 Millionen Euro als Teil der Hilfsgelder f&uuml;r das Corona-Virus.
+ 
+ Dies ist Ihr Spendencode: [CJ530342019]
+ 
+ www.youtube.com/watch?v=BSr8myiLPMQ
+ 
+ Bitte antworten Sie auf diese E-Mail mit dem SPENDERCODE:
+ 
+ charlesjacksonjr001@gmail.com
+ 
+ Ich hoffe, dass Sie und Ihre Familie dies durchkommen
+ 
+ 
+ Herr Charles Jackson
