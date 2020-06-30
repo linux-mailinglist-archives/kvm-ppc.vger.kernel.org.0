@@ -2,334 +2,94 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EEE120E573
-	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Jun 2020 00:07:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4167920EAED
+	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Jun 2020 03:29:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729436AbgF2VhH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 29 Jun 2020 17:37:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26776 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728403AbgF2Skj (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Jun 2020 14:40:39 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05T8X909168789;
-        Mon, 29 Jun 2020 04:48:24 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31ybntjymu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 29 Jun 2020 04:48:23 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05T8eO9X029171;
-        Mon, 29 Jun 2020 08:48:22 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 31wyyas349-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 29 Jun 2020 08:48:21 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05T8mIfn61734922
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Jun 2020 08:48:19 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D41D652054;
-        Mon, 29 Jun 2020 08:48:18 +0000 (GMT)
-Received: from pomme.local (unknown [9.145.167.117])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3FF4B52050;
-        Mon, 29 Jun 2020 08:48:18 +0000 (GMT)
-Subject: Re: [PATCH v3 3/4] KVM: PPC: Book3S HV: migrate remaining normal-GFNs
- to secure-GFNs in H_SVM_INIT_DONE
-To:     bharata@linux.ibm.com, Ram Pai <linuxram@us.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
-        bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
-        cclaudio@linux.ibm.com, sathnaga@linux.vnet.ibm.com
-References: <1592606622-29884-1-git-send-email-linuxram@us.ibm.com>
- <1592606622-29884-4-git-send-email-linuxram@us.ibm.com>
- <20200628162047.GB27215@in.ibm.com>
-From:   Laurent Dufour <ldufour@linux.ibm.com>
-Message-ID: <3d9c08dc-397e-e144-27be-f88e4641b976@linux.ibm.com>
-Date:   Mon, 29 Jun 2020 10:48:18 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+        id S1728029AbgF3B3D (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 29 Jun 2020 21:29:03 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:37409 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726949AbgF3B3C (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 29 Jun 2020 21:29:02 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 49wmwY0ngrz9sDX;
+        Tue, 30 Jun 2020 11:29:01 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1593480541;
+        bh=sO4yMS1A2SFbDoE7ljp73eC5quNBLazBAQZ5GXL7cPE=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=klXYTE8wct8ju2z/MZ7O3QIEO6iBhY530LxsxGishzWu1BwXpZBg1tJwXzLtjnNZ6
+         moG0u0gJLwMe/6QxC+tEtX0kPD8vuwctfKS1fRoeL6vuUFVbOHm4/+y5A1S8nVYKQx
+         deeLYzfMoEgKYx7fpT5Cy7/c4SDNd/vmSydNr2BTdOlKJ0XUKkfe9kqi8tBrnxGECK
+         QXPHsfc2b0jfjshQLmoXp1agsfTbPc7h59LDqYEdTSDrGcWLupWvYlRxmhyTWHK8Dk
+         UD+DZ6EJFuXFEqUSJ3tTzhNPSPYgTeHteuvPCN1+Hgym2aBAosUI7hDpx84aMb2r+e
+         5XJSB4EnEgoLg==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     kernel test robot <lkp@intel.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     kbuild-all@lists.01.org, Nicholas Piggin <npiggin@gmail.com>,
+        =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+        Anton Blanchard <anton@linux.ibm.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH 1/3] powerpc: inline doorbell sending functions
+In-Reply-To: <202006280326.fcRFUNzs%lkp@intel.com>
+References: <20200627150428.2525192-2-npiggin@gmail.com> <202006280326.fcRFUNzs%lkp@intel.com>
+Date:   Tue, 30 Jun 2020 11:31:15 +1000
+Message-ID: <87zh8l7318.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20200628162047.GB27215@in.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-29_07:2020-06-26,2020-06-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- bulkscore=0 priorityscore=1501 malwarescore=0 spamscore=0 adultscore=0
- clxscore=1015 impostorscore=0 mlxlogscore=999 phishscore=0 suspectscore=2
- cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2006290057
+Content-Type: text/plain
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Le 28/06/2020 à 18:20, Bharata B Rao a écrit :
-> On Fri, Jun 19, 2020 at 03:43:41PM -0700, Ram Pai wrote:
->> H_SVM_INIT_DONE incorrectly assumes that the Ultravisor has explicitly
-> 
-> As noted in the last iteration, can you reword the above please?
-> I don't see it as an incorrect assumption, but see it as extension of
-> scope now :-)
-> 
->> called H_SVM_PAGE_IN for all secure pages. These GFNs continue to be
->> normal GFNs associated with normal PFNs; when infact, these GFNs should
->> have been secure GFNs, associated with device PFNs.
->>
->> Move all the PFNs associated with the SVM's GFNs, to secure-PFNs, in
->> H_SVM_INIT_DONE. Skip the GFNs that are already Paged-in or Shared
->> through H_SVM_PAGE_IN, or Paged-in followed by a Paged-out through
->> UV_PAGE_OUT.
->>
->> Cc: Paul Mackerras <paulus@ozlabs.org>
->> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> Cc: Michael Ellerman <mpe@ellerman.id.au>
->> Cc: Bharata B Rao <bharata@linux.ibm.com>
->> Cc: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
->> Cc: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
->> Cc: Laurent Dufour <ldufour@linux.ibm.com>
->> Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>
->> Cc: David Gibson <david@gibson.dropbear.id.au>
->> Cc: Claudio Carvalho <cclaudio@linux.ibm.com>
->> Cc: kvm-ppc@vger.kernel.org
->> Cc: linuxppc-dev@lists.ozlabs.org
->> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
->> ---
->>   Documentation/powerpc/ultravisor.rst        |   2 +
->>   arch/powerpc/include/asm/kvm_book3s_uvmem.h |   2 +
->>   arch/powerpc/kvm/book3s_hv_uvmem.c          | 154 +++++++++++++++++++++++-----
->>   3 files changed, 132 insertions(+), 26 deletions(-)
->>
->> diff --git a/Documentation/powerpc/ultravisor.rst b/Documentation/powerpc/ultravisor.rst
->> index 363736d..3bc8957 100644
->> --- a/Documentation/powerpc/ultravisor.rst
->> +++ b/Documentation/powerpc/ultravisor.rst
->> @@ -933,6 +933,8 @@ Return values
->>   	* H_UNSUPPORTED		if called from the wrong context (e.g.
->>   				from an SVM or before an H_SVM_INIT_START
->>   				hypercall).
->> +	* H_STATE		if the hypervisor could not successfully
->> +                                transition the VM to Secure VM.
->>   
->>   Description
->>   ~~~~~~~~~~~
->> diff --git a/arch/powerpc/include/asm/kvm_book3s_uvmem.h b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
->> index 5a9834e..b9cd7eb 100644
->> --- a/arch/powerpc/include/asm/kvm_book3s_uvmem.h
->> +++ b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
->> @@ -22,6 +22,8 @@ unsigned long kvmppc_h_svm_page_out(struct kvm *kvm,
->>   unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm);
->>   void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
->>   			     struct kvm *kvm, bool skip_page_out);
->> +int kvmppc_uv_migrate_mem_slot(struct kvm *kvm,
->> +			const struct kvm_memory_slot *memslot);
->>   #else
->>   static inline int kvmppc_uvmem_init(void)
->>   {
->> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
->> index c8c0290..449e8a7 100644
->> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
->> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
->> @@ -93,6 +93,7 @@
->>   #include <asm/ultravisor.h>
->>   #include <asm/mman.h>
->>   #include <asm/kvm_ppc.h>
->> +#include <asm/kvm_book3s_uvmem.h>
->>   
->>   static struct dev_pagemap kvmppc_uvmem_pgmap;
->>   static unsigned long *kvmppc_uvmem_bitmap;
->> @@ -339,6 +340,21 @@ static bool kvmppc_gfn_is_uvmem_pfn(unsigned long gfn, struct kvm *kvm,
->>   	return false;
->>   }
->>   
->> +/* return true, if the GFN is a shared-GFN, or a secure-GFN */
->> +bool kvmppc_gfn_has_transitioned(unsigned long gfn, struct kvm *kvm)
->> +{
->> +	struct kvmppc_uvmem_slot *p;
->> +
->> +	list_for_each_entry(p, &kvm->arch.uvmem_pfns, list) {
->> +		if (gfn >= p->base_pfn && gfn < p->base_pfn + p->nr_pfns) {
->> +			unsigned long index = gfn - p->base_pfn;
->> +
->> +			return (p->pfns[index] & KVMPPC_GFN_FLAG_MASK);
->> +		}
->> +	}
->> +	return false;
->> +}
->> +
->>   unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
->>   {
->>   	struct kvm_memslots *slots;
->> @@ -379,12 +395,31 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
->>   
->>   unsigned long kvmppc_h_svm_init_done(struct kvm *kvm)
->>   {
->> +	struct kvm_memslots *slots;
->> +	struct kvm_memory_slot *memslot;
->> +	int srcu_idx;
->> +	long ret = H_SUCCESS;
->> +
->>   	if (!(kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START))
->>   		return H_UNSUPPORTED;
->>   
->> +	/* migrate any unmoved normal pfn to device pfns*/
->> +	srcu_idx = srcu_read_lock(&kvm->srcu);
->> +	slots = kvm_memslots(kvm);
->> +	kvm_for_each_memslot(memslot, slots) {
->> +		ret = kvmppc_uv_migrate_mem_slot(kvm, memslot);
->> +		if (ret) {
->> +			ret = H_STATE;
->> +			goto out;
->> +		}
->> +	}
->> +
->>   	kvm->arch.secure_guest |= KVMPPC_SECURE_INIT_DONE;
->>   	pr_info("LPID %d went secure\n", kvm->arch.lpid);
->> -	return H_SUCCESS;
->> +
->> +out:
->> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
->> +	return ret;
->>   }
->>   
->>   /*
->> @@ -505,12 +540,14 @@ static struct page *kvmppc_uvmem_get_page(unsigned long gpa, struct kvm *kvm)
->>   }
->>   
->>   /*
->> - * Alloc a PFN from private device memory pool and copy page from normal
->> - * memory to secure memory using UV_PAGE_IN uvcall.
->> + * Alloc a PFN from private device memory pool. If @pagein is true,
->> + * copy page from normal memory to secure memory using UV_PAGE_IN uvcall.
->>    */
->> -static int kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
->> -		   unsigned long end, unsigned long gpa, struct kvm *kvm,
->> -		   unsigned long page_shift, bool *downgrade)
->> +static int kvmppc_svm_migrate_page(struct vm_area_struct *vma,
->> +		unsigned long start,
->> +		unsigned long end, unsigned long gpa, struct kvm *kvm,
->> +		unsigned long page_shift,
->> +		bool pagein)
->>   {
->>   	unsigned long src_pfn, dst_pfn = 0;
->>   	struct migrate_vma mig;
->> @@ -526,18 +563,6 @@ static int kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
->>   	mig.src = &src_pfn;
->>   	mig.dst = &dst_pfn;
->>   
->> -	/*
->> -	 * We come here with mmap_sem write lock held just for
->> -	 * ksm_madvise(), otherwise we only need read mmap_sem.
->> -	 * Hence downgrade to read lock once ksm_madvise() is done.
->> -	 */
-> 
-> Can you please retain this comment? This explains why we take write lock
-> and then downgrade.
-> 
->> -	ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
->> -			  MADV_UNMERGEABLE, &vma->vm_flags);
->> -	downgrade_write(&kvm->mm->mmap_sem);
->> -	*downgrade = true;
-> 
-> When I introduced this variable, there was a suggestion to rename it
-> to "downgraded", but we were a bit late then. When you are touching
-> this now, can you rename it appropriately?
-> 
->> -	if (ret)
->> -		return ret;
->> -
->>   	ret = migrate_vma_setup(&mig);
->>   	if (ret)
->>   		return ret;
->> @@ -553,11 +578,16 @@ static int kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
->>   		goto out_finalize;
->>   	}
->>   
->> -	pfn = *mig.src >> MIGRATE_PFN_SHIFT;
->> -	spage = migrate_pfn_to_page(*mig.src);
->> -	if (spage)
->> -		uv_page_in(kvm->arch.lpid, pfn << page_shift, gpa, 0,
->> -			   page_shift);
->> +	if (pagein) {
->> +		pfn = *mig.src >> MIGRATE_PFN_SHIFT;
->> +		spage = migrate_pfn_to_page(*mig.src);
->> +		if (spage) {
->> +			ret = uv_page_in(kvm->arch.lpid, pfn << page_shift,
->> +					gpa, 0, page_shift);
->> +			if (ret)
->> +				goto out_finalize;
->> +		}
->> +	}
->>   
->>   	*mig.dst = migrate_pfn(page_to_pfn(dpage)) | MIGRATE_PFN_LOCKED;
->>   	migrate_vma_pages(&mig);
->> @@ -566,6 +596,66 @@ static int kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
->>   	return ret;
->>   }
->>   
->> +int kvmppc_uv_migrate_mem_slot(struct kvm *kvm,
->> +		const struct kvm_memory_slot *memslot)
->> +{
->> +	unsigned long gfn = memslot->base_gfn;
->> +	unsigned long end;
->> +	bool downgrade = false;
->> +	struct vm_area_struct *vma;
->> +	int i, ret = 0;
->> +	unsigned long start = gfn_to_hva(kvm, gfn);
->> +
->> +	if (kvm_is_error_hva(start))
->> +		return H_STATE;
->> +
->> +	end = start + (memslot->npages << PAGE_SHIFT);
->> +
->> +	down_write(&kvm->mm->mmap_sem);
->> +
->> +	mutex_lock(&kvm->arch.uvmem_lock);
->> +	vma = find_vma_intersection(kvm->mm, start, end);
->> +	if (!vma || vma->vm_start > start || vma->vm_end < end) {
->> +		ret = H_STATE;
->> +		goto out_unlock;
->> +	}
->> +
->> +	ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
->> +			  MADV_UNMERGEABLE, &vma->vm_flags);
->> +	downgrade_write(&kvm->mm->mmap_sem);
->> +	downgrade = true;
->> +	if (ret) {
->> +		ret = H_STATE;
->> +		goto out_unlock;
->> +	}
->> +
->> +	for (i = 0; i < memslot->npages; i++, ++gfn) {
->> +		/*
->> +		 * skip GFNs that have already tranistioned.
->> +		 * paged-in GFNs, shared GFNs, paged-in GFNs
->> +		 * that were later paged-out.
->> +		 */
->> +		if (kvmppc_gfn_has_transitioned(gfn, kvm))
->> +			continue;
->> +
->> +		start = gfn_to_hva(kvm, gfn);
->> +		end = start + (1UL << PAGE_SHIFT);
->> +		ret = kvmppc_svm_migrate_page(vma, start, end,
->> +			(gfn << PAGE_SHIFT), kvm, PAGE_SHIFT, false);
->> +
-> 
-> As I said last time, you are assuming that the vma that you obtained
-> in the beginning actually spans the entire memslot range. This might
-> be true as you haven't found any issues during testing, but I feel it
-> is better if there is no such implicit assumption in the code here.
+kernel test robot <lkp@intel.com> writes:
+> Hi Nicholas,
+>
+> I love your patch! Yet something to improve:
+>
+> [auto build test ERROR on powerpc/next]
+> [also build test ERROR on scottwood/next v5.8-rc2 next-20200626]
+> [cannot apply to kvm-ppc/kvm-ppc-next]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use  as documented in
+> https://git-scm.com/docs/git-format-patch]
+>
+> url:    https://github.com/0day-ci/linux/commits/Nicholas-Piggin/powerpc-pseries-IPI-doorbell-improvements/20200627-230544
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git next
+> config: powerpc-randconfig-c003-20200628 (attached as .config)
+> compiler: powerpc64-linux-gcc (GCC) 9.3.0
 
-I agree that assumptions are sometimes not good for future work, but here the 
-mmap_sem is held, and the VMA's boundaries have already been checked, so how 
-could the VMA not spans over the memslot's range?
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+>
+> All error/warnings (new ones prefixed by >>):
+>
+>    In file included from arch/powerpc/kernel/asm-offsets.c:38:
+>    arch/powerpc/include/asm/dbell.h: In function 'doorbell_global_ipi':
+>>> arch/powerpc/include/asm/dbell.h:114:12: error: implicit declaration of function 'get_hard_smp_processor_id'; did you mean 'raw_smp_processor_id'? [-Werror=implicit-function-declaration]
+>      114 |  u32 tag = get_hard_smp_processor_id(cpu);
+>          |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+>          |            raw_smp_processor_id
+>    arch/powerpc/include/asm/dbell.h: In function 'doorbell_try_core_ipi':
+>>> arch/powerpc/include/asm/dbell.h:146:28: error: implicit declaration of function 'cpu_sibling_mask'; did you mean 'cpu_online_mask'? [-Werror=implicit-function-declaration]
+>      146 |  if (cpumask_test_cpu(cpu, cpu_sibling_mask(this_cpu))) {
+>          |                            ^~~~~~~~~~~~~~~~
+>          |                            cpu_online_mask
+>>> arch/powerpc/include/asm/dbell.h:146:28: warning: passing argument 2 of 'cpumask_test_cpu' makes pointer from integer without a cast [-Wint-conversion]
+>      146 |  if (cpumask_test_cpu(cpu, cpu_sibling_mask(this_cpu))) {
+>          |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Am I missing something?
+Seems like CONFIG_SMP=n is probably the root cause.
 
-Cheers,
-Laurent.
+You could try including asm/smp.h, but good chance that will lead to
+header soup.
+
+Other option would be to wrap the whole lot in #ifdef CONFIG_SMP?
+
+cheers
