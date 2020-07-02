@@ -2,39 +2,39 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 85E36211838
-	for <lists+kvm-ppc@lfdr.de>; Thu,  2 Jul 2020 03:28:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F73A211974
+	for <lists+kvm-ppc@lfdr.de>; Thu,  2 Jul 2020 03:37:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729011AbgGBBZz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 1 Jul 2020 21:25:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56936 "EHLO mail.kernel.org"
+        id S1729335AbgGBBfQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 1 Jul 2020 21:35:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54100 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728987AbgGBBZy (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 1 Jul 2020 21:25:54 -0400
+        id S1728371AbgGBBXc (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 1 Jul 2020 21:23:32 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C6268206BE;
-        Thu,  2 Jul 2020 01:25:52 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AB5E22082F;
+        Thu,  2 Jul 2020 01:23:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593653153;
-        bh=mVT1nm+k/l19rJIVXm8NMTgjChCxlRFDhy6XAsQx29g=;
+        s=default; t=1593653011;
+        bh=Vo3x2TRiXq5ViMr6k5CcJOTSHhyC2Yca1owqTu51t0U=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZjSj7zFAtjSXzS/bofwywL9xBccP+LztiaSsA4AOx5Fm3UPnwZP9Dw7tj0RCN/A6J
-         wacgJutl8FQPe152KAVpgBHyNj8Lw28b67PIUEqk4qDrlrO/7YiLhrv1WiJ2gpkZAQ
-         +h1vkrem64cMImiPOfJ48VyFinPxKqWYq6tg6NWI=
+        b=umyc41LhZIIa0ZUERPq850jeBO7C9lVSvomXEWcmiSsjrnPbrXXe3Bdtr9Mzfik7o
+         1UTVy/xQf+5lP6Nj6a3f3+UXT17KvH1W+Fnz2o2VEgcJIRVLLGfH4/Dd8VaxFF5ZEl
+         mt9p3ji1+e5BK3DSlYc7UeV4QSW7L0qCCEEwzmMw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 5.4 23/40] powerpc/kvm/book3s64: Fix kernel crash with nested kvm & DEBUG_VIRTUAL
-Date:   Wed,  1 Jul 2020 21:23:44 -0400
-Message-Id: <20200702012402.2701121-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.7 29/53] powerpc/kvm/book3s64: Fix kernel crash with nested kvm & DEBUG_VIRTUAL
+Date:   Wed,  1 Jul 2020 21:21:38 -0400
+Message-Id: <20200702012202.2700645-29-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200702012402.2701121-1-sashal@kernel.org>
-References: <20200702012402.2701121-1-sashal@kernel.org>
+In-Reply-To: <20200702012202.2700645-1-sashal@kernel.org>
+References: <20200702012202.2700645-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -93,10 +93,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index 43b56f8f6bebd..da8375437d161 100644
+index bc6c1aa3d0e92..ef40addd52c65 100644
 --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
 +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -38,7 +38,8 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
+@@ -40,7 +40,8 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
  	/* Can't access quadrants 1 or 2 in non-HV mode, call the HV to do it */
  	if (kvmhv_on_pseries())
  		return plpar_hcall_norets(H_COPY_TOFROM_GUEST, lpid, pid, eaddr,
