@@ -2,104 +2,158 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CAC2212183
-	for <lists+kvm-ppc@lfdr.de>; Thu,  2 Jul 2020 12:48:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FAAB212E66
+	for <lists+kvm-ppc@lfdr.de>; Thu,  2 Jul 2020 23:01:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728007AbgGBKsw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 2 Jul 2020 06:48:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38092 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726483AbgGBKsv (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 2 Jul 2020 06:48:51 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726272AbgGBVBQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 2 Jul 2020 17:01:16 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22358 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726157AbgGBVBP (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 2 Jul 2020 17:01:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593723673;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Qmj46YtkbL+I9zTq7ntIIfxROQfpX1hCxEUSvoiv0+I=;
+        b=CY6ZNsp2fqeFzt6+2MPlc3aNQZbQVC5cvUnHoOkZo3w3QVk34TOZalPFnA+r6oIXwjVHeF
+        5oPFyM4t2Eqa1TE/aKKTmnR4bqXpj20+beqj4vsXAcoAmPVzNl2wPvdAHPHiDh/FASCsav
+        EGtwiyDbPvdo0iDIbtcU6MjAKftOrdI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-150-mkvppFasMUC-xIraJrAEgA-1; Thu, 02 Jul 2020 17:01:09 -0400
+X-MC-Unique: mkvppFasMUC-xIraJrAEgA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 874412075D;
-        Thu,  2 Jul 2020 10:48:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593686931;
-        bh=g1cKP96vnhwpBadUWi+K/NTNmduKoAdrQtOe2iZfYXg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rND6qhP59jK5UT3eXdMAPYj3XlxaRqljjqiK6gfVkN56KQRkwXJI42Wa2o9R7S9C4
-         VFijU4tvdYZpSIS8Qv0WJJv8LFLP7+yGyqLBBAyv8zPZtGwUf/Wc5UzxBctdMWfWvP
-         z8yinVoQFqZAzTvxE9QCVMXFJXdbBY07btq8tQFU=
-Date:   Thu, 2 Jul 2020 11:48:46 +0100
-From:   Will Deacon <will@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17FAA107ACF7;
+        Thu,  2 Jul 2020 21:01:08 +0000 (UTC)
+Received: from llong.remote.csb (ovpn-118-66.rdu2.redhat.com [10.10.118.66])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C9FBE77899;
+        Thu,  2 Jul 2020 21:01:06 +0000 (UTC)
+Subject: Re: [PATCH 6/8] powerpc/pseries: implement paravirt qspinlocks for
+ SPLPAR
 To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     Anton Blanchard <anton@ozlabs.org>,
-        Boqun Feng <boqun.feng@gmail.com>, kvm-ppc@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, Waiman Long <longman@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
+Cc:     Will Deacon <will@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 5/8] powerpc/64s: implement queued spinlocks and rwlocks
-Message-ID: <20200702104845.GB16418@willie-the-truck>
+        Boqun Feng <boqun.feng@gmail.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Anton Blanchard <anton@ozlabs.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm-ppc@vger.kernel.org,
+        linux-arch@vger.kernel.org
 References: <20200702074839.1057733-1-npiggin@gmail.com>
- <20200702074839.1057733-6-npiggin@gmail.com>
- <20200702080219.GB16113@willie-the-truck>
- <1593685459.r2tfxtfdp6.astroid@bobo.none>
- <20200702103506.GA16418@willie-the-truck>
- <1593686722.w9psaqk7yp.astroid@bobo.none>
+ <20200702074839.1057733-7-npiggin@gmail.com>
+From:   Waiman Long <longman@redhat.com>
+Organization: Red Hat
+Message-ID: <6b8ccb02-53ca-35d2-0dc6-2fc8e5523a97@redhat.com>
+Date:   Thu, 2 Jul 2020 17:01:06 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1593686722.w9psaqk7yp.astroid@bobo.none>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200702074839.1057733-7-npiggin@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Jul 02, 2020 at 08:47:05PM +1000, Nicholas Piggin wrote:
-> Excerpts from Will Deacon's message of July 2, 2020 8:35 pm:
-> > On Thu, Jul 02, 2020 at 08:25:43PM +1000, Nicholas Piggin wrote:
-> >> Excerpts from Will Deacon's message of July 2, 2020 6:02 pm:
-> >> > On Thu, Jul 02, 2020 at 05:48:36PM +1000, Nicholas Piggin wrote:
-> >> >> diff --git a/arch/powerpc/include/asm/qspinlock.h b/arch/powerpc/include/asm/qspinlock.h
-> >> >> new file mode 100644
-> >> >> index 000000000000..f84da77b6bb7
-> >> >> --- /dev/null
-> >> >> +++ b/arch/powerpc/include/asm/qspinlock.h
-> >> >> @@ -0,0 +1,20 @@
-> >> >> +/* SPDX-License-Identifier: GPL-2.0 */
-> >> >> +#ifndef _ASM_POWERPC_QSPINLOCK_H
-> >> >> +#define _ASM_POWERPC_QSPINLOCK_H
-> >> >> +
-> >> >> +#include <asm-generic/qspinlock_types.h>
-> >> >> +
-> >> >> +#define _Q_PENDING_LOOPS	(1 << 9) /* not tuned */
-> >> >> +
-> >> >> +#define smp_mb__after_spinlock()   smp_mb()
-> >> >> +
-> >> >> +static __always_inline int queued_spin_is_locked(struct qspinlock *lock)
-> >> >> +{
-> >> >> +	smp_mb();
-> >> >> +	return atomic_read(&lock->val);
-> >> >> +}
-> >> > 
-> >> > Why do you need the smp_mb() here?
-> >> 
-> >> A long and sad tale that ends here 51d7d5205d338
-> >> 
-> >> Should probably at least refer to that commit from here, since this one 
-> >> is not going to git blame back there. I'll add something.
-> > 
-> > Is this still an issue, though?
-> > 
-> > See 38b850a73034 (where we added a similar barrier on arm64) and then
-> > c6f5d02b6a0f (where we removed it).
-> > 
-> 
-> Oh nice, I didn't know that went away. Thanks for the heads up.
-> 
-> I'm going to say I'm too scared to remove it while changing the
-> spinlock algorithm, but I'll open an issue and we should look at 
-> removing it.
+On 7/2/20 3:48 AM, Nicholas Piggin wrote:
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   arch/powerpc/include/asm/paravirt.h           | 23 ++++++++
+>   arch/powerpc/include/asm/qspinlock.h          | 55 +++++++++++++++++++
+>   arch/powerpc/include/asm/qspinlock_paravirt.h |  5 ++
+>   arch/powerpc/platforms/pseries/Kconfig        |  5 ++
+>   arch/powerpc/platforms/pseries/setup.c        |  6 +-
+>   include/asm-generic/qspinlock.h               |  2 +
+>   6 files changed, 95 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/powerpc/include/asm/qspinlock_paravirt.h
+>
+> diff --git a/arch/powerpc/include/asm/paravirt.h b/arch/powerpc/include/asm/paravirt.h
+> index 7a8546660a63..5fae9dfa6fe9 100644
+> --- a/arch/powerpc/include/asm/paravirt.h
+> +++ b/arch/powerpc/include/asm/paravirt.h
+> @@ -29,6 +29,16 @@ static inline void yield_to_preempted(int cpu, u32 yield_count)
+>   {
+>   	plpar_hcall_norets(H_CONFER, get_hard_smp_processor_id(cpu), yield_count);
+>   }
+> +
+> +static inline void prod_cpu(int cpu)
+> +{
+> +	plpar_hcall_norets(H_PROD, get_hard_smp_processor_id(cpu));
+> +}
+> +
+> +static inline void yield_to_any(void)
+> +{
+> +	plpar_hcall_norets(H_CONFER, -1, 0);
+> +}
+>   #else
+>   static inline bool is_shared_processor(void)
+>   {
+> @@ -45,6 +55,19 @@ static inline void yield_to_preempted(int cpu, u32 yield_count)
+>   {
+>   	___bad_yield_to_preempted(); /* This would be a bug */
+>   }
+> +
+> +extern void ___bad_yield_to_any(void);
+> +static inline void yield_to_any(void)
+> +{
+> +	___bad_yield_to_any(); /* This would be a bug */
+> +}
+> +
+> +extern void ___bad_prod_cpu(void);
+> +static inline void prod_cpu(int cpu)
+> +{
+> +	___bad_prod_cpu(); /* This would be a bug */
+> +}
+> +
+>   #endif
+>   
+>   #define vcpu_is_preempted vcpu_is_preempted
+> diff --git a/arch/powerpc/include/asm/qspinlock.h b/arch/powerpc/include/asm/qspinlock.h
+> index f84da77b6bb7..997a9a32df77 100644
+> --- a/arch/powerpc/include/asm/qspinlock.h
+> +++ b/arch/powerpc/include/asm/qspinlock.h
+> @@ -3,9 +3,36 @@
+>   #define _ASM_POWERPC_QSPINLOCK_H
+>   
+>   #include <asm-generic/qspinlock_types.h>
+> +#include <asm/paravirt.h>
+>   
+>   #define _Q_PENDING_LOOPS	(1 << 9) /* not tuned */
+>   
+> +#ifdef CONFIG_PARAVIRT_SPINLOCKS
+> +extern void native_queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
+> +extern void __pv_queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
+> +
+> +static __always_inline void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
+> +{
+> +	if (!is_shared_processor())
+> +		native_queued_spin_lock_slowpath(lock, val);
+> +	else
+> +		__pv_queued_spin_lock_slowpath(lock, val);
+> +}
 
-Makes sense to me -- it certainly needs a deeper look! In the meantime,
-please put some of this in a comment next to the barrier.
+You may need to match the use of __pv_queued_spin_lock_slowpath() with 
+the corresponding __pv_queued_spin_unlock(), e.g.
+
+#define queued_spin_unlock queued_spin_unlock
+static inline queued_spin_unlock(struct qspinlock *lock)
+{
+         if (!is_shared_processor())
+                 smp_store_release(&lock->locked, 0);
+         else
+                 __pv_queued_spin_unlock(lock);
+}
+
+Otherwise, pv_kick() will never be called.
 
 Cheers,
+Longman
 
-Will
