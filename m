@@ -2,110 +2,65 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F73A211974
-	for <lists+kvm-ppc@lfdr.de>; Thu,  2 Jul 2020 03:37:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CD87211C94
+	for <lists+kvm-ppc@lfdr.de>; Thu,  2 Jul 2020 09:22:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729335AbgGBBfQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 1 Jul 2020 21:35:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54100 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728371AbgGBBXc (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 1 Jul 2020 21:23:32 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AB5E22082F;
-        Thu,  2 Jul 2020 01:23:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593653011;
-        bh=Vo3x2TRiXq5ViMr6k5CcJOTSHhyC2Yca1owqTu51t0U=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=umyc41LhZIIa0ZUERPq850jeBO7C9lVSvomXEWcmiSsjrnPbrXXe3Bdtr9Mzfik7o
-         1UTVy/xQf+5lP6Nj6a3f3+UXT17KvH1W+Fnz2o2VEgcJIRVLLGfH4/Dd8VaxFF5ZEl
-         mt9p3ji1+e5BK3DSlYc7UeV4QSW7L0qCCEEwzmMw=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 5.7 29/53] powerpc/kvm/book3s64: Fix kernel crash with nested kvm & DEBUG_VIRTUAL
-Date:   Wed,  1 Jul 2020 21:21:38 -0400
-Message-Id: <20200702012202.2700645-29-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200702012202.2700645-1-sashal@kernel.org>
-References: <20200702012202.2700645-1-sashal@kernel.org>
+        id S1726892AbgGBHWM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 2 Jul 2020 03:22:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37576 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726362AbgGBHWL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 2 Jul 2020 03:22:11 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B68FBC08C5C1
+        for <kvm-ppc@vger.kernel.org>; Thu,  2 Jul 2020 00:22:11 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id h22so12145618pjf.1
+        for <kvm-ppc@vger.kernel.org>; Thu, 02 Jul 2020 00:22:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=to:from:message-id:date:user-agent:mime-version:content-language
+         :content-transfer-encoding;
+        bh=IM8OcCd1J5H5NYYxqt8/UURDJnjX3/PpwHj5eTTFHqg=;
+        b=pOAkwY3cCB11ZLmjjIqhc1xk2fSYmSP9+twK7x1Zl82aOYD9sRSStHDz/rVjC1ITCP
+         TMh6SIUz2YFLP4/Qw3O+V8tGZ6KQFIqJ7oFufIe5cJLXbuKml4WL8R5NkoOKib74Eq0V
+         bWg6wN9ckkkzbmpGYCmyAK095PJJHDqMCfN7uuha0thw0UjTHn4XKycToG5zCEQR0+9r
+         7bTW43id3/p9HmVYmj+3ABIEEG7biFbCu9g3NKTWTzwRhKOdIXrvk7wD5K/lEiaLplJ+
+         2VtnXr5fSpWpwhlvSYPFlK6fxlEpIy46NZjCyV+Mnzm1ItkAMX3xaIi+OOVUYw/aRS0z
+         pMfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=IM8OcCd1J5H5NYYxqt8/UURDJnjX3/PpwHj5eTTFHqg=;
+        b=EC+nd/rGh4gukAjjDBR34+/Xn+0+5UpjDZ0gI0i+p4Q/7RcykaZAUVAcbO6u96N56v
+         lHvkddyRODQwige+JdBoko41AgqZA79lhfJ8o/m3Nm18IzY/+fYUFl6T5kHC8FlmuTHF
+         /ADnZNXBHFUff0A4Xkjm5Osp90M9BY+iLo43pnl+zQQgWG7+q1lY5vmsEPdoGNJveLmz
+         DW3K6EnmgK7nUJAVmIksV9BDqm4PQa8dDgluo6zvImxjkr33vOJqUlf3FmK7NtUpGVAA
+         Ml2fVupE6KKR2JQfx6763GGx69USV1Fr74B4gZslsUX3bsdQToujcpBIPC4vtIvKnfB9
+         GKqQ==
+X-Gm-Message-State: AOAM533p5zEB7Xy9gellYVfRGCWyls/X+uC0JuIfaXRisqLn18SClRhu
+        iKzVwQ1Vzzu4a+7DJjqa2HL5n1S5
+X-Google-Smtp-Source: ABdhPJxNRm+AwTmnsjcjAy46T4/vbs5iLx6L91lWDGctU4njoA7i9xflHX2hIPFZdVWsTZ4e/jq6qg==
+X-Received: by 2002:a17:90b:388d:: with SMTP id mu13mr30271474pjb.187.1593674530915;
+        Thu, 02 Jul 2020 00:22:10 -0700 (PDT)
+Received: from JAVRIS.in.ibm.com ([49.206.9.181])
+        by smtp.gmail.com with ESMTPSA id t184sm7923914pfd.49.2020.07.02.00.22.09
+        for <kvm-ppc@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Jul 2020 00:22:10 -0700 (PDT)
+To:     kvm-ppc@vger.kernel.org
+From:   Kamalesh Babulal <kamalesh.babulal@gmail.com>
+Message-ID: <6ba94eab-8dfe-fdd0-20db-2cff98718f06@gmail.com>
+Date:   Thu, 2 Jul 2020 12:51:58 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-
-[ Upstream commit c1ed1754f271f6b7acb1bfdc8cfb62220fbed423 ]
-
-With CONFIG_DEBUG_VIRTUAL=y, __pa() checks for addr value and if it's
-less than PAGE_OFFSET it leads to a BUG().
-
-  #define __pa(x)
-  ({
-  	VIRTUAL_BUG_ON((unsigned long)(x) < PAGE_OFFSET);
-  	(unsigned long)(x) & 0x0fffffffffffffffUL;
-  })
-
-  kernel BUG at arch/powerpc/kvm/book3s_64_mmu_radix.c:43!
-  cpu 0x70: Vector: 700 (Program Check) at [c0000018a2187360]
-      pc: c000000000161b30: __kvmhv_copy_tofrom_guest_radix+0x130/0x1f0
-      lr: c000000000161d5c: kvmhv_copy_from_guest_radix+0x3c/0x80
-  ...
-  kvmhv_copy_from_guest_radix+0x3c/0x80
-  kvmhv_load_from_eaddr+0x48/0xc0
-  kvmppc_ld+0x98/0x1e0
-  kvmppc_load_last_inst+0x50/0x90
-  kvmppc_hv_emulate_mmio+0x288/0x2b0
-  kvmppc_book3s_radix_page_fault+0xd8/0x2b0
-  kvmppc_book3s_hv_page_fault+0x37c/0x1050
-  kvmppc_vcpu_run_hv+0xbb8/0x1080
-  kvmppc_vcpu_run+0x34/0x50
-  kvm_arch_vcpu_ioctl_run+0x2fc/0x410
-  kvm_vcpu_ioctl+0x2b4/0x8f0
-  ksys_ioctl+0xf4/0x150
-  sys_ioctl+0x28/0x80
-  system_call_exception+0x104/0x1d0
-  system_call_common+0xe8/0x214
-
-kvmhv_copy_tofrom_guest_radix() uses a NULL value for to/from to
-indicate direction of copy.
-
-Avoid calling __pa() if the value is NULL to avoid the BUG().
-
-Signed-off-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-[mpe: Massage change log a bit to mention CONFIG_DEBUG_VIRTUAL]
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-Link: https://lore.kernel.org/r/20200611120159.680284-1-aneesh.kumar@linux.ibm.com
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/powerpc/kvm/book3s_64_mmu_radix.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index bc6c1aa3d0e92..ef40addd52c65 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -40,7 +40,8 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
- 	/* Can't access quadrants 1 or 2 in non-HV mode, call the HV to do it */
- 	if (kvmhv_on_pseries())
- 		return plpar_hcall_norets(H_COPY_TOFROM_GUEST, lpid, pid, eaddr,
--					  __pa(to), __pa(from), n);
-+					  (to != NULL) ? __pa(to): 0,
-+					  (from != NULL) ? __pa(from): 0, n);
- 
- 	quadrant = 1;
- 	if (!pid)
--- 
-2.25.1
-
+Subscribe
