@@ -2,126 +2,112 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AEA42130EB
-	for <lists+kvm-ppc@lfdr.de>; Fri,  3 Jul 2020 03:20:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A34D121350C
+	for <lists+kvm-ppc@lfdr.de>; Fri,  3 Jul 2020 09:35:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbgGCBUW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 2 Jul 2020 21:20:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35066 "EHLO
+        id S1725779AbgGCHf3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 3 Jul 2020 03:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726017AbgGCBUV (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 2 Jul 2020 21:20:21 -0400
+        with ESMTP id S1725764AbgGCHf3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 3 Jul 2020 03:35:29 -0400
 Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69E83C08C5C1;
-        Thu,  2 Jul 2020 18:20:21 -0700 (PDT)
-Received: by mail-pj1-x1044.google.com with SMTP id o22so8197580pjw.2;
-        Thu, 02 Jul 2020 18:20:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F973C08C5C1;
+        Fri,  3 Jul 2020 00:35:29 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id l6so10456250pjq.1;
+        Fri, 03 Jul 2020 00:35:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=o8LwC+qktyP8ZqLNY6wHCDbWY3Ky3sWMv7KAmaONrVU=;
-        b=XvguNpRZTZP/h71d93R73VBOlM08LPuaeOBlneU63ne/L7GLBObyffyWirquXwzInf
-         59t68Sik6FbFSfnqXHjB9LmnXjakPzB8VDLhS/RbAAziGzaIv+Sncs0FV3mfuwzt7AFX
-         gLIt/5rvF/ONaC+jkxf2MHxcxslGczknFLwtC238Vw3nzbqnGFqV8b/1ZJa8Y8QQIItG
-         9Q/OubfWO1HtogwuIrDelys65tKh+KSZwYhYusdsiQpYyLUqDXDGhCJ8eqvU0LILRmeB
-         jRgxPziUKmXugrRCu8qc6vh58u4756iZfl8/VXOQRfMPFab7InZAUaLJIz7aueuRVuYF
-         x2bg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vbRBeJ+XIbof8SsSnUrtwZgJ/aiu8Z+x8SsI7+GEKqo=;
+        b=Sx/HrLI1gUrhnhruDmTnduBJm6i1u2AFd+QouTv/vb5YltoyihE6ABJowb0MWAz6Pf
+         +uXGTwzRxR7b4k3wQmaA6naeh+y4u9Y2BAoN9vb0ulKlIyhXQw/raf4qDDowv+9P3vx6
+         YEPSk+sNOeSOK0Umr8u1rPFcNnN5aW+kfalo8IP036e6NWdMYadk5NZDPS8fvt9SB2tQ
+         sSHyx3urEWcOP26k/GNZ3LLNVlsem7fH+NdDgB53nCrQVtn+Jf6XtQEbLD4BdcW+QJ5v
+         JucXQVQ44J3p+gLsA04oOXln9Ypjb4MyUkxCDnJOZein/EaL7mal3GVQ2TRMyoqf03c/
+         2E4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=o8LwC+qktyP8ZqLNY6wHCDbWY3Ky3sWMv7KAmaONrVU=;
-        b=ZsOa3KokECfez7PciHxB5zVj/wwEgFVXXXQSyorriSn5jYE6Ag2gpFmwDI5IEC7bNT
-         lGKkxpCVV6FbnDItKTUpmPr9PQH8JYHBM8yZsV1xH+ipcMxt6i6rsc3tmTlE/EyNpUyU
-         tfwOQfTjspHuapb6bXeF8HKY8c4qsPQVp88XmGLUrPIet2Kd2VOpHEhclhCKYqa1VEM9
-         6YzK3dm8Tgj8aMEqMtmSov51FeYdBmJZWtvDfO5uycdsB6vkIkMIryGHsYlpxI2hnRTk
-         RXfoMbKt9tWSOygP35AdCapeXpoEUqRZ4JfRJZG2+/05BRnHsYE4zS18U+gMIO1GTPVO
-         bMzQ==
-X-Gm-Message-State: AOAM53375p0guHK8dS5Z3BxbbOAepFkLhtecaNpqdYAKgbAqyVCsyKgi
-        S7TQfF3ySs9oxE+IaRG3ars=
-X-Google-Smtp-Source: ABdhPJzjRaAlp7XO//YM/8n2zmmXsVRaggi4uCA028UZFvDs8+H+qXrObFXTvNH00boHgly3COvZYw==
-X-Received: by 2002:a17:90a:e618:: with SMTP id j24mr4699964pjy.41.1593739221038;
-        Thu, 02 Jul 2020 18:20:21 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vbRBeJ+XIbof8SsSnUrtwZgJ/aiu8Z+x8SsI7+GEKqo=;
+        b=Q0830cjYwVR6THe5bTLC3oqxXtXYXiz+hYMVYj9RT+KUxSTjthyQz/XnxI/ebtfytB
+         SSY0SqzZysJNtfJsAVgjD7wUmOY8fnPMp7UIlmWrJw8Xivd7CpowM+HjRrdlkaiy97in
+         QM6vfkyqE3ARcnd/SyhzpusgMk7cr1sZCyh/Ck2YKYpAJIALgePaNEqswmSwCfOwq9V4
+         wg2kZOT3fOAUbWan18X8QBJNxIwIH6FEiEkxsVOy/6hlcl9naKxzF4Uz7CJan7JMxnQU
+         PDuzLnWqnOVKs+GAhvqJHTfX04fTLpDC3K1/94YGm8Tear55IY2zg7cwLHQO6gHTibw1
+         0QcA==
+X-Gm-Message-State: AOAM532OyqNG7thfLvANgDDRRQ5kOl+szRkkokvrhTakJOheF+EGY7yD
+        NOyv3NUobJ3GePW08hobM4A=
+X-Google-Smtp-Source: ABdhPJxGGr/T+DMbaejYqpR0giBM8nZ8ynq17VDv7uveaGsjhL5t6fMWI9MQnFOkBe6Nr0BI89jHMg==
+X-Received: by 2002:a17:90a:db48:: with SMTP id u8mr5957942pjx.169.1593761728886;
+        Fri, 03 Jul 2020 00:35:28 -0700 (PDT)
 Received: from bobo.ozlabs.ibm.com (61-68-186-125.tpgi.com.au. [61.68.186.125])
-        by smtp.gmail.com with ESMTPSA id v186sm10094222pfv.141.2020.07.02.18.20.18
+        by smtp.gmail.com with ESMTPSA id y7sm10218499pgk.93.2020.07.03.00.35.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2020 18:20:20 -0700 (PDT)
+        Fri, 03 Jul 2020 00:35:28 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
-        linux-mm@kvack.org, linux-api@vger.kernel.org
-Subject: [PATCH v2 3/3] powerpc/64s/hash: disable subpage_prot syscall by default
-Date:   Fri,  3 Jul 2020 11:19:58 +1000
-Message-Id: <20200703011958.1166620-4-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, Will Deacon <will@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Waiman Long <longman@redhat.com>,
+        Anton Blanchard <anton@ozlabs.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm-ppc@vger.kernel.org,
+        linux-arch@vger.kernel.org
+Subject: [PATCH v2 0/6] powerpc: queued spinlocks and rwlocks
+Date:   Fri,  3 Jul 2020 17:35:10 +1000
+Message-Id: <20200703073516.1354108-1-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200703011958.1166620-1-npiggin@gmail.com>
-References: <20200703011958.1166620-1-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The subpage_prot syscall was added for specialised system software
-(Lx86) that has been discontinued for about 7 years, and is not thought
-to be used elsewhere, so disable it by default.
+v2 is updated to account for feedback from Will, Peter, and
+Waiman (thank you), and trims off a couple of RFC and unrelated
+patches.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- arch/powerpc/Kconfig                   | 7 +++++--
- arch/powerpc/configs/powernv_defconfig | 1 -
- arch/powerpc/configs/pseries_defconfig | 1 -
- 3 files changed, 5 insertions(+), 4 deletions(-)
+Thanks,
+Nick
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index 9fa23eb320ff..04c6ca17661a 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -833,13 +833,16 @@ config FORCE_MAX_ZONEORDER
- 	  this in mind when choosing a value for this option.
- 
- config PPC_SUBPAGE_PROT
--	bool "Support setting protections for 4k subpages"
-+	bool "Support setting protections for 4k subpages (subpage_prot syscall)"
-+	default n
- 	depends on PPC_BOOK3S_64 && PPC_64K_PAGES
- 	help
--	  This option adds support for a system call to allow user programs
-+	  This option adds support for system call to allow user programs
- 	  to set access permissions (read/write, readonly, or no access)
- 	  on the 4k subpages of each 64k page.
- 
-+	  If unsure, say N here.
-+
- config PPC_COPRO_BASE
- 	bool
- 
-diff --git a/arch/powerpc/configs/powernv_defconfig b/arch/powerpc/configs/powernv_defconfig
-index 2de9aadf0f50..afc0dd73a1e6 100644
---- a/arch/powerpc/configs/powernv_defconfig
-+++ b/arch/powerpc/configs/powernv_defconfig
-@@ -64,7 +64,6 @@ CONFIG_HWPOISON_INJECT=m
- CONFIG_TRANSPARENT_HUGEPAGE=y
- CONFIG_DEFERRED_STRUCT_PAGE_INIT=y
- CONFIG_PPC_64K_PAGES=y
--CONFIG_PPC_SUBPAGE_PROT=y
- CONFIG_SCHED_SMT=y
- CONFIG_PM=y
- CONFIG_HOTPLUG_PCI=y
-diff --git a/arch/powerpc/configs/pseries_defconfig b/arch/powerpc/configs/pseries_defconfig
-index dfa4a726333b..894e8d85fb48 100644
---- a/arch/powerpc/configs/pseries_defconfig
-+++ b/arch/powerpc/configs/pseries_defconfig
-@@ -57,7 +57,6 @@ CONFIG_MEMORY_HOTREMOVE=y
- CONFIG_KSM=y
- CONFIG_TRANSPARENT_HUGEPAGE=y
- CONFIG_PPC_64K_PAGES=y
--CONFIG_PPC_SUBPAGE_PROT=y
- CONFIG_SCHED_SMT=y
- CONFIG_HOTPLUG_PCI=y
- CONFIG_HOTPLUG_PCI_RPA=m
+Nicholas Piggin (6):
+  powerpc/powernv: must include hvcall.h to get PAPR defines
+  powerpc/pseries: move some PAPR paravirt functions to their own file
+  powerpc: move spinlock implementation to simple_spinlock
+  powerpc/64s: implement queued spinlocks and rwlocks
+  powerpc/pseries: implement paravirt qspinlocks for SPLPAR
+  powerpc/qspinlock: optimised atomic_try_cmpxchg_lock that adds the
+    lock hint
+
+ arch/powerpc/Kconfig                          |  13 +
+ arch/powerpc/include/asm/Kbuild               |   2 +
+ arch/powerpc/include/asm/atomic.h             |  28 ++
+ arch/powerpc/include/asm/paravirt.h           |  89 +++++
+ arch/powerpc/include/asm/qspinlock.h          |  80 +++++
+ arch/powerpc/include/asm/qspinlock_paravirt.h |   5 +
+ arch/powerpc/include/asm/simple_spinlock.h    | 292 +++++++++++++++++
+ .../include/asm/simple_spinlock_types.h       |  21 ++
+ arch/powerpc/include/asm/spinlock.h           | 308 +-----------------
+ arch/powerpc/include/asm/spinlock_types.h     |  17 +-
+ arch/powerpc/lib/Makefile                     |   3 +
+ arch/powerpc/lib/locks.c                      |  12 +-
+ arch/powerpc/platforms/powernv/pci-ioda-tce.c |   1 +
+ arch/powerpc/platforms/pseries/Kconfig        |   5 +
+ arch/powerpc/platforms/pseries/setup.c        |   6 +-
+ include/asm-generic/qspinlock.h               |   4 +
+ 16 files changed, 564 insertions(+), 322 deletions(-)
+ create mode 100644 arch/powerpc/include/asm/paravirt.h
+ create mode 100644 arch/powerpc/include/asm/qspinlock.h
+ create mode 100644 arch/powerpc/include/asm/qspinlock_paravirt.h
+ create mode 100644 arch/powerpc/include/asm/simple_spinlock.h
+ create mode 100644 arch/powerpc/include/asm/simple_spinlock_types.h
+
 -- 
 2.23.0
 
