@@ -2,167 +2,110 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD083215EEA
-	for <lists+kvm-ppc@lfdr.de>; Mon,  6 Jul 2020 20:40:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C564D21616F
+	for <lists+kvm-ppc@lfdr.de>; Tue,  7 Jul 2020 00:24:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730083AbgGFSkE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 6 Jul 2020 14:40:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60063 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729866AbgGFSkC (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 6 Jul 2020 14:40:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594060800;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fGfzwKmfId0nPt6AjeRSKqUxZBg1dc0lbe/SE6/v6yI=;
-        b=JdFGqhHg+oRFLj3Y+qOTU8ohclcfrWDJGozKtde0gywHkxJ+spk50g0AWtuHON95UVjTUk
-        BHRS4mvfPImdAbRSV8G7lXMfFNOU7MIr45bW70qbKEZPoZ4mcE030ipvmedMzz3ZcxaEu7
-        0hEOsV4DwkTEBbRB0FShoxAV8J11Ubo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-ZRiGS6MdOQm63DvY3owoAw-1; Mon, 06 Jul 2020 14:39:57 -0400
-X-MC-Unique: ZRiGS6MdOQm63DvY3owoAw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 597AF8014D4;
-        Mon,  6 Jul 2020 18:39:55 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-117-98.rdu2.redhat.com [10.10.117.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 150B52C2BC;
-        Mon,  6 Jul 2020 18:39:54 +0000 (UTC)
-Subject: Re: [PATCH v3 0/6] powerpc: queued spinlocks and rwlocks
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     Will Deacon <will@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Anton Blanchard <anton@ozlabs.org>,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm-ppc@vger.kernel.org,
-        linux-arch@vger.kernel.org
-References: <20200706043540.1563616-1-npiggin@gmail.com>
-From:   Waiman Long <longman@redhat.com>
-Organization: Red Hat
-Message-ID: <24f75d2c-60cd-2766-4aab-1a3b1c80646e@redhat.com>
-Date:   Mon, 6 Jul 2020 14:39:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1726933AbgGFWYE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 6 Jul 2020 18:24:04 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:17948 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726765AbgGFWYE (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 6 Jul 2020 18:24:04 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5f03a41a0001>; Mon, 06 Jul 2020 15:22:18 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 06 Jul 2020 15:24:03 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 06 Jul 2020 15:24:03 -0700
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 6 Jul
+ 2020 22:23:58 +0000
+Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Mon, 6 Jul 2020 22:23:58 +0000
+Received: from rcampbell-dev.nvidia.com (Not Verified[10.110.48.66]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
+        id <B5f03a47e0000>; Mon, 06 Jul 2020 15:23:58 -0700
+From:   Ralph Campbell <rcampbell@nvidia.com>
+To:     <linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>,
+        <nouveau@lists.freedesktop.org>, <kvm-ppc@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     Jerome Glisse <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>,
+        "Ben Skeggs" <bskeggs@redhat.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        "Ralph Campbell" <rcampbell@nvidia.com>
+Subject: [PATCH 0/5] mm/migrate: avoid device private invalidations
+Date:   Mon, 6 Jul 2020 15:23:42 -0700
+Message-ID: <20200706222347.32290-1-rcampbell@nvidia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200706043540.1563616-1-npiggin@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-NVConfidentiality: public
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1594074138; bh=L1q+tY8XtVCJVAfZQvRMNXjLijJuUT/RKi3sLXZmr28=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         MIME-Version:X-NVConfidentiality:Content-Transfer-Encoding:
+         Content-Type;
+        b=gkERmIj7sPNRqUTDSXWmzecTz0WtFK0U3kvh9q3hMeDHLm/Owv8u5sQcfDjbbRTz/
+         +TgRzZRSMSZwtWLEi6CRcKCkUSasti32p/o8/XZ0mZzXiV34vDAdpZx/le+SAO8x0Q
+         QLY/XEOfpmLryYdmMy62yrhZWa2bouIBs6hkQ/GsQZ7UlzXM1MR60Dt/TXPH3tUwV4
+         OkmmZLR01IbgEZbiFd7QwnQl70JEualApo09S4soxZBIhCPDS8u02MIFDANsmL6Qx4
+         8oVXc2Pps8U4J/YR2/KnPSmUqjfOXI5qq9o7B1Zu8N8mCMvGGrbsu1QshOx8Y/iaZi
+         ZMd1XohWj+O7w==
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 7/6/20 12:35 AM, Nicholas Piggin wrote:
-> v3 is updated to use __pv_queued_spin_unlock, noticed by Waiman (thank you).
->
-> Thanks,
-> Nick
->
-> Nicholas Piggin (6):
->    powerpc/powernv: must include hvcall.h to get PAPR defines
->    powerpc/pseries: move some PAPR paravirt functions to their own file
->    powerpc: move spinlock implementation to simple_spinlock
->    powerpc/64s: implement queued spinlocks and rwlocks
->    powerpc/pseries: implement paravirt qspinlocks for SPLPAR
->    powerpc/qspinlock: optimised atomic_try_cmpxchg_lock that adds the
->      lock hint
->
->   arch/powerpc/Kconfig                          |  13 +
->   arch/powerpc/include/asm/Kbuild               |   2 +
->   arch/powerpc/include/asm/atomic.h             |  28 ++
->   arch/powerpc/include/asm/paravirt.h           |  89 +++++
->   arch/powerpc/include/asm/qspinlock.h          |  91 ++++++
->   arch/powerpc/include/asm/qspinlock_paravirt.h |   7 +
->   arch/powerpc/include/asm/simple_spinlock.h    | 292 +++++++++++++++++
->   .../include/asm/simple_spinlock_types.h       |  21 ++
->   arch/powerpc/include/asm/spinlock.h           | 308 +-----------------
->   arch/powerpc/include/asm/spinlock_types.h     |  17 +-
->   arch/powerpc/lib/Makefile                     |   3 +
->   arch/powerpc/lib/locks.c                      |  12 +-
->   arch/powerpc/platforms/powernv/pci-ioda-tce.c |   1 +
->   arch/powerpc/platforms/pseries/Kconfig        |   5 +
->   arch/powerpc/platforms/pseries/setup.c        |   6 +-
->   include/asm-generic/qspinlock.h               |   4 +
->   16 files changed, 577 insertions(+), 322 deletions(-)
->   create mode 100644 arch/powerpc/include/asm/paravirt.h
->   create mode 100644 arch/powerpc/include/asm/qspinlock.h
->   create mode 100644 arch/powerpc/include/asm/qspinlock_paravirt.h
->   create mode 100644 arch/powerpc/include/asm/simple_spinlock.h
->   create mode 100644 arch/powerpc/include/asm/simple_spinlock_types.h
->
-This patch looks OK to me.
+The goal for this series is to avoid device private memory TLB
+invalidations when migrating a range of addresses from system
+memory to device private memory and some of those pages have already
+been migrated. The approach taken is to introduce a new mmu notifier
+invalidation event type and use that in the device driver to skip
+invalidation callbacks from migrate_vma_setup(). The device driver is
+also then expected to handle device MMU invalidations as part of the
+migrate_vma_setup(), migrate_vma_pages(), migrate_vma_finalize() process.
+Note that this is opt-in. A device driver can simply invalidate its MMU
+in the mmu notifier callback and not handle MMU invalidations in the
+migration sequence.
 
-I had run some microbenchmark on powerpc system with or w/o the patch.
+This series is based on linux-5.8.0-rc4 and the patches I sent for
+("mm/hmm/nouveau: add PMD system memory mapping")
+https://lore.kernel.org/linux-mm/20200701225352.9649-1-rcampbell@nvidia.com
+There are no logical dependencies, but there would be merge conflicts
+which could be resolved if this were to be applied before the other
+series.
 
-On a 2-socket 160-thread SMT4 POWER9 system (not virtualized):
+Also, this replaces the need for the following two patches I sent:
+("mm: fix migrate_vma_setup() src_owner and normal pages")
+https://lore.kernel.org/linux-mm/20200622222008.9971-1-rcampbell@nvidia.com
+("nouveau: fix mixed normal and device private page migration")
+https://lore.kernel.org/lkml/20200622233854.10889-3-rcampbell@nvidia.com
 
-5.8.0-rc4
-=========
+Ralph Campbell (5):
+  nouveau: fix storing invalid ptes
+  mm/migrate: add a direction parameter to migrate_vma
+  mm/notifier: add migration invalidation type
+  nouveau/svm: use the new migration invalidation
+  mm/hmm/test: use the new migration invalidation
 
-Running locktest with spinlock [runtime = 10s, load = 1]
-Threads = 160, Min/Mean/Max = 77,665/90,153/106,895
-Threads = 160, Total Rate = 1,441,759 op/s; Percpu Rate = 9,011 op/s
+ arch/powerpc/kvm/book3s_hv_uvmem.c            |  2 ++
+ drivers/gpu/drm/nouveau/nouveau_dmem.c        | 13 ++++++--
+ drivers/gpu/drm/nouveau/nouveau_svm.c         | 10 +++++-
+ drivers/gpu/drm/nouveau/nouveau_svm.h         |  1 +
+ .../drm/nouveau/nvkm/subdev/mmu/vmmgp100.c    | 13 +++++---
+ include/linux/migrate.h                       | 12 +++++--
+ include/linux/mmu_notifier.h                  |  7 ++++
+ lib/test_hmm.c                                | 33 +++++++++++--------
+ mm/migrate.c                                  | 13 ++++++--
+ 9 files changed, 77 insertions(+), 27 deletions(-)
 
-Running locktest with rwlock [runtime = 10s, r% = 50%, load = 1]
-Threads = 160, Min/Mean/Max = 47,879/53,807/63,689
-Threads = 160, Total Rate = 860,192 op/s; Percpu Rate = 5,376 op/s
-
-Running locktest with spinlock [runtime = 10s, load = 1]
-Threads = 80, Min/Mean/Max = 242,907/319,514/463,161
-Threads = 80, Total Rate = 2,555 kop/s; Percpu Rate = 32 kop/s
-
-Running locktest with rwlock [runtime = 10s, r% = 50%, load = 1]
-Threads = 80, Min/Mean/Max = 146,161/187,474/259,270
-Threads = 80, Total Rate = 1,498 kop/s; Percpu Rate = 19 kop/s
-
-Running locktest with spinlock [runtime = 10s, load = 1]
-Threads = 40, Min/Mean/Max = 646,639/1,000,817/1,455,205
-Threads = 40, Total Rate = 4,001 kop/s; Percpu Rate = 100 kop/s
-
-Running locktest with rwlock [runtime = 10s, r% = 50%, load = 1]
-Threads = 40, Min/Mean/Max = 402,165/597,132/814,555
-Threads = 40, Total Rate = 2,388 kop/s; Percpu Rate = 60 kop/s
-
-5.8.0-rc4-qlock+
-================
-
-Running locktest with spinlock [runtime = 10s, load = 1]
-Threads = 160, Min/Mean/Max = 123,835/124,580/124,587
-Threads = 160, Total Rate = 1,992 kop/s; Percpu Rate = 12 kop/s
-
-Running locktest with rwlock [runtime = 10s, r% = 50%, load = 1]
-Threads = 160, Min/Mean/Max = 254,210/264,714/276,784
-Threads = 160, Total Rate = 4,231 kop/s; Percpu Rate = 26 kop/s
-
-Running locktest with spinlock [runtime = 10s, load = 1]
-Threads = 80, Min/Mean/Max = 599,715/603,397/603,450
-Threads = 80, Total Rate = 4,825 kop/s; Percpu Rate = 60 kop/s
-
-Running locktest with rwlock [runtime = 10s, r% = 50%, load = 1]
-Threads = 80, Min/Mean/Max = 492,687/525,224/567,456
-Threads = 80, Total Rate = 4,199 kop/s; Percpu Rate = 52 kop/s
-
-Running locktest with spinlock [runtime = 10s, load = 1]
-Threads = 40, Min/Mean/Max = 1,325,623/1,325,628/1,325,636
-Threads = 40, Total Rate = 5,299 kop/s; Percpu Rate = 132 kop/s
-
-Running locktest with rwlock [runtime = 10s, r% = 50%, load = 1]
-Threads = 40, Min/Mean/Max = 1,249,731/1,292,977/1,342,815
-Threads = 40, Total Rate = 5,168 kop/s; Percpu Rate = 129 kop/s
-
-On systems on large number of cpus, qspinlock lock is faster and more fair.
-
-With some tuning, we may be able to squeeze out more performance.
-
-Cheers,
-Longman
+--=20
+2.20.1
 
