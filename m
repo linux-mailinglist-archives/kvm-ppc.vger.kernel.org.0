@@ -2,132 +2,198 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9675D216324
-	for <lists+kvm-ppc@lfdr.de>; Tue,  7 Jul 2020 02:49:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E56B21660C
+	for <lists+kvm-ppc@lfdr.de>; Tue,  7 Jul 2020 07:57:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726681AbgGGAtL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 6 Jul 2020 20:49:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38884 "EHLO
+        id S1728037AbgGGF5M (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 7 Jul 2020 01:57:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725942AbgGGAtL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 6 Jul 2020 20:49:11 -0400
-Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66958C061755;
-        Mon,  6 Jul 2020 17:49:11 -0700 (PDT)
-Received: by mail-qv1-xf41.google.com with SMTP id dm12so18107523qvb.9;
-        Mon, 06 Jul 2020 17:49:11 -0700 (PDT)
+        with ESMTP id S1727928AbgGGF5M (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 7 Jul 2020 01:57:12 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03D26C061755;
+        Mon,  6 Jul 2020 22:57:12 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id s26so4332623pfm.4;
+        Mon, 06 Jul 2020 22:57:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nupjNinoHUh+uunJaY1+lviIz5/yMs8Gt+iI8FGKf1E=;
-        b=aiktmtNj5ZAoNyPO1vLNFxBZIg4wlgHK6Lj3LTR6TuvRNwIUv7FlYq7hz36B/C9zYu
-         JQxB8ajz6Wqk4BEOOWRLZDtOgTwRvJ3enGHwNIPJzN0MlvRp5i4zdcsgT5KVGLkhWMWx
-         Ze/izcWhua9ygTYA0VHp9wTGxaBtuxstHphkPkNzxWTyO2FNRAPW83yZSTzICoi9w7j6
-         JHxnWX2NjjQ5ryqTQpVaOvI42+H20BPKcrIzezzNDzujgticoI78gSt6M6ZPY95sv8uN
-         poI9ocj5Y6sM8hhmljMdl9WFWCnFoFLjjRKN1ia4Ig+DmbrkMXP3Z+R5cJJuKm0u8Zvw
-         LEIw==
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=I7ns89tYStKSD19MEHznyG2I9XSfuUkGKtpU/r5MMac=;
+        b=PDoHvPLxNl6TaF6PxvEjhtHK8f4JDz/IfWer/E1UJubzsbNLxzT7qZt1VpGsjA5ZKf
+         eNpJQ995yfHQzT7jv59geBsJ6xN1reEX4Bk0eQRaZP89L0yz7bhxQfhv8pmhq0Von0oW
+         f7KUtjSv/p+roRH7gJm10UCz5d32YK4AdVoNfDi4gc7MgSjHxrWGt6oI4s4qFEfNnW1Z
+         dDzbVG7MfDKvZs5afxztEsaDNlwmiN96s4+aPiTnfI5w16SKqSCJAG58cbc/MEe5roCM
+         pL98oqdNzB6kMRypLiGnKY8LcS8OP2a/Y2pvipFvK4GX73hdO99Jcq99JWm8Mp7mY12i
+         gnnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nupjNinoHUh+uunJaY1+lviIz5/yMs8Gt+iI8FGKf1E=;
-        b=keNUwyJDc6JS68HZlpw8I25gJR09cHwZOUH/rat6rB+GxE0XZJkEllKo2x4IMgvAxp
-         svzpIeNswS+BOljUGaXy2FjSUbToJWtWRaWlHQc0Ig+I9+f1uMUWWLFymbOHswTyJY+r
-         lbD2TfoXBBeo8ppTPofRR7YfPPerpLge1VNO/K0mZa1oRYuH0DV2RnihSUXy/iUzXyB3
-         9mRibldDejm77A1sKmab7tuxoYPkGe1NXMM2//9s0IEgGCGyAK8wJdNvKLmbCsbtb7no
-         AA0kF4RMB1NSrvl1mACp9a+dGFEyRjAlhnPYBn8gmCsg36nQTsZeOm1nXc/QAOwihCpB
-         A8Ig==
-X-Gm-Message-State: AOAM530cjYCddtWgUO0SNcrCaKcTodOacjesQ01HeYgfrGaWHb4CHOWT
-        EAH1C5pd/jT794hA21KXJuM=
-X-Google-Smtp-Source: ABdhPJztRm0dtfm0yUaV6CFQuiSny4WpTBoh+ADVnQgav5R2Q07nHdng/u3kPPaGv8DoqtC4hoHQ0Q==
-X-Received: by 2002:a05:6214:289:: with SMTP id l9mr41967514qvv.238.1594082950616;
-        Mon, 06 Jul 2020 17:49:10 -0700 (PDT)
-Received: from localhost.localdomain (179-125-148-98.dynamic.desktop.com.br. [179.125.148.98])
-        by smtp.gmail.com with ESMTPSA id d23sm24413636qtk.97.2020.07.06.17.49.03
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=I7ns89tYStKSD19MEHznyG2I9XSfuUkGKtpU/r5MMac=;
+        b=KICtlbvcQqQcMT3dUh2I1HEosHy2wr9y+WMb90z2OCp/mau3h9WX+MV+SJfhm2gul/
+         L8UO3iNcTlpqFM5iER3LPZiQR8vxsWs/CP+Gl3sJIau5Dbxo8NLvb0X/iiogFaGUHJgC
+         qNJnX9gPgY/5vdSz9wYAosdc4UvR66v8/9XjYEtSZnfktvuYVC2s0i+boFu53kwyY+pX
+         SOF8j6XUi/hTkSo6eM6gppdfbG1mAhusWW5fRZ6RVpPPfLt/7BApYyTZum66CERPgZqG
+         SrL11UwrUkyj/VAWXNMyrtPnMv+nv3Xj+E7rF/lyTDAOERLJ25bXoNXevzCzxBNc5fiy
+         rJlw==
+X-Gm-Message-State: AOAM530eFM6JPv+/ElvYvA2Qn/6bl5dUuiuK0BrWBnmRMCmgM2qdRY+v
+        IF1PogrYCeOKrKEOBQKo6ghGKyjw
+X-Google-Smtp-Source: ABdhPJzgoP//jHra6cbNRfSfL58k0z7LGnKGSFV6r4z5xdDumbyO9o0SKdBgLzyJp/37ixgJbLb9wA==
+X-Received: by 2002:a65:6246:: with SMTP id q6mr43272321pgv.133.1594101431561;
+        Mon, 06 Jul 2020 22:57:11 -0700 (PDT)
+Received: from localhost (61-68-186-125.tpgi.com.au. [61.68.186.125])
+        by smtp.gmail.com with ESMTPSA id u74sm21211889pgc.58.2020.07.06.22.57.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jul 2020 17:49:09 -0700 (PDT)
-From:   Leonardo Bras <leobras.c@gmail.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Peter Zijlstra <peterz@infradead.org>,
+        Mon, 06 Jul 2020 22:57:11 -0700 (PDT)
+Date:   Tue, 07 Jul 2020 15:57:06 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v3 0/6] powerpc: queued spinlocks and rwlocks
+To:     linuxppc-dev@lists.ozlabs.org, Waiman Long <longman@redhat.com>
+Cc:     Anton Blanchard <anton@ozlabs.org>,
+        Boqun Feng <boqun.feng@gmail.com>, kvm-ppc@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
         Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Leonardo Bras <leobras.c@gmail.com>,
-        Vaibhav Jain <vaibhav@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-Subject: [PATCH 1/1] KVM/PPC: Fix typo on H_DISABLE_AND_GET hcall
-Date:   Mon,  6 Jul 2020 21:48:12 -0300
-Message-Id: <20200707004812.190765-1-leobras.c@gmail.com>
-X-Mailer: git-send-email 2.25.4
+        Peter Zijlstra <peterz@infradead.org>,
+        virtualization@lists.linux-foundation.org,
+        Will Deacon <will@kernel.org>
+References: <20200706043540.1563616-1-npiggin@gmail.com>
+        <24f75d2c-60cd-2766-4aab-1a3b1c80646e@redhat.com>
+In-Reply-To: <24f75d2c-60cd-2766-4aab-1a3b1c80646e@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-Id: <1594101082.hfq9x5yact.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On PAPR+ the hcall() on 0x1B0 is called H_DISABLE_AND_GET, but got
-defined as H_DISABLE_AND_GETC instead.
+Excerpts from Waiman Long's message of July 7, 2020 4:39 am:
+> On 7/6/20 12:35 AM, Nicholas Piggin wrote:
+>> v3 is updated to use __pv_queued_spin_unlock, noticed by Waiman (thank y=
+ou).
+>>
+>> Thanks,
+>> Nick
+>>
+>> Nicholas Piggin (6):
+>>    powerpc/powernv: must include hvcall.h to get PAPR defines
+>>    powerpc/pseries: move some PAPR paravirt functions to their own file
+>>    powerpc: move spinlock implementation to simple_spinlock
+>>    powerpc/64s: implement queued spinlocks and rwlocks
+>>    powerpc/pseries: implement paravirt qspinlocks for SPLPAR
+>>    powerpc/qspinlock: optimised atomic_try_cmpxchg_lock that adds the
+>>      lock hint
+>>
+>>   arch/powerpc/Kconfig                          |  13 +
+>>   arch/powerpc/include/asm/Kbuild               |   2 +
+>>   arch/powerpc/include/asm/atomic.h             |  28 ++
+>>   arch/powerpc/include/asm/paravirt.h           |  89 +++++
+>>   arch/powerpc/include/asm/qspinlock.h          |  91 ++++++
+>>   arch/powerpc/include/asm/qspinlock_paravirt.h |   7 +
+>>   arch/powerpc/include/asm/simple_spinlock.h    | 292 +++++++++++++++++
+>>   .../include/asm/simple_spinlock_types.h       |  21 ++
+>>   arch/powerpc/include/asm/spinlock.h           | 308 +-----------------
+>>   arch/powerpc/include/asm/spinlock_types.h     |  17 +-
+>>   arch/powerpc/lib/Makefile                     |   3 +
+>>   arch/powerpc/lib/locks.c                      |  12 +-
+>>   arch/powerpc/platforms/powernv/pci-ioda-tce.c |   1 +
+>>   arch/powerpc/platforms/pseries/Kconfig        |   5 +
+>>   arch/powerpc/platforms/pseries/setup.c        |   6 +-
+>>   include/asm-generic/qspinlock.h               |   4 +
+>>   16 files changed, 577 insertions(+), 322 deletions(-)
+>>   create mode 100644 arch/powerpc/include/asm/paravirt.h
+>>   create mode 100644 arch/powerpc/include/asm/qspinlock.h
+>>   create mode 100644 arch/powerpc/include/asm/qspinlock_paravirt.h
+>>   create mode 100644 arch/powerpc/include/asm/simple_spinlock.h
+>>   create mode 100644 arch/powerpc/include/asm/simple_spinlock_types.h
+>>
+> This patch looks OK to me.
 
-This define was introduced with a typo in commit <b13a96cfb055>
-("[PATCH] powerpc: Extends HCALL interface for InfiniBand usage"), and was
-later used without having the typo noticed.
+Thanks for reviewing and testing.
 
-Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
----
- arch/powerpc/include/asm/hvcall.h            | 2 +-
- arch/powerpc/kvm/trace_hv.h                  | 2 +-
- tools/perf/arch/powerpc/util/book3s_hcalls.h | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+> I had run some microbenchmark on powerpc system with or w/o the patch.
+>=20
+> On a 2-socket 160-thread SMT4 POWER9 system (not virtualized):
+>=20
+> 5.8.0-rc4
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> Running locktest with spinlock [runtime =3D 10s, load =3D 1]
+> Threads =3D 160, Min/Mean/Max =3D 77,665/90,153/106,895
+> Threads =3D 160, Total Rate =3D 1,441,759 op/s; Percpu Rate =3D 9,011 op/=
+s
+>=20
+> Running locktest with rwlock [runtime =3D 10s, r% =3D 50%, load =3D 1]
+> Threads =3D 160, Min/Mean/Max =3D 47,879/53,807/63,689
+> Threads =3D 160, Total Rate =3D 860,192 op/s; Percpu Rate =3D 5,376 op/s
+>=20
+> Running locktest with spinlock [runtime =3D 10s, load =3D 1]
+> Threads =3D 80, Min/Mean/Max =3D 242,907/319,514/463,161
+> Threads =3D 80, Total Rate =3D 2,555 kop/s; Percpu Rate =3D 32 kop/s
+>=20
+> Running locktest with rwlock [runtime =3D 10s, r% =3D 50%, load =3D 1]
+> Threads =3D 80, Min/Mean/Max =3D 146,161/187,474/259,270
+> Threads =3D 80, Total Rate =3D 1,498 kop/s; Percpu Rate =3D 19 kop/s
+>=20
+> Running locktest with spinlock [runtime =3D 10s, load =3D 1]
+> Threads =3D 40, Min/Mean/Max =3D 646,639/1,000,817/1,455,205
+> Threads =3D 40, Total Rate =3D 4,001 kop/s; Percpu Rate =3D 100 kop/s
+>=20
+> Running locktest with rwlock [runtime =3D 10s, r% =3D 50%, load =3D 1]
+> Threads =3D 40, Min/Mean/Max =3D 402,165/597,132/814,555
+> Threads =3D 40, Total Rate =3D 2,388 kop/s; Percpu Rate =3D 60 kop/s
+>=20
+> 5.8.0-rc4-qlock+
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> Running locktest with spinlock [runtime =3D 10s, load =3D 1]
+> Threads =3D 160, Min/Mean/Max =3D 123,835/124,580/124,587
+> Threads =3D 160, Total Rate =3D 1,992 kop/s; Percpu Rate =3D 12 kop/s
+>=20
+> Running locktest with rwlock [runtime =3D 10s, r% =3D 50%, load =3D 1]
+> Threads =3D 160, Min/Mean/Max =3D 254,210/264,714/276,784
+> Threads =3D 160, Total Rate =3D 4,231 kop/s; Percpu Rate =3D 26 kop/s
+>=20
+> Running locktest with spinlock [runtime =3D 10s, load =3D 1]
+> Threads =3D 80, Min/Mean/Max =3D 599,715/603,397/603,450
+> Threads =3D 80, Total Rate =3D 4,825 kop/s; Percpu Rate =3D 60 kop/s
+>=20
+> Running locktest with rwlock [runtime =3D 10s, r% =3D 50%, load =3D 1]
+> Threads =3D 80, Min/Mean/Max =3D 492,687/525,224/567,456
+> Threads =3D 80, Total Rate =3D 4,199 kop/s; Percpu Rate =3D 52 kop/s
+>=20
+> Running locktest with spinlock [runtime =3D 10s, load =3D 1]
+> Threads =3D 40, Min/Mean/Max =3D 1,325,623/1,325,628/1,325,636
+> Threads =3D 40, Total Rate =3D 5,299 kop/s; Percpu Rate =3D 132 kop/s
+>=20
+> Running locktest with rwlock [runtime =3D 10s, r% =3D 50%, load =3D 1]
+> Threads =3D 40, Min/Mean/Max =3D 1,249,731/1,292,977/1,342,815
+> Threads =3D 40, Total Rate =3D 5,168 kop/s; Percpu Rate =3D 129 kop/s
+>=20
+> On systems on large number of cpus, qspinlock lock is faster and more fai=
+r.
+>=20
+> With some tuning, we may be able to squeeze out more performance.
 
-diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
-index e90c073e437e..d8ada9c7ec78 100644
---- a/arch/powerpc/include/asm/hvcall.h
-+++ b/arch/powerpc/include/asm/hvcall.h
-@@ -237,7 +237,7 @@
- #define H_CREATE_RPT            0x1A4
- #define H_REMOVE_RPT            0x1A8
- #define H_REGISTER_RPAGES       0x1AC
--#define H_DISABLE_AND_GETC      0x1B0
-+#define H_DISABLE_AND_GET       0x1B0
- #define H_ERROR_DATA            0x1B4
- #define H_GET_HCA_INFO          0x1B8
- #define H_GET_PERF_COUNT        0x1BC
-diff --git a/arch/powerpc/kvm/trace_hv.h b/arch/powerpc/kvm/trace_hv.h
-index 4a61a971c34e..830a126e095d 100644
---- a/arch/powerpc/kvm/trace_hv.h
-+++ b/arch/powerpc/kvm/trace_hv.h
-@@ -89,7 +89,7 @@
- 	{H_CREATE_RPT,			"H_CREATE_RPT"}, \
- 	{H_REMOVE_RPT,			"H_REMOVE_RPT"}, \
- 	{H_REGISTER_RPAGES,		"H_REGISTER_RPAGES"}, \
--	{H_DISABLE_AND_GETC,		"H_DISABLE_AND_GETC"}, \
-+	{H_DISABLE_AND_GET,		"H_DISABLE_AND_GET"}, \
- 	{H_ERROR_DATA,			"H_ERROR_DATA"}, \
- 	{H_GET_HCA_INFO,		"H_GET_HCA_INFO"}, \
- 	{H_GET_PERF_COUNT,		"H_GET_PERF_COUNT"}, \
-diff --git a/tools/perf/arch/powerpc/util/book3s_hcalls.h b/tools/perf/arch/powerpc/util/book3s_hcalls.h
-index 54cfa0530e86..488f4339b83c 100644
---- a/tools/perf/arch/powerpc/util/book3s_hcalls.h
-+++ b/tools/perf/arch/powerpc/util/book3s_hcalls.h
-@@ -84,7 +84,7 @@
- 	{0x1a4, "H_CREATE_RPT"},				\
- 	{0x1a8, "H_REMOVE_RPT"},				\
- 	{0x1ac, "H_REGISTER_RPAGES"},				\
--	{0x1b0, "H_DISABLE_AND_GETC"},				\
-+	{0x1b0, "H_DISABLE_AND_GET"},				\
- 	{0x1b4, "H_ERROR_DATA"},				\
- 	{0x1b8, "H_GET_HCA_INFO"},				\
- 	{0x1bc, "H_GET_PERF_COUNT"},				\
--- 
-2.25.4
+Yes, powerpc could certainly get more performance out of the slow
+paths, and then there are a few parameters to tune.
 
+We don't have a good alternate patching for function calls yet, but
+that would be something to do for native vs pv.
+
+And then there seem to be one or two tunable parameters we could
+experiment with.
+
+The paravirt locks may need a bit more tuning. Some simple testing
+under KVM shows we might be a bit slower in some cases. Whether this
+is fairness or something else I'm not sure. The current simple pv
+spinlock code can do a directed yield to the lock holder CPU, whereas=20
+the pv qspl here just does a general yield. I think we might actually
+be able to change that to also support directed yield. Though I'm
+not sure if this is actually the cause of the slowdown yet.
+
+Thanks,
+Nick
