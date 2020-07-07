@@ -2,164 +2,132 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64E76216183
-	for <lists+kvm-ppc@lfdr.de>; Tue,  7 Jul 2020 00:25:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9675D216324
+	for <lists+kvm-ppc@lfdr.de>; Tue,  7 Jul 2020 02:49:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727858AbgGFWYK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 6 Jul 2020 18:24:10 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:1770 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727828AbgGFWYJ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 6 Jul 2020 18:24:09 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5f03a4530002>; Mon, 06 Jul 2020 15:23:15 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 06 Jul 2020 15:24:08 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 06 Jul 2020 15:24:08 -0700
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 6 Jul
- 2020 22:23:58 +0000
-Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 6 Jul 2020 22:23:58 +0000
-Received: from rcampbell-dev.nvidia.com (Not Verified[10.110.48.66]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5f03a47e0009>; Mon, 06 Jul 2020 15:23:58 -0700
-From:   Ralph Campbell <rcampbell@nvidia.com>
-To:     <linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>,
-        <nouveau@lists.freedesktop.org>, <kvm-ppc@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC:     Jerome Glisse <jglisse@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>,
-        "Ben Skeggs" <bskeggs@redhat.com>,
+        id S1726681AbgGGAtL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 6 Jul 2020 20:49:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38884 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725942AbgGGAtL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 6 Jul 2020 20:49:11 -0400
+Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66958C061755;
+        Mon,  6 Jul 2020 17:49:11 -0700 (PDT)
+Received: by mail-qv1-xf41.google.com with SMTP id dm12so18107523qvb.9;
+        Mon, 06 Jul 2020 17:49:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nupjNinoHUh+uunJaY1+lviIz5/yMs8Gt+iI8FGKf1E=;
+        b=aiktmtNj5ZAoNyPO1vLNFxBZIg4wlgHK6Lj3LTR6TuvRNwIUv7FlYq7hz36B/C9zYu
+         JQxB8ajz6Wqk4BEOOWRLZDtOgTwRvJ3enGHwNIPJzN0MlvRp5i4zdcsgT5KVGLkhWMWx
+         Ze/izcWhua9ygTYA0VHp9wTGxaBtuxstHphkPkNzxWTyO2FNRAPW83yZSTzICoi9w7j6
+         JHxnWX2NjjQ5ryqTQpVaOvI42+H20BPKcrIzezzNDzujgticoI78gSt6M6ZPY95sv8uN
+         poI9ocj5Y6sM8hhmljMdl9WFWCnFoFLjjRKN1ia4Ig+DmbrkMXP3Z+R5cJJuKm0u8Zvw
+         LEIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nupjNinoHUh+uunJaY1+lviIz5/yMs8Gt+iI8FGKf1E=;
+        b=keNUwyJDc6JS68HZlpw8I25gJR09cHwZOUH/rat6rB+GxE0XZJkEllKo2x4IMgvAxp
+         svzpIeNswS+BOljUGaXy2FjSUbToJWtWRaWlHQc0Ig+I9+f1uMUWWLFymbOHswTyJY+r
+         lbD2TfoXBBeo8ppTPofRR7YfPPerpLge1VNO/K0mZa1oRYuH0DV2RnihSUXy/iUzXyB3
+         9mRibldDejm77A1sKmab7tuxoYPkGe1NXMM2//9s0IEgGCGyAK8wJdNvKLmbCsbtb7no
+         AA0kF4RMB1NSrvl1mACp9a+dGFEyRjAlhnPYBn8gmCsg36nQTsZeOm1nXc/QAOwihCpB
+         A8Ig==
+X-Gm-Message-State: AOAM530cjYCddtWgUO0SNcrCaKcTodOacjesQ01HeYgfrGaWHb4CHOWT
+        EAH1C5pd/jT794hA21KXJuM=
+X-Google-Smtp-Source: ABdhPJztRm0dtfm0yUaV6CFQuiSny4WpTBoh+ADVnQgav5R2Q07nHdng/u3kPPaGv8DoqtC4hoHQ0Q==
+X-Received: by 2002:a05:6214:289:: with SMTP id l9mr41967514qvv.238.1594082950616;
+        Mon, 06 Jul 2020 17:49:10 -0700 (PDT)
+Received: from localhost.localdomain (179-125-148-98.dynamic.desktop.com.br. [179.125.148.98])
+        by smtp.gmail.com with ESMTPSA id d23sm24413636qtk.97.2020.07.06.17.49.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jul 2020 17:49:09 -0700 (PDT)
+From:   Leonardo Bras <leobras.c@gmail.com>
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
         Bharata B Rao <bharata@linux.ibm.com>,
-        "Ralph Campbell" <rcampbell@nvidia.com>
-Subject: [PATCH 5/5] mm/hmm/test: use the new migration invalidation
-Date:   Mon, 6 Jul 2020 15:23:47 -0700
-Message-ID: <20200706222347.32290-6-rcampbell@nvidia.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200706222347.32290-1-rcampbell@nvidia.com>
-References: <20200706222347.32290-1-rcampbell@nvidia.com>
+        Leonardo Bras <leobras.c@gmail.com>,
+        Vaibhav Jain <vaibhav@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org
+Subject: [PATCH 1/1] KVM/PPC: Fix typo on H_DISABLE_AND_GET hcall
+Date:   Mon,  6 Jul 2020 21:48:12 -0300
+Message-Id: <20200707004812.190765-1-leobras.c@gmail.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1594074195; bh=kgnsv7iVAI/kXfctFPCsW2QnU6XTpmeohMoPVouzWVs=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=oObkPYI+R1CqoLcqZa2YtQ3GzSAl0oyJCPs20fvcCYe0RShZ4D6Fz1RZ7TlTc7a5R
-         f/qeoM7GIcjjIPYpw+vehCbgVbgHryq1qA5E77uP6+eToA2HrHkmwX7I1lEuErOV1F
-         MAP9uoTwWP98pOC+Lpq39BpxzJBOhfhYLDaXIeiQYH2pTZyfUvUh9jxDUBOikB7GWl
-         qHzh9TOjDaVXS7bdXO15v0twfFSMWIjPbtj/WfyQ6SH/Fj7PenVdj2y6wd2zPXFxS2
-         BUS9tgWbx9FnMHABfyPxACGypj9j5Js++ovrOSNLK3dAkds/oabG1sArzxUhNLi4gz
-         ne59VYb+JBBGQ==
+Content-Transfer-Encoding: 8bit
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Use the new MMU_NOTIFY_MIGRATE event to skip MMU invalidations of device
-private memory and handle the invalidation in the driver as part of
-migrating device private memory.
+On PAPR+ the hcall() on 0x1B0 is called H_DISABLE_AND_GET, but got
+defined as H_DISABLE_AND_GETC instead.
 
-Signed-off-by: Ralph Campbell <rcampbell@nvidia.com>
+This define was introduced with a typo in commit <b13a96cfb055>
+("[PATCH] powerpc: Extends HCALL interface for InfiniBand usage"), and was
+later used without having the typo noticed.
+
+Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
 ---
- lib/test_hmm.c | 31 ++++++++++++++++++-------------
- 1 file changed, 18 insertions(+), 13 deletions(-)
+ arch/powerpc/include/asm/hvcall.h            | 2 +-
+ arch/powerpc/kvm/trace_hv.h                  | 2 +-
+ tools/perf/arch/powerpc/util/book3s_hcalls.h | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/lib/test_hmm.c b/lib/test_hmm.c
-index 1bd60cfb5a25..a170e5f7fb2e 100644
---- a/lib/test_hmm.c
-+++ b/lib/test_hmm.c
-@@ -214,6 +214,14 @@ static bool dmirror_interval_invalidate(struct mmu_int=
-erval_notifier *mni,
- {
- 	struct dmirror *dmirror =3D container_of(mni, struct dmirror, notifier);
-=20
-+	/*
-+	 * Ignore invalidation callbacks for device private pages since
-+	 * the invalidation is handled as part of the migration process.
-+	 */
-+	if (range->event =3D=3D MMU_NOTIFY_MIGRATE &&
-+	    range->data =3D=3D dmirror->mdevice)
-+		return true;
-+
- 	if (mmu_notifier_range_blockable(range))
- 		mutex_lock(&dmirror->mutex);
- 	else if (!mutex_trylock(&dmirror->mutex))
-@@ -702,7 +710,7 @@ static int dmirror_migrate(struct dmirror *dmirror,
- 		args.dst =3D dst_pfns;
- 		args.start =3D addr;
- 		args.end =3D next;
--		args.src_owner =3D NULL;
-+		args.src_owner =3D dmirror->mdevice;
- 		args.dir =3D MIGRATE_VMA_FROM_SYSTEM;
- 		ret =3D migrate_vma_setup(&args);
- 		if (ret)
-@@ -992,7 +1000,7 @@ static void dmirror_devmem_free(struct page *page)
- }
-=20
- static vm_fault_t dmirror_devmem_fault_alloc_and_copy(struct migrate_vma *=
-args,
--						struct dmirror_device *mdevice)
-+						      struct dmirror *dmirror)
- {
- 	const unsigned long *src =3D args->src;
- 	unsigned long *dst =3D args->dst;
-@@ -1014,6 +1022,7 @@ static vm_fault_t dmirror_devmem_fault_alloc_and_copy=
-(struct migrate_vma *args,
- 			continue;
-=20
- 		lock_page(dpage);
-+		xa_erase(&dmirror->pt, addr >> PAGE_SHIFT);
- 		copy_highpage(dpage, spage);
- 		*dst =3D migrate_pfn(page_to_pfn(dpage)) | MIGRATE_PFN_LOCKED;
- 		if (*src & MIGRATE_PFN_WRITE)
-@@ -1022,15 +1031,6 @@ static vm_fault_t dmirror_devmem_fault_alloc_and_cop=
-y(struct migrate_vma *args,
- 	return 0;
- }
-=20
--static void dmirror_devmem_fault_finalize_and_map(struct migrate_vma *args=
-,
--						  struct dmirror *dmirror)
--{
--	/* Invalidate the device's page table mapping. */
--	mutex_lock(&dmirror->mutex);
--	dmirror_do_update(dmirror, args->start, args->end);
--	mutex_unlock(&dmirror->mutex);
--}
--
- static vm_fault_t dmirror_devmem_fault(struct vm_fault *vmf)
- {
- 	struct migrate_vma args;
-@@ -1060,11 +1060,16 @@ static vm_fault_t dmirror_devmem_fault(struct vm_fa=
-ult *vmf)
- 	if (migrate_vma_setup(&args))
- 		return VM_FAULT_SIGBUS;
-=20
--	ret =3D dmirror_devmem_fault_alloc_and_copy(&args, dmirror->mdevice);
-+	ret =3D dmirror_devmem_fault_alloc_and_copy(&args, dmirror);
- 	if (ret)
- 		return ret;
- 	migrate_vma_pages(&args);
--	dmirror_devmem_fault_finalize_and_map(&args, dmirror);
-+	/*
-+	 * No device finalize step is needed since
-+	 * dmirror_devmem_fault_alloc_and_copy() will have already
-+	 * invalidated the device page table. We could reinstate device MMU
-+	 * entries for pages that didn't migrate but that should be rare.
-+	 */
- 	migrate_vma_finalize(&args);
- 	return 0;
- }
---=20
-2.20.1
+diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
+index e90c073e437e..d8ada9c7ec78 100644
+--- a/arch/powerpc/include/asm/hvcall.h
++++ b/arch/powerpc/include/asm/hvcall.h
+@@ -237,7 +237,7 @@
+ #define H_CREATE_RPT            0x1A4
+ #define H_REMOVE_RPT            0x1A8
+ #define H_REGISTER_RPAGES       0x1AC
+-#define H_DISABLE_AND_GETC      0x1B0
++#define H_DISABLE_AND_GET       0x1B0
+ #define H_ERROR_DATA            0x1B4
+ #define H_GET_HCA_INFO          0x1B8
+ #define H_GET_PERF_COUNT        0x1BC
+diff --git a/arch/powerpc/kvm/trace_hv.h b/arch/powerpc/kvm/trace_hv.h
+index 4a61a971c34e..830a126e095d 100644
+--- a/arch/powerpc/kvm/trace_hv.h
++++ b/arch/powerpc/kvm/trace_hv.h
+@@ -89,7 +89,7 @@
+ 	{H_CREATE_RPT,			"H_CREATE_RPT"}, \
+ 	{H_REMOVE_RPT,			"H_REMOVE_RPT"}, \
+ 	{H_REGISTER_RPAGES,		"H_REGISTER_RPAGES"}, \
+-	{H_DISABLE_AND_GETC,		"H_DISABLE_AND_GETC"}, \
++	{H_DISABLE_AND_GET,		"H_DISABLE_AND_GET"}, \
+ 	{H_ERROR_DATA,			"H_ERROR_DATA"}, \
+ 	{H_GET_HCA_INFO,		"H_GET_HCA_INFO"}, \
+ 	{H_GET_PERF_COUNT,		"H_GET_PERF_COUNT"}, \
+diff --git a/tools/perf/arch/powerpc/util/book3s_hcalls.h b/tools/perf/arch/powerpc/util/book3s_hcalls.h
+index 54cfa0530e86..488f4339b83c 100644
+--- a/tools/perf/arch/powerpc/util/book3s_hcalls.h
++++ b/tools/perf/arch/powerpc/util/book3s_hcalls.h
+@@ -84,7 +84,7 @@
+ 	{0x1a4, "H_CREATE_RPT"},				\
+ 	{0x1a8, "H_REMOVE_RPT"},				\
+ 	{0x1ac, "H_REGISTER_RPAGES"},				\
+-	{0x1b0, "H_DISABLE_AND_GETC"},				\
++	{0x1b0, "H_DISABLE_AND_GET"},				\
+ 	{0x1b4, "H_ERROR_DATA"},				\
+ 	{0x1b8, "H_GET_HCA_INFO"},				\
+ 	{0x1bc, "H_GET_PERF_COUNT"},				\
+-- 
+2.25.4
 
