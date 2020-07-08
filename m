@@ -2,73 +2,84 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 685892182BB
-	for <lists+kvm-ppc@lfdr.de>; Wed,  8 Jul 2020 10:42:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4F5921846A
+	for <lists+kvm-ppc@lfdr.de>; Wed,  8 Jul 2020 11:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727927AbgGHIl4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 8 Jul 2020 04:41:56 -0400
-Received: from casper.infradead.org ([90.155.50.34]:57892 "EHLO
-        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725789AbgGHIl4 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 8 Jul 2020 04:41:56 -0400
-X-Greylist: delayed 512 seconds by postgrey-1.27 at vger.kernel.org; Wed, 08 Jul 2020 04:41:55 EDT
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=S32XUF0JR40sOoi2lYA1Jt2WlEew0VlzGuJ1gwYbhcU=; b=s35D4xLyvnkYZU4YcWf+9NjRFK
-        qAGphMcWSVhYkoJc8aLz2jh51DodnUkao4ypjVVvtlh5fcEIsMpk6UdXCby8V2qdZA2gSM5VTx11d
-        ejcgbzpQUBqwaR783SFDpecCm7eKgFdgoL4fECk9Qy30bGquxIr924rnywePvDNug5/GOl4mBqpIf
-        yhYDUhFAoVr+rZtcrUHltrwRK7hN7qpv20iSjblFycKsMdUlki/Rvlx96bthlu203IRbVK2rv+Qyz
-        fe6lVWcbvlapeHkqUU1cRfS5tDsGg7qLw6HfdJdLjRTuWghNE1CJUhLCA2Q5UKIbSoK08YZTIcjeG
-        XvtIgbgA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jt5df-0008Ee-Rc; Wed, 08 Jul 2020 08:41:16 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BAE6F304D58;
-        Wed,  8 Jul 2020 10:41:06 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id A7CDA203D34DE; Wed,  8 Jul 2020 10:41:06 +0200 (CEST)
-Date:   Wed, 8 Jul 2020 10:41:06 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, Waiman Long <longman@redhat.com>,
-        Anton Blanchard <anton@ozlabs.org>,
-        Boqun Feng <boqun.feng@gmail.com>, kvm-ppc@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 0/6] powerpc: queued spinlocks and rwlocks
-Message-ID: <20200708084106.GE597537@hirez.programming.kicks-ass.net>
-References: <20200706043540.1563616-1-npiggin@gmail.com>
- <24f75d2c-60cd-2766-4aab-1a3b1c80646e@redhat.com>
- <1594101082.hfq9x5yact.astroid@bobo.none>
+        id S1726445AbgGHJyE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 8 Jul 2020 05:54:04 -0400
+Received: from mail.elsol.com.pe ([170.231.82.35]:48273 "EHLO
+        mail.elsol.com.pe" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726302AbgGHJyD (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 8 Jul 2020 05:54:03 -0400
+X-Greylist: delayed 8636 seconds by postgrey-1.27 at vger.kernel.org; Wed, 08 Jul 2020 05:54:02 EDT
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mail.elsol.com.pe (Postfix) with ESMTP id 5D49E606290;
+        Wed,  8 Jul 2020 02:11:52 -0500 (-05)
+Received: from mail.elsol.com.pe ([127.0.0.1])
+        by localhost (mail.elsol.com.pe [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id a8-7TDM0ghHv; Wed,  8 Jul 2020 02:11:52 -0500 (-05)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mail.elsol.com.pe (Postfix) with ESMTP id CD7686059E2;
+        Wed,  8 Jul 2020 02:11:51 -0500 (-05)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.elsol.com.pe CD7686059E2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=elsol.com.pe;
+        s=17F39D2A-FFD0-11E7-BCBF-081969246B0E; t=1594192311;
+        bh=7Y6RtNhSVAIVHdJEU2gHHWYvaP8LRgEAhMNj0EoKaAA=;
+        h=MIME-Version:To:From:Date:Message-Id;
+        b=QlknwBm88P8X9w2tp5a/OTMkreUHE50oTfYU6UhYdY/NXvrPe3V9pejrti5MkoRyl
+         kRebibZWjdqmmljg/dFXM9EZQ1W6GK0+htWf9szGCiIRbfRii9ytIZXFhy18UTzNO1
+         MhmnxcYJhC3CYtxtNBOe6x8yDKOZBtqoNyaqcZ0wYvrYgEZxosvU/D+mTvkJdrJLcs
+         rB/6FW5AQdEhVWiygsB+oJKJJR6mHmjF2wtZr+id4pWUMsdBhYC1ZXMlg1CpkhxTeO
+         f/Zojgew/YW2U9JMcyUlk3+2h++AZdiz6iBo7wnTUczuel0D3ba2YaIIPclLCA19pS
+         PDukF8GmE3fRQ==
+X-Virus-Scanned: amavisd-new at elsol.com.pe
+Received: from mail.elsol.com.pe ([127.0.0.1])
+        by localhost (mail.elsol.com.pe [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id PWLsx7PtOnml; Wed,  8 Jul 2020 02:11:51 -0500 (-05)
+Received: from [10.86.65.172] (unknown [105.8.7.225])
+        by mail.elsol.com.pe (Postfix) with ESMTPSA id 84AB2608390;
+        Wed,  8 Jul 2020 02:11:41 -0500 (-05)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1594101082.hfq9x5yact.astroid@bobo.none>
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: =?utf-8?q?Covid_19_Wohlt=C3=A4tigkeitsfonds?=
+To:     Recipients <dreyes@elsol.com.pe>
+From:   ''Tayeb Souami'' <dreyes@elsol.com.pe>
+Date:   Wed, 08 Jul 2020 09:07:55 +0200
+Reply-To: Tayebsouam.spende@gmail.com
+Message-Id: <20200708071141.84AB2608390@mail.elsol.com.pe>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Jul 07, 2020 at 03:57:06PM +1000, Nicholas Piggin wrote:
-> Yes, powerpc could certainly get more performance out of the slow
-> paths, and then there are a few parameters to tune.
+Lieber Freund,
 
-Can you clarify? The slow path is already in use on ARM64 which is weak,
-so I doubt there's superfluous serialization present. And Will spend a
-fair amount of time on making that thing guarantee forward progressm, so
-there just isn't too much room to play.
+Ich bin Herr Tayeb Souami, New Jersey, Vereinigte Staaten von Amerika, der =
+Mega-Gewinner von $ 315million In Mega Millions Jackpot, spende ich an 5 zu=
+f=C3=A4llige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Ma=
+il nach einem Spinball ausgew=C3=A4hlt.Ich habe den gr=C3=B6=C3=9Ften Teil =
+meines Verm=C3=B6gens auf eine Reihe von Wohlt=C3=A4tigkeitsorganisationen =
+und Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die =
+Summe von =E2=82=AC 2.000.000,00 an Sie als eine der ausgew=C3=A4hlten 5 zu=
+ spenden, um meine Gewinne zu =C3=BCberpr=C3=BCfen, sehen Sie bitte meine Y=
+ou Tube Seite unten.
 
-> We don't have a good alternate patching for function calls yet, but
-> that would be something to do for native vs pv.
+UHR MICH HIER: https://www.youtube.com/watch?v=3DZ6ui8ZDQ6Ks
 
-Going by your jump_label implementation, support for static_call should
-be fairly straight forward too, no?
 
-  https://lkml.kernel.org/r/20200624153024.794671356@infradead.org
+
+Das ist dein Spendencode: [TS530342018]
+
+
+
+Antworten Sie mit dem SPENDE-CODE an diese
+
+E-Mail:Tayebsouam.spende@gmail.com
+
+
+Ich hoffe, Sie und Ihre Familie gl=C3=BCcklich zu machen.
+
+Gr=C3=BC=C3=9Fe
+Herr Tayeb Souami
