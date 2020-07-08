@@ -2,167 +2,94 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25EDF218709
-	for <lists+kvm-ppc@lfdr.de>; Wed,  8 Jul 2020 14:17:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22087218754
+	for <lists+kvm-ppc@lfdr.de>; Wed,  8 Jul 2020 14:31:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728896AbgGHMRE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 8 Jul 2020 08:17:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38138 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728790AbgGHMRE (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 8 Jul 2020 08:17:04 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 068C0eio107900;
-        Wed, 8 Jul 2020 08:16:42 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 325dp70r9k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jul 2020 08:16:41 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 068CAH8u002721;
-        Wed, 8 Jul 2020 12:16:40 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 322hd7vhgy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jul 2020 12:16:40 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 068CGbaI36896792
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Jul 2020 12:16:37 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 41927AE055;
-        Wed,  8 Jul 2020 12:16:37 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BA336AE045;
-        Wed,  8 Jul 2020 12:16:36 +0000 (GMT)
-Received: from pomme.local (unknown [9.145.179.233])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  8 Jul 2020 12:16:36 +0000 (GMT)
-Subject: Re: [PATCH 2/2] KVM: PPC: Book3S HV: rework secure mem slot dropping
-To:     bharata@linux.ibm.com
-Cc:     linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        paulus@samba.org, bauerman@linux.ibm.com, sukadev@linux.ibm.com,
-        sathnaga@linux.vnet.ibm.com, Ram Pai <linuxram@us.ibm.com>,
-        Paul Mackerras <paulus@ozlabs.org>
-References: <20200703155914.40262-1-ldufour@linux.ibm.com>
- <20200703155914.40262-3-ldufour@linux.ibm.com>
- <20200708112531.GA7902@in.ibm.com>
-From:   Laurent Dufour <ldufour@linux.ibm.com>
-Message-ID: <0588d16a-8548-0f55-1132-400807a390a1@linux.ibm.com>
-Date:   Wed, 8 Jul 2020 14:16:36 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
+        id S1728987AbgGHMbM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 8 Jul 2020 08:31:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59888 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728919AbgGHMbM (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 8 Jul 2020 08:31:12 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70259C08C5DC
+        for <kvm-ppc@vger.kernel.org>; Wed,  8 Jul 2020 05:31:12 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id o5so46651064iow.8
+        for <kvm-ppc@vger.kernel.org>; Wed, 08 Jul 2020 05:31:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=/vBVbAxvijag95IA6OM26aTa2bKDnUtimRlc1mZm/7M=;
+        b=n3Rfi0Yx55UFE+w5He+aJHAl4yzUzSAwQNvG+FVyPzwuTrfr2l5IY97B1btO0szxxT
+         FSh/ZXua0XUlS+GWMPkTBnvfwn6oOYDR1Ed/bXhWwnH7Wx0AHnEtTOfk4PWmi2A+AfM1
+         U0vYO+VtNThdczbYPvOrnSLH07J6FeIALNj71iJLIdV70J0P0rp0FT60ftwIQHZZ8M1F
+         JFUIHyaDjSr6eBh1BRXtDfBfY1ojSb3ysLj4We1VEx06I6AKYSMzTEHcUdzM7ILIsNm/
+         TddqUBWRpG/83sSOz8kFOjLXZKO4gGchVNyLI38CtbjIaScTeheBYlhib2NWqsavNTIj
+         MaZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=/vBVbAxvijag95IA6OM26aTa2bKDnUtimRlc1mZm/7M=;
+        b=tr7MquoprrPOhTMbSIciHx8+P841E7qoovHpOwE5q3h2qaQK85ohpf85nO+TwinPqT
+         IoxxWJoUD5VEWD4POSeS3hbDTCPbmGoO0d4INEk4UHmq49lISSBS6GIzUDTMLvM5KNdF
+         3BAe5QR0JgVsTGVFAlbom29YDi4y80GfGXYDf8uKk9CXkiIDcI3uJvNc+cy500xJEBhM
+         ZnvFpx9tIUnn8D+8jq74OMSTsYmm+lyoA5028qYo70prfjWPGjhmeOkYMB3/BTco1kb6
+         HCYOis5k6apHOOmDLAQ2WeNuJo3dB1T041PiJAqmGphTjPFVri1+nLLzgE61F1EKKVWj
+         5USQ==
+X-Gm-Message-State: AOAM530rKddPyhZFqTLUEyeTX/ZaAqFI9g9VVuvar8+98cHjJCSnbDD6
+        eBG4UD6I1nO55zOIPRtYSyxywdj+PHlFHrCHy5A=
+X-Google-Smtp-Source: ABdhPJz81frHYn+OzT4UXA1MDGzrA+srDj29FYarYGKTd+AWY8zKpa99vbdlSytV/h/xC+qEjWC3Cksp9UmpCOa6Ajs=
+X-Received: by 2002:a5d:9c0e:: with SMTP id 14mr36876519ioe.109.1594211470176;
+ Wed, 08 Jul 2020 05:31:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200708112531.GA7902@in.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-08_08:2020-07-08,2020-07-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- cotscore=-2147483648 phishscore=0 impostorscore=0 priorityscore=1501
- mlxscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=3 bulkscore=0
- spamscore=0 mlxlogscore=779 adultscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2007080084
+Received: by 2002:a92:9886:0:0:0:0:0 with HTTP; Wed, 8 Jul 2020 05:31:09 -0700 (PDT)
+Reply-To: mmsafiatou057@gmail.com
+From:   "Mrs. Safitaou Zoungrana" <s.alireza1972@gmail.com>
+Date:   Wed, 8 Jul 2020 12:31:09 +0000
+Message-ID: <CAPGBjpwPwm-gJmdO58mUNPZHtm=q-TV63pAg3Etzkaj0tq+pxg@mail.gmail.com>
+Subject: My Dear Beloved One,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Le 08/07/2020 à 13:25, Bharata B Rao a écrit :
-> On Fri, Jul 03, 2020 at 05:59:14PM +0200, Laurent Dufour wrote:
->> When a secure memslot is dropped, all the pages backed in the secure device
->> (aka really backed by secure memory by the Ultravisor) should be paged out
->> to a normal page. Previously, this was achieved by triggering the page
->> fault mechanism which is calling kvmppc_svm_page_out() on each pages.
->>
->> This can't work when hot unplugging a memory slot because the memory slot
->> is flagged as invalid and gfn_to_pfn() is then not trying to access the
->> page, so the page fault mechanism is not triggered.
->>
->> Since the final goal is to make a call to kvmppc_svm_page_out() it seems
->> simpler to directly calling it instead of triggering such a mechanism. This
->> way kvmppc_uvmem_drop_pages() can be called even when hot unplugging a
->> memslot.
-> 
-> Yes, this appears much simpler.
+My Dear Beloved One,
 
-Thanks Bharata for reviewing this.
+I greet you in the name of God almighty the givers of all good things
+in life. Please kindly pardon me for any inconvenience this letter may
+cost you because I know it may come to you as a surprise as we have no
+previous correspondence.  I sent this mail praying for it to reach you
+in good health, since I myself are in a very critical health condition
+in which I sleep every night without knowing if I may be alive to see
+the next day.
 
-> 
->>
->> Since kvmppc_uvmem_drop_pages() is already holding kvm->arch.uvmem_lock,
->> the call to __kvmppc_svm_page_out() is made.
->> As __kvmppc_svm_page_out needs the vma pointer to migrate the pages, the
->> VMA is fetched in a lazy way, to not trigger find_vma() all the time. In
->> addition, the mmap_sem is help in read mode during that time, not in write
->> mode since the virual memory layout is not impacted, and
->> kvm->arch.uvmem_lock prevents concurrent operation on the secure device.
->>
->> Cc: Ram Pai <linuxram@us.ibm.com>
->> Cc: Bharata B Rao <bharata@linux.ibm.com>
->> Cc: Paul Mackerras <paulus@ozlabs.org>
->> Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
->> ---
->>   arch/powerpc/kvm/book3s_hv_uvmem.c | 54 ++++++++++++++++++++----------
->>   1 file changed, 37 insertions(+), 17 deletions(-)
->>
->> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
->> index 852cc9ae6a0b..479ddf16d18c 100644
->> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
->> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
->> @@ -533,35 +533,55 @@ static inline int kvmppc_svm_page_out(struct vm_area_struct *vma,
->>    * fault on them, do fault time migration to replace the device PTEs in
->>    * QEMU page table with normal PTEs from newly allocated pages.
->>    */
->> -void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
->> +void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *slot,
->>   			     struct kvm *kvm, bool skip_page_out)
->>   {
->>   	int i;
->>   	struct kvmppc_uvmem_page_pvt *pvt;
->> -	unsigned long pfn, uvmem_pfn;
->> -	unsigned long gfn = free->base_gfn;
->> +	struct page *uvmem_page;
->> +	struct vm_area_struct *vma = NULL;
->> +	unsigned long uvmem_pfn, gfn;
->> +	unsigned long addr, end;
->> +
->> +	down_read(&kvm->mm->mmap_sem);
-> 
-> You should be using mmap_read_lock(kvm->mm) with recent kernels.
+I am Mrs. Safiatou Zoungrana,  the wife of late Engineer Ralph
+Alphonso Zoungrana from Paris France but based here in Burkina Faso
+West Africa since eight years ago as a business woman dealing with
+gold exportation and Sales. We have been married for years before his
+sudden death although we were childless. I have been diagnosed with
+ovarian cancer and I have been battling with the sickness when my late
+lovely husband of a blessed memory was alive. May his soul rest in
+peace, Amen.
 
-Absolutely, shame on me, I reviewed Michel's series about that!
+My late Husband left the sum of =E2=82=AC7.900.000.00 Seven Million Nine
+Hundred Thousand Euros in a fix/suspense account in one of the prime
+bank here in Burkina Faso. Recently, my Doctor told me that I have few
+days to live due to the cancer problem. The one that disturbs me most
+is my blood pressure sickness.
 
-Paul, Michael, could you fix that when pulling this patch or should I sent a 
-whole new series?
+Having known my health condition I decided to seek for your kind
+assistance to transfer this fund into your account and you will use it
+to establish an orphanage home in my name. I will give you more
+details about the project as soon as I receive your reply in my
+private email (mmsafiatou057@gmail.com) to handle this project because
+I do not want to state all here until I see your reply, desire and
+commitment to handle this project.
 
-> 
->> +
->> +	addr = slot->userspace_addr;
->> +	end = addr + (slot->npages * PAGE_SIZE);
->>   
->> -	for (i = free->npages; i; --i, ++gfn) {
->> -		struct page *uvmem_page;
->> +	gfn = slot->base_gfn;
->> +	for (i = slot->npages; i; --i, ++gfn, addr += PAGE_SIZE) {
->> +
->> +		/* Fetch the VMA if addr is not in the latest fetched one */
->> +		if (!vma || (addr < vma->vm_start || addr >= vma->vm_end)) {
->> +			vma = find_vma_intersection(kvm->mm, addr, end);
->> +			if (!vma ||
->> +			    vma->vm_start > addr || vma->vm_end < end) {
->> +				pr_err("Can't find VMA for gfn:0x%lx\n", gfn);
->> +				break;
->> +			}
->> +		}
-> 
-> The first find_vma_intersection() was called for the range spanning the
-> entire memslot, but you have code to check if vma remains valid for the
-> new addr in each iteration. Guess you wanted to get vma for one page at
-> a time and use it for subsequent pages until it covers the range?
-
-That's the goal, fetch the VMA once and no more until we reach its end boundary.
+My Regards to your family.
+Mrs. Safiatou Zoungrana.
