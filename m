@@ -2,118 +2,131 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6DA92188D5
-	for <lists+kvm-ppc@lfdr.de>; Wed,  8 Jul 2020 15:19:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 738DA21949B
+	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jul 2020 01:50:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729248AbgGHNTm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 8 Jul 2020 09:19:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37610 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729145AbgGHNTm (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 8 Jul 2020 09:19:42 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 068D3JIh106025;
-        Wed, 8 Jul 2020 09:19:32 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 324y2y0mnt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jul 2020 09:19:31 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 068D3Jaa106020;
-        Wed, 8 Jul 2020 09:19:29 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 324y2y0mh6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jul 2020 09:19:29 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 068DGaD8009730;
-        Wed, 8 Jul 2020 13:19:19 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma02fra.de.ibm.com with ESMTP id 322hd84q1k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Jul 2020 13:19:19 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 068DJGZG58982506
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Jul 2020 13:19:16 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 995F9A4065;
-        Wed,  8 Jul 2020 13:19:16 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 434F3A4062;
-        Wed,  8 Jul 2020 13:19:14 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.85.75.251])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed,  8 Jul 2020 13:19:14 +0000 (GMT)
-Date:   Wed, 8 Jul 2020 18:49:11 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     Ralph Campbell <rcampbell@nvidia.com>
-Cc:     linux-rdma@vger.kernel.org, linux-mm@kvack.org,
-        nouveau@lists.freedesktop.org, kvm-ppc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jerome Glisse <jglisse@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Ben Skeggs <bskeggs@redhat.com>
-Subject: Re: [PATCH 2/5] mm/migrate: add a direction parameter to migrate_vma
-Message-ID: <20200708131911.GC7902@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <20200706222347.32290-1-rcampbell@nvidia.com>
- <20200706222347.32290-3-rcampbell@nvidia.com>
+        id S1726119AbgGHXuR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 8 Jul 2020 19:50:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43678 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726006AbgGHXuR (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 8 Jul 2020 19:50:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594252216;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7a+U5YBzYfEsFsCMWL9LQvEdqafvJrKo9TGytXjXtNY=;
+        b=FFF5Uhym+Z9d/PSvRCKHK6oo27iZtuXtObyFUhfZJUEYh1Q4j/MEef1pYwkju9lFhuuzyy
+        8l6jBOMu6vrzdT/zhnCQo7B06Pn460dwYTGs0exw59On28UqSILFVNJGRakjP9G/VISEPG
+        EI4GgYPeU1uIxxZHSGwEgDBOVNcfVz4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490-y7uP8t23P4WocJdbNKNi9g-1; Wed, 08 Jul 2020 19:50:12 -0400
+X-MC-Unique: y7uP8t23P4WocJdbNKNi9g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DD511085;
+        Wed,  8 Jul 2020 23:50:10 +0000 (UTC)
+Received: from llong.remote.csb (ovpn-116-205.rdu2.redhat.com [10.10.116.205])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2B6FD60E3E;
+        Wed,  8 Jul 2020 23:50:06 +0000 (UTC)
+Subject: Re: [PATCH v3 0/6] powerpc: queued spinlocks and rwlocks
+To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Cc:     Anton Blanchard <anton@ozlabs.org>,
+        Boqun Feng <boqun.feng@gmail.com>, kvm-ppc@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        virtualization@lists.linux-foundation.org,
+        Will Deacon <will@kernel.org>
+References: <20200706043540.1563616-1-npiggin@gmail.com>
+ <24f75d2c-60cd-2766-4aab-1a3b1c80646e@redhat.com>
+ <1594101082.hfq9x5yact.astroid@bobo.none>
+ <de3ead58-7f81-8ebd-754d-244f6be24af4@redhat.com>
+ <1594184204.ncuq7vstsz.astroid@bobo.none>
+From:   Waiman Long <longman@redhat.com>
+Organization: Red Hat
+Message-ID: <62fa6343-e084-75c3-01c9-349a4617e67c@redhat.com>
+Date:   Wed, 8 Jul 2020 19:50:05 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200706222347.32290-3-rcampbell@nvidia.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-08_11:2020-07-08,2020-07-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 suspectscore=1 bulkscore=0 lowpriorityscore=0
- phishscore=0 mlxlogscore=885 cotscore=-2147483648 spamscore=0
- clxscore=1015 impostorscore=0 adultscore=0 mlxscore=0 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2007080095
+In-Reply-To: <1594184204.ncuq7vstsz.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Jul 06, 2020 at 03:23:44PM -0700, Ralph Campbell wrote:
-> The src_owner field in struct migrate_vma is being used for two purposes,
-> it implies the direction of the migration and it identifies device private
-> pages owned by the caller. Split this into separate parameters so the
-> src_owner field can be used just to identify device private pages owned
-> by the caller of migrate_vma_setup().
-> 
-> Signed-off-by: Ralph Campbell <rcampbell@nvidia.com>
-> ---
->  arch/powerpc/kvm/book3s_hv_uvmem.c     |  2 ++
->  drivers/gpu/drm/nouveau/nouveau_dmem.c |  2 ++
->  include/linux/migrate.h                | 12 +++++++++---
->  lib/test_hmm.c                         |  2 ++
->  mm/migrate.c                           |  5 +++--
->  5 files changed, 18 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> index 09d8119024db..acbf14cd2d72 100644
-> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> @@ -400,6 +400,7 @@ kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
->  	mig.end = end;
->  	mig.src = &src_pfn;
->  	mig.dst = &dst_pfn;
-> +	mig.dir = MIGRATE_VMA_FROM_SYSTEM;
->  
->  	/*
->  	 * We come here with mmap_lock write lock held just for
-> @@ -578,6 +579,7 @@ kvmppc_svm_page_out(struct vm_area_struct *vma, unsigned long start,
->  	mig.src = &src_pfn;
->  	mig.dst = &dst_pfn;
->  	mig.src_owner = &kvmppc_uvmem_pgmap;
-> +	mig.dir = MIGRATE_VMA_FROM_DEVICE_PRIVATE;
+On 7/8/20 1:10 AM, Nicholas Piggin wrote:
+> Excerpts from Waiman Long's message of July 8, 2020 1:33 pm:
+>> On 7/7/20 1:57 AM, Nicholas Piggin wrote:
+>>> Yes, powerpc could certainly get more performance out of the slow
+>>> paths, and then there are a few parameters to tune.
+>>>
+>>> We don't have a good alternate patching for function calls yet, but
+>>> that would be something to do for native vs pv.
+>>>
+>>> And then there seem to be one or two tunable parameters we could
+>>> experiment with.
+>>>
+>>> The paravirt locks may need a bit more tuning. Some simple testing
+>>> under KVM shows we might be a bit slower in some cases. Whether this
+>>> is fairness or something else I'm not sure. The current simple pv
+>>> spinlock code can do a directed yield to the lock holder CPU, whereas
+>>> the pv qspl here just does a general yield. I think we might actually
+>>> be able to change that to also support directed yield. Though I'm
+>>> not sure if this is actually the cause of the slowdown yet.
+>> Regarding the paravirt lock, I have taken a further look into the
+>> current PPC spinlock code. There is an equivalent of pv_wait() but no
+>> pv_kick(). Maybe PPC doesn't really need that.
+> So powerpc has two types of wait, either undirected "all processors" or
+> directed to a specific processor which has been preempted by the
+> hypervisor.
+>
+> The simple spinlock code does a directed wait, because it knows the CPU
+> which is holding the lock. In this case, there is a sequence that is
+> used to ensure we don't wait if the condition has become true, and the
+> target CPU does not need to kick the waiter it will happen automatically
+> (see splpar_spin_yield). This is preferable because we only wait as
+> needed and don't require the kick operation.
+Thanks for the explanation.
+>
+> The pv spinlock code I did uses the undirected wait, because we don't
+> know the CPU number which we are waiting on. This is undesirable because
+> it's higher overhead and the wait is not so accurate.
+>
+> I think perhaps we could change things so we wait on the correct CPU
+> when queued, which might be good enough (we could also put the lock
+> owner CPU in the spinlock word, if we add another format).
 
-Reviewed-by: Bharata B Rao <bharata@linux.ibm.com>
+The LS byte of the lock word is used to indicate locking status. If we 
+have less than 255 cpus, we can put the (cpu_nr + 1) into the lock byte. 
+The special 0xff value can be used to indicate a cpu number >= 255 for 
+indirect yield. The required change to the qspinlock code will be 
+minimal, I think.
 
-for the above kvmppc change.
+
+>> Attached are two
+>> additional qspinlock patches that adds a CONFIG_PARAVIRT_QSPINLOCKS_LITE
+>> option to not require pv_kick(). There is also a fixup patch to be
+>> applied after your patchset.
+>>
+>> I don't have access to a PPC LPAR with shared processor at the moment,
+>> so I can't test the performance of the paravirt code. Would you mind
+>> adding my patches and do some performance test on your end to see if it
+>> gives better result?
+> Great, I'll do some tests. Any suggestions for what to try?
+
+I will just like to see if it will produce some better performance 
+result compared with your current version.
+
+Cheers,
+Longman
+
