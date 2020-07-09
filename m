@@ -2,82 +2,81 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71ED4219CFE
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jul 2020 12:07:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22D7E219D10
+	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jul 2020 12:09:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726140AbgGIKHR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 9 Jul 2020 06:07:17 -0400
-Received: from ozlabs.org ([203.11.71.1]:41883 "EHLO ozlabs.org"
+        id S1726610AbgGIKJT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 9 Jul 2020 06:09:19 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:43361 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726327AbgGIKHR (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 9 Jul 2020 06:07:17 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4B2X0M4TJ3z9sSn; Thu,  9 Jul 2020 20:07:15 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1594289235; bh=BmqapbAxcPw7d2zoeQ9P3HK6zqK/QShIaRzUdVUueHA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=AxDdTwnPeYgWw58dmekGMZublU5kFAsvyG1J2q1UrG5l3LB6RU5Dr8zF11y+gUAVi
-         gE+2SdW/AufV1xj8AblcSs8+G0p50e+iuxLv2e+OvHNV1j/l4TzILFQhxL7KciSoHq
-         5l0+IFVtg6iqef7jErk5uEx+9A2q8zhqMuV+6Y741Wl5enlEqAVGqxHp3rzVJEnIkH
-         2igv6Sr7VEO4GEF5pnVDRy9Ei8L+BM+IidVzn1ZIrhiDo8H7Yh8vQx9JTS+Fhh5cmJ
-         DMovbCbi3FAbc4Hg2iU1il3W031Sw7Kcm/VvM+FvYhqk5egiwgGm+ceftl7w0JSwE5
-         hz+T3z6Zu4IQw==
-Date:   Thu, 9 Jul 2020 20:07:11 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Bharata B Rao <bharata@linux.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        aneesh.kumar@linux.ibm.com, npiggin@gmail.com, mpe@ellerman.id.au
-Subject: Re: [RFC PATCH v0 2/2] KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in
- nested KVM
-Message-ID: <20200709100711.GA2961345@thinks.paulus.ozlabs.org>
-References: <20200703104420.21349-1-bharata@linux.ibm.com>
- <20200703104420.21349-3-bharata@linux.ibm.com>
- <20200709051803.GC2822576@thinks.paulus.ozlabs.org>
- <20200709090851.GD7902@in.ibm.com>
+        id S1726323AbgGIKJS (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 9 Jul 2020 06:09:18 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B2X2f6tyhz9sSd;
+        Thu,  9 Jul 2020 20:09:14 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1594289355;
+        bh=B+pvOdRR00uR6MW/d9Tg/MIy1GpvfDv7HP5aB55eLMw=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=kxRBUjVzQLmCVjdHJKK+OcMHo6neU1RQex6N/x2BrSSEzz8iH/g7k4DoVMlUhjVk7
+         qjlMzJqNzIPeCAL4m8bkMuCl1Dr7W0UwucYzh02G9a/78uSyNSp/rFzURUfJIof5xH
+         rvrxbDJUq5MJV/BQwK0VcLmyEvCImjHGLb+/cWWbDQYBeOaA4oQ2CL3X3APXF6/y2J
+         D2L/vyTlEu1jwKOp2V1ztZHSpC9pxYI9LfxuGcgX3zR3P6RAS/67QId4q+XfV3yQtt
+         K7ocKhOlTOWEa7eB+mqmgAgCqXAnWX3PTuHX9vuE8pgXODpslKd4pTMDt2KQ2hnq7g
+         Rlwx0t1IcWGFQ==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>, Will Deacon <will@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Waiman Long <longman@redhat.com>,
+        Anton Blanchard <anton@ozlabs.org>,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm-ppc@vger.kernel.org,
+        linux-arch@vger.kernel.org
+Subject: Re: [PATCH v3 2/6] powerpc/pseries: move some PAPR paravirt functions to their own file
+In-Reply-To: <20200706043540.1563616-3-npiggin@gmail.com>
+References: <20200706043540.1563616-1-npiggin@gmail.com> <20200706043540.1563616-3-npiggin@gmail.com>
+Date:   Thu, 09 Jul 2020 20:11:29 +1000
+Message-ID: <87d055vvzi.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200709090851.GD7902@in.ibm.com>
+Content-Type: text/plain
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Jul 09, 2020 at 02:38:51PM +0530, Bharata B Rao wrote:
-> On Thu, Jul 09, 2020 at 03:18:03PM +1000, Paul Mackerras wrote:
-> > On Fri, Jul 03, 2020 at 04:14:20PM +0530, Bharata B Rao wrote:
-> > > In the nested KVM case, replace H_TLB_INVALIDATE by the new hcall
-> > > H_RPT_INVALIDATE if available. The availability of this hcall
-> > > is determined from "hcall-rpt-invalidate" string in ibm,hypertas-functions
-> > > DT property.
-> > 
-> > What are we going to use when nested KVM supports HPT guests at L2?
-> > L1 will need to do partition-scoped tlbies with R=0 via a hypercall,
-> > but H_RPT_INVALIDATE says in its name that it only handles radix
-> > page tables (i.e. R=1).
-> 
-> For L2 HPT guests, the old hcall is expected to work after it adds
-> support for R=0 case?
+Nicholas Piggin <npiggin@gmail.com> writes:
+>
 
-That was the plan.
+Little bit of changelog would be nice :D
 
-> The new hcall should be advertised via ibm,hypertas-functions only
-> for radix guests I suppose.
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>  arch/powerpc/include/asm/paravirt.h | 61 +++++++++++++++++++++++++++++
+>  arch/powerpc/include/asm/spinlock.h | 24 +-----------
+>  arch/powerpc/lib/locks.c            | 12 +++---
+>  3 files changed, 68 insertions(+), 29 deletions(-)
+>  create mode 100644 arch/powerpc/include/asm/paravirt.h
+>
+> diff --git a/arch/powerpc/include/asm/paravirt.h b/arch/powerpc/include/asm/paravirt.h
+> new file mode 100644
+> index 000000000000..7a8546660a63
+> --- /dev/null
+> +++ b/arch/powerpc/include/asm/paravirt.h
+> @@ -0,0 +1,61 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +#ifndef __ASM_PARAVIRT_H
+> +#define __ASM_PARAVIRT_H
 
-Well, the L1 hypervisor is a radix guest of L0, so it would have
-H_RPT_INVALIDATE available to it?
+Should be _ASM_POWERPC_PARAVIRT_H
 
-I guess the question is whether H_RPT_INVALIDATE is supposed to do
-everything, that is, radix process-scoped invalidations, radix
-partition-scoped invalidations, and HPT partition-scoped
-invalidations.  If that is the plan then we should call it something
-different.
+> +#ifdef __KERNEL__
 
-This patchset seems to imply that H_RPT_INVALIDATE is at least going
-to be used for radix partition-scoped invalidations as well as radix
-process-scoped invalidations.  If you are thinking that in future when
-we need HPT partition-scoped invalidations for a radix L1 hypervisor
-running a HPT L2 guest, we are going to define a new hypercall for
-that, I suppose that is OK, though it doesn't really seem necessary.
+We shouldn't need __KERNEL__ in here, it's not a uapi header.
 
-Paul.
+cheers
