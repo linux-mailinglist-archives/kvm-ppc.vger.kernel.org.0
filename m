@@ -2,122 +2,68 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 551952194C1
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jul 2020 01:58:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CA2B219710
+	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jul 2020 06:09:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbgGHX6u (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 8 Jul 2020 19:58:50 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39065 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726261AbgGHX6s (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 8 Jul 2020 19:58:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594252727;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bnQ0NpLgUMhM2rS/Fc950+H8OU2zboSJSf+KmCP3N40=;
-        b=aezOC4Ky+tajYUWf1HQFJN10ai8Sj+lpZv1du1GRmTqYpBBFcXpvPKDq17i84US242f+6D
-        LeNOZSu2w6PKb/LPAHLQZ27PgpQPyAhrNpyqF58xkaVbt1iVJ2h/yexs5gr9O1sN/uWQnR
-        e+eNqOADEk2vs5h6BqqSmGGaTtnW1xI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-OX3HluVBObG5NMo_XcEqww-1; Wed, 08 Jul 2020 19:58:43 -0400
-X-MC-Unique: OX3HluVBObG5NMo_XcEqww-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D26521005504;
-        Wed,  8 Jul 2020 23:58:41 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-116-205.rdu2.redhat.com [10.10.116.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A75C61001925;
-        Wed,  8 Jul 2020 23:58:40 +0000 (UTC)
-Subject: Re: [PATCH v3 0/6] powerpc: queued spinlocks and rwlocks
-From:   Waiman Long <longman@redhat.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     Anton Blanchard <anton@ozlabs.org>,
-        Boqun Feng <boqun.feng@gmail.com>, kvm-ppc@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
+        id S1726091AbgGIEJZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 9 Jul 2020 00:09:25 -0400
+Received: from ozlabs.org ([203.11.71.1]:56311 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726064AbgGIEJZ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 9 Jul 2020 00:09:25 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 4B2N3R3m99z9sRR; Thu,  9 Jul 2020 14:09:23 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1594267763; bh=x3yYAYWDQc/AdH5qio9yXXUu0zr/fL7TKBtMwdncb/c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=iCc6UqOpjAdIOX2JTPrizZlG7+t7aHyyI5SgduWOnArh6gkN/ti74h+PyG40pemmv
+         gdNifGpSclbkJE3kf3Lu5m8/zyEfs6Vd1EO5TJrV94DD3UPMzEuBbezVcufHTvAbRy
+         aUHB9XpOli1FDFOxjDPKHB4s0vr2W51vRHYpX4GITYl9QhTcgNM6prVSqp7tHHkPKP
+         JzvfhQ+RD4mlx3P8YW0jqC5kE7wLn937/qthldPGhURUf/ZzuyaGbGFSIitV9kln2m
+         DSjAYumx/SA6f38vH3qntEn988EhWL23FfJqigij+Bn7uASbQ9FKCdlBKiJl6CKUue
+         h5Cd7+pE+jYeQ==
+Date:   Thu, 9 Jul 2020 14:09:18 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Leonardo Bras <leobras.c@gmail.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
         Peter Zijlstra <peterz@infradead.org>,
-        virtualization@lists.linux-foundation.org,
-        Will Deacon <will@kernel.org>
-References: <20200706043540.1563616-1-npiggin@gmail.com>
- <24f75d2c-60cd-2766-4aab-1a3b1c80646e@redhat.com>
- <1594101082.hfq9x5yact.astroid@bobo.none>
- <de3ead58-7f81-8ebd-754d-244f6be24af4@redhat.com>
- <1594184204.ncuq7vstsz.astroid@bobo.none>
- <62fa6343-e084-75c3-01c9-349a4617e67c@redhat.com>
-Organization: Red Hat
-Message-ID: <808a262d-8863-5986-082d-1088b66714df@redhat.com>
-Date:   Wed, 8 Jul 2020 19:58:40 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Vaibhav Jain <vaibhav@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH 1/1] KVM/PPC: Fix typo on H_DISABLE_AND_GET hcall
+Message-ID: <20200709040918.GA2822576@thinks.paulus.ozlabs.org>
+References: <20200707004812.190765-1-leobras.c@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <62fa6343-e084-75c3-01c9-349a4617e67c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200707004812.190765-1-leobras.c@gmail.com>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 7/8/20 7:50 PM, Waiman Long wrote:
-> On 7/8/20 1:10 AM, Nicholas Piggin wrote:
->> Excerpts from Waiman Long's message of July 8, 2020 1:33 pm:
->>> On 7/7/20 1:57 AM, Nicholas Piggin wrote:
->>>> Yes, powerpc could certainly get more performance out of the slow
->>>> paths, and then there are a few parameters to tune.
->>>>
->>>> We don't have a good alternate patching for function calls yet, but
->>>> that would be something to do for native vs pv.
->>>>
->>>> And then there seem to be one or two tunable parameters we could
->>>> experiment with.
->>>>
->>>> The paravirt locks may need a bit more tuning. Some simple testing
->>>> under KVM shows we might be a bit slower in some cases. Whether this
->>>> is fairness or something else I'm not sure. The current simple pv
->>>> spinlock code can do a directed yield to the lock holder CPU, whereas
->>>> the pv qspl here just does a general yield. I think we might actually
->>>> be able to change that to also support directed yield. Though I'm
->>>> not sure if this is actually the cause of the slowdown yet.
->>> Regarding the paravirt lock, I have taken a further look into the
->>> current PPC spinlock code. There is an equivalent of pv_wait() but no
->>> pv_kick(). Maybe PPC doesn't really need that.
->> So powerpc has two types of wait, either undirected "all processors" or
->> directed to a specific processor which has been preempted by the
->> hypervisor.
->>
->> The simple spinlock code does a directed wait, because it knows the CPU
->> which is holding the lock. In this case, there is a sequence that is
->> used to ensure we don't wait if the condition has become true, and the
->> target CPU does not need to kick the waiter it will happen automatically
->> (see splpar_spin_yield). This is preferable because we only wait as
->> needed and don't require the kick operation.
-> Thanks for the explanation.
->>
->> The pv spinlock code I did uses the undirected wait, because we don't
->> know the CPU number which we are waiting on. This is undesirable because
->> it's higher overhead and the wait is not so accurate.
->>
->> I think perhaps we could change things so we wait on the correct CPU
->> when queued, which might be good enough (we could also put the lock
->> owner CPU in the spinlock word, if we add another format).
->
-> The LS byte of the lock word is used to indicate locking status. If we 
-> have less than 255 cpus, we can put the (cpu_nr + 1) into the lock 
-> byte. The special 0xff value can be used to indicate a cpu number >= 
-> 255 for indirect yield. The required change to the qspinlock code will 
-> be minimal, I think. 
+On Mon, Jul 06, 2020 at 09:48:12PM -0300, Leonardo Bras wrote:
+> On PAPR+ the hcall() on 0x1B0 is called H_DISABLE_AND_GET, but got
+> defined as H_DISABLE_AND_GETC instead.
+> 
+> This define was introduced with a typo in commit <b13a96cfb055>
+> ("[PATCH] powerpc: Extends HCALL interface for InfiniBand usage"), and was
+> later used without having the typo noticed.
+> 
+> Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
 
-BTW, we can also keep track of the previous cpu in the waiting queue. 
-Due to lock stealing, that may not be the cpu that is holding the lock. 
-Maybe we can use this, if available, in case the cpu number is >= 255.
+Acked-by: Paul Mackerras <paulus@ozlabs.org>
 
-Regards,
-Longman
+Since this hypercall is not implemented in KVM nor used by KVM guests,
+I'll leave this one for Michael to pick up.
 
+Paul.
