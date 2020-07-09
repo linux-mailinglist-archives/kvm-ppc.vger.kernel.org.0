@@ -2,35 +2,43 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E76B219D8B
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jul 2020 12:18:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6269219DE4
+	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jul 2020 12:33:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726357AbgGIKSL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 9 Jul 2020 06:18:11 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:48913 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726313AbgGIKSL (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 9 Jul 2020 06:18:11 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B2XDx5w9fz9sSd;
-        Thu,  9 Jul 2020 20:18:09 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1594289889;
-        bh=ou5GvH7X+W5XkenHcVbChXPfY+zWQZQPug6Gv9qz3HE=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=Vq+WB38V5Vr/85nXNhGqpqupy+34Vv3WSzVEQwoNCfqjMOzALtdReOZo98sRNdF4v
-         sGsRiBQZQRt9C10DozPjdUV+RVnAD+xtRpukIAyztq9aHvkQ7/XJdsPUAl3LuHK+wj
-         I+iQuTB21OEn2hVajUA+VVaiYzvot5nUEtDX3PWAK0rNKp94aOfUACCnwCPfDJHTD/
-         KdBs6WLMY5gzQ3OaXS2KwOuuu+1z1BuTcE9hZDf/FSr1zbkU2zqJX99Vfvgk6YPtuA
-         Jd7OYgdjaDbdWZq1nwUULVHLrRzs0jKC70v2D3AgBk59KBxHS6YKhIhksR5MJn+pvZ
-         8f7eEgvbfiJuA==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, Will Deacon <will@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
+        id S1726358AbgGIKds (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 9 Jul 2020 06:33:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38382 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726357AbgGIKdr (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 9 Jul 2020 06:33:47 -0400
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 917A5C061A0B;
+        Thu,  9 Jul 2020 03:33:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=IvpXUYK9H+QnmAsI+N7Y+NJkZMFkfZkklbiU2ToyVQs=; b=ysIolg+CeRhNjk4NEZhTj9mj5g
+        ca828lNtjuaGV9NHITlG2ZDPtxGhXNhk3KrvudsXjUJmb8J4XG/OF1nzUOwI//gHDtqE0EANnpbE+
+        bbiBnPXo5VHSiHumhpr2Qu+akcJEqpES74jCyTShVPKFLAmD/sBzeRgZb/ORaBfu5DUyt8R+5OLWf
+        GfezKgB7POj5RVO9xyLQJYa4YqvWXnYTcjZguHbo5tiN+wTk/yxkJo9dnoBBMvOLBeJh/GXmNplaB
+        k6UuaBO7U4dpxgXLgt+GyuZ9p/eO25EDL03UeJAkSn2ViIUTHUSjhhYACWMO+fCLOzes7hYXYC/zl
+        7sbP7/LA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jtTs4-0007rF-9q; Thu, 09 Jul 2020 10:33:40 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 66F76300739;
+        Thu,  9 Jul 2020 12:33:38 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 53455235B3D17; Thu,  9 Jul 2020 12:33:38 +0200 (CEST)
+Date:   Thu, 9 Jul 2020 12:33:38 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+        Will Deacon <will@kernel.org>,
         Boqun Feng <boqun.feng@gmail.com>,
         Ingo Molnar <mingo@redhat.com>,
         Waiman Long <longman@redhat.com>,
@@ -38,81 +46,50 @@ Cc:     Nicholas Piggin <npiggin@gmail.com>, Will Deacon <will@kernel.org>,
         linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org, kvm-ppc@vger.kernel.org,
         linux-arch@vger.kernel.org
-Subject: Re: [PATCH v3 4/6] powerpc/64s: implement queued spinlocks and rwlocks
-In-Reply-To: <20200706043540.1563616-5-npiggin@gmail.com>
-References: <20200706043540.1563616-1-npiggin@gmail.com> <20200706043540.1563616-5-npiggin@gmail.com>
-Date:   Thu, 09 Jul 2020 20:20:25 +1000
-Message-ID: <877dvdvvkm.fsf@mpe.ellerman.id.au>
+Subject: Re: [PATCH v3 4/6] powerpc/64s: implement queued spinlocks and
+ rwlocks
+Message-ID: <20200709103338.GQ597537@hirez.programming.kicks-ass.net>
+References: <20200706043540.1563616-1-npiggin@gmail.com>
+ <20200706043540.1563616-5-npiggin@gmail.com>
+ <877dvdvvkm.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <877dvdvvkm.fsf@mpe.ellerman.id.au>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
-> These have shown significantly improved performance and fairness when
-> spinlock contention is moderate to high on very large systems.
->
->  [ Numbers hopefully forthcoming after more testing, but initial
->    results look good ]
+On Thu, Jul 09, 2020 at 08:20:25PM +1000, Michael Ellerman wrote:
+> Nicholas Piggin <npiggin@gmail.com> writes:
+> > These have shown significantly improved performance and fairness when
+> > spinlock contention is moderate to high on very large systems.
+> >
+> >  [ Numbers hopefully forthcoming after more testing, but initial
+> >    results look good ]
+> 
+> Would be good to have something here, even if it's preliminary.
+> 
+> > Thanks to the fast path, single threaded performance is not noticably
+> > hurt.
+> >
+> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> > ---
+> >  arch/powerpc/Kconfig                      | 13 ++++++++++++
+> >  arch/powerpc/include/asm/Kbuild           |  2 ++
+> >  arch/powerpc/include/asm/qspinlock.h      | 25 +++++++++++++++++++++++
+> >  arch/powerpc/include/asm/spinlock.h       |  5 +++++
+> >  arch/powerpc/include/asm/spinlock_types.h |  5 +++++
+> >  arch/powerpc/lib/Makefile                 |  3 +++
+> 
+> >  include/asm-generic/qspinlock.h           |  2 ++
+> 
+> Who's ack do we need for that part?
 
-Would be good to have something here, even if it's preliminary.
-
-> Thanks to the fast path, single threaded performance is not noticably
-> hurt.
->
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arch/powerpc/Kconfig                      | 13 ++++++++++++
->  arch/powerpc/include/asm/Kbuild           |  2 ++
->  arch/powerpc/include/asm/qspinlock.h      | 25 +++++++++++++++++++++++
->  arch/powerpc/include/asm/spinlock.h       |  5 +++++
->  arch/powerpc/include/asm/spinlock_types.h |  5 +++++
->  arch/powerpc/lib/Makefile                 |  3 +++
-
->  include/asm-generic/qspinlock.h           |  2 ++
-
-Who's ack do we need for that part?
-
-> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-> index 24ac85c868db..17663ea57697 100644
-> --- a/arch/powerpc/Kconfig
-> +++ b/arch/powerpc/Kconfig
-> @@ -492,6 +494,17 @@ config HOTPLUG_CPU
->  
->  	  Say N if you are unsure.
->  
-> +config PPC_QUEUED_SPINLOCKS
-> +	bool "Queued spinlocks"
-> +	depends on SMP
-> +	default "y" if PPC_BOOK3S_64
-
-Not sure about default y? At least until we've got a better idea of the
-perf impact on a range of small/big new/old systems.
-
-> +	help
-> +	  Say Y here to use to use queued spinlocks which are more complex
-> +	  but give better salability and fairness on large SMP and NUMA
-> +	  systems.
-> +
-> +	  If unsure, say "Y" if you have lots of cores, otherwise "N".
-
-Would be nice if we could give a range for "lots".
-
-> diff --git a/arch/powerpc/include/asm/Kbuild b/arch/powerpc/include/asm/Kbuild
-> index dadbcf3a0b1e..1dd8b6adff5e 100644
-> --- a/arch/powerpc/include/asm/Kbuild
-> +++ b/arch/powerpc/include/asm/Kbuild
-> @@ -6,5 +6,7 @@ generated-y += syscall_table_spu.h
->  generic-y += export.h
->  generic-y += local64.h
->  generic-y += mcs_spinlock.h
-> +generic-y += qrwlock.h
-> +generic-y += qspinlock.h
-
-The 2nd line spits a warning about a redundant entry. I think you want
-to just drop it.
+Mine I suppose would do, as discussed earlier, it probably isn't
+required anymore, but I understand the paranoia of not wanting to change
+too many things at once :-)
 
 
-cheers
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
