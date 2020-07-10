@@ -2,122 +2,129 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ABAB21BE1A
-	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Jul 2020 21:49:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B383221BE60
+	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Jul 2020 22:18:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728510AbgGJTs5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 10 Jul 2020 15:48:57 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:11372 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728404AbgGJTsy (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 10 Jul 2020 15:48:54 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5f08c6190000>; Fri, 10 Jul 2020 12:48:41 -0700
+        id S1727984AbgGJURw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 10 Jul 2020 16:17:52 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:11248 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726832AbgGJURv (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 10 Jul 2020 16:17:51 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5f08ccb80000>; Fri, 10 Jul 2020 13:16:56 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
   by hqpgpgate102.nvidia.com (PGP Universal service);
-  Fri, 10 Jul 2020 12:48:54 -0700
+  Fri, 10 Jul 2020 13:17:51 -0700
 X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Fri, 10 Jul 2020 12:48:54 -0700
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 10 Jul
- 2020 19:48:44 +0000
-Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Fri, 10 Jul 2020 19:48:44 +0000
-Received: from rcampbell-dev.nvidia.com (Not Verified[10.110.48.66]) by rnnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5f08c61c0000>; Fri, 10 Jul 2020 12:48:44 -0700
-From:   Ralph Campbell <rcampbell@nvidia.com>
-To:     <linux-mm@kvack.org>, <kvm-ppc@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC:     Jerome Glisse <jglisse@redhat.com>,
+        by hqpgpgate102.nvidia.com on Fri, 10 Jul 2020 13:17:51 -0700
+Received: from rcampbell-dev.nvidia.com (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 10 Jul
+ 2020 20:17:51 +0000
+Subject: Re: [PATCH 3/5] mm/notifier: add migration invalidation type
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     <linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>,
+        <nouveau@lists.freedesktop.org>, <kvm-ppc@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Jerome Glisse" <jglisse@redhat.com>,
         John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        "Bharata B Rao" <bharata@linux.ibm.com>,
-        Shuah Khan <shuah@kernel.org>,
+        "Christoph Hellwig" <hch@lst.de>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Ralph Campbell <rcampbell@nvidia.com>
-Subject: [PATCH v2 2/2] mm/migrate: add migrate-shared test for migrate_vma_*()
-Date:   Fri, 10 Jul 2020 12:48:40 -0700
-Message-ID: <20200710194840.7602-3-rcampbell@nvidia.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200710194840.7602-1-rcampbell@nvidia.com>
-References: <20200710194840.7602-1-rcampbell@nvidia.com>
+        Shuah Khan <shuah@kernel.org>, Ben Skeggs <bskeggs@redhat.com>,
+        Bharata B Rao <bharata@linux.ibm.com>
+References: <20200706222347.32290-1-rcampbell@nvidia.com>
+ <20200706222347.32290-4-rcampbell@nvidia.com>
+ <20200710193939.GA2129070@nvidia.com>
+X-Nvconfidentiality: public
+From:   Ralph Campbell <rcampbell@nvidia.com>
+Message-ID: <9364c81b-10a1-1fe4-b2c2-f48a73d2e04a@nvidia.com>
+Date:   Fri, 10 Jul 2020 13:17:50 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
+In-Reply-To: <20200710193939.GA2129070@nvidia.com>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1594410521; bh=7bNg4+W9LUQA56P48nlUXj5006Ok1vcN7L9AinD3FBk=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=GdZuurl2c1vcX7Bo7E3MmL+tKh8sqjTCxeafBVEKNXdGhoxRKXCs1zUSd2WjHIZ4M
-         2jEMhfQZ/rohsR75Pra4m19ZfrtVRCxfYRbv1wS7EVFNHlD1zLi4P92swbjK3hC1Ms
-         iIKd4DCEUvHiLqing5Ff6sf9ftQM1Yf6H8j7UR1pdg50BzKa28K7JZmwnwp2vxjiyb
-         kH8k6nf8dF/woJlVBnOoVbZTGBrbx6J1rAevOrBa/Kh1qnaAdy3J873BCSq03Anzt+
-         UTyxOIMzUooHtJCea1d5bIDFZVPuBjUHUwkExANruA10lT8gxU83QCfOehKeAgoAqt
-         LMJZmrSYwfd2A==
+        t=1594412216; bh=rUDxEVDDXg2ewE0+kszxB/UwPBy9zLM3dlTpNaw+dUU=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=IeX73XrMpdnEzMR3GU6vvGaowi1ON8mbtbHE8oD4o0cC8C8T17muOcgvoL3nje3j9
+         H+nq23dn58RFQrzvqy5KHLpfXdOSIdwT32OUCRjroCnbkBRsA1SemDH7JyDZkVBvWH
+         D6Q3iTflCh0zMowlVcbuClrA7FkfIRqV17397yMqNWQQTQiuYVbAdysB4Lv7MqpXMB
+         N+8fNe30DS2jEVW3jw0s00eVM8AtnLIbv9aEu4S9JEHW3SsMs/5XYPT4GkgHvPCkuB
+         RIjrMcZyZOndBWT61zU2V9kVMTzzC/PFf0x3p5WXjCwpBqbcs4a1ixNVYGmkzmdWa+
+         nQOVi6u+my9XQ==
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Add a migrate_vma_*() self test for mmap(MAP_SHARED) to verify that
-!vma_anonymous() ranges won't be migrated.
 
-Signed-off-by: Ralph Campbell <rcampbell@nvidia.com>
----
- tools/testing/selftests/vm/hmm-tests.c | 35 ++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+On 7/10/20 12:39 PM, Jason Gunthorpe wrote:
+> On Mon, Jul 06, 2020 at 03:23:45PM -0700, Ralph Campbell wrote:
+>> Currently migrate_vma_setup() calls mmu_notifier_invalidate_range_start()
+>> which flushes all device private page mappings whether or not a page
+>> is being migrated to/from device private memory. In order to not disrupt
+>> device mappings that are not being migrated, shift the responsibility
+>> for clearing device private mappings to the device driver and leave
+>> CPU page table unmapping handled by migrate_vma_setup(). To support
+>> this, the caller of migrate_vma_setup() should always set struct
+>> migrate_vma::src_owner to a non NULL value that matches the device
+>> private page->pgmap->owner. This value is then passed to the struct
+>> mmu_notifier_range with a new event type which the driver's invalidation
+>> function can use to avoid device MMU invalidations.
+>>
+>> Signed-off-by: Ralph Campbell <rcampbell@nvidia.com>
+>>   include/linux/mmu_notifier.h | 7 +++++++
+>>   mm/migrate.c                 | 8 +++++++-
+>>   2 files changed, 14 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
+>> index fc68f3570e19..bd0b34dbe4de 100644
+>> +++ b/include/linux/mmu_notifier.h
+>> @@ -38,6 +38,10 @@ struct mmu_interval_notifier;
+>>    *
+>>    * @MMU_NOTIFY_RELEASE: used during mmu_interval_notifier invalidate to signal
+>>    * that the mm refcount is zero and the range is no longer accessible.
+>> + *
+>> + * @MMU_NOTIFY_MIGRATE: used during migrate_vma_collect() invalidate to signal
+>> + * a device driver to possibly ignore the invalidation if the src_own
+>> + * field matches.
+>>    */
+>>   enum mmu_notifier_event {
+>>   	MMU_NOTIFY_UNMAP = 0,
+>> @@ -46,6 +50,7 @@ enum mmu_notifier_event {
+>>   	MMU_NOTIFY_PROTECTION_PAGE,
+>>   	MMU_NOTIFY_SOFT_DIRTY,
+>>   	MMU_NOTIFY_RELEASE,
+>> +	MMU_NOTIFY_MIGRATE,
+>>   };
+>>   
+>>   #define MMU_NOTIFIER_RANGE_BLOCKABLE (1 << 0)
+>> @@ -264,6 +269,7 @@ struct mmu_notifier_range {
+>>   	unsigned long end;
+>>   	unsigned flags;
+>>   	enum mmu_notifier_event event;
+>> +	void *data;
+>>   };
+> 
+> This generic member usually ends up a bit ugly, can we do a tagged
+> union instead?
+> 
+> union
+> {
+>       void *migrate_pgmap_owner;
+> };
+> 
+> and probably drop the union until we actually need two things here.
+> 
+> Jason
 
-diff --git a/tools/testing/selftests/vm/hmm-tests.c b/tools/testing/selftes=
-ts/vm/hmm-tests.c
-index 79db22604019..e83d3ab37697 100644
---- a/tools/testing/selftests/vm/hmm-tests.c
-+++ b/tools/testing/selftests/vm/hmm-tests.c
-@@ -931,6 +931,41 @@ TEST_F(hmm, migrate_fault)
- 	hmm_buffer_free(buffer);
- }
-=20
-+/*
-+ * Migrate anonymous shared memory to device private memory.
-+ */
-+TEST_F(hmm, migrate_shared)
-+{
-+	struct hmm_buffer *buffer;
-+	unsigned long npages;
-+	unsigned long size;
-+	int ret;
-+
-+	npages =3D ALIGN(HMM_BUFFER_SIZE, self->page_size) >> self->page_shift;
-+	ASSERT_NE(npages, 0);
-+	size =3D npages << self->page_shift;
-+
-+	buffer =3D malloc(sizeof(*buffer));
-+	ASSERT_NE(buffer, NULL);
-+
-+	buffer->fd =3D -1;
-+	buffer->size =3D size;
-+	buffer->mirror =3D malloc(size);
-+	ASSERT_NE(buffer->mirror, NULL);
-+
-+	buffer->ptr =3D mmap(NULL, size,
-+			   PROT_READ | PROT_WRITE,
-+			   MAP_SHARED | MAP_ANONYMOUS,
-+			   buffer->fd, 0);
-+	ASSERT_NE(buffer->ptr, MAP_FAILED);
-+
-+	/* Migrate memory to device. */
-+	ret =3D hmm_dmirror_cmd(self->fd, HMM_DMIRROR_MIGRATE, buffer, npages);
-+	ASSERT_EQ(ret, -ENOENT);
-+
-+	hmm_buffer_free(buffer);
-+}
-+
- /*
-  * Try to migrate various memory types to device private memory.
-  */
---=20
-2.20.1
-
+OK, I'll send a v2 with this change.
