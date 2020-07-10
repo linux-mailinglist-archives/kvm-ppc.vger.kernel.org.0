@@ -2,161 +2,118 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18B6621B0FC
-	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Jul 2020 10:07:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10C8021BAA9
+	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Jul 2020 18:20:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727059AbgGJIG7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 10 Jul 2020 04:06:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34338 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726942AbgGJIG6 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 10 Jul 2020 04:06:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594368417;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U4jS1QoQjjeHX3nPPzYjEddY3DRl7Jsr2mcq4h0i1jc=;
-        b=BtVEkmGyeiLf1NmxwEisL0pgA/fXYsAzjvm7IvGNMzI5Dmrb+P5tPUmzesic+F0EH/lBj4
-        +BOobClErGeXU57p3mnY6H6x0DL+Wkg6k8M60/IBm/VZmhTgvach14O+DbWG1tw2CpJhIT
-        gzXgHz0KKDuvkdNYqQmeD8my8zhcqzU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-33jbIrCqOiqZEJObrcFk_Q-1; Fri, 10 Jul 2020 04:06:55 -0400
-X-MC-Unique: 33jbIrCqOiqZEJObrcFk_Q-1
-Received: by mail-wr1-f71.google.com with SMTP id v3so5124557wrq.10
-        for <kvm-ppc@vger.kernel.org>; Fri, 10 Jul 2020 01:06:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=U4jS1QoQjjeHX3nPPzYjEddY3DRl7Jsr2mcq4h0i1jc=;
-        b=G0pVZruf31eHJB68JF4PuLR6nvp0ijGSmkf7GbVyTrpl+CieVjtNMpewroyvdP6UyJ
-         64ZBYpHd8wFpftTib4MXjDR5yv63kkAMQBqaGG3HYwBI0TpRqHT4jdSKp+rk2umM7sRE
-         14Y4GvVS8QAOVT+LNkcLi9Y6ZdNuhjD3jqXwDlJRjDwljcgjGyrX9nXbirjXwiAvI4op
-         y6udPjVlkSoM59rYWq3er9UJT8VRr06EKPP+QthJpabb+uRVS8DjHSOhW+W8008s6qnY
-         GT2rNn4PErcQ2ZuzKaI+sqxhI9lhmP+U4hGapDFG8YV0W8cwNHUqoaT0+W9k+1MjS+5D
-         8dhA==
-X-Gm-Message-State: AOAM532ZIL9uDcEMtDDV9jBWp48qnTpeh1F2oa6SEGHiqC81DOUmL3l7
-        2xEw0UMwpOB/nrj2S1RMwIO7u8lYjrVj8El8WeG+u59GB/yE50n77ucu1DVb1EKBu2YrYDAmV2R
-        cD6PaVaAZ1i3aUeoepQ==
-X-Received: by 2002:a1c:1fd1:: with SMTP id f200mr3838437wmf.162.1594368414537;
-        Fri, 10 Jul 2020 01:06:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyJjT5tWv9/nRHPZPlasSYyXK0UFRsIXqd7zkWACOymjphFAEJPu8OB7fs8YgXWFmbnz1f6Yg==
-X-Received: by 2002:a1c:1fd1:: with SMTP id f200mr3838385wmf.162.1594368414271;
-        Fri, 10 Jul 2020 01:06:54 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c? ([2001:b07:6468:f312:9541:9439:cb0f:89c])
-        by smtp.gmail.com with ESMTPSA id v3sm9130496wrq.57.2020.07.10.01.06.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jul 2020 01:06:53 -0700 (PDT)
-Subject: Re: [PATCH v6 0/5] clean up redundant 'kvm_run' parameters
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        tsbogend@alpha.franken.de, paulus@ozlabs.org, mpe@ellerman.id.au,
-        benh@kernel.crashing.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
-        chenhuacai@gmail.com
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
- <6604e273-d7b1-5007-8721-75c4a4dec68e@linux.alibaba.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <433ae9a7-ee86-28ea-e600-8769f9759513@redhat.com>
-Date:   Fri, 10 Jul 2020 10:06:51 +0200
+        id S1726942AbgGJQUE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 10 Jul 2020 12:20:04 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:2162 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726820AbgGJQUE (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 10 Jul 2020 12:20:04 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5f0894c70000>; Fri, 10 Jul 2020 09:18:15 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Fri, 10 Jul 2020 09:20:04 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Fri, 10 Jul 2020 09:20:04 -0700
+Received: from rcampbell-dev.nvidia.com (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 10 Jul
+ 2020 16:19:57 +0000
+Subject: Re: [PATCH 1/2] mm/migrate: optimize migrate_vma_setup() for holes
+To:     <bharata@linux.ibm.com>
+CC:     <linux-mm@kvack.org>, <kvm-ppc@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Jerome Glisse" <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        "Christoph Hellwig" <hch@lst.de>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+References: <20200709165711.26584-1-rcampbell@nvidia.com>
+ <20200709165711.26584-2-rcampbell@nvidia.com>
+ <20200710063509.GE7902@in.ibm.com>
+From:   Ralph Campbell <rcampbell@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <72557537-3d64-7082-11f7-d70b41f7d0e6@nvidia.com>
+Date:   Fri, 10 Jul 2020 09:19:56 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <6604e273-d7b1-5007-8721-75c4a4dec68e@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200710063509.GE7902@in.ibm.com>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1594397895; bh=Ue/frzFxUQ5xNe2FlvXb4r/DHKPE3j0pZwT+2iMRx4s=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=CsSiPpre9qxK1jS02numnr4cfl7QmxJ0/oYmekUMhjtq34QymiInNuhlkiCDn0E7p
+         Bl+cgS3sGUonpda8dBJFP7ibbOFONADHdtgHtgcRKvXQArVDB0uEePCFyqO8B5UHlb
+         KR1pBKdSmVPdg062vI5u3K6IVK2DExOIGzrUf2dX5pQySstXbXRvhrXpWDd6xWF+c8
+         TMjfbHedmpP4pZt21f75Zm+hj4lVqe8Ny94gFMGjxbEqdutYx1QT/u3g8DBXsjb5a0
+         DtGKN67dVzTn8mziAEBNJI/0nEz200XIpALyu/RdCHrI+Df8RJivh9s4L720y+2BV3
+         M0oTYVkJHwS9g==
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 10/07/20 09:32, Tianjia Zhang wrote:
-> Hi Paolo,
-> 
-> Any opinion on this series patches? Can I help with this patchset ?
 
-I was hoping to have some Tested-by, for now I'm queuing patches 1 and
-2.  Thanks,
-
-Paolo
-
-> Thanks and best,
-> Tianjia
-> 
-> On 2020/6/23 21:14, Tianjia Zhang wrote:
->> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
->> structure. For historical reasons, many kvm-related function parameters
->> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
->> patch does a unified cleanup of these remaining redundant parameters.
+On 7/9/20 11:35 PM, Bharata B Rao wrote:
+> On Thu, Jul 09, 2020 at 09:57:10AM -0700, Ralph Campbell wrote:
+>> When migrating system memory to device private memory, if the source
+>> address range is a valid VMA range and there is no memory or a zero page,
+>> the source PFN array is marked as valid but with no PFN. This lets the
+>> device driver allocate private memory and clear it, then insert the new
+>> device private struct page into the CPU's page tables when
+>> migrate_vma_pages() is called. migrate_vma_pages() only inserts the
+>> new page if the VMA is an anonymous range. There is no point in telling
+>> the device driver to allocate device private memory and then not migrate
+>> the page. Instead, mark the source PFN array entries as not migrating to
+>> avoid this overhead.
 >>
->> This series of patches has completely cleaned the architecture of
->> arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
->> the large number of modified codes, a separate patch is made for each
->> platform. On the ppc platform, there is also a redundant structure
->> pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
->> separately.
->>
+>> Signed-off-by: Ralph Campbell <rcampbell@nvidia.com>
 >> ---
->> v6 changes:
->>    Rearrange patch sets, only keep the unmerged patch.
->>    rebase on mainline.
+>>   mm/migrate.c | 6 +++++-
+>>   1 file changed, 5 insertions(+), 1 deletion(-)
 >>
->> v5 change:
->>    ppc: fix for review.
->>
->> v4 change:
->>    mips: fixes two errors in entry.c.
->>
->> v3 change:
->>    Keep the existing `vcpu->run` in the function body unchanged.
->>
->> v2 change:
->>    s390 retains the original variable name and minimizes modification.
->>
->> Tianjia Zhang (5):
->>    KVM: s390: clean up redundant 'kvm_run' parameters
->>    KVM: arm64: clean up redundant 'kvm_run' parameters
->>    KVM: PPC: clean up redundant kvm_run parameters in assembly
->>    KVM: MIPS: clean up redundant 'kvm_run' parameters
->>    KVM: MIPS: clean up redundant kvm_run parameters in assembly
->>
->>   arch/arm64/include/asm/kvm_coproc.h   |  12 +--
->>   arch/arm64/include/asm/kvm_host.h     |  11 +--
->>   arch/arm64/include/asm/kvm_mmu.h      |   2 +-
->>   arch/arm64/kvm/arm.c                  |   6 +-
->>   arch/arm64/kvm/handle_exit.c          |  36 ++++----
->>   arch/arm64/kvm/mmio.c                 |  11 +--
->>   arch/arm64/kvm/mmu.c                  |   5 +-
->>   arch/arm64/kvm/sys_regs.c             |  13 ++-
->>   arch/mips/include/asm/kvm_host.h      |  32 ++------
->>   arch/mips/kvm/emulate.c               |  59 +++++--------
->>   arch/mips/kvm/entry.c                 |  21 ++---
->>   arch/mips/kvm/mips.c                  |  14 ++--
->>   arch/mips/kvm/trap_emul.c             | 114 +++++++++++---------------
->>   arch/mips/kvm/vz.c                    |  26 +++---
->>   arch/powerpc/include/asm/kvm_ppc.h    |   2 +-
->>   arch/powerpc/kvm/book3s_interrupts.S  |  22 +++--
->>   arch/powerpc/kvm/book3s_pr.c          |   9 +-
->>   arch/powerpc/kvm/booke.c              |   9 +-
->>   arch/powerpc/kvm/booke_interrupts.S   |   9 +-
->>   arch/powerpc/kvm/bookehv_interrupts.S |  10 +--
->>   arch/s390/kvm/kvm-s390.c              |  23 ++++--
->>   21 files changed, 188 insertions(+), 258 deletions(-)
->>
+>> diff --git a/mm/migrate.c b/mm/migrate.c
+>> index b0125c082549..8aa434691577 100644
+>> --- a/mm/migrate.c
+>> +++ b/mm/migrate.c
+>> @@ -2204,9 +2204,13 @@ static int migrate_vma_collect_hole(unsigned long start,
+>>   {
+>>   	struct migrate_vma *migrate = walk->private;
+>>   	unsigned long addr;
+>> +	unsigned long flags;
+>> +
+>> +	/* Only allow populating anonymous memory. */
+>> +	flags = vma_is_anonymous(walk->vma) ? MIGRATE_PFN_MIGRATE : 0;
+>>   
+>>   	for (addr = start; addr < end; addr += PAGE_SIZE) {
+>> -		migrate->src[migrate->npages] = MIGRATE_PFN_MIGRATE;
+>> +		migrate->src[migrate->npages] = flags;
 > 
+> I see a few other such cases where we directly populate MIGRATE_PFN_MIGRATE
+> w/o a pfn in migrate_vma_collect_pmd() and wonder why the vma_is_anonymous()
+> check can't help there as well?
+> 
+> 1. pte_none() check in migrate_vma_collect_pmd()
+> 2. is_zero_pfn() check in migrate_vma_collect_pmd()
+> 
+> Regards,
+> Bharata.
 
+For case 1, this seems like a useful addition.
+For case 2, the zero page is only inserted if the VMA is marked read-only and
+anonymous so I don't think the check is needed.
+I'll post a v2 with the change.
+
+Thanks for the suggestions!
