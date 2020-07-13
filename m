@@ -2,136 +2,237 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0C3121CD84
-	for <lists+kvm-ppc@lfdr.de>; Mon, 13 Jul 2020 05:07:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 828B621CED6
+	for <lists+kvm-ppc@lfdr.de>; Mon, 13 Jul 2020 07:30:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728378AbgGMDH3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 12 Jul 2020 23:07:29 -0400
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:35605 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725892AbgGMDH3 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 12 Jul 2020 23:07:29 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01355;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0U2UhFSb_1594609639;
-Received: from 30.25.206.74(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U2UhFSb_1594609639)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 13 Jul 2020 11:07:21 +0800
-Subject: Re: [PATCH v4 5/7] KVM: PPC: clean up redundant kvm_run parameters in
- assembly
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     pbonzini@redhat.com, tsbogend@alpha.franken.de, mpe@ellerman.id.au,
-        benh@kernel.crashing.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
-        chenhuacai@gmail.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
- <20200427043514.16144-6-tianjia.zhang@linux.alibaba.com>
- <20200526055924.GD282305@thinks.paulus.ozlabs.org>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <c3540a4b-a568-3428-0427-ae2a1f30dbe2@linux.alibaba.com>
-Date:   Mon, 13 Jul 2020 11:07:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1725818AbgGMFaC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 13 Jul 2020 01:30:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47586 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725804AbgGMFaB (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 Jul 2020 01:30:01 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06D51qVj036163;
+        Mon, 13 Jul 2020 01:29:51 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3279k2q7ra-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Jul 2020 01:29:51 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06D5PZ1n004547;
+        Mon, 13 Jul 2020 05:29:49 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3275281tw9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Jul 2020 05:29:48 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06D5TkEl42336478
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Jul 2020 05:29:46 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3232111C054;
+        Mon, 13 Jul 2020 05:29:46 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E6A6411C04C;
+        Mon, 13 Jul 2020 05:29:43 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.199.58.151])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 13 Jul 2020 05:29:43 +0000 (GMT)
+Date:   Mon, 13 Jul 2020 10:59:41 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     Ram Pai <linuxram@us.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
+        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
+        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
+        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
+        sathnaga@linux.vnet.ibm.com
+Subject: Re: [v3 1/5] KVM: PPC: Book3S HV: Disable page merging in
+ H_SVM_INIT_START
+Message-ID: <20200713052941.GF7902@in.ibm.com>
+Reply-To: bharata@linux.ibm.com
+References: <1594458827-31866-1-git-send-email-linuxram@us.ibm.com>
+ <1594458827-31866-2-git-send-email-linuxram@us.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200526055924.GD282305@thinks.paulus.ozlabs.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1594458827-31866-2-git-send-email-linuxram@us.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-12_14:2020-07-10,2020-07-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 malwarescore=0 phishscore=0 adultscore=0 mlxscore=0
+ bulkscore=0 mlxlogscore=943 priorityscore=1501 impostorscore=0
+ suspectscore=5 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2006250000 definitions=main-2007130034
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Sat, Jul 11, 2020 at 02:13:43AM -0700, Ram Pai wrote:
+> Merging of pages associated with each memslot of a SVM is
+> disabled the page is migrated in H_SVM_PAGE_IN handler.
+> 
+> This operation should have been done much earlier; the moment the VM
+> is initiated for secure-transition. Delaying this operation, increases
+> the probability for those pages to acquire new references , making it
+> impossible to migrate those pages in H_SVM_PAGE_IN handler.
+> 
+> Disable page-migration in H_SVM_INIT_START handling.
 
+While it is a good idea to disable KSM merging for all VMAs during
+H_SVM_INIT_START, I am curious if you did observe an actual case of
+ksm_madvise() failing which resulted in subsequent H_SVM_PAGE_IN
+failing to migrate?
 
-On 2020/5/26 13:59, Paul Mackerras wrote:
-> On Mon, Apr 27, 2020 at 12:35:12PM +0800, Tianjia Zhang wrote:
->> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
->> structure. For historical reasons, many kvm-related function parameters
->> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
->> patch does a unified cleanup of these remaining redundant parameters.
 > 
-> Some of these changes don't look completely correct to me, see below.
-> If you're expecting these patches to go through my tree, I can fix up
-> the patch and commit it (with you as author), noting the changes I
-> made in the commit message.  Do you want me to do that?
+> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+> ---
+>  arch/powerpc/kvm/book3s_hv_uvmem.c | 96 +++++++++++++++++++++++++++++---------
+>  1 file changed, 74 insertions(+), 22 deletions(-)
 > 
+> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> index 3d987b1..bfc3841 100644
+> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> @@ -211,6 +211,65 @@ static bool kvmppc_gfn_is_uvmem_pfn(unsigned long gfn, struct kvm *kvm,
+>  	return false;
+>  }
+>  
+> +static int kvmppc_memslot_page_merge(struct kvm *kvm,
+> +		struct kvm_memory_slot *memslot, bool merge)
+> +{
+> +	unsigned long gfn = memslot->base_gfn;
+> +	unsigned long end, start = gfn_to_hva(kvm, gfn);
+> +	int ret = 0;
+> +	struct vm_area_struct *vma;
+> +	int merge_flag = (merge) ? MADV_MERGEABLE : MADV_UNMERGEABLE;
+> +
+> +	if (kvm_is_error_hva(start))
+> +		return H_STATE;
 
-I am very glad for you to do so, although I have submitted a new version 
-of patch, I still prefer you to fix up and commit it.
+This and other cases below seem to be a new return value from
+H_SVM_INIT_START. May be update the documentation too along with
+this patch?
 
-Thanks and best,
-Tianjia
+> +
+> +	end = start + (memslot->npages << PAGE_SHIFT);
+> +
+> +	down_write(&kvm->mm->mmap_sem);
 
->> diff --git a/arch/powerpc/kvm/book3s_interrupts.S b/arch/powerpc/kvm/book3s_interrupts.S
->> index f7ad99d972ce..0eff749d8027 100644
->> --- a/arch/powerpc/kvm/book3s_interrupts.S
->> +++ b/arch/powerpc/kvm/book3s_interrupts.S
->> @@ -55,8 +55,7 @@
->>    ****************************************************************************/
->>   
->>   /* Registers:
->> - *  r3: kvm_run pointer
->> - *  r4: vcpu pointer
->> + *  r3: vcpu pointer
->>    */
->>   _GLOBAL(__kvmppc_vcpu_run)
->>   
->> @@ -68,8 +67,8 @@ kvm_start_entry:
->>   	/* Save host state to the stack */
->>   	PPC_STLU r1, -SWITCH_FRAME_SIZE(r1)
->>   
->> -	/* Save r3 (kvm_run) and r4 (vcpu) */
->> -	SAVE_2GPRS(3, r1)
->> +	/* Save r3 (vcpu) */
->> +	SAVE_GPR(3, r1)
->>   
->>   	/* Save non-volatile registers (r14 - r31) */
->>   	SAVE_NVGPRS(r1)
->> @@ -82,11 +81,11 @@ kvm_start_entry:
->>   	PPC_STL	r0, _LINK(r1)
->>   
->>   	/* Load non-volatile guest state from the vcpu */
->> -	VCPU_LOAD_NVGPRS(r4)
->> +	VCPU_LOAD_NVGPRS(r3)
->>   
->>   kvm_start_lightweight:
->>   	/* Copy registers into shadow vcpu so we can access them in real mode */
->> -	mr	r3, r4
->> +	mr	r4, r3
-> 
-> This mr doesn't seem necessary.
-> 
->>   	bl	FUNC(kvmppc_copy_to_svcpu)
->>   	nop
->>   	REST_GPR(4, r1)
-> 
-> This should be loading r4 from GPR3(r1), not GPR4(r1) - which is what
-> REST_GPR(4, r1) will do.
-> 
-> Then, in the file but not in the patch context, there is this line:
-> 
-> 	PPC_LL	r3, GPR4(r1)		/* vcpu pointer */
-> 
-> where once again GPR4 needs to be GPR3.
-> 
->> @@ -191,10 +190,10 @@ after_sprg3_load:
->>   	PPC_STL	r31, VCPU_GPR(R31)(r7)
->>   
->>   	/* Pass the exit number as 3rd argument to kvmppc_handle_exit */
-> 
-> The comment should be modified to say "2nd" instead of "3rd",
-> otherwise it is confusing.
-> 
-> The rest of the patch looks OK.
-> 
-> Paul.
-> 
+When you rebase the patches against latest upstream you may want to
+replace the above and other instances by mmap_write/read_lock().
+
+> +	do {
+> +		vma = find_vma_intersection(kvm->mm, start, end);
+> +		if (!vma) {
+> +			ret = H_STATE;
+> +			break;
+> +		}
+> +		ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
+> +			  merge_flag, &vma->vm_flags);
+> +		if (ret) {
+> +			ret = H_STATE;
+> +			break;
+> +		}
+> +		start = vma->vm_end + 1;
+> +	} while (end > vma->vm_end);
+> +
+> +	up_write(&kvm->mm->mmap_sem);
+> +	return ret;
+> +}
+> +
+> +static int __kvmppc_page_merge(struct kvm *kvm, bool merge)
+> +{
+> +	struct kvm_memslots *slots;
+> +	struct kvm_memory_slot *memslot;
+> +	int ret = 0;
+> +
+> +	slots = kvm_memslots(kvm);
+> +	kvm_for_each_memslot(memslot, slots) {
+> +		ret = kvmppc_memslot_page_merge(kvm, memslot, merge);
+> +		if (ret)
+> +			break;
+> +	}
+> +	return ret;
+> +}
+> +
+> +static inline int kvmppc_disable_page_merge(struct kvm *kvm)
+> +{
+> +	return __kvmppc_page_merge(kvm, false);
+> +}
+> +
+> +static inline int kvmppc_enable_page_merge(struct kvm *kvm)
+> +{
+> +	return __kvmppc_page_merge(kvm, true);
+> +}
+> +
+>  unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>  {
+>  	struct kvm_memslots *slots;
+> @@ -232,11 +291,18 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>  		return H_AUTHORITY;
+>  
+>  	srcu_idx = srcu_read_lock(&kvm->srcu);
+> +
+> +	/* disable page-merging for all memslot */
+> +	ret = kvmppc_disable_page_merge(kvm);
+> +	if (ret)
+> +		goto out;
+> +
+> +	/* register the memslot */
+>  	slots = kvm_memslots(kvm);
+>  	kvm_for_each_memslot(memslot, slots) {
+>  		if (kvmppc_uvmem_slot_init(kvm, memslot)) {
+>  			ret = H_PARAMETER;
+> -			goto out;
+> +			break;
+>  		}
+>  		ret = uv_register_mem_slot(kvm->arch.lpid,
+>  					   memslot->base_gfn << PAGE_SHIFT,
+> @@ -245,9 +311,12 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>  		if (ret < 0) {
+>  			kvmppc_uvmem_slot_free(kvm, memslot);
+>  			ret = H_PARAMETER;
+> -			goto out;
+> +			break;
+>  		}
+>  	}
+> +
+> +	if (ret)
+> +		kvmppc_enable_page_merge(kvm);
+
+Is there any use of enabling KSM merging in the failure path here?
+Won't UV terminate the VM if H_SVM_INIT_START fails? If there is no need,
+you can do away with some extra routines above.
+
+>  out:
+>  	srcu_read_unlock(&kvm->srcu, srcu_idx);
+>  	return ret;
+> @@ -384,7 +453,7 @@ static struct page *kvmppc_uvmem_get_page(unsigned long gpa, struct kvm *kvm)
+>   */
+>  static int kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
+>  		   unsigned long end, unsigned long gpa, struct kvm *kvm,
+> -		   unsigned long page_shift, bool *downgrade)
+> +		   unsigned long page_shift)
+>  {
+>  	unsigned long src_pfn, dst_pfn = 0;
+>  	struct migrate_vma mig;
+> @@ -400,18 +469,6 @@ static int kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
+>  	mig.src = &src_pfn;
+>  	mig.dst = &dst_pfn;
+>  
+> -	/*
+> -	 * We come here with mmap_sem write lock held just for
+> -	 * ksm_madvise(), otherwise we only need read mmap_sem.
+> -	 * Hence downgrade to read lock once ksm_madvise() is done.
+> -	 */
+> -	ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
+> -			  MADV_UNMERGEABLE, &vma->vm_flags);
+
+I haven't seen the subsequent patches yet, but guess you are
+taking care of disabling KSM mering for hot-plugged memory too.
+
+Regards,
+Bharata.
