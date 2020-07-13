@@ -2,168 +2,111 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A27F321D331
-	for <lists+kvm-ppc@lfdr.de>; Mon, 13 Jul 2020 11:51:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98D5F21DE8E
+	for <lists+kvm-ppc@lfdr.de>; Mon, 13 Jul 2020 19:22:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726725AbgGMJvF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 13 Jul 2020 05:51:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22814 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726523AbgGMJvE (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 Jul 2020 05:51:04 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06D9WAvN142833;
-        Mon, 13 Jul 2020 05:50:53 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 32771wrcwg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Jul 2020 05:50:53 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06D9nZKV021830;
-        Mon, 13 Jul 2020 09:50:51 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 327528223f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Jul 2020 09:50:51 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06D9om0B66388098
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Jul 2020 09:50:48 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D3534203F;
-        Mon, 13 Jul 2020 09:50:48 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 366924204B;
-        Mon, 13 Jul 2020 09:50:46 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.199.58.151])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 13 Jul 2020 09:50:46 +0000 (GMT)
-Date:   Mon, 13 Jul 2020 15:20:43 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     Ram Pai <linuxram@us.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
-        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
-        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
-        sathnaga@linux.vnet.ibm.com
-Subject: Re: [v3 4/5] KVM: PPC: Book3S HV: retry page migration before
- erroring-out H_SVM_PAGE_IN
-Message-ID: <20200713095043.GH7902@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <1594458827-31866-1-git-send-email-linuxram@us.ibm.com>
- <1594458827-31866-5-git-send-email-linuxram@us.ibm.com>
+        id S1729889AbgGMRWi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 13 Jul 2020 13:22:38 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:17652 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730412AbgGMRWH (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 Jul 2020 13:22:07 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5f0c98050002>; Mon, 13 Jul 2020 10:21:09 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 13 Jul 2020 10:22:07 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 13 Jul 2020 10:22:07 -0700
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 13 Jul
+ 2020 17:21:59 +0000
+Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Mon, 13 Jul 2020 17:21:58 +0000
+Received: from rcampbell-dev.nvidia.com (Not Verified[10.110.48.66]) by rnnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
+        id <B5f0c98360001>; Mon, 13 Jul 2020 10:21:58 -0700
+From:   Ralph Campbell <rcampbell@nvidia.com>
+To:     <linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>,
+        <nouveau@lists.freedesktop.org>, <kvm-ppc@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     Jerome Glisse <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>,
+        "Ben Skeggs" <bskeggs@redhat.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        "Ralph Campbell" <rcampbell@nvidia.com>
+Subject: [PATCH v2 0/5] mm/migrate: avoid device private invalidations
+Date:   Mon, 13 Jul 2020 10:21:44 -0700
+Message-ID: <20200713172149.2310-1-rcampbell@nvidia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1594458827-31866-5-git-send-email-linuxram@us.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-13_04:2020-07-10,2020-07-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- mlxlogscore=999 impostorscore=0 malwarescore=0 suspectscore=1 adultscore=0
- clxscore=1015 bulkscore=0 phishscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007130071
+X-NVConfidentiality: public
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1594660869; bh=5i6MV2A7BbbUmWCEieFN/sAj7Mt92VZyVtIABtiqqhI=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         MIME-Version:X-NVConfidentiality:Content-Transfer-Encoding:
+         Content-Type;
+        b=S9Srg5FV2+5NPoiew/+hOS5KMNb8dFviiWPao2+p2Ju/zDqV/LiBwF7jMuhMCy+Uc
+         vyAUDnXqWRiOCZ+CbT276SESkRonomfHiLgBbPR9IqtD3J/qYs0hiaSBfMvPGCSDFs
+         iOoQ8SN1Ojl+DPkcBsHzXLtWPvP04BDrHw1AeFXip8lsjV6s5NRlkaSRPBOB0U+sZD
+         M5Xahv4Y9eXcv+UfN2KgairH7lKJH0NaD+nhB3E2OKM2SrQLW0SItS1nfh2pi5++3b
+         Sdqq7YNWAZjd+lI+yWDcrPVKy5xpAxf7Ft8BbpAeArRd4Cu4W4lNlsEEd0y+ePj3Bt
+         RuxeEs7N6FHFw==
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Sat, Jul 11, 2020 at 02:13:46AM -0700, Ram Pai wrote:
-> The page requested for page-in; sometimes, can have transient
-> references, and hence cannot migrate immediately. Retry a few times
-> before returning error.
+The goal for this series is to avoid device private memory TLB
+invalidations when migrating a range of addresses from system
+memory to device private memory and some of those pages have already
+been migrated. The approach taken is to introduce a new mmu notifier
+invalidation event type and use that in the device driver to skip
+invalidation callbacks from migrate_vma_setup(). The device driver is
+also then expected to handle device MMU invalidations as part of the
+migrate_vma_setup(), migrate_vma_pages(), migrate_vma_finalize() process.
+Note that this is opt-in. A device driver can simply invalidate its MMU
+in the mmu notifier callback and not handle MMU invalidations in the
+migration sequence.
 
-As I noted in the previous patch, we need to understand what are these
-transient errors and they occur on what type of pages?
+This series is based on Jason Gunthorpe's HMM tree (linux-5.8.0-rc4).
 
-The previous patch also introduced a bit of retry logic in the
-page-in path. Can you consolidate the retry logic into a separate
-patch?
+Also, this replaces the need for the following two patches I sent:
+("mm: fix migrate_vma_setup() src_owner and normal pages")
+https://lore.kernel.org/linux-mm/20200622222008.9971-1-rcampbell@nvidia.com
+("nouveau: fix mixed normal and device private page migration")
+https://lore.kernel.org/lkml/20200622233854.10889-3-rcampbell@nvidia.com
 
-> 
-> H_SVM_PAGE_IN interface is enhanced to return H_BUSY if the page is
-> not in a migratable state.
-> 
-> Cc: Paul Mackerras <paulus@ozlabs.org>
-> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Bharata B Rao <bharata@linux.ibm.com>
-> Cc: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-> Cc: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-> Cc: Laurent Dufour <ldufour@linux.ibm.com>
-> Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Claudio Carvalho <cclaudio@linux.ibm.com>
-> Cc: kvm-ppc@vger.kernel.org
-> Cc: linuxppc-dev@lists.ozlabs.org
-> 
-> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-> ---
->  Documentation/powerpc/ultravisor.rst |  1 +
->  arch/powerpc/kvm/book3s_hv_uvmem.c   | 54 +++++++++++++++++++++---------------
->  2 files changed, 33 insertions(+), 22 deletions(-)
-> 
-> diff --git a/Documentation/powerpc/ultravisor.rst b/Documentation/powerpc/ultravisor.rst
-> index d98fc85..638d1a7 100644
-> --- a/Documentation/powerpc/ultravisor.rst
-> +++ b/Documentation/powerpc/ultravisor.rst
-> @@ -1034,6 +1034,7 @@ Return values
->  	* H_PARAMETER	if ``guest_pa`` is invalid.
->  	* H_P2		if ``flags`` is invalid.
->  	* H_P3		if ``order`` of page is invalid.
-> +	* H_BUSY	if ``page`` is not in a state to pagein
->  
->  Description
->  ~~~~~~~~~~~
-> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> index 12ed52a..c9bdef6 100644
-> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> @@ -843,7 +843,7 @@ unsigned long kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
->  	struct vm_area_struct *vma;
->  	int srcu_idx;
->  	unsigned long gfn = gpa >> page_shift;
-> -	int ret;
-> +	int ret, repeat_count = REPEAT_COUNT;
->  
->  	if (!(kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START))
->  		return H_UNSUPPORTED;
-> @@ -857,34 +857,44 @@ unsigned long kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
->  	if (flags & H_PAGE_IN_SHARED)
->  		return kvmppc_share_page(kvm, gpa, page_shift);
->  
-> -	ret = H_PARAMETER;
->  	srcu_idx = srcu_read_lock(&kvm->srcu);
-> -	down_write(&kvm->mm->mmap_sem);
->  
-> -	start = gfn_to_hva(kvm, gfn);
-> -	if (kvm_is_error_hva(start))
-> -		goto out;
-> -
-> -	mutex_lock(&kvm->arch.uvmem_lock);
->  	/* Fail the page-in request of an already paged-in page */
-> -	if (kvmppc_gfn_is_uvmem_pfn(gfn, kvm, NULL))
-> -		goto out_unlock;
-> +	mutex_lock(&kvm->arch.uvmem_lock);
-> +	ret = kvmppc_gfn_is_uvmem_pfn(gfn, kvm, NULL);
-> +	mutex_unlock(&kvm->arch.uvmem_lock);
-> +	if (ret) {
-> +		srcu_read_unlock(&kvm->srcu, srcu_idx);
-> +		return H_PARAMETER;
-> +	}
->  
-> -	end = start + (1UL << page_shift);
-> -	vma = find_vma_intersection(kvm->mm, start, end);
-> -	if (!vma || vma->vm_start > start || vma->vm_end < end)
-> -		goto out_unlock;
-> +	do {
-> +		ret = H_PARAMETER;
-> +		down_write(&kvm->mm->mmap_sem);
+Changes in v2:
+Rebase to Jason Gunthorpe's HMM tree.
+Added reviewed-by from Bharata B Rao.
+Rename the mmu_notifier_range::data field to migrate_pgmap_owner as
+  suggested by Jason Gunthorpe.
 
-Again with ksm_madvise() moved to init time, check if you still need
-write mmap_sem here.
+Ralph Campbell (5):
+  nouveau: fix storing invalid ptes
+  mm/migrate: add a direction parameter to migrate_vma
+  mm/notifier: add migration invalidation type
+  nouveau/svm: use the new migration invalidation
+  mm/hmm/test: use the new migration invalidation
 
-Regards,
-Bharata.
+ arch/powerpc/kvm/book3s_hv_uvmem.c            |  2 ++
+ drivers/gpu/drm/nouveau/nouveau_dmem.c        | 13 ++++++--
+ drivers/gpu/drm/nouveau/nouveau_svm.c         | 10 +++++-
+ drivers/gpu/drm/nouveau/nouveau_svm.h         |  1 +
+ .../drm/nouveau/nvkm/subdev/mmu/vmmgp100.c    | 13 +++++---
+ include/linux/migrate.h                       | 12 +++++--
+ include/linux/mmu_notifier.h                  |  7 ++++
+ lib/test_hmm.c                                | 33 +++++++++++--------
+ mm/migrate.c                                  | 13 ++++++--
+ 9 files changed, 77 insertions(+), 27 deletions(-)
+
+--=20
+2.20.1
+
