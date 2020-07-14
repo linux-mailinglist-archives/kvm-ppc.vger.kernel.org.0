@@ -2,164 +2,125 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 339F121DE7E
-	for <lists+kvm-ppc@lfdr.de>; Mon, 13 Jul 2020 19:22:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25F9621E771
+	for <lists+kvm-ppc@lfdr.de>; Tue, 14 Jul 2020 07:31:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730447AbgGMRWK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 13 Jul 2020 13:22:10 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:17686 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730435AbgGMRWJ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 Jul 2020 13:22:09 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5f0c98070003>; Mon, 13 Jul 2020 10:21:11 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 13 Jul 2020 10:22:09 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 13 Jul 2020 10:22:09 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 13 Jul
- 2020 17:22:01 +0000
-Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 13 Jul 2020 17:22:01 +0000
-Received: from rcampbell-dev.nvidia.com (Not Verified[10.110.48.66]) by rnnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5f0c9838000b>; Mon, 13 Jul 2020 10:22:01 -0700
-From:   Ralph Campbell <rcampbell@nvidia.com>
-To:     <linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>,
-        <nouveau@lists.freedesktop.org>, <kvm-ppc@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC:     Jerome Glisse <jglisse@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>,
-        "Ben Skeggs" <bskeggs@redhat.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        "Ralph Campbell" <rcampbell@nvidia.com>
-Subject: [PATCH v2 5/5] mm/hmm/test: use the new migration invalidation
-Date:   Mon, 13 Jul 2020 10:21:49 -0700
-Message-ID: <20200713172149.2310-6-rcampbell@nvidia.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200713172149.2310-1-rcampbell@nvidia.com>
-References: <20200713172149.2310-1-rcampbell@nvidia.com>
+        id S1725778AbgGNFbj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 14 Jul 2020 01:31:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54476 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725283AbgGNFbi (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 14 Jul 2020 01:31:38 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06E53ELO039431;
+        Tue, 14 Jul 2020 01:31:31 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3278qt4y97-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jul 2020 01:31:31 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06E5Ohjc111622;
+        Tue, 14 Jul 2020 01:31:30 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3278qt4y8h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jul 2020 01:31:30 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06E5RBp7027455;
+        Tue, 14 Jul 2020 05:31:28 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3274pgtw4m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Jul 2020 05:31:28 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06E5VQID57082064
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Jul 2020 05:31:26 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 009AB4C046;
+        Tue, 14 Jul 2020 05:31:26 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CBCFA4C059;
+        Tue, 14 Jul 2020 05:31:24 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.79.210.191])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 14 Jul 2020 05:31:24 +0000 (GMT)
+Date:   Tue, 14 Jul 2020 11:01:22 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com, mpe@ellerman.id.au
+Subject: Re: [RFC PATCH v0 2/2] KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in
+ nested KVM
+Message-ID: <20200714053122.GI7902@in.ibm.com>
+Reply-To: bharata@linux.ibm.com
+References: <20200703104420.21349-1-bharata@linux.ibm.com>
+ <20200703104420.21349-3-bharata@linux.ibm.com>
+ <20200709051803.GC2822576@thinks.paulus.ozlabs.org>
+ <20200709090851.GD7902@in.ibm.com>
+ <20200709100711.GA2961345@thinks.paulus.ozlabs.org>
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1594660871; bh=9IIuPtj59etQET6XQzw0bMUB+2aW73xZLXgD2GoJ4ec=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=kh5nU6VW9tnNBPWQqX71XltgDPOm1zkutww5LVlecYz2mLPH3oKZQAyW9rtckV084
-         qA1j9je3ucjTMg/3t65OpqoSFb5gMN4jmqzKD42GuPNEs1G4YgCDOkkrVQtdgjZRre
-         6uM4nqv054kJDrfvRKpXWXXsogMFOt60pn+J/0flBYkKdrUhqY5R2u/GJgC5xzHB0U
-         uH5Z5o/w88n9kL/iYoCi5c+dDF9nQ4dewS4qX4Kp64hVGj0rUzSdc/XBEFSXf3SHje
-         gleJnXunyobNzEN0wJ56h2idOoaAwZwcp8yrAr5JcWrnTZODtIqB66AFFVLXruI0m9
-         thlDkRVOTEATg==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200709100711.GA2961345@thinks.paulus.ozlabs.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-13_17:2020-07-13,2020-07-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=1 malwarescore=0
+ bulkscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0 spamscore=0
+ priorityscore=1501 mlxlogscore=999 phishscore=0 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007140034
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Use the new MMU_NOTIFY_MIGRATE event to skip MMU invalidations of device
-private memory and handle the invalidation in the driver as part of
-migrating device private memory.
+On Thu, Jul 09, 2020 at 08:07:11PM +1000, Paul Mackerras wrote:
+> On Thu, Jul 09, 2020 at 02:38:51PM +0530, Bharata B Rao wrote:
+> > On Thu, Jul 09, 2020 at 03:18:03PM +1000, Paul Mackerras wrote:
+> > > On Fri, Jul 03, 2020 at 04:14:20PM +0530, Bharata B Rao wrote:
+> > > > In the nested KVM case, replace H_TLB_INVALIDATE by the new hcall
+> > > > H_RPT_INVALIDATE if available. The availability of this hcall
+> > > > is determined from "hcall-rpt-invalidate" string in ibm,hypertas-functions
+> > > > DT property.
+> > > 
+> > > What are we going to use when nested KVM supports HPT guests at L2?
+> > > L1 will need to do partition-scoped tlbies with R=0 via a hypercall,
+> > > but H_RPT_INVALIDATE says in its name that it only handles radix
+> > > page tables (i.e. R=1).
+> > 
+> > For L2 HPT guests, the old hcall is expected to work after it adds
+> > support for R=0 case?
+> 
+> That was the plan.
+> 
+> > The new hcall should be advertised via ibm,hypertas-functions only
+> > for radix guests I suppose.
+> 
+> Well, the L1 hypervisor is a radix guest of L0, so it would have
+> H_RPT_INVALIDATE available to it?
+> 
+> I guess the question is whether H_RPT_INVALIDATE is supposed to do
+> everything, that is, radix process-scoped invalidations, radix
+> partition-scoped invalidations, and HPT partition-scoped
+> invalidations.  If that is the plan then we should call it something
+> different.
 
-Signed-off-by: Ralph Campbell <rcampbell@nvidia.com>
----
- lib/test_hmm.c | 31 ++++++++++++++++++-------------
- 1 file changed, 18 insertions(+), 13 deletions(-)
+Guess we are bit late now to rename it and include HPT in the scope.
 
-diff --git a/lib/test_hmm.c b/lib/test_hmm.c
-index 1bd60cfb5a25..77875fc4e7c1 100644
---- a/lib/test_hmm.c
-+++ b/lib/test_hmm.c
-@@ -214,6 +214,14 @@ static bool dmirror_interval_invalidate(struct mmu_int=
-erval_notifier *mni,
- {
- 	struct dmirror *dmirror =3D container_of(mni, struct dmirror, notifier);
-=20
-+	/*
-+	 * Ignore invalidation callbacks for device private pages since
-+	 * the invalidation is handled as part of the migration process.
-+	 */
-+	if (range->event =3D=3D MMU_NOTIFY_MIGRATE &&
-+	    range->migrate_pgmap_owner =3D=3D dmirror->mdevice)
-+		return true;
-+
- 	if (mmu_notifier_range_blockable(range))
- 		mutex_lock(&dmirror->mutex);
- 	else if (!mutex_trylock(&dmirror->mutex))
-@@ -702,7 +710,7 @@ static int dmirror_migrate(struct dmirror *dmirror,
- 		args.dst =3D dst_pfns;
- 		args.start =3D addr;
- 		args.end =3D next;
--		args.src_owner =3D NULL;
-+		args.src_owner =3D dmirror->mdevice;
- 		args.dir =3D MIGRATE_VMA_FROM_SYSTEM;
- 		ret =3D migrate_vma_setup(&args);
- 		if (ret)
-@@ -992,7 +1000,7 @@ static void dmirror_devmem_free(struct page *page)
- }
-=20
- static vm_fault_t dmirror_devmem_fault_alloc_and_copy(struct migrate_vma *=
-args,
--						struct dmirror_device *mdevice)
-+						      struct dmirror *dmirror)
- {
- 	const unsigned long *src =3D args->src;
- 	unsigned long *dst =3D args->dst;
-@@ -1014,6 +1022,7 @@ static vm_fault_t dmirror_devmem_fault_alloc_and_copy=
-(struct migrate_vma *args,
- 			continue;
-=20
- 		lock_page(dpage);
-+		xa_erase(&dmirror->pt, addr >> PAGE_SHIFT);
- 		copy_highpage(dpage, spage);
- 		*dst =3D migrate_pfn(page_to_pfn(dpage)) | MIGRATE_PFN_LOCKED;
- 		if (*src & MIGRATE_PFN_WRITE)
-@@ -1022,15 +1031,6 @@ static vm_fault_t dmirror_devmem_fault_alloc_and_cop=
-y(struct migrate_vma *args,
- 	return 0;
- }
-=20
--static void dmirror_devmem_fault_finalize_and_map(struct migrate_vma *args=
-,
--						  struct dmirror *dmirror)
--{
--	/* Invalidate the device's page table mapping. */
--	mutex_lock(&dmirror->mutex);
--	dmirror_do_update(dmirror, args->start, args->end);
--	mutex_unlock(&dmirror->mutex);
--}
--
- static vm_fault_t dmirror_devmem_fault(struct vm_fault *vmf)
- {
- 	struct migrate_vma args;
-@@ -1060,11 +1060,16 @@ static vm_fault_t dmirror_devmem_fault(struct vm_fa=
-ult *vmf)
- 	if (migrate_vma_setup(&args))
- 		return VM_FAULT_SIGBUS;
-=20
--	ret =3D dmirror_devmem_fault_alloc_and_copy(&args, dmirror->mdevice);
-+	ret =3D dmirror_devmem_fault_alloc_and_copy(&args, dmirror);
- 	if (ret)
- 		return ret;
- 	migrate_vma_pages(&args);
--	dmirror_devmem_fault_finalize_and_map(&args, dmirror);
-+	/*
-+	 * No device finalize step is needed since
-+	 * dmirror_devmem_fault_alloc_and_copy() will have already
-+	 * invalidated the device page table. We could reinstate device MMU
-+	 * entries for pages that didn't migrate but that should be rare.
-+	 */
- 	migrate_vma_finalize(&args);
- 	return 0;
- }
---=20
-2.20.1
+> 
+> This patchset seems to imply that H_RPT_INVALIDATE is at least going
+> to be used for radix partition-scoped invalidations as well as radix
+> process-scoped invalidations.  If you are thinking that in future when
+> we need HPT partition-scoped invalidations for a radix L1 hypervisor
+> running a HPT L2 guest, we are going to define a new hypercall for
+> that, I suppose that is OK, though it doesn't really seem necessary.
 
+Guess a new hcall would be the way forward to cover the HPT L2 guest
+requirements.
+
+Thanks for pointing this out.
+
+Regards,
+Bharata.
