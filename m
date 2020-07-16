@@ -2,207 +2,200 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D539221E7C
-	for <lists+kvm-ppc@lfdr.de>; Thu, 16 Jul 2020 10:35:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A330221F58
+	for <lists+kvm-ppc@lfdr.de>; Thu, 16 Jul 2020 11:04:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726870AbgGPIdB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 16 Jul 2020 04:33:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1954 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727095AbgGPIdA (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 16 Jul 2020 04:33:00 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06G8WLoA119505;
-        Thu, 16 Jul 2020 04:32:46 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32792x0rq2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Jul 2020 04:32:45 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06G8Uhus016837;
-        Thu, 16 Jul 2020 08:32:32 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 327527wcsn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 16 Jul 2020 08:32:32 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06G8WTVn65339696
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Jul 2020 08:32:29 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66526A4053;
-        Thu, 16 Jul 2020 08:32:29 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7867AA4051;
-        Thu, 16 Jul 2020 08:32:26 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.163.39.1])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 16 Jul 2020 08:32:26 +0000 (GMT)
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        bharata@linux.ibm.com, sukadev@linux.vnet.ibm.com,
-        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        sathnaga@linux.vnet.ibm.com, aik@ozlabs.ru
-Subject: [RFC PATCH] powerpc/pseries/svm: capture instruction faulting on MMIO access, in sprg0 register
-Date:   Thu, 16 Jul 2020 01:32:13 -0700
-Message-Id: <1594888333-9370-1-git-send-email-linuxram@us.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-16_04:2020-07-16,2020-07-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 priorityscore=1501 lowpriorityscore=0 clxscore=1011
- adultscore=0 impostorscore=0 spamscore=0 malwarescore=0 bulkscore=0
- mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007160063
+        id S1726831AbgGPJDZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 16 Jul 2020 05:03:25 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7869 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726350AbgGPJDY (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 16 Jul 2020 05:03:24 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id C89E76DB5867427788A6;
+        Thu, 16 Jul 2020 17:03:21 +0800 (CST)
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 16 Jul 2020 17:03:17 +0800
+From:   Qinglang Miao <miaoqinglang@huawei.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+CC:     <kvm-ppc@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH -next] powerpc: Convert to DEFINE_SHOW_ATTRIBUTE
+Date:   Thu, 16 Jul 2020 17:07:12 +0800
+Message-ID: <20200716090712.14375-1-miaoqinglang@huawei.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.113.25]
+X-CFilter-Loop: Reflected
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-An instruction accessing a mmio address, generates a HDSI fault.  This fault is
-appropriately handled by the Hypervisor.  However in the case of secureVMs, the
-fault is delivered to the ultravisor.
+From: Chen Huang <chenhuang5@huawei.com>
 
-Unfortunately the Ultravisor has no correct-way to fetch the faulting
-instruction. The PEF architecture does not allow Ultravisor to enable MMU
-translation. Walking the two level page table to read the instruction can race
-with other vcpus modifying the SVM's process scoped page table.
+Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
 
-This problem can be correctly solved with some help from the kernel.
-
-Capture the faulting instruction in SPRG0 register, before executing the
-faulting instruction. This enables the ultravisor to easily procure the
-faulting instruction and emulate it.
-
-Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+Signed-off-by: Chen Huang <chenhuang5@huawei.com>
 ---
- arch/powerpc/include/asm/io.h | 85 ++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 75 insertions(+), 10 deletions(-)
+ arch/powerpc/kvm/book3s_xive_native.c  | 12 +-----------
+ arch/powerpc/mm/ptdump/bats.c          | 24 +++++++-----------------
+ arch/powerpc/mm/ptdump/hashpagetable.c | 12 +-----------
+ arch/powerpc/mm/ptdump/ptdump.c        | 13 +------------
+ arch/powerpc/mm/ptdump/segment_regs.c  | 12 +-----------
+ 5 files changed, 11 insertions(+), 62 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
-index 635969b..7ef663d 100644
---- a/arch/powerpc/include/asm/io.h
-+++ b/arch/powerpc/include/asm/io.h
-@@ -35,6 +35,7 @@
- #include <asm/mmu.h>
- #include <asm/ppc_asm.h>
- #include <asm/pgtable.h>
-+#include <asm/svm.h>
- 
- #define SIO_CONFIG_RA	0x398
- #define SIO_CONFIG_RD	0x399
-@@ -105,34 +106,98 @@
- static inline u##size name(const volatile u##size __iomem *addr)	\
- {									\
- 	u##size ret;							\
--	__asm__ __volatile__("sync;"#insn" %0,%y1;twi 0,%0,0;isync"	\
--		: "=r" (ret) : "Z" (*addr) : "memory");			\
-+	if (is_secure_guest()) {					\
-+		__asm__ __volatile__("mfsprg0 %3;"			\
-+				"lnia %2;"				\
-+				"ld %2,12(%2);"				\
-+				"mtsprg0 %2;"				\
-+				"sync;"					\
-+				#insn" %0,%y1;"				\
-+				"twi 0,%0,0;"				\
-+				"isync;"				\
-+				"mtsprg0 %3"				\
-+			: "=r" (ret)					\
-+			: "Z" (*addr), "r" (0), "r" (0)			\
-+			: "memory");					\
-+	} else {							\
-+		__asm__ __volatile__("sync;"				\
-+				#insn" %0,%y1;"				\
-+				"twi 0,%0,0;"				\
-+				"isync"					\
-+			: "=r" (ret) : "Z" (*addr) : "memory");		\
-+	}								\
- 	return ret;							\
+diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+index 02e3cbbea..d0c2db0e0 100644
+--- a/arch/powerpc/kvm/book3s_xive_native.c
++++ b/arch/powerpc/kvm/book3s_xive_native.c
+@@ -1227,17 +1227,7 @@ static int xive_native_debug_show(struct seq_file *m, void *private)
+ 	return 0;
  }
  
- #define DEF_MMIO_OUT_X(name, size, insn)				\
- static inline void name(volatile u##size __iomem *addr, u##size val)	\
- {									\
--	__asm__ __volatile__("sync;"#insn" %1,%y0"			\
--		: "=Z" (*addr) : "r" (val) : "memory");			\
--	mmiowb_set_pending();						\
-+	if (is_secure_guest()) {					\
-+		__asm__ __volatile__("mfsprg0 %3;"			\
-+				"lnia %2;"				\
-+				"ld %2,12(%2);"				\
-+				"mtsprg0 %2;"				\
-+				"sync;"					\
-+				#insn" %1,%y0;"				\
-+				"mtsprg0 %3"				\
-+			: "=Z" (*addr)					\
-+			: "r" (val), "r" (0), "r" (0)			\
-+			: "memory");					\
-+	} else {							\
-+		__asm__ __volatile__("sync;"				\
-+				#insn" %1,%y0"				\
-+			: "=Z" (*addr) : "r" (val) : "memory");         \
-+		mmiowb_set_pending();					\
-+	}								\
+-static int xive_native_debug_open(struct inode *inode, struct file *file)
+-{
+-	return single_open(file, xive_native_debug_show, inode->i_private);
+-}
+-
+-static const struct file_operations xive_native_debug_fops = {
+-	.open = xive_native_debug_open,
+-	.read_iter = seq_read_iter,
+-	.llseek = seq_lseek,
+-	.release = single_release,
+-};
++DEFINE_SHOW_ATTRIBUTE(xive_native_debug);
+ 
+ static void xive_native_debugfs_init(struct kvmppc_xive *xive)
+ {
+diff --git a/arch/powerpc/mm/ptdump/bats.c b/arch/powerpc/mm/ptdump/bats.c
+index 7afcdac48..93771af72 100644
+--- a/arch/powerpc/mm/ptdump/bats.c
++++ b/arch/powerpc/mm/ptdump/bats.c
+@@ -56,7 +56,7 @@ static void bat_show_601(struct seq_file *m, int idx, u32 lower, u32 upper)
+ 
+ #define BAT_SHOW_601(_m, _n, _l, _u) bat_show_601(_m, _n, mfspr(_l), mfspr(_u))
+ 
+-static int bats_show_601(struct seq_file *m, void *v)
++static int bats_601_show(struct seq_file *m, void *v)
+ {
+ 	seq_puts(m, "---[ Block Address Translation ]---\n");
+ 
+@@ -113,7 +113,7 @@ static void bat_show_603(struct seq_file *m, int idx, u32 lower, u32 upper, bool
+ 
+ #define BAT_SHOW_603(_m, _n, _l, _u, _d) bat_show_603(_m, _n, mfspr(_l), mfspr(_u), _d)
+ 
+-static int bats_show_603(struct seq_file *m, void *v)
++static int bats_603_show(struct seq_file *m, void *v)
+ {
+ 	seq_puts(m, "---[ Instruction Block Address Translation ]---\n");
+ 
+@@ -144,25 +144,15 @@ static int bats_show_603(struct seq_file *m, void *v)
+ 	return 0;
  }
  
- #define DEF_MMIO_IN_D(name, size, insn)				\
- static inline u##size name(const volatile u##size __iomem *addr)	\
- {									\
- 	u##size ret;							\
--	__asm__ __volatile__("sync;"#insn"%U1%X1 %0,%1;twi 0,%0,0;isync"\
--		: "=r" (ret) : "m" (*addr) : "memory");			\
-+	if (is_secure_guest()) {					\
-+		__asm__ __volatile__("mfsprg0 %3;"			\
-+				"lnia %2;"				\
-+				"ld %2,12(%2);"				\
-+				"mtsprg0 %2;"				\
-+				"sync;"					\
-+				#insn"%U1%X1 %0,%1;"			\
-+				"twi 0,%0,0;"				\
-+				"isync;"				\
-+				"mtsprg0 %3"				\
-+			: "=r" (ret)					\
-+			: "m" (*addr), "r" (0), "r" (0)			\
-+			: "memory");					\
-+	} else {							\
-+		__asm__ __volatile__("sync;"				\
-+				#insn"%U1%X1 %0,%1;"			\
-+				"twi 0,%0,0;"				\
-+				"isync"					\
-+			: "=r" (ret) : "m" (*addr) : "memory");         \
-+	}								\
- 	return ret;							\
+-static int bats_open(struct inode *inode, struct file *file)
+-{
+-	if (IS_ENABLED(CONFIG_PPC_BOOK3S_601))
+-		return single_open(file, bats_show_601, NULL);
+-
+-	return single_open(file, bats_show_603, NULL);
+-}
+-
+-static const struct file_operations bats_fops = {
+-	.open		= bats_open,
+-	.read_iter		= seq_read_iter,
+-	.llseek		= seq_lseek,
+-	.release	= single_release,
+-};
++DEFINE_SHOW_ATTRIBUTE(bats_601);
++DEFINE_SHOW_ATTRIBUTE(bats_603);
+ 
+ static int __init bats_init(void)
+ {
+ 	debugfs_create_file("block_address_translation", 0400,
+-			    powerpc_debugfs_root, NULL, &bats_fops);
++			    powerpc_debugfs_root, NULL,
++			    IS_ENABLED(CONFIG_PPC_BOOK3S_601) ?
++			    &bats_601_fops : &bats_603_fops);
+ 	return 0;
+ }
+ device_initcall(bats_init);
+diff --git a/arch/powerpc/mm/ptdump/hashpagetable.c b/arch/powerpc/mm/ptdump/hashpagetable.c
+index 457fcee7e..c7f824d29 100644
+--- a/arch/powerpc/mm/ptdump/hashpagetable.c
++++ b/arch/powerpc/mm/ptdump/hashpagetable.c
+@@ -526,17 +526,7 @@ static int ptdump_show(struct seq_file *m, void *v)
+ 	return 0;
  }
  
- #define DEF_MMIO_OUT_D(name, size, insn)				\
- static inline void name(volatile u##size __iomem *addr, u##size val)	\
- {									\
--	__asm__ __volatile__("sync;"#insn"%U0%X0 %1,%0"			\
--		: "=m" (*addr) : "r" (val) : "memory");			\
--	mmiowb_set_pending();						\
-+	if (is_secure_guest()) {					\
-+		__asm__ __volatile__("mfsprg0 %3;"			\
-+				"lnia %2;"				\
-+				"ld %2,12(%2);"				\
-+				"mtsprg0 %2;"				\
-+				"sync;"					\
-+				#insn"%U0%X0 %1,%0;"			\
-+				"mtsprg0 %3"				\
-+			: "=m" (*addr)					\
-+			: "r" (val), "r" (0), "r" (0)			\
-+			: "memory");					\
-+	} else {							\
-+		__asm__ __volatile__("sync;"				\
-+				#insn"%U0%X0 %1,%0"			\
-+			: "=m" (*addr) : "r" (val) : "memory");		\
-+		mmiowb_set_pending();					\
-+	}								\
+-static int ptdump_open(struct inode *inode, struct file *file)
+-{
+-	return single_open(file, ptdump_show, NULL);
+-}
+-
+-static const struct file_operations ptdump_fops = {
+-	.open		= ptdump_open,
+-	.read_iter		= seq_read_iter,
+-	.llseek		= seq_lseek,
+-	.release	= single_release,
+-};
++DEFINE_SHOW_ATTRIBUTE(ptdump);
+ 
+ static int ptdump_init(void)
+ {
+diff --git a/arch/powerpc/mm/ptdump/ptdump.c b/arch/powerpc/mm/ptdump/ptdump.c
+index db17e84b5..58b062f1b 100644
+--- a/arch/powerpc/mm/ptdump/ptdump.c
++++ b/arch/powerpc/mm/ptdump/ptdump.c
+@@ -398,18 +398,7 @@ static int ptdump_show(struct seq_file *m, void *v)
+ 	return 0;
  }
  
- DEF_MMIO_IN_D(in_8,     8, lbz);
+-
+-static int ptdump_open(struct inode *inode, struct file *file)
+-{
+-	return single_open(file, ptdump_show, NULL);
+-}
+-
+-static const struct file_operations ptdump_fops = {
+-	.open		= ptdump_open,
+-	.read_iter		= seq_read_iter,
+-	.llseek		= seq_lseek,
+-	.release	= single_release,
+-};
++DEFINE_SHOW_ATTRIBUTE(ptdump);
+ 
+ static void build_pgtable_complete_mask(void)
+ {
+diff --git a/arch/powerpc/mm/ptdump/segment_regs.c b/arch/powerpc/mm/ptdump/segment_regs.c
+index 8b15bad5a..9e870d44c 100644
+--- a/arch/powerpc/mm/ptdump/segment_regs.c
++++ b/arch/powerpc/mm/ptdump/segment_regs.c
+@@ -41,17 +41,7 @@ static int sr_show(struct seq_file *m, void *v)
+ 	return 0;
+ }
+ 
+-static int sr_open(struct inode *inode, struct file *file)
+-{
+-	return single_open(file, sr_show, NULL);
+-}
+-
+-static const struct file_operations sr_fops = {
+-	.open		= sr_open,
+-	.read_iter		= seq_read_iter,
+-	.llseek		= seq_lseek,
+-	.release	= single_release,
+-};
++DEFINE_SHOW_ATTRIBUTE(sr);
+ 
+ static int __init sr_init(void)
+ {
 -- 
-1.8.3.1
+2.17.1
 
