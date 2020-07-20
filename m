@@ -2,228 +2,163 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 846DE225BDC
-	for <lists+kvm-ppc@lfdr.de>; Mon, 20 Jul 2020 11:40:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1CB0225C65
+	for <lists+kvm-ppc@lfdr.de>; Mon, 20 Jul 2020 12:06:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727844AbgGTJkR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 20 Jul 2020 05:40:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30888 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726520AbgGTJkR (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 20 Jul 2020 05:40:17 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06K9YnQ3101084;
-        Mon, 20 Jul 2020 05:40:01 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32d5pedtfy-1
+        id S1728068AbgGTKGS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 20 Jul 2020 06:06:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63040 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728044AbgGTKGS (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 20 Jul 2020 06:06:18 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06KA3Esu152502;
+        Mon, 20 Jul 2020 06:06:07 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32bwk6xjgq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Jul 2020 05:40:01 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06K9Txx8023307;
-        Mon, 20 Jul 2020 09:39:59 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma05fra.de.ibm.com with ESMTP id 32brq818vv-1
+        Mon, 20 Jul 2020 06:06:07 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06KA5VfI022330;
+        Mon, 20 Jul 2020 10:06:05 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma01wdc.us.ibm.com with ESMTP id 32brq8g56g-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Jul 2020 09:39:59 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06K9duJc60686484
+        Mon, 20 Jul 2020 10:06:05 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06KA65X837880178
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Jul 2020 09:39:56 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D674311C04A;
-        Mon, 20 Jul 2020 09:39:56 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5B36511C054;
-        Mon, 20 Jul 2020 09:39:56 +0000 (GMT)
-Received: from pomme.local (unknown [9.145.81.101])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 20 Jul 2020 09:39:56 +0000 (GMT)
-Subject: Re: [RFC PATCH] powerpc/pseries/svm: capture instruction faulting on
- MMIO access, in sprg0 register
-To:     Ram Pai <linuxram@us.ibm.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        bharata@linux.ibm.com, sukadev@linux.vnet.ibm.com,
-        bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
-        sathnaga@linux.vnet.ibm.com, aik@ozlabs.ru
-References: <1594888333-9370-1-git-send-email-linuxram@us.ibm.com>
-From:   Laurent Dufour <ldufour@linux.ibm.com>
-Message-ID: <18e3bcee-8a3a-bd13-c995-8e4168471f74@linux.ibm.com>
-Date:   Mon, 20 Jul 2020 11:39:56 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
+        Mon, 20 Jul 2020 10:06:05 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7246328059;
+        Mon, 20 Jul 2020 10:06:05 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 821E928058;
+        Mon, 20 Jul 2020 10:06:04 +0000 (GMT)
+Received: from sofia.ibm.com (unknown [9.85.72.83])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 20 Jul 2020 10:06:04 +0000 (GMT)
+Received: by sofia.ibm.com (Postfix, from userid 1000)
+        id E70162E48BA; Mon, 20 Jul 2020 15:35:57 +0530 (IST)
+Date:   Mon, 20 Jul 2020 15:35:57 +0530
+From:   Gautham R Shenoy <ego@linux.vnet.ibm.com>
+To:     Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+Cc:     mpe@ellerman.id.au, linuxppc-dev@lists.ozlabs.org,
+        maddy@linux.vnet.ibm.com, mikey@neuling.org,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        ego@linux.vnet.ibm.com, svaidyan@in.ibm.com, acme@kernel.org,
+        jolsa@kernel.org
+Subject: Re: [v3 11/15] powerpc/perf: BHRB control to disable BHRB logic when
+ not used
+Message-ID: <20200720100557.GA9055@in.ibm.com>
+Reply-To: ego@linux.vnet.ibm.com
+References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com>
+ <1594996707-3727-12-git-send-email-atrajeev@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1594888333-9370-1-git-send-email-linuxram@us.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1594996707-3727-12-git-send-email-atrajeev@linux.vnet.ibm.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-20_05:2020-07-17,2020-07-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 suspectscore=0 lowpriorityscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 phishscore=0 impostorscore=0 spamscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007200071
+ definitions=2020-07-20_05:2020-07-20,2020-07-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ lowpriorityscore=0 clxscore=1011 mlxscore=0 bulkscore=0 adultscore=0
+ phishscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007200074
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Le 16/07/2020 à 10:32, Ram Pai a écrit :
-> An instruction accessing a mmio address, generates a HDSI fault.  This fault is
-> appropriately handled by the Hypervisor.  However in the case of secureVMs, the
-> fault is delivered to the ultravisor.
+On Fri, Jul 17, 2020 at 10:38:23AM -0400, Athira Rajeev wrote:
+> PowerISA v3.1 has few updates for the Branch History Rolling Buffer(BHRB).
 > 
-> Unfortunately the Ultravisor has no correct-way to fetch the faulting
-> instruction. The PEF architecture does not allow Ultravisor to enable MMU
-> translation. Walking the two level page table to read the instruction can race
-> with other vcpus modifying the SVM's process scoped page table.
+> BHRB disable is controlled via Monitor Mode Control Register A (MMCRA)
+> bit, namely "BHRB Recording Disable (BHRBRD)". This field controls
+> whether BHRB entries are written when BHRB recording is enabled by other
+> bits. This patch implements support for this BHRB disable bit.
 > 
-> This problem can be correctly solved with some help from the kernel.
+> By setting 0b1 to this bit will disable the BHRB and by setting 0b0
+> to this bit will have BHRB enabled. This addresses backward
+> compatibility (for older OS), since this bit will be cleared and
+> hardware will be writing to BHRB by default.
 > 
-> Capture the faulting instruction in SPRG0 register, before executing the
-> faulting instruction. This enables the ultravisor to easily procure the
-> faulting instruction and emulate it.
+> This patch addresses changes to set MMCRA (BHRBRD) at boot for power10
+> ( there by the core will run faster) and enable this feature only on
+> runtime ie, on explicit need from user. Also save/restore MMCRA in the
+> restore path of state-loss idle state to make sure we keep BHRB disabled
+> if it was not enabled on request at runtime.
 > 
-> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+> Signed-off-by: Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+
+For arch/powerpc/platforms/powernv/idle.c
+Reviewed-by: Gautham R. Shenoy <ego@linux.vnet.ibm.com>
+
+
 > ---
->   arch/powerpc/include/asm/io.h | 85 ++++++++++++++++++++++++++++++++++++++-----
->   1 file changed, 75 insertions(+), 10 deletions(-)
+>  arch/powerpc/perf/core-book3s.c       | 20 ++++++++++++++++----
+>  arch/powerpc/perf/isa207-common.c     | 12 ++++++++++++
+>  arch/powerpc/platforms/powernv/idle.c | 22 ++++++++++++++++++++--
+>  3 files changed, 48 insertions(+), 6 deletions(-)
+
+[..snip..]
+
+> diff --git a/arch/powerpc/platforms/powernv/idle.c b/arch/powerpc/platforms/powernv/idle.c
+> index 2dd4673..1c9d0a9 100644
+> --- a/arch/powerpc/platforms/powernv/idle.c
+> +++ b/arch/powerpc/platforms/powernv/idle.c
+> @@ -611,6 +611,7 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
+>  	unsigned long srr1;
+>  	unsigned long pls;
+>  	unsigned long mmcr0 = 0;
+> +	unsigned long mmcra = 0;
+>  	struct p9_sprs sprs = {}; /* avoid false used-uninitialised */
+>  	bool sprs_saved = false;
 > 
-> diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
-> index 635969b..7ef663d 100644
-> --- a/arch/powerpc/include/asm/io.h
-> +++ b/arch/powerpc/include/asm/io.h
-> @@ -35,6 +35,7 @@
->   #include <asm/mmu.h>
->   #include <asm/ppc_asm.h>
->   #include <asm/pgtable.h>
-> +#include <asm/svm.h>
->   
->   #define SIO_CONFIG_RA	0x398
->   #define SIO_CONFIG_RD	0x399
-> @@ -105,34 +106,98 @@
->   static inline u##size name(const volatile u##size __iomem *addr)	\
->   {									\
->   	u##size ret;							\
-> -	__asm__ __volatile__("sync;"#insn" %0,%y1;twi 0,%0,0;isync"	\
-> -		: "=r" (ret) : "Z" (*addr) : "memory");			\
-> +	if (is_secure_guest()) {					\
-> +		__asm__ __volatile__("mfsprg0 %3;"			\
-> +				"lnia %2;"				\
-> +				"ld %2,12(%2);"				\
-> +				"mtsprg0 %2;"				\
-> +				"sync;"					\
-> +				#insn" %0,%y1;"				\
-> +				"twi 0,%0,0;"				\
-> +				"isync;"				\
-> +				"mtsprg0 %3"				\
-> +			: "=r" (ret)					\
-> +			: "Z" (*addr), "r" (0), "r" (0)			\
-
-I'm wondering if SPRG0 is restored to its original value.
-You're using the same register (r0) for parameters 2 and 3, so when doing lnia 
-%2, you're overwriting the SPRG0 value you saved in r0 just earlier.
-
-It may be clearer to use explicit registers for %2 and %3 and to mark them as 
-modified for the compiler.
-
-This applies to the other macros.
-
-Cheers,
-Laurent.
-
-> +			: "memory");					\
-> +	} else {							\
-> +		__asm__ __volatile__("sync;"				\
-> +				#insn" %0,%y1;"				\
-> +				"twi 0,%0,0;"				\
-> +				"isync"					\
-> +			: "=r" (ret) : "Z" (*addr) : "memory");		\
-> +	}								\
->   	return ret;							\
->   }
->   
->   #define DEF_MMIO_OUT_X(name, size, insn)				\
->   static inline void name(volatile u##size __iomem *addr, u##size val)	\
->   {									\
-> -	__asm__ __volatile__("sync;"#insn" %1,%y0"			\
-> -		: "=Z" (*addr) : "r" (val) : "memory");			\
-> -	mmiowb_set_pending();						\
-> +	if (is_secure_guest()) {					\
-> +		__asm__ __volatile__("mfsprg0 %3;"			\
-> +				"lnia %2;"				\
-> +				"ld %2,12(%2);"				\
-> +				"mtsprg0 %2;"				\
-> +				"sync;"					\
-> +				#insn" %1,%y0;"				\
-> +				"mtsprg0 %3"				\
-> +			: "=Z" (*addr)					\
-> +			: "r" (val), "r" (0), "r" (0)			\
-> +			: "memory");					\
-> +	} else {							\
-> +		__asm__ __volatile__("sync;"				\
-> +				#insn" %1,%y0"				\
-> +			: "=Z" (*addr) : "r" (val) : "memory");         \
-> +		mmiowb_set_pending();					\
-> +	}								\
->   }
->   
->   #define DEF_MMIO_IN_D(name, size, insn)				\
->   static inline u##size name(const volatile u##size __iomem *addr)	\
->   {									\
->   	u##size ret;							\
-> -	__asm__ __volatile__("sync;"#insn"%U1%X1 %0,%1;twi 0,%0,0;isync"\
-> -		: "=r" (ret) : "m" (*addr) : "memory");			\
-> +	if (is_secure_guest()) {					\
-> +		__asm__ __volatile__("mfsprg0 %3;"			\
-> +				"lnia %2;"				\
-> +				"ld %2,12(%2);"				\
-> +				"mtsprg0 %2;"				\
-> +				"sync;"					\
-> +				#insn"%U1%X1 %0,%1;"			\
-> +				"twi 0,%0,0;"				\
-> +				"isync;"				\
-> +				"mtsprg0 %3"				\
-> +			: "=r" (ret)					\
-> +			: "m" (*addr), "r" (0), "r" (0)			\
-> +			: "memory");					\
-> +	} else {							\
-> +		__asm__ __volatile__("sync;"				\
-> +				#insn"%U1%X1 %0,%1;"			\
-> +				"twi 0,%0,0;"				\
-> +				"isync"					\
-> +			: "=r" (ret) : "m" (*addr) : "memory");         \
-> +	}								\
->   	return ret;							\
->   }
->   
->   #define DEF_MMIO_OUT_D(name, size, insn)				\
->   static inline void name(volatile u##size __iomem *addr, u##size val)	\
->   {									\
-> -	__asm__ __volatile__("sync;"#insn"%U0%X0 %1,%0"			\
-> -		: "=m" (*addr) : "r" (val) : "memory");			\
-> -	mmiowb_set_pending();						\
-> +	if (is_secure_guest()) {					\
-> +		__asm__ __volatile__("mfsprg0 %3;"			\
-> +				"lnia %2;"				\
-> +				"ld %2,12(%2);"				\
-> +				"mtsprg0 %2;"				\
-> +				"sync;"					\
-> +				#insn"%U0%X0 %1,%0;"			\
-> +				"mtsprg0 %3"				\
-> +			: "=m" (*addr)					\
-> +			: "r" (val), "r" (0), "r" (0)			\
-> +			: "memory");					\
-> +	} else {							\
-> +		__asm__ __volatile__("sync;"				\
-> +				#insn"%U0%X0 %1,%0"			\
-> +			: "=m" (*addr) : "r" (val) : "memory");		\
-> +		mmiowb_set_pending();					\
-> +	}								\
->   }
->   
->   DEF_MMIO_IN_D(in_8,     8, lbz);
+> @@ -657,6 +658,21 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
+>  		  */
+>  		mmcr0		= mfspr(SPRN_MMCR0);
+>  	}
+> +
+> +	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
+> +		/*
+> +		 * POWER10 uses MMCRA (BHRBRD) as BHRB disable bit.
+> +		 * If the user hasn't asked for the BHRB to be
+> +		 * written, the value of MMCRA[BHRBRD] is 1.
+> +		 * On wakeup from stop, MMCRA[BHRBD] will be 0,
+> +		 * since it is previleged resource and will be lost.
+> +		 * Thus, if we do not save and restore the MMCRA[BHRBD],
+> +		 * hardware will be needlessly writing to the BHRB
+> +		 * in problem mode.
+> +		 */
+> +		mmcra		= mfspr(SPRN_MMCRA);
+> +	}
+> +
+>  	if ((psscr & PSSCR_RL_MASK) >= pnv_first_spr_loss_level) {
+>  		sprs.lpcr	= mfspr(SPRN_LPCR);
+>  		sprs.hfscr	= mfspr(SPRN_HFSCR);
+> @@ -700,8 +716,6 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
+>  	WARN_ON_ONCE(mfmsr() & (MSR_IR|MSR_DR));
 > 
-
+>  	if ((srr1 & SRR1_WAKESTATE) != SRR1_WS_NOLOSS) {
+> -		unsigned long mmcra;
+> -
+>  		/*
+>  		 * We don't need an isync after the mtsprs here because the
+>  		 * upcoming mtmsrd is execution synchronizing.
+> @@ -721,6 +735,10 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
+>  			mtspr(SPRN_MMCR0, mmcr0);
+>  		}
+> 
+> +		/* Reload MMCRA to restore BHRB disable bit for POWER10 */
+> +		if (cpu_has_feature(CPU_FTR_ARCH_31))
+> +			mtspr(SPRN_MMCRA, mmcra);
+> +
+>  		/*
+>  		 * DD2.2 and earlier need to set then clear bit 60 in MMCRA
+>  		 * to ensure the PMU starts running.
+> -- 
+> 1.8.3.1
+> 
