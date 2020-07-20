@@ -2,75 +2,118 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33A27226FB2
-	for <lists+kvm-ppc@lfdr.de>; Mon, 20 Jul 2020 22:26:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FB78226FF5
+	for <lists+kvm-ppc@lfdr.de>; Mon, 20 Jul 2020 22:49:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728724AbgGTUZH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 20 Jul 2020 16:25:07 -0400
-Received: from gate.crashing.org ([63.228.1.57]:42009 "EHLO gate.crashing.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727123AbgGTUZG (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 20 Jul 2020 16:25:06 -0400
-Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
-        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 06KKOrG5032543;
-        Mon, 20 Jul 2020 15:24:53 -0500
-Received: (from segher@localhost)
-        by gate.crashing.org (8.14.1/8.14.1/Submit) id 06KKOqCj032537;
-        Mon, 20 Jul 2020 15:24:52 -0500
-X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
-Date:   Mon, 20 Jul 2020 15:24:52 -0500
-From:   Segher Boessenkool <segher@kernel.crashing.org>
-To:     Laurent Dufour <ldufour@linux.ibm.com>
-Cc:     aik@ozlabs.ru, Ram Pai <linuxram@us.ibm.com>,
-        kvm-ppc@vger.kernel.org, bharata@linux.ibm.com,
-        sathnaga@linux.vnet.ibm.com, sukadev@linux.vnet.ibm.com,
-        linuxppc-dev@lists.ozlabs.org, bauerman@linux.ibm.com,
-        david@gibson.dropbear.id.au
-Subject: Re: [RFC PATCH] powerpc/pseries/svm: capture instruction faulting on MMIO access, in sprg0 register
-Message-ID: <20200720202452.GN30544@gate.crashing.org>
-References: <1594888333-9370-1-git-send-email-linuxram@us.ibm.com> <18e3bcee-8a3a-bd13-c995-8e4168471f74@linux.ibm.com> <20200720201041.GM30544@gate.crashing.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200720201041.GM30544@gate.crashing.org>
-User-Agent: Mutt/1.4.2.3i
+        id S1728789AbgGTUtL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 20 Jul 2020 16:49:11 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:2409 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726012AbgGTUtL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 20 Jul 2020 16:49:11 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5f16033a0000>; Mon, 20 Jul 2020 13:48:58 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 20 Jul 2020 13:49:10 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 20 Jul 2020 13:49:10 -0700
+Received: from rcampbell-dev.nvidia.com (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 20 Jul
+ 2020 20:49:10 +0000
+Subject: Re: [PATCH v2 2/5] mm/migrate: add a direction parameter to
+ migrate_vma
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     <linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>,
+        <nouveau@lists.freedesktop.org>, <kvm-ppc@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Jerome Glisse" <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        "Christoph Hellwig" <hch@lst.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Ben Skeggs <bskeggs@redhat.com>,
+        Bharata B Rao <bharata@linux.ibm.com>
+References: <20200713172149.2310-1-rcampbell@nvidia.com>
+ <20200713172149.2310-3-rcampbell@nvidia.com>
+ <20200720183643.GA3028737@nvidia.com>
+ <2e775a5d-9d62-de52-6799-3bbb09c88c5a@nvidia.com>
+ <20200720195943.GH2021234@nvidia.com>
+From:   Ralph Campbell <rcampbell@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <fdfde6a0-f2bf-c0b2-0283-c882aa755292@nvidia.com>
+Date:   Mon, 20 Jul 2020 13:49:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <20200720195943.GH2021234@nvidia.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1595278138; bh=Ccj/+mKAxu8hTLWfU4Ue43iWGdFGZ2AWQABgAkqwS5c=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=VcLaCG1jeJ3grIAQ6dNREngT9LTn9RlNSSs2PV9xB2FKhVBQ9sSCMPElcq6X8bk+g
+         BffYfWyypukyPqCEivuSYDvDbuieMzbmOD4tLYnkHSGC+/8Eo7xnq/qABwzVunk2E6
+         uuRVRSaBj5I2QN265J3jgZcvbPEcUO9iGyrjO1Dmiosny1t4HQJP2yT8VtJhLO0nNd
+         d2SZ6bBN3ywT4vnkEiIQBekg3S0vniVavcHfZrE0YcmAZXB+VncPBE1u5hMqQT3tC2
+         V47tjJs5XwPa9/MN0I8bxqzoDxEte6LZmbM+QXwVdqRgI+PVl2LkjNrZZ7TGxvNp+b
+         GRhbS0bjKKnhw==
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Jul 20, 2020 at 03:10:41PM -0500, Segher Boessenkool wrote:
-> On Mon, Jul 20, 2020 at 11:39:56AM +0200, Laurent Dufour wrote:
-> > Le 16/07/2020 à 10:32, Ram Pai a écrit :
-> > >+	if (is_secure_guest()) {					\
-> > >+		__asm__ __volatile__("mfsprg0 %3;"			\
-> > >+				"lnia %2;"				\
-> > >+				"ld %2,12(%2);"				\
-> > >+				"mtsprg0 %2;"				\
-> > >+				"sync;"					\
-> > >+				#insn" %0,%y1;"				\
-> > >+				"twi 0,%0,0;"				\
-> > >+				"isync;"				\
-> > >+				"mtsprg0 %3"				\
-> > >+			: "=r" (ret)					\
-> > >+			: "Z" (*addr), "r" (0), "r" (0)			\
-> > 
-> > I'm wondering if SPRG0 is restored to its original value.
-> > You're using the same register (r0) for parameters 2 and 3, so when doing 
-> > lnia %2, you're overwriting the SPRG0 value you saved in r0 just earlier.
-> 
-> It is putting the value 0 in the registers the compiler chooses for
-> operands 2 and 3.  But operand 3 is written, while the asm says it is an
-> input.  It needs an earlyclobber as well.
-> 
-> > It may be clearer to use explicit registers for %2 and %3 and to mark them 
-> > as modified for the compiler.
-> 
-> That is not a good idea, imnsho.
 
-(The explicit register number part, I mean; operand 2 should be an
-output as well, yes.)
+On 7/20/20 12:59 PM, Jason Gunthorpe wrote:
+> On Mon, Jul 20, 2020 at 12:54:53PM -0700, Ralph Campbell wrote:
+>>>> diff --git a/include/linux/migrate.h b/include/linux/migrate.h
+>>>> index 3e546cbf03dd..620f2235d7d4 100644
+>>>> +++ b/include/linux/migrate.h
+>>>> @@ -180,6 +180,11 @@ static inline unsigned long migrate_pfn(unsigned long pfn)
+>>>>    	return (pfn << MIGRATE_PFN_SHIFT) | MIGRATE_PFN_VALID;
+>>>>    }
+>>>> +enum migrate_vma_direction {
+>>>> +	MIGRATE_VMA_FROM_SYSTEM,
+>>>> +	MIGRATE_VMA_FROM_DEVICE_PRIVATE,
+>>>> +};
+>>>
+>>> I would have guessed this is more natural as _FROM_DEVICE_ and
+>>> TO_DEVICE_ ?
+>>
+>> The caller controls where the destination memory is allocated so it isn't
+>> necessarily device private memory, it could be from system to system.
+>> The use case for system to system memory migration is for hardware
+>> like ARM SMMU or PCIe ATS where a single set of page tables is shared by
+>> the device and a CPU process over a coherent system memory bus.
+>> Also many integrated GPUs in SOCs fall into this category too.
+> 
+> Maybe just TO/FROM_DEIVCE then? Even though the memory is not
+> DEVICE_PRIVATE it is still device owned pages right?
+> 
+>> So to me, it makes more sense to specify the direction based on the
+>> source location.
+> 
+> It feels strange because the driver doesn't always know or control the
+> source?
+> 
+> Jason
+> 
 
+The driver can't really know where the source is currently located because the
+API is designed to not initially hold the page locks, migrate_vma_setup() only knows
+the source once it holds the page table locks and isolates/locks the pages being
+migrated. The direction and pgmap_owner are supposed to filter which pages
+the caller is interested in migrating.
+Perhaps the direction should instead be a flags field with separate bits for
+system memory and device private memory selecting source candidates for
+migration. I can imagine use cases for all 4 combinations of
+d->d, d->s, s->d, and s->s being valid.
 
-Segher
+I didn't really think a direction was needed, this was something that
+Christoph Hellwig seemed to think made the API safer.
