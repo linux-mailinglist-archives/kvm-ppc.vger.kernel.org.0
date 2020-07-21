@@ -2,55 +2,39 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31396227EA3
-	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Jul 2020 13:20:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 079A722825B
+	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Jul 2020 16:36:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729596AbgGULUT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 21 Jul 2020 07:20:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53174 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729514AbgGULUS (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Jul 2020 07:20:18 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977AEC061794;
-        Tue, 21 Jul 2020 04:20:18 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id r12so20722571wrj.13;
-        Tue, 21 Jul 2020 04:20:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=cgE7yCvC2TsM3N9RxN0ivNvrTATSLMzpTj/dTB9AGDk=;
-        b=mu8Irwtky5HM+EiEeEeJR5ujsfvK+4dRAQRaaVcc7HsqkvVK5OdZ66y3jHwGTwX8Cu
-         zczEMY4FPKkfMJPyqoq/zEQTDqVrWHiKq35CWL+NseYxjRUXqM17lsfcA3S2fUbacz4F
-         paoMeJ2RbHu5MMFCr9bSA1dbKVqhP5CQFlBIRXxKK2DBfodI5dmWrdix02VwYwBLvq7Y
-         TftEIFzy6Oqpsf3KxqPjswQGUu4zx2fkccY9iW9azevcnJDENK3yYmxXnT8KmtHnkU+O
-         QAlb9uxvjbo6Lx3o/O/kQVN+N4n65xMKivLjHruWEFxL5BOP2ogapw3UZF/MG5dgU8Tv
-         2Uxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=cgE7yCvC2TsM3N9RxN0ivNvrTATSLMzpTj/dTB9AGDk=;
-        b=qL82uYsPowA7MbjQOkjHd/3xRt/ye2bs5oF/qyJR1VGSv+NZrp0GsFynCGZCTmEfYV
-         tBkR/Z66Ju6yDnmt7m5vGhVJMTey/jxOvUrL9fujW5KHDfdTAJL9siniwcedgkqW2LUO
-         VcjJpG49NPPhNgqUwNA1lTCeV/J9Cts0Eftbd0p3WgIBD/WGSfpmNV2vKGQqr/Evd3Cd
-         ehtgrtNsKOYTcYKKvb0fhzJ8P0lvhbp6f9l8aNSlTqUQW74KzrRTfAm9A/VIpVnhF2b6
-         iZXA8W1QcGZNwrhnDBe+5itNG1OfSX+WSdnVcmcb/cZNHtm80YFfWw58m4cijYCD5VHj
-         En4g==
-X-Gm-Message-State: AOAM530aL0Xqk/xXVDL0Go1fUOljWH9Yz54I+oQMMWMW9u8rj46/lMJL
-        Fs95b8hF/Foph1VO01Vx6cY=
-X-Google-Smtp-Source: ABdhPJwmCaJOo8AdzQqS2eChCE+7XLE3Au1lXisG7/a/kYL/4vC9x9VNW5OotawEVy00sIUB49kphA==
-X-Received: by 2002:adf:de12:: with SMTP id b18mr28232045wrm.390.1595330417294;
-        Tue, 21 Jul 2020 04:20:17 -0700 (PDT)
-Received: from localhost (110-174-173-27.tpgi.com.au. [110.174.173.27])
-        by smtp.gmail.com with ESMTPSA id c188sm3106579wma.22.2020.07.21.04.20.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2020 04:20:16 -0700 (PDT)
-Date:   Tue, 21 Jul 2020 21:20:09 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
+        id S1726412AbgGUOg2 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 21 Jul 2020 10:36:28 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32845 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728924AbgGUOg1 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Jul 2020 10:36:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595342185;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NycHO4cCvRulg7ZB9M1xTLI2cl8/0+geie9uWHt9/cE=;
+        b=a7xqnZUuSH3CwlBWbCupdKoCpDN0vZaEXIRcD1ZrXxk33bYBZFloERqLPsBAi2vFcvtoly
+        6bI2sSNIhWUW//3doyPYQh1lODTFnogW15/R66JZpRA3Li2nC/zcTAcaHWdvl7jTjbXRtc
+        GlornLz9Gf6CIlBY3VZAgsom4LxEgkg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-Zm_0Vb-1P1eJUlH4iKjACg-1; Tue, 21 Jul 2020 10:36:22 -0400
+X-MC-Unique: Zm_0Vb-1P1eJUlH4iKjACg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE3FE80183C;
+        Tue, 21 Jul 2020 14:36:19 +0000 (UTC)
+Received: from llong.remote.csb (ovpn-115-32.rdu2.redhat.com [10.10.115.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A76752B6E2;
+        Tue, 21 Jul 2020 14:36:16 +0000 (UTC)
 Subject: Re: [PATCH v3 0/6] powerpc: queued spinlocks and rwlocks
-To:     Waiman Long <longman@redhat.com>,
+To:     Nicholas Piggin <npiggin@gmail.com>,
         Peter Zijlstra <peterz@infradead.org>
 Cc:     Anton Blanchard <anton@ozlabs.org>,
         Boqun Feng <boqun.feng@gmail.com>, kvm-ppc@vger.kernel.org,
@@ -59,66 +43,171 @@ Cc:     Anton Blanchard <anton@ozlabs.org>,
         virtualization@lists.linux-foundation.org,
         Will Deacon <will@kernel.org>
 References: <20200706043540.1563616-1-npiggin@gmail.com>
-        <24f75d2c-60cd-2766-4aab-1a3b1c80646e@redhat.com>
-        <1594101082.hfq9x5yact.astroid@bobo.none>
-        <20200708084106.GE597537@hirez.programming.kicks-ass.net>
-        <a9834278-25bf-90e9-10f2-cd10e5407ff6@redhat.com>
-        <20200709083113.GI597537@hirez.programming.kicks-ass.net>
-In-Reply-To: <20200709083113.GI597537@hirez.programming.kicks-ass.net>
+ <24f75d2c-60cd-2766-4aab-1a3b1c80646e@redhat.com>
+ <1594101082.hfq9x5yact.astroid@bobo.none>
+ <20200708084106.GE597537@hirez.programming.kicks-ass.net>
+ <1595327263.lk78cqolxm.astroid@bobo.none>
+From:   Waiman Long <longman@redhat.com>
+Organization: Red Hat
+Message-ID: <eaabf501-80fe-dd15-c03c-f75ce4f75877@redhat.com>
+Date:   Tue, 21 Jul 2020 10:36:16 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Message-Id: <1595329799.y24rka8cv4.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1595327263.lk78cqolxm.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Peter Zijlstra's message of July 9, 2020 6:31 pm:
-> On Wed, Jul 08, 2020 at 07:54:34PM -0400, Waiman Long wrote:
->> On 7/8/20 4:41 AM, Peter Zijlstra wrote:
->> > On Tue, Jul 07, 2020 at 03:57:06PM +1000, Nicholas Piggin wrote:
->> > > Yes, powerpc could certainly get more performance out of the slow
->> > > paths, and then there are a few parameters to tune.
->> > Can you clarify? The slow path is already in use on ARM64 which is wea=
-k,
->> > so I doubt there's superfluous serialization present. And Will spend a
->> > fair amount of time on making that thing guarantee forward progressm, =
-so
->> > there just isn't too much room to play.
->> >=20
->> > > We don't have a good alternate patching for function calls yet, but
->> > > that would be something to do for native vs pv.
->> > Going by your jump_label implementation, support for static_call shoul=
-d
->> > be fairly straight forward too, no?
->> >=20
->> >    https://lkml.kernel.org/r/20200624153024.794671356@infradead.org
->> >=20
->> Speaking of static_call, I am also looking forward to it. Do you have an
->> idea when that will be merged?
->=20
-> 0day had one crash on the last round, I think Steve send a fix for that
-> last night and I'll go look at it.
->=20
-> That said, the last posting got 0 feedback, so either everybody is
-> really happy with it, or not interested. So let us know in the thread,
-> with some review feedback.
->=20
-> Once I get through enough of the inbox to actually find the fix and test
-> it, I'll also update the thread, and maybe threaten to merge it if
-> everybody stays silent :-)
+On 7/21/20 7:08 AM, Nicholas Piggin wrote:
+> diff --git a/arch/powerpc/include/asm/qspinlock.h b/arch/powerpc/include/asm/qspinlock.h
+> index b752d34517b3..26d8766a1106 100644
+> --- a/arch/powerpc/include/asm/qspinlock.h
+> +++ b/arch/powerpc/include/asm/qspinlock.h
+> @@ -31,16 +31,57 @@ static inline void queued_spin_unlock(struct qspinlock *lock)
+>   
+>   #else
+>   extern void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
+> +extern void queued_spin_lock_slowpath_queue(struct qspinlock *lock);
+>   #endif
+>   
+>   static __always_inline void queued_spin_lock(struct qspinlock *lock)
+>   {
+> -	u32 val = 0;
+> -
+> -	if (likely(atomic_try_cmpxchg_lock(&lock->val, &val, _Q_LOCKED_VAL)))
+> +	atomic_t *a = &lock->val;
+> +	u32 val;
+> +
+> +again:
+> +	asm volatile(
+> +"1:\t"	PPC_LWARX(%0,0,%1,1) "	# queued_spin_lock			\n"
+> +	: "=&r" (val)
+> +	: "r" (&a->counter)
+> +	: "memory");
+> +
+> +	if (likely(val == 0)) {
+> +		asm_volatile_goto(
+> +	"	stwcx.	%0,0,%1							\n"
+> +	"	bne-	%l[again]						\n"
+> +	"\t"	PPC_ACQUIRE_BARRIER "						\n"
+> +		:
+> +		: "r"(_Q_LOCKED_VAL), "r" (&a->counter)
+> +		: "cr0", "memory"
+> +		: again );
+>   		return;
+> -
+> -	queued_spin_lock_slowpath(lock, val);
+> +	}
+> +
+> +	if (likely(val == _Q_LOCKED_VAL)) {
+> +		asm_volatile_goto(
+> +	"	stwcx.	%0,0,%1							\n"
+> +	"	bne-	%l[again]						\n"
+> +		:
+> +		: "r"(_Q_LOCKED_VAL | _Q_PENDING_VAL), "r" (&a->counter)
+> +		: "cr0", "memory"
+> +		: again );
+> +
+> +		atomic_cond_read_acquire(a, !(VAL & _Q_LOCKED_MASK));
+> +//		clear_pending_set_locked(lock);
+> +		WRITE_ONCE(lock->locked_pending, _Q_LOCKED_VAL);
+> +//		lockevent_inc(lock_pending);
+> +		return;
+> +	}
+> +
+> +	if (val == _Q_PENDING_VAL) {
+> +		int cnt = _Q_PENDING_LOOPS;
+> +		val = atomic_cond_read_relaxed(a,
+> +					       (VAL != _Q_PENDING_VAL) || !cnt--);
+> +		if (!(val & ~_Q_LOCKED_MASK))
+> +			goto again;
+> +        }
+> +	queued_spin_lock_slowpath_queue(lock);
+>   }
+>   #define queued_spin_lock queued_spin_lock
+>   
 
-I'd like to use it in powerpc. We have code now for example that patches=20
-a branch immediately at the top of memcpy which branches to a different=20
-version of the function. pv queued spinlock selection obviously, and
-there's a bunch of platform ops struct things that get filled in at boot=20
-time, etc.
+I am fine with the arch code override some part of the generic code.
 
-So +1 here if you can get them through. I'm not 100% sure we can do
-it with existing toolchain and no ugly hacks, but there's no way to
-structure things that can get around that AFAIKS. We'd eventually
-use it though, I'd say.
 
-Thanks,
-Nick
+> diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
+> index b9515fcc9b29..ebcc6f5d99d5 100644
+> --- a/kernel/locking/qspinlock.c
+> +++ b/kernel/locking/qspinlock.c
+> @@ -287,10 +287,14 @@ static __always_inline u32  __pv_wait_head_or_lock(struct qspinlock *lock,
+>   
+>   #ifdef CONFIG_PARAVIRT_SPINLOCKS
+>   #define queued_spin_lock_slowpath	native_queued_spin_lock_slowpath
+> +#define queued_spin_lock_slowpath_queue	native_queued_spin_lock_slowpath_queue
+>   #endif
+>   
+>   #endif /* _GEN_PV_LOCK_SLOWPATH */
+>   
+> +void queued_spin_lock_slowpath_queue(struct qspinlock *lock);
+> +static void __queued_spin_lock_slowpath_queue(struct qspinlock *lock);
+> +
+>   /**
+>    * queued_spin_lock_slowpath - acquire the queued spinlock
+>    * @lock: Pointer to queued spinlock structure
+> @@ -314,12 +318,6 @@ static __always_inline u32  __pv_wait_head_or_lock(struct qspinlock *lock,
+>    */
+>   void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
+>   {
+> -	struct mcs_spinlock *prev, *next, *node;
+> -	u32 old, tail;
+> -	int idx;
+> -
+> -	BUILD_BUG_ON(CONFIG_NR_CPUS >= (1U << _Q_TAIL_CPU_BITS));
+> -
+>   	if (pv_enabled())
+>   		goto pv_queue;
+>   
+> @@ -397,6 +395,26 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
+>   queue:
+>   	lockevent_inc(lock_slowpath);
+>   pv_queue:
+> +	__queued_spin_lock_slowpath_queue(lock);
+> +}
+> +EXPORT_SYMBOL(queued_spin_lock_slowpath);
+> +
+> +void queued_spin_lock_slowpath_queue(struct qspinlock *lock)
+> +{
+> +	lockevent_inc(lock_slowpath);
+> +	__queued_spin_lock_slowpath_queue(lock);
+> +}
+> +EXPORT_SYMBOL(queued_spin_lock_slowpath_queue);
+> +
+> +static void __queued_spin_lock_slowpath_queue(struct qspinlock *lock)
+> +{
+> +	struct mcs_spinlock *prev, *next, *node;
+> +	u32 old, tail;
+> +	u32 val;
+> +	int idx;
+> +
+> +	BUILD_BUG_ON(CONFIG_NR_CPUS >= (1U << _Q_TAIL_CPU_BITS));
+> +
+>   	node = this_cpu_ptr(&qnodes[0].mcs);
+>   	idx = node->count++;
+>   	tail = encode_tail(smp_processor_id(), idx);
+> @@ -559,7 +577,6 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
+>   	 */
+>   	__this_cpu_dec(qnodes[0].mcs.count);
+>   }
+> -EXPORT_SYMBOL(queued_spin_lock_slowpath);
+>   
+>   /*
+>    * Generate the paravirt code for queued_spin_unlock_slowpath().
+>
+I would prefer to extract out the pending bit handling code out into a 
+separate helper function which can be overridden by the arch code 
+instead of breaking the slowpath into 2 pieces.
+
+Cheers,
+Longman
+
