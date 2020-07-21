@@ -2,160 +2,641 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE83822734C
-	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Jul 2020 01:53:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B275A22771E
+	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Jul 2020 05:42:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727032AbgGTXxq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 20 Jul 2020 19:53:46 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:2712 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726907AbgGTXxp (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 20 Jul 2020 19:53:45 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5f162e110000>; Mon, 20 Jul 2020 16:51:45 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Mon, 20 Jul 2020 16:53:45 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Mon, 20 Jul 2020 16:53:45 -0700
-Received: from rcampbell-dev.nvidia.com (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 20 Jul
- 2020 23:53:44 +0000
-Subject: Re: [PATCH v2 2/5] mm/migrate: add a direction parameter to
- migrate_vma
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     <linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>,
-        <nouveau@lists.freedesktop.org>, <kvm-ppc@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Jerome Glisse" <jglisse@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        "Christoph Hellwig" <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Ben Skeggs <bskeggs@redhat.com>,
-        Bharata B Rao <bharata@linux.ibm.com>
-References: <20200713172149.2310-1-rcampbell@nvidia.com>
- <20200713172149.2310-3-rcampbell@nvidia.com>
- <20200720183643.GA3028737@nvidia.com>
- <2e775a5d-9d62-de52-6799-3bbb09c88c5a@nvidia.com>
- <20200720195943.GH2021234@nvidia.com>
- <fdfde6a0-f2bf-c0b2-0283-c882aa755292@nvidia.com>
- <20200720231633.GI2021234@nvidia.com>
-From:   Ralph Campbell <rcampbell@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <d458ffef-d205-e71d-1b8b-60721c42ca7f@nvidia.com>
-Date:   Mon, 20 Jul 2020 16:53:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1726962AbgGUDmf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 20 Jul 2020 23:42:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37258 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726089AbgGUDme (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 20 Jul 2020 23:42:34 -0400
+Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6364C061794;
+        Mon, 20 Jul 2020 20:42:34 -0700 (PDT)
+Received: by mail-ot1-x344.google.com with SMTP id n24so14000979otr.13;
+        Mon, 20 Jul 2020 20:42:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hbyJCzv+MBbrbHM7IHEbJFub115CPz83CLRYOcNvuWU=;
+        b=e+9Irk3xslzS1Xe65vBHshx1JxTPcO9mGNnk7Mmf3ZDO0ol5vlkmv1T12UEi4UN7wV
+         HsjU5jSotdFjno6yW5nMI08xvHChZvLRiSU9WKpTU4eN+FE01lb8a9rwfazHQ5gA4ug5
+         qAqkRuU+lZjJWN9ApBTidLQSm7nyicd3ydHyrxHESQ3ZDOt/vcmrbSzhlA3GiExRw9rq
+         3wxzO48wnDkLicF9ripUDg0SFASPVS1Nckn/EBBab3Ci15LCeZn7TqSiWxYnVvM+MGmh
+         /zop1Umv85livzM9tGcobmNw4/XdIk9NIpdR0wgSZdVoLHV18lUhswUUHfZVmLDOMb2d
+         9KNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hbyJCzv+MBbrbHM7IHEbJFub115CPz83CLRYOcNvuWU=;
+        b=UAu7q36VaIjo2vaAmaMZOj3QGGWrhlIYKGtsdj0ox7Kj9EG6sBCBkmpXBftIy4hW3O
+         8g5kwnXyKxrpiPNvbBUV04YTa5zgpnh0GKmittuqlPBXI9tdu2Vzt7L8/puJddnOfzTB
+         iJxvCrfNgSsaNwl7K2iok3nYvJ71CnWW5gH36Ys4ZkwPgQdAlFTNQInky47MuQBK1HYW
+         nrnqt8V3/C7+q5zSBnzyWkv8QLHmxaQxy8ptP1DyK4Wm7/TD6ooJvMT2eLXDHllK9Kg9
+         /jlP6T/tLkeYl5wpwatiLE7d/n16VRK2pTFx8FEyx1Vhdhwz6QPlb9PGleNdOk4dnFPU
+         IBfA==
+X-Gm-Message-State: AOAM53307PbUihuFnXmTXbSrxiCMT5EzNxaowOcTsqoZXRb2OdQnwO6o
+        UdGloRURsLuUoCQ0QNyHsGa9fUR9X4uxXwAK8KA=
+X-Google-Smtp-Source: ABdhPJwyDGLQblOirP/K/HCy4ai7cJl/fxI2CdXZZf7T5hfW29rsnEeLe0gbH4nIPiTnmtik0NCnQrrEJ8oso2Er8xQ=
+X-Received: by 2002:a9d:6a12:: with SMTP id g18mr24369820otn.155.1595302953747;
+ Mon, 20 Jul 2020 20:42:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200720231633.GI2021234@nvidia.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1595289105; bh=ZQjRhhF+y7yVrWHN10F4rwb8PZd9lDc5hIDmGv41Pnw=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=Nwzysd2f4rPxKQVih681HcCnyXf4qE7QVnsfF9tUtJg8Dc9oBycsJXLGLV3kaUfXV
-         nmm4LncwyqzoOLgco1FCThZHDdqbmM3+CjrFswyr5WV7DTb3AMo9EKjCt5biRhuWMB
-         lSRgCG173E4ml5n8MeKW+VBZQVkO0yyD5hf+OodIOjSKRiTXJ/tKAEye51AIva2T1U
-         FODQh+Z15ZUAjjTsNpkmriBFpTDfXwqEn0A6fxS4VnMjggS0A7MGoqiWrIfS4pU0+f
-         NlFesJezdyDMTEH/Zg4AeOZpuwCO6L+bQkrLw/S41vxNr5I2vrNdySmYHnqVEy3tJf
-         nQod1z/sAA/4w==
+References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com> <1594996707-3727-2-git-send-email-atrajeev@linux.vnet.ibm.com>
+In-Reply-To: <1594996707-3727-2-git-send-email-atrajeev@linux.vnet.ibm.com>
+From:   Jordan Niethe <jniethe5@gmail.com>
+Date:   Tue, 21 Jul 2020 13:42:19 +1000
+Message-ID: <CACzsE9rnE_z-uEw2tyvdFDVzkOeBKJoZiTHD9fSRm9d8fVBr5w@mail.gmail.com>
+Subject: Re: [v3 01/15] powerpc/perf: Update cpu_hw_event to use `struct` for
+ storing MMCR registers
+To:     Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Gautham R Shenoy <ego@linux.vnet.ibm.com>, mikey@neuling.org,
+        maddy@linux.vnet.ibm.com, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, svaidyan@in.ibm.com, acme@kernel.org,
+        jolsa@kernel.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-
-On 7/20/20 4:16 PM, Jason Gunthorpe wrote:
-> On Mon, Jul 20, 2020 at 01:49:09PM -0700, Ralph Campbell wrote:
->>
->> On 7/20/20 12:59 PM, Jason Gunthorpe wrote:
->>> On Mon, Jul 20, 2020 at 12:54:53PM -0700, Ralph Campbell wrote:
->>>>>> diff --git a/include/linux/migrate.h b/include/linux/migrate.h
->>>>>> index 3e546cbf03dd..620f2235d7d4 100644
->>>>>> +++ b/include/linux/migrate.h
->>>>>> @@ -180,6 +180,11 @@ static inline unsigned long migrate_pfn(unsigned long pfn)
->>>>>>     	return (pfn << MIGRATE_PFN_SHIFT) | MIGRATE_PFN_VALID;
->>>>>>     }
->>>>>> +enum migrate_vma_direction {
->>>>>> +	MIGRATE_VMA_FROM_SYSTEM,
->>>>>> +	MIGRATE_VMA_FROM_DEVICE_PRIVATE,
->>>>>> +};
->>>>>
->>>>> I would have guessed this is more natural as _FROM_DEVICE_ and
->>>>> TO_DEVICE_ ?
->>>>
->>>> The caller controls where the destination memory is allocated so it isn't
->>>> necessarily device private memory, it could be from system to system.
->>>> The use case for system to system memory migration is for hardware
->>>> like ARM SMMU or PCIe ATS where a single set of page tables is shared by
->>>> the device and a CPU process over a coherent system memory bus.
->>>> Also many integrated GPUs in SOCs fall into this category too.
->>>
->>> Maybe just TO/FROM_DEIVCE then? Even though the memory is not
->>> DEVICE_PRIVATE it is still device owned pages right?
->>>
->>>> So to me, it makes more sense to specify the direction based on the
->>>> source location.
->>>
->>> It feels strange because the driver doesn't always know or control the
->>> source?
->>
->> The driver can't really know where the source is currently located because the
->> API is designed to not initially hold the page locks, migrate_vma_setup() only knows
->> the source once it holds the page table locks and isolates/locks the pages being
->> migrated. The direction and pgmap_owner are supposed to filter which pages
->> the caller is interested in migrating.
->> Perhaps the direction should instead be a flags field with separate bits for
->> system memory and device private memory selecting source candidates for
->> migration. I can imagine use cases for all 4 combinations of
->> d->d, d->s, s->d, and s->s being valid.
->>
->> I didn't really think a direction was needed, this was something that
->> Christoph Hellwig seemed to think made the API safer.
-> 
-> If it is a filter then just using those names would make sense
-> 
-> MIGRATE_VMA_SELECT_SYSTEM
-> MIGRATE_VMA_SELECT_DEVICE_PRIVATE
-> 
-> SYSTEM feels like the wrong name too, doesn't linux have a formal name
-> for RAM struct pages?
-
-Highmem? Movable? Zone normal?
-There are quite a few :-)
-At the moment, only anonymous pages are being migrated but I expect
-file backed pages to be supported at some point (but not DAX).
-VM_PFNMAP and VM_MIXEDMAP might make sense some day with peer-to-peer
-copies.
-
-So MIGRATE_VMA_SELECT_SYSTEM seems OK to me.
-
-> In your future coherent design how would the migrate select 'device'
-> pages that are fully coherent? Are they still zone something pages
-> that are OK for CPU usage?
-> 
-> Jason
-> 
-
-For pages that are device private, the pgmap_owner selects them (plus the
-MIGRATE_VMA_SELECT_DEVICE_PRIVATE flag).
-For pages that are migrating from system memory to system memory, I expect
-the pages to be in different NUMA zones. Otherwise, there wouldn't be much
-point in migrating them. And yes, the CPU can access them.
-It might be useful to have a filter saying "migrate system memory not already
-in NUMA zone X" if the MIGRATE_VMA_SELECT_SYSTEM flag is set.
-
-Also, in support of the flags field, I'm looking at THP migration and I can
-picture defining some request flags like hmm_range_fault() to say "migrate
-THPs if they exist, otherwise split THPs".
-A default_flags MIGRATE_PFN_REQ_FAULT would be useful if the source page is
-swapped out. Currently, migrate_vma_setup() just skips these pages without
-any indication to the caller why the page isn't being migrated or if retrying
-is worth attempting.
+On Sat, Jul 18, 2020 at 12:48 AM Athira Rajeev
+<atrajeev@linux.vnet.ibm.com> wrote:
+>
+> core-book3s currently uses array to store the MMCR registers as part
+> of per-cpu `cpu_hw_events`. This patch does a clean up to use `struct`
+> to store mmcr regs instead of array. This will make code easier to read
+> and reduces chance of any subtle bug that may come in the future, say
+> when new registers are added. Patch updates all relevant code that was
+> using MMCR array ( cpuhw->mmcr[x]) to use newly introduced `struct`.
+> This includes the PMU driver code for supported platforms (power5
+> to power9) and ISA macros for counter support functions.
+>
+> Signed-off-by: Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+> ---
+>  arch/powerpc/include/asm/perf_event_server.h | 10 ++++--
+>  arch/powerpc/perf/core-book3s.c              | 53 +++++++++++++---------------
+>  arch/powerpc/perf/isa207-common.c            | 20 +++++------
+>  arch/powerpc/perf/isa207-common.h            |  4 +--
+>  arch/powerpc/perf/mpc7450-pmu.c              | 21 +++++++----
+>  arch/powerpc/perf/power5+-pmu.c              | 17 ++++-----
+>  arch/powerpc/perf/power5-pmu.c               | 17 ++++-----
+>  arch/powerpc/perf/power6-pmu.c               | 16 ++++-----
+>  arch/powerpc/perf/power7-pmu.c               | 17 ++++-----
+>  arch/powerpc/perf/ppc970-pmu.c               | 24 ++++++-------
+>  10 files changed, 105 insertions(+), 94 deletions(-)
+>
+> diff --git a/arch/powerpc/include/asm/perf_event_server.h b/arch/powerpc/include/asm/perf_event_server.h
+> index 3e9703f..f9a3668 100644
+> --- a/arch/powerpc/include/asm/perf_event_server.h
+> +++ b/arch/powerpc/include/asm/perf_event_server.h
+> @@ -17,6 +17,12 @@
+>
+>  struct perf_event;
+>
+> +struct mmcr_regs {
+> +       unsigned long mmcr0;
+> +       unsigned long mmcr1;
+> +       unsigned long mmcr2;
+> +       unsigned long mmcra;
+> +};
+>  /*
+>   * This struct provides the constants and functions needed to
+>   * describe the PMU on a particular POWER-family CPU.
+> @@ -28,7 +34,7 @@ struct power_pmu {
+>         unsigned long   add_fields;
+>         unsigned long   test_adder;
+>         int             (*compute_mmcr)(u64 events[], int n_ev,
+> -                               unsigned int hwc[], unsigned long mmcr[],
+> +                               unsigned int hwc[], struct mmcr_regs *mmcr,
+>                                 struct perf_event *pevents[]);
+>         int             (*get_constraint)(u64 event_id, unsigned long *mskp,
+>                                 unsigned long *valp);
+> @@ -41,7 +47,7 @@ struct power_pmu {
+>         unsigned long   group_constraint_val;
+>         u64             (*bhrb_filter_map)(u64 branch_sample_type);
+>         void            (*config_bhrb)(u64 pmu_bhrb_filter);
+> -       void            (*disable_pmc)(unsigned int pmc, unsigned long mmcr[]);
+> +       void            (*disable_pmc)(unsigned int pmc, struct mmcr_regs *mmcr);
+>         int             (*limited_pmc_event)(u64 event_id);
+>         u32             flags;
+>         const struct attribute_group    **attr_groups;
+> diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-book3s.c
+> index cd6a742..18b1b6a 100644
+> --- a/arch/powerpc/perf/core-book3s.c
+> +++ b/arch/powerpc/perf/core-book3s.c
+> @@ -37,12 +37,7 @@ struct cpu_hw_events {
+>         struct perf_event *event[MAX_HWEVENTS];
+>         u64 events[MAX_HWEVENTS];
+>         unsigned int flags[MAX_HWEVENTS];
+> -       /*
+> -        * The order of the MMCR array is:
+> -        *  - 64-bit, MMCR0, MMCR1, MMCRA, MMCR2
+> -        *  - 32-bit, MMCR0, MMCR1, MMCR2
+> -        */
+> -       unsigned long mmcr[4];
+> +       struct mmcr_regs mmcr;
+>         struct perf_event *limited_counter[MAX_LIMITED_HWCOUNTERS];
+>         u8  limited_hwidx[MAX_LIMITED_HWCOUNTERS];
+>         u64 alternatives[MAX_HWEVENTS][MAX_EVENT_ALTERNATIVES];
+> @@ -121,7 +116,7 @@ static void ebb_event_add(struct perf_event *event) { }
+>  static void ebb_switch_out(unsigned long mmcr0) { }
+>  static unsigned long ebb_switch_in(bool ebb, struct cpu_hw_events *cpuhw)
+>  {
+> -       return cpuhw->mmcr[0];
+> +       return cpuhw->mmcr.mmcr0;
+>  }
+>
+>  static inline void power_pmu_bhrb_enable(struct perf_event *event) {}
+> @@ -590,7 +585,7 @@ static void ebb_switch_out(unsigned long mmcr0)
+>
+>  static unsigned long ebb_switch_in(bool ebb, struct cpu_hw_events *cpuhw)
+>  {
+> -       unsigned long mmcr0 = cpuhw->mmcr[0];
+> +       unsigned long mmcr0 = cpuhw->mmcr.mmcr0;
+>
+>         if (!ebb)
+>                 goto out;
+> @@ -624,7 +619,7 @@ static unsigned long ebb_switch_in(bool ebb, struct cpu_hw_events *cpuhw)
+>          * unfreeze counters, it should not set exclude_xxx in its events and
+>          * instead manage the MMCR2 entirely by itself.
+>          */
+> -       mtspr(SPRN_MMCR2, cpuhw->mmcr[3] | current->thread.mmcr2);
+> +       mtspr(SPRN_MMCR2, cpuhw->mmcr.mmcr2 | current->thread.mmcr2);
+>  out:
+>         return mmcr0;
+>  }
+> @@ -1232,9 +1227,9 @@ static void power_pmu_disable(struct pmu *pmu)
+>                 /*
+>                  * Disable instruction sampling if it was enabled
+>                  */
+> -               if (cpuhw->mmcr[2] & MMCRA_SAMPLE_ENABLE) {
+> +               if (cpuhw->mmcr.mmcra & MMCRA_SAMPLE_ENABLE) {
+>                         mtspr(SPRN_MMCRA,
+> -                             cpuhw->mmcr[2] & ~MMCRA_SAMPLE_ENABLE);
+> +                             cpuhw->mmcr.mmcra & ~MMCRA_SAMPLE_ENABLE);
+>                         mb();
+>                         isync();
+>                 }
+> @@ -1308,18 +1303,18 @@ static void power_pmu_enable(struct pmu *pmu)
+>          * (possibly updated for removal of events).
+>          */
+>         if (!cpuhw->n_added) {
+> -               mtspr(SPRN_MMCRA, cpuhw->mmcr[2] & ~MMCRA_SAMPLE_ENABLE);
+> -               mtspr(SPRN_MMCR1, cpuhw->mmcr[1]);
+> +               mtspr(SPRN_MMCRA, cpuhw->mmcr.mmcra & ~MMCRA_SAMPLE_ENABLE);
+> +               mtspr(SPRN_MMCR1, cpuhw->mmcr.mmcr1);
+>                 goto out_enable;
+>         }
+>
+>         /*
+>          * Clear all MMCR settings and recompute them for the new set of events.
+>          */
+> -       memset(cpuhw->mmcr, 0, sizeof(cpuhw->mmcr));
+> +       memset(&cpuhw->mmcr, 0, sizeof(cpuhw->mmcr));
+>
+>         if (ppmu->compute_mmcr(cpuhw->events, cpuhw->n_events, hwc_index,
+> -                              cpuhw->mmcr, cpuhw->event)) {
+> +                              &cpuhw->mmcr, cpuhw->event)) {
+>                 /* shouldn't ever get here */
+>                 printk(KERN_ERR "oops compute_mmcr failed\n");
+>                 goto out;
+> @@ -1333,11 +1328,11 @@ static void power_pmu_enable(struct pmu *pmu)
+>                  */
+>                 event = cpuhw->event[0];
+>                 if (event->attr.exclude_user)
+> -                       cpuhw->mmcr[0] |= MMCR0_FCP;
+> +                       cpuhw->mmcr.mmcr0 |= MMCR0_FCP;
+>                 if (event->attr.exclude_kernel)
+> -                       cpuhw->mmcr[0] |= freeze_events_kernel;
+> +                       cpuhw->mmcr.mmcr0 |= freeze_events_kernel;
+>                 if (event->attr.exclude_hv)
+> -                       cpuhw->mmcr[0] |= MMCR0_FCHV;
+> +                       cpuhw->mmcr.mmcr0 |= MMCR0_FCHV;
+>         }
+>
+>         /*
+> @@ -1346,12 +1341,12 @@ static void power_pmu_enable(struct pmu *pmu)
+>          * Then unfreeze the events.
+>          */
+>         ppc_set_pmu_inuse(1);
+> -       mtspr(SPRN_MMCRA, cpuhw->mmcr[2] & ~MMCRA_SAMPLE_ENABLE);
+> -       mtspr(SPRN_MMCR1, cpuhw->mmcr[1]);
+> -       mtspr(SPRN_MMCR0, (cpuhw->mmcr[0] & ~(MMCR0_PMC1CE | MMCR0_PMCjCE))
+> +       mtspr(SPRN_MMCRA, cpuhw->mmcr.mmcra & ~MMCRA_SAMPLE_ENABLE);
+> +       mtspr(SPRN_MMCR1, cpuhw->mmcr.mmcr1);
+> +       mtspr(SPRN_MMCR0, (cpuhw->mmcr.mmcr0 & ~(MMCR0_PMC1CE | MMCR0_PMCjCE))
+>                                 | MMCR0_FC);
+>         if (ppmu->flags & PPMU_ARCH_207S)
+> -               mtspr(SPRN_MMCR2, cpuhw->mmcr[3]);
+> +               mtspr(SPRN_MMCR2, cpuhw->mmcr.mmcr2);
+>
+>         /*
+>          * Read off any pre-existing events that need to move
+> @@ -1402,7 +1397,7 @@ static void power_pmu_enable(struct pmu *pmu)
+>                 perf_event_update_userpage(event);
+>         }
+>         cpuhw->n_limited = n_lim;
+> -       cpuhw->mmcr[0] |= MMCR0_PMXE | MMCR0_FCECE;
+> +       cpuhw->mmcr.mmcr0 |= MMCR0_PMXE | MMCR0_FCECE;
+>
+>   out_enable:
+>         pmao_restore_workaround(ebb);
+> @@ -1418,9 +1413,9 @@ static void power_pmu_enable(struct pmu *pmu)
+>         /*
+>          * Enable instruction sampling if necessary
+>          */
+> -       if (cpuhw->mmcr[2] & MMCRA_SAMPLE_ENABLE) {
+> +       if (cpuhw->mmcr.mmcra & MMCRA_SAMPLE_ENABLE) {
+>                 mb();
+> -               mtspr(SPRN_MMCRA, cpuhw->mmcr[2]);
+> +               mtspr(SPRN_MMCRA, cpuhw->mmcr.mmcra);
+>         }
+>
+>   out:
+> @@ -1550,7 +1545,7 @@ static void power_pmu_del(struct perf_event *event, int ef_flags)
+>                                 cpuhw->flags[i-1] = cpuhw->flags[i];
+>                         }
+>                         --cpuhw->n_events;
+> -                       ppmu->disable_pmc(event->hw.idx - 1, cpuhw->mmcr);
+> +                       ppmu->disable_pmc(event->hw.idx - 1, &cpuhw->mmcr);
+>                         if (event->hw.idx) {
+>                                 write_pmc(event->hw.idx, 0);
+>                                 event->hw.idx = 0;
+> @@ -1571,7 +1566,7 @@ static void power_pmu_del(struct perf_event *event, int ef_flags)
+>         }
+>         if (cpuhw->n_events == 0) {
+>                 /* disable exceptions if no events are running */
+> -               cpuhw->mmcr[0] &= ~(MMCR0_PMXE | MMCR0_FCECE);
+> +               cpuhw->mmcr.mmcr0 &= ~(MMCR0_PMXE | MMCR0_FCECE);
+>         }
+>
+>         if (has_branch_stack(event))
+> @@ -2240,7 +2235,7 @@ static void __perf_event_interrupt(struct pt_regs *regs)
+>          * XXX might want to use MSR.PM to keep the events frozen until
+>          * we get back out of this interrupt.
+>          */
+> -       write_mmcr0(cpuhw, cpuhw->mmcr[0]);
+> +       write_mmcr0(cpuhw, cpuhw->mmcr.mmcr0);
+>
+>         if (nmi)
+>                 nmi_exit();
+> @@ -2262,7 +2257,7 @@ static int power_pmu_prepare_cpu(unsigned int cpu)
+>
+>         if (ppmu) {
+>                 memset(cpuhw, 0, sizeof(*cpuhw));
+> -               cpuhw->mmcr[0] = MMCR0_FC;
+> +               cpuhw->mmcr.mmcr0 = MMCR0_FC;
+>         }
+>         return 0;
+>  }
+> diff --git a/arch/powerpc/perf/isa207-common.c b/arch/powerpc/perf/isa207-common.c
+> index 4c86da5..2fe63f2 100644
+> --- a/arch/powerpc/perf/isa207-common.c
+> +++ b/arch/powerpc/perf/isa207-common.c
+> @@ -363,7 +363,7 @@ int isa207_get_constraint(u64 event, unsigned long *maskp, unsigned long *valp)
+>  }
+>
+>  int isa207_compute_mmcr(u64 event[], int n_ev,
+> -                              unsigned int hwc[], unsigned long mmcr[],
+> +                              unsigned int hwc[], struct mmcr_regs *mmcr,
+>                                struct perf_event *pevents[])
+>  {
+>         unsigned long mmcra, mmcr1, mmcr2, unit, combine, psel, cache, val;
+> @@ -464,30 +464,30 @@ int isa207_compute_mmcr(u64 event[], int n_ev,
+>         }
+>
+>         /* Return MMCRx values */
+> -       mmcr[0] = 0;
+> +       mmcr->mmcr0 = 0;
+>
+>         /* pmc_inuse is 1-based */
+>         if (pmc_inuse & 2)
+> -               mmcr[0] = MMCR0_PMC1CE;
+> +               mmcr->mmcr0 = MMCR0_PMC1CE;
+>
+>         if (pmc_inuse & 0x7c)
+> -               mmcr[0] |= MMCR0_PMCjCE;
+> +               mmcr->mmcr0 |= MMCR0_PMCjCE;
+>
+>         /* If we're not using PMC 5 or 6, freeze them */
+>         if (!(pmc_inuse & 0x60))
+> -               mmcr[0] |= MMCR0_FC56;
+> +               mmcr->mmcr0 |= MMCR0_FC56;
+>
+> -       mmcr[1] = mmcr1;
+> -       mmcr[2] = mmcra;
+> -       mmcr[3] = mmcr2;
+> +       mmcr->mmcr1 = mmcr1;
+> +       mmcr->mmcra = mmcra;
+> +       mmcr->mmcr2 = mmcr2;
+>
+>         return 0;
+>  }
+>
+> -void isa207_disable_pmc(unsigned int pmc, unsigned long mmcr[])
+> +void isa207_disable_pmc(unsigned int pmc, struct mmcr_regs *mmcr)
+>  {
+>         if (pmc <= 3)
+> -               mmcr[1] &= ~(0xffUL << MMCR1_PMCSEL_SHIFT(pmc + 1));
+> +               mmcr->mmcr1 &= ~(0xffUL << MMCR1_PMCSEL_SHIFT(pmc + 1));
+>  }
+>
+>  static int find_alternative(u64 event, const unsigned int ev_alt[][MAX_ALT], int size)
+> diff --git a/arch/powerpc/perf/isa207-common.h b/arch/powerpc/perf/isa207-common.h
+> index 63fd4f3..df968fd 100644
+> --- a/arch/powerpc/perf/isa207-common.h
+> +++ b/arch/powerpc/perf/isa207-common.h
+> @@ -217,9 +217,9 @@
+>
+>  int isa207_get_constraint(u64 event, unsigned long *maskp, unsigned long *valp);
+>  int isa207_compute_mmcr(u64 event[], int n_ev,
+> -                               unsigned int hwc[], unsigned long mmcr[],
+> +                               unsigned int hwc[], struct mmcr_regs *mmcr,
+>                                 struct perf_event *pevents[]);
+> -void isa207_disable_pmc(unsigned int pmc, unsigned long mmcr[]);
+> +void isa207_disable_pmc(unsigned int pmc, struct mmcr_regs *mmcr);
+>  int isa207_get_alternatives(u64 event, u64 alt[], int size, unsigned int flags,
+>                                         const unsigned int ev_alt[][MAX_ALT]);
+>  void isa207_get_mem_data_src(union perf_mem_data_src *dsrc, u32 flags,
+> diff --git a/arch/powerpc/perf/mpc7450-pmu.c b/arch/powerpc/perf/mpc7450-pmu.c
+> index 4d5ef92..826de25 100644
+> --- a/arch/powerpc/perf/mpc7450-pmu.c
+> +++ b/arch/powerpc/perf/mpc7450-pmu.c
+> @@ -257,7 +257,7 @@ static int mpc7450_get_alternatives(u64 event, unsigned int flags, u64 alt[])
+>   * Compute MMCR0/1/2 values for a set of events.
+>   */
+>  static int mpc7450_compute_mmcr(u64 event[], int n_ev, unsigned int hwc[],
+> -                               unsigned long mmcr[],
+> +                               struct mmcr_regs *mmcr,
+>                                 struct perf_event *pevents[])
+>  {
+>         u8 event_index[N_CLASSES][N_COUNTER];
+> @@ -321,9 +321,16 @@ static int mpc7450_compute_mmcr(u64 event[], int n_ev, unsigned int hwc[],
+>                 mmcr0 |= MMCR0_PMCnCE;
+>
+>         /* Return MMCRx values */
+> -       mmcr[0] = mmcr0;
+> -       mmcr[1] = mmcr1;
+> -       mmcr[2] = mmcr2;
+> +       mmcr->mmcr0 = mmcr0;
+> +       mmcr->mmcr1 = mmcr1;
+> +       mmcr->mmcr2 = mmcr2;
+Will this mmcr->mmcr2 be used anywere, or will it always use mmcr->mmcra?
+> +       /*
+> +        * 32-bit doesn't have an MMCRA and uses SPRN_MMCR2 to define
+> +        * SPRN_MMCRA. So assign mmcra of cpu_hw_events with `mmcr2`
+> +        * value to ensure that any write to this SPRN_MMCRA will
+> +        * use mmcr2 value.
+> +        */
+Something like this comment would probably be useful to near the struct mmcr.
+> +       mmcr->mmcra = mmcr2;
+>         return 0;
+>  }
+>
+> @@ -331,12 +338,12 @@ static int mpc7450_compute_mmcr(u64 event[], int n_ev, unsigned int hwc[],
+>   * Disable counting by a PMC.
+>   * Note that the pmc argument is 0-based here, not 1-based.
+>   */
+> -static void mpc7450_disable_pmc(unsigned int pmc, unsigned long mmcr[])
+> +static void mpc7450_disable_pmc(unsigned int pmc, struct mmcr_regs *mmcr)
+>  {
+>         if (pmc <= 1)
+> -               mmcr[0] &= ~(pmcsel_mask[pmc] << pmcsel_shift[pmc]);
+> +               mmcr->mmcr0 &= ~(pmcsel_mask[pmc] << pmcsel_shift[pmc]);
+>         else
+> -               mmcr[1] &= ~(pmcsel_mask[pmc] << pmcsel_shift[pmc]);
+> +               mmcr->mmcr1 &= ~(pmcsel_mask[pmc] << pmcsel_shift[pmc]);
+>  }
+>
+>  static int mpc7450_generic_events[] = {
+> diff --git a/arch/powerpc/perf/power5+-pmu.c b/arch/powerpc/perf/power5+-pmu.c
+> index f857454..5f0821e 100644
+> --- a/arch/powerpc/perf/power5+-pmu.c
+> +++ b/arch/powerpc/perf/power5+-pmu.c
+> @@ -448,7 +448,8 @@ static int power5p_marked_instr_event(u64 event)
+>  }
+>
+>  static int power5p_compute_mmcr(u64 event[], int n_ev,
+> -                               unsigned int hwc[], unsigned long mmcr[], struct perf_event *pevents[])
+> +                               unsigned int hwc[], struct mmcr_regs *mmcr,
+> +                               struct perf_event *pevents[])
+>  {
+>         unsigned long mmcr1 = 0;
+>         unsigned long mmcra = 0;
+> @@ -586,20 +587,20 @@ static int power5p_compute_mmcr(u64 event[], int n_ev,
+>         }
+>
+>         /* Return MMCRx values */
+> -       mmcr[0] = 0;
+> +       mmcr->mmcr0 = 0;
+>         if (pmc_inuse & 1)
+> -               mmcr[0] = MMCR0_PMC1CE;
+> +               mmcr->mmcr0 = MMCR0_PMC1CE;
+>         if (pmc_inuse & 0x3e)
+> -               mmcr[0] |= MMCR0_PMCjCE;
+> -       mmcr[1] = mmcr1;
+> -       mmcr[2] = mmcra;
+> +               mmcr->mmcr0 |= MMCR0_PMCjCE;
+> +       mmcr->mmcr1 = mmcr1;
+> +       mmcr->mmcra = mmcra;
+>         return 0;
+>  }
+>
+> -static void power5p_disable_pmc(unsigned int pmc, unsigned long mmcr[])
+> +static void power5p_disable_pmc(unsigned int pmc, struct mmcr_regs *mmcr)
+>  {
+>         if (pmc <= 3)
+> -               mmcr[1] &= ~(0x7fUL << MMCR1_PMCSEL_SH(pmc));
+> +               mmcr->mmcr1 &= ~(0x7fUL << MMCR1_PMCSEL_SH(pmc));
+>  }
+>
+>  static int power5p_generic_events[] = {
+> diff --git a/arch/powerpc/perf/power5-pmu.c b/arch/powerpc/perf/power5-pmu.c
+> index da52eca..426021d 100644
+> --- a/arch/powerpc/perf/power5-pmu.c
+> +++ b/arch/powerpc/perf/power5-pmu.c
+> @@ -379,7 +379,8 @@ static int power5_marked_instr_event(u64 event)
+>  }
+>
+>  static int power5_compute_mmcr(u64 event[], int n_ev,
+> -                              unsigned int hwc[], unsigned long mmcr[], struct perf_event *pevents[])
+> +                              unsigned int hwc[], struct mmcr_regs *mmcr,
+> +                              struct perf_event *pevents[])
+>  {
+>         unsigned long mmcr1 = 0;
+>         unsigned long mmcra = MMCRA_SDAR_DCACHE_MISS | MMCRA_SDAR_ERAT_MISS;
+> @@ -528,20 +529,20 @@ static int power5_compute_mmcr(u64 event[], int n_ev,
+>         }
+>
+>         /* Return MMCRx values */
+> -       mmcr[0] = 0;
+> +       mmcr->mmcr0 = 0;
+>         if (pmc_inuse & 1)
+> -               mmcr[0] = MMCR0_PMC1CE;
+> +               mmcr->mmcr0 = MMCR0_PMC1CE;
+>         if (pmc_inuse & 0x3e)
+> -               mmcr[0] |= MMCR0_PMCjCE;
+> -       mmcr[1] = mmcr1;
+> -       mmcr[2] = mmcra;
+> +               mmcr->mmcr0 |= MMCR0_PMCjCE;
+> +       mmcr->mmcr1 = mmcr1;
+> +       mmcr->mmcra = mmcra;
+>         return 0;
+>  }
+>
+> -static void power5_disable_pmc(unsigned int pmc, unsigned long mmcr[])
+> +static void power5_disable_pmc(unsigned int pmc, struct mmcr_regs *mmcr)
+>  {
+>         if (pmc <= 3)
+> -               mmcr[1] &= ~(0x7fUL << MMCR1_PMCSEL_SH(pmc));
+> +               mmcr->mmcr1 &= ~(0x7fUL << MMCR1_PMCSEL_SH(pmc));
+>  }
+>
+>  static int power5_generic_events[] = {
+> diff --git a/arch/powerpc/perf/power6-pmu.c b/arch/powerpc/perf/power6-pmu.c
+> index 3929cac..e343a51 100644
+> --- a/arch/powerpc/perf/power6-pmu.c
+> +++ b/arch/powerpc/perf/power6-pmu.c
+> @@ -171,7 +171,7 @@ static int power6_marked_instr_event(u64 event)
+>   * Assign PMC numbers and compute MMCR1 value for a set of events
+>   */
+>  static int p6_compute_mmcr(u64 event[], int n_ev,
+> -                          unsigned int hwc[], unsigned long mmcr[], struct perf_event *pevents[])
+> +                          unsigned int hwc[], struct mmcr_regs *mmcr, struct perf_event *pevents[])
+>  {
+>         unsigned long mmcr1 = 0;
+>         unsigned long mmcra = MMCRA_SDAR_DCACHE_MISS | MMCRA_SDAR_ERAT_MISS;
+> @@ -243,13 +243,13 @@ static int p6_compute_mmcr(u64 event[], int n_ev,
+>                 if (pmc < 4)
+>                         mmcr1 |= (unsigned long)psel << MMCR1_PMCSEL_SH(pmc);
+>         }
+> -       mmcr[0] = 0;
+> +       mmcr->mmcr0 = 0;
+>         if (pmc_inuse & 1)
+> -               mmcr[0] = MMCR0_PMC1CE;
+> +               mmcr->mmcr0 = MMCR0_PMC1CE;
+>         if (pmc_inuse & 0xe)
+> -               mmcr[0] |= MMCR0_PMCjCE;
+> -       mmcr[1] = mmcr1;
+> -       mmcr[2] = mmcra;
+> +               mmcr->mmcr0 |= MMCR0_PMCjCE;
+> +       mmcr->mmcr1 = mmcr1;
+> +       mmcr->mmcra = mmcra;
+>         return 0;
+>  }
+>
+> @@ -457,11 +457,11 @@ static int p6_get_alternatives(u64 event, unsigned int flags, u64 alt[])
+>         return nalt;
+>  }
+>
+> -static void p6_disable_pmc(unsigned int pmc, unsigned long mmcr[])
+> +static void p6_disable_pmc(unsigned int pmc, struct mmcr_regs *mmcr)
+>  {
+>         /* Set PMCxSEL to 0 to disable PMCx */
+>         if (pmc <= 3)
+> -               mmcr[1] &= ~(0xffUL << MMCR1_PMCSEL_SH(pmc));
+> +               mmcr->mmcr1 &= ~(0xffUL << MMCR1_PMCSEL_SH(pmc));
+>  }
+>
+>  static int power6_generic_events[] = {
+> diff --git a/arch/powerpc/perf/power7-pmu.c b/arch/powerpc/perf/power7-pmu.c
+> index a137813..3152336 100644
+> --- a/arch/powerpc/perf/power7-pmu.c
+> +++ b/arch/powerpc/perf/power7-pmu.c
+> @@ -242,7 +242,8 @@ static int power7_marked_instr_event(u64 event)
+>  }
+>
+>  static int power7_compute_mmcr(u64 event[], int n_ev,
+> -                              unsigned int hwc[], unsigned long mmcr[], struct perf_event *pevents[])
+> +                              unsigned int hwc[], struct mmcr_regs *mmcr,
+> +                              struct perf_event *pevents[])
+>  {
+>         unsigned long mmcr1 = 0;
+>         unsigned long mmcra = MMCRA_SDAR_DCACHE_MISS | MMCRA_SDAR_ERAT_MISS;
+> @@ -298,20 +299,20 @@ static int power7_compute_mmcr(u64 event[], int n_ev,
+>         }
+>
+>         /* Return MMCRx values */
+> -       mmcr[0] = 0;
+> +       mmcr->mmcr0 = 0;
+>         if (pmc_inuse & 1)
+> -               mmcr[0] = MMCR0_PMC1CE;
+> +               mmcr->mmcr0 = MMCR0_PMC1CE;
+>         if (pmc_inuse & 0x3e)
+> -               mmcr[0] |= MMCR0_PMCjCE;
+> -       mmcr[1] = mmcr1;
+> -       mmcr[2] = mmcra;
+> +               mmcr->mmcr0 |= MMCR0_PMCjCE;
+> +       mmcr->mmcr1 = mmcr1;
+> +       mmcr->mmcra = mmcra;
+>         return 0;
+>  }
+>
+> -static void power7_disable_pmc(unsigned int pmc, unsigned long mmcr[])
+> +static void power7_disable_pmc(unsigned int pmc, struct mmcr_regs *mmcr)
+>  {
+>         if (pmc <= 3)
+> -               mmcr[1] &= ~(0xffUL << MMCR1_PMCSEL_SH(pmc));
+> +               mmcr->mmcr1 &= ~(0xffUL << MMCR1_PMCSEL_SH(pmc));
+>  }
+>
+>  static int power7_generic_events[] = {
+> diff --git a/arch/powerpc/perf/ppc970-pmu.c b/arch/powerpc/perf/ppc970-pmu.c
+> index 4035d93..89a90ab 100644
+> --- a/arch/powerpc/perf/ppc970-pmu.c
+> +++ b/arch/powerpc/perf/ppc970-pmu.c
+> @@ -253,7 +253,8 @@ static int p970_get_alternatives(u64 event, unsigned int flags, u64 alt[])
+>  }
+>
+>  static int p970_compute_mmcr(u64 event[], int n_ev,
+> -                            unsigned int hwc[], unsigned long mmcr[], struct perf_event *pevents[])
+> +                            unsigned int hwc[], struct mmcr_regs *mmcr,
+> +                            struct perf_event *pevents[])
+>  {
+>         unsigned long mmcr0 = 0, mmcr1 = 0, mmcra = 0;
+>         unsigned int pmc, unit, byte, psel;
+> @@ -393,27 +394,26 @@ static int p970_compute_mmcr(u64 event[], int n_ev,
+>         mmcra |= 0x2000;        /* mark only one IOP per PPC instruction */
+>
+>         /* Return MMCRx values */
+> -       mmcr[0] = mmcr0;
+> -       mmcr[1] = mmcr1;
+> -       mmcr[2] = mmcra;
+> +       mmcr->mmcr0 = mmcr0;
+> +       mmcr->mmcr1 = mmcr1;
+> +       mmcr->mmcra = mmcra;
+>         return 0;
+>  }
+>
+> -static void p970_disable_pmc(unsigned int pmc, unsigned long mmcr[])
+> +static void p970_disable_pmc(unsigned int pmc, struct mmcr_regs *mmcr)
+>  {
+> -       int shift, i;
+> +       int shift;
+>
+> +       /*
+> +        * Setting the PMCxSEL field to 0x08 disables PMC x.
+> +        */
+>         if (pmc <= 1) {
+>                 shift = MMCR0_PMC1SEL_SH - 7 * pmc;
+> -               i = 0;
+> +               mmcr->mmcr0 = (mmcr->mmcr0 & ~(0x1fUL << shift)) | (0x08UL << shift);
+>         } else {
+>                 shift = MMCR1_PMC3SEL_SH - 5 * (pmc - 2);
+> -               i = 1;
+> +               mmcr->mmcr1 = (mmcr->mmcr1 & ~(0x1fUL << shift)) | (0x08UL << shift);
+>         }
+> -       /*
+> -        * Setting the PMCxSEL field to 0x08 disables PMC x.
+> -        */
+> -       mmcr[i] = (mmcr[i] & ~(0x1fUL << shift)) | (0x08UL << shift);
+>  }
+>
+>  static int ppc970_generic_events[] = {
+> --
+> 1.8.3.1
+>
