@@ -2,90 +2,124 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15793228B42
-	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Jul 2020 23:28:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2CFC228B67
+	for <lists+kvm-ppc@lfdr.de>; Tue, 21 Jul 2020 23:31:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730488AbgGUV2v (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 21 Jul 2020 17:28:51 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31816 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726658AbgGUV2u (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Jul 2020 17:28:50 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06LL2wsa152507;
-        Tue, 21 Jul 2020 17:28:24 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 32e1vv3xnm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Jul 2020 17:28:24 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06LLA6KI024505;
-        Tue, 21 Jul 2020 21:28:22 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03fra.de.ibm.com with ESMTP id 32brq826kx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Jul 2020 21:28:22 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06LLSJ7230146928
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Jul 2020 21:28:19 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5257E11C050;
-        Tue, 21 Jul 2020 21:28:19 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EA3AB11C052;
-        Tue, 21 Jul 2020 21:28:16 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.163.39.1])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 21 Jul 2020 21:28:16 +0000 (GMT)
-Date:   Tue, 21 Jul 2020 14:28:13 -0700
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Laurent Dufour <ldufour@linux.ibm.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, mpe@ellerman.id.au, paulus@samba.org,
-        sukadev@linux.ibm.com, bauerman@linux.ibm.com,
-        bharata@linux.ibm.com, Paul Mackerras <paulus@ozlabs.org>
-Subject: Re: [PATCH v2 1/2] KVM: PPC: Book3S HV: move kvmppc_svm_page_out up
-Message-ID: <20200721212813.GF7339@oc0525413822.ibm.com>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <20200721104202.15727-1-ldufour@linux.ibm.com>
- <20200721104202.15727-2-ldufour@linux.ibm.com>
+        id S1731238AbgGUVbd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 21 Jul 2020 17:31:33 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:16107 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730974AbgGUVbc (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 21 Jul 2020 17:31:32 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5f175e750002>; Tue, 21 Jul 2020 14:30:29 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 21 Jul 2020 14:31:31 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Tue, 21 Jul 2020 14:31:31 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 21 Jul
+ 2020 21:31:25 +0000
+Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Tue, 21 Jul 2020 21:31:25 +0000
+Received: from rcampbell-dev.nvidia.com (Not Verified[10.110.48.66]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
+        id <B5f175ead0001>; Tue, 21 Jul 2020 14:31:25 -0700
+From:   Ralph Campbell <rcampbell@nvidia.com>
+To:     <linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>,
+        <nouveau@lists.freedesktop.org>, <kvm-ppc@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     Jerome Glisse <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>,
+        "Ben Skeggs" <bskeggs@redhat.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        "Ralph Campbell" <rcampbell@nvidia.com>
+Subject: [PATCH v3 0/5] mm/migrate: avoid device private invalidations
+Date:   Tue, 21 Jul 2020 14:31:14 -0700
+Message-ID: <20200721213119.32344-1-rcampbell@nvidia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200721104202.15727-2-ldufour@linux.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-21_15:2020-07-21,2020-07-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- spamscore=0 bulkscore=0 impostorscore=0 priorityscore=1501
- lowpriorityscore=0 mlxlogscore=871 malwarescore=0 clxscore=1011
- adultscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2007210135
+X-NVConfidentiality: public
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1595367029; bh=S6TSnAaZe1yneC9qg+vali1aI4hicYt4hljXvpfEYPc=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         MIME-Version:X-NVConfidentiality:Content-Transfer-Encoding:
+         Content-Type;
+        b=DnuBVmb4eDYGee/BzoLo3pnjgjneMSU/TSTsQmcQ9DAbiNQQpPFtY+zbjGwdGx2FF
+         wQ6Uie5n1usLkpeq4/h6ifVK6vhZghGtFt7gzWin8SCeBODjKeAvShGk2vXYxUCVOe
+         YPy7FXSBzYywTFkmYRzY/Mf2A+pRCCSw28133BMQTAYMJufABqRMzUNyGM+QA4MadI
+         3lrbbggcvIW9549w/6LetDLr5CS0Y/oxcvSS+Xw6f+zXsjvkvv7hn5hg4ry/LAzEst
+         lBF6Vstb7mTJefMpdEj61ilm2pL9jwuK6fgV8W22Nomolyn3Eh2Tuokdxb4C7/b5lL
+         1PhIiZU+SarUg==
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Jul 21, 2020 at 12:42:01PM +0200, Laurent Dufour wrote:
-> kvmppc_svm_page_out() will need to be called by kvmppc_uvmem_drop_pages()
-> so move it upper in this file.
-> 
-> Furthermore it will be interesting to call this function when already
-> holding the kvm->arch.uvmem_lock, so prefix the original function with __
-> and remove the locking in it, and introduce a wrapper which call that
-> function with the lock held.
-> 
-> There is no functional change.
+The goal for this series is to avoid device private memory TLB
+invalidations when migrating a range of addresses from system
+memory to device private memory and some of those pages have already
+been migrated. The approach taken is to introduce a new mmu notifier
+invalidation event type and use that in the device driver to skip
+invalidation callbacks from migrate_vma_setup(). The device driver is
+also then expected to handle device MMU invalidations as part of the
+migrate_vma_setup(), migrate_vma_pages(), migrate_vma_finalize() process.
+Note that this is opt-in. A device driver can simply invalidate its MMU
+in the mmu notifier callback and not handle MMU invalidations in the
+migration sequence.
 
-Reviewed-by: Ram Pai <linuxram@us.ibm.com>
+This series is based on Jason Gunthorpe's HMM tree (linux-5.8.0-rc4).
 
-> 
-> Cc: Ram Pai <linuxram@us.ibm.com>
-> Cc: Bharata B Rao <bharata@linux.ibm.com>
-> Cc: Paul Mackerras <paulus@ozlabs.org>
-> Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
-> ---
+Also, this replaces the need for the following two patches I sent:
+("mm: fix migrate_vma_setup() src_owner and normal pages")
+https://lore.kernel.org/linux-mm/20200622222008.9971-1-rcampbell@nvidia.com
+("nouveau: fix mixed normal and device private page migration")
+https://lore.kernel.org/lkml/20200622233854.10889-3-rcampbell@nvidia.com
 
-RP
+Bharata Rao, let me know if I can add your reviewed-by back since
+I made a fair number of changes to this version of the series.
+
+Changes in v3:
+Changed the direction field "dir" to a "flags" field and renamed
+  src_owner to pgmap_owner.
+Fixed a locking issue in nouveau for the migration invalidation.
+Added a HMM selftest test case to exercise the HMM test driver
+  invalidation changes.
+Removed reviewed-by Bharata B Rao since this version is moderately
+  changed.
+
+Changes in v2:
+Rebase to Jason Gunthorpe's HMM tree.
+Added reviewed-by from Bharata B Rao.
+Rename the mmu_notifier_range::data field to migrate_pgmap_owner as
+  suggested by Jason Gunthorpe.
+
+Ralph Campbell (5):
+  nouveau: fix storing invalid ptes
+  mm/migrate: add a flags parameter to migrate_vma
+  mm/notifier: add migration invalidation type
+  nouveau/svm: use the new migration invalidation
+  mm/hmm/test: use the new migration invalidation
+
+ arch/powerpc/kvm/book3s_hv_uvmem.c            |  4 ++-
+ drivers/gpu/drm/nouveau/nouveau_dmem.c        | 19 ++++++++---
+ drivers/gpu/drm/nouveau/nouveau_svm.c         | 21 +++++-------
+ drivers/gpu/drm/nouveau/nouveau_svm.h         | 13 ++++++-
+ .../drm/nouveau/nvkm/subdev/mmu/vmmgp100.c    | 13 ++++---
+ include/linux/migrate.h                       | 16 ++++++---
+ include/linux/mmu_notifier.h                  |  7 ++++
+ lib/test_hmm.c                                | 34 +++++++++++--------
+ mm/migrate.c                                  | 14 ++++++--
+ tools/testing/selftests/vm/hmm-tests.c        | 18 +++++++---
+ 10 files changed, 112 insertions(+), 47 deletions(-)
+
+--=20
+2.20.1
+
