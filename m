@@ -2,119 +2,95 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED55C2297B9
-	for <lists+kvm-ppc@lfdr.de>; Wed, 22 Jul 2020 13:51:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 211772297D2
+	for <lists+kvm-ppc@lfdr.de>; Wed, 22 Jul 2020 14:03:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726462AbgGVLvb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 22 Jul 2020 07:51:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37034 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726334AbgGVLvb (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 22 Jul 2020 07:51:31 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06MBXRFd125842;
-        Wed, 22 Jul 2020 07:51:21 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32e1yayggw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Jul 2020 07:51:21 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06MBYZiL129623;
-        Wed, 22 Jul 2020 07:51:21 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32e1yaygg0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Jul 2020 07:51:20 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06MBfPXb012436;
-        Wed, 22 Jul 2020 11:51:18 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 32brq7mybr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Jul 2020 11:51:18 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06MBpG3w56295454
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Jul 2020 11:51:16 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 711BC5204F;
-        Wed, 22 Jul 2020 11:51:16 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.102.3.172])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 2EFB35204E;
-        Wed, 22 Jul 2020 11:51:14 +0000 (GMT)
-Date:   Wed, 22 Jul 2020 17:21:11 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     Ralph Campbell <rcampbell@nvidia.com>
-Cc:     linux-rdma@vger.kernel.org, linux-mm@kvack.org,
-        nouveau@lists.freedesktop.org, kvm-ppc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jerome Glisse <jglisse@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Ben Skeggs <bskeggs@redhat.com>
-Subject: Re: [PATCH v3 2/5] mm/migrate: add a flags parameter to migrate_vma
-Message-ID: <20200722115111.GR7902@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <20200721213119.32344-1-rcampbell@nvidia.com>
- <20200721213119.32344-3-rcampbell@nvidia.com>
+        id S1726334AbgGVMDZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 22 Jul 2020 08:03:25 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:47687 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726161AbgGVMDZ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 22 Jul 2020 08:03:25 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4BBYyM02F6z9sPf;
+        Wed, 22 Jul 2020 22:03:22 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1595419403;
+        bh=ZYxAwsh+3V5ye+dbkADhu2jHGiIvpQV3pkw5+1n3oQ4=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=pbJKuaAbmKMnTeSJtpm/DmRD0ObL6TwDoH5YKVdk177dIMEO3tiudGi2nfK4T1nGC
+         IEGLosv3KFMK582kcIoHGZqOsxpq5V3/V5oTOHNL4VtyaEflh9c1+1O2OuQqi+ShRA
+         1dzO0TPYEYCY2av4+fsq9esViJWyOfQCgEIa5yrWoBiui7Haa8VR16wV3Lg0tmOUts
+         o8KQyfOsD11S8kQ2m+UsCIjtXAYzZ5tm8MItxsKIPAgCT3QZuKwVwNxi6HCk3iS1fe
+         SOpwGxc75kco5+vnZgaymlIE4J7sKjzeMd/N15WclBfP+E/vOZN+lZzvtpDPFLGmya
+         rS+fUezpswXXQ==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Jordan Niethe <jniethe5@gmail.com>,
+        Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+Cc:     Gautham R Shenoy <ego@linux.vnet.ibm.com>, mikey@neuling.org,
+        maddy@linux.vnet.ibm.com, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, svaidyan@in.ibm.com, acme@kernel.org,
+        jolsa@kernel.org, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [v3 04/15] powerpc/perf: Add support for ISA3.1 PMU SPRs
+In-Reply-To: <CACzsE9r9fy22hScRm7yz5OeZH9jXA+97hEfAOo-Nk_EPwW-_Dw@mail.gmail.com>
+References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com> <1594996707-3727-5-git-send-email-atrajeev@linux.vnet.ibm.com> <CACzsE9r9fy22hScRm7yz5OeZH9jXA+97hEfAOo-Nk_EPwW-_Dw@mail.gmail.com>
+Date:   Wed, 22 Jul 2020 22:03:19 +1000
+Message-ID: <87d04nrc3c.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200721213119.32344-3-rcampbell@nvidia.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-22_05:2020-07-22,2020-07-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 suspectscore=1 bulkscore=0 adultscore=0 clxscore=1015
- priorityscore=1501 mlxscore=0 mlxlogscore=989 phishscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007220089
+Content-Type: text/plain
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Jul 21, 2020 at 02:31:16PM -0700, Ralph Campbell wrote:
-> The src_owner field in struct migrate_vma is being used for two purposes,
-> it acts as a selection filter for which types of pages are to be migrated
-> and it identifies device private pages owned by the caller. Split this
-> into separate parameters so the src_owner field can be used just to
-> identify device private pages owned by the caller of migrate_vma_setup().
-> Rename the src_owner field to pgmap_owner to reflect it is now used only
-> to identify which device private pages to migrate.
-> 
-> Signed-off-by: Ralph Campbell <rcampbell@nvidia.com>
-> ---
->  arch/powerpc/kvm/book3s_hv_uvmem.c     |  4 +++-
->  drivers/gpu/drm/nouveau/nouveau_dmem.c |  4 +++-
->  include/linux/migrate.h                | 13 +++++++++----
->  lib/test_hmm.c                         |  6 ++++--
->  mm/migrate.c                           |  6 ++++--
->  5 files changed, 23 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> index 09d8119024db..6850bd04bcb9 100644
-> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> @@ -400,6 +400,7 @@ kvmppc_svm_page_in(struct vm_area_struct *vma, unsigned long start,
->  	mig.end = end;
->  	mig.src = &src_pfn;
->  	mig.dst = &dst_pfn;
-> +	mig.flags = MIGRATE_VMA_SELECT_SYSTEM;
->  
->  	/*
->  	 * We come here with mmap_lock write lock held just for
-> @@ -577,7 +578,8 @@ kvmppc_svm_page_out(struct vm_area_struct *vma, unsigned long start,
->  	mig.end = end;
->  	mig.src = &src_pfn;
->  	mig.dst = &dst_pfn;
-> -	mig.src_owner = &kvmppc_uvmem_pgmap;
-> +	mig.pgmap_owner = &kvmppc_uvmem_pgmap;
-> +	mig.flags = MIGRATE_VMA_SELECT_DEVICE_PRIVATE;
->  
->  	mutex_lock(&kvm->arch.uvmem_lock);
+Jordan Niethe <jniethe5@gmail.com> writes:
+> On Sat, Jul 18, 2020 at 1:02 AM Athira Rajeev <atrajeev@linux.vnet.ibm.com> wrote:
+>> From: Madhavan Srinivasan <maddy@linux.ibm.com>
+>>
+>> PowerISA v3.1 includes new performance monitoring unit(PMU)
+>> special purpose registers (SPRs). They are
+...
+>>
+>> diff --git a/arch/powerpc/include/asm/perf_event_server.h b/arch/powerpc/include/asm/perf_event_server.h
+>> index 14b8dc1..832450a 100644
+>> --- a/arch/powerpc/include/asm/perf_event_server.h
+>> +++ b/arch/powerpc/include/asm/perf_event_server.h
+>> @@ -75,6 +76,7 @@ struct power_pmu {
+>>  #define PPMU_HAS_SIER          0x00000040 /* Has SIER */
+>>  #define PPMU_ARCH_207S         0x00000080 /* PMC is architecture v2.07S */
+>>  #define PPMU_NO_SIAR           0x00000100 /* Do not use SIAR */
+>> +#define PPMU_ARCH_310S         0x00000200 /* Has MMCR3, SIER2 and SIER3 */
 
-For the kvmppc changes above,
-Reviewed-by: Bharata B Rao <bharata@linux.ibm.com>
+> We elsewhere have CPU_FTR_ARCH_31, so should this be PPMU_ARCH_31S to
+> be consistent.
+
+The "S" is no longer needed as there's no Book S vs Book E distinction
+in ISA v3.1.
+
+So I changed it to PPMU_ARCH_31.
+
+>> diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-book3s.c
+>> index f4d07b5..ca32fc0 100644
+>> --- a/arch/powerpc/perf/core-book3s.c
+>> +++ b/arch/powerpc/perf/core-book3s.c
+>> @@ -581,6 +589,11 @@ static void ebb_switch_out(unsigned long mmcr0)
+>>         current->thread.sdar  = mfspr(SPRN_SDAR);
+>>         current->thread.mmcr0 = mmcr0 & MMCR0_USER_MASK;
+>>         current->thread.mmcr2 = mfspr(SPRN_MMCR2) & MMCR2_USER_MASK;
+>> +       if (ppmu->flags & PPMU_ARCH_310S) {
+>> +               current->thread.mmcr3 = mfspr(SPRN_MMCR3);
+
+> Like MMCR0_USER_MASK and MMCR2_USER_MASK do we need a MMCR3_USER_MASK
+> here, or is there no need?
+
+mmcr0 and mmcr2 are visible via ptrace, so masking them here means we
+don't expose any bits to userspace via ptrace that aren't also visible
+by reading the register.
+
+So at least while mmcr3 is not exposed via ptrace it's safe to not mask
+it, if there are even any sensitive bits in it.
+
+cheers
