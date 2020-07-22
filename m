@@ -2,179 +2,182 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB51322959B
-	for <lists+kvm-ppc@lfdr.de>; Wed, 22 Jul 2020 12:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AA0D229660
+	for <lists+kvm-ppc@lfdr.de>; Wed, 22 Jul 2020 12:39:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728856AbgGVKBq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 22 Jul 2020 06:01:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64932 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728642AbgGVKBq (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 22 Jul 2020 06:01:46 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06MA1ESI007524;
-        Wed, 22 Jul 2020 06:01:32 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 32e1wkvgs8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Jul 2020 06:01:32 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06MA0hUe015784;
-        Wed, 22 Jul 2020 10:01:29 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 32brq84vhn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Jul 2020 10:01:29 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06MA03w253936472
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Jul 2020 10:00:03 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 00EF8A405C;
-        Wed, 22 Jul 2020 10:01:27 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BDBDCA405B;
-        Wed, 22 Jul 2020 10:01:24 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.102.3.172])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 22 Jul 2020 10:01:24 +0000 (GMT)
-Date:   Wed, 22 Jul 2020 15:31:22 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     Ram Pai <linuxram@us.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
-        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
-        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
-        sathnaga@linux.vnet.ibm.com
-Subject: Re: [v4 5/5] KVM: PPC: Book3S HV: migrate hot plugged memory
-Message-ID: <20200722100122.GQ7902@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <1594972827-13928-1-git-send-email-linuxram@us.ibm.com>
- <1594972827-13928-6-git-send-email-linuxram@us.ibm.com>
+        id S1725847AbgGVKjH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 22 Jul 2020 06:39:07 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:41063 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725878AbgGVKjG (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 22 Jul 2020 06:39:06 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4BBX5307cTz9sRN;
+        Wed, 22 Jul 2020 20:39:02 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1595414343;
+        bh=jtBj3K1Yjgzf7uVcLOWUMyl0qabi63I82NgtnW9MR2s=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=fW7DOEJLjm0fCgoqd5G1p9Ml9LTgOwWlJQH8xIUKYlAAXUO+AfP52S3THPvkp/pF1
+         cn/rg24bel821tQB5LsXvVeR5X0tl7aiQhK+8a/OAJpbIrr0i0lfOknmc3SBPEHMOZ
+         myhA4Z6Z2DX2PiBaHLayV649vNeKBk1zHYshz3dO1WMmn6stFTX66kEA5O0/YDqLNa
+         2EKNUUdk0BvhYpehO+ZGGFP0S/L2d2YldC3j+66milwlUuHWbGkjqAJGP8XIbYdJkH
+         G0Gz/Q2nke6qoFhUVZchjdXLT0zAZNyFtOus7xzA2V53+GY3bQj3fAwNmKndgWzVbF
+         7pPijz409EnUg==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Athira Rajeev <atrajeev@linux.vnet.ibm.com>,
+        Jordan Niethe <jniethe5@gmail.com>
+Cc:     Gautham R Shenoy <ego@linux.vnet.ibm.com>,
+        Michael Neuling <mikey@neuling.org>, maddy@linux.vnet.ibm.com,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, svaidyan@in.ibm.com,
+        acme@kernel.org, jolsa@kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [v3 07/15] powerpc/perf: Add power10_feat to dt_cpu_ftrs
+In-Reply-To: <9A4E06A2-5686-4C85-B2F7-0904F195B58A@linux.vnet.ibm.com>
+References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com> <1594996707-3727-8-git-send-email-atrajeev@linux.vnet.ibm.com> <CACzsE9oBw1ZrJLqOAg1QqPrQgSoVbEdPh_ax7mU_kcWNyfyAcg@mail.gmail.com> <9A4E06A2-5686-4C85-B2F7-0904F195B58A@linux.vnet.ibm.com>
+Date:   Wed, 22 Jul 2020 20:39:00 +1000
+Message-ID: <87ft9jrfzv.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1594972827-13928-6-git-send-email-linuxram@us.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-22_04:2020-07-22,2020-07-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- mlxlogscore=999 impostorscore=0 mlxscore=0 suspectscore=5 bulkscore=0
- clxscore=1015 spamscore=0 lowpriorityscore=0 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007220072
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Jul 17, 2020 at 01:00:27AM -0700, Ram Pai wrote:
-> From: Laurent Dufour <ldufour@linux.ibm.com>
-> 
-> When a memory slot is hot plugged to a SVM, PFNs associated with the
-> GFNs in that slot must be migrated to secure-PFNs, aka device-PFNs.
-> 
-> Call kvmppc_uv_migrate_mem_slot() to accomplish this.
-> Disable page-merge for all pages in the memory slot.
-> 
-> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-> [rearranged the code, and modified the commit log]
-> Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
-> ---
->  arch/powerpc/include/asm/kvm_book3s_uvmem.h | 10 ++++++++++
->  arch/powerpc/kvm/book3s_hv.c                | 10 ++--------
->  arch/powerpc/kvm/book3s_hv_uvmem.c          | 22 ++++++++++++++++++++++
->  3 files changed, 34 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/powerpc/include/asm/kvm_book3s_uvmem.h b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-> index f229ab5..6f7da00 100644
-> --- a/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-> +++ b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-> @@ -25,6 +25,9 @@ void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
->  			     struct kvm *kvm, bool skip_page_out);
->  int kvmppc_uv_migrate_mem_slot(struct kvm *kvm,
->  			const struct kvm_memory_slot *memslot);
-> +void kvmppc_memslot_create(struct kvm *kvm, const struct kvm_memory_slot *new);
-> +void kvmppc_memslot_delete(struct kvm *kvm, const struct kvm_memory_slot *old);
+Athira Rajeev <atrajeev@linux.vnet.ibm.com> writes:
+>> On 22-Jul-2020, at 10:11 AM, Jordan Niethe <jniethe5@gmail.com> wrote:
+>>=20
+>> On Sat, Jul 18, 2020 at 1:13 AM Athira Rajeev
+>> <atrajeev@linux.vnet.ibm.com <mailto:atrajeev@linux.vnet.ibm.com>> wrote:
+>>>=20
+>>> From: Madhavan Srinivasan <maddy@linux.ibm.com>
+>>>=20
+>>> Add power10 feature function to dt_cpu_ftrs.c along
+>>> with a power10 specific init() to initialize pmu sprs,
+>>> sets the oprofile_cpu_type and cpu_features. This will
+>>> enable performance monitoring unit(PMU) for Power10
+>>> in CPU features with "performance-monitor-power10".
+>>>=20
+>>> For PowerISA v3.1, BHRB disable is controlled via Monitor Mode
+>>> Control Register A (MMCRA) bit, namely "BHRB Recording Disable
+>>> (BHRBRD)". This patch initializes MMCRA BHRBRD to disable BHRB
+>>> feature at boot for power10.
+>>>=20
+>>> Signed-off-by: Madhavan Srinivasan <maddy@linux.ibm.com>
+>>> ---
+>>> arch/powerpc/include/asm/reg.h        |  3 +++
+>>> arch/powerpc/kernel/cpu_setup_power.S |  8 ++++++++
+>>> arch/powerpc/kernel/dt_cpu_ftrs.c     | 26 ++++++++++++++++++++++++++
+>>> 3 files changed, 37 insertions(+)
+>>>=20
+>>> diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/=
+reg.h
+>>> index 21a1b2d..900ada1 100644
+>>> --- a/arch/powerpc/include/asm/reg.h
+>>> +++ b/arch/powerpc/include/asm/reg.h
+>>> @@ -1068,6 +1068,9 @@
+>>> #define MMCR0_PMC2_LOADMISSTIME        0x5
+>>> #endif
+>>>=20
+>>> +/* BHRB disable bit for PowerISA v3.10 */
+>>> +#define MMCRA_BHRB_DISABLE     0x0000002000000000
+>> Shouldn't this go under SPRN_MMCRA with the other MMCRA_*.
+>
+>
+> Hi Jordan
+>
+> Ok, the definition of MMCRA is under #ifdef for 64 bit .  if I move defin=
+ition of MMCRA_BHRB_DISABLE along with other SPR's, I also
+> need to define this for 32-bit to satisfy core-book3s to compile as below:
+>
+> diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/re=
+g.h
+> index 900ada10762c..7e271657b412 100644
+> --- a/arch/powerpc/include/asm/reg.h
+> +++ b/arch/powerpc/include/asm/reg.h
+> @@ -888,6 +888,8 @@
+>  #define   MMCRA_SLOT   0x07000000UL /* SLOT bits (37-39) */
+>  #define   MMCRA_SLOT_SHIFT     24
+>  #define   MMCRA_SAMPLE_ENABLE 0x00000001UL /* enable sampling */
+> +/* BHRB disable bit for PowerISA v3.10 */
+> +#define   MMCRA_BHRB_DISABLE  0x0000002000000000
 
-The names look a bit generic, but these functions are specific
-to secure guests. May be rename them to kvmppc_uvmem_memslot_[create/delele]?
+I changed it to:
 
-> +
->  #else
->  static inline int kvmppc_uvmem_init(void)
->  {
-> @@ -84,5 +87,12 @@ static inline int kvmppc_send_page_to_uv(struct kvm *kvm, unsigned long gfn)
->  static inline void
->  kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
->  			struct kvm *kvm, bool skip_page_out) { }
-> +
-> +static inline void  kvmppc_memslot_create(struct kvm *kvm,
-> +		const struct kvm_memory_slot *new) { }
-> +
-> +static inline void  kvmppc_memslot_delete(struct kvm *kvm,
-> +		const struct kvm_memory_slot *old) { }
-> +
->  #endif /* CONFIG_PPC_UV */
->  #endif /* __ASM_KVM_BOOK3S_UVMEM_H__ */
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index d331b46..bf3be3b 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -4515,16 +4515,10 @@ static void kvmppc_core_commit_memory_region_hv(struct kvm *kvm,
->  
->  	switch (change) {
->  	case KVM_MR_CREATE:
-> -		if (kvmppc_uvmem_slot_init(kvm, new))
-> -			return;
-> -		uv_register_mem_slot(kvm->arch.lpid,
-> -				     new->base_gfn << PAGE_SHIFT,
-> -				     new->npages * PAGE_SIZE,
-> -				     0, new->id);
-> +		kvmppc_memslot_create(kvm, new);
->  		break;
->  	case KVM_MR_DELETE:
-> -		uv_unregister_mem_slot(kvm->arch.lpid, old->id);
-> -		kvmppc_uvmem_slot_free(kvm, old);
-> +		kvmppc_memslot_delete(kvm, old);
->  		break;
->  	default:
->  		/* TODO: Handle KVM_MR_MOVE */
-> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> index a206984..a2b4d25 100644
-> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> @@ -1089,6 +1089,28 @@ int kvmppc_send_page_to_uv(struct kvm *kvm, unsigned long gfn)
->  	return (ret == U_SUCCESS) ? RESUME_GUEST : -EFAULT;
->  }
->  
-> +void kvmppc_memslot_create(struct kvm *kvm, const struct kvm_memory_slot *new)
-> +{
-> +	if (kvmppc_uvmem_slot_init(kvm, new))
-> +		return;
-> +
-> +	if (kvmppc_memslot_page_merge(kvm, new, false))
-> +		return;
-> +
-> +	if (uv_register_mem_slot(kvm->arch.lpid, new->base_gfn << PAGE_SHIFT,
-> +			new->npages * PAGE_SIZE, 0, new->id))
-> +		return;
-> +
-> +	kvmppc_uv_migrate_mem_slot(kvm, new);
+#define   MMCRA_BHRB_DISABLE  0x2000000000UL // BHRB disable bit for ISA v3=
+.1
 
-Quite a few things can return failure here including
-kvmppc_uv_migrate_mem_slot() and we are ignoring all of those.
-I am wondering if this should be called from prepare_memory_region callback
-instead of commit_memory_region. In the prepare phase, we have a way
-to back out in case of error. Can you check if moving this call to
-prepare callback is feasible?
+>>> diff --git a/arch/powerpc/kernel/cpu_setup_power.S b/arch/powerpc/kerne=
+l/cpu_setup_power.S
+>>> index efdcfa7..b8e0d1e 100644
+>>> --- a/arch/powerpc/kernel/cpu_setup_power.S
+>>> +++ b/arch/powerpc/kernel/cpu_setup_power.S
+>>> @@ -94,6 +94,7 @@ _GLOBAL(__restore_cpu_power8)
+>>> _GLOBAL(__setup_cpu_power10)
+>>>        mflr    r11
+>>>        bl      __init_FSCR_power10
+>>> +       bl      __init_PMU_ISA31
+>> So we set MMCRA here but then aren't we still going to call __init_PMU
+>> which will overwrite that?
+>> Would this setting MMCRA also need to be handled in __restore_cpu_power1=
+0?
+>
+> Thanks for this nice catch !  When I rebased code initial phase, we didn=
+=E2=80=99t had power10 part filled in.
+> It was a miss from my side in adding PMu init functions and thanks for po=
+inting this out.=20
+> Below patch will call __init_PMU functions in setup and restore. Please c=
+heck if this looks good
 
-In the other case in 1/5, the code issues ksm unmerge request on error,
-but not here.
+Actually those changes should be in a separate patch.
 
-Also check if the code for 1st three calls can be shared with similar
-code in 1/5.
+This one is wiring up DT CPU features, the cpu setup routines are not
+used by DT CPU features.
 
-Regards,
-Bharata.
+So please send a new patch I can insert into the series that adds the
+cpu_setup_power.S changes.
+
+cheers
+
+> --
+> diff --git a/arch/powerpc/kernel/cpu_setup_power.S b/arch/powerpc/kernel/=
+cpu_setup_power.S
+> index efdcfa714106..e672a6c5fd7c 100644
+> --- a/arch/powerpc/kernel/cpu_setup_power.S
+> +++ b/arch/powerpc/kernel/cpu_setup_power.S
+> @@ -94,6 +94,9 @@ _GLOBAL(__restore_cpu_power8)
+>  _GLOBAL(__setup_cpu_power10)
+>  	mflr	r11
+>  	bl	__init_FSCR_power10
+> +	bl	__init_PMU
+> +	bl	__init_PMU_ISA31
+> +	bl	__init_PMU_HV
+>  	b	1f
+>=20=20
+>  _GLOBAL(__setup_cpu_power9)
+> @@ -124,6 +127,9 @@ _GLOBAL(__setup_cpu_power9)
+>  _GLOBAL(__restore_cpu_power10)
+>  	mflr	r11
+>  	bl	__init_FSCR_power10
+> +	bl	__init_PMU
+> +	bl	__init_PMU_ISA31
+> +	bl	__init_PMU_HV
+>  	b	1f
+>=20=20
+>  _GLOBAL(__restore_cpu_power9)
+> @@ -233,3 +239,10 @@ __init_PMU_ISA207:
+>  	li	r5,0
+>  	mtspr	SPRN_MMCRS,r5
+>  	blr
+> +
+> +__init_PMU_ISA31:
+> +	li	r5,0
+> +	mtspr	SPRN_MMCR3,r5
+> +	LOAD_REG_IMMEDIATE(r5, MMCRA_BHRB_DISABLE)
+> +	mtspr	SPRN_MMCRA,r5
+> +	blr
+>
