@@ -2,99 +2,208 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D7A77229285
-	for <lists+kvm-ppc@lfdr.de>; Wed, 22 Jul 2020 09:50:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD5F522940D
+	for <lists+kvm-ppc@lfdr.de>; Wed, 22 Jul 2020 10:52:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726253AbgGVHuA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 22 Jul 2020 03:50:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53096 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726157AbgGVHt7 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 22 Jul 2020 03:49:59 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06M7VUIJ143166;
-        Wed, 22 Jul 2020 03:49:40 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32e1x7rwn1-1
+        id S1726807AbgGVIwu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 22 Jul 2020 04:52:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56656 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726254AbgGVIwt (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 22 Jul 2020 04:52:49 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06M8WucU185680;
+        Wed, 22 Jul 2020 04:52:39 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32dn6yhgxn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Jul 2020 03:49:39 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06M7kIaX032222;
-        Wed, 22 Jul 2020 07:49:38 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 32brq82fgb-1
+        Wed, 22 Jul 2020 04:52:38 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06M8pQBq014533;
+        Wed, 22 Jul 2020 08:52:36 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 32brq7mt77-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 22 Jul 2020 07:49:38 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06M7nZGD31326476
+        Wed, 22 Jul 2020 08:52:36 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06M8qX8E32899554
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Jul 2020 07:49:35 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2DC765204E;
-        Wed, 22 Jul 2020 07:49:35 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.211.146.165])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 299A452052;
-        Wed, 22 Jul 2020 07:49:31 +0000 (GMT)
-Date:   Wed, 22 Jul 2020 00:49:29 -0700
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>
+        Wed, 22 Jul 2020 08:52:33 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 30254AE053;
+        Wed, 22 Jul 2020 08:52:33 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E813DAE059;
+        Wed, 22 Jul 2020 08:52:30 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.102.3.172])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 22 Jul 2020 08:52:30 +0000 (GMT)
+Date:   Wed, 22 Jul 2020 14:22:28 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     Ram Pai <linuxram@us.ibm.com>
 Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        paulus@ozlabs.org, benh@kernel.crashing.org, bharata@linux.ibm.com,
-        sukadev@linux.vnet.ibm.com, ldufour@linux.ibm.com,
-        bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
-        sathnaga@linux.vnet.ibm.com, aik@ozlabs.ru
-Message-ID: <20200722074929.GI7339@oc0525413822.ibm.com>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <1594888333-9370-1-git-send-email-linuxram@us.ibm.com>
- <875zags3qp.fsf@mpe.ellerman.id.au>
+        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
+        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
+        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
+        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
+        sathnaga@linux.vnet.ibm.com
+Subject: Re: [v4 1/5] KVM: PPC: Book3S HV: Disable page merging in
+ H_SVM_INIT_START
+Message-ID: <20200722085228.GP7902@in.ibm.com>
+Reply-To: bharata@linux.ibm.com
+References: <1594972827-13928-1-git-send-email-linuxram@us.ibm.com>
+ <1594972827-13928-2-git-send-email-linuxram@us.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <875zags3qp.fsf@mpe.ellerman.id.au>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <1594972827-13928-2-git-send-email-linuxram@us.ibm.com>
 X-TM-AS-GCONF: 00
-Subject: RE: [RFC PATCH] powerpc/pseries/svm: capture instruction faulting on MMIO
- access, in sprg0 register
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-07-22_03:2020-07-22,2020-07-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- impostorscore=0 spamscore=0 adultscore=0 mlxscore=0 lowpriorityscore=0
- clxscore=1015 bulkscore=0 suspectscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007220052
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ impostorscore=0 mlxscore=0 malwarescore=0 clxscore=1015 bulkscore=0
+ priorityscore=1501 lowpriorityscore=0 mlxlogscore=969 adultscore=0
+ suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007220065
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 12:06:06PM +1000, Michael Ellerman wrote:
-> Ram Pai <linuxram@us.ibm.com> writes:
-> > An instruction accessing a mmio address, generates a HDSI fault.  This fault is
-> > appropriately handled by the Hypervisor.  However in the case of secureVMs, the
-> > fault is delivered to the ultravisor.
-> >
-> > Unfortunately the Ultravisor has no correct-way to fetch the faulting
-> > instruction. The PEF architecture does not allow Ultravisor to enable MMU
-> > translation. Walking the two level page table to read the instruction can race
-> > with other vcpus modifying the SVM's process scoped page table.
+On Fri, Jul 17, 2020 at 01:00:23AM -0700, Ram Pai wrote:
+> Page-merging of pages in memory-slots associated with a Secure VM,
+> is disabled in H_SVM_PAGE_IN handler.
 > 
-> You're trying to read the guest's kernel text IIUC, that mapping should
-> be stable. Possibly permissions on it could change over time, but the
-> virtual -> real mapping should not.
-
-Actually the code does not capture the address of the instruction in the
-sprg0 register. It captures the instruction itself. So should the mapping
-matter?
-
+> This operation should have been done much earlier; the moment the VM
+> is initiated for secure-transition. Delaying this operation, increases
+> the probability for those pages to acquire new references , making it
+> impossible to migrate those pages.
 > 
-> > This problem can be correctly solved with some help from the kernel.
-> >
-> > Capture the faulting instruction in SPRG0 register, before executing the
-> > faulting instruction. This enables the ultravisor to easily procure the
-> > faulting instruction and emulate it.
+> Disable page-migration in H_SVM_INIT_START handling.
 > 
-> This is not something I'm going to merge. Sorry.
+> Signed-off-by: Ram Pai <linuxram@us.ibm.com>
 
-Ok. Will consider other approaches.
+Reviewed-by: Bharata B Rao <bharata@linux.ibm.com>
 
-RP
+with a few observations below...
+
+> ---
+>  Documentation/powerpc/ultravisor.rst |  1 +
+>  arch/powerpc/kvm/book3s_hv_uvmem.c   | 98 +++++++++++++++++++++++++++---------
+>  2 files changed, 76 insertions(+), 23 deletions(-)
+> 
+> diff --git a/Documentation/powerpc/ultravisor.rst b/Documentation/powerpc/ultravisor.rst
+> index df136c8..a1c8c37 100644
+> --- a/Documentation/powerpc/ultravisor.rst
+> +++ b/Documentation/powerpc/ultravisor.rst
+> @@ -895,6 +895,7 @@ Return values
+>      One of the following values:
+>  
+>  	* H_SUCCESS	 on success.
+> +        * H_STATE        if the VM is not in a position to switch to secure.
+>  
+>  Description
+>  ~~~~~~~~~~~
+> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> index e6f76bc..0baa293 100644
+> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> @@ -211,6 +211,65 @@ static bool kvmppc_gfn_is_uvmem_pfn(unsigned long gfn, struct kvm *kvm,
+>  	return false;
+>  }
+>  
+> +static int kvmppc_memslot_page_merge(struct kvm *kvm,
+> +		struct kvm_memory_slot *memslot, bool merge)
+> +{
+> +	unsigned long gfn = memslot->base_gfn;
+> +	unsigned long end, start = gfn_to_hva(kvm, gfn);
+> +	int ret = 0;
+> +	struct vm_area_struct *vma;
+> +	int merge_flag = (merge) ? MADV_MERGEABLE : MADV_UNMERGEABLE;
+> +
+> +	if (kvm_is_error_hva(start))
+> +		return H_STATE;
+> +
+> +	end = start + (memslot->npages << PAGE_SHIFT);
+> +
+> +	mmap_write_lock(kvm->mm);
+> +	do {
+> +		vma = find_vma_intersection(kvm->mm, start, end);
+> +		if (!vma) {
+> +			ret = H_STATE;
+> +			break;
+> +		}
+> +		ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
+> +			  merge_flag, &vma->vm_flags);
+> +		if (ret) {
+> +			ret = H_STATE;
+> +			break;
+> +		}
+> +		start = vma->vm_end + 1;
+
+This should be start = vma->vm_end I believe.
+
+> +	} while (end > vma->vm_end);
+> +
+> +	mmap_write_unlock(kvm->mm);
+> +	return ret;
+> +}
+> +
+> +static int __kvmppc_page_merge(struct kvm *kvm, bool merge)
+> +{
+> +	struct kvm_memslots *slots;
+> +	struct kvm_memory_slot *memslot;
+> +	int ret = 0;
+> +
+> +	slots = kvm_memslots(kvm);
+> +	kvm_for_each_memslot(memslot, slots) {
+> +		ret = kvmppc_memslot_page_merge(kvm, memslot, merge);
+> +		if (ret)
+> +			break;
+> +	}
+> +	return ret;
+> +}
+
+You walk through all the slots here to issue kvm_madvise, but...
+
+> +
+> +static inline int kvmppc_disable_page_merge(struct kvm *kvm)
+> +{
+> +	return __kvmppc_page_merge(kvm, false);
+> +}
+> +
+> +static inline int kvmppc_enable_page_merge(struct kvm *kvm)
+> +{
+> +	return __kvmppc_page_merge(kvm, true);
+> +}
+> +
+>  unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>  {
+>  	struct kvm_memslots *slots;
+> @@ -232,11 +291,18 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
+>  		return H_AUTHORITY;
+>  
+>  	srcu_idx = srcu_read_lock(&kvm->srcu);
+> +
+> +	/* disable page-merging for all memslot */
+> +	ret = kvmppc_disable_page_merge(kvm);
+> +	if (ret)
+> +		goto out;
+> +
+> +	/* register the memslot */
+>  	slots = kvm_memslots(kvm);
+>  	kvm_for_each_memslot(memslot, slots) {
+
+... you are walking thro' the same set of slots here anyway. I think
+it makes sense to issue merge advices from here itself. That will
+help you to share code with kvmppc_memslot_create() in 5/5.
+
+All the below 3 calls are common to both the code paths, I think
+they can be carved out into a separate function if you prefer.
+
+kvmppc_uvmem_slot_init
+kvmppc_memslot_page_merge
+uv_register_mem_slot
+
+Regards,
+Bharata.
