@@ -2,97 +2,76 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A9C9228F6D
-	for <lists+kvm-ppc@lfdr.de>; Wed, 22 Jul 2020 06:54:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83413228F7E
+	for <lists+kvm-ppc@lfdr.de>; Wed, 22 Jul 2020 07:02:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726899AbgGVEyx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 22 Jul 2020 00:54:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47506 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbgGVEyx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 22 Jul 2020 00:54:53 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FBE7C061794;
-        Tue, 21 Jul 2020 21:54:53 -0700 (PDT)
+        id S1726253AbgGVFCi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 22 Jul 2020 01:02:38 -0400
+Received: from ozlabs.org ([203.11.71.1]:44525 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726147AbgGVFCi (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 22 Jul 2020 01:02:38 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4BBNRv6j1qz9sR4; Wed, 22 Jul 2020 14:54:51 +1000 (AEST)
+        id 4BBNcr48VYz9sSt; Wed, 22 Jul 2020 15:02:36 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1595393691; bh=SPr8+lQ/5tRFTDOXTAmNurdJdDePVRoXfmN5P09ctLw=;
+        t=1595394156; bh=YtTRfCV4UahyLx9Af7pCCXJP0N0KNpM91guqaVdDXQc=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=B53OnyDOFtochptnZj8D7Rr+5yr9+k3vXB6P84hQJkMpACKGcASdubZYp6mAWYi6i
-         TB/A47YLeKWbGnAEkuxJmztAZNsSJI50GkrTDTPjxU77jflAo1yFtuq5nSmtfJfJwE
-         c+bwiwGYGkpeewoAnostK4rC5NnL3TMOpPKqnAO2bNFy3O8WtE1SHWAoeyU4daPNbM
-         SYL8kW8BWG8wwcGJ1vy8agxkiqiFSJPLkTBF8zVhFIXoFIiphGsjvj/7mKFAXj8Ddl
-         2SfHojlzZYFBCWxRwSWVbu4ksvjKZ0D+rNRcqnjto9z5O4U4MigCogrw8xnIkPh+o6
-         Wd4vvmk9noaGw==
-Date:   Wed, 22 Jul 2020 14:54:48 +1000
+        b=LuLH3ggsM3xwahl7ZiSsX9oFJRX5yuR2rs95boy0b/VEmM5uv7WAPLe0YCwUjsmyg
+         Gc4M0C6UTeVY/mWM8YN0SzosJEf1HX6ovVos38OPQmtj+TPgxLCE76N0nsE3xfEmib
+         SxwYzRrK4gPu9Xk9NdlJMXNOGooqPxZiqMCYAzlw7NVA5WIMSrggqfquvC56UOny1C
+         CA8S/gwWo5ALj8KW2/+X8FcAPkKgEYHQ+7+v+44FHkKI/uopHf1Y2HE98OiybQjcdf
+         1ewhngXHg1iVwpeSqc3iDsmc6RW+3clDpp9GMeZ9+6D8WrMSOzBsgF59pDi3M95HVa
+         GUOm/hlnoIkfQ==
+Date:   Wed, 22 Jul 2020 15:02:32 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org, maddy@linux.vnet.ibm.com,
-        Michael Neuling <mikey@neuling.org>, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, ego@linux.vnet.ibm.com, svaidyan@in.ibm.com,
-        acme@kernel.org, jolsa@kernel.org
-Subject: Re: [v3 02/15] KVM: PPC: Book3S HV: Cleanup updates for kvm vcpu MMCR
-Message-ID: <20200722045448.GC3878639@thinks.paulus.ozlabs.org>
-References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com>
- <1594996707-3727-3-git-send-email-atrajeev@linux.vnet.ibm.com>
- <20200721035420.GA3819606@thinks.paulus.ozlabs.org>
- <B83C440A-1AC4-4737-8AB1-EB9A6B8A474B@linux.vnet.ibm.com>
+To:     Ram Pai <linuxram@us.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        benh@kernel.crashing.org, mpe@ellerman.id.au,
+        bharata@linux.ibm.com, sukadev@linux.vnet.ibm.com,
+        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
+        david@gibson.dropbear.id.au, sathnaga@linux.vnet.ibm.com,
+        aik@ozlabs.ru
+Subject: Re: [RFC PATCH] powerpc/pseries/svm: capture instruction faulting on
+ MMIO access, in sprg0 register
+Message-ID: <20200722050232.GD3878639@thinks.paulus.ozlabs.org>
+References: <1594888333-9370-1-git-send-email-linuxram@us.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <B83C440A-1AC4-4737-8AB1-EB9A6B8A474B@linux.vnet.ibm.com>
+In-Reply-To: <1594888333-9370-1-git-send-email-linuxram@us.ibm.com>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 07:39:26AM +0530, Athira Rajeev wrote:
+On Thu, Jul 16, 2020 at 01:32:13AM -0700, Ram Pai wrote:
+> An instruction accessing a mmio address, generates a HDSI fault.  This fault is
+> appropriately handled by the Hypervisor.  However in the case of secureVMs, the
+> fault is delivered to the ultravisor.
 > 
+> Unfortunately the Ultravisor has no correct-way to fetch the faulting
+> instruction. The PEF architecture does not allow Ultravisor to enable MMU
+> translation. Walking the two level page table to read the instruction can race
+> with other vcpus modifying the SVM's process scoped page table.
 > 
-> > On 21-Jul-2020, at 9:24 AM, Paul Mackerras <paulus@ozlabs.org> wrote:
-> > 
-> > On Fri, Jul 17, 2020 at 10:38:14AM -0400, Athira Rajeev wrote:
-> >> Currently `kvm_vcpu_arch` stores all Monitor Mode Control registers
-> >> in a flat array in order: mmcr0, mmcr1, mmcra, mmcr2, mmcrs
-> >> Split this to give mmcra and mmcrs its own entries in vcpu and
-> >> use a flat array for mmcr0 to mmcr2. This patch implements this
-> >> cleanup to make code easier to read.
-> > 
-> > Changing the way KVM stores these values internally is fine, but
-> > changing the user ABI is not.  This part:
-> > 
-> >> diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/uapi/asm/kvm.h
-> >> index 264e266..e55d847 100644
-> >> --- a/arch/powerpc/include/uapi/asm/kvm.h
-> >> +++ b/arch/powerpc/include/uapi/asm/kvm.h
-> >> @@ -510,8 +510,8 @@ struct kvm_ppc_cpu_char {
-> >> 
-> >> #define KVM_REG_PPC_MMCR0	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x10)
-> >> #define KVM_REG_PPC_MMCR1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x11)
-> >> -#define KVM_REG_PPC_MMCRA	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x12)
-> >> -#define KVM_REG_PPC_MMCR2	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x13)
-> >> +#define KVM_REG_PPC_MMCR2	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x12)
-> >> +#define KVM_REG_PPC_MMCRA	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0x13)
-> > 
-> > means that existing userspace programs that used to work would now be
-> > broken.  That is not acceptable (breaking the user ABI is only ever
-> > acceptable with a very compelling reason).  So NAK to this part of the
-> > patch.
+> This problem can be correctly solved with some help from the kernel.
 > 
-> Hi Paul
-> 
-> Thanks for checking the patch. I understood your point on user ABI breakage that this particular change can cause.
-> I will retain original KVM_REG_PPC_MMCRA and KVM_REG_PPC_MMCR2 order in `kvm.h`
-> And with that, additionally I will need below change ( on top of current patch ) for my clean up updates for kvm cpu MMCR to work,
-> Because now mmcra and mmcrs will have its own entries in vcpu and is not part of the mmcr[] array
-> Please suggest if this looks good
+> Capture the faulting instruction in SPRG0 register, before executing the
+> faulting instruction. This enables the ultravisor to easily procure the
+> faulting instruction and emulate it.
 
-Yes, that looks fine.
+Just a comment on the approach of putting the instruction in SPRG0:
+these I/O accessors can be used in interrupt routines, which means
+that if these accessors are ever used with interrupts enabled, there
+is the possibility of an external interrupt occurring between the
+instruction that sets SPRG0 and the load/store instruction that
+faults.  If the handler for that interrupt itself does an I/O access,
+it will overwrite SPRG0, corrupting the value set by the interrupted
+code.
 
-By the way, is the new MMCRS register here at all related to the MMCRS
-that there used to be on POWER8, but which wasn't present (as far as I
-know) on POWER9?
+The choices to fix that would seem to be (a) disable interrupts around
+all I/O accesses, (b) have the accessor save and restore SPRG0, or (c)
+solve the problem another way, such as by doing a H_LOGICAL_CI_LOAD
+or H_LOGICAL_CI_STORE hypercall.
 
 Paul.
