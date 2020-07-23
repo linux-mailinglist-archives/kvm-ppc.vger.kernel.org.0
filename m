@@ -2,124 +2,129 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65AD222B90B
-	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 23:58:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6B0B22B982
+	for <lists+kvm-ppc@lfdr.de>; Fri, 24 Jul 2020 00:31:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727034AbgGWV6x (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 23 Jul 2020 17:58:53 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55544 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726368AbgGWV6w (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Jul 2020 17:58:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595541531;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=T3T05BblW5qcrnE9EzvsH5COWPH3G8n5S+3dyvDj4j8=;
-        b=NNZgxHPYs7IiJSENv23mZk1yvLJWyFHvx9PaUvtbFiATGc0fHdN/j3DhIep3IxgB5/Oqmo
-        I55Vg6aqdMmQt5WkO4PBr/ENZ0vLouZEYuSY2kdpYnxpfJx2384HcOMqaOyIvKfJ7C/vWp
-        JuCJ1bDLV+D2D5Y3yBT1m4y66grP22o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-1wwkHWrOOpOP_vwI3YSGQw-1; Thu, 23 Jul 2020 17:58:47 -0400
-X-MC-Unique: 1wwkHWrOOpOP_vwI3YSGQw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6195D80183C;
-        Thu, 23 Jul 2020 21:58:45 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-119-128.rdu2.redhat.com [10.10.119.128])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D6E245C1D3;
-        Thu, 23 Jul 2020 21:58:43 +0000 (UTC)
-Subject: Re: [PATCH v3 5/6] powerpc/pseries: implement paravirt qspinlocks for
- SPLPAR
-To:     peterz@infradead.org
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Anton Blanchard <anton@ozlabs.org>,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm-ppc@vger.kernel.org,
-        linux-arch@vger.kernel.org
-References: <20200706043540.1563616-1-npiggin@gmail.com>
- <20200706043540.1563616-6-npiggin@gmail.com>
- <874kqhvu1v.fsf@mpe.ellerman.id.au>
- <8265d782-4e50-a9b2-a908-0cb588ffa09c@redhat.com>
- <20200723140011.GR5523@worktop.programming.kicks-ass.net>
- <845de183-56f5-2958-3159-faa131d46401@redhat.com>
- <20200723184759.GS119549@hirez.programming.kicks-ass.net>
- <6d6279ad-7432-63c1-14c3-18c4cff30bf8@redhat.com>
- <20200723195855.GU119549@hirez.programming.kicks-ass.net>
-From:   Waiman Long <longman@redhat.com>
-Organization: Red Hat
-Message-ID: <4fbe47a5-dbc9-427a-5b21-b31b37bc751a@redhat.com>
-Date:   Thu, 23 Jul 2020 17:58:43 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1726603AbgGWWbK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 23 Jul 2020 18:31:10 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:13879 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727871AbgGWWav (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Jul 2020 18:30:51 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5f1a0f200002>; Thu, 23 Jul 2020 15:28:48 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Thu, 23 Jul 2020 15:30:50 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Thu, 23 Jul 2020 15:30:50 -0700
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 23 Jul
+ 2020 22:30:40 +0000
+Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Thu, 23 Jul 2020 22:30:40 +0000
+Received: from rcampbell-dev.nvidia.com (Not Verified[10.110.48.66]) by rnnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
+        id <B5f1a0f8f0005>; Thu, 23 Jul 2020 15:30:40 -0700
+From:   Ralph Campbell <rcampbell@nvidia.com>
+To:     <linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>,
+        <nouveau@lists.freedesktop.org>, <kvm-ppc@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     Jerome Glisse <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>,
+        "Ben Skeggs" <bskeggs@redhat.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        "Ralph Campbell" <rcampbell@nvidia.com>
+Subject: [PATCH v4 0/6] mm/migrate: avoid device private invalidations
+Date:   Thu, 23 Jul 2020 15:29:58 -0700
+Message-ID: <20200723223004.9586-1-rcampbell@nvidia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200723195855.GU119549@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-NVConfidentiality: public
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1595543328; bh=ZwXB9DTR4tPS7zaUfLV/qJCI/BkZe94g9qf7+cwfua0=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         MIME-Version:X-NVConfidentiality:Content-Transfer-Encoding:
+         Content-Type;
+        b=TVbFTQ16TWQJrMKOy3aejSRVgaoLbc4Vkm8uJUav1IGnV8UCNIxlcUNaIljT32lLT
+         IFUkxKku3oiwD/s0KJPRD2Z5P92RzMfRlTNzyvob2p19ZeLstAi5XHAFOBPxyRoqHT
+         XBNFeLeeyRWkhXkXYByL4G9XWOc7aVCZRw3V1jZnUEOyUtW4VjCR2X/5I3mN05w0Na
+         7Hb+FGjZFJyT5e5+vPs3gJ8zif2PIR0pJ9PLBihz71appn3YYQeHz8jk2u5NBb1/Qg
+         paTD0aiMmUhZsUuOny88asPXliyd2ClVGLWx7CS4R7UJwX67oKy4GfaMplRxnjuLZk
+         rkNZaL4BWZv2Q==
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 7/23/20 3:58 PM, peterz@infradead.org wrote:
-> On Thu, Jul 23, 2020 at 03:04:13PM -0400, Waiman Long wrote:
->> On 7/23/20 2:47 PM, peterz@infradead.org wrote:
->>> On Thu, Jul 23, 2020 at 02:32:36PM -0400, Waiman Long wrote:
->>>> BTW, do you have any comment on my v2 lock holder cpu info qspinlock patch?
->>>> I will have to update the patch to fix the reported 0-day test problem, but
->>>> I want to collect other feedback before sending out v3.
->>> I want to say I hate it all, it adds instructions to a path we spend an
->>> aweful lot of time optimizing without really getting anything back for
->>> it.
->> It does add some extra instruction that may slow it down slightly, but I
->> don't agree that it gives nothing back. The cpu lock holder information can
->> be useful in analyzing crash dumps and in some debugging situation. I think
->> it can be useful in RHEL for this readon. How about an x86 config option to
->> allow distros to decide if they want to have it enabled? I will make sure
->> that it will have no performance degradation if the option is not enabled.
-> Config knobs suck too; they create a maintenance burden (we get to make
-> sure all the permutations works/build/etc..) and effectively nobody uses
-> them, since world+dog uses what distros pick.
->
-> Anyway, instead of adding a second per-cpu variable, can you see how
-> horrible something like this is:
->
-> unsigned char adds(unsigned char var, unsigned char val)
-> {
-> 	unsigned short sat = 0xff, tmp = var;
->
-> 	asm ("addb	%[val], %b[var];"
-> 	     "cmovc	%[sat], %[var];"
-> 	     : [var] "+r" (tmp)
-> 	     : [val] "ir" (val), [sat] "r" (sat)
-> 	     );
->
-> 	return tmp;
-> }
->
-> Another thing to try is, instead of threading that lockval throughout
-> the thing, simply:
->
-> #define _Q_LOCKED_VAL	this_cpu_read_stable(cpu_sat)
->
-> or combined with the above
->
-> #define _Q_LOCKED_VAL	adds(this_cpu_read_stable(cpu_number), 2)
->
-> and see if the compiler really makes a mess of things.
->
-Thanks for the suggestion. I will try that out.
+The goal for this series is to avoid device private memory TLB
+invalidations when migrating a range of addresses from system
+memory to device private memory and some of those pages have already
+been migrated. The approach taken is to introduce a new mmu notifier
+invalidation event type and use that in the device driver to skip
+invalidation callbacks from migrate_vma_setup(). The device driver is
+also then expected to handle device MMU invalidations as part of the
+migrate_vma_setup(), migrate_vma_pages(), migrate_vma_finalize() process.
+Note that this is opt-in. A device driver can simply invalidate its MMU
+in the mmu notifier callback and not handle MMU invalidations in the
+migration sequence.
 
-Cheers,
-Longman
+This series is based on Jason Gunthorpe's HMM tree (linux-5.8.0-rc4).
+
+Also, this replaces the need for the following two patches I sent:
+("mm: fix migrate_vma_setup() src_owner and normal pages")
+https://lore.kernel.org/linux-mm/20200622222008.9971-1-rcampbell@nvidia.com
+("nouveau: fix mixed normal and device private page migration")
+https://lore.kernel.org/lkml/20200622233854.10889-3-rcampbell@nvidia.com
+
+Changes in v4:
+Added reviewed-by from Bharata B Rao.
+Removed dead code checking for source device private page in lib/test_hmm.c
+  dmirror_migrate_alloc_and_copy() since the source filter flag guarantees
+  that.
+Added patch 6 to remove a redundant invalidation in migrate_vma_pages().
+
+Changes in v3:
+Changed the direction field "dir" to a "flags" field and renamed
+  src_owner to pgmap_owner.
+Fixed a locking issue in nouveau for the migration invalidation.
+Added a HMM selftest test case to exercise the HMM test driver
+  invalidation changes.
+Removed reviewed-by Bharata B Rao since this version is moderately
+  changed.
+
+Changes in v2:
+Rebase to Jason Gunthorpe's HMM tree.
+Added reviewed-by from Bharata B Rao.
+Rename the mmu_notifier_range::data field to migrate_pgmap_owner as
+  suggested by Jason Gunthorpe.
+
+Ralph Campbell (6):
+  nouveau: fix storing invalid ptes
+  mm/migrate: add a flags parameter to migrate_vma
+  mm/notifier: add migration invalidation type
+  nouveau/svm: use the new migration invalidation
+  mm/hmm/test: use the new migration invalidation
+  mm/migrate: remove range invalidation in migrate_vma_pages()
+
+ arch/powerpc/kvm/book3s_hv_uvmem.c            |  4 +-
+ drivers/gpu/drm/nouveau/nouveau_dmem.c        | 19 ++++++--
+ drivers/gpu/drm/nouveau/nouveau_svm.c         | 21 ++++-----
+ drivers/gpu/drm/nouveau/nouveau_svm.h         | 13 +++++-
+ .../drm/nouveau/nvkm/subdev/mmu/vmmgp100.c    | 13 ++++--
+ include/linux/migrate.h                       | 16 +++++--
+ include/linux/mmu_notifier.h                  |  7 +++
+ lib/test_hmm.c                                | 43 +++++++++----------
+ mm/migrate.c                                  | 34 +++++----------
+ tools/testing/selftests/vm/hmm-tests.c        | 18 ++++++--
+ 10 files changed, 112 insertions(+), 76 deletions(-)
+
+--=20
+2.20.1
 
