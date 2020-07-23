@@ -2,43 +2,43 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F87822ADE3
-	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 13:39:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF62B22AE1D
+	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 13:44:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728156AbgGWLjm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 23 Jul 2020 07:39:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42612 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725846AbgGWLjm (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Jul 2020 07:39:42 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06NBV5IC006580;
-        Thu, 23 Jul 2020 07:39:30 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 32f6wbw4kt-1
+        id S1727859AbgGWLoY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 23 Jul 2020 07:44:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36376 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726109AbgGWLoX (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Jul 2020 07:44:23 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06NBWddM118568;
+        Thu, 23 Jul 2020 07:44:13 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32bvqxjv5c-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 07:39:29 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06NBVUiC007238;
-        Thu, 23 Jul 2020 11:39:28 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 32brq7p48v-1
+        Thu, 23 Jul 2020 07:44:13 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06NBUZU1004327;
+        Thu, 23 Jul 2020 11:44:10 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 32brq839yw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 11:39:28 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06NBdPM223396722
+        Thu, 23 Jul 2020 11:44:10 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06NBi7pm47251600
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Jul 2020 11:39:25 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2FC7DA404D;
-        Thu, 23 Jul 2020 11:39:25 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1E04DA4053;
-        Thu, 23 Jul 2020 11:39:22 +0000 (GMT)
+        Thu, 23 Jul 2020 11:44:07 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 99B44AE051;
+        Thu, 23 Jul 2020 11:44:07 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8BB36AE057;
+        Thu, 23 Jul 2020 11:44:04 +0000 (GMT)
 Received: from oc0525413822.ibm.com (unknown [9.211.150.76])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu, 23 Jul 2020 11:39:21 +0000 (GMT)
-Date:   Thu, 23 Jul 2020 04:39:18 -0700
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 23 Jul 2020 11:44:04 +0000 (GMT)
+Date:   Thu, 23 Jul 2020 04:44:01 -0700
 From:   Ram Pai <linuxram@us.ibm.com>
 To:     Bharata B Rao <bharata@linux.ibm.com>
 Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
@@ -47,79 +47,117 @@ Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         ldufour@linux.ibm.com, bauerman@linux.ibm.com,
         david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
         sathnaga@linux.vnet.ibm.com
-Subject: Re: [v4 3/5] KVM: PPC: Book3S HV: in H_SVM_INIT_DONE, migrate
- remaining normal-GFNs to secure-GFNs.
-Message-ID: <20200723113918.GB5493@oc0525413822.ibm.com>
+Subject: Re: [v4 4/5] KVM: PPC: Book3S HV: retry page migration before
+ erroring-out
+Message-ID: <20200723114401.GC5493@oc0525413822.ibm.com>
 Reply-To: Ram Pai <linuxram@us.ibm.com>
 References: <1594972827-13928-1-git-send-email-linuxram@us.ibm.com>
- <1594972827-13928-4-git-send-email-linuxram@us.ibm.com>
- <20200723061037.GA1082478@in.ibm.com>
+ <1594972827-13928-5-git-send-email-linuxram@us.ibm.com>
+ <20200723061344.GB1082478@in.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200723061037.GA1082478@in.ibm.com>
+In-Reply-To: <20200723061344.GB1082478@in.ibm.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-07-23_03:2020-07-23,2020-07-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- adultscore=0 impostorscore=0 suspectscore=0 phishscore=0 bulkscore=0
- lowpriorityscore=0 malwarescore=0 priorityscore=1501 mlxscore=0
- mlxlogscore=875 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007230083
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=611 spamscore=0
+ bulkscore=0 impostorscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0
+ suspectscore=0 adultscore=0 clxscore=1015 phishscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007230087
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Jul 23, 2020 at 11:40:37AM +0530, Bharata B Rao wrote:
-> On Fri, Jul 17, 2020 at 01:00:25AM -0700, Ram Pai wrote:
+I am dropping this patch based on our conversation, where we agreed, we
+need to rootcause the migration failure.
+
+On Thu, Jul 23, 2020 at 11:43:44AM +0530, Bharata B Rao wrote:
+> On Fri, Jul 17, 2020 at 01:00:26AM -0700, Ram Pai wrote:
+> > @@ -812,7 +842,7 @@ unsigned long kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
+> >  	struct vm_area_struct *vma;
+> >  	int srcu_idx;
+> >  	unsigned long gfn = gpa >> page_shift;
+> > -	int ret;
+> > +	int ret, repeat_count = REPEAT_COUNT;
 > >  
-> > +int kvmppc_uv_migrate_mem_slot(struct kvm *kvm,
-> > +		const struct kvm_memory_slot *memslot)
+> >  	if (!(kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START))
+> >  		return H_UNSUPPORTED;
+> > @@ -826,34 +856,44 @@ unsigned long kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
+> >  	if (flags & H_PAGE_IN_SHARED)
+> >  		return kvmppc_share_page(kvm, gpa, page_shift);
+> >  
+> > -	ret = H_PARAMETER;
+> >  	srcu_idx = srcu_read_lock(&kvm->srcu);
+> > -	mmap_read_lock(kvm->mm);
+> >  
+> > -	start = gfn_to_hva(kvm, gfn);
+> > -	if (kvm_is_error_hva(start))
+> > -		goto out;
+> > -
+> > -	mutex_lock(&kvm->arch.uvmem_lock);
+> >  	/* Fail the page-in request of an already paged-in page */
+> > -	if (kvmppc_gfn_is_uvmem_pfn(gfn, kvm, NULL))
+> > -		goto out_unlock;
+> > +	mutex_lock(&kvm->arch.uvmem_lock);
+> > +	ret = kvmppc_gfn_is_uvmem_pfn(gfn, kvm, NULL);
+> > +	mutex_unlock(&kvm->arch.uvmem_lock);
 > 
-> Don't see any callers for this outside of this file, so why not static?
+> Same comment as for the prev patch. I don't think you can release
+> the lock here.
 > 
-> > +{
-> > +	unsigned long gfn = memslot->base_gfn;
-> > +	struct vm_area_struct *vma;
-> > +	unsigned long start, end;
-> > +	int ret = 0;
-> > +
-> > +	while (kvmppc_next_nontransitioned_gfn(memslot, kvm, &gfn)) {
-> 
-> So you checked the state of gfn under uvmem_lock above, but release
-> it too.
-> 
-> > +
+> > +	if (ret) {
+> > +		srcu_read_unlock(&kvm->srcu, srcu_idx);
+> > +		return H_PARAMETER;
+> > +	}
+> >  
+> > -	end = start + (1UL << page_shift);
+> > -	vma = find_vma_intersection(kvm->mm, start, end);
+> > -	if (!vma || vma->vm_start > start || vma->vm_end < end)
+> > -		goto out_unlock;
+> > +	do {
+> > +		ret = H_PARAMETER;
 > > +		mmap_read_lock(kvm->mm);
+> >  
+> > -	if (kvmppc_svm_migrate_page(vma, start, end, gpa, kvm, page_shift,
+> > -				true))
+> > -		goto out_unlock;
 > > +		start = gfn_to_hva(kvm, gfn);
 > > +		if (kvm_is_error_hva(start)) {
-> > +			ret = H_STATE;
-> > +			goto next;
+> > +			mmap_read_unlock(kvm->mm);
+> > +			break;
 > > +		}
-> > +
-> > +		end = start + (1UL << PAGE_SHIFT);
+> >  
+> > -	ret = H_SUCCESS;
+> > +		end = start + (1UL << page_shift);
 > > +		vma = find_vma_intersection(kvm->mm, start, end);
 > > +		if (!vma || vma->vm_start > start || vma->vm_end < end) {
-> > +			ret = H_STATE;
-> > +			goto next;
+> > +			mmap_read_unlock(kvm->mm);
+> > +			break;
 > > +		}
 > > +
 > > +		mutex_lock(&kvm->arch.uvmem_lock);
-> > +		ret = kvmppc_svm_migrate_page(vma, start, end,
-> > +				(gfn << PAGE_SHIFT), kvm, PAGE_SHIFT, false);
-> 
-> What is the guarantee that the gfn is in the same earlier state when you do
-> do migration here?
+> > +		ret = kvmppc_svm_migrate_page(vma, start, end, gpa, kvm, page_shift, true);
+> > +		mutex_unlock(&kvm->arch.uvmem_lock);
+> > +
+> > +		mmap_read_unlock(kvm->mm);
+> > +	} while (ret == -2 && repeat_count--);
+> > +
+> > +	if (ret == -2)
+> > +		ret = H_BUSY;
+> >  
+> > -out_unlock:
+> > -	mutex_unlock(&kvm->arch.uvmem_lock);
+> > -out:
+> > -	mmap_read_unlock(kvm->mm);
+> >  	srcu_read_unlock(&kvm->srcu, srcu_idx);
+> >  	return ret;
+> >  }
+> > -- 
+> > 1.8.3.1
 
-Are you worried about the case, where someother thread will sneak-in and
-migrate the GFN, and this migration request will become a duplicate one?
-
-That is theortically possible, though practically improbable. This
-transition is attempted only when there is one vcpu active in the VM.
-
-However, may be, we should not bake-in that assumption in this code.
-Will remove that assumption.
-
-RP
+-- 
+Ram Pai
