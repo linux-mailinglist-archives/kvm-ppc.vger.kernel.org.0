@@ -2,182 +2,53 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3E7922B733
-	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 22:08:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6950922B7C9
+	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 22:31:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726918AbgGWUIW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 23 Jul 2020 16:08:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3234 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726046AbgGWUIW (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Jul 2020 16:08:22 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06NK3s1x154776;
-        Thu, 23 Jul 2020 16:08:12 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32fac3dew0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 16:08:12 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06NK7OXG010037;
-        Thu, 23 Jul 2020 20:08:09 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06fra.de.ibm.com with ESMTP id 32brbgufyy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 20:08:09 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06NK86xA39911560
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Jul 2020 20:08:06 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A39814C044;
-        Thu, 23 Jul 2020 20:08:06 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 833D84C040;
-        Thu, 23 Jul 2020 20:08:03 +0000 (GMT)
-Received: from oc0525413822.ibm.com (unknown [9.211.150.76])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Jul 2020 20:08:03 +0000 (GMT)
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        bharata@linux.ibm.com, aneesh.kumar@linux.ibm.com,
-        sukadev@linux.vnet.ibm.com, ldufour@linux.ibm.com,
-        bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
-        cclaudio@linux.ibm.com, linuxram@us.ibm.com,
-        sathnaga@linux.vnet.ibm.com
-Subject: [PATCH v5 7/7] KVM: PPC: Book3S HV: rework secure mem slot dropping
-Date:   Thu, 23 Jul 2020 13:07:24 -0700
-Message-Id: <1595534844-16188-8-git-send-email-linuxram@us.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1595534844-16188-1-git-send-email-linuxram@us.ibm.com>
-References: <1595534844-16188-1-git-send-email-linuxram@us.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-23_09:2020-07-23,2020-07-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- suspectscore=2 phishscore=0 mlxlogscore=784 priorityscore=1501
- adultscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007230144
+        id S1726501AbgGWUbE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 23 Jul 2020 16:31:04 -0400
+Received: from gate.crashing.org ([63.228.1.57]:51798 "EHLO gate.crashing.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726146AbgGWUbE (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 23 Jul 2020 16:31:04 -0400
+Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
+        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 06NKUlRb019444;
+        Thu, 23 Jul 2020 15:30:47 -0500
+Received: (from segher@localhost)
+        by gate.crashing.org (8.14.1/8.14.1/Submit) id 06NKUkhI019442;
+        Thu, 23 Jul 2020 15:30:46 -0500
+X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
+Date:   Thu, 23 Jul 2020 15:30:46 -0500
+From:   Segher Boessenkool <segher@kernel.crashing.org>
+To:     peterz@infradead.org
+Cc:     Waiman Long <longman@redhat.com>, linux-arch@vger.kernel.org,
+        Boqun Feng <boqun.feng@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        linuxppc-dev@lists.ozlabs.org, Nicholas Piggin <npiggin@gmail.com>,
+        linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        kvm-ppc@vger.kernel.org, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 5/6] powerpc/pseries: implement paravirt qspinlocks for SPLPAR
+Message-ID: <20200723203046.GI32057@gate.crashing.org>
+References: <20200706043540.1563616-1-npiggin@gmail.com> <20200706043540.1563616-6-npiggin@gmail.com> <874kqhvu1v.fsf@mpe.ellerman.id.au> <8265d782-4e50-a9b2-a908-0cb588ffa09c@redhat.com> <20200723140011.GR5523@worktop.programming.kicks-ass.net> <845de183-56f5-2958-3159-faa131d46401@redhat.com> <20200723184759.GS119549@hirez.programming.kicks-ass.net> <6d6279ad-7432-63c1-14c3-18c4cff30bf8@redhat.com> <20200723195855.GU119549@hirez.programming.kicks-ass.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200723195855.GU119549@hirez.programming.kicks-ass.net>
+User-Agent: Mutt/1.4.2.3i
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Laurent Dufour <ldufour@linux.ibm.com>
+On Thu, Jul 23, 2020 at 09:58:55PM +0200, peterz@infradead.org wrote:
+> 	asm ("addb	%[val], %b[var];"
+> 	     "cmovc	%[sat], %[var];"
+> 	     : [var] "+r" (tmp)
+> 	     : [val] "ir" (val), [sat] "r" (sat)
+> 	     );
 
-When a secure memslot is dropped, all the pages backed in the secure
-device (aka really backed by secure memory by the Ultravisor)
-should be paged out to a normal page. Previously, this was
-achieved by triggering the page fault mechanism which is calling
-kvmppc_svm_page_out() on each pages.
+"var" (operand 0) needs an earlyclobber ("sat" is read after "var" is
+written for the first time).
 
-This can't work when hot unplugging a memory slot because the memory
-slot is flagged as invalid and gfn_to_pfn() is then not trying to access
-the page, so the page fault mechanism is not triggered.
 
-Since the final goal is to make a call to kvmppc_svm_page_out() it seems
-simpler to call directly instead of triggering such a mechanism. This
-way kvmppc_uvmem_drop_pages() can be called even when hot unplugging a
-memslot.
-
-Since kvmppc_uvmem_drop_pages() is already holding kvm->arch.uvmem_lock,
-the call to __kvmppc_svm_page_out() is made.  As
-__kvmppc_svm_page_out needs the vma pointer to migrate the pages,
-the VMA is fetched in a lazy way, to not trigger find_vma() all
-the time. In addition, the mmap_sem is held in read mode during
-that time, not in write mode since the virual memory layout is not
-impacted, and kvm->arch.uvmem_lock prevents concurrent operation
-on the secure device.
-
-Cc: Ram Pai <linuxram@us.ibm.com>
-Cc: Bharata B Rao <bharata@linux.ibm.com>
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-	[modified the changelog description]
-Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_hv_uvmem.c | 54 ++++++++++++++++++++++++++------------
- 1 file changed, 37 insertions(+), 17 deletions(-)
-
-diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-index c772e92..daffa6e 100644
---- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-+++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-@@ -632,35 +632,55 @@ static inline int kvmppc_svm_page_out(struct vm_area_struct *vma,
-  * fault on them, do fault time migration to replace the device PTEs in
-  * QEMU page table with normal PTEs from newly allocated pages.
-  */
--void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
-+void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *slot,
- 			     struct kvm *kvm, bool skip_page_out)
- {
- 	int i;
- 	struct kvmppc_uvmem_page_pvt *pvt;
--	unsigned long pfn, uvmem_pfn;
--	unsigned long gfn = free->base_gfn;
-+	struct page *uvmem_page;
-+	struct vm_area_struct *vma = NULL;
-+	unsigned long uvmem_pfn, gfn;
-+	unsigned long addr, end;
-+
-+	mmap_read_lock(kvm->mm);
-+
-+	addr = slot->userspace_addr;
-+	end = addr + (slot->npages * PAGE_SIZE);
- 
--	for (i = free->npages; i; --i, ++gfn) {
--		struct page *uvmem_page;
-+	gfn = slot->base_gfn;
-+	for (i = slot->npages; i; --i, ++gfn, addr += PAGE_SIZE) {
-+
-+		/* Fetch the VMA if addr is not in the latest fetched one */
-+		if (!vma || (addr < vma->vm_start || addr >= vma->vm_end)) {
-+			vma = find_vma_intersection(kvm->mm, addr, end);
-+			if (!vma ||
-+			    vma->vm_start > addr || vma->vm_end < end) {
-+				pr_err("Can't find VMA for gfn:0x%lx\n", gfn);
-+				break;
-+			}
-+		}
- 
- 		mutex_lock(&kvm->arch.uvmem_lock);
--		if (!kvmppc_gfn_is_uvmem_pfn(gfn, kvm, &uvmem_pfn)) {
-+
-+		if (kvmppc_gfn_is_uvmem_pfn(gfn, kvm, &uvmem_pfn)) {
-+			uvmem_page = pfn_to_page(uvmem_pfn);
-+			pvt = uvmem_page->zone_device_data;
-+			pvt->skip_page_out = skip_page_out;
-+			pvt->remove_gfn = true;
-+
-+			if (__kvmppc_svm_page_out(vma, addr, addr + PAGE_SIZE,
-+						  PAGE_SHIFT, kvm, pvt->gpa))
-+				pr_err("Can't page out gpa:0x%lx addr:0x%lx\n",
-+				       pvt->gpa, addr);
-+		} else {
-+			/* Remove the shared flag if any */
- 			kvmppc_gfn_remove(gfn, kvm);
--			mutex_unlock(&kvm->arch.uvmem_lock);
--			continue;
- 		}
- 
--		uvmem_page = pfn_to_page(uvmem_pfn);
--		pvt = uvmem_page->zone_device_data;
--		pvt->skip_page_out = skip_page_out;
--		pvt->remove_gfn = true;
- 		mutex_unlock(&kvm->arch.uvmem_lock);
--
--		pfn = gfn_to_pfn(kvm, gfn);
--		if (is_error_noslot_pfn(pfn))
--			continue;
--		kvm_release_pfn_clean(pfn);
- 	}
-+
-+	mmap_read_unlock(kvm->mm);
- }
- 
- unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm)
--- 
-1.8.3.1
-
+Segher
