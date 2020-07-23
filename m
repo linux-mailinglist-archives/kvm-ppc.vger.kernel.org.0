@@ -2,179 +2,181 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0DA022B0FC
-	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 16:07:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FB9422B106
+	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 16:09:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728006AbgGWOHD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 23 Jul 2020 10:07:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12540 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727111AbgGWOHD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Jul 2020 10:07:03 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06NE3QnP061533;
-        Thu, 23 Jul 2020 10:06:50 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32f23g9dtm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 10:06:49 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06NE0Ltc010223;
-        Thu, 23 Jul 2020 14:06:47 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 32brq83ch9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 14:06:46 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06NE6heE59834608
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Jul 2020 14:06:44 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DF6B411C04C;
-        Thu, 23 Jul 2020 14:06:43 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 64F5711C04A;
-        Thu, 23 Jul 2020 14:06:43 +0000 (GMT)
-Received: from pomme.local (unknown [9.145.31.161])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Jul 2020 14:06:43 +0000 (GMT)
-Subject: Re: [PATCH v2 2/2] KVM: PPC: Book3S HV: rework secure mem slot
- dropping
-From:   Laurent Dufour <ldufour@linux.ibm.com>
-To:     bharata@linux.ibm.com, linuxram@us.ibm.com
-Cc:     linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        paulus@samba.org, sukadev@linux.ibm.com,
-        linuxppc-dev@lists.ozlabs.org, bauerman@linux.ibm.com
-References: <20200721104202.15727-1-ldufour@linux.ibm.com>
- <20200721104202.15727-3-ldufour@linux.ibm.com>
- <20200723033600.GS7902@in.ibm.com>
- <4a3caeaf-cd0c-fcd7-0a97-f367a5f78dac@linux.ibm.com>
-Message-ID: <0631397b-44af-ea3b-b70b-e4a0dc2c0366@linux.ibm.com>
-Date:   Thu, 23 Jul 2020 16:06:43 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
+        id S1728002AbgGWOJ4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 23 Jul 2020 10:09:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46290 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727068AbgGWOJz (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Jul 2020 10:09:55 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0479C0619DC;
+        Thu, 23 Jul 2020 07:09:55 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id s189so3153216pgc.13;
+        Thu, 23 Jul 2020 07:09:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=QQ+1Br77BLz8lQjoivkzwXKzJFU6kfi+6X+tKUpNas4=;
+        b=VrjaKnJdpR1Q8/zxNQwaywYVL4aRO5VkRzHmFjYwybGM9tx089/g1Ffv46QKdc+RUs
+         R6DCZA9k7t+FSZ+Mx0vuWBZYJQ3WTcoGb0I4V6VpiEKCbu9AdTetnakuIydsSwfoz2+j
+         l9EEEwDmIUWZaHP8Ud2g2is+SUIFouXgPyKbBKXnQFdCHgwraxGL1m6ZgEJgDc8Y5tPM
+         A9btbBCW4lz7/PYi8S0j5NpaOSvPfDMwrMQ9KKnOcxBdZWT/pclllFueGNwszxTu6NYA
+         M65pHDPqBZpoRwWQi+vBgtEGz3FonNJXLnNsaxu5yE/7TsVl63Qg3ZTXw78Xo8A9jJtj
+         DI4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=QQ+1Br77BLz8lQjoivkzwXKzJFU6kfi+6X+tKUpNas4=;
+        b=YZmZBSJlNjpgxHp26SH9siM08cWzI0Jnz0fs9lg8OEal0jEMhr8JHs5lMQYc4I40QE
+         srF636l0Mp8d2p7B1CEzY/RxXwDKTLWnanoDIE6dPO0e2TwM4dpj1YG+u0yv3jSwsktB
+         O/PwpKUIjNzcorBhEizuyF45wp1cMPpm+W+o9mHSIx8Nwjsy7aTzmO/nTTHCTNgCyY32
+         R5juYZl3JGvmPx757hzIwFDxfwYq9P5R1AgA5tDzQcJtuskLE/Cpb7QhCfgl39xz60a4
+         BtHZHVWNYwxca62rA3ROSXHOrYDS1eJHJB6RqiMVttavnXJwsd3OBznHLsy6uvMe9D0a
+         rgYg==
+X-Gm-Message-State: AOAM530KN1Uywyz8Qsa0o51scKmOFSI3iNvW3YTwIQnKgpjjKRKNesI3
+        Ij8hpLG/L1KEYJKsU4OPo3g=
+X-Google-Smtp-Source: ABdhPJz9Ux/xe9gUmHJptXyzmvpTWCDbn3NSD1ykHJ9GcvjlxMgG8/bFHnuOpReypGSbZRKQ2OYRGA==
+X-Received: by 2002:a63:ca11:: with SMTP id n17mr4276124pgi.439.1595513395017;
+        Thu, 23 Jul 2020 07:09:55 -0700 (PDT)
+Received: from localhost (110-174-173-27.tpgi.com.au. [110.174.173.27])
+        by smtp.gmail.com with ESMTPSA id q4sm3208683pjq.36.2020.07.23.07.09.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2020 07:09:54 -0700 (PDT)
+Date:   Fri, 24 Jul 2020 00:09:48 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v3 5/6] powerpc/pseries: implement paravirt qspinlocks for
+ SPLPAR
+To:     linuxppc-dev@lists.ozlabs.org,
+        Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Anton Blanchard <anton@ozlabs.org>,
+        Boqun Feng <boqun.feng@gmail.com>, kvm-ppc@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Waiman Long <longman@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        virtualization@lists.linux-foundation.org,
+        Will Deacon <will@kernel.org>
+References: <20200706043540.1563616-1-npiggin@gmail.com>
+        <20200706043540.1563616-6-npiggin@gmail.com>
+        <874kqhvu1v.fsf@mpe.ellerman.id.au>
+In-Reply-To: <874kqhvu1v.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <4a3caeaf-cd0c-fcd7-0a97-f367a5f78dac@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-23_06:2020-07-23,2020-07-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- adultscore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0 phishscore=0
- priorityscore=1501 malwarescore=0 spamscore=0 clxscore=1015 suspectscore=2
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007230105
+Message-Id: <1595512823.5k2rrd4zk5.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Le 23/07/2020 à 14:32, Laurent Dufour a écrit :
-> Le 23/07/2020 à 05:36, Bharata B Rao a écrit :
->> On Tue, Jul 21, 2020 at 12:42:02PM +0200, Laurent Dufour wrote:
->>> When a secure memslot is dropped, all the pages backed in the secure device
->>> (aka really backed by secure memory by the Ultravisor) should be paged out
->>> to a normal page. Previously, this was achieved by triggering the page
->>> fault mechanism which is calling kvmppc_svm_page_out() on each pages.
->>>
->>> This can't work when hot unplugging a memory slot because the memory slot
->>> is flagged as invalid and gfn_to_pfn() is then not trying to access the
->>> page, so the page fault mechanism is not triggered.
->>>
->>> Since the final goal is to make a call to kvmppc_svm_page_out() it seems
->>> simpler to directly calling it instead of triggering such a mechanism. This
->>> way kvmppc_uvmem_drop_pages() can be called even when hot unplugging a
->>> memslot.
->>>
->>> Since kvmppc_uvmem_drop_pages() is already holding kvm->arch.uvmem_lock,
->>> the call to __kvmppc_svm_page_out() is made.
->>> As __kvmppc_svm_page_out needs the vma pointer to migrate the pages, the
->>> VMA is fetched in a lazy way, to not trigger find_vma() all the time. In
->>> addition, the mmap_sem is help in read mode during that time, not in write
->>> mode since the virual memory layout is not impacted, and
->>> kvm->arch.uvmem_lock prevents concurrent operation on the secure device.
->>>
->>> Cc: Ram Pai <linuxram@us.ibm.com>
->>> Cc: Bharata B Rao <bharata@linux.ibm.com>
->>> Cc: Paul Mackerras <paulus@ozlabs.org>
->>> Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
->>> ---
->>>   arch/powerpc/kvm/book3s_hv_uvmem.c | 54 ++++++++++++++++++++----------
->>>   1 file changed, 37 insertions(+), 17 deletions(-)
->>>
->>> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c 
->>> b/arch/powerpc/kvm/book3s_hv_uvmem.c
->>> index 5a4b02d3f651..ba5c7c77cc3a 100644
->>> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
->>> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
->>> @@ -624,35 +624,55 @@ static inline int kvmppc_svm_page_out(struct 
->>> vm_area_struct *vma,
->>>    * fault on them, do fault time migration to replace the device PTEs in
->>>    * QEMU page table with normal PTEs from newly allocated pages.
->>>    */
->>> -void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
->>> +void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *slot,
->>>                    struct kvm *kvm, bool skip_page_out)
->>>   {
->>>       int i;
->>>       struct kvmppc_uvmem_page_pvt *pvt;
->>> -    unsigned long pfn, uvmem_pfn;
->>> -    unsigned long gfn = free->base_gfn;
->>> +    struct page *uvmem_page;
->>> +    struct vm_area_struct *vma = NULL;
->>> +    unsigned long uvmem_pfn, gfn;
->>> +    unsigned long addr, end;
->>> +
->>> +    mmap_read_lock(kvm->mm);
->>> +
->>> +    addr = slot->userspace_addr;
->>
->> We typically use gfn_to_hva() for that, but that won't work for a
->> memslot that is already marked INVALID which is the case here.
->> I think it is ok to access slot->userspace_addr here of an INVALID
->> memslot, but just thought of explictly bringing this up.
-> 
-> Which explicitly mentioned above in the patch's description:
-> 
-> This can't work when hot unplugging a memory slot because the memory slot
-> is flagged as invalid and gfn_to_pfn() is then not trying to access the
-> page, so the page fault mechanism is not triggered.
-> 
->>
->>> +    end = addr + (slot->npages * PAGE_SIZE);
->>> -    for (i = free->npages; i; --i, ++gfn) {
->>> -        struct page *uvmem_page;
->>> +    gfn = slot->base_gfn;
->>> +    for (i = slot->npages; i; --i, ++gfn, addr += PAGE_SIZE) {
->>> +
->>> +        /* Fetch the VMA if addr is not in the latest fetched one */
->>> +        if (!vma || (addr < vma->vm_start || addr >= vma->vm_end)) {
->>> +            vma = find_vma_intersection(kvm->mm, addr, end);
->>> +            if (!vma ||
->>> +                vma->vm_start > addr || vma->vm_end < end) {
->>> +                pr_err("Can't find VMA for gfn:0x%lx\n", gfn);
->>> +                break;
->>> +            }
->>> +        }
->>
->> In Ram's series, kvmppc_memslot_page_merge() also walks the VMAs spanning
->> the memslot, but it uses a different logic for the same. Why can't these
->> two cases use the same method to walk the VMAs? Is there anything subtly
->> different between the two cases?
-> 
-> This is probably doable. At the time I wrote that patch, the 
-> kvmppc_memslot_page_merge() was not yet introduced AFAIR.
-> 
-> This being said, I'd help a lot to factorize that code... I let Ram dealing with 
-> that ;)
+Excerpts from Michael Ellerman's message of July 9, 2020 8:53 pm:
+> Nicholas Piggin <npiggin@gmail.com> writes:
+>=20
+>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> ---
+>>  arch/powerpc/include/asm/paravirt.h           | 28 ++++++++
+>>  arch/powerpc/include/asm/qspinlock.h          | 66 +++++++++++++++++++
+>>  arch/powerpc/include/asm/qspinlock_paravirt.h |  7 ++
+>>  arch/powerpc/platforms/pseries/Kconfig        |  5 ++
+>>  arch/powerpc/platforms/pseries/setup.c        |  6 +-
+>>  include/asm-generic/qspinlock.h               |  2 +
+>=20
+> Another ack?
+>=20
+>> diff --git a/arch/powerpc/include/asm/paravirt.h b/arch/powerpc/include/=
+asm/paravirt.h
+>> index 7a8546660a63..f2d51f929cf5 100644
+>> --- a/arch/powerpc/include/asm/paravirt.h
+>> +++ b/arch/powerpc/include/asm/paravirt.h
+>> @@ -45,6 +55,19 @@ static inline void yield_to_preempted(int cpu, u32 yi=
+eld_count)
+>>  {
+>>  	___bad_yield_to_preempted(); /* This would be a bug */
+>>  }
+>> +
+>> +extern void ___bad_yield_to_any(void);
+>> +static inline void yield_to_any(void)
+>> +{
+>> +	___bad_yield_to_any(); /* This would be a bug */
+>> +}
+>=20
+> Why do we do that rather than just not defining yield_to_any() at all
+> and letting the build fail on that?
+>=20
+> There's a condition somewhere that we know will false at compile time
+> and drop the call before linking?
 
-Indeed I don't think this is relevant, the loop in kvmppc_memslot_page_merge() 
-deals with one call (to ksm_advise) per VMA, while this code is dealing with one 
-call per page of the VMA, which completely different.
+Mainly so you could use it in if (IS_ENABLED()) blocks, but would still
+catch the (presumably buggy) case where something calls it without the
+option set.
 
-I don't think merging the both will be a good idea.
+I think I had it arranged a different way that was using IS_ENABLED=20
+earlier and changed it but might as well keep it this way.
 
-Cheers,
-Laurent.
+>=20
+>> diff --git a/arch/powerpc/include/asm/qspinlock_paravirt.h b/arch/powerp=
+c/include/asm/qspinlock_paravirt.h
+>> new file mode 100644
+>> index 000000000000..750d1b5e0202
+>> --- /dev/null
+>> +++ b/arch/powerpc/include/asm/qspinlock_paravirt.h
+>> @@ -0,0 +1,7 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+>> +#ifndef __ASM_QSPINLOCK_PARAVIRT_H
+>> +#define __ASM_QSPINLOCK_PARAVIRT_H
+>=20
+> _ASM_POWERPC_QSPINLOCK_PARAVIRT_H please.
+>=20
+>> +
+>> +EXPORT_SYMBOL(__pv_queued_spin_unlock);
+>=20
+> Why's that in a header? Should that (eventually) go with the generic impl=
+ementation?
+
+Yeah the qspinlock_paravirt.h header is a bit weird and only gets=20
+included into kernel/locking/qspinlock.c
+
+>> diff --git a/arch/powerpc/platforms/pseries/Kconfig b/arch/powerpc/platf=
+orms/pseries/Kconfig
+>> index 24c18362e5ea..756e727b383f 100644
+>> --- a/arch/powerpc/platforms/pseries/Kconfig
+>> +++ b/arch/powerpc/platforms/pseries/Kconfig
+>> @@ -25,9 +25,14 @@ config PPC_PSERIES
+>>  	select SWIOTLB
+>>  	default y
+>> =20
+>> +config PARAVIRT_SPINLOCKS
+>> +	bool
+>> +	default n
+>=20
+> default n is the default.
+>=20
+>> diff --git a/arch/powerpc/platforms/pseries/setup.c b/arch/powerpc/platf=
+orms/pseries/setup.c
+>> index 2db8469e475f..747a203d9453 100644
+>> --- a/arch/powerpc/platforms/pseries/setup.c
+>> +++ b/arch/powerpc/platforms/pseries/setup.c
+>> @@ -771,8 +771,12 @@ static void __init pSeries_setup_arch(void)
+>>  	if (firmware_has_feature(FW_FEATURE_LPAR)) {
+>>  		vpa_init(boot_cpuid);
+>> =20
+>> -		if (lppaca_shared_proc(get_lppaca()))
+>> +		if (lppaca_shared_proc(get_lppaca())) {
+>>  			static_branch_enable(&shared_processor);
+>> +#ifdef CONFIG_PARAVIRT_SPINLOCKS
+>> +			pv_spinlocks_init();
+>> +#endif
+>> +		}
+>=20
+> We could avoid the ifdef with this I think?
+
+Yes I think so.
+
+Thanks,
+Nick
+
