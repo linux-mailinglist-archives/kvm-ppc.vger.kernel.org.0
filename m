@@ -2,42 +2,42 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D76922B731
-	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 22:08:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6442D22B732
+	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 22:08:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725894AbgGWUIQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 23 Jul 2020 16:08:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10816 "EHLO
+        id S1726904AbgGWUIV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 23 Jul 2020 16:08:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41514 "EHLO
         mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726046AbgGWUIQ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Jul 2020 16:08:16 -0400
+        by vger.kernel.org with ESMTP id S1726046AbgGWUIV (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Jul 2020 16:08:21 -0400
 Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06NK1cmj097424;
-        Thu, 23 Jul 2020 16:08:04 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32faj6vhx2-1
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06NK1cem097379;
+        Thu, 23 Jul 2020 16:08:08 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32faj6vhyv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 16:08:04 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06NJpwLw009126;
-        Thu, 23 Jul 2020 20:08:02 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 32brbh6ed9-1
+        Thu, 23 Jul 2020 16:08:08 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06NK7YQK010065;
+        Thu, 23 Jul 2020 20:08:06 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06fra.de.ibm.com with ESMTP id 32brbgufyx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 23 Jul 2020 20:08:02 +0000
+        Thu, 23 Jul 2020 20:08:06 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06NK7x5x63045800
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06NK83hK32244020
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Jul 2020 20:07:59 GMT
+        Thu, 23 Jul 2020 20:08:03 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 68B9A4C040;
+        by IMSVA (Postfix) with ESMTP id 253AD4C04A;
+        Thu, 23 Jul 2020 20:08:03 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D3D274C044;
         Thu, 23 Jul 2020 20:07:59 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2E0C84C044;
-        Thu, 23 Jul 2020 20:07:56 +0000 (GMT)
 Received: from oc0525413822.ibm.com (unknown [9.211.150.76])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Jul 2020 20:07:55 +0000 (GMT)
+        Thu, 23 Jul 2020 20:07:59 +0000 (GMT)
 From:   Ram Pai <linuxram@us.ibm.com>
 To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 Cc:     paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
@@ -46,9 +46,9 @@ Cc:     paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
         bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
         cclaudio@linux.ibm.com, linuxram@us.ibm.com,
         sathnaga@linux.vnet.ibm.com
-Subject: [PATCH v5 5/7] KVM: PPC: Book3S HV: migrate hot plugged memory
-Date:   Thu, 23 Jul 2020 13:07:22 -0700
-Message-Id: <1595534844-16188-6-git-send-email-linuxram@us.ibm.com>
+Subject: [PATCH v5 6/7] KVM: PPC: Book3S HV: move kvmppc_svm_page_out up
+Date:   Thu, 23 Jul 2020 13:07:23 -0700
+Message-Id: <1595534844-16188-7-git-send-email-linuxram@us.ibm.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1595534844-16188-1-git-send-email-linuxram@us.ibm.com>
 References: <1595534844-16188-1-git-send-email-linuxram@us.ibm.com>
@@ -67,137 +67,209 @@ X-Mailing-List: kvm-ppc@vger.kernel.org
 
 From: Laurent Dufour <ldufour@linux.ibm.com>
 
-When a memory slot is hot plugged to a SVM, PFNs associated with the
-GFNs in that slot must be migrated to the secure-PFNs, aka device-PFNs.
+kvmppc_svm_page_out() will need to be called by kvmppc_uvmem_drop_pages()
+so move it upper in this file.
 
-Call kvmppc_uv_migrate_mem_slot() to accomplish this.
-Disable page-merge for all pages in the memory slot.
+Furthermore it will be interesting to call this function when already
+holding the kvm->arch.uvmem_lock, so prefix the original function with __
+and remove the locking in it, and introduce a wrapper which call that
+function with the lock held.
 
+There is no functional change.
+
+Cc: Ram Pai <linuxram@us.ibm.com>
+Cc: Bharata B Rao <bharata@linux.ibm.com>
+Cc: Paul Mackerras <paulus@ozlabs.org>
 Signed-off-by: Ram Pai <linuxram@us.ibm.com>
-[rearranged the code, and modified the commit log]
 Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
 ---
- arch/powerpc/include/asm/kvm_book3s_uvmem.h | 14 ++++++++++++++
- arch/powerpc/kvm/book3s_hv.c                | 10 ++--------
- arch/powerpc/kvm/book3s_hv_uvmem.c          | 23 +++++++++++++++++++----
- 3 files changed, 35 insertions(+), 12 deletions(-)
+ arch/powerpc/kvm/book3s_hv_uvmem.c | 166 ++++++++++++++++++++-----------------
+ 1 file changed, 90 insertions(+), 76 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/kvm_book3s_uvmem.h b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-index f229ab5..59c17ca 100644
---- a/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-+++ b/arch/powerpc/include/asm/kvm_book3s_uvmem.h
-@@ -25,6 +25,10 @@ void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
- 			     struct kvm *kvm, bool skip_page_out);
- int kvmppc_uv_migrate_mem_slot(struct kvm *kvm,
- 			const struct kvm_memory_slot *memslot);
-+int kvmppc_uvmem_memslot_create(struct kvm *kvm,
-+		const struct kvm_memory_slot *new);
-+void kvmppc_uvmem_memslot_delete(struct kvm *kvm,
-+		const struct kvm_memory_slot *old);
- #else
- static inline int kvmppc_uvmem_init(void)
- {
-@@ -84,5 +88,15 @@ static inline int kvmppc_send_page_to_uv(struct kvm *kvm, unsigned long gfn)
- static inline void
- kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
- 			struct kvm *kvm, bool skip_page_out) { }
-+
-+static inline int  kvmppc_uvmem_memslot_create(struct kvm *kvm,
-+		const struct kvm_memory_slot *new)
-+{
-+	return H_UNSUPPORTED;
-+}
-+
-+static inline void  kvmppc_uvmem_memslot_delete(struct kvm *kvm,
-+		const struct kvm_memory_slot *old) { }
-+
- #endif /* CONFIG_PPC_UV */
- #endif /* __ASM_KVM_BOOK3S_UVMEM_H__ */
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index d331b46..b1485ca 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4515,16 +4515,10 @@ static void kvmppc_core_commit_memory_region_hv(struct kvm *kvm,
- 
- 	switch (change) {
- 	case KVM_MR_CREATE:
--		if (kvmppc_uvmem_slot_init(kvm, new))
--			return;
--		uv_register_mem_slot(kvm->arch.lpid,
--				     new->base_gfn << PAGE_SHIFT,
--				     new->npages * PAGE_SIZE,
--				     0, new->id);
-+		kvmppc_uvmem_memslot_create(kvm, new);
- 		break;
- 	case KVM_MR_DELETE:
--		uv_unregister_mem_slot(kvm->arch.lpid, old->id);
--		kvmppc_uvmem_slot_free(kvm, old);
-+		kvmppc_uvmem_memslot_delete(kvm, old);
- 		break;
- 	default:
- 		/* TODO: Handle KVM_MR_MOVE */
 diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-index 43b3566..fd9ff6e 100644
+index fd9ff6e..c772e92 100644
 --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
 +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-@@ -418,7 +418,7 @@ static int kvmppc_memslot_page_merge(struct kvm *kvm,
- 	return ret;
+@@ -535,6 +535,96 @@ unsigned long kvmppc_h_svm_init_done(struct kvm *kvm)
  }
  
--static void kvmppc_uvmem_memslot_delete(struct kvm *kvm,
-+static void __kvmppc_uvmem_memslot_delete(struct kvm *kvm,
- 		const struct kvm_memory_slot *memslot)
- {
- 	uv_unregister_mem_slot(kvm->arch.lpid, memslot->id);
-@@ -426,7 +426,7 @@ static void kvmppc_uvmem_memslot_delete(struct kvm *kvm,
- 	kvmppc_memslot_page_merge(kvm, memslot, true);
- }
- 
--static int kvmppc_uvmem_memslot_create(struct kvm *kvm,
-+static int __kvmppc_uvmem_memslot_create(struct kvm *kvm,
- 		const struct kvm_memory_slot *memslot)
- {
- 	int ret = H_PARAMETER;
-@@ -478,7 +478,7 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
- 	/* register the memslot */
- 	slots = kvm_memslots(kvm);
- 	kvm_for_each_memslot(memslot, slots) {
--		ret = kvmppc_uvmem_memslot_create(kvm, memslot);
-+		ret = __kvmppc_uvmem_memslot_create(kvm, memslot);
- 		if (ret)
- 			break;
- 	}
-@@ -488,7 +488,7 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
- 		kvm_for_each_memslot(m, slots) {
- 			if (m == memslot)
- 				break;
--			kvmppc_uvmem_memslot_delete(kvm, memslot);
-+			__kvmppc_uvmem_memslot_delete(kvm, memslot);
- 		}
- 	}
- 
-@@ -1057,6 +1057,21 @@ int kvmppc_send_page_to_uv(struct kvm *kvm, unsigned long gfn)
- 	return (ret == U_SUCCESS) ? RESUME_GUEST : -EFAULT;
- }
- 
-+int kvmppc_uvmem_memslot_create(struct kvm *kvm, const struct kvm_memory_slot *new)
+ /*
++ * Provision a new page on HV side and copy over the contents
++ * from secure memory using UV_PAGE_OUT uvcall.
++ * Caller must held kvm->arch.uvmem_lock.
++ */
++static int __kvmppc_svm_page_out(struct vm_area_struct *vma,
++		unsigned long start,
++		unsigned long end, unsigned long page_shift,
++		struct kvm *kvm, unsigned long gpa)
 +{
-+	int ret = __kvmppc_uvmem_memslot_create(kvm, new);
++	unsigned long src_pfn, dst_pfn = 0;
++	struct migrate_vma mig;
++	struct page *dpage, *spage;
++	struct kvmppc_uvmem_page_pvt *pvt;
++	unsigned long pfn;
++	int ret = U_SUCCESS;
 +
-+	if (!ret)
-+		ret = kvmppc_uv_migrate_mem_slot(kvm, new);
++	memset(&mig, 0, sizeof(mig));
++	mig.vma = vma;
++	mig.start = start;
++	mig.end = end;
++	mig.src = &src_pfn;
++	mig.dst = &dst_pfn;
++	mig.src_owner = &kvmppc_uvmem_pgmap;
++
++	/* The requested page is already paged-out, nothing to do */
++	if (!kvmppc_gfn_is_uvmem_pfn(gpa >> page_shift, kvm, NULL))
++		return ret;
++
++	ret = migrate_vma_setup(&mig);
++	if (ret)
++		return -1;
++
++	spage = migrate_pfn_to_page(*mig.src);
++	if (!spage || !(*mig.src & MIGRATE_PFN_MIGRATE))
++		goto out_finalize;
++
++	if (!is_zone_device_page(spage))
++		goto out_finalize;
++
++	dpage = alloc_page_vma(GFP_HIGHUSER, vma, start);
++	if (!dpage) {
++		ret = -1;
++		goto out_finalize;
++	}
++
++	lock_page(dpage);
++	pvt = spage->zone_device_data;
++	pfn = page_to_pfn(dpage);
++
++	/*
++	 * This function is used in two cases:
++	 * - When HV touches a secure page, for which we do UV_PAGE_OUT
++	 * - When a secure page is converted to shared page, we *get*
++	 *   the page to essentially unmap the device page. In this
++	 *   case we skip page-out.
++	 */
++	if (!pvt->skip_page_out)
++		ret = uv_page_out(kvm->arch.lpid, pfn << page_shift,
++				  gpa, 0, page_shift);
++
++	if (ret == U_SUCCESS)
++		*mig.dst = migrate_pfn(pfn) | MIGRATE_PFN_LOCKED;
++	else {
++		unlock_page(dpage);
++		__free_page(dpage);
++		goto out_finalize;
++	}
++
++	migrate_vma_pages(&mig);
++
++out_finalize:
++	migrate_vma_finalize(&mig);
++	return ret;
++}
++
++static inline int kvmppc_svm_page_out(struct vm_area_struct *vma,
++				      unsigned long start, unsigned long end,
++				      unsigned long page_shift,
++				      struct kvm *kvm, unsigned long gpa)
++{
++	int ret;
++
++	mutex_lock(&kvm->arch.uvmem_lock);
++	ret = __kvmppc_svm_page_out(vma, start, end, page_shift, kvm, gpa);
++	mutex_unlock(&kvm->arch.uvmem_lock);
 +
 +	return ret;
 +}
 +
-+void kvmppc_uvmem_memslot_delete(struct kvm *kvm, const struct kvm_memory_slot *old)
-+{
-+	__kvmppc_uvmem_memslot_delete(kvm, old);
-+}
-+
- static u64 kvmppc_get_secmem_size(void)
- {
- 	struct device_node *np;
++/*
+  * Drop device pages that we maintain for the secure guest
+  *
+  * We first mark the pages to be skipped from UV_PAGE_OUT when there
+@@ -866,82 +956,6 @@ unsigned long kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
+ 	return ret;
+ }
+ 
+-/*
+- * Provision a new page on HV side and copy over the contents
+- * from secure memory using UV_PAGE_OUT uvcall.
+- */
+-static int kvmppc_svm_page_out(struct vm_area_struct *vma,
+-		unsigned long start,
+-		unsigned long end, unsigned long page_shift,
+-		struct kvm *kvm, unsigned long gpa)
+-{
+-	unsigned long src_pfn, dst_pfn = 0;
+-	struct migrate_vma mig;
+-	struct page *dpage, *spage;
+-	struct kvmppc_uvmem_page_pvt *pvt;
+-	unsigned long pfn;
+-	int ret = U_SUCCESS;
+-
+-	memset(&mig, 0, sizeof(mig));
+-	mig.vma = vma;
+-	mig.start = start;
+-	mig.end = end;
+-	mig.src = &src_pfn;
+-	mig.dst = &dst_pfn;
+-	mig.src_owner = &kvmppc_uvmem_pgmap;
+-
+-	mutex_lock(&kvm->arch.uvmem_lock);
+-	/* The requested page is already paged-out, nothing to do */
+-	if (!kvmppc_gfn_is_uvmem_pfn(gpa >> page_shift, kvm, NULL))
+-		goto out;
+-
+-	ret = migrate_vma_setup(&mig);
+-	if (ret)
+-		goto out;
+-
+-	spage = migrate_pfn_to_page(*mig.src);
+-	if (!spage || !(*mig.src & MIGRATE_PFN_MIGRATE))
+-		goto out_finalize;
+-
+-	if (!is_zone_device_page(spage))
+-		goto out_finalize;
+-
+-	dpage = alloc_page_vma(GFP_HIGHUSER, vma, start);
+-	if (!dpage) {
+-		ret = -1;
+-		goto out_finalize;
+-	}
+-
+-	lock_page(dpage);
+-	pvt = spage->zone_device_data;
+-	pfn = page_to_pfn(dpage);
+-
+-	/*
+-	 * This function is used in two cases:
+-	 * - When HV touches a secure page, for which we do UV_PAGE_OUT
+-	 * - When a secure page is converted to shared page, we *get*
+-	 *   the page to essentially unmap the device page. In this
+-	 *   case we skip page-out.
+-	 */
+-	if (!pvt->skip_page_out)
+-		ret = uv_page_out(kvm->arch.lpid, pfn << page_shift,
+-				  gpa, 0, page_shift);
+-
+-	if (ret == U_SUCCESS)
+-		*mig.dst = migrate_pfn(pfn) | MIGRATE_PFN_LOCKED;
+-	else {
+-		unlock_page(dpage);
+-		__free_page(dpage);
+-		goto out_finalize;
+-	}
+-
+-	migrate_vma_pages(&mig);
+-out_finalize:
+-	migrate_vma_finalize(&mig);
+-out:
+-	mutex_unlock(&kvm->arch.uvmem_lock);
+-	return ret;
+-}
+ 
+ /*
+  * Fault handler callback that gets called when HV touches any page that
 -- 
 1.8.3.1
 
