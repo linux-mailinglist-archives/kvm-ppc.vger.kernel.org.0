@@ -2,234 +2,151 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A8E822A499
-	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 03:30:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2AFA22A617
+	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Jul 2020 05:36:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387411AbgGWBaO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 22 Jul 2020 21:30:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41670 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733075AbgGWBaN (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 22 Jul 2020 21:30:13 -0400
-Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5930C0619DC;
-        Wed, 22 Jul 2020 18:30:13 -0700 (PDT)
-Received: by mail-oi1-x241.google.com with SMTP id j11so3575305oiw.12;
-        Wed, 22 Jul 2020 18:30:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YhLOcjKpCgLt9oimmCJP4UVsxMUg1CDYf6yyYw8HbJ0=;
-        b=BoO4p+rFFbuFiuHh5Pqlltm6349FRazyKgxJhgbyowZV+wRbNyCkRmw+0idYJkch4j
-         z1xnBYXriUkVfpcQyAfJvHS3zqO+2Nb1qdA3W+Tobh/qpKos+RN25ibIKvo2K6GYexgV
-         qLl7v2jh0jiahIHPPSbf4kdLzA6iawc5p8W7SDPvGX8Lcl7iS1colNmrjjIDr33J1rjP
-         1G9MtEFrMX50cYcU4KaAE6JI2ungLdDGfy/WfHBpmRvDlIJ06KDEixpyeNS6A1w2MgY4
-         l+GUHqtJ7H+q0Lz+ucwx2EzI8GBWp7GdAgPxFHUwbBbr7wb8VgCzXoPySA1zLm4ZypiO
-         BKuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YhLOcjKpCgLt9oimmCJP4UVsxMUg1CDYf6yyYw8HbJ0=;
-        b=Rk3Hm3udrpyeI9aNdwSzwhD0MJrVQ9ZUpdxd8u9TsI92+i9l9oVKqEbbRJ4NHTi5Xg
-         VjTpBydmQ4LngE1eJTqIaUB1s6umG1PlDwnAC1H/VX66cJA42WXo9y4HBbSjNz0LAAXX
-         R3Gj6TGWBkaUIIHDIHqI6lSk1ikxKnGE5ODNGJX9PAZ2xQAT94kCNUFKKV5ZJSd62zeH
-         YU5sTEhrYfnv4Zp8Pu8ZdcaJK2tLYlGtJJ+isYx2UwHbEeSh8LoBStPzT3sZWiyoWjxi
-         Rt/fWrY4GYRnuh0VetHhZrSpe2Vxlaxl+61QO9lZXKkQ94jPYxEGj5535FE8Qm3Wc9BM
-         WDSw==
-X-Gm-Message-State: AOAM532J0ueUrNImwgZjpShMEHITCqhyqlZM3uNmC1KLE0WSFAo6T+Bq
-        Sc0drNaNXlBZFsQAvHOv78MKs/wQe4DflfQu72I=
-X-Google-Smtp-Source: ABdhPJyQcxAMRL3JGmj7nO+Tmk2DdxuUkrpSYbyfcTaP3o/PkZYxVRZb84LYpTu8w+cfiAdVLskOmzZaD+midLe430o=
-X-Received: by 2002:a54:4418:: with SMTP id k24mr1987878oiw.126.1595467813141;
- Wed, 22 Jul 2020 18:30:13 -0700 (PDT)
+        id S1733174AbgGWDg1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 22 Jul 2020 23:36:27 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9918 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1733169AbgGWDg0 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 22 Jul 2020 23:36:26 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06N3XCZ1097526;
+        Wed, 22 Jul 2020 23:36:10 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32e11p0sub-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Jul 2020 23:36:10 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06N3ZEfp003764;
+        Thu, 23 Jul 2020 03:36:08 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 32brq7npv4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Jul 2020 03:36:08 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06N3a5Iq47448140
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Jul 2020 03:36:05 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6CED85204E;
+        Thu, 23 Jul 2020 03:36:05 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.85.75.152])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 1CF1552051;
+        Thu, 23 Jul 2020 03:36:02 +0000 (GMT)
+Date:   Thu, 23 Jul 2020 09:06:00 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     Laurent Dufour <ldufour@linux.ibm.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, mpe@ellerman.id.au, paulus@samba.org,
+        linuxram@us.ibm.com, sukadev@linux.ibm.com, bauerman@linux.ibm.com,
+        Paul Mackerras <paulus@ozlabs.org>
+Subject: Re: [PATCH v2 2/2] KVM: PPC: Book3S HV: rework secure mem slot
+ dropping
+Message-ID: <20200723033600.GS7902@in.ibm.com>
+Reply-To: bharata@linux.ibm.com
+References: <20200721104202.15727-1-ldufour@linux.ibm.com>
+ <20200721104202.15727-3-ldufour@linux.ibm.com>
 MIME-Version: 1.0
-References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com>
- <1594996707-3727-12-git-send-email-atrajeev@linux.vnet.ibm.com> <CACzsE9q-oOhABFWUWH5Jc3BuePpUSmtyrzaJt0x7iJSVpeXH0g@mail.gmail.com>
-In-Reply-To: <CACzsE9q-oOhABFWUWH5Jc3BuePpUSmtyrzaJt0x7iJSVpeXH0g@mail.gmail.com>
-From:   Jordan Niethe <jniethe5@gmail.com>
-Date:   Thu, 23 Jul 2020 11:28:46 +1000
-Message-ID: <CACzsE9qyLvSQs2KFirQoTDRZZeVkirDXQumhXycYQ8Kojc8BLQ@mail.gmail.com>
-Subject: Re: [v3 11/15] powerpc/perf: BHRB control to disable BHRB logic when
- not used
-To:     Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Gautham R Shenoy <ego@linux.vnet.ibm.com>,
-        Michael Neuling <mikey@neuling.org>, maddy@linux.vnet.ibm.com,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, svaidyan@in.ibm.com,
-        acme@kernel.org, jolsa@kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200721104202.15727-3-ldufour@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-22_17:2020-07-22,2020-07-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=5
+ impostorscore=0 phishscore=0 bulkscore=0 mlxlogscore=722
+ priorityscore=1501 spamscore=0 malwarescore=0 clxscore=1015 mlxscore=0
+ adultscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2006250000 definitions=main-2007230026
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Jul 23, 2020 at 11:26 AM Jordan Niethe <jniethe5@gmail.com> wrote:
->
-> On Sat, Jul 18, 2020 at 1:26 AM Athira Rajeev
-> <atrajeev@linux.vnet.ibm.com> wrote:
-> >
-> > PowerISA v3.1 has few updates for the Branch History Rolling Buffer(BHRB).
-> >
-> > BHRB disable is controlled via Monitor Mode Control Register A (MMCRA)
-> > bit, namely "BHRB Recording Disable (BHRBRD)". This field controls
-> > whether BHRB entries are written when BHRB recording is enabled by other
-> > bits. This patch implements support for this BHRB disable bit.
-> >
-> > By setting 0b1 to this bit will disable the BHRB and by setting 0b0
-> > to this bit will have BHRB enabled. This addresses backward
-> > compatibility (for older OS), since this bit will be cleared and
-> > hardware will be writing to BHRB by default.
-> >
-> > This patch addresses changes to set MMCRA (BHRBRD) at boot for power10
-> > ( there by the core will run faster) and enable this feature only on
-> > runtime ie, on explicit need from user. Also save/restore MMCRA in the
-> > restore path of state-loss idle state to make sure we keep BHRB disabled
-> > if it was not enabled on request at runtime.
-> >
-> > Signed-off-by: Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-> > ---
-> >  arch/powerpc/perf/core-book3s.c       | 20 ++++++++++++++++----
-> >  arch/powerpc/perf/isa207-common.c     | 12 ++++++++++++
-> >  arch/powerpc/platforms/powernv/idle.c | 22 ++++++++++++++++++++--
-> >  3 files changed, 48 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-book3s.c
-> > index bd125fe..31c0535 100644
-> > --- a/arch/powerpc/perf/core-book3s.c
-> > +++ b/arch/powerpc/perf/core-book3s.c
-> > @@ -1218,7 +1218,7 @@ static void write_mmcr0(struct cpu_hw_events *cpuhw, unsigned long mmcr0)
-> >  static void power_pmu_disable(struct pmu *pmu)
-> >  {
-> >         struct cpu_hw_events *cpuhw;
-> > -       unsigned long flags, mmcr0, val;
-> > +       unsigned long flags, mmcr0, val, mmcra;
-> >
-> >         if (!ppmu)
-> >                 return;
-> > @@ -1251,12 +1251,24 @@ static void power_pmu_disable(struct pmu *pmu)
-> >                 mb();
-> >                 isync();
-> >
-> > +               val = mmcra = cpuhw->mmcr.mmcra;
-> > +
-> >                 /*
-> >                  * Disable instruction sampling if it was enabled
-> >                  */
-> > -               if (cpuhw->mmcr.mmcra & MMCRA_SAMPLE_ENABLE) {
-> > -                       mtspr(SPRN_MMCRA,
-> > -                             cpuhw->mmcr.mmcra & ~MMCRA_SAMPLE_ENABLE);
-> > +               if (cpuhw->mmcr.mmcra & MMCRA_SAMPLE_ENABLE)
-> > +                       val &= ~MMCRA_SAMPLE_ENABLE;
-> > +
-> > +               /* Disable BHRB via mmcra (BHRBRD) for p10 */
-> > +               if (ppmu->flags & PPMU_ARCH_310S)
-> > +                       val |= MMCRA_BHRB_DISABLE;
-> > +
-> > +               /*
-> > +                * Write SPRN_MMCRA if mmcra has either disabled
-> > +                * instruction sampling or BHRB.
-> > +                */
-> > +               if (val != mmcra) {
-> > +                       mtspr(SPRN_MMCRA, mmcra);
-> >                         mb();
-> >                         isync();
-> >                 }
-> > diff --git a/arch/powerpc/perf/isa207-common.c b/arch/powerpc/perf/isa207-common.c
-> > index 77643f3..964437a 100644
-> > --- a/arch/powerpc/perf/isa207-common.c
-> > +++ b/arch/powerpc/perf/isa207-common.c
-> > @@ -404,6 +404,13 @@ int isa207_compute_mmcr(u64 event[], int n_ev,
-> >
-> >         mmcra = mmcr1 = mmcr2 = mmcr3 = 0;
-> >
-> > +       /*
-> > +        * Disable bhrb unless explicitly requested
-> > +        * by setting MMCRA (BHRBRD) bit.
-> > +        */
-> > +       if (cpu_has_feature(CPU_FTR_ARCH_31))
-> > +               mmcra |= MMCRA_BHRB_DISABLE;
-> > +
-> >         /* Second pass: assign PMCs, set all MMCR1 fields */
-> >         for (i = 0; i < n_ev; ++i) {
-> >                 pmc     = (event[i] >> EVENT_PMC_SHIFT) & EVENT_PMC_MASK;
-> > @@ -479,6 +486,11 @@ int isa207_compute_mmcr(u64 event[], int n_ev,
-> >                         mmcra |= val << MMCRA_IFM_SHIFT;
-> >                 }
-> >
-> > +               /* set MMCRA (BHRBRD) to 0 if there is user request for BHRB */
-> > +               if (cpu_has_feature(CPU_FTR_ARCH_31) &&
-> > +                               (has_branch_stack(pevents[i]) || (event[i] & EVENT_WANTS_BHRB)))
-> > +                       mmcra &= ~MMCRA_BHRB_DISABLE;
-> > +
-> >                 if (pevents[i]->attr.exclude_user)
-> >                         mmcr2 |= MMCR2_FCP(pmc);
-> >
-> > diff --git a/arch/powerpc/platforms/powernv/idle.c b/arch/powerpc/platforms/powernv/idle.c
-> > index 2dd4673..1c9d0a9 100644
-> > --- a/arch/powerpc/platforms/powernv/idle.c
-> > +++ b/arch/powerpc/platforms/powernv/idle.c
-> > @@ -611,6 +611,7 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
-> >         unsigned long srr1;
-> >         unsigned long pls;
-> >         unsigned long mmcr0 = 0;
-> > +       unsigned long mmcra = 0;
-> >         struct p9_sprs sprs = {}; /* avoid false used-uninitialised */
-> >         bool sprs_saved = false;
-> >
-> > @@ -657,6 +658,21 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
-> >                   */
-> >                 mmcr0           = mfspr(SPRN_MMCR0);
-> >         }
-> > +
-> > +       if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> > +               /*
-> > +                * POWER10 uses MMCRA (BHRBRD) as BHRB disable bit.
-> > +                * If the user hasn't asked for the BHRB to be
-> > +                * written, the value of MMCRA[BHRBRD] is 1.
-> > +                * On wakeup from stop, MMCRA[BHRBD] will be 0,
-> > +                * since it is previleged resource and will be lost.
-> > +                * Thus, if we do not save and restore the MMCRA[BHRBD],
-> > +                * hardware will be needlessly writing to the BHRB
-> > +                * in problem mode.
-> > +                */
-> > +               mmcra           = mfspr(SPRN_MMCRA);
-> If the only thing that needs to happen is set MMCRA[BHRBRD], why save the MMCRA?
-> > +       }
-> > +
-> >         if ((psscr & PSSCR_RL_MASK) >= pnv_first_spr_loss_level) {
-> >                 sprs.lpcr       = mfspr(SPRN_LPCR);
-> >                 sprs.hfscr      = mfspr(SPRN_HFSCR);
-> > @@ -700,8 +716,6 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
-> >         WARN_ON_ONCE(mfmsr() & (MSR_IR|MSR_DR));
-> >
-> >         if ((srr1 & SRR1_WAKESTATE) != SRR1_WS_NOLOSS) {
-> > -               unsigned long mmcra;
-> > -
-> >                 /*
-> >                  * We don't need an isync after the mtsprs here because the
-> >                  * upcoming mtmsrd is execution synchronizing.
-> > @@ -721,6 +735,10 @@ static unsigned long power9_idle_stop(unsigned long psscr, bool mmu_on)
-> >                         mtspr(SPRN_MMCR0, mmcr0);
-> >                 }
-> >
-> > +               /* Reload MMCRA to restore BHRB disable bit for POWER10 */
-> > +               if (cpu_has_feature(CPU_FTR_ARCH_31))
-> > +                       mtspr(SPRN_MMCRA, mmcra);
-> > +
-> >                 /*
-> >                  * DD2.2 and earlier need to set then clear bit 60 in MMCRA
-> >                  * to ensure the PMU starts running.
-> Just below here we have:
->         mmcra = mfspr(SPRN_MMCRA);
->         mmcra |= PPC_BIT(60);
->         mtspr(SPRN_MMCRA, mmcra);
->         mmcra &= ~PPC_BIT(60);
->         mtspr(SPRN_MMCRA, mmcra);
-> It seems MMCRA[BHRBRD] could just be OR'd in someway similar to this
-> for ISA v3.1?
-Oh wait the user could have cleared it, just ignore me.
-> > --
-> > 1.8.3.1
-> >
+On Tue, Jul 21, 2020 at 12:42:02PM +0200, Laurent Dufour wrote:
+> When a secure memslot is dropped, all the pages backed in the secure device
+> (aka really backed by secure memory by the Ultravisor) should be paged out
+> to a normal page. Previously, this was achieved by triggering the page
+> fault mechanism which is calling kvmppc_svm_page_out() on each pages.
+> 
+> This can't work when hot unplugging a memory slot because the memory slot
+> is flagged as invalid and gfn_to_pfn() is then not trying to access the
+> page, so the page fault mechanism is not triggered.
+> 
+> Since the final goal is to make a call to kvmppc_svm_page_out() it seems
+> simpler to directly calling it instead of triggering such a mechanism. This
+> way kvmppc_uvmem_drop_pages() can be called even when hot unplugging a
+> memslot.
+> 
+> Since kvmppc_uvmem_drop_pages() is already holding kvm->arch.uvmem_lock,
+> the call to __kvmppc_svm_page_out() is made.
+> As __kvmppc_svm_page_out needs the vma pointer to migrate the pages, the
+> VMA is fetched in a lazy way, to not trigger find_vma() all the time. In
+> addition, the mmap_sem is help in read mode during that time, not in write
+> mode since the virual memory layout is not impacted, and
+> kvm->arch.uvmem_lock prevents concurrent operation on the secure device.
+> 
+> Cc: Ram Pai <linuxram@us.ibm.com>
+> Cc: Bharata B Rao <bharata@linux.ibm.com>
+> Cc: Paul Mackerras <paulus@ozlabs.org>
+> Signed-off-by: Laurent Dufour <ldufour@linux.ibm.com>
+> ---
+>  arch/powerpc/kvm/book3s_hv_uvmem.c | 54 ++++++++++++++++++++----------
+>  1 file changed, 37 insertions(+), 17 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> index 5a4b02d3f651..ba5c7c77cc3a 100644
+> --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+> +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> @@ -624,35 +624,55 @@ static inline int kvmppc_svm_page_out(struct vm_area_struct *vma,
+>   * fault on them, do fault time migration to replace the device PTEs in
+>   * QEMU page table with normal PTEs from newly allocated pages.
+>   */
+> -void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *free,
+> +void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *slot,
+>  			     struct kvm *kvm, bool skip_page_out)
+>  {
+>  	int i;
+>  	struct kvmppc_uvmem_page_pvt *pvt;
+> -	unsigned long pfn, uvmem_pfn;
+> -	unsigned long gfn = free->base_gfn;
+> +	struct page *uvmem_page;
+> +	struct vm_area_struct *vma = NULL;
+> +	unsigned long uvmem_pfn, gfn;
+> +	unsigned long addr, end;
+> +
+> +	mmap_read_lock(kvm->mm);
+> +
+> +	addr = slot->userspace_addr;
+
+We typically use gfn_to_hva() for that, but that won't work for a
+memslot that is already marked INVALID which is the case here.
+I think it is ok to access slot->userspace_addr here of an INVALID
+memslot, but just thought of explictly bringing this up.
+
+> +	end = addr + (slot->npages * PAGE_SIZE);
+>  
+> -	for (i = free->npages; i; --i, ++gfn) {
+> -		struct page *uvmem_page;
+> +	gfn = slot->base_gfn;
+> +	for (i = slot->npages; i; --i, ++gfn, addr += PAGE_SIZE) {
+> +
+> +		/* Fetch the VMA if addr is not in the latest fetched one */
+> +		if (!vma || (addr < vma->vm_start || addr >= vma->vm_end)) {
+> +			vma = find_vma_intersection(kvm->mm, addr, end);
+> +			if (!vma ||
+> +			    vma->vm_start > addr || vma->vm_end < end) {
+> +				pr_err("Can't find VMA for gfn:0x%lx\n", gfn);
+> +				break;
+> +			}
+> +		}
+
+In Ram's series, kvmppc_memslot_page_merge() also walks the VMAs spanning
+the memslot, but it uses a different logic for the same. Why can't these
+two cases use the same method to walk the VMAs? Is there anything subtly
+different between the two cases?
+
+Regards,
+Bharata.
