@@ -2,128 +2,103 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4840F22CCD6
-	for <lists+kvm-ppc@lfdr.de>; Fri, 24 Jul 2020 20:13:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F15A22CE7E
+	for <lists+kvm-ppc@lfdr.de>; Fri, 24 Jul 2020 21:11:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726826AbgGXSNw convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm-ppc@lfdr.de>); Fri, 24 Jul 2020 14:13:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13114 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726503AbgGXSNw (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 Jul 2020 14:13:52 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06OI3K9L049700;
-        Fri, 24 Jul 2020 14:13:45 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32fac4c6jh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jul 2020 14:13:45 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06OIBK6B025023;
-        Fri, 24 Jul 2020 18:13:43 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma02fra.de.ibm.com with ESMTP id 32brq7xcpy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jul 2020 18:13:42 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06OIDeZs32899382
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Jul 2020 18:13:40 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F0ACDA404D;
-        Fri, 24 Jul 2020 18:13:39 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51A46A405B;
-        Fri, 24 Jul 2020 18:13:37 +0000 (GMT)
-Received: from [9.85.74.228] (unknown [9.85.74.228])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 24 Jul 2020 18:13:36 +0000 (GMT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [v3 12/15] powerpc/perf: Add support for outputting extended regs
- in perf intr_regs
-From:   Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-In-Reply-To: <b7aa5dfb-273b-e0f7-6337-c71094c666cd@linux.ibm.com>
-Date:   Fri, 24 Jul 2020 23:43:34 +0530
-Cc:     Gautham R Shenoy <ego@linux.vnet.ibm.com>,
-        Michael Neuling <mikey@neuling.org>, maddy@linux.vnet.ibm.com,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, svaidyan@in.ibm.com,
-        acme@kernel.org, jolsa@kernel.org, linuxppc-dev@lists.ozlabs.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <763A7E0C-24E4-4F60-AE92-F0DBB64BAE4B@linux.vnet.ibm.com>
-References: <1594996707-3727-1-git-send-email-atrajeev@linux.vnet.ibm.com>
- <1594996707-3727-13-git-send-email-atrajeev@linux.vnet.ibm.com>
- <b7aa5dfb-273b-e0f7-6337-c71094c666cd@linux.ibm.com>
-To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-24_07:2020-07-24,2020-07-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- suspectscore=0 phishscore=0 mlxlogscore=999 priorityscore=1501
- adultscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007240133
+        id S1726703AbgGXTLJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 24 Jul 2020 15:11:09 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25027 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726397AbgGXTLI (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 Jul 2020 15:11:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595617867;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/IKeY6oErXCv4WxvHD12K0X54wE8JqQGDnTdTiMdbbI=;
+        b=RHVnsO9D2LL8J0m5E/jkUjUIKWBgw/m3Jc2H/4rcNXDt7kkS5hX3+Buv7rewneUbKzgNNL
+        rR4cDCplwVwqSLjF+V2K1NvBv+k5OEQLWQLa9b84/cRS8XR9yw/BQ5jL8DF8PHJRsPTDe2
+        xS5NwySHsx2VWdcIXe45AYvcSw0rnjg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-114-KSQWmsA2MWyLHLlGSd4LFQ-1; Fri, 24 Jul 2020 15:11:03 -0400
+X-MC-Unique: KSQWmsA2MWyLHLlGSd4LFQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0ADD8015F4;
+        Fri, 24 Jul 2020 19:11:01 +0000 (UTC)
+Received: from llong.remote.csb (ovpn-117-203.rdu2.redhat.com [10.10.117.203])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 572FD1A835;
+        Fri, 24 Jul 2020 19:11:00 +0000 (UTC)
+Subject: Re: [PATCH v3 5/6] powerpc/pseries: implement paravirt qspinlocks for
+ SPLPAR
+To:     Will Deacon <will@kernel.org>, peterz@infradead.org
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org, Boqun Feng <boqun.feng@gmail.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Anton Blanchard <anton@ozlabs.org>,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm-ppc@vger.kernel.org,
+        linux-arch@vger.kernel.org
+References: <20200706043540.1563616-1-npiggin@gmail.com>
+ <20200706043540.1563616-6-npiggin@gmail.com>
+ <874kqhvu1v.fsf@mpe.ellerman.id.au>
+ <8265d782-4e50-a9b2-a908-0cb588ffa09c@redhat.com>
+ <20200723140011.GR5523@worktop.programming.kicks-ass.net>
+ <845de183-56f5-2958-3159-faa131d46401@redhat.com>
+ <20200723184759.GS119549@hirez.programming.kicks-ass.net>
+ <20200724081647.GA16642@willie-the-truck>
+From:   Waiman Long <longman@redhat.com>
+Organization: Red Hat
+Message-ID: <8532332b-85dd-661b-cf72-81a8ceb70747@redhat.com>
+Date:   Fri, 24 Jul 2020 15:10:59 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200724081647.GA16642@willie-the-truck>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On 7/24/20 4:16 AM, Will Deacon wrote:
+> On Thu, Jul 23, 2020 at 08:47:59PM +0200, peterz@infradead.org wrote:
+>> On Thu, Jul 23, 2020 at 02:32:36PM -0400, Waiman Long wrote:
+>>> BTW, do you have any comment on my v2 lock holder cpu info qspinlock patch?
+>>> I will have to update the patch to fix the reported 0-day test problem, but
+>>> I want to collect other feedback before sending out v3.
+>> I want to say I hate it all, it adds instructions to a path we spend an
+>> aweful lot of time optimizing without really getting anything back for
+>> it.
+>>
+>> Will, how do you feel about it?
+> I can see it potentially being useful for debugging, but I hate the
+> limitation to 256 CPUs. Even arm64 is hitting that now.
 
+After thinking more about that, I think we can use all the remaining 
+bits in the 16-bit locked_pending. Reserving 1 bit for locked and 1 bit 
+for pending, there are 14 bits left. So as long as NR_CPUS < 16k 
+(requirement for 16-bit locked_pending), we can put all possible cpu 
+numbers into the lock. We can also just use smp_processor_id() without 
+additional percpu data.
 
-> On 24-Jul-2020, at 5:56 PM, Ravi Bangoria <ravi.bangoria@linux.ibm.com> wrote:
-> 
-> Hi Athira,
-> 
->> +/* Function to return the extended register values */
->> +static u64 get_ext_regs_value(int idx)
->> +{
->> +	switch (idx) {
->> +	case PERF_REG_POWERPC_MMCR0:
->> +		return mfspr(SPRN_MMCR0);
->> +	case PERF_REG_POWERPC_MMCR1:
->> +		return mfspr(SPRN_MMCR1);
->> +	case PERF_REG_POWERPC_MMCR2:
->> +		return mfspr(SPRN_MMCR2);
->> +	default: return 0;
->> +	}
->> +}
->> +
->>  u64 perf_reg_value(struct pt_regs *regs, int idx)
->>  {
->> -	if (WARN_ON_ONCE(idx >= PERF_REG_POWERPC_MAX))
->> -		return 0;
->> +	u64 PERF_REG_EXTENDED_MAX;
-> 
-> PERF_REG_EXTENDED_MAX should be initialized. otherwise ...
-> 
->> +
->> +	if (cpu_has_feature(CPU_FTR_ARCH_300))
->> +		PERF_REG_EXTENDED_MAX = PERF_REG_MAX_ISA_300;
->>    	if (idx == PERF_REG_POWERPC_SIER &&
->>  	   (IS_ENABLED(CONFIG_FSL_EMB_PERF_EVENT) ||
->> @@ -85,6 +103,16 @@ u64 perf_reg_value(struct pt_regs *regs, int idx)
->>  	    IS_ENABLED(CONFIG_PPC32)))
->>  		return 0;
->>  +	if (idx >= PERF_REG_POWERPC_MAX && idx < PERF_REG_EXTENDED_MAX)
->> +		return get_ext_regs_value(idx);
-> 
-> On non p9/p10 machine, PERF_REG_EXTENDED_MAX may contain random value which will
-> allow user to pass this if condition unintentionally.
+>
+> Also, you're talking ~1% gains here. I think our collective time would
+> be better spent off reviewing the CNA series and trying to make it more
+> deterministic.
 
-> 
-> Neat: PERF_REG_EXTENDED_MAX is a local variable so it should be in lowercase.
-> Any specific reason to define it in capital?
+I thought you guys are not interested in CNA. I do want to get CNA 
+merged, if possible. Let review the current version again and see if 
+there are ways we can further improve it.
 
-Hi Ravi
-
-There is no specific reason. I will include both these changes in next version
-
-Thanks
-Athira Rajeev
-
-
-> 
-> Ravi
+Cheers,
+Longman
 
