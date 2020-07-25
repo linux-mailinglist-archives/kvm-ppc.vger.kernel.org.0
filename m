@@ -2,121 +2,103 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 579CC22D052
-	for <lists+kvm-ppc@lfdr.de>; Fri, 24 Jul 2020 23:11:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDE4F22D40D
+	for <lists+kvm-ppc@lfdr.de>; Sat, 25 Jul 2020 05:03:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726764AbgGXVLs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 24 Jul 2020 17:11:48 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22525 "EHLO
+        id S1726592AbgGYDDG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 24 Jul 2020 23:03:06 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29319 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726747AbgGXVLq (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 Jul 2020 17:11:46 -0400
+        by vger.kernel.org with ESMTP id S1726572AbgGYDDF (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 Jul 2020 23:03:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595625105;
+        s=mimecast20190719; t=1595646184;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tgk0E/B+fKLI4HapciZOOHShfeB4adj+yNndqo5HAqc=;
-        b=iMiGlJIhDIn2HDHYXq42UTQ8WnJdHCIAiBmnHGQFnHqFp6QnrqFQjFJRoMDjnzaj46t4FE
-        IjZcHE0WPHuvL47mHf3PTeVyq4bNj2Rb/m8fNjcfYNkqIWtFdRUQLPNiu0ENgNwoc3qHgP
-        3FYNh6V44bH2+YFGBtOP9obf/Q3Rf+s=
+        bh=dJKlmgtXl7uNqK+gi01GLPol8dXOhIFF+vRj8dKFHJ4=;
+        b=FEySoPLInVFVh5YkfP/xQh+kVwmLH6Er/vk+tKrfIJR5B63jpKI5pUDPswaiDLYqDn4h0h
+        k4P06wq6+lRni9y9PQ9vh8wX9b0YAisFAroaqYkhHAvKovpG/AZrDoWzz/zd5HhgW3SKH3
+        IyINchM0ZG6EKqxvC4yjPhrwlyCLoXA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-467-EvQuSqI9Np-gVoJuVaSCpw-1; Fri, 24 Jul 2020 17:11:41 -0400
-X-MC-Unique: EvQuSqI9Np-gVoJuVaSCpw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-388-taJbuqtoOr-9IUyajzXA8A-1; Fri, 24 Jul 2020 23:03:02 -0400
+X-MC-Unique: taJbuqtoOr-9IUyajzXA8A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6ED61106B251;
-        Fri, 24 Jul 2020 21:11:39 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA6B958;
+        Sat, 25 Jul 2020 03:03:00 +0000 (UTC)
 Received: from llong.remote.csb (ovpn-117-203.rdu2.redhat.com [10.10.117.203])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9267410013C2;
-        Fri, 24 Jul 2020 21:11:36 +0000 (UTC)
-Subject: Re: [PATCH v4 0/6] powerpc: queued spinlocks and rwlocks
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     Will Deacon <will@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B17D18FA2A;
+        Sat, 25 Jul 2020 03:02:58 +0000 (UTC)
+Subject: Re: [PATCH v3 5/6] powerpc/pseries: implement paravirt qspinlocks for
+ SPLPAR
+From:   Waiman Long <longman@redhat.com>
+To:     Will Deacon <will@kernel.org>, peterz@infradead.org
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org, Boqun Feng <boqun.feng@gmail.com>,
         Ingo Molnar <mingo@redhat.com>,
         Anton Blanchard <anton@ozlabs.org>,
-        =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>,
         linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org, kvm-ppc@vger.kernel.org,
         linux-arch@vger.kernel.org
-References: <20200724131423.1362108-1-npiggin@gmail.com>
-From:   Waiman Long <longman@redhat.com>
+References: <20200706043540.1563616-1-npiggin@gmail.com>
+ <20200706043540.1563616-6-npiggin@gmail.com>
+ <874kqhvu1v.fsf@mpe.ellerman.id.au>
+ <8265d782-4e50-a9b2-a908-0cb588ffa09c@redhat.com>
+ <20200723140011.GR5523@worktop.programming.kicks-ass.net>
+ <845de183-56f5-2958-3159-faa131d46401@redhat.com>
+ <20200723184759.GS119549@hirez.programming.kicks-ass.net>
+ <20200724081647.GA16642@willie-the-truck>
+ <8532332b-85dd-661b-cf72-81a8ceb70747@redhat.com>
 Organization: Red Hat
-Message-ID: <f568c8aa-29b5-dbe9-47b8-ee12ce55cb31@redhat.com>
-Date:   Fri, 24 Jul 2020 17:11:36 -0400
+Message-ID: <ccf0c6a6-b7c3-8909-cc8f-0c5e7434c372@redhat.com>
+Date:   Fri, 24 Jul 2020 23:02:58 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200724131423.1362108-1-npiggin@gmail.com>
+In-Reply-To: <8532332b-85dd-661b-cf72-81a8ceb70747@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 7/24/20 9:14 AM, Nicholas Piggin wrote:
-> Updated with everybody's feedback (thanks all), and more performance
-> results.
+On 7/24/20 3:10 PM, Waiman Long wrote:
+> On 7/24/20 4:16 AM, Will Deacon wrote:
+>> On Thu, Jul 23, 2020 at 08:47:59PM +0200, peterz@infradead.org wrote:
+>>> On Thu, Jul 23, 2020 at 02:32:36PM -0400, Waiman Long wrote:
+>>>> BTW, do you have any comment on my v2 lock holder cpu info 
+>>>> qspinlock patch?
+>>>> I will have to update the patch to fix the reported 0-day test 
+>>>> problem, but
+>>>> I want to collect other feedback before sending out v3.
+>>> I want to say I hate it all, it adds instructions to a path we spend an
+>>> aweful lot of time optimizing without really getting anything back for
+>>> it.
+>>>
+>>> Will, how do you feel about it?
+>> I can see it potentially being useful for debugging, but I hate the
+>> limitation to 256 CPUs. Even arm64 is hitting that now.
 >
-> What I've found is I might have been measuring the worst load point for
-> the paravirt case, and by looking at a range of loads it's clear that
-> queued spinlocks are overall better even on PV, doubly so when you look
-> at the generally much improved worst case latencies.
->
-> I have defaulted it to N even though I'm less concerned about the PV
-> numbers now, just because I think it needs more stress testing. But
-> it's very nicely selectable so should be low risk to include.
->
-> All in all this is a very cool technology and great results especially
-> on the big systems but even on smaller ones there are nice gains. Thanks
-> Waiman and everyone who developed it.
->
-> Thanks,
-> Nick
->
-> Nicholas Piggin (6):
->    powerpc/pseries: move some PAPR paravirt functions to their own file
->    powerpc: move spinlock implementation to simple_spinlock
->    powerpc/64s: implement queued spinlocks and rwlocks
->    powerpc/pseries: implement paravirt qspinlocks for SPLPAR
->    powerpc/qspinlock: optimised atomic_try_cmpxchg_lock that adds the
->      lock hint
->    powerpc: implement smp_cond_load_relaxed
->
->   arch/powerpc/Kconfig                          |  15 +
->   arch/powerpc/include/asm/Kbuild               |   1 +
->   arch/powerpc/include/asm/atomic.h             |  28 ++
->   arch/powerpc/include/asm/barrier.h            |  14 +
->   arch/powerpc/include/asm/paravirt.h           |  87 +++++
->   arch/powerpc/include/asm/qspinlock.h          |  91 ++++++
->   arch/powerpc/include/asm/qspinlock_paravirt.h |   7 +
->   arch/powerpc/include/asm/simple_spinlock.h    | 288 ++++++++++++++++
->   .../include/asm/simple_spinlock_types.h       |  21 ++
->   arch/powerpc/include/asm/spinlock.h           | 308 +-----------------
->   arch/powerpc/include/asm/spinlock_types.h     |  17 +-
->   arch/powerpc/lib/Makefile                     |   3 +
->   arch/powerpc/lib/locks.c                      |  12 +-
->   arch/powerpc/platforms/pseries/Kconfig        |   9 +-
->   arch/powerpc/platforms/pseries/setup.c        |   4 +-
->   include/asm-generic/qspinlock.h               |   4 +
->   16 files changed, 588 insertions(+), 321 deletions(-)
->   create mode 100644 arch/powerpc/include/asm/paravirt.h
->   create mode 100644 arch/powerpc/include/asm/qspinlock.h
->   create mode 100644 arch/powerpc/include/asm/qspinlock_paravirt.h
->   create mode 100644 arch/powerpc/include/asm/simple_spinlock.h
->   create mode 100644 arch/powerpc/include/asm/simple_spinlock_types.h
->
-That patch series looks good to me. Thanks for working on this.
+> After thinking more about that, I think we can use all the remaining 
+> bits in the 16-bit locked_pending. Reserving 1 bit for locked and 1 
+> bit for pending, there are 14 bits left. So as long as NR_CPUS < 16k 
+> (requirement for 16-bit locked_pending), we can put all possible cpu 
+> numbers into the lock. We can also just use smp_processor_id() without 
+> additional percpu data. 
 
-For the series,
+Sorry, that doesn't work. The extra bits in the pending byte won't get 
+cleared on unlock. That will have noticeable performance impact. 
+Clearing the pending byte on unlock will cause other performance 
+problem. So I guess we will have to limit the cpu number in the locked byte.
 
-Acked-by: Waiman Long <longman@redhat.com>
+Regards,
+Longman
 
