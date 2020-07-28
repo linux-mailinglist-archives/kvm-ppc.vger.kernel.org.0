@@ -2,113 +2,75 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D8FB230214
-	for <lists+kvm-ppc@lfdr.de>; Tue, 28 Jul 2020 07:52:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F028230217
+	for <lists+kvm-ppc@lfdr.de>; Tue, 28 Jul 2020 07:52:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726871AbgG1FwV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        id S1726901AbgG1FwW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 28 Jul 2020 01:52:22 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:53825 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726857AbgG1FwV (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
         Tue, 28 Jul 2020 01:52:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40210 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726841AbgG1FwV (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 28 Jul 2020 01:52:21 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BFE6C061794;
-        Mon, 27 Jul 2020 22:52:21 -0700 (PDT)
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4BG5RR52nlz9sTk; Tue, 28 Jul 2020 15:52:19 +1000 (AEST)
+        id 4BG5RR6QYSz9sRN; Tue, 28 Jul 2020 15:52:19 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1595915539; bh=YdXzNj3yLITWMwct98Hrs/Ck+OqhvBxNa6tu3onfhmQ=;
-        h=Date:From:To:Cc:Subject:From;
-        b=DfJJ9n0KUqXuEohxRDafm3ceWLolNWIrUZGi/vBfITeTWk5KptXtRxcQ1bRHsH9HJ
-         FkyI63nA8B64Exj2aBXZUFAmkYVektnMKYHV2eYUa26Fj6jHz25TtgDs3uRtbdWgR/
-         VnWUiNaZ5MnbuctyQqDS0RPPXOThyQ00kJRsakHp5FXVmZsWlnnXYew4xro8Lz38Js
-         hqVT95VHLJaQ3eM9rLIPDgMYJr/AGkL8Idi9HbzF+AbSWa6C/Y2fCv7GPTkNyCAqa+
-         mc7bnBO2hZTS0SA06Gc2sk+Dk7SyyRhIuTZh5SwdCwsEmZUpz3XWIYLcfQNxIA/nvP
-         tCz1xrxfssLsQ==
-Date:   Tue, 28 Jul 2020 15:51:00 +1000
+        t=1595915539; bh=hqi9wl0i8BmJzMLB0DK4D3vfsNHrdTqCEVzktLAKVJE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=LnGgL97VFXhcniyw8eWKUYdvBXzGiE0IxO5/P7nQx6kpB5yljADLkSAChAoD3buC0
+         sAvCWM2DL8HEEFULd8jpx9TPRScCHZf2EmmnzUwuzTt0XVkRISnEC+knlv8E1gEdIX
+         3w08JRddPWukAyyFvJy3caYhUGbiNTksepXQ8m3VWHfD/YZFoD0u1STjMJKVHiCFXX
+         YM9ezRMQScr4R4NV8X+zNPUJo3e6pA1nCxj500Y3aLz3SZSKkLFcD26OS3dyI1DgLq
+         s6vS8/f0+jsz8762K53TimpwU8agM9x6xZT++2oi13++uVZ3slZ9EjOI/laemLd8zZ
+         FHzh4PJEFkj3w==
+Date:   Tue, 28 Jul 2020 15:51:42 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-Subject: [GIT PULL] Please pull my kvm-ppc-next-5.9-1 tag
-Message-ID: <20200728055100.GA2460422@thinks.paulus.ozlabs.org>
+To:     Ram Pai <linuxram@us.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        benh@kernel.crashing.org, mpe@ellerman.id.au,
+        bharata@linux.ibm.com, aneesh.kumar@linux.ibm.com,
+        sukadev@linux.vnet.ibm.com, ldufour@linux.ibm.com,
+        bauerman@linux.ibm.com, david@gibson.dropbear.id.au,
+        cclaudio@linux.ibm.com, sathnaga@linux.vnet.ibm.com
+Subject: Re: [PATCH v6 0/5] Migrate non-migrated pages of a SVM.
+Message-ID: <20200728055142.GB2460422@thinks.paulus.ozlabs.org>
+References: <1595873238-26184-1-git-send-email-linuxram@us.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1595873238-26184-1-git-send-email-linuxram@us.ibm.com>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paolo,
+On Mon, Jul 27, 2020 at 11:07:13AM -0700, Ram Pai wrote:
+> The time to switch a VM to Secure-VM, increases by the size of the VM.
+> A 100GB VM takes about 7minutes. This is unacceptable.  This linear
+> increase is caused by a suboptimal behavior by the Ultravisor and the
+> Hypervisor.  The Ultravisor unnecessarily migrates all the GFN of the
+> VM from normal-memory to secure-memory. It has to just migrate the
+> necessary and sufficient GFNs.
+> 
+> However when the optimization is incorporated in the Ultravisor, the
+> Hypervisor starts misbehaving. The Hypervisor has a inbuilt assumption
+> that the Ultravisor will explicitly request to migrate, each and every
+> GFN of the VM. If only necessary and sufficient GFNs are requested for
+> migration, the Hypervisor continues to manage the remaining GFNs as
+> normal GFNs. This leads to memory corruption; manifested
+> consistently when the SVM reboots.
+> 
+> The same is true, when a memory slot is hotplugged into a SVM. The
+> Hypervisor expects the ultravisor to request migration of all GFNs to
+> secure-GFN.  But the hypervisor cannot handle any H_SVM_PAGE_IN
+> requests from the Ultravisor, done in the context of
+> UV_REGISTER_MEM_SLOT ucall.  This problem manifests as random errors
+> in the SVM, when a memory-slot is hotplugged.
+> 
+> This patch series automatically migrates the non-migrated pages of a
+> SVM, and thus solves the problem.
+> 
+> Testing: Passed rigorous testing using various sized SVMs.
 
-Please do a pull from my kvm-ppc-next-5.9-1 tag to get a PPC KVM
-update for 5.9.  It's another relatively small update this time, the
-main thing being a series to improve the startup time for secure VMs
-and make memory hotplug work in secure VMs.
+Thanks, series applied to my kvm-ppc-next branch and pull request sent.
 
-Thanks,
 Paul.
-
-The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
-
-  Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.9-1
-
-for you to fetch changes up to 81ab595ddd3c3036806b460526e1fbc5b271ff33:
-
-  KVM: PPC: Book3S HV: Rework secure mem slot dropping (2020-07-28 12:34:52 +1000)
-
-----------------------------------------------------------------
-PPC KVM update for 5.9
-
-- Improvements and bug-fixes for secure VM support, giving reduced startup
-  time and memory hotplug support.
-- Locking fixes in nested KVM code
-- Increase number of guests supported by HV KVM to 4094
-- Preliminary POWER10 support
-
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      KVM: PPC: Protect kvm_vcpu_read_guest with srcu locks
-
-Alistair Popple (1):
-      KVM: PPC: Book3SHV: Enable support for ISA v3.1 guests
-
-Cédric Le Goater (1):
-      KVM: PPC: Book3S HV: Increase KVMPPC_NR_LPIDS on POWER8 and POWER9
-
-Laurent Dufour (3):
-      KVM: PPC: Book3S HV: Migrate hot plugged memory
-      KVM: PPC: Book3S HV: Move kvmppc_svm_page_out up
-      KVM: PPC: Book3S HV: Rework secure mem slot dropping
-
-Ram Pai (4):
-      KVM: PPC: Book3S HV: Fix function definition in book3s_hv_uvmem.c
-      KVM: PPC: Book3S HV: Disable page merging in H_SVM_INIT_START
-      KVM: PPC: Book3S HV: Track the state GFNs associated with secure VMs
-      KVM: PPC: Book3S HV: In H_SVM_INIT_DONE, migrate remaining normal-GFNs to secure-GFNs
-
-Tianjia Zhang (1):
-      KVM: PPC: Clean up redundant kvm_run parameters in assembly
-
- Documentation/powerpc/ultravisor.rst        |   3 +
- arch/powerpc/include/asm/kvm_book3s_uvmem.h |  14 +
- arch/powerpc/include/asm/kvm_ppc.h          |   2 +-
- arch/powerpc/include/asm/reg.h              |   4 +-
- arch/powerpc/kvm/book3s_64_mmu_hv.c         |   8 +-
- arch/powerpc/kvm/book3s_64_mmu_radix.c      |   4 +
- arch/powerpc/kvm/book3s_hv.c                |  26 +-
- arch/powerpc/kvm/book3s_hv_nested.c         |  30 +-
- arch/powerpc/kvm/book3s_hv_uvmem.c          | 698 +++++++++++++++++++++-------
- arch/powerpc/kvm/book3s_interrupts.S        |  56 ++-
- arch/powerpc/kvm/book3s_pr.c                |   9 +-
- arch/powerpc/kvm/book3s_rtas.c              |   2 +
- arch/powerpc/kvm/booke.c                    |   9 +-
- arch/powerpc/kvm/booke_interrupts.S         |   9 +-
- arch/powerpc/kvm/bookehv_interrupts.S       |  10 +-
- arch/powerpc/kvm/powerpc.c                  |   5 +-
- 16 files changed, 646 insertions(+), 243 deletions(-)
