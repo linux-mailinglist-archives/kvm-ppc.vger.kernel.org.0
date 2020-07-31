@@ -2,121 +2,157 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A3522343E2
-	for <lists+kvm-ppc@lfdr.de>; Fri, 31 Jul 2020 12:03:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD7C8234B7E
+	for <lists+kvm-ppc@lfdr.de>; Fri, 31 Jul 2020 21:15:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732527AbgGaKDC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 31 Jul 2020 06:03:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57522 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732371AbgGaKDB (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 31 Jul 2020 06:03:01 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06VA28wW083706;
-        Fri, 31 Jul 2020 06:02:52 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32mfb8k32h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Jul 2020 06:02:51 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06V9ucCr011895;
-        Fri, 31 Jul 2020 10:02:48 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 32gcqgq3uq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Jul 2020 10:02:48 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06VA2j6Y28574140
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 Jul 2020 10:02:45 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 60E014C058;
-        Fri, 31 Jul 2020 10:02:45 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 208664C040;
-        Fri, 31 Jul 2020 10:02:43 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.199.52.65])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 31 Jul 2020 10:02:42 +0000 (GMT)
-Date:   Fri, 31 Jul 2020 15:32:40 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     Ram Pai <linuxram@us.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
-        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
-        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
-        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
-        sathnaga@linux.vnet.ibm.com
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: fix a oops in
- kvmppc_uvmem_page_free()
-Message-ID: <20200731100240.GC20199@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <1596151526-4374-1-git-send-email-linuxram@us.ibm.com>
- <20200731042940.GA20199@in.ibm.com>
- <20200731083700.GB5787@oc0525413822.ibm.com>
+        id S1730177AbgGaTPq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 31 Jul 2020 15:15:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38230 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729209AbgGaTPq (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 31 Jul 2020 15:15:46 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E6EC061756
+        for <kvm-ppc@vger.kernel.org>; Fri, 31 Jul 2020 12:15:45 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id b25so23789496qto.2
+        for <kvm-ppc@vger.kernel.org>; Fri, 31 Jul 2020 12:15:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Fq0Y+W4Lgf9ZSs2fq5dZEqY/mzSGk+8POFJ4bFdvCDk=;
+        b=G/VpxuJUEys50kS6M4S8wb2H1SZFH9TAe6PT9j9DjWLTOfJB5PNMU67K3dsNbEqa/T
+         f/t/ak0QhLCebd7u7VQEHzvhQW9JdWn6Q0zDWLUeVDy3t8XfK0bgdcd4pK6d11b8hDOJ
+         awmYIM72dgL0i2V7jQWPII+xmQ6s7xdvCa7yHe3VPproYPZLgxU/trvWLMs7TJ1a17zM
+         hkxnvRS2KHmbgVl2ohPFNxuIcOG5Hy4m6X5ZU/L5bcHwUkvXjAenwqP7ddqeXsdvNx8d
+         7a/WH0YQE0MirCzNS6Fv+Fw+tL8mCVhiagDDtra7MILsPqqCdx7raAC9vGeT/LHU24gG
+         VvfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Fq0Y+W4Lgf9ZSs2fq5dZEqY/mzSGk+8POFJ4bFdvCDk=;
+        b=BL7ZUloK32tj+yxJA8ZEFJVhfpUrgiUxFVx/6bz9e2eDv4kRXhhK6OOK/+7afl/Y6M
+         ZKsJA9DN6wy2uzjrcp6fE3qhtq21+S7nQfLqVK/T0NtpMGyPVCO6eVlHEHY07k9DmIHF
+         eFgIgYFXXwP9X4XTPRtex+rUJxgqlkoQOt527EUf02zjm0eXhLB1ZNC9f6mmHe+AZa/o
+         PnUA7fug8dSrR4AZL8ZNQnlgn9vjB10RjcCpz2oOpmwWEpKkxCDuQl5cCKJGkdLzlLCb
+         CO1X8nAEMBo370w8eLa/IgsxB5TXjjbtDSU1/LcwgsRwTTyIIcm6Uwi2cSU5TamjJWq9
+         14mg==
+X-Gm-Message-State: AOAM531e2I2LLPWPVoTxYEhYevvLIGjhfmRUZIdxFpchvguDqD43rORy
+        UCOKU78hnrAU+dbyBOKA3pGl6w==
+X-Google-Smtp-Source: ABdhPJy80fPm/ep3Y4AxQL+NAp4HUm3l9/dB0ABYDlNS+XUMwzmiJ6PHh20/a5m/KIRuQsM16pnQBA==
+X-Received: by 2002:aed:3361:: with SMTP id u88mr5258595qtd.79.1596222944775;
+        Fri, 31 Jul 2020 12:15:44 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id q2sm10160900qtl.64.2020.07.31.12.15.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Jul 2020 12:15:44 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1k1aVL-002Bep-EX; Fri, 31 Jul 2020 16:15:43 -0300
+Date:   Fri, 31 Jul 2020 16:15:43 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Ralph Campbell <rcampbell@nvidia.com>
+Cc:     linux-rdma@vger.kernel.org, linux-mm@kvack.org,
+        nouveau@lists.freedesktop.org, kvm-ppc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jerome Glisse <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Ben Skeggs <bskeggs@redhat.com>,
+        Bharata B Rao <bharata@linux.ibm.com>
+Subject: Re: [PATCH v4 6/6] mm/migrate: remove range invalidation in
+ migrate_vma_pages()
+Message-ID: <20200731191543.GJ24045@ziepe.ca>
+References: <20200723223004.9586-1-rcampbell@nvidia.com>
+ <20200723223004.9586-7-rcampbell@nvidia.com>
+ <20200728191940.GB159104@nvidia.com>
+ <7f947311-0034-9148-1dca-fb9b9a10abc4@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200731083700.GB5787@oc0525413822.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-31_03:2020-07-31,2020-07-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- mlxscore=0 mlxlogscore=999 adultscore=0 bulkscore=0 lowpriorityscore=0
- impostorscore=0 phishscore=0 priorityscore=1501 clxscore=1015
- suspectscore=5 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007310071
+In-Reply-To: <7f947311-0034-9148-1dca-fb9b9a10abc4@nvidia.com>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Jul 31, 2020 at 01:37:00AM -0700, Ram Pai wrote:
-> On Fri, Jul 31, 2020 at 09:59:40AM +0530, Bharata B Rao wrote:
-> > On Thu, Jul 30, 2020 at 04:25:26PM -0700, Ram Pai wrote:
-> > In our case, device pages that are in use are always associated with a valid
-> > pvt member. See kvmppc_uvmem_get_page() which returns failure if it
-> > runs out of device pfns and that will result in proper failure of
-> > page-in calls.
+On Tue, Jul 28, 2020 at 03:04:07PM -0700, Ralph Campbell wrote:
 > 
-> looked at the code, and yes that code path looks correct. So my
-> reasoning behind the root cause of this bug is incorrect. However the
-> bug is surfacing and there must be a reason.
-> 
+> On 7/28/20 12:19 PM, Jason Gunthorpe wrote:
+> > On Thu, Jul 23, 2020 at 03:30:04PM -0700, Ralph Campbell wrote:
+> > > When migrating the special zero page, migrate_vma_pages() calls
+> > > mmu_notifier_invalidate_range_start() before replacing the zero page
+> > > PFN in the CPU page tables. This is unnecessary since the range was
+> > > invalidated in migrate_vma_setup() and the page table entry is checked
+> > > to be sure it hasn't changed between migrate_vma_setup() and
+> > > migrate_vma_pages(). Therefore, remove the redundant invalidation.
 > > 
-> > For the case where we run out of device pfns, migrate_vma_finalize() will
-> > restore the original PTE and will not replace the PTE with device private PTE.
+> > I don't follow this logic, the purpose of the invalidation is also to
+> > clear out anything that may be mirroring this VA, and "the page hasn't
+> > changed" doesn't seem to rule out that case?
 > > 
-> > Also kvmppc_uvmem_page_free() (=dev_pagemap_ops.page_free()) is never
-> > called for non-device-private pages.
+> > I'm also not sure I follow where the zero page came from?
 > 
-> Yes. it should not be called. But as seen above in the stack trace, it is called. 
+> The zero page comes from an anonymous private VMA that is read-only
+> and the user level CPU process tries to read the page data (or any
+> other read page fault).
 > 
-> What would cause the HMM to call ->page_free() on a page that is not
-> associated with that device's pfn?
-
-I believe it is being called for a device private page, you can verify
-it when you hit it next time?
-
-> 
+> > Jason
 > > 
-> > This could be a use-after-free case possibly arising out of the new state
-> > changes in HV. If so, this fix will only mask the bug and not address the
-> > original problem.
 > 
-> I can verify by rerunning the tests, without the new state changes. But
-> I do not see how those changes can cause this fault?
+> The overall migration process is:
 > 
-> This could also be caused by a duplicate ->page_free() call due to some
-> bug in the migrate_page path? Could there be a race between
-> migrate_page() and a page_fault ?
+> mmap_read_lock()
 > 
+> migrate_vma_setup()
+>       // invalidates range, locks/isolates pages, puts migration entry in page table
 > 
-> Regardless, kvmppc_uvmem_page_free() needs to be fixed. It should not
-> access contents of pvt, without verifing pvt is valid.
+> <driver allocates destination pages and copies source to dest>
+> 
+> migrate_vma_pages()
+>       // moves source struct page info to destination struct page info.
+>       // clears migration flag for pages that can't be migrated.
+> 
+> <driver updates device page tables for pages still migrating, rollback pages not migrating>
+> 
+> migrate_vma_finalize()
+>       // replaces migration page table entry with destination page PFN.
+> 
+> mmap_read_unlock()
+> 
+> Since the address range is invalidated in the migrate_vma_setup() stage,
+> and the page is isolated from the LRU cache, locked, unmapped, and the page table
+> holds a migration entry (so the page can't be faulted and the CPU page table set
+> valid again), and there are no extra page references (pins), the page
+> "should not be modified".
 
-We don't expect pvt to be NULL here. Checking for NULL and returning
-isn't the right fix, I think.
+That is the physical page though, it doesn't prove nobody else is
+reading the PTE.
+ 
+> For pte_none()/is_zero_pfn() entries, migrate_vma_setup() leaves the
+> pte_none()/is_zero_pfn() entry in place but does still call
+> mmu_notifier_invalidate_range_start() for the whole range being migrated.
 
-Regards,
-Bharata.
+Ok..
+
+> In the migrate_vma_pages() step, the pte page table is locked and the
+> pte entry checked to be sure it is still pte_none/is_zero_pfn(). If not,
+> the new page isn't inserted. If it is still none/zero, the new device private
+> struct page is inserted into the page table, replacing the pte_none()/is_zero_pfn()
+> page table entry. The secondary MMUs were already invalidated in the migrate_vma_setup()
+> step and a pte_none() or zero page can't be modified so the only invalidation needed
+> is the CPU TLB(s) for clearing the special zero page PTE entry.
+
+No, the secondary MMU was invalidated but the invalidation start/end
+range was exited. That means a secondary MMU is immeidately able to
+reload the zero page into its MMU cache.
+
+When this code replaces the PTE that has a zero page it also has to
+invalidate again so that secondary MMU's are guaranteed to pick up the
+new PTE value.
+
+So, I still don't understand how this is safe?
+
+Jason
