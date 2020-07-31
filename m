@@ -2,103 +2,199 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 988952340E2
-	for <lists+kvm-ppc@lfdr.de>; Fri, 31 Jul 2020 10:11:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A878823414A
+	for <lists+kvm-ppc@lfdr.de>; Fri, 31 Jul 2020 10:37:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731524AbgGaILK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 31 Jul 2020 04:11:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48986 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731510AbgGaILK (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 31 Jul 2020 04:11:10 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06V81uqv102565;
-        Fri, 31 Jul 2020 04:10:56 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32mfb8gcrd-1
+        id S1728437AbgGaIhY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 31 Jul 2020 04:37:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53686 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728412AbgGaIhY (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 31 Jul 2020 04:37:24 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06V8VM9c032523;
+        Fri, 31 Jul 2020 04:37:11 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 32mdjsbu5p-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Jul 2020 04:10:56 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06V859t6019431;
-        Fri, 31 Jul 2020 08:10:54 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 32gcqk49te-1
+        Fri, 31 Jul 2020 04:37:11 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06V8ZOeP015588;
+        Fri, 31 Jul 2020 08:37:09 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 32gcpwcajk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 31 Jul 2020 08:10:53 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06V8ApnT63898038
+        Fri, 31 Jul 2020 08:37:09 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 06V8b6rk25297156
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 Jul 2020 08:10:51 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EBDE511C050;
-        Fri, 31 Jul 2020 08:10:50 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E37C211C04C;
-        Fri, 31 Jul 2020 08:10:47 +0000 (GMT)
+        Fri, 31 Jul 2020 08:37:06 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5B72642045;
+        Fri, 31 Jul 2020 08:37:06 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A0EE942049;
+        Fri, 31 Jul 2020 08:37:03 +0000 (GMT)
 Received: from oc0525413822.ibm.com (unknown [9.211.129.132])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 31 Jul 2020 08:10:47 +0000 (GMT)
-Date:   Fri, 31 Jul 2020 01:10:44 -0700
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 31 Jul 2020 08:37:03 +0000 (GMT)
+Date:   Fri, 31 Jul 2020 01:37:00 -0700
 From:   Ram Pai <linuxram@us.ibm.com>
 To:     Bharata B Rao <bharata@linux.ibm.com>
-Cc:     Julia Lawall <julia.lawall@inria.fr>, sukadev@linux.ibm.com,
-        corbet@lwn.net, linux-doc@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
-        mpe@ellerman.id.au, benh@kernel.crashing.org,
-        ldufour@linux.ibm.com, david@gibson.dropbear.id.au,
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au,
+        aneesh.kumar@linux.ibm.com, sukadev@linux.vnet.ibm.com,
+        ldufour@linux.ibm.com, bauerman@linux.ibm.com,
+        david@gibson.dropbear.id.au, cclaudio@linux.ibm.com,
         sathnaga@linux.vnet.ibm.com
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Define H_PAGE_IN_NONSHARED for
- H_SVM_PAGE_IN hcall
-Message-ID: <20200731081044.GA5787@oc0525413822.ibm.com>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: fix a oops in
+ kvmppc_uvmem_page_free()
+Message-ID: <20200731083700.GB5787@oc0525413822.ibm.com>
 Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <alpine.DEB.2.22.394.2007301231140.2548@hadrien>
- <20200730232101.GB5882@oc0525413822.ibm.com>
- <20200731043334.GB20199@in.ibm.com>
+References: <1596151526-4374-1-git-send-email-linuxram@us.ibm.com>
+ <20200731042940.GA20199@in.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200731043334.GB20199@in.ibm.com>
+In-Reply-To: <20200731042940.GA20199@in.ibm.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-31_02:2020-07-30,2020-07-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- mlxscore=0 mlxlogscore=996 adultscore=0 bulkscore=0 lowpriorityscore=0
- impostorscore=0 phishscore=0 priorityscore=1501 clxscore=1015
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007310054
+ definitions=2020-07-31_02:2020-07-31,2020-07-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 bulkscore=0 mlxlogscore=999 impostorscore=0
+ malwarescore=0 suspectscore=2 phishscore=0 mlxscore=0 adultscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007310059
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Jul 31, 2020 at 10:03:34AM +0530, Bharata B Rao wrote:
-> On Thu, Jul 30, 2020 at 04:21:01PM -0700, Ram Pai wrote:
-> > H_SVM_PAGE_IN hcall takes a flag parameter. This parameter specifies the
-> > way in which a page will be treated.  H_PAGE_IN_NONSHARED indicates
-> > that the page will be shared with the Secure VM, and H_PAGE_IN_SHARED
-> > indicates that the page will not be shared but its contents will
-> > be copied.
-> 
-> Looks like you got the definitions of shared and non-shared interchanged.
-
-Yes. Realized it after sending the patch. Will fix it.
-
-> 
+On Fri, Jul 31, 2020 at 09:59:40AM +0530, Bharata B Rao wrote:
+> On Thu, Jul 30, 2020 at 04:25:26PM -0700, Ram Pai wrote:
+> > Observed the following oops while stress-testing, using multiple
+> > secureVM on a distro kernel. However this issue theoritically exists in
+> > 5.5 kernel and later.
 > > 
-> > However H_PAGE_IN_NONSHARED is not defined in the header file, though
-> > it is defined and documented in the API captured in
-> > Documentation/powerpc/ultravisor.rst
+> > This issue occurs when the total number of requested device-PFNs exceed
+> > the total-number of available device-PFNs.  PFN migration fails to
+> > allocate a device-pfn, which causes migrate_vma_finalize() to trigger
+> > kvmppc_uvmem_page_free() on a page, that is not associated with any
+> > device-pfn.  kvmppc_uvmem_page_free() blindly tries to access the
+> > contents of the private data which can be null, leading to the following
+> > kernel fault.
 > > 
-> > Define H_PAGE_IN_NONSHARED in the header file.
+> >  --------------------------------------------------------------------------
+> >  Unable to handle kernel paging request for data at address 0x00000011
+> >  Faulting instruction address: 0xc00800000e36e110
+> >  Oops: Kernel access of bad area, sig: 11 [#1]
+> >  LE SMP NR_CPUS=2048 NUMA PowerNV
+> > ....
+> >  MSR:  900000000280b033 <SF,HV,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>
+> > 		 CR: 24424822  XER: 00000000
+> >  CFAR: c000000000e3d764 DAR: 0000000000000011 DSISR: 40000000 IRQMASK: 0
+> >  GPR00: c00800000e36e0a4 c000001f1d59f610 c00800000e38a400 0000000000000000
+> >  GPR04: c000001fa5000000 fffffffffffffffe ffffffffffffffff c000201fffeaf300
+> >  GPR08: 00000000000001f0 0000000000000000 0000000000000f80 c00800000e373608
+> >  GPR12: c000000000e3d710 c000201fffeaf300 0000000000000001 00007fef87360000
+> >  GPR16: 00007fff97db4410 c000201c3b66a578 ffffffffffffffff 0000000000000000
+> >  GPR20: 0000000119db9ad0 000000000000000a fffffffffffffffc 0000000000000001
+> >  GPR24: c000201c3b660000 c000001f1d59f7a0 c0000000004cffb0 0000000000000001
+> >  GPR28: 0000000000000000 c00a001ff003e000 c00800000e386150 0000000000000f80
+> >  NIP [c00800000e36e110] kvmppc_uvmem_page_free+0xc8/0x210 [kvm_hv]
+> >  LR [c00800000e36e0a4] kvmppc_uvmem_page_free+0x5c/0x210 [kvm_hv]
+> >  Call Trace:
+> >  [c000000000512010] free_devmap_managed_page+0xd0/0x100
+> >  [c0000000003f71d0] put_devmap_managed_page+0xa0/0xc0
+> >  [c0000000004d24bc] migrate_vma_finalize+0x32c/0x410
+> >  [c00800000e36e828] kvmppc_svm_page_in.constprop.5+0xa0/0x460 [kvm_hv]
+> >  [c00800000e36eddc] kvmppc_uv_migrate_mem_slot.isra.2+0x1f4/0x230 [kvm_hv]
+> >  [c00800000e36fa98] kvmppc_h_svm_init_done+0x90/0x170 [kvm_hv]
+> >  [c00800000e35bb14] kvmppc_pseries_do_hcall+0x1ac/0x10a0 [kvm_hv]
+> >  [c00800000e35edf4] kvmppc_vcpu_run_hv+0x83c/0x1060 [kvm_hv]
+> >  [c00800000e95eb2c] kvmppc_vcpu_run+0x34/0x48 [kvm]
+> >  [c00800000e95a2dc] kvm_arch_vcpu_ioctl_run+0x374/0x830 [kvm]
+> >  [c00800000e9433b4] kvm_vcpu_ioctl+0x45c/0x7c0 [kvm]
+> >  [c0000000005451d0] do_vfs_ioctl+0xe0/0xaa0
+> >  [c000000000545d64] sys_ioctl+0xc4/0x160
+> >  [c00000000000b408] system_call+0x5c/0x70
+> >  Instruction dump:
+> >  a12d1174 2f890000 409e0158 a1271172 3929ffff b1271172 7c2004ac 39200000
+> >  913e0140 39200000 e87d0010 f93d0010 <89230011> e8c30000 e9030008 2f890000
+> >  --------------------------------------------------------------------------
+> > 
+> >  Fix the oops..
+> > 
+> > fixes: ca9f49 ("KVM: PPC: Book3S HV: Support for running secure guests")
+> > Signed-off-by: Ram Pai <linuxram@us.ibm.com>
+> > ---
+> >  arch/powerpc/kvm/book3s_hv_uvmem.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> > index 2806983..f4002bf 100644
+> > --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
+> > +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
+> > @@ -1018,13 +1018,15 @@ static void kvmppc_uvmem_page_free(struct page *page)
+> >  {
+> >  	unsigned long pfn = page_to_pfn(page) -
+> >  			(kvmppc_uvmem_pgmap.res.start >> PAGE_SHIFT);
+> > -	struct kvmppc_uvmem_page_pvt *pvt;
+> > +	struct kvmppc_uvmem_page_pvt *pvt = page->zone_device_data;
+> > +
+> > +	if (!pvt)
+> > +		return;
+> >  
+> >  	spin_lock(&kvmppc_uvmem_bitmap_lock);
+> >  	bitmap_clear(kvmppc_uvmem_bitmap, pfn, 1);
+> >  	spin_unlock(&kvmppc_uvmem_bitmap_lock);
+> >  
+> > -	pvt = page->zone_device_data;
+> >  	page->zone_device_data = NULL;
+> >  	if (pvt->remove_gfn)
+> >  		kvmppc_gfn_remove(pvt->gpa >> PAGE_SHIFT, pvt->kvm);
 > 
-> What is the use of defining this? Is this used directly in any place?
-> Or, are youp planning to introduce such a usage?
+> In our case, device pages that are in use are always associated with a valid
+> pvt member. See kvmppc_uvmem_get_page() which returns failure if it
+> runs out of device pfns and that will result in proper failure of
+> page-in calls.
 
-I know the Hypervisor code currently has no use for that define.
-It assumes  H_PAGE_IN_NONSHARED to be !H_PAGE_IN_SHARED.
+looked at the code, and yes that code path looks correct. So my
+reasoning behind the root cause of this bug is incorrect. However the
+bug is surfacing and there must be a reason.
 
-But H_PAGE_IN_NONSHARED is defined in the Ultravisor API, and hence has
-to be captured in the header, to stay consistent.
+> 
+> For the case where we run out of device pfns, migrate_vma_finalize() will
+> restore the original PTE and will not replace the PTE with device private PTE.
+> 
+> Also kvmppc_uvmem_page_free() (=dev_pagemap_ops.page_free()) is never
+> called for non-device-private pages.
 
-RP
+Yes. it should not be called. But as seen above in the stack trace, it is called. 
+
+What would cause the HMM to call ->page_free() on a page that is not
+associated with that device's pfn?
+
+> 
+> This could be a use-after-free case possibly arising out of the new state
+> changes in HV. If so, this fix will only mask the bug and not address the
+> original problem.
+
+I can verify by rerunning the tests, without the new state changes. But
+I do not see how those changes can cause this fault?
+
+This could also be caused by a duplicate ->page_free() call due to some
+bug in the migrate_page path? Could there be a race between
+migrate_page() and a page_fault ?
+
+
+Regardless, kvmppc_uvmem_page_free() needs to be fixed. It should not
+access contents of pvt, without verifing pvt is valid.
+
+> 
+> Regards,
+> Bharata.
+
+-- 
+Ram Pai
