@@ -2,169 +2,74 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EB27242A1C
-	for <lists+kvm-ppc@lfdr.de>; Wed, 12 Aug 2020 15:13:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 614FB244138
+	for <lists+kvm-ppc@lfdr.de>; Fri, 14 Aug 2020 00:24:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726946AbgHLNNA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 12 Aug 2020 09:13:00 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.51]:32624 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726404AbgHLNM7 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 12 Aug 2020 09:12:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1597237974;
-        s=strato-dkim-0002; d=xenosoft.de;
-        h=In-Reply-To:Date:Message-ID:Cc:To:References:From:Subject:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=Kcodj0v7+WjSyfmFV8xxq/qYKikq4tATpX4BNGbJoj0=;
-        b=isqSSEwVFqWkzordsv26DPUqU10ji97nRP203S92QoXqtTOUb4LD+Ex3b1fW/LRMFm
-        +rn6Md0STXxtr2DtcvQW5mC+N9q4ifxD+AfIOqCsr4cCLoIFAOz06GxBcauj6+ay+7PR
-        HcGiiL8mIFpM8I+cpV/yZ25DKEpXathxtyjobGziqLaRq8MTi6cnznyc2yRgY3UPjFwb
-        E4tjB+atSDabT54Lc2hgBUZFUf7km8S2h0huky4GCooywqATjs3cDDsrxoCP832RPddn
-        UjBsB6fIfS0S9nLw6cIKGE30eT0eDQTOvNIfbuYAiBkExHMXo6piznNs6v99jB3d7vMz
-        IBLA==
-X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHfJ+Dkjp5DdBJSrwuuqxvPgBLnW+lALRBb0WtQiyeOSIyvQMpg=="
-X-RZG-CLASS-ID: mo00
-Received: from [IPv6:2a02:8109:89c0:ebfc:b869:b453:e120:98dd]
-        by smtp.strato.de (RZmta 46.10.5 AUTH)
-        with ESMTPSA id 60686ew7CD9ocIN
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Wed, 12 Aug 2020 15:09:50 +0200 (CEST)
-Subject: [Virtual ppce500] virtio_gpu virtio0: swiotlb buffer is full
-From:   Christian Zigotzky <chzigotzky@xenosoft.de>
-References: <87h7tb4zwp.fsf@linux.ibm.com>
- <E1C071A5-19D1-4493-B04A-4507A70D7848@xenosoft.de>
- <bc1975fb-23df-09c2-540a-c13b39ad56c5@xenosoft.de>
- <51482c70-1007-1202-9ed1-2d174c1e923f@xenosoft.de>
- <9688335c-d7d0-9eaa-22c6-511e708e0d2a@linux.ibm.com>
- <9805f81d-651d-d1a3-fd05-fb224a8c2031@xenosoft.de>
-To:     daniel.vetter@ffwll.ch
-Cc:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>,
-        =?UTF-8?Q?Michel_D=c3=a4nzer?= <michel@daenzer.net>,
-        "R.T.Dickinson" <rtd2@xtra.co.nz>,
-        Darren Stevens <darren@stevens-zone.net>,
-        mad skateman <madskateman@gmail.com>
-Message-ID: <3162da18-462c-72b4-f8f0-eef896c6b162@xenosoft.de>
-Date:   Wed, 12 Aug 2020 15:09:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726639AbgHMWY6 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Thu, 13 Aug 2020 18:24:58 -0400
+Received: from [186.47.21.114] ([186.47.21.114]:44966 "EHLO mail.hmvi.gob.ec"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726546AbgHMWY4 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 13 Aug 2020 18:24:56 -0400
+X-Greylist: delayed 15161 seconds by postgrey-1.27 at vger.kernel.org; Thu, 13 Aug 2020 18:24:55 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by mail.hmvi.gob.ec (Postfix) with ESMTP id 014ADC0355E30;
+        Thu, 13 Aug 2020 12:08:38 -0500 (-05)
+Received: from mail.hmvi.gob.ec ([127.0.0.1])
+        by localhost (mail.hmvi.gob.ec [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id IRp8WiV-t4kH; Thu, 13 Aug 2020 12:08:37 -0500 (-05)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.hmvi.gob.ec (Postfix) with ESMTP id 25E18C0355E36;
+        Thu, 13 Aug 2020 11:57:45 -0500 (-05)
+X-Virus-Scanned: amavisd-new at hmvi.gob.ec
+Received: from mail.hmvi.gob.ec ([127.0.0.1])
+        by localhost (mail.hmvi.gob.ec [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id eDytJcQbOJxA; Thu, 13 Aug 2020 11:57:44 -0500 (-05)
+Received: from [10.73.80.190] (unknown [105.8.3.183])
+        by mail.hmvi.gob.ec (Postfix) with ESMTPSA id 0DA22C033BBCE;
+        Thu, 13 Aug 2020 11:50:46 -0500 (-05)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <9805f81d-651d-d1a3-fd05-fb224a8c2031@xenosoft.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: de-DE
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: =?utf-8?q?Covid_19_Wohlt=C3=A4tigkeitsfonds?=
+To:     Recipients <danny.puetate@mail.hmvi.gob.ec>
+From:   ''Tayeb Souami'' <danny.puetate@mail.hmvi.gob.ec>
+Date:   Thu, 13 Aug 2020 18:50:26 +0200
+Reply-To: Tayebsouam.spende@gmail.com
+Message-Id: <20200813165047.0DA22C033BBCE@mail.hmvi.gob.ec>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hello Daniel,
+Lieber Freund,
 
-The VirtIO-GPU doesn't work anymore with the latest Git kernel in a 
-virtual e5500 PPC64 QEMU machine [1,2] after the commit "drm/virtio: 
-Call the right shmem helpers". [3]
-The kernel 5.8 works with the VirtIO-GPU in this virtual machine.
+Ich bin Herr Tayeb Souami, New Jersey, Vereinigte Staaten von Amerika,
+der Mega-Gewinner von $ 315million In Mega Millions Jackpot, spende ich
+an 5 zufällige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre
+E-Mail nach einem Spinball ausgewählt.Ich habe den größten Teil meines
+Vermögens auf eine Reihe von Wohltätigkeitsorganisationen und
+Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die
+Summe von € 2.000.000,00 an Sie als eine der ausgewählten 5 zu spenden,
+um meine Gewinne zu überprüfen, sehen Sie bitte meine You Tube Seite
+unten.
 
-I bisected today [4].
 
-Result: drm/virtio: Call the right shmem helpers ( 
-d323bb44e4d23802eb25d13de1f93f2335bd60d0) [3] is the first bad commit.
+UHR MICH HIER: https://www.youtube.com/watch?v=Z6ui8ZDQ6Ks
 
-I was able to revert the first bad commit. [5] After that I compiled a 
-new kernel again. Then I was able to boot Linux with this kernel in a 
-virtual e5500 PPC64 QEMU machine with the VirtIO-GPU.
 
-I created a patch. [6] With this patch I can use the VirtIO-GPU again.
+Das ist dein Spendencode: [TS530342018]
 
-Could you please check the first bad commit?
 
-Thanks,
-Christian
+Antworten Sie mit dem SPENDE-CODE an diese
 
-[1] QEMU command: qemu-system-ppc64 -M ppce500 -cpu e5500 -enable-kvm -m 
-1024 -kernel uImage -drive 
-format=raw,file=fienix-soar_3.0-2020608-net.img,index=0,if=virtio -nic 
-user,model=e1000 -append "rw root=/dev/vda2" -device virtio-vga -device 
-virtio-mouse-pci -device virtio-keyboard-pci -device pci-ohci,id=newusb 
--device usb-audio,bus=newusb.0 -smp 4
+E-Mail:Tayebsouam.spende@gmail.com
 
-[2] Error messages:
 
-virtio_gpu virtio0: swiotlb buffer is full (sz: 4096 bytes), total 0 
-(slots), used 0 (slots)
-BUG: Kernel NULL pointer dereference on read at 0x00000010
-Faulting instruction address: 0xc0000000000c7324
-Oops: Kernel access of bad area, sig: 11 [#1]
-BE PAGE_SIZE=4K PREEMPT SMP NR_CPUS=4 QEMU e500
-Modules linked in:
-CPU: 2 PID: 1678 Comm: kworker/2:2 Not tainted 
-5.9-a3_A-EON_X5000-11735-g06a81c1c7db9-dirty #1
-Workqueue: events .virtio_gpu_dequeue_ctrl_func
-NIP:  c0000000000c7324 LR: c0000000000c72e4 CTR: c000000000462930
-REGS: c00000003dba75e0 TRAP: 0300   Not tainted 
-(5.9-a3_A-EON_X5000-11735-g06a81c1c7db9-dirty)
-MSR:  0000000090029000 <CE,EE,ME>  CR: 24002288  XER: 00000000
-DEAR: 0000000000000010 ESR: 0000000000000000 IRQMASK: 0
-GPR00: c0000000000c6188 c00000003dba7870 c0000000017f2300 c00000003d893010
-GPR04: 0000000000000000 0000000000000001 0000000000000000 0000000000000000
-GPR08: 0000000000000000 0000000000000000 0000000000000000 7f7f7f7f7f7f7f7f
-GPR12: 0000000024002284 c00000003fff9200 c00000000008c3a0 c0000000061566c0
-GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-GPR20: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-GPR24: 0000000000000001 0000000000110000 0000000000000000 0000000000000000
-GPR28: c00000003d893010 0000000000000000 0000000000000000 c00000003d893010
-NIP [c0000000000c7324] .dma_direct_unmap_sg+0x4c/0xd8
-LR [c0000000000c72e4] .dma_direct_unmap_sg+0xc/0xd8
-Call Trace:
-[c00000003dba7870] [c00000003dba7950] 0xc00000003dba7950 (unreliable)
-[c00000003dba7920] [c0000000000c6188] .dma_unmap_sg_attrs+0x5c/0x98
-[c00000003dba79d0] [c0000000005cd438] .drm_gem_shmem_free_object+0x98/0xcc
-[c00000003dba7a50] [c0000000006af5b4] .virtio_gpu_cleanup_object+0xc8/0xd4
-[c00000003dba7ad0] [c0000000006ad3bc] .virtio_gpu_cmd_unref_cb+0x1c/0x30
-[c00000003dba7b40] [c0000000006adab8] 
-.virtio_gpu_dequeue_ctrl_func+0x208/0x28c
-[c00000003dba7c10] [c000000000086b70] .process_one_work+0x1a4/0x258
-[c00000003dba7cb0] [c0000000000870f4] .worker_thread+0x214/0x284
-[c00000003dba7d70] [c00000000008c4f0] .kthread+0x150/0x158
-[c00000003dba7e20] [c00000000000082c] .ret_from_kernel_thread+0x58/0x60
-Instruction dump:
-f821ff51 7cb82b78 7cdb3378 4e000000 7cfa3b78 3bc00000 7f9ec000 41fc0014
-382100b0 81810008 7d808120 48bc1ba8 <e93d0010> ebfc0248 833d0018 7fff4850
----[ end trace f28d194d9f0955a8 ]---
+Ich hoffe, Sie und Ihre Familie glücklich zu machen.
 
-virtio_gpu virtio0: swiotlb buffer is full (sz: 4096 bytes), total 0 
-(slots), used 0 (slots)
-virtio_gpu virtio0: swiotlb buffer is full (sz: 16384 bytes), total 0 
-(slots), used 0 (slots)
 
----
+Grüße
 
-[3] 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d323bb44e4d23802eb25d13de1f93f2335bd60d0
-
-[4] https://forum.hyperion-entertainment.com/viewtopic.php?p=51377#p51377
-
-[5] git revert d323bb44e4d23802eb25d13de1f93f2335bd60d0 //Output: 
-[master 966950f724e4] Revert "drm/virtio: Call the right shmem helpers" 
-1 file changed, 1 insertion(+), 1 deletion(-)
-
-[6]
-diff --git a/drivers/gpu/drm/virtio/virtgpu_object.c 
-b/drivers/gpu/drm/virtio/virtgpu_object.c
-index 6ccbd01cd888..346cef5ce251 100644
---- a/drivers/gpu/drm/virtio/virtgpu_object.c
-+++ b/drivers/gpu/drm/virtio/virtgpu_object.c
-@@ -150,7 +150,7 @@ static int virtio_gpu_object_shmem_init(struct 
-virtio_gpu_device *vgdev,
-      if (ret < 0)
-          return -EINVAL;
-
--    shmem->pages = drm_gem_shmem_get_pages_sgt(&bo->base.base);
-+    shmem->pages = drm_gem_shmem_get_sg_table(&bo->base.base);
-      if (!shmem->pages) {
-          drm_gem_shmem_unpin(&bo->base.base);
-          return -EINVAL;
----
+Herr Tayeb Souami
