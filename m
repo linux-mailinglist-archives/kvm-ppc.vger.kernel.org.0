@@ -2,34 +2,34 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8D45248391
-	for <lists+kvm-ppc@lfdr.de>; Tue, 18 Aug 2020 13:08:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AB4F2487FA
+	for <lists+kvm-ppc@lfdr.de>; Tue, 18 Aug 2020 16:41:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726273AbgHRLIk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 18 Aug 2020 07:08:40 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:34211 "EHLO
+        id S1726923AbgHROlz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 18 Aug 2020 10:41:55 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.52]:31810 "EHLO
         mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726145AbgHRLIj (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 18 Aug 2020 07:08:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1597748918;
+        with ESMTP id S1726863AbgHROly (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 18 Aug 2020 10:41:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1597761709;
         s=strato-dkim-0002; d=xenosoft.de;
         h=In-Reply-To:Date:Message-ID:From:References:Cc:To:Subject:
         X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=koJFguAnm5m7Yf22e906vapRRMCc7tRf8L4mLRereyM=;
-        b=VBudImc3ITxGcLwcfkNDMtdgEX8O2rnZ95SxM9v8/r0FjTwYaOlpUDEtkywwI9IYUA
-        zNUHa6tH29rUV4HaWYZ0ZEy6nPVfPbpsce1dhDQ9cpVI879JITc9FKrb9MyHqZWk/CfM
-        wtbEgYoXUd2XAyklQD2NnVVz6YIDumeDA25ab6o3mpmgY9CpoLdR5noHCO5KJ9Gq+mW/
-        URGaBuxDN89zJLJjdu7x2pRYcN1i5sWCcNxCrbOHdFYpHfh9GU9+wjVcFddFZkGyUaXr
-        mczPiPdlomBbcU30EoXH6EC1roqf5PKXGFzBV7yheIzutIa2M8/Kc1eWyyrXIoPKq25I
-        BXJA==
-X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHvJzedV4hp0hM3BukOMWh+LViYiuzXqVlZzVo7xSI73ElHU="
+        bh=yY8lZpT6KH3C16Gfks0UQ6yD6WQSNt9zdE+YDfsTYO4=;
+        b=aiKtXg3SHLzB+oyLUOi+sA6kkLHRNunAeTq1bGCglC4BVDEw+6giVULGmF0rTQc/y2
+        oouF3qmWNp1IEl9BjywdUS8/bejp3VZERXo0BFvwNJw+aUTA3B45fC4Y0F0/38y5Zgtq
+        w+EQVtEPGOMOrhAzoOQ1KSiyX3sOqKJhwWif8iRp9b15pm3rbwKEWJGelDWgqZEFX6PF
+        9DNCreio9EUxh3f/ipZjb7faQXp8SwyUngHzk20fbJIZnucFLPreWdkLGvutYrYRf9Zk
+        D4PPjEBR+gJOCqZThE/4kNstFusryG+c8UD7NLmEyvkKKhDT3tMKvYVq3F5OLfgKkcpN
+        ffCA==
+X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHvJzedV4hp0hM3BukOMWh76B1HxtPtLuZ1yU+QFTgVvLrsuJ"
 X-RZG-CLASS-ID: mo00
-Received: from [IPv6:2a01:598:b10d:7054:8ddd:9a9:703b:cd26]
+Received: from [IPv6:2a01:598:b10d:7054:d092:5f3e:8032:9dca]
         by smtp.strato.de (RZmta 46.10.5 AUTH)
-        with ESMTPSA id 60686ew7IB8Sqqz
+        with ESMTPSA id 60686ew7IEfcrlW
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-        Tue, 18 Aug 2020 13:08:28 +0200 (CEST)
+        Tue, 18 Aug 2020 16:41:38 +0200 (CEST)
 Subject: Re: [Virtual ppce500] virtio_gpu virtio0: swiotlb buffer is full
 To:     Gerd Hoffmann <kraxel@redhat.com>
 Cc:     daniel.vetter@ffwll.ch, Darren Stevens <darren@stevens-zone.net>,
@@ -39,7 +39,8 @@ Cc:     daniel.vetter@ffwll.ch, Darren Stevens <darren@stevens-zone.net>,
         <dri-devel@lists.freedesktop.org>,
         "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
         "R.T.Dickinson" <rtd2@xtra.co.nz>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        gurchetansingh@chromium.org
 References: <87h7tb4zwp.fsf@linux.ibm.com>
  <E1C071A5-19D1-4493-B04A-4507A70D7848@xenosoft.de>
  <bc1975fb-23df-09c2-540a-c13b39ad56c5@xenosoft.de>
@@ -50,8 +51,8 @@ References: <87h7tb4zwp.fsf@linux.ibm.com>
  <3eee8130-6913-49d2-2160-abf0bf17c44e@xenosoft.de>
  <20200818081830.d2a2cva4hd2jzwba@sirius.home.kraxel.org>
 From:   Christian Zigotzky <chzigotzky@xenosoft.de>
-Message-ID: <56faac9f-49e8-2f0b-6cd5-f8e589db4c8c@xenosoft.de>
-Date:   Tue, 18 Aug 2020 13:08:27 +0200
+Message-ID: <0f2434a5-edcf-e7d1-f6ae-7c912dc8d859@xenosoft.de>
+Date:   Tue, 18 Aug 2020 16:41:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
@@ -79,4 +80,20 @@ On 18 August 2020 at 10:18 am, Gerd Hoffmann wrote:
 > take care,
 >    Gerd
 >
-Thank you!
+Hello Gerd,
+
+I compiled a new kernel with the latest DRM misc updates today. The 
+patch is included in these updates.
+
+This kernel works with the VirtIO-GPU in a virtual e5500 QEMU/KVM HV 
+machine on my X5000.
+
+Unfortunately I can only use the VirtIO-GPU (Monitor: Red Hat, Inc. 8") 
+with a resolution of 640x480. If I set a higher resolution then the 
+guest disables the monitor.
+I can use higher resolutions with the stable kernel 5.8 and the VirtIO-GPU.
+
+Please check the latest DRM updates.
+
+Thanks,
+Christian
