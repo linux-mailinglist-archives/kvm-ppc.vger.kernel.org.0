@@ -2,149 +2,258 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D0AA2513A4
-	for <lists+kvm-ppc@lfdr.de>; Tue, 25 Aug 2020 09:55:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8EE52574E9
+	for <lists+kvm-ppc@lfdr.de>; Mon, 31 Aug 2020 10:03:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728666AbgHYHzr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 25 Aug 2020 03:55:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55784 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725379AbgHYHzp (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 25 Aug 2020 03:55:45 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEFCCC061574
-        for <kvm-ppc@vger.kernel.org>; Tue, 25 Aug 2020 00:55:44 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id y206so6669328pfb.10
-        for <kvm-ppc@vger.kernel.org>; Tue, 25 Aug 2020 00:55:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xWZCcKXp7dQkLY1ua1N7VSvKv+b8YJkHyth4+PNi84E=;
-        b=WzLcj8UvBir/fg2DWzThgI9VWnwFAbE0SDTvc/ZiOVRoPJX+Q67bzfhP/0T7lC5gAm
-         z/97UrVQ/iJ/1pTiPD72shcvMX4G2r867cPp5Ezib3VX074fiQxFPZShBQSO78gGk0oC
-         uOHa0PdRQ/5m3aMxkZSsNHwSQHL1pwh0/x1QBAfvslMHkMfDKTXUhEHEyptmC6Q0gNWR
-         mcVQiXl4lqaSVo/ltgbeGPrFVNUk2KFciSAozFNnAX0sczVHFWd2GJEcNYTB8mRIZqiq
-         YPIuPqDIGR2lnF5TrtQ04qgpRrbIb1Lz4QSpGsBNGlvd4douwRt/Sk9AEjtr2WLurFVW
-         SfFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xWZCcKXp7dQkLY1ua1N7VSvKv+b8YJkHyth4+PNi84E=;
-        b=O54crB9Z9Vfft7cihJXCeHjXEWI67y9Jcm72vf/gAVHimS02dxnCuVlxS+rQD9RnVf
-         Nc6yLCXnbe5g9i9sHOUqyOMJ8DyD5X2qDwSsRoGmyA2yXnd9C+k0unnwCKILtLe9rt8A
-         w2yJsXwDyDjUXB/RuZYNWv4FdSYT+Ig5JOz6S3qheoLVaff0OxcI4CcERZo+2v/vvlQ3
-         lPGu04Scw6qZEHescsgfvOliyOkRK8fOaZoP/jmlr/C1LXbFDIrx7R+K+cYshZFgmobI
-         epafxwjI5e+NWJXcAJnLC58/nKUytMxZGMkE4TKrzvIs5BIykqq+W+g2xMd+/OOEJg02
-         bxag==
-X-Gm-Message-State: AOAM533Dj6bUUem4dBULrP2Wc+6JVOe9D/2aDTlWb2tKeqhhD8ef1xWT
-        41TECluiZ1mJH44BTgaQQ2M=
-X-Google-Smtp-Source: ABdhPJzf+BaXZmZz+oBdRtibxl2pb0ox4A4t3T7MMCXGbbK+TiqjEgQT0VCLsFW65M/6iBDdvL8CGw==
-X-Received: by 2002:a63:ef47:: with SMTP id c7mr5778379pgk.249.1598342144450;
-        Tue, 25 Aug 2020 00:55:44 -0700 (PDT)
-Received: from bobo.ozlabs.ibm.com (61-68-212-105.tpgi.com.au. [61.68.212.105])
-        by smtp.gmail.com with ESMTPSA id z1sm1802577pjn.34.2020.08.25.00.55.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Aug 2020 00:55:44 -0700 (PDT)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH] powerpc/64s: handle ISA v3.1 local copy-paste context switches
-Date:   Tue, 25 Aug 2020 17:55:35 +1000
-Message-Id: <20200825075535.224536-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.23.0
+        id S1726198AbgHaIDP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 31 Aug 2020 04:03:15 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:36519 "EHLO
+        smtpout1.mo529.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725829AbgHaIDO (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 31 Aug 2020 04:03:14 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.143.158])
+        by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 4813F55AE9C4;
+        Mon, 31 Aug 2020 10:03:11 +0200 (CEST)
+Received: from kaod.org (37.59.142.103) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Mon, 31 Aug
+ 2020 10:03:10 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-103G0052585dda5-7f0d-41bb-a613-1ff894d1e0c5,
+                    70438FF62B8DED8CE1D87E404E7B2A4B79B9F11D) smtp.auth=groug@kaod.org
+Date:   Mon, 31 Aug 2020 10:03:09 +0200
+From:   Greg Kurz <groug@kaod.org>
+To:     Paul Mackerras <paulus@ozlabs.org>
+CC:     David Gibson <david@gibson.dropbear.id.au>,
+        "=?UTF-8?B?Q8OpZHJpYw==?= Le Goater" <clg@kaod.org>,
+        <kvm-ppc@vger.kernel.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: XICS: Replace the 'destroy' method
+ by a 'release' method
+Message-ID: <20200831100309.4264d5fa@bahia.lan>
+In-Reply-To: <159705408550.1308430.10165736270896374279.stgit@bahia.lan>
+References: <159705408550.1308430.10165736270896374279.stgit@bahia.lan>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.103]
+X-ClientProxiedBy: DAG9EX1.mxp5.local (172.16.2.81) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 34f183be-fbe3-46e0-85ec-908f531d7beb
+X-Ovh-Tracer-Id: 12591501611849980323
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefgedguddvkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfedutdeijeejveehkeeileetgfelteekteehtedtieefffevhffflefftdefleejnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegtlhhgsehkrghougdrohhrgh
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The ISA v3.1 the copy-paste facility has a new memory move functionality
-which allows the copy buffer to be pasted to domestic memory (RAM) as
-opposed to foreign memory (accelerator).
+On Mon, 10 Aug 2020 12:08:05 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-This means the POWER9 trick of avoiding the cp_abort on context switch if
-the process had not mapped foreign memory does not work on POWER10. Do the
-cp_abort unconditionally there.
+> Similarly to what was done with XICS-on-XIVE and XIVE native KVM devices
+> with commit 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy'
+> method by a 'release' method"), convert the historical XICS KVM device to
+> implement the 'release' method. This is needed to run nested guests with
+> an in-kernel IRQ chip. A typical POWER9 guest can select XICS or XIVE
+> during boot, which requires to be able to destroy and to re-create the
+> KVM device. Only the historical XICS KVM device is available under pseries
+> at the current time and it still uses the legacy 'destroy' method.
+> 
+> Switching to 'release' means that vCPUs might still be running when the
+> device is destroyed. In order to avoid potential use-after-free, the
+> kvmppc_xics structure is allocated on first usage and kept around until
+> the VM exits. The same pointer is used each time a KVM XICS device is
+> being created, but this is okay since we only have one per VM.
+> 
+> Clear the ICP of each vCPU with vcpu->mutex held. This ensures that the
+> next time the vCPU resumes execution, it won't be going into the XICS
+> code anymore.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
 
-KVM must also cp_abort on guest exit to prevent copy buffer state leaking
-between contexts.
+Any chance someone can review this ?
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- arch/powerpc/kernel/process.c           | 16 +++++++++-------
- arch/powerpc/kvm/book3s_hv.c            |  7 +++++++
- arch/powerpc/kvm/book3s_hv_rmhandlers.S |  8 ++++++++
- 3 files changed, 24 insertions(+), 7 deletions(-)
+Cheers,
 
-diff --git a/arch/powerpc/kernel/process.c b/arch/powerpc/kernel/process.c
-index 016bd831908e..1a572c811ca5 100644
---- a/arch/powerpc/kernel/process.c
-+++ b/arch/powerpc/kernel/process.c
-@@ -1250,15 +1250,17 @@ struct task_struct *__switch_to(struct task_struct *prev,
- 		restore_math(current->thread.regs);
- 
- 		/*
--		 * The copy-paste buffer can only store into foreign real
--		 * addresses, so unprivileged processes can not see the
--		 * data or use it in any way unless they have foreign real
--		 * mappings. If the new process has the foreign real address
--		 * mappings, we must issue a cp_abort to clear any state and
--		 * prevent snooping, corruption or a covert channel.
-+		 * On POWER9 the copy-paste buffer can only paste into
-+		 * foreign real addresses, so unprivileged processes can not
-+		 * see the data or use it in any way unless they have
-+		 * foreign real mappings. If the new process has the foreign
-+		 * real address mappings, we must issue a cp_abort to clear
-+		 * any state and prevent snooping, corruption or a covert
-+		 * channel. ISA v3.1 supports paste into local memory.
- 		 */
- 		if (current->mm &&
--			atomic_read(&current->mm->context.vas_windows))
-+			(cpu_has_feature(CPU_FTR_ARCH_31) ||
-+			atomic_read(&current->mm->context.vas_windows)))
- 			asm volatile(PPC_CP_ABORT);
- 	}
- #endif /* CONFIG_PPC_BOOK3S_64 */
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 4ba06a2a306c..3bd3118c7633 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3530,6 +3530,13 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 	 */
- 	asm volatile("eieio; tlbsync; ptesync");
- 
-+	/*
-+	 * cp_abort is required if the processor supports local copy-paste
-+	 * to clear the copy buffer that was under control of the guest.
-+	 */
-+	if (cpu_has_feature(CPU_FTR_ARCH_31))
-+		asm volatile(PPC_CP_ABORT);
-+
- 	mtspr(SPRN_LPID, vcpu->kvm->arch.host_lpid);	/* restore host LPID */
- 	isync();
- 
-diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index 799d6d0f4ead..cd9995ee8441 100644
---- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-+++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -1830,6 +1830,14 @@ END_FTR_SECTION_IFSET(CPU_FTR_P9_RADIX_PREFETCH_BUG)
- 2:
- #endif /* CONFIG_PPC_RADIX_MMU */
- 
-+	/*
-+	 * cp_abort is required if the processor supports local copy-paste
-+	 * to clear the copy buffer that was under control of the guest.
-+	 */
-+BEGIN_FTR_SECTION
-+	PPC_CP_ABORT
-+END_FTR_SECTION_IFSET(CPU_FTR_ARCH_31)
-+
- 	/*
- 	 * POWER7/POWER8 guest -> host partition switch code.
- 	 * We don't have to lock against tlbies but we do
--- 
-2.23.0
+--
+Greg
+
+>  arch/powerpc/include/asm/kvm_host.h |    1 
+>  arch/powerpc/kvm/book3s.c           |    4 +-
+>  arch/powerpc/kvm/book3s_xics.c      |   86 ++++++++++++++++++++++++++++-------
+>  3 files changed, 72 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index e020d269416d..974adda2ec94 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -325,6 +325,7 @@ struct kvm_arch {
+>  #endif
+>  #ifdef CONFIG_KVM_XICS
+>  	struct kvmppc_xics *xics;
+> +	struct kvmppc_xics *xics_device;
+>  	struct kvmppc_xive *xive;    /* Current XIVE device in use */
+>  	struct {
+>  		struct kvmppc_xive *native;
+> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+> index 41fedec69ac3..56618c2770e1 100644
+> --- a/arch/powerpc/kvm/book3s.c
+> +++ b/arch/powerpc/kvm/book3s.c
+> @@ -878,13 +878,15 @@ void kvmppc_core_destroy_vm(struct kvm *kvm)
+>  
+>  #ifdef CONFIG_KVM_XICS
+>  	/*
+> -	 * Free the XIVE devices which are not directly freed by the
+> +	 * Free the XIVE and XICS devices which are not directly freed by the
+>  	 * device 'release' method
+>  	 */
+>  	kfree(kvm->arch.xive_devices.native);
+>  	kvm->arch.xive_devices.native = NULL;
+>  	kfree(kvm->arch.xive_devices.xics_on_xive);
+>  	kvm->arch.xive_devices.xics_on_xive = NULL;
+> +	kfree(kvm->arch.xics_device);
+> +	kvm->arch.xics_device = NULL;
+>  #endif /* CONFIG_KVM_XICS */
+>  }
+>  
+> diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
+> index 381bf8dea193..5fee5a11550d 100644
+> --- a/arch/powerpc/kvm/book3s_xics.c
+> +++ b/arch/powerpc/kvm/book3s_xics.c
+> @@ -1334,47 +1334,97 @@ static int xics_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
+>  	return -ENXIO;
+>  }
+>  
+> -static void kvmppc_xics_free(struct kvm_device *dev)
+> +/*
+> + * Called when device fd is closed. kvm->lock is held.
+> + */
+> +static void kvmppc_xics_release(struct kvm_device *dev)
+>  {
+>  	struct kvmppc_xics *xics = dev->private;
+>  	int i;
+>  	struct kvm *kvm = xics->kvm;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	pr_devel("Releasing xics device\n");
+> +
+> +	/*
+> +	 * Since this is the device release function, we know that
+> +	 * userspace does not have any open fd referring to the
+> +	 * device.  Therefore there can not be any of the device
+> +	 * attribute set/get functions being executed concurrently,
+> +	 * and similarly, the connect_vcpu and set/clr_mapped
+> +	 * functions also cannot be being executed.
+> +	 */
+>  
+>  	debugfs_remove(xics->dentry);
+>  
+> +	/*
+> +	 * We should clean up the vCPU interrupt presenters first.
+> +	 */
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		/*
+> +		 * Take vcpu->mutex to ensure that no one_reg get/set ioctl
+> +		 * (i.e. kvmppc_xics_[gs]et_icp) can be done concurrently.
+> +		 * Holding the vcpu->mutex also means that execution is
+> +		 * excluded for the vcpu until the ICP was freed. When the vcpu
+> +		 * can execute again, vcpu->arch.icp and vcpu->arch.irq_type
+> +		 * have been cleared and the vcpu will not be going into the
+> +		 * XICS code anymore.
+> +		 */
+> +		mutex_lock(&vcpu->mutex);
+> +		kvmppc_xics_free_icp(vcpu);
+> +		mutex_unlock(&vcpu->mutex);
+> +	}
+> +
+>  	if (kvm)
+>  		kvm->arch.xics = NULL;
+>  
+> -	for (i = 0; i <= xics->max_icsid; i++)
+> +	for (i = 0; i <= xics->max_icsid; i++) {
+>  		kfree(xics->ics[i]);
+> -	kfree(xics);
+> +		xics->ics[i] = NULL;
+> +	}
+> +	/*
+> +	 * A reference of the kvmppc_xics pointer is now kept under
+> +	 * the xics_device pointer of the machine for reuse. It is
+> +	 * freed when the VM is destroyed for now until we fix all the
+> +	 * execution paths.
+> +	 */
+>  	kfree(dev);
+>  }
+>  
+> +static struct kvmppc_xics *kvmppc_xics_get_device(struct kvm *kvm)
+> +{
+> +	struct kvmppc_xics **kvm_xics_device = &kvm->arch.xics_device;
+> +	struct kvmppc_xics *xics = *kvm_xics_device;
+> +
+> +	if (!xics) {
+> +		xics = kzalloc(sizeof(*xics), GFP_KERNEL);
+> +		*kvm_xics_device = xics;
+> +	} else {
+> +		memset(xics, 0, sizeof(*xics));
+> +	}
+> +
+> +	return xics;
+> +}
+> +
+>  static int kvmppc_xics_create(struct kvm_device *dev, u32 type)
+>  {
+>  	struct kvmppc_xics *xics;
+>  	struct kvm *kvm = dev->kvm;
+> -	int ret = 0;
+>  
+> -	xics = kzalloc(sizeof(*xics), GFP_KERNEL);
+> +	pr_devel("Creating xics for partition\n");
+> +
+> +	/* Already there ? */
+> +	if (kvm->arch.xics)
+> +		return -EEXIST;
+> +
+> +	xics = kvmppc_xics_get_device(kvm);
+>  	if (!xics)
+>  		return -ENOMEM;
+>  
+>  	dev->private = xics;
+>  	xics->dev = dev;
+>  	xics->kvm = kvm;
+> -
+> -	/* Already there ? */
+> -	if (kvm->arch.xics)
+> -		ret = -EEXIST;
+> -	else
+> -		kvm->arch.xics = xics;
+> -
+> -	if (ret) {
+> -		kfree(xics);
+> -		return ret;
+> -	}
+> +	kvm->arch.xics = xics;
+>  
+>  #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+>  	if (cpu_has_feature(CPU_FTR_ARCH_206) &&
+> @@ -1399,7 +1449,7 @@ struct kvm_device_ops kvm_xics_ops = {
+>  	.name = "kvm-xics",
+>  	.create = kvmppc_xics_create,
+>  	.init = kvmppc_xics_init,
+> -	.destroy = kvmppc_xics_free,
+> +	.release = kvmppc_xics_release,
+>  	.set_attr = xics_set_attr,
+>  	.get_attr = xics_get_attr,
+>  	.has_attr = xics_has_attr,
+> @@ -1415,7 +1465,7 @@ int kvmppc_xics_connect_vcpu(struct kvm_device *dev, struct kvm_vcpu *vcpu,
+>  		return -EPERM;
+>  	if (xics->kvm != vcpu->kvm)
+>  		return -EPERM;
+> -	if (vcpu->arch.irq_type)
+> +	if (vcpu->arch.irq_type != KVMPPC_IRQ_DEFAULT)
+>  		return -EBUSY;
+>  
+>  	r = kvmppc_xics_create_icp(vcpu, xcpu);
+> 
+> 
 
