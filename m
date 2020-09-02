@@ -2,59 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24EBE25A744
-	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Sep 2020 10:00:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 103F125A87B
+	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Sep 2020 11:19:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726285AbgIBIAi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 2 Sep 2020 04:00:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37424 "EHLO
+        id S1726140AbgIBJTe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 2 Sep 2020 05:19:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726140AbgIBIAi (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 2 Sep 2020 04:00:38 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D80DBC061244
-        for <kvm-ppc@vger.kernel.org>; Wed,  2 Sep 2020 01:00:36 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id v16so3494855otp.10
-        for <kvm-ppc@vger.kernel.org>; Wed, 02 Sep 2020 01:00:36 -0700 (PDT)
+        with ESMTP id S1726173AbgIBJTe (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 2 Sep 2020 05:19:34 -0400
+Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56FB5C061244
+        for <kvm-ppc@vger.kernel.org>; Wed,  2 Sep 2020 02:19:34 -0700 (PDT)
+Received: by mail-ot1-x343.google.com with SMTP id k20so3697012otr.1
+        for <kvm-ppc@vger.kernel.org>; Wed, 02 Sep 2020 02:19:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=zpnjn6f8oeFbP2O+Jv7aUIl6F5Bk24aTxxfcp1ZBfPQ=;
-        b=WdhcQ80bdf8jjmBasboFEWb4emxu3yEKjvw629iQqu1e34rp5yDFGGOtEXVuv2AAAk
-         LeVcKSX3onUojPc867KHrhEsyNhoQpZp58cVZNJJT3nGvckpQr+lNcTKWNuyj8R7OIh6
-         lANv1VU4e6nCjwj10b+f+Nz/O6Lj2taQcN8mqxqwjDGlw5NUjWZAj149oC/5AQffwlkc
-         hlHA72T39lK4LnRYYelh+4vClvHo1SXx8YXU0dmi+TOBPjMHI4fhP7OITVA/mBAAZ9W3
-         BKc1SBhadVu4z/8sUoH1gK+xROyjkbMbCBYLH37UVsg7LAeQaPKKQsLj1Yg0i3CJmJDF
-         +LWg==
+        bh=OXMTCYKKDHUBQdldt8AzU2mUeg41hBCxakL+XCbBpKs=;
+        b=cSnVWxgU0+gX0Cl711d7S/2g8jICe89QKFmbmYivR7A9cZxv9//44M0x3vxH3g0Ym5
+         hTYmzBAU8dI0tRGow1vLG+K7TBCB4mG4yM2GHg9hgwtEYZtBwP4nVW15INvFKWxkRfJj
+         jNBG4bLMNZ46IQYTDb//qqw6K3TwO0z9dmLdXrYsTPYtjYVehDun5f/BW4UN000g+yVy
+         XFmAlyKM7ExthPHjdYh0waEAptpXw4p34ju0hIUSwmP2o1lfECQMUBnWBTfulyhagwHJ
+         y/DpJxJ+5KniiA85NsIjhzAWNswP5dA8KqyTws5ULBX84MzF4d1n6gMba/zOd+xNJVRk
+         PLwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=zpnjn6f8oeFbP2O+Jv7aUIl6F5Bk24aTxxfcp1ZBfPQ=;
-        b=BDFdYm8Hf8ejmlAhaE/x2wJS1bLxtTutkeWVBfqVwbJsctLBGbRl8NTBUMmEyHVnQI
-         hyCJAU41xL22IEX2J7wZNO9m5DUjrxArIAbEY2ucM/4Q3qDDFtZGGkIZKfGhb4zfScof
-         VYoHa+sg+oqSVg+gXxyapcUxRPas4XWjcVPuydasu2spwuJikFZomFQdlIecII3dKjPY
-         Qk078tZXd+8+AyT9p214eZEgAQkrNoY4rS4zFgZf4XuFndQz5yA92QBsxQtzuzmyRbqV
-         KpGBzoe5dEhXfLwynjHignXkgGhIwAF1h8ml8b5f+vXilz7ZHvPsfl+sQ7oMCzEqLjau
-         VbsQ==
-X-Gm-Message-State: AOAM533ZQrIofxzXZ/hOYdEXaklnnQKsoeK8x8I8vJ0do1E4cPuasY7+
-        Zgp68YVeothapEYY8myydNO+TB+3aU0BObBDpBI=
-X-Google-Smtp-Source: ABdhPJx0WBNr9W1Nwgn0liQdUfM1taDwLxQD9fexgGLSMjFOjxOuNtFcfvzrxV80VGe+mFpQDmezLwJQXUj41yLgsGQ=
-X-Received: by 2002:a05:6830:1283:: with SMTP id z3mr4244875otp.51.1599033636102;
- Wed, 02 Sep 2020 01:00:36 -0700 (PDT)
+        bh=OXMTCYKKDHUBQdldt8AzU2mUeg41hBCxakL+XCbBpKs=;
+        b=PLoF+ZtepDKCbmYCdq+rDMm6OiCVPB3y94R97K/8qQv4eAdlCexRFKbTSC4wip03XB
+         7yw5gN8/8UFbRTL09cCnODnMAmiSr68Kj6VIGR114qQQbfGgYBCixE4gE0ujFhAVcnpY
+         scNsR8L8DFoZo1cz8NYu6XJ4ylX7s3EZkqvbIxy/4gUp6OIcigGu2ka78kAaySo1fnFF
+         QM6R2S/E8Szf3YgW94NnqFHQ19kR9IvFi9TuIUWePjmviGlnp52Zt9OgZPBvQNcOeoCi
+         /jijzlllDTg98B/YmO21rURR/rFf2oZgJqvraxYVc3XSnq7K+73TGTU/jvph/wZSClTt
+         aqbQ==
+X-Gm-Message-State: AOAM530krAEnLKvfQlgCyfEqqpuQZTw8i7VTQefg3vL8exZea5rmSO9A
+        e7iEK8ZmVoSo84mmP/aOd6MqQW5ncS0H3Oka95/YDtMwFXQ=
+X-Google-Smtp-Source: ABdhPJwbWD8tSzF0QVqiA/05NYJo6VEKYL57PswdCntj5l5+QTb26hx7UUIMjEEIwQ0tyInsXpzPX6k5OFMkK7tNt9w=
+X-Received: by 2002:a05:6830:1283:: with SMTP id z3mr4409133otp.51.1599038371804;
+ Wed, 02 Sep 2020 02:19:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200820033922.32311-1-jniethe5@gmail.com> <20200902061318.GE272502@thinks.paulus.ozlabs.org>
-In-Reply-To: <20200902061318.GE272502@thinks.paulus.ozlabs.org>
+References: <20200820033922.32311-1-jniethe5@gmail.com> <20200820033922.32311-2-jniethe5@gmail.com>
+ <20200902061829.GF272502@thinks.paulus.ozlabs.org>
+In-Reply-To: <20200902061829.GF272502@thinks.paulus.ozlabs.org>
 From:   Jordan Niethe <jniethe5@gmail.com>
-Date:   Wed, 2 Sep 2020 18:00:24 +1000
-Message-ID: <CACzsE9qrgs8ujQ7HeHVo-8oyY2bdwFVnVxR5dEZns5V7qK7Cbg@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/2] KVM: PPC: Use the ppc_inst type
+Date:   Wed, 2 Sep 2020 19:19:20 +1000
+Message-ID: <CACzsE9oeNBRyrf9Tm+3uSypO0mn00Aib=2zCbSE3J5q-i5Ceew@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/2] KVM: PPC: Book3S HV: Support prefixed instructions
 To:     Paul Mackerras <paulus@ozlabs.org>
 Cc:     kvm-ppc@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
@@ -63,132 +62,103 @@ X-Mailing-List: kvm-ppc@vger.kernel.org
 
 On Wed, Sep 2, 2020 at 4:18 PM Paul Mackerras <paulus@ozlabs.org> wrote:
 >
-> On Thu, Aug 20, 2020 at 01:39:21PM +1000, Jordan Niethe wrote:
-> > The ppc_inst type was added to help cope with the addition of prefixed
-> > instructions to the ISA. Convert KVM to use this new type for dealing
-> > wiht instructions. For now do not try to add further support for
-> > prefixed instructions.
->
-> This change does seem to splatter itself across a lot of code that
-> mostly or exclusively runs on machines which are not POWER10 and will
-> never need to handle prefixed instructions, unfortunately.  I wonder
-> if there is a less invasive way to approach this.
-Something less invasive would be good.
->
-> In particular we are inflicting this 64-bit struct on 32-bit platforms
-> unnecessarily (I assume, correct me if I am wrong here).
-No, that is something that I wanted to to avoid, on 32 bit platforms
-it is a 32bit struct:
-
-struct ppc_inst {
-        u32 val;
-#ifdef CONFIG_PPC64
-        u32 suffix;
-#endif
-} __packed;
->
-> How would it be to do something like:
->
-> typedef unsigned long ppc_inst_t;
->
-> so it is 32 bits on 32-bit platforms and 64 bits on 64-bit platforms,
-> and then use that instead of 'struct ppc_inst'?  You would still need
-> to change the function declarations but I think most of the function
-> bodies would not need to be changed.  In particular you would avoid a
-> lot of the churn related to having to add ppc_inst_val() and suchlike.
-
-Would the idea be to get rid of `struct ppc_inst` entirely or just not
-use it in kvm?
-In an earlier series I did something similar (at least code shared
-between 32bit and 64bit would need helpers, but 32bit only code need
-not change):
-
-#ifdef __powerpc64__
-
-typedef struct ppc_inst {
-    union {
-        struct {
-            u32 word;
-            u32 pad;
-        } __packed;
-        struct {
-            u32 prefix;
-            u32 suffix;
-        } __packed;
-    };
-} ppc_inst;
-
-#else /* !__powerpc64__ */
-
-typedef u32 ppc_inst;
-#endif
-
-However mpe wanted to avoid using a typedef
-(https://patchwork.ozlabs.org/comment/2391845/)
-
-We did also talk about just using a u64 for instructions
-(https://lore.kernel.org/linuxppc-dev/1585028462.t27rstc2uf.astroid@bobo.none/)
-but the concern was that as prefixed instructions act as two separate
-u32s (prefix is always before the suffix regardless of endianess)
-keeping it as a u64 would lead to lot of macros and potential
-confusion.
-But it does seem if that can avoid a lot of needless churn it might
-worth the trade off.
->
-> > -static inline unsigned make_dsisr(unsigned instr)
-> > +static inline unsigned make_dsisr(struct ppc_inst instr)
+> On Thu, Aug 20, 2020 at 01:39:22PM +1000, Jordan Niethe wrote:
+> > There are two main places where instructions are loaded from the guest:
+> >     * Emulate loadstore - such as when performing MMIO emulation
+> >       triggered by an HDSI
+> >     * After an HV emulation assistance interrupt (e40)
+> >
+> > If it is a prefixed instruction that triggers these cases, its suffix
+> > must be loaded. Use the SRR1_PREFIX bit to decide if a suffix needs to
+> > be loaded. Make sure if this bit is set inject_interrupt() also sets it
+> > when giving an interrupt to the guest.
+> >
+> > ISA v3.10 extends the Hypervisor Emulation Instruction Register (HEIR)
+> > to 64 bits long to accommodate prefixed instructions. For interrupts
+> > caused by a word instruction the instruction is loaded into bits 32:63
+> > and bits 0:31 are zeroed. When caused by a prefixed instruction the
+> > prefix and suffix are loaded into bits 0:63.
+> >
+> > Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
+> > ---
+> >  arch/powerpc/kvm/book3s.c               | 15 +++++++++++++--
+> >  arch/powerpc/kvm/book3s_64_mmu_hv.c     | 10 +++++++---
+> >  arch/powerpc/kvm/book3s_hv_builtin.c    |  3 +++
+> >  arch/powerpc/kvm/book3s_hv_rmhandlers.S | 14 ++++++++++++++
+> >  4 files changed, 37 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+> > index 70d8967acc9b..18b1928a571b 100644
+> > --- a/arch/powerpc/kvm/book3s.c
+> > +++ b/arch/powerpc/kvm/book3s.c
+> > @@ -456,13 +456,24 @@ int kvmppc_load_last_inst(struct kvm_vcpu *vcpu,
 > >  {
-> >       unsigned dsisr;
-> > +     u32 word = ppc_inst_val(instr);
+> >       ulong pc = kvmppc_get_pc(vcpu);
+> >       u32 word;
+> > +     u64 doubleword;
+> >       int r;
 > >
+> >       if (type == INST_SC)
+> >               pc -= 4;
 > >
-> >       /* bits  6:15 --> 22:31 */
-> > -     dsisr = (instr & 0x03ff0000) >> 16;
-> > +     dsisr = (word & 0x03ff0000) >> 16;
+> > -     r = kvmppc_ld(vcpu, &pc, sizeof(u32), &word, false);
+> > -     *inst = ppc_inst(word);
+> > +     if ((kvmppc_get_msr(vcpu) & SRR1_PREFIXED)) {
+> > +             r = kvmppc_ld(vcpu, &pc, sizeof(u64), &doubleword, false);
+>
+> Should we also have a check here that the doubleword is not crossing a
+> page boundary?  I can't think of a way to get this code to cross a
+> page boundary, assuming the hardware is working correctly, but it
+> makes me just a little nervous.
+I didn't think it could happen but I will add a check to be safe.
+>
+> > +#ifdef CONFIG_CPU_LITTLE_ENDIAN
+> > +             *inst = ppc_inst_prefix(doubleword & 0xffffffff, doubleword >> 32);
+> > +#else
+> > +             *inst = ppc_inst_prefix(doubleword >> 32, doubleword & 0xffffffff);
+> > +#endif
+>
+> Ick.  Is there a cleaner way to do this?
+Would it be nicer to read the prefix as u32 then the suffix as a u32 too?
+>
+> > +     } else {
+> > +             r = kvmppc_ld(vcpu, &pc, sizeof(u32), &word, false);
+> > +             *inst = ppc_inst(word);
+> > +     }
+> > +
+> >       if (r == EMULATE_DONE)
+> >               return r;
+> >       else
+> > diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> > index 775ce41738ce..0802471f4856 100644
+> > --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> > +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> > @@ -411,9 +411,13 @@ static int instruction_is_store(struct ppc_inst instr)
+> >       unsigned int mask;
 > >
-> >       if (IS_XFORM(instr)) {
-> >               /* bits 29:30 --> 15:16 */
-> > -             dsisr |= (instr & 0x00000006) << 14;
-> > +             dsisr |= (word & 0x00000006) << 14;
-> >               /* bit     25 -->    17 */
-> > -             dsisr |= (instr & 0x00000040) << 8;
-> > +             dsisr |= (word & 0x00000040) << 8;
-> >               /* bits 21:24 --> 18:21 */
-> > -             dsisr |= (instr & 0x00000780) << 3;
-> > +             dsisr |= (word & 0x00000780) << 3;
-> >       } else {
-> >               /* bit      5 -->    17 */
-> > -             dsisr |= (instr & 0x04000000) >> 12;
-> > +             dsisr |= (word & 0x04000000) >> 12;
-> >               /* bits  1: 4 --> 18:21 */
-> > -             dsisr |= (instr & 0x78000000) >> 17;
-> > +             dsisr |= (word & 0x78000000) >> 17;
-> >               /* bits 30:31 --> 12:13 */
-> >               if (IS_DSFORM(instr))
-> > -                     dsisr |= (instr & 0x00000003) << 18;
-> > +                     dsisr |= (word & 0x00000003) << 18;
+> >       mask = 0x10000000;
+> > -     if ((ppc_inst_val(instr) & 0xfc000000) == 0x7c000000)
+> > -             mask = 0x100;           /* major opcode 31 */
+> > -     return (ppc_inst_val(instr) & mask) != 0;
+> > +     if (ppc_inst_prefixed(instr)) {
+> > +             return (ppc_inst_suffix(instr) & mask) != 0;
+> > +     } else {
+> > +             if ((ppc_inst_val(instr) & 0xfc000000) == 0x7c000000)
+> > +                     mask = 0x100;           /* major opcode 31 */
+> > +             return (ppc_inst_val(instr) & mask) != 0;
+> > +     }
 >
-> Here I would have done something like:
+> The way the code worked before, the mask depended on whether the
+> instruction was a D-form (or DS-form or other variant) instruction,
+> where you can tell loads and stores apart by looking at the major
+> opcode, or an X-form instruction, where you look at the minor opcode.
 >
-> > -static inline unsigned make_dsisr(unsigned instr)
-> > +static inline unsigned make_dsisr(struct ppc_inst pi)
-> >  {
-> >       unsigned dsisr;
-> > +     u32 instr = ppc_inst_val(pi);
->
-> and left the rest of the function unchanged.
-That is better.
->
-> At first I wondered why we still had that function, since IBM Power
-> CPUs have not set DSISR on an alignment interrupt since POWER3 days.
-> It turns out it this function is used by PR KVM when it is emulating
-> one of the old 32-bit PowerPC CPUs (601, 603, 604, 750, 7450 etc.).
->
-> > diff --git a/arch/powerpc/kernel/kvm.c b/arch/powerpc/kernel/kvm.c
->
-> Despite the file name, this code is not used on IBM Power servers.
-> It is for platforms which run under an ePAPR (not server PAPR)
-> hypervisor (which would be a KVM variant, but generally book E KVM not
-> book 3S).
+> Now we are only looking at the minor opcode if it is not a prefixed
+> instruction.  Are there no X-form prefixed loads or stores?
+I could not see an X-form load/stores so I went with just that.
+But checking the ISA it does mention  "..X-form instructions that are
+preceded by an MLS-form or MMLS-form prefix..." so I shall use the
+other mask too.
 >
 > Paul.
+Thank you for the comments and suggestions.
