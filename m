@@ -2,62 +2,55 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 01BF725A312
-	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Sep 2020 04:33:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD53D25A4BC
+	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Sep 2020 06:51:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726269AbgIBCdH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 1 Sep 2020 22:33:07 -0400
-Received: from ozlabs.org ([203.11.71.1]:34405 "EHLO ozlabs.org"
+        id S1726021AbgIBEv0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 2 Sep 2020 00:51:26 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:52265 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726122AbgIBCdF (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 1 Sep 2020 22:33:05 -0400
+        id S1725808AbgIBEvZ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 2 Sep 2020 00:51:25 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4Bh7Jt5XNMz9sV7; Wed,  2 Sep 2020 12:33:02 +1000 (AEST)
+        id 4BhBNW4Sxsz9sV8; Wed,  2 Sep 2020 14:51:23 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1599013982; bh=3HN/3EBvdb78tsfY8PadQdQ5z7NAekpcsOqrCfMPQqs=;
+        t=1599022283; bh=WOfp9otDnweaCa9QqM2OIoG8iDSDoTlcwj+EuEhBVJA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lLNGBfO0pcebXNzR5mgwARaiB1s+uIQiGmmFYc+0Lnr9idyC1Cz3ht9OXTavvioxD
-         l/WmNcValHRjmPwU+6yrqWmZy0PRWaxb/bnGUXCFGxitEfYpGlPwSTvMDcJNg0eoHr
-         GQkvS4T3A6tDoH+kgz4/yND883xW/0cN/kjg9WHBkEw22OZUKNATt7P53rQJwekFKi
-         wYCjUZO+TuBTjl5wR09qJ6l+7qqa0HpYuy4O9NlCeNndrLJgSd30u8JHb3f/qi4m3Q
-         uOxtuuIwqCzYO03yU0nPpyZH8WNoLVNwltJJBb9y13T8GZ7aP7AxgfTSS56mv3nY6a
-         DEcR1PurA6cpQ==
-Date:   Wed, 2 Sep 2020 12:32:59 +1000
+        b=DTR+woOO6qeYDsljobUQVGIbaihDCn3rXPf03LnF7I6kLqQhgbaMpLTeQ07etO+c5
+         xwZ67OX3DnhiFTAEQwIUQdLGKkFbf9xj4HGPbZl6RdlOrL7gpXntDESOju2lESBUdC
+         aGv0ZsYaPG3y1E3dKV47QPQe79W26HvGEhs977pmdWQOfcRXS1yyg0yIQ/qFjATM7d
+         TkXtzQyKya6L3YWtB1VOLoOFaGD8KOED50c1V1ps4UETTC8BooW5uZYnI3wHZrlJ8M
+         QO5+R5GfyNTFzk7NRVkMM94NZdgZoSHl6M0lf8GZ4tJMBtRK4qCPXEI7WtewThoGTz
+         NdJMOilWIYc2A==
+Date:   Wed, 2 Sep 2020 14:51:18 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-Cc:     mpe@ellerman.id.au, mikey@neuling.org, npiggin@gmail.com,
-        pbonzini@redhat.com, christophe.leroy@c-s.fr, jniethe5@gmail.com,
-        pedromfc@br.ibm.com, rogealve@br.ibm.com, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 0/7] powerpc/watchpoint: 2nd DAWR kvm enablement +
- selftests
-Message-ID: <20200902023259.GC272502@thinks.paulus.ozlabs.org>
-References: <20200723102058.312282-1-ravi.bangoria@linux.ibm.com>
+To:     Qinglang Miao <miaoqinglang@huawei.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next] powerpc: Convert to DEFINE_SHOW_ATTRIBUTE
+Message-ID: <20200902045118.GD272502@thinks.paulus.ozlabs.org>
+References: <20200716090712.14375-1-miaoqinglang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200723102058.312282-1-ravi.bangoria@linux.ibm.com>
+In-Reply-To: <20200716090712.14375-1-miaoqinglang@huawei.com>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Jul 23, 2020 at 03:50:51PM +0530, Ravi Bangoria wrote:
-> Patch #1, #2 and #3 enables p10 2nd DAWR feature for Book3S kvm guest. DAWR
-> is a hypervisor resource and thus H_SET_MODE hcall is used to set/unset it.
-> A new case H_SET_MODE_RESOURCE_SET_DAWR1 is introduced in H_SET_MODE hcall
-> for setting/unsetting 2nd DAWR. Also, new capability KVM_CAP_PPC_DAWR1 has
-> been added to query 2nd DAWR support via kvm ioctl.
+On Thu, Jul 16, 2020 at 05:07:12PM +0800, Qinglang Miao wrote:
+> From: Chen Huang <chenhuang5@huawei.com>
 > 
-> This feature also needs to be enabled in Qemu to really use it. I'll reply
-> link to qemu patches once I post them in qemu-devel mailing list.
+> Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
 > 
-> Patch #4, #5, #6 and #7 adds selftests to test 2nd DAWR.
+> Signed-off-by: Chen Huang <chenhuang5@huawei.com>
 
-If/when you resubmit these patches, please split the KVM patches into
-a separate series, since the KVM patches would go via my tree whereas
-I expect the selftests/powerpc patches would go through Michael
-Ellerman's tree.
+For the arch/powerpc/kvm part:
+
+Acked-by: Paul Mackerras <paulus@ozlabs.org>
+
+I expect Michael Ellerman will take the patch through his tree.
 
 Paul.
