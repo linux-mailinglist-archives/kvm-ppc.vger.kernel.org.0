@@ -2,273 +2,193 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 823A025A6F4
-	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Sep 2020 09:42:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24EBE25A744
+	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Sep 2020 10:00:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726193AbgIBHmO convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm-ppc@lfdr.de>); Wed, 2 Sep 2020 03:42:14 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:46231 "EHLO
-        smtpout1.mo804.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726144AbgIBHmN (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 2 Sep 2020 03:42:13 -0400
-X-Greylist: delayed 564 seconds by postgrey-1.27 at vger.kernel.org; Wed, 02 Sep 2020 03:42:11 EDT
-Received: from mxplan5.mail.ovh.net (unknown [10.109.143.210])
-        by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 9C52A5D0A961;
-        Wed,  2 Sep 2020 09:31:37 +0200 (CEST)
-Received: from kaod.org (37.59.142.95) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 2 Sep 2020
- 09:31:37 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-95G0018b64f145-c98b-42a4-a53b-b7c9d6e7aed3,
-                    AA3809B24A0F88596FE87CA7447536A9393A4537) smtp.auth=groug@kaod.org
-Date:   Wed, 2 Sep 2020 09:31:35 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-CC:     Paul Mackerras <paulus@ozlabs.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        <kvm-ppc@vger.kernel.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: XICS: Replace the 'destroy' method
- by a 'release' method
-Message-ID: <20200902093135.7324d307@bahia.lan>
-In-Reply-To: <a7e1e908-3460-f6dc-78a8-8f69c031bcb0@kaod.org>
-References: <159705408550.1308430.10165736270896374279.stgit@bahia.lan>
-        <a7e1e908-3460-f6dc-78a8-8f69c031bcb0@kaod.org>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1726285AbgIBIAi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 2 Sep 2020 04:00:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37424 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726140AbgIBIAi (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 2 Sep 2020 04:00:38 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D80DBC061244
+        for <kvm-ppc@vger.kernel.org>; Wed,  2 Sep 2020 01:00:36 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id v16so3494855otp.10
+        for <kvm-ppc@vger.kernel.org>; Wed, 02 Sep 2020 01:00:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zpnjn6f8oeFbP2O+Jv7aUIl6F5Bk24aTxxfcp1ZBfPQ=;
+        b=WdhcQ80bdf8jjmBasboFEWb4emxu3yEKjvw629iQqu1e34rp5yDFGGOtEXVuv2AAAk
+         LeVcKSX3onUojPc867KHrhEsyNhoQpZp58cVZNJJT3nGvckpQr+lNcTKWNuyj8R7OIh6
+         lANv1VU4e6nCjwj10b+f+Nz/O6Lj2taQcN8mqxqwjDGlw5NUjWZAj149oC/5AQffwlkc
+         hlHA72T39lK4LnRYYelh+4vClvHo1SXx8YXU0dmi+TOBPjMHI4fhP7OITVA/mBAAZ9W3
+         BKc1SBhadVu4z/8sUoH1gK+xROyjkbMbCBYLH37UVsg7LAeQaPKKQsLj1Yg0i3CJmJDF
+         +LWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zpnjn6f8oeFbP2O+Jv7aUIl6F5Bk24aTxxfcp1ZBfPQ=;
+        b=BDFdYm8Hf8ejmlAhaE/x2wJS1bLxtTutkeWVBfqVwbJsctLBGbRl8NTBUMmEyHVnQI
+         hyCJAU41xL22IEX2J7wZNO9m5DUjrxArIAbEY2ucM/4Q3qDDFtZGGkIZKfGhb4zfScof
+         VYoHa+sg+oqSVg+gXxyapcUxRPas4XWjcVPuydasu2spwuJikFZomFQdlIecII3dKjPY
+         Qk078tZXd+8+AyT9p214eZEgAQkrNoY4rS4zFgZf4XuFndQz5yA92QBsxQtzuzmyRbqV
+         KpGBzoe5dEhXfLwynjHignXkgGhIwAF1h8ml8b5f+vXilz7ZHvPsfl+sQ7oMCzEqLjau
+         VbsQ==
+X-Gm-Message-State: AOAM533ZQrIofxzXZ/hOYdEXaklnnQKsoeK8x8I8vJ0do1E4cPuasY7+
+        Zgp68YVeothapEYY8myydNO+TB+3aU0BObBDpBI=
+X-Google-Smtp-Source: ABdhPJx0WBNr9W1Nwgn0liQdUfM1taDwLxQD9fexgGLSMjFOjxOuNtFcfvzrxV80VGe+mFpQDmezLwJQXUj41yLgsGQ=
+X-Received: by 2002:a05:6830:1283:: with SMTP id z3mr4244875otp.51.1599033636102;
+ Wed, 02 Sep 2020 01:00:36 -0700 (PDT)
 MIME-Version: 1.0
+References: <20200820033922.32311-1-jniethe5@gmail.com> <20200902061318.GE272502@thinks.paulus.ozlabs.org>
+In-Reply-To: <20200902061318.GE272502@thinks.paulus.ozlabs.org>
+From:   Jordan Niethe <jniethe5@gmail.com>
+Date:   Wed, 2 Sep 2020 18:00:24 +1000
+Message-ID: <CACzsE9qrgs8ujQ7HeHVo-8oyY2bdwFVnVxR5dEZns5V7qK7Cbg@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] KVM: PPC: Use the ppc_inst type
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     kvm-ppc@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [37.59.142.95]
-X-ClientProxiedBy: DAG8EX2.mxp5.local (172.16.2.72) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 21c699b7-7a9a-4457-a2fb-297c61d1c60a
-X-Ovh-Tracer-Id: 5357313234836691363
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefkedguddvudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepveelhfdtudffhfeiveehhfelgeellefgteffteekudegheejfffghefhfeeuudffnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, 2 Sep 2020 09:26:06 +0200
-Cédric Le Goater <clg@kaod.org> wrote:
+On Wed, Sep 2, 2020 at 4:18 PM Paul Mackerras <paulus@ozlabs.org> wrote:
+>
+> On Thu, Aug 20, 2020 at 01:39:21PM +1000, Jordan Niethe wrote:
+> > The ppc_inst type was added to help cope with the addition of prefixed
+> > instructions to the ISA. Convert KVM to use this new type for dealing
+> > wiht instructions. For now do not try to add further support for
+> > prefixed instructions.
+>
+> This change does seem to splatter itself across a lot of code that
+> mostly or exclusively runs on machines which are not POWER10 and will
+> never need to handle prefixed instructions, unfortunately.  I wonder
+> if there is a less invasive way to approach this.
+Something less invasive would be good.
+>
+> In particular we are inflicting this 64-bit struct on 32-bit platforms
+> unnecessarily (I assume, correct me if I am wrong here).
+No, that is something that I wanted to to avoid, on 32 bit platforms
+it is a 32bit struct:
 
-> On 8/10/20 12:08 PM, Greg Kurz wrote:
-> > Similarly to what was done with XICS-on-XIVE and XIVE native KVM devices
-> > with commit 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy'
-> > method by a 'release' method"), convert the historical XICS KVM device to
-> > implement the 'release' method. This is needed to run nested guests with
-> > an in-kernel IRQ chip. A typical POWER9 guest can select XICS or XIVE
-> > during boot, which requires to be able to destroy and to re-create the
-> > KVM device. Only the historical XICS KVM device is available under pseries
-> > at the current time and it still uses the legacy 'destroy' method.
-> > 
-> > Switching to 'release' means that vCPUs might still be running when the
-> > device is destroyed. In order to avoid potential use-after-free, the
-> > kvmppc_xics structure is allocated on first usage and kept around until
-> > the VM exits. The same pointer is used each time a KVM XICS device is
-> > being created, but this is okay since we only have one per VM.
-> > 
-> > Clear the ICP of each vCPU with vcpu->mutex held. This ensures that the
-> > next time the vCPU resumes execution, it won't be going into the XICS
-> > code anymore.
-> > 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> 
-> Reviewed-by: Cédric Le Goater <clg@kaod.org>
-> 
-> and on a P8 host, 
-> 
-> Tested-by: Cédric Le Goater <clg@kaod.org>
-> 
-> Thanks,
-> 
-> C. 
-> 
+struct ppc_inst {
+        u32 val;
+#ifdef CONFIG_PPC64
+        u32 suffix;
+#endif
+} __packed;
+>
+> How would it be to do something like:
+>
+> typedef unsigned long ppc_inst_t;
+>
+> so it is 32 bits on 32-bit platforms and 64 bits on 64-bit platforms,
+> and then use that instead of 'struct ppc_inst'?  You would still need
+> to change the function declarations but I think most of the function
+> bodies would not need to be changed.  In particular you would avoid a
+> lot of the churn related to having to add ppc_inst_val() and suchlike.
 
-Thanks for the review and testing !
+Would the idea be to get rid of `struct ppc_inst` entirely or just not
+use it in kvm?
+In an earlier series I did something similar (at least code shared
+between 32bit and 64bit would need helpers, but 32bit only code need
+not change):
 
-Cheers,
+#ifdef __powerpc64__
 
---
-Greg
+typedef struct ppc_inst {
+    union {
+        struct {
+            u32 word;
+            u32 pad;
+        } __packed;
+        struct {
+            u32 prefix;
+            u32 suffix;
+        } __packed;
+    };
+} ppc_inst;
 
-> > ---
-> >  arch/powerpc/include/asm/kvm_host.h |    1 
-> >  arch/powerpc/kvm/book3s.c           |    4 +-
-> >  arch/powerpc/kvm/book3s_xics.c      |   86 ++++++++++++++++++++++++++++-------
-> >  3 files changed, 72 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-> > index e020d269416d..974adda2ec94 100644
-> > --- a/arch/powerpc/include/asm/kvm_host.h
-> > +++ b/arch/powerpc/include/asm/kvm_host.h
-> > @@ -325,6 +325,7 @@ struct kvm_arch {
-> >  #endif
-> >  #ifdef CONFIG_KVM_XICS
-> >  	struct kvmppc_xics *xics;
-> > +	struct kvmppc_xics *xics_device;
-> >  	struct kvmppc_xive *xive;    /* Current XIVE device in use */
-> >  	struct {
-> >  		struct kvmppc_xive *native;
-> > diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-> > index 41fedec69ac3..56618c2770e1 100644
-> > --- a/arch/powerpc/kvm/book3s.c
-> > +++ b/arch/powerpc/kvm/book3s.c
-> > @@ -878,13 +878,15 @@ void kvmppc_core_destroy_vm(struct kvm *kvm)
-> >  
-> >  #ifdef CONFIG_KVM_XICS
-> >  	/*
-> > -	 * Free the XIVE devices which are not directly freed by the
-> > +	 * Free the XIVE and XICS devices which are not directly freed by the
-> >  	 * device 'release' method
-> >  	 */
-> >  	kfree(kvm->arch.xive_devices.native);
-> >  	kvm->arch.xive_devices.native = NULL;
-> >  	kfree(kvm->arch.xive_devices.xics_on_xive);
-> >  	kvm->arch.xive_devices.xics_on_xive = NULL;
-> > +	kfree(kvm->arch.xics_device);
-> > +	kvm->arch.xics_device = NULL;
-> >  #endif /* CONFIG_KVM_XICS */
-> >  }
-> >  
-> > diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
-> > index 381bf8dea193..5fee5a11550d 100644
-> > --- a/arch/powerpc/kvm/book3s_xics.c
-> > +++ b/arch/powerpc/kvm/book3s_xics.c
-> > @@ -1334,47 +1334,97 @@ static int xics_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
-> >  	return -ENXIO;
-> >  }
-> >  
-> > -static void kvmppc_xics_free(struct kvm_device *dev)
-> > +/*
-> > + * Called when device fd is closed. kvm->lock is held.
-> > + */
-> > +static void kvmppc_xics_release(struct kvm_device *dev)
+#else /* !__powerpc64__ */
+
+typedef u32 ppc_inst;
+#endif
+
+However mpe wanted to avoid using a typedef
+(https://patchwork.ozlabs.org/comment/2391845/)
+
+We did also talk about just using a u64 for instructions
+(https://lore.kernel.org/linuxppc-dev/1585028462.t27rstc2uf.astroid@bobo.none/)
+but the concern was that as prefixed instructions act as two separate
+u32s (prefix is always before the suffix regardless of endianess)
+keeping it as a u64 would lead to lot of macros and potential
+confusion.
+But it does seem if that can avoid a lot of needless churn it might
+worth the trade off.
+>
+> > -static inline unsigned make_dsisr(unsigned instr)
+> > +static inline unsigned make_dsisr(struct ppc_inst instr)
 > >  {
-> >  	struct kvmppc_xics *xics = dev->private;
-> >  	int i;
-> >  	struct kvm *kvm = xics->kvm;
-> > +	struct kvm_vcpu *vcpu;
-> > +
-> > +	pr_devel("Releasing xics device\n");
-> > +
-> > +	/*
-> > +	 * Since this is the device release function, we know that
-> > +	 * userspace does not have any open fd referring to the
-> > +	 * device.  Therefore there can not be any of the device
-> > +	 * attribute set/get functions being executed concurrently,
-> > +	 * and similarly, the connect_vcpu and set/clr_mapped
-> > +	 * functions also cannot be being executed.
-> > +	 */
-> >  
-> >  	debugfs_remove(xics->dentry);
-> >  
-> > +	/*
-> > +	 * We should clean up the vCPU interrupt presenters first.
-> > +	 */
-> > +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> > +		/*
-> > +		 * Take vcpu->mutex to ensure that no one_reg get/set ioctl
-> > +		 * (i.e. kvmppc_xics_[gs]et_icp) can be done concurrently.
-> > +		 * Holding the vcpu->mutex also means that execution is
-> > +		 * excluded for the vcpu until the ICP was freed. When the vcpu
-> > +		 * can execute again, vcpu->arch.icp and vcpu->arch.irq_type
-> > +		 * have been cleared and the vcpu will not be going into the
-> > +		 * XICS code anymore.
-> > +		 */
-> > +		mutex_lock(&vcpu->mutex);
-> > +		kvmppc_xics_free_icp(vcpu);
-> > +		mutex_unlock(&vcpu->mutex);
-> > +	}
-> > +
-> >  	if (kvm)
-> >  		kvm->arch.xics = NULL;
-> >  
-> > -	for (i = 0; i <= xics->max_icsid; i++)
-> > +	for (i = 0; i <= xics->max_icsid; i++) {
-> >  		kfree(xics->ics[i]);
-> > -	kfree(xics);
-> > +		xics->ics[i] = NULL;
-> > +	}
-> > +	/*
-> > +	 * A reference of the kvmppc_xics pointer is now kept under
-> > +	 * the xics_device pointer of the machine for reuse. It is
-> > +	 * freed when the VM is destroyed for now until we fix all the
-> > +	 * execution paths.
-> > +	 */
-> >  	kfree(dev);
-> >  }
-> >  
-> > +static struct kvmppc_xics *kvmppc_xics_get_device(struct kvm *kvm)
-> > +{
-> > +	struct kvmppc_xics **kvm_xics_device = &kvm->arch.xics_device;
-> > +	struct kvmppc_xics *xics = *kvm_xics_device;
-> > +
-> > +	if (!xics) {
-> > +		xics = kzalloc(sizeof(*xics), GFP_KERNEL);
-> > +		*kvm_xics_device = xics;
-> > +	} else {
-> > +		memset(xics, 0, sizeof(*xics));
-> > +	}
-> > +
-> > +	return xics;
-> > +}
-> > +
-> >  static int kvmppc_xics_create(struct kvm_device *dev, u32 type)
+> >       unsigned dsisr;
+> > +     u32 word = ppc_inst_val(instr);
+> >
+> >
+> >       /* bits  6:15 --> 22:31 */
+> > -     dsisr = (instr & 0x03ff0000) >> 16;
+> > +     dsisr = (word & 0x03ff0000) >> 16;
+> >
+> >       if (IS_XFORM(instr)) {
+> >               /* bits 29:30 --> 15:16 */
+> > -             dsisr |= (instr & 0x00000006) << 14;
+> > +             dsisr |= (word & 0x00000006) << 14;
+> >               /* bit     25 -->    17 */
+> > -             dsisr |= (instr & 0x00000040) << 8;
+> > +             dsisr |= (word & 0x00000040) << 8;
+> >               /* bits 21:24 --> 18:21 */
+> > -             dsisr |= (instr & 0x00000780) << 3;
+> > +             dsisr |= (word & 0x00000780) << 3;
+> >       } else {
+> >               /* bit      5 -->    17 */
+> > -             dsisr |= (instr & 0x04000000) >> 12;
+> > +             dsisr |= (word & 0x04000000) >> 12;
+> >               /* bits  1: 4 --> 18:21 */
+> > -             dsisr |= (instr & 0x78000000) >> 17;
+> > +             dsisr |= (word & 0x78000000) >> 17;
+> >               /* bits 30:31 --> 12:13 */
+> >               if (IS_DSFORM(instr))
+> > -                     dsisr |= (instr & 0x00000003) << 18;
+> > +                     dsisr |= (word & 0x00000003) << 18;
+>
+> Here I would have done something like:
+>
+> > -static inline unsigned make_dsisr(unsigned instr)
+> > +static inline unsigned make_dsisr(struct ppc_inst pi)
 > >  {
-> >  	struct kvmppc_xics *xics;
-> >  	struct kvm *kvm = dev->kvm;
-> > -	int ret = 0;
-> >  
-> > -	xics = kzalloc(sizeof(*xics), GFP_KERNEL);
-> > +	pr_devel("Creating xics for partition\n");
-> > +
-> > +	/* Already there ? */
-> > +	if (kvm->arch.xics)
-> > +		return -EEXIST;
-> > +
-> > +	xics = kvmppc_xics_get_device(kvm);
-> >  	if (!xics)
-> >  		return -ENOMEM;
-> >  
-> >  	dev->private = xics;
-> >  	xics->dev = dev;
-> >  	xics->kvm = kvm;
-> > -
-> > -	/* Already there ? */
-> > -	if (kvm->arch.xics)
-> > -		ret = -EEXIST;
-> > -	else
-> > -		kvm->arch.xics = xics;
-> > -
-> > -	if (ret) {
-> > -		kfree(xics);
-> > -		return ret;
-> > -	}
-> > +	kvm->arch.xics = xics;
-> >  
-> >  #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> >  	if (cpu_has_feature(CPU_FTR_ARCH_206) &&
-> > @@ -1399,7 +1449,7 @@ struct kvm_device_ops kvm_xics_ops = {
-> >  	.name = "kvm-xics",
-> >  	.create = kvmppc_xics_create,
-> >  	.init = kvmppc_xics_init,
-> > -	.destroy = kvmppc_xics_free,
-> > +	.release = kvmppc_xics_release,
-> >  	.set_attr = xics_set_attr,
-> >  	.get_attr = xics_get_attr,
-> >  	.has_attr = xics_has_attr,
-> > @@ -1415,7 +1465,7 @@ int kvmppc_xics_connect_vcpu(struct kvm_device *dev, struct kvm_vcpu *vcpu,
-> >  		return -EPERM;
-> >  	if (xics->kvm != vcpu->kvm)
-> >  		return -EPERM;
-> > -	if (vcpu->arch.irq_type)
-> > +	if (vcpu->arch.irq_type != KVMPPC_IRQ_DEFAULT)
-> >  		return -EBUSY;
-> >  
-> >  	r = kvmppc_xics_create_icp(vcpu, xcpu);
-> > 
-> > 
-> 
-
+> >       unsigned dsisr;
+> > +     u32 instr = ppc_inst_val(pi);
+>
+> and left the rest of the function unchanged.
+That is better.
+>
+> At first I wondered why we still had that function, since IBM Power
+> CPUs have not set DSISR on an alignment interrupt since POWER3 days.
+> It turns out it this function is used by PR KVM when it is emulating
+> one of the old 32-bit PowerPC CPUs (601, 603, 604, 750, 7450 etc.).
+>
+> > diff --git a/arch/powerpc/kernel/kvm.c b/arch/powerpc/kernel/kvm.c
+>
+> Despite the file name, this code is not used on IBM Power servers.
+> It is for platforms which run under an ePAPR (not server PAPR)
+> hypervisor (which would be a KVM variant, but generally book E KVM not
+> book 3S).
+>
+> Paul.
