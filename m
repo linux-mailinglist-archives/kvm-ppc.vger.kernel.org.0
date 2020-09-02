@@ -2,113 +2,119 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F21225A4E3
-	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Sep 2020 07:14:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CB2025A576
+	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Sep 2020 08:18:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726536AbgIBFNz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 2 Sep 2020 01:13:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20044 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726386AbgIBFNx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 2 Sep 2020 01:13:53 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0824Wo1Q129282;
-        Wed, 2 Sep 2020 01:13:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=bcFjTM9prI7H/cWTGkaxNjaQRb2P7oXYF4edeXsqgw0=;
- b=px5rCbOH6Y3t3FkN6B+xOpxyoMI1sMjzEda43gR0g2PQfP8qDg8IIwv+GGLco5Ix+wD7
- sJdjSd/35XRC1E7AY03EF6mvtdecgaiVBSLkkl99oM7jqtzZStFk/x+UzFLlS5MYj3TU
- lrC54lY9MkhFCPDx3yxGkkHWBnwNq+D9z5Voil5lJAwUZVlwbyUZXlWrq7eShLkwfsyt
- JY7i/wh/Y8LJtWjL+GX0ri2y1tpS/LxWHgJgNrMGZFPflE33iM8AO8N0wQPahKh4zyUs
- dRh1WF+NnBQ10H+doBUwwJnpF6A0CeXZ+bB6ejTtUAMQgKupRDpPjBwrWujGT2g9NbGO Ng== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33a462h7va-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Sep 2020 01:13:44 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 082514j8045612;
-        Wed, 2 Sep 2020 01:13:44 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33a462h7uj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Sep 2020 01:13:43 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0825DG0p014118;
-        Wed, 2 Sep 2020 05:13:41 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 337e9gva6m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Sep 2020 05:13:41 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0825Dbie30867902
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 2 Sep 2020 05:13:37 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7A16DA405F;
-        Wed,  2 Sep 2020 05:13:37 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1C056A4054;
-        Wed,  2 Sep 2020 05:13:34 +0000 (GMT)
-Received: from [9.199.37.120] (unknown [9.199.37.120])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  2 Sep 2020 05:13:33 +0000 (GMT)
-Subject: Re: [PATCH 0/7] powerpc/watchpoint: 2nd DAWR kvm enablement +
- selftests
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     mpe@ellerman.id.au, mikey@neuling.org, npiggin@gmail.com,
-        pbonzini@redhat.com, christophe.leroy@c-s.fr, jniethe5@gmail.com,
-        pedromfc@br.ibm.com, rogealve@br.ibm.com, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kselftest@vger.kernel.org,
-        Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-References: <20200723102058.312282-1-ravi.bangoria@linux.ibm.com>
- <20200902023259.GC272502@thinks.paulus.ozlabs.org>
-From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-Message-ID: <38177cfb-3abf-2629-174a-cdd958286be2@linux.ibm.com>
-Date:   Wed, 2 Sep 2020 10:43:33 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726559AbgIBGSk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 2 Sep 2020 02:18:40 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:50023 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726426AbgIBGSg (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 2 Sep 2020 02:18:36 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 4BhDK65dhWz9sSJ; Wed,  2 Sep 2020 16:18:34 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1599027514; bh=92OiPKNwGzvI92aBDZKrl9ja+G+TFCy0aCOwfiebq1E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sOvM+oWr+E6AxOGH5S4kSqMjRLhG/3AI5+MldMl6wLi+xcjohCQcgq2Z+WqW+MCFa
+         lmm6FGnVUUkf3tmf3QO0UgdQmyRpIMsGNktzV23GQXwB74q9s6gCYU705hmpqXXwej
+         Z9JMtLx4LCGbJCVIKKvXMaIdaPasq1oDGu8ED/xf+fpRKsikvk+iqwPB3gCaRz4qNr
+         aM9ja/ABQMowYWaZcvLWAWr1Tyj0IhdOPeWS1wR9xP68KhU+lNOogCKNvt3klGE2nT
+         qOzHv2qg2+p0YOkrSZOJTdfCISwkU/jhy4W20DwLVGO+qhc54P7BwywCnvb7n4XGU/
+         C4g6F4gsHXpQA==
+Date:   Wed, 2 Sep 2020 16:13:18 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Jordan Niethe <jniethe5@gmail.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [RFC PATCH 1/2] KVM: PPC: Use the ppc_inst type
+Message-ID: <20200902061318.GE272502@thinks.paulus.ozlabs.org>
+References: <20200820033922.32311-1-jniethe5@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200902023259.GC272502@thinks.paulus.ozlabs.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-02_02:2020-09-01,2020-09-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- suspectscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0
- malwarescore=0 mlxlogscore=999 impostorscore=0 adultscore=0
- priorityscore=1501 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2009020042
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200820033922.32311-1-jniethe5@gmail.com>
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi Paul,
+On Thu, Aug 20, 2020 at 01:39:21PM +1000, Jordan Niethe wrote:
+> The ppc_inst type was added to help cope with the addition of prefixed
+> instructions to the ISA. Convert KVM to use this new type for dealing
+> wiht instructions. For now do not try to add further support for
+> prefixed instructions.
 
-On 9/2/20 8:02 AM, Paul Mackerras wrote:
-> On Thu, Jul 23, 2020 at 03:50:51PM +0530, Ravi Bangoria wrote:
->> Patch #1, #2 and #3 enables p10 2nd DAWR feature for Book3S kvm guest. DAWR
->> is a hypervisor resource and thus H_SET_MODE hcall is used to set/unset it.
->> A new case H_SET_MODE_RESOURCE_SET_DAWR1 is introduced in H_SET_MODE hcall
->> for setting/unsetting 2nd DAWR. Also, new capability KVM_CAP_PPC_DAWR1 has
->> been added to query 2nd DAWR support via kvm ioctl.
->>
->> This feature also needs to be enabled in Qemu to really use it. I'll reply
->> link to qemu patches once I post them in qemu-devel mailing list.
->>
->> Patch #4, #5, #6 and #7 adds selftests to test 2nd DAWR.
-> 
-> If/when you resubmit these patches, please split the KVM patches into
-> a separate series, since the KVM patches would go via my tree whereas
-> I expect the selftests/powerpc patches would go through Michael
-> Ellerman's tree.
+This change does seem to splatter itself across a lot of code that
+mostly or exclusively runs on machines which are not POWER10 and will
+never need to handle prefixed instructions, unfortunately.  I wonder
+if there is a less invasive way to approach this.
 
-Sure. Will split it.
+In particular we are inflicting this 64-bit struct on 32-bit platforms
+unnecessarily (I assume, correct me if I am wrong here).
 
-Thanks,
-Ravi
+How would it be to do something like:
+
+typedef unsigned long ppc_inst_t;
+
+so it is 32 bits on 32-bit platforms and 64 bits on 64-bit platforms,
+and then use that instead of 'struct ppc_inst'?  You would still need
+to change the function declarations but I think most of the function
+bodies would not need to be changed.  In particular you would avoid a
+lot of the churn related to having to add ppc_inst_val() and suchlike.
+
+> -static inline unsigned make_dsisr(unsigned instr)
+> +static inline unsigned make_dsisr(struct ppc_inst instr)
+>  {
+>  	unsigned dsisr;
+> +	u32 word = ppc_inst_val(instr);
+>  
+>  
+>  	/* bits  6:15 --> 22:31 */
+> -	dsisr = (instr & 0x03ff0000) >> 16;
+> +	dsisr = (word & 0x03ff0000) >> 16;
+>  
+>  	if (IS_XFORM(instr)) {
+>  		/* bits 29:30 --> 15:16 */
+> -		dsisr |= (instr & 0x00000006) << 14;
+> +		dsisr |= (word & 0x00000006) << 14;
+>  		/* bit     25 -->    17 */
+> -		dsisr |= (instr & 0x00000040) << 8;
+> +		dsisr |= (word & 0x00000040) << 8;
+>  		/* bits 21:24 --> 18:21 */
+> -		dsisr |= (instr & 0x00000780) << 3;
+> +		dsisr |= (word & 0x00000780) << 3;
+>  	} else {
+>  		/* bit      5 -->    17 */
+> -		dsisr |= (instr & 0x04000000) >> 12;
+> +		dsisr |= (word & 0x04000000) >> 12;
+>  		/* bits  1: 4 --> 18:21 */
+> -		dsisr |= (instr & 0x78000000) >> 17;
+> +		dsisr |= (word & 0x78000000) >> 17;
+>  		/* bits 30:31 --> 12:13 */
+>  		if (IS_DSFORM(instr))
+> -			dsisr |= (instr & 0x00000003) << 18;
+> +			dsisr |= (word & 0x00000003) << 18;
+
+Here I would have done something like:
+
+> -static inline unsigned make_dsisr(unsigned instr)
+> +static inline unsigned make_dsisr(struct ppc_inst pi)
+>  {
+>  	unsigned dsisr;
+> +	u32 instr = ppc_inst_val(pi);
+
+and left the rest of the function unchanged.
+
+At first I wondered why we still had that function, since IBM Power
+CPUs have not set DSISR on an alignment interrupt since POWER3 days.
+It turns out it this function is used by PR KVM when it is emulating
+one of the old 32-bit PowerPC CPUs (601, 603, 604, 750, 7450 etc.).
+
+> diff --git a/arch/powerpc/kernel/kvm.c b/arch/powerpc/kernel/kvm.c
+
+Despite the file name, this code is not used on IBM Power servers.
+It is for platforms which run under an ePAPR (not server PAPR)
+hypervisor (which would be a KVM variant, but generally book E KVM not
+book 3S).
+
+Paul.
