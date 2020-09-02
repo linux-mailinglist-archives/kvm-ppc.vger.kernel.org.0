@@ -2,134 +2,261 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9F3225A577
-	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Sep 2020 08:18:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 202EF25A6D4
+	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Sep 2020 09:32:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726426AbgIBGSl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 2 Sep 2020 02:18:41 -0400
-Received: from ozlabs.org ([203.11.71.1]:45903 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726384AbgIBGSh (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 2 Sep 2020 02:18:37 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4BhDK64lNVz9sV8; Wed,  2 Sep 2020 16:18:34 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1599027514; bh=SvqrLtSy7O4r2ulnso5MmauMzcR2/XPprpW6tHLdmU0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Ffc2tECGO/BfdwgaKDDzmaBTJHLSERwSxWOrUXDRUFZmpDniBaHsrswbonOJpjcBF
-         6zrgDy8atFX7fKYRdRRkVCOrl5b/8pEHyUszcURis/g4MKfrlIhHu+03gnuz9BRPDH
-         qp0Kg65i41QOuU99/vPq38d0FbXqAo7lg4QnuU1NsQyI022Q+aDsR5ZDUByM30LJJ6
-         PnKN6Til4YplHTxVPpENQH5x6ZslU5wA+AwOL91UrR49bkCOeJjBpsMOry0XWU04Ll
-         JxX1pOfKU+6VlnJkTMU6FF/xJwVc5YdtPaJxfvembQcSIYlSn9Q/ggMr3CAU/pq8in
-         LNaEwQgmR13Kw==
-Date:   Wed, 2 Sep 2020 16:18:29 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Jordan Niethe <jniethe5@gmail.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [RFC PATCH 2/2] KVM: PPC: Book3S HV: Support prefixed
- instructions
-Message-ID: <20200902061829.GF272502@thinks.paulus.ozlabs.org>
-References: <20200820033922.32311-1-jniethe5@gmail.com>
- <20200820033922.32311-2-jniethe5@gmail.com>
+        id S1726489AbgIBHcm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 2 Sep 2020 03:32:42 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:49367 "EHLO
+        smtpout1.mo804.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726167AbgIBHcl (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 2 Sep 2020 03:32:41 -0400
+X-Greylist: delayed 390 seconds by postgrey-1.27 at vger.kernel.org; Wed, 02 Sep 2020 03:32:39 EDT
+Received: from mxplan5.mail.ovh.net (unknown [10.109.156.124])
+        by mo804.mail-out.ovh.net (Postfix) with ESMTPS id BBDF25D09F5E;
+        Wed,  2 Sep 2020 09:26:07 +0200 (CEST)
+Received: from kaod.org (37.59.142.100) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 2 Sep 2020
+ 09:26:07 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-100R00329184cd7-05c0-4851-9ca5-2a03b9df3e53,
+                    725C0B02AD5EA5A9EE23B5614217EC25792C566F) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: XICS: Replace the 'destroy' method
+ by a 'release' method
+To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>
+CC:     David Gibson <david@gibson.dropbear.id.au>,
+        <kvm-ppc@vger.kernel.org>, <kvm@vger.kernel.org>
+References: <159705408550.1308430.10165736270896374279.stgit@bahia.lan>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a7e1e908-3460-f6dc-78a8-8f69c031bcb0@kaod.org>
+Date:   Wed, 2 Sep 2020 09:26:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200820033922.32311-2-jniethe5@gmail.com>
+In-Reply-To: <159705408550.1308430.10165736270896374279.stgit@bahia.lan>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.100]
+X-ClientProxiedBy: DAG7EX1.mxp5.local (172.16.2.61) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 2a95f13f-f070-4eb3-8752-452ed65dbce5
+X-Ovh-Tracer-Id: 5264426489863768995
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefkedguddvtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddttdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepghhrohhugheskhgrohgurdhorhhg
 Sender: kvm-ppc-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Aug 20, 2020 at 01:39:22PM +1000, Jordan Niethe wrote:
-> There are two main places where instructions are loaded from the guest:
->     * Emulate loadstore - such as when performing MMIO emulation
->       triggered by an HDSI
->     * After an HV emulation assistance interrupt (e40)
+On 8/10/20 12:08 PM, Greg Kurz wrote:
+> Similarly to what was done with XICS-on-XIVE and XIVE native KVM devices
+> with commit 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy'
+> method by a 'release' method"), convert the historical XICS KVM device to
+> implement the 'release' method. This is needed to run nested guests with
+> an in-kernel IRQ chip. A typical POWER9 guest can select XICS or XIVE
+> during boot, which requires to be able to destroy and to re-create the
+> KVM device. Only the historical XICS KVM device is available under pseries
+> at the current time and it still uses the legacy 'destroy' method.
 > 
-> If it is a prefixed instruction that triggers these cases, its suffix
-> must be loaded. Use the SRR1_PREFIX bit to decide if a suffix needs to
-> be loaded. Make sure if this bit is set inject_interrupt() also sets it
-> when giving an interrupt to the guest.
+> Switching to 'release' means that vCPUs might still be running when the
+> device is destroyed. In order to avoid potential use-after-free, the
+> kvmppc_xics structure is allocated on first usage and kept around until
+> the VM exits. The same pointer is used each time a KVM XICS device is
+> being created, but this is okay since we only have one per VM.
 > 
-> ISA v3.10 extends the Hypervisor Emulation Instruction Register (HEIR)
-> to 64 bits long to accommodate prefixed instructions. For interrupts
-> caused by a word instruction the instruction is loaded into bits 32:63
-> and bits 0:31 are zeroed. When caused by a prefixed instruction the
-> prefix and suffix are loaded into bits 0:63.
+> Clear the ICP of each vCPU with vcpu->mutex held. This ensures that the
+> next time the vCPU resumes execution, it won't be going into the XICS
+> code anymore.
 > 
-> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+
+and on a P8 host, 
+
+Tested-by: Cédric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C. 
+
 > ---
->  arch/powerpc/kvm/book3s.c               | 15 +++++++++++++--
->  arch/powerpc/kvm/book3s_64_mmu_hv.c     | 10 +++++++---
->  arch/powerpc/kvm/book3s_hv_builtin.c    |  3 +++
->  arch/powerpc/kvm/book3s_hv_rmhandlers.S | 14 ++++++++++++++
->  4 files changed, 37 insertions(+), 5 deletions(-)
+>  arch/powerpc/include/asm/kvm_host.h |    1 
+>  arch/powerpc/kvm/book3s.c           |    4 +-
+>  arch/powerpc/kvm/book3s_xics.c      |   86 ++++++++++++++++++++++++++++-------
+>  3 files changed, 72 insertions(+), 19 deletions(-)
 > 
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index e020d269416d..974adda2ec94 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -325,6 +325,7 @@ struct kvm_arch {
+>  #endif
+>  #ifdef CONFIG_KVM_XICS
+>  	struct kvmppc_xics *xics;
+> +	struct kvmppc_xics *xics_device;
+>  	struct kvmppc_xive *xive;    /* Current XIVE device in use */
+>  	struct {
+>  		struct kvmppc_xive *native;
 > diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-> index 70d8967acc9b..18b1928a571b 100644
+> index 41fedec69ac3..56618c2770e1 100644
 > --- a/arch/powerpc/kvm/book3s.c
 > +++ b/arch/powerpc/kvm/book3s.c
-> @@ -456,13 +456,24 @@ int kvmppc_load_last_inst(struct kvm_vcpu *vcpu,
+> @@ -878,13 +878,15 @@ void kvmppc_core_destroy_vm(struct kvm *kvm)
+>  
+>  #ifdef CONFIG_KVM_XICS
+>  	/*
+> -	 * Free the XIVE devices which are not directly freed by the
+> +	 * Free the XIVE and XICS devices which are not directly freed by the
+>  	 * device 'release' method
+>  	 */
+>  	kfree(kvm->arch.xive_devices.native);
+>  	kvm->arch.xive_devices.native = NULL;
+>  	kfree(kvm->arch.xive_devices.xics_on_xive);
+>  	kvm->arch.xive_devices.xics_on_xive = NULL;
+> +	kfree(kvm->arch.xics_device);
+> +	kvm->arch.xics_device = NULL;
+>  #endif /* CONFIG_KVM_XICS */
+>  }
+>  
+> diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
+> index 381bf8dea193..5fee5a11550d 100644
+> --- a/arch/powerpc/kvm/book3s_xics.c
+> +++ b/arch/powerpc/kvm/book3s_xics.c
+> @@ -1334,47 +1334,97 @@ static int xics_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
+>  	return -ENXIO;
+>  }
+>  
+> -static void kvmppc_xics_free(struct kvm_device *dev)
+> +/*
+> + * Called when device fd is closed. kvm->lock is held.
+> + */
+> +static void kvmppc_xics_release(struct kvm_device *dev)
 >  {
->  	ulong pc = kvmppc_get_pc(vcpu);
->  	u32 word;
-> +	u64 doubleword;
->  	int r;
+>  	struct kvmppc_xics *xics = dev->private;
+>  	int i;
+>  	struct kvm *kvm = xics->kvm;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	pr_devel("Releasing xics device\n");
+> +
+> +	/*
+> +	 * Since this is the device release function, we know that
+> +	 * userspace does not have any open fd referring to the
+> +	 * device.  Therefore there can not be any of the device
+> +	 * attribute set/get functions being executed concurrently,
+> +	 * and similarly, the connect_vcpu and set/clr_mapped
+> +	 * functions also cannot be being executed.
+> +	 */
 >  
->  	if (type == INST_SC)
->  		pc -= 4;
+>  	debugfs_remove(xics->dentry);
 >  
-> -	r = kvmppc_ld(vcpu, &pc, sizeof(u32), &word, false);
-> -	*inst = ppc_inst(word);
-> +	if ((kvmppc_get_msr(vcpu) & SRR1_PREFIXED)) {
-> +		r = kvmppc_ld(vcpu, &pc, sizeof(u64), &doubleword, false);
-
-Should we also have a check here that the doubleword is not crossing a
-page boundary?  I can't think of a way to get this code to cross a
-page boundary, assuming the hardware is working correctly, but it
-makes me just a little nervous.
-
-> +#ifdef CONFIG_CPU_LITTLE_ENDIAN
-> +		*inst = ppc_inst_prefix(doubleword & 0xffffffff, doubleword >> 32);
-> +#else
-> +		*inst = ppc_inst_prefix(doubleword >> 32, doubleword & 0xffffffff);
-> +#endif
-
-Ick.  Is there a cleaner way to do this?
-
-> +	} else {
-> +		r = kvmppc_ld(vcpu, &pc, sizeof(u32), &word, false);
-> +		*inst = ppc_inst(word);
+> +	/*
+> +	 * We should clean up the vCPU interrupt presenters first.
+> +	 */
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		/*
+> +		 * Take vcpu->mutex to ensure that no one_reg get/set ioctl
+> +		 * (i.e. kvmppc_xics_[gs]et_icp) can be done concurrently.
+> +		 * Holding the vcpu->mutex also means that execution is
+> +		 * excluded for the vcpu until the ICP was freed. When the vcpu
+> +		 * can execute again, vcpu->arch.icp and vcpu->arch.irq_type
+> +		 * have been cleared and the vcpu will not be going into the
+> +		 * XICS code anymore.
+> +		 */
+> +		mutex_lock(&vcpu->mutex);
+> +		kvmppc_xics_free_icp(vcpu);
+> +		mutex_unlock(&vcpu->mutex);
 > +	}
 > +
->  	if (r == EMULATE_DONE)
->  		return r;
->  	else
-> diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> index 775ce41738ce..0802471f4856 100644
-> --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> @@ -411,9 +411,13 @@ static int instruction_is_store(struct ppc_inst instr)
->  	unsigned int mask;
+>  	if (kvm)
+>  		kvm->arch.xics = NULL;
 >  
->  	mask = 0x10000000;
-> -	if ((ppc_inst_val(instr) & 0xfc000000) == 0x7c000000)
-> -		mask = 0x100;		/* major opcode 31 */
-> -	return (ppc_inst_val(instr) & mask) != 0;
-> +	if (ppc_inst_prefixed(instr)) {
-> +		return (ppc_inst_suffix(instr) & mask) != 0;
-> +	} else {
-> +		if ((ppc_inst_val(instr) & 0xfc000000) == 0x7c000000)
-> +			mask = 0x100;		/* major opcode 31 */
-> +		return (ppc_inst_val(instr) & mask) != 0;
+> -	for (i = 0; i <= xics->max_icsid; i++)
+> +	for (i = 0; i <= xics->max_icsid; i++) {
+>  		kfree(xics->ics[i]);
+> -	kfree(xics);
+> +		xics->ics[i] = NULL;
 > +	}
+> +	/*
+> +	 * A reference of the kvmppc_xics pointer is now kept under
+> +	 * the xics_device pointer of the machine for reuse. It is
+> +	 * freed when the VM is destroyed for now until we fix all the
+> +	 * execution paths.
+> +	 */
+>  	kfree(dev);
+>  }
+>  
+> +static struct kvmppc_xics *kvmppc_xics_get_device(struct kvm *kvm)
+> +{
+> +	struct kvmppc_xics **kvm_xics_device = &kvm->arch.xics_device;
+> +	struct kvmppc_xics *xics = *kvm_xics_device;
+> +
+> +	if (!xics) {
+> +		xics = kzalloc(sizeof(*xics), GFP_KERNEL);
+> +		*kvm_xics_device = xics;
+> +	} else {
+> +		memset(xics, 0, sizeof(*xics));
+> +	}
+> +
+> +	return xics;
+> +}
+> +
+>  static int kvmppc_xics_create(struct kvm_device *dev, u32 type)
+>  {
+>  	struct kvmppc_xics *xics;
+>  	struct kvm *kvm = dev->kvm;
+> -	int ret = 0;
+>  
+> -	xics = kzalloc(sizeof(*xics), GFP_KERNEL);
+> +	pr_devel("Creating xics for partition\n");
+> +
+> +	/* Already there ? */
+> +	if (kvm->arch.xics)
+> +		return -EEXIST;
+> +
+> +	xics = kvmppc_xics_get_device(kvm);
+>  	if (!xics)
+>  		return -ENOMEM;
+>  
+>  	dev->private = xics;
+>  	xics->dev = dev;
+>  	xics->kvm = kvm;
+> -
+> -	/* Already there ? */
+> -	if (kvm->arch.xics)
+> -		ret = -EEXIST;
+> -	else
+> -		kvm->arch.xics = xics;
+> -
+> -	if (ret) {
+> -		kfree(xics);
+> -		return ret;
+> -	}
+> +	kvm->arch.xics = xics;
+>  
+>  #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+>  	if (cpu_has_feature(CPU_FTR_ARCH_206) &&
+> @@ -1399,7 +1449,7 @@ struct kvm_device_ops kvm_xics_ops = {
+>  	.name = "kvm-xics",
+>  	.create = kvmppc_xics_create,
+>  	.init = kvmppc_xics_init,
+> -	.destroy = kvmppc_xics_free,
+> +	.release = kvmppc_xics_release,
+>  	.set_attr = xics_set_attr,
+>  	.get_attr = xics_get_attr,
+>  	.has_attr = xics_has_attr,
+> @@ -1415,7 +1465,7 @@ int kvmppc_xics_connect_vcpu(struct kvm_device *dev, struct kvm_vcpu *vcpu,
+>  		return -EPERM;
+>  	if (xics->kvm != vcpu->kvm)
+>  		return -EPERM;
+> -	if (vcpu->arch.irq_type)
+> +	if (vcpu->arch.irq_type != KVMPPC_IRQ_DEFAULT)
+>  		return -EBUSY;
+>  
+>  	r = kvmppc_xics_create_icp(vcpu, xcpu);
+> 
+> 
 
-The way the code worked before, the mask depended on whether the
-instruction was a D-form (or DS-form or other variant) instruction,
-where you can tell loads and stores apart by looking at the major
-opcode, or an X-form instruction, where you look at the minor opcode.
-
-Now we are only looking at the minor opcode if it is not a prefixed
-instruction.  Are there no X-form prefixed loads or stores?
-
-Paul.
