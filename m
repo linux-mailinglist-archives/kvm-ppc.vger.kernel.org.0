@@ -2,85 +2,83 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30D3326D000
-	for <lists+kvm-ppc@lfdr.de>; Thu, 17 Sep 2020 02:35:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56A7126F206
+	for <lists+kvm-ppc@lfdr.de>; Fri, 18 Sep 2020 04:55:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726047AbgIQAfy (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 16 Sep 2020 20:35:54 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:3924 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725858AbgIQAfx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 16 Sep 2020 20:35:53 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5f62af5b0000>; Wed, 16 Sep 2020 17:35:39 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Wed, 16 Sep 2020 17:35:52 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Wed, 16 Sep 2020 17:35:52 -0700
-Received: from rcampbell-dev.nvidia.com (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 17 Sep
- 2020 00:35:49 +0000
-Subject: Re: [PATCH] mm: remove extra ZONE_DEVICE struct page refcount
-To:     Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>
-CC:     Linux MM <linux-mm@kvack.org>, <kvm-ppc@vger.kernel.org>,
-        <nouveau@lists.freedesktop.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        "Matthew Wilcox" <willy@infradead.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        "John Hubbard" <jhubbard@nvidia.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        "Jason Gunthorpe" <jgg@nvidia.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Zi Yan <ziy@nvidia.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <20200914224509.17699-1-rcampbell@nvidia.com>
- <CAPcyv4gVJuWsOtejrKvWgByq=c1niwQOZ0HHYaSo4h6vc-Xw+Q@mail.gmail.com>
- <20200916061054.GC7321@lst.de>
-X-Nvconfidentiality: public
-From:   Ralph Campbell <rcampbell@nvidia.com>
-Message-ID: <4842558d-9626-0452-6398-c2fe39a9a31c@nvidia.com>
-Date:   Wed, 16 Sep 2020 17:35:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1727902AbgIRCz1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 17 Sep 2020 22:55:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57222 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727855AbgIRCHI (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:07:08 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7380F23A31;
+        Fri, 18 Sep 2020 02:07:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600394825;
+        bh=SPERwlclIXQwTDhY9S9VzGMn42+SabgQHJDdP2nrnVQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=rO7WPuTZ/yUzvg9shwPlE0akOMvDAHC4/R1DGcEMDLKFfYVc6hvHJ2y7HIv1rFh7l
+         1n7s+70jVctX0/NoThT8uncUrTZdJ8C5mQ1svngMo4fNhMyY2GDoLeXo1cRpncqm3O
+         LMziZvv18gnNC+a0IyQHYvA1dHhDfycxu4/+3ZDs=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH AUTOSEL 5.4 290/330] KVM: PPC: Book3S HV: Close race with page faults around memslot flushes
+Date:   Thu, 17 Sep 2020 22:00:30 -0400
+Message-Id: <20200918020110.2063155-290-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200918020110.2063155-1-sashal@kernel.org>
+References: <20200918020110.2063155-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200916061054.GC7321@lst.de>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1600302939; bh=8LDzccoActo8nWBlttLgmhuoOW1Z2c2MD7demjEypqQ=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=Q/uj+ryQtb/eBmR3IpGzH7gC57BnghlEPBnv1cfvPBKIfxMtly6SFT3dGaW7ig7v7
-         IqeBEul8UUEhPQWsnDmUGbW5BOBMEwHoFyICyTqId2jjJN+DWzVTtT8r7U9JWuI3ty
-         F/SQQ5yVqGc/dogmTjyTpLXc03CLbAeKQ09g6JU8uxdWledt63qLshfHBS1d0Ml6WU
-         K5/fiDprqbnotHdK0rsU8Gb+3Vl7Mz8C0krvlL4Ho9I3ktE1WwCw75QLUof3DXbClB
-         KZXQ7DGc/wOxKQ62l7DYgJrhRS9BOWyBN5AG8Xic+kGTxp4DZvSYeHVsLZxKc+yfw3
-         AoiTmL0CKD69g==
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+From: Paul Mackerras <paulus@ozlabs.org>
 
-On 9/15/20 11:10 PM, Christoph Hellwig wrote:
-> On Mon, Sep 14, 2020 at 04:10:38PM -0700, Dan Williams wrote:
->> You also need to fix up ext4_break_layouts() and
->> xfs_break_dax_layouts() to expect ->_refcount is 0 instead of 1. This
->> also needs some fstests exposure.
-> 
-> While we're at it, can we add a wait_fsdax_unref helper macro that hides
-> the _refcount access from the file systems?
+[ Upstream commit 11362b1befeadaae4d159a8cddcdaf6b8afe08f9 ]
 
-Sure. I'll add a separate patch for it in v2.
+There is a potential race condition between hypervisor page faults
+and flushing a memslot.  It is possible for a page fault to read the
+memslot before a memslot is updated and then write a PTE to the
+partition-scoped page tables after kvmppc_radix_flush_memslot has
+completed.  (Note that this race has never been explicitly observed.)
+
+To close this race, it is sufficient to increment the MMU sequence
+number while the kvm->mmu_lock is held.  That will cause
+mmu_notifier_retry() to return true, and the page fault will then
+return to the guest without inserting a PTE.
+
+Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/powerpc/kvm/book3s_64_mmu_radix.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index da8375437d161..9d73448354698 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -1104,6 +1104,11 @@ void kvmppc_radix_flush_memslot(struct kvm *kvm,
+ 					 kvm->arch.lpid);
+ 		gpa += PAGE_SIZE;
+ 	}
++	/*
++	 * Increase the mmu notifier sequence number to prevent any page
++	 * fault that read the memslot earlier from writing a PTE.
++	 */
++	kvm->mmu_notifier_seq++;
+ 	spin_unlock(&kvm->mmu_lock);
+ }
+ 
+-- 
+2.25.1
+
