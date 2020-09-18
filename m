@@ -2,27 +2,27 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95A7526F099
-	for <lists+kvm-ppc@lfdr.de>; Fri, 18 Sep 2020 04:45:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83C1126F30E
+	for <lists+kvm-ppc@lfdr.de>; Fri, 18 Sep 2020 05:04:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729044AbgIRCoy (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 17 Sep 2020 22:44:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34788 "EHLO mail.kernel.org"
+        id S1728983AbgIRDDz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 17 Sep 2020 23:03:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52614 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727513AbgIRCKW (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:10:22 -0400
+        id S1726658AbgIRCEx (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:04:53 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 307BF2389E;
-        Fri, 18 Sep 2020 02:10:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 290F62388E;
+        Fri, 18 Sep 2020 02:04:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600395020;
-        bh=KMLqImPNOE1ihO099INA/bTChzzfWJhKz9mooxlg828=;
+        s=default; t=1600394692;
+        bh=1p0mPBYyP+5pGBfPtHVqw/Ox9V+qSduw8oc0iYUP1wk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uCODIVdBpVI60wDh0d91wN0yt5HhwTctgIg29lFV7QJ/yO8bcLx83Bjp1s9CtFWNF
-         137CIxsXzoOpY3AI15UP2etuEYjpTaPYPzm8AFNHaLU6SmVPpkfS575wOz0RfokiJZ
-         zP6NwRlIUL0smBiZVbVsBJ6RQtp+8AtsC+EDjypo=
+        b=Tvnt+704tjNY28iaNUv1YsKcQNXtbGxZoaFiyOQZMKWLj6f0LnVibzkps9sY3OxfH
+         gbS3Bk2+hFCP2ZMxhnfRXf68HHM0r22FcIFHV53iMeorsspDld5CPe4WdbjVA7nQm8
+         24gCJg9bZmbt+oU2fxJ/lc+4JoxeXoFr3Slku5P8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Gustavo Romero <gromero@linux.ibm.com>,
@@ -32,12 +32,12 @@ Cc:     Gustavo Romero <gromero@linux.ibm.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
         kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 4.19 114/206] KVM: PPC: Book3S HV: Treat TM-related invalid form instructions on P9 like the valid ones
-Date:   Thu, 17 Sep 2020 22:06:30 -0400
-Message-Id: <20200918020802.2065198-114-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 180/330] KVM: PPC: Book3S HV: Treat TM-related invalid form instructions on P9 like the valid ones
+Date:   Thu, 17 Sep 2020 21:58:40 -0400
+Message-Id: <20200918020110.2063155-180-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200918020802.2065198-1-sashal@kernel.org>
-References: <20200918020802.2065198-1-sashal@kernel.org>
+In-Reply-To: <20200918020110.2063155-1-sashal@kernel.org>
+References: <20200918020110.2063155-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -133,10 +133,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 40 insertions(+), 7 deletions(-)
 
 diff --git a/arch/powerpc/include/asm/kvm_asm.h b/arch/powerpc/include/asm/kvm_asm.h
-index a790d5cf6ea37..684e8ae00d160 100644
+index 635fb154b33f9..a3633560493be 100644
 --- a/arch/powerpc/include/asm/kvm_asm.h
 +++ b/arch/powerpc/include/asm/kvm_asm.h
-@@ -163,4 +163,7 @@
+@@ -150,4 +150,7 @@
  
  #define KVM_INST_FETCH_FAILED	-1
  
@@ -145,11 +145,11 @@ index a790d5cf6ea37..684e8ae00d160 100644
 +
  #endif /* __POWERPC_KVM_ASM_H__ */
 diff --git a/arch/powerpc/kvm/book3s_hv_tm.c b/arch/powerpc/kvm/book3s_hv_tm.c
-index 31cd0f327c8a2..e7fd60cf97804 100644
+index 0db9374971697..cc90b8b823291 100644
 --- a/arch/powerpc/kvm/book3s_hv_tm.c
 +++ b/arch/powerpc/kvm/book3s_hv_tm.c
-@@ -6,6 +6,8 @@
-  * published by the Free Software Foundation.
+@@ -3,6 +3,8 @@
+  * Copyright 2017 Paul Mackerras, IBM Corp. <paulus@au1.ibm.com>
   */
  
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -157,7 +157,7 @@ index 31cd0f327c8a2..e7fd60cf97804 100644
  #include <linux/kvm_host.h>
  
  #include <asm/kvm_ppc.h>
-@@ -47,7 +49,18 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
+@@ -44,7 +46,18 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
  	u64 newmsr, bescr;
  	int ra, rs;
  
@@ -177,7 +177,7 @@ index 31cd0f327c8a2..e7fd60cf97804 100644
  	case PPC_INST_RFID:
  		/* XXX do we need to check for PR=0 here? */
  		newmsr = vcpu->arch.shregs.srr1;
-@@ -108,7 +121,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
+@@ -105,7 +118,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
  		vcpu->arch.shregs.msr = newmsr;
  		return RESUME_GUEST;
  
@@ -187,7 +187,7 @@ index 31cd0f327c8a2..e7fd60cf97804 100644
  		/* check for PR=1 and arch 2.06 bit set in PCR */
  		if ((msr & MSR_PR) && (vcpu->arch.vcore->pcr & PCR_ARCH_206)) {
  			/* generate an illegal instruction interrupt */
-@@ -143,7 +157,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
+@@ -140,7 +154,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
  		vcpu->arch.shregs.msr = msr;
  		return RESUME_GUEST;
  
@@ -197,7 +197,7 @@ index 31cd0f327c8a2..e7fd60cf97804 100644
  		/* check for TM disabled in the HFSCR or MSR */
  		if (!(vcpu->arch.hfscr & HFSCR_TM)) {
  			/* generate an illegal instruction interrupt */
-@@ -179,7 +194,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
+@@ -176,7 +191,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
  		vcpu->arch.shregs.msr &= ~MSR_TS_MASK;
  		return RESUME_GUEST;
  
@@ -207,7 +207,7 @@ index 31cd0f327c8a2..e7fd60cf97804 100644
  		/* XXX do we need to check for PR=0 here? */
  		/* check for TM disabled in the HFSCR or MSR */
  		if (!(vcpu->arch.hfscr & HFSCR_TM)) {
-@@ -211,6 +227,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
+@@ -208,6 +224,8 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
  	}
  
  	/* What should we do here? We didn't recognize the instruction */
@@ -218,10 +218,10 @@ index 31cd0f327c8a2..e7fd60cf97804 100644
  	return RESUME_GUEST;
  }
 diff --git a/arch/powerpc/kvm/book3s_hv_tm_builtin.c b/arch/powerpc/kvm/book3s_hv_tm_builtin.c
-index 3cf5863bc06e8..3c7ca2fa19597 100644
+index 217246279dfae..fad931f224efd 100644
 --- a/arch/powerpc/kvm/book3s_hv_tm_builtin.c
 +++ b/arch/powerpc/kvm/book3s_hv_tm_builtin.c
-@@ -26,7 +26,18 @@ int kvmhv_p9_tm_emulation_early(struct kvm_vcpu *vcpu)
+@@ -23,7 +23,18 @@ int kvmhv_p9_tm_emulation_early(struct kvm_vcpu *vcpu)
  	u64 newmsr, msr, bescr;
  	int rs;
  
@@ -241,7 +241,7 @@ index 3cf5863bc06e8..3c7ca2fa19597 100644
  	case PPC_INST_RFID:
  		/* XXX do we need to check for PR=0 here? */
  		newmsr = vcpu->arch.shregs.srr1;
-@@ -76,7 +87,8 @@ int kvmhv_p9_tm_emulation_early(struct kvm_vcpu *vcpu)
+@@ -73,7 +84,8 @@ int kvmhv_p9_tm_emulation_early(struct kvm_vcpu *vcpu)
  		vcpu->arch.shregs.msr = newmsr;
  		return 1;
  
