@@ -2,60 +2,119 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F933270B5C
-	for <lists+kvm-ppc@lfdr.de>; Sat, 19 Sep 2020 09:12:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88A68271E7F
+	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Sep 2020 11:03:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726097AbgISHMW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 19 Sep 2020 03:12:22 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13327 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726054AbgISHMW (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sat, 19 Sep 2020 03:12:22 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 064361527795F6012CE4;
-        Sat, 19 Sep 2020 15:12:16 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 19 Sep 2020 15:12:07 +0800
-From:   Jing Xiangfeng <jingxiangfeng@huawei.com>
-To:     <paulus@ozlabs.org>, <mpe@ellerman.id.au>,
-        <benh@kernel.crashing.org>
-CC:     <kvm-ppc@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-        <linux-kernel@vger.kernel.org>, <jingxiangfeng@huawei.com>
-Subject: [PATCH] KVM: PPC: Book3S: Remove redundant initialization of variable ret
-Date:   Sat, 19 Sep 2020 15:12:30 +0800
-Message-ID: <20200919071230.125798-1-jingxiangfeng@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        id S1726435AbgIUJDa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 21 Sep 2020 05:03:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41018 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726428AbgIUJDa (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 21 Sep 2020 05:03:30 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08L9305J146229;
+        Mon, 21 Sep 2020 05:03:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=leuZBYJN+/lc+Fxidrffl08f1oCjwqKg5qzlph2Ogn4=;
+ b=WHBBKE1GUfZB1ECOVoQDcwNj9LmC1qqp47gJP8wq2B6HZr1wR96jYTTYMM2buaVgn3YE
+ /7HD2WsZzVJZWOQdu5thPBBbJV3d3uLN44L2E3+mSv9qNAeygZzH6PfJqWXFXzTqQM5b
+ 7qn2QsISdgnsQh1BUzOGE0PQZKcp58SU2a6N5ubIbK9+BFaTVXiXqdIBSNI5Gzim8Pa9
+ dudhf4LUJatvlJesIDd6d1xxanVwUiaD3N2hvVIKbUrEnQTCARZ4N6ateAUKq8AA07JJ
+ uezPdaCGhwE/R0R4EYzHWNwlzK3vWm+HWYUtg6JGSg6G3rONZGt1qDC3vWngc8X6p8gf DA== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33ps1f08gr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Sep 2020 05:03:04 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08L92ZQ9016538;
+        Mon, 21 Sep 2020 09:02:35 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 33n9m89u7s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Sep 2020 09:02:34 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08L92VSj27132210
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Sep 2020 09:02:31 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9A1E4A4062;
+        Mon, 21 Sep 2020 09:02:32 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6E7BEA4054;
+        Mon, 21 Sep 2020 09:02:29 +0000 (GMT)
+Received: from satheesh.ibmuc.com (unknown [9.102.17.247])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 21 Sep 2020 09:02:29 +0000 (GMT)
+From:   sathnaga@linux.vnet.ibm.com
+To:     linux-doc@vger.kernel.org
+Cc:     Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH V2] Doc: admin-guide: Add entry for kvm_cma_resv_ratio kernel param
+Date:   Mon, 21 Sep 2020 14:32:20 +0530
+Message-Id: <20200921090220.14981-1-sathnaga@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-21_01:2020-09-21,2020-09-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1011
+ priorityscore=1501 malwarescore=0 mlxlogscore=979 mlxscore=0 bulkscore=0
+ lowpriorityscore=0 phishscore=0 spamscore=0 impostorscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009210067
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The variable ret is being initialized with '-ENOMEM' that is meaningless.
-So remove it.
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 
-Signed-off-by: Jing Xiangfeng <jingxiangfeng@huawei.com>
+Add document entry for kvm_cma_resv_ratio kernel param which
+is used to alter the KVM contiguous memory allocation percentage
+for hash pagetable allocation used by hash mode PowerPC KVM guests.
+
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm-ppc@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 ---
- arch/powerpc/kvm/book3s_64_vio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-index 1a529df0ab44..b277a75cd1be 100644
---- a/arch/powerpc/kvm/book3s_64_vio.c
-+++ b/arch/powerpc/kvm/book3s_64_vio.c
-@@ -283,7 +283,7 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
- 	struct kvmppc_spapr_tce_table *siter;
- 	struct mm_struct *mm = kvm->mm;
- 	unsigned long npages, size = args->size;
--	int ret = -ENOMEM;
-+	int ret;
+V2: 
+Addressed review comments from Randy.
+
+V1: https://lkml.org/lkml/2020/9/16/72
+---
+ Documentation/admin-guide/kernel-parameters.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index a1068742a6df..932ed45740c9 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2258,6 +2258,14 @@
+ 			[KVM,ARM] Allow use of GICv4 for direct injection of
+ 			LPIs.
  
- 	if (!args->size || args->page_shift < 12 || args->page_shift > 34 ||
- 		(args->offset + args->size > (ULLONG_MAX >> args->page_shift)))
++	kvm_cma_resv_ratio=n [PPC]
++			Reserves given percentage from system memory area for
++			contiguous memory allocation for KVM hash pagetable
++			allocation.
++			By default it reserves 5% of total system memory.
++			Format: <integer>
++			Default: 5
++
+ 	kvm-intel.ept=	[KVM,Intel] Disable extended page tables
+ 			(virtualized MMU) support on capable Intel chips.
+ 			Default is 1 (enabled)
 -- 
-2.17.1
+2.26.2
 
