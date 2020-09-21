@@ -2,119 +2,159 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88A68271E7F
-	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Sep 2020 11:03:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57DB5272257
+	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Sep 2020 13:24:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726435AbgIUJDa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 21 Sep 2020 05:03:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41018 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726428AbgIUJDa (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 21 Sep 2020 05:03:30 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08L9305J146229;
-        Mon, 21 Sep 2020 05:03:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=leuZBYJN+/lc+Fxidrffl08f1oCjwqKg5qzlph2Ogn4=;
- b=WHBBKE1GUfZB1ECOVoQDcwNj9LmC1qqp47gJP8wq2B6HZr1wR96jYTTYMM2buaVgn3YE
- /7HD2WsZzVJZWOQdu5thPBBbJV3d3uLN44L2E3+mSv9qNAeygZzH6PfJqWXFXzTqQM5b
- 7qn2QsISdgnsQh1BUzOGE0PQZKcp58SU2a6N5ubIbK9+BFaTVXiXqdIBSNI5Gzim8Pa9
- dudhf4LUJatvlJesIDd6d1xxanVwUiaD3N2hvVIKbUrEnQTCARZ4N6ateAUKq8AA07JJ
- uezPdaCGhwE/R0R4EYzHWNwlzK3vWm+HWYUtg6JGSg6G3rONZGt1qDC3vWngc8X6p8gf DA== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 33ps1f08gr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Sep 2020 05:03:04 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08L92ZQ9016538;
-        Mon, 21 Sep 2020 09:02:35 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 33n9m89u7s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Sep 2020 09:02:34 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08L92VSj27132210
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Sep 2020 09:02:31 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9A1E4A4062;
-        Mon, 21 Sep 2020 09:02:32 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E7BEA4054;
-        Mon, 21 Sep 2020 09:02:29 +0000 (GMT)
-Received: from satheesh.ibmuc.com (unknown [9.102.17.247])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 21 Sep 2020 09:02:29 +0000 (GMT)
-From:   sathnaga@linux.vnet.ibm.com
-To:     linux-doc@vger.kernel.org
-Cc:     Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
-        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH V2] Doc: admin-guide: Add entry for kvm_cma_resv_ratio kernel param
-Date:   Mon, 21 Sep 2020 14:32:20 +0530
-Message-Id: <20200921090220.14981-1-sathnaga@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.26.2
+        id S1726419AbgIULY6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 21 Sep 2020 07:24:58 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:44764 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726367AbgIULY5 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 21 Sep 2020 07:24:57 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 26FF28EAE5C88EE86BD1;
+        Mon, 21 Sep 2020 19:24:56 +0800 (CST)
+Received: from huawei.com (10.175.112.208) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Mon, 21 Sep 2020
+ 19:24:50 +0800
+From:   Wang Wensheng <wangwensheng4@huawei.com>
+To:     <paulus@ozlabs.org>, <mpe@ellerman.id.au>,
+        <benh@kernel.crashing.org>, <kvm-ppc@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH -next] powerpc/kvm/books: Fix symbol undeclared warnings
+Date:   Mon, 21 Sep 2020 11:22:11 +0000
+Message-ID: <20200921112211.82830-1-wangwensheng4@huawei.com>
+X-Mailer: git-send-email 2.25.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-21_01:2020-09-21,2020-09-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1011
- priorityscore=1501 malwarescore=0 mlxlogscore=979 mlxscore=0 bulkscore=0
- lowpriorityscore=0 phishscore=0 spamscore=0 impostorscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009210067
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.112.208]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Build the kernel with `C=2`:
+arch/powerpc/kvm/book3s_hv_nested.c:572:25: warning: symbol
+'kvmhv_alloc_nested' was not declared. Should it be static?
+arch/powerpc/kvm/book3s_64_mmu_radix.c:350:6: warning: symbol
+'kvmppc_radix_set_pte_at' was not declared. Should it be static?
+arch/powerpc/kvm/book3s_hv.c:3568:5: warning: symbol
+'kvmhv_p9_guest_entry' was not declared. Should it be static?
+arch/powerpc/kvm/book3s_hv_rm_xics.c:767:15: warning: symbol 'eoi_rc'
+was not declared. Should it be static?
+arch/powerpc/kvm/book3s_64_vio_hv.c:240:13: warning: symbol
+'iommu_tce_kill_rm' was not declared. Should it be static?
+arch/powerpc/kvm/book3s_64_vio.c:492:6: warning: symbol
+'kvmppc_tce_iommu_do_map' was not declared. Should it be static?
+arch/powerpc/kvm/book3s_pr.c:572:6: warning: symbol 'kvmppc_set_pvr_pr'
+was not declared. Should it be static?
 
-Add document entry for kvm_cma_resv_ratio kernel param which
-is used to alter the KVM contiguous memory allocation percentage
-for hash pagetable allocation used by hash mode PowerPC KVM guests.
+Those symbols are used only in the files that define them so make them
+static to fix the warnings.
 
-Cc: linux-kernel@vger.kernel.org
-Cc: kvm-ppc@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
-Signed-off-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Signed-off-by: Wang Wensheng <wangwensheng4@huawei.com>
 ---
+ arch/powerpc/kvm/book3s_64_mmu_radix.c | 2 +-
+ arch/powerpc/kvm/book3s_64_vio.c       | 2 +-
+ arch/powerpc/kvm/book3s_64_vio_hv.c    | 2 +-
+ arch/powerpc/kvm/book3s_hv.c           | 2 +-
+ arch/powerpc/kvm/book3s_hv_nested.c    | 2 +-
+ arch/powerpc/kvm/book3s_hv_rm_xics.c   | 2 +-
+ arch/powerpc/kvm/book3s_pr.c           | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
 
-V2: 
-Addressed review comments from Randy.
-
-V1: https://lkml.org/lkml/2020/9/16/72
----
- Documentation/admin-guide/kernel-parameters.txt | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index a1068742a6df..932ed45740c9 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2258,6 +2258,14 @@
- 			[KVM,ARM] Allow use of GICv4 for direct injection of
- 			LPIs.
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 22a677b18695..bb35490400e9 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -347,7 +347,7 @@ static unsigned long kvmppc_radix_update_pte(struct kvm *kvm, pte_t *ptep,
+ 	return __radix_pte_update(ptep, clr, set);
+ }
  
-+	kvm_cma_resv_ratio=n [PPC]
-+			Reserves given percentage from system memory area for
-+			contiguous memory allocation for KVM hash pagetable
-+			allocation.
-+			By default it reserves 5% of total system memory.
-+			Format: <integer>
-+			Default: 5
-+
- 	kvm-intel.ept=	[KVM,Intel] Disable extended page tables
- 			(virtualized MMU) support on capable Intel chips.
- 			Default is 1 (enabled)
+-void kvmppc_radix_set_pte_at(struct kvm *kvm, unsigned long addr,
++static void kvmppc_radix_set_pte_at(struct kvm *kvm, unsigned long addr,
+ 			     pte_t *ptep, pte_t pte)
+ {
+ 	radix__set_pte_at(kvm->mm, addr, ptep, pte, 0);
+diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
+index 1a529df0ab44..c2fbeb04bba2 100644
+--- a/arch/powerpc/kvm/book3s_64_vio.c
++++ b/arch/powerpc/kvm/book3s_64_vio.c
+@@ -489,7 +489,7 @@ static long kvmppc_tce_iommu_unmap(struct kvm *kvm,
+ 	return ret;
+ }
+ 
+-long kvmppc_tce_iommu_do_map(struct kvm *kvm, struct iommu_table *tbl,
++static long kvmppc_tce_iommu_do_map(struct kvm *kvm, struct iommu_table *tbl,
+ 		unsigned long entry, unsigned long ua,
+ 		enum dma_data_direction dir)
+ {
+diff --git a/arch/powerpc/kvm/book3s_64_vio_hv.c b/arch/powerpc/kvm/book3s_64_vio_hv.c
+index ac6ac192b8bb..470e7c518a10 100644
+--- a/arch/powerpc/kvm/book3s_64_vio_hv.c
++++ b/arch/powerpc/kvm/book3s_64_vio_hv.c
+@@ -237,7 +237,7 @@ static long iommu_tce_xchg_no_kill_rm(struct mm_struct *mm,
+ 	return ret;
+ }
+ 
+-extern void iommu_tce_kill_rm(struct iommu_table *tbl,
++static void iommu_tce_kill_rm(struct iommu_table *tbl,
+ 		unsigned long entry, unsigned long pages)
+ {
+ 	if (tbl->it_ops->tce_kill)
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index cb1d16a3730c..31407be44e57 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3575,7 +3575,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+  * Virtual-mode guest entry for POWER9 and later when the host and
+  * guest are both using the radix MMU.  The LPIDR has already been set.
+  */
+-int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
++static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 			 unsigned long lpcr)
+ {
+ 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
+diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+index 6822d23a2da4..33b58549a9aa 100644
+--- a/arch/powerpc/kvm/book3s_hv_nested.c
++++ b/arch/powerpc/kvm/book3s_hv_nested.c
+@@ -569,7 +569,7 @@ static void kvmhv_update_ptbl_cache(struct kvm_nested_guest *gp)
+ 	kvmhv_set_nested_ptbl(gp);
+ }
+ 
+-struct kvm_nested_guest *kvmhv_alloc_nested(struct kvm *kvm, unsigned int lpid)
++static struct kvm_nested_guest *kvmhv_alloc_nested(struct kvm *kvm, unsigned int lpid)
+ {
+ 	struct kvm_nested_guest *gp;
+ 	long shadow_lpid;
+diff --git a/arch/powerpc/kvm/book3s_hv_rm_xics.c b/arch/powerpc/kvm/book3s_hv_rm_xics.c
+index 4d7e5610731a..c2c9c733f359 100644
+--- a/arch/powerpc/kvm/book3s_hv_rm_xics.c
++++ b/arch/powerpc/kvm/book3s_hv_rm_xics.c
+@@ -764,7 +764,7 @@ int xics_rm_h_eoi(struct kvm_vcpu *vcpu, unsigned long xirr)
+ 	return ics_rm_eoi(vcpu, irq);
+ }
+ 
+-unsigned long eoi_rc;
++static unsigned long eoi_rc;
+ 
+ static void icp_eoi(struct irq_chip *c, u32 hwirq, __be32 xirr, bool *again)
+ {
+diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
+index 88fac22fbf09..b1fefa63e125 100644
+--- a/arch/powerpc/kvm/book3s_pr.c
++++ b/arch/powerpc/kvm/book3s_pr.c
+@@ -569,7 +569,7 @@ static void kvmppc_set_msr_pr(struct kvm_vcpu *vcpu, u64 msr)
+ #endif
+ }
+ 
+-void kvmppc_set_pvr_pr(struct kvm_vcpu *vcpu, u32 pvr)
++static void kvmppc_set_pvr_pr(struct kvm_vcpu *vcpu, u32 pvr)
+ {
+ 	u32 host_pvr;
+ 
 -- 
-2.26.2
+2.25.0
 
