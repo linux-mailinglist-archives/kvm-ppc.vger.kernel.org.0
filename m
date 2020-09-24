@@ -2,39 +2,60 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 437C827640B
-	for <lists+kvm-ppc@lfdr.de>; Thu, 24 Sep 2020 00:45:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4098727686B
+	for <lists+kvm-ppc@lfdr.de>; Thu, 24 Sep 2020 07:31:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726769AbgIWWpj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 23 Sep 2020 18:45:39 -0400
-Received: from mga02.intel.com ([134.134.136.20]:41185 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726696AbgIWWpe (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 23 Sep 2020 18:45:34 -0400
-IronPort-SDR: rd4dRM8i0Op1CTJECvVk73v+o5m1aHDNTpQl4LenNGJnEOREkknCzkHQ5bN/ptl1k8aq6wt2Qu
- Rrpv8fL5EbFg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="148698570"
-X-IronPort-AV: E=Sophos;i="5.77,295,1596524400"; 
-   d="scan'208";a="148698570"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 15:45:33 -0700
-IronPort-SDR: Fr2JxZMxsomuX02zVQNCadcnQn8OG4+lUnDKf9BKljc31q3oeEAJran7O1u3QsqFtB5ZxEhbOZ
- XohwXf3KsMRQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,295,1596524400"; 
-   d="scan'208";a="335660071"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.160])
-  by fmsmga004.fm.intel.com with ESMTP; 23 Sep 2020 15:45:33 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        id S1726825AbgIXFbP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 24 Sep 2020 01:31:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37902 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726683AbgIXFbO (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 24 Sep 2020 01:31:14 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08O59QA8089871;
+        Thu, 24 Sep 2020 01:30:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=RVAYJ1+ohfp4WrP9CGBemRWlu8SvZ6N72YZ4FeIJg+w=;
+ b=k/oKuy0X4KvbZvKMe1Plm0o3m6eX2WobF7jqWWApZdv3Y4eNoqnwXGDUi2VoWQZ7Zbdf
+ R1ZYcDShL6Kr023twP9/VnG12LekGLXq338BIq11xACCnVDWsRbyHGWRNtTbPLaGJcHp
+ XJRUSvGQKa90otmyeHgdJSC4YuMJ8TIp2ULYg4CWo5g2h/cV5s37QSd5q26R++AJULYK
+ sR6KA97x8qqoVwzv4/EusY5ogXPgaVANU29YqOknB43cawM2/TAMsjSaRlCLSGp5lFLM
+ OJ9+JAmEo/+cled0uKkBtVtZEZzZsANhC2sBkmjXH+1Zu6EKuGP2Fb8vkMMEOsLLRio7 Jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33rn2a8cp2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Sep 2020 01:30:28 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08O5FOTG106863;
+        Thu, 24 Sep 2020 01:30:28 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 33rn2a8cn1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Sep 2020 01:30:28 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08O5SeLP001960;
+        Thu, 24 Sep 2020 05:30:25 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 33n9m7thd9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Sep 2020 05:30:25 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 08O5UMst28508438
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 24 Sep 2020 05:30:22 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3474552050;
+        Thu, 24 Sep 2020 05:30:22 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.65.79])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 43B915205F;
+        Thu, 24 Sep 2020 05:30:21 +0000 (GMT)
+Subject: Re: [PATCH] KVM: Enable hardware before doing arch VM initialization
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -42,144 +63,121 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Huacai Chen <chenhc@lemote.com>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        kvm-ppc@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
+        kvm-ppc@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Subject: [RFC PATCH 3/3] KVM: x86: Use KVM_BUG/KVM_BUG_ON to handle bugs that are fatal to the VM
-Date:   Wed, 23 Sep 2020 15:45:30 -0700
-Message-Id: <20200923224530.17735-4-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200923224530.17735-1-sean.j.christopherson@intel.com>
-References: <20200923224530.17735-1-sean.j.christopherson@intel.com>
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <20200923185757.1806-1-sean.j.christopherson@intel.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <af0ccfeb-14eb-58c4-724b-bd75532cb6a4@de.ibm.com>
+Date:   Thu, 24 Sep 2020 07:30:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200923185757.1806-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-24_01:2020-09-24,2020-09-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ adultscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=675
+ clxscore=1011 suspectscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009240036
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Add support for KVM_REQ_VM_BUGG in x86, and replace a variety of WARNs
-with KVM_BUG() and KVM_BUG_ON().  Return -EIO if a KVM_BUG is hit to
-align with the common KVM behavior of rejecting iocts() with -EIO if the
-VM is bugged.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/svm/svm.c |  2 +-
- arch/x86/kvm/vmx/vmx.c | 23 ++++++++++++++---------
- arch/x86/kvm/x86.c     |  4 ++++
- 3 files changed, 19 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3da5b2f1b4a1..e684794c6249 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1380,7 +1380,7 @@ static void svm_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
- 		load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu));
- 		break;
- 	default:
--		WARN_ON_ONCE(1);
-+		KVM_BUG_ON(1, vcpu->kvm);
- 	}
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6f9a0c6d5dc5..810d46ab0a47 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2250,7 +2250,7 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
- 		vcpu->arch.cr4 |= vmcs_readl(GUEST_CR4) & guest_owned_bits;
- 		break;
- 	default:
--		WARN_ON_ONCE(1);
-+		KVM_BUG_ON(1, vcpu->kvm);
- 		break;
- 	}
- }
-@@ -4960,6 +4960,7 @@ static int handle_cr(struct kvm_vcpu *vcpu)
- 			return kvm_complete_insn_gp(vcpu, err);
- 		case 3:
- 			WARN_ON_ONCE(enable_unrestricted_guest);
-+
- 			err = kvm_set_cr3(vcpu, val);
- 			return kvm_complete_insn_gp(vcpu, err);
- 		case 4:
-@@ -4985,14 +4986,13 @@ static int handle_cr(struct kvm_vcpu *vcpu)
- 		}
- 		break;
- 	case 2: /* clts */
--		WARN_ONCE(1, "Guest should always own CR0.TS");
--		vmx_set_cr0(vcpu, kvm_read_cr0_bits(vcpu, ~X86_CR0_TS));
--		trace_kvm_cr_write(0, kvm_read_cr0(vcpu));
--		return kvm_skip_emulated_instruction(vcpu);
-+		KVM_BUG(1, vcpu->kvm, "Guest always owns CR0.TS");
-+		return -EIO;
- 	case 1: /*mov from cr*/
- 		switch (cr) {
- 		case 3:
- 			WARN_ON_ONCE(enable_unrestricted_guest);
-+
- 			val = kvm_read_cr3(vcpu);
- 			kvm_register_write(vcpu, reg, val);
- 			trace_kvm_cr_read(cr, val);
-@@ -5330,7 +5330,9 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
- 
- static int handle_nmi_window(struct kvm_vcpu *vcpu)
- {
--	WARN_ON_ONCE(!enable_vnmi);
-+	if (KVM_BUG_ON(!enable_vnmi, vcpu->kvm))
-+		return -EIO;
-+
- 	exec_controls_clearbit(to_vmx(vcpu), CPU_BASED_NMI_WINDOW_EXITING);
- 	++vcpu->stat.nmi_window_exits;
- 	kvm_make_request(KVM_REQ_EVENT, vcpu);
-@@ -5908,7 +5910,8 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 	 * below) should never happen as that means we incorrectly allowed a
- 	 * nested VM-Enter with an invalid vmcs12.
- 	 */
--	WARN_ON_ONCE(vmx->nested.nested_run_pending);
-+	if (KVM_BUG_ON(vmx->nested.nested_run_pending, vcpu->kvm))
-+		return -EIO;
- 
- 	/* If guest state is invalid, start emulating */
- 	if (vmx->emulation_required)
-@@ -6258,7 +6261,9 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
- 	int max_irr;
- 	bool max_irr_updated;
- 
--	WARN_ON(!vcpu->arch.apicv_active);
-+	if (KVM_BUG_ON(!vcpu->arch.apicv_active, vcpu->kvm))
-+		return -EIO;
-+
- 	if (pi_test_on(&vmx->pi_desc)) {
- 		pi_clear_on(&vmx->pi_desc);
- 		/*
-@@ -6345,7 +6350,7 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
- 	gate_desc *desc;
- 	u32 intr_info = vmx_get_intr_info(vcpu);
- 
--	if (WARN_ONCE(!is_external_intr(intr_info),
-+	if (KVM_BUG(!is_external_intr(intr_info), vcpu->kvm,
- 	    "KVM: unexpected VM-Exit interrupt info: 0x%x", intr_info))
- 		return;
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 17f4995e80a7..672eb5142b34 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8363,6 +8363,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	bool req_immediate_exit = false;
- 
- 	if (kvm_request_pending(vcpu)) {
-+		if (kvm_check_request(KVM_REQ_VM_BUGGED, vcpu)) {
-+			r = -EIO;
-+			goto out;
-+		}
- 		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu)) {
- 			if (unlikely(!kvm_x86_ops.nested_ops->get_vmcs12_pages(vcpu))) {
- 				r = 0;
--- 
-2.28.0
+On 23.09.20 20:57, Sean Christopherson wrote:
+> Swap the order of hardware_enable_all() and kvm_arch_init_vm() to
+> accommodate Intel's Trust Domain Extension (TDX), which needs VMX to be
+> fully enabled during VM init in order to make SEAMCALLs.
+> 
+> This also provides consistent ordering between kvm_create_vm() and
+> kvm_destroy_vm() with respect to calling kvm_arch_destroy_vm() and
+> hardware_disable_all().
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: Huacai Chen <chenhc@lemote.com>
+> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> Cc: linux-mips@vger.kernel.org
+> Cc: Paul Mackerras <paulus@ozlabs.org>
+> Cc: kvm-ppc@vger.kernel.org
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Janosch Frank <frankja@linux.ibm.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Wanpeng Li <wanpengli@tencent.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+> 
+> Obviously not required until the TDX series comes along, but IMO KVM
+> should be consistent with respect to enabling and disabling virt support
+> in hardware.
+> 
+> Tested only on Intel hardware.  Unless I missed something, this only
+> affects x86, Arm and MIPS as hardware enabling is a nop for s390 and PPC.
+
+Yes, looks fine from an s390 perspective.
+
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
