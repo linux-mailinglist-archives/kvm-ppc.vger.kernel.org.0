@@ -2,59 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5EE2276945
-	for <lists+kvm-ppc@lfdr.de>; Thu, 24 Sep 2020 08:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E33D1276B16
+	for <lists+kvm-ppc@lfdr.de>; Thu, 24 Sep 2020 09:45:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727077AbgIXGuu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 24 Sep 2020 02:50:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25828 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727054AbgIXGun (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 24 Sep 2020 02:50:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1600930241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LIKAioeplGLyiuBbUFdtMjnI7W3D9Z3j5vefA4s4ufw=;
-        b=TGjf3Mgex9r9t86KufiyJi3s851fcQxVcPOJyWPavnr42E3stSUuJjqGDTdqgsp7pWEzz/
-        f/ohVWR1BRiTiUsc4lAA2REgZtVttaLbdwAGxwfliWWT/QUVfxgClvI8sfXMl3wu5wJq9X
-        mOGXZEi5jO3SI7yILsvl1bEAv4vH+GY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-D55B9IfWNyWy0WAOrmyneQ-1; Thu, 24 Sep 2020 02:50:37 -0400
-X-MC-Unique: D55B9IfWNyWy0WAOrmyneQ-1
-Received: by mail-wm1-f71.google.com with SMTP id b20so3186391wmj.1
-        for <kvm-ppc@vger.kernel.org>; Wed, 23 Sep 2020 23:50:37 -0700 (PDT)
+        id S1727130AbgIXHpZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 24 Sep 2020 03:45:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51782 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727013AbgIXHpY (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 24 Sep 2020 03:45:24 -0400
+Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE497C0613CE;
+        Thu, 24 Sep 2020 00:45:24 -0700 (PDT)
+Received: by mail-il1-x142.google.com with SMTP id h2so2166605ilo.12;
+        Thu, 24 Sep 2020 00:45:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IxTyfqdQxLsGAMyRUvmRffvJyTeVBIXZuLoIIydSIMs=;
+        b=L41Sz9YzaRenimIvko0cU8wwGfr7axecHDVXquVtPxNplBENOLzJAYg2IL9GaVUJ3i
+         ntU0cx8dImDvNIZNvlPxt/ApaKQvmP+swKYbK4olUGDJquS1h2iHEoVstipvyGh1qjc0
+         qd56UpqhXezSnGi07/FMvcgZOqdbOfz5zb6O7dChp61LZjuCzzJ570TzvVxOwKGtecsh
+         ldTDFKT1pfdmdVvD3nPdi94L6EkuwpnTSVWSXEoLnOPp/j81CkGe5yUscPC2f3p522lm
+         0rz8K2Zi36Z/ZLRF+JGQ9M/6z+z71XCtW4ud1vWNBHlSTzf7yBDDOcR8oQBk4VqkWmhW
+         FORA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LIKAioeplGLyiuBbUFdtMjnI7W3D9Z3j5vefA4s4ufw=;
-        b=uZ6aU0UPJDfyKJOztGsSkmqD/VuhWFSy5c1ermTf3Yrk9KeOVGUZFSwo4dNl1iMGUR
-         tlklsFl1tOcT5cto5IF9DTYO+aOkNCEuX3q9HEEPQLvglwgF5tIlwDUOMCZnhqxd4X82
-         rHLbEdp3VrOZl4ZbfFUrVP04WuueiViyrkdBWg8i37kUzQs5hJdE6lHNTQTKhbAJUXB2
-         V7gua0pAagRURwpH1bZEKE4bdUvySBjjuVUymM8y6eghWsDvmSG0oelreCKHDalp01oi
-         BvgkMNq47t2TW5Lpx39IpVdrsEhXPZdUcvtt3lU9icFGTLqmwDWzVrj7FuTXMQwaFYYV
-         0OtQ==
-X-Gm-Message-State: AOAM531QerUK3xN0TMkFctV8p0bI53dW/4m8e3+UKujLqyNB6kED7koS
-        jsSsZaA4pfgwG12Jf4cFgzR5GiVhR2yF3zTilZZW4HTVStZGyaM4jiD4MEK7w75+jSjhyx1CP5Y
-        n09H3moOPU7FxyaJJ5w==
-X-Received: by 2002:adf:dbc3:: with SMTP id e3mr3333435wrj.1.1600930236327;
-        Wed, 23 Sep 2020 23:50:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzdKgtG8a23gp9sPKCgac/G4/YiS2x4mbujGoCbXj7ZDMRA/eaMcnIrHNWJ/P8aBoLyEtKHFA==
-X-Received: by 2002:adf:dbc3:: with SMTP id e3mr3333401wrj.1.1600930236064;
-        Wed, 23 Sep 2020 23:50:36 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d80e:a78:c27b:93ed? ([2001:b07:6468:f312:d80e:a78:c27b:93ed])
-        by smtp.gmail.com with ESMTPSA id m18sm2283735wrx.58.2020.09.23.23.50.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Sep 2020 23:50:35 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IxTyfqdQxLsGAMyRUvmRffvJyTeVBIXZuLoIIydSIMs=;
+        b=RG1Qf5M7U3ZE3ipNi3JcSBIQ0c4s/rrvgJeZcPPAw4pCWtEdBkpbaeORgqn6u93alj
+         E98BS5LQI8KtVj2dn8VjIUX/dgcQqs3OBcU/Rk7qwVfP0xVtXW/q6rSitjl2eKzz3d8f
+         dX9v6JWWCXSyq16XbKGt6V3sC1RrUwvrfLNSbk8hkIpkNSvex+UmajvpuC1E6HlvxMOI
+         cz/wcNc758rTtCK0T4z3HDEZ+HW3aH2ZpMzvj4Tjdm3fUvEnovB3ZcIQ6wQdB+cUxeWy
+         M9s8JcTsUNTSTlbt5aZowWcgfb5Ik8rN4vFGSuVU4kD+sr0Ih50eNPAOFmQwW/ZjoSzU
+         yW0w==
+X-Gm-Message-State: AOAM530+RH5smy4vLdQvaarBP7bS2zIOj4nJYFmLv+dDQoXNCAvkxobw
+        DEeiHOr9BUCcWgboKmEHPizxRj6J23VJwkX1FKo=
+X-Google-Smtp-Source: ABdhPJyNVTUNbHkzBWdwy2SAA9QTIAjXqOIuGAjXbewwl2m2fEAtO13LhCk7EBH3sWcbwi7iM8A7opzoamFgUSiML7c=
+X-Received: by 2002:a05:6e02:d48:: with SMTP id h8mr2976131ilj.251.1600933524016;
+ Thu, 24 Sep 2020 00:45:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200923185757.1806-1-sean.j.christopherson@intel.com>
+ <CAAhV-H6QLRh8kWyt4KfVgS64nsixx_3er+qmeph3csxpq3scdw@mail.gmail.com> <11d4e52e-6bc2-934d-0487-561033b3ab87@redhat.com>
+In-Reply-To: <11d4e52e-6bc2-934d-0487-561033b3ab87@redhat.com>
+From:   Huacai Chen <chenhuacai@gmail.com>
+Date:   Thu, 24 Sep 2020 15:45:12 +0800
+Message-ID: <CAAhV-H6rzcoJ_d=+yKzyAie_+T1aFgbqEWpSq438RKqvzajAnA@mail.gmail.com>
 Subject: Re: [PATCH] KVM: Enable hardware before doing arch VM initialization
-To:     Huacai Chen <chenhuacai@gmail.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
         Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
@@ -72,143 +71,140 @@ Cc:     kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-References: <20200923185757.1806-1-sean.j.christopherson@intel.com>
- <CAAhV-H6QLRh8kWyt4KfVgS64nsixx_3er+qmeph3csxpq3scdw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <11d4e52e-6bc2-934d-0487-561033b3ab87@redhat.com>
-Date:   Thu, 24 Sep 2020 08:50:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <CAAhV-H6QLRh8kWyt4KfVgS64nsixx_3er+qmeph3csxpq3scdw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 24/09/20 08:31, Huacai Chen wrote:
-> Hi, Sean,
-> 
-> On Thu, Sep 24, 2020 at 3:00 AM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
->>
->> Swap the order of hardware_enable_all() and kvm_arch_init_vm() to
->> accommodate Intel's Trust Domain Extension (TDX), which needs VMX to be
->> fully enabled during VM init in order to make SEAMCALLs.
->>
->> This also provides consistent ordering between kvm_create_vm() and
->> kvm_destroy_vm() with respect to calling kvm_arch_destroy_vm() and
->> hardware_disable_all().
-> Do you means that hardware_enable_all() enable VMX, kvm_arch_init_vm()
-> enable TDX, and TDX depends on VMX enabled at first? If so, can TDX be
-> also enabled at hardware_enable_all()?
+Hi, Paolo,
 
-kvm_arch_init_vm() enables TDX *for the VM*, and to do that it needs VMX
-instructions (specifically SEAMCALL, which is a hypervisor->"ultravisor"
-call).  Because that action is VM-specific it cannot be done in
-hardware_enable_all().
+On Thu, Sep 24, 2020 at 2:50 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 24/09/20 08:31, Huacai Chen wrote:
+> > Hi, Sean,
+> >
+> > On Thu, Sep 24, 2020 at 3:00 AM Sean Christopherson
+> > <sean.j.christopherson@intel.com> wrote:
+> >>
+> >> Swap the order of hardware_enable_all() and kvm_arch_init_vm() to
+> >> accommodate Intel's Trust Domain Extension (TDX), which needs VMX to be
+> >> fully enabled during VM init in order to make SEAMCALLs.
+> >>
+> >> This also provides consistent ordering between kvm_create_vm() and
+> >> kvm_destroy_vm() with respect to calling kvm_arch_destroy_vm() and
+> >> hardware_disable_all().
+> > Do you means that hardware_enable_all() enable VMX, kvm_arch_init_vm()
+> > enable TDX, and TDX depends on VMX enabled at first? If so, can TDX be
+> > also enabled at hardware_enable_all()?
+>
+> kvm_arch_init_vm() enables TDX *for the VM*, and to do that it needs VMX
+> instructions (specifically SEAMCALL, which is a hypervisor->"ultravisor"
+> call).  Because that action is VM-specific it cannot be done in
+> hardware_enable_all().
+>
+> Paolo
+OK, I know.
 
-Paolo
+Reviewed-by: Huacai Chen <chenhc@lemote.com>
 
-> The swapping seems not affect MIPS, but I observed a fact:
-> kvm_arch_hardware_enable() not only be called at
-> hardware_enable_all(), but also be called at kvm_starting_cpu(). Even
-> if you swap the order, new starting CPUs are not enabled VMX before
-> kvm_arch_init_vm(). (Maybe I am wrong because I'm not familiar with
-> VMX/TDX).
-> 
-> Huacai
->>
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
->> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: Huacai Chen <chenhc@lemote.com>
->> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->> Cc: linux-mips@vger.kernel.org
->> Cc: Paul Mackerras <paulus@ozlabs.org>
->> Cc: kvm-ppc@vger.kernel.org
->> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
->> Cc: Janosch Frank <frankja@linux.ibm.com>
->> Cc: David Hildenbrand <david@redhat.com>
->> Cc: Cornelia Huck <cohuck@redhat.com>
->> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
->> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Cc: Wanpeng Li <wanpengli@tencent.com>
->> Cc: Jim Mattson <jmattson@google.com>
->> Cc: Joerg Roedel <joro@8bytes.org>
->> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->> ---
->>
->> Obviously not required until the TDX series comes along, but IMO KVM
->> should be consistent with respect to enabling and disabling virt support
->> in hardware.
->>
->> Tested only on Intel hardware.  Unless I missed something, this only
->> affects x86, Arm and MIPS as hardware enabling is a nop for s390 and PPC.
->> Arm looks safe (based on my mostly clueless reading of the code), but I
->> have no idea if this will cause problem for MIPS, which is doing all kinds
->> of things in hardware_enable() that I don't pretend to fully understand.
->>
->>  virt/kvm/kvm_main.c | 16 ++++++++--------
->>  1 file changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index cf88233b819a..58fa19bcfc90 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -766,7 +766,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
->>                 struct kvm_memslots *slots = kvm_alloc_memslots();
->>
->>                 if (!slots)
->> -                       goto out_err_no_arch_destroy_vm;
->> +                       goto out_err_no_disable;
->>                 /* Generations must be different for each address space. */
->>                 slots->generation = i;
->>                 rcu_assign_pointer(kvm->memslots[i], slots);
->> @@ -776,19 +776,19 @@ static struct kvm *kvm_create_vm(unsigned long type)
->>                 rcu_assign_pointer(kvm->buses[i],
->>                         kzalloc(sizeof(struct kvm_io_bus), GFP_KERNEL_ACCOUNT));
->>                 if (!kvm->buses[i])
->> -                       goto out_err_no_arch_destroy_vm;
->> +                       goto out_err_no_disable;
->>         }
->>
->>         kvm->max_halt_poll_ns = halt_poll_ns;
->>
->> -       r = kvm_arch_init_vm(kvm, type);
->> -       if (r)
->> -               goto out_err_no_arch_destroy_vm;
->> -
->>         r = hardware_enable_all();
->>         if (r)
->>                 goto out_err_no_disable;
->>
->> +       r = kvm_arch_init_vm(kvm, type);
->> +       if (r)
->> +               goto out_err_no_arch_destroy_vm;
->> +
->>  #ifdef CONFIG_HAVE_KVM_IRQFD
->>         INIT_HLIST_HEAD(&kvm->irq_ack_notifier_list);
->>  #endif
->> @@ -815,10 +815,10 @@ static struct kvm *kvm_create_vm(unsigned long type)
->>                 mmu_notifier_unregister(&kvm->mmu_notifier, current->mm);
->>  #endif
->>  out_err_no_mmu_notifier:
->> -       hardware_disable_all();
->> -out_err_no_disable:
->>         kvm_arch_destroy_vm(kvm);
->>  out_err_no_arch_destroy_vm:
->> +       hardware_disable_all();
->> +out_err_no_disable:
->>         WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
->>         for (i = 0; i < KVM_NR_BUSES; i++)
->>                 kfree(kvm_get_bus(kvm, i));
->> --
->> 2.28.0
->>
-> 
-
+>
+> > The swapping seems not affect MIPS, but I observed a fact:
+> > kvm_arch_hardware_enable() not only be called at
+> > hardware_enable_all(), but also be called at kvm_starting_cpu(). Even
+> > if you swap the order, new starting CPUs are not enabled VMX before
+> > kvm_arch_init_vm(). (Maybe I am wrong because I'm not familiar with
+> > VMX/TDX).
+> >
+> > Huacai
+> >>
+> >> Cc: Marc Zyngier <maz@kernel.org>
+> >> Cc: James Morse <james.morse@arm.com>
+> >> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+> >> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >> Cc: linux-arm-kernel@lists.infradead.org
+> >> Cc: Huacai Chen <chenhc@lemote.com>
+> >> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> >> Cc: linux-mips@vger.kernel.org
+> >> Cc: Paul Mackerras <paulus@ozlabs.org>
+> >> Cc: kvm-ppc@vger.kernel.org
+> >> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> >> Cc: Janosch Frank <frankja@linux.ibm.com>
+> >> Cc: David Hildenbrand <david@redhat.com>
+> >> Cc: Cornelia Huck <cohuck@redhat.com>
+> >> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> >> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> >> Cc: Wanpeng Li <wanpengli@tencent.com>
+> >> Cc: Jim Mattson <jmattson@google.com>
+> >> Cc: Joerg Roedel <joro@8bytes.org>
+> >> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> >> ---
+> >>
+> >> Obviously not required until the TDX series comes along, but IMO KVM
+> >> should be consistent with respect to enabling and disabling virt support
+> >> in hardware.
+> >>
+> >> Tested only on Intel hardware.  Unless I missed something, this only
+> >> affects x86, Arm and MIPS as hardware enabling is a nop for s390 and PPC.
+> >> Arm looks safe (based on my mostly clueless reading of the code), but I
+> >> have no idea if this will cause problem for MIPS, which is doing all kinds
+> >> of things in hardware_enable() that I don't pretend to fully understand.
+> >>
+> >>  virt/kvm/kvm_main.c | 16 ++++++++--------
+> >>  1 file changed, 8 insertions(+), 8 deletions(-)
+> >>
+> >> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> >> index cf88233b819a..58fa19bcfc90 100644
+> >> --- a/virt/kvm/kvm_main.c
+> >> +++ b/virt/kvm/kvm_main.c
+> >> @@ -766,7 +766,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
+> >>                 struct kvm_memslots *slots = kvm_alloc_memslots();
+> >>
+> >>                 if (!slots)
+> >> -                       goto out_err_no_arch_destroy_vm;
+> >> +                       goto out_err_no_disable;
+> >>                 /* Generations must be different for each address space. */
+> >>                 slots->generation = i;
+> >>                 rcu_assign_pointer(kvm->memslots[i], slots);
+> >> @@ -776,19 +776,19 @@ static struct kvm *kvm_create_vm(unsigned long type)
+> >>                 rcu_assign_pointer(kvm->buses[i],
+> >>                         kzalloc(sizeof(struct kvm_io_bus), GFP_KERNEL_ACCOUNT));
+> >>                 if (!kvm->buses[i])
+> >> -                       goto out_err_no_arch_destroy_vm;
+> >> +                       goto out_err_no_disable;
+> >>         }
+> >>
+> >>         kvm->max_halt_poll_ns = halt_poll_ns;
+> >>
+> >> -       r = kvm_arch_init_vm(kvm, type);
+> >> -       if (r)
+> >> -               goto out_err_no_arch_destroy_vm;
+> >> -
+> >>         r = hardware_enable_all();
+> >>         if (r)
+> >>                 goto out_err_no_disable;
+> >>
+> >> +       r = kvm_arch_init_vm(kvm, type);
+> >> +       if (r)
+> >> +               goto out_err_no_arch_destroy_vm;
+> >> +
+> >>  #ifdef CONFIG_HAVE_KVM_IRQFD
+> >>         INIT_HLIST_HEAD(&kvm->irq_ack_notifier_list);
+> >>  #endif
+> >> @@ -815,10 +815,10 @@ static struct kvm *kvm_create_vm(unsigned long type)
+> >>                 mmu_notifier_unregister(&kvm->mmu_notifier, current->mm);
+> >>  #endif
+> >>  out_err_no_mmu_notifier:
+> >> -       hardware_disable_all();
+> >> -out_err_no_disable:
+> >>         kvm_arch_destroy_vm(kvm);
+> >>  out_err_no_arch_destroy_vm:
+> >> +       hardware_disable_all();
+> >> +out_err_no_disable:
+> >>         WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
+> >>         for (i = 0; i < KVM_NR_BUSES; i++)
+> >>                 kfree(kvm_get_bus(kvm, i));
+> >> --
+> >> 2.28.0
+> >>
+> >
+>
