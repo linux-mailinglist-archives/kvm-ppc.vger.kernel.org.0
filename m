@@ -2,165 +2,101 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26FBC2792A9
-	for <lists+kvm-ppc@lfdr.de>; Fri, 25 Sep 2020 22:51:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 750292792E7
+	for <lists+kvm-ppc@lfdr.de>; Fri, 25 Sep 2020 23:05:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726807AbgIYUvp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 25 Sep 2020 16:51:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56816 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725272AbgIYUvp (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 25 Sep 2020 16:51:45 -0400
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 999DDC0613CE
-        for <kvm-ppc@vger.kernel.org>; Fri, 25 Sep 2020 13:51:44 -0700 (PDT)
-Received: by mail-ed1-x542.google.com with SMTP id n22so3905778edt.4
-        for <kvm-ppc@vger.kernel.org>; Fri, 25 Sep 2020 13:51:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3mlgRZ8EIdOR1DUsE60QDF3pdVLwyWMe5uQg0KYqZh8=;
-        b=lLK1nDqkdE4kFMX940riOKRARxVPqhXy/zVsS1A2BF583+Bs6t1HB1PWpX8FT5fmMG
-         kj4laN7PoFAAtTf7nKQSfmgnZthfYdYFaYc0Bz7Y4wYumWs+ZoZt7fmJ8iqWpP6o5/sH
-         kFEKtwuYlk8CyIxak76lqkTU29ToFQ6l7KznxP19PVlyKf6+tAzcGhQhn+oCjZs+I/BG
-         hZj0p+yuyE04b9WjaCBMYkiqC6sMzMV4Oux/HTOgLFkJAvw3LNpYth20Ega3GkDNOEsf
-         zaPOXph5obEzLyOHAdc1MO70dyb/pb3ItgeObMBTO/ckPhs1YDk3R/RfTdj8iII54jF+
-         B2eA==
+        id S1726694AbgIYVFz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 25 Sep 2020 17:05:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30430 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726587AbgIYVFz (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 25 Sep 2020 17:05:55 -0400
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601067954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KYytt9bssGAEWyPGrn3z2bXHN59vb0kbWX+R/SRNIRg=;
+        b=TX7Q8T6sVFtwfq78r5EdF1L6EAL5m2Ke41+zAPZwzoxR0m4WpRFYhas+kBqagLvVsWRvwY
+        HD36eduovl4FT+XFgGAjsMf7tDQnkus2V0Fti6u0r5yJ23m935yDatrxMAMMZUx1YsyJiG
+        0rDG6ZT7TMBHP8BkZgFMQmKEDXD3gWY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-420-AQYOSEX2MhaXkZDPAeIbQw-1; Fri, 25 Sep 2020 17:05:52 -0400
+X-MC-Unique: AQYOSEX2MhaXkZDPAeIbQw-1
+Received: by mail-wr1-f71.google.com with SMTP id l17so1545343wrw.11
+        for <kvm-ppc@vger.kernel.org>; Fri, 25 Sep 2020 14:05:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3mlgRZ8EIdOR1DUsE60QDF3pdVLwyWMe5uQg0KYqZh8=;
-        b=YSXxuDaJEZw+EWFbj7N5fHnZ/TPKG3kRvR1mEyoC+V3ZGGPIWINPIZctcwfHBOnt3C
-         BOlkjZbdnKE1g5fYjlhmb3i5ZuVW6XNTCcHYI/aIXAQRIvZwCOl4Sgb/lw28hmsujoqM
-         zB8M4Ii4Yp8W327sm1BeMQrT2EIkqBHhEeyWscEch9dhwb3vk+fRF4LFUU7rCLFRzUoH
-         xAfOq9T4xtBoANUW9OLGP0PTmGkIZ3Gqwf8G1K/warDw2lu4CxBy+NJ3MRz8VIIpQjF8
-         JwQrGFnqlCn0Qh37XZIzGRTFRNtEmheCRnc1B+C2k7/D82n6CGl5SBdyuUYwulppg9D6
-         lHOg==
-X-Gm-Message-State: AOAM532E4dwpwD3xNAK0Di2Llu2iwMkUMHJDnd8eDcD0RYThbb6jJ0b2
-        /5JYoTzgNEw+6uyNsOCp7g8Xo+zHKfI2Jm+Cd011mA==
-X-Google-Smtp-Source: ABdhPJw5Nq9khn3WBHc4y05yhciUUDN3DTtsOPc4oBfxkZyBg1L19vOrTNS0zLznVWAuuf5nyBS89YukU7GH7FAKcjI=
-X-Received: by 2002:aa7:d58e:: with SMTP id r14mr3532250edq.52.1601067103227;
- Fri, 25 Sep 2020 13:51:43 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=KYytt9bssGAEWyPGrn3z2bXHN59vb0kbWX+R/SRNIRg=;
+        b=ql3E1m5RgVqLjd4ty7+EhgMPBcncJ1VuldkrgQxSGefsNUXhKuemTFGDVy6lGUL4Tb
+         J7oizI8rONHv9RIwQnTlwiY+AOYNEg8Mjh9EERwQHOx4oIK+M7w3PpBC2yMzIb7dDhhz
+         gDS9C7IsMj47IsVsrDOv62hNKx09MyVYtvIv94IHds30JGWqc9zjteT9wAa4CpLUPxII
+         Ivb+cDu56KOozw03HSMZ1L+mdLZrENIHhhC/3tJrvmllBoOqModpC9ChnEQ8unrdZ9KB
+         vDBbMcpDmWvz9wKoLJPQhov3erZjK0Qi7r/z+izt9haQ9RftX/1sQ3riw4ak01hxbByi
+         Y/ag==
+X-Gm-Message-State: AOAM531NxtaU8729qNCB/GGqzOR3m781aIE6zMBWUIpQiiPPpcVxH60Y
+        w6GDOCcEjLLMGy3rKIUDKGzWZZCNHUZJHWMul5AG+rL06BsAlc73esPs1/nr3JtGc2osf4RpVZB
+        Em6oFiEo6DUUBUaIokQ==
+X-Received: by 2002:a05:600c:228e:: with SMTP id 14mr457095wmf.17.1601067950967;
+        Fri, 25 Sep 2020 14:05:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyXVvhHeab8ly63BYQtucuJlTvz3AS/Mr+Hmurwb2UpVZ7QkUFAEARwgGqla0VJ1OcRKIUZ6A==
+X-Received: by 2002:a05:600c:228e:: with SMTP id 14mr457065wmf.17.1601067950750;
+        Fri, 25 Sep 2020 14:05:50 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ec9b:111a:97e3:4baf? ([2001:b07:6468:f312:ec9b:111a:97e3:4baf])
+        by smtp.gmail.com with ESMTPSA id a15sm4540071wrn.3.2020.09.25.14.05.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Sep 2020 14:05:50 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/3] KVM: Introduce "VM bugged" concept
+To:     Marc Zyngier <maz@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Huacai Chen <chenhc@lemote.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        kvm-ppc@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+References: <20200923224530.17735-1-sean.j.christopherson@intel.com>
+ <874knlrf4a.wl-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <100a603f-193c-5a46-d428-cfc0ce0a8fe4@redhat.com>
+Date:   Fri, 25 Sep 2020 23:05:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200925204442.31348-1-rcampbell@nvidia.com> <20200925204442.31348-2-rcampbell@nvidia.com>
-In-Reply-To: <20200925204442.31348-2-rcampbell@nvidia.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Fri, 25 Sep 2020 13:51:31 -0700
-Message-ID: <CAPcyv4iOgN6nmF0N4hQGZo-DJNh3UAf1wDy1ata1Rc+RQWVH=Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] ext4/xfs: add page refcount helper
-To:     Ralph Campbell <rcampbell@nvidia.com>
-Cc:     Linux MM <linux-mm@kvack.org>, kvm-ppc@vger.kernel.org,
-        nouveau@lists.freedesktop.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Zi Yan <ziy@nvidia.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <874knlrf4a.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Sep 25, 2020 at 1:45 PM Ralph Campbell <rcampbell@nvidia.com> wrote:
->
-> There are several places where ZONE_DEVICE struct pages assume a reference
-> count == 1 means the page is idle and free. Instead of open coding this,
-> add a helper function to hide this detail.
->
-> Signed-off-by: Ralph Campbell <rcampbell@nvidia.com>
-> ---
->  fs/dax.c            | 8 ++++----
->  fs/ext4/inode.c     | 2 +-
->  fs/xfs/xfs_file.c   | 2 +-
->  include/linux/dax.h | 5 +++++
->  4 files changed, 11 insertions(+), 6 deletions(-)
->
-> diff --git a/fs/dax.c b/fs/dax.c
-> index 994ab66a9907..8eddbcc0e149 100644
-> --- a/fs/dax.c
-> +++ b/fs/dax.c
-> @@ -358,7 +358,7 @@ static void dax_disassociate_entry(void *entry, struct address_space *mapping,
->         for_each_mapped_pfn(entry, pfn) {
->                 struct page *page = pfn_to_page(pfn);
->
-> -               WARN_ON_ONCE(trunc && page_ref_count(page) > 1);
-> +               WARN_ON_ONCE(trunc && !dax_layout_is_idle_page(page));
->                 WARN_ON_ONCE(page->mapping && page->mapping != mapping);
->                 page->mapping = NULL;
->                 page->index = 0;
-> @@ -372,7 +372,7 @@ static struct page *dax_busy_page(void *entry)
->         for_each_mapped_pfn(entry, pfn) {
->                 struct page *page = pfn_to_page(pfn);
->
-> -               if (page_ref_count(page) > 1)
-> +               if (!dax_layout_is_idle_page(page))
->                         return page;
->         }
->         return NULL;
-> @@ -560,11 +560,11 @@ static void *grab_mapping_entry(struct xa_state *xas,
->
->  /**
->   * dax_layout_busy_page - find first pinned page in @mapping
-> - * @mapping: address space to scan for a page with ref count > 1
-> + * @mapping: address space to scan for a page with ref count > 0
->   *
->   * DAX requires ZONE_DEVICE mapped pages. These pages are never
->   * 'onlined' to the page allocator so they are considered idle when
-> - * page->count == 1. A filesystem uses this interface to determine if
-> + * page->count == 0. A filesystem uses this interface to determine if
->   * any page in the mapping is busy, i.e. for DMA, or other
->   * get_user_pages() usages.
->   *
-> diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-> index bf596467c234..d9f8ad55523a 100644
-> --- a/fs/ext4/inode.c
-> +++ b/fs/ext4/inode.c
-> @@ -3927,7 +3927,7 @@ int ext4_break_layouts(struct inode *inode)
->                         return 0;
->
->                 error = ___wait_var_event(&page->_refcount,
-> -                               atomic_read(&page->_refcount) == 1,
-> +                               dax_layout_is_idle_page(page),
->                                 TASK_INTERRUPTIBLE, 0, 0,
->                                 ext4_wait_dax_page(ei));
->         } while (error == 0);
-> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> index a29f78a663ca..29ab96541bc1 100644
-> --- a/fs/xfs/xfs_file.c
-> +++ b/fs/xfs/xfs_file.c
-> @@ -750,7 +750,7 @@ xfs_break_dax_layouts(
->
->         *retry = true;
->         return ___wait_var_event(&page->_refcount,
-> -                       atomic_read(&page->_refcount) == 1, TASK_INTERRUPTIBLE,
-> +                       dax_layout_is_idle_page(page), TASK_INTERRUPTIBLE,
->                         0, 0, xfs_wait_dax_page(inode));
->  }
->
-> diff --git a/include/linux/dax.h b/include/linux/dax.h
-> index 43b39ab9de1a..3f78ed78d1d6 100644
-> --- a/include/linux/dax.h
-> +++ b/include/linux/dax.h
-> @@ -238,4 +238,9 @@ static inline bool dax_mapping(struct address_space *mapping)
->         return mapping->host && IS_DAX(mapping->host);
->  }
->
-> +static inline bool dax_layout_is_idle_page(struct page *page)
-> +{
-> +       return page_ref_count(page) <= 1;
+On 25/09/20 18:32, Marc Zyngier wrote:
+> I'm quite like the idea. However, I wonder whether preventing the
+> vcpus from re-entering the guest is enough. When something goes really
+> wrong, is it safe to allow the userspace process to terminate normally
+> and free the associated memory? And is it still safe to allow new VMs
+> to be started?
 
-Why convert the check from "== 1" to "<= 1" and then back to the ==
-operator in the next patch? A refcount < 1 in this path before your
-other change is a bug.
+For something that bad, where e.g. you can't rule out future memory
+corruptions via use-after-free bugs or similar, you're probably entering
+BUG_ON territory.
+
+Paolo
+
