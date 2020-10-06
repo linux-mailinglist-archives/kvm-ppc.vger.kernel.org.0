@@ -2,121 +2,59 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43E4A283E40
-	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Oct 2020 20:24:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88D08285250
+	for <lists+kvm-ppc@lfdr.de>; Tue,  6 Oct 2020 21:20:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727901AbgJESYU (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 5 Oct 2020 14:24:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727184AbgJESYU (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 5 Oct 2020 14:24:20 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32A6C0613A7
-        for <kvm-ppc@vger.kernel.org>; Mon,  5 Oct 2020 11:24:19 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id c62so13078319qke.1
-        for <kvm-ppc@vger.kernel.org>; Mon, 05 Oct 2020 11:24:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OCSLqGNh9b5YSmYsk1DlWKJeyULS7OR1a85rgALsc9w=;
-        b=MCDa+1cwmN3uqvhljUtqnjRDTYQZ/bi0REuAsgRPHawGFRLu9yuU9WlllBKYKSYWoC
-         COppqAsu3MTAife2gP8sPBj5BM2BbGaDJxEwZvtuafwP4a4hdfpwdn/NGDE42M6wmPYx
-         w6RKz8PK1yLHK6fqWqsgZhdkxQJNKhX5RC2wxagFLtzU3TwNIOuknrBo7berTriabUSB
-         qqTiGv8KasNRDd1sfsDjr2lO2IxW1f9KChgBRQcBUplHmmgGaWF66ZIebhDq1VNBfLXS
-         ScC9FSdcE4fiChkQkPfTWWSWJq5i1UZonfVL4S1jsX1F1gH31b2ZbJ02j2EKwtYWInDJ
-         gSCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OCSLqGNh9b5YSmYsk1DlWKJeyULS7OR1a85rgALsc9w=;
-        b=ACmGOY30DID0WkKOASQcdhXScJRSvfACVpDeIleJ5h4J5Rqrv4lwHIuTFSLCgPqCGd
-         GBCw2Wf+GRYldjyvcDG8r5A38PjmKf7+8nccWnZTzVTQhgJ+tyfeGHpKj5RgDFwT/R5d
-         wjWd9kd+HLgCvFHc165aRh0Sk2XPY94YJ/Dsa+WjvUwKdLGl00oqYcrmH9m8Euvy28LL
-         h3bsuoUUvfyORSUKxoaCXoicPMi6bSkc3efPArsxpNg/e4MiA/rJBZaeqGnfwJPUAnev
-         Akx3GkZ9Vvl9y8UjZcd33StdEvNNPTkJPuGvFiV5Qn7Edk8X3GCdaHn6nbPuEzgbRbVb
-         0w0A==
-X-Gm-Message-State: AOAM5332F0vLY2dNvipZRlgZrwjLj6pbhFF7FShDMv+qRxFEACbYFxsG
-        yleTTFRyMd5k0t4zXM0cyDutA4QxMul49UfMYG3q7A==
-X-Google-Smtp-Source: ABdhPJxukAgIYi20kSI9kjVPF33fEc4rKpb9eQYgj02bTfT4kUplSjOE1HGcZ8LTlpn7FoBl8beo3/6xylx4QC83AAg=
-X-Received: by 2002:a05:620a:4d0:: with SMTP id 16mr1333224qks.200.1601922258954;
- Mon, 05 Oct 2020 11:24:18 -0700 (PDT)
+        id S1727020AbgJFTUq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 6 Oct 2020 15:20:46 -0400
+Received: from sonic307-3.consmr.mail.ne1.yahoo.com ([66.163.190.122]:46855
+        "EHLO sonic307-3.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726981AbgJFTUq (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 6 Oct 2020 15:20:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1602012045; bh=aQBm+9Bca4ejs9ftzYnk89bfX4ekoPZ6NeQWeQKD++E=; h=Date:From:Reply-To:Subject:References:From:Subject; b=uhjdyputIVmV+XMQ/klGlLZIsv7CTIsQ5mv6w6IdBspGAtrsZSUaJ592KVOeBL8F7uTMjWFh/LTnf5OqX3UUxwsp5WghYXBDzU6yZRj7fkaeOBlyb88zfxao4pvYdBxN45pgbEWXqIrLrmDBJuTQqfUXWgKEhkRg5Jaa/qxfjh6kVl3BjF/W4TAHDjbVh75mhX3y2ylLkLVG4zaLUBTqxXw8Ril1j8xHwaSU065wK9dzTyz90FECdKEclftHvmCImzyj+VFNawm5Nr/2qQSXJx0WGaTrh+d54gQP3/13hF87vvJiYaXMaD/ZjTYDGy4vY98di3u1NBlHS7vqjLRDjg==
+X-YMail-OSG: Zsfx.xAVM1nvYpxJ9rOr8gTTkjL6iZO8bHlBuq1Zt4U0jL8qek4j3lgqa0Iivrh
+ XAvQsVpcWAcbU0IkkF.v6LXjSfUFp6pGjDUfBUNUUAungPEQ_38q7z50zV9pxVXG45jO9UXTUf3q
+ 6bRaVfIrJsQ0oxb2G.PBihubHAjNn8DZVZ9FlWRM4pfrW37xXs2ZzS7S8a6stijoZ32YQyh2uoFB
+ 9mylhfulFywFJQnm04n61rFwmELSWAzZwyEVGt4BCERWVUJrOcw.3ymJSWbvPsk6JkjpmGqIBokf
+ wGsoyisxWO1UnGqAL42MGaMwmDxIe6zgRZkBMQYFoEly.Nkrydvq_axYIOrvr7RzQOgbBlChyK5J
+ _P53JunZQqVa2kfwRs1u735YLxJ.S_FH2hwZXm9sdSgeg2wZ59De_qha2AnwL0DIySh0X4Ylqicg
+ 4gSnJYA4b3i2_YDfQD9zydg8I8kefVYW63nMvTlGcIqnt8svf8k75dYnJc4TFiWzIv3Pfj79mhAs
+ MWCG63uZtERb50C7vjvgR9oyEkaiguLmKUZ_3XEZdfvZKJN4.jnQDlht99arZIwpMCfhzmP4vp2Y
+ wVWSGBqsGteFiWXAnsLyi0zyVXy56ikhfc_EjebNcXBFp.kDjShJsp_AzHNpJwR0ywFDGsCp.lyE
+ Zzmn.snkoQlonM1zPyUCOevK3mGymWN0YPmZy3FjgcgcByOu4LPRFCa_fN.lTP5SAigl1kItx70Q
+ I6IkAineCXLVepi5ox3aUGoqiqvXp9hDNuC3O6RSIDdZGAOKf2H5zdovv4qPOdkBtCLAZuqhZMbW
+ 0tTZSb5HTZlL8TXHYEWWVy22JyWS45Ox__vNT3TvvnTPM_yql6vUdo1PiNRcCfY7uXVMSTcGjkF2
+ uB4eCHd8_fycts3eUASDAR4SafNKCZDi5SkwfGgk6EaWnHbutb_5vL0ffhz7VPGqwV5cetqfn1du
+ YUPPv_NkArhlopkPGUY1i8u02NuXmeahp51lp1b7164hANUdLXeJPwAWB9odcMcZRKk3yMKa5mtu
+ 9dXUZHjS2k9nD2cS3y2e9x4XkeIff.0Qih6QfiFTAMfb68LKw6saZycxPdTNoKTUKREXB1buazKs
+ aAi_atdT.lzbDCH7Im7jqJER58w.loJMgJnV9B12HyFL01XaFrCqgEEayxwnPr3rt5GYpmj8qJrT
+ I3lxT2befF6UF0e4.TWNJkuxtZarv.LYuMInqAdXKkL4ZmOIvBFMb3jqW.G30WujShcquirqsQu5
+ 2EmwVhg.WC6xkSCOZLO..xVUVXwGga7q6YCYy74trTqFkT3H2NapH8LmFlnXzvnv.WbF459xqeTT
+ H_YxedsDTV328wTYMD12cxmC4WHOLuy0aLCtEwCSCiqRTkRkmr3Ycx_3YemwpLFE4YHsU8hlELmV
+ s9ahzTBQ9Z3QgfqmxJ5rDzejv4ADStKr1Rib0ucASHDjkEqLEGxKuIzDGJBhcDUUMWduiufVvNp6
+ RHMjCQYBgNw--
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ne1.yahoo.com with HTTP; Tue, 6 Oct 2020 19:20:45 +0000
+Date:   Tue, 6 Oct 2020 19:18:44 +0000 (UTC)
+From:   "Mrs. Maureen Hinckley" <mau8@lfsh.space>
+Reply-To: maurhinck5@gmail.com
+Message-ID: <751448603.2688949.1602011924739@mail.yahoo.com>
+Subject: RE
 MIME-Version: 1.0
-References: <20201001181715.17416-1-rcampbell@nvidia.com>
-In-Reply-To: <20201001181715.17416-1-rcampbell@nvidia.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Mon, 5 Oct 2020 11:24:07 -0700
-Message-ID: <CAPcyv4gu=So5PgQU9LezhW4vUQt+paaUr1T6CAvQYjh0XzkkgQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 0/2] mm: remove extra ZONE_DEVICE struct page refcount
-To:     Ralph Campbell <rcampbell@nvidia.com>
-Cc:     Linux MM <linux-mm@kvack.org>, kvm-ppc@vger.kernel.org,
-        nouveau@lists.freedesktop.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Bharata B Rao <bharata@linux.ibm.com>,
-        Zi Yan <ziy@nvidia.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Yang Shi <yang.shi@linux.alibaba.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+References: <751448603.2688949.1602011924739.ref@mail.yahoo.com>
+X-Mailer: WebService/1.1.16718 YMailNodin Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Oct 1, 2020 at 11:17 AM Ralph Campbell <rcampbell@nvidia.com> wrote:
->
-> This is still an RFC because after looking at the pmem/dax code some
-> more, I realized that the ZONE_DEVICE struct pages are being inserted
-> into the process' page tables with vmf_insert_mixed() and a zero
-> refcount on the ZONE_DEVICE struct page. This is sort of OK because
-> insert_pfn() increments the reference count on the pgmap which is what
-> prevents memunmap_pages() from freeing the struct pages and it doesn't
-> check for a non-zero struct page reference count.
-> But, any calls to get_page() will hit the VM_BUG_ON_PAGE() that
-> checks for a reference count == 0.
->
-> // mmap() an ext4 file that is mounted -o dax.
-> ext4_dax_fault()
->   ext4_dax_huge_fault()
->     dax_iomap_fault(&ext4_iomap_ops)
->       dax_iomap_pte_fault()
->         ops->iomap_begin() // ext4_iomap_begin()
->           ext4_map_blocks()
->           ext4_set_iomap()
->         dax_iomap_pfn()
->         dax_insert_entry()
->         vmf_insert_mixed(pfn)
->           __vm_insert_mixed()
->             if (!IS_ENABLED(CONFIG_ARCH_HAS_PTE_SPECIAL) &&
->                 !pfn_t_devmap(pfn) && pfn_t_valid(pfn))
->               insert_page()
->                 get_page(page) // XXX would trigger VM_BUG_ON_PAGE()
->                 page_add_file_rmap()
->                 set_pte_at()
->             else
->               insert_pfn()
->                 pte_mkdevmap()
->                 set_pte_at()
->
-> Should pmem set the page reference count to one before inserting the
-> pfn into the page tables (and decrement when removing devmap PTEs)?
-> What about MEMORY_DEVICE_GENERIC and MEMORY_DEVICE_PCI_P2PDMA use cases?
-> Where should they icrement/decrement the page reference count?
-> I don't know enough about how these are used to really know what to
-> do at this point. If people want me to continue to work on this series,
-> I will need some guidance.
 
-fs/dax could take the reference when inserting, but that would mean
-that ext4 and xfs would need to go back to checking for 1 to be page
-idle. I think that's ok because the filesystem is actually not
-checking for page-idle it's checking for "get_user_pages()" idle.
+
+I am Maureen Hinckley and my foundation is donating (Five hundred and fifty=
+ thousand USD) to you. Contact us via my email at (maurhinck5@gmail.com) fo=
+r further details.
+
+Best Regards,
+Mrs. Maureen Hinckley,
+Copyright =C2=A92020 The Maureen Hinckley Foundation All Rights Reserved.
