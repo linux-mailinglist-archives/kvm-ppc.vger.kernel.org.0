@@ -2,59 +2,67 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88D08285250
-	for <lists+kvm-ppc@lfdr.de>; Tue,  6 Oct 2020 21:20:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B762285D7C
+	for <lists+kvm-ppc@lfdr.de>; Wed,  7 Oct 2020 12:52:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727020AbgJFTUq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 6 Oct 2020 15:20:46 -0400
-Received: from sonic307-3.consmr.mail.ne1.yahoo.com ([66.163.190.122]:46855
-        "EHLO sonic307-3.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726981AbgJFTUq (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 6 Oct 2020 15:20:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1602012045; bh=aQBm+9Bca4ejs9ftzYnk89bfX4ekoPZ6NeQWeQKD++E=; h=Date:From:Reply-To:Subject:References:From:Subject; b=uhjdyputIVmV+XMQ/klGlLZIsv7CTIsQ5mv6w6IdBspGAtrsZSUaJ592KVOeBL8F7uTMjWFh/LTnf5OqX3UUxwsp5WghYXBDzU6yZRj7fkaeOBlyb88zfxao4pvYdBxN45pgbEWXqIrLrmDBJuTQqfUXWgKEhkRg5Jaa/qxfjh6kVl3BjF/W4TAHDjbVh75mhX3y2ylLkLVG4zaLUBTqxXw8Ril1j8xHwaSU065wK9dzTyz90FECdKEclftHvmCImzyj+VFNawm5Nr/2qQSXJx0WGaTrh+d54gQP3/13hF87vvJiYaXMaD/ZjTYDGy4vY98di3u1NBlHS7vqjLRDjg==
-X-YMail-OSG: Zsfx.xAVM1nvYpxJ9rOr8gTTkjL6iZO8bHlBuq1Zt4U0jL8qek4j3lgqa0Iivrh
- XAvQsVpcWAcbU0IkkF.v6LXjSfUFp6pGjDUfBUNUUAungPEQ_38q7z50zV9pxVXG45jO9UXTUf3q
- 6bRaVfIrJsQ0oxb2G.PBihubHAjNn8DZVZ9FlWRM4pfrW37xXs2ZzS7S8a6stijoZ32YQyh2uoFB
- 9mylhfulFywFJQnm04n61rFwmELSWAzZwyEVGt4BCERWVUJrOcw.3ymJSWbvPsk6JkjpmGqIBokf
- wGsoyisxWO1UnGqAL42MGaMwmDxIe6zgRZkBMQYFoEly.Nkrydvq_axYIOrvr7RzQOgbBlChyK5J
- _P53JunZQqVa2kfwRs1u735YLxJ.S_FH2hwZXm9sdSgeg2wZ59De_qha2AnwL0DIySh0X4Ylqicg
- 4gSnJYA4b3i2_YDfQD9zydg8I8kefVYW63nMvTlGcIqnt8svf8k75dYnJc4TFiWzIv3Pfj79mhAs
- MWCG63uZtERb50C7vjvgR9oyEkaiguLmKUZ_3XEZdfvZKJN4.jnQDlht99arZIwpMCfhzmP4vp2Y
- wVWSGBqsGteFiWXAnsLyi0zyVXy56ikhfc_EjebNcXBFp.kDjShJsp_AzHNpJwR0ywFDGsCp.lyE
- Zzmn.snkoQlonM1zPyUCOevK3mGymWN0YPmZy3FjgcgcByOu4LPRFCa_fN.lTP5SAigl1kItx70Q
- I6IkAineCXLVepi5ox3aUGoqiqvXp9hDNuC3O6RSIDdZGAOKf2H5zdovv4qPOdkBtCLAZuqhZMbW
- 0tTZSb5HTZlL8TXHYEWWVy22JyWS45Ox__vNT3TvvnTPM_yql6vUdo1PiNRcCfY7uXVMSTcGjkF2
- uB4eCHd8_fycts3eUASDAR4SafNKCZDi5SkwfGgk6EaWnHbutb_5vL0ffhz7VPGqwV5cetqfn1du
- YUPPv_NkArhlopkPGUY1i8u02NuXmeahp51lp1b7164hANUdLXeJPwAWB9odcMcZRKk3yMKa5mtu
- 9dXUZHjS2k9nD2cS3y2e9x4XkeIff.0Qih6QfiFTAMfb68LKw6saZycxPdTNoKTUKREXB1buazKs
- aAi_atdT.lzbDCH7Im7jqJER58w.loJMgJnV9B12HyFL01XaFrCqgEEayxwnPr3rt5GYpmj8qJrT
- I3lxT2befF6UF0e4.TWNJkuxtZarv.LYuMInqAdXKkL4ZmOIvBFMb3jqW.G30WujShcquirqsQu5
- 2EmwVhg.WC6xkSCOZLO..xVUVXwGga7q6YCYy74trTqFkT3H2NapH8LmFlnXzvnv.WbF459xqeTT
- H_YxedsDTV328wTYMD12cxmC4WHOLuy0aLCtEwCSCiqRTkRkmr3Ycx_3YemwpLFE4YHsU8hlELmV
- s9ahzTBQ9Z3QgfqmxJ5rDzejv4ADStKr1Rib0ucASHDjkEqLEGxKuIzDGJBhcDUUMWduiufVvNp6
- RHMjCQYBgNw--
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ne1.yahoo.com with HTTP; Tue, 6 Oct 2020 19:20:45 +0000
-Date:   Tue, 6 Oct 2020 19:18:44 +0000 (UTC)
-From:   "Mrs. Maureen Hinckley" <mau8@lfsh.space>
-Reply-To: maurhinck5@gmail.com
-Message-ID: <751448603.2688949.1602011924739@mail.yahoo.com>
-Subject: RE
+        id S1728265AbgJGKwQ convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Wed, 7 Oct 2020 06:52:16 -0400
+Received: from mx.metalurgs.lv ([81.198.125.103]:61424 "EHLO mx.metalurgs.lv"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728261AbgJGKwQ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 7 Oct 2020 06:52:16 -0400
+Received: from mx.metalurgs.lv (localhost [127.0.0.1])
+        by mx.metalurgs.lv (Postfix) with ESMTP id C8EA1634B2
+        for <kvm-ppc@vger.kernel.org>; Wed,  7 Oct 2020 13:51:14 +0300 (EEST)
+Received: from kas30pipe.localhost (localhost [127.0.0.1])
+        by mx.metalurgs.lv (Postfix) with ESMTP id AB0976384D
+        for <kvm-ppc@vger.kernel.org>; Wed,  7 Oct 2020 13:51:14 +0300 (EEST)
+Received: by mx.metalurgs.lv (Postfix, from userid 1005)
+        id C666263155; Wed,  7 Oct 2020 13:51:12 +0300 (EEST)
+Received: from [100.64.1.74] (unknown [190.15.125.55])
+        (Authenticated sender: admin)
+        by mx.metalurgs.lv (Postfix) with ESMTPA id 559B3605E0;
+        Wed,  7 Oct 2020 13:51:06 +0300 (EEST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-References: <751448603.2688949.1602011924739.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.16718 YMailNodin Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36
-To:     unlisted-recipients:; (no To-header on input)
+Content-Description: Mail message body
+To:     Recipients <financialcapability6@gmail.com>
+From:   "Mr. Hashim Bin" <financialcapability6@gmail.com>
+Date:   Wed, 07 Oct 2020 07:50:59 -0300
+Reply-To: hmurrah39@gmail.com
+X-SpamTest-Envelope-From: financialcapability6@gmail.com
+X-SpamTest-Group-ID: 00000000
+X-SpamTest-Info: Profiles 71303 [Jan 01 2015]
+X-SpamTest-Info: {TO: forged address, i.e. recipient, investors, public, etc.}
+X-SpamTest-Info: {DATE: unreal year}
+X-SpamTest-Method: none
+X-SpamTest-Rate: 55
+X-SpamTest-Status: Not detected
+X-SpamTest-Status-Extended: not_detected
+X-SpamTest-Version: SMTP-Filter Version 3.0.0 [0284], KAS30/Release
+Message-ID: <20201007105112.C666263155@mx.metalurgs.lv>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Subject: Low Rate Loan./mmm,
+X-Anti-Virus: Kaspersky Anti-Virus for Linux Mail Server 5.6.39/RELEASE,
+         bases: 20140401 #7726142, check: 20201007 notchecked
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Hello Dear,
 
 
-I am Maureen Hinckley and my foundation is donating (Five hundred and fifty=
- thousand USD) to you. Contact us via my email at (maurhinck5@gmail.com) fo=
-r further details.
+We are Base Investment Company offering Corporate and Personal Loan at 3% Interest Rate for a duration of 10Years.
 
-Best Regards,
-Mrs. Maureen Hinckley,
-Copyright =C2=A92020 The Maureen Hinckley Foundation All Rights Reserved.
+
+We also pay 1% commission to brokers, who introduce project owners for finance or other opportunities.
+
+
+Please get back to me if you are interested for more
+
+details.
+
+
+Yours faithfully,
+
+Hashim Murrah
