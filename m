@@ -2,78 +2,114 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0086C286487
-	for <lists+kvm-ppc@lfdr.de>; Wed,  7 Oct 2020 18:34:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32F1B286DF3
+	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Oct 2020 07:17:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726803AbgJGQex (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 7 Oct 2020 12:34:53 -0400
-Received: from sonic307-9.consmr.mail.ne1.yahoo.com ([66.163.190.32]:41795
-        "EHLO sonic307-9.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726702AbgJGQex (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 7 Oct 2020 12:34:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1602088491; bh=PxMwWzXvs+dqOoH0/FHvFmQpYH2JguaCUHYAVLLmaiw=; h=Date:From:Reply-To:Subject:References:From:Subject; b=b5tzIyOWX562g+1+7XFwP3F0qHlylBE4VR/DySfRlJE8RQQWCKdX0Cvx1QRIxF9dsRC7jYv3AisLjpuuO4+IgVT9TxjdWg48nFsfHqGw+yc0ONmgC8s3OooF7t/L2Hl+ZZjU1fPJ4aDPupYfXBBkwP7TkhCT/zJ/Y9CsCaLAM5IamjT0zQxdq0RCCHaOtMIRIUcfQWqv3TL4lVZLDRHzBfVeF1P2FOWZRFUkxrUSJ6AjMLb53Mc6EoqrjXo0WbXuF30CHvzch7cOcDDRLuC0tVL+ijM0BI9f5DU0ETM9fr+guRY7LVQnisc/bXHIv7Rri/uKmMBd48m253kV9QvNbA==
-X-YMail-OSG: cf9kJ2oVM1kK3T6VOOsgCsR19qP6pE4rv1Nkqt8rGR35kXS4fZJOqche7JeIlVR
- qFthOBPawK3fABEy1f3x47yELoM1QdPVIllcbCXZVpJ0XyZbOmT4Q_yomz8zS2l8RYB_tlobF.FQ
- K7gHjq1ogZyKC2aXDERtALMxQvba7_ca52_I5wgxZyFmLtb033Zel3zSFylJkd9b3WaKMH0OaRqE
- BP8F8lIUADgHcryBS2fY3yUPQANCvYlJn4H9H1vbqUi5xKU_bSw92NMqbk.szYfMx5IdVn43XT_t
- ZNBAByWC1LFpBtagT7gRcNYqYpd1aGcSohQJSDPxVA2L4z6VzjZK6vJpYr4lI4gEc_aP10R4wAaC
- gkzjssh1Gx_O.Mrh8Hz8CPoEWVzdT0iGRrLDoxYzTXRS8xpGz1A8jfZImPixqLrLbM7lEDfeWufV
- e57Dz1o1_qia3jbLryDy5Pj04omBoguJckpndBrmee38e4sDY2JbbQ2Az5MhjVZrwCkwSaj9NNkU
- ccPShg4OIGUNZDefirSman0b6.CNIirWdHxgqfwBe5qswzVaOabmaoyMpyjAUS2cIxITZI8_heZJ
- 5nREsHs0I9HnoE5bZu9GHK3WcG8x44tYQyHkyPfVE2bhg4unpggrrocvJsEQ7MlE__Bo1iZfF7Fx
- gdr5HoaP3LJL6a2w3zl9L3QceCILU7izsaUV2Cd0NccbkAvF0vkGu.GAwmuBcikZWTrplskMeZ1e
- CGIVyZZwhpRI7AOA8tzYjv84T46.Qwkgc7SNTijBdBplRIRP6OzD41w6kiZtx59Q4GAZj9Gj6t0v
- OrzudK30FDXm2k5cBk5jHucRVPMCBja8Nz2STyyVL2HoeaovSvlhJs.BB6jyh0Cq2tLw5fEqeYLP
- ubHwtUVJaUOlb8U0MSa8aFAzHu1t1mni8EZjQ6vJOq4mexRo8a4Cvjlgg_438wZkh8AOU2HkWoSZ
- _TdkaiosH0Hki5uVn.fOuz3xA3EGU5sMUcaTbNtxEMEH.gTBByzfJ4n4Pwhudt.O.ITgtiC0xu3F
- 5bmXe3smr84rMtWNk.9RqyR1D6yOUOKkvhyJlLX8nOiyf4HDnLdy_jmABIVeRYQFxgSt202UngQv
- RG8xh8F2WZjbMR9yf6v3BvRWwdpKcxRUJ5sPFLZbtLYE08p3LJ0jZXue.lT47Psa87zKjQPRXgDr
- MJ6B9yzn1PswBC7nmTervV.AEsSO5ns.Ea8Of1o8ioFdXMEKPTZWwPCiwq_vZYh5sVBAYWX4Ol8X
- 5KpPHoBSs79EBP8V2BYMuoyuSGU0ocVtZ3G1QEhBoP2eiv7J3o3d6qVx4utjcArT55FD828IRVD1
- 6yvXR9ZKy6VugjgeVUHBMJ2zh2Foe9spleuVwSUcBVgf38s5qGqQezwNVoI4cBuqWMFC9VqLJbpL
- bfBQVVy7z1jEkXDrF.jp9Vs.n8WemnfN2EIkq8KnY
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ne1.yahoo.com with HTTP; Wed, 7 Oct 2020 16:34:51 +0000
-Date:   Wed, 7 Oct 2020 16:34:47 +0000 (UTC)
-From:   Marilyn Robert <fredodinga22@gmail.com>
-Reply-To: marilyobert@gmail.com
-Message-ID: <1477561969.293747.1602088487254@mail.yahoo.com>
-Subject: =?UTF-8?B?0J3QsNGY0LzQuNC70LAg0LrQsNGYINCz0L7RgdC/0L7QtNCw0YDQvtGC?=
+        id S1728092AbgJHFRg (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 8 Oct 2020 01:17:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4330 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728132AbgJHFRg (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Oct 2020 01:17:36 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09857bs2050696;
+        Thu, 8 Oct 2020 01:17:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : reply-to : references : mime-version : content-type
+ : in-reply-to; s=pp1; bh=NawSu7taze30v9JrwKG21rHX7O3UERKk5e7HU0ddEqs=;
+ b=keRb4EW6iNfG8XIWZcHr5FR9aqZ9cYqEelpjfvJUKPKkHG/l6grDgpdRvM4PC0QC8rzY
+ OSiMsKXunVXH2yxNgXg5TjlogjaSYE+/vBNdCzrdkTOODQEZMm+vDE1fJ4szTnF9onov
+ e72VNGNSTeDrPGl+t2bB/8ZQYI3kQb0yF1pyCWu49/X4v4yI9oAqLija7UbaXVZVh382
+ fv91tqGNcJsjhQ4oCUwN2rsLN7B/5FMCDCPjym3UabzVkGlnUh63H1QLQenB4B25rgeT
+ le6oa9TZ7TA8339yOgPBGtw5JFlecod00pR0YY7rVUze8ao0cKla7GhLFxQ8u6uSFkRJ +Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 341unssc4h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Oct 2020 01:17:15 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0985HE6u083044;
+        Thu, 8 Oct 2020 01:17:14 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 341unssc3m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Oct 2020 01:17:14 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09858HL1008864;
+        Thu, 8 Oct 2020 05:17:12 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 33xgx8ak2q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Oct 2020 05:17:12 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0985H98h30540256
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 8 Oct 2020 05:17:09 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CB8684C040;
+        Thu,  8 Oct 2020 05:17:09 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3D3244C050;
+        Thu,  8 Oct 2020 05:17:05 +0000 (GMT)
+Received: from ram-ibm-com.ibm.com (unknown [9.85.204.94])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu,  8 Oct 2020 05:17:05 +0000 (GMT)
+Date:   Wed, 7 Oct 2020 22:17:02 -0700
+From:   Ram Pai <linuxram@us.ibm.com>
+To:     Ralph Campbell <rcampbell@nvidia.com>
+Cc:     linux-mm@kvack.org, kvm-ppc@vger.kernel.org,
+        nouveau@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jerome Glisse <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Alistair Popple <apopple@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Zi Yan <ziy@nvidia.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Yang Shi <yang.shi@linux.alibaba.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [RFC PATCH v3 2/2] mm: remove extra ZONE_DEVICE struct page
+ refcount
+Message-ID: <20201008051702.GA4773@ram-ibm-com.ibm.com>
+Reply-To: Ram Pai <linuxram@us.ibm.com>
+References: <20201001181715.17416-1-rcampbell@nvidia.com>
+ <20201001181715.17416-3-rcampbell@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-References: <1477561969.293747.1602088487254.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.16795 YMailNodin Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201001181715.17416-3-rcampbell@nvidia.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-08_01:2020-10-07,2020-10-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ clxscore=1011 adultscore=0 phishscore=0 spamscore=0 bulkscore=0
+ lowpriorityscore=0 impostorscore=0 suspectscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2010080035
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-DQoNCtCd0LDRmNC80LjQu9CwINC60LDRmCDQs9C+0YHQv9C+0LTQsNGA0L7Rgg0KDQrQiNCw0YEg
-0YHRg9C8IDY4LdCz0L7QtNC40YjQvdCwINC20LXQvdCwLCDQutC+0ZjQsCDRgdGC0YDQsNC00LAg
-0L7QtCDQv9GA0L7QtNC+0LvQttC10L0g0LrQsNGA0YbQuNC90L7QvCDQvdCwINC00L7RmNC60LAs
-INC+0LQg0YHQuNGC0LUg0LzQtdC00LjRhtC40L3RgdC60Lgg0LjQvdC00LjQutCw0YbQuNC4LCDQ
-vNC+0ZjQsNGC0LAg0YHQvtGB0YLQvtGY0LHQsCDQvdCw0LLQuNGB0YLQuNC90LAg0YHQtSDQstC7
-0L7RiNC4INC4INC+0YfQuNCz0LvQtdC00L3QviDQtSDQtNC10LrQsCDQvNC+0LbQtdCx0Lgg0L3Q
-tdC80LAg0LTQsCDQttC40LLQtdCw0Lwg0L/QvtCy0LXRnNC1INC+0LQg0YjQtdGB0YIg0LzQtdGB
-0LXRhtC4INC60LDQutC+INGA0LXQt9GD0LvRgtCw0YIg0L3QsCDQsdGA0LfQuNC+0YIg0YDQsNGB
-0YIg0Lgg0LHQvtC70LrQsNGC0LAg0YjRgtC+INGB0LUg0ZjQsNCy0YPQstCwINC60LDRmCDQvdC1
-0LAuINCc0L7RmNC+0YIg0YHQvtC/0YDRg9CzINC/0L7Rh9C40L3QsCDQvdC10LrQvtC70LrRgyDQ
-s9C+0LTQuNC90Lgg0L3QsNC90LDQt9Cw0LQg0Lgg0L3QsNGI0LjRgtC1INC00L7Qu9Cz0Lgg0LPQ
-vtC00LjQvdC4INCx0YDQsNC6INC90LUg0LHQtdCwINCx0LvQsNCz0L7RgdC70L7QstC10L3QuCDR
-gdC+INC90LjRgtGDINC10LTQvdC+INC00LXRgtC1LCDQv9C+INC90LXQs9C+0LLQsNGC0LAg0YHQ
-vNGA0YIg0LPQviDQvdCw0YHQu9C10LTQuNCyINGG0LXQu9C+0YLQviDQvdC10LPQvtCy0L4g0LHQ
-vtCz0LDRgtGB0YLQstC+Lg0KDQrQlNC+0LDRk9Cw0Lwg0LrQsNGYINCy0LDRgSDQvtGC0LrQsNC6
-0L4g0YHQtSDQv9C+0LzQvtC70LjQsiDQt9CwINGC0L7QsCwg0L/QvtC00LPQvtGC0LLQtdC9INGB
-0YPQvCDQtNCwINC00L7QvdC40YDQsNC8INGB0YPQvNCwINC+0LQgMiwgMzAwLCAwMDAg0LXQstGA
-0LAg0LfQsCDQv9C+0LzQvtGIINC90LAg0YHQuNGA0L7QvNCw0YjQvdC40YLQtSwg0YHQuNGA0L7Q
-vNCw0YjQvdC40YLQtSDQuCDQv9C+0LzQsNC70LrRgyDQv9GA0LjQstC40LvQtdCz0LjRgNCw0L3Q
-uNGC0LUg0LzQtdGT0YMg0LLQsNGI0LjRgtC1INGB0L7QsdGA0LDQvdC40ZjQsCAvINC+0L/RiNGC
-0LXRgdGC0LLQvi4g0JfQsNCx0LXQu9C10LbQtdGC0LUg0LTQtdC60LAg0L7QstC+0Zgg0YTQvtC9
-0LQg0LUg0LTQtdC/0L7QvdC40YDQsNC9INCy0L4g0LHQsNC90LrQsCDQutCw0LTQtSDRiNGC0L4g
-0YDQsNCx0L7RgtC10YjQtSDQvNC+0ZjQvtGCINGB0L7Qv9GA0YPQsy4gQXBwcmVjaWF0ZdC1INGG
-0LXQvdCw0Lwg0LDQutC+INC+0LHRgNC90LXRgtC1INCy0L3QuNC80LDQvdC40LUg0L3QsCDQvNC+
-0LXRgtC+INCx0LDRgNCw0ZrQtSDQt9CwINC/0YDQvtC/0LDQs9C40YDQsNGa0LUg0L3QsCDQvNCw
-0YHQsNC20LDRgtCwINC90LAg0LrRgNCw0LvRgdGC0LLQvtGC0L4sINGc0LUg0LLQuCDQtNCw0LTQ
-sNC8INC/0L7QstC10ZzQtSDQtNC10YLQsNC70Lgg0LfQsCDRgtC+0LAg0LrQsNC60L4g0LTQsCDQ
-v9C+0YHRgtCw0L/QuNGC0LUuDQoNCtCR0LvQsNCz0L7QtNCw0YDQsNC8DQrQky3Rk9CwINCc0LXR
-gNC40LvQuNC9INCg0L7QsdC10YDRgg==
+On Thu, Oct 01, 2020 at 11:17:15AM -0700, Ralph Campbell wrote:
+> ZONE_DEVICE struct pages have an extra reference count that complicates the
+> code for put_page() and several places in the kernel that need to check the
+> reference count to see that a page is not being used (gup, compaction,
+> migration, etc.). Clean up the code so the reference count doesn't need to
+> be treated specially for ZONE_DEVICE.
+
+
+I was hoping this patch would resolve a page-reference issue that we run
+into at random times while migrating a page to a device page backed by
+secure-memory.
+
+Unfortunately I continue to see the problem. There is a reference
+held on that page, which fails the migration.
+
+FYI
+RP
