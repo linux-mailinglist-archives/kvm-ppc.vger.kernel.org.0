@@ -2,53 +2,149 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC94E287DAA
-	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Oct 2020 23:12:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6F47288F34
+	for <lists+kvm-ppc@lfdr.de>; Fri,  9 Oct 2020 18:53:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728854AbgJHVME (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 8 Oct 2020 17:12:04 -0400
-Received: from [58.87.100.240] ([58.87.100.240]:59884 "EHLO
-        mail.hebei-kuixing.com" rhost-flags-FAIL-FAIL-OK-OK)
-        by vger.kernel.org with ESMTP id S1726766AbgJHVMD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Oct 2020 17:12:03 -0400
-X-Greylist: delayed 622 seconds by postgrey-1.27 at vger.kernel.org; Thu, 08 Oct 2020 17:12:02 EDT
-Received: from localhost (unknown [127.0.0.1])
-        by mail.hebei-kuixing.com (Postfix) with ESMTP id 0F46860E7E;
-        Thu,  8 Oct 2020 21:01:40 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at hebei-kuixing.com
-Received: from mail.hebei-kuixing.com ([127.0.0.1])
-        by localhost (mail.hebei-kuixing.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id NXVkdo_yTtlL; Fri,  9 Oct 2020 05:01:39 +0800 (CST)
-Received: from User (unknown [185.248.12.71])
-        by mail.hebei-kuixing.com (Postfix) with ESMTPA id A741A613AA;
-        Fri,  9 Oct 2020 05:01:17 +0800 (CST)
-Reply-To: <kim.leang2011@yahoo.com>
-From:   " Kim Leang" <sales@hebei-kuixing.com>
-Subject: Greeting!
-Date:   Fri, 9 Oct 2020 00:01:37 +0300
+        id S2389529AbgJIQxx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 9 Oct 2020 12:53:53 -0400
+Received: from mga18.intel.com ([134.134.136.126]:27293 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389334AbgJIQxx (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 9 Oct 2020 12:53:53 -0400
+IronPort-SDR: X2afcn6UEUQFXSLFjqmvqC7MrfpGBq9wBp9IDl4zl3bbgTO5ejvSsySkG9iymqrY492C6bdh1L
+ Z9pHfzhgPHCw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9769"; a="153343172"
+X-IronPort-AV: E=Sophos;i="5.77,355,1596524400"; 
+   d="scan'208";a="153343172"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 09:53:51 -0700
+IronPort-SDR: cZPsX0pTjYEGuD0ArdpSCuRg3di0O8Q5VtMLwajHT3ZQMVDnnXcOC/xpo+DvF5F75jcclyC3Q9
+ zRwAKC+0JvpA==
+X-IronPort-AV: E=Sophos;i="5.77,355,1596524400"; 
+   d="scan'208";a="528996042"
+Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 09:53:50 -0700
+Date:   Fri, 9 Oct 2020 09:53:50 -0700
+From:   Ira Weiny <ira.weiny@intel.com>
+To:     Ralph Campbell <rcampbell@nvidia.com>
+Cc:     linux-mm@kvack.org, kvm-ppc@vger.kernel.org,
+        nouveau@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jerome Glisse <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Alistair Popple <apopple@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        Zi Yan <ziy@nvidia.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Yang Shi <yang.shi@linux.alibaba.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] mm: make device private reference counts zero based
+Message-ID: <20201009165350.GV2046448@iweiny-DESK2.sc.intel.com>
+References: <20201008172544.29905-1-rcampbell@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-X-MSMail-Priority: Normal
-X-Mailer: Microsoft Outlook Express 6.00.2600.0000
-X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
-Message-Id: <20201008210140.0F46860E7E@mail.hebei-kuixing.com>
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201008172544.29905-1-rcampbell@nvidia.com>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Greeting!
+On Thu, Oct 08, 2020 at 10:25:44AM -0700, Ralph Campbell wrote:
+> ZONE_DEVICE struct pages have an extra reference count that complicates the
+> code for put_page() and several places in the kernel that need to check the
+> reference count to see that a page is not being used (gup, compaction,
+> migration, etc.). Clean up the code so the reference count doesn't need to
+> be treated specially for device private pages, leaving DAX as still being
+> a special case.
 
-I am contacting you to receive and share with me an abandoned fund ( $21,537.000.00 ) left in our bank by a deceased customer. I was going through the Internet search when I found your email address. My name is Mr. Kim Leang.
+What about the check in mc_handle_swap_pte()?
 
-I want to utilize this opportunity and make use of this fund if I should present your name to the bank to stand as his business associate/ trustee for the fund to be released to you via Visa card for easy withdrawals in any VISA ATM machine anywhere in the World.
+mm/memcontrol.c:
 
-The bank will also give you international online transfer options. With these you can transfer the funds without any risk.
+5513                 /*
+5514                  * MEMORY_DEVICE_PRIVATE means ZONE_DEVICE page and which have
+5515                  * a refcount of 1 when free (unlike normal page)
+5516                  */
+5517                 if (!page_ref_add_unless(page, 1, 1))
+5518                         return NULL;
 
-Should you be interested in working with me in this project? Please reply back and let's benefit from this golden opportunity.You are my first contact. I shall wait a few days and if I do not hear from you, I shall look for another person.
+... does that need to change?  Perhaps just the comment?
 
-Thanks and have a nice day,
-Mr. Kim Leang.
+> 
+> Signed-off-by: Ralph Campbell <rcampbell@nvidia.com>
+> ---
+> 
+
+[snip]
+
+>  
+>  void put_devmap_managed_page(struct page *page);
+> diff --git a/lib/test_hmm.c b/lib/test_hmm.c
+> index e151a7f10519..bf92a261fa6f 100644
+> --- a/lib/test_hmm.c
+> +++ b/lib/test_hmm.c
+> @@ -509,10 +509,15 @@ static bool dmirror_allocate_chunk(struct dmirror_device *mdevice,
+>  		mdevice->devmem_count * (DEVMEM_CHUNK_SIZE / (1024 * 1024)),
+>  		pfn_first, pfn_last);
+>  
+> +	/*
+> +	 * Pages are created with an initial reference count of one but should
+> +	 * have a reference count of zero while in the free state.
+> +	 */
+>  	spin_lock(&mdevice->lock);
+>  	for (pfn = pfn_first; pfn < pfn_last; pfn++) {
+>  		struct page *page = pfn_to_page(pfn);
+>  
+> +		set_page_count(page, 0);
+
+This confuses me.  How does this and init_page_count() not confuse the buddy
+allocator?  Don't you have to reset the refcount somewhere after the test?
+
+>  		page->zone_device_data = mdevice->free_pages;
+>  		mdevice->free_pages = page;
+>  	}
+> @@ -561,7 +566,7 @@ static struct page *dmirror_devmem_alloc_page(struct dmirror_device *mdevice)
+>  	}
+>  
+>  	dpage->zone_device_data = rpage;
+> -	get_page(dpage);
+> +	init_page_count(dpage);
+>  	lock_page(dpage);
+>  	return dpage;
+>  
+> diff --git a/mm/internal.h b/mm/internal.h
+> index c43ccdddb0f6..e1443b73aa9b 100644
+> --- a/mm/internal.h
+> +++ b/mm/internal.h
+>  
+
+[snip]
+
+> diff --git a/mm/swap.c b/mm/swap.c
+> index 0eb057141a04..93d880c6f73c 100644
+> --- a/mm/swap.c
+> +++ b/mm/swap.c
+> @@ -116,12 +116,11 @@ static void __put_compound_page(struct page *page)
+>  void __put_page(struct page *page)
+>  {
+>  	if (is_zone_device_page(page)) {
+> -		put_dev_pagemap(page->pgmap);
+> -
+>  		/*
+>  		 * The page belongs to the device that created pgmap. Do
+>  		 * not return it to page allocator.
+>  		 */
+> +		free_zone_device_page(page);
+
+I really like this.
+
+Ira
+
