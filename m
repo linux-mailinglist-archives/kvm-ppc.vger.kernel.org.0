@@ -2,55 +2,47 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08829289174
-	for <lists+kvm-ppc@lfdr.de>; Fri,  9 Oct 2020 20:52:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B46F28A170
+	for <lists+kvm-ppc@lfdr.de>; Sat, 10 Oct 2020 23:12:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388066AbgJISwo convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm-ppc@lfdr.de>); Fri, 9 Oct 2020 14:52:44 -0400
-Received: from mail.csu.ru ([195.54.14.68]:37894 "HELO mail.csu.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-        id S2388043AbgJISwo (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 9 Oct 2020 14:52:44 -0400
-X-Greylist: delayed 524 seconds by postgrey-1.27 at vger.kernel.org; Fri, 09 Oct 2020 14:52:34 EDT
-Received: from webmail.csu.ru (webmail.csu.ru [195.54.14.80])
-        (Authenticated sender: gmu)
-        by mail.csu.ru (Postfix) with ESMTPA id C6941146B28;
-        Fri,  9 Oct 2020 23:42:23 +0500 (+05)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.csu.ru C6941146B28
-Received: from 156.146.59.22
-        (SquirrelMail authenticated user gmu)
-        by webmail.csu.ru with HTTP;
-        Fri, 9 Oct 2020 23:42:26 +0500
-Message-ID: <fc84a83537f6a8cc108a314c0a6d5cbe.squirrel@webmail.csu.ru>
-Date:   Fri, 9 Oct 2020 23:42:26 +0500
-Subject: Vorschlag
-From:   "Yi Huiman" <info@bsu.de>
-Reply-To: info@huiman.cf
-User-Agent: SquirrelMail/1.4.22
+        id S1732602AbgJJTtA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 10 Oct 2020 15:49:00 -0400
+Received: from gs-mr.7gis.ru ([185.157.254.10]:39204 "EHLO gs-mr.7gis.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731178AbgJJRvA (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sat, 10 Oct 2020 13:51:00 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by gs-mr.7gis.ru (ESMTP) with ESMTP id 1D96B204F5;
+        Sat, 10 Oct 2020 22:50:58 +0500 (+05)
+Received: from gs-mr.7gis.ru ([127.0.0.1])
+        by localhost (gs-mr.7gis.ru [127.0.0.1]) (GS-MR-CF, port 10024)
+        with LMTP id pFbrOYy7VQSa; Sat, 10 Oct 2020 22:50:55 +0500 (+05)
+Received: from mail.7gis.ru (unknown [188.234.155.189])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by gs-mr.7gis.ru (ESMTP) with ESMTPS id C36ED204AF;
+        Sat, 10 Oct 2020 22:50:55 +0500 (+05)
+Received: from User (217.29.155.140) by EX1.galileosky.local (192.168.1.16)
+ with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sat, 10 Oct 2020 12:59:32
+ +0500
+Reply-To: <info@skilsaws.org>
+From:   Andon@vger.kernel.org
+Subject: Rep Wanted.
+Date:   Sat, 10 Oct 2020 09:59:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-X-Priority: 3 (Normal)
-Importance: Normal
-X-KLMS-Rule-ID: 1
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Lua-Profiles: 159051 [Oct 09 2020]
-X-KLMS-AntiSpam-Version: 5.9.11.0
-X-KLMS-AntiSpam-Envelope-From: info@bsu.de
-X-KLMS-AntiSpam-Auth: dmarc=none header.from=bsu.de;spf=none smtp.mailfrom=bsu.de;dkim=none
-X-KLMS-AntiSpam-Rate: 70
-X-KLMS-AntiSpam-Status: not_detected
-X-KLMS-AntiSpam-Method: none
-X-KLMS-AntiSpam-Info: LuaCore: 381 381 faef97d3f9d8f5dd6a9feadc50ba5b34b9486c58, {rep_avail}, {Tracking_content_type, plain}, {Prob_reply_not_match_from}, {Prob_to_header_missing}, {Prob_Reply_to_without_To}, {Tracking_susp_macro_from_formal}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;huiman.cf:7.1.1;127.0.0.199:7.1.2;webmail.csu.ru:7.1.1;bsu.de:7.1.1;195.54.14.80:7.1.2, ApMailHostAddress: 195.54.14.80
-X-MS-Exchange-Organization-SCL: -1
-X-KLMS-AntiSpam-Interceptor-Info: scan successful
-X-KLMS-AntiPhishing: Clean, bases: 2020/10/09 16:54:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2020/10/09 00:29:00 #15463494
-X-KLMS-AntiVirus-Status: Clean, skipped
-Content-Transfer-Encoding: 8BIT
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 6.00.2600.0000
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
+Message-ID: <6179d7f956b04b5297d7c7cdb77d46b4@EX1.galileosky.local>
+To:     Undisclosed recipients:;
+X-Originating-IP: [217.29.155.140]
+X-ClientProxiedBy: EX1.galileosky.local (192.168.1.16) To EX1.galileosky.local
+ (192.168.1.16)
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-ich habe ein Geschäft Vorschlag für dich.
-
+Andon Health is seeking a motivated Company/Person representatives on part time basis with good salary structure.
