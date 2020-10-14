@@ -2,69 +2,48 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF94228CA67
-	for <lists+kvm-ppc@lfdr.de>; Tue, 13 Oct 2020 10:43:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88A0528DC35
+	for <lists+kvm-ppc@lfdr.de>; Wed, 14 Oct 2020 11:00:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391355AbgJMInI convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm-ppc@lfdr.de>); Tue, 13 Oct 2020 04:43:08 -0400
-Received: from [178.252.167.140] ([178.252.167.140]:58629 "EHLO EXG16.DOE.ir"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2390190AbgJMInH (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 13 Oct 2020 04:43:07 -0400
-X-Greylist: delayed 905 seconds by postgrey-1.27 at vger.kernel.org; Tue, 13 Oct 2020 04:43:07 EDT
-Received: from doe.ir (217.218.14.250) by EXG16.DOE.ir (172.20.1.44) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1261.35; Tue, 13 Oct
- 2020 11:58:00 +0330
-Reply-To: <imfc@mail2washington.com>
-From:   "Mrs. Roonie Holbrook" <n.saffar@doe.ir>
-To:     <kvm-ppc@vger.kernel.org>
-Subject: From Mrs. Roonie Holbrook !!
-Date:   Tue, 13 Oct 2020 01:27:37 -0700
-Message-ID: <20201013012736.92DBDA48AC906655@doe.ir>
+        id S1727833AbgJNI7n (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 14 Oct 2020 04:59:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36790 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727871AbgJNI7h (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 14 Oct 2020 04:59:37 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E1D6C051101
+        for <kvm-ppc@vger.kernel.org>; Tue, 13 Oct 2020 23:31:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ivg+4ShKhK9J0GIBMLdbzyswn07sEhcY++hSSvHufe4=; b=l+BYk6ta+igFPgPUIzsT+YDnFG
+        gV+mlI8oW2Q/9UQThToJzMKf9c1q/o4ndoivvU1ArJoWHAYvZPR/5fJa3ybE2HKQGfEJ76msTHwvk
+        g09NSjnV19vWz1lLbzRplSOEm2kXV3Z243YfEyDDN9/wWCiCE38PBOiVajBkLFuogNSEdlZckPIOY
+        9i0Ok9UoVdJ5FE09XNoUUp8EKBaE3vlv6+Tq/WvU9PfjkZyW6UNHAVJhh3zpAYUx1cnDPJxSzYEcj
+        d2Kov4NfLRcYhQs8gGnKNYFC1jW9Md6yAEjdMJR5o0kxAWSpn80CaR2QvZK8mi35uyCsEcoULd8sH
+        VlHo7jJA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kSaJh-0007fw-4q; Wed, 14 Oct 2020 06:31:17 +0000
+Date:   Wed, 14 Oct 2020 07:31:17 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ram Pai <linuxram@us.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        farosas@linux.ibm.com, bharata@linux.ibm.com
+Subject: Re: [RFC v1 0/2] Plumbing to support multiple secure memory backends.
+Message-ID: <20201014063117.GA26161@infradead.org>
+References: <1602487663-7321-1-git-send-email-linuxram@us.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [217.218.14.250]
-X-ClientProxiedBy: EXG16.DOE.ir (172.20.1.44) To EXG16.DOE.ir (172.20.1.44)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1602487663-7321-1-git-send-email-linuxram@us.ibm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Attention,
-
-Nice day and Congratulations !!!.
-
-You are qualified for the IMFC Covid 19 grant of $750,000.00 
-dollars to support the people in your community. Now respond to 
-details to claim your money.
-
-You are directed to contact the below Office of Paymaster General 
-immediately through his contact details below:
-
-Mr. Williams Fox
-Email: claim.dept@mail2finance.com 
-
-This is to avoid mistake while transferring your overdue payment 
-to you, You have to forward to him below details of yours to 
-start processing your payment file and this ref: 
-UN/FM14/WB/Covid-19:
- 
-Your Full Name:
-Your Contact Address:
-State:
-Country:
-Telephone and Fax Number:
-Occupation:
-Age:
- 
-Kindly get back to Mr. Williams Fox  as soon as possible so that 
-he will direct you on what to do for the claims through our 
-Affiliated Bank.
- 
-
-Best regards
-
-Mrs. Roonie Holbrook
-IMFC Grant Claim Department
-Email: imfc@mail2washington.com
+Please don't add an abstraction without a second implementation.
+Once we have the implementation we can consider the tradeoffs.  E.g.
+if expensive indirect function calls are really needed vs simple
+branches.
