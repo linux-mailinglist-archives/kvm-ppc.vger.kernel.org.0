@@ -2,37 +2,39 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0B3829A1B2
-	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Oct 2020 01:48:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8511D29A083
+	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Oct 2020 01:32:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409111AbgJ0Anf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 26 Oct 2020 20:43:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47594 "EHLO mail.kernel.org"
+        id S2439284AbgJ0Aa6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 26 Oct 2020 20:30:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52566 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2408733AbgJZXtc (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 26 Oct 2020 19:49:32 -0400
+        id S2409452AbgJZXve (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 26 Oct 2020 19:51:34 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 923FA20874;
-        Mon, 26 Oct 2020 23:49:30 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E48B521D41;
+        Mon, 26 Oct 2020 23:51:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603756171;
-        bh=7qDKrIH5KNymgmUgST0I3iXpf5p0CWrV8Pqgx/ukEt0=;
+        s=default; t=1603756293;
+        bh=7R5xqVgNV8SBj5rHvCGLv44NHswCNNGcoAZYxRlZAjE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dVUD7rXfphylDjWgZSv8+XpknEweDxAc4omrX9HeQE6Goq13cka/5NxlpgCRCXnPH
-         XgLC3cndXNa33og6mcq9TmfpDvMMWWeO0Mtse7u2NHFlLtJ7nWfMLJ1rFuXGDO2/S2
-         GSLfaS/1vsMQOA8kUh3nTDaAmegsBf1mLjxh6q+c=
+        b=NfsS28eJ5UYslL7njdlhPkECF0XEi0Xn+XwMlbFc5TvzuwosYKiKFVLAHPaFTRx5b
+         EGBCXFdnqDQ7dMCeaY393gFKIuY/BBMMB6A92TqqhlbSQR3zCNTY+9Kr2/16p2M/Xf
+         b24JfX0Q/ixx/uF1OEBITm0AFjLf8E87n3cTiagc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>,
+Cc:     Fabiano Rosas <farosas@linux.ibm.com>,
+        Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+        Greg Kurz <groug@kaod.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Sasha Levin <sashal@kernel.org>, linuxppc-dev@lists.ozlabs.org,
-        kvm-ppc@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.9 020/147] powerpc/64s: handle ISA v3.1 local copy-paste context switches
-Date:   Mon, 26 Oct 2020 19:46:58 -0400
-Message-Id: <20201026234905.1022767-20-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH AUTOSEL 5.9 121/147] KVM: PPC: Book3S HV: Do not allocate HPT for a nested guest
+Date:   Mon, 26 Oct 2020 19:48:39 -0400
+Message-Id: <20201026234905.1022767-121-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201026234905.1022767-1-sashal@kernel.org>
 References: <20201026234905.1022767-1-sashal@kernel.org>
@@ -44,98 +46,99 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Nicholas Piggin <npiggin@gmail.com>
+From: Fabiano Rosas <farosas@linux.ibm.com>
 
-[ Upstream commit dc462267d2d7aacffc3c1d99b02d7a7c59db7c66 ]
+[ Upstream commit 05e6295dc7de859c9d56334805485c4d20bebf25 ]
 
-The ISA v3.1 the copy-paste facility has a new memory move functionality
-which allows the copy buffer to be pasted to domestic memory (RAM) as
-opposed to foreign memory (accelerator).
+The current nested KVM code does not support HPT guests. This is
+informed/enforced in some ways:
 
-This means the POWER9 trick of avoiding the cp_abort on context switch if
-the process had not mapped foreign memory does not work on POWER10. Do the
-cp_abort unconditionally there.
+- Hosts < P9 will not be able to enable the nested HV feature;
 
-KVM must also cp_abort on guest exit to prevent copy buffer state leaking
-between contexts.
+- The nested hypervisor MMU capabilities will not contain
+  KVM_CAP_PPC_MMU_HASH_V3;
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-Acked-by: Paul Mackerras <paulus@ozlabs.org>
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-Link: https://lore.kernel.org/r/20200825075535.224536-1-npiggin@gmail.com
+- QEMU reflects the MMU capabilities in the
+  'ibm,arch-vec-5-platform-support' device-tree property;
+
+- The nested guest, at 'prom_parse_mmu_model' ignores the
+  'disable_radix' kernel command line option if HPT is not supported;
+
+- The KVM_PPC_CONFIGURE_V3_MMU ioctl will fail if trying to use HPT.
+
+There is, however, still a way to start a HPT guest by using
+max-compat-cpu=power8 at the QEMU machine options. This leads to the
+guest being set to use hash after QEMU calls the KVM_PPC_ALLOCATE_HTAB
+ioctl.
+
+With the guest set to hash, the nested hypervisor goes through the
+entry path that has no knowledge of nesting (kvmppc_run_vcpu) and
+crashes when it tries to execute an hypervisor-privileged (mtspr
+HDEC) instruction at __kvmppc_vcore_entry:
+
+root@L1:~ $ qemu-system-ppc64 -machine pseries,max-cpu-compat=power8 ...
+
+<snip>
+[  538.543303] CPU: 83 PID: 25185 Comm: CPU 0/KVM Not tainted 5.9.0-rc4 #1
+[  538.543355] NIP:  c00800000753f388 LR: c00800000753f368 CTR: c0000000001e5ec0
+[  538.543417] REGS: c0000013e91e33b0 TRAP: 0700   Not tainted  (5.9.0-rc4)
+[  538.543470] MSR:  8000000002843033 <SF,VEC,VSX,FP,ME,IR,DR,RI,LE>  CR: 22422882  XER: 20040000
+[  538.543546] CFAR: c00800000753f4b0 IRQMASK: 3
+               GPR00: c0080000075397a0 c0000013e91e3640 c00800000755e600 0000000080000000
+               GPR04: 0000000000000000 c0000013eab19800 c000001394de0000 00000043a054db72
+               GPR08: 00000000003b1652 0000000000000000 0000000000000000 c0080000075502e0
+               GPR12: c0000000001e5ec0 c0000007ffa74200 c0000013eab19800 0000000000000008
+               GPR16: 0000000000000000 c00000139676c6c0 c000000001d23948 c0000013e91e38b8
+               GPR20: 0000000000000053 0000000000000000 0000000000000001 0000000000000000
+               GPR24: 0000000000000001 0000000000000001 0000000000000000 0000000000000001
+               GPR28: 0000000000000001 0000000000000053 c0000013eab19800 0000000000000001
+[  538.544067] NIP [c00800000753f388] __kvmppc_vcore_entry+0x90/0x104 [kvm_hv]
+[  538.544121] LR [c00800000753f368] __kvmppc_vcore_entry+0x70/0x104 [kvm_hv]
+[  538.544173] Call Trace:
+[  538.544196] [c0000013e91e3640] [c0000013e91e3680] 0xc0000013e91e3680 (unreliable)
+[  538.544260] [c0000013e91e3820] [c0080000075397a0] kvmppc_run_core+0xbc8/0x19d0 [kvm_hv]
+[  538.544325] [c0000013e91e39e0] [c00800000753d99c] kvmppc_vcpu_run_hv+0x404/0xc00 [kvm_hv]
+[  538.544394] [c0000013e91e3ad0] [c0080000072da4fc] kvmppc_vcpu_run+0x34/0x48 [kvm]
+[  538.544472] [c0000013e91e3af0] [c0080000072d61b8] kvm_arch_vcpu_ioctl_run+0x310/0x420 [kvm]
+[  538.544539] [c0000013e91e3b80] [c0080000072c7450] kvm_vcpu_ioctl+0x298/0x778 [kvm]
+[  538.544605] [c0000013e91e3ce0] [c0000000004b8c2c] sys_ioctl+0x1dc/0xc90
+[  538.544662] [c0000013e91e3dc0] [c00000000002f9a4] system_call_exception+0xe4/0x1c0
+[  538.544726] [c0000013e91e3e20] [c00000000000d140] system_call_common+0xf0/0x27c
+[  538.544787] Instruction dump:
+[  538.544821] f86d1098 60000000 60000000 48000099 e8ad0fe8 e8c500a0 e9264140 75290002
+[  538.544886] 7d1602a6 7cec42a6 40820008 7d0807b4 <7d164ba6> 7d083a14 f90d10a0 480104fd
+[  538.544953] ---[ end trace 74423e2b948c2e0c ]---
+
+This patch makes the KVM_PPC_ALLOCATE_HTAB ioctl fail when running in
+the nested hypervisor, causing QEMU to abort.
+
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/powerpc/kernel/process.c           | 16 +++++++++-------
- arch/powerpc/kvm/book3s_hv.c            |  7 +++++++
- arch/powerpc/kvm/book3s_hv_rmhandlers.S |  8 ++++++++
- 3 files changed, 24 insertions(+), 7 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/powerpc/kernel/process.c b/arch/powerpc/kernel/process.c
-index 73a57043ee662..3f2dc0675ea7a 100644
---- a/arch/powerpc/kernel/process.c
-+++ b/arch/powerpc/kernel/process.c
-@@ -1256,15 +1256,17 @@ struct task_struct *__switch_to(struct task_struct *prev,
- 		restore_math(current->thread.regs);
- 
- 		/*
--		 * The copy-paste buffer can only store into foreign real
--		 * addresses, so unprivileged processes can not see the
--		 * data or use it in any way unless they have foreign real
--		 * mappings. If the new process has the foreign real address
--		 * mappings, we must issue a cp_abort to clear any state and
--		 * prevent snooping, corruption or a covert channel.
-+		 * On POWER9 the copy-paste buffer can only paste into
-+		 * foreign real addresses, so unprivileged processes can not
-+		 * see the data or use it in any way unless they have
-+		 * foreign real mappings. If the new process has the foreign
-+		 * real address mappings, we must issue a cp_abort to clear
-+		 * any state and prevent snooping, corruption or a covert
-+		 * channel. ISA v3.1 supports paste into local memory.
- 		 */
- 		if (current->mm &&
--			atomic_read(&current->mm->context.vas_windows))
-+			(cpu_has_feature(CPU_FTR_ARCH_31) ||
-+			atomic_read(&current->mm->context.vas_windows)))
- 			asm volatile(PPC_CP_ABORT);
- 	}
- #endif /* CONFIG_PPC_BOOK3S_64 */
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 4ba06a2a306cf..3bd3118c76330 100644
+index 3bd3118c76330..e2b476d76506a 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3530,6 +3530,13 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 	 */
- 	asm volatile("eieio; tlbsync; ptesync");
+@@ -5257,6 +5257,12 @@ static long kvm_arch_vm_ioctl_hv(struct file *filp,
+ 	case KVM_PPC_ALLOCATE_HTAB: {
+ 		u32 htab_order;
  
-+	/*
-+	 * cp_abort is required if the processor supports local copy-paste
-+	 * to clear the copy buffer that was under control of the guest.
-+	 */
-+	if (cpu_has_feature(CPU_FTR_ARCH_31))
-+		asm volatile(PPC_CP_ABORT);
++		/* If we're a nested hypervisor, we currently only support radix */
++		if (kvmhv_on_pseries()) {
++			r = -EOPNOTSUPP;
++			break;
++		}
 +
- 	mtspr(SPRN_LPID, vcpu->kvm->arch.host_lpid);	/* restore host LPID */
- 	isync();
- 
-diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index 799d6d0f4eade..cd9995ee84419 100644
---- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-+++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -1830,6 +1830,14 @@ END_FTR_SECTION_IFSET(CPU_FTR_P9_RADIX_PREFETCH_BUG)
- 2:
- #endif /* CONFIG_PPC_RADIX_MMU */
- 
-+	/*
-+	 * cp_abort is required if the processor supports local copy-paste
-+	 * to clear the copy buffer that was under control of the guest.
-+	 */
-+BEGIN_FTR_SECTION
-+	PPC_CP_ABORT
-+END_FTR_SECTION_IFSET(CPU_FTR_ARCH_31)
-+
- 	/*
- 	 * POWER7/POWER8 guest -> host partition switch code.
- 	 * We don't have to lock against tlbies but we do
+ 		r = -EFAULT;
+ 		if (get_user(htab_order, (u32 __user *)argp))
+ 			break;
 -- 
 2.25.1
 
