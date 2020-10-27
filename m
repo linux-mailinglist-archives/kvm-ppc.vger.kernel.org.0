@@ -2,27 +2,27 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2119D299F66
-	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Oct 2020 01:22:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 148F9299E13
+	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Oct 2020 01:12:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2410960AbgJZXzq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 26 Oct 2020 19:55:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60272 "EHLO mail.kernel.org"
+        id S2411833AbgJ0ALw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 26 Oct 2020 20:11:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33784 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2410429AbgJZXyZ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 26 Oct 2020 19:54:25 -0400
+        id S2439295AbgJ0ALw (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 26 Oct 2020 20:11:52 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 55B3721D41;
-        Mon, 26 Oct 2020 23:54:23 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C4D4B2151B;
+        Tue, 27 Oct 2020 00:11:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603756464;
-        bh=vWUgmi0amkMpZBF9ioCKe6qiGr46hapEaG1US+Evmw8=;
+        s=default; t=1603757510;
+        bh=hP7h/RRUoYHzprBdN0Vj4BtVDcb9zPDb6kdxUZX5yRU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=xjaS33TOmgIiwQzPjfyCrxwJdSWXd5eYzhT2JrrWq9PZDqAPM6X8FHOBL1Egpm74y
-         t/faVf+2HCxCq4Q8YVV1ldruvi3ZUXWYeAX6tVryfEkeX1/KlElnfe9XPvY3kL5CGq
-         2Kaw3edlJm2bTI5GNPAe2JrfWBGkoGcJS5PtcRxs=
+        b=kXe+4/eJueNx1rdYzZkiXeBeeZ7Y+pa/opJ6CxKKFSasonr6zkRUmEMkmNGhTdsKo
+         HRLRMzHD2BrUJOsXi1q5XHNNsZOBoygaYv4IM9cCmxLrU3bcbivGucDKydDy17/TxQ
+         FTpKPMd7dpygRDjHlv6w7a/AA7kDhLpVPNPyDm5A=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Fabiano Rosas <farosas@linux.ibm.com>,
@@ -32,12 +32,12 @@ Cc:     Fabiano Rosas <farosas@linux.ibm.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 5.8 112/132] KVM: PPC: Book3S HV: Do not allocate HPT for a nested guest
-Date:   Mon, 26 Oct 2020 19:51:44 -0400
-Message-Id: <20201026235205.1023962-112-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 21/25] KVM: PPC: Book3S HV: Do not allocate HPT for a nested guest
+Date:   Mon, 26 Oct 2020 20:11:19 -0400
+Message-Id: <20201027001123.1027642-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201026235205.1023962-1-sashal@kernel.org>
-References: <20201026235205.1023962-1-sashal@kernel.org>
+In-Reply-To: <20201027001123.1027642-1-sashal@kernel.org>
+References: <20201027001123.1027642-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -123,10 +123,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 1928b86d6e6b5..51e8353310c2e 100644
+index 54c6ba87a25ad..b005ce9dc8f04 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -5214,6 +5214,12 @@ static long kvm_arch_vm_ioctl_hv(struct file *filp,
+@@ -3157,6 +3157,12 @@ static long kvm_arch_vm_ioctl_hv(struct file *filp,
  	case KVM_PPC_ALLOCATE_HTAB: {
  		u32 htab_order;
  
