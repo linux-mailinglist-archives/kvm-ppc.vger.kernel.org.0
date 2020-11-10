@@ -2,95 +2,111 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C60812AA669
-	for <lists+kvm-ppc@lfdr.de>; Sat,  7 Nov 2020 16:49:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A99D2AE29B
+	for <lists+kvm-ppc@lfdr.de>; Tue, 10 Nov 2020 23:10:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726060AbgKGPto (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 7 Nov 2020 10:49:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53980 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726053AbgKGPto (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 7 Nov 2020 10:49:44 -0500
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5583EC0613CF
-        for <kvm-ppc@vger.kernel.org>; Sat,  7 Nov 2020 07:49:44 -0800 (PST)
-Received: by mail-pj1-x1042.google.com with SMTP id r9so929489pjl.5
-        for <kvm-ppc@vger.kernel.org>; Sat, 07 Nov 2020 07:49:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=7/TyYiy/5YMk+mjNioNCBNSjuP8QdrV8gyWB7vm7Ee4=;
-        b=avtEcUhNqqjSLS+EfsY67zoE0Imvh3Z3/y6Wsw5xHsCv73Hd4peccJ36/5aVb323I3
-         5oCoomgspQUWmEb13n/G5tmvMcW8WmJiGjld9PjBt26OZW1EnEB6GwI9Ns3qufY4ufVp
-         ErvInhBCZgV6lxRIa1lDHBn4upauaOGfb0xU7sadmgK3Rq7fPIs6+tXrJXQo2J+bxs25
-         LhUAq70ib5Ym486IWNzK0x1y2ed2HwM8DlQF/GAIpJycqGs+yQ0DbQNGA+Dy+pBLWFpU
-         1pkpONzVXpA2FmeoZYAU3W3s5/Rcij4bt92aLCZ9FoB8qRXWUDOFMkMkmmvr98tAJ+pB
-         vjKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=7/TyYiy/5YMk+mjNioNCBNSjuP8QdrV8gyWB7vm7Ee4=;
-        b=G8bpg61Xi2/OekX0esoZmf2D1yCMA0xoPo2vEfCr/lPovNIKDIW3XxF/02LaQv4eva
-         NBLRaJJnGL63EugB2z1NERF4Aue+UlK5vjtdmdxXRRGlP3YUfMvmTsGZpGHfzdVYIGQq
-         0a+lNWGlLxuI+1AaluO2vIlKF9dxbxYTh728/IeR2QP/8WjeK7En+CdyHzJVHfEnQ3u5
-         POmqpH/dxxoCCPp1NF/kt3qzgdrSdKxhgGb6ur/mjsrxq5KGG9Wg8j8O0xhtjnv3SZ9m
-         Ulae+c8yPXCObSlOcxGFd6KKJ41L5v9tEZ0F/CeoOV15uUFj9FHPQTv6a+GU0xhmCnGK
-         cFFQ==
-X-Gm-Message-State: AOAM530J8E5v3Hn7LPqzEuVSNn5pLR3hkfPpj6InI9Ve5kgTk8darGET
-        yK+xgVibDYBwgobuabefkKEqx7ZtE6G2
-X-Google-Smtp-Source: ABdhPJyPrKkZuv82wY4VNPDIZFDkA2Whl8MeIKe3R/fJUILTiZOJueiDHikEWqrDBbQdM+Gv0T8rxA==
-X-Received: by 2002:a17:902:724c:b029:d5:c1de:e34e with SMTP id c12-20020a170902724cb02900d5c1dee34emr5947456pll.71.1604764183921;
-        Sat, 07 Nov 2020 07:49:43 -0800 (PST)
-Received: from he-cluster.localdomain (67.216.221.250.16clouds.com. [67.216.221.250])
-        by smtp.gmail.com with ESMTPSA id u24sm6317375pfm.81.2020.11.07.07.49.42
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 07 Nov 2020 07:49:43 -0800 (PST)
-From:   xiakaixu1987@gmail.com
-X-Google-Original-From: kaixuxia@tencent.com
-To:     paulus@ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Kaixu Xia <kaixuxia@tencent.com>
-Subject: [PATCH] KVM: PPC: fix comparison to bool warning
-Date:   Sat,  7 Nov 2020 23:49:38 +0800
-Message-Id: <1604764178-8087-1-git-send-email-kaixuxia@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1730618AbgKJWKW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 10 Nov 2020 17:10:22 -0500
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:51097 "EHLO
+        smtpout1.mo529.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726467AbgKJWKW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 10 Nov 2020 17:10:22 -0500
+X-Greylist: delayed 347 seconds by postgrey-1.27 at vger.kernel.org; Tue, 10 Nov 2020 17:10:21 EST
+Received: from mxplan5.mail.ovh.net (unknown [10.108.20.7])
+        by mo529.mail-out.ovh.net (Postfix) with ESMTPS id F0CC76B9553E;
+        Tue, 10 Nov 2020 23:04:32 +0100 (CET)
+Received: from kaod.org (37.59.142.99) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 10 Nov
+ 2020 23:04:31 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-99G003bc792778-fc7e-40f1-8439-94edc17bb2ab,
+                    BF55E036A69FA8A58606F388C5C835316A6FE4B9) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: XIVE: Fix possible oops when
+ accessing ESB page
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>
+CC:     <linuxppc-dev@lists.ozlabs.org>, <kvm-ppc@vger.kernel.org>,
+        <kvm@vger.kernel.org>, Greg Kurz <groug@kaod.org>,
+        Gustavo Romero <gromero@linux.ibm.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+References: <20201105134713.656160-1-clg@kaod.org>
+ <878sbftbnt.fsf@mpe.ellerman.id.au>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <1270ada4-e2a9-6a1a-52a9-b5c3479c05ea@kaod.org>
+Date:   Tue, 10 Nov 2020 23:04:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
+MIME-Version: 1.0
+In-Reply-To: <878sbftbnt.fsf@mpe.ellerman.id.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.99]
+X-ClientProxiedBy: DAG8EX1.mxp5.local (172.16.2.71) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 49ff0c72-0c37-4ed2-93ee-8126ad6004f8
+X-Ovh-Tracer-Id: 1040331516666481516
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedruddujedgudehjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehgrhhouhhgsehkrghougdrohhrgh
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Kaixu Xia <kaixuxia@tencent.com>
+On 11/6/20 4:19 AM, Michael Ellerman wrote:
+> Cédric Le Goater <clg@kaod.org> writes:
+>> When accessing the ESB page of a source interrupt, the fault handler
+>> will retrieve the page address from the XIVE interrupt 'xive_irq_data'
+>> structure. If the associated KVM XIVE interrupt is not valid, that is
+>> not allocated at the HW level for some reason, the fault handler will
+>> dereference a NULL pointer leading to the oops below :
+>>
+>>     WARNING: CPU: 40 PID: 59101 at arch/powerpc/kvm/book3s_xive_native.c:259 xive_native_esb_fault+0xe4/0x240 [kvm]
+>>     CPU: 40 PID: 59101 Comm: qemu-system-ppc Kdump: loaded Tainted: G        W        --------- -  - 4.18.0-240.el8.ppc64le #1
+>>     NIP:  c00800000e949fac LR: c00000000044b164 CTR: c00800000e949ec8
+>>     REGS: c000001f69617840 TRAP: 0700   Tainted: G        W        --------- -  -  (4.18.0-240.el8.ppc64le)
+>>     MSR:  9000000000029033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR: 44044282  XER: 00000000
+>>     CFAR: c00000000044b160 IRQMASK: 0
+>>     GPR00: c00000000044b164 c000001f69617ac0 c00800000e96e000 c000001f69617c10
+>>     GPR04: 05faa2b21e000080 0000000000000000 0000000000000005 ffffffffffffffff
+>>     GPR08: 0000000000000000 0000000000000001 0000000000000000 0000000000000001
+>>     GPR12: c00800000e949ec8 c000001ffffd3400 0000000000000000 0000000000000000
+>>     GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+>>     GPR20: 0000000000000000 0000000000000000 c000001f5c065160 c000000001c76f90
+>>     GPR24: c000001f06f20000 c000001f5c065100 0000000000000008 c000001f0eb98c78
+>>     GPR28: c000001dcab40000 c000001dcab403d8 c000001f69617c10 0000000000000011
+>>     NIP [c00800000e949fac] xive_native_esb_fault+0xe4/0x240 [kvm]
+>>     LR [c00000000044b164] __do_fault+0x64/0x220
+>>     Call Trace:
+>>     [c000001f69617ac0] [0000000137a5dc20] 0x137a5dc20 (unreliable)
+>>     [c000001f69617b50] [c00000000044b164] __do_fault+0x64/0x220
+>>     [c000001f69617b90] [c000000000453838] do_fault+0x218/0x930
+>>     [c000001f69617bf0] [c000000000456f50] __handle_mm_fault+0x350/0xdf0
+>>     [c000001f69617cd0] [c000000000457b1c] handle_mm_fault+0x12c/0x310
+>>     [c000001f69617d10] [c00000000007ef44] __do_page_fault+0x264/0xbb0
+>>     [c000001f69617df0] [c00000000007f8c8] do_page_fault+0x38/0xd0
+>>     [c000001f69617e30] [c00000000000a714] handle_page_fault+0x18/0x38
+>>     Instruction dump:
+>>     40c2fff0 7c2004ac 2fa90000 409e0118 73e90001 41820080 e8bd0008 7c2004ac
+>>     7ca90074 39400000 915c0000 7929d182 <0b090000> 2fa50000 419e0080 e89e0018
+>>     ---[ end trace 66c6ff034c53f64f ]---
+>>     xive-kvm: xive_native_esb_fault: accessing invalid ESB page for source 8 !
+>>
+>> Fix that by checking the validity of the KVM XIVE interrupt structure.
+>>
+>> Reported-by: Greg Kurz <groug@kaod.org>
+>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> 
+> Fixes ?
 
-Fix the following coccicheck warning:
+Ah yes :/  
 
-./arch/powerpc/kvm/booke.c:503:6-16: WARNING: Comparison to bool
-./arch/powerpc/kvm/booke.c:505:6-17: WARNING: Comparison to bool
-./arch/powerpc/kvm/booke.c:507:6-16: WARNING: Comparison to bool
+Cc: stable@vger.kernel.org # v5.2+
+Fixes: 6520ca64cde7 ("KVM: PPC: Book3S HV: XIVE: Add a mapping for the source ESB pages")
 
-Reported-by: Tosk Robot <tencent_os_robot@tencent.com>
-Signed-off-by: Kaixu Xia <kaixuxia@tencent.com>
----
- arch/powerpc/kvm/booke.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Since my provider changed its imap servers, my email filters are really screwed 
+up and I miss emails. 
 
-diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-index b1abcb816439..288a9820ec01 100644
---- a/arch/powerpc/kvm/booke.c
-+++ b/arch/powerpc/kvm/booke.c
-@@ -500,11 +500,11 @@ static int kvmppc_booke_irqprio_deliver(struct kvm_vcpu *vcpu,
- 
- 		vcpu->arch.regs.nip = vcpu->arch.ivpr |
- 					vcpu->arch.ivor[priority];
--		if (update_esr == true)
-+		if (update_esr)
- 			kvmppc_set_esr(vcpu, vcpu->arch.queued_esr);
--		if (update_dear == true)
-+		if (update_dear)
- 			kvmppc_set_dar(vcpu, vcpu->arch.queued_dear);
--		if (update_epr == true) {
-+		if (update_epr) {
- 			if (vcpu->arch.epr_flags & KVMPPC_EPR_USER)
- 				kvm_make_request(KVM_REQ_EPR_EXIT, vcpu);
- 			else if (vcpu->arch.epr_flags & KVMPPC_EPR_KERNEL) {
--- 
-2.20.0
+Sorry about that,
 
+C.
