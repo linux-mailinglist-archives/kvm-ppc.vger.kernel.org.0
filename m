@@ -2,129 +2,126 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86D292B43C0
-	for <lists+kvm-ppc@lfdr.de>; Mon, 16 Nov 2020 13:30:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 680032B6590
+	for <lists+kvm-ppc@lfdr.de>; Tue, 17 Nov 2020 14:58:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728329AbgKPM3h (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 16 Nov 2020 07:29:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54174 "EHLO
+        id S1730684AbgKQN4a (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 17 Nov 2020 08:56:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727895AbgKPM3h (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 16 Nov 2020 07:29:37 -0500
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB23C0613CF;
-        Mon, 16 Nov 2020 04:29:37 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CZT0Z6L5sz9sPB;
-        Mon, 16 Nov 2020 23:29:34 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1605529774;
-        bh=9E6JzyfDdjUQLEqbF7UI53b0Chv12+R9IYyhrZU8bFM=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=rmPfVp13hL1v/7EmT4rYsbfw1Am6SIA3S7arhMzW29Rq7yowZG9hEgpOTnST9xzXP
-         mD+QiCcDuS2Ec1TRyCZBYMzBNtyilemUsWAKEtNjrAqme3gFYURjQvVBLjOhzxWEJu
-         R5uDld+LWjx6LLmxKBl7SX3ZT0XfWnhT0p+ES46dswu1tUD+qKsuXoea4jOpWMrnUg
-         dbNZdxmVdtPfs6KF3WeWlGoBNWxvZZxO3PV3lAMwsx6RyfqKv12hBG3Vaxhf2oikob
-         0aMVyN6DmzjvcO/+Vr5HV1G+AU7Cz24jt3YIK66K9z64Z5bSzvd616oDy4Tb5BORwa
-         IUhr6jS+/0ZUg==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
-        Paul Mackerras <paulus@samba.org>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, Greg Kurz <groug@kaod.org>,
-        Gustavo Romero <gromero@linux.ibm.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: XIVE: Fix possible oops when accessing ESB page
-In-Reply-To: <1270ada4-e2a9-6a1a-52a9-b5c3479c05ea@kaod.org>
-References: <20201105134713.656160-1-clg@kaod.org> <878sbftbnt.fsf@mpe.ellerman.id.au> <1270ada4-e2a9-6a1a-52a9-b5c3479c05ea@kaod.org>
-Date:   Mon, 16 Nov 2020 23:29:33 +1100
-Message-ID: <875z654h8y.fsf@mpe.ellerman.id.au>
+        with ESMTP id S1731995AbgKQN42 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 17 Nov 2020 08:56:28 -0500
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D02AC0613CF
+        for <kvm-ppc@vger.kernel.org>; Tue, 17 Nov 2020 05:56:27 -0800 (PST)
+Received: by mail-pg1-x544.google.com with SMTP id 62so16111535pgg.12
+        for <kvm-ppc@vger.kernel.org>; Tue, 17 Nov 2020 05:56:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=t4SJB4YbRl5B4MeSiy1HFdk1USDyn/nEsoq1u8bjNIo=;
+        b=PmLjpiBQuy/dWIkb1kpYuV9XtHFFZg7Qosc6YZ7mcWTdXLIU5CkkVhg5D0YEIxdlHK
+         OcatU2VPPlZZlpDD1Lr310UjbB5FY93+H8/wBBswbWW95RD8esZ87r3PvFk/GAvGEAzX
+         rG3iBZSoFnKzYgcBFpOnn406iiWWjufjS8a3GxnvZudS64WggpxyLFbdcELenjNwB8uS
+         TIs/llb+TmzETNqfbUOvUjrJUyckPbaVFno354a4uR4RSg/pAL5agi7XJCGAOV5SiCTD
+         n7heo1oQApPtB8gEwvSK+8dgKc57SjC776RnJtS4OvRxCZA8nzkf+unikxZwjsn35Btp
+         JIGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=t4SJB4YbRl5B4MeSiy1HFdk1USDyn/nEsoq1u8bjNIo=;
+        b=tvC0qTjhTF5x8XwdHkQnkKVNM/Gwn1gH3A1LNTD8MN38yWYJOuUOWuIvP8wD3b1RLD
+         Z19izY4eO+BLwxlNHqbnL4+8AJZM0FUvnmSkF/yQLGo96bAbVAXPiCr+wuwbubaYNr+H
+         1ccgC7N0wAeh+5TJc4IySGoxt+73b4O2xL4j33nt1Z/V9PMB5Fkm1QGa4fcLVrX/vCGv
+         o9pw+xCucR4z9d/T6+5MHWeh1H06KufPJ6JdjNocnJ5mxrK0QNJ9RTM9BCOoTlL4O0sa
+         OigYZA1B2tEp1g1zkxGKC9WDHj2Ox/mD0ZpvENpN9E6bXd+TWzbUHi56kyFvZ7RJo91E
+         dn4Q==
+X-Gm-Message-State: AOAM532eEuKUVprV2EAm5tWwlDxw+BzXLZ5Mgj+43OwwHlDapoTSqmG8
+        z4+5sDDffV5CDR5PRsNRGFBkR5YI7SU=
+X-Google-Smtp-Source: ABdhPJyECMDo82Nu+OwdOhisuYPhda2UPM3DJ35r6/6BMeDv9ttUKUrgGuVVUsfsHJqHqPkDFGk8ew==
+X-Received: by 2002:a63:cc50:: with SMTP id q16mr3790165pgi.246.1605621386711;
+        Tue, 17 Nov 2020 05:56:26 -0800 (PST)
+Received: from bobo.ozlabs.ibm.com (27-32-36-31.tpgi.com.au. [27.32.36.31])
+        by smtp.gmail.com with ESMTPSA id q12sm21965535pfc.84.2020.11.17.05.56.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Nov 2020 05:56:26 -0800 (PST)
+From:   Nicholas Piggin <npiggin@gmail.com>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Subject: [PATCH] powerpc/64s/exception: KVM Fix for host DSI being taken in HPT guest MMU context
+Date:   Tue, 17 Nov 2020 23:56:17 +1000
+Message-Id: <20201117135617.3521127-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-C=C3=A9dric Le Goater <clg@kaod.org> writes:
-> On 11/6/20 4:19 AM, Michael Ellerman wrote:
->> C=C3=A9dric Le Goater <clg@kaod.org> writes:
->>> When accessing the ESB page of a source interrupt, the fault handler
->>> will retrieve the page address from the XIVE interrupt 'xive_irq_data'
->>> structure. If the associated KVM XIVE interrupt is not valid, that is
->>> not allocated at the HW level for some reason, the fault handler will
->>> dereference a NULL pointer leading to the oops below :
->>>
->>>     WARNING: CPU: 40 PID: 59101 at arch/powerpc/kvm/book3s_xive_native.=
-c:259 xive_native_esb_fault+0xe4/0x240 [kvm]
->>>     CPU: 40 PID: 59101 Comm: qemu-system-ppc Kdump: loaded Tainted: G  =
-      W        --------- -  - 4.18.0-240.el8.ppc64le #1
->>>     NIP:  c00800000e949fac LR: c00000000044b164 CTR: c00800000e949ec8
->>>     REGS: c000001f69617840 TRAP: 0700   Tainted: G        W        ----=
------ -  -  (4.18.0-240.el8.ppc64le)
->>>     MSR:  9000000000029033 <SF,HV,EE,ME,IR,DR,RI,LE>  CR: 44044282  XER=
-: 00000000
->>>     CFAR: c00000000044b160 IRQMASK: 0
->>>     GPR00: c00000000044b164 c000001f69617ac0 c00800000e96e000 c000001f6=
-9617c10
->>>     GPR04: 05faa2b21e000080 0000000000000000 0000000000000005 fffffffff=
-fffffff
->>>     GPR08: 0000000000000000 0000000000000001 0000000000000000 000000000=
-0000001
->>>     GPR12: c00800000e949ec8 c000001ffffd3400 0000000000000000 000000000=
-0000000
->>>     GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000=
-0000000
->>>     GPR20: 0000000000000000 0000000000000000 c000001f5c065160 c00000000=
-1c76f90
->>>     GPR24: c000001f06f20000 c000001f5c065100 0000000000000008 c000001f0=
-eb98c78
->>>     GPR28: c000001dcab40000 c000001dcab403d8 c000001f69617c10 000000000=
-0000011
->>>     NIP [c00800000e949fac] xive_native_esb_fault+0xe4/0x240 [kvm]
->>>     LR [c00000000044b164] __do_fault+0x64/0x220
->>>     Call Trace:
->>>     [c000001f69617ac0] [0000000137a5dc20] 0x137a5dc20 (unreliable)
->>>     [c000001f69617b50] [c00000000044b164] __do_fault+0x64/0x220
->>>     [c000001f69617b90] [c000000000453838] do_fault+0x218/0x930
->>>     [c000001f69617bf0] [c000000000456f50] __handle_mm_fault+0x350/0xdf0
->>>     [c000001f69617cd0] [c000000000457b1c] handle_mm_fault+0x12c/0x310
->>>     [c000001f69617d10] [c00000000007ef44] __do_page_fault+0x264/0xbb0
->>>     [c000001f69617df0] [c00000000007f8c8] do_page_fault+0x38/0xd0
->>>     [c000001f69617e30] [c00000000000a714] handle_page_fault+0x18/0x38
->>>     Instruction dump:
->>>     40c2fff0 7c2004ac 2fa90000 409e0118 73e90001 41820080 e8bd0008 7c20=
-04ac
->>>     7ca90074 39400000 915c0000 7929d182 <0b090000> 2fa50000 419e0080 e8=
-9e0018
->>>     ---[ end trace 66c6ff034c53f64f ]---
->>>     xive-kvm: xive_native_esb_fault: accessing invalid ESB page for sou=
-rce 8 !
->>>
->>> Fix that by checking the validity of the KVM XIVE interrupt structure.
->>>
->>> Reported-by: Greg Kurz <groug@kaod.org>
->>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>=20
->> Fixes ?
->
-> Ah yes :/=20=20
->
-> Cc: stable@vger.kernel.org # v5.2+
-> Fixes: 6520ca64cde7 ("KVM: PPC: Book3S HV: XIVE: Add a mapping for the so=
-urce ESB pages")
->
-> Since my provider changed its imap servers, my email filters are really s=
-crewed=20
-> up and I miss emails.=20
->
-> Sorry about that,
+Commit 2284ffea8f0c ("powerpc/64s/exception: Only test KVM in SRR
+interrupts when PR KVM is supported") removed KVM guest tests from
+interrupts that do not set HV=1, when PR-KVM is not configured.
 
-No worries.
+This is wrong for HV-KVM HPT guest MMIO emulation case which attempts
+to load the faulting instruction word with MSR[DR]=1 and MSR[HV]=1 with
+the guest MMU context loaded. This can cause host DSI, DSLB interrupts
+which must test for KVM guest. Restore this and add a comment.
 
-It doesn't look like Paul has grabbed this, so I'll take it.
+Fixes: 2284ffea8f0c ("powerpc/64s/exception: Only test KVM in SRR interrupts when PR KVM is supported")
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ arch/powerpc/kernel/exceptions-64s.S | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-cheers
+diff --git a/arch/powerpc/kernel/exceptions-64s.S b/arch/powerpc/kernel/exceptions-64s.S
+index f7d748b88705..b67892e2c9f5 100644
+--- a/arch/powerpc/kernel/exceptions-64s.S
++++ b/arch/powerpc/kernel/exceptions-64s.S
+@@ -1412,6 +1412,11 @@ END_FTR_SECTION_IFSET(CPU_FTR_HVMODE)
+  *   If none is found, do a Linux page fault. Linux page faults can happen in
+  *   kernel mode due to user copy operations of course.
+  *
++ *   KVM: The KVM HDSI handler may perform a load with MSR[DR]=1 in guest
++ *   MMU context, which may cause a DSI in the host, which must go to the
++ *   KVM handler. MSR[IR] is not enabled, so the real-mode handler will
++ *   always be used regardless of AIL setting.
++ *
+  * - Radix MMU
+  *   The hardware loads from the Linux page table directly, so a fault goes
+  *   immediately to Linux page fault.
+@@ -1422,10 +1427,8 @@ INT_DEFINE_BEGIN(data_access)
+ 	IVEC=0x300
+ 	IDAR=1
+ 	IDSISR=1
+-#ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
+ 	IKVM_SKIP=1
+ 	IKVM_REAL=1
+-#endif
+ INT_DEFINE_END(data_access)
+ 
+ EXC_REAL_BEGIN(data_access, 0x300, 0x80)
+@@ -1464,6 +1467,8 @@ ALT_MMU_FTR_SECTION_END_IFCLR(MMU_FTR_TYPE_RADIX)
+  *   ppc64_bolted_size (first segment). The kernel handler must avoid stomping
+  *   on user-handler data structures.
+  *
++ *   KVM: Same as 0x300, DSLB must test for KVM guest.
++ *
+  * A dedicated save area EXSLB is used (XXX: but it actually need not be
+  * these days, we could use EXGEN).
+  */
+@@ -1472,10 +1477,8 @@ INT_DEFINE_BEGIN(data_access_slb)
+ 	IAREA=PACA_EXSLB
+ 	IRECONCILE=0
+ 	IDAR=1
+-#ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
+ 	IKVM_SKIP=1
+ 	IKVM_REAL=1
+-#endif
+ INT_DEFINE_END(data_access_slb)
+ 
+ EXC_REAL_BEGIN(data_access_slb, 0x380, 0x80)
+-- 
+2.23.0
+
