@@ -2,187 +2,120 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAC692C21FC
-	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Nov 2020 10:45:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 712422C237C
+	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Nov 2020 12:02:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731107AbgKXJoj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 24 Nov 2020 04:44:39 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30844 "EHLO
+        id S1732330AbgKXLBv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 24 Nov 2020 06:01:51 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48194 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729704AbgKXJoj (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 24 Nov 2020 04:44:39 -0500
+        by vger.kernel.org with ESMTP id S1732243AbgKXLBv (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 24 Nov 2020 06:01:51 -0500
 Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AO9X5dU144025;
-        Tue, 24 Nov 2020 04:44:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : reply-to : references : mime-version : content-type
- : content-transfer-encoding : in-reply-to; s=pp1;
- bh=1vZhDxrI0UH7+tnSnDGhw+6VjE+lwO1okY22M3IqcgU=;
- b=rB7ybnh0/GiVIvl+NDmTcMPKqhQROD1uaENqmgNk2U0arcAw+uHYAalB6PuT7XyiU8h7
- CsS/sPWUC++KP2ZnlkNrL5WCIK+4wyg/gyIUtCbizZukEgm+R3W07OImgnPgio24hSC5
- V/c2waixGOKq1HpKfnauw/e6Pz0UhRn3aZyrO1et1ufSw6OvhWA7QfV2XqAiXR0vq/c5
- +EZfKhjv3qxSDZewkY8+gb2Z/NSprKiyCXWKnYn0DcvdWJky6wx5sXIORnOF2rnzGHo5
- BZjcd2ydLFMA9PNOxIYWurV6tbZzQ52MAFZAfJb8pHyrWqy7QLFEA+Lr7rLUZXJjUmfH nA== 
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AOAW7bM179577;
+        Tue, 24 Nov 2020 06:01:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=LZBPkChyo3/20UhougbKb9Te/JdSFl+s/zG6QHX7z8U=;
+ b=FFC/r45L7ZnomqcM3AOy/4q8VvmLpe1o5ak4LCVAykOvMu74Xnvth2144VlmvDLdleX7
+ DEcGehgggIyHE1sM5Px1/pY9uTtFFoX8DZvP46kU2HoTj4NICWsJByTc+8XED5t6rv/k
+ ZiKml3eXVd6RyQkB5FJ3+jjViX2FijELvM7668M648KR71sK2cD3YZPMUeC/+6uBPoeX
+ fq353oz6pTN9lagpmOWBHoDaMkW9MVWqPcK1yUBpBDCtAyLjoKYTeK5FEAEBWMfL4KwA
+ pbsmveO5OT6P7btzEj1QdungSFkypOg4XQEtUdIucjBIMeOVNtvZ6XRHx7GQ6HsnOVbj FQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 350rb0wduq-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 350rb0ysb6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Nov 2020 04:44:21 -0500
+        Tue, 24 Nov 2020 06:01:35 -0500
 Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AO9XC9Y144581;
-        Tue, 24 Nov 2020 04:44:20 -0500
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 350rb0wdtj-1
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AOAWRQA180968;
+        Tue, 24 Nov 2020 06:01:34 -0500
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 350rb0ys80-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Nov 2020 04:44:20 -0500
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AO9X29h016220;
-        Tue, 24 Nov 2020 09:44:18 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 34y6k4sh6g-1
+        Tue, 24 Nov 2020 06:01:33 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AOAr6kV017839;
+        Tue, 24 Nov 2020 11:01:29 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma02fra.de.ibm.com with ESMTP id 350cvrs0ta-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Nov 2020 09:44:17 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AO9iFOM63439202
+        Tue, 24 Nov 2020 11:01:29 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AOB0Cdp11600570
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Nov 2020 09:44:15 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BC289A4054;
-        Tue, 24 Nov 2020 09:44:15 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0389FA4065;
-        Tue, 24 Nov 2020 09:44:14 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.199.46.179])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 24 Nov 2020 09:44:13 +0000 (GMT)
-Date:   Tue, 24 Nov 2020 15:14:11 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
-        mpe@ellerman.id.au
-Subject: Re: [PATCH v1 0/2] Use H_RPT_INVALIDATE for nested guest
-Message-ID: <20201124094411.GA72234@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <20201019112642.53016-1-bharata@linux.ibm.com>
+        Tue, 24 Nov 2020 11:00:12 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E83DC4203F;
+        Tue, 24 Nov 2020 11:00:11 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BD8CE42059;
+        Tue, 24 Nov 2020 11:00:08 +0000 (GMT)
+Received: from bangoria.ibmuc.com (unknown [9.199.32.189])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 24 Nov 2020 11:00:08 +0000 (GMT)
+From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+To:     mpe@ellerman.id.au, paulus@samba.org
+Cc:     ravi.bangoria@linux.ibm.com, mikey@neuling.org, npiggin@gmail.com,
+        leobras.c@gmail.com, pbonzini@redhat.com, christophe.leroy@c-s.fr,
+        jniethe5@gmail.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v2 0/4] KVM: PPC: Power10 2nd DAWR enablement
+Date:   Tue, 24 Nov 2020 16:29:49 +0530
+Message-Id: <20201124105953.39325-1-ravi.bangoria@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201019112642.53016-1-bharata@linux.ibm.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-24_03:2020-11-24,2020-11-23 signatures=0
+ definitions=2020-11-24_04:2020-11-24,2020-11-23 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- mlxscore=0 priorityscore=1501 adultscore=0 clxscore=1011 spamscore=0
+ mlxscore=0 priorityscore=1501 adultscore=0 clxscore=1015 spamscore=0
  lowpriorityscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999
  impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011240056
+ engine=8.12.0-2009150000 definitions=main-2011240061
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi,
+Enable p10 2nd DAWR feature for Book3S kvm guest. DAWR is a hypervisor
+resource and thus H_SET_MODE hcall is used to set/unset it. A new case
+H_SET_MODE_RESOURCE_SET_DAWR1 is introduced in H_SET_MODE hcall for
+setting/unsetting 2nd DAWR. Also, new capability KVM_CAP_PPC_DAWR1 has
+been added to query 2nd DAWR support via kvm ioctl.
 
-Any comments on this patchset? Anything specific to be addressed
-before it could be considered for inclusion?
+This feature also needs to be enabled in Qemu to really use it. I'll
+post Qemu patches once kvm patches get accepted.
 
-Regards,
-Bharata.
+v1: https://lore.kernel.org/r/20200723102058.312282-1-ravi.bangoria@linux.ibm.com
 
-On Mon, Oct 19, 2020 at 04:56:40PM +0530, Bharata B Rao wrote:
-> This patchset adds support for the new hcall H_RPT_INVALIDATE
-> (currently handles nested case only) and replaces the nested tlb flush
-> calls with this new hcall if the support for the same exists.
-> 
-> Changes in v1:
-> -------------
-> - Removed the bits that added the FW_FEATURE_RPT_INVALIDATE feature
->   as they are already upstream.
-> 
-> v0: https://lore.kernel.org/linuxppc-dev/20200703104420.21349-1-bharata@linux.ibm.com/T/#m1800c5f5b3d4f6a154ae58fc1c617c06f286358f
-> 
-> H_RPT_INVALIDATE
-> ================
-> Syntax:
-> int64   /* H_Success: Return code on successful completion */
->         /* H_Busy - repeat the call with the same */
->         /* H_Parameter, H_P2, H_P3, H_P4, H_P5 : Invalid parameters */
->         hcall(const uint64 H_RPT_INVALIDATE, /* Invalidate RPT translation lookaside information */
->               uint64 pid,       /* PID/LPID to invalidate */
->               uint64 target,    /* Invalidation target */
->               uint64 type,      /* Type of lookaside information */
->               uint64 pageSizes,     /* Page sizes */
->               uint64 start,     /* Start of Effective Address (EA) range (inclusive) */
->               uint64 end)       /* End of EA range (exclusive) */
-> 
-> Invalidation targets (target)
-> -----------------------------
-> Core MMU        0x01 /* All virtual processors in the partition */
-> Core local MMU  0x02 /* Current virtual processor */
-> Nest MMU        0x04 /* All nest/accelerator agents in use by the partition */
-> 
-> A combination of the above can be specified, except core and core local.
-> 
-> Type of translation to invalidate (type)
-> ---------------------------------------
-> NESTED       0x0001  /* Invalidate nested guest partition-scope */
-> TLB          0x0002  /* Invalidate TLB */
-> PWC          0x0004  /* Invalidate Page Walk Cache */
-> PRT          0x0008  /* Invalidate Process Table Entries if NESTED is clear */
-> PAT          0x0008  /* Invalidate Partition Table Entries if NESTED is set */
-> 
-> A combination of the above can be specified.
-> 
-> Page size mask (pageSizes)
-> --------------------------
-> 4K              0x01
-> 64K             0x02
-> 2M              0x04
-> 1G              0x08
-> All sizes       (-1UL)
-> 
-> A combination of the above can be specified.
-> All page sizes can be selected with -1.
-> 
-> Semantics: Invalidate radix tree lookaside information
->            matching the parameters given.
-> * Return H_P2, H_P3 or H_P4 if target, type, or pageSizes parameters are
->   different from the defined values.
-> * Return H_PARAMETER if NESTED is set and pid is not a valid nested
->   LPID allocated to this partition
-> * Return H_P5 if (start, end) doesn't form a valid range. Start and end
->   should be a valid Quadrant address and  end > start.
-> * Return H_NotSupported if the partition is not in running in radix
->   translation mode.
-> * May invalidate more translation information than requested.
-> * If start = 0 and end = -1, set the range to cover all valid addresses.
->   Else start and end should be aligned to 4kB (lower 11 bits clear).
-> * If NESTED is clear, then invalidate process scoped lookaside information.
->   Else pid specifies a nested LPID, and the invalidation is performed
->   on nested guest partition table and nested guest partition scope real
->   addresses.
-> * If pid = 0 and NESTED is clear, then valid addresses are quadrant 3 and
->   quadrant 0 spaces, Else valid addresses are quadrant 0.
-> * Pages which are fully covered by the range are to be invalidated.
->   Those which are partially covered are considered outside invalidation
->   range, which allows a caller to optimally invalidate ranges that may
->   contain mixed page sizes.
-> * Return H_SUCCESS on success.
-> 
-> Bharata B Rao (2):
->   KVM: PPC: Book3S HV: Add support for H_RPT_INVALIDATE (nested case
->     only)
->   KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in nested KVM
-> 
->  Documentation/virt/kvm/api.rst                |  17 +++
->  .../include/asm/book3s/64/tlbflush-radix.h    |  18 +++
->  arch/powerpc/include/asm/kvm_book3s.h         |   3 +
->  arch/powerpc/kvm/book3s_64_mmu_radix.c        |  26 ++++-
->  arch/powerpc/kvm/book3s_hv.c                  |  32 ++++++
->  arch/powerpc/kvm/book3s_hv_nested.c           | 107 +++++++++++++++++-
->  arch/powerpc/kvm/powerpc.c                    |   3 +
->  arch/powerpc/mm/book3s64/radix_tlb.c          |   4 -
->  include/uapi/linux/kvm.h                      |   1 +
->  9 files changed, 200 insertions(+), 11 deletions(-)
-> 
-> -- 
-> 2.26.2
+v1->v2:
+ - patch #1: New patch
+ - patch #2: Don't rename KVM_REG_PPC_DAWR, it's an uapi macro
+ - patch #3: Increment HV_GUEST_STATE_VERSION
+ - Split kvm and selftests patches into different series
+ - Patches rebased to paulus/kvm-ppc-next (cf59eb13e151) + few
+   other watchpoint patches which are yet to be merged in
+   paulus/kvm-ppc-next.
+
+Ravi Bangoria (4):
+  KVM: PPC: Allow nested guest creation when L0 hv_guest_state > L1
+  KVM: PPC: Rename current DAWR macros and variables
+  KVM: PPC: Add infrastructure to support 2nd DAWR
+  KVM: PPC: Introduce new capability for 2nd DAWR
+
+ Documentation/virt/kvm/api.rst            |  2 +
+ arch/powerpc/include/asm/hvcall.h         | 25 ++++++++-
+ arch/powerpc/include/asm/kvm_host.h       |  6 +-
+ arch/powerpc/include/uapi/asm/kvm.h       |  2 +
+ arch/powerpc/kernel/asm-offsets.c         |  6 +-
+ arch/powerpc/kvm/book3s_hv.c              | 65 ++++++++++++++++++----
+ arch/powerpc/kvm/book3s_hv_nested.c       | 68 ++++++++++++++++++-----
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 43 ++++++++++----
+ arch/powerpc/kvm/powerpc.c                |  3 +
+ include/uapi/linux/kvm.h                  |  1 +
+ tools/arch/powerpc/include/uapi/asm/kvm.h |  2 +
+ 11 files changed, 181 insertions(+), 42 deletions(-)
+
+-- 
+2.26.2
+
