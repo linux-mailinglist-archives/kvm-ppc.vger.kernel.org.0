@@ -2,146 +2,149 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 875962C844D
-	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Nov 2020 13:49:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDABE2C878C
+	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Nov 2020 16:18:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726038AbgK3Msz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 30 Nov 2020 07:48:55 -0500
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:51287 "EHLO
-        smtpout1.mo804.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725897AbgK3Msz (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Nov 2020 07:48:55 -0500
-Received: from mxplan5.mail.ovh.net (unknown [10.108.20.48])
-        by mo804.mail-out.ovh.net (Postfix) with ESMTPS id AAA5776AA6CC;
-        Mon, 30 Nov 2020 13:48:11 +0100 (CET)
-Received: from kaod.org (37.59.142.97) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Mon, 30 Nov
- 2020 13:47:44 +0100
-Authentication-Results: garm.ovh; auth=pass (GARM-97G002978f41c7-e800-44a0-8e37-0dccf4f80915,
-                    54E7F54749740F6D21A4FFD7F03B08EA4E155DE3) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: XIVE: Fix vCPU id sanity check
-To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-CC:     <kvm-ppc@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-        <linux-kernel@vger.kernel.org>
-References: <160673876747.695514.1809676603724514920.stgit@bahia.lan>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a25aaf4b-fdc9-89b1-e518-f0aa273c49bb@kaod.org>
-Date:   Mon, 30 Nov 2020 13:47:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1727893AbgK3PRV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 30 Nov 2020 10:17:21 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30890 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725859AbgK3PRV (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Nov 2020 10:17:21 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AUEmxq8134051;
+        Mon, 30 Nov 2020 10:16:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=SVunJp4tA4QxqyyebemWUkhMQjF3mk9I7QKpQCzCIYw=;
+ b=r/QIno9Xo/xO4H+mXfvE/3pHss07Yvz1UKLT38kW7GQsKEgWLm+SV1H5V13dcMRWS/4j
+ 7dcqKJ9YY8N3nr5A4Mb1l1gDM544ki/1AEl6QvejV5upE1PKjcAJh2VUcfTnq+XgXwnV
+ IGfAEn71H0pI7+oXsW0iaELAQ1Lav6H7WhJ4WtnalD06161VTybOnIEQmQo7lrhezJKO
+ 9N8k7UPzleTiUy+RLzVngePah2opW8Zg102Yy7EJ5sEyJtBMIxZHP6Oxco+WXkAjXwo7
+ EVBEvTGuAJ1ZwSl7Tr/XZhyHt7oLG7qmjEMD0a6FpKf0VeqPY8+Qik0gwjRFyyQF+vYo /g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3552u5ryrb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 Nov 2020 10:16:22 -0500
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AUEplk5146991;
+        Mon, 30 Nov 2020 10:16:21 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3552u5ryq9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 Nov 2020 10:16:21 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AUF94mW008196;
+        Mon, 30 Nov 2020 15:16:19 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 353e68a5p0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 Nov 2020 15:16:19 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AUFGHwt62914990
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 30 Nov 2020 15:16:17 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DF27AAE045;
+        Mon, 30 Nov 2020 15:16:16 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 45D6BAE051;
+        Mon, 30 Nov 2020 15:16:15 +0000 (GMT)
+Received: from lep8c.aus.stglabs.ibm.com (unknown [9.40.192.207])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 30 Nov 2020 15:16:15 +0000 (GMT)
+Subject: [RFC Qemu PATCH v2 0/2] spapr: nvdimm: Asynchronus flush hcall
+ support
+From:   Shivaprasad G Bhat <sbhat@linux.ibm.com>
+To:     xiaoguangrong.eric@gmail.com, mst@redhat.com, imammedo@redhat.com,
+        david@gibson.dropbear.id.au, qemu-devel@nongnu.org,
+        qemu-ppc@nongnu.org
+Cc:     shivaprasadbhat@gmail.com, bharata@linux.vnet.ibm.com,
+        linux-nvdimm@lists.01.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-ppc@vger.kernel.org, aneesh.kumar@linux.ibm.com
+Date:   Mon, 30 Nov 2020 09:16:14 -0600
+Message-ID: <160674929554.2492771.17651548703390170573.stgit@lep8c.aus.stglabs.ibm.com>
+User-Agent: StGit/0.19
 MIME-Version: 1.0
-In-Reply-To: <160673876747.695514.1809676603724514920.stgit@bahia.lan>
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.97]
-X-ClientProxiedBy: DAG4EX1.mxp5.local (172.16.2.31) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 74709152-3782-4f2d-a519-aded61145703
-X-Ovh-Tracer-Id: 16856973407783258918
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrudeitddggeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehgrhhouhhgsehkrghougdrohhrgh
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-30_05:2020-11-30,2020-11-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ lowpriorityscore=0 mlxlogscore=999 mlxscore=0 malwarescore=0
+ impostorscore=0 priorityscore=1501 phishscore=0 adultscore=0
+ suspectscore=0 bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2011300094
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 11/30/20 1:19 PM, Greg Kurz wrote:
-> Commit 062cfab7069f ("KVM: PPC: Book3S HV: XIVE: Make VP block size
-> configurable") updated kvmppc_xive_vcpu_id_valid() in a way that
-> allows userspace to trigger an assertion in skiboot and crash the host:
-> 
-> [  696.186248988,3] XIVE[ IC 08  ] eq_blk != vp_blk (0 vs. 1) for target 0x4300008c/0
-> [  696.186314757,0] Assert fail: hw/xive.c:2370:0
-> [  696.186342458,0] Aborting!
-> xive-kvCPU 0043 Backtrace:
->  S: 0000000031e2b8f0 R: 0000000030013840   .backtrace+0x48
->  S: 0000000031e2b990 R: 000000003001b2d0   ._abort+0x4c
->  S: 0000000031e2ba10 R: 000000003001b34c   .assert_fail+0x34
->  S: 0000000031e2ba90 R: 0000000030058984   .xive_eq_for_target.part.20+0xb0
->  S: 0000000031e2bb40 R: 0000000030059fdc   .xive_setup_silent_gather+0x2c
->  S: 0000000031e2bc20 R: 000000003005a334   .opal_xive_set_vp_info+0x124
->  S: 0000000031e2bd20 R: 00000000300051a4   opal_entry+0x134
->  --- OPAL call token: 0x8a caller R1: 0xc000001f28563850 ---
-> 
-> XIVE maintains the interrupt context state of non-dispatched vCPUs in
-> an internal VP structure. We allocate a bunch of those on startup to
-> accommodate all possible vCPUs. Each VP has an id, that we derive from
-> the vCPU id for efficiency:
-> 
-> static inline u32 kvmppc_xive_vp(struct kvmppc_xive *xive, u32 server)
-> {
-> 	return xive->vp_base + kvmppc_pack_vcpu_id(xive->kvm, server);
-> }
-> 
-> The KVM XIVE device used to allocate KVM_MAX_VCPUS VPs. This was
-> limitting the number of concurrent VMs because the VP space is
-> limited on the HW. Since most of the time, VMs run with a lot less
-> vCPUs, commit 062cfab7069f ("KVM: PPC: Book3S HV: XIVE: Make VP
-> block size configurable") gave the possibility for userspace to
-> tune the size of the VP block through the KVM_DEV_XIVE_NR_SERVERS
-> attribute.
-> 
-> The check in kvmppc_pack_vcpu_id() was changed from
-> 
-> 	cpu < KVM_MAX_VCPUS * xive->kvm->arch.emul_smt_mode
-> 
-> to
-> 
-> 	cpu < xive->nr_servers * xive->kvm->arch.emul_smt_mode
-> 
-> The previous check was based on the fact that the VP block had
-> KVM_MAX_VCPUS entries and that kvmppc_pack_vcpu_id() guarantees
-> that packed vCPU ids are below KVM_MAX_VCPUS. We've changed the
-> size of the VP block, but kvmppc_pack_vcpu_id() has nothing to
-> do with it and it certainly doesn't ensure that the packed vCPU
-> ids are below xive->nr_servers. kvmppc_xive_vcpu_id_valid() might
-> thus return true when the VM was configured with a non-standard
-> VSMT mode, even if the packed vCPU id is higher than what we
-> expect. We end up using an unallocated VP id, which confuses
-> OPAL. The assert in OPAL is probably abusive and should be
-> converted to a regular error that the kernel can handle, but
-> we shouldn't really use broken VP ids in the first place.
-> 
-> Fix kvmppc_xive_vcpu_id_valid() so that it checks the packed
-> vCPU id is below xive->nr_servers, which is explicitly what we
-> want.
-> 
-> Fixes: 062cfab7069f ("KVM: PPC: Book3S HV: XIVE: Make VP block size configurable")
-> Cc: stable@vger.kernel.org # v5.5+
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+The nvdimm devices are expected to ensure write persistent during power
+failure kind of scenarios.
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+The libpmem has architecture specific instructions like dcbf on power
+to flush the cache data to backend nvdimm device during normal writes.
 
-Thanks,
+Qemu - virtual nvdimm devices are memory mapped. The dcbf in the guest
+doesn't traslate to actual flush to the backend file on the host in case
+of file backed vnvdimms. This is addressed by virtio-pmem in case of x86_64
+by making asynchronous flushes.
 
-C.
+On PAPR, issue is addressed by adding a new hcall to
+request for an explicit asynchronous flush requests from the guest ndctl
+driver when the backend nvdimm cannot ensure write persistence with dcbf
+alone. So, the approach here is to convey when the asynchronous flush is
+required in a device tree property. The guest makes the hcall when the
+property is found, instead of relying on dcbf.
 
-> ---
->  arch/powerpc/kvm/book3s_xive.c |    7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> index 85215e79db42..a0ebc29f30b2 100644
-> --- a/arch/powerpc/kvm/book3s_xive.c
-> +++ b/arch/powerpc/kvm/book3s_xive.c
-> @@ -1214,12 +1214,9 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
->  static bool kvmppc_xive_vcpu_id_valid(struct kvmppc_xive *xive, u32 cpu)
->  {
->  	/* We have a block of xive->nr_servers VPs. We just need to check
-> -	 * raw vCPU ids are below the expected limit for this guest's
-> -	 * core stride ; kvmppc_pack_vcpu_id() will pack them down to an
-> -	 * index that can be safely used to compute a VP id that belongs
-> -	 * to the VP block.
-> +	 * packed vCPU ids are below that.
->  	 */
-> -	return cpu < xive->nr_servers * xive->kvm->arch.emul_smt_mode;
-> +	return kvmppc_pack_vcpu_id(xive->kvm, cpu) < xive->nr_servers;
->  }
->  
->  int kvmppc_xive_compute_vp_id(struct kvmppc_xive *xive, u32 cpu, u32 *vp)
-> 
-> 
+The first patch adds the necessary asynchronous hcall support infrastructure
+code at the DRC level. Second patch implements the hcall using the
+infrastructure.
+
+Hcall semantics are in review and not final.
+
+A new device property sync-dax is added to the nvdimm device. When the 
+sync-dax is off(default), the asynchronous hcalls will be called.
+
+With respect to save from new qemu to restore on old qemu, having the
+sync-dax by default off(when not specified) causes IO errors in guests as
+the async-hcall would not be supported on old qemu. The new hcall
+implementation being supported only on the new  pseries machine version,
+the current machine version checks may be sufficient to prevent
+such migration. Please suggest what should be done.
+
+The below demonstration shows the map_sync behavior with sync-dax on & off.
+(https://github.com/avocado-framework-tests/avocado-misc-tests/blob/master/memory/ndctl.py.data/map_sync.c)
+
+The pmem0 is from nvdimm with With sync-dax=on, and pmem1 is from nvdimm with syn-dax=off, mounted as
+/dev/pmem0 on /mnt1 type xfs (rw,relatime,attr2,dax=always,inode64,logbufs=8,logbsize=32k,noquota)
+/dev/pmem1 on /mnt2 type xfs (rw,relatime,attr2,dax=always,inode64,logbufs=8,logbsize=32k,noquota)
+
+[root@atest-guest ~]# ./mapsync /mnt1/newfile    ----> When sync-dax=off
+[root@atest-guest ~]# ./mapsync /mnt2/newfile    ----> when sync-dax=on
+Failed to mmap  with Operation not supported
+
+---
+v1 - https://lists.gnu.org/archive/html/qemu-devel/2020-11/msg06330.html
+Changes from v1
+      - Fixed a missed-out unlock
+      - using QLIST_FOREACH instead of QLIST_FOREACH_SAFE while generating token
+
+Shivaprasad G Bhat (2):
+      spapr: drc: Add support for async hcalls at the drc level
+      spapr: nvdimm: Implement async flush hcalls
+
+
+ hw/mem/nvdimm.c            |    1
+ hw/ppc/spapr_drc.c         |  146 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_nvdimm.c      |   79 ++++++++++++++++++++++++
+ include/hw/mem/nvdimm.h    |   10 +++
+ include/hw/ppc/spapr.h     |    3 +
+ include/hw/ppc/spapr_drc.h |   25 ++++++++
+ 6 files changed, 263 insertions(+), 1 deletion(-)
+
+--
+Signature
 
