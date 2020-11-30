@@ -2,126 +2,134 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1283D2C7D7B
-	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Nov 2020 04:57:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32CCD2C8409
+	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Nov 2020 13:21:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727103AbgK3D4d (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 29 Nov 2020 22:56:33 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39674 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726000AbgK3D4d (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 29 Nov 2020 22:56:33 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0AU3WR2X179964;
-        Sun, 29 Nov 2020 22:55:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : reply-to : references : mime-version : content-type
- : in-reply-to; s=pp1; bh=gRA3ZPmcwtlvU08q1iPwhxoVtOcb8hEH82B4M1MSv6I=;
- b=KoBOjs/OtkPY6/CWaxSl1Hh1Dqsw7dTgkbXnae39l/5aSrisqlppSw46aeYLgL/7mzV4
- GcuNPFzv2zp/2i1CYLebpRt7VRZ1pEE9rTs3nXzgLBb7xzSeaLFINbNqR5kiMtPMK1Jf
- gvKp8Oep3Ip0ofToqlLU/TMi+AoKAdDLSoPvl2CHnV+mVKvK0elBiMfZ81k9szTpicJp
- hgdex7fKS1ETwb/B+IFHxiSbKYzMo9PpTJiqWIr6DbHnfs6rObsnzU0E5yzC9a0LVzhL
- 0KE0X3OK/hZvZZZAVX07ee0HrqjkiPPKzlQboNF/rdJ8vRE/IGPV3QY9tYcCY2cQhO3Y AA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 354rak8yak-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 29 Nov 2020 22:55:46 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0AU3mcS9082297;
-        Sun, 29 Nov 2020 22:55:46 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 354rak8ya7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 29 Nov 2020 22:55:45 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0AU3mFqX021901;
-        Mon, 30 Nov 2020 03:55:43 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 353e681khf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Nov 2020 03:55:43 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0AU3tfOS50921828
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Nov 2020 03:55:41 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 302F84204B;
-        Mon, 30 Nov 2020 03:55:41 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E28942047;
-        Mon, 30 Nov 2020 03:55:40 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.85.71.39])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 30 Nov 2020 03:55:40 +0000 (GMT)
-Date:   Mon, 30 Nov 2020 09:25:38 +0530
-From:   Mahesh J Salgaonkar <mahesh@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH 1/8] powerpc/64s/powernv: Fix memory corruption when
- saving SLB entries on MCE
-Message-ID: <20201130035538.n63kjui6wslj33vt@in.ibm.com>
-Reply-To: mahesh@linux.ibm.com
-References: <20201128070728.825934-1-npiggin@gmail.com>
- <20201128070728.825934-2-npiggin@gmail.com>
+        id S1726578AbgK3MU1 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Mon, 30 Nov 2020 07:20:27 -0500
+Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:54378 "EHLO
+        us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726114AbgK3MU1 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Nov 2020 07:20:27 -0500
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-Mmcox3aAPuqo9iwFaxczOA-1; Mon, 30 Nov 2020 07:19:32 -0500
+X-MC-Unique: Mmcox3aAPuqo9iwFaxczOA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C607107ACFA;
+        Mon, 30 Nov 2020 12:19:30 +0000 (UTC)
+Received: from bahia.lan (ovpn-112-87.ams2.redhat.com [10.36.112.87])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 881625D9D2;
+        Mon, 30 Nov 2020 12:19:28 +0000 (UTC)
+Subject: [PATCH] KVM: PPC: Book3S HV: XIVE: Fix vCPU id sanity check
+From:   Greg Kurz <groug@kaod.org>
+To:     Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Cc:     =?utf-8?q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+Date:   Mon, 30 Nov 2020 13:19:27 +0100
+Message-ID: <160673876747.695514.1809676603724514920.stgit@bahia.lan>
+User-Agent: StGit/0.21
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201128070728.825934-2-npiggin@gmail.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-29_12:2020-11-26,2020-11-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 mlxlogscore=999 spamscore=0 priorityscore=1501
- impostorscore=0 suspectscore=1 malwarescore=0 clxscore=1011 adultscore=0
- mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2011300018
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kaod.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 2020-11-28 17:07:21 Sat, Nicholas Piggin wrote:
-> This can be hit by an HPT guest running on an HPT host and bring down
-> the host, so it's quite important to fix.
-> 
-> Fixes: 7290f3b3d3e66 ("powerpc/64s/powernv: machine check dump SLB contents")
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arch/powerpc/platforms/powernv/setup.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/powerpc/platforms/powernv/setup.c b/arch/powerpc/platforms/powernv/setup.c
-> index 46115231a3b2..4426a109ec2f 100644
-> --- a/arch/powerpc/platforms/powernv/setup.c
-> +++ b/arch/powerpc/platforms/powernv/setup.c
-> @@ -211,11 +211,16 @@ static void __init pnv_init(void)
->  		add_preferred_console("hvc", 0, NULL);
->  
->  	if (!radix_enabled()) {
-> +		size_t size = sizeof(struct slb_entry) * mmu_slb_size;
+Commit 062cfab7069f ("KVM: PPC: Book3S HV: XIVE: Make VP block size
+configurable") updated kvmppc_xive_vcpu_id_valid() in a way that
+allows userspace to trigger an assertion in skiboot and crash the host:
 
-Acked-by: Mahesh Salgaonkar <mahesh@linux.ibm.com>
+[  696.186248988,3] XIVE[ IC 08  ] eq_blk != vp_blk (0 vs. 1) for target 0x4300008c/0
+[  696.186314757,0] Assert fail: hw/xive.c:2370:0
+[  696.186342458,0] Aborting!
+xive-kvCPU 0043 Backtrace:
+ S: 0000000031e2b8f0 R: 0000000030013840   .backtrace+0x48
+ S: 0000000031e2b990 R: 000000003001b2d0   ._abort+0x4c
+ S: 0000000031e2ba10 R: 000000003001b34c   .assert_fail+0x34
+ S: 0000000031e2ba90 R: 0000000030058984   .xive_eq_for_target.part.20+0xb0
+ S: 0000000031e2bb40 R: 0000000030059fdc   .xive_setup_silent_gather+0x2c
+ S: 0000000031e2bc20 R: 000000003005a334   .opal_xive_set_vp_info+0x124
+ S: 0000000031e2bd20 R: 00000000300051a4   opal_entry+0x134
+ --- OPAL call token: 0x8a caller R1: 0xc000001f28563850 ---
 
-Thanks,
--Mahesh.
+XIVE maintains the interrupt context state of non-dispatched vCPUs in
+an internal VP structure. We allocate a bunch of those on startup to
+accommodate all possible vCPUs. Each VP has an id, that we derive from
+the vCPU id for efficiency:
+
+static inline u32 kvmppc_xive_vp(struct kvmppc_xive *xive, u32 server)
+{
+	return xive->vp_base + kvmppc_pack_vcpu_id(xive->kvm, server);
+}
+
+The KVM XIVE device used to allocate KVM_MAX_VCPUS VPs. This was
+limitting the number of concurrent VMs because the VP space is
+limited on the HW. Since most of the time, VMs run with a lot less
+vCPUs, commit 062cfab7069f ("KVM: PPC: Book3S HV: XIVE: Make VP
+block size configurable") gave the possibility for userspace to
+tune the size of the VP block through the KVM_DEV_XIVE_NR_SERVERS
+attribute.
+
+The check in kvmppc_pack_vcpu_id() was changed from
+
+	cpu < KVM_MAX_VCPUS * xive->kvm->arch.emul_smt_mode
+
+to
+
+	cpu < xive->nr_servers * xive->kvm->arch.emul_smt_mode
+
+The previous check was based on the fact that the VP block had
+KVM_MAX_VCPUS entries and that kvmppc_pack_vcpu_id() guarantees
+that packed vCPU ids are below KVM_MAX_VCPUS. We've changed the
+size of the VP block, but kvmppc_pack_vcpu_id() has nothing to
+do with it and it certainly doesn't ensure that the packed vCPU
+ids are below xive->nr_servers. kvmppc_xive_vcpu_id_valid() might
+thus return true when the VM was configured with a non-standard
+VSMT mode, even if the packed vCPU id is higher than what we
+expect. We end up using an unallocated VP id, which confuses
+OPAL. The assert in OPAL is probably abusive and should be
+converted to a regular error that the kernel can handle, but
+we shouldn't really use broken VP ids in the first place.
+
+Fix kvmppc_xive_vcpu_id_valid() so that it checks the packed
+vCPU id is below xive->nr_servers, which is explicitly what we
+want.
+
+Fixes: 062cfab7069f ("KVM: PPC: Book3S HV: XIVE: Make VP block size configurable")
+Cc: stable@vger.kernel.org # v5.5+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ arch/powerpc/kvm/book3s_xive.c |    7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+index 85215e79db42..a0ebc29f30b2 100644
+--- a/arch/powerpc/kvm/book3s_xive.c
++++ b/arch/powerpc/kvm/book3s_xive.c
+@@ -1214,12 +1214,9 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
+ static bool kvmppc_xive_vcpu_id_valid(struct kvmppc_xive *xive, u32 cpu)
+ {
+ 	/* We have a block of xive->nr_servers VPs. We just need to check
+-	 * raw vCPU ids are below the expected limit for this guest's
+-	 * core stride ; kvmppc_pack_vcpu_id() will pack them down to an
+-	 * index that can be safely used to compute a VP id that belongs
+-	 * to the VP block.
++	 * packed vCPU ids are below that.
+ 	 */
+-	return cpu < xive->nr_servers * xive->kvm->arch.emul_smt_mode;
++	return kvmppc_pack_vcpu_id(xive->kvm, cpu) < xive->nr_servers;
+ }
+ 
+ int kvmppc_xive_compute_vp_id(struct kvmppc_xive *xive, u32 cpu, u32 *vp)
 
 
->  		int i;
->  
->  		/* Allocate per cpu area to save old slb contents during MCE */
-> -		for_each_possible_cpu(i)
-> -			paca_ptrs[i]->mce_faulty_slbs = memblock_alloc_node(mmu_slb_size, __alignof__(*paca_ptrs[i]->mce_faulty_slbs), cpu_to_node(i));
-> +		for_each_possible_cpu(i) {
-> +			paca_ptrs[i]->mce_faulty_slbs =
-> +					memblock_alloc_node(size,
-> +						__alignof__(struct slb_entry),
-> +						cpu_to_node(i));
-> +		}
->  	}
->  }
->  
-> -- 
-> 2.23.0
-> 
-
--- 
-Mahesh J Salgaonkar
