@@ -2,119 +2,125 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 977D72CBDA1
-	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Dec 2020 14:01:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6CB42CE317
+	for <lists+kvm-ppc@lfdr.de>; Fri,  4 Dec 2020 00:51:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730010AbgLBNAq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 2 Dec 2020 08:00:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57094 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727102AbgLBNAn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 2 Dec 2020 08:00:43 -0500
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247E7C0613D4
-        for <kvm-ppc@vger.kernel.org>; Wed,  2 Dec 2020 05:00:03 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S2388162AbgLCXuY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 3 Dec 2020 18:50:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36861 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388136AbgLCXuY (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 3 Dec 2020 18:50:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607039337;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=h2PLhlAnoOsX/pwTCtmcWSJg6wOqgMga2gkoIQHGoBg=;
+        b=bHz+mazvIGAB5U1LW5tu+7iZ0zmnJw50HAPCNwyoJBIfcBx9g5twTbCS7IzYfQTkB10Czy
+        cKebS0mSgGr5G47wkX5/zYJ0qHepY5/FcR9bStfw984whIU85rGM2BCHErEETReXOHQol8
+        QolnPI3+SIoUNrlYZ/qXuzMB3eh5taE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-530-rNmOTHbUNfuBpzE4t0YOvg-1; Thu, 03 Dec 2020 18:48:56 -0500
+X-MC-Unique: rNmOTHbUNfuBpzE4t0YOvg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CmJwJ6mw3z9sTL;
-        Thu,  3 Dec 2020 00:00:00 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1606914001;
-        bh=il+wpPBmVvm9r7smyT4j5MqUTkLNm2LQ7yE8BD7sboE=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=ozECxdJLj/5kK42PP1HJK/3kvDl4Oqt12XnZmdjhEIi54iSTRlZfABpdZTTY8JIcs
-         fMgFhaQwqzrVQl3LDwMAUk6B6RovGugeKA/kaHwJQmMwkpJSr16SZk43qlDrmzpEP8
-         VU9/Xf9spcp6hXX3kkDFjFrHED3RIFg4iei6W7KLxvHQRhXjjD0vxLv/k9icFvGkPo
-         NEN9zyNI1v0X/toH/il+39rT3CbfRfxKMghKpgdbTTNqvG05oRIRaOoaH3hCECSzF7
-         Sj67G8l+1ddeoORzK+HgbW20JlRvzf/Fsem4mwPe89THj4kpMzx4Tc2TfqJn8+l9ke
-         of2IC1O+z0FjA==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
-        Mahesh Salgaonkar <mahesh@linux.ibm.com>
-Subject: Re: [PATCH 5/8] powerpc/64s/powernv: ratelimit harmless HMI error printing
-In-Reply-To: <20201128070728.825934-6-npiggin@gmail.com>
-References: <20201128070728.825934-1-npiggin@gmail.com> <20201128070728.825934-6-npiggin@gmail.com>
-Date:   Thu, 03 Dec 2020 00:00:00 +1100
-Message-ID: <87zh2wuzvz.fsf@mpe.ellerman.id.au>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6192C10766BA;
+        Thu,  3 Dec 2020 23:48:54 +0000 (UTC)
+Received: from w520.home (ovpn-112-10.phx2.redhat.com [10.3.112.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 490AF1A8A0;
+        Thu,  3 Dec 2020 23:48:52 +0000 (UTC)
+Date:   Thu, 3 Dec 2020 16:48:52 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     linuxppc-dev@lists.ozlabs.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org,
+        Leonardo Augusto =?UTF-8?B?R3VpbWFyw6Nlcw==?= Garcia 
+        <lagarcia@br.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
+        kvm@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH kernel v2] vfio/pci/nvlink2: Do not attempt NPU2 setup
+ on POWER8NVL NPU
+Message-ID: <20201203164852.46d5f7c0@w520.home>
+In-Reply-To: <20201122073950.15684-1-aik@ozlabs.ru>
+References: <20201122073950.15684-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
-> Harmless HMI errors can be triggered by guests in some cases, and don't
-> contain much useful information anyway. Ratelimit these to avoid
-> flooding the console/logs.
->
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+On Sun, 22 Nov 2020 18:39:50 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+
+> We execute certain NPU2 setup code (such as mapping an LPID to a device
+> in NPU2) unconditionally if an Nvlink bridge is detected. However this
+> cannot succeed on POWER8NVL machines as the init helpers return an error
+> other than ENODEV which means the device is there is and setup failed so
+> vfio_pci_enable() fails and pass through is not possible.
+> 
+> This changes the two NPU2 related init helpers to return -ENODEV if
+> there is no "memory-region" device tree property as this is
+> the distinction between NPU and NPU2.
+> 
+> Tested on
+> - POWER9 pvr=004e1201, Ubuntu 19.04 host, Ubuntu 18.04 vm,
+>   NVIDIA GV100 10de:1db1 driver 418.39
+> - POWER8 pvr=004c0100, RHEL 7.6 host, Ubuntu 16.10 vm,
+>   NVIDIA P100 10de:15f9 driver 396.47
+> 
+> Fixes: 7f92891778df ("vfio_pci: Add NVIDIA GV100GL [Tesla V100 SXM2] subdriver")
+> Cc: stable@vger.kernel.org # 5.0
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > ---
->  arch/powerpc/platforms/powernv/opal-hmi.c | 27 +++++++++++++----------
->  1 file changed, 15 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/powerpc/platforms/powernv/opal-hmi.c b/arch/powerpc/platforms/powernv/opal-hmi.c
-> index 3e1f064a18db..959da6df0227 100644
-> --- a/arch/powerpc/platforms/powernv/opal-hmi.c
-> +++ b/arch/powerpc/platforms/powernv/opal-hmi.c
-> @@ -240,19 +240,22 @@ static void print_hmi_event_info(struct OpalHMIEvent *hmi_evt)
->  		break;
->  	}
+> Changes:
+> v2:
+> * updated commit log with tested configs and replaced P8+ with POWER8NVL for clarity
+> ---
+>  drivers/vfio/pci/vfio_pci_nvlink2.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+
+Thanks, applies to vfio next branch for v5.11.
+
+Alex
+
+
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pci_nvlink2.c
+> index 65c61710c0e9..9adcf6a8f888 100644
+> --- a/drivers/vfio/pci/vfio_pci_nvlink2.c
+> +++ b/drivers/vfio/pci/vfio_pci_nvlink2.c
+> @@ -231,7 +231,7 @@ int vfio_pci_nvdia_v100_nvlink2_init(struct vfio_pci_device *vdev)
+>  		return -EINVAL;
 >  
-> -	printk("%s%s Hypervisor Maintenance interrupt [%s]\n",
-> -		level, sevstr,
-> -		hmi_evt->disposition == OpalHMI_DISPOSITION_RECOVERED ?
-> -		"Recovered" : "Not recovered");
-> -	error_info = hmi_evt->type < ARRAY_SIZE(hmi_error_types) ?
-> -			hmi_error_types[hmi_evt->type]
-> -			: "Unknown";
-> -	printk("%s Error detail: %s\n", level, error_info);
-> -	printk("%s	HMER: %016llx\n", level, be64_to_cpu(hmi_evt->hmer));
-> -	if ((hmi_evt->type == OpalHMI_ERROR_TFAC) ||
-> -		(hmi_evt->type == OpalHMI_ERROR_TFMR_PARITY))
-> -		printk("%s	TFMR: %016llx\n", level,
-> +	if (hmi_evt->severity != OpalHMI_SEV_NO_ERROR || printk_ratelimit()) {
-> +		printk("%s%s Hypervisor Maintenance interrupt [%s]\n",
-> +			level, sevstr,
-> +			hmi_evt->disposition == OpalHMI_DISPOSITION_RECOVERED ?
-> +			"Recovered" : "Not recovered");
-> +		error_info = hmi_evt->type < ARRAY_SIZE(hmi_error_types) ?
-> +				hmi_error_types[hmi_evt->type]
-> +				: "Unknown";
-> +		printk("%s Error detail: %s\n", level, error_info);
-> +		printk("%s	HMER: %016llx\n", level,
-> +					be64_to_cpu(hmi_evt->hmer));
-> +		if ((hmi_evt->type == OpalHMI_ERROR_TFAC) ||
-> +			(hmi_evt->type == OpalHMI_ERROR_TFMR_PARITY))
-> +			printk("%s	TFMR: %016llx\n", level,
->  						be64_to_cpu(hmi_evt->tfmr));
-> +	}
+>  	if (of_property_read_u32(npu_node, "memory-region", &mem_phandle))
+> -		return -EINVAL;
+> +		return -ENODEV;
+>  
+>  	mem_node = of_find_node_by_phandle(mem_phandle);
+>  	if (!mem_node)
+> @@ -393,7 +393,7 @@ int vfio_pci_ibm_npu2_init(struct vfio_pci_device *vdev)
+>  	int ret;
+>  	struct vfio_pci_npu2_data *data;
+>  	struct device_node *nvlink_dn;
+> -	u32 nvlink_index = 0;
+> +	u32 nvlink_index = 0, mem_phandle = 0;
+>  	struct pci_dev *npdev = vdev->pdev;
+>  	struct device_node *npu_node = pci_device_to_OF_node(npdev);
+>  	struct pci_controller *hose = pci_bus_to_host(npdev->bus);
+> @@ -408,6 +408,9 @@ int vfio_pci_ibm_npu2_init(struct vfio_pci_device *vdev)
+>  	if (!pnv_pci_get_gpu_dev(vdev->pdev))
+>  		return -ENODEV;
+>  
+> +	if (of_property_read_u32(npu_node, "memory-region", &mem_phandle))
+> +		return -ENODEV;
+> +
+>  	/*
+>  	 * NPU2 normally has 8 ATSD registers (for concurrency) and 6 links
+>  	 * so we can allocate one register per link, using nvlink index as
 
-Same comment RE printk_ratelimit(), I folded this in:
-
-diff --git a/arch/powerpc/platforms/powernv/opal-hmi.c b/arch/powerpc/platforms/powernv/opal-hmi.c
-index 959da6df0227..f0c1830deb51 100644
---- a/arch/powerpc/platforms/powernv/opal-hmi.c
-+++ b/arch/powerpc/platforms/powernv/opal-hmi.c
-@@ -213,6 +213,8 @@ static void print_hmi_event_info(struct OpalHMIEvent *hmi_evt)
- 		"A hypervisor resource error occurred",
- 		"CAPP recovery process is in progress",
- 	};
-+	static DEFINE_RATELIMIT_STATE(rs, DEFAULT_RATELIMIT_INTERVAL,
-+				      DEFAULT_RATELIMIT_BURST);
- 
- 	/* Print things out */
- 	if (hmi_evt->version < OpalHMIEvt_V1) {
-@@ -240,7 +242,7 @@ static void print_hmi_event_info(struct OpalHMIEvent *hmi_evt)
- 		break;
- 	}
- 
--	if (hmi_evt->severity != OpalHMI_SEV_NO_ERROR || printk_ratelimit()) {
-+	if (hmi_evt->severity != OpalHMI_SEV_NO_ERROR || __ratelimit(&rs)) {
- 		printk("%s%s Hypervisor Maintenance interrupt [%s]\n",
- 			level, sevstr,
- 			hmi_evt->disposition == OpalHMI_DISPOSITION_RECOVERED ?
-
-cheers
