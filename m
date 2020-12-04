@@ -2,43 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 375692CEDA6
-	for <lists+kvm-ppc@lfdr.de>; Fri,  4 Dec 2020 13:00:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02D982CF868
+	for <lists+kvm-ppc@lfdr.de>; Sat,  5 Dec 2020 02:02:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726988AbgLDMA0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 4 Dec 2020 07:00:26 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:50975 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726618AbgLDMA0 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 4 Dec 2020 07:00:26 -0500
-Received: by ozlabs.org (Postfix, from userid 1034)
-        id 4CnWTs3gD5z9sWn; Fri,  4 Dec 2020 22:59:45 +1100 (AEDT)
-From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, Mahesh Salgaonkar <mahesh@linux.ibm.com>
-In-Reply-To: <20201128070728.825934-1-npiggin@gmail.com>
-References: <20201128070728.825934-1-npiggin@gmail.com>
-Subject: Re: [PATCH 0/8] powerpc/64s: fix and improve machine check handling
-Message-Id: <160708314571.99163.1566766431664408141.b4-ty@ellerman.id.au>
-Date:   Fri,  4 Dec 2020 22:59:45 +1100 (AEDT)
+        id S1729421AbgLEAu4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 4 Dec 2020 19:50:56 -0500
+Received: from vsm-gw.hyogo-dai.ac.jp ([202.244.76.12]:54776 "EHLO
+        vsm-gw.hyogo-dai.ac.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726917AbgLEAu4 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 4 Dec 2020 19:50:56 -0500
+X-Greylist: delayed 14546 seconds by postgrey-1.27 at vger.kernel.org; Fri, 04 Dec 2020 19:50:55 EST
+Received: from humans-kc.hyogo-dai.ac.jp (humans-kc.hyogo-dai.ac.jp [202.244.77.11])
+        by vsm-gw.hyogo-dai.ac.jp (Postfix) with ESMTP id 0974C1A42A5;
+        Sat,  5 Dec 2020 04:47:18 +0900 (JST)
+Received: from humans-kc.hyogo-dai.ac.jp (humans-kc.hyogo-dai.ac.jp [127.0.0.1])
+        by postfix.imss71 (Postfix) with ESMTP id BB7CC6821C4;
+        Sat,  5 Dec 2020 04:47:17 +0900 (JST)
+Received: from hyogo-dai.ac.jp (unknown [202.244.77.11])
+        by humans-kc.hyogo-dai.ac.jp (Postfix) with SMTP id 8F456838858;
+        Sat,  5 Dec 2020 04:47:17 +0900 (JST)
+MIME-Version: 1.0
+Message-ID: <20201204194717.00003855.0847@hyogo-dai.ac.jp>
+Date:   Sat, 05 Dec 2020 04:47:17 +0900
+From:   "Dr.Raymond" <tabata@hyogo-dai.ac.jp>
+To:     <infocarferr1@aim.com>
+Reply-To: <infocarfer@aim.com>
+Subject: I am Vice Chairman of Hang Seng Bank, Dr. Raymond Chien
+         Kuo Fung I have Important Matter to Discuss with you concerning
+         my late client. Died without a NEXT OF KIN. Send me your private
+         email for full details information. 
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MAILER: Active! mail
+X-TM-AS-MML: disable
+X-TM-AS-Product-Ver: IMSS-7.1.0.1808-8.2.0.1013-25446.007
+X-TM-AS-Result: No--4.326-5.0-31-10
+X-imss-scan-details: No--4.326-5.0-31-10
+X-TM-AS-User-Approved-Sender: No
+X-TMASE-MatchedRID: +T4Z3mpR0x5ITndh1lLRASsOycAMAhSTkCM77ifYafsBLhz6t76Ce/bj
+        Enpjm61/Gf23dqZJjE4Erxo5p8V1/E1+zyfzlN7y/sToY2qzpx7w5nZ/qYg41XEWw1TkKAjcYff
+        qdBtG2ocgOkCKsW/kbuunGEBqPil++coAzulIP8gMTyJMXCOBhj9BWL7GG0LsKrauXd3MZDUZaR
+        NzIP3XI5u3uLPgwbAMH5RdHnhWfwyq9gpuf+A6coDeeVSgzszVDx5n520Z3eZyT7DDRtYlKaWBy
+        ZE9nSaC/rhfyjvqkZu/pNa4BidtZEMMprcbiest
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Sat, 28 Nov 2020 17:07:20 +1000, Nicholas Piggin wrote:
-> First patch is a nasty memory scribble introduced by me :( That
-> should go into fixes.
-> 
-> The next ones could wait for next merge window. They get things to the
-> point where misbehaving or buggy guest isn't so painful for the host,
-> and also get the guest SLB dumping code working (because the host no
-> longer clears them before delivering the MCE to the guest).
-> 
-> [...]
+infocarfer@aim.com
 
-Patch 1 applied to powerpc/fixes.
 
-[1/8] powerpc/64s/powernv: Fix memory corruption when saving SLB entries on MCE
-      https://git.kernel.org/powerpc/c/a1ee28117077c3bf24e5ab6324c835eaab629c45
 
-cheers
