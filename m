@@ -2,63 +2,227 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59E772D39A9
-	for <lists+kvm-ppc@lfdr.de>; Wed,  9 Dec 2020 05:38:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FC872D443E
+	for <lists+kvm-ppc@lfdr.de>; Wed,  9 Dec 2020 15:26:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727068AbgLIEhg (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 8 Dec 2020 23:37:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58168 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726303AbgLIEhg (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 8 Dec 2020 23:37:36 -0500
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB13BC0613CF;
-        Tue,  8 Dec 2020 20:36:55 -0800 (PST)
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4CrPQY6Dvbz9sWL; Wed,  9 Dec 2020 15:36:53 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1607488613; bh=4qK0Qeph9aujlXGIFVNGaEAyJsEJ75znCDH6aXQBnaQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=saNnipqailTWZYEW7o1ETFKqbdiCFVgtlrhAlbhLtiElZxzzwFEmnfrXPdhBgys+a
-         d0gWxSbTajAn5DXmA7bQthrlka5qpKKBNb0qzC5wHWZfEKW9R5UbkP/aeUOBiWnzOp
-         mvs92dvWGLufV0p3b/bsxctGKwxuID2zW33fh1P0aOnWWlSCPtJfzelfqljdkxhv5u
-         scToA9zMk+qWYvWTpaZH0dZi6DIN4IX7CmFf+0qa945U/7r7vAlCj75hxjI8ngjxPb
-         4UU3yHvWOQitK25dHPKpKMuTBleyugeZWWYLEbhnxOX1u40KESNUmiwjJsCS6u+f7/
-         6cz08KAshW+3Q==
-Date:   Wed, 9 Dec 2020 15:36:48 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-Cc:     mpe@ellerman.id.au, mikey@neuling.org, npiggin@gmail.com,
+        id S1732961AbgLIO0p (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 9 Dec 2020 09:26:45 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36358 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732623AbgLIO0o (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 9 Dec 2020 09:26:44 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B9E2Z77119171;
+        Wed, 9 Dec 2020 09:25:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=bqFwMxKIfvJ8bopMr1/KAEblJfpQ8B3u0rXvp6N6T20=;
+ b=A4yMV1J8BVScsnt00pSQd3hRPFOcSEr5TdOTGsHkrl9D4OIwCWDy7/WHHmdV7Ata5q4l
+ VXsafgpl+EEX/E6JT2TzBS5UyUREiTxM+RMrEcB2sLJJDEJDfEbnDd2TpMHh725QGmfV
+ ZYiW6WFxW/mcXrrky+G+T++1xmu+QSIGImVC8vqP4/wqJFO92eJ5qWAmvCqNI3DkQQZi
+ kIx/KquKWHgD/+bFUHjYlp1C6vJvWU7hiaAFHqWJr4oVWQhYUbZrQ1yn0aFgBH6opj6p
+ gGTamMtC4Lk+kXEjsbQs0bE3oM6yA0ZjBYQddD+siNQt2aUyjLwfMC7k8qKUpVa0vKL0 /A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35avmu7bs1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Dec 2020 09:25:31 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B9E2cBC119399;
+        Wed, 9 Dec 2020 09:25:30 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35avmu7br7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Dec 2020 09:25:30 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B9EMAJT022362;
+        Wed, 9 Dec 2020 14:25:29 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma02dal.us.ibm.com with ESMTP id 3581ua02gr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Dec 2020 14:25:29 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B9EPSNY9700036
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Dec 2020 14:25:28 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4925EBE054;
+        Wed,  9 Dec 2020 14:25:28 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7A097BE05A;
+        Wed,  9 Dec 2020 14:25:27 +0000 (GMT)
+Received: from localhost (unknown [9.211.134.143])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Wed,  9 Dec 2020 14:25:27 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>, mpe@ellerman.id.au,
+        paulus@samba.org
+Cc:     ravi.bangoria@linux.ibm.com, mikey@neuling.org, npiggin@gmail.com,
         leobras.c@gmail.com, pbonzini@redhat.com, christophe.leroy@c-s.fr,
         jniethe5@gmail.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
         linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v2 4/4] KVM: PPC: Introduce new capability for 2nd DAWR
-Message-ID: <20201209043648.GB29825@thinks.paulus.ozlabs.org>
-References: <20201124105953.39325-1-ravi.bangoria@linux.ibm.com>
- <20201124105953.39325-5-ravi.bangoria@linux.ibm.com>
+Subject: Re: [PATCH v2 1/4] KVM: PPC: Allow nested guest creation when L0 hv_guest_state > L1
+In-Reply-To: <20201124105953.39325-2-ravi.bangoria@linux.ibm.com>
+References: <20201124105953.39325-1-ravi.bangoria@linux.ibm.com> <20201124105953.39325-2-ravi.bangoria@linux.ibm.com>
+Date:   Wed, 09 Dec 2020 11:25:24 -0300
+Message-ID: <87r1nzgip7.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201124105953.39325-5-ravi.bangoria@linux.ibm.com>
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-09_11:2020-12-09,2020-12-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ spamscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
+ mlxscore=0 malwarescore=0 suspectscore=1 adultscore=0 clxscore=1011
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012090097
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Nov 24, 2020 at 04:29:53PM +0530, Ravi Bangoria wrote:
-> Introduce KVM_CAP_PPC_DAWR1 which can be used by Qemu to query whether
-> kvm supports 2nd DAWR or not.
+Ravi Bangoria <ravi.bangoria@linux.ibm.com> writes:
 
-This should be described in Documentation/virt/kvm/api.rst.
+> On powerpc, L1 hypervisor takes help of L0 using H_ENTER_NESTED
+> hcall to load L2 guest state in cpu. L1 hypervisor prepares the
+> L2 state in struct hv_guest_state and passes a pointer to it via
+> hcall. Using that pointer, L0 reads/writes that state directly
+> from/to L1 memory. Thus L0 must be aware of hv_guest_state layout
+> of L1. Currently it uses version field to achieve this. i.e. If
+> L0 hv_guest_state.version != L1 hv_guest_state.version, L0 won't
+> allow nested kvm guest.
+>
+> This restriction can be loosen up a bit. L0 can be taught to
+> understand older layout of hv_guest_state, if we restrict the
+> new member to be added only at the end. i.e. we can allow
+> nested guest even when L0 hv_guest_state.version > L1
+> hv_guest_state.version. Though, the other way around is not
+> possible.
+>
+> Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
 
-Strictly speaking, it should be a capability which is disabled by
-default, so the guest can only do the H_SET_MODE to set DAWR[X]1 if it
-has been explicitly permitted to do so by userspace (QEMU).  This is
-because we want as little as possible of the VM configuration to come
-from the host capabilities rather than from what userspace configures.
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 
-So what we really need here is for this to be a capability which can
-be queried by userspace to find out if it is possible, and then
-enabled by userspace if it wants.  See how KVM_CAP_PPC_NESTED_HV is
-handled for example.
-
-Paul.
+> ---
+>  arch/powerpc/include/asm/hvcall.h   | 17 +++++++--
+>  arch/powerpc/kvm/book3s_hv_nested.c | 53 ++++++++++++++++++++++++-----
+>  2 files changed, 59 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
+> index fbb377055471..a7073fddb657 100644
+> --- a/arch/powerpc/include/asm/hvcall.h
+> +++ b/arch/powerpc/include/asm/hvcall.h
+> @@ -524,9 +524,12 @@ struct h_cpu_char_result {
+>  	u64 behaviour;
+>  };
+>
+> -/* Register state for entering a nested guest with H_ENTER_NESTED */
+> +/*
+> + * Register state for entering a nested guest with H_ENTER_NESTED.
+> + * New member must be added at the end.
+> + */
+>  struct hv_guest_state {
+> -	u64 version;		/* version of this structure layout */
+> +	u64 version;		/* version of this structure layout, must be first */
+>  	u32 lpid;
+>  	u32 vcpu_token;
+>  	/* These registers are hypervisor privileged (at least for writing) */
+> @@ -560,6 +563,16 @@ struct hv_guest_state {
+>  /* Latest version of hv_guest_state structure */
+>  #define HV_GUEST_STATE_VERSION	1
+>
+> +static inline int hv_guest_state_size(unsigned int version)
+> +{
+> +	switch (version) {
+> +	case 1:
+> +		return offsetofend(struct hv_guest_state, ppr);
+> +	default:
+> +		return -1;
+> +	}
+> +}
+> +
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* __KERNEL__ */
+>  #endif /* _ASM_POWERPC_HVCALL_H */
+> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+> index 33b58549a9aa..2b433c3bacea 100644
+> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+> @@ -215,6 +215,45 @@ static void kvmhv_nested_mmio_needed(struct kvm_vcpu *vcpu, u64 regs_ptr)
+>  	}
+>  }
+>
+> +static int kvmhv_read_guest_state_and_regs(struct kvm_vcpu *vcpu,
+> +					   struct hv_guest_state *l2_hv,
+> +					   struct pt_regs *l2_regs,
+> +					   u64 hv_ptr, u64 regs_ptr)
+> +{
+> +	int size;
+> +
+> +	if (kvm_vcpu_read_guest(vcpu, hv_ptr, &(l2_hv->version),
+> +				sizeof(l2_hv->version)))
+> +		return -1;
+> +
+> +	if (kvmppc_need_byteswap(vcpu))
+> +		l2_hv->version = swab64(l2_hv->version);
+> +
+> +	size = hv_guest_state_size(l2_hv->version);
+> +	if (size < 0)
+> +		return -1;
+> +
+> +	return kvm_vcpu_read_guest(vcpu, hv_ptr, l2_hv, size) ||
+> +		kvm_vcpu_read_guest(vcpu, regs_ptr, l2_regs,
+> +				    sizeof(struct pt_regs));
+> +}
+> +
+> +static int kvmhv_write_guest_state_and_regs(struct kvm_vcpu *vcpu,
+> +					    struct hv_guest_state *l2_hv,
+> +					    struct pt_regs *l2_regs,
+> +					    u64 hv_ptr, u64 regs_ptr)
+> +{
+> +	int size;
+> +
+> +	size = hv_guest_state_size(l2_hv->version);
+> +	if (size < 0)
+> +		return -1;
+> +
+> +	return kvm_vcpu_write_guest(vcpu, hv_ptr, l2_hv, size) ||
+> +		kvm_vcpu_write_guest(vcpu, regs_ptr, l2_regs,
+> +				     sizeof(struct pt_regs));
+> +}
+> +
+>  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>  {
+>  	long int err, r;
+> @@ -235,17 +274,15 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>  	hv_ptr = kvmppc_get_gpr(vcpu, 4);
+>  	regs_ptr = kvmppc_get_gpr(vcpu, 5);
+>  	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> -	err = kvm_vcpu_read_guest(vcpu, hv_ptr, &l2_hv,
+> -				  sizeof(struct hv_guest_state)) ||
+> -		kvm_vcpu_read_guest(vcpu, regs_ptr, &l2_regs,
+> -				    sizeof(struct pt_regs));
+> +	err = kvmhv_read_guest_state_and_regs(vcpu, &l2_hv, &l2_regs,
+> +					      hv_ptr, regs_ptr);
+>  	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+>  	if (err)
+>  		return H_PARAMETER;
+>
+>  	if (kvmppc_need_byteswap(vcpu))
+>  		byteswap_hv_regs(&l2_hv);
+> -	if (l2_hv.version != HV_GUEST_STATE_VERSION)
+> +	if (l2_hv.version > HV_GUEST_STATE_VERSION)
+>  		return H_P2;
+>
+>  	if (kvmppc_need_byteswap(vcpu))
+> @@ -325,10 +362,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>  		byteswap_pt_regs(&l2_regs);
+>  	}
+>  	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> -	err = kvm_vcpu_write_guest(vcpu, hv_ptr, &l2_hv,
+> -				   sizeof(struct hv_guest_state)) ||
+> -		kvm_vcpu_write_guest(vcpu, regs_ptr, &l2_regs,
+> -				   sizeof(struct pt_regs));
+> +	err = kvmhv_write_guest_state_and_regs(vcpu, &l2_hv, &l2_regs,
+> +					       hv_ptr, regs_ptr);
+>  	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+>  	if (err)
+>  		return H_AUTHORITY;
