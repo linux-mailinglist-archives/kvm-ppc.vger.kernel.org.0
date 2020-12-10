@@ -2,227 +2,121 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FC872D443E
-	for <lists+kvm-ppc@lfdr.de>; Wed,  9 Dec 2020 15:26:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EED7E2D52CA
+	for <lists+kvm-ppc@lfdr.de>; Thu, 10 Dec 2020 05:26:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732961AbgLIO0p (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 9 Dec 2020 09:26:45 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36358 "EHLO
+        id S1730400AbgLJEZc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 9 Dec 2020 23:25:32 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28410 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732623AbgLIO0o (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 9 Dec 2020 09:26:44 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0B9E2Z77119171;
-        Wed, 9 Dec 2020 09:25:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=bqFwMxKIfvJ8bopMr1/KAEblJfpQ8B3u0rXvp6N6T20=;
- b=A4yMV1J8BVScsnt00pSQd3hRPFOcSEr5TdOTGsHkrl9D4OIwCWDy7/WHHmdV7Ata5q4l
- VXsafgpl+EEX/E6JT2TzBS5UyUREiTxM+RMrEcB2sLJJDEJDfEbnDd2TpMHh725QGmfV
- ZYiW6WFxW/mcXrrky+G+T++1xmu+QSIGImVC8vqP4/wqJFO92eJ5qWAmvCqNI3DkQQZi
- kIx/KquKWHgD/+bFUHjYlp1C6vJvWU7hiaAFHqWJr4oVWQhYUbZrQ1yn0aFgBH6opj6p
- gGTamMtC4Lk+kXEjsbQs0bE3oM6yA0ZjBYQddD+siNQt2aUyjLwfMC7k8qKUpVa0vKL0 /A== 
+        by vger.kernel.org with ESMTP id S1729536AbgLJEZU (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 9 Dec 2020 23:25:20 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BA42fFB099229;
+        Wed, 9 Dec 2020 23:24:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : reply-to : references : mime-version : content-type
+ : in-reply-to; s=pp1; bh=6VzA0bXuz72kczdUrPJE0gfgD0jew8ofGOPNyWUXFsY=;
+ b=KzVuWbSwzIVzAqPxQ0587O8EHKaUmJdZkysv6X6T/cpnDzEjOsMT8unyVRAOvGhvgOhp
+ FhkIX0nb4lHFuDkDNNBNMuz+BbkMUvx5s7GFvh8POfHBPcjCF0b7IBn02sNEIXYEDYGY
+ xB+P5CFoGKujN1alnrm12N/KrwHRGeK7t77nskgTxut3/3hWtetzN50XdEy3gNGtLlcO
+ ODObct6Pgv5p7gcIkLDvo9gntSh7ICKkAcHloMvwNIrcOhfFtKpABkkr1Usff37p2yaD
+ jwdPlHSyL6ITUXNkYL59wndKwlAy0Y2MqNE96v7Ia/T0PCmkAOVjTQ+FU22fIAuHuh+k Ig== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35avmu7bs1-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35b6b58t8d-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Dec 2020 09:25:31 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B9E2cBC119399;
-        Wed, 9 Dec 2020 09:25:30 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35avmu7br7-1
+        Wed, 09 Dec 2020 23:24:26 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BA42gRK099316;
+        Wed, 9 Dec 2020 23:24:26 -0500
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35b6b58t81-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Dec 2020 09:25:30 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0B9EMAJT022362;
-        Wed, 9 Dec 2020 14:25:29 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma02dal.us.ibm.com with ESMTP id 3581ua02gr-1
+        Wed, 09 Dec 2020 23:24:26 -0500
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BA4OOWf001404;
+        Thu, 10 Dec 2020 04:24:24 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06fra.de.ibm.com with ESMTP id 3581fhjrw8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Dec 2020 14:25:29 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0B9EPSNY9700036
+        Thu, 10 Dec 2020 04:24:24 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BA4OMFq23724468
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 9 Dec 2020 14:25:28 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4925EBE054;
-        Wed,  9 Dec 2020 14:25:28 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7A097BE05A;
-        Wed,  9 Dec 2020 14:25:27 +0000 (GMT)
-Received: from localhost (unknown [9.211.134.143])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Wed,  9 Dec 2020 14:25:27 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>, mpe@ellerman.id.au,
-        paulus@samba.org
-Cc:     ravi.bangoria@linux.ibm.com, mikey@neuling.org, npiggin@gmail.com,
-        leobras.c@gmail.com, pbonzini@redhat.com, christophe.leroy@c-s.fr,
-        jniethe5@gmail.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v2 1/4] KVM: PPC: Allow nested guest creation when L0 hv_guest_state > L1
-In-Reply-To: <20201124105953.39325-2-ravi.bangoria@linux.ibm.com>
-References: <20201124105953.39325-1-ravi.bangoria@linux.ibm.com> <20201124105953.39325-2-ravi.bangoria@linux.ibm.com>
-Date:   Wed, 09 Dec 2020 11:25:24 -0300
-Message-ID: <87r1nzgip7.fsf@linux.ibm.com>
+        Thu, 10 Dec 2020 04:24:22 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 029CFA404D;
+        Thu, 10 Dec 2020 04:24:22 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A4D22A4053;
+        Thu, 10 Dec 2020 04:24:20 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.77.203.190])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 10 Dec 2020 04:24:20 +0000 (GMT)
+Date:   Thu, 10 Dec 2020 09:54:18 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com, mpe@ellerman.id.au,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v1 1/2] KVM: PPC: Book3S HV: Add support for
+ H_RPT_INVALIDATE (nested case only)
+Message-ID: <20201210042418.GA775394@in.ibm.com>
+Reply-To: bharata@linux.ibm.com
+References: <20201019112642.53016-1-bharata@linux.ibm.com>
+ <20201019112642.53016-2-bharata@linux.ibm.com>
+ <20201209041542.GA29825@thinks.paulus.ozlabs.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201209041542.GA29825@thinks.paulus.ozlabs.org>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-09_11:2020-12-09,2020-12-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- spamscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- mlxscore=0 malwarescore=0 suspectscore=1 adultscore=0 clxscore=1011
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012090097
+ definitions=2020-12-10_01:2020-12-09,2020-12-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 phishscore=0 suspectscore=1 adultscore=0 clxscore=1015
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012100023
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Ravi Bangoria <ravi.bangoria@linux.ibm.com> writes:
+On Wed, Dec 09, 2020 at 03:15:42PM +1100, Paul Mackerras wrote:
+> On Mon, Oct 19, 2020 at 04:56:41PM +0530, Bharata B Rao wrote:
+> > Implements H_RPT_INVALIDATE hcall and supports only nested case
+> > currently.
+> > 
+> > A KVM capability KVM_CAP_RPT_INVALIDATE is added to indicate the
+> > support for this hcall.
+> 
+> I have a couple of questions about this patch:
+> 
+> 1. Is this something that is useful today, or is it something that may
+> become useful in the future depending on future product plans? In
+> other words, what advantage is there to forcing L2 guests to use this
+> hcall instead of doing tlbie themselves?
 
-> On powerpc, L1 hypervisor takes help of L0 using H_ENTER_NESTED
-> hcall to load L2 guest state in cpu. L1 hypervisor prepares the
-> L2 state in struct hv_guest_state and passes a pointer to it via
-> hcall. Using that pointer, L0 reads/writes that state directly
-> from/to L1 memory. Thus L0 must be aware of hv_guest_state layout
-> of L1. Currently it uses version field to achieve this. i.e. If
-> L0 hv_guest_state.version != L1 hv_guest_state.version, L0 won't
-> allow nested kvm guest.
->
-> This restriction can be loosen up a bit. L0 can be taught to
-> understand older layout of hv_guest_state, if we restrict the
-> new member to be added only at the end. i.e. we can allow
-> nested guest even when L0 hv_guest_state.version > L1
-> hv_guest_state.version. Though, the other way around is not
-> possible.
->
-> Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+H_RPT_INVALIDATE will replace the use of the existing H_TLB_INVALIDATE
+for nested partition scoped invalidations. Implementations that want to
+off-load invalidations to the host (when GTSE=0) would have to bother
+about only one hcall (H_RPT_INVALIDATE)
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+> 
+> 2. Why does it need to be added to the default-enabled hcall list?
+> 
+> There is a concern that if this is enabled by default we could get the
+> situation where a guest using it gets migrated to a host that doesn't
+> support it, which would be bad.  That is the reason that all new
+> things like this are disabled by default and only enabled by userspace
+> (i.e. QEMU) in situations where we can enforce that it is available on
+> all hosts to which the VM might be migrated.
 
-> ---
->  arch/powerpc/include/asm/hvcall.h   | 17 +++++++--
->  arch/powerpc/kvm/book3s_hv_nested.c | 53 ++++++++++++++++++++++++-----
->  2 files changed, 59 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
-> index fbb377055471..a7073fddb657 100644
-> --- a/arch/powerpc/include/asm/hvcall.h
-> +++ b/arch/powerpc/include/asm/hvcall.h
-> @@ -524,9 +524,12 @@ struct h_cpu_char_result {
->  	u64 behaviour;
->  };
->
-> -/* Register state for entering a nested guest with H_ENTER_NESTED */
-> +/*
-> + * Register state for entering a nested guest with H_ENTER_NESTED.
-> + * New member must be added at the end.
-> + */
->  struct hv_guest_state {
-> -	u64 version;		/* version of this structure layout */
-> +	u64 version;		/* version of this structure layout, must be first */
->  	u32 lpid;
->  	u32 vcpu_token;
->  	/* These registers are hypervisor privileged (at least for writing) */
-> @@ -560,6 +563,16 @@ struct hv_guest_state {
->  /* Latest version of hv_guest_state structure */
->  #define HV_GUEST_STATE_VERSION	1
->
-> +static inline int hv_guest_state_size(unsigned int version)
-> +{
-> +	switch (version) {
-> +	case 1:
-> +		return offsetofend(struct hv_guest_state, ppr);
-> +	default:
-> +		return -1;
-> +	}
-> +}
-> +
->  #endif /* __ASSEMBLY__ */
->  #endif /* __KERNEL__ */
->  #endif /* _ASM_POWERPC_HVCALL_H */
-> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-> index 33b58549a9aa..2b433c3bacea 100644
-> --- a/arch/powerpc/kvm/book3s_hv_nested.c
-> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
-> @@ -215,6 +215,45 @@ static void kvmhv_nested_mmio_needed(struct kvm_vcpu *vcpu, u64 regs_ptr)
->  	}
->  }
->
-> +static int kvmhv_read_guest_state_and_regs(struct kvm_vcpu *vcpu,
-> +					   struct hv_guest_state *l2_hv,
-> +					   struct pt_regs *l2_regs,
-> +					   u64 hv_ptr, u64 regs_ptr)
-> +{
-> +	int size;
-> +
-> +	if (kvm_vcpu_read_guest(vcpu, hv_ptr, &(l2_hv->version),
-> +				sizeof(l2_hv->version)))
-> +		return -1;
-> +
-> +	if (kvmppc_need_byteswap(vcpu))
-> +		l2_hv->version = swab64(l2_hv->version);
-> +
-> +	size = hv_guest_state_size(l2_hv->version);
-> +	if (size < 0)
-> +		return -1;
-> +
-> +	return kvm_vcpu_read_guest(vcpu, hv_ptr, l2_hv, size) ||
-> +		kvm_vcpu_read_guest(vcpu, regs_ptr, l2_regs,
-> +				    sizeof(struct pt_regs));
-> +}
-> +
-> +static int kvmhv_write_guest_state_and_regs(struct kvm_vcpu *vcpu,
-> +					    struct hv_guest_state *l2_hv,
-> +					    struct pt_regs *l2_regs,
-> +					    u64 hv_ptr, u64 regs_ptr)
-> +{
-> +	int size;
-> +
-> +	size = hv_guest_state_size(l2_hv->version);
-> +	if (size < 0)
-> +		return -1;
-> +
-> +	return kvm_vcpu_write_guest(vcpu, hv_ptr, l2_hv, size) ||
-> +		kvm_vcpu_write_guest(vcpu, regs_ptr, l2_regs,
-> +				     sizeof(struct pt_regs));
-> +}
-> +
->  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->  {
->  	long int err, r;
-> @@ -235,17 +274,15 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->  	hv_ptr = kvmppc_get_gpr(vcpu, 4);
->  	regs_ptr = kvmppc_get_gpr(vcpu, 5);
->  	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-> -	err = kvm_vcpu_read_guest(vcpu, hv_ptr, &l2_hv,
-> -				  sizeof(struct hv_guest_state)) ||
-> -		kvm_vcpu_read_guest(vcpu, regs_ptr, &l2_regs,
-> -				    sizeof(struct pt_regs));
-> +	err = kvmhv_read_guest_state_and_regs(vcpu, &l2_hv, &l2_regs,
-> +					      hv_ptr, regs_ptr);
->  	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
->  	if (err)
->  		return H_PARAMETER;
->
->  	if (kvmppc_need_byteswap(vcpu))
->  		byteswap_hv_regs(&l2_hv);
-> -	if (l2_hv.version != HV_GUEST_STATE_VERSION)
-> +	if (l2_hv.version > HV_GUEST_STATE_VERSION)
->  		return H_P2;
->
->  	if (kvmppc_need_byteswap(vcpu))
-> @@ -325,10 +362,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->  		byteswap_pt_regs(&l2_regs);
->  	}
->  	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-> -	err = kvm_vcpu_write_guest(vcpu, hv_ptr, &l2_hv,
-> -				   sizeof(struct hv_guest_state)) ||
-> -		kvm_vcpu_write_guest(vcpu, regs_ptr, &l2_regs,
-> -				   sizeof(struct pt_regs));
-> +	err = kvmhv_write_guest_state_and_regs(vcpu, &l2_hv, &l2_regs,
-> +					       hv_ptr, regs_ptr);
->  	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
->  	if (err)
->  		return H_AUTHORITY;
+As you suggested privately, I am thinking of falling back to
+H_TLB_INVALIDATE in case where this new hcall fails due to not being
+present. That should address the migration case that you mention
+above. With that and leaving the new hcall enabled by default
+is good okay?
+
+Regards,
+Bharata.
