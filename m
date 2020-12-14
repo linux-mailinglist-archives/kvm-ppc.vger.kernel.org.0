@@ -2,107 +2,159 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A9DF2D73FB
-	for <lists+kvm-ppc@lfdr.de>; Fri, 11 Dec 2020 11:36:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD2A32D9483
+	for <lists+kvm-ppc@lfdr.de>; Mon, 14 Dec 2020 10:02:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388682AbgLKKej (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 11 Dec 2020 05:34:39 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7450 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727680AbgLKKeg (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 11 Dec 2020 05:34:36 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BBA5ceg036311;
-        Fri, 11 Dec 2020 05:33:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : reply-to : references : mime-version : content-type
- : in-reply-to; s=pp1; bh=KgLxMkEJ8BV3d0OFbuBTbEdL+9Q4/ypB1NhM9lOYIYI=;
- b=d9NHIH1qYqoNfB1Ywo7QR5QEI4iOJ1gssX6NDVyrG9i9WgizOQLfPXcg6nQ+sIl5xnL6
- Ucj8z/LzdvW+LFDoF+q7st9H+/anSUqTA9lafXyXzW7NQMez2EmShbC0H8CtuN4xzIyq
- /SCVBVw01y2aCeW33QxPy/Kmvd2uRpEx+0urhboOtFzf+WD0F8CfI+YW62XKYxkQgSxU
- VG1p7yk9fxMcn4e9kB/X0CNdMuWZuEbhPY77Cc+ENyL51lfPTPXFYFCu+8+R6EJy0qRe
- j9RmzaqYDvuZYAX+QmsVUrIYS2e7Z5e0QhP8/LPB0INVSGBlKmQ0HnrPOmT0YzxUk1t0 bw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35c6cwh3cx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Dec 2020 05:33:48 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BBA5m8q036580;
-        Fri, 11 Dec 2020 05:33:47 -0500
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35c6cwh3ak-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Dec 2020 05:33:47 -0500
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BBATj5T028822;
-        Fri, 11 Dec 2020 10:33:42 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 35958q2nj2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Dec 2020 10:33:42 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BBAXeS960162482
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Dec 2020 10:33:40 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EEA65AE055;
-        Fri, 11 Dec 2020 10:33:39 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A57A1AE045;
-        Fri, 11 Dec 2020 10:33:38 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.199.57.136])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 11 Dec 2020 10:33:38 +0000 (GMT)
-Date:   Fri, 11 Dec 2020 16:03:36 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
-        mpe@ellerman.id.au, david@gibson.dropbear.id.au
+        id S2439514AbgLNJB4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 14 Dec 2020 04:01:56 -0500
+Received: from ozlabs.org ([203.11.71.1]:56971 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2439362AbgLNJBp (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 14 Dec 2020 04:01:45 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4Cvb300NFhz9sVH; Mon, 14 Dec 2020 20:01:00 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1607936460;
+        bh=EWK5ufuz4FP5W6Ymw5LZtDR8Jv1KQzNATVIdOo2ntYs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hrwQ1VFjSksSS8mHr+sV/9TLUjTbwT8g4t34lM3JdZg72tVLwf67eT9sYfQO7wwE8
+         j6dkyRZpF9UF6KNiGLAI5wNsTYTwOCwTv01bD0kX7zaWYhsEMu/jCI7gldl21CB46o
+         hTVWxZczUdCCe5xJL7RccRVQ0LWxgqnc4UIAqxgI=
+Date:   Mon, 14 Dec 2020 17:05:01 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     Bharata B Rao <bharata@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, aneesh.kumar@linux.ibm.com,
+        npiggin@gmail.com, mpe@ellerman.id.au
 Subject: Re: [PATCH v1 1/2] KVM: PPC: Book3S HV: Add support for
  H_RPT_INVALIDATE (nested case only)
-Message-ID: <20201211103336.GB775394@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
+Message-ID: <20201214060501.GG4717@yekko.fritz.box>
 References: <20201019112642.53016-1-bharata@linux.ibm.com>
  <20201019112642.53016-2-bharata@linux.ibm.com>
+ <20201209041542.GA29825@thinks.paulus.ozlabs.org>
+ <20201210042418.GA775394@in.ibm.com>
+ <20201211011639.GD4874@yekko.fritz.box>
+ <20201211052744.GB69862@thinks.paulus.ozlabs.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Zrag5V6pnZGjLKiw"
 Content-Disposition: inline
-In-Reply-To: <20201019112642.53016-2-bharata@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-11_01:2020-12-09,2020-12-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- malwarescore=0 phishscore=0 lowpriorityscore=0 suspectscore=1 adultscore=0
- bulkscore=0 spamscore=0 mlxlogscore=999 priorityscore=1501 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012110061
+In-Reply-To: <20201211052744.GB69862@thinks.paulus.ozlabs.org>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Oct 19, 2020 at 04:56:41PM +0530, Bharata B Rao wrote:
-> Implements H_RPT_INVALIDATE hcall and supports only nested case
-> currently.
-> 
-> A KVM capability KVM_CAP_RPT_INVALIDATE is added to indicate the
-> support for this hcall.
 
-As Paul mentioned in the thread, this hcall does both process scoped
-invalidations and partition scoped invalidations for L2 guest.
-I am adding KVM_CAP_RPT_INVALIDATE capability with only partition
-scoped invalidations (nested case) implemented in the hcall as we
-don't see the need for KVM to implement process scoped invalidation
-function as KVM may never run with LPCR[GTSE]=0.
+--Zrag5V6pnZGjLKiw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I am wondering if enabling the capability with only partial
-implementation of the hcall is the correct thing to do. In future
-if we ever want process scoped invalidations support in this hcall,
-we may not be able to differentiate the availability of two functions
-cleanly from QEMU.
+On Fri, Dec 11, 2020 at 04:27:44PM +1100, Paul Mackerras wrote:
+> On Fri, Dec 11, 2020 at 12:16:39PM +1100, David Gibson wrote:
+> > On Thu, Dec 10, 2020 at 09:54:18AM +0530, Bharata B Rao wrote:
+> > > On Wed, Dec 09, 2020 at 03:15:42PM +1100, Paul Mackerras wrote:
+> > > > On Mon, Oct 19, 2020 at 04:56:41PM +0530, Bharata B Rao wrote:
+> > > > > Implements H_RPT_INVALIDATE hcall and supports only nested case
+> > > > > currently.
+> > > > >=20
+> > > > > A KVM capability KVM_CAP_RPT_INVALIDATE is added to indicate the
+> > > > > support for this hcall.
+> > > >=20
+> > > > I have a couple of questions about this patch:
+> > > >=20
+> > > > 1. Is this something that is useful today, or is it something that =
+may
+> > > > become useful in the future depending on future product plans? In
+> > > > other words, what advantage is there to forcing L2 guests to use th=
+is
+> > > > hcall instead of doing tlbie themselves?
+> > >=20
+> > > H_RPT_INVALIDATE will replace the use of the existing H_TLB_INVALIDATE
+> > > for nested partition scoped invalidations. Implementations that want =
+to
+> > > off-load invalidations to the host (when GTSE=3D0) would have to both=
+er
+> > > about only one hcall (H_RPT_INVALIDATE)
+> > >=20
+> > > >=20
+> > > > 2. Why does it need to be added to the default-enabled hcall list?
+> > > >=20
+> > > > There is a concern that if this is enabled by default we could get =
+the
+> > > > situation where a guest using it gets migrated to a host that doesn=
+'t
+> > > > support it, which would be bad.  That is the reason that all new
+> > > > things like this are disabled by default and only enabled by usersp=
+ace
+> > > > (i.e. QEMU) in situations where we can enforce that it is available=
+ on
+> > > > all hosts to which the VM might be migrated.
+> > >=20
+> > > As you suggested privately, I am thinking of falling back to
+> > > H_TLB_INVALIDATE in case where this new hcall fails due to not being
+> > > present. That should address the migration case that you mention
+> > > above. With that and leaving the new hcall enabled by default
+> > > is good okay?
+> >=20
+> > No.  Assuming that guests will have some fallback is not how the qemu
+> > migration compatibility model works.  If we specify an old machine
+> > type, we need to provide the same environment that the older host
+> > would have.
+>=20
+> I misunderstood what this patchset is about when I first looked at
+> it.  H_RPT_INVALIDATE has two separate functions; one is to do
+> process-scoped invalidations for a guest when LPCR[GTSE] =3D 0 (i.e.,
+> when the guest is not permitted to do tlbie itself), and the other is
+> to do partition-scoped invalidations that an L1 hypervisor needs to do
+> on behalf of an L2 guest.  The second function is a replacement and
+> standardization of the existing H_TLB_INVALIDATE which was introduced
+> with the nested virtualization code (using a hypercall number from the
+> platform-specific range).
+>=20
+> This patchset only implements the second function, not the first.  The
+> first function remains unimplemented in KVM at present.
+>=20
+> Given that QEMU will need changes for a guest to be able to exploit
+> H_RPT_INVALIDATE (at a minimum, adding a device tree property), it
+> doesn't seem onerous for QEMU to have to enable the hcall with
+> KVM_CAP_PPC_ENABLE_HCALL.  I think that the control on whether the
+> hcall is handled in KVM along with the control on nested hypervisor
+> function provides adequate control for QEMU without needing a writable
+> capability.  The read-only capability to say whether the hcall exists
+> does seem useful.
+>=20
+> Given all that, I'm veering towards taking Bharata's patchset pretty
+> much as-is, minus the addition of H_RPT_INVALIDATE to the
+> default-enabled set.
 
-So does it make sense to implement the process scoped invalidation
-function also now itself even if it is not going to be used in
-KVM?
+Yes, that's fine.  I was only the suggestion that it be on the
+default-enabled set I was objecting to.
 
-Regards,
-Bharata.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Zrag5V6pnZGjLKiw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl/XAI0ACgkQbDjKyiDZ
+s5IoUg/+NY1jDO3XnNiZuVwR0Vx2mCKGspEcgUoy0gPeISCvAWyu1C47ow4TLmus
+F9+izHyCsppnm2fNTY1fo2EGSzzAh3ctQUHaQ4DaaezrjwJlWRaanXwcQJ7bG3eA
+cDbxbMMt4BzQHMANubYVFq1bGOaYRCu1jRgFwxzE22paR1sxBeOcW9TtMUNBleTL
+GU53msMgxuYa+dMI9VpsN52VahqUDYuZQF5JKOsx/0zXcOou9UWRFA0nuRG/d05j
+HsTOpxP8W9ASKxk37D/qanc1DqgVqCyLB7v+JWTEF5dYlhMTYUINCplyOqgJwh0W
+whXdkmPxPeVRZWrZj4oxi+ULVq7Hcr1nKUQpFs8ne3nBQwROL6EACRvu8teUnbcH
+Tj/jKyTwYP9nCCYH1/KgA9wcaociqL1THWLFrztLETIptXTTl3Rvh/B0kYF0k10G
+6ZzrWZkbnUFzVUXD6doymym+XYEFew7FRILXw2G68Ow1x9DLBtlikOriL1DCaJnY
+ZO+afgHQ7Zeu2M+ooU9Rph/2Ack459oDa6GlZgxVnNRve9W43kg3nF6/xY+94HGV
+BgfiiBjiy6nuqIfIturxMXg5BxqAIhTOsU1doF6hkpt+OWXeDuua15kNmqumlmTO
+ENuLEsuhjXvgtFqak3kjDrUbPzGB3DJd8PsZx70JBVPayeNED08=
+=ph5k
+-----END PGP SIGNATURE-----
+
+--Zrag5V6pnZGjLKiw--
