@@ -2,176 +2,134 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 034282DBD22
-	for <lists+kvm-ppc@lfdr.de>; Wed, 16 Dec 2020 09:56:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 711DC2DBEE9
+	for <lists+kvm-ppc@lfdr.de>; Wed, 16 Dec 2020 11:45:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725858AbgLPIzu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 16 Dec 2020 03:55:50 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15898 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725819AbgLPIzu (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 16 Dec 2020 03:55:50 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BG8Uxik184704;
-        Wed, 16 Dec 2020 03:55:00 -0500
+        id S1726273AbgLPKoc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 16 Dec 2020 05:44:32 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55098 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726288AbgLPKob (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 16 Dec 2020 05:44:31 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BGAVUGp074045;
+        Wed, 16 Dec 2020 05:43:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=MDNA3xJ3VTEjr15P6WUJ09S2CQjeygx6FB8Un2JkJtE=;
- b=fbVbEC/ar5eYyqPw+FiwGpzbGcohvCTzz3pcCyE2IP/ImvJEOqYkV5gJxMgaBGc71OPV
- PpzshxqKUHrd5zK1xunssXi3r8z0hLFcJ/oCeW/npoahQtctDzwtYrjAHUOFO55aK7zp
- t91LLXhiU+2ycBkpryb9BxB+5oVlqd39Z3mJZ4J1yVvyQOGlJ1Hv2fVtB7ldLdBxQrlm
- LS7YzKRWbURycIEaAJDPCzEwY3xnF4vn68a6rvwQVUSiS/anaDNEwZZGd1YsOiUlYe8p
- Q1n2XH2PejQ3doVoQ7P+R3u5awjyOFTarfj0FDoFfahQ5/oeG28qDUx/yZw3QWSfC7hL 4Q== 
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=sTi5ENDvNYn/Nu6cWCNyjnsbtTWHyVrZRsMwWRoJwmY=;
+ b=fWdZdtSr52y3gdyvh7hsCHrC5li8W4aI7388ehhNFlT4btNADdIxDgn9AigPkrJHYV/r
+ 3HS01300rQjpv3DlzEdTiCBOZ+ugLOsl5LQAKG3UCAUBNPVG3WuFTBKP4RrivtamUp68
+ inPZgmNdOtaS8pVhiZBZNjWt5Cax78gR3sNlS7HsivDGbkwiyYPH1YB7Xs8V7/62AjPy
+ IksFq4HHWB4k0a4aw1FpOGAJVo1TTpxnsh44cPSSrsNRH4jo79Hwq2J5k3ZwoiavqTpu
+ ThmSUNkYMhN3LHvx5bQv8E9eHs0Omazti0j2VCKJ1zKVAY9IFieyU0XKizK1VINLEQPc lA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35fa98f7my-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35ff7k2p3u-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Dec 2020 03:55:00 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BG8VLnI187150;
-        Wed, 16 Dec 2020 03:55:00 -0500
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35fa98f7mm-1
+        Wed, 16 Dec 2020 05:43:16 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BGAVZHu074484;
+        Wed, 16 Dec 2020 05:43:15 -0500
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35ff7k2p36-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Dec 2020 03:54:59 -0500
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BG8rORt017450;
-        Wed, 16 Dec 2020 08:54:58 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 35cng8e31u-1
+        Wed, 16 Dec 2020 05:43:15 -0500
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BGAhE7P011329;
+        Wed, 16 Dec 2020 10:43:14 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 35cng8a66n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Dec 2020 08:54:58 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BG8stML33227154
+        Wed, 16 Dec 2020 10:43:13 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BGAhBKf29557034
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Dec 2020 08:54:55 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2D7B34203F;
-        Wed, 16 Dec 2020 08:54:55 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 951A242047;
-        Wed, 16 Dec 2020 08:54:53 +0000 (GMT)
-Received: from bharata.ibmuc.com (unknown [9.85.116.220])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 16 Dec 2020 08:54:53 +0000 (GMT)
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
-        mpe@ellerman.id.au, david@gibson.dropbear.id.au,
-        Bharata B Rao <bharata@linux.ibm.com>
-Subject: [PATCH v2 2/2] KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in nested KVM
-Date:   Wed, 16 Dec 2020 14:24:47 +0530
-Message-Id: <20201216085447.1265433-3-bharata@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201216085447.1265433-1-bharata@linux.ibm.com>
-References: <20201216085447.1265433-1-bharata@linux.ibm.com>
+        Wed, 16 Dec 2020 10:43:11 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8DF7E11C052;
+        Wed, 16 Dec 2020 10:43:11 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 62C7D11C05C;
+        Wed, 16 Dec 2020 10:43:08 +0000 (GMT)
+Received: from bangoria.ibmuc.com (unknown [9.199.41.249])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Dec 2020 10:43:08 +0000 (GMT)
+From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+To:     mpe@ellerman.id.au, paulus@samba.org
+Cc:     ravi.bangoria@linux.ibm.com, mikey@neuling.org, npiggin@gmail.com,
+        leobras.c@gmail.com, pbonzini@redhat.com, christophe.leroy@c-s.fr,
+        jniethe5@gmail.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v3 0/4] KVM: PPC: Power10 2nd DAWR enablement
+Date:   Wed, 16 Dec 2020 16:12:15 +0530
+Message-Id: <20201216104219.458713-1-ravi.bangoria@linux.ibm.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-16_02:2020-12-15,2020-12-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 phishscore=0 spamscore=0 priorityscore=1501 mlxscore=0
- malwarescore=0 mlxlogscore=999 clxscore=1015 impostorscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012160051
+ definitions=2020-12-16_04:2020-12-15,2020-12-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 mlxlogscore=966 adultscore=0 spamscore=0 mlxscore=0
+ malwarescore=0 priorityscore=1501 phishscore=0 bulkscore=0 impostorscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012160063
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-In the nested KVM case, replace H_TLB_INVALIDATE by the new hcall
-H_RPT_INVALIDATE if available. The availability of this hcall
-is determined from "hcall-rpt-invalidate" string in ibm,hypertas-functions
-DT property.
+Enable p10 2nd DAWR feature for Book3S kvm guest. DAWR is a hypervisor
+resource and thus H_SET_MODE hcall is used to set/unset it. A new case
+H_SET_MODE_RESOURCE_SET_DAWR1 is introduced in H_SET_MODE hcall for
+setting/unsetting 2nd DAWR. Also, new capability KVM_CAP_PPC_DAWR1 has
+been added to query 2nd DAWR support via kvm ioctl.
 
-Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_64_mmu_radix.c | 27 +++++++++++++++++++++-----
- arch/powerpc/kvm/book3s_hv_nested.c    | 12 ++++++++++--
- 2 files changed, 32 insertions(+), 7 deletions(-)
+This feature also needs to be enabled in Qemu to really use it. I'll
+post Qemu patches once kvm patches get accepted.
 
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index bb35490400e9..7ea5459022cb 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -21,6 +21,7 @@
- #include <asm/pte-walk.h>
- #include <asm/ultravisor.h>
- #include <asm/kvm_book3s_uvmem.h>
-+#include <asm/plpar_wrappers.h>
- 
- /*
-  * Supported radix tree geometry.
-@@ -318,9 +319,19 @@ void kvmppc_radix_tlbie_page(struct kvm *kvm, unsigned long addr,
- 	}
- 
- 	psi = shift_to_mmu_psize(pshift);
--	rb = addr | (mmu_get_ap(psi) << PPC_BITLSHIFT(58));
--	rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(0, 0, 1),
--				lpid, rb);
-+
-+	if (!firmware_has_feature(FW_FEATURE_RPT_INVALIDATE)) {
-+		rb = addr | (mmu_get_ap(psi) << PPC_BITLSHIFT(58));
-+		rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(0, 0, 1),
-+					lpid, rb);
-+	} else {
-+		rc = pseries_rpt_invalidate(lpid, H_RPTI_TARGET_CMMU,
-+					    H_RPTI_TYPE_NESTED |
-+					    H_RPTI_TYPE_TLB,
-+					    psize_to_rpti_pgsize(psi),
-+					    addr, addr + psize);
-+	}
-+
- 	if (rc)
- 		pr_err("KVM: TLB page invalidation hcall failed, rc=%ld\n", rc);
- }
-@@ -334,8 +345,14 @@ static void kvmppc_radix_flush_pwc(struct kvm *kvm, unsigned int lpid)
- 		return;
- 	}
- 
--	rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(1, 0, 1),
--				lpid, TLBIEL_INVAL_SET_LPID);
-+	if (!firmware_has_feature(FW_FEATURE_RPT_INVALIDATE))
-+		rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(1, 0, 1),
-+					lpid, TLBIEL_INVAL_SET_LPID);
-+	else
-+		rc = pseries_rpt_invalidate(lpid, H_RPTI_TARGET_CMMU,
-+					    H_RPTI_TYPE_NESTED |
-+					    H_RPTI_TYPE_PWC, H_RPTI_PAGE_ALL,
-+					    0, -1UL);
- 	if (rc)
- 		pr_err("KVM: TLB PWC invalidation hcall failed, rc=%ld\n", rc);
- }
-diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-index a54ba4b1d4a7..9dc694288757 100644
---- a/arch/powerpc/kvm/book3s_hv_nested.c
-+++ b/arch/powerpc/kvm/book3s_hv_nested.c
-@@ -19,6 +19,7 @@
- #include <asm/pgalloc.h>
- #include <asm/pte-walk.h>
- #include <asm/reg.h>
-+#include <asm/plpar_wrappers.h>
- 
- static struct patb_entry *pseries_partition_tb;
- 
-@@ -402,8 +403,15 @@ static void kvmhv_flush_lpid(unsigned int lpid)
- 		return;
- 	}
- 
--	rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(2, 0, 1),
--				lpid, TLBIEL_INVAL_SET_LPID);
-+	if (!firmware_has_feature(FW_FEATURE_RPT_INVALIDATE))
-+		rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(2, 0, 1),
-+					lpid, TLBIEL_INVAL_SET_LPID);
-+	else
-+		rc = pseries_rpt_invalidate(lpid, H_RPTI_TARGET_CMMU,
-+					    H_RPTI_TYPE_NESTED |
-+					    H_RPTI_TYPE_TLB | H_RPTI_TYPE_PWC |
-+					    H_RPTI_TYPE_PAT,
-+					    H_RPTI_PAGE_ALL, 0, -1UL);
- 	if (rc)
- 		pr_err("KVM: TLB LPID invalidation hcall failed, rc=%ld\n", rc);
- }
+v2: https://lore.kernel.org/kvm/20201124105953.39325-1-ravi.bangoria@linux.ibm.com
+
+v2->v3:
+ - Patch #1. If L0 version > L1, L0 hv_guest_state will contain some
+   additional fields which won't be filled while reading from L1
+   memory and thus they can contain garbage. Initialize l2_hv with 0s
+   to avoid such situations.
+ - Patch #3. Introduce per vm flag dawr1_enabled.
+ - Patch #4. Instead of auto enabling KVM_CAP_PPC_DAWR1, let user check
+   and enable it manually. Also move KVM_CAP_PPC_DAWR1 check / enable
+   logic inside #if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE).
+ - Explain KVM_CAP_PPC_DAWR1 in Documentation/virt/kvm/api.rst 
+ - Rebased on top of 5.10-rc3.
+
+v1->v2:
+ - patch #1: New patch
+ - patch #2: Don't rename KVM_REG_PPC_DAWR, it's an uapi macro
+ - patch #3: Increment HV_GUEST_STATE_VERSION
+ - Split kvm and selftests patches into different series
+ - Patches rebased to paulus/kvm-ppc-next (cf59eb13e151) + few
+   other watchpoint patches which are yet to be merged in
+   paulus/kvm-ppc-next.
+
+Ravi Bangoria (4):
+  KVM: PPC: Allow nested guest creation when L0 hv_guest_state > L1
+  KVM: PPC: Rename current DAWR macros and variables
+  KVM: PPC: Add infrastructure to support 2nd DAWR
+  KVM: PPC: Introduce new capability for 2nd DAWR
+
+ Documentation/virt/kvm/api.rst            | 12 ++++
+ arch/powerpc/include/asm/hvcall.h         | 25 ++++++-
+ arch/powerpc/include/asm/kvm_host.h       |  7 +-
+ arch/powerpc/include/asm/kvm_ppc.h        |  1 +
+ arch/powerpc/include/uapi/asm/kvm.h       |  2 +
+ arch/powerpc/kernel/asm-offsets.c         |  6 +-
+ arch/powerpc/kvm/book3s_hv.c              | 79 +++++++++++++++++++----
+ arch/powerpc/kvm/book3s_hv_nested.c       | 70 ++++++++++++++++----
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 43 +++++++++---
+ arch/powerpc/kvm/powerpc.c                | 10 +++
+ include/uapi/linux/kvm.h                  |  1 +
+ tools/arch/powerpc/include/uapi/asm/kvm.h |  2 +
+ tools/include/uapi/linux/kvm.h            |  1 +
+ 13 files changed, 216 insertions(+), 43 deletions(-)
+
 -- 
 2.26.2
 
