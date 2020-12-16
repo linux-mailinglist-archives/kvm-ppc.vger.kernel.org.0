@@ -2,56 +2,177 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD3392DA613
-	for <lists+kvm-ppc@lfdr.de>; Tue, 15 Dec 2020 03:17:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 077F72DBD28
+	for <lists+kvm-ppc@lfdr.de>; Wed, 16 Dec 2020 09:57:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbgLOCQh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 14 Dec 2020 21:16:37 -0500
-Received: from ozlabs.org ([203.11.71.1]:49669 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726266AbgLOCQc (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 14 Dec 2020 21:16:32 -0500
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4Cw20x5ZWFz9sRR; Tue, 15 Dec 2020 13:15:45 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1607998545; bh=HIoL3hYia/VL0H8kxL6qHX8RQtpD9XmN0+Gy2vsT9c0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=a1eIbgUR8izZ8apPi6OAsVBqalg61msyq1wD1KLkArhkC7vAdmdAS17cb/B+XGiWp
-         jnZ6skMXJvFPwVxQq2KWtYBYNCjp+ZdBVksqX/q+xu/6IcPTL+DGNa0lQK9QX9KpMd
-         eHLkop+Fe+3aemWoK7rxsXDWTBAMk70i53x0QzNnkfPsj7+iE+QRjKRDLMk/zVLlWR
-         dPrVU8f7K6tz7iljIYbmoKtqSGc8DVZPqx+kryU/lV8eI1m1OL9oAyasRL9N6ibJF3
-         NjtCVm4ByCnE/nASHWNADKGa3k/ogFFdYirxOzRfsPCop290p0shx2iF0WTPCqkfn8
-         FJNGj5C+s9XOw==
-Date:   Tue, 15 Dec 2020 13:15:23 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Leonardo Bras <leobras.c@gmail.com>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] powerpc/kvm: Fix mask size for emulated msgsndp
-Message-ID: <20201215021523.GC2441086@thinks.paulus.ozlabs.org>
-References: <20201208215707.31149-1-leobras.c@gmail.com>
+        id S1726132AbgLPI5D (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 16 Dec 2020 03:57:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59202 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725819AbgLPI5D (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 16 Dec 2020 03:57:03 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BG8Ux4b184793;
+        Wed, 16 Dec 2020 03:56:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=diY0OnzX0DLJXGQaVUrqXiIPoD58kEfGJHBpjnGGW9A=;
+ b=ocBFD4LQm6JG8GMt4uvajlZU16/dbyRz88rm2bbGw4raPQEp4QZUgQ9Y3UY6FgCFdHkX
+ f6geVn7hTl1F75CrNNaH7HrERJpO9SYg5T1Z0mdWF+qTWapald38zIJAsIFyGlkoL+Jj
+ 7qQ1rDTADVIWoRhYiBX70UrpOzdeeGPzrabXtf1VXK168fzsM8ZlP6yXDiNf3wAJLmWn
+ z+A/QLbmNLkPP6drqjEChfgW4F2Ey0EYNsdFP7WqcvheHXZ+H2eCwFU0PUOGIfnPW1km
+ 9CD7Fr1Q1BfNHFSTtq33j4gQHGVgv5Co3cwMVQRF7gHGi+Vc1kP59zLb3rUv+obc3JgU LA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35fa98f8kj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 03:56:11 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BG8cgQx040846;
+        Wed, 16 Dec 2020 03:56:11 -0500
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35fa98f8jk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 03:56:11 -0500
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BG8rAf2017409;
+        Wed, 16 Dec 2020 08:56:09 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03fra.de.ibm.com with ESMTP id 35cng8e32y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Dec 2020 08:56:09 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BG8spGB22413650
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Dec 2020 08:54:51 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 65A6042041;
+        Wed, 16 Dec 2020 08:54:51 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CC6114204B;
+        Wed, 16 Dec 2020 08:54:49 +0000 (GMT)
+Received: from bharata.ibmuc.com (unknown [9.85.116.220])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Dec 2020 08:54:49 +0000 (GMT)
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
+        mpe@ellerman.id.au, david@gibson.dropbear.id.au,
+        Bharata B Rao <bharata@linux.ibm.com>
+Subject: [PATCH v2 0/2] Support for H_RPT_INVALIDATE in PowerPC KVM
+Date:   Wed, 16 Dec 2020 14:24:45 +0530
+Message-Id: <20201216085447.1265433-1-bharata@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201208215707.31149-1-leobras.c@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-16_02:2020-12-15,2020-12-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 phishscore=0 spamscore=0 priorityscore=1501 mlxscore=0
+ malwarescore=0 mlxlogscore=999 clxscore=1015 impostorscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012160051
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Dec 08, 2020 at 06:57:08PM -0300, Leonardo Bras wrote:
-> According to ISAv3.1 and ISAv3.0b, the msgsndp is described to split RB in:
-> msgtype <- (RB) 32:36
-> payload <- (RB) 37:63
-> t       <- (RB) 57:63
-> 
-> The current way of getting 'msgtype', and 't' is missing their MSB:
-> msgtype: ((arg >> 27) & 0xf) : Gets (RB) 33:36, missing bit 32
-> t:       (arg &= 0x3f)       : Gets (RB) 58:63, missing bit 57
-> 
-> Fixes this by applying the correct mask.
-> 
-> Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
+This patchset adds support for the new hcall H_RPT_INVALIDATE
+and replaces the nested tlb flush calls with this new hcall
+if support for the same exists.
 
-Acked-by: Paul Mackerras <paulus@ozlabs.org>
+Changes in v2:
+-------------
+- Not enabling the hcall by default now, userspace can enable it when
+  required.
+- Added implementation for process-scoped invalidations in the hcall.
+
+v1: https://lore.kernel.org/linuxppc-dev/20201019112642.53016-1-bharata@linux.ibm.com/T/#t
+
+H_RPT_INVALIDATE
+================
+Syntax:
+int64   /* H_Success: Return code on successful completion */
+        /* H_Busy - repeat the call with the same */
+        /* H_Parameter, H_P2, H_P3, H_P4, H_P5 : Invalid parameters */
+        hcall(const uint64 H_RPT_INVALIDATE, /* Invalidate RPT translation lookaside information */
+              uint64 pid,       /* PID/LPID to invalidate */
+              uint64 target,    /* Invalidation target */
+              uint64 type,      /* Type of lookaside information */
+              uint64 pageSizes,     /* Page sizes */
+              uint64 start,     /* Start of Effective Address (EA) range (inclusive) */
+              uint64 end)       /* End of EA range (exclusive) */
+
+Invalidation targets (target)
+-----------------------------
+Core MMU        0x01 /* All virtual processors in the partition */
+Core local MMU  0x02 /* Current virtual processor */
+Nest MMU        0x04 /* All nest/accelerator agents in use by the partition */
+
+A combination of the above can be specified, except core and core local.
+
+Type of translation to invalidate (type)
+---------------------------------------
+NESTED       0x0001  /* Invalidate nested guest partition-scope */
+TLB          0x0002  /* Invalidate TLB */
+PWC          0x0004  /* Invalidate Page Walk Cache */
+PRT          0x0008  /* Invalidate Process Table Entries if NESTED is clear */
+PAT          0x0008  /* Invalidate Partition Table Entries if NESTED is set */
+
+A combination of the above can be specified.
+
+Page size mask (pageSizes)
+--------------------------
+4K              0x01
+64K             0x02
+2M              0x04
+1G              0x08
+All sizes       (-1UL)
+
+A combination of the above can be specified.
+All page sizes can be selected with -1.
+
+Semantics: Invalidate radix tree lookaside information
+           matching the parameters given.
+* Return H_P2, H_P3 or H_P4 if target, type, or pageSizes parameters are
+  different from the defined values.
+* Return H_PARAMETER if NESTED is set and pid is not a valid nested
+  LPID allocated to this partition
+* Return H_P5 if (start, end) doesn't form a valid range. Start and end
+  should be a valid Quadrant address and  end > start.
+* Return H_NotSupported if the partition is not in running in radix
+  translation mode.
+* May invalidate more translation information than requested.
+* If start = 0 and end = -1, set the range to cover all valid addresses.
+  Else start and end should be aligned to 4kB (lower 11 bits clear).
+* If NESTED is clear, then invalidate process scoped lookaside information.
+  Else pid specifies a nested LPID, and the invalidation is performed
+  on nested guest partition table and nested guest partition scope real
+  addresses.
+* If pid = 0 and NESTED is clear, then valid addresses are quadrant 3 and
+  quadrant 0 spaces, Else valid addresses are quadrant 0.
+* Pages which are fully covered by the range are to be invalidated.
+  Those which are partially covered are considered outside invalidation
+  range, which allows a caller to optimally invalidate ranges that may
+  contain mixed page sizes.
+* Return H_SUCCESS on success.
+
+Bharata B Rao (2):
+  KVM: PPC: Book3S HV: Add support for H_RPT_INVALIDATE
+  KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in nested KVM
+
+ Documentation/virt/kvm/api.rst                |  17 +++
+ .../include/asm/book3s/64/tlbflush-radix.h    |  18 +++
+ arch/powerpc/include/asm/kvm_book3s.h         |   3 +
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        |  27 +++-
+ arch/powerpc/kvm/book3s_hv.c                  | 121 ++++++++++++++++++
+ arch/powerpc/kvm/book3s_hv_nested.c           | 106 ++++++++++++++-
+ arch/powerpc/kvm/powerpc.c                    |   3 +
+ arch/powerpc/mm/book3s64/radix_tlb.c          |   4 -
+ include/uapi/linux/kvm.h                      |   1 +
+ 9 files changed, 289 insertions(+), 11 deletions(-)
+
+-- 
+2.26.2
+
