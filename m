@@ -2,214 +2,194 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A92682DBEEE
-	for <lists+kvm-ppc@lfdr.de>; Wed, 16 Dec 2020 11:45:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FBF02DCB80
+	for <lists+kvm-ppc@lfdr.de>; Thu, 17 Dec 2020 04:56:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726338AbgLPKod (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 16 Dec 2020 05:44:33 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28420 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725562AbgLPKoc (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 16 Dec 2020 05:44:32 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BGAX7dL056766;
-        Wed, 16 Dec 2020 05:43:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=3tnHLPjh9qpDIqfh7R6GMQ3xavAW0IZ7Ihe8oP/GnlE=;
- b=DfzmxFdjFM7ks0MTchkSLecgU2jy3hKORQu3qDRuM3aCr1fRB4lSMG/mL9k7WKDR4acT
- KrDNDE9upRWJ+2V70EMAzWaqvbzt6ZQ5A90SY31yJtGU/9mtDUHUvXXxERZV/iz9WPBQ
- RgzeZt62mWkaRfjqK8WV0/J01+jJIbaFhGkpNfyW/OXOZAbcy/jN1PY02/iVNvaLK5yz
- gTPup1g1EgTj2o7qKyoRB7sRGwlL3D2q1qno4DpUuOSCHmBLgLcpBHWjz4s3kmwu1Hcj
- 8nhBlI27D4UPk989lrc96LuhqZ8oqpP9kwY36wXyI0JeDE87Iaskv1OGJwEMglyyvq9+ 7w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35fe53md6x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Dec 2020 05:43:30 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BGAXa8d058460;
-        Wed, 16 Dec 2020 05:43:30 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35fe53md64-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Dec 2020 05:43:29 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BGAghOt016789;
-        Wed, 16 Dec 2020 10:43:27 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 35cng846en-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Dec 2020 10:43:27 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BGAhPOt18612528
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Dec 2020 10:43:25 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 94C6711C052;
-        Wed, 16 Dec 2020 10:43:25 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 895C311C04C;
-        Wed, 16 Dec 2020 10:43:22 +0000 (GMT)
-Received: from bangoria.ibmuc.com (unknown [9.199.41.249])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 16 Dec 2020 10:43:22 +0000 (GMT)
-From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-To:     mpe@ellerman.id.au, paulus@samba.org
-Cc:     ravi.bangoria@linux.ibm.com, mikey@neuling.org, npiggin@gmail.com,
-        leobras.c@gmail.com, pbonzini@redhat.com, christophe.leroy@c-s.fr,
-        jniethe5@gmail.com, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v3 4/4] KVM: PPC: Introduce new capability for 2nd DAWR
-Date:   Wed, 16 Dec 2020 16:12:19 +0530
-Message-Id: <20201216104219.458713-5-ravi.bangoria@linux.ibm.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201216104219.458713-1-ravi.bangoria@linux.ibm.com>
-References: <20201216104219.458713-1-ravi.bangoria@linux.ibm.com>
+        id S1727351AbgLQD4F (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 16 Dec 2020 22:56:05 -0500
+Received: from ozlabs.org ([203.11.71.1]:54025 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727115AbgLQD4F (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 16 Dec 2020 22:56:05 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4CxJ6y0MzKz9sTK; Thu, 17 Dec 2020 14:55:21 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1608177322;
+        bh=cvgT7gwiMUPIhgMBd9kg9Hf6iDUYg9kOAYSlr1+qXUU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AnZ2uWwWKqUVXSWLWJsrGGFWu/L0y3N9fFj/Fa0d2kdB8zS8/+T63tbyQD0q/CBHP
+         M0qTYdswJ3Xejgcw37hgTBt4o+bUFYVMp273QhyZsbX/cIpoHyhSUMo1B8bYqfn42l
+         Ur/bMRvKY+AXCWj5710xJyqNv9AumpfnEAAp0umg=
+Date:   Thu, 17 Dec 2020 14:33:35 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Bharata B Rao <bharata@linux.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
+        mpe@ellerman.id.au
+Subject: Re: [PATCH v2 0/2] Support for H_RPT_INVALIDATE in PowerPC KVM
+Message-ID: <20201217033335.GD310465@yekko.fritz.box>
+References: <20201216085447.1265433-1-bharata@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2020-12-16_04:2020-12-15,2020-12-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- mlxscore=0 lowpriorityscore=0 mlxlogscore=999 suspectscore=0
- impostorscore=0 bulkscore=0 phishscore=0 priorityscore=1501 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012160067
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="d01dLTUuW90fS44H"
+Content-Disposition: inline
+In-Reply-To: <20201216085447.1265433-1-bharata@linux.ibm.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Introduce KVM_CAP_PPC_DAWR1 which can be used by Qemu to query whether
-kvm supports 2nd DAWR or not. The capability is by default disabled
-even when the underlying CPU supports 2nd DAWR. Qemu needs to check
-and enable it manually to use the feature.
 
-Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
----
- Documentation/virt/kvm/api.rst     | 10 ++++++++++
- arch/powerpc/include/asm/kvm_ppc.h |  1 +
- arch/powerpc/kvm/book3s_hv.c       | 12 ++++++++++++
- arch/powerpc/kvm/powerpc.c         | 10 ++++++++++
- include/uapi/linux/kvm.h           |  1 +
- tools/include/uapi/linux/kvm.h     |  1 +
- 6 files changed, 35 insertions(+)
+--d01dLTUuW90fS44H
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index abb24575bdf9..049f07ebf197 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6016,6 +6016,16 @@ KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR exit notifications which user space
- can then handle to implement model specific MSR handling and/or user notifications
- to inform a user that an MSR was not handled.
- 
-+7.22 KVM_CAP_PPC_DAWR1
-+----------------------
-+
-+:Architectures: ppc
-+:Parameters: none
-+:Returns: 0 on success, -EINVAL when CPU doesn't support 2nd DAWR
-+
-+This capability can be used to check / enable 2nd DAWR feature provided
-+by POWER10 processor.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index 0a056c64c317..13c39d24dda5 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -314,6 +314,7 @@ struct kvmppc_ops {
- 			      int size);
- 	int (*enable_svm)(struct kvm *kvm);
- 	int (*svm_off)(struct kvm *kvm);
-+	int (*enable_dawr1)(struct kvm *kvm);
- };
- 
- extern struct kvmppc_ops *kvmppc_hv_ops;
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index b7a30c0692a7..04c02344bd3f 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -5625,6 +5625,17 @@ static int kvmhv_svm_off(struct kvm *kvm)
- 	return ret;
- }
- 
-+static int kvmhv_enable_dawr1(struct kvm *kvm)
-+{
-+	if (!cpu_has_feature(CPU_FTR_DAWR1))
-+		return -ENODEV;
-+
-+	/* kvm == NULL means the caller is testing if the capability exists */
-+	if (kvm)
-+		kvm->arch.dawr1_enabled = true;
-+	return 0;
-+}
-+
- static struct kvmppc_ops kvm_ops_hv = {
- 	.get_sregs = kvm_arch_vcpu_ioctl_get_sregs_hv,
- 	.set_sregs = kvm_arch_vcpu_ioctl_set_sregs_hv,
-@@ -5668,6 +5679,7 @@ static struct kvmppc_ops kvm_ops_hv = {
- 	.store_to_eaddr = kvmhv_store_to_eaddr,
- 	.enable_svm = kvmhv_enable_svm,
- 	.svm_off = kvmhv_svm_off,
-+	.enable_dawr1 = kvmhv_enable_dawr1,
- };
- 
- static int kvm_init_subcore_bitmap(void)
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 13999123b735..380656528b5b 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -678,6 +678,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = hv_enabled && kvmppc_hv_ops->enable_svm &&
- 			!kvmppc_hv_ops->enable_svm(NULL);
- 		break;
-+	case KVM_CAP_PPC_DAWR1:
-+		r = !!(hv_enabled && kvmppc_hv_ops->enable_dawr1 &&
-+		       !kvmppc_hv_ops->enable_dawr1(NULL));
-+		break;
- #endif
- 	default:
- 		r = 0;
-@@ -2187,6 +2191,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			break;
- 		r = kvm->arch.kvm_ops->enable_svm(kvm);
- 		break;
-+	case KVM_CAP_PPC_DAWR1:
-+		r = -EINVAL;
-+		if (!is_kvmppc_hv_enabled(kvm) || !kvm->arch.kvm_ops->enable_dawr1)
-+			break;
-+		r = kvm->arch.kvm_ops->enable_dawr1(kvm);
-+		break;
- #endif
- 	default:
- 		r = -EINVAL;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index ca41220b40b8..f1210f99a52d 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1053,6 +1053,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_X86_USER_SPACE_MSR 188
- #define KVM_CAP_X86_MSR_FILTER 189
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
-+#define KVM_CAP_PPC_DAWR1 191
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index ca41220b40b8..f1210f99a52d 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -1053,6 +1053,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_X86_USER_SPACE_MSR 188
- #define KVM_CAP_X86_MSR_FILTER 189
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
-+#define KVM_CAP_PPC_DAWR1 191
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.26.2
+On Wed, Dec 16, 2020 at 02:24:45PM +0530, Bharata B Rao wrote:
+> This patchset adds support for the new hcall H_RPT_INVALIDATE
+> and replaces the nested tlb flush calls with this new hcall
+> if support for the same exists.
+>=20
+> Changes in v2:
+> -------------
+> - Not enabling the hcall by default now, userspace can enable it when
+>   required.
+> - Added implementation for process-scoped invalidations in the hcall.
+>=20
+> v1: https://lore.kernel.org/linuxppc-dev/20201019112642.53016-1-bharata@l=
+inux.ibm.com/T/#t
+>=20
+> H_RPT_INVALIDATE
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Syntax:
+> int64=A0=A0 /* H_Success: Return code on successful completion */
+> =A0=A0=A0=A0=A0=A0=A0 /* H_Busy - repeat the call with the same */
+> =A0=A0=A0=A0=A0=A0=A0 /* H_Parameter, H_P2, H_P3, H_P4, H_P5 : Invalid pa=
+rameters */
+> =A0=A0=A0=A0=A0=A0=A0 hcall(const uint64 H_RPT_INVALIDATE, /* Invalidate =
+RPT translation lookaside information */
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64 pid,=A0=A0=A0=A0=A0=A0 /* =
+PID/LPID to invalidate */
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64 target,=A0=A0=A0 /* Invali=
+dation target */
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64 type,=A0=A0=A0=A0=A0 /* Ty=
+pe of lookaside information */
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64 pageSizes,=A0=A0=A0=A0 /* =
+Page sizes */
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64 start,=A0=A0=A0=A0 /* Star=
+t of Effective Address (EA) range (inclusive) */
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64 end)=A0=A0=A0=A0=A0=A0 /* =
+End of EA range (exclusive) */
+>=20
+> Invalidation targets (target)
+> -----------------------------
+> Core MMU=A0=A0=A0=A0=A0=A0=A0 0x01 /* All virtual processors in the parti=
+tion */
+> Core local MMU=A0 0x02 /* Current virtual processor */
+> Nest MMU=A0=A0=A0=A0=A0=A0=A0 0x04 /* All nest/accelerator agents in use =
+by the partition */
+>=20
+> A combination of the above can be specified, except core and core local.
+>=20
+> Type of translation to invalidate (type)
+> ---------------------------------------
+> NESTED=A0=A0=A0=A0=A0=A0 0x0001=A0 /* Invalidate nested guest partition-s=
+cope */
+> TLB=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x0002=A0 /* Invalidate TLB */
+> PWC=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x0004=A0 /* Invalidate Page Walk Cache =
+*/
+> PRT=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x0008=A0 /* Invalidate Process Table En=
+tries if NESTED is clear */
+> PAT=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x0008=A0 /* Invalidate Partition Table =
+Entries=A0if NESTED is set */
+>=20
+> A combination of the above can be specified.
+>=20
+> Page size mask (pageSizes)
+> --------------------------
+> 4K=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 0x01
+> 64K=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 0x02
+> 2M=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 0x04
+> 1G=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 0x08
+> All sizes=A0=A0=A0=A0=A0=A0 (-1UL)
 
+PAPR really has a real talent for tying its own shoelaces together.
+They could have just made the bit for each pagesize be... the size of
+the page, but why use something obviously extensible to any future
+pagesizes when we can make it both less flexible and more complicated
+to deal with.  Sigh.
+
+>=20
+> A combination of the above can be specified.
+> All page sizes can be selected with -1.
+>=20
+> Semantics: Invalidate radix tree lookaside information
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 matching the parameters given.
+> * Return H_P2, H_P3 or H_P4 if target, type, or pageSizes parameters are
+> =A0 different from the defined values.
+> * Return H_PARAMETER if NESTED is set and pid is not a valid nested
+>   LPID allocated to this partition
+> * Return H_P5 if (start, end) doesn't form a valid range. Start and end
+>   should be a valid Quadrant address and=A0 end > start.
+> * Return H_NotSupported if the partition is not in running in radix
+>   translation mode.
+> * May invalidate more translation information than requested.
+> * If start =3D 0 and end =3D -1, set the range to cover all valid address=
+es.
+> =A0 Else start and end should be aligned to 4kB (lower 11 bits clear).
+> * If NESTED is clear, then invalidate process scoped lookaside informatio=
+n.
+> =A0 Else pid specifies a nested LPID, and the invalidation is performed
+> =A0 on nested guest partition table and nested guest partition scope real
+>   addresses.
+> * If pid =3D 0 and NESTED is clear, then valid addresses are quadrant 3 a=
+nd
+> =A0 quadrant 0 spaces, Else valid addresses are quadrant 0.
+> * Pages which are fully covered by the range are to be invalidated.
+> =A0 Those which are partially covered are considered outside invalidation
+> =A0 range, which allows a caller to optimally invalidate ranges that may
+> =A0 contain mixed page sizes.
+> * Return H_SUCCESS on success.
+>=20
+> Bharata B Rao (2):
+>   KVM: PPC: Book3S HV: Add support for H_RPT_INVALIDATE
+>   KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in nested KVM
+>=20
+>  Documentation/virt/kvm/api.rst                |  17 +++
+>  .../include/asm/book3s/64/tlbflush-radix.h    |  18 +++
+>  arch/powerpc/include/asm/kvm_book3s.h         |   3 +
+>  arch/powerpc/kvm/book3s_64_mmu_radix.c        |  27 +++-
+>  arch/powerpc/kvm/book3s_hv.c                  | 121 ++++++++++++++++++
+>  arch/powerpc/kvm/book3s_hv_nested.c           | 106 ++++++++++++++-
+>  arch/powerpc/kvm/powerpc.c                    |   3 +
+>  arch/powerpc/mm/book3s64/radix_tlb.c          |   4 -
+>  include/uapi/linux/kvm.h                      |   1 +
+>  9 files changed, 289 insertions(+), 11 deletions(-)
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--d01dLTUuW90fS44H
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl/a0Y0ACgkQbDjKyiDZ
+s5IY3g//RYfZQj7oWfCOGQ+WiPvmXzedSNgcem45g35yyy7rO/PITIkfIpRQYfcJ
+C28T90418pE5b6bqIsFwkWrWhVUye3htZv51A41LItymTEFwsN7TA60BByMEHkw5
+SFromcnxg6hWw07vrYP9YPUBcDyDNk/b53kbEQ34x0Rb04X9/jRcQfP7mh8lRthN
+cJUpzrtunAlEsHRdWrkZgSlVEOf9jgnrDAjsf0jrnVTjEydt9EQRlcz3/xrDgXOi
+N71adhtfOVYin8nEEIGhBfdDt04LrLhh/bS/AxGtsNUKEf/XUZUqS0I4gowjPrDA
+Wkp3iZf08fTHJ9BBT+FIAjSvTkak58z8CUw2fLQLNTsX1MgwbtiY9FfvvNfh/u+9
+0lWobO3uA7CGVXPAmPNefk7wYtVh8NVUWRPgcqZVpk1h+C0dmuve9tuXnjySi1SC
+JVwYtGPHtg9gLgkCZ6WGF6o226++Kpf60qZR1bdrUYmyJNYL8sUi8LFRSdF6+5B+
+hKqhlwlsoqhoT7wcfyWnRmmjcqGw30Z4dlu7wN/FR0FaC2/B7HtHNocByDDuB/9V
+PChVQGKhrMcJhnNmVK1/fXvgtpxw8Y2QgXQ0/I87T6F7LCZNuDjXOq8DnDpDNWQO
+Hywz9usBXeRjl19j91LWQ7fvJgmrKgepUeSR2l7pO9PMdjf4UpY=
+=weEp
+-----END PGP SIGNATURE-----
+
+--d01dLTUuW90fS44H--
