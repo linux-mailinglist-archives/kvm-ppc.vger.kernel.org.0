@@ -2,393 +2,177 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58B492E357E
-	for <lists+kvm-ppc@lfdr.de>; Mon, 28 Dec 2020 10:30:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B0822EA6FC
+	for <lists+kvm-ppc@lfdr.de>; Tue,  5 Jan 2021 10:07:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726548AbgL1JaV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 28 Dec 2020 04:30:21 -0500
-Received: from ozlabs.org ([203.11.71.1]:46001 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726509AbgL1JaV (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 28 Dec 2020 04:30:21 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4D4C1Y2N7jz9sW8; Mon, 28 Dec 2020 20:29:37 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1609147777;
-        bh=8A/a80aMSVI1J6qMz+x23Z7MlE9J/dHR1C8PKR0mx7g=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ACnzM7EBLzvIRbjra1YNBVRqPCA6uKsh8ZLirYDRaPPkQACyCtEi5cDH12E0M4QJV
-         zEVOGz//eOYTvJvHONwUP2Mt5WkWO0U8GoubhOQZQRY/aHT3yF8WkzQdRBsj+nKTMT
-         rpGsx00eourdncSSSJfLn7GMxqFHhqrywMhCquoQ=
-Date:   Mon, 28 Dec 2020 19:38:00 +1100
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Greg Kurz <groug@kaod.org>
-Cc:     Shivaprasad G Bhat <sbhat@linux.ibm.com>,
-        xiaoguangrong.eric@gmail.com, mst@redhat.com, imammedo@redhat.com,
-        qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
-        linux-nvdimm@lists.01.org, aneesh.kumar@linux.ibm.com,
-        kvm-ppc@vger.kernel.org, shivaprasadbhat@gmail.com,
-        bharata@linux.vnet.ibm.com, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [RFC Qemu PATCH v2 1/2] spapr: drc: Add support for async hcalls
- at the drc level
-Message-ID: <20201228083800.GN6952@yekko.fritz.box>
-References: <160674929554.2492771.17651548703390170573.stgit@lep8c.aus.stglabs.ibm.com>
- <160674938210.2492771.1728601884822491679.stgit@lep8c.aus.stglabs.ibm.com>
- <20201221130853.15c8ddfd@bahia.lan>
+        id S1727657AbhAEJHC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 5 Jan 2021 04:07:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55760 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727853AbhAEJHB (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 5 Jan 2021 04:07:01 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 105939Ti084924;
+        Tue, 5 Jan 2021 04:06:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=HgJe+yqDdb3Jo5VtP0tndt5ruTe/QZbrILC3yqC7gJE=;
+ b=Dd9otjl66jTQiOlrw42NGGwEQHPl64k16zVaBjsO5U71rSs8y7qMgTCvhzi0X5ZThbNw
+ /TwIJCK/cDo2Vjt9Sb2FX3ZsqWbMwlwYCcYxgqFpDSHnNAGXohbhbLl52w+ABZ4h9zUo
+ l86UJqLIpOguGxfYDvIS90Z9zs39QYuhZARdBHQpwLIclgc4A/cMN7+KeQbv4fYCBmaR
+ 3RWzqNF+nY1vZiTTyzoSBAP31kiKqQIol3L2gbhTpVeJ0XEmppnwrK5wDJoor/sco2+E
+ Sp9IqVu25VfeGOkl/R9I9ckb+4TdKG2lsHFGUNk/KR6Du9gV8Q37bIZtB036P8Ssr6Fl dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35vmm80v54-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Jan 2021 04:06:10 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10593FMF085471;
+        Tue, 5 Jan 2021 04:06:10 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35vmm80v48-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Jan 2021 04:06:09 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10592Gml015818;
+        Tue, 5 Jan 2021 09:06:07 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 35tg3haqk3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Jan 2021 09:06:07 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 105964FQ32178518
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 Jan 2021 09:06:05 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D810342047;
+        Tue,  5 Jan 2021 09:06:04 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3ECBF4204B;
+        Tue,  5 Jan 2021 09:06:03 +0000 (GMT)
+Received: from bharata.ibmuc.com (unknown [9.102.0.65])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  5 Jan 2021 09:06:03 +0000 (GMT)
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
+        mpe@ellerman.id.au, david@gibson.dropbear.id.au,
+        farosas@linux.ibm.com, Bharata B Rao <bharata@linux.ibm.com>
+Subject: [PATCH v3 0/2] Support for H_RPT_INVALIDATE in PowerPC KVM
+Date:   Tue,  5 Jan 2021 14:35:55 +0530
+Message-Id: <20210105090557.2150104-1-bharata@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="nRwNdQxTdQ7rZk9A"
-Content-Disposition: inline
-In-Reply-To: <20201221130853.15c8ddfd@bahia.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-05_01:2021-01-04,2021-01-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
+ lowpriorityscore=0 spamscore=0 impostorscore=0 bulkscore=0 phishscore=0
+ mlxscore=0 mlxlogscore=999 adultscore=0 clxscore=1015 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101050052
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+This patchset adds support for the new hcall H_RPT_INVALIDATE
+and replaces the nested tlb flush calls with this new hcall
+if support for the same exists.
 
---nRwNdQxTdQ7rZk9A
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Changes in v3:
+-------------
+- Reused the tlb flush routines from radix_tlb.c
+- Ensured fixups are take care of due to the above change.
+ 
+v2: https://lore.kernel.org/linuxppc-dev/20201217033335.GD310465@yekko.fritz.box/T/#t
 
-On Mon, Dec 21, 2020 at 01:08:53PM +0100, Greg Kurz wrote:
-> Hi Shiva,
->=20
-> On Mon, 30 Nov 2020 09:16:39 -0600
-> Shivaprasad G Bhat <sbhat@linux.ibm.com> wrote:
->=20
-> > The patch adds support for async hcalls at the DRC level for the
-> > spapr devices. To be used by spapr-scm devices in the patch/es to follo=
-w.
-> >=20
-> > Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-> > ---
->=20
-> The overall idea looks good but I think you should consider using
-> a thread pool to implement it. See below.
+H_RPT_INVALIDATE
+================
+Syntax:
+int64   /* H_Success: Return code on successful completion */
+        /* H_Busy - repeat the call with the same */
+        /* H_Parameter, H_P2, H_P3, H_P4, H_P5 : Invalid parameters */
+        hcall(const uint64 H_RPT_INVALIDATE, /* Invalidate RPT translation lookaside information */
+              uint64 pid,       /* PID/LPID to invalidate */
+              uint64 target,    /* Invalidation target */
+              uint64 type,      /* Type of lookaside information */
+              uint64 pageSizes,     /* Page sizes */
+              uint64 start,     /* Start of Effective Address (EA) range (inclusive) */
+              uint64 end)       /* End of EA range (exclusive) */
 
-I am not convinced, however.  Specifically, attaching this to the DRC
-doesn't make sense to me.  We're adding exactly one DRC related async
-hcall, and I can't really see much call for another one.  We could
-have other async hcalls - indeed we already have one for HPT resizing
-- but attaching this to DRCs doesn't help for those.
+Invalidation targets (target)
+-----------------------------
+Core MMU        0x01 /* All virtual processors in the partition */
+Core local MMU  0x02 /* Current virtual processor */
+Nest MMU        0x04 /* All nest/accelerator agents in use by the partition */
 
->=20
-> >  hw/ppc/spapr_drc.c         |  149 ++++++++++++++++++++++++++++++++++++=
-++++++++
-> >  include/hw/ppc/spapr_drc.h |   25 +++++++
-> >  2 files changed, 174 insertions(+)
-> >=20
-> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> > index 77718cde1f..4ecd04f686 100644
-> > --- a/hw/ppc/spapr_drc.c
-> > +++ b/hw/ppc/spapr_drc.c
-> > @@ -15,6 +15,7 @@
-> >  #include "qapi/qmp/qnull.h"
-> >  #include "cpu.h"
-> >  #include "qemu/cutils.h"
-> > +#include "qemu/guest-random.h"
-> >  #include "hw/ppc/spapr_drc.h"
-> >  #include "qom/object.h"
-> >  #include "migration/vmstate.h"
-> > @@ -421,6 +422,148 @@ void spapr_drc_detach(SpaprDrc *drc)
-> >      spapr_drc_release(drc);
-> >  }
-> > =20
-> > +
-> > +/*
-> > + * @drc : device DRC targetting which the async hcalls to be made.
-> > + *
-> > + * All subsequent requests to run/query the status should use the
-> > + * unique token returned here.
-> > + */
-> > +uint64_t spapr_drc_get_new_async_hcall_token(SpaprDrc *drc)
-> > +{
-> > +    Error *err =3D NULL;
-> > +    uint64_t token;
-> > +    SpaprDrcDeviceAsyncHCallState *tmp, *next, *state;
-> > +
-> > +    state =3D g_malloc0(sizeof(*state));
-> > +    state->pending =3D true;
-> > +
-> > +    qemu_mutex_lock(&drc->async_hcall_states_lock);
-> > +retry:
-> > +    if (qemu_guest_getrandom(&token, sizeof(token), &err) < 0) {
-> > +        error_report_err(err);
-> > +        g_free(state);
-> > +        qemu_mutex_unlock(&drc->async_hcall_states_lock);
-> > +        return 0;
-> > +    }
-> > +
-> > +    if (!token) /* Token should be non-zero */
-> > +        goto retry;
-> > +
-> > +    if (!QLIST_EMPTY(&drc->async_hcall_states)) {
-> > +        QLIST_FOREACH_SAFE(tmp, &drc->async_hcall_states, node, next) {
-> > +            if (tmp->continue_token =3D=3D token) {
-> > +                /* If the token already in use, get a new one */
-> > +                goto retry;
-> > +            }
-> > +        }
-> > +    }
-> > +
-> > +    state->continue_token =3D token;
-> > +    QLIST_INSERT_HEAD(&drc->async_hcall_states, state, node);
-> > +
-> > +    qemu_mutex_unlock(&drc->async_hcall_states_lock);
-> > +
-> > +    return state->continue_token;
-> > +}
-> > +
-> > +static void *spapr_drc_async_hcall_runner(void *opaque)
-> > +{
-> > +    int response =3D -1;
-> > +    SpaprDrcDeviceAsyncHCallState *state =3D opaque;
-> > +
-> > +    /*
-> > +     * state is freed only after this thread finishes(after pthread_jo=
-in()),
-> > +     * don't worry about it becoming NULL.
-> > +     */
-> > +
-> > +    response =3D state->func(state->data);
-> > +
-> > +    state->hcall_ret =3D response;
-> > +    state->pending =3D 0;
-> > +
-> > +    return NULL;
-> > +}
-> > +
-> > +/*
-> > + * @drc  : device DRC targetting which the async hcalls to be made.
-> > + * token : The continue token to be used for tracking as recived from
-> > + *         spapr_drc_get_new_async_hcall_token
-> > + * @func() : the worker function which needs to be executed asynchrono=
-usly
-> > + * @data : data to be passed to the asynchronous function. Worker is s=
-upposed
-> > + *         to free/cleanup the data that is passed here
->=20
-> It'd be cleaner to pass a completion callback and have free/cleanup handl=
-ed there.
->=20
-> > + */
-> > +void spapr_drc_run_async_hcall(SpaprDrc *drc, uint64_t token,
-> > +                               SpaprDrcAsyncHcallWorkerFunc *func, voi=
-d *data)
-> > +{
-> > +    SpaprDrcDeviceAsyncHCallState *state;
-> > +
-> > +    qemu_mutex_lock(&drc->async_hcall_states_lock);
-> > +    QLIST_FOREACH(state, &drc->async_hcall_states, node) {
-> > +        if (state->continue_token =3D=3D token) {
-> > +            state->func =3D func;
-> > +            state->data =3D data;
-> > +            qemu_thread_create(&state->thread, "sPAPR Async HCALL",
-> > +                               spapr_drc_async_hcall_runner, state,
-> > +                               QEMU_THREAD_JOINABLE);
->=20
-> qemu_thread_create() exits on failure, it shouldn't be called on
-> a guest triggerable path, eg. a buggy guest could call it up to
-> the point that pthread_create() returns EAGAIN.
->=20
-> Please use a thread pool (see thread_pool_submit_aio()). This takes care
-> of all the thread housekeeping for you in a safe way, and it provides a
-> completion callback API. The implementation could then be just about
-> having two lists: one for pending requests (fed here) and one for
-> completed requests (fed by the completion callback).
->=20
-> > +            break;
-> > +        }
-> > +    }
-> > +    qemu_mutex_unlock(&drc->async_hcall_states_lock);
-> > +}
-> > +
-> > +/*
-> > + * spapr_drc_finish_async_hcalls
-> > + *      Waits for all pending async requests to complete
-> > + *      thier execution and free the states
-> > + */
-> > +static void spapr_drc_finish_async_hcalls(SpaprDrc *drc)
-> > +{
-> > +    SpaprDrcDeviceAsyncHCallState *state, *next;
-> > +
-> > +    if (QLIST_EMPTY(&drc->async_hcall_states)) {
-> > +        return;
-> > +    }
-> > +
-> > +    qemu_mutex_lock(&drc->async_hcall_states_lock);
-> > +    QLIST_FOREACH_SAFE(state, &drc->async_hcall_states, node, next) {
-> > +        qemu_thread_join(&state->thread);
->=20
-> With a thread-pool, you'd just need to aio_poll() until the pending list
-> is empty and then clear the completed list.
->=20
-> > +        QLIST_REMOVE(state, node);
-> > +        g_free(state);
-> > +    }
-> > +    qemu_mutex_unlock(&drc->async_hcall_states_lock);
-> > +}
-> > +
-> > +/*
-> > + * spapr_drc_get_async_hcall_status
-> > + *      Fetches the status of the hcall worker and returns H_BUSY
-> > + *      if the worker is still running.
-> > + */
-> > +int spapr_drc_get_async_hcall_status(SpaprDrc *drc, uint64_t token)
-> > +{
-> > +    int ret =3D H_PARAMETER;
-> > +    SpaprDrcDeviceAsyncHCallState *state, *node;
-> > +
-> > +    qemu_mutex_lock(&drc->async_hcall_states_lock);
-> > +    QLIST_FOREACH_SAFE(state, &drc->async_hcall_states, node, node) {
-> > +        if (state->continue_token =3D=3D token) {
-> > +            if (state->pending) {
-> > +                ret =3D H_BUSY;
-> > +                break;
-> > +            } else {
-> > +                ret =3D state->hcall_ret;
-> > +                qemu_thread_join(&state->thread);
->=20
-> Like for qemu_thread_create(), the guest shouldn't be responsible for
-> thread housekeeping. Getting the hcall status should just be about
-> finding the token in the pending or completed lists.
->=20
-> > +                QLIST_REMOVE(state, node);
-> > +                g_free(state);
-> > +                break;
-> > +            }
-> > +        }
-> > +    }
-> > +    qemu_mutex_unlock(&drc->async_hcall_states_lock);
-> > +
-> > +    return ret;
-> > +}
-> > +
-> >  void spapr_drc_reset(SpaprDrc *drc)
-> >  {
-> >      SpaprDrcClass *drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-> > @@ -448,6 +591,7 @@ void spapr_drc_reset(SpaprDrc *drc)
-> >          drc->ccs_offset =3D -1;
-> >          drc->ccs_depth =3D -1;
-> >      }
-> > +    spapr_drc_finish_async_hcalls(drc);
-> >  }
-> > =20
-> >  static bool spapr_drc_unplug_requested_needed(void *opaque)
-> > @@ -558,6 +702,7 @@ SpaprDrc *spapr_dr_connector_new(Object *owner, con=
-st char *type,
-> >      drc->owner =3D owner;
-> >      prop_name =3D g_strdup_printf("dr-connector[%"PRIu32"]",
-> >                                  spapr_drc_index(drc));
-> > +
->=20
-> Unrelated change.
->=20
-> >      object_property_add_child(owner, prop_name, OBJECT(drc));
-> >      object_unref(OBJECT(drc));
-> >      qdev_realize(DEVICE(drc), NULL, NULL);
-> > @@ -577,6 +722,10 @@ static void spapr_dr_connector_instance_init(Objec=
-t *obj)
-> >      object_property_add(obj, "fdt", "struct", prop_get_fdt,
-> >                          NULL, NULL, NULL);
-> >      drc->state =3D drck->empty_state;
-> > +
-> > +    qemu_mutex_init(&drc->async_hcall_states_lock);
-> > +    QLIST_INIT(&drc->async_hcall_states);
-> > +
->=20
-> Empty line not needed.
->=20
-> >  }
-> > =20
-> >  static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
-> > diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> > index 165b281496..77f6e4386c 100644
-> > --- a/include/hw/ppc/spapr_drc.h
-> > +++ b/include/hw/ppc/spapr_drc.h
-> > @@ -18,6 +18,7 @@
-> >  #include "sysemu/runstate.h"
-> >  #include "hw/qdev-core.h"
-> >  #include "qapi/error.h"
-> > +#include "block/thread-pool.h"
-> > =20
-> >  #define TYPE_SPAPR_DR_CONNECTOR "spapr-dr-connector"
-> >  #define SPAPR_DR_CONNECTOR_GET_CLASS(obj) \
-> > @@ -168,6 +169,21 @@ typedef enum {
-> >      SPAPR_DRC_STATE_PHYSICAL_CONFIGURED =3D 8,
-> >  } SpaprDrcState;
-> > =20
-> > +typedef struct SpaprDrc SpaprDrc;
-> > +
-> > +typedef int SpaprDrcAsyncHcallWorkerFunc(void *opaque);
-> > +typedef struct SpaprDrcDeviceAsyncHCallState {
-> > +    uint64_t continue_token;
-> > +    bool pending;
-> > +
-> > +    int hcall_ret;
-> > +    SpaprDrcAsyncHcallWorkerFunc *func;
-> > +    void *data;
-> > +
-> > +    QemuThread thread;
-> > +
-> > +    QLIST_ENTRY(SpaprDrcDeviceAsyncHCallState) node;
-> > +} SpaprDrcDeviceAsyncHCallState;
-> >  typedef struct SpaprDrc {
-> >      /*< private >*/
-> >      DeviceState parent;
-> > @@ -182,6 +198,10 @@ typedef struct SpaprDrc {
-> >      int ccs_offset;
-> >      int ccs_depth;
-> > =20
-> > +    /* async hcall states */
-> > +    QemuMutex async_hcall_states_lock;
-> > +    QLIST_HEAD(, SpaprDrcDeviceAsyncHCallState) async_hcall_states;
-> > +
-> >      /* device pointer, via link property */
-> >      DeviceState *dev;
-> >      bool unplug_requested;
-> > @@ -241,6 +261,11 @@ void spapr_drc_detach(SpaprDrc *drc);
-> >  /* Returns true if a hot plug/unplug request is pending */
-> >  bool spapr_drc_transient(SpaprDrc *drc);
-> > =20
-> > +uint64_t spapr_drc_get_new_async_hcall_token(SpaprDrc *drc);
-> > +void spapr_drc_run_async_hcall(SpaprDrc *drc, uint64_t token,
-> > +                               SpaprDrcAsyncHcallWorkerFunc, void *dat=
-a);
-> > +int spapr_drc_get_async_hcall_status(SpaprDrc *drc, uint64_t token);
-> > +
-> >  static inline bool spapr_drc_unplug_requested(SpaprDrc *drc)
-> >  {
-> >      return drc->unplug_requested;
-> >=20
-> >=20
-> >=20
->=20
+A combination of the above can be specified, except core and core local.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Type of translation to invalidate (type)
+---------------------------------------
+NESTED       0x0001  /* Invalidate nested guest partition-scope */
+TLB          0x0002  /* Invalidate TLB */
+PWC          0x0004  /* Invalidate Page Walk Cache */
+PRT          0x0008  /* Invalidate Process Table Entries if NESTED is clear */
+PAT          0x0008  /* Invalidate Partition Table Entries if NESTED is set */
 
---nRwNdQxTdQ7rZk9A
-Content-Type: application/pgp-signature; name="signature.asc"
+A combination of the above can be specified.
 
------BEGIN PGP SIGNATURE-----
+Page size mask (pageSizes)
+--------------------------
+4K              0x01
+64K             0x02
+2M              0x04
+1G              0x08
+All sizes       (-1UL)
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl/pmWcACgkQbDjKyiDZ
-s5Iohg//USPWwzRXy6Htm1lgHOQkkmLnhCUkh2zL/mCm4+N3YI8qPPuR+X/LVg1Y
-VevigW5RoUsgrw0QJyAhvjiBJJHwT1ZRzui+t5X0dxVGyMz2MAZmEIUCe9+v38R5
-eCd3H0gyWQh3MT2bxjFlUDM6PWGIUhirxilOfzK2GJrSYcX6/XYbSZ70n1ooEb8P
-rZLOe0BLG4woWRD5U7/s81fiG/mH8pCeUrG55kG2tLI50cIOHM0kH9CimIG4Sd+E
-oXZUVdDvA/gNS51QxQnevqkFglvx9e2JuCxzo02X/fdMJOmGakxdH2Z5fnsDUELp
-HAPLpTexg6LcKBy2wyfTZylWeXj58r/2GfXd2FTTAOnUhOOWbCCQNltemRxl/91q
-MiMLi/wIlP+xboanOP5ryBwPtOUqFjUtF2GP1dSbtJ+YJI6EuFeOEuxCQTMBkQHR
-WUYDvGIaWxotfTl7+5qK7NNS8XdykdH6zZGBUgTBcb6XnQCQ7M0CTwuAKq936MaP
-3g/ldjIfBvwopbzDWRGXfI1qiGsnylZQLfna/DFIAD3mbX+bVjGi+oteVozJUzun
-h7i0IxTf9EyRHAc8BXBS+8isB6HQIYxOKqPqnZC7WNKUtwMdGWn/chYbNLiCwhm5
-wuNRcRgn5iKixi4V9r7ug0NcZS1WtX0nVJXbsVLEXH7qMQLxaCw=
-=i1pT
------END PGP SIGNATURE-----
+A combination of the above can be specified.
+All page sizes can be selected with -1.
 
---nRwNdQxTdQ7rZk9A--
+Semantics: Invalidate radix tree lookaside information
+           matching the parameters given.
+* Return H_P2, H_P3 or H_P4 if target, type, or pageSizes parameters are
+  different from the defined values.
+* Return H_PARAMETER if NESTED is set and pid is not a valid nested
+  LPID allocated to this partition
+* Return H_P5 if (start, end) doesn't form a valid range. Start and end
+  should be a valid Quadrant address and  end > start.
+* Return H_NotSupported if the partition is not in running in radix
+  translation mode.
+* May invalidate more translation information than requested.
+* If start = 0 and end = -1, set the range to cover all valid addresses.
+  Else start and end should be aligned to 4kB (lower 11 bits clear).
+* If NESTED is clear, then invalidate process scoped lookaside information.
+  Else pid specifies a nested LPID, and the invalidation is performed
+  on nested guest partition table and nested guest partition scope real
+  addresses.
+* If pid = 0 and NESTED is clear, then valid addresses are quadrant 3 and
+  quadrant 0 spaces, Else valid addresses are quadrant 0.
+* Pages which are fully covered by the range are to be invalidated.
+  Those which are partially covered are considered outside invalidation
+  range, which allows a caller to optimally invalidate ranges that may
+  contain mixed page sizes.
+* Return H_SUCCESS on success.
+
+Bharata B Rao (2):
+  KVM: PPC: Book3S HV: Add support for H_RPT_INVALIDATE
+  KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in nested KVM
+
+ Documentation/virt/kvm/api.rst                |  17 +++
+ .../include/asm/book3s/64/tlbflush-radix.h    |  18 +++
+ arch/powerpc/include/asm/kvm_book3s.h         |   3 +
+ arch/powerpc/include/asm/mmu_context.h        |   7 ++
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        |  27 ++++-
+ arch/powerpc/kvm/book3s_hv.c                  |  56 +++++++++
+ arch/powerpc/kvm/book3s_hv_nested.c           | 108 +++++++++++++++++-
+ arch/powerpc/kvm/powerpc.c                    |   3 +
+ arch/powerpc/mm/book3s64/radix_tlb.c          |  24 +++-
+ include/uapi/linux/kvm.h                      |   1 +
+ 10 files changed, 253 insertions(+), 11 deletions(-)
+
+-- 
+2.26.2
+
