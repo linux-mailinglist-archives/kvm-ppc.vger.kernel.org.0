@@ -2,177 +2,117 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F3742EA6FE
-	for <lists+kvm-ppc@lfdr.de>; Tue,  5 Jan 2021 10:07:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5D372EC94E
+	for <lists+kvm-ppc@lfdr.de>; Thu,  7 Jan 2021 05:10:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727853AbhAEJHZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 5 Jan 2021 04:07:25 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22288 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727207AbhAEJHY (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 5 Jan 2021 04:07:24 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 105928Mn148955;
-        Tue, 5 Jan 2021 04:06:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=iCBk1NOd0a6lSSN3rCtEoXo9dkSEZTWs7wG7GgD1Wek=;
- b=F7koI3+TAihrpk6LzOPwa6joUD7lbdPXxu9TxPvjEYCZnt2cTNI5JuFMyAVCTOIXjGAg
- anV5BiBePcDcKUYiOf3j9zAjhZJ5W9vbGMQkxsaWvKAZoudOeG+h+3k7DC+32LRhLYzv
- 46CaLN/L+6Mk2n02zVqywoepCuUjyA+L1VKUjMCKOmSv/cdOfowxkzzoX0kD6LMMpEBH
- Q8w6h46qvrkuAYhjZQxI1qde7P+HP2YtNIGaS4gDU+llrdhXVJ1a0YGM30ewJbcR2pxH
- 1Vt1nplWVg7KUJ0eomH9fUjhqzo38wPaiC3syuVsRklQgH7l13zCZyAv9qcNnz2IaHuX SA== 
+        id S1726051AbhAGEJo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 6 Jan 2021 23:09:44 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52530 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725803AbhAGEJo (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 6 Jan 2021 23:09:44 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10743l1p058704;
+        Wed, 6 Jan 2021 23:08:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : reply-to : references : mime-version : content-type
+ : in-reply-to; s=pp1; bh=b1OhnpERz+OZzeE628X1oNdxkVzqJI1Q0iUVqfk74UM=;
+ b=i7nHNYTkhvOC8uXnj2IJjCNIuKk7WV5rN7N34N29dYqLkvIYDyzNSHtWA9/xeVXq9yt/
+ UcxWbTJKY9WQLJGGz+TVBhHaNSQEj7BiWna4ChFSHjncOQKBUqBGssNIHO5XgnD4ZSWN
+ 95cni7htx9TX89JrHrp7cC+0Kg6bGHDZYpM/HXT9dzzMCHrshw9xt45UoVx6A0JbfgCR
+ H5741+e/REdF+M7n8BkKIQy6y2ZWtD6diEk+TboAXxDj1CaiNSu44SMm9y+txESihUv6
+ qmO5VS6/ytNLWhwVdebTgMCfYEIldJsXIqD2t6/n+NQB0EwGArJ7pgsZjdREX9YdG4G/ Qw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35vgx15t72-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35wt0bh730-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jan 2021 04:06:33 -0500
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10592NW8149543;
-        Tue, 5 Jan 2021 04:06:32 -0500
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35vgx15t1b-1
+        Wed, 06 Jan 2021 23:08:55 -0500
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10744Lcd060325;
+        Wed, 6 Jan 2021 23:08:55 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35wt0bh71u-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jan 2021 04:06:32 -0500
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10592cng017759;
-        Tue, 5 Jan 2021 09:06:18 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04fra.de.ibm.com with ESMTP id 35va37g81g-1
+        Wed, 06 Jan 2021 23:08:55 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10748LTR018983;
+        Thu, 7 Jan 2021 04:08:51 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 35tg3hcgm0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jan 2021 09:06:18 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10596Cfs23462284
+        Thu, 07 Jan 2021 04:08:51 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10748mog41746902
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 Jan 2021 09:06:12 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AFEA4204B;
-        Tue,  5 Jan 2021 09:06:15 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DD15242047;
-        Tue,  5 Jan 2021 09:06:13 +0000 (GMT)
-Received: from bharata.ibmuc.com (unknown [9.102.0.65])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  5 Jan 2021 09:06:13 +0000 (GMT)
+        Thu, 7 Jan 2021 04:08:48 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A5DB8A404D;
+        Thu,  7 Jan 2021 04:08:48 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A0B1A4053;
+        Thu,  7 Jan 2021 04:08:47 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.85.71.15])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu,  7 Jan 2021 04:08:46 +0000 (GMT)
+Date:   Thu, 7 Jan 2021 09:38:44 +0530
 From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
-        mpe@ellerman.id.au, david@gibson.dropbear.id.au,
-        farosas@linux.ibm.com, Bharata B Rao <bharata@linux.ibm.com>
-Subject: [PATCH v3 2/2] KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in nested KVM
-Date:   Tue,  5 Jan 2021 14:35:57 +0530
-Message-Id: <20210105090557.2150104-3-bharata@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210105090557.2150104-1-bharata@linux.ibm.com>
+To:     Fabiano Rosas <farosas@linux.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
+        mpe@ellerman.id.au, david@gibson.dropbear.id.au
+Subject: Re: [PATCH v3 1/2] KVM: PPC: Book3S HV: Add support for
+ H_RPT_INVALIDATE
+Message-ID: <20210107040844.GA2158493@in.ibm.com>
+Reply-To: bharata@linux.ibm.com
 References: <20210105090557.2150104-1-bharata@linux.ibm.com>
+ <20210105090557.2150104-2-bharata@linux.ibm.com>
+ <87k0sp95g0.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87k0sp95g0.fsf@linux.ibm.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-05_01:2021-01-04,2021-01-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- spamscore=0 mlxscore=0 phishscore=0 impostorscore=0 adultscore=0
- suspectscore=0 mlxlogscore=999 malwarescore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101050052
+ definitions=2021-01-07_02:2021-01-06,2021-01-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 mlxscore=0 mlxlogscore=999 adultscore=0 spamscore=0
+ priorityscore=1501 bulkscore=0 clxscore=1015 malwarescore=0 suspectscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101070021
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-In the nested KVM case, replace H_TLB_INVALIDATE by the new hcall
-H_RPT_INVALIDATE if available. The availability of this hcall
-is determined from "hcall-rpt-invalidate" string in ibm,hypertas-functions
-DT property.
+On Wed, Jan 06, 2021 at 05:27:27PM -0300, Fabiano Rosas wrote:
+> Bharata B Rao <bharata@linux.ibm.com> writes:
+> > +
+> > +long kvmhv_h_rpti_nested(struct kvm_vcpu *vcpu, unsigned long lpid,
+> > +			 unsigned long type, unsigned long pg_sizes,
+> > +			 unsigned long start, unsigned long end)
+> > +{
+> > +	struct kvm_nested_guest *gp;
+> > +	long ret;
+> > +	unsigned long psize, ap;
+> > +
+> > +	/*
+> > +	 * If L2 lpid isn't valid, we need to return H_PARAMETER.
+> > +	 *
+> > +	 * However, nested KVM issues a L2 lpid flush call when creating
+> > +	 * partition table entries for L2. This happens even before the
+> > +	 * corresponding shadow lpid is created in HV which happens in
+> > +	 * H_ENTER_NESTED call. Since we can't differentiate this case from
+> > +	 * the invalid case, we ignore such flush requests and return success.
+> > +	 */
+> 
+> So for a nested lpid the H_TLB_INVALIDATE in:
+> 
+> kvmppc_core_init_vm_hv -> kvmppc_setup_partition_table ->
+> kvmhv_set_ptbl_entry -> kvmhv_flush_lpid
+> 
+> has always been a noop? It seems that we could just skip
+> kvmhv_flush_lpid in L1 during init_vm then.
 
-Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_64_mmu_radix.c | 27 +++++++++++++++++++++-----
- arch/powerpc/kvm/book3s_hv_nested.c    | 12 ++++++++++--
- 2 files changed, 32 insertions(+), 7 deletions(-)
+May be, but I suppose that flush is required and could be fixed
+eventually.
 
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index bb35490400e9..7ea5459022cb 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -21,6 +21,7 @@
- #include <asm/pte-walk.h>
- #include <asm/ultravisor.h>
- #include <asm/kvm_book3s_uvmem.h>
-+#include <asm/plpar_wrappers.h>
- 
- /*
-  * Supported radix tree geometry.
-@@ -318,9 +319,19 @@ void kvmppc_radix_tlbie_page(struct kvm *kvm, unsigned long addr,
- 	}
- 
- 	psi = shift_to_mmu_psize(pshift);
--	rb = addr | (mmu_get_ap(psi) << PPC_BITLSHIFT(58));
--	rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(0, 0, 1),
--				lpid, rb);
-+
-+	if (!firmware_has_feature(FW_FEATURE_RPT_INVALIDATE)) {
-+		rb = addr | (mmu_get_ap(psi) << PPC_BITLSHIFT(58));
-+		rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(0, 0, 1),
-+					lpid, rb);
-+	} else {
-+		rc = pseries_rpt_invalidate(lpid, H_RPTI_TARGET_CMMU,
-+					    H_RPTI_TYPE_NESTED |
-+					    H_RPTI_TYPE_TLB,
-+					    psize_to_rpti_pgsize(psi),
-+					    addr, addr + psize);
-+	}
-+
- 	if (rc)
- 		pr_err("KVM: TLB page invalidation hcall failed, rc=%ld\n", rc);
- }
-@@ -334,8 +345,14 @@ static void kvmppc_radix_flush_pwc(struct kvm *kvm, unsigned int lpid)
- 		return;
- 	}
- 
--	rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(1, 0, 1),
--				lpid, TLBIEL_INVAL_SET_LPID);
-+	if (!firmware_has_feature(FW_FEATURE_RPT_INVALIDATE))
-+		rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(1, 0, 1),
-+					lpid, TLBIEL_INVAL_SET_LPID);
-+	else
-+		rc = pseries_rpt_invalidate(lpid, H_RPTI_TARGET_CMMU,
-+					    H_RPTI_TYPE_NESTED |
-+					    H_RPTI_TYPE_PWC, H_RPTI_PAGE_ALL,
-+					    0, -1UL);
- 	if (rc)
- 		pr_err("KVM: TLB PWC invalidation hcall failed, rc=%ld\n", rc);
- }
-diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-index 40ed4eb80adb..0ebddb615684 100644
---- a/arch/powerpc/kvm/book3s_hv_nested.c
-+++ b/arch/powerpc/kvm/book3s_hv_nested.c
-@@ -19,6 +19,7 @@
- #include <asm/pgalloc.h>
- #include <asm/pte-walk.h>
- #include <asm/reg.h>
-+#include <asm/plpar_wrappers.h>
- 
- static struct patb_entry *pseries_partition_tb;
- 
-@@ -402,8 +403,15 @@ static void kvmhv_flush_lpid(unsigned int lpid)
- 		return;
- 	}
- 
--	rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(2, 0, 1),
--				lpid, TLBIEL_INVAL_SET_LPID);
-+	if (!firmware_has_feature(FW_FEATURE_RPT_INVALIDATE))
-+		rc = plpar_hcall_norets(H_TLB_INVALIDATE, H_TLBIE_P1_ENC(2, 0, 1),
-+					lpid, TLBIEL_INVAL_SET_LPID);
-+	else
-+		rc = pseries_rpt_invalidate(lpid, H_RPTI_TARGET_CMMU,
-+					    H_RPTI_TYPE_NESTED |
-+					    H_RPTI_TYPE_TLB | H_RPTI_TYPE_PWC |
-+					    H_RPTI_TYPE_PAT,
-+					    H_RPTI_PAGE_ALL, 0, -1UL);
- 	if (rc)
- 		pr_err("KVM: TLB LPID invalidation hcall failed, rc=%ld\n", rc);
- }
--- 
-2.26.2
-
+Regards,
+Bharata.
