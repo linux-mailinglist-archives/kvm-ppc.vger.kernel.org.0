@@ -2,117 +2,210 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C5D372EC94E
-	for <lists+kvm-ppc@lfdr.de>; Thu,  7 Jan 2021 05:10:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 479542F618B
+	for <lists+kvm-ppc@lfdr.de>; Thu, 14 Jan 2021 14:09:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726051AbhAGEJo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 6 Jan 2021 23:09:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52530 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725803AbhAGEJo (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 6 Jan 2021 23:09:44 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10743l1p058704;
-        Wed, 6 Jan 2021 23:08:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : reply-to : references : mime-version : content-type
- : in-reply-to; s=pp1; bh=b1OhnpERz+OZzeE628X1oNdxkVzqJI1Q0iUVqfk74UM=;
- b=i7nHNYTkhvOC8uXnj2IJjCNIuKk7WV5rN7N34N29dYqLkvIYDyzNSHtWA9/xeVXq9yt/
- UcxWbTJKY9WQLJGGz+TVBhHaNSQEj7BiWna4ChFSHjncOQKBUqBGssNIHO5XgnD4ZSWN
- 95cni7htx9TX89JrHrp7cC+0Kg6bGHDZYpM/HXT9dzzMCHrshw9xt45UoVx6A0JbfgCR
- H5741+e/REdF+M7n8BkKIQy6y2ZWtD6diEk+TboAXxDj1CaiNSu44SMm9y+txESihUv6
- qmO5VS6/ytNLWhwVdebTgMCfYEIldJsXIqD2t6/n+NQB0EwGArJ7pgsZjdREX9YdG4G/ Qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35wt0bh730-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 Jan 2021 23:08:55 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10744Lcd060325;
-        Wed, 6 Jan 2021 23:08:55 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35wt0bh71u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 Jan 2021 23:08:55 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10748LTR018983;
-        Thu, 7 Jan 2021 04:08:51 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 35tg3hcgm0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Jan 2021 04:08:51 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10748mog41746902
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Jan 2021 04:08:48 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A5DB8A404D;
-        Thu,  7 Jan 2021 04:08:48 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2A0B1A4053;
-        Thu,  7 Jan 2021 04:08:47 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.85.71.15])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu,  7 Jan 2021 04:08:46 +0000 (GMT)
-Date:   Thu, 7 Jan 2021 09:38:44 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     Fabiano Rosas <farosas@linux.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
-        mpe@ellerman.id.au, david@gibson.dropbear.id.au
-Subject: Re: [PATCH v3 1/2] KVM: PPC: Book3S HV: Add support for
- H_RPT_INVALIDATE
-Message-ID: <20210107040844.GA2158493@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <20210105090557.2150104-1-bharata@linux.ibm.com>
- <20210105090557.2150104-2-bharata@linux.ibm.com>
- <87k0sp95g0.fsf@linux.ibm.com>
+        id S1726704AbhANNIv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 14 Jan 2021 08:08:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47550 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726442AbhANNIu (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 14 Jan 2021 08:08:50 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55DDCC061574
+        for <kvm-ppc@vger.kernel.org>; Thu, 14 Jan 2021 05:08:10 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id i5so3767781pgo.1
+        for <kvm-ppc@vger.kernel.org>; Thu, 14 Jan 2021 05:08:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=V5mBBcc1pjGGwRJQjUnzrQlgeQFUaJGngHzEvAldn7U=;
+        b=OmBR1Bn//cDynJ9MsHrhy3y38bHmg/GCtKYjoJjulMbCGTLrRVg0O0b3HcDMJ8dSq5
+         5INUgnMfVCphKArsaBelMVM0qpgULZMsdtCbGwBNaWRNbsXcIn4uskoxlVs0HTSm0VtM
+         eCWydJwGwOxaC7UDQKSjTgWRltnCC1dNut6WF4URpkQ+qxaqHnSHMMrxReFlg2ILMQ7U
+         MXGFIOMReR/Wa+aTB3BnCSZ1WuIU0TjuwKo2Cqh4RCyjgo4gxFbKVWsTElERh7+tU/VA
+         U6+3BNZGlALxhN6MGl5cFGxHEw/y51B79N7ViRT+uCK0xodY+oUdHf0WO0QV/p7zy7lu
+         lwOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=V5mBBcc1pjGGwRJQjUnzrQlgeQFUaJGngHzEvAldn7U=;
+        b=AAOGwodfws3FoyfoBlXZ8SUyKkcgSHl7wQnSLLjEzrbdPb9RLEpI8g9n+BlYGKG9kI
+         R9OJAlriIVdPLJ+sam0YsF4FUVSXt8ikxqlkwqi2496bq02n+uxeNtx3TUfCcolWtJ2R
+         eJqcPVvL+kHvHzoHCZ0HqLjtCxlqKfNW5cqWW9GNxLw1a8Y+9Na9pNS0cwQhW/FEQUd8
+         ukRhXNRLRw2oyFe2HjH7a3zq4IasqQX5htzUHWS1yfqC5JudrjGxQiYNIzg7Kwz1bxiO
+         PUCHyA5xuuPZDhszfYRZVAIJFqy86gp/KBoy/iHiKQJjhgHz8YegcL+sEzxQOMjVvgAy
+         HWfQ==
+X-Gm-Message-State: AOAM533iystQtnsjZo1LssAZBafFpTKUnIy86m+bi9FXHqSxjEXvrInK
+        sxMKpAIXY65XRBj9s5bInJNdio8CVbc=
+X-Google-Smtp-Source: ABdhPJyDX52tq0NAghsdIbcddA+MMQdCV7v35i+R9Oe/DuK0f5Gcx0ag83mEIH33ZEYlsO6KRu2Xfw==
+X-Received: by 2002:a62:e906:0:b029:1ae:6d80:1338 with SMTP id j6-20020a62e9060000b02901ae6d801338mr7263852pfh.24.1610629689858;
+        Thu, 14 Jan 2021 05:08:09 -0800 (PST)
+Received: from localhost ([124.170.13.62])
+        by smtp.gmail.com with ESMTPSA id x23sm5440617pgk.14.2021.01.14.05.08.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jan 2021 05:08:08 -0800 (PST)
+Date:   Thu, 14 Jan 2021 23:08:03 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: KVM on POWER8 host lock up since 10d91611f426 ("powerpc/64s:
+ Reimplement book3s idle code in C")
+To:     Michal =?iso-8859-1?q?Such=E1nek?= <msuchanek@suse.de>
+Cc:     Hari Bathini <hbathini@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        Michael Ellerman <mpe@ellerman.id.au>, ro@suse.de,
+        kvm-ppc@vger.kernel.org
+References: <20200830201145.GA29521@kitsune.suse.cz>
+        <1598835313.5688ngko4f.astroid@bobo.none>
+        <20200831091523.GC29521@kitsune.suse.cz> <87y2lv1430.fsf@mpe.ellerman.id.au>
+        <1599484062.vgmycu6q5i.astroid@bobo.none>
+        <20201016201410.GH29778@kitsune.suse.cz>
+        <1603066878.gtbyofrzyo.astroid@bobo.none>
+        <1603082970.5545yt7raj.astroid@bobo.none>
+        <20210114124023.GL6564@kitsune.suse.cz>
+In-Reply-To: <20210114124023.GL6564@kitsune.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87k0sp95g0.fsf@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-07_02:2021-01-06,2021-01-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 mlxscore=0 mlxlogscore=999 adultscore=0 spamscore=0
- priorityscore=1501 bulkscore=0 clxscore=1015 malwarescore=0 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101070021
+Message-Id: <1610628922.o1ihbt98xg.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Jan 06, 2021 at 05:27:27PM -0300, Fabiano Rosas wrote:
-> Bharata B Rao <bharata@linux.ibm.com> writes:
-> > +
-> > +long kvmhv_h_rpti_nested(struct kvm_vcpu *vcpu, unsigned long lpid,
-> > +			 unsigned long type, unsigned long pg_sizes,
-> > +			 unsigned long start, unsigned long end)
-> > +{
-> > +	struct kvm_nested_guest *gp;
-> > +	long ret;
-> > +	unsigned long psize, ap;
-> > +
-> > +	/*
-> > +	 * If L2 lpid isn't valid, we need to return H_PARAMETER.
-> > +	 *
-> > +	 * However, nested KVM issues a L2 lpid flush call when creating
-> > +	 * partition table entries for L2. This happens even before the
-> > +	 * corresponding shadow lpid is created in HV which happens in
-> > +	 * H_ENTER_NESTED call. Since we can't differentiate this case from
-> > +	 * the invalid case, we ignore such flush requests and return success.
-> > +	 */
-> 
-> So for a nested lpid the H_TLB_INVALIDATE in:
-> 
-> kvmppc_core_init_vm_hv -> kvmppc_setup_partition_table ->
-> kvmhv_set_ptbl_entry -> kvmhv_flush_lpid
-> 
-> has always been a noop? It seems that we could just skip
-> kvmhv_flush_lpid in L1 during init_vm then.
+Excerpts from Michal Such=C3=A1nek's message of January 14, 2021 10:40 pm:
+> On Mon, Oct 19, 2020 at 02:50:51PM +1000, Nicholas Piggin wrote:
+>> Excerpts from Nicholas Piggin's message of October 19, 2020 11:00 am:
+>> > Excerpts from Michal Such=C3=A1nek's message of October 17, 2020 6:14 =
+am:
+>> >> On Mon, Sep 07, 2020 at 11:13:47PM +1000, Nicholas Piggin wrote:
+>> >>> Excerpts from Michael Ellerman's message of August 31, 2020 8:50 pm:
+>> >>> > Michal Such=C3=A1nek <msuchanek@suse.de> writes:
+>> >>> >> On Mon, Aug 31, 2020 at 11:14:18AM +1000, Nicholas Piggin wrote:
+>> >>> >>> Excerpts from Michal Such=C3=A1nek's message of August 31, 2020 =
+6:11 am:
+>> >>> >>> > Hello,
+>> >>> >>> >=20
+>> >>> >>> > on POWER8 KVM hosts lock up since commit 10d91611f426 ("powerp=
+c/64s:
+>> >>> >>> > Reimplement book3s idle code in C").
+>> >>> >>> >=20
+>> >>> >>> > The symptom is host locking up completely after some hours of =
+KVM
+>> >>> >>> > workload with messages like
+>> >>> >>> >=20
+>> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn't =
+grab cpu 47
+>> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn't =
+grab cpu 71
+>> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn't =
+grab cpu 47
+>> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn't =
+grab cpu 71
+>> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn't =
+grab cpu 47
+>> >>> >>> >=20
+>> >>> >>> > printed before the host locks up.
+>> >>> >>> >=20
+>> >>> >>> > The machines run sandboxed builds which is a mixed workload re=
+sulting in
+>> >>> >>> > IO/single core/mutiple core load over time and there are perio=
+ds of no
+>> >>> >>> > activity and no VMS runnig as well. The VMs are shortlived so =
+VM
+>> >>> >>> > setup/terdown is somewhat excercised as well.
+>> >>> >>> >=20
+>> >>> >>> > POWER9 with the new guest entry fast path does not seem to be =
+affected.
+>> >>> >>> >=20
+>> >>> >>> > Reverted the patch and the followup idle fixes on top of 5.2.1=
+4 and
+>> >>> >>> > re-applied commit a3f3072db6ca ("powerpc/powernv/idle: Restore=
+ IAMR
+>> >>> >>> > after idle") which gives same idle code as 5.1.16 and the kern=
+el seems
+>> >>> >>> > stable.
+>> >>> >>> >=20
+>> >>> >>> > Config is attached.
+>> >>> >>> >=20
+>> >>> >>> > I cannot easily revert this commit, especially if I want to us=
+e the same
+>> >>> >>> > kernel on POWER8 and POWER9 - many of the POWER9 fixes are app=
+licable
+>> >>> >>> > only to the new idle code.
+>> >>> >>> >=20
+>> >>> >>> > Any idea what can be the problem?
+>> >>> >>>=20
+>> >>> >>> So hwthread_state is never getting back to to HWTHREAD_IN_IDLE o=
+n
+>> >>> >>> those threads. I wonder what they are doing. POWER8 doesn't have=
+ a good
+>> >>> >>> NMI IPI and I don't know if it supports pdbg dumping registers f=
+rom the
+>> >>> >>> BMC unfortunately.
+>> >>> >>
+>> >>> >> It may be possible to set up fadump with a later kernel version t=
+hat
+>> >>> >> supports it on powernv and dump the whole kernel.
+>> >>> >=20
+>> >>> > Your firmware won't support it AFAIK.
+>> >>> >=20
+>> >>> > You could try kdump, but if we have CPUs stuck in KVM then there's=
+ a
+>> >>> > good chance it won't work :/
+>> >>>=20
+>> >>> I haven't had any luck yet reproducing this still. Testing with sub=20
+>> >>> cores of various different combinations, etc. I'll keep trying thoug=
+h.
+>> >>=20
+>> >> Hello,
+>> >>=20
+>> >> I tried running some KVM guests to simulate the workload and what I g=
+et
+>> >> is guests failing to start with a rcu stall. Tried both 5.3 and 5.9
+>> >> kernel and qemu 4.2.1 and 5.1.0
+>> >>=20
+>> >> To start some guests I run
+>> >>=20
+>> >> for i in $(seq 0 9) ; do /opt/qemu/bin/qemu-system-ppc64 -m 2048 -acc=
+el kvm -smp 8 -kernel /boot/vmlinux -initrd /boot/initrd -nodefaults -nogra=
+phic -serial mon:telnet::444$i,server,wait & done
+>> >>=20
+>> >> To simulate some workload I run
+>> >>=20
+>> >> xz -zc9T0 < /dev/zero > /dev/null &
+>> >> while true; do
+>> >>     killall -STOP xz; sleep 1; killall -CONT xz; sleep 1;
+>> >> done &
+>> >>=20
+>> >> on the host and add a job that executes this to the ramdisk. However,=
+ most
+>> >> guests never get to the point where the job is executed.
+>> >>=20
+>> >> Any idea what might be the problem?
+>> >=20
+>> > I would say try without pv queued spin locks (but if the same thing is=
+=20
+>> > happening with 5.3 then it must be something else I guess).=20
+>> >=20
+>> > I'll try to test a similar setup on a POWER8 here.
+>>=20
+>> Couldn't reproduce the guest hang, they seem to run fine even with=20
+>> queued spinlocks. Might have a different .config.
+>>=20
+>> I might have got a lockup in the host (although different symptoms than=20
+>> the original report). I'll look into that a bit further.
+>=20
+> Hello,
+>=20
+> any progress on this?
 
-May be, but I suppose that flush is required and could be fixed
-eventually.
+No progress, I still wasn't able to reproduce, and it fell off the=20
+radar sorry.
 
-Regards,
-Bharata.
+I expect hwthred_state must be getting corrupted somewhere or a
+secondary thread getting stuck but I couldn't see where. I try pick
+it up again thanks for the reminder.
+
+Thanks,
+Nick
