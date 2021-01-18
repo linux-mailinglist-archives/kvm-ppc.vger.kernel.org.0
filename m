@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 201632F99E8
+	by mail.lfdr.de (Postfix) with ESMTP id 967EB2F99E9
 	for <lists+kvm-ppc@lfdr.de>; Mon, 18 Jan 2021 07:30:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731070AbhARG3Q (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 18 Jan 2021 01:29:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35428 "EHLO
+        id S1732359AbhARG3e (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 18 Jan 2021 01:29:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732359AbhARG3D (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 18 Jan 2021 01:29:03 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4713BC061575
-        for <kvm-ppc@vger.kernel.org>; Sun, 17 Jan 2021 22:28:22 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id i7so10313715pgc.8
-        for <kvm-ppc@vger.kernel.org>; Sun, 17 Jan 2021 22:28:22 -0800 (PST)
+        with ESMTP id S1732387AbhARG3F (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 18 Jan 2021 01:29:05 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE30CC061757
+        for <kvm-ppc@vger.kernel.org>; Sun, 17 Jan 2021 22:28:24 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id 15so10316307pgx.7
+        for <kvm-ppc@vger.kernel.org>; Sun, 17 Jan 2021 22:28:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=jXaTZ2SGwG1cE+iI7Sy2bmCo1yKmf961EI27ucblZh4=;
-        b=IRKw4e4tDWXh4pqfVmo2G+R5JjX3xazmyrDoBVbDdHEbGeldFpI2xg2YNmNqwUyYom
-         NqETqxRjqnwAWsuigKOtbe8tSI0xcf5UqWYQ9/qhppex3FZqU7WoYCjDxMJnBvQBZRF8
-         N9eW8gcIvcJoltTkfxxCHN7P6FOVihuE422dzhyrbnyqwpUB9CTB0T1UZCRWMZhqerkd
-         24xSeT1evxNOhhvtlXPil17n11Qtj9b3NPSMYVXF4MYkWkoUSw9/dCJOZ/IlPWdqFMFD
-         Lr4HTI1hExSlwZTxJw+qbfMk5R6IFu9AVOQgsuhSjCvyvDYfDTO68QIZzv0IbpmaaWLs
-         qi9A==
+        bh=DRPSJD7+yRSMbzMAVOs56nCLOyY7wHWQSU/LgGBests=;
+        b=rl9X0ucm6tIBSec+46Ft4KEBHhkqpMquh7iVCDgAPJMoa7pGKmIxqCEKI5wvvd3Ble
+         CCaFitk/Yu0thY6dyCLpjrKUGzrVnXT8uP+WjKxQpNI+uUnv4z38KoiV33D3nU8ohpwi
+         ZLE3x7JeyeyfdAScWQYAcTrme0S9ieWjhd0UaTrxXI+qG7seVEYfGveXsbXWoVxG+LR3
+         gC4aSI/ba8N5sQNHft/izB5A/SHuvvtTsVt1J37EirLue4tQ4eWwzCmQJVWygtd6u+7a
+         tpiw7Oq+y81cCShU0E1kWgednaKiJ+La6D8gfqdQ2IKbWAwaVTiShaOdwZNdkeO7oTJl
+         hoIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jXaTZ2SGwG1cE+iI7Sy2bmCo1yKmf961EI27ucblZh4=;
-        b=fEX2H5edbzEwApKS3+3oL2adHi769agPEFmnqoFob38ULjqv4fZNo6yY2nJ0NRmwHQ
-         90iUj+7O7N8lV6ioiu3e/9WRKSyyHP9UaEH65BbXzRwGh8veLuihNUfYIc5ZFZM/gXua
-         pU1CGQ6+pU6v+/2/gyc9xeqQYoXBaEIYZk27K6SDdtQE6yg3wl16Q+OljLG+PAhWkVcg
-         x/IzPHPfMFzkLJm018C0owSACuhYIMzERAW3n++JZewdJdelA9qw9GKxtSJ8Yalb+/Zn
-         yGNNzlISCmgxokAEfLN/SECDJcyluaJ9mL5OVMweNijCeybSnW3mYPpjUot/lBc4f6v6
-         LC5g==
-X-Gm-Message-State: AOAM531an4VeU1ZnYJFji4346g5fEz2piZckoccPGI8hLLgsOn2I8TpY
-        CkcCiGFrROUyYhLGeZn1IKd0B0KwYU0=
-X-Google-Smtp-Source: ABdhPJxGh8qEA/O08tQng/lZyfyoQ2G9xC5NxXCawABM83Yk/uUVzwuGbsUqRmfVExHJdCxnAG803w==
-X-Received: by 2002:a63:e24a:: with SMTP id y10mr9851779pgj.413.1610951301726;
-        Sun, 17 Jan 2021 22:28:21 -0800 (PST)
+        bh=DRPSJD7+yRSMbzMAVOs56nCLOyY7wHWQSU/LgGBests=;
+        b=ZLNSvaEoWRxjNDKGxvy0Dz7FOCnGa4crHvTQT7KJwI4yZ/FxmGE2t+jwE8bUCEvMMw
+         NAQWhcgJ1WxzUQTP2+dI28fRkujNdAjRCwwZwFdbscv5kWy3zkr0bDqGvVsLJ5S2NwK1
+         vqAf6k1tE7NCknP3Z4Qb/8InMKxKTZ9lNw+l1XmrdxUZh4LRemjSiUuL+hIonU6bXOa3
+         FtEaZyabBGcyxDh7KAIWsz2k0d1NwmKq0NcQXfEg0WNDjMwR9DHc3EStqv0D6Ic2dpO1
+         chsHEcY8lMiAlOEt1Y8DXMpI8VtNL3VFOEiFwEvxnhEvh2W1qVH8xlCdY8LKQvP2iDFQ
+         c+jQ==
+X-Gm-Message-State: AOAM5333SKX3+eEXcnpS7o/IOLQU9eHUAJaGTM5dtc1ILL3kQNe5lyWs
+        gxllncxMr41Zo0sPcl10DNLqpByLmi8=
+X-Google-Smtp-Source: ABdhPJzuDgOZ1yOV4nFB/Vn8Xa8D/e1LZ/1qZseMeKA2f9bOopinPfG3A1rS5nGTvN/PrE25ucqKxA==
+X-Received: by 2002:a63:1f54:: with SMTP id q20mr24665084pgm.135.1610951304259;
+        Sun, 17 Jan 2021 22:28:24 -0800 (PST)
 Received: from bobo.ibm.com ([124.170.13.62])
-        by smtp.gmail.com with ESMTPSA id w25sm8502318pfg.103.2021.01.17.22.28.19
+        by smtp.gmail.com with ESMTPSA id w25sm8502318pfg.103.2021.01.17.22.28.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Jan 2021 22:28:21 -0800 (PST)
+        Sun, 17 Jan 2021 22:28:23 -0800 (PST)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 2/4] KVM: PPC: Book3S HV: Fix radix guest SLB side channel
-Date:   Mon, 18 Jan 2021 16:28:07 +1000
-Message-Id: <20210118062809.1430920-3-npiggin@gmail.com>
+Subject: [PATCH 3/4] KVM: PPC: Book3S HV: No need to clear radix host SLB before loading guest
+Date:   Mon, 18 Jan 2021 16:28:08 +1000
+Message-Id: <20210118062809.1430920-4-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210118062809.1430920-1-npiggin@gmail.com>
 References: <20210118062809.1430920-1-npiggin@gmail.com>
@@ -62,108 +62,36 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The slbmte instruction is legal in radix mode, including radix guest
-mode. This means radix guests can load the SLB with arbitrary data.
-
-KVM host does not clear the SLB when exiting a guest if it was a
-radix guest, which would allow a rogue radix guest to use the SLB as
-a side channel to communicate with other guests.
-
-Fix this by ensuring the SLB is cleared when coming out of a radix
-guest. Only the first 4 entries are a concern, because radix guests
-always run with LPCR[UPRT]=1, which limits the reach of slbmte. slbia
-is not used (except in a non-performance-critical path) because it
-can clear cached translations.
-
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv_rmhandlers.S | 39 ++++++++++++++++++++-----
- 1 file changed, 31 insertions(+), 8 deletions(-)
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index d5a9b57ec129..0e1f5bf168a1 100644
+index 0e1f5bf168a1..9f0fdbae4b44 100644
 --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
 +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -1157,6 +1157,20 @@ EXPORT_SYMBOL_GPL(__kvmhv_vcpu_entry_p9)
- 	mr	r4, r3
- 	b	fast_guest_entry_c
- guest_exit_short_path:
-+	/*
-+	 * Malicious or buggy radix guests may have inserted SLB entries
-+	 * (only 0..3 because radix always runs with UPRT=1), so these must
-+	 * be cleared here to avoid side-channels. slbmte is used rather
-+	 * than slbia, as it won't clear cached translations.
-+	 */
-+	li	r0,0
-+	slbmte	r0,r0
-+	li	r4,1
-+	slbmte	r0,r4
-+	li	r4,2
-+	slbmte	r0,r4
-+	li	r4,3
-+	slbmte	r0,r4
+@@ -888,15 +888,19 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_ARCH_300)
+ 	cmpdi	r3, 512		/* 1 microsecond */
+ 	blt	hdec_soon
  
- 	li	r0, KVM_GUEST_MODE_NONE
- 	stb	r0, HSTATE_IN_GUEST(r13)
-@@ -1469,7 +1483,7 @@ guest_exit_cont:		/* r9 = vcpu, r12 = trap, r13 = paca */
- 	lbz	r0, KVM_RADIX(r5)
- 	li	r5, 0
+-	/* For hash guest, clear out and reload the SLB */
+ 	ld	r6, VCPU_KVM(r4)
+ 	lbz	r0, KVM_RADIX(r6)
  	cmpwi	r0, 0
--	bne	3f			/* for radix, save 0 entries */
-+	bne	0f			/* for radix, save 0 entries */
- 	lwz	r0,VCPU_SLB_NR(r9)	/* number of entries in SLB */
- 	mtctr	r0
- 	li	r6,0
-@@ -1490,12 +1504,9 @@ guest_exit_cont:		/* r9 = vcpu, r12 = trap, r13 = paca */
- 	slbmte	r0,r0
+ 	bne	9f
++
++	/* For hash guest, clear out and reload the SLB */
++BEGIN_MMU_FTR_SECTION
++	/* Radix host won't have populated the SLB, so no need to clear */
+ 	li	r6, 0
+ 	slbmte	r6, r6
  	slbia
  	ptesync
--3:	stw	r5,VCPU_SLB_MAX(r9)
-+	stw	r5,VCPU_SLB_MAX(r9)
++END_MMU_FTR_SECTION_IFCLR(MMU_FTR_TYPE_RADIX)
  
- 	/* load host SLB entries */
--BEGIN_MMU_FTR_SECTION
--	b	0f
--END_MMU_FTR_SECTION_IFSET(MMU_FTR_TYPE_RADIX)
- 	ld	r8,PACA_SLBSHADOWPTR(r13)
- 
- 	.rept	SLB_NUM_BOLTED
-@@ -1508,7 +1519,17 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_TYPE_RADIX)
- 	slbmte	r6,r5
- 1:	addi	r8,r8,16
- 	.endr
--0:
-+	b	guest_bypass
-+
-+0:	/* Sanitise radix guest SLB, see guest_exit_short_path comment. */
-+	li	r0,0
-+	slbmte	r0,r0
-+	li	r4,1
-+	slbmte	r0,r4
-+	li	r4,2
-+	slbmte	r0,r4
-+	li	r4,3
-+	slbmte	r0,r4
- 
- guest_bypass:
- 	stw	r12, STACK_SLOT_TRAP(r1)
-@@ -3302,12 +3323,14 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_300)
- 	mtspr	SPRN_CIABR, r0
- 	mtspr	SPRN_DAWRX0, r0
- 
-+	/* Clear hash and radix guest SLB, see guest_exit_short_path comment. */
-+	slbmte	r0, r0
-+	slbia
-+
- BEGIN_MMU_FTR_SECTION
- 	b	4f
- END_MMU_FTR_SECTION_IFSET(MMU_FTR_TYPE_RADIX)
- 
--	slbmte	r0, r0
--	slbia
- 	ptesync
- 	ld	r8, PACA_SLBSHADOWPTR(r13)
- 	.rept	SLB_NUM_BOLTED
+ 	/* Load up guest SLB entries (N.B. slb_max will be 0 for radix) */
+ 	lwz	r5,VCPU_SLB_MAX(r4)
 -- 
 2.23.0
 
