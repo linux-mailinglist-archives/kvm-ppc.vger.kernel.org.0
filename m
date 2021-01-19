@@ -2,128 +2,75 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 932E72FB29D
-	for <lists+kvm-ppc@lfdr.de>; Tue, 19 Jan 2021 08:15:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D7FF2FB4C5
+	for <lists+kvm-ppc@lfdr.de>; Tue, 19 Jan 2021 10:05:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730184AbhASHOd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 19 Jan 2021 02:14:33 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47564 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730073AbhASHN4 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 19 Jan 2021 02:13:56 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10J73fDp141028;
-        Tue, 19 Jan 2021 02:12:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=TjgaFPFDJH1Zmk+EzMNJQgevie8By4s9zWMwEvR//Lo=;
- b=gPRGb6lXM+mGqGH+seThTFc3N3rUpsS8X8QVKzuHcMRFuHUURfThfsB8YZCKmPHnB2Ne
- 9NgJHgddYYhJCrpEr1Da9CdIsheLpF2jyKTcVrNeS69FICG67Fa1GM6Yn7KAeiuISurp
- 4FIBtP259ujP5O1ikYGsfQEaYUu5S+26fylmtBL02CtD9HcKwBTLYNKCvBIhmQVPxkgq
- KyODj0p26OUxl0XixLgn2FX2WB5vDsz460HgHpuPjZRHx2pa4nuK93XWrw0QqrRoj79r
- RUMq/kreWzc+uAJnf4cW5i5VvPknivmpbmDexXhmfQTlAXARQTk4KyO09NVFwveJ0IcG jQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 365sm19mf5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 02:12:52 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10J75AUW003059;
-        Tue, 19 Jan 2021 02:12:52 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 365sm19mej-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 02:12:52 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10J7032Q025006;
-        Tue, 19 Jan 2021 07:12:50 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 363qdhat4d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 07:12:49 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10J7Cl1r40763666
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Jan 2021 07:12:47 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BA9C3A4051;
-        Tue, 19 Jan 2021 07:12:47 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 97971A4040;
-        Tue, 19 Jan 2021 07:12:44 +0000 (GMT)
-Received: from [9.77.206.253] (unknown [9.77.206.253])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 19 Jan 2021 07:12:44 +0000 (GMT)
-Subject: Re: [RFC Qemu PATCH v2 1/2] spapr: drc: Add support for async hcalls
- at the drc level
-To:     David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>
-Cc:     xiaoguangrong.eric@gmail.com, mst@redhat.com, imammedo@redhat.com,
-        qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
-        linux-nvdimm@lists.01.org, aneesh.kumar@linux.ibm.com,
-        kvm-ppc@vger.kernel.org, shivaprasadbhat@gmail.com,
-        bharata@linux.vnet.ibm.com, linuxppc-dev@lists.ozlabs.org
-References: <160674929554.2492771.17651548703390170573.stgit@lep8c.aus.stglabs.ibm.com>
- <160674938210.2492771.1728601884822491679.stgit@lep8c.aus.stglabs.ibm.com>
- <20201221130853.15c8ddfd@bahia.lan> <20201228083800.GN6952@yekko.fritz.box>
-From:   Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Message-ID: <3b47312a-217f-8df5-0bfd-1a653598abad@linux.ibm.com>
-Date:   Tue, 19 Jan 2021 12:40:31 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-MIME-Version: 1.0
-In-Reply-To: <20201228083800.GN6952@yekko.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-19_01:2021-01-18,2021-01-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- spamscore=0 suspectscore=0 clxscore=1011 mlxlogscore=999 phishscore=0
- adultscore=0 priorityscore=1501 lowpriorityscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101190041
+        id S1731402AbhASJEi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 19 Jan 2021 04:04:38 -0500
+Received: from pegase1.c-s.fr ([93.17.236.30]:17536 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730612AbhASJEO (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 19 Jan 2021 04:04:14 -0500
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 4DKjP81Cfjz9txSb;
+        Tue, 19 Jan 2021 10:03:24 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id XQKW7MRXoPXn; Tue, 19 Jan 2021 10:03:24 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 4DKjP74myHz9txSZ;
+        Tue, 19 Jan 2021 10:03:23 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id A46158B7B8;
+        Tue, 19 Jan 2021 10:03:24 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id FrUXJlyGBR-b; Tue, 19 Jan 2021 10:03:24 +0100 (CET)
+Received: from po16121vm.idsi0.si.c-s.fr (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 4E0728B7B7;
+        Tue, 19 Jan 2021 10:03:24 +0100 (CET)
+Received: by po16121vm.idsi0.si.c-s.fr (Postfix, from userid 0)
+        id D4B716639E; Tue, 19 Jan 2021 06:36:52 +0000 (UTC)
+Message-Id: <74461a99fa1466f361532ca794ca0753be3d9f86.1611038044.git.christophe.leroy@csgroup.eu>
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+Subject: [PATCH] powerpc/kvm: Force selection of CONFIG_PPC_FPU
+To:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Cc:     linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-ppc@vger.kernel.org
+Date:   Tue, 19 Jan 2021 06:36:52 +0000 (UTC)
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Thanks for the comments!
+book3s/32 kvm is designed with the assumption that
+an FPU is always present.
 
+Force selection of FPU support in the kernel when
+build KVM.
 
-On 12/28/20 2:08 PM, David Gibson wrote:
+Reported-by: kernel test robot <lkp@intel.com>
+Fixes: 7d68c8916950 ("powerpc/32s: Allow deselecting CONFIG_PPC_FPU on mpc832x")
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+---
+ arch/powerpc/kvm/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-> On Mon, Dec 21, 2020 at 01:08:53PM +0100, Greg Kurz wrote:
-...
->> The overall idea looks good but I think you should consider using
->> a thread pool to implement it. See below.
-> I am not convinced, however.  Specifically, attaching this to the DRC
-> doesn't make sense to me.  We're adding exactly one DRC related async
-> hcall, and I can't really see much call for another one.  We could
-> have other async hcalls - indeed we already have one for HPT resizing
-> - but attaching this to DRCs doesn't help for those.
-
-The semantics of the hcall made me think, if this is going to be
-
-re-usable for future if implemented at DRC level. Other option
-
-is to move the async-hcall-state/list into the NVDIMMState structure
-
-in include/hw/mem/nvdimm.h and handle it with machine->nvdimms_state
-
-at a global level.
-
-
-Hope you are okay with using the pool based approach that Greg
-
-suggested.
-
-
-Please let me know.
-
-
-Thanks,
-
-Shivaprasad
-
+diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
+index 549591d9aaa2..e45644657d49 100644
+--- a/arch/powerpc/kvm/Kconfig
++++ b/arch/powerpc/kvm/Kconfig
+@@ -54,6 +54,7 @@ config KVM_BOOK3S_32
+ 	select KVM
+ 	select KVM_BOOK3S_32_HANDLER
+ 	select KVM_BOOK3S_PR_POSSIBLE
++	select PPC_FPU
+ 	help
+ 	  Support running unmodified book3s_32 guest kernels
+ 	  in virtual machines on book3s_32 host processors.
+-- 
+2.25.0
 
