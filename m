@@ -2,186 +2,184 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A24C2FA279
-	for <lists+kvm-ppc@lfdr.de>; Mon, 18 Jan 2021 15:05:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1558C2FAE61
+	for <lists+kvm-ppc@lfdr.de>; Tue, 19 Jan 2021 02:41:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392625AbhAROE4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 18 Jan 2021 09:04:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55732 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391440AbhARM06 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 18 Jan 2021 07:26:58 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C93FC061573
-        for <kvm-ppc@vger.kernel.org>; Mon, 18 Jan 2021 04:26:18 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id kx7so163311pjb.2
-        for <kvm-ppc@vger.kernel.org>; Mon, 18 Jan 2021 04:26:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=EVfhBrBc4bRhWEYaMdwcW79J/KS3SFlxun+R1Uj1eXU=;
-        b=On3XP3a3BY0kh1TareEHF1WeVCC5eq2vIVMzv44lvynxhGvnwHUEcEnD6gYdSvIi2d
-         ev5Y0DhuGWz8DJiWB9C6dXq1HSUAQ2EzbrNxPTXYzNqXYgWkuDOGbSlJnaMyox98dkLj
-         0FJiLI5fOhJw6sduO61HMumGA+sUe9547W/Bm9MmsZRwvdHfiWph4BVj8V7745TKCYJf
-         6FgIDPBGiGN19lHNMi+xE/0RIqK1YYj8saqJ3Xkv7rZbLV5M6RNP0sKyLzC8WsaoJhCs
-         PxhzU5cCfjkaCMErfNNZNQxUte14Ak9d3j8YHhs1tl2DSaZx1Ya8D/LqtyPPdM+aXH2G
-         /ROg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=EVfhBrBc4bRhWEYaMdwcW79J/KS3SFlxun+R1Uj1eXU=;
-        b=PZAW2fpCjdaboOW55RTfd8FwxRuVCll862yjSYHZG6M5cMGiqLFT7Y+ZamXsOo5Su+
-         T5pYEnhljLFI1QHzHPFF3OerGudEmwbYKb4wLKXFYUcnaFPbOFycrBUilyMuZwiExK5d
-         qKa7nHC6dY1gYK5CFlBZ2Slg8MhsvxL59nR6a6MdwkehoBQY+bCwj+mfFN8U+GTiKV2u
-         nzi1FoINJ8eyXIFoThHrZzMUOh1IHDZeXPwhW90DG1z/Fl6o4gDMhvGgbm7+6eYDA607
-         p1VhM5HXB+6J/GiSe9BQr6XgqKpVOpOoa3vKfx7tE6D1Ey2DiuQwe5A/WN+eZvHpPE02
-         PvZg==
-X-Gm-Message-State: AOAM532HVCuN0TGUAQCFlTEXp+iBrH30g8EZzrHjKpOpDFdp4Ph2MMBw
-        GJN8SKTuGJ9obvNNFIdRuxvZ85Bunos=
-X-Google-Smtp-Source: ABdhPJxs8Dq1VNINpn+3xDNUm1xm3HTQZoVuZQfOkT0U4jf7mnfthiIGzQpWds62KetZdKnhp6w9tQ==
-X-Received: by 2002:a17:902:6b02:b029:da:c6c0:d650 with SMTP id o2-20020a1709026b02b02900dac6c0d650mr26480557plk.74.1610972777777;
-        Mon, 18 Jan 2021 04:26:17 -0800 (PST)
-Received: from bobo.ibm.com ([124.170.13.62])
-        by smtp.gmail.com with ESMTPSA id h3sm15896098pgm.67.2021.01.18.04.26.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jan 2021 04:26:17 -0800 (PST)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH 1/2] KVM: PPC: Book3S HV: Remove shared-TLB optimisation from vCPU TLB coherency logic
-Date:   Mon, 18 Jan 2021 22:26:08 +1000
-Message-Id: <20210118122609.1447366-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.23.0
+        id S1732949AbhASBkq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 18 Jan 2021 20:40:46 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49664 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729202AbhASBkp (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 18 Jan 2021 20:40:45 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10J1VDGH022172;
+        Mon, 18 Jan 2021 20:39:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=vCnPONhsbszbjEO+eNVCR6n012BR8Inlxk4aaej4GK4=;
+ b=Zo8+ZDwbkWobMpPWjsP8yhDeUYmMTGiKHIyuAVssfHwJV5AneHNuCm1NXuhTMsFqKmhQ
+ 7iLMGWLNk0qjX25JxvTobuH0rIK43F+/BEQOvNXMATG8SMOpDDnbqQ8AP4KGTHOLm4jz
+ 9AKNpirYPEEIvakkFNYA/QENbXHKTvHTA/bvI1jkhL63JSp79Lv4bzTm43LVZc1v5Q7t
+ UGyg7VINuaAYeNeIBDwihgObbA0Qy1XQvSrYs9QtxqBHO0PTlfzry9nkmaKEZle1puDL
+ J+0ZAPbK8sIOrggvOsqsqLonFRZ12tov5noEL9HICt6lB7UQszGNhovtFvDhucncJev0 xQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365gs0eg6c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 18 Jan 2021 20:39:47 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10J1Xpp0031960;
+        Mon, 18 Jan 2021 20:39:46 -0500
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365gs0eg62-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 18 Jan 2021 20:39:46 -0500
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10J1VYCx019261;
+        Tue, 19 Jan 2021 01:39:46 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma03wdc.us.ibm.com with ESMTP id 363qs8twvs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 01:39:45 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10J1djdU26739002
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Jan 2021 01:39:45 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 79A37112062;
+        Tue, 19 Jan 2021 01:39:45 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8AA1C112061;
+        Tue, 19 Jan 2021 01:39:44 +0000 (GMT)
+Received: from localhost (unknown [9.211.51.53])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Tue, 19 Jan 2021 01:39:44 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 2/4] KVM: PPC: Book3S HV: Fix radix guest SLB side channel
+In-Reply-To: <20210118062809.1430920-3-npiggin@gmail.com>
+References: <20210118062809.1430920-1-npiggin@gmail.com>
+ <20210118062809.1430920-3-npiggin@gmail.com>
+Date:   Mon, 18 Jan 2021 22:39:41 -0300
+Message-ID: <87ft2xbt7m.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-18_15:2021-01-18,2021-01-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ malwarescore=0 adultscore=0 impostorscore=0 mlxscore=0 suspectscore=0
+ clxscore=1015 mlxlogscore=999 priorityscore=1501 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101190003
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Processors that implement ISA v3.0 or later don't necessarily have
-threads in a core sharing all translations, and/or TLBIEL does not
-necessarily invalidate translations on all other threads (the
-architecture talks only about the effect on translations for "the thread
-executing the tlbiel instruction".
+Nicholas Piggin <npiggin@gmail.com> writes:
 
-While this worked for POWER9, it may not for future implementations, so
-remove it. A POWER9 specific optimisation would have to have a specific
-CPU feature to check, if it were to be re-added.
+> The slbmte instruction is legal in radix mode, including radix guest
+> mode. This means radix guests can load the SLB with arbitrary data.
+>
+> KVM host does not clear the SLB when exiting a guest if it was a
+> radix guest, which would allow a rogue radix guest to use the SLB as
+> a side channel to communicate with other guests.
+>
+> Fix this by ensuring the SLB is cleared when coming out of a radix
+> guest. Only the first 4 entries are a concern, because radix guests
+> always run with LPCR[UPRT]=1, which limits the reach of slbmte. slbia
+> is not used (except in a non-performance-critical path) because it
+> can clear cached translations.
+>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- arch/powerpc/kvm/book3s_hv.c         | 32 +++++++++++++++++++---------
- arch/powerpc/kvm/book3s_hv_builtin.c |  9 --------
- arch/powerpc/kvm/book3s_hv_rm_mmu.c  |  6 ------
- 3 files changed, 22 insertions(+), 25 deletions(-)
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 2d8627dbd9f6..752daf43f780 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -2588,22 +2588,34 @@ static void radix_flush_cpu(struct kvm *kvm, int cpu, struct kvm_vcpu *vcpu)
- {
- 	struct kvm_nested_guest *nested = vcpu->arch.nested;
- 	cpumask_t *cpu_in_guest;
-+	cpumask_t *need_tlb_flush;
- 	int i;
- 
--	cpu = cpu_first_thread_sibling(cpu);
- 	if (nested) {
--		cpumask_set_cpu(cpu, &nested->need_tlb_flush);
-+		need_tlb_flush = &nested->need_tlb_flush;
- 		cpu_in_guest = &nested->cpu_in_guest;
- 	} else {
--		cpumask_set_cpu(cpu, &kvm->arch.need_tlb_flush);
-+		need_tlb_flush = &kvm->arch.need_tlb_flush;
- 		cpu_in_guest = &kvm->arch.cpu_in_guest;
- 	}
-+
-+	cpu = cpu_first_thread_sibling(cpu);
-+	for (i = 0; i < threads_per_core; ++i)
-+		cpumask_set_cpu(cpu + i, need_tlb_flush);
-+
- 	/*
--	 * Make sure setting of bit in need_tlb_flush precedes
-+	 * Make sure setting of bits in need_tlb_flush precedes
- 	 * testing of cpu_in_guest bits.  The matching barrier on
- 	 * the other side is the first smp_mb() in kvmppc_run_core().
- 	 */
- 	smp_mb();
-+
-+	/*
-+	 * Pull vcpus out of guests if necessary, such that they'll notice
-+	 * the need_tlb_flush bit when they re-enter the guest. If this was
-+	 * ever a performance concern, it would be interesting to compare
-+	 * with performance of using TLBIE.
-+	 */
- 	for (i = 0; i < threads_per_core; ++i)
- 		if (cpumask_test_cpu(cpu + i, cpu_in_guest))
- 			smp_call_function_single(cpu + i, do_nothing, NULL, 1);
-@@ -2632,18 +2644,18 @@ static void kvmppc_prepare_radix_vcpu(struct kvm_vcpu *vcpu, int pcpu)
- 	 * can move around between pcpus.  To cope with this, when
- 	 * a vcpu moves from one pcpu to another, we need to tell
- 	 * any vcpus running on the same core as this vcpu previously
--	 * ran to flush the TLB.  The TLB is shared between threads,
--	 * so we use a single bit in .need_tlb_flush for all 4 threads.
-+	 * ran to flush the TLB.
- 	 */
- 	if (prev_cpu != pcpu) {
--		if (prev_cpu >= 0 &&
--		    cpu_first_thread_sibling(prev_cpu) !=
--		    cpu_first_thread_sibling(pcpu))
--			radix_flush_cpu(kvm, prev_cpu, vcpu);
- 		if (nested)
- 			nested->prev_cpu[vcpu->arch.nested_vcpu_id] = pcpu;
- 		else
- 			vcpu->arch.prev_cpu = pcpu;
-+
-+		if (prev_cpu < 0)
-+			return; /* first run */
-+
-+		radix_flush_cpu(kvm, prev_cpu, vcpu);
- 	}
- }
- 
-diff --git a/arch/powerpc/kvm/book3s_hv_builtin.c b/arch/powerpc/kvm/book3s_hv_builtin.c
-index f3d3183249fe..dad118760a4e 100644
---- a/arch/powerpc/kvm/book3s_hv_builtin.c
-+++ b/arch/powerpc/kvm/book3s_hv_builtin.c
-@@ -789,15 +789,6 @@ void kvmppc_check_need_tlb_flush(struct kvm *kvm, int pcpu,
- {
- 	cpumask_t *need_tlb_flush;
- 
--	/*
--	 * On POWER9, individual threads can come in here, but the
--	 * TLB is shared between the 4 threads in a core, hence
--	 * invalidating on one thread invalidates for all.
--	 * Thus we make all 4 threads use the same bit.
--	 */
--	if (cpu_has_feature(CPU_FTR_ARCH_300))
--		pcpu = cpu_first_thread_sibling(pcpu);
--
- 	if (nested)
- 		need_tlb_flush = &nested->need_tlb_flush;
- 	else
-diff --git a/arch/powerpc/kvm/book3s_hv_rm_mmu.c b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-index 88da2764c1bb..f87237927096 100644
---- a/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-+++ b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-@@ -62,12 +62,6 @@ static int global_invalidates(struct kvm *kvm)
- 		smp_wmb();
- 		cpumask_setall(&kvm->arch.need_tlb_flush);
- 		cpu = local_paca->kvm_hstate.kvm_vcore->pcpu;
--		/*
--		 * On POWER9, threads are independent but the TLB is shared,
--		 * so use the bit for the first thread to represent the core.
--		 */
--		if (cpu_has_feature(CPU_FTR_ARCH_300))
--			cpu = cpu_first_thread_sibling(cpu);
- 		cpumask_clear_cpu(cpu, &kvm->arch.need_tlb_flush);
- 	}
- 
--- 
-2.23.0
-
+> ---
+>  arch/powerpc/kvm/book3s_hv_rmhandlers.S | 39 ++++++++++++++++++++-----
+>  1 file changed, 31 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> index d5a9b57ec129..0e1f5bf168a1 100644
+> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> @@ -1157,6 +1157,20 @@ EXPORT_SYMBOL_GPL(__kvmhv_vcpu_entry_p9)
+>  	mr	r4, r3
+>  	b	fast_guest_entry_c
+>  guest_exit_short_path:
+> +	/*
+> +	 * Malicious or buggy radix guests may have inserted SLB entries
+> +	 * (only 0..3 because radix always runs with UPRT=1), so these must
+> +	 * be cleared here to avoid side-channels. slbmte is used rather
+> +	 * than slbia, as it won't clear cached translations.
+> +	 */
+> +	li	r0,0
+> +	slbmte	r0,r0
+> +	li	r4,1
+> +	slbmte	r0,r4
+> +	li	r4,2
+> +	slbmte	r0,r4
+> +	li	r4,3
+> +	slbmte	r0,r4
+>
+>  	li	r0, KVM_GUEST_MODE_NONE
+>  	stb	r0, HSTATE_IN_GUEST(r13)
+> @@ -1469,7 +1483,7 @@ guest_exit_cont:		/* r9 = vcpu, r12 = trap, r13 = paca */
+>  	lbz	r0, KVM_RADIX(r5)
+>  	li	r5, 0
+>  	cmpwi	r0, 0
+> -	bne	3f			/* for radix, save 0 entries */
+> +	bne	0f			/* for radix, save 0 entries */
+>  	lwz	r0,VCPU_SLB_NR(r9)	/* number of entries in SLB */
+>  	mtctr	r0
+>  	li	r6,0
+> @@ -1490,12 +1504,9 @@ guest_exit_cont:		/* r9 = vcpu, r12 = trap, r13 = paca */
+>  	slbmte	r0,r0
+>  	slbia
+>  	ptesync
+> -3:	stw	r5,VCPU_SLB_MAX(r9)
+> +	stw	r5,VCPU_SLB_MAX(r9)
+>
+>  	/* load host SLB entries */
+> -BEGIN_MMU_FTR_SECTION
+> -	b	0f
+> -END_MMU_FTR_SECTION_IFSET(MMU_FTR_TYPE_RADIX)
+>  	ld	r8,PACA_SLBSHADOWPTR(r13)
+>
+>  	.rept	SLB_NUM_BOLTED
+> @@ -1508,7 +1519,17 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_TYPE_RADIX)
+>  	slbmte	r6,r5
+>  1:	addi	r8,r8,16
+>  	.endr
+> -0:
+> +	b	guest_bypass
+> +
+> +0:	/* Sanitise radix guest SLB, see guest_exit_short_path comment. */
+> +	li	r0,0
+> +	slbmte	r0,r0
+> +	li	r4,1
+> +	slbmte	r0,r4
+> +	li	r4,2
+> +	slbmte	r0,r4
+> +	li	r4,3
+> +	slbmte	r0,r4
+>
+>  guest_bypass:
+>  	stw	r12, STACK_SLOT_TRAP(r1)
+> @@ -3302,12 +3323,14 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_300)
+>  	mtspr	SPRN_CIABR, r0
+>  	mtspr	SPRN_DAWRX0, r0
+>
+> +	/* Clear hash and radix guest SLB, see guest_exit_short_path comment. */
+> +	slbmte	r0, r0
+> +	slbia
+> +
+>  BEGIN_MMU_FTR_SECTION
+>  	b	4f
+>  END_MMU_FTR_SECTION_IFSET(MMU_FTR_TYPE_RADIX)
+>
+> -	slbmte	r0, r0
+> -	slbia
+>  	ptesync
+>  	ld	r8, PACA_SLBSHADOWPTR(r13)
+>  	.rept	SLB_NUM_BOLTED
