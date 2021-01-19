@@ -2,121 +2,128 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92B182FAF1A
-	for <lists+kvm-ppc@lfdr.de>; Tue, 19 Jan 2021 04:28:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 932E72FB29D
+	for <lists+kvm-ppc@lfdr.de>; Tue, 19 Jan 2021 08:15:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394898AbhASD2P (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 18 Jan 2021 22:28:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51588 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387937AbhASD2F (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 18 Jan 2021 22:28:05 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D4FEC061573
-        for <kvm-ppc@vger.kernel.org>; Mon, 18 Jan 2021 19:27:21 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id i7so12169207pgc.8
-        for <kvm-ppc@vger.kernel.org>; Mon, 18 Jan 2021 19:27:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=IvOBsG72TdtWfS2ELjW2ZROhGBBtphs2og0NRX6347g=;
-        b=WzlPZUCPM1Cpmyg5zbkdCabBVvDTpgo8HeopahJpAXcJuBQctVehr4fdJ7m2jOoTt+
-         vkFbB+v/gPYeVUQo7bAffL3xndtPaPwPxhtT8hzJcxSYC5PU71DcbGJxuNbOM+XdHcLK
-         L75NUaoLyUSyKV0k2c27k1iIhCjoSDuHgDsbDaIIP6BYY0pu/lPJnhutPEMwsBOMZvjm
-         OvkLMroUT/L2C3UQJJIyRJjVCiA4iXPN4O6Gz5OVVYBrbSMIhdbgRxvyG4lehy2x7iEO
-         llE/soVjr3po/L0NOpvUEKcKpsMDVUL/d/HQj5NmbyyOUlOYGKjduvccvEfuGATDBKVY
-         JnOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=IvOBsG72TdtWfS2ELjW2ZROhGBBtphs2og0NRX6347g=;
-        b=WSPHZP+JF4j2ZFjY7YfTjEd4bxysXz1ykIJW1lDZovFKfSAGYG7dwOK0YdMPT5vc8g
-         ylC2vYpd5cVAViVz5KxKcloPwiGQ4PPLR6FdtgqAp66vq5vUZGjp/zPrMPXvXTS6FEzO
-         BxmPiv1bQnBbcla6hJswlHDTs3Z7Oscwqq5/CikceYcOl3iiCi5VqLCHfHkB6j20l4M6
-         pKCSDtgNVWEXB9u1mrkiqqCYec8UrdgCl2cr+o6ho35OMea7Z48O1TrBeNxhqLnIGJd6
-         rsLpeYK0UCmgwagbvoSXXHrCF85jUjDdRDevTeZIw2gVRsKimxy5yAXKij1ya//7nwcq
-         rpgg==
-X-Gm-Message-State: AOAM531KeaVV6bRWfJ8OHwlIQE9B1Td2fBsYxW9bLmSRVZ6RwVe1fvuq
-        72X1fS8Cx9Pute4a5TdIYimsrns1gZU=
-X-Google-Smtp-Source: ABdhPJx3qm+cpo9wollUnAI7zsT1q9W49I+QP8XB1qmGNZRU8jW7AlePuZqpCb/i2a/qtXU0ANS1HA==
-X-Received: by 2002:a63:4e44:: with SMTP id o4mr2666091pgl.46.1611026840999;
-        Mon, 18 Jan 2021 19:27:20 -0800 (PST)
-Received: from localhost ([124.170.13.62])
-        by smtp.gmail.com with ESMTPSA id b72sm16882132pfb.129.2021.01.18.19.27.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jan 2021 19:27:20 -0800 (PST)
-Date:   Tue, 19 Jan 2021 13:27:15 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 1/4] KVM: PPC: Book3S HV: Remove support for running HPT
- guest on RPT host without mixed mode support
-To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org
-References: <20210118062809.1430920-1-npiggin@gmail.com>
-        <20210118062809.1430920-2-npiggin@gmail.com> <87czy1bsvz.fsf@linux.ibm.com>
-In-Reply-To: <87czy1bsvz.fsf@linux.ibm.com>
+        id S1730184AbhASHOd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 19 Jan 2021 02:14:33 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47564 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730073AbhASHN4 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 19 Jan 2021 02:13:56 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10J73fDp141028;
+        Tue, 19 Jan 2021 02:12:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=TjgaFPFDJH1Zmk+EzMNJQgevie8By4s9zWMwEvR//Lo=;
+ b=gPRGb6lXM+mGqGH+seThTFc3N3rUpsS8X8QVKzuHcMRFuHUURfThfsB8YZCKmPHnB2Ne
+ 9NgJHgddYYhJCrpEr1Da9CdIsheLpF2jyKTcVrNeS69FICG67Fa1GM6Yn7KAeiuISurp
+ 4FIBtP259ujP5O1ikYGsfQEaYUu5S+26fylmtBL02CtD9HcKwBTLYNKCvBIhmQVPxkgq
+ KyODj0p26OUxl0XixLgn2FX2WB5vDsz460HgHpuPjZRHx2pa4nuK93XWrw0QqrRoj79r
+ RUMq/kreWzc+uAJnf4cW5i5VvPknivmpbmDexXhmfQTlAXARQTk4KyO09NVFwveJ0IcG jQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365sm19mf5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 02:12:52 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10J75AUW003059;
+        Tue, 19 Jan 2021 02:12:52 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365sm19mej-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 02:12:52 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10J7032Q025006;
+        Tue, 19 Jan 2021 07:12:50 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 363qdhat4d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 07:12:49 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10J7Cl1r40763666
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Jan 2021 07:12:47 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BA9C3A4051;
+        Tue, 19 Jan 2021 07:12:47 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 97971A4040;
+        Tue, 19 Jan 2021 07:12:44 +0000 (GMT)
+Received: from [9.77.206.253] (unknown [9.77.206.253])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 19 Jan 2021 07:12:44 +0000 (GMT)
+Subject: Re: [RFC Qemu PATCH v2 1/2] spapr: drc: Add support for async hcalls
+ at the drc level
+To:     David Gibson <david@gibson.dropbear.id.au>,
+        Greg Kurz <groug@kaod.org>
+Cc:     xiaoguangrong.eric@gmail.com, mst@redhat.com, imammedo@redhat.com,
+        qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+        linux-nvdimm@lists.01.org, aneesh.kumar@linux.ibm.com,
+        kvm-ppc@vger.kernel.org, shivaprasadbhat@gmail.com,
+        bharata@linux.vnet.ibm.com, linuxppc-dev@lists.ozlabs.org
+References: <160674929554.2492771.17651548703390170573.stgit@lep8c.aus.stglabs.ibm.com>
+ <160674938210.2492771.1728601884822491679.stgit@lep8c.aus.stglabs.ibm.com>
+ <20201221130853.15c8ddfd@bahia.lan> <20201228083800.GN6952@yekko.fritz.box>
+From:   Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Message-ID: <3b47312a-217f-8df5-0bfd-1a653598abad@linux.ibm.com>
+Date:   Tue, 19 Jan 2021 12:40:31 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Message-Id: <1611025782.s66bkxjtqz.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20201228083800.GN6952@yekko.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-19_01:2021-01-18,2021-01-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ spamscore=0 suspectscore=0 clxscore=1011 mlxlogscore=999 phishscore=0
+ adultscore=0 priorityscore=1501 lowpriorityscore=0 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101190041
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Fabiano Rosas's message of January 19, 2021 11:46 am:
-> Resending because the previous got spam-filtered:
->=20
-> Nicholas Piggin <npiggin@gmail.com> writes:
->=20
->> This reverts much of commit c01015091a770 ("KVM: PPC: Book3S HV: Run HPT
->> guests on POWER9 radix hosts"), which was required to run HPT guests on
->> RPT hosts on early POWER9 CPUs without support for "mixed mode", which
->> meant the host could not run with MMU on while guests were running.
->>
->> This code has some corner case bugs, e.g., when the guest hits a machine
->> check or HMI the primary locks up waiting for secondaries to switch LPCR
->> to host, which they never do. This could all be fixed in software, but
->> most CPUs in production have mixed mode support, and those that don't
->> are believed to be all in installations that don't use this capability.
->> So simplify things and remove support.
->=20
-> With this patch in a DD2.1 machine + indep_threads_mode=3DN +
-> disable_radix, QEMU aborts and dumps registers, is that intended?
+Thanks for the comments!
 
-Yes. That configuration is hanging handling MCEs in the guest with some=20
-threads waiting forever to synchronize. Paul suggested it was never a
-supported configuration so we might just remove it.
 
-> Could we use the 'no_mixing_hpt_and_radix' logic in check_extension to
-> advertise only KVM_CAP_PPC_MMU_RADIX to the guest via OV5 so it doesn't
-> try to run hash?
->=20
-> For instance, if I hack QEMU's 'spapr_dt_ov5_platform_support' from
-> OV5_MMU_BOTH to OV5_MMU_RADIX_300 then it boots succesfuly, but the
-> guest turns into radix, due to this code in prom_init:
->=20
-> prom_parse_mmu_model:
->=20
-> case OV5_FEAT(OV5_MMU_RADIX): /* Only Radix */
-> 	prom_debug("MMU - radix only\n");
-> 	if (prom_radix_disable) {
-> 		/*
-> 		 * If we __have__ to do radix, we're better off ignoring
-> 		 * the command line rather than not booting.
-> 		 */
-> 		prom_printf("WARNING: Ignoring cmdline option disable_radix\n");
-> 	}
-> 	support->radix_mmu =3D true;
-> 	break;
->=20
-> It seems we could explicitly say that the host does not support hash and
-> that would align with the above code.
+On 12/28/20 2:08 PM, David Gibson wrote:
 
-I'm not sure, sounds like you could, on the other hand these aborts seem=20
-like the prefered failure mode for these kinds of configuration issues,=20
-I don't know what the policy is, is reverting back to radix acceptable?
+> On Mon, Dec 21, 2020 at 01:08:53PM +0100, Greg Kurz wrote:
+...
+>> The overall idea looks good but I think you should consider using
+>> a thread pool to implement it. See below.
+> I am not convinced, however.  Specifically, attaching this to the DRC
+> doesn't make sense to me.  We're adding exactly one DRC related async
+> hcall, and I can't really see much call for another one.  We could
+> have other async hcalls - indeed we already have one for HPT resizing
+> - but attaching this to DRCs doesn't help for those.
+
+The semantics of the hcall made me think, if this is going to be
+
+re-usable for future if implemented at DRC level. Other option
+
+is to move the async-hcall-state/list into the NVDIMMState structure
+
+in include/hw/mem/nvdimm.h and handle it with machine->nvdimms_state
+
+at a global level.
+
+
+Hope you are okay with using the pool based approach that Greg
+
+suggested.
+
+
+Please let me know.
+
 
 Thanks,
-Nick
+
+Shivaprasad
+
 
