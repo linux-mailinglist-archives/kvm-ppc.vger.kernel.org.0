@@ -2,161 +2,255 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E6A32FC5C2
-	for <lists+kvm-ppc@lfdr.de>; Wed, 20 Jan 2021 01:28:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D1992FD438
+	for <lists+kvm-ppc@lfdr.de>; Wed, 20 Jan 2021 16:38:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728871AbhATA1k (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 19 Jan 2021 19:27:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40994 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727450AbhATA1i (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 19 Jan 2021 19:27:38 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4418AC061573
-        for <kvm-ppc@vger.kernel.org>; Tue, 19 Jan 2021 16:26:58 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id q20so13392105pfu.8
-        for <kvm-ppc@vger.kernel.org>; Tue, 19 Jan 2021 16:26:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:references:in-reply-to:mime-version:message-id
-         :content-transfer-encoding;
-        bh=fZ6Yeu0aefudIRTiSVq3VDUTWlirpo0W2U3YMont1js=;
-        b=cFFhDQ9ohOw4egQ6Ew7IBMYT2hI9F2d+r2AgbIoa6R34KnUTt8GSfzprrLxB87GFMU
-         vyGIKGZn3lL/5oXNgLYcZ19JyLzgJ2Al89lI5y5Qov+6ZBDIQ704cKJYQFxyXkMiiyUZ
-         5DS6dF9cm0ikI44oBcoDzsYvGGD+c2sAqfeu5q0D+RcZ6yfWrUyIp4E8wWU1CKWt6Fbl
-         AzAR1Bt1u4eM038Gbr/7NPSy8EzQaKZVqpmmVhYD47poesdaUX/HpEf3EdvHSahkgE6q
-         plKFcUPuMkZ6RTijxh5Oi2KRaOmaHaejleb50POECXZ5NdOhOYjottOLqWt9nZfIuVgV
-         YRJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=fZ6Yeu0aefudIRTiSVq3VDUTWlirpo0W2U3YMont1js=;
-        b=Y1cXhBcBST175TsdjCyOWuk+jjhcvCbKxo5HJ3nIPFb4E+flWqjd8y69AMtuVaZYR1
-         jIhiX3aP909r8lQjg7dSZI2n6kvE+W9O7Z4vcuSTwy+Vb2i5HH6pULTbOv+nEsqHFWZ2
-         n/7lb/LXtExxg3/xrWBz6Vo6TXg4vbjNiDoQYtQnt2ILsfQHz7NpdN020y9bZZEDq04B
-         mxfockUVI2Ce6H9V7+BW1dAM/4iMlVTY2DFacAp8jDwVWfAp6R+kVjbH/i0e5Ie+XF4s
-         LGNqTIQPyBnQ9mPdoZq11QQuIrSAI0UtqC0RGwPcMfCcwts8cWAEdd9P9KJVMtfTwJtw
-         Jlzg==
-X-Gm-Message-State: AOAM5322YQIt+YLMI4yYLymivWZk30kYOBod1pM7SYFRj7jCcMs4wdXq
-        zyc/FifidsyKcOMXBSWtKZo=
-X-Google-Smtp-Source: ABdhPJxClTRJyVnEaBp6AjtkhCmMl7ShkitYnh3pvrxu3TEz0RfeU5GJVoFtELjNveXPo1K99yX74w==
-X-Received: by 2002:a63:ff09:: with SMTP id k9mr6789190pgi.175.1611102417849;
-        Tue, 19 Jan 2021 16:26:57 -0800 (PST)
-Received: from localhost ([124.170.13.62])
-        by smtp.gmail.com with ESMTPSA id s76sm247062pfc.35.2021.01.19.16.26.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jan 2021 16:26:57 -0800 (PST)
-Date:   Wed, 20 Jan 2021 10:26:51 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 2/2] KVM: PPC: Book3S HV: Optimise TLB flushing when a
- vcpu moves between threads in a core
-To:     "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
-        kvm-ppc@vger.kernel.org
-References: <20210118122609.1447366-1-npiggin@gmail.com>
-        <20210118122609.1447366-2-npiggin@gmail.com> <87sg6x5kfo.fsf@linux.ibm.com>
-In-Reply-To: <87sg6x5kfo.fsf@linux.ibm.com>
+        id S2387652AbhATOvy (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 20 Jan 2021 09:51:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19218 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729869AbhATO24 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 20 Jan 2021 09:28:56 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10KE3ewZ126306;
+        Wed, 20 Jan 2021 09:28:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=97yAGHY0MFwvD6eNI1hLKhB1ltZzOEl9TAIgB0hjtGg=;
+ b=gZL++4pziDYT9yHe7i/vWIh0ib3zTW6HD0jJTnys6V+cBrI16wjA5MmQWSDQbr6qvYKj
+ h+NgL6Lk43oS75+mG9AplZfK4bjbJpCjPWoYqnPpVJcQjEw3TseBOXl0EJlIqUikgnnK
+ Zl+PGciobLWvulM4SSz7kpV0LNz0m6DsSJqtsKahWAe6pqXMmmaAUUDmVQFPIVnTf+wC
+ 6RygO5Mhg6Y26KN917yf53p+G8JFgUt4HsSkNBv8mDxQxqkGF/44yba4kjjljApoq2MH
+ UzT8gZelV4f4YweYYuR9QpFP4QI21spXb2MM7o0nUEX308nyKlxoMhm7S/3kAEwiAijl 0w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 366ntjh0tk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 09:28:09 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10KE3fHW126331;
+        Wed, 20 Jan 2021 09:28:08 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 366ntjh0re-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 09:28:08 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10KEMsmS006932;
+        Wed, 20 Jan 2021 14:28:06 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma04dal.us.ibm.com with ESMTP id 3668p2p178-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 14:28:06 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10KES67p36897044
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Jan 2021 14:28:06 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E6F6BAE060;
+        Wed, 20 Jan 2021 14:28:05 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 13674AE063;
+        Wed, 20 Jan 2021 14:28:05 +0000 (GMT)
+Received: from localhost (unknown [9.163.16.99])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Wed, 20 Jan 2021 14:28:04 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 1/4] KVM: PPC: Book3S HV: Remove support for running HPT
+ guest on RPT host without mixed mode support
+In-Reply-To: <1611099866.a9bsenxeey.astroid@bobo.none>
+References: <20210118062809.1430920-1-npiggin@gmail.com>
+ <20210118062809.1430920-2-npiggin@gmail.com>
+ <87czy1bsvz.fsf@linux.ibm.com> <1611025782.s66bkxjtqz.astroid@bobo.none>
+ <87a6t4bpp2.fsf@linux.ibm.com> <1611099866.a9bsenxeey.astroid@bobo.none>
+Date:   Wed, 20 Jan 2021 11:27:57 -0300
+Message-ID: <877do7bs42.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Message-Id: <1611101698.8m2ih5f8sn.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-20_05:2021-01-20,2021-01-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 spamscore=0 phishscore=0 adultscore=0 mlxscore=0
+ suspectscore=0 malwarescore=0 impostorscore=0 clxscore=1015 bulkscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101200079
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Aneesh Kumar K.V's message of January 19, 2021 7:45 pm:
-> Nicholas Piggin <npiggin@gmail.com> writes:
->=20
->> As explained in the comment, there is no need to flush TLBs on all
->> threads in a core when a vcpu moves between threads in the same core.
->>
->> Thread migrations can be a significant proportion of vcpu migrations,
->> so this can help reduce the TLB flushing and IPI traffic.
->>
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Nicholas Piggin <npiggin@gmail.com> writes:
+
+> Excerpts from Fabiano Rosas's message of January 20, 2021 7:07 am:
+>> Nicholas Piggin <npiggin@gmail.com> writes:
+>> 
+>>> Excerpts from Fabiano Rosas's message of January 19, 2021 11:46 am:
+>>>> Resending because the previous got spam-filtered:
+>>>> 
+>>>> Nicholas Piggin <npiggin@gmail.com> writes:
+>>>> 
+>>>>> This reverts much of commit c01015091a770 ("KVM: PPC: Book3S HV: Run HPT
+>>>>> guests on POWER9 radix hosts"), which was required to run HPT guests on
+>>>>> RPT hosts on early POWER9 CPUs without support for "mixed mode", which
+>>>>> meant the host could not run with MMU on while guests were running.
+>>>>>
+>>>>> This code has some corner case bugs, e.g., when the guest hits a machine
+>>>>> check or HMI the primary locks up waiting for secondaries to switch LPCR
+>>>>> to host, which they never do. This could all be fixed in software, but
+>>>>> most CPUs in production have mixed mode support, and those that don't
+>>>>> are believed to be all in installations that don't use this capability.
+>>>>> So simplify things and remove support.
+>>>> 
+>>>> With this patch in a DD2.1 machine + indep_threads_mode=N +
+>>>> disable_radix, QEMU aborts and dumps registers, is that intended?
+>>>
+>>> Yes. That configuration is hanging handling MCEs in the guest with some 
+>>> threads waiting forever to synchronize. Paul suggested it was never a
+>>> supported configuration so we might just remove it.
+>>>
+>> 
+>> OK, so:
+>> 
+>> Tested-by: Fabiano Rosas <farosas@linux.ibm.com>
+>> 
+>>>> Could we use the 'no_mixing_hpt_and_radix' logic in check_extension to
+>>>> advertise only KVM_CAP_PPC_MMU_RADIX to the guest via OV5 so it doesn't
+>>>> try to run hash?
+>>>> 
+>>>> For instance, if I hack QEMU's 'spapr_dt_ov5_platform_support' from
+>>>> OV5_MMU_BOTH to OV5_MMU_RADIX_300 then it boots succesfuly, but the
+>>>> guest turns into radix, due to this code in prom_init:
+>>>> 
+>>>> prom_parse_mmu_model:
+>>>> 
+>>>> case OV5_FEAT(OV5_MMU_RADIX): /* Only Radix */
+>>>> 	prom_debug("MMU - radix only\n");
+>>>> 	if (prom_radix_disable) {
+>>>> 		/*
+>>>> 		 * If we __have__ to do radix, we're better off ignoring
+>>>> 		 * the command line rather than not booting.
+>>>> 		 */
+>>>> 		prom_printf("WARNING: Ignoring cmdline option disable_radix\n");
+>>>> 	}
+>>>> 	support->radix_mmu = true;
+>>>> 	break;
+>>>> 
+>>>> It seems we could explicitly say that the host does not support hash and
+>>>> that would align with the above code.
+>>>
+>>> I'm not sure, sounds like you could, on the other hand these aborts seem 
+>>> like the prefered failure mode for these kinds of configuration issues, 
+>>> I don't know what the policy is, is reverting back to radix acceptable?
+>>>
+>> 
+>> Yeah, I couldn't find documentation about why we're reverting back to
+>> radix. I personally dislike it, but there is already a precedent so I'm
+>> not sure. A radix guest on a hash host does the same transparent
+>> conversion AFAICT.
+>> 
+>> But despite that, this patch removes support for hash MMU in this
+>> particular scenario. I don't see why continuing to tell the guest we
+>> support hash.
+>> 
+>> Anyway, here's a patch if you decide to go that way (tested w/ DD2.1 &
+>> 2.3 machines):
+>
+> Thanks, I don't mind it, have to see if the maintainer will take it :)
+>
+> You could add a small changelog / SOB and I could putit after my patch?
+>
+
+Sure, I'll reply to this thread with a proper patch.
+
+>> 
 >> ---
->> I believe we can do this and have the TLB coherency correct as per
->> the architecture, but would appreciate someone else verifying my
->> thinking.
->>
->> Thanks,
->> Nick
->>
->>  arch/powerpc/kvm/book3s_hv.c | 28 ++++++++++++++++++++++++++--
->>  1 file changed, 26 insertions(+), 2 deletions(-)
->>
+>> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+>> index 0a056c64c317b..53743555676d6 100644
+>> --- a/arch/powerpc/include/asm/kvm_ppc.h
+>> +++ b/arch/powerpc/include/asm/kvm_ppc.h
+>> @@ -314,6 +314,7 @@ struct kvmppc_ops {
+>>  			      int size);
+>>  	int (*enable_svm)(struct kvm *kvm);
+>>  	int (*svm_off)(struct kvm *kvm);
+>> +	bool (*hash_possible)(void);
+>>  };
+>>  
+>>  extern struct kvmppc_ops *kvmppc_hv_ops;
 >> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
->> index 752daf43f780..53d0cbfe5933 100644
+>> index 6f612d240392f..2d1e8aba22b85 100644
 >> --- a/arch/powerpc/kvm/book3s_hv.c
 >> +++ b/arch/powerpc/kvm/book3s_hv.c
->> @@ -2584,7 +2584,7 @@ static void kvmppc_release_hwthread(int cpu)
->>  	tpaca->kvm_hstate.kvm_split_mode =3D NULL;
+>> @@ -5599,6 +5599,15 @@ static int kvmhv_svm_off(struct kvm *kvm)
+>>  	return ret;
 >>  }
->> =20
->> -static void radix_flush_cpu(struct kvm *kvm, int cpu, struct kvm_vcpu *=
-vcpu)
->> +static void radix_flush_cpu(struct kvm *kvm, int cpu, bool core, struct=
- kvm_vcpu *vcpu)
->>  {
->=20
-> Can we rename 'core' to something like 'core_sched'  or 'within_core'=20
->=20
->>  	struct kvm_nested_guest *nested =3D vcpu->arch.nested;
->>  	cpumask_t *cpu_in_guest;
->> @@ -2599,6 +2599,14 @@ static void radix_flush_cpu(struct kvm *kvm, int =
-cpu, struct kvm_vcpu *vcpu)
->>  		cpu_in_guest =3D &kvm->arch.cpu_in_guest;
->>  	}
->>
->=20
-> and do
->       if (core_sched) {
-
-This function is called to flush guest TLBs on this cpu / all threads on=20
-this cpu core. I don't think it helps to bring any "why" logic into it
-because the caller has already dealt with that.
-
-Thanks,
-Nick
-
->=20
->> +	if (!core) {
->> +		cpumask_set_cpu(cpu, need_tlb_flush);
->> +		smp_mb();
->> +		if (cpumask_test_cpu(cpu, cpu_in_guest))
->> +			smp_call_function_single(cpu, do_nothing, NULL, 1);
->> +		return;
->> +	}
+>>  
+>> +static bool kvmppc_hash_possible(void)
+>> +{
+>> +	if (radix_enabled() && no_mixing_hpt_and_radix)
+>> +		return false;
 >> +
->>  	cpu =3D cpu_first_thread_sibling(cpu);
->>  	for (i =3D 0; i < threads_per_core; ++i)
->>  		cpumask_set_cpu(cpu + i, need_tlb_flush);
->> @@ -2655,7 +2663,23 @@ static void kvmppc_prepare_radix_vcpu(struct kvm_=
-vcpu *vcpu, int pcpu)
->>  		if (prev_cpu < 0)
->>  			return; /* first run */
->> =20
->> -		radix_flush_cpu(kvm, prev_cpu, vcpu);
->> +		/*
->> +		 * If changing cores, all threads on the old core should
->> +		 * flush, because TLBs can be shared between threads. More
->> +		 * precisely, the thread we previously ran on should be
->> +		 * flushed, and the thread to first run a vcpu on the old
->> +		 * core should flush, but we don't keep enough information
->> +		 * around to track that, so we flush all.
->> +		 *
->> +		 * If changing threads in the same core, only the old thread
->> +		 * need be flushed.
->> +		 */
->> +		if (cpu_first_thread_sibling(prev_cpu) !=3D
->> +		    cpu_first_thread_sibling(pcpu))
->> +			radix_flush_cpu(kvm, prev_cpu, true, vcpu);
->> +		else
->> +			radix_flush_cpu(kvm, prev_cpu, false, vcpu);
+>> +	return cpu_has_feature(CPU_FTR_ARCH_300) &&
+>> +		cpu_has_feature(CPU_FTR_HVMODE);
+>> +}
+>
+> Just be careful, it's hash_v3 specifically. Either make this return true 
+> for arch < 300 add the ARCH_300 check in the ioctl, or rename to include
+> v3.
+>
 >> +
->>  	}
->>  }
->> =20
->> --=20
->> 2.23.0
->=20
+>>  static struct kvmppc_ops kvm_ops_hv = {
+>>  	.get_sregs = kvm_arch_vcpu_ioctl_get_sregs_hv,
+>>  	.set_sregs = kvm_arch_vcpu_ioctl_set_sregs_hv,
+>> @@ -5642,6 +5651,7 @@ static struct kvmppc_ops kvm_ops_hv = {
+>>  	.store_to_eaddr = kvmhv_store_to_eaddr,
+>>  	.enable_svm = kvmhv_enable_svm,
+>>  	.svm_off = kvmhv_svm_off,
+>> +	.hash_possible = kvmppc_hash_possible,
+>>  };
+>>  
+>
+> How about adding an op which can check extensions? It could return false
+> if it wasn't checked and so default to the generic checks in 
+> kvm_vm_ioctl_check_extension, and take a pointer to 'r' to set.
+>
+
+I'm not sure I get the part about "return false if it wasn't
+checked". Do you mean like this?
+
+static bool kvmhv_check_extension(long ext, int *r)
+{
+	switch (ext) {
+	case KVM_CAP_PPC_MMU_HASH_V3:
+		r = kvmppc_hash_v3_possible();
+		break;
+	default:
+		return false;
+	}
+	return true;
+}
+
+And then we could move all of the #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+cases into it and early in kvm_vm_ioctl_check_extension have something
+like:
+
+if (hv_enabled && kvmppc_hv_ops->check_extension(ext, &r))
+	return r;
+
+>>  static int kvm_init_subcore_bitmap(void)
+>> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+>> index cf52d26f49cd7..99ced6c570e74 100644
+>> --- a/arch/powerpc/kvm/powerpc.c
+>> +++ b/arch/powerpc/kvm/powerpc.c
+>> @@ -611,8 +611,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  		r = !!(hv_enabled && radix_enabled());
+>>  		break;
+>>  	case KVM_CAP_PPC_MMU_HASH_V3:
+>> -		r = !!(hv_enabled && cpu_has_feature(CPU_FTR_ARCH_300) &&
+>> -		       cpu_has_feature(CPU_FTR_HVMODE));
+>> +		r = !!(hv_enabled && kvmppc_hv_ops->hash_possible());
+>>  		break;
+>>  	case KVM_CAP_PPC_NESTED_HV:
+>>  		r = !!(hv_enabled && kvmppc_hv_ops->enable_nested &&
+>
+> Thanks,
+> Nick
