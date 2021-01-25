@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A566300FB2
-	for <lists+kvm-ppc@lfdr.de>; Fri, 22 Jan 2021 23:15:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91B1F3022AA
+	for <lists+kvm-ppc@lfdr.de>; Mon, 25 Jan 2021 09:09:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730891AbhAVWEW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 22 Jan 2021 17:04:22 -0500
-Received: from mail.padangpariamankab.go.id ([103.94.3.123]:41332 "EHLO
-        mail.padangpariamankab.go.id" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730959AbhAVWDf (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 22 Jan 2021 17:03:35 -0500
-X-Greylist: delayed 3803 seconds by postgrey-1.27 at vger.kernel.org; Fri, 22 Jan 2021 17:03:32 EST
-Received: from localhost (localhost [127.0.0.1])
-        by mail.padangpariamankab.go.id (Postfix) with ESMTP id 84F186E6C30;
-        Sat, 23 Jan 2021 03:47:17 +0700 (WIB)
-Received: from mail.padangpariamankab.go.id ([127.0.0.1])
-        by localhost (mail.padangpariamankab.go.id [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 0dH-CSEhwA2u; Sat, 23 Jan 2021 03:47:17 +0700 (WIB)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.padangpariamankab.go.id (Postfix) with ESMTP id 6FAFB6E6C3B;
-        Sat, 23 Jan 2021 03:47:16 +0700 (WIB)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.padangpariamankab.go.id 6FAFB6E6C3B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=padangpariamankab.go.id; s=D2C6CDEC-3607-11EA-BC8A-EEDE4AB8B776;
-        t=1611348436; bh=4AhSoXRU63EAbbOwseUY/pxjidGey07DskAQ7pZ9AvE=;
-        h=Date:From:Message-ID:MIME-Version;
-        b=NMY9iARxDAtLGWoSMXn+qoAj88alDZXEmR2BvnFsTPxN3ujrnamuhsl1jRDQkmeiN
-         YeMhTSqE0XjcsszT9Sr9oc3pw5BQnWwe13YqSWyMmGYoMWIEWxOerHsMl9vZOyOUYj
-         bZyy/W9SOB0+xbgvAToLg6ODt6/olgMDAqS2xQfU=
-X-Virus-Scanned: amavisd-new at padangpariamankab.go.id
-Received: from mail.padangpariamankab.go.id ([127.0.0.1])
-        by localhost (mail.padangpariamankab.go.id [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id PbXbZJOsuh89; Sat, 23 Jan 2021 03:47:16 +0700 (WIB)
-Received: from mail.padangpariamankab.go.id (mail.padangpariamankab.go.id [103.94.3.123])
-        by mail.padangpariamankab.go.id (Postfix) with ESMTP id C15BE6E6C32;
-        Sat, 23 Jan 2021 03:47:13 +0700 (WIB)
-Date:   Sat, 23 Jan 2021 03:47:13 +0700 (WIB)
-From:   GREENLIGHT <rsud@padangpariamankab.go.id>
-Reply-To: "Greenlight Financial Services " <greenlightservices@usa.com>
-Message-ID: <2017763427.19429.1611348433702.JavaMail.zimbra@padangpariamankab.go.id>
-Subject: Update
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [103.94.3.123]
-X-Mailer: Zimbra 8.8.15_GA_3895 (zclient/8.8.15_GA_3895)
-Thread-Index: /yeJfe9Au6kijbvRlHe7mC1h8p/s4Q==
-Thread-Topic: Update
-To:     unlisted-recipients:; (no To-header on input)
+        id S1727241AbhAYIIh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 25 Jan 2021 03:08:37 -0500
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:40834 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727307AbhAYIAd (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 25 Jan 2021 03:00:33 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R761e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=abaci-bugfix@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UMmi-sD_1611561544;
+Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:abaci-bugfix@linux.alibaba.com fp:SMTPD_---0UMmi-sD_1611561544)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 25 Jan 2021 15:59:08 +0800
+From:   Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+To:     paulus@ozlabs.org
+Cc:     mpe@ellerman.id.au, benh@kernel.crashing.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org,
+        Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+Subject: [PATCH] KVM: PPC: Book3S: Assign boolean values to a bool variable
+Date:   Mon, 25 Jan 2021 15:59:02 +0800
+Message-Id: <1611561542-17017-1-git-send-email-abaci-bugfix@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Fix the following coccicheck warnings:
 
+./arch/powerpc/kvm/book3s_hv_rm_xics.c:381:3-15: WARNING: Assignment of
+0/1 to bool variable.
 
-We offer Reliable/Low Interest Rate Financial Services to Companies & Individuals including; Start-Up Business, Loans & Mortgage ETC. Apply Now
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+---
+ arch/powerpc/kvm/book3s_hv_rm_xics.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/powerpc/kvm/book3s_hv_rm_xics.c b/arch/powerpc/kvm/book3s_hv_rm_xics.c
+index c2c9c73..68e509d 100644
+--- a/arch/powerpc/kvm/book3s_hv_rm_xics.c
++++ b/arch/powerpc/kvm/book3s_hv_rm_xics.c
+@@ -378,7 +378,7 @@ static void icp_rm_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
+ 			arch_spin_unlock(&ics->lock);
+ 			icp->n_reject++;
+ 			new_irq = reject;
+-			check_resend = 0;
++			check_resend = false;
+ 			goto again;
+ 		}
+ 	} else {
+-- 
+1.8.3.1
+
