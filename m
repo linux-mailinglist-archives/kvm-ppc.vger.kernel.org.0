@@ -2,51 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 81B2B30519B
-	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Jan 2021 06:01:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7814A30632A
+	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Jan 2021 19:24:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238509AbhA0EYb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 26 Jan 2021 23:24:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36082 "EHLO
+        id S236093AbhA0SYF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 27 Jan 2021 13:24:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231956AbhA0CzL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 Jan 2021 21:55:11 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C407FC061221
-        for <kvm-ppc@vger.kernel.org>; Tue, 26 Jan 2021 18:45:49 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id a20so394276pjs.1
-        for <kvm-ppc@vger.kernel.org>; Tue, 26 Jan 2021 18:45:49 -0800 (PST)
+        with ESMTP id S236062AbhA0SYC (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Jan 2021 13:24:02 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D3D8C061756
+        for <kvm-ppc@vger.kernel.org>; Wed, 27 Jan 2021 10:23:22 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id f63so1718851pfa.13
+        for <kvm-ppc@vger.kernel.org>; Wed, 27 Jan 2021 10:23:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=7PtWXNzHrzTp7A9th7APDIEImQRlLS2mGOWSoaKCv+4=;
-        b=BrtxP2Kw4oAJZWLYhPtp+ptr4ogWuI50wfy8gQE2Ga0c07iSWeUli+TqOMp7KQ3DNM
-         HzFzbmh40furMmKuniJgnZFQAs0PI5WDjP97KQMQo/UxgicGFtik8YyomHk4XHAuhukH
-         Mlnh6Fo1TdiWgV9bWfXtrj4tb7ZZtvJHcwnD0=
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jJRPrAWF7MFclOHB2Lr1Il6UnBQA+yMSwpuT+dr3FeE=;
+        b=p+JOm0MaAq0DKLuPmm62TKPoLEb63Ivgqxil78dFCdEx4sz1UgEhA/sr1202i1f6fO
+         gP7dBosWqWE8SEl5Q9bXMvRttmO8MBkch9w74sMo3b4uL32ehzuvDUOBIATwr0R0jhK0
+         wGRAbqIP9ZOtS4RGRPo2nOos/oPULUsm4x6AllyAgIBAyWdz6upYM6KonsT6v1VM7h02
+         rCbHzpgKaZvHxKNM2a0EAofk1HjicEqG+hgMq7srXFKGVCqhp+ey+fC+nLuHf0PTADwe
+         rQtWBV+yPvFIpO4pNyMKRoWlZirWQrvsMnCt7yvFN3uXHS8Umhyg+bkawtJCTQvJHdiF
+         ARtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=7PtWXNzHrzTp7A9th7APDIEImQRlLS2mGOWSoaKCv+4=;
-        b=M2TZ5TpAzqxwBZIoXyhRIqVTx7lIdlvzW6QdzZEOKx7JHmgv07zR7RYUuNPrNTrTIF
-         tmfFnqAqxLAL7LLALV9UeVhUaCQw2N4s0LoVzKbudsiTNu5JLDc6z7h2iGxAFLzREQCP
-         4iQlKNL6qf4JCGVLpGNlxIdCbTR+NoYIRrHeUodNvjSghh7bT6E06nQv2a3zpGH+4fNk
-         WZRciuc7mqOPNPCxXZ8obvlb/wXAciq1GyDBF0nKtVCx/uojABM9hKDtcV5mPrN7j0u1
-         v9x3iZH6+8uTP3TYAk7/Xmu9nLE23BkZo7lf4l5QkaN6WDycLLJTrcYfYoGOdgvhtDqj
-         vN6Q==
-X-Gm-Message-State: AOAM532Z9nWRr/5oLNRqr/MKuh0w0O98UzCjoPB4snVFcEIGexP6thbJ
-        rUSkOrxSe+aKQNd8xto99GkH3w==
-X-Google-Smtp-Source: ABdhPJx9soZ2g5SyR6Sp+xlR7Exg7c0f4vDMem4XLIp37iD5OQJdbs3wxxqnvGnGT0/mr+DipLiGCg==
-X-Received: by 2002:a17:902:6843:b029:e0:52c:ad88 with SMTP id f3-20020a1709026843b02900e0052cad88mr9197016pln.72.1611715549193;
-        Tue, 26 Jan 2021 18:45:49 -0800 (PST)
-Received: from localhost ([2401:fa00:8f:203:55b7:86cc:655d:9dcb])
-        by smtp.gmail.com with ESMTPSA id w66sm391620pfd.48.2021.01.26.18.45.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 18:45:48 -0800 (PST)
-From:   David Stevens <stevensd@chromium.org>
-X-Google-Original-From: David Stevens <stevensd@google.com>
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jJRPrAWF7MFclOHB2Lr1Il6UnBQA+yMSwpuT+dr3FeE=;
+        b=A05kI03+ZBIpqcZl1F8WKU/qsjHIQlUILYBgZc5sAPjBvqDBIsDWC17dSHvj9jKCqD
+         TMt5/yjTFTdzzNyGU5PivfJX8nHFgVpvAicUqq1siRposxrJU4E/vS+Qw8zwIv08kVSn
+         pDkh8jMN9QZhNZoy1GXB6jwgYBdRS24eb5u4HQkfjQiD4T4o9f8zgu7wJliZtWedRZoH
+         WhMr24O5EZp7KjZ74WUJjf4U3dsnAj5ja+y8/QA0wC0CkqSOJ40i7J+T6pJZUDC9Vqk5
+         APpHhTYv6dAF/O2GFVP+k+2HL/+m4RiYqYlVhpLZwVa1UazTwSTl7UAHR44ALUCbsxTs
+         gImQ==
+X-Gm-Message-State: AOAM532TeSzPXfBQSzPFLxvzH5KOwVY/DwLvJaGi3KLsxp7eGCOW0S+x
+        4GE5t4Nao88OhUzp5y+e/ksKBw==
+X-Google-Smtp-Source: ABdhPJwSTnTQ18ANJPAv6GUZl6bhKkOAA3IiPI3vNrcPn/QyI7/VnJlki21EIEAx7yZmuM3T0cOiNg==
+X-Received: by 2002:a63:5459:: with SMTP id e25mr1610122pgm.403.1611771801851;
+        Wed, 27 Jan 2021 10:23:21 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id m73sm3022198pga.25.2021.01.27.10.23.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Jan 2021 10:23:21 -0800 (PST)
+Date:   Wed, 27 Jan 2021 10:23:14 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Stevens <stevensd@chromium.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -65,294 +68,190 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Stevens <stevensd@chromium.org>
-Subject: [PATCH v2] KVM: x86/mmu: consider the hva in mmu_notifier retry
-Date:   Wed, 27 Jan 2021 11:45:04 +0900
-Message-Id: <20210127024504.613844-1-stevensd@google.com>
-X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH v2] KVM: x86/mmu: consider the hva in mmu_notifier retry
+Message-ID: <YBGvku1KUUk6LPAj@google.com>
+References: <20210127024504.613844-1-stevensd@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; boundary="MkeFThl52DvUx8zi"
+Content-Disposition: inline
+In-Reply-To: <20210127024504.613844-1-stevensd@google.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: David Stevens <stevensd@chromium.org>
 
-Track the range being invalidated by mmu_notifier and skip page fault
-retries if the fault address is not affected by the in-progress
-invalidation. Handle concurrent invalidations by finding the minimal
-range which includes all ranges being invalidated. Although the combined
-range may include unrelated addresses and cannot be shrunk as individual
-invalidation operations complete, it is unlikely the marginal gains of
-proper range tracking are worth the additional complexity.
+--MkeFThl52DvUx8zi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The primary benefit of this change is the reduction in the likelihood of
-extreme latency when handing a page fault due to another thread having
-been preempted while modifying host virtual addresses.
+On Wed, Jan 27, 2021, David Stevens wrote:
+> From: David Stevens <stevensd@chromium.org>
+> 
+> Track the range being invalidated by mmu_notifier and skip page fault
+> retries if the fault address is not affected by the in-progress
+> invalidation. Handle concurrent invalidations by finding the minimal
+> range which includes all ranges being invalidated. Although the combined
+> range may include unrelated addresses and cannot be shrunk as individual
+> invalidation operations complete, it is unlikely the marginal gains of
+> proper range tracking are worth the additional complexity.
+> 
+> The primary benefit of this change is the reduction in the likelihood of
+> extreme latency when handing a page fault due to another thread having
+> been preempted while modifying host virtual addresses.
+> 
+> Signed-off-by: David Stevens <stevensd@chromium.org>
+> ---
+> v1 -> v2:
+>  - improve handling of concurrent invalidation requests by unioning
+>    ranges, instead of just giving up and using [0, ULONG_MAX).
 
-Signed-off-by: David Stevens <stevensd@chromium.org>
+Ooh, even better.
+
+>  - add lockdep check
+>  - code comments and formatting
+> 
+>  arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
+>  arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
+>  arch/x86/kvm/mmu/mmu.c                 | 16 ++++++++------
+>  arch/x86/kvm/mmu/paging_tmpl.h         |  7 ++++---
+>  include/linux/kvm_host.h               | 27 +++++++++++++++++++++++-
+>  virt/kvm/kvm_main.c                    | 29 ++++++++++++++++++++++----
+>  6 files changed, 67 insertions(+), 16 deletions(-)
+> 
+
+...
+
+> @@ -3717,7 +3720,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	smp_rmb();
+>  
+> -	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, write, &map_writable))
+> +	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, &hva,
+> +			 write, &map_writable))
+>  		return RET_PF_RETRY;
+>  
+>  	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
+> @@ -3725,7 +3729,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  
+>  	r = RET_PF_RETRY;
+>  	spin_lock(&vcpu->kvm->mmu_lock);
+> -	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
+> +	if (mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva))
+
+'hva' will be uninitialized at this point if the gfn did not resolve to a
+memslot, i.e. when handling an MMIO page fault.  On the plus side, that's an
+opportunity for another optimization as there is no need to retry MMIO page
+faults on mmu_notifier invalidations.  Including the attached patch as a preqreq
+to this will avoid consuming an uninitialized 'hva'.
+
+
+>  		goto out_unlock;
+>  	r = make_mmu_pages_available(vcpu);
+>  	if (r)
+
+...
+
+>  void kvm_release_pfn_clean(kvm_pfn_t pfn);
+>  void kvm_release_pfn_dirty(kvm_pfn_t pfn);
+> @@ -1203,6 +1206,28 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
+>  		return 1;
+>  	return 0;
+>  }
+> +
+> +static inline int mmu_notifier_retry_hva(struct kvm *kvm,
+> +					 unsigned long mmu_seq,
+> +					 unsigned long hva)
+> +{
+> +#ifdef CONFIG_LOCKDEP
+> +	lockdep_is_held(&kvm->mmu_lock);
+
+No need to manually do the #ifdef, just use lockdep_assert_held instead of
+lockdep_is_held.
+
+> +#endif
+> +	/*
+> +	 * If mmu_notifier_count is non-zero, then the range maintained by
+> +	 * kvm_mmu_notifier_invalidate_range_start contains all addresses that
+> +	 * might be being invalidated. Note that it may include some false
+> +	 * positives, due to shortcuts when handing concurrent invalidations.
+> +	 */
+> +	if (unlikely(kvm->mmu_notifier_count) &&
+> +	    kvm->mmu_notifier_range_start <= hva &&
+> +	    hva < kvm->mmu_notifier_range_end)
+
+Uber nit: I find this easier to read if 'hva' is on the left-hand side for both
+checks, i.e.
+
+	if (unlikely(kvm->mmu_notifier_count) &&
+	    hva >= kvm->mmu_notifier_range_start &&
+	    hva < kvm->mmu_notifier_range_end)
+
+> +		return 1;
+> +	if (kvm->mmu_notifier_seq != mmu_seq)
+> +		return 1;
+> +	return 0;
+> +}
+>  #endif
+>  
+>  #ifdef CONFIG_HAVE_KVM_IRQ_ROUTING
+
+--MkeFThl52DvUx8zi
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-KVM-x86-mmu-Skip-mmu_notifier-check-when-handling-MM.patch"
+
+From a1bfdc6fe16582440815cfecc656313dff993003 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Wed, 27 Jan 2021 10:04:45 -0800
+Subject: [PATCH] KVM: x86/mmu: Skip mmu_notifier check when handling MMIO page
+ fault
+
+Don't retry a page fault due to an mmu_notifier invalidation when
+handling a page fault for a GPA that did not resolve to a memslot, i.e.
+an MMIO page fault.  Invalidations from the mmu_notifier signal a change
+in a host virtual address (HVA) mapping; without a memslot, there is no
+HVA and thus no possibility that the invalidation is relevant to the
+page fault being handled.
+
+Note, the MMIO vs. memslot generation checks handle the case where a
+pending memslot will create a memslot overlapping the faulting GPA.  The
+mmu_notifier checks are orthogonal to memslot updates.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
-v1 -> v2:
- - improve handling of concurrent invalidation requests by unioning
-   ranges, instead of just giving up and using [0, ULONG_MAX).
- - add lockdep check
- - code comments and formatting
+ arch/x86/kvm/mmu/mmu.c         | 2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
- arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
- arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
- arch/x86/kvm/mmu/mmu.c                 | 16 ++++++++------
- arch/x86/kvm/mmu/paging_tmpl.h         |  7 ++++---
- include/linux/kvm_host.h               | 27 +++++++++++++++++++++++-
- virt/kvm/kvm_main.c                    | 29 ++++++++++++++++++++++----
- 6 files changed, 67 insertions(+), 16 deletions(-)
-
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-index 38ea396a23d6..8e06cd3f759c 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-@@ -590,7 +590,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
- 	} else {
- 		/* Call KVM generic code to do the slow-path check */
- 		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
--					   writing, &write_ok);
-+					   writing, &write_ok, NULL);
- 		if (is_error_noslot_pfn(pfn))
- 			return -EFAULT;
- 		page = NULL;
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index bb35490400e9..e603de7ade52 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -822,7 +822,7 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcpu *vcpu,
- 
- 		/* Call KVM generic code to do the slow-path check */
- 		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
--					   writing, upgrade_p);
-+					   writing, upgrade_p, NULL);
- 		if (is_error_noslot_pfn(pfn))
- 			return -EFAULT;
- 		page = NULL;
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6d16481aa29d..79166288ed03 100644
+index 6d16481aa29d..9ac0a727015d 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3658,8 +3658,8 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- }
- 
- static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
--			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, bool write,
--			 bool *writable)
-+			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, hva_t *hva,
-+			 bool write, bool *writable)
- {
- 	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 	bool async;
-@@ -3672,7 +3672,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 	}
- 
- 	async = false;
--	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async, write, writable);
-+	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async,
-+				    write, writable, hva);
- 	if (!async)
- 		return false; /* *pfn has correct page already */
- 
-@@ -3686,7 +3687,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 			return true;
- 	}
- 
--	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL, write, writable);
-+	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
-+				    write, writable, hva);
- 	return false;
- }
- 
-@@ -3699,6 +3701,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	gfn_t gfn = gpa >> PAGE_SHIFT;
- 	unsigned long mmu_seq;
- 	kvm_pfn_t pfn;
-+	hva_t hva;
- 	int r;
- 
- 	if (page_fault_handle_page_track(vcpu, error_code, gfn))
-@@ -3717,7 +3720,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
- 	smp_rmb();
- 
--	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, write, &map_writable))
-+	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, &hva,
-+			 write, &map_writable))
- 		return RET_PF_RETRY;
- 
- 	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
-@@ -3725,7 +3729,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+@@ -3725,7 +3725,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
  
  	r = RET_PF_RETRY;
  	spin_lock(&vcpu->kvm->mmu_lock);
 -	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
-+	if (mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva))
++	if (!is_noslot_pfn(pfn) && mmu_notifier_retry(vcpu->kvm, mmu_seq))
  		goto out_unlock;
  	r = make_mmu_pages_available(vcpu);
  	if (r)
 diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 50e268eb8e1a..3171784139a4 100644
+index 50e268eb8e1a..ab54263d857c 100644
 --- a/arch/x86/kvm/mmu/paging_tmpl.h
 +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -790,6 +790,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 	struct guest_walker walker;
- 	int r;
- 	kvm_pfn_t pfn;
-+	hva_t hva;
- 	unsigned long mmu_seq;
- 	bool map_writable, is_self_change_mapping;
- 	int max_level;
-@@ -840,8 +841,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
- 	smp_rmb();
- 
--	if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, write_fault,
--			 &map_writable))
-+	if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, &hva,
-+			 write_fault, &map_writable))
- 		return RET_PF_RETRY;
- 
- 	if (handle_abnormal_pfn(vcpu, addr, walker.gfn, pfn, walker.pte_access, &r))
-@@ -869,7 +870,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+@@ -869,7 +869,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
  
  	r = RET_PF_RETRY;
  	spin_lock(&vcpu->kvm->mmu_lock);
 -	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
-+	if (mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva))
++	if (!is_noslot_pfn(pfn) && mmu_notifier_retry(vcpu->kvm, mmu_seq))
  		goto out_unlock;
  
  	kvm_mmu_audit(vcpu, AUDIT_PRE_PAGE_FAULT);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f3b1013fb22c..08f22c958d64 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -11,6 +11,7 @@
- #include <linux/signal.h>
- #include <linux/sched.h>
- #include <linux/bug.h>
-+#include <linux/minmax.h>
- #include <linux/mm.h>
- #include <linux/mmu_notifier.h>
- #include <linux/preempt.h>
-@@ -502,6 +503,8 @@ struct kvm {
- 	struct mmu_notifier mmu_notifier;
- 	unsigned long mmu_notifier_seq;
- 	long mmu_notifier_count;
-+	unsigned long mmu_notifier_range_start;
-+	unsigned long mmu_notifier_range_end;
- #endif
- 	long tlbs_dirty;
- 	struct list_head devices;
-@@ -729,7 +732,7 @@ kvm_pfn_t gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn);
- kvm_pfn_t gfn_to_pfn_memslot_atomic(struct kvm_memory_slot *slot, gfn_t gfn);
- kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
- 			       bool atomic, bool *async, bool write_fault,
--			       bool *writable);
-+			       bool *writable, hva_t *hva);
- 
- void kvm_release_pfn_clean(kvm_pfn_t pfn);
- void kvm_release_pfn_dirty(kvm_pfn_t pfn);
-@@ -1203,6 +1206,28 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
- 		return 1;
- 	return 0;
- }
-+
-+static inline int mmu_notifier_retry_hva(struct kvm *kvm,
-+					 unsigned long mmu_seq,
-+					 unsigned long hva)
-+{
-+#ifdef CONFIG_LOCKDEP
-+	lockdep_is_held(&kvm->mmu_lock);
-+#endif
-+	/*
-+	 * If mmu_notifier_count is non-zero, then the range maintained by
-+	 * kvm_mmu_notifier_invalidate_range_start contains all addresses that
-+	 * might be being invalidated. Note that it may include some false
-+	 * positives, due to shortcuts when handing concurrent invalidations.
-+	 */
-+	if (unlikely(kvm->mmu_notifier_count) &&
-+	    kvm->mmu_notifier_range_start <= hva &&
-+	    hva < kvm->mmu_notifier_range_end)
-+		return 1;
-+	if (kvm->mmu_notifier_seq != mmu_seq)
-+		return 1;
-+	return 0;
-+}
- #endif
- 
- #ifdef CONFIG_HAVE_KVM_IRQ_ROUTING
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index fa9e3614d30e..b4b0a1eeb4c5 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -483,6 +483,24 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 	 * count is also read inside the mmu_lock critical section.
- 	 */
- 	kvm->mmu_notifier_count++;
-+	if (likely(kvm->mmu_notifier_count == 1)) {
-+		kvm->mmu_notifier_range_start = range->start;
-+		kvm->mmu_notifier_range_end = range->end;
-+	} else {
-+		/*
-+		 * Fully tracking multiple concurrent ranges has dimishing
-+		 * returns. Keep things simple and just find the minimal range
-+		 * which includes the current and new ranges. As there won't be
-+		 * enough information to subtract a range after its invalidate
-+		 * completes, any ranges invalidated concurrently will
-+		 * accumulate and persist until all outstanding invalidates
-+		 * complete.
-+		 */
-+		kvm->mmu_notifier_range_start =
-+			min(kvm->mmu_notifier_range_start, range->start);
-+		kvm->mmu_notifier_range_end =
-+			max(kvm->mmu_notifier_range_end, range->end);
-+	}
- 	need_tlb_flush = kvm_unmap_hva_range(kvm, range->start, range->end,
- 					     range->flags);
- 	/* we've to flush the tlb before the pages can be freed */
-@@ -2010,10 +2028,13 @@ static kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
- 
- kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
- 			       bool atomic, bool *async, bool write_fault,
--			       bool *writable)
-+			       bool *writable, hva_t *hva)
- {
- 	unsigned long addr = __gfn_to_hva_many(slot, gfn, NULL, write_fault);
- 
-+	if (hva)
-+		*hva = addr;
-+
- 	if (addr == KVM_HVA_ERR_RO_BAD) {
- 		if (writable)
- 			*writable = false;
-@@ -2041,19 +2062,19 @@ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
- 		      bool *writable)
- {
- 	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false, NULL,
--				    write_fault, writable);
-+				    write_fault, writable, NULL);
- }
- EXPORT_SYMBOL_GPL(gfn_to_pfn_prot);
- 
- kvm_pfn_t gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
- {
--	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL);
-+	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL, NULL);
- }
- EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot);
- 
- kvm_pfn_t gfn_to_pfn_memslot_atomic(struct kvm_memory_slot *slot, gfn_t gfn)
- {
--	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL);
-+	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL, NULL);
- }
- EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot_atomic);
- 
 -- 
 2.30.0.280.ga3ce27912f-goog
 
+
+--MkeFThl52DvUx8zi--
