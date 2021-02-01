@@ -2,64 +2,113 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E65230BDCC
-	for <lists+kvm-ppc@lfdr.de>; Tue,  2 Feb 2021 13:13:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E22D30A35C
+	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Feb 2021 09:34:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229815AbhBBMKp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 2 Feb 2021 07:10:45 -0500
-Received: from [20.39.40.203] ([20.39.40.203]:50772 "EHLO optinix.in"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S231285AbhBBMKT (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 2 Feb 2021 07:10:19 -0500
-dkim-signature: v=1; a=rsa-sha256; d=digitalsol.in; s=dkim;
-        c=relaxed/relaxed; q=dns/txt; h=From:Reply-To:Subject:Date:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding;
-        bh=wK2neTcOXNiSQ+RBxrnFed+mRrGUU/ndLGEgvo8IMCc=;
-        b=aQygEQ0D9r2QnTA//A3GiZU+2aPu30sun5Km8wASGtP7QUK1vDWC1idXlh69ACtNkZBMkOtu/mH38VxBKanAcg96z2CdeKRYwdA3/rTARcymlKtLQOBZ3KsYlU6pGk3pn6rdL9+1EW1bgkBfBNoHHHjq3oAiZ6qrFv1Ry/jAEqhLznFUX6uly+hsrFPTmd9XJqVfVDgK1MLdfmdpCax+09TbJ8ydKv2iYdAFlc8KmH7QHL7NKpX5evmAFT
-        lKrtOK5DGXzImg2bNtDC6eBHa7biSzRYercN9zxGYSrnbqSmeJjYeZ3gGiPYwVWzy/TMYj17E720wZ1X7fHxcDp+ifcg==
-Received: from User (Unknown [52.231.31.5])
-        by optinix.in with ESMTP
-        ; Sat, 30 Jan 2021 00:13:19 +0000
-Message-ID: <E8FFBAAB-26DC-44CD-B9C5-15C6FD0E1BCF@optinix.in>
-Reply-To: <ms.reem@yandex.com>
-From:   "Ms. Reem" <support@digitalsol.in>
-Subject: Re:read
-Date:   Sat, 30 Jan 2021 00:13:18 -0000
+        id S231915AbhBAIdm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 1 Feb 2021 03:33:42 -0500
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.219]:24135 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232533AbhBAIdi (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Feb 2021 03:33:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1612168183;
+        s=strato-dkim-0002; d=xenosoft.de;
+        h=In-Reply-To:Date:Message-ID:References:Cc:To:From:Subject:Cc:Date:
+        From:Subject:Sender;
+        bh=SpbmEisnLoL6lSlImlvuqP2MXYU76Kyfh+BBqDqcBj8=;
+        b=oC2DqUXq7nvKutMcsz5+fn+j654w6abJ5NR8/i/f5hpf8H5m3f8OjQVBhJCHd6mA8i
+        HL7//nuIFj1Exg6jvddDofBbsB3Gn+A1Ma3vvpZr1sa/P6/iODvi2IxvStDvWZ8lDyKN
+        OKbsviA/KBwzEqIZBZUcCQUPbNkj7McuDWQj5l6KgrEHbuSop6NzbJkDiEX+vnZfqp6O
+        kEmKlWmtumWO9ySgvh89qI2pt/4B2LHRxH0LKCoc9GJ07xV6mf2ytYAYrXpB2J0norCj
+        ToDBwkBkKcMtPTLGH/89CM38uwdZEKAfDLMn2k71nxW6sfL6j8eprh86BKDVMPOMEaGk
+        ycXg==
+X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHfJ+Dkjp5DdBJSrwuuqxvPhQImqeseX15NqTF93hOr+kotnQew=="
+X-RZG-CLASS-ID: mo00
+Received: from Christians-iMac.fritz.box
+        by smtp.strato.de (RZmta 47.16.0 AUTH)
+        with ESMTPSA id R0b2d2x118TH9gf
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Mon, 1 Feb 2021 09:29:17 +0100 (CET)
+Subject: Re: FSL P5040: KVM HV doesn't work with the RC5 of kernel 5.11
+From:   Christian Zigotzky <chzigotzky@xenosoft.de>
+To:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, tglx@linutronix.de,
+        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>
+Cc:     "R.T.Dickinson" <rtd2@xtra.co.nz>,
+        Darren Stevens <darren@stevens-zone.net>,
+        mad skateman <madskateman@gmail.com>
+References: <a546bc22-1e18-8e71-e973-65cf7095594a@xenosoft.de>
+ <b0ba0690-507f-7660-79e2-5268cc6684bf@xenosoft.de>
+Message-ID: <8a2ddbb2-134a-6692-7645-4079c9c486e9@xenosoft.de>
+Date:   Mon, 1 Feb 2021 09:29:17 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-X-MSMail-Priority: Normal
-X-Mailer: Microsoft Outlook Express 6.00.2600.0000
-X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
-To:     unlisted-recipients:; (no To-header on input)
+In-Reply-To: <b0ba0690-507f-7660-79e2-5268cc6684bf@xenosoft.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: de-DE
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 Hello,
 
-My name is Ms. Reem Ebrahim Al-Hashimi, I am the "Minister of state
-and Petroleum" also "Minister of State for International Cooperation"
-in UAE. I write to you on behalf of my other "three (3) colleagues"
-who has approved me to solicit for your "partnership in claiming of
-{us$47=Million}" from a Financial Home in Cambodia on their behalf and
-for our "Mutual Benefits".
+I compiled the RC6 of kernel 5.11 today and KVM HV works again. 
+Therefore I don't need the patch below anymore.
 
-The Fund {us$47=Million} is our share from the (over-invoiced) Oil/Gas
-deal with Cambodian/Vietnam Government within 2013/2014, however, we
-don't want our government to know about the fund. If this proposal
-interests you, let me know, by sending me an email and I will send to
-you detailed information on how this business would be successfully
-transacted. Be informed that nobody knows about the secret of this
-fund except us, and we know how to carry out the entire transaction.
-So I am compelled to ask, that you will stand on our behalf and
-receive this fund into any account that is solely controlled by you.
+Many thanks for solving the issue,
+Christian
 
-We will compensate you with 15% of the total amount involved as
-gratification for being our partner in this transaction. Reply to:
-ms.reem@yandex.com
 
-Regards,
-Ms. Reem.
+On 27 January 2021 at 05:07pm, Christian Zigotzky wrote:
+> Hello,
+>
+> I compiled the RC5 of kernel 5.11 today. Unfortunately KVM HV doesn't 
+> work anymore on my FSL P5040 board [1]. I tested it with QEMU 5.0.0 
+> today [2]. The virtual e5500 QEMU machine works with the "RC4 with KVM 
+> HV" and with the "RC5 without KVM HV". The complete system freezes if 
+> I use KVM HV with the RC5.
+>
+> I have bisected and 785025820a6a565185ce9d47fdd8d23dbf91dee8 
+> (powerpc/mm/highmem: use __set_pte_at() for kmap_local()) [3] is the 
+> first bad commit.
+>
+> I was able to revert this bad commit and after a new compiling, KVM HV 
+> works again.  I created a patch for reverting the commit. [4] Please 
+> find attached the kernel config. I use one uImage for the virtual 
+> machine and for the P5040 board.
+>
+> Please check the first bad commit.
+>
+> Thanks,
+> Christian
+>
+>
+> [1] http://wiki.amiga.org/index.php?title=X5000
+> [2] qemu-system-ppc64 -M ppce500 -cpu e5500 -enable-kvm -m 1024 
+> -kernel uImage-5.11 -drive 
+> format=raw,file=MintPPC32-X5000.img,index=0,if=virtio -netdev 
+> user,id=mynet0 -device e1000,netdev=mynet0 -append "rw root=/dev/vda" 
+> -device virtio-vga -device virtio-mouse-pci -device 
+> virtio-keyboard-pci -device pci-ohci,id=newusb -device 
+> usb-audio,bus=newusb.0 -smp 4
+> [3] 
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v5.11-rc5&id=785025820a6a565185ce9d47fdd8d23dbf91dee8
+> [4]
+> diff -rupN a/arch/powerpc/include/asm/highmem.h 
+> b/arch/powerpc/include/asm/highmem.h
+> --- a/arch/powerpc/include/asm/highmem.h        2021-01-27 
+> 16:12:40.382164118 +0100
+> +++ b/arch/powerpc/include/asm/highmem.h        2021-01-27 
+> 16:10:54.055249957 +0100
+> @@ -58,8 +58,6 @@ extern pte_t *pkmap_page_table;
+>
+>  #define flush_cache_kmaps()    flush_cache_all()
+>
+> -#define arch_kmap_local_set_pte(mm, vaddr, ptep, ptev) \
+> -       __set_pte_at(mm, vaddr, ptep, ptev, 1)
+>  #define arch_kmap_local_post_map(vaddr, pteval)        \
+>         local_flush_tlb_page(NULL, vaddr)
+>  #define arch_kmap_local_post_unmap(vaddr)      \
 
