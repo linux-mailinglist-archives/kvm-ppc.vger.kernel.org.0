@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 105DE30B597
-	for <lists+kvm-ppc@lfdr.de>; Tue,  2 Feb 2021 04:04:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08B3030B599
+	for <lists+kvm-ppc@lfdr.de>; Tue,  2 Feb 2021 04:04:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231285AbhBBDE4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 1 Feb 2021 22:04:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49934 "EHLO
+        id S231292AbhBBDE5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 1 Feb 2021 22:04:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231336AbhBBDEx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Feb 2021 22:04:53 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40513C06178B
-        for <kvm-ppc@vger.kernel.org>; Mon,  1 Feb 2021 19:03:43 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id c132so13961537pga.3
-        for <kvm-ppc@vger.kernel.org>; Mon, 01 Feb 2021 19:03:43 -0800 (PST)
+        with ESMTP id S231194AbhBBDEz (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Feb 2021 22:04:55 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAD96C06178C
+        for <kvm-ppc@vger.kernel.org>; Mon,  1 Feb 2021 19:03:45 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id t25so13966670pga.2
+        for <kvm-ppc@vger.kernel.org>; Mon, 01 Feb 2021 19:03:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=T2Cf0Dea5IVu8wyZcNFokAipIIQ+cvVbnC5vSCAngNg=;
-        b=buJIVIpfFuqgrxAee8RQsZT4y7UQXj9NHK5s0INu0VdlKgxTqN8UzA1KWyJpCqLUqG
-         dgEL9YzcDjmvr2BUoSRtOyP3U191ip8o1VD+Kkqj8ii8WFCYfYqtZ7/M5TT2Azfg5H2n
-         vqHH+0VMyUj5WKgG93+TvkColwN9vinKHMNOvT+JO0lUpW7nSdCXoXko+FzO5a72yhAB
-         AYBxF0igX+KGxGoxR+udkXa2BukpZutlRtr++hjvyWkF97tq5xto1bwoEi/d8ebFHg3L
-         34cjrjW2hqJIOiQmGq0V633iDd12aM9DynPhHGPG4p/uWXSD9LIxNUs4kmMmL3CiJopM
-         y8FA==
+        bh=4BVMs1eI4ftVoSL+zUWabpiVvkWT9oHnIuTQaI+hCtQ=;
+        b=QtHkEhU7O7wVhrxoiCNhEOoC8Gwhh4xDnIiufAU/Jb72B4OfoxFnHi0jVdzokikKmW
+         aGvnjPy49j3eQLgwCyqWXQieQ9MI7pLYEa98DEREzEWJInqtkCQY1SlMgg1nMnaiXEnU
+         k4XinTG1Qp296sxkNFGKEt56ynamIz286baVgf/ZhsoX9+DtO0RjyqHRgogSPNHJGSwl
+         THfnKEptdIOJexcRTkFodEnmKp3eUhpjbAkCb68r8EcryzmVP2CV+yZcahM036kpnEkL
+         beZs1ss4qkUG/zFte5304WRjftJIfu+8srOhuYI/iAUL3YMKOWJzKxEG+HMr9ZnrWCNg
+         X2jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=T2Cf0Dea5IVu8wyZcNFokAipIIQ+cvVbnC5vSCAngNg=;
-        b=jStIYrLM33I4vlrQvqa4cMGTk0M8Xk0j+MqggMIn909JAUvv+SC6Ufa/piY1LFILlf
-         veunwkH1Rovfsa6R3DuZDQ8yRZztluTCxMFqlIYBhrBX9+7/b827tZqcjB7m2Es1C3ex
-         lH9H1QhEZ1gsy6109HuCVq90D7xlLhljbbxUi/yl2vsEBXrFT+VobYYrbaHLmZ0/Sy6A
-         LVwOqZXAqwINqiviYfBGXscDGnsIMkCcopSOdWAOo79pQu/hV5WWghoVV/zz17F/2hoi
-         zO5vPxXMma+1Gr57n8IDlvhW+u+F+qiy8KHxzOWfJvtzDAuL2Rif00lKxOMH1fytWV5S
-         HJNg==
-X-Gm-Message-State: AOAM532oNMyLhXGaDk4a836SRhHmi/RPKZH//TLFvK0/OV82Blrg8E0P
-        uNz3hw1xFMDenpdLTHVH/o8QmxZUxtc=
-X-Google-Smtp-Source: ABdhPJyzr7S0bUxb0POQmg1pXJj1IkWSkMSEdIMKyfMiqyWGuZ/0bMWyT906VhQAKF1Ex1ewyV7PHA==
-X-Received: by 2002:a65:5b47:: with SMTP id y7mr19646725pgr.221.1612235022648;
-        Mon, 01 Feb 2021 19:03:42 -0800 (PST)
+        bh=4BVMs1eI4ftVoSL+zUWabpiVvkWT9oHnIuTQaI+hCtQ=;
+        b=cpLeyE0D4iedfRCmELXtaNGR0lRU9cxAAHCg3UDbBNQi8ZPnVBv6smXGAhHmWggRwQ
+         5IYG4wM6o731ZsSM+4w90Ufcx+M/YniOkIIzfD7L6eyCcnYioR0UcdeZQO1pAonXgvGD
+         gKAgDWLtTusNIgU8ibJqKdjnITN13i1p0elblASvzo4r/yMOsq8j1vqV0dWTCF9T0TTp
+         2ktJX2WKflT7/XzK6YFV7p0H9S7c9+eDF9ekbR22FpaQBBUIqnyyAcyNDY3iFaDPxL0R
+         nyOefPG1XPZ8ow+eurSBmdJlpXqP5Tp7U8Uwd4M48Oes6ZiK7X+UzGWJhqW0eE2JKSAw
+         8XAg==
+X-Gm-Message-State: AOAM531lSbEIlBN86fDBnPMCQ2AzAbUERLRK5RxgMxzUIX0W+1VZFKal
+        Y8CD3aDVvFgamOZoJcs8knqpliXlSWY=
+X-Google-Smtp-Source: ABdhPJx/DlMu/4wAMZY8C9aMWnzLHQaYGm9MJb5STjougpD298+ZD0uUU71SCjKWiJer61zGLPMS0Q==
+X-Received: by 2002:a05:6a00:a8f:b029:1bd:bb89:5911 with SMTP id b15-20020a056a000a8fb02901bdbb895911mr19069196pfl.42.1612235025069;
+        Mon, 01 Feb 2021 19:03:45 -0800 (PST)
 Received: from bobo.ozlabs.ibm.com (192.156.221.203.dial.dynamic.acc50-nort-cbr.comindico.com.au. [203.221.156.192])
-        by smtp.gmail.com with ESMTPSA id a24sm20877337pff.18.2021.02.01.19.03.40
+        by smtp.gmail.com with ESMTPSA id a24sm20877337pff.18.2021.02.01.19.03.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Feb 2021 19:03:42 -0800 (PST)
+        Mon, 01 Feb 2021 19:03:44 -0800 (PST)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [RFC PATCH 7/9] KVM: PPC: Book3S HV: move bad_host_intr check to HV handler
-Date:   Tue,  2 Feb 2021 13:03:11 +1000
-Message-Id: <20210202030313.3509446-8-npiggin@gmail.com>
+Subject: [RFC PATCH 8/9] KVM: PPC: Book3S HV: Minimise hcall handler calling convention differences
+Date:   Tue,  2 Feb 2021 13:03:12 +1000
+Message-Id: <20210202030313.3509446-9-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210202030313.3509446-1-npiggin@gmail.com>
 References: <20210202030313.3509446-1-npiggin@gmail.com>
@@ -62,80 +62,80 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This is not used by PR KVM.
-
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_64_entry.S      | 3 ---
- arch/powerpc/kvm/book3s_hv_rmhandlers.S | 4 +++-
- arch/powerpc/kvm/book3s_segment.S       | 7 +++++++
- 3 files changed, 10 insertions(+), 4 deletions(-)
+ arch/powerpc/kernel/exceptions-64s.S | 16 +++++++++++++++-
+ arch/powerpc/kvm/book3s_64_entry.S   | 22 +++-------------------
+ 2 files changed, 18 insertions(+), 20 deletions(-)
 
+diff --git a/arch/powerpc/kernel/exceptions-64s.S b/arch/powerpc/kernel/exceptions-64s.S
+index bed4499488b3..0844558f1d7c 100644
+--- a/arch/powerpc/kernel/exceptions-64s.S
++++ b/arch/powerpc/kernel/exceptions-64s.S
+@@ -1923,8 +1923,22 @@ EXC_VIRT_END(system_call, 0x4c00, 0x100)
+ 
+ #ifdef CONFIG_KVM_BOOK3S_64_HANDLER
+ TRAMP_REAL_BEGIN(kvm_hcall)
++	std	r9,PACA_EXGEN+EX_R9(r13)
++	std	r11,PACA_EXGEN+EX_R11(r13)
++	std	r12,PACA_EXGEN+EX_R12(r13)
++	mfcr	r9
+ 	mfctr	r10
+-	SET_SCRATCH0(r10) /* Save r13 in SCRATCH0 */
++	std	r10,PACA_EXGEN+EX_R13(r13)
++	li	r10,0
++	std	r10,PACA_EXGEN+EX_CFAR(r13)
++	std	r10,PACA_EXGEN+EX_CTR(r13)
++BEGIN_FTR_SECTION
++	mfspr	r10,SPRN_PPR
++	std	r10,PACA_EXGEN+EX_PPR(r13)
++END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
++
++	HMT_MEDIUM
++
+ #ifdef CONFIG_RELOCATABLE
+ 	/*
+ 	 * Requires __LOAD_FAR_HANDLER beause kvmppc_hcall lives
 diff --git a/arch/powerpc/kvm/book3s_64_entry.S b/arch/powerpc/kvm/book3s_64_entry.S
-index 5db76c8d4012..0d9e1e55c24d 100644
+index 0d9e1e55c24d..0e39267aef63 100644
 --- a/arch/powerpc/kvm/book3s_64_entry.S
 +++ b/arch/powerpc/kvm/book3s_64_entry.S
-@@ -73,11 +73,8 @@ do_kvm_interrupt:
- 	beq	maybe_skip
- no_skip:
- #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
--	cmpwi	r9,KVM_GUEST_MODE_HOST_HV
--	beq	kvmppc_bad_host_intr
- #ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
- 	cmpwi	r9,KVM_GUEST_MODE_GUEST
--	ld	r9,HSTATE_SCRATCH2(r13)
- 	beq	kvmppc_interrupt_pr
- #endif
- 	b	kvmppc_interrupt_hv
-diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index b9c4acd747f7..8144c1403203 100644
---- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-+++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -1251,6 +1251,7 @@ hdec_soon:
- kvmppc_interrupt_hv:
- 	/*
- 	 * Register contents:
-+	 * R9		= HSTATE_IN_GUEST
- 	 * R12		= (guest CR << 32) | interrupt vector
- 	 * R13		= PACA
- 	 * guest R12 saved in shadow VCPU SCRATCH0
-@@ -1258,6 +1259,8 @@ kvmppc_interrupt_hv:
- 	 * guest R9 saved in HSTATE_SCRATCH2
- 	 */
- 	/* We're now back in the host but in guest MMU context */
-+	cmpwi	r9,KVM_GUEST_MODE_HOST_HV
-+	beq	kvmppc_bad_host_intr
- 	li	r9, KVM_GUEST_MODE_HOST_HV
- 	stb	r9, HSTATE_IN_GUEST(r13)
+@@ -9,24 +9,9 @@
+ .global	kvmppc_hcall
+ .balign IFETCH_ALIGN_BYTES
+ kvmppc_hcall:
+-	/*
+-	 * This is a hcall, so register convention is as
+-	 * Documentation/powerpc/papr_hcalls.rst, with these additions:
+-	 * R13		= PACA
+-	 * guest R13 saved in SPRN_SCRATCH0
+-	 * R10		= free
+-	 */
+-BEGIN_FTR_SECTION
+-	mfspr	r10,SPRN_PPR
+-	std	r10,HSTATE_PPR(r13)
+-END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+-	HMT_MEDIUM
+-	mfcr	r10
+-	std	r12,HSTATE_SCRATCH0(r13)
+-	sldi	r12,r10,32
+-	ori	r12,r12,0xc00
+-	ld	r10,PACA_EXGEN+EX_R10(r13)
+-	b	do_kvm_interrupt
++	ld	r10,PACA_EXGEN+EX_R13(r13)
++	SET_SCRATCH0(r10)
++	li	r10,0xc00
  
-@@ -3245,7 +3248,6 @@ END_FTR_SECTION_IFCLR(CPU_FTR_P9_TM_HV_ASSIST)
-  * cfar is saved in HSTATE_CFAR(r13)
-  * ppr is saved in HSTATE_PPR(r13)
-  */
--.global kvmppc_bad_host_intr
- kvmppc_bad_host_intr:
+ .global	kvmppc_interrupt
+ .balign IFETCH_ALIGN_BYTES
+@@ -57,7 +42,6 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+ 	ld	r10,EX_R10(r11)
+ 	ld	r11,EX_R11(r11)
+ 
+-do_kvm_interrupt:
  	/*
- 	 * Switch to the emergency stack, but start half-way down in
-diff --git a/arch/powerpc/kvm/book3s_segment.S b/arch/powerpc/kvm/book3s_segment.S
-index 1f492aa4c8d6..ef1d88b869bf 100644
---- a/arch/powerpc/kvm/book3s_segment.S
-+++ b/arch/powerpc/kvm/book3s_segment.S
-@@ -167,8 +167,15 @@ kvmppc_interrupt_pr:
- 	 * R12             = (guest CR << 32) | exit handler id
- 	 * R13             = PACA
- 	 * HSTATE.SCRATCH0 = guest R12
-+	 *
-+	 * If HV is possible, additionally:
-+	 * R9              = HSTATE_IN_GUEST
-+	 * HSTATE.SCRATCH2 = guest R9
- 	 */
- #ifdef CONFIG_PPC64
-+#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-+	ld	r9,HSTATE_SCRATCH2(r13)
-+#endif
- 	/* Match 32-bit entry */
- 	rotldi	r12, r12, 32		  /* Flip R12 halves for stw */
- 	stw	r12, HSTATE_SCRATCH1(r13) /* CR is now in the low half */
+ 	 * Hcalls and other interrupts come here after normalising register
+ 	 * contents and save locations:
 -- 
 2.23.0
 
