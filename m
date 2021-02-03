@@ -2,68 +2,46 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C53730DB3B
-	for <lists+kvm-ppc@lfdr.de>; Wed,  3 Feb 2021 14:30:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CF2430D8FA
+	for <lists+kvm-ppc@lfdr.de>; Wed,  3 Feb 2021 12:42:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231690AbhBCN2D (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 3 Feb 2021 08:28:03 -0500
-Received: from 198-20-226-115.unifiedlayer.com ([198.20.226.115]:51174 "EHLO
-        198-20-226-115.unifiedlayer.com" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231886AbhBCN2C (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 3 Feb 2021 08:28:02 -0500
-X-Greylist: delayed 21682 seconds by postgrey-1.27 at vger.kernel.org; Wed, 03 Feb 2021 08:27:03 EST
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=carnivalassure.com.bd; s=default; h=Content-Transfer-Encoding:Content-Type:
-        Message-ID:Reply-To:Subject:To:From:Date:MIME-Version:Sender:Cc:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=miRpAdBSO5eDo01VDX+EK9bqGCmqMjXHS3kO16T6iWw=; b=oR9DBi73zWrpNptVGG8joD1q3D
-        a2vFVnixMQAUcmehD6fgJOQ9JP9N27NiM2NuC8HmaSTuyc4tIbd8kMLlSjPNy8b19j5i4Yecn4k41
-        d2L53GGQ3KAYNm9cTjTcF00G/e0wgveF66KZo4CFoHY+VyQWZpnDvHs7YXjdM1k0LGC10SnlZJnOf
-        hyfuxn41TeLbFp37bqri+jK8o3wb0VHiGKRxBfijUx18MCanoqvAna1IaS7ccBxFfbvZdTXygBXlc
-        j3LFBSU0eQazmqTdBY+jvtCMEdlAV/WbBykAUBZA45AnMWlIO1A8LzPVfVBXCEwNqNeODasQNIR6+
-        B0GfR5SA==;
-Received: from [127.0.0.1] (port=46664 helo=dot.dotlines.com.sg)
-        by dot.dotlines.com.sg with esmtpa (Exim 4.93)
-        (envelope-from <noreply@carnivalassure.com.bd>)
-        id 1l7CVp-0005bM-9S; Wed, 03 Feb 2021 01:23:41 -0600
-MIME-Version: 1.0
-Date:   Wed, 03 Feb 2021 01:23:40 -0600
-From:   Francois Pinault <noreply@carnivalassure.com.bd>
-To:     undisclosed-recipients:;
-Subject: Hello/Hallo
-Organization: Donation
-Reply-To: francoispinault1936@outlook.com
-Mail-Reply-To: francoispinault1936@outlook.com
-Message-ID: <02cc13f2661d3cb7582fa6695be089c9@carnivalassure.com.bd>
-X-Sender: noreply@carnivalassure.com.bd
-User-Agent: Roundcube Webmail/1.3.15
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - dot.dotlines.com.sg
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - carnivalassure.com.bd
-X-Get-Message-Sender-Via: dot.dotlines.com.sg: authenticated_id: noreply@carnivalassure.com.bd
-X-Authenticated-Sender: dot.dotlines.com.sg: noreply@carnivalassure.com.bd
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+        id S234440AbhBCLmJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 3 Feb 2021 06:42:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46922 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234091AbhBCLkz (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 3 Feb 2021 06:40:55 -0500
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAE78C0613ED;
+        Wed,  3 Feb 2021 03:40:14 -0800 (PST)
+Received: by ozlabs.org (Postfix, from userid 1034)
+        id 4DW0950ZLHz9vDV; Wed,  3 Feb 2021 22:40:08 +1100 (AEDT)
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Paul Mackerras <paulus@samba.org>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org
+In-Reply-To: <74461a99fa1466f361532ca794ca0753be3d9f86.1611038044.git.christophe.leroy@csgroup.eu>
+References: <74461a99fa1466f361532ca794ca0753be3d9f86.1611038044.git.christophe.leroy@csgroup.eu>
+Subject: Re: [PATCH] powerpc/kvm: Force selection of CONFIG_PPC_FPU
+Message-Id: <161235200600.1516112.11309702624334183045.b4-ty@ellerman.id.au>
+Date:   Wed,  3 Feb 2021 22:40:08 +1100 (AEDT)
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Tue, 19 Jan 2021 06:36:52 +0000 (UTC), Christophe Leroy wrote:
+> book3s/32 kvm is designed with the assumption that
+> an FPU is always present.
+> 
+> Force selection of FPU support in the kernel when
+> build KVM.
 
+Applied to powerpc/next.
 
--- 
-Hallo, ich bin Herr Francois Pinault, ich habe Ihnen gespendet. Sie 
-können mein Profil auf Wikipedia, Google oder Forbes überprüfen.
+[1/1] powerpc/kvm: Force selection of CONFIG_PPC_FPU
+      https://git.kernel.org/powerpc/c/27f699579b64dbf27caf31e5c0eac567ec0aa8b8
 
-Für Ihren Spendenanspruch und weitere Informationen kontaktieren Sie 
-mich umgehend unter francoispinault1936@outlook.com
-
-Mit freundlichen Grüßen,
-Herr Francois Pinault
+cheers
