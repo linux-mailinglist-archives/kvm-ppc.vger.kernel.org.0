@@ -2,146 +2,221 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA3C43112A2
-	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Feb 2021 21:39:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 023E931129A
+	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Feb 2021 21:37:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233247AbhBES4F (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 5 Feb 2021 13:56:05 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42648 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232861AbhBEPE0 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Feb 2021 10:04:26 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 115Gg3Td105612;
-        Fri, 5 Feb 2021 11:42:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=2CLLm2jArK2LVDHui3EuwFCiCxm1AUnIWFTw2F88tlo=;
- b=B2Z4yLK1sPGoLwFDE7HQYIHbp5wj0mQkUYdV8PHUp3Av1BXWh5M3z3Xu5IgYmSUNCu+x
- jwVCK4FKV2dmEcpurgZ7wqw2KILzc3PhTTYYSNgMAsG4+f1bon3LUwTovsI2KtY8Aumb
- q2z4joDwgZ3ZHz1fjHMxXiQTjOoRQHDoYlLgvzi3Lz1IiaA28Q3d8mj+K8db1PM0GfCv
- DJNHcVhJYtT4J+0GTwWOhF7liMddZ/lBjn7dU58uaQ2R+b2J/ngcQfxLXXoK5VCPfbjU
- OdvElLPpDYvmhp8UC+XLfsO2qHsxysOhnzssQ/Eq4/2F++4mzW9vUeyJ3a139JCORKOZ kg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36h9rx8020-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 11:42:02 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 115Gg22f105568;
-        Fri, 5 Feb 2021 11:42:02 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36h9rx801q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 11:42:02 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 115GWGtc001057;
-        Fri, 5 Feb 2021 16:42:01 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma03dal.us.ibm.com with ESMTP id 36f3kw1sfw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 16:42:01 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 115Gg05k31064512
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 5 Feb 2021 16:42:01 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DF6D6AC064;
-        Fri,  5 Feb 2021 16:42:00 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 47C0FAC059;
-        Fri,  5 Feb 2021 16:41:59 +0000 (GMT)
-Received: from farosas.linux.ibm.com.com (unknown [9.163.5.169])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri,  5 Feb 2021 16:41:58 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, npiggin@gmail.com
-Subject: [PATCH] KVM: PPC: Don't always report hash MMU capability for P9 < DD2.2
-Date:   Fri,  5 Feb 2021 13:41:54 -0300
-Message-Id: <20210205164154.1513317-1-farosas@linux.ibm.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210118062809.1430920-2-npiggin@gmail.com>
-References: <20210118062809.1430920-2-npiggin@gmail.com>
+        id S233103AbhBESzF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 5 Feb 2021 13:55:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233077AbhBESxg (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Feb 2021 13:53:36 -0500
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58826C06174A;
+        Fri,  5 Feb 2021 12:35:20 -0800 (PST)
+Received: by mail-qt1-x82d.google.com with SMTP id t17so5988073qtq.2;
+        Fri, 05 Feb 2021 12:35:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :organization:user-agent:mime-version:content-transfer-encoding;
+        bh=4AhGSITWRB/+3r9DX0VQhRwXg3mKhUT9vJOFFrm5ehI=;
+        b=WkcblcPJROy90tOTWsZ/2MYZJJFSw8xz49/HRue/W9Q91oX0F0AQ+m5PPNj80Pwvod
+         6dcVhzjEsH/LilwjTgE02RyPLv5IgYKV1gD7K06rYMiRbx/je+c6TXGrmVhEQpSImVJ9
+         olab5jBEVm89bOiMYnWS4BARYK0mPrUzrC0wx/idthRuwxHM62NsqMcdMvXGeDFJ6i96
+         FB/FsE5H6CjukH+ae5y0eGJ+JJpnGWP3JvZobpdmwWyy/j03TQZlnFPxYGu0GxMl5LVB
+         2kAop/SFGzZzha4NGD+DhiO/8Wml8d5O7HvXwgsRM62p/tMHApd1s2epVRw7upripVrv
+         FuhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:organization:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=4AhGSITWRB/+3r9DX0VQhRwXg3mKhUT9vJOFFrm5ehI=;
+        b=uTJdTpMhq9J4bmXoTrIHTXdv6oAFUlPQtOj96opNK7luqK/CwNE6ewt27VPXNnIZAs
+         dPXKn2v2adeUWFsLFsEyoJWI7ptMTckwhXkP+ZHESZXT8jbMK9UP/RxxYNnpQuNMIJGF
+         kCM2mDDSHrcyVKI2JF6/Xz7Q5GOZhafqTBdaDj3H44D803EboF5FX64WjhqF4pI4LPXG
+         6BtUbjHd5qVN8xBiFt89Arc/JHAJX5yYw+HmFyy7VozLG92/doUq4iahhdzUcNwXt/F3
+         DrNkZBhsejMm5mYYquJ7k7/R01xosdry98WYVJCLg0dQa14+2U0iIMrnebfAlBuJRB9B
+         RiBw==
+X-Gm-Message-State: AOAM533rWit8wN+phCgV8xBSL4ube4R+zdP1WLf3SIRsrMedHlFC1QWz
+        o4z2g7ocve/7pY0tebSW2h4=
+X-Google-Smtp-Source: ABdhPJyRTDK1ExugbcuH3wmjlLPaiNI2vCciWhLGrFzUqABxkTFyrjL0kWhpV9YzphNAJ8nTd5CUrw==
+X-Received: by 2002:ac8:6f28:: with SMTP id i8mr3872524qtv.231.1612557319590;
+        Fri, 05 Feb 2021 12:35:19 -0800 (PST)
+Received: from li-908e0a4c-2250-11b2-a85c-f027e903211b.ibm.com (186-249-147-196.dynamic.desktop.com.br. [186.249.147.196])
+        by smtp.gmail.com with ESMTPSA id t3sm10220763qkg.91.2021.02.05.12.35.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Feb 2021 12:35:18 -0800 (PST)
+Message-ID: <10b5e7e55f18c14567d4076e76c204c8805b33c8.camel@gmail.com>
+Subject: Re: [PATCH v2 1/1] powerpc/kvm: Save Timebase Offset to fix
+ sched_clock() while running guest code.
+From:   Leonardo Bras <leobras.c@gmail.com>
+To:     Fabiano Rosas <farosas@linux.ibm.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Athira Rajeev <atrajeev@linux.vnet.ibm.com>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
+        Jordan Niethe <jniethe5@gmail.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+Date:   Fri, 05 Feb 2021 17:35:12 -0300
+In-Reply-To: <874kiqy82t.fsf@linux.ibm.com>
+References: <20210205060643.233481-1-leobras.c@gmail.com>
+         <874kiqy82t.fsf@linux.ibm.com>
+Organization: IBM
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-05_09:2021-02-05,2021-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 spamscore=0 mlxscore=0 suspectscore=0 priorityscore=1501
- clxscore=1015 phishscore=0 adultscore=0 impostorscore=0 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102050104
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-These machines don't support running both MMU types at the same time,
-so remove the KVM_CAP_PPC_MMU_HASH_V3 capability when the host is
-using Radix MMU.
+Hello Fabiano, 
+Thanks for reviewing! 
+(answers inline)
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- arch/powerpc/include/asm/kvm_ppc.h |  1 +
- arch/powerpc/kvm/book3s_hv.c       | 10 ++++++++++
- arch/powerpc/kvm/powerpc.c         |  3 +--
- 3 files changed, 12 insertions(+), 2 deletions(-)
+On Fri, 2021-02-05 at 10:09 -0300, Fabiano Rosas wrote:
+> Leonardo Bras <leobras.c@gmail.com> writes:
+> 
+> > Before guest entry, TBU40 register is changed to reflect guest timebase.
+> > After exitting guest, the register is reverted to it's original value.
+> > 
+> > If one tries to get the timestamp from host between those changes, it
+> > will present an incorrect value.
+> > 
+> > An example would be trying to add a tracepoint in
+> > kvmppc_guest_entry_inject_int(), which depending on last tracepoint
+> > acquired could actually cause the host to crash.
+> > 
+> > Save the Timebase Offset to PACA and use it on sched_clock() to always
+> > get the correct timestamp.
+> > 
+> > Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
+> > Suggested-by: Paul Mackerras <paulus@ozlabs.org>
+> > ---
+> > Changes since v1:
+> > - Subtracts offset only when CONFIG_KVM_BOOK3S_HANDLER and
+> >   CONFIG_PPC_BOOK3S_64 are defined.
+> > ---
+> >  arch/powerpc/include/asm/kvm_book3s_asm.h | 1 +
+> >  arch/powerpc/kernel/asm-offsets.c         | 1 +
+> >  arch/powerpc/kernel/time.c                | 8 +++++++-
+> >  arch/powerpc/kvm/book3s_hv.c              | 2 ++
+> >  arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 2 ++
+> >  5 files changed, 13 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/powerpc/include/asm/kvm_book3s_asm.h b/arch/powerpc/include/asm/kvm_book3s_asm.h
+> > index 078f4648ea27..e2c12a10eed2 100644
+> > --- a/arch/powerpc/include/asm/kvm_book3s_asm.h
+> > +++ b/arch/powerpc/include/asm/kvm_book3s_asm.h
+> > @@ -131,6 +131,7 @@ struct kvmppc_host_state {
+> >  	u64 cfar;
+> >  	u64 ppr;
+> >  	u64 host_fscr;
+> > +	u64 tb_offset;		/* Timebase offset: keeps correct
+> > timebase while on guest */
+> 
+> Couldn't you use the vc->tb_offset_applied for this? We have a reference
+> for the vcore in the hstate already.
 
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index 0a056c64c317..b36abc89baf3 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -314,6 +314,7 @@ struct kvmppc_ops {
- 			      int size);
- 	int (*enable_svm)(struct kvm *kvm);
- 	int (*svm_off)(struct kvm *kvm);
-+	bool (*hash_v3_possible)(void);
- };
- 
- extern struct kvmppc_ops *kvmppc_hv_ops;
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 6f612d240392..d20c0682cae5 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -5599,6 +5599,15 @@ static int kvmhv_svm_off(struct kvm *kvm)
- 	return ret;
- }
- 
-+static bool kvmppc_hash_v3_possible(void)
-+{
-+	if (radix_enabled() && no_mixing_hpt_and_radix)
-+		return false;
-+
-+	return cpu_has_feature(CPU_FTR_ARCH_300) &&
-+		cpu_has_feature(CPU_FTR_HVMODE);
-+}
-+
- static struct kvmppc_ops kvm_ops_hv = {
- 	.get_sregs = kvm_arch_vcpu_ioctl_get_sregs_hv,
- 	.set_sregs = kvm_arch_vcpu_ioctl_set_sregs_hv,
-@@ -5642,6 +5651,7 @@ static struct kvmppc_ops kvm_ops_hv = {
- 	.store_to_eaddr = kvmhv_store_to_eaddr,
- 	.enable_svm = kvmhv_enable_svm,
- 	.svm_off = kvmhv_svm_off,
-+	.hash_v3_possible = kvmppc_hash_v3_possible,
- };
- 
- static int kvm_init_subcore_bitmap(void)
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index cf52d26f49cd..b9fb2f20f879 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -611,8 +611,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = !!(hv_enabled && radix_enabled());
- 		break;
- 	case KVM_CAP_PPC_MMU_HASH_V3:
--		r = !!(hv_enabled && cpu_has_feature(CPU_FTR_ARCH_300) &&
--		       cpu_has_feature(CPU_FTR_HVMODE));
-+		r = !!(hv_enabled && kvmppc_hv_ops->hash_v3_possible());
- 		break;
- 	case KVM_CAP_PPC_NESTED_HV:
- 		r = !!(hv_enabled && kvmppc_hv_ops->enable_nested &&
--- 
-2.29.2
+But it's a pointer, which means we would have to keep checking for NULL
+every time we need sched_clock(). 
+Potentially it would cost a cache miss for PACA memory region that
+contain vc, another for getting the part of *vc that contains the
+tb_offset_applied, instead of only one for PACA struct region that
+contains tb_offset.
+
+On the other hand, it got me thinking: If the offset is applied per
+cpu, why don't we get this info only in PACA, instead of in vc?
+It could be a general way to get an offset applied for any purpose and
+still get the sched_clock() right. 
+(Not that I have any idea of any other purpose we could use it) 
+
+Best regards!
+Leonardo Bras
+
+> 
+> >  #endif
+> >  };
+> > 
+> > diff --git a/arch/powerpc/kernel/asm-offsets.c b/arch/powerpc/kernel/asm-offsets.c
+> > index b12d7c049bfe..0beb8fdc6352 100644
+> > --- a/arch/powerpc/kernel/asm-offsets.c
+> > +++ b/arch/powerpc/kernel/asm-offsets.c
+> > @@ -706,6 +706,7 @@ int main(void)
+> >  	HSTATE_FIELD(HSTATE_CFAR, cfar);
+> >  	HSTATE_FIELD(HSTATE_PPR, ppr);
+> >  	HSTATE_FIELD(HSTATE_HOST_FSCR, host_fscr);
+> > +	HSTATE_FIELD(HSTATE_TB_OFFSET, tb_offset);
+> >  #endif /* CONFIG_PPC_BOOK3S_64 */
+> > 
+> >  #else /* CONFIG_PPC_BOOK3S */
+> > diff --git a/arch/powerpc/kernel/time.c b/arch/powerpc/kernel/time.c
+> > index 67feb3524460..f27f0163792b 100644
+> > --- a/arch/powerpc/kernel/time.c
+> > +++ b/arch/powerpc/kernel/time.c
+> > @@ -699,7 +699,13 @@ EXPORT_SYMBOL_GPL(tb_to_ns);
+> >   */
+> >  notrace unsigned long long sched_clock(void)
+> >  {
+> > -	return mulhdu(get_tb() - boot_tb, tb_to_ns_scale) << tb_to_ns_shift;
+> > +	u64 tb = get_tb() - boot_tb;
+> > +
+> > +#if defined(CONFIG_PPC_BOOK3S_64) && defined(CONFIG_KVM_BOOK3S_HANDLER)
+> > +	tb -= local_paca->kvm_hstate.tb_offset;
+> > +#endif
+> > +
+> > +	return mulhdu(tb, tb_to_ns_scale) << tb_to_ns_shift;
+> >  }
+> > 
+> > 
+> > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> > index b3731572295e..c08593c63353 100644
+> > --- a/arch/powerpc/kvm/book3s_hv.c
+> > +++ b/arch/powerpc/kvm/book3s_hv.c
+> > @@ -3491,6 +3491,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+> >  		if ((tb & 0xffffff) < (new_tb & 0xffffff))
+> >  			mtspr(SPRN_TBU40, new_tb + 0x1000000);
+> >  		vc->tb_offset_applied = vc->tb_offset;
+> > +		local_paca->kvm_hstate.tb_offset = vc->tb_offset;
+> >  	}
+> > 
+> >  	if (vc->pcr)
+> > @@ -3594,6 +3595,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+> >  		if ((tb & 0xffffff) < (new_tb & 0xffffff))
+> >  			mtspr(SPRN_TBU40, new_tb + 0x1000000);
+> >  		vc->tb_offset_applied = 0;
+> > +		local_paca->kvm_hstate.tb_offset = 0;
+> >  	}
+> > 
+> >  	mtspr(SPRN_HDEC, 0x7fffffff);
+> > diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> > index b73140607875..8f7a9f7f4ee6 100644
+> > --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> > +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> > @@ -632,6 +632,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_300)
+> >  	cmpdi	r8,0
+> >  	beq	37f
+> >  	std	r8, VCORE_TB_OFFSET_APPL(r5)
+> > +	std	r8, HSTATE_TB_OFFSET(r13)
+> >  	mftb	r6		/* current host timebase */
+> >  	add	r8,r8,r6
+> >  	mtspr	SPRN_TBU40,r8	/* update upper 40 bits */
+> > @@ -1907,6 +1908,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
+> >  	beq	17f
+> >  	li	r0, 0
+> >  	std	r0, VCORE_TB_OFFSET_APPL(r5)
+> > +	std	r0, HSTATE_TB_OFFSET(r13)
+> >  	mftb	r6			/* current guest timebase */
+> >  	subf	r8,r8,r6
+> >  	mtspr	SPRN_TBU40,r8		/* update upper 40 bits */
+
 
