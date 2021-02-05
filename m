@@ -2,208 +2,207 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 746A2311393
-	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Feb 2021 22:30:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C08D031160C
+	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Feb 2021 23:55:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231701AbhBEVaR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 5 Feb 2021 16:30:17 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58932 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233524AbhBEV3k (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Feb 2021 16:29:40 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 115L2B3R143895;
-        Fri, 5 Feb 2021 16:28:49 -0500
+        id S233158AbhBEWtE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 5 Feb 2021 17:49:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15280 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229707AbhBENLL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Feb 2021 08:11:11 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 115D2YZF148771;
+        Fri, 5 Feb 2021 08:09:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=KX7k9kLXymzTRaGNadAL0QaapilxXNnCoImncC6ki/o=;
- b=NHMaqD4inPttME3GmMWRIcRRvIvM4ASodI5xtTc3pCLKbPcG8+3LvJobeY8OpxadvzIs
- 3dMlCllE2vpF9b3Kj1j1/usxCnuSqukSnfFbzKokE9c6JCU6yBE/PAkUMnW6hjxUwUhK
- b9TJenK+SssV5ah9fJnWDtzUbzI1GD2MMBA95K7jElKj4pUmd9G7MQiHeQT40N68l9xp
- 0VSOakoRX4B8w8A0fv31zp7b0SAnR5PWC41iPu7g85SERgzfSxbTwtEh0wm2bsDRxFyz
- pcAj/H5PMIjs7BU/SY4I45lBbSwjiWIZOcRW4IvsjfGwk8RwRF9a4pwILlJV+4RH55Pq +g== 
+ content-type; s=pp1; bh=FuHd5B8vQDs909fxLg4Hf92nFou7E5WKngwdbrDJ29E=;
+ b=RMIoz47Q2nEx3A/aPzFKD18YZZ2fj1G/XzwH4yY8CD1bsH/eD31n7bn21sCh7PvQarOr
+ 3WnOXR5MsT6Gww3zalOwjhGk181MV/Lf4zVutTrCEFSM+BZJNisjmcueSW9kTrVhz7hN
+ 3Akfbgiuf+JDPdM4XX2IuoaXhRwq+FfPPsAxfYgFAzNc/MLINQv3eXt2lbjCcO1WL8Ge
+ HF/MxQgVBXs4hYdmVeXqVn9FXLzpOqnZ7U+M4vWCnJApOEKU9yErmaigE0PxzixZRkdK
+ 7JulrxlzftKECYQ32iJng3Ujnh/rCYwdSiCp1R8+X62jvpL3OBnt1xvoVGlUVN41e8gd zg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36hd9tgym0-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36h5pktfaa-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 16:28:48 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 115L4NO3150898;
-        Fri, 5 Feb 2021 16:28:48 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36hd9tgykr-1
+        Fri, 05 Feb 2021 08:09:52 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 115D3fgo155574;
+        Fri, 5 Feb 2021 08:09:52 -0500
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36h5pktf9y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 16:28:48 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 115LCbfa029556;
-        Fri, 5 Feb 2021 21:28:47 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma04dal.us.ibm.com with ESMTP id 36ex3pp4ys-1
+        Fri, 05 Feb 2021 08:09:52 -0500
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 115D8PtF019834;
+        Fri, 5 Feb 2021 13:09:51 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma01dal.us.ibm.com with ESMTP id 36eu8rbpju-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 21:28:47 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 115LSlIi29426060
+        Fri, 05 Feb 2021 13:09:51 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 115D9onk25821548
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 5 Feb 2021 21:28:47 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EF117AC05E;
-        Fri,  5 Feb 2021 21:28:46 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B017AC05B;
-        Fri,  5 Feb 2021 21:28:46 +0000 (GMT)
+        Fri, 5 Feb 2021 13:09:50 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE3E5112066;
+        Fri,  5 Feb 2021 13:09:49 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0E0AF112063;
+        Fri,  5 Feb 2021 13:09:49 +0000 (GMT)
 Received: from localhost (unknown [9.163.5.169])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Fri,  5 Feb 2021 21:28:45 +0000 (GMT)
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Fri,  5 Feb 2021 13:09:48 +0000 (GMT)
 From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [RFC PATCH 1/9] KVM: PPC: Book3S 64: move KVM interrupt entry
- to a common entry point
-In-Reply-To: <20210202030313.3509446-2-npiggin@gmail.com>
-References: <20210202030313.3509446-1-npiggin@gmail.com>
- <20210202030313.3509446-2-npiggin@gmail.com>
-Date:   Fri, 05 Feb 2021 18:28:43 -0300
-Message-ID: <874kiqi4qc.fsf@linux.ibm.com>
+To:     Leonardo Bras <leobras.c@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Athira Rajeev <atrajeev@linux.vnet.ibm.com>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
+        Leonardo Bras <leobras.c@gmail.com>,
+        Jordan Niethe <jniethe5@gmail.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/1] powerpc/kvm: Save Timebase Offset to fix
+ sched_clock() while running guest code.
+In-Reply-To: <20210205060643.233481-1-leobras.c@gmail.com>
+References: <20210205060643.233481-1-leobras.c@gmail.com>
+Date:   Fri, 05 Feb 2021 10:09:46 -0300
+Message-ID: <874kiqy82t.fsf@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-05_11:2021-02-05,2021-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- spamscore=0 mlxscore=0 clxscore=1015 bulkscore=0 priorityscore=1501
- impostorscore=0 suspectscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102050128
+ definitions=2021-02-05_07:2021-02-05,2021-02-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 adultscore=0 impostorscore=0 priorityscore=1501
+ lowpriorityscore=0 suspectscore=0 mlxscore=0 spamscore=0 malwarescore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102050083
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
+Leonardo Bras <leobras.c@gmail.com> writes:
 
-> Rather than bifurcate the call depending on whether or not HV is
-> possible, and have the HV entry test for PR, just make a single
-> common point which does the demultiplexing. This makes it simpler
-> to add another type of exit handler.
+> Before guest entry, TBU40 register is changed to reflect guest timebase.
+> After exitting guest, the register is reverted to it's original value.
 >
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
-
+> If one tries to get the timestamp from host between those changes, it
+> will present an incorrect value.
+>
+> An example would be trying to add a tracepoint in
+> kvmppc_guest_entry_inject_int(), which depending on last tracepoint
+> acquired could actually cause the host to crash.
+>
+> Save the Timebase Offset to PACA and use it on sched_clock() to always
+> get the correct timestamp.
+>
+> Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
+> Suggested-by: Paul Mackerras <paulus@ozlabs.org>
 > ---
->  arch/powerpc/kernel/exceptions-64s.S    |  8 +-----
->  arch/powerpc/kvm/Makefile               |  3 +++
->  arch/powerpc/kvm/book3s_64_entry.S      | 34 +++++++++++++++++++++++++
->  arch/powerpc/kvm/book3s_hv_rmhandlers.S | 11 ++------
->  4 files changed, 40 insertions(+), 16 deletions(-)
->  create mode 100644 arch/powerpc/kvm/book3s_64_entry.S
+> Changes since v1:
+> - Subtracts offset only when CONFIG_KVM_BOOK3S_HANDLER and
+>   CONFIG_PPC_BOOK3S_64 are defined.
+> ---
+>  arch/powerpc/include/asm/kvm_book3s_asm.h | 1 +
+>  arch/powerpc/kernel/asm-offsets.c         | 1 +
+>  arch/powerpc/kernel/time.c                | 8 +++++++-
+>  arch/powerpc/kvm/book3s_hv.c              | 2 ++
+>  arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 2 ++
+>  5 files changed, 13 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/powerpc/kernel/exceptions-64s.S b/arch/powerpc/kernel/exceptions-64s.S
-> index e02ad6fefa46..65659ea3cec4 100644
-> --- a/arch/powerpc/kernel/exceptions-64s.S
-> +++ b/arch/powerpc/kernel/exceptions-64s.S
-> @@ -212,7 +212,6 @@ do_define_int n
->  .endm
+> diff --git a/arch/powerpc/include/asm/kvm_book3s_asm.h b/arch/powerpc/include/asm/kvm_book3s_asm.h
+> index 078f4648ea27..e2c12a10eed2 100644
+> --- a/arch/powerpc/include/asm/kvm_book3s_asm.h
+> +++ b/arch/powerpc/include/asm/kvm_book3s_asm.h
+> @@ -131,6 +131,7 @@ struct kvmppc_host_state {
+>  	u64 cfar;
+>  	u64 ppr;
+>  	u64 host_fscr;
+> +	u64 tb_offset;		/* Timebase offset: keeps correct
+> timebase while on guest */
+
+Couldn't you use the vc->tb_offset_applied for this? We have a reference
+for the vcore in the hstate already.
+
+>  #endif
+>  };
 >
->  #ifdef CONFIG_KVM_BOOK3S_64_HANDLER
-> -#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
->  /*
->   * All interrupts which set HSRR registers, as well as SRESET and MCE and
->   * syscall when invoked with "sc 1" switch to MSR[HV]=1 (HVMODE) to be taken,
-> @@ -242,13 +241,8 @@ do_define_int n
+> diff --git a/arch/powerpc/kernel/asm-offsets.c b/arch/powerpc/kernel/asm-offsets.c
+> index b12d7c049bfe..0beb8fdc6352 100644
+> --- a/arch/powerpc/kernel/asm-offsets.c
+> +++ b/arch/powerpc/kernel/asm-offsets.c
+> @@ -706,6 +706,7 @@ int main(void)
+>  	HSTATE_FIELD(HSTATE_CFAR, cfar);
+>  	HSTATE_FIELD(HSTATE_PPR, ppr);
+>  	HSTATE_FIELD(HSTATE_HOST_FSCR, host_fscr);
+> +	HSTATE_FIELD(HSTATE_TB_OFFSET, tb_offset);
+>  #endif /* CONFIG_PPC_BOOK3S_64 */
 >
->  /*
->   * If an interrupt is taken while a guest is running, it is immediately routed
-> - * to KVM to handle. If both HV and PR KVM arepossible, KVM interrupts go first
-> - * to kvmppc_interrupt_hv, which handles the PR guest case.
-> + * to KVM to handle.
+>  #else /* CONFIG_PPC_BOOK3S */
+> diff --git a/arch/powerpc/kernel/time.c b/arch/powerpc/kernel/time.c
+> index 67feb3524460..f27f0163792b 100644
+> --- a/arch/powerpc/kernel/time.c
+> +++ b/arch/powerpc/kernel/time.c
+> @@ -699,7 +699,13 @@ EXPORT_SYMBOL_GPL(tb_to_ns);
 >   */
-> -#define kvmppc_interrupt kvmppc_interrupt_hv
-> -#else
-> -#define kvmppc_interrupt kvmppc_interrupt_pr
-> -#endif
->
->  .macro KVMTEST name
->  	lbz	r10,HSTATE_IN_GUEST(r13)
-> diff --git a/arch/powerpc/kvm/Makefile b/arch/powerpc/kvm/Makefile
-> index 2bfeaa13befb..cdd119028f64 100644
-> --- a/arch/powerpc/kvm/Makefile
-> +++ b/arch/powerpc/kvm/Makefile
-> @@ -59,6 +59,9 @@ kvm-pr-y := \
->  kvm-book3s_64-builtin-objs-$(CONFIG_KVM_BOOK3S_64_HANDLER) += \
->  	tm.o
->
-> +kvm-book3s_64-builtin-objs-y += \
-> +	book3s_64_entry.o
+>  notrace unsigned long long sched_clock(void)
+>  {
+> -	return mulhdu(get_tb() - boot_tb, tb_to_ns_scale) << tb_to_ns_shift;
+> +	u64 tb = get_tb() - boot_tb;
 > +
->  ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
->  kvm-book3s_64-builtin-objs-$(CONFIG_KVM_BOOK3S_64_HANDLER) += \
->  	book3s_rmhandlers.o
-> diff --git a/arch/powerpc/kvm/book3s_64_entry.S b/arch/powerpc/kvm/book3s_64_entry.S
-> new file mode 100644
-> index 000000000000..22e34b95f478
-> --- /dev/null
-> +++ b/arch/powerpc/kvm/book3s_64_entry.S
-> @@ -0,0 +1,34 @@
-> +#include <asm/cache.h>
-> +#include <asm/ppc_asm.h>
-> +#include <asm/kvm_asm.h>
-> +#include <asm/reg.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/kvm_book3s_asm.h>
+> +#if defined(CONFIG_PPC_BOOK3S_64) && defined(CONFIG_KVM_BOOK3S_HANDLER)
+> +	tb -= local_paca->kvm_hstate.tb_offset;
+> +#endif
 > +
-> +/*
-> + * We come here from the first-level interrupt handlers.
-> + */
-> +.global	kvmppc_interrupt
-> +.balign IFETCH_ALIGN_BYTES
-> +kvmppc_interrupt:
-> +	/*
-> +	 * Register contents:
-> +	 * R12		= (guest CR << 32) | interrupt vector
-> +	 * R13		= PACA
-> +	 * guest R12 saved in shadow VCPU SCRATCH0
-> +	 * guest R13 saved in SPRN_SCRATCH0
-> +	 */
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +	std	r9, HSTATE_SCRATCH2(r13)
-> +	lbz	r9, HSTATE_IN_GUEST(r13)
-> +	cmpwi	r9, KVM_GUEST_MODE_HOST_HV
-> +	beq	kvmppc_bad_host_intr
-> +#ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
-> +	cmpwi	r9, KVM_GUEST_MODE_GUEST
-> +	ld	r9, HSTATE_SCRATCH2(r13)
-> +	beq	kvmppc_interrupt_pr
-> +#endif
-> +	b	kvmppc_interrupt_hv
-> +#else
-> +	b	kvmppc_interrupt_pr
-> +#endif
+> +	return mulhdu(tb, tb_to_ns_scale) << tb_to_ns_shift;
+>  }
+>
+>
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index b3731572295e..c08593c63353 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -3491,6 +3491,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+>  		if ((tb & 0xffffff) < (new_tb & 0xffffff))
+>  			mtspr(SPRN_TBU40, new_tb + 0x1000000);
+>  		vc->tb_offset_applied = vc->tb_offset;
+> +		local_paca->kvm_hstate.tb_offset = vc->tb_offset;
+>  	}
+>
+>  	if (vc->pcr)
+> @@ -3594,6 +3595,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+>  		if ((tb & 0xffffff) < (new_tb & 0xffffff))
+>  			mtspr(SPRN_TBU40, new_tb + 0x1000000);
+>  		vc->tb_offset_applied = 0;
+> +		local_paca->kvm_hstate.tb_offset = 0;
+>  	}
+>
+>  	mtspr(SPRN_HDEC, 0x7fffffff);
 > diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> index 8cf1f69f442e..b9c4acd747f7 100644
+> index b73140607875..8f7a9f7f4ee6 100644
 > --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
 > +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> @@ -1255,16 +1255,8 @@ kvmppc_interrupt_hv:
->  	 * R13		= PACA
->  	 * guest R12 saved in shadow VCPU SCRATCH0
->  	 * guest R13 saved in SPRN_SCRATCH0
-> +	 * guest R9 saved in HSTATE_SCRATCH2
->  	 */
-> -	std	r9, HSTATE_SCRATCH2(r13)
-> -	lbz	r9, HSTATE_IN_GUEST(r13)
-> -	cmpwi	r9, KVM_GUEST_MODE_HOST_HV
-> -	beq	kvmppc_bad_host_intr
-> -#ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
-> -	cmpwi	r9, KVM_GUEST_MODE_GUEST
-> -	ld	r9, HSTATE_SCRATCH2(r13)
-> -	beq	kvmppc_interrupt_pr
-> -#endif
->  	/* We're now back in the host but in guest MMU context */
->  	li	r9, KVM_GUEST_MODE_HOST_HV
->  	stb	r9, HSTATE_IN_GUEST(r13)
-> @@ -3253,6 +3245,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_P9_TM_HV_ASSIST)
->   * cfar is saved in HSTATE_CFAR(r13)
->   * ppr is saved in HSTATE_PPR(r13)
->   */
-> +.global kvmppc_bad_host_intr
->  kvmppc_bad_host_intr:
->  	/*
->  	 * Switch to the emergency stack, but start half-way down in
+> @@ -632,6 +632,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_300)
+>  	cmpdi	r8,0
+>  	beq	37f
+>  	std	r8, VCORE_TB_OFFSET_APPL(r5)
+> +	std	r8, HSTATE_TB_OFFSET(r13)
+>  	mftb	r6		/* current host timebase */
+>  	add	r8,r8,r6
+>  	mtspr	SPRN_TBU40,r8	/* update upper 40 bits */
+> @@ -1907,6 +1908,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
+>  	beq	17f
+>  	li	r0, 0
+>  	std	r0, VCORE_TB_OFFSET_APPL(r5)
+> +	std	r0, HSTATE_TB_OFFSET(r13)
+>  	mftb	r6			/* current guest timebase */
+>  	subf	r8,r8,r6
+>  	mtspr	SPRN_TBU40,r8		/* update upper 40 bits */
