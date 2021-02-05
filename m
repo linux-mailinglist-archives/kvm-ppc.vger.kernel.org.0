@@ -2,122 +2,178 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB63830FDC6
-	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Feb 2021 21:15:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F025310365
+	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Feb 2021 04:17:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239962AbhBDUGt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 4 Feb 2021 15:06:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6008 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239818AbhBDUGc (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Feb 2021 15:06:32 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 114K1J2g033196;
-        Thu, 4 Feb 2021 15:05:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=kjgmLOqy2IHSMC4krSKZvVE2p3Tr66l0k7MC5Clqlj8=;
- b=Ni/yFHlCsslX/JkrpllvIEWkFqS9b6IKdXGTvHPL5WKYM5BIBVd8FAaMrXcrJJjjGnnw
- LyKaXF2wivncgmi7EOqWoXgyMtpkivT9cTZH1a2FxJUj9loKmkSzaGH6KtQIedKCQwsp
- wOsXBl8sYS43I0BB9gsyQxSWmVx+w0kMiiXu6BjiHja2n3O1Cem77ZamPeuSjCGeE5jN
- WoH+CbcfQN46RzsQAaSbWrfZ8LfxBpeERlPjM8v1ER35B9sL/ng/uS29Wtqn0pSH5+4B
- 2o1kkVu1DVvqKMNp+TE/viN4zwl+cz328jb8HHEVpu2MqUrW8Jf3wl8xmWkJ7sPCFFse FA== 
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36gqb9rqk4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Feb 2021 15:05:25 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 114K2A8M012565;
-        Thu, 4 Feb 2021 20:05:22 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma03wdc.us.ibm.com with ESMTP id 36f2nxcm3y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Feb 2021 20:05:22 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 114K5Moc23790074
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 4 Feb 2021 20:05:22 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 39B04AE05F;
-        Thu,  4 Feb 2021 20:05:22 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 69F6AAE062;
-        Thu,  4 Feb 2021 20:05:20 +0000 (GMT)
-Received: from farosas.linux.ibm.com.com (unknown [9.163.38.10])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu,  4 Feb 2021 20:05:20 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
-        mpe@ellerman.id.au
-Subject: [PATCH] KVM: PPC: Book3S HV: Save and restore FSCR in the P9 path
-Date:   Thu,  4 Feb 2021 17:05:17 -0300
-Message-Id: <20210204200517.1481811-1-farosas@linux.ibm.com>
+        id S229692AbhBEDRZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 4 Feb 2021 22:17:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50266 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229567AbhBEDRY (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Feb 2021 22:17:24 -0500
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F9A7C0613D6;
+        Thu,  4 Feb 2021 19:16:44 -0800 (PST)
+Received: by mail-qk1-x72c.google.com with SMTP id n15so5641156qkh.8;
+        Thu, 04 Feb 2021 19:16:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=8WTNk9Xbw6EghApIXQgl/ogYtRuCwBqSCPnWZ2LdagU=;
+        b=kl220autwj+PrnjrQxTlb2/j43lozhddaVtEdxeo3Eb1olxxUNrgM27SIT2VuHAEbQ
+         UtZypHI/rURy1bC9zu6yyd6rgCtEaseSa8e/f8tSCV9L/AvOaA6Q1NquI0/7bcwOBvo/
+         n/Br77ExjxcR1sTUsdJL1mY9250CfUvUypKT4l50J0xQYcfMF4ezP8p3Sho80IY07Unz
+         dVX9H9NNI1dk35W20/lmJlEqpF19WFZQSdg7MBDLXFq0gnskmB8iH/spt3+RF0wOmCfd
+         LMEiRVaQbuURxJ5lxjaIywwxstP2rNwlDJd/ij7rSS/AKPWJxIsfEXzpynwp1jSAsYA5
+         YTTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=8WTNk9Xbw6EghApIXQgl/ogYtRuCwBqSCPnWZ2LdagU=;
+        b=ArGB/OMvKF/grLkMx0TP6dNYfZ+sxX0eaY+qMbRpDVFWjQs92p1PZZqHGQ6AOAbvPr
+         nRDQdrBB5HeHbfIiPLONwjebNJ+vq1dkyyYIPSaqNyhG7MiggWvUBwChftN67DmLQI3y
+         QOs370aFu93XrjYNI85bKy4DoQI6LhNgqIqvYiE9Kb9/5I3VuHCEwL3VU9cEdDigcC7D
+         PyCmOXIc/mPWHTpNOC0VpDZK+EVI5IDyGT/cfFuTPJ2+q8D+138k2nZj3uWqUse0O/Zn
+         Llzjwk/GrxNUtuQ3GvfmlD0+gNklywVSkeBEHrARIH2z15f3n4D0WCAr0ilywOpm/ZEP
+         QPpA==
+X-Gm-Message-State: AOAM531PxAUvpsQhcr0zqctDzVmCOF3poUH/UIWdcRUntV+69tte6WGR
+        ujvxGEvN/HEKb4i7AmGsr08=
+X-Google-Smtp-Source: ABdhPJzquNM+md70FmybygGiqQluF5m3/Rm/hLyrOyr5Kt5Vk91Zinjx4QN+Nlm3uwB6RKvlBAe5dw==
+X-Received: by 2002:a37:455:: with SMTP id 82mr2590683qke.490.1612495003118;
+        Thu, 04 Feb 2021 19:16:43 -0800 (PST)
+Received: from li-908e0a4c-2250-11b2-a85c-f027e903211b.ibm.com.com (186-249-147-196.dynamic.desktop.com.br. [186.249.147.196])
+        by smtp.gmail.com with ESMTPSA id o45sm6842587qto.91.2021.02.04.19.16.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Feb 2021 19:16:42 -0800 (PST)
+From:   Leonardo Bras <leobras.c@gmail.com>
+To:     Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Athira Rajeev <atrajeev@linux.vnet.ibm.com>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
+        Gustavo Romero <gromero@linux.ibm.com>,
+        Jordan Niethe <jniethe5@gmail.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Frederic Weisbecker <frederic@kernel.org>
+Cc:     Leonardo Bras <leobras.c@gmail.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] powerpc/kvm: Save Timebase Offset to fix sched_clock() while running guest code.
+Date:   Fri,  5 Feb 2021 00:16:24 -0300
+Message-Id: <20210205031623.222730-1-leobras.c@gmail.com>
 X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-04_10:2021-02-04,2021-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 spamscore=0 malwarescore=0 suspectscore=0 mlxlogscore=881
- mlxscore=0 bulkscore=0 clxscore=1011 adultscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102040118
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The Facility Status and Control Register is a privileged SPR that
-defines the availability of some features in problem state. Since it
-can be written by the guest, we must restore it to the previous host
-value after guest exit.
+Before guest entry, TBU40 register is changed to reflect guest timebase.
+After exitting guest, the register is reverted to it's original value.
 
-This restoration is currently done by taking the value from
-current->thread.fscr, which in the P9 path is not enough anymore
-because the guest could context switch the QEMU thread, causing the
-guest-current value to be saved into the thread struct.
+If one tries to get the timestamp from host between those changes, it
+will present an incorrect value.
 
-The above situation manifested when running a QEMU linked against a
-libc with System Call Vectored support, which causes scv
-instructions to be run by QEMU early during the guest boot (during
-SLOF), at which point the FSCR is 0 due to guest entry. After a few
-scv calls (1 to a couple hundred), the context switching happens and
-the QEMU thread runs with the guest value, resulting in a Facility
-Unavailable interrupt.
+An example would be trying to add a tracepoint in
+kvmppc_guest_entry_inject_int(), which depending on last tracepoint
+acquired could actually cause the host to crash.
 
-This patch saves and restores the host value of FSCR in the inner
-guest entry loop in a way independent of current->thread.fscr. The old
-way of doing it is still kept in place because it works for the old
-entry path.
+Save the Timebase Offset to PACA and use it on sched_clock() to always
+get the correct timestamp.
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/powerpc/include/asm/kvm_book3s_asm.h | 1 +
+ arch/powerpc/kernel/asm-offsets.c         | 1 +
+ arch/powerpc/kernel/time.c                | 3 ++-
+ arch/powerpc/kvm/book3s_hv.c              | 2 ++
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 2 ++
+ 5 files changed, 8 insertions(+), 1 deletion(-)
 
+diff --git a/arch/powerpc/include/asm/kvm_book3s_asm.h b/arch/powerpc/include/asm/kvm_book3s_asm.h
+index 078f4648ea27..e2c12a10eed2 100644
+--- a/arch/powerpc/include/asm/kvm_book3s_asm.h
++++ b/arch/powerpc/include/asm/kvm_book3s_asm.h
+@@ -131,6 +131,7 @@ struct kvmppc_host_state {
+ 	u64 cfar;
+ 	u64 ppr;
+ 	u64 host_fscr;
++	u64 tb_offset;		/* Timebase offset: keeps correct timebase while on guest */
+ #endif
+ };
+ 
+diff --git a/arch/powerpc/kernel/asm-offsets.c b/arch/powerpc/kernel/asm-offsets.c
+index b12d7c049bfe..0beb8fdc6352 100644
+--- a/arch/powerpc/kernel/asm-offsets.c
++++ b/arch/powerpc/kernel/asm-offsets.c
+@@ -706,6 +706,7 @@ int main(void)
+ 	HSTATE_FIELD(HSTATE_CFAR, cfar);
+ 	HSTATE_FIELD(HSTATE_PPR, ppr);
+ 	HSTATE_FIELD(HSTATE_HOST_FSCR, host_fscr);
++	HSTATE_FIELD(HSTATE_TB_OFFSET, tb_offset);
+ #endif /* CONFIG_PPC_BOOK3S_64 */
+ 
+ #else /* CONFIG_PPC_BOOK3S */
+diff --git a/arch/powerpc/kernel/time.c b/arch/powerpc/kernel/time.c
+index 67feb3524460..adf6648e3572 100644
+--- a/arch/powerpc/kernel/time.c
++++ b/arch/powerpc/kernel/time.c
+@@ -699,7 +699,8 @@ EXPORT_SYMBOL_GPL(tb_to_ns);
+  */
+ notrace unsigned long long sched_clock(void)
+ {
+-	return mulhdu(get_tb() - boot_tb, tb_to_ns_scale) << tb_to_ns_shift;
++	return mulhdu(get_tb() - boot_tb - local_paca->kvm_hstate.tb_offset, tb_to_ns_scale)
++			<< tb_to_ns_shift;
+ }
+ 
+ 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 6f612d240392..f2ddf7139a2a 100644
+index b3731572295e..c08593c63353 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3595,6 +3595,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	unsigned long host_tidr = mfspr(SPRN_TIDR);
- 	unsigned long host_iamr = mfspr(SPRN_IAMR);
- 	unsigned long host_amr = mfspr(SPRN_AMR);
-+	unsigned long host_fscr = mfspr(SPRN_FSCR);
- 	s64 dec;
- 	u64 tb;
- 	int trap, save_pmu;
-@@ -3735,6 +3736,9 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	if (host_amr != vcpu->arch.amr)
- 		mtspr(SPRN_AMR, host_amr);
+@@ -3491,6 +3491,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+ 		if ((tb & 0xffffff) < (new_tb & 0xffffff))
+ 			mtspr(SPRN_TBU40, new_tb + 0x1000000);
+ 		vc->tb_offset_applied = vc->tb_offset;
++		local_paca->kvm_hstate.tb_offset = vc->tb_offset;
+ 	}
  
-+	if (host_fscr != vcpu->arch.fscr)
-+		mtspr(SPRN_FSCR, host_fscr);
-+
- 	msr_check_and_set(MSR_FP | MSR_VEC | MSR_VSX);
- 	store_fp_state(&vcpu->arch.fp);
- #ifdef CONFIG_ALTIVEC
+ 	if (vc->pcr)
+@@ -3594,6 +3595,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+ 		if ((tb & 0xffffff) < (new_tb & 0xffffff))
+ 			mtspr(SPRN_TBU40, new_tb + 0x1000000);
+ 		vc->tb_offset_applied = 0;
++		local_paca->kvm_hstate.tb_offset = 0;
+ 	}
+ 
+ 	mtspr(SPRN_HDEC, 0x7fffffff);
+diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+index b73140607875..8f7a9f7f4ee6 100644
+--- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
++++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+@@ -632,6 +632,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_300)
+ 	cmpdi	r8,0
+ 	beq	37f
+ 	std	r8, VCORE_TB_OFFSET_APPL(r5)
++	std	r8, HSTATE_TB_OFFSET(r13)
+ 	mftb	r6		/* current host timebase */
+ 	add	r8,r8,r6
+ 	mtspr	SPRN_TBU40,r8	/* update upper 40 bits */
+@@ -1907,6 +1908,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
+ 	beq	17f
+ 	li	r0, 0
+ 	std	r0, VCORE_TB_OFFSET_APPL(r5)
++	std	r0, HSTATE_TB_OFFSET(r13)
+ 	mftb	r6			/* current guest timebase */
+ 	subf	r8,r8,r6
+ 	mtspr	SPRN_TBU40,r8		/* update upper 40 bits */
 -- 
 2.29.2
 
