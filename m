@@ -2,63 +2,65 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61DD4312209
-	for <lists+kvm-ppc@lfdr.de>; Sun,  7 Feb 2021 07:44:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D25B3129DE
+	for <lists+kvm-ppc@lfdr.de>; Mon,  8 Feb 2021 06:03:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229561AbhBGGoF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 7 Feb 2021 01:44:05 -0500
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:50245 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229506AbhBGGoE (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 7 Feb 2021 01:44:04 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UO3FkMB_1612680193;
-Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0UO3FkMB_1612680193)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Sun, 07 Feb 2021 14:43:17 +0800
-From:   Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-To:     paulus@ozlabs.org
-Cc:     mpe@ellerman.id.au, benh@kernel.crashing.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org,
-        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-Subject: [PATCH] powerpc/xive: Assign boolean values to a bool variable
-Date:   Sun,  7 Feb 2021 14:43:12 +0800
-Message-Id: <1612680192-43116-1-git-send-email-jiapeng.chong@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S229482AbhBHFAc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 8 Feb 2021 00:00:32 -0500
+Received: from smtp-18d.idc2.mandic.com.br ([177.70.124.135]:31006 "EHLO
+        smtp-18.idc2.mandic.com.br" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229453AbhBHFAc (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Feb 2021 00:00:32 -0500
+Received: by smtp-18.smtp.mandic.prv (Postfix, from userid 491)
+        id 4345D6074D70; Mon,  8 Feb 2021 01:59:47 -0300 (-03)
+Received: from smtp-18.idc2.mandic.com.br (ifsmtp2 [192.168.1.38])
+        by smtp-18.smtp.mandic.prv (Postfix) with ESMTPS id 310BB606D844;
+        Mon,  8 Feb 2021 01:59:41 -0300 (-03)
+Received: from User (unknown [52.235.38.23])
+        by smtp-18.smtp.mandic.prv (Postfix) with ESMTPA id DF83746993C1;
+        Mon,  8 Feb 2021 01:57:07 -0300 (-03)
+Reply-To: <ms.reem@yandex.com>
+From:   "Ms. Reem" <stefy@macrometrica.com.br>
+Subject: Re:reply
+Date:   Mon, 8 Feb 2021 04:59:39 -0000
+MIME-Version: 1.0
+Content-Type: text/plain;
+        charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 6.00.2600.0000
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
+X-Mandic-Auth: DYB6x5JcyVot9snxiAasWC73cfc93V+pC3vUrorm87+eXbqAUeEHL0ZNPgpM50IYQeUbiYx0PkMIK2oavHcOOA==
+X-Mandic-Sender: stefy@macrometrica.com.br
+Message-Id: <20210208045941.310BB606D844@smtp-18.smtp.mandic.prv>
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Fix the following coccicheck warnings:
+Hello,
 
-./arch/powerpc/kvm/book3s_xive.c:1856:2-17: WARNING: Assignment of 0/1
-to bool variable.
+My name is Ms. Reem Ebrahim Al-Hashimi, I am the "Minister of state
+and Petroleum" also "Minister of State for International Cooperation"
+in UAE. I write to you on behalf of my other "three (3) colleagues"
+who has approved me to solicit for your "partnership in claiming of
+{us$47=Million}" from a Financial Home in Cambodia on their behalf and
+for our "Mutual Benefits".
 
-./arch/powerpc/kvm/book3s_xive.c:1854:2-17: WARNING: Assignment of 0/1
-to bool variable.
+The Fund {us$47=Million} is our share from the (over-invoiced) Oil/Gas
+deal with Cambodian/Vietnam Government within 2013/2014, however, we
+don't want our government to know about the fund. If this proposal
+interests you, let me know, by sending me an email and I will send to
+you detailed information on how this business would be successfully
+transacted. Be informed that nobody knows about the secret of this
+fund except us, and we know how to carry out the entire transaction.
+So I am compelled to ask, that you will stand on our behalf and
+receive this fund into any account that is solely controlled by you.
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
----
- arch/powerpc/kvm/book3s_xive.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+We will compensate you with 15% of the total amount involved as
+gratification for being our partner in this transaction. Reply to:
+ms.reem@yandex.com
 
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index 30dfeac..e7219b6 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -1813,9 +1813,9 @@ int kvmppc_xive_set_irq(struct kvm *kvm, int irq_source_id, u32 irq, int level,
- 		return -EINVAL;
- 
- 	if ((level == 1 && state->lsi) || level == KVM_INTERRUPT_SET_LEVEL)
--		state->asserted = 1;
-+		state->asserted = true;
- 	else if (level == 0 || level == KVM_INTERRUPT_UNSET) {
--		state->asserted = 0;
-+		state->asserted = false;
- 		return 0;
- 	}
- 
--- 
-1.8.3.1
-
+Regards,
+Ms. Reem.
