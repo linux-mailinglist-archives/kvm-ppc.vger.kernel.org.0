@@ -2,96 +2,157 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECB57314AD4
-	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Feb 2021 09:51:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3B0C314D0E
+	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Feb 2021 11:32:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbhBIIuy (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 9 Feb 2021 03:50:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52746 "EHLO
+        id S231853AbhBIKa0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 9 Feb 2021 05:30:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230158AbhBIIsn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 9 Feb 2021 03:48:43 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40DA7C061786
-        for <kvm-ppc@vger.kernel.org>; Tue,  9 Feb 2021 00:48:02 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id c132so12030413pga.3
-        for <kvm-ppc@vger.kernel.org>; Tue, 09 Feb 2021 00:48:02 -0800 (PST)
+        with ESMTP id S231873AbhBIK2E (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 9 Feb 2021 05:28:04 -0500
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B1ADC06178B
+        for <kvm-ppc@vger.kernel.org>; Tue,  9 Feb 2021 02:27:18 -0800 (PST)
+Received: by mail-oi1-x233.google.com with SMTP id k204so17310996oih.3
+        for <kvm-ppc@vger.kernel.org>; Tue, 09 Feb 2021 02:27:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=UItTkC1S0isHcanScpoQ+wTmx30vQ0eqqPqpSb2cW14=;
-        b=UQWewsmUAO/o+CHnJhrtt2wGtDmSJOPb8TlQJI5b6y0BNDTrj5EAPizNBvBdJx0jLM
-         qc0NMgrIxw6aStWs8NLgAEkpp8yN6P7ZRfvYmS6POcXjsJyHLaCDdoxZqhX7gpsxdwh+
-         +OHSM9BO/C7+ycPgakZ/cVzZK55jrGgqdhve+7zho43dMlHu225uwnbppTf2x1ZB6V+3
-         gmmF69HllvUYRXrZZay593cOyINQuqNoIZDWJbd52u6uT2WzVhhk+WaNRjYg7g6onIM4
-         FoPIC+s0ek0ZLlmTyiTn9IP+PqYvsVphca31AozMkOawaFjnKQ1nhFp0PoBY0ro3A1/H
-         p4NA==
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IuPwe6UnW2D70azMPi7ooQm/qzJFfsCFKJ5pbRf3Rag=;
+        b=fjNiIqJN11AmOAs1Pa1q8noSSurhramxPWrN+UmCUCz19mWIDz3e7u/5LlRSNHdThF
+         3SEZ7MSpAtz9+pzxH2o0Dx3sbAmj0oYCQwbWPReA/QOLUf+HZ5ccnMsn7DBtkieJMPzL
+         BA++OnfY3vQP93lMntxdlYu6pI2Pqm/Q0zTQA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=UItTkC1S0isHcanScpoQ+wTmx30vQ0eqqPqpSb2cW14=;
-        b=XcqNPjKUZEH0hrb/k9TIuXAlTlaY7KZr1tNbBe74nL1ZfmJfVtEkhZ36Xmdv6lafTC
-         DtrWYvtmv7vklEs34i0o3isfPZF0Dr8VxTjJl+gzpe9k7fnAOG52+JZIh3w7JMdLo4xu
-         YN0JV8vF9lRazUhaineg87DOxqu5Ij29tsOoth7ifJ2GNZ1zk5NSgminy8q1TJnTR3I5
-         ZMPh/XmQKQ/YylK6VQOv0DbiP40vzdSm8YxgUNmQP8hF+CNDATPdoGoXa3fTNMY3JGE2
-         H1waNZBgjwAG8CZVgmkq5Y5ZpwnYwiw9Tii6M2nZJosyYrXOZOpLZvOhEPjcjHDnWPVN
-         V16A==
-X-Gm-Message-State: AOAM532gWZwOzCqBKXJ1gUNXZHNTgNWgrnOn1sEy+UKMs8JzS1GJJRkF
-        IpqRHNOKuhkV4bB3DpljWt08cgOQXdy2Yw==
-X-Google-Smtp-Source: ABdhPJznAZib/PPSdxYOlNOuoMxJOGMnHiXNiqiFQBmRpnun3s42c/x+lKkYzDKm5ZPGUlCMKfg1yA==
-X-Received: by 2002:a62:1c86:0:b029:1e0:cacb:8447 with SMTP id c128-20020a621c860000b02901e0cacb8447mr4025588pfc.16.1612860481837;
-        Tue, 09 Feb 2021 00:48:01 -0800 (PST)
-Received: from localhost (14-201-150-91.tpgi.com.au. [14.201.150.91])
-        by smtp.gmail.com with ESMTPSA id w11sm21390715pge.28.2021.02.09.00.48.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Feb 2021 00:48:01 -0800 (PST)
-Date:   Tue, 09 Feb 2021 18:47:55 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 2/2] KVM: PPC: Book3S HV: Optimise TLB flushing when a
- vcpu moves between threads in a core
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     kvm-ppc@vger.kernel.org
-References: <20210118122609.1447366-1-npiggin@gmail.com>
-        <20210118122609.1447366-2-npiggin@gmail.com>
-        <20210209072355.GB2841126@thinks.paulus.ozlabs.org>
-In-Reply-To: <20210209072355.GB2841126@thinks.paulus.ozlabs.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IuPwe6UnW2D70azMPi7ooQm/qzJFfsCFKJ5pbRf3Rag=;
+        b=GNpqqRldbOW6zOSyLSq/HetR8skCpoqdvKEV1UsNuW1lb1xV/EJ2ov36h0aCpZJbDC
+         u2AE0Xa7UP69MGFw9GKcB4azzTHkKjbA93L/mEDRGQ3CxAc/j9T+z1eZRS2sz7EIHS7v
+         zkzK0mSu16Fgwc+M9OX/a5UrvEO9LXjhxr3trqoAqoWRz19+Htpv8W+wMDejJGld8iKZ
+         amK31nXFBrYdiFRm4amTEEL906bRZLPgGGBUccx4ulZIbgjxJuueNhs26tofIx+Wvcxv
+         gzfyQjwEusTjQjDspPLrl0Bp8itt9KyI76EtaDCtkbaRQMRIyF8T4MKwSpuPjZwFsmbj
+         DeEA==
+X-Gm-Message-State: AOAM532DsQRWUrWVWUW/3v0ipUvJcioDeE5hY1coUMFbm2AQez8wk3Rx
+        ov0UWlO2nIXY7ZwAOhN692L3EcMNUnU/0bPY3sCXJQ==
+X-Google-Smtp-Source: ABdhPJyir5D67fhPcTVsC/9F/To+q3sh8YkD1lFXu3j/zAvynT6ofUoVqy6egtyN+Ya2IAdtuesS+PnTgi+/Evagt+A=
+X-Received: by 2002:aca:1906:: with SMTP id l6mr1967569oii.101.1612866437717;
+ Tue, 09 Feb 2021 02:27:17 -0800 (PST)
 MIME-Version: 1.0
-Message-Id: <1612860313.ha7v5sozz4.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20210209010722.13839-1-apopple@nvidia.com>
+In-Reply-To: <20210209010722.13839-1-apopple@nvidia.com>
+From:   Daniel Vetter <daniel@ffwll.ch>
+Date:   Tue, 9 Feb 2021 11:27:05 +0100
+Message-ID: <CAKMK7uGwg2-DTU7Zrco=TSkcR4yTqN1AF0hvVYEAbuj4BUYi5Q@mail.gmail.com>
+Subject: Re: [PATCH 0/9] Add support for SVM atomics in Nouveau
+To:     Alistair Popple <apopple@nvidia.com>
+Cc:     Linux MM <linux-mm@kvack.org>,
+        Nouveau Dev <nouveau@lists.freedesktop.org>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm-ppc@vger.kernel.org,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Jerome Glisse <jglisse@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Paul Mackerras's message of February 9, 2021 5:23 pm:
-> On Mon, Jan 18, 2021 at 10:26:09PM +1000, Nicholas Piggin wrote:
->> As explained in the comment, there is no need to flush TLBs on all
->> threads in a core when a vcpu moves between threads in the same core.
->>=20
->> Thread migrations can be a significant proportion of vcpu migrations,
->> so this can help reduce the TLB flushing and IPI traffic.
->>=20
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->> ---
->> I believe we can do this and have the TLB coherency correct as per
->> the architecture, but would appreciate someone else verifying my
->> thinking.
->=20
-> So far I have not been able to convince myself that migrating within a
-> core is really different from migrating across cores as far as the
-> architecture is concerned.  If you're trying to allow for an
-> implementation where TLB entries are shared but tlbiel only works
-> (effectively and completely) on the local thread, then I don't think
-> you can do this.  If a TLB entry is created on T0, then the vcpu moves
-> to T1 and does a tlbiel, then the guest task on that vcpu migrates to
-> the vcpu that is on T2, it might still see a stale TLB entry.
+On Tue, Feb 09, 2021 at 12:07:13PM +1100, Alistair Popple wrote:
+> This series adds support to Nouveau for atomic memory operations on OpenCL
+> shared virtual memory (SVM). This is achieved using the atomic PTE bits on
+> the GPU to only permit atomic operations to system memory when a page is
+> not mapped in userspace on the CPU.
+>
+> This is implemented by adding a mode to migrate_vma_pages() which unmaps
+> and isolates existing pages from the CPU and pins them. The original
+> userspace page table entries are migrated to point to device private pages
+> allocated by the driver. This allows the driver to enable GPU atomic access
+> to the page as it will receive a callback when CPU userspace needs to
+> access it.
+>
+> In response to this callback the driver revokes the atomic access
+> permission from the GPU and migrates entries to point back to the original
+> page. The original page is unpinned as part of the migration operation
+> which also returns it to the LRU.
+>
+> Patch 3 contains the bulk of the memory management changes to implement
+> unmap and pin.
+>
+> Patches 6-9 extend Nouveau to use the new mode to allow system wide atomics
+> for OpenCL SVM to be implemented on Nouveau.
+>
+> This has been tested using the latest upstream Mesa userspace with a simple
+> OpenCL test program which checks the results of atomic GPU operations on a
+> buffer whilst also writing to the same buffer from the CPU.
+>
+> Problems yet to be addressed:
+>
+> Recent changes to pin_user_pages() prevent the creation of pinned pages in
+> ZONE_MOVABLE. This series allows pinned pages to be created in ZONE_MOVABLE
+> as attempts to migrate may fail which would be fatal to userspace.
+>
+> In this case migration of the pinned page is unnecessary as the page can be
+> unpinned at anytime by having the driver revoke atomic permission as it
+> does for the migrate_to_ram() callback. However a method of calling this
+> when memory needs to be moved has yet to be resolved so any discussion is
+> welcome.
 
-The difference is that the guest TLBIEL will still execute on the same=20
-core, so it should take care of the shared / core-wide translations that=20
-were set up. Therefore you just have to worry about the private ones,=20
-and in that case you only need to invalidate the threads that it ran on.
+Why do we need to pin for gpu atomics? You still have the callback for
+cpu faults, so you
+can move the page as needed, and hence a long-term pin sounds like the
+wrong approach.
 
-Thanks,
-Nick
+That would avoid all the hacking around long term pin constraints, because
+for real unmoveable long term pinned memory we really want to have all
+these checks. So I think we might be missing some other callbacks to be
+able to move these pages, instead of abusing longterm pins for lack of
+better tools.
+
+Cheers, Daniel
+
+
+
+>
+> Alistair Popple (9):
+>   mm/migrate.c: Always allow device private pages to migrate
+>   mm/migrate.c: Allow pfn flags to be passed to migrate_vma_setup()
+>   mm/migrate: Add a unmap and pin migration mode
+>   Documentation: Add unmap and pin to HMM
+>   hmm-tests: Add test for unmap and pin
+>   nouveau/dmem: Only map migrating pages
+>   nouveau/svm: Refactor nouveau_range_fault
+>   nouveau/dmem: Add support for multiple page types
+>   nouveau/svm: Implement atomic SVM access
+>
+>  Documentation/vm/hmm.rst                      |  22 +-
+>  arch/powerpc/kvm/book3s_hv_uvmem.c            |   4 +-
+>  drivers/gpu/drm/nouveau/include/nvif/if000c.h |   1 +
+>  drivers/gpu/drm/nouveau/nouveau_dmem.c        | 190 +++++++++++++++---
+>  drivers/gpu/drm/nouveau/nouveau_dmem.h        |   9 +
+>  drivers/gpu/drm/nouveau/nouveau_svm.c         | 148 +++++++++++---
+>  drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h |   1 +
+>  .../drm/nouveau/nvkm/subdev/mmu/vmmgp100.c    |   6 +
+>  include/linux/migrate.h                       |   2 +
+>  include/linux/migrate_mode.h                  |   1 +
+>  lib/test_hmm.c                                | 109 ++++++++--
+>  lib/test_hmm_uapi.h                           |   1 +
+>  mm/migrate.c                                  |  82 +++++---
+>  tools/testing/selftests/vm/hmm-tests.c        |  49 +++++
+>  14 files changed, 524 insertions(+), 101 deletions(-)
+>
+> --
+> 2.20.1
+>
+
+--
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
