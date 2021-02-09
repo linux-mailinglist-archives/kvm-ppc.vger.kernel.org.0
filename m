@@ -2,180 +2,121 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EEAE031399E
-	for <lists+kvm-ppc@lfdr.de>; Mon,  8 Feb 2021 17:38:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 453E0314545
+	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Feb 2021 02:10:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233471AbhBHQiY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 8 Feb 2021 11:38:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42246 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233634AbhBHQiP (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Feb 2021 11:38:15 -0500
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B66F6C061786;
-        Mon,  8 Feb 2021 08:37:35 -0800 (PST)
-Received: by mail-qt1-x82d.google.com with SMTP id z32so10705228qtd.8;
-        Mon, 08 Feb 2021 08:37:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :organization:user-agent:mime-version:content-transfer-encoding;
-        bh=0HGJhzf1G3q3frtQdQfHf7vZn5MRVAT2xn4qaxvZi1U=;
-        b=ZCnSrK8LjbN2c5cFVRG8Y/oJxehO4A8/tz5FWWPFXPIFK20ClWGSl1ycugUiWZv96X
-         gnzaSQox2p06FwUSGLgIjEcfLTyaVjRP3zWJ0jDIJ3pBkNuSYszTkRDAFNGc0Z+2vPmj
-         kE5KOYOGtCJ8rO1KdQXK8f29i7lWJcft/u45IPrhagQnf+B2Iho/kXPiCy2Idhksu8Gy
-         JrQo92inlAM87m/A/agpxNoW3/F2ASQXN0ZG33LgSo08ttpQpdqBGtQ7z0WFU3zPtDm8
-         LGXi1Ad9ZyFxGDBwWOmAypp/fg0KxfxrToUsRIEge7jkM8qFAj7UzxuQYPn6c3ikH7Pz
-         L9bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:organization:user-agent:mime-version
-         :content-transfer-encoding;
-        bh=0HGJhzf1G3q3frtQdQfHf7vZn5MRVAT2xn4qaxvZi1U=;
-        b=AyNMldO+d8X2/a2LlWI7k4m86XaSaDL/HuGELu1mWgxVeC2Anewq6m1cALD8yUc6oy
-         mYAHH7AOmb1+6zQfwlyagYPADUn/A10vXEaMn/89wG8Gle1s1MRi6Tdxcl3rlbrIMd9Q
-         WfDPvnKFRSu2PlkVXY59ok0Q5/YzSH0NA1F9MARHnPzE/LeUlPNWPy/Ocv2BCOy3OXKd
-         DMQ7b06xUuCttctcEl/JkWc+/bDndQfLvJbMfo6X01ZiJbfIAlN0InsCe1uqHpkRochv
-         rJFNODg6VoKWVF7xec8E0ZJC6Nf6+qgZw1cXylS3uHqE1lza5ON8319FjrvSrQUWHQpr
-         5CLg==
-X-Gm-Message-State: AOAM532g3pB2iB1GnewBgDYOhF9YgQYoOTLRnpIUS1Q7Gxk8JVFRecNh
-        K7n8mnwc7SyUyd0tbgEZ3RM=
-X-Google-Smtp-Source: ABdhPJxNBkhFgcpxYqi/I81KZzI4gTQD8gRxnBMkUmMMD7+YFyASMpNVveQ5vs6x229sbqpsjBgABw==
-X-Received: by 2002:a05:622a:44d:: with SMTP id o13mr9623179qtx.378.1612802254979;
-        Mon, 08 Feb 2021 08:37:34 -0800 (PST)
-Received: from li-908e0a4c-2250-11b2-a85c-f027e903211b.ibm.com (186-249-147-196.dynamic.desktop.com.br. [186.249.147.196])
-        by smtp.gmail.com with ESMTPSA id c17sm16409866qka.16.2021.02.08.08.37.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Feb 2021 08:37:33 -0800 (PST)
-Message-ID: <5f267a8aec5b8199a580c96ab2b1a3c27de4eb09.camel@gmail.com>
-Subject: Re: [PATCH v2 1/1] powerpc/kvm: Save Timebase Offset to fix
- sched_clock() while running guest code.
-From:   Leonardo Bras <leobras.c@gmail.com>
-To:     Nicholas Piggin <npiggin@gmail.com>,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
-        Athira Rajeev <atrajeev@linux.vnet.ibm.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Jordan Niethe <jniethe5@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Date:   Mon, 08 Feb 2021 13:37:04 -0300
-In-Reply-To: <1612579579.ztbklit4un.astroid@bobo.none>
-References: <20210205060643.233481-1-leobras.c@gmail.com>
-         <1612506268.6rrvx34gzu.astroid@bobo.none>
-         <7e231b91e41c3f3586ba2fd604c40f1716db228d.camel@gmail.com>
-         <1612579579.ztbklit4un.astroid@bobo.none>
-Organization: IBM
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
+        id S229669AbhBIBKC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 8 Feb 2021 20:10:02 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:6565 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229638AbhBIBKC (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Feb 2021 20:10:02 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B6021e0c10002>; Mon, 08 Feb 2021 17:09:21 -0800
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Feb
+ 2021 01:09:21 +0000
+Received: from localhost (172.20.145.6) by DRHQMAIL107.nvidia.com (10.27.9.16)
+ with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 9 Feb 2021 01:09:20
+ +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
+        <bskeggs@redhat.com>, <akpm@linux-foundation.org>
+CC:     <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
+        <jglisse@redhat.com>, "Alistair Popple" <apopple@nvidia.com>
+Subject: [PATCH 0/9] Add support for SVM atomics in Nouveau
+Date:   Tue, 9 Feb 2021 12:07:13 +1100
+Message-ID: <20210209010722.13839-1-apopple@nvidia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ DRHQMAIL107.nvidia.com (10.27.9.16)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1612832961; bh=fHzIrA6EUkcvyYZOzc2r5U/q2OlDx68NlFICQTs7dQ8=;
+        h=From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+         Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+         X-ClientProxiedBy;
+        b=JLn42Im7IWDEnuTDb+HAfmg21WCbnWEbIR0KYAxMkB56Xg+hXwpVMRWJJRpoQRHJa
+         huf1OdR0WZ/xbBkkJUUvfEpMrTL1a5eUkJvtZpjNYotNPcpHubOEIwYsPQWQwTlOxO
+         jybuOYXvAGRV+8LewjvSBZSReyU0Uwa0ZRMllU/kW0/RgIx1LjmT0zt3MKIYYamXOK
+         pB30alYCHMQ0EXloW6/GydUcrRRaxaCIdqaauza/x+VFBXw1WCAhGJL+cD9g6rHI7u
+         K2FsmBZ+Lca4vpaXoQR0qV/i4FwObqrVWHlQXKPTDH/AljdLXGbV8p9MZ6wUzY0KkI
+         TsL/93w80i8dw==
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hello Nick,
+This series adds support to Nouveau for atomic memory operations on OpenCL
+shared virtual memory (SVM). This is achieved using the atomic PTE bits on
+the GPU to only permit atomic operations to system memory when a page is
+not mapped in userspace on the CPU.
 
-On Sat, 2021-02-06 at 13:03 +1000, Nicholas Piggin wrote:
-> Excerpts from Leonardo Bras's message of February 5, 2021 5:01 pm:
-> > Hey Nick, thanks for reviewing :)
-> > 
-> > On Fri, 2021-02-05 at 16:28 +1000, Nicholas Piggin wrote:
-> > > Excerpts from Leonardo Bras's message of February 5, 2021 4:06 pm:
-> > > > Before guest entry, TBU40 register is changed to reflect guest timebase.
-> > > > After exitting guest, the register is reverted to it's original value.
-> > > > 
-> > > > If one tries to get the timestamp from host between those changes, it
-> > > > will present an incorrect value.
-> > > > 
-> > > > An example would be trying to add a tracepoint in
-> > > > kvmppc_guest_entry_inject_int(), which depending on last tracepoint
-> > > > acquired could actually cause the host to crash.
-> > > > 
-> > > > Save the Timebase Offset to PACA and use it on sched_clock() to always
-> > > > get the correct timestamp.
-> > > 
-> > > Ouch. Not sure how reasonable it is to half switch into guest registers 
-> > > and expect to call into the wider kernel, fixing things up as we go. 
-> > > What if mftb is used in other places?
-> > 
-> > IIUC, the CPU is not supposed to call anything as host between guest
-> > entry and guest exit, except guest-related cases, like
-> 
-> When I say "call", I'm including tracing in that. If a function is not 
-> marked as no trace, then it will call into the tracing subsystem.
-> 
-> > kvmppc_guest_entry_inject_int(), but anyway, if something calls mftb it
-> > will still get the same value as before.
-> 
-> Right, so it'll be out of whack again.
-> 
-> > This is only supposed to change stuff that depends on sched_clock, like
-> > Tracepoints, that can happen in those exceptions.
-> 
-> If they depend on sched_clock that's one thing. Do they definitely have 
-> no dependencies on mftb from other calls?
+This is implemented by adding a mode to migrate_vma_pages() which unmaps
+and isolates existing pages from the CPU and pins them. The original
+userspace page table entries are migrated to point to device private pages
+allocated by the driver. This allows the driver to enable GPU atomic access
+to the page as it will receive a callback when CPU userspace needs to
+access it.
 
-We could change that on get_tb() or mftb() @ timebase.h, which would
-have a broader reach, but would not reach any mftb from asm code.
+In response to this callback the driver revokes the atomic access
+permission from the GPU and migrates entries to point back to the original
+page. The original page is unpinned as part of the migration operation
+which also returns it to the LRU.
 
-> > > Especially as it doesn't seem like there is a reason that function _has_
-> > > to be called after the timebase is switched to guest, that's just how 
-> > > the code is structured.
-> > 
-> > Correct, but if called, like in rb routines, used by tracepoints, the
-> > difference between last tb and current (lower) tb may cause the CPU to
-> > trap PROGRAM exception, crashing host. 
-> 
-> Yes, so I agree with Michael any function that is involved when we begin 
-> to switch into guest context (or have not completed switching back to 
-> host going the other way) should be marked as no trace (noinstr even, 
-> perhaps).
+Patch 3 contains the bulk of the memory management changes to implement
+unmap and pin.
 
-Sure, that would avoid having to get paca->tb_offset for every mftb()
-called, and avoid inconsistencies when different ways to get time are
-used in code.
+Patches 6-9 extend Nouveau to use the new mode to allow system wide atomics
+for OpenCL SVM to be implemented on Nouveau.
 
-On the other hand, it would make it very hard to debug functions like
-kvmppc_guest_entry_inject_int() as I am doing right now.
+This has been tested using the latest upstream Mesa userspace with a simple
+OpenCL test program which checks the results of atomic GPU operations on a
+buffer whilst also writing to the same buffer from the CPU.
 
-> 
-> > > As a local hack to work out a bug okay. If you really need it upstream 
-> > > could you put it under a debug config option?
-> > 
-> > You mean something that is automatically selected whenever those
-> > configs are enabled? 
-> > 
-> > CONFIG_TRACEPOINT && CONFIG_KVM_BOOK3S_HANDLER && CONFIG_PPC_BOOK3S_64
-> > 
-> > Or something the user need to select himself in menuconfig?
-> 
-> Yeah I meant a default n thing under powerpc kernel debugging somewhere.
+Problems yet to be addressed:
 
-So, IIUC all we can do is split this in 2 changes:
-1 - Adding notrace to those functions
-2 - Introducing a kernel debug config that reverts (1) and 'fixes' mftb
+Recent changes to pin_user_pages() prevent the creation of pinned pages in
+ZONE_MOVABLE. This series allows pinned pages to be created in ZONE_MOVABLE
+as attempts to migrate may fail which would be fatal to userspace.
 
-If that's correct, I have some ideas we can use. 
+In this case migration of the pinned page is unnecessary as the page can be
+unpinned at anytime by having the driver revoke atomic permission as it
+does for the migrate_to_ram() callback. However a method of calling this
+when memory needs to be moved has yet to be resolved so any discussion is
+welcome.
 
-For debug option, should we add the offset on get_tb() or mftb()?
+Alistair Popple (9):
+  mm/migrate.c: Always allow device private pages to migrate
+  mm/migrate.c: Allow pfn flags to be passed to migrate_vma_setup()
+  mm/migrate: Add a unmap and pin migration mode
+  Documentation: Add unmap and pin to HMM
+  hmm-tests: Add test for unmap and pin
+  nouveau/dmem: Only map migrating pages
+  nouveau/svm: Refactor nouveau_range_fault
+  nouveau/dmem: Add support for multiple page types
+  nouveau/svm: Implement atomic SVM access
 
-Another option would be to adding this tb_offset only in the routines
-used by tracing. But this could probably mean having to add a function
-in arch-generic code, but still an option.
+ Documentation/vm/hmm.rst                      |  22 +-
+ arch/powerpc/kvm/book3s_hv_uvmem.c            |   4 +-
+ drivers/gpu/drm/nouveau/include/nvif/if000c.h |   1 +
+ drivers/gpu/drm/nouveau/nouveau_dmem.c        | 190 +++++++++++++++---
+ drivers/gpu/drm/nouveau/nouveau_dmem.h        |   9 +
+ drivers/gpu/drm/nouveau/nouveau_svm.c         | 148 +++++++++++---
+ drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h |   1 +
+ .../drm/nouveau/nvkm/subdev/mmu/vmmgp100.c    |   6 +
+ include/linux/migrate.h                       |   2 +
+ include/linux/migrate_mode.h                  |   1 +
+ lib/test_hmm.c                                | 109 ++++++++--
+ lib/test_hmm_uapi.h                           |   1 +
+ mm/migrate.c                                  |  82 +++++---
+ tools/testing/selftests/vm/hmm-tests.c        |  49 +++++
+ 14 files changed, 524 insertions(+), 101 deletions(-)
 
-What do you think?
-
-> 
-> Thanks,
-> Nick
-
-Thank you!
-Leonardo Bras
+--=20
+2.20.1
 
