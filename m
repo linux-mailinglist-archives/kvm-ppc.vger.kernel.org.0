@@ -2,88 +2,142 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 206E1315091
-	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Feb 2021 14:42:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6A7031509B
+	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Feb 2021 14:44:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbhBINmR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 9 Feb 2021 08:42:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58970 "EHLO
+        id S231339AbhBINnQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 9 Feb 2021 08:43:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230108AbhBINkP (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 9 Feb 2021 08:40:15 -0500
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12A29C061786
-        for <kvm-ppc@vger.kernel.org>; Tue,  9 Feb 2021 05:39:35 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id o193so8350092qke.11
-        for <kvm-ppc@vger.kernel.org>; Tue, 09 Feb 2021 05:39:35 -0800 (PST)
+        with ESMTP id S231627AbhBINk4 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 9 Feb 2021 08:40:56 -0500
+Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1ED1C061794
+        for <kvm-ppc@vger.kernel.org>; Tue,  9 Feb 2021 05:40:02 -0800 (PST)
+Received: by mail-oo1-xc35.google.com with SMTP id t196so2113716oot.2
+        for <kvm-ppc@vger.kernel.org>; Tue, 09 Feb 2021 05:40:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=q4gBt83LBvEvfgqjMk5XxBqoQUgJu0Updm2eupI2oTY=;
-        b=aQhoXa9jPalDWlVkfGxPk+c+I0Q9JZFKo47tCsmclHZEsPNYfreM817gCFAr4kOU8W
-         fHBrAIQilQhVmk1iG9w5EWskZgjnukqG4cUDzLNZ6BylHXqnGvwuThK4UN4InIuRH/ze
-         cvAS/4B/aBNt8AOe4VR/tiAtWA123wCajp47c9XzIXZFa0/I9e6/nmkjO6l7O80x9iCT
-         kP9CrF06fB0beIFQO/9dbuqk7hvLl+4qLhMBYJj+SEwVoqE/HfXTlsjgBKUF7reYwTlf
-         Ov9fDvgK+9WKyztUGrdI96zt7nHKT/h6nbpz8LPo9nETq4dWfycOqz7C26v5rJTgWElw
-         YGyw==
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LhfQbnhwDGpqGDadCiKHjxS8DmSjilEDHzg3CJ532pI=;
+        b=JigqNdgDEFgtQlKMjnmdnlDlN7M4qkzWm5dhzF1dd992sb4eU3A75DIikN86A5yKF3
+         +HYqLOXv3f90n0bmYdNvleTeiQcUc5RdDT1mXps9fTyTu9OPEPFxGyjMaOdfAf5jGZOp
+         LN5zBs74rUhwch5wHpsKumLLOkAYJemIb3dfs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=q4gBt83LBvEvfgqjMk5XxBqoQUgJu0Updm2eupI2oTY=;
-        b=DyA4fePa7kc7X/li94DVAXWIAsF5nipoJsxE/6GVe4cn1bvCRXd+yMy6pPSJg6K06k
-         n3KapSfVvGrFijRcbMGosDrtEXhNt1v+eA1A/lIHyePxVVr3k7sIldMHGONIhkUxKAIw
-         1KP4Cz+6dzO1M78uJm2W0MbZFls2LpD65jOkDYoVx5Z0Vfz7MbozbSiRllFlo/Itii5i
-         cWyAYIT1SzRRiHh56dduOrL2KoL0JUV9BsNC88jgQSzvtGKTBFqJU8OkLguhcJiW6V0r
-         KY4dd4nxmaMtDlWPFqBRxxvu8M15greb0Zwg6UfPyKJz6p+PDdxUMmL3e7Ns8g6LST3C
-         1dxg==
-X-Gm-Message-State: AOAM530wdspx+KnDjrNc/lxIGxbNSP7zmusd3F8wGVfeynA0OgAeow1f
-        2I59bpSIK7WrcNbsUvoQNwDQNA==
-X-Google-Smtp-Source: ABdhPJzETc8qT6BXd1BDQmX3B26rXpyj1TrCOmYb4Fqo0JHFF6LTk7HRkfK/22tofKGhVc50wAK02g==
-X-Received: by 2002:a37:5a45:: with SMTP id o66mr21362019qkb.446.1612877974387;
-        Tue, 09 Feb 2021 05:39:34 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-115-133.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.115.133])
-        by smtp.gmail.com with ESMTPSA id m21sm17197217qtq.52.2021.02.09.05.39.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Feb 2021 05:39:33 -0800 (PST)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1l9TEq-005RKt-Q3; Tue, 09 Feb 2021 09:39:32 -0400
-Date:   Tue, 9 Feb 2021 09:39:32 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Alistair Popple <apopple@nvidia.com>
-Cc:     linux-mm@kvack.org, nouveau@lists.freedesktop.org,
-        bskeggs@redhat.com, akpm@linux-foundation.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        jhubbard@nvidia.com, rcampbell@nvidia.com, jglisse@redhat.com
-Subject: Re: [PATCH 1/9] mm/migrate.c: Always allow device private pages to
- migrate
-Message-ID: <20210209133932.GD4718@ziepe.ca>
-References: <20210209010722.13839-1-apopple@nvidia.com>
- <20210209010722.13839-2-apopple@nvidia.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LhfQbnhwDGpqGDadCiKHjxS8DmSjilEDHzg3CJ532pI=;
+        b=KoRCbmeuDGElJJY00YX5C6AhYtAErL4QH4SeqFYyEwR8FMvHBh+Q8xm3otJJ1S12kT
+         +cJMp+oCcPMZbej6kZc+VE8nJIG8f6HnxRwHRChJd9fLmKPDisMYsqbEI/i7npnQds/M
+         0EkiAixsPLBsO7BOI/SMXa6OFXWx5hCrS7AwhTAVoRBK+3kw++PkmQPnweAy6AQn3SKP
+         Q4GvmYuVRe0UAL8jdrmj3Fe2rYIVesMY/qVJ1pFu2pXOJrIOI/sSbQHqK738/lS/Kmqd
+         CP32vSjvru3fu3W4pXXZUK+jMpK9HAM3/BznWoYxIo0HDdM1dunx3ZX9D3KaODFePY5X
+         ocww==
+X-Gm-Message-State: AOAM531X52yAEbE5oiGYPmK48bJRZHiyzEO3Tuz60yG9miiu5iiAIrM0
+        mCuJ0KZYyDboKdiEdAQ2StRXJJHccmV6DcSWhlB6FQ==
+X-Google-Smtp-Source: ABdhPJxCuVVi8kRB1kkxAZJFWPpa7yPv+iZrvRDXXQ3OzMMiP+Pm+I8NUjrdp4w6xRd7m67NamfzG5rvygCAv52MFRA=
+X-Received: by 2002:a4a:d891:: with SMTP id b17mr15851254oov.28.1612878002267;
+ Tue, 09 Feb 2021 05:40:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210209010722.13839-2-apopple@nvidia.com>
+References: <20210209010722.13839-1-apopple@nvidia.com> <CAKMK7uGwg2-DTU7Zrco=TSkcR4yTqN1AF0hvVYEAbuj4BUYi5Q@mail.gmail.com>
+ <3426910.QXTomnrpqD@nvdebian> <20210209133520.GB4718@ziepe.ca>
+In-Reply-To: <20210209133520.GB4718@ziepe.ca>
+From:   Daniel Vetter <daniel@ffwll.ch>
+Date:   Tue, 9 Feb 2021 14:39:51 +0100
+Message-ID: <CAKMK7uGR44pSdL7FOui4XE6hRY8pMs7d0bPbgHHoprRG4tGmFQ@mail.gmail.com>
+Subject: Re: [PATCH 0/9] Add support for SVM atomics in Nouveau
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Alistair Popple <apopple@nvidia.com>,
+        Linux MM <linux-mm@kvack.org>,
+        Nouveau Dev <nouveau@lists.freedesktop.org>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm-ppc@vger.kernel.org,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Jerome Glisse <jglisse@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Feb 09, 2021 at 12:07:14PM +1100, Alistair Popple wrote:
-> Device private pages are used to represent device memory that is not
-> directly accessible from the CPU. Extra references to a device private
-> page are only used to ensure the struct page itself remains valid whilst
-> waiting for migration entries. Therefore extra references should not
-> prevent device private page migration as this can lead to failures to
-> migrate pages back to the CPU which are fatal to the user process.
+On Tue, Feb 9, 2021 at 2:35 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Tue, Feb 09, 2021 at 11:57:28PM +1100, Alistair Popple wrote:
+> > On Tuesday, 9 February 2021 9:27:05 PM AEDT Daniel Vetter wrote:
+> > > >
+> > > > Recent changes to pin_user_pages() prevent the creation of pinned pages in
+> > > > ZONE_MOVABLE. This series allows pinned pages to be created in
+> > ZONE_MOVABLE
+> > > > as attempts to migrate may fail which would be fatal to userspace.
+> > > >
+> > > > In this case migration of the pinned page is unnecessary as the page can
+> > be
+> > > > unpinned at anytime by having the driver revoke atomic permission as it
+> > > > does for the migrate_to_ram() callback. However a method of calling this
+> > > > when memory needs to be moved has yet to be resolved so any discussion is
+> > > > welcome.
+> > >
+> > > Why do we need to pin for gpu atomics? You still have the callback for
+> > > cpu faults, so you
+> > > can move the page as needed, and hence a long-term pin sounds like the
+> > > wrong approach.
+> >
+> > Technically a real long term unmoveable pin isn't required, because as you say
+> > the page can be moved as needed at any time. However I needed some way of
+> > stopping the CPU page from being freed once the userspace mappings for it had
+> > been removed.
+>
+> The issue is you took the page out of the PTE it belongs to, which
+> makes it orphaned and unlocatable by the rest of the mm?
+>
+> Ideally this would leave the PTE in place so everything continues to
+> work, just disable CPU access to it.
+>
+> Maybe some kind of special swap entry?
 
-This should identify the extra references in expected_count, just
-disabling this protection seems unsafe, ZONE_DEVICE is not so special
-that the refcount means nothing
+I probably should have read the patches more in detail, I was assuming
+the ZONE_DEVICE is only for vram. At least I thought the requirement
+for gpu atomics was that the page is in vram, but maybe I'm mixing up
+how this works on nvidia with how it works in other places. Iirc we
+had a long discussion about this at lpc19 that ended with the
+conclusion that we must be able to migrate, and sometimes migration is
+blocked. But the details ellude me now.
 
-Is this a side effect of the extra refcounts that Ralph was trying to
-get rid of? I'd rather see that work finished :)
+Either way ZONE_DEVICE for not vram/device memory sounds wrong. Is
+that really going on here?
+-Daniel
 
-Jason
+>
+> I also don't much like the use of ZONE_DEVICE here, that should only
+> be used for actual device memory, not as a temporary proxy for CPU
+> pages.. Having two struct pages refer to the same physical memory is
+> pretty ugly.
+>
+> > The normal solution of registering an MMU notifier to unpin the page when it
+> > needs to be moved also doesn't work as the CPU page tables now point to the
+> > device-private page and hence the migration code won't call any invalidate
+> > notifiers for the CPU page.
+>
+> The fact the page is lost from the MM seems to be the main issue here.
+>
+> > Yes, I would like to avoid the long term pin constraints as well if possible I
+> > just haven't found a solution yet. Are you suggesting it might be possible to
+> > add a callback in the page migration logic to specially deal with moving these
+> > pages?
+>
+> How would migration even find the page?
+>
+> Jason
+
+
+
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
