@@ -2,126 +2,115 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA57331A620
-	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Feb 2021 21:38:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 589D431B569
+	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Feb 2021 07:37:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231290AbhBLUiG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 12 Feb 2021 15:38:06 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23824 "EHLO
+        id S229652AbhBOGgo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 15 Feb 2021 01:36:44 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30822 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231289AbhBLUiF (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 12 Feb 2021 15:38:05 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11CKb2Nl191938;
-        Fri, 12 Feb 2021 15:37:19 -0500
+        by vger.kernel.org with ESMTP id S229578AbhBOGgn (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 15 Feb 2021 01:36:43 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11F6XRMY139007;
+        Mon, 15 Feb 2021 01:35:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=dvPEWDW+9VOy4Q60WTiBHflSgOiPtdmPLEgqzLrScy8=;
- b=eHwNjy6jrpcc3HwIs69YdJn3MHWwUc/Y00Uh75BZ0qIHvtR029Nyu9eM1EvsLYA13+Ra
- /GT5I6rH973vpvu07le5VMo2kns/aLxxiLsNygQ1S+6WxQi6hsOVd8xZXY7iHRZpHADi
- zZ1jAuItqCuBzJWjMr1duchnzkr7iKS4QQrc3zszTgmpbJjY3BgvR8KdXJ2EH7uLFb/o
- VAzVLRbPAcS+C6umPB5YsHncF9qosPl56SxkKHtPlI0xCiAIjUxwY6wBZoXxLYfb/R3g
- zZbMmCQ4n/3ZUoCGDxPnvn3R9H94lJ4Q4JaUCsK3M7Wy3Udz9TY3CRsRMoiNqQvhHG12 uA== 
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=Zh4tiM0Evde4MAzUmu3bK4AGDwCVMa7MOld1H/rhWhA=;
+ b=qX81qz6B8hrB/rF74rB4DXn9LPrZ1fA6zwB5Hy0E+BYIiS9MPodz4Olmy6g0g7peAbiC
+ 81hJVxcHfgM9h6pO2UAgukmZGSDTPp6yQtThot1Vg9BmpNNuz2iQia4zW1Y2J8YY5D6W
+ +rzLH+juiQC/cCLjxHBH2L3zEHu/rOMedY57/NnViUh9lk6LWOO8m3kzDzdtQyLCbvdD
+ 9b7nLUFGLSPbJfUoCJwBF5w0BUUsEBN9ETlb5cy2SqdbyOupprl9/YhJTIYd/XOaJ5F5
+ 4zZLLtewwOL+46eUwL9e2d5+IMBB/SoUh/UBfU8DRcFdszrVjUEp+/i+3i+IvE5yUV5s yA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36p0gxgfdu-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36qk3g1145-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Feb 2021 15:37:18 -0500
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11CKbGAL192463;
-        Fri, 12 Feb 2021 15:37:17 -0500
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36p0gxget1-1
+        Mon, 15 Feb 2021 01:35:54 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11F6Xg0H140452;
+        Mon, 15 Feb 2021 01:35:53 -0500
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36qk3g1123-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Feb 2021 15:37:17 -0500
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11CKRUbQ020370;
-        Fri, 12 Feb 2021 20:33:37 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma05wdc.us.ibm.com with ESMTP id 36hjr9ytus-1
+        Mon, 15 Feb 2021 01:35:53 -0500
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11F6ShdY006357;
+        Mon, 15 Feb 2021 06:35:50 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 36p6d8gsh1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Feb 2021 20:33:37 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11CKXauB43188700
+        Mon, 15 Feb 2021 06:35:50 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11F6ZlrJ26477006
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 12 Feb 2021 20:33:36 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 99F75AE060;
-        Fri, 12 Feb 2021 20:33:36 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B0431AE05C;
-        Fri, 12 Feb 2021 20:33:35 +0000 (GMT)
-Received: from localhost (unknown [9.163.11.170])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Fri, 12 Feb 2021 20:33:35 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [RFC PATCH 3/9] KVM: PPC: Book3S 64: add hcall interrupt handler
-In-Reply-To: <20210202030313.3509446-4-npiggin@gmail.com>
-References: <20210202030313.3509446-1-npiggin@gmail.com>
- <20210202030313.3509446-4-npiggin@gmail.com>
-Date:   Fri, 12 Feb 2021 17:33:33 -0300
-Message-ID: <87r1llxbz6.fsf@linux.ibm.com>
+        Mon, 15 Feb 2021 06:35:47 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B0EC042056;
+        Mon, 15 Feb 2021 06:35:47 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0AC2442049;
+        Mon, 15 Feb 2021 06:35:46 +0000 (GMT)
+Received: from bharata.ibmuc.com (unknown [9.85.74.227])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 15 Feb 2021 06:35:45 +0000 (GMT)
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
+        mpe@ellerman.id.au, david@gibson.dropbear.id.au,
+        farosas@linux.ibm.com, Bharata B Rao <bharata@linux.ibm.com>
+Subject: [PATCH v4 0/3] Support for H_RPT_INVALIDATE in PowerPC KVM
+Date:   Mon, 15 Feb 2021 12:05:39 +0530
+Message-Id: <20210215063542.3642366-1-bharata@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-12_09:2021-02-12,2021-02-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- mlxscore=0 malwarescore=0 bulkscore=0 clxscore=1015 priorityscore=1501
- mlxlogscore=910 adultscore=0 suspectscore=0 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102120152
+ definitions=2021-02-15_02:2021-02-12,2021-02-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
+ priorityscore=1501 phishscore=0 suspectscore=0 spamscore=0 mlxlogscore=793
+ adultscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2102150056
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
+This patchset adds support for the new hcall H_RPT_INVALIDATE
+and replaces the nested tlb flush calls with this new hcall
+if support for the same exists.
 
-> Add a separate hcall entry point. This can be used to deal with the
-> different calling convention.
->
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Changes in v4:
+-------------
+- While reusing the tlb flush routines from radix_tlb.c in v3,
+  setting of LPID got missed out. Take care of this by
+  introducing new flush routines that set both PID and LPID
+  when using tlbie instruction. This is required for
+  process-scoped invalidations from guests (both L1 and
+  nested guests). Added a new patch 1/3 for this.
+- Added code to handle H_RPT_INVALIDATE hcall issued
+  by nested guest in L0 nested guest exit path.
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+v3: https://lore.kernel.org/linuxppc-dev/20210105090557.2150104-1-bharata@linux.ibm.com/T/#t
 
-> ---
->  arch/powerpc/kernel/exceptions-64s.S | 4 ++--
->  arch/powerpc/kvm/book3s_64_entry.S   | 4 ++++
->  2 files changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/powerpc/kernel/exceptions-64s.S b/arch/powerpc/kernel/exceptions-64s.S
-> index e6f7fc7c61a1..c25395b5921a 100644
-> --- a/arch/powerpc/kernel/exceptions-64s.S
-> +++ b/arch/powerpc/kernel/exceptions-64s.S
-> @@ -2028,13 +2028,13 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
->  	 * Requires __LOAD_FAR_HANDLER beause kvmppc_interrupt lives
->  	 * outside the head section.
->  	 */
-> -	__LOAD_FAR_HANDLER(r10, kvmppc_interrupt)
-> +	__LOAD_FAR_HANDLER(r10, kvmppc_hcall)
->  	mtctr   r10
->  	ld	r10,PACA_EXGEN+EX_R10(r13)
->  	bctr
->  #else
->  	ld	r10,PACA_EXGEN+EX_R10(r13)
-> -	b       kvmppc_interrupt
-> +	b       kvmppc_hcall
->  #endif
->  #endif
->
-> diff --git a/arch/powerpc/kvm/book3s_64_entry.S b/arch/powerpc/kvm/book3s_64_entry.S
-> index 8e7216f3c3ee..3b894b90862f 100644
-> --- a/arch/powerpc/kvm/book3s_64_entry.S
-> +++ b/arch/powerpc/kvm/book3s_64_entry.S
-> @@ -9,6 +9,10 @@
->  /*
->   * We come here from the first-level interrupt handlers.
->   */
-> +.global	kvmppc_hcall
-> +.balign IFETCH_ALIGN_BYTES
-> +kvmppc_hcall:
-> +
->  .global	kvmppc_interrupt
->  .balign IFETCH_ALIGN_BYTES
->  kvmppc_interrupt:
+Bharata B Rao (3):
+  powerpc/book3s64/radix/tlb: tlbie primitives for process-scoped
+    invalidations from guests
+  KVM: PPC: Book3S HV: Add support for H_RPT_INVALIDATE
+  KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in nested KVM
+
+ Documentation/virt/kvm/api.rst                |  17 ++
+ .../include/asm/book3s/64/tlbflush-radix.h    |  18 +++
+ arch/powerpc/include/asm/kvm_book3s.h         |   3 +
+ arch/powerpc/include/asm/mmu_context.h        |  11 ++
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        |  27 +++-
+ arch/powerpc/kvm/book3s_hv.c                  |  91 +++++++++++
+ arch/powerpc/kvm/book3s_hv_nested.c           | 108 ++++++++++++-
+ arch/powerpc/kvm/powerpc.c                    |   3 +
+ arch/powerpc/mm/book3s64/radix_tlb.c          | 147 +++++++++++++++++-
+ include/uapi/linux/kvm.h                      |   1 +
+ 10 files changed, 415 insertions(+), 11 deletions(-)
+
+-- 
+2.26.2
+
