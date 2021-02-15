@@ -2,115 +2,317 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 589D431B569
-	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Feb 2021 07:37:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E72231B56C
+	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Feb 2021 07:37:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229652AbhBOGgo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 15 Feb 2021 01:36:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30822 "EHLO
+        id S229578AbhBOGgp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 15 Feb 2021 01:36:45 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2732 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229578AbhBOGgn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 15 Feb 2021 01:36:43 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11F6XRMY139007;
+        by vger.kernel.org with ESMTP id S229591AbhBOGgo (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 15 Feb 2021 01:36:44 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11F6X3aw028676;
         Mon, 15 Feb 2021 01:35:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=Zh4tiM0Evde4MAzUmu3bK4AGDwCVMa7MOld1H/rhWhA=;
- b=qX81qz6B8hrB/rF74rB4DXn9LPrZ1fA6zwB5Hy0E+BYIiS9MPodz4Olmy6g0g7peAbiC
- 81hJVxcHfgM9h6pO2UAgukmZGSDTPp6yQtThot1Vg9BmpNNuz2iQia4zW1Y2J8YY5D6W
- +rzLH+juiQC/cCLjxHBH2L3zEHu/rOMedY57/NnViUh9lk6LWOO8m3kzDzdtQyLCbvdD
- 9b7nLUFGLSPbJfUoCJwBF5w0BUUsEBN9ETlb5cy2SqdbyOupprl9/YhJTIYd/XOaJ5F5
- 4zZLLtewwOL+46eUwL9e2d5+IMBB/SoUh/UBfU8DRcFdszrVjUEp+/i+3i+IvE5yUV5s yA== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=DSgcEZOLnC/mE1xNRPcz6WDehWPmuUNeS1N0ct801HE=;
+ b=ZgDXewLRmIRiNszE3xJtBU5+O/+XB9VorAqUH3jI/iFB58u4xHDQkCwerKR7WWLYiR1w
+ 3o/5jy2fMdt3B+IBuPuaKJmJvG+rW29Bvw6B1Ne6Oa0LYRbyt2Dc9e0sozmBTvaoz0i8
+ NrX4KonMxWWD1xqKqAF48iVyAtF9pDvtbTg/4u56C+wiW0YnlWjonHVuc4EsYzycn9JT
+ E5MD5PZaThpaB8nExd9XFgSAic0y4XRJDrsaeB46VKX/JGpP8EAEpN4Du61IVJI5qgyc
+ N1I7Z57+LAj9IxvBKuhlt39w514lh/bIn6IxNF3D5tvwrBWNb+v740Io+DilyvoE0v8h KA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36qk3g1145-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36qhvdttvg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Feb 2021 01:35:54 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11F6Xg0H140452;
-        Mon, 15 Feb 2021 01:35:53 -0500
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36qk3g1123-1
+        Mon, 15 Feb 2021 01:35:55 -0500
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11F6YHho033281;
+        Mon, 15 Feb 2021 01:35:55 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36qhvdttuq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Feb 2021 01:35:53 -0500
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11F6ShdY006357;
-        Mon, 15 Feb 2021 06:35:50 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma05fra.de.ibm.com with ESMTP id 36p6d8gsh1-1
+        Mon, 15 Feb 2021 01:35:55 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11F6TKhu006330;
+        Mon, 15 Feb 2021 06:35:52 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 36p6d89ha7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Feb 2021 06:35:50 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11F6ZlrJ26477006
+        Mon, 15 Feb 2021 06:35:52 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11F6ZniO40436156
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 Feb 2021 06:35:47 GMT
+        Mon, 15 Feb 2021 06:35:50 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B0EC042056;
-        Mon, 15 Feb 2021 06:35:47 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C4FA642049;
+        Mon, 15 Feb 2021 06:35:49 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0AC2442049;
-        Mon, 15 Feb 2021 06:35:46 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 137214204C;
+        Mon, 15 Feb 2021 06:35:48 +0000 (GMT)
 Received: from bharata.ibmuc.com (unknown [9.85.74.227])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 15 Feb 2021 06:35:45 +0000 (GMT)
+        Mon, 15 Feb 2021 06:35:47 +0000 (GMT)
 From:   Bharata B Rao <bharata@linux.ibm.com>
 To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 Cc:     aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
         mpe@ellerman.id.au, david@gibson.dropbear.id.au,
         farosas@linux.ibm.com, Bharata B Rao <bharata@linux.ibm.com>
-Subject: [PATCH v4 0/3] Support for H_RPT_INVALIDATE in PowerPC KVM
-Date:   Mon, 15 Feb 2021 12:05:39 +0530
-Message-Id: <20210215063542.3642366-1-bharata@linux.ibm.com>
+Subject: [PATCH v4 1/3] powerpc/book3s64/radix/tlb: tlbie primitives for process-scoped invalidations from guests
+Date:   Mon, 15 Feb 2021 12:05:40 +0530
+Message-Id: <20210215063542.3642366-2-bharata@linux.ibm.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210215063542.3642366-1-bharata@linux.ibm.com>
+References: <20210215063542.3642366-1-bharata@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
  definitions=2021-02-15_02:2021-02-12,2021-02-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- priorityscore=1501 phishscore=0 suspectscore=0 spamscore=0 mlxlogscore=793
- adultscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102150056
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
+ lowpriorityscore=0 mlxlogscore=976 phishscore=0 priorityscore=1501
+ impostorscore=0 suspectscore=0 spamscore=0 bulkscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102150056
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This patchset adds support for the new hcall H_RPT_INVALIDATE
-and replaces the nested tlb flush calls with this new hcall
-if support for the same exists.
+H_RPT_INVALIDATE hcall needs to perform process scoped tlbie
+invalidations of L1 and nested guests from L0. This needs RS register
+for TLBIE instruction to contain both PID and LPID. Introduce
+primitives that execute tlbie instruction with both PID
+and LPID set in prepartion for H_RPT_INVALIDATE hcall.
 
-Changes in v4:
--------------
-- While reusing the tlb flush routines from radix_tlb.c in v3,
-  setting of LPID got missed out. Take care of this by
-  introducing new flush routines that set both PID and LPID
-  when using tlbie instruction. This is required for
-  process-scoped invalidations from guests (both L1 and
-  nested guests). Added a new patch 1/3 for this.
-- Added code to handle H_RPT_INVALIDATE hcall issued
-  by nested guest in L0 nested guest exit path.
+While we are here, move RIC_FLUSH definitions to header file
+and introduce helper rpti_pgsize_to_psize() that will be needed
+by the upcoming hcall.
 
-v3: https://lore.kernel.org/linuxppc-dev/20210105090557.2150104-1-bharata@linux.ibm.com/T/#t
-
-Bharata B Rao (3):
-  powerpc/book3s64/radix/tlb: tlbie primitives for process-scoped
-    invalidations from guests
-  KVM: PPC: Book3S HV: Add support for H_RPT_INVALIDATE
-  KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in nested KVM
-
- Documentation/virt/kvm/api.rst                |  17 ++
+Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+---
  .../include/asm/book3s/64/tlbflush-radix.h    |  18 +++
- arch/powerpc/include/asm/kvm_book3s.h         |   3 +
- arch/powerpc/include/asm/mmu_context.h        |  11 ++
- arch/powerpc/kvm/book3s_64_mmu_radix.c        |  27 +++-
- arch/powerpc/kvm/book3s_hv.c                  |  91 +++++++++++
- arch/powerpc/kvm/book3s_hv_nested.c           | 108 ++++++++++++-
- arch/powerpc/kvm/powerpc.c                    |   3 +
- arch/powerpc/mm/book3s64/radix_tlb.c          | 147 +++++++++++++++++-
- include/uapi/linux/kvm.h                      |   1 +
- 10 files changed, 415 insertions(+), 11 deletions(-)
+ arch/powerpc/mm/book3s64/radix_tlb.c          | 122 +++++++++++++++++-
+ 2 files changed, 136 insertions(+), 4 deletions(-)
 
+diff --git a/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h b/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
+index 94439e0cefc9..aace7e9b2397 100644
+--- a/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
++++ b/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
+@@ -4,6 +4,10 @@
+ 
+ #include <asm/hvcall.h>
+ 
++#define RIC_FLUSH_TLB 0
++#define RIC_FLUSH_PWC 1
++#define RIC_FLUSH_ALL 2
++
+ struct vm_area_struct;
+ struct mm_struct;
+ struct mmu_gather;
+@@ -21,6 +25,20 @@ static inline u64 psize_to_rpti_pgsize(unsigned long psize)
+ 	return H_RPTI_PAGE_ALL;
+ }
+ 
++static inline int rpti_pgsize_to_psize(unsigned long page_size)
++{
++	if (page_size == H_RPTI_PAGE_4K)
++		return MMU_PAGE_4K;
++	if (page_size == H_RPTI_PAGE_64K)
++		return MMU_PAGE_64K;
++	if (page_size == H_RPTI_PAGE_2M)
++		return MMU_PAGE_2M;
++	if (page_size == H_RPTI_PAGE_1G)
++		return MMU_PAGE_1G;
++	else
++		return MMU_PAGE_64K; /* Default */
++}
++
+ static inline int mmu_get_ap(int psize)
+ {
+ 	return mmu_psize_defs[psize].ap;
+diff --git a/arch/powerpc/mm/book3s64/radix_tlb.c b/arch/powerpc/mm/book3s64/radix_tlb.c
+index fb66d154b26c..097402435303 100644
+--- a/arch/powerpc/mm/book3s64/radix_tlb.c
++++ b/arch/powerpc/mm/book3s64/radix_tlb.c
+@@ -18,10 +18,6 @@
+ #include <asm/cputhreads.h>
+ #include <asm/plpar_wrappers.h>
+ 
+-#define RIC_FLUSH_TLB 0
+-#define RIC_FLUSH_PWC 1
+-#define RIC_FLUSH_ALL 2
+-
+ /*
+  * tlbiel instruction for radix, set invalidation
+  * i.e., r=1 and is=01 or is=10 or is=11
+@@ -128,6 +124,21 @@ static __always_inline void __tlbie_pid(unsigned long pid, unsigned long ric)
+ 	trace_tlbie(0, 0, rb, rs, ric, prs, r);
+ }
+ 
++static __always_inline void __tlbie_pid_lpid(unsigned long pid,
++					     unsigned long lpid,
++					     unsigned long ric)
++{
++	unsigned long rb, rs, prs, r;
++
++	rb = PPC_BIT(53); /* IS = 1 */
++	rs = (pid << PPC_BITLSHIFT(31)) | (lpid & ~(PPC_BITMASK(0, 31)));
++	prs = 1; /* process scoped */
++	r = 1;   /* radix format */
++
++	asm volatile(PPC_TLBIE_5(%0, %4, %3, %2, %1)
++		     : : "r"(rb), "i"(r), "i"(prs), "i"(ric), "r"(rs) : "memory");
++	trace_tlbie(0, 0, rb, rs, ric, prs, r);
++}
+ static __always_inline void __tlbie_lpid(unsigned long lpid, unsigned long ric)
+ {
+ 	unsigned long rb,rs,prs,r;
+@@ -188,6 +199,23 @@ static __always_inline void __tlbie_va(unsigned long va, unsigned long pid,
+ 	trace_tlbie(0, 0, rb, rs, ric, prs, r);
+ }
+ 
++static __always_inline void __tlbie_va_lpid(unsigned long va, unsigned long pid,
++					    unsigned long lpid,
++					    unsigned long ap, unsigned long ric)
++{
++	unsigned long rb, rs, prs, r;
++
++	rb = va & ~(PPC_BITMASK(52, 63));
++	rb |= ap << PPC_BITLSHIFT(58);
++	rs = (pid << PPC_BITLSHIFT(31)) | (lpid & ~(PPC_BITMASK(0, 31)));
++	prs = 1; /* process scoped */
++	r = 1;   /* radix format */
++
++	asm volatile(PPC_TLBIE_5(%0, %4, %3, %2, %1)
++		     : : "r"(rb), "i"(r), "i"(prs), "i"(ric), "r"(rs) : "memory");
++	trace_tlbie(0, 0, rb, rs, ric, prs, r);
++}
++
+ static __always_inline void __tlbie_lpid_va(unsigned long va, unsigned long lpid,
+ 					    unsigned long ap, unsigned long ric)
+ {
+@@ -233,6 +261,22 @@ static inline void fixup_tlbie_va_range(unsigned long va, unsigned long pid,
+ 	}
+ }
+ 
++static inline void fixup_tlbie_va_range_lpid(unsigned long va,
++					     unsigned long pid,
++					     unsigned long lpid,
++					     unsigned long ap)
++{
++	if (cpu_has_feature(CPU_FTR_P9_TLBIE_ERAT_BUG)) {
++		asm volatile("ptesync" : : : "memory");
++		__tlbie_pid_lpid(0, lpid, RIC_FLUSH_TLB);
++	}
++
++	if (cpu_has_feature(CPU_FTR_P9_TLBIE_STQ_BUG)) {
++		asm volatile("ptesync" : : : "memory");
++		__tlbie_va_lpid(va, pid, lpid, ap, RIC_FLUSH_TLB);
++	}
++}
++
+ static inline void fixup_tlbie_pid(unsigned long pid)
+ {
+ 	/*
+@@ -252,6 +296,25 @@ static inline void fixup_tlbie_pid(unsigned long pid)
+ 	}
+ }
+ 
++static inline void fixup_tlbie_pid_lpid(unsigned long pid, unsigned long lpid)
++{
++	/*
++	 * We can use any address for the invalidation, pick one which is
++	 * probably unused as an optimisation.
++	 */
++	unsigned long va = ((1UL << 52) - 1);
++
++	if (cpu_has_feature(CPU_FTR_P9_TLBIE_ERAT_BUG)) {
++		asm volatile("ptesync" : : : "memory");
++		__tlbie_pid_lpid(0, lpid, RIC_FLUSH_TLB);
++	}
++
++	if (cpu_has_feature(CPU_FTR_P9_TLBIE_STQ_BUG)) {
++		asm volatile("ptesync" : : : "memory");
++		__tlbie_va_lpid(va, pid, lpid, mmu_get_ap(MMU_PAGE_64K),
++				RIC_FLUSH_TLB);
++	}
++}
+ 
+ static inline void fixup_tlbie_lpid_va(unsigned long va, unsigned long lpid,
+ 				       unsigned long ap)
+@@ -342,6 +405,31 @@ static inline void _tlbie_pid(unsigned long pid, unsigned long ric)
+ 	asm volatile("eieio; tlbsync; ptesync": : :"memory");
+ }
+ 
++static inline void _tlbie_pid_lpid(unsigned long pid, unsigned long lpid,
++				   unsigned long ric)
++{
++	asm volatile("ptesync" : : : "memory");
++
++	/*
++	 * Workaround the fact that the "ric" argument to __tlbie_pid
++	 * must be a compile-time contraint to match the "i" constraint
++	 * in the asm statement.
++	 */
++	switch (ric) {
++	case RIC_FLUSH_TLB:
++		__tlbie_pid_lpid(pid, lpid, RIC_FLUSH_TLB);
++		fixup_tlbie_pid_lpid(pid, lpid);
++		break;
++	case RIC_FLUSH_PWC:
++		__tlbie_pid_lpid(pid, lpid, RIC_FLUSH_PWC);
++		break;
++	case RIC_FLUSH_ALL:
++	default:
++		__tlbie_pid_lpid(pid, lpid, RIC_FLUSH_ALL);
++		fixup_tlbie_pid_lpid(pid, lpid);
++	}
++	asm volatile("eieio; tlbsync; ptesync" : : : "memory");
++}
+ struct tlbiel_pid {
+ 	unsigned long pid;
+ 	unsigned long ric;
+@@ -467,6 +555,20 @@ static inline void __tlbie_va_range(unsigned long start, unsigned long end,
+ 	fixup_tlbie_va_range(addr - page_size, pid, ap);
+ }
+ 
++static inline void __tlbie_va_range_lpid(unsigned long start, unsigned long end,
++					 unsigned long pid, unsigned long lpid,
++					 unsigned long page_size,
++					 unsigned long psize)
++{
++	unsigned long addr;
++	unsigned long ap = mmu_get_ap(psize);
++
++	for (addr = start; addr < end; addr += page_size)
++		__tlbie_va_lpid(addr, pid, lpid, ap, RIC_FLUSH_TLB);
++
++	fixup_tlbie_va_range_lpid(addr - page_size, pid, lpid, ap);
++}
++
+ static __always_inline void _tlbie_va(unsigned long va, unsigned long pid,
+ 				      unsigned long psize, unsigned long ric)
+ {
+@@ -547,6 +649,18 @@ static inline void _tlbie_va_range(unsigned long start, unsigned long end,
+ 	asm volatile("eieio; tlbsync; ptesync": : :"memory");
+ }
+ 
++static inline void _tlbie_va_range_lpid(unsigned long start, unsigned long end,
++					unsigned long pid, unsigned long lpid,
++					unsigned long page_size,
++					unsigned long psize, bool also_pwc)
++{
++	asm volatile("ptesync" : : : "memory");
++	if (also_pwc)
++		__tlbie_pid_lpid(pid, lpid, RIC_FLUSH_PWC);
++	__tlbie_va_range_lpid(start, end, pid, lpid, page_size, psize);
++	asm volatile("eieio; tlbsync; ptesync" : : : "memory");
++}
++
+ static inline void _tlbiel_va_range_multicast(struct mm_struct *mm,
+ 				unsigned long start, unsigned long end,
+ 				unsigned long pid, unsigned long page_size,
 -- 
 2.26.2
 
