@@ -2,188 +2,148 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 139BC31C5DE
-	for <lists+kvm-ppc@lfdr.de>; Tue, 16 Feb 2021 04:35:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0338B31D37B
+	for <lists+kvm-ppc@lfdr.de>; Wed, 17 Feb 2021 01:41:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229717AbhBPDec (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 15 Feb 2021 22:34:32 -0500
-Received: from ozlabs.ru ([107.174.27.60]:48942 "EHLO ozlabs.ru"
+        id S230347AbhBQAj3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 16 Feb 2021 19:39:29 -0500
+Received: from ozlabs.org ([203.11.71.1]:34337 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229694AbhBPDea (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 15 Feb 2021 22:34:30 -0500
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 77AE6AE8022A;
-        Mon, 15 Feb 2021 22:33:17 -0500 (EST)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: [PATCH kernel 2/2] powerpc/iommu: Do not immediately panic when failed IOMMU table allocation
-Date:   Tue, 16 Feb 2021 14:33:07 +1100
-Message-Id: <20210216033307.69863-3-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210216033307.69863-1-aik@ozlabs.ru>
+        id S229581AbhBQAj2 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 16 Feb 2021 19:39:28 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4DgJqT6L7bz9rx8; Wed, 17 Feb 2021 11:38:45 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1613522325;
+        bh=b7eZN7NZjy0XVtnh0bmjT52ABW2hdIeTWdUoAGEIF7o=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=pWqmCJ2jmNitjlmGQ3ILOHgUg/4xgNkRUTsqEY9e2HnnfFJA5Ha0abY5u28W2WkAA
+         5EDZS9Ro9zep2GY10SbKkdxS283IZlTWCoxpDngUn4/O5QkB5+EA4wxlRsitNFyON0
+         +DssMdbvvM9Q3g7zZSxSCLuJVNkiAuzUty3nwsGQ=
+Date:   Wed, 17 Feb 2021 11:16:11 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH kernel 1/2] powerpc/iommu: Allocate it_map by vmalloc
+Message-ID: <YCxgSz6JdyW7Ll9T@yekko.fritz.box>
 References: <20210216033307.69863-1-aik@ozlabs.ru>
+ <20210216033307.69863-2-aik@ozlabs.ru>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="+KYLCqoJuglLtO2j"
+Content-Disposition: inline
+In-Reply-To: <20210216033307.69863-2-aik@ozlabs.ru>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Most platforms allocate IOMMU table structures (specifically it_map)
-at the boot time and when this fails - it is a valid reason for panic().
 
-However the powernv platform allocates it_map after a device is returned
-to the host OS after being passed through and this happens long after
-the host OS booted. It is quite possible to trigger the it_map allocation
-panic() and kill the host even though it is not necessary - the host OS
-can still use the DMA bypass mode (requires a tiny fraction of it_map's
-memory) and even if that fails, the host OS is runnnable as it was without
-the device for which allocating it_map causes the panic.
+--+KYLCqoJuglLtO2j
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Instead of immediately crashing in a powernv/ioda2 system, this prints
-an error and continues. All other platforms still call panic().
+On Tue, Feb 16, 2021 at 02:33:06PM +1100, Alexey Kardashevskiy wrote:
+> The IOMMU table uses the it_map bitmap to keep track of allocated DMA
+> pages. This has always been a contiguous array allocated at either
+> the boot time or when a passed through device is returned to the host OS.
+> The it_map memory is allocated by alloc_pages() which allocates
+> contiguous physical memory.
+>=20
+> Such allocation method occasionally creates a problem when there is
+> no big chunk of memory available (no free memory or too fragmented).
+> On powernv/ioda2 the default DMA window requires 16MB for it_map.
+>=20
+> This replaces alloc_pages_node() with vzalloc_node() which allocates
+> contiguous block but in virtual memory. This should reduce changes of
+> failure but should not cause other behavioral changes as it_map is only
+> used by the kernel's DMA hooks/api when MMU is on.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- arch/powerpc/kernel/iommu.c               |  6 ++++--
- arch/powerpc/platforms/cell/iommu.c       |  3 ++-
- arch/powerpc/platforms/pasemi/iommu.c     |  4 +++-
- arch/powerpc/platforms/powernv/pci-ioda.c | 15 ++++++++-------
- arch/powerpc/platforms/pseries/iommu.c    | 10 +++++++---
- arch/powerpc/sysdev/dart_iommu.c          |  3 ++-
- 6 files changed, 26 insertions(+), 15 deletions(-)
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
-index 8eb6eb0afa97..c1a5c366a664 100644
---- a/arch/powerpc/kernel/iommu.c
-+++ b/arch/powerpc/kernel/iommu.c
-@@ -728,8 +728,10 @@ struct iommu_table *iommu_init_table(struct iommu_table *tbl, int nid,
- 	sz = BITS_TO_LONGS(tbl->it_size) * sizeof(unsigned long);
- 
- 	tbl->it_map = vzalloc_node(sz, nid);
--	if (!tbl->it_map)
--		panic("iommu_init_table: Can't allocate %ld bytes\n", sz);
-+	if (!tbl->it_map) {
-+		pr_err("%s: Can't allocate %ld bytes\n", __func__, sz);
-+		return NULL;
-+	}
- 
- 	iommu_table_reserve_pages(tbl, res_start, res_end);
- 
-diff --git a/arch/powerpc/platforms/cell/iommu.c b/arch/powerpc/platforms/cell/iommu.c
-index 2124831cf57c..fa08699aedeb 100644
---- a/arch/powerpc/platforms/cell/iommu.c
-+++ b/arch/powerpc/platforms/cell/iommu.c
-@@ -486,7 +486,8 @@ cell_iommu_setup_window(struct cbe_iommu *iommu, struct device_node *np,
- 	window->table.it_size = size >> window->table.it_page_shift;
- 	window->table.it_ops = &cell_iommu_ops;
- 
--	iommu_init_table(&window->table, iommu->nid, 0, 0);
-+	if (!iommu_init_table(&window->table, iommu->nid, 0, 0))
-+		panic("Failed to initialize iommu table");
- 
- 	pr_debug("\tioid      %d\n", window->ioid);
- 	pr_debug("\tblocksize %ld\n", window->table.it_blocksize);
-diff --git a/arch/powerpc/platforms/pasemi/iommu.c b/arch/powerpc/platforms/pasemi/iommu.c
-index b500a6e47e6b..5be7242fbd86 100644
---- a/arch/powerpc/platforms/pasemi/iommu.c
-+++ b/arch/powerpc/platforms/pasemi/iommu.c
-@@ -146,7 +146,9 @@ static void iommu_table_iobmap_setup(void)
- 	 */
- 	iommu_table_iobmap.it_blocksize = 4;
- 	iommu_table_iobmap.it_ops = &iommu_table_iobmap_ops;
--	iommu_init_table(&iommu_table_iobmap, 0, 0, 0);
-+	if (!iommu_init_table(&iommu_table_iobmap, 0, 0, 0))
-+		panic("Failed to initialize iommu table");
-+
- 	pr_debug(" <- %s\n", __func__);
- }
- 
-diff --git a/arch/powerpc/platforms/powernv/pci-ioda.c b/arch/powerpc/platforms/powernv/pci-ioda.c
-index f0f901683a2f..66c3c3337334 100644
---- a/arch/powerpc/platforms/powernv/pci-ioda.c
-+++ b/arch/powerpc/platforms/powernv/pci-ioda.c
-@@ -1762,7 +1762,8 @@ static void pnv_pci_ioda1_setup_dma_pe(struct pnv_phb *phb,
- 	tbl->it_ops = &pnv_ioda1_iommu_ops;
- 	pe->table_group.tce32_start = tbl->it_offset << tbl->it_page_shift;
- 	pe->table_group.tce32_size = tbl->it_size << tbl->it_page_shift;
--	iommu_init_table(tbl, phb->hose->node, 0, 0);
-+	if (!iommu_init_table(tbl, phb->hose->node, 0, 0))
-+		panic("Failed to initialize iommu table");
- 
- 	pe->dma_setup_done = true;
- 	return;
-@@ -1930,16 +1931,16 @@ static long pnv_pci_ioda2_setup_default_config(struct pnv_ioda_pe *pe)
- 		res_start = pe->phb->ioda.m32_pci_base >> tbl->it_page_shift;
- 		res_end = min(window_size, SZ_4G) >> tbl->it_page_shift;
- 	}
--	iommu_init_table(tbl, pe->phb->hose->node, res_start, res_end);
- 
--	rc = pnv_pci_ioda2_set_window(&pe->table_group, 0, tbl);
-+	if (iommu_init_table(tbl, pe->phb->hose->node, res_start, res_end))
-+		rc = pnv_pci_ioda2_set_window(&pe->table_group, 0, tbl);
-+	else
-+		rc = -ENOMEM;
- 	if (rc) {
--		pe_err(pe, "Failed to configure 32-bit TCE table, err %ld\n",
--				rc);
-+		pe_err(pe, "Failed to configure 32-bit TCE table, err %ld\n", rc);
- 		iommu_tce_table_put(tbl);
--		return rc;
-+		tbl = NULL; /* This clears iommu_table_base below */
- 	}
--
- 	if (!pnv_iommu_bypass_disabled)
- 		pnv_pci_ioda2_set_bypass(pe, true);
- 
-diff --git a/arch/powerpc/platforms/pseries/iommu.c b/arch/powerpc/platforms/pseries/iommu.c
-index 9fc5217f0c8e..4d9ac1f181c2 100644
---- a/arch/powerpc/platforms/pseries/iommu.c
-+++ b/arch/powerpc/platforms/pseries/iommu.c
-@@ -638,7 +638,8 @@ static void pci_dma_bus_setup_pSeries(struct pci_bus *bus)
- 
- 	iommu_table_setparms(pci->phb, dn, tbl);
- 	tbl->it_ops = &iommu_table_pseries_ops;
--	iommu_init_table(tbl, pci->phb->node, 0, 0);
-+	if (!iommu_init_table(tbl, pci->phb->node, 0, 0))
-+		panic("Failed to initialize iommu table");
- 
- 	/* Divide the rest (1.75GB) among the children */
- 	pci->phb->dma_window_size = 0x80000000ul;
-@@ -720,7 +721,8 @@ static void pci_dma_bus_setup_pSeriesLP(struct pci_bus *bus)
- 		iommu_table_setparms_lpar(ppci->phb, pdn, tbl,
- 				ppci->table_group, dma_window);
- 		tbl->it_ops = &iommu_table_lpar_multi_ops;
--		iommu_init_table(tbl, ppci->phb->node, 0, 0);
-+		if (!iommu_init_table(tbl, ppci->phb->node, 0, 0))
-+			panic("Failed to initialize iommu table");
- 		iommu_register_group(ppci->table_group,
- 				pci_domain_nr(bus), 0);
- 		pr_debug("  created table: %p\n", ppci->table_group);
-@@ -749,7 +751,9 @@ static void pci_dma_dev_setup_pSeries(struct pci_dev *dev)
- 		tbl = PCI_DN(dn)->table_group->tables[0];
- 		iommu_table_setparms(phb, dn, tbl);
- 		tbl->it_ops = &iommu_table_pseries_ops;
--		iommu_init_table(tbl, phb->node, 0, 0);
-+		if (!iommu_init_table(tbl, phb->node, 0, 0))
-+			panic("Failed to initialize iommu table");
-+
- 		set_iommu_table_base(&dev->dev, tbl);
- 		return;
- 	}
-diff --git a/arch/powerpc/sysdev/dart_iommu.c b/arch/powerpc/sysdev/dart_iommu.c
-index 6b4a34b36d98..1d33b7a5ea83 100644
---- a/arch/powerpc/sysdev/dart_iommu.c
-+++ b/arch/powerpc/sysdev/dart_iommu.c
-@@ -344,7 +344,8 @@ static void iommu_table_dart_setup(void)
- 	iommu_table_dart.it_index = 0;
- 	iommu_table_dart.it_blocksize = 1;
- 	iommu_table_dart.it_ops = &iommu_dart_ops;
--	iommu_init_table(&iommu_table_dart, -1, 0, 0);
-+	if (!iommu_init_table(&iommu_table_dart, -1, 0, 0))
-+		panic("Failed to initialize iommu table");
- 
- 	/* Reserve the last page of the DART to avoid possible prefetch
- 	 * past the DART mapped area
--- 
-2.17.1
+> ---
+>  arch/powerpc/kernel/iommu.c | 15 +++------------
+>  1 file changed, 3 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
+> index c00214a4355c..8eb6eb0afa97 100644
+> --- a/arch/powerpc/kernel/iommu.c
+> +++ b/arch/powerpc/kernel/iommu.c
+> @@ -719,7 +719,6 @@ struct iommu_table *iommu_init_table(struct iommu_tab=
+le *tbl, int nid,
+>  {
+>  	unsigned long sz;
+>  	static int welcomed =3D 0;
+> -	struct page *page;
+>  	unsigned int i;
+>  	struct iommu_pool *p;
+> =20
+> @@ -728,11 +727,9 @@ struct iommu_table *iommu_init_table(struct iommu_ta=
+ble *tbl, int nid,
+>  	/* number of bytes needed for the bitmap */
+>  	sz =3D BITS_TO_LONGS(tbl->it_size) * sizeof(unsigned long);
+> =20
+> -	page =3D alloc_pages_node(nid, GFP_KERNEL, get_order(sz));
+> -	if (!page)
+> +	tbl->it_map =3D vzalloc_node(sz, nid);
+> +	if (!tbl->it_map)
+>  		panic("iommu_init_table: Can't allocate %ld bytes\n", sz);
+> -	tbl->it_map =3D page_address(page);
+> -	memset(tbl->it_map, 0, sz);
+> =20
+>  	iommu_table_reserve_pages(tbl, res_start, res_end);
+> =20
+> @@ -774,8 +771,6 @@ struct iommu_table *iommu_init_table(struct iommu_tab=
+le *tbl, int nid,
+> =20
+>  static void iommu_table_free(struct kref *kref)
+>  {
+> -	unsigned long bitmap_sz;
+> -	unsigned int order;
+>  	struct iommu_table *tbl;
+> =20
+>  	tbl =3D container_of(kref, struct iommu_table, it_kref);
+> @@ -796,12 +791,8 @@ static void iommu_table_free(struct kref *kref)
+>  	if (!bitmap_empty(tbl->it_map, tbl->it_size))
+>  		pr_warn("%s: Unexpected TCEs\n", __func__);
+> =20
+> -	/* calculate bitmap size in bytes */
+> -	bitmap_sz =3D BITS_TO_LONGS(tbl->it_size) * sizeof(unsigned long);
+> -
+>  	/* free bitmap */
+> -	order =3D get_order(bitmap_sz);
+> -	free_pages((unsigned long) tbl->it_map, order);
+> +	vfree(tbl->it_map);
+> =20
+>  	/* free table */
+>  	kfree(tbl);
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--+KYLCqoJuglLtO2j
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmAsYEsACgkQbDjKyiDZ
+s5KMNg/9GaI2PXLbH2Ff4Ua+Fmlj1iRNdBqHb1qbBNcOsGcrFMyVZeNEwn0XWCeU
+xhU/uoV0ybW6bzFDSN67TjhTX8pq3MWi9MhjyzCufpLAr9x107leKMptihYfc6k7
+QKPkIfoz4kdfdsjiQAl6UBbDKnT2XZxdA8oXTU+wga5qKc1gkWUdQEr64EhKObX8
+GM3TeA/n2YTW445DrsuebekLZR/RqBxiGPIy4xr1F2RkWlZV4tDyDczvAdvDK2rx
+KrBlh1HJpk9GGCZaOhhP0MH2nOHRQ99wqcqeQFLILq220diEo1Ea3JUDGPx6ntNZ
+Ep5rsd/iwNasiI0xKwiIbgbPSFwVeGNnp9rEYlRWhnVoS3/WLeugtIKeXUKffiKU
+QQJo85LmYwmBQtDtRNahb4eGLcL0WDAW0kVVd/OAuvXk1fvoMh/rvhc0AXvb3sqS
+zeQvP6YDWy2fblrUnXT6nf4ha8gQb79ioYg7YvnwmFTb9OhGN6jqSo2lKb6ImM7c
+X9rYGdaMAwekvyj2Rnx7IbkYaHmxWyELdTcK+Iww6okWvcfq5peh2Htx1Il3LXUv
+FIhWrvfTPbHNPFv9LNSIzSq0HnO5eiEplzG4hpkf/ck1kWAiGKTH+KxLeKw9oJV3
+s2BUAVB7oglilKTHWhHTME7JeVmOV6klTVyIVzySaDKIbSfRQcY=
+=ruIe
+-----END PGP SIGNATURE-----
+
+--+KYLCqoJuglLtO2j--
