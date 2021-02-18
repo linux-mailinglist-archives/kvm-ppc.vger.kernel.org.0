@@ -2,79 +2,138 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E88331E2E2
-	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Feb 2021 00:01:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D55031EC6D
+	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Feb 2021 17:49:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230306AbhBQXBk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 17 Feb 2021 18:01:40 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:16785 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229774AbhBQXBk (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 17 Feb 2021 18:01:40 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B602da02b0005>; Wed, 17 Feb 2021 15:00:59 -0800
-Received: from nvdebian.localnet (172.20.145.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 17 Feb
- 2021 23:00:56 +0000
-From:   Alistair Popple <apopple@nvidia.com>
-To:     <linux-mm@kvack.org>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        "Nouveau Dev" <nouveau@lists.freedesktop.org>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        <kvm-ppc@vger.kernel.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Jerome Glisse <jglisse@redhat.com>
-Subject: Re: [PATCH 0/9] Add support for SVM atomics in Nouveau
-Date:   Thu, 18 Feb 2021 10:00:54 +1100
-Message-ID: <6616185.Wbe1NtApLk@nvdebian>
-In-Reply-To: <20210211075510.GA2368090@infradead.org>
-References: <20210209010722.13839-1-apopple@nvidia.com> <20210210175913.GO4718@ziepe.ca> <20210211075510.GA2368090@infradead.org>
+        id S231737AbhBRQky (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 18 Feb 2021 11:40:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31138 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233321AbhBRNAg (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 18 Feb 2021 08:00:36 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11ICXDAW021066;
+        Thu, 18 Feb 2021 07:59:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=v+T4dp1ovGoJGWReuDO7bXfe7brYHaMZpOcuA/LiUzc=;
+ b=O2I/EiTQKbd4xaIybCglbugZtjH3Jgz1UpNtc+BrtNTk81KUS6V58oALukOF74DSj0FJ
+ q+A42tNHw+XWOpXiuAJbAEeZPKNoI0G0c8CkdQPKO5bD2/yEvGreX7GlKBAWio6Q5vdS
+ XF/CjWN8DPZpqgctDLKnsgwyRT9KpzlQmK3CceKS0T37cRcOKIjI39ctpCJ1Y7HMpXB/
+ hZac9sug3Wf2vzTAV5ODrXnD1AZYd8j6lXl3rnmT/zEYqDfbCj2Ob7nthskfLa8WjopT
+ t1AN7OgDWlOEl4m9AsSdzVXSt8djpp44oSVsTiEG/oIaDr/KBUdpxK/jnnGQUQZ7y3Av NA== 
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36sqpkj46t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Feb 2021 07:59:48 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11ICw6N0027581;
+        Thu, 18 Feb 2021 12:59:46 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 36p6d8jdkb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Feb 2021 12:59:46 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11ICxWnJ38011220
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Feb 2021 12:59:32 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 397844C04A;
+        Thu, 18 Feb 2021 12:59:44 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 103D14C044;
+        Thu, 18 Feb 2021 12:59:44 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.183.155])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Feb 2021 12:59:43 +0000 (GMT)
+Subject: Re: [PATCH kernel] powerpc/iommu: Annotate nested lock for lockdep
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org
+References: <20210216032000.21642-1-aik@ozlabs.ru>
+From:   Frederic Barrat <fbarrat@linux.ibm.com>
+Message-ID: <49b1f5cb-107c-296f-c339-13e627a73d6d@linux.ibm.com>
+Date:   Thu, 18 Feb 2021 13:59:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1613602859; bh=Zcp6FwQOo6uCl+bAC2DWEr4Viwiu5nIBT+YN6D2qruU=;
-        h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-         MIME-Version:Content-Transfer-Encoding:Content-Type:
-         X-Originating-IP:X-ClientProxiedBy;
-        b=AXb+ut3ot7Odaa4NfndUdnHlBWh/CmCbxa90e7XGqYDqOl0itTA0ey/0xdqSoXbA2
-         JlMNydOcVXGiAO1uyIryQXCh6IJNMB5+ajbf7PvbtDcER0T/TTnEqkgpU2USIY0Ya+
-         NqYaHlrJc7yam1VcZFkBNUvumzVGyvnQedJAd2+hs20Ac8NKfjzT6p3t31zwxNt/Hq
-         gR+sHNOCuxdnohI6TOW7pnPo+iGVNWMyVlv0cNOIZszQSsdsXR69vsDcRIyKwiHLuU
-         QHMPy9U3pXXKcoKf2xltHJbe92pWiS2sWG6fQJuE1wnVVzjgSmr5R0ufLguVI0LbOK
-         oydiyGx+ixcIg==
+In-Reply-To: <20210216032000.21642-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-18_05:2021-02-18,2021-02-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ phishscore=0 adultscore=0 bulkscore=0 mlxlogscore=999 mlxscore=0
+ impostorscore=0 priorityscore=1501 clxscore=1011 lowpriorityscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102180110
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thursday, 11 February 2021 6:55:10 PM AEDT Christoph Hellwig wrote:
-> On Wed, Feb 10, 2021 at 01:59:13PM -0400, Jason Gunthorpe wrote:
-> > Really what you want to do here is leave the CPU page in the VMA and
-> > the page tables where it started and deny CPU access to the page. Then
-> > all the proper machinery will continue to work.
-> > 
-> > IMHO "migration" is the wrong idea if the data isn't actually moving.
+
+
+On 16/02/2021 04:20, Alexey Kardashevskiy wrote:
+> The IOMMU table is divided into pools for concurrent mappings and each
+> pool has a separate spinlock. When taking the ownership of an IOMMU group
+> to pass through a device to a VM, we lock these spinlocks which triggers
+> a false negative warning in lockdep (below).
 > 
-> Agreed.
- 
-I chose "migration" because device private pages seemed like a good way of 
-reusing existing code to do what was required (a callback on CPU access).
+> This fixes it by annotating the large pool's spinlock as a nest lock.
+> 
+> ===
+> WARNING: possible recursive locking detected
+> 5.11.0-le_syzkaller_a+fstn1 #100 Not tainted
+> --------------------------------------------
+> qemu-system-ppc/4129 is trying to acquire lock:
+> c0000000119bddb0 (&(p->lock)/1){....}-{2:2}, at: iommu_take_ownership+0xac/0x1e0
+> 
+> but task is already holding lock:
+> c0000000119bdd30 (&(p->lock)/1){....}-{2:2}, at: iommu_take_ownership+0xac/0x1e0
+> 
+> other info that might help us debug this:
+>   Possible unsafe locking scenario:
+> 
+>         CPU0
+>         ----
+>    lock(&(p->lock)/1);
+>    lock(&(p->lock)/1);
+> ===
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>   arch/powerpc/kernel/iommu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
+> index 557a09dd5b2f..2ee642a6731a 100644
+> --- a/arch/powerpc/kernel/iommu.c
+> +++ b/arch/powerpc/kernel/iommu.c
+> @@ -1089,7 +1089,7 @@ int iommu_take_ownership(struct iommu_table *tbl)
+>   
+>   	spin_lock_irqsave(&tbl->large_pool.lock, flags);
+>   	for (i = 0; i < tbl->nr_pools; i++)
+> -		spin_lock(&tbl->pools[i].lock);
+> +		spin_lock_nest_lock(&tbl->pools[i].lock, &tbl->large_pool.lock);
 
-However I have been reworking this to use mmu notifiers as the callback and it 
-seems to simplify some things nicely so think I also agree. It removes the 
-requirement for the pin as well which is nice, I'll post it as a v2 soon.
 
- - Alistair
+We have the same pattern and therefore should have the same problem in 
+iommu_release_ownership().
+
+But as I understand, we're hacking our way around lockdep here, since 
+conceptually, those locks are independent. I was wondering why it seems 
+to fix it by worrying only about the large pool lock. That loop can take 
+many locks (up to 4 with current config). However, if the dma window is 
+less than 1GB, we would only have one, so it would make sense for 
+lockdep to stop complaining. Is it what happened? In which case, this 
+patch doesn't really fix it. Or I'm missing something :-)
+
+   Fred
 
 
 
+>   	iommu_table_release_pages(tbl);
+>   
+> 
