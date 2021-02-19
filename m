@@ -2,106 +2,120 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DACC731F4F8
-	for <lists+kvm-ppc@lfdr.de>; Fri, 19 Feb 2021 07:04:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F41B131F51B
+	for <lists+kvm-ppc@lfdr.de>; Fri, 19 Feb 2021 07:36:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229481AbhBSGDq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 19 Feb 2021 01:03:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48062 "EHLO
+        id S229535AbhBSGgc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 19 Feb 2021 01:36:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbhBSGDq (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 19 Feb 2021 01:03:46 -0500
+        with ESMTP id S229481AbhBSGgb (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 19 Feb 2021 01:36:31 -0500
 Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFC4DC061574
-        for <kvm-ppc@vger.kernel.org>; Thu, 18 Feb 2021 22:03:05 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id a24so2761383plm.11
-        for <kvm-ppc@vger.kernel.org>; Thu, 18 Feb 2021 22:03:05 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF596C061574
+        for <kvm-ppc@vger.kernel.org>; Thu, 18 Feb 2021 22:35:50 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id ba1so2832404plb.1
+        for <kvm-ppc@vger.kernel.org>; Thu, 18 Feb 2021 22:35:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=axtens.net; s=google;
-        h=from:to:cc:subject:in-reply-to:references:date:message-id
-         :mime-version;
-        bh=MYyTS1/wjznlU/v9GaBg3e/Ma7dOx08FztPRQ5y5qlE=;
-        b=Hq1q4ynuFCz5blo4G1nrCE1FA13tIsGAEcqU0lkN+k4W33oAYkmmQHgOCa7bNXvVbd
-         MVjfvll4LGVIGCtuqQdROagYlmtiviaFMc2bRxgJw0yyhYFnAbYHww770ei2jfiZ6aUP
-         y4Nd4OpUHDs/Z7O1NUhr60eM5CWx0rfOt4H38=
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=UymbtmbdqSs8j3UG2YdaaaUw62kh30J7HQRbQZoqk44=;
+        b=YhOxqAvJA2J4SAvdzaUv4tDBFzuXDZF1zkP7zX3jz+8qFSCkYd7ZfgZYRdqfe1M2Hy
+         lOdZP8Fw1owFl9bFOqKTlz+RHfv427I4CaOvtCYII5THolZQkdb5Np8f4vD0YmgD5Ae1
+         Jm9Qz5XMj9FkeJLYWlqnuaV+n6sqRlYr7Rucgv2U8oW5H49n8TbxdrTcPCJHnANGEbkV
+         cnwjL5q64FH4YFZO9+GuDnd2/GkdANjld8+8nax98ea4rYAIQb5hq/ZnW9cny1BYRdGw
+         INy30LZBprtcvCnsq5mpQK7x+wCxiIt1epiUubRqe9iyMwJh30EnLCyPDhm/KcYx2JVK
+         MjuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=MYyTS1/wjznlU/v9GaBg3e/Ma7dOx08FztPRQ5y5qlE=;
-        b=Vut9MbhxzqoneVksH00l2vCOm5n1DoNfA9yhuJZyc4bKkgTW6yJW0StMscBpbcFdms
-         q5OJLYnnMA8oG1gS+6X1tGR3vzTqLSMJDTOjsb4XASBkxnc4KqQYM21TN3xtBK9t9Wk/
-         s8FhwUfZoszrxxAMje8sC1GCA6QHWRFMFmIl4G7lk7b9UEERTHSAEFFOEx8e90eOwlu2
-         CGaput826an/UfP/BLcJ4hMxfdB1c0Qbihub5C55xuydPs3u/IRAHI+SsjX1MHCTZpSd
-         RGecBuAumcgmhtJHjpvUQi4BrMaw6YwRBoTL8s877cJRFiFSHf6d3SfsQdPmLihyeSR5
-         +eCw==
-X-Gm-Message-State: AOAM5303wGdrLyeggL/1TbF40YKC68HVIJrOMsGnrQqCcZD0BHDyB4i/
-        w4djaeDwGBYCBJNPj/QIRD5AVw==
-X-Google-Smtp-Source: ABdhPJzvWi0zCztT5Olu5NZaIhs7oxY5snfk/RG6lqe8acnTTpe3q8ceVFCVTXQx18S9P+ZpZ3y0ug==
-X-Received: by 2002:a17:90b:e83:: with SMTP id fv3mr7686838pjb.204.1613714585297;
-        Thu, 18 Feb 2021 22:03:05 -0800 (PST)
-Received: from localhost (2001-44b8-1113-6700-7ad2-5bb3-4fd4-d737.static.ipv6.internode.on.net. [2001:44b8:1113:6700:7ad2:5bb3:4fd4:d737])
-        by smtp.gmail.com with ESMTPSA id p18sm8336399pfn.178.2021.02.18.22.03.03
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=UymbtmbdqSs8j3UG2YdaaaUw62kh30J7HQRbQZoqk44=;
+        b=N6cRnmsBRrravalSWgM3oDx6/UuPc5ZCWh5axcybjUcEgd/aeunKNtivDT25M+894h
+         RDHaKDmTmiFwPnlhYoiFpjJz4LLEM6nYkuE1/4nYEqsfsmX494wqCbe3JKVu/tUkRhpY
+         y8V+tzPQLYbDzyQFxg7x/fB23vphAEEm1j1K0LVgY/+t63c7kHa7p1Ryn8KYlv8URD2S
+         06DFvePOD8y+10xUOw3XQAIoKsGPBjSj+HZKnnIpk2HycG8l03mjrpBlM6xO2NXhRvIx
+         0FZEa6Wv/5bVfcXv87/rkFezeXvpVQSf+Jk2WSwRlxPYVBgmF5QPME1jIKjl49hpiZlv
+         2NVw==
+X-Gm-Message-State: AOAM533EYoyQH5i0iITAQixKAoutAx8rkAftizXJh/cpSeKqyonMb23R
+        nXIeIqPyHre69dC9+clR7d01Ic6pkbU=
+X-Google-Smtp-Source: ABdhPJyPRF0a10TfMG/EtsZivUGEtkgV3v8OiBgHlDh9o99Xn820XzQu15exvkO9OkfpQkmyHOP2bg==
+X-Received: by 2002:a17:902:e5c4:b029:e3:b422:34ef with SMTP id u4-20020a170902e5c4b02900e3b42234efmr455796plf.26.1613716549848;
+        Thu, 18 Feb 2021 22:35:49 -0800 (PST)
+Received: from bobo.ozlabs.ibm.com (14-201-150-91.tpgi.com.au. [14.201.150.91])
+        by smtp.gmail.com with ESMTPSA id v16sm7813099pfu.76.2021.02.18.22.35.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Feb 2021 22:03:04 -0800 (PST)
-From:   Daniel Axtens <dja@axtens.net>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [RFC PATCH 2/9] KVM: PPC: Book3S 64: Move GUEST_MODE_SKIP test into KVM
-In-Reply-To: <20210202030313.3509446-3-npiggin@gmail.com>
-References: <20210202030313.3509446-1-npiggin@gmail.com> <20210202030313.3509446-3-npiggin@gmail.com>
-Date:   Fri, 19 Feb 2021 17:03:01 +1100
-Message-ID: <87lfbka92i.fsf@linkitivity.dja.id.au>
+        Thu, 18 Feb 2021 22:35:49 -0800 (PST)
+From:   Nicholas Piggin <npiggin@gmail.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH 00/13] KVM: PPC: Book3S: C-ify the P9 entry/exit code
+Date:   Fri, 19 Feb 2021 16:35:29 +1000
+Message-Id: <20210219063542.1425130-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi Nick,
+This has a lot more implemented, things tidied up, and more things split
+out. It's also implemented on top of powerpc next and kvm next which
+have a few prerequisite patches (mainly removing EXSLB).
 
-> +maybe_skip:
-> +	cmpwi	r12,0x200
-> +	beq	1f
-> +	cmpwi	r12,0x300
-> +	beq	1f
-> +	cmpwi	r12,0x380
-> +	beq	1f
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +	/* XXX: cbe stuff? instruction breakpoint? */
-> +	cmpwi	r12,0xe02
-> +	beq	2f
-> +#endif
-> +	b	no_skip
-> +1:	mfspr	r9,SPRN_SRR0
-> +	addi	r9,r9,4
-> +	mtspr	SPRN_SRR0,r9
-> +	ld	r12,HSTATE_SCRATCH0(r13)
-> +	ld	r9,HSTATE_SCRATCH2(r13)
-> +	GET_SCRATCH0(r13)
-> +	RFI_TO_KERNEL
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +2:	mfspr	r9,SPRN_HSRR0
-> +	addi	r9,r9,4
-> +	mtspr	SPRN_HSRR0,r9
-> +	ld	r12,HSTATE_SCRATCH0(r13)
-> +	ld	r9,HSTATE_SCRATCH2(r13)
-> +	GET_SCRATCH0(r13)
-> +	HRFI_TO_KERNEL
-> +#endif
+I've got a bunch more things after this including implementing HPT
+guests with radix host in the "new" path -- whether we ever actually
+want to do that, or port the legacy path up to C, or just leave it to
+maintenance mode, I was just testing the waters there and making sure I
+wasn't doing something fundamentally incompatible with hash.
 
-If I understand correctly, label 1 is the kvmppc_skip_interrupt and
-label 2 is the kvmppc_skip_Hinterrupt. Would it be easier to understand
-if we used symbolic labels, or do you think the RFI_TO_KERNEL vs
-HRFI_TO_KERNEL and other changes are sufficient?
+I won't post anything further than this for now because I think it's a
+good start and gets the total asm code for KVM entry and exit down to
+about 160 lines plus the shim for the legacy paths. So would like to
+concentrate on getting this in before juggling things around too much
+or adding new things.
 
-Apart from that, I haven't checked the precise copy-paste to make sure
-nothing has changed by accident, but I am able to follow the general
-idea of the patch and am vigorously in favour of anything that
-simplifies our exception/interrupt paths!
+Thanks,
+Nick
 
-Kind regards,
-Daniel
+Nicholas Piggin (13):
+  powerpc/64s: Remove KVM handler support from CBE_RAS interrupts
+  powerpc/64s: remove KVM SKIP test from instruction breakpoint handler
+  KVM: PPC: Book3S HV: Ensure MSR[ME] is always set in guest MSR
+  KVM: PPC: Book3S 64: remove unused kvmppc_h_protect argument
+  KVM: PPC: Book3S 64: move KVM interrupt entry to a common entry point
+  KVM: PPC: Book3S 64: Move GUEST_MODE_SKIP test into KVM
+  KVM: PPC: Book3S 64: add hcall interrupt handler
+  KVM: PPC: Book3S HV: Move hcall early register setup to KVM
+  KVM: PPC: Book3S HV: Move interrupt early register setup to KVM
+  KVM: PPC: Book3S HV: move bad_host_intr check to HV handler
+  KVM: PPC: Book3S HV: Minimise hcall handler calling convention
+    differences
+  KVM: PPC: Book3S HV: Move radix MMU switching together in the P9 path
+  KVM: PPC: Book3S HV: Implement the rest of the P9 entry/exit handling
+    in C
 
-> -- 
-> 2.23.0
+ arch/powerpc/include/asm/asm-prototypes.h |   3 +-
+ arch/powerpc/include/asm/exception-64s.h  |  13 +
+ arch/powerpc/include/asm/kvm_asm.h        |   3 +-
+ arch/powerpc/include/asm/kvm_book3s_64.h  |   2 +
+ arch/powerpc/include/asm/kvm_ppc.h        |   5 +-
+ arch/powerpc/kernel/exceptions-64s.S      | 257 +++----------------
+ arch/powerpc/kernel/security.c            |   5 +-
+ arch/powerpc/kvm/Makefile                 |   6 +
+ arch/powerpc/kvm/book3s_64_entry.S        | 295 ++++++++++++++++++++++
+ arch/powerpc/kvm/book3s_hv.c              |  69 +++--
+ arch/powerpc/kvm/book3s_hv_builtin.c      |   7 +
+ arch/powerpc/kvm/book3s_hv_interrupt.c    | 208 +++++++++++++++
+ arch/powerpc/kvm/book3s_hv_rm_mmu.c       |   3 +-
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 125 +--------
+ arch/powerpc/kvm/book3s_segment.S         |   7 +
+ arch/powerpc/kvm/book3s_xive.c            |  32 +++
+ 16 files changed, 670 insertions(+), 370 deletions(-)
+ create mode 100644 arch/powerpc/kvm/book3s_64_entry.S
+ create mode 100644 arch/powerpc/kvm/book3s_hv_interrupt.c
+
+-- 
+2.23.0
+
