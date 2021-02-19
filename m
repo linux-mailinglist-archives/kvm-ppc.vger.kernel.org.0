@@ -2,133 +2,260 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B042331F599
-	for <lists+kvm-ppc@lfdr.de>; Fri, 19 Feb 2021 09:04:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29B2731F6C5
+	for <lists+kvm-ppc@lfdr.de>; Fri, 19 Feb 2021 10:50:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229481AbhBSIEV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 19 Feb 2021 03:04:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45382 "EHLO
+        id S229546AbhBSJte (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 19 Feb 2021 04:49:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbhBSID7 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 19 Feb 2021 03:03:59 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8BE8C061574
-        for <kvm-ppc@vger.kernel.org>; Fri, 19 Feb 2021 00:03:19 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id u11so2912927plg.13
-        for <kvm-ppc@vger.kernel.org>; Fri, 19 Feb 2021 00:03:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=JQX1BGNeD8Fpdj6eenxDBcFHyQY3bVVigApTih5grCs=;
-        b=tG6Rby36uL2jzdv2wp0h+OcUEsu10rvV1dOILRDLzmYq85TakGeY+08iKqAbDqrTRv
-         erfA291+Wkz+3JdAuXk7+xTHSjNEK0swqdX6ZpIAEGfwuHEmi3r0S96ImXiqvbosFPlv
-         inJ37GO0aN6q4Mv75+7y2gy3tlt/eK5o9aTtLmp7NQVuufJkaQzHvWBLazTA1IIhCOYz
-         gM3usqbxAyHCV+M6bpO9SBKSO+ghV3CB6wydNE+a0pG3GqNVkKLqoG+n8NWBV34QzYcn
-         2yKsvJBBbZq0JkFeqj49d/fxUZe9AvHfNZflql7OwkPxByXvG/SLzr8tZZiYo84e7oNN
-         ohhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=JQX1BGNeD8Fpdj6eenxDBcFHyQY3bVVigApTih5grCs=;
-        b=jm67U7Um4x693mvJMfDa+zSZWrjOeYvlSFaT2cyF9qCEfM8Fslp1LhCggDz/yABjH4
-         /BB0RqRQbDxt5Pup/+ffm8xgnfDqG+6rQpTGUZlUmQZxI75tlSXmLFUJCYK+xfgu8zCs
-         ybE1EQb7V+xtNb4fBUMfxgcABUrUwIPOFKrYb/48m/+cCx4FGzn/1Swfo16M+3rTFRaa
-         FkegpQM+4WjyA+2FMrr9zFxZgZA3LSq6PUPoV4DdYmFMkJ/T2QNL+LihUuFefoS+NrT5
-         GZlN9X/sla3vXdaUKxuYEwlw/+DPPX/PKTVsYIMmbi9dGrCEl6F4tm4GZRYdRlKc+714
-         xuUQ==
-X-Gm-Message-State: AOAM533BWN6cHlF17xxYt0mHCmwRnu6ZhCgeUCcb+q2Cku8L5hbRKnkg
-        A4MEx/aI0H+IZSDdRmIrJHY=
-X-Google-Smtp-Source: ABdhPJxxZ8ie7QAdeAbFf6eX3Q7TwmrmzCVG3hnA1gi2NL84R0Lu2NWEZmoHO98lwPIQjWdom1DB4Q==
-X-Received: by 2002:a17:90b:80f:: with SMTP id bk15mr7997174pjb.76.1613721798483;
-        Fri, 19 Feb 2021 00:03:18 -0800 (PST)
-Received: from localhost (14-201-150-91.tpgi.com.au. [14.201.150.91])
-        by smtp.gmail.com with ESMTPSA id w3sm7624044pjb.2.2021.02.19.00.03.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Feb 2021 00:03:17 -0800 (PST)
-Date:   Fri, 19 Feb 2021 18:03:12 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [RFC PATCH 1/9] KVM: PPC: Book3S 64: move KVM interrupt entry to
- a common entry point
-To:     Daniel Axtens <dja@axtens.net>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org
-References: <20210202030313.3509446-1-npiggin@gmail.com>
-        <20210202030313.3509446-2-npiggin@gmail.com>
-        <87o8ggab50.fsf@linkitivity.dja.id.au>
-In-Reply-To: <87o8ggab50.fsf@linkitivity.dja.id.au>
+        with ESMTP id S229636AbhBSJta (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 19 Feb 2021 04:49:30 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2147CC061786;
+        Fri, 19 Feb 2021 01:48:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ZI0RLkKXb+MTh0o6tijJ0vZsP4VuwukuwPULbyVK0mQ=; b=aYlimAFS+2sygyQngCLjEk9f5x
+        0pEI9OFxZfCtaaeKB13nLxYUu4zvXmV0lDajMqRUzu9Fvpow+hMUrjS+a4AHeOOm3IrbhakGPgfpn
+        61wibgPfFl0Qz28R5vXOrRfnI8Suo9j3lNM5Hrh781KfWrQ9fNIBPO65IeheJhkMgfy6f7TjjHzcF
+        7lc3IUTVHAMhzUlp17Hk51ia8PEStjOvmxozV9TNRIPeJYQJAHZmZI36IYH8HHtTNa7ez5hm8Xhip
+        jgD8cGtVcG62iiYBFywTr8VHhKdDUBX7hP5NCnjT5jnVXIVib6izttVigeC6oNafx+KBkILaniIj9
+        AOgRJhNg==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lD2Nx-002iIr-C7; Fri, 19 Feb 2021 09:47:45 +0000
+Date:   Fri, 19 Feb 2021 09:47:41 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Alistair Popple <apopple@nvidia.com>
+Cc:     linux-mm@kvack.org, nouveau@lists.freedesktop.org,
+        bskeggs@redhat.com, akpm@linux-foundation.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        jhubbard@nvidia.com, rcampbell@nvidia.com, jglisse@redhat.com,
+        jgg@nvidia.com, hch@infradead.org, daniel@ffwll.ch
+Subject: Re: [PATCH v2 1/4] hmm: Device exclusive memory access
+Message-ID: <20210219094741.GA641389@infradead.org>
+References: <20210219020750.16444-1-apopple@nvidia.com>
+ <20210219020750.16444-2-apopple@nvidia.com>
 MIME-Version: 1.0
-Message-Id: <1613721408.9e7tf7vuqz.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210219020750.16444-2-apopple@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Daniel Axtens's message of February 19, 2021 3:18 pm:
-> Hi Nick,
->=20
->> +++ b/arch/powerpc/kvm/book3s_64_entry.S
->> @@ -0,0 +1,34 @@
->> +#include <asm/cache.h>
->> +#include <asm/ppc_asm.h>
->> +#include <asm/kvm_asm.h>
->> +#include <asm/reg.h>
->> +#include <asm/asm-offsets.h>
->> +#include <asm/kvm_book3s_asm.h>
->> +
->> +/*
->> + * We come here from the first-level interrupt handlers.
->> + */
->> +.global	kvmppc_interrupt
->> +.balign IFETCH_ALIGN_BYTES
->> +kvmppc_interrupt:
->> +	/*
->> +	 * Register contents:
->=20
-> Clearly r9 contains some data at this point, and I think it's guest r9
-> because of what you say later on in
-> book3s_hv_rmhandlers.S::kvmppc_interrupt_hv. Is that right?
+>  			page = migration_entry_to_page(swpent);
+>  		else if (is_device_private_entry(swpent))
+>  			page = device_private_entry_to_page(swpent);
+> +		else if (is_device_exclusive_entry(swpent))
+> +			page = device_exclusive_entry_to_page(swpent);
 
-Yes I hope so.
+>  			page = migration_entry_to_page(swpent);
+>  		else if (is_device_private_entry(swpent))
+>  			page = device_private_entry_to_page(swpent);
+> +		else if (is_device_exclusive_entry(swpent))
+> +			page = device_exclusive_entry_to_page(swpent);
 
-> Should that
-> be documented in this comment as well?
+>  		if (is_device_private_entry(entry))
+>  			page = device_private_entry_to_page(entry);
+> +
+> +		if (is_device_exclusive_entry(entry))
+> +			page = device_exclusive_entry_to_page(entry);
 
-Normally it can be assumed the registers not explicitly enumerated would=20
-be unchanged from the interrupted context, so they would all contain=20
-guest values. I added the R9 contents comment later because I changed
-it later.
+Any chance we can come up with a clever scheme to avoid all this
+boilerplate code (and maybe also what it gets compiled to)?
 
->=20
->> +	 * R12		=3D (guest CR << 32) | interrupt vector
->> +	 * R13		=3D PACA
->> +	 * guest R12 saved in shadow VCPU SCRATCH0
->> +	 * guest R13 saved in SPRN_SCRATCH0
->> +	 */
->> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
->> +	std	r9, HSTATE_SCRATCH2(r13)
->> +	lbz	r9, HSTATE_IN_GUEST(r13)
->> +	cmpwi	r9, KVM_GUEST_MODE_HOST_HV
->> +	beq	kvmppc_bad_host_intr
->> +#ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
->> +	cmpwi	r9, KVM_GUEST_MODE_GUEST
->> +	ld	r9, HSTATE_SCRATCH2(r13)
->> +	beq	kvmppc_interrupt_pr
->> +#endif
->> +	b	kvmppc_interrupt_hv
->> +#else
->> +	b	kvmppc_interrupt_pr
->> +#endif
->=20
-> Apart from that I had a look and convinced myself that the code will
-> behave the same as before. On that basis:
->=20
-> Reviewed-by: Daniel Axtens <dja@axtens.net>
->=20
-> Kind regards,
-> Daniel
+> diff --git a/include/linux/hmm.h b/include/linux/hmm.h
+> index 866a0fa104c4..5d28ff6d4d80 100644
+> --- a/include/linux/hmm.h
+> +++ b/include/linux/hmm.h
+> @@ -109,6 +109,10 @@ struct hmm_range {
+>   */
+>  int hmm_range_fault(struct hmm_range *range);
+>  
+> +int hmm_exclusive_range(struct mm_struct *mm, unsigned long start,
+> +			unsigned long end, struct page **pages);
+> +vm_fault_t hmm_remove_exclusive_entry(struct vm_fault *vmf);
 
-Thanks,
-Nick
->=20
+Can we avoid the hmm naming for new code (we should probably also kill
+it off for the existing code)?
+
+> +#define free_swap_and_cache(e) ({(is_migration_entry(e) || is_device_private_entry(e) \
+> +					|| is_device_exclusive_entry(e)); })
+> +#define swapcache_prepare(e) ({(is_migration_entry(e) || is_device_private_entry(e) \
+> +					|| is_device_exclusive_entry(e)); })
+
+Can you turn these into properly formatted inline functions?  As-is this
+becomes pretty unreadable.
+
+> +static inline void make_device_exclusive_entry_read(swp_entry_t *entry)
+> +{
+> +	*entry = swp_entry(SWP_DEVICE_EXCLUSIVE_READ, swp_offset(*entry));
+> +}
+
+s/make_device_exclusive_entry_read/mark_device_exclusive_entry_readable/
+??
+
+> +
+> +static inline swp_entry_t make_device_exclusive_entry(struct page *page, bool write)
+> +{
+> +	return swp_entry(write ? SWP_DEVICE_EXCLUSIVE_WRITE : SWP_DEVICE_EXCLUSIVE_READ,
+> +			 page_to_pfn(page));
+> +}
+
+I'd split this into two helpers, which is easier to follow and avoids
+the pointlessly overlong lines.
+
+> +static inline bool is_device_exclusive_entry(swp_entry_t entry)
+> +{
+> +	int type = swp_type(entry);
+> +	return type == SWP_DEVICE_EXCLUSIVE_READ || type == SWP_DEVICE_EXCLUSIVE_WRITE;
+> +}
+
+Another overly long line.  I also wouldn't bother with the local
+variable:
+
+	return swp_type(entry) == SWP_DEVICE_EXCLUSIVE_READ ||
+		swp_type(entry) == SWP_DEVICE_EXCLUSIVE_WRITE;
+		
+
+> +static inline bool is_write_device_exclusive_entry(swp_entry_t entry)
+> +{
+> +	return swp_type(entry) == SWP_DEVICE_EXCLUSIVE_WRITE;
+> +}
+
+Or reuse these kind of helpers..
+
+> +
+> +static inline unsigned long device_exclusive_entry_to_pfn(swp_entry_t entry)
+> +{
+> +	return swp_offset(entry);
+> +}
+> +
+> +static inline struct page *device_exclusive_entry_to_page(swp_entry_t entry)
+> +{
+> +	return pfn_to_page(swp_offset(entry));
+> +}
+
+I'd rather open code these two, and as a prep patch also kill off the
+equivalents for the migration and device private entries, which would
+actually clean up a lot of the mess mentioned in my first comment above.
+
+> +static int hmm_exclusive_skip(unsigned long start,
+> +		      unsigned long end,
+> +		      __always_unused int depth,
+> +		      struct mm_walk *walk)
+> +{
+> +	struct hmm_exclusive_walk *hmm_exclusive_walk = walk->private;
+> +	unsigned long addr;
+> +
+> +	for (addr = start; addr < end; addr += PAGE_SIZE)
+> +		hmm_exclusive_walk->pages[hmm_exclusive_walk->npages++] = NULL;
+> +
+> +	return 0;
+> +}
+
+Wouldn't pre-zeroing the array be simpler and more efficient?
+
+> +int hmm_exclusive_range(struct mm_struct *mm, unsigned long start,
+> +			unsigned long end, struct page **pages)
+> +{
+> +	struct hmm_exclusive_walk hmm_exclusive_walk = { .pages = pages, .npages = 0 };
+> +	int i;
+> +
+> +	/* Collect and lock candidate pages */
+> +	walk_page_range(mm, start, end, &hmm_exclusive_walk_ops, &hmm_exclusive_walk);
+
+Please avoid the overly long lines.
+
+But more importantly:  Unless I'm missing something obvious this
+walk_page_range call just open codes get_user_pages_fast, why can't you
+use that?
+
+> +#if defined(CONFIG_ARCH_ENABLE_THP_MIGRATION) || defined(CONFIG_HUGETLB)
+> +		if (PageTransHuge(page)) {
+> +			VM_BUG_ON_PAGE(1, page);
+> +			continue;
+> +		}
+> +#endif
+
+Doesn't PageTransHuge always return false for that case?  If not
+shouldn't we make sure it does?
+
+> +
+> +		pte = pte_mkold(mk_pte(page, READ_ONCE(vma->vm_page_prot)));
+> +		if (pte_swp_soft_dirty(*pvmw.pte))
+> +			pte = pte_mksoft_dirty(pte);
+> +
+> +		entry = pte_to_swp_entry(*pvmw.pte);
+> +		if (pte_swp_uffd_wp(*pvmw.pte))
+> +			pte = pte_mkuffd_wp(pte);
+> +		else if (is_write_device_exclusive_entry(entry))
+> +			pte = maybe_mkwrite(pte_mkdirty(pte), vma);
+> +
+> +		set_pte_at(vma->vm_mm, pvmw.address, pvmw.pte, pte);
+> +
+> +		/*
+> +		 * No need to take a page reference as one was already
+> +		 * created when the swap entry was made.
+> +		 */
+> +		if (PageAnon(page))
+> +			page_add_anon_rmap(page, vma, pvmw.address, false);
+> +		else
+> +			page_add_file_rmap(page, false);
+> +
+> +		if (vma->vm_flags & VM_LOCKED)
+> +			mlock_vma_page(page);
+> +
+> +		/*
+> +		 * No need to invalidate - it was non-present before. However
+> +		 * secondary CPUs may have mappings that need invalidating.
+> +		 */
+> +		update_mmu_cache(vma, pvmw.address, pvmw.pte);
+
+It would be nice to split out the body of this loop into a helper.
+
+> +				if (!is_device_private_entry(entry) &&
+> +					!is_device_exclusive_entry(entry))
+
+The normal style for this would be:
+
+				if (!is_device_private_entry(entry) &&
+				    !is_device_exclusive_entry(entry))
+
+> -		if (!is_device_private_entry(entry))
+> +		if (!is_device_private_entry(entry) && !is_device_exclusive_entry(entry))
+
+Plase split this into two lines.
+
+> @@ -216,6 +219,7 @@ bool page_vma_mapped_walk(struct page_vma_mapped_walk *pvmw)
+>  	}
+>  	if (!map_pte(pvmw))
+>  		goto next_pte;
+> +
+>  	while (1) {
+>  		if (check_pte(pvmw))
+>  			return true;
+
+Spurious whitespace change.
+
+> -	if (IS_ENABLED(CONFIG_MIGRATION) && (flags & TTU_MIGRATION) &&
+> +	if (IS_ENABLED(CONFIG_MIGRATION) && (flags & (TTU_MIGRATION | TTU_EXCLUSIVE)) &&
+
+Please split this into two lines.
+
+>  	    is_zone_device_page(page) && !is_device_private_page(page))
+>  		return true;
+>  
+> @@ -1591,6 +1591,33 @@ static bool try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
+>  			/* We have to invalidate as we cleared the pte */
+>  			mmu_notifier_invalidate_range(mm, address,
+>  						      address + PAGE_SIZE);
+> +		} else if (flags & TTU_EXCLUSIVE) {
+
+try_to_unmap_one has turned into a monster.  A little refactoring to
+split it into managable pieces would be nice.
