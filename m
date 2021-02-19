@@ -2,138 +2,111 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D55031EC6D
-	for <lists+kvm-ppc@lfdr.de>; Thu, 18 Feb 2021 17:49:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C67C31F3D7
+	for <lists+kvm-ppc@lfdr.de>; Fri, 19 Feb 2021 03:08:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231737AbhBRQky (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 18 Feb 2021 11:40:54 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31138 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233321AbhBRNAg (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 18 Feb 2021 08:00:36 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11ICXDAW021066;
-        Thu, 18 Feb 2021 07:59:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=v+T4dp1ovGoJGWReuDO7bXfe7brYHaMZpOcuA/LiUzc=;
- b=O2I/EiTQKbd4xaIybCglbugZtjH3Jgz1UpNtc+BrtNTk81KUS6V58oALukOF74DSj0FJ
- q+A42tNHw+XWOpXiuAJbAEeZPKNoI0G0c8CkdQPKO5bD2/yEvGreX7GlKBAWio6Q5vdS
- XF/CjWN8DPZpqgctDLKnsgwyRT9KpzlQmK3CceKS0T37cRcOKIjI39ctpCJ1Y7HMpXB/
- hZac9sug3Wf2vzTAV5ODrXnD1AZYd8j6lXl3rnmT/zEYqDfbCj2Ob7nthskfLa8WjopT
- t1AN7OgDWlOEl4m9AsSdzVXSt8djpp44oSVsTiEG/oIaDr/KBUdpxK/jnnGQUQZ7y3Av NA== 
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36sqpkj46t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Feb 2021 07:59:48 -0500
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11ICw6N0027581;
-        Thu, 18 Feb 2021 12:59:46 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 36p6d8jdkb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Feb 2021 12:59:46 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11ICxWnJ38011220
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Feb 2021 12:59:32 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 397844C04A;
-        Thu, 18 Feb 2021 12:59:44 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 103D14C044;
-        Thu, 18 Feb 2021 12:59:44 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.183.155])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Feb 2021 12:59:43 +0000 (GMT)
-Subject: Re: [PATCH kernel] powerpc/iommu: Annotate nested lock for lockdep
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org
-References: <20210216032000.21642-1-aik@ozlabs.ru>
-From:   Frederic Barrat <fbarrat@linux.ibm.com>
-Message-ID: <49b1f5cb-107c-296f-c339-13e627a73d6d@linux.ibm.com>
-Date:   Thu, 18 Feb 2021 13:59:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S229722AbhBSCIm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 18 Feb 2021 21:08:42 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:2721 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229587AbhBSCIl (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 18 Feb 2021 21:08:41 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B602f1d810001>; Thu, 18 Feb 2021 18:08:01 -0800
+Received: from localhost (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 19 Feb
+ 2021 02:08:00 +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
+        <bskeggs@redhat.com>, <akpm@linux-foundation.org>
+CC:     <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
+        <jglisse@redhat.com>, <jgg@nvidia.com>, <hch@infradead.org>,
+        <daniel@ffwll.ch>, Alistair Popple <apopple@nvidia.com>
+Subject: [PATCH v2 0/4] Add support for SVM atomics in Nouveau
+Date:   Fri, 19 Feb 2021 13:07:46 +1100
+Message-ID: <20210219020750.16444-1-apopple@nvidia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20210216032000.21642-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-18_05:2021-02-18,2021-02-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- phishscore=0 adultscore=0 bulkscore=0 mlxlogscore=999 mlxscore=0
- impostorscore=0 priorityscore=1501 clxscore=1011 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102180110
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1613700481; bh=5OrVHikvQYHHvCBqjLvpLd1/wujsuMHrn59MGSbB4U8=;
+        h=From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+         Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+         X-ClientProxiedBy;
+        b=QZzxAptqC9yZxIAmGC2CizywepnAeNH/FXMAYREg1kl+419LRnhO3RfNIiaasjLzo
+         MO+T4y29Md6+e0pm4fwbXJK56zd8AMa2CyyTRErWST1mEqte8lG5RaO1z3SYnJFCD2
+         NiTwdbUCKd/kgxKQCjVw2/feRuvtspwv/3FP8HanEccPirZrj1ZywaKo9YQ8BpETqx
+         7dRc+hE5QM9my9gMF8BF9U4nzS1xSVOzQbZxk3LClRf7rgTUrFBPGn2nLe/P0dvDt/
+         AQMp4reYdQg+ijQ0rSvtLGabW/vzVVprXlxQ55azJ+3knwPbhz9J4rMJVDMBZyy20t
+         wjVSt58ckMImg==
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+This is the second version of a series to add support to Nouveau for atomic
+memory operations on OpenCL shared virtual memory (SVM) regions. This is
+achieved using the atomic PTE bits on the GPU to only permit atomic
+operations to system memory when a page is not mapped in userspace on the
+CPU. The previous version of this series used an unmap and pin page
+migration, however this resulted in problems with ZONE_MOVABLE and other
+issues so this series uses a different approach.
 
+Instead exclusive device access is implemented by adding a new swap entry
+type (SWAP_DEVICE_EXCLUSIVE) which is similar to a migration entry. The
+main difference is that on fault the original entry is immediately restored
+by the fault handler instead of waiting.
 
-On 16/02/2021 04:20, Alexey Kardashevskiy wrote:
-> The IOMMU table is divided into pools for concurrent mappings and each
-> pool has a separate spinlock. When taking the ownership of an IOMMU group
-> to pass through a device to a VM, we lock these spinlocks which triggers
-> a false negative warning in lockdep (below).
-> 
-> This fixes it by annotating the large pool's spinlock as a nest lock.
-> 
-> ===
-> WARNING: possible recursive locking detected
-> 5.11.0-le_syzkaller_a+fstn1 #100 Not tainted
-> --------------------------------------------
-> qemu-system-ppc/4129 is trying to acquire lock:
-> c0000000119bddb0 (&(p->lock)/1){....}-{2:2}, at: iommu_take_ownership+0xac/0x1e0
-> 
-> but task is already holding lock:
-> c0000000119bdd30 (&(p->lock)/1){....}-{2:2}, at: iommu_take_ownership+0xac/0x1e0
-> 
-> other info that might help us debug this:
->   Possible unsafe locking scenario:
-> 
->         CPU0
->         ----
->    lock(&(p->lock)/1);
->    lock(&(p->lock)/1);
-> ===
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->   arch/powerpc/kernel/iommu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
-> index 557a09dd5b2f..2ee642a6731a 100644
-> --- a/arch/powerpc/kernel/iommu.c
-> +++ b/arch/powerpc/kernel/iommu.c
-> @@ -1089,7 +1089,7 @@ int iommu_take_ownership(struct iommu_table *tbl)
->   
->   	spin_lock_irqsave(&tbl->large_pool.lock, flags);
->   	for (i = 0; i < tbl->nr_pools; i++)
-> -		spin_lock(&tbl->pools[i].lock);
-> +		spin_lock_nest_lock(&tbl->pools[i].lock, &tbl->large_pool.lock);
+Restoring the entry triggers calls to MMU notifers which allows a device
+driver to revoke the atomic access permission from the GPU prior to the CPU
+finalising the entry.
 
+Patch 1 contains the bulk of the memory management changes required to
+implement the new entry type.
 
-We have the same pattern and therefore should have the same problem in 
-iommu_release_ownership().
+Patch 2 contains some additions to the HMM selftests to ensure everything
+works as expected.
 
-But as I understand, we're hacking our way around lockdep here, since 
-conceptually, those locks are independent. I was wondering why it seems 
-to fix it by worrying only about the large pool lock. That loop can take 
-many locks (up to 4 with current config). However, if the dma window is 
-less than 1GB, we would only have one, so it would make sense for 
-lockdep to stop complaining. Is it what happened? In which case, this 
-patch doesn't really fix it. Or I'm missing something :-)
+Patch 3 was posted previously and has not changed.
 
-   Fred
+Patch 4 is similar to what was posted previously but updated to use the new
+swap entries instread of migration.
 
+This has been tested using the latest upstream Mesa userspace with a simple
+OpenCL test program which checks the results of atomic GPU operations on a
+SVM buffer whilst also writing to the same buffer from the CPU.
 
+Alistair Popple (4):
+  hmm: Device exclusive memory access
+  hmm: Selftests for exclusive device memory
+  nouveau/svm: Refactor nouveau_range_fault
+  nouveau/svm: Implement atomic SVM access
 
->   	iommu_table_release_pages(tbl);
->   
-> 
+ Documentation/vm/hmm.rst                      |  15 ++
+ drivers/gpu/drm/nouveau/include/nvif/if000c.h |   1 +
+ drivers/gpu/drm/nouveau/nouveau_svm.c         | 118 +++++++---
+ drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h |   1 +
+ .../drm/nouveau/nvkm/subdev/mmu/vmmgp100.c    |   6 +
+ fs/proc/task_mmu.c                            |   7 +
+ include/linux/hmm.h                           |   4 +
+ include/linux/rmap.h                          |   1 +
+ include/linux/swap.h                          |  10 +-
+ include/linux/swapops.h                       |  32 +++
+ lib/test_hmm.c                                | 124 ++++++++++
+ lib/test_hmm_uapi.h                           |   2 +
+ mm/hmm.c                                      | 206 ++++++++++++++++
+ mm/memory.c                                   |  34 ++-
+ mm/mprotect.c                                 |   7 +
+ mm/page_vma_mapped.c                          |  14 +-
+ mm/rmap.c                                     |  29 ++-
+ tools/testing/selftests/vm/hmm-tests.c        | 219 ++++++++++++++++++
+ 18 files changed, 792 insertions(+), 38 deletions(-)
+
+--=20
+2.20.1
+
