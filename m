@@ -2,316 +2,311 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56840322247
-	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Feb 2021 23:42:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61F2532247B
+	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Feb 2021 04:08:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231710AbhBVWlx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 22 Feb 2021 17:41:53 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39754 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231691AbhBVWlv (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Feb 2021 17:41:51 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11MMWkoX010253;
-        Mon, 22 Feb 2021 17:41:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=mPXl1s51vI+IzPBxEkK6UTc8TmutK7bZotIZsA9kpMQ=;
- b=FC5lVuAUtB/ALnTzprhz2Z/vzm3fI2BrMke+03/qAKbEgD3kM48v9lnsfzm6H3kd4RQg
- s0whAX+H7DjapRM4reI7aTgwuvulGZKcEWM67BRPyGdhCZX8v/XIPF/PbqPE8ppHsi0F
- brMz/Ym6QgY3NsAGwHPcuynKWr1U6Gw2MJh9RizYKKp5Q1AiqtxTUa97fJVGmTdEgueM
- +wuJzC4lRJFYKxNMknXrdwYAlDENSdP7jSfoYwgDy6LLNgqUAt6Sr3J5Z4lm4ra3JkRD
- qVx7gmzvPAjZ/UnLhEP8PDKn5gYjwz4JFM/ERIS4ELaUyHggS/usWPuffB2jAz3qISva lA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkf7v610-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Feb 2021 17:41:07 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11MMbWhj028828;
-        Mon, 22 Feb 2021 17:41:06 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkf7v5xh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Feb 2021 17:41:06 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11MMWOaU013897;
-        Mon, 22 Feb 2021 22:41:02 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma02wdc.us.ibm.com with ESMTP id 36tt28t9ct-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Feb 2021 22:41:02 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11MMf13Z12452182
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Feb 2021 22:41:01 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A4CD8AE071;
-        Mon, 22 Feb 2021 22:41:01 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9637BAE06B;
-        Mon, 22 Feb 2021 22:41:00 +0000 (GMT)
-Received: from localhost (unknown [9.160.141.72])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Mon, 22 Feb 2021 22:41:00 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 06/13] KVM: PPC: Book3S 64: Move GUEST_MODE_SKIP test
- into KVM
-In-Reply-To: <20210219063542.1425130-7-npiggin@gmail.com>
-References: <20210219063542.1425130-1-npiggin@gmail.com>
- <20210219063542.1425130-7-npiggin@gmail.com>
-Date:   Mon, 22 Feb 2021 19:40:58 -0300
-Message-ID: <87eeh7ybd1.fsf@linux.ibm.com>
+        id S231320AbhBWDIa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Feb 2021 22:08:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52828 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231300AbhBWDI1 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Feb 2021 22:08:27 -0500
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E44CC06174A
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Feb 2021 19:07:40 -0800 (PST)
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4Dl3rS4KKCz9sVF; Tue, 23 Feb 2021 14:07:36 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1614049656;
+        bh=sgC7aR4rh50aHjSpJhVoj4gGB6SwMndr271GcvZF6PM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RwkBmspBxRr44aj536Ij5ZTsH/Zc9wTaHfvJxL8WxnZl6tZlPyHbNm8LQJWNpM6/t
+         GmVNZ81VouOqoGSi54XA/9raWmJB8mlBqQ5vZm7WOHWlxuE9wbeg0zbuo09/pT3GRQ
+         qRFHVCuO3kcAkGARZ4m5gRgf5dlHmFxOayuldyCw=
+Date:   Tue, 23 Feb 2021 10:26:23 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Bharata B Rao <bharata@linux.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
+        mpe@ellerman.id.au, farosas@linux.ibm.com
+Subject: Re: [PATCH v4 2/3] KVM: PPC: Book3S HV: Add support for
+ H_RPT_INVALIDATE
+Message-ID: <YDQ9n6Tj0usuzibX@yekko.fritz.box>
+References: <20210215063542.3642366-1-bharata@linux.ibm.com>
+ <20210215063542.3642366-3-bharata@linux.ibm.com>
+ <YCxlb133Hf6hLjuD@yekko.fritz.box>
+ <20210222064608.GB3672042@in.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-22_07:2021-02-22,2021-02-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- phishscore=0 adultscore=0 mlxscore=0 priorityscore=1501 clxscore=1015
- spamscore=0 lowpriorityscore=0 suspectscore=0 mlxlogscore=999
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102220194
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="WH716LgmVfRC5lia"
+Content-Disposition: inline
+In-Reply-To: <20210222064608.GB3672042@in.ibm.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
 
-> Move the GUEST_MODE_SKIP logic into KVM code. This is quite a KVM
-> internal detail that has no real need to be in common handlers.
->
-> Also add a comment explaining why this this thing exists.
+--WH716LgmVfRC5lia
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-this this
+On Mon, Feb 22, 2021 at 12:16:08PM +0530, Bharata B Rao wrote:
+> On Wed, Feb 17, 2021 at 11:38:07AM +1100, David Gibson wrote:
+> > On Mon, Feb 15, 2021 at 12:05:41PM +0530, Bharata B Rao wrote:
+> > > Implement H_RPT_INVALIDATE hcall and add KVM capability
+> > > KVM_CAP_PPC_RPT_INVALIDATE to indicate the support for the same.
+> > >=20
+> > > This hcall does two types of TLB invalidations:
+> > >=20
+> > > 1. Process-scoped invalidations for guests with LPCR[GTSE]=3D0.
+> > >    This is currently not used in KVM as GTSE is not usually
+> > >    disabled in KVM.
+> > > 2. Partition-scoped invalidations that an L1 hypervisor does on
+> > >    behalf of an L2 guest. This replaces the uses of the existing
+> > >    hcall H_TLB_INVALIDATE.
+> > >=20
+> > > In order to handle process scoped invalidations of L2, we
+> > > intercept the nested exit handling code in L0 only to handle
+> > > H_TLB_INVALIDATE hcall.
+> > >=20
+> > > Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+> > > ---
+> > >  Documentation/virt/kvm/api.rst         | 17 +++++
+> > >  arch/powerpc/include/asm/kvm_book3s.h  |  3 +
+> > >  arch/powerpc/include/asm/mmu_context.h | 11 +++
+> > >  arch/powerpc/kvm/book3s_hv.c           | 91 ++++++++++++++++++++++++
+> > >  arch/powerpc/kvm/book3s_hv_nested.c    | 96 ++++++++++++++++++++++++=
+++
+> > >  arch/powerpc/kvm/powerpc.c             |  3 +
+> > >  arch/powerpc/mm/book3s64/radix_tlb.c   | 25 +++++++
+> > >  include/uapi/linux/kvm.h               |  1 +
+> > >  8 files changed, 247 insertions(+)
+> > >=20
+> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/=
+api.rst
+> > > index 99ceb978c8b0..416c36aa35d4 100644
+> > > --- a/Documentation/virt/kvm/api.rst
+> > > +++ b/Documentation/virt/kvm/api.rst
+> > > @@ -6038,6 +6038,23 @@ KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR exit=
+ notifications which user space
+> > >  can then handle to implement model specific MSR handling and/or user=
+ notifications
+> > >  to inform a user that an MSR was not handled.
+> > > =20
+> > > +7.22 KVM_CAP_PPC_RPT_INVALIDATE
+> > > +------------------------------
+> > > +
+> > > +:Capability: KVM_CAP_PPC_RPT_INVALIDATE
+> > > +:Architectures: ppc
+> > > +:Type: vm
+> > > +
+> > > +This capability indicates that the kernel is capable of handling
+> > > +H_RPT_INVALIDATE hcall.
+> > > +
+> > > +In order to enable the use of H_RPT_INVALIDATE in the guest,
+> > > +user space might have to advertise it for the guest. For example,
+> > > +IBM pSeries (sPAPR) guest starts using it if "hcall-rpt-invalidate" =
+is
+> > > +present in the "ibm,hypertas-functions" device-tree property.
+> > > +
+> > > +This capability is always enabled.
+> >=20
+> > I guess that means it's always enabled when it's available - I'm
+> > pretty sure it won't be enabled on POWER8 or on PR KVM.
+>=20
+> Correct, will reword this and restrict this to POWER9, radix etc
+>=20
+> >=20
+> > > +
+> > >  8. Other capabilities.
+> > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > =20
+> > > diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/inc=
+lude/asm/kvm_book3s.h
+> > > index d32ec9ae73bd..0f1c5fa6e8ce 100644
+> > > --- a/arch/powerpc/include/asm/kvm_book3s.h
+> > > +++ b/arch/powerpc/include/asm/kvm_book3s.h
+> > > @@ -298,6 +298,9 @@ void kvmhv_set_ptbl_entry(unsigned int lpid, u64 =
+dw0, u64 dw1);
+> > >  void kvmhv_release_all_nested(struct kvm *kvm);
+> > >  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu);
+> > >  long kvmhv_do_nested_tlbie(struct kvm_vcpu *vcpu);
+> > > +long kvmhv_h_rpti_nested(struct kvm_vcpu *vcpu, unsigned long lpid,
+> > > +			 unsigned long type, unsigned long pg_sizes,
+> > > +			 unsigned long start, unsigned long end);
+> > >  int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu,
+> > >  			  u64 time_limit, unsigned long lpcr);
+> > >  void kvmhv_save_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state=
+ *hr);
+> > > diff --git a/arch/powerpc/include/asm/mmu_context.h b/arch/powerpc/in=
+clude/asm/mmu_context.h
+> > > index d5821834dba9..fbf3b5b45fe9 100644
+> > > --- a/arch/powerpc/include/asm/mmu_context.h
+> > > +++ b/arch/powerpc/include/asm/mmu_context.h
+> > > @@ -124,8 +124,19 @@ static inline bool need_extra_context(struct mm_=
+struct *mm, unsigned long ea)
+> > > =20
+> > >  #if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_RAD=
+IX_MMU)
+> > >  extern void radix_kvm_prefetch_workaround(struct mm_struct *mm);
+> > > +void do_h_rpt_invalidate(unsigned long pid, unsigned long lpid,
+> > > +			 unsigned long type, unsigned long page_size,
+> > > +			 unsigned long psize, unsigned long start,
+> > > +			 unsigned long end);
+> > >  #else
+> > >  static inline void radix_kvm_prefetch_workaround(struct mm_struct *m=
+m) { }
+> > > +static inline void do_h_rpt_invalidate(unsigned long pid,
+> > > +				       unsigned long lpid,
+> > > +				       unsigned long type,
+> > > +				       unsigned long page_size,
+> > > +				       unsigned long psize,
+> > > +				       unsigned long start,
+> > > +				       unsigned long end) { }
+> > >  #endif
+> > > =20
+> > >  extern void switch_cop(struct mm_struct *next);
+> > > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_h=
+v.c
+> > > index 6f612d240392..802cb77c39cc 100644
+> > > --- a/arch/powerpc/kvm/book3s_hv.c
+> > > +++ b/arch/powerpc/kvm/book3s_hv.c
+> > > @@ -904,6 +904,64 @@ static int kvmppc_get_yield_count(struct kvm_vcp=
+u *vcpu)
+> > >  	return yield_count;
+> > >  }
+> > > =20
+> > > +static void do_h_rpt_invalidate_prs(unsigned long pid, unsigned long=
+ lpid,
+> > > +				    unsigned long type, unsigned long pg_sizes,
+> > > +				    unsigned long start, unsigned long end)
+> > > +{
+> > > +	unsigned long psize;
+> > > +
+> > > +	if (pg_sizes & H_RPTI_PAGE_64K) {
+> > > +		psize =3D rpti_pgsize_to_psize(pg_sizes & H_RPTI_PAGE_64K);
+> > > +		do_h_rpt_invalidate(pid, lpid, type, (1UL << 16), psize,
+> > > +				    start, end);
+> > > +	}
+> > > +
+> > > +	if (pg_sizes & H_RPTI_PAGE_2M) {
+> > > +		psize =3D rpti_pgsize_to_psize(pg_sizes & H_RPTI_PAGE_2M);
+> > > +		do_h_rpt_invalidate(pid, lpid, type, (1UL << 21), psize,
+> > > +				    start, end);
+> > > +	}
+> > > +
+> > > +	if (pg_sizes & H_RPTI_PAGE_1G) {
+> > > +		psize =3D rpti_pgsize_to_psize(pg_sizes & H_RPTI_PAGE_1G);
+> > > +		do_h_rpt_invalidate(pid, lpid, type, (1UL << 30), psize,
+> > > +				    start, end);
+> > > +	}
+> >=20
+> > Hrm.  Here you're stepping through the hcall defined pagesizes, then
+> > mapping each one to the Linux internal page size defs.
+> >=20
+> > It might be more elegant to step through mmu_psize_defs table, and
+> > conditionally performan an invalidate on that pagesize if the
+> > corresponding bit in pg_sizes is set (as noted earlier you could
+> > easily add the H_RPTI_PAGE bit to the table).  That way it's a direct
+> > table lookup rather than a bunch of ifs or switches.
+>=20
+> Yes, let me give this a try.
+>=20
+> >=20
+> > > +}
+> > > +
+> > > +static long kvmppc_h_rpt_invalidate(struct kvm_vcpu *vcpu,
+> > > +				    unsigned long pid, unsigned long target,
+> > > +				    unsigned long type, unsigned long pg_sizes,
+> > > +				    unsigned long start, unsigned long end)
+> > > +{
+> > > +	if (!kvm_is_radix(vcpu->kvm))
+> > > +		return H_UNSUPPORTED;
+> > > +
+> > > +	if (kvmhv_on_pseries())
+> > > +		return H_UNSUPPORTED;
+> >=20
+> > This doesn't seem quite right.  If you have multiply nested guests,
+> > won't the L2 be issueing H_RPT_INVALIDATE hcalls to the L1 on behalf
+> > of the L3?  The L1 would have to implement them by calling the L0, but
+> > the L1 can't just reject them, no?
+> >=20
+> > Likewise for the !H_RPTI_TYPE_NESTED case, but on what happens to be a
+> > nested guest in any case, couldn't this case legitimately arise and
+> > need to be handled?
+>=20
+> The approach is to handle this hcall on behalf of all the nested
+> guests in L0 only. I am intercepting the nested exit path precisely
+> for this as shown in the below hunk.
 
->
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Ah, I see.  Might be worth commenting that, since it's not necessarily obvi=
+ous.
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+>=20
+> > > @@ -1573,6 +1640,30 @@ static int kvmppc_handle_nested_exit(struct kv=
+m_vcpu *vcpu)
+> > >  		if (!xics_on_xive())
+> > >  			kvmppc_xics_rm_complete(vcpu, 0);
+> > >  		break;
+> > > +	case BOOK3S_INTERRUPT_SYSCALL:
+> > > +	{
+> > > +		unsigned long req =3D kvmppc_get_gpr(vcpu, 3);
+> > > +
+> > > +		if (req !=3D H_RPT_INVALIDATE) {
+> > > +			r =3D RESUME_HOST;
+> > > +			break;
+> > > +		}
+> > > +
+> > > +		/*
+> > > +		 * The H_RPT_INVALIDATE hcalls issued by nested
+> > > +		 * guest for process scoped invalidations when
+> > > +		 * GTSE=3D0 are handled here.
+> > > +		 */
+> > > +		do_h_rpt_invalidate_prs(kvmppc_get_gpr(vcpu, 4),
+> > > +					vcpu->arch.nested->shadow_lpid,
+> > > +					kvmppc_get_gpr(vcpu, 5),
+> > > +					kvmppc_get_gpr(vcpu, 6),
+> > > +					kvmppc_get_gpr(vcpu, 7),
+> > > +					kvmppc_get_gpr(vcpu, 8));
+> > > +		kvmppc_set_gpr(vcpu, 3, H_SUCCESS);
+> > > +		r =3D RESUME_GUEST;
+> > > +		break;
+> > > +	}
+> > >  	default:
+> > >  		r =3D RESUME_HOST;
+> > >  		break;
+>=20
+> Thanks for your review.
+>=20
+> Regards,
+> Bharata.
+>=20
 
-> ---
->  arch/powerpc/kernel/exceptions-64s.S | 60 --------------------------
->  arch/powerpc/kvm/book3s_64_entry.S   | 64 ++++++++++++++++++++++++----
->  2 files changed, 56 insertions(+), 68 deletions(-)
->
-> diff --git a/arch/powerpc/kernel/exceptions-64s.S b/arch/powerpc/kernel/exceptions-64s.S
-> index a1640d6ea65d..96f22c582213 100644
-> --- a/arch/powerpc/kernel/exceptions-64s.S
-> +++ b/arch/powerpc/kernel/exceptions-64s.S
-> @@ -133,7 +133,6 @@ name:
->  #define IBRANCH_TO_COMMON	.L_IBRANCH_TO_COMMON_\name\() /* ENTRY branch to common */
->  #define IREALMODE_COMMON	.L_IREALMODE_COMMON_\name\() /* Common runs in realmode */
->  #define IMASK		.L_IMASK_\name\()	/* IRQ soft-mask bit */
-> -#define IKVM_SKIP	.L_IKVM_SKIP_\name\()	/* Generate KVM skip handler */
->  #define IKVM_REAL	.L_IKVM_REAL_\name\()	/* Real entry tests KVM */
->  #define __IKVM_REAL(name)	.L_IKVM_REAL_ ## name
->  #define IKVM_VIRT	.L_IKVM_VIRT_\name\()	/* Virt entry tests KVM */
-> @@ -191,9 +190,6 @@ do_define_int n
->  	.ifndef IMASK
->  		IMASK=0
->  	.endif
-> -	.ifndef IKVM_SKIP
-> -		IKVM_SKIP=0
-> -	.endif
->  	.ifndef IKVM_REAL
->  		IKVM_REAL=0
->  	.endif
-> @@ -254,15 +250,10 @@ do_define_int n
->  	.balign IFETCH_ALIGN_BYTES
->  \name\()_kvm:
->
-> -	.if IKVM_SKIP
-> -	cmpwi	r10,KVM_GUEST_MODE_SKIP
-> -	beq	89f
-> -	.else
->  BEGIN_FTR_SECTION
->  	ld	r10,IAREA+EX_CFAR(r13)
->  	std	r10,HSTATE_CFAR(r13)
->  END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
-> -	.endif
->
->  	ld	r10,IAREA+EX_CTR(r13)
->  	mtctr	r10
-> @@ -289,27 +280,6 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
->  	ori	r12,r12,(IVEC)
->  	.endif
->  	b	kvmppc_interrupt
-> -
-> -	.if IKVM_SKIP
-> -89:	mtocrf	0x80,r9
-> -	ld	r10,IAREA+EX_CTR(r13)
-> -	mtctr	r10
-> -	ld	r9,IAREA+EX_R9(r13)
-> -	ld	r10,IAREA+EX_R10(r13)
-> -	ld	r11,IAREA+EX_R11(r13)
-> -	ld	r12,IAREA+EX_R12(r13)
-> -	.if IHSRR_IF_HVMODE
-> -	BEGIN_FTR_SECTION
-> -	b	kvmppc_skip_Hinterrupt
-> -	FTR_SECTION_ELSE
-> -	b	kvmppc_skip_interrupt
-> -	ALT_FTR_SECTION_END_IFSET(CPU_FTR_HVMODE | CPU_FTR_ARCH_206)
-> -	.elseif IHSRR
-> -	b	kvmppc_skip_Hinterrupt
-> -	.else
-> -	b	kvmppc_skip_interrupt
-> -	.endif
-> -	.endif
->  .endm
->
->  #else
-> @@ -1128,7 +1098,6 @@ INT_DEFINE_BEGIN(machine_check)
->  	ISET_RI=0
->  	IDAR=1
->  	IDSISR=1
-> -	IKVM_SKIP=1
->  	IKVM_REAL=1
->  INT_DEFINE_END(machine_check)
->
-> @@ -1419,7 +1388,6 @@ INT_DEFINE_BEGIN(data_access)
->  	IVEC=0x300
->  	IDAR=1
->  	IDSISR=1
-> -	IKVM_SKIP=1
->  	IKVM_REAL=1
->  INT_DEFINE_END(data_access)
->
-> @@ -1465,7 +1433,6 @@ INT_DEFINE_BEGIN(data_access_slb)
->  	IVEC=0x380
->  	IRECONCILE=0
->  	IDAR=1
-> -	IKVM_SKIP=1
->  	IKVM_REAL=1
->  INT_DEFINE_END(data_access_slb)
->
-> @@ -2111,7 +2078,6 @@ INT_DEFINE_BEGIN(h_data_storage)
->  	IHSRR=1
->  	IDAR=1
->  	IDSISR=1
-> -	IKVM_SKIP=1
->  	IKVM_REAL=1
->  	IKVM_VIRT=1
->  INT_DEFINE_END(h_data_storage)
-> @@ -3088,32 +3054,6 @@ EXPORT_SYMBOL(do_uaccess_flush)
->  MASKED_INTERRUPT
->  MASKED_INTERRUPT hsrr=1
->
-> -#ifdef CONFIG_KVM_BOOK3S_64_HANDLER
-> -kvmppc_skip_interrupt:
-> -	/*
-> -	 * Here all GPRs are unchanged from when the interrupt happened
-> -	 * except for r13, which is saved in SPRG_SCRATCH0.
-> -	 */
-> -	mfspr	r13, SPRN_SRR0
-> -	addi	r13, r13, 4
-> -	mtspr	SPRN_SRR0, r13
-> -	GET_SCRATCH0(r13)
-> -	RFI_TO_KERNEL
-> -	b	.
-> -
-> -kvmppc_skip_Hinterrupt:
-> -	/*
-> -	 * Here all GPRs are unchanged from when the interrupt happened
-> -	 * except for r13, which is saved in SPRG_SCRATCH0.
-> -	 */
-> -	mfspr	r13, SPRN_HSRR0
-> -	addi	r13, r13, 4
-> -	mtspr	SPRN_HSRR0, r13
-> -	GET_SCRATCH0(r13)
-> -	HRFI_TO_KERNEL
-> -	b	.
-> -#endif
-> -
->  	/*
->  	 * Relocation-on interrupts: A subset of the interrupts can be delivered
->  	 * with IR=1/DR=1, if AIL==2 and MSR.HV won't be changed by delivering
-> diff --git a/arch/powerpc/kvm/book3s_64_entry.S b/arch/powerpc/kvm/book3s_64_entry.S
-> index 147ebf1c3c1f..820d103e5f50 100644
-> --- a/arch/powerpc/kvm/book3s_64_entry.S
-> +++ b/arch/powerpc/kvm/book3s_64_entry.S
-> @@ -1,9 +1,10 @@
-> +#include <asm/asm-offsets.h>
->  #include <asm/cache.h>
-> -#include <asm/ppc_asm.h>
-> +#include <asm/exception-64s.h>
->  #include <asm/kvm_asm.h>
-> -#include <asm/reg.h>
-> -#include <asm/asm-offsets.h>
->  #include <asm/kvm_book3s_asm.h>
-> +#include <asm/ppc_asm.h>
-> +#include <asm/reg.h>
->
->  /*
->   * This is branched to from interrupt handlers in exception-64s.S which set
-> @@ -19,17 +20,64 @@ kvmppc_interrupt:
->  	 * guest R12 saved in shadow VCPU SCRATCH0
->  	 * guest R13 saved in SPRN_SCRATCH0
->  	 */
-> +	std	r9,HSTATE_SCRATCH2(r13)
-> +	lbz	r9,HSTATE_IN_GUEST(r13)
-> +	cmpwi	r9,KVM_GUEST_MODE_SKIP
-> +	beq-	.Lmaybe_skip
-> +.Lno_skip:
->  #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> -	std	r9, HSTATE_SCRATCH2(r13)
-> -	lbz	r9, HSTATE_IN_GUEST(r13)
-> -	cmpwi	r9, KVM_GUEST_MODE_HOST_HV
-> +	cmpwi	r9,KVM_GUEST_MODE_HOST_HV
->  	beq	kvmppc_bad_host_intr
->  #ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
-> -	cmpwi	r9, KVM_GUEST_MODE_GUEST
-> -	ld	r9, HSTATE_SCRATCH2(r13)
-> +	cmpwi	r9,KVM_GUEST_MODE_GUEST
-> +	ld	r9,HSTATE_SCRATCH2(r13)
->  	beq	kvmppc_interrupt_pr
->  #endif
->  	b	kvmppc_interrupt_hv
->  #else
->  	b	kvmppc_interrupt_pr
->  #endif
-> +
-> +/*
-> + * KVM uses a trick where it is running in MSR[HV]=1 mode in real-mode with the
-> + * guest MMU context loaded, and it sets KVM_GUEST_MODE_SKIP and enables
-> + * MSR[DR]=1 while leaving MSR[IR]=0, so it continues to fetch HV instructions
-> + * but loads and stores will access the guest context. This is used to load
-> + * the faulting instruction without walking page tables.
-> + *
-> + * However the guest context may not be able to translate, or it may cause a
-> + * machine check or other issue, which will result in a fault in the host
-> + * (even with KVM-HV).
-> + *
-> + * These faults are caught here and if the fault was (or was likely) due to
-> + * that load, then we just return with the PC advanced +4 and skip the load,
-> + * which then goes via the slow path.
-> + */
-> +.Lmaybe_skip:
-> +	cmpwi	r12,BOOK3S_INTERRUPT_MACHINE_CHECK
-> +	beq	1f
-> +	cmpwi	r12,BOOK3S_INTERRUPT_DATA_STORAGE
-> +	beq	1f
-> +	cmpwi	r12,BOOK3S_INTERRUPT_DATA_SEGMENT
-> +	beq	1f
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +	cmpwi	r12,BOOK3S_INTERRUPT_H_DATA_STORAGE | 0x2
-> +	beq	2f
-> +#endif
-> +	b	.Lno_skip
-> +1:	mfspr	r9,SPRN_SRR0
-> +	addi	r9,r9,4
-> +	mtspr	SPRN_SRR0,r9
-> +	ld	r12,HSTATE_SCRATCH0(r13)
-> +	ld	r9,HSTATE_SCRATCH2(r13)
-> +	GET_SCRATCH0(r13)
-> +	RFI_TO_KERNEL
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +2:	mfspr	r9,SPRN_HSRR0
-> +	addi	r9,r9,4
-> +	mtspr	SPRN_HSRR0,r9
-> +	ld	r12,HSTATE_SCRATCH0(r13)
-> +	ld	r9,HSTATE_SCRATCH2(r13)
-> +	GET_SCRATCH0(r13)
-> +	HRFI_TO_KERNEL
-> +#endif
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--WH716LgmVfRC5lia
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmA0PZ0ACgkQbDjKyiDZ
+s5La/RAAw7O/fnfaLDwElCQPPZ+mHFpKWibLUOrCLsrgGa3VO9QzqZ8V5gOCdZ2Y
+SmQDQQ2bu3QLpKVMVyA0o9bqw0GgKehBnTs8KKQCFsWNc/QUcUoZn99f6GshWyTv
++MkwuBRceHif1P02LnjjEWysJ/P3tMFwGMZg8qQo1D00yWWL3hP98Zk2N2ya2Gtz
+e/tGbaINb7SGTUzny8UdByjB1VttS8RXhklOMx7cxWMaT8F7dBHnoE59jbnhijhj
+QIjUzCDlsnoleBu0AuBN/pg5Il5NNf8zVwbBJA12q56iOnh1XjenVfSiEC5rO7pZ
+CktHGA9esDOBnlKfPUNzZ1JPhPyTFW7EmKAD2y+nF8wjt2xsxiEfN+QPMemqcfTs
+grCPqOpG2s/hAmpTvWQpnbo+fxpr4qVPARnhlGEvvMAv7mkvN/iXBfMGojKLb4kK
+GHZfH0qRGeNGdH99jdTK4OHAM2NhxcezCsHYU+Fi6CV5Ocq8RlfW4Sg1+YI0kSuB
++ZgxgBKe4K3+4r3KjPHqOKlyoU9+kSTq/gZddWYJ7NeQChGP9D5t3ITAi8Jm2wuB
+U2QiizJT0w8xGY1UhBL/F8qvzM1BfNnihERk3FWSWruMBow23TwXFjz93QCnDHvi
+oDrbvRb6Kibiq3nu8WfxuFwF7dBukjwJ378UAkZaM+HGfhd4Umc=
+=jcLp
+-----END PGP SIGNATURE-----
+
+--WH716LgmVfRC5lia--
