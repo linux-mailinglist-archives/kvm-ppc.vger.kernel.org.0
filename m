@@ -2,281 +2,120 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8AD5321465
-	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Feb 2021 11:47:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52BC1321CDB
+	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Feb 2021 17:26:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230379AbhBVKro (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 22 Feb 2021 05:47:44 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:15265 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230117AbhBVKri (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Feb 2021 05:47:38 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B60338ba00000>; Mon, 22 Feb 2021 02:46:56 -0800
-Received: from nvdebian.localnet (172.20.145.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 22 Feb
- 2021 10:46:53 +0000
-From:   Alistair Popple <apopple@nvidia.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
-        <bskeggs@redhat.com>, <akpm@linux-foundation.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
-        <jglisse@redhat.com>, <jgg@nvidia.com>, <daniel@ffwll.ch>
-Subject: Re: [PATCH v2 1/4] hmm: Device exclusive memory access
-Date:   Mon, 22 Feb 2021 21:46:51 +1100
-Message-ID: <67252432.xGUjY6W94y@nvdebian>
-In-Reply-To: <20210219094741.GA641389@infradead.org>
-References: <20210219020750.16444-1-apopple@nvidia.com> <20210219020750.16444-2-apopple@nvidia.com> <20210219094741.GA641389@infradead.org>
+        id S231510AbhBVQZv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Feb 2021 11:25:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55602 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231438AbhBVQZk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Feb 2021 11:25:40 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35931C06178A
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Feb 2021 08:25:00 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id t9so4235513pjl.5
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Feb 2021 08:25:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=K8Mk8DPpk11B6V3YwuQN3+iAtbjKIINrpZOMJr9ijMU=;
+        b=ZkL+DPyOhtNNe7hZI9CaKbe4ebR0w/c08TMwcW6jEWxnEH8r794ZleXZWoZ/UR0m9l
+         /JvwszOIsqxGcoQusTcqqjnSjevmzjijIqmibZWhNlf1fAH+fqB2XaC9yYLNGSgQajKW
+         cQ37mvXb34+aOOxfrJiSDd0duyNERIQhiKqe1mF+9oUWIOq5QI43wZI8wjHcqYbkkeNz
+         F74iB1b0pF2iLrhK6gzgmonIkdXMBmp9UGOP+w4UrVRBbDRpQmc5IjIAIQwXpNnoKanf
+         hCRm8lc+Mszq2AP9WNUUdxblVMsJd9jJlh10sSOCswStuXopFHTvKoZcecsf/gsAVlr3
+         E8CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=K8Mk8DPpk11B6V3YwuQN3+iAtbjKIINrpZOMJr9ijMU=;
+        b=r3U/7TUvVzpciu1GaqSwQdweCt5f4sO8S7T9e7yZIqw9PJWUSQCncimjfxsfUSPibk
+         5oD0HCdrjYEOHP0xxSHRyAeEQsmTAKg/3xMv/1z9ZEDXCbCOle3RHTUt7v1qsGT/R/dF
+         O43DLNrw8uhUn1l1I12fDW86MGDQvgze0ugElM9rf95RqJBUXDH8E6uEd+kAzyYDj+T4
+         HfTUrfeKO3SS5cUpH+95t/15P29i11EpQFR9RaolTlGQpIA9oA/jG/vBznLJLOnBM4Vj
+         KQgXEdlz9xBdauxaY4SupvWqojyCuRazkMovIIvQm0d8UoQIL1+4Zy0iRn83qh//Boep
+         idHg==
+X-Gm-Message-State: AOAM533XFOFFwvH6V0U4++F+/wZhRfXznL8kqY2vY4w2S/kpbME6kAlW
+        IKAZVcqAnt7ZBId4oH6geUBQfw==
+X-Google-Smtp-Source: ABdhPJzpaRZ20ovy1dpVfBdxXc3ZVF23iR3XDePJsjQUoeSVBm8Osbw6p/Oa6Rqwlvu7+JfquMJWyQ==
+X-Received: by 2002:a17:903:1d0:b029:df:d098:f1cb with SMTP id e16-20020a17090301d0b02900dfd098f1cbmr23104083plh.49.1614011099559;
+        Mon, 22 Feb 2021 08:24:59 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:655e:415b:3b95:bd58])
+        by smtp.gmail.com with ESMTPSA id f2sm21929378pfk.63.2021.02.22.08.24.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Feb 2021 08:24:58 -0800 (PST)
+Date:   Mon, 22 Feb 2021 08:24:51 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        kvm-ppc@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH v4 2/2] KVM: x86/mmu: Consider the hva in mmu_notifier
+ retry
+Message-ID: <YDPa07i3S3Y7/iwy@google.com>
+References: <20210222024522.1751719-1-stevensd@google.com>
+ <20210222024522.1751719-3-stevensd@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1613990816; bh=WSELGhqP+NOSudWxdZmSn1jCecQ9LfJU/HOyyjATzQk=;
-        h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-         MIME-Version:Content-Transfer-Encoding:Content-Type:
-         X-Originating-IP:X-ClientProxiedBy;
-        b=AsDH1KFt7q2fn1GQH1bGZsfxPuP6PWniyR68l2YMD7Q3Cfbq5uK+p+mMUtOfNCzHP
-         a+hSdF72Kju84oKrEh0gg6e8rGRcP4SODxDcOyS/1SQNOgR82RHgMN4+muzfJRKteX
-         TZjWkSDKTi+eWBm5dbyv/oZyE95BVowqo+OXcexYvpYnlUsHqC93D9hf3z7vCcYpXg
-         beQX9uq28IHVckKy1BtFiOs2mBRghniAdXwhBHNF2E6SUF7HvL5sLv5fN7c9Krbh1R
-         iMHvxXCUtmJre53wnpmserXyNhCq0cnsUNF+34d7gdgVUyWwc2BnUqJO0ARndiY3DG
-         gOBglEpWEttmA==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210222024522.1751719-3-stevensd@google.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Friday, 19 February 2021 8:47:41 PM AEDT Christoph Hellwig wrote:
-> >  			page = migration_entry_to_page(swpent);
-> >  		else if (is_device_private_entry(swpent))
-> >  			page = device_private_entry_to_page(swpent);
-> > +		else if (is_device_exclusive_entry(swpent))
-> > +			page = device_exclusive_entry_to_page(swpent);
-> 
-> >  			page = migration_entry_to_page(swpent);
-> >  		else if (is_device_private_entry(swpent))
-> >  			page = device_private_entry_to_page(swpent);
-> > +		else if (is_device_exclusive_entry(swpent))
-> > +			page = device_exclusive_entry_to_page(swpent);
-> 
-> >  		if (is_device_private_entry(entry))
-> >  			page = device_private_entry_to_page(entry);
-> > +
-> > +		if (is_device_exclusive_entry(entry))
-> > +			page = device_exclusive_entry_to_page(entry);
-> 
-> Any chance we can come up with a clever scheme to avoid all this
-> boilerplate code (and maybe also what it gets compiled to)?
+On Mon, Feb 22, 2021, David Stevens wrote:
+> ---
+> v3 -> v4:
+>  - Skip prefetch while invalidations are in progress
 
-If I open code the entry_to_page() functions as suggested below then these 
-simplify down to single if statements like so:
+Oof, nice catch.
 
-                if (is_migration_entry(entry) ||
-                    is_device_private_entry(entry) ||
-                    is_device_exclusive_entry(entry))
-                        page = pfn_to_page(swp_offset(entry));
+...
 
-I could simplify further by hiding that in a single static inline like so:
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 9ac0a727015d..f6aaac729667 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2758,6 +2758,13 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+>  	if (sp->role.level > PG_LEVEL_4K)
+>  		return;
+>  
+> +	/*
+> +	 * If addresses are being invalidated, skip prefetching to avoid
+> +	 * accidentally prefetching those addresses.
+> +	 */
+> +	if (unlikely(vcpu->kvm->mmu_notifier_count))
+> +		return;
 
-static inline bool is_special_entry(swp_entry_t entry)
-{
-	return is_migration_entry(entry) ||
-			is_device_private_entry(entry) ||
-          is_device_exclusive_entry(entry);
-}
+FNAME(pte_prefetch) needs the same check.
 
-My only concern with doing that is these entries can't *always* be treated the 
-same so it might make it too easy to overlook the subtle differences.
+Paolo, this brings up a good addition for the work to integrate the mmu notifier
+into the rest of KVM, e.g. for vmcs12 pages.  Ideally, gfn_to_page_many_atomic()
+and __gfn_to_pfn_memslot() would WARN if mmu_notifier_count is non-zero, but
+that will fire all over the place until the nested code properly integrates the
+notifier.  There are a few use cases where racing with the notifier is acceptable,
+e.g. reexecute_instruction(), but hopefully we can address those flows without
+things getting too ugly.
 
-> > diff --git a/include/linux/hmm.h b/include/linux/hmm.h
-> > index 866a0fa104c4..5d28ff6d4d80 100644
-> > --- a/include/linux/hmm.h
-> > +++ b/include/linux/hmm.h
-> > @@ -109,6 +109,10 @@ struct hmm_range {
-> >   */
-> >  int hmm_range_fault(struct hmm_range *range);
-> >  
-> > +int hmm_exclusive_range(struct mm_struct *mm, unsigned long start,
-> > +			unsigned long end, struct page **pages);
-> > +vm_fault_t hmm_remove_exclusive_entry(struct vm_fault *vmf);
-> 
-> Can we avoid the hmm naming for new code (we should probably also kill
-> it off for the existing code)?
-
-Sure. I ended up stuffing it in there for the moment because I didn't know of 
-any other "obvious" spot to put it. How about these for names:
-
-int make_device_exclusive_range(struct mm_struct *mm, unsigned long start,
-			unsigned long end, struct page **pages);
-vm_fault_t remove_device_exclusive_entry(struct vm_fault *vmf);
-
-I am open to any alternative naming suggestions though.
-
-> > +#define free_swap_and_cache(e) ({(is_migration_entry(e) || 
-is_device_private_entry(e) \
-> > +					|| is_device_exclusive_entry(e)); })
-> > +#define swapcache_prepare(e) ({(is_migration_entry(e) || 
-is_device_private_entry(e) \
-> > +					|| is_device_exclusive_entry(e)); })
-> Can you turn these into properly formatted inline functions?  As-is this
-> becomes pretty unreadable.
-
-Ok, if I add a is_special_entry() function as suggested above these could just 
-use that.
- 
-> > +static inline void make_device_exclusive_entry_read(swp_entry_t *entry)
-> > +{
-> > +	*entry = swp_entry(SWP_DEVICE_EXCLUSIVE_READ, swp_offset(*entry));
-> > +}
-> 
-> s/make_device_exclusive_entry_read/mark_device_exclusive_entry_readable/
-> ??
-
-See my next comment.
-
-> > +
-> > +static inline swp_entry_t make_device_exclusive_entry(struct page *page, 
-bool write)
-> > +{
-> > +	return swp_entry(write ? SWP_DEVICE_EXCLUSIVE_WRITE : 
-SWP_DEVICE_EXCLUSIVE_READ,
-> > +			 page_to_pfn(page));
-> > +}
-> 
-> I'd split this into two helpers, which is easier to follow and avoids
-> the pointlessly overlong lines.
-
-I assume you mean separate read and write functions instead of using the write 
-flag?
-
-These are based on the existing device private functions which themselves 
-looked to be based on the migration entry functions. It would be good to keep 
-these consistent so when making the changes above I would also refactor the 
-existing make_device_private_entry() and make_migration_entry() functions to 
-match as well.
-
-As a test I tried refactoring the migration entry functions into the below and 
-it seemed to make things a bit easier to follow if not a little verbose:
-
-static inline int is_writable_migration_entry(swp_entry_t entry);
-static inline swp_entry_t make_readable_migration_entry(pgoff_t offset);
-static inline swp_entry_t make_writable_migration_entry(pgoff_t offset);
-static inline int is_migration_entry(swp_entry_t entry);
-
-So I can do that along with the same refactoring of device private accessor 
-functions as a prep patch if that seems reasonable?
-
-> > +static inline bool is_device_exclusive_entry(swp_entry_t entry)
-> > +{
-> > +	int type = swp_type(entry);
-> > +	return type == SWP_DEVICE_EXCLUSIVE_READ || type == 
-SWP_DEVICE_EXCLUSIVE_WRITE;
-> > +}
-> 
-> Another overly long line.  I also wouldn't bother with the local
-> variable:
-> 
-> 	return swp_type(entry) == SWP_DEVICE_EXCLUSIVE_READ ||
-> 		swp_type(entry) == SWP_DEVICE_EXCLUSIVE_WRITE;
-> 		
-> 
-> > +static inline bool is_write_device_exclusive_entry(swp_entry_t entry)
-> > +{
-> > +	return swp_type(entry) == SWP_DEVICE_EXCLUSIVE_WRITE;
-> > +}
-> 
-> Or reuse these kind of helpers..
->
-> > +
-> > +static inline unsigned long device_exclusive_entry_to_pfn(swp_entry_t 
-entry)
-> > +{
-> > +	return swp_offset(entry);
-> > +}
-> > +
-> > +static inline struct page *device_exclusive_entry_to_page(swp_entry_t 
-entry)
-> > +{
-> > +	return pfn_to_page(swp_offset(entry));
-> > +}
-> 
-> I'd rather open code these two, and as a prep patch also kill off the
-> equivalents for the migration and device private entries, which would
-> actually clean up a lot of the mess mentioned in my first comment above.
-
-Ok, I have just tried doing that and it ends up being more concise and 
-accurate so I'll add it to the series. 
-
-> > +static int hmm_exclusive_skip(unsigned long start,
-> > +		      unsigned long end,
-> > +		      __always_unused int depth,
-> > +		      struct mm_walk *walk)
-> > +{
-> > +	struct hmm_exclusive_walk *hmm_exclusive_walk = walk->private;
-> > +	unsigned long addr;
-> > +
-> > +	for (addr = start; addr < end; addr += PAGE_SIZE)
-> > +		hmm_exclusive_walk->pages[hmm_exclusive_walk->npages++] = NULL;
-> > +
-> > +	return 0;
-> > +}
-> 
-> Wouldn't pre-zeroing the array be simpler and more efficient?
-
-Good point. I had other code here but I didn't need it and should have just 
-removed what was left.
-
-> > +int hmm_exclusive_range(struct mm_struct *mm, unsigned long start,
-> > +			unsigned long end, struct page **pages)
-> > +{
-> > +	struct hmm_exclusive_walk hmm_exclusive_walk = { .pages = pages, 
-.npages = 0 };
-> > +	int i;
-> > +
-> > +	/* Collect and lock candidate pages */
-> > +	walk_page_range(mm, start, end, &hmm_exclusive_walk_ops, 
-&hmm_exclusive_walk);
-> 
-> Please avoid the overly long lines.
-> 
-> But more importantly:  Unless I'm missing something obvious this
-> walk_page_range call just open codes get_user_pages_fast, why can't you
-> use that?
-
-Good idea, you aren't missing anything although I don't think 
-get_user_pages_fast() will work as the driver needs to be able to operate on a 
-remote mm_struct. 
-
-But something like get_user_pages_remote() would work better than open-coding 
-it.
-
-> > +#if defined(CONFIG_ARCH_ENABLE_THP_MIGRATION) || defined(CONFIG_HUGETLB)
-> > +		if (PageTransHuge(page)) {
-> > +			VM_BUG_ON_PAGE(1, page);
-> > +			continue;
-> > +		}
-> > +#endif
-> 
-> Doesn't PageTransHuge always return false for that case?  If not
-> shouldn't we make sure it does?
-
-Right, this is probably an overly defensive check so I'll remove it.
-
-[snip - will address code format/structure suggestions]
-
-> 
-> try_to_unmap_one has turned into a monster.  A little refactoring to
-> split it into managable pieces would be nice.
-> 
-
-Agreed, adding this it did seem a little unwieldy. I will see if I can do a 
-bit of refactoring for the next version.
-
- - Alistair
-
-
-
+> +
+>  	__direct_pte_prefetch(vcpu, sp, sptep);
+>  }
