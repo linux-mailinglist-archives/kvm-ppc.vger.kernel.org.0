@@ -2,56 +2,60 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 52BC1321CDB
-	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Feb 2021 17:26:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44AAE321F0B
+	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Feb 2021 19:20:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231510AbhBVQZv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 22 Feb 2021 11:25:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55602 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231438AbhBVQZk (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Feb 2021 11:25:40 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35931C06178A
-        for <kvm-ppc@vger.kernel.org>; Mon, 22 Feb 2021 08:25:00 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id t9so4235513pjl.5
-        for <kvm-ppc@vger.kernel.org>; Mon, 22 Feb 2021 08:25:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=K8Mk8DPpk11B6V3YwuQN3+iAtbjKIINrpZOMJr9ijMU=;
-        b=ZkL+DPyOhtNNe7hZI9CaKbe4ebR0w/c08TMwcW6jEWxnEH8r794ZleXZWoZ/UR0m9l
-         /JvwszOIsqxGcoQusTcqqjnSjevmzjijIqmibZWhNlf1fAH+fqB2XaC9yYLNGSgQajKW
-         cQ37mvXb34+aOOxfrJiSDd0duyNERIQhiKqe1mF+9oUWIOq5QI43wZI8wjHcqYbkkeNz
-         F74iB1b0pF2iLrhK6gzgmonIkdXMBmp9UGOP+w4UrVRBbDRpQmc5IjIAIQwXpNnoKanf
-         hCRm8lc+Mszq2AP9WNUUdxblVMsJd9jJlh10sSOCswStuXopFHTvKoZcecsf/gsAVlr3
-         E8CA==
+        id S232348AbhBVSTi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Feb 2021 13:19:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53660 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232285AbhBVSSk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Feb 2021 13:18:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614017833;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=M1O2O9X5RXSfF+m5PX0DyBo6+zLejZgNhGtzl18mwLU=;
+        b=QDjXmzeb1OSx90iF0IKeV2aFsu7iNXdqyaxP2vhMhiFcqs2njGWR9t6HXuETHmXksExCnP
+        Ft3k5eDjMY7NerrJ+cOyFFbmgz2hcFX7HEi0+AM+oEOU4/JkYfDgSQZeil4cnWxYAOq9uo
+        z+5Weeg5mhQQ1vZ34OXNZusETOZlu6U=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311-VyWuv1GiNF6CjdPIZwYGXQ-1; Mon, 22 Feb 2021 13:17:09 -0500
+X-MC-Unique: VyWuv1GiNF6CjdPIZwYGXQ-1
+Received: by mail-ed1-f69.google.com with SMTP id w9so7316001edi.15
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Feb 2021 10:17:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=K8Mk8DPpk11B6V3YwuQN3+iAtbjKIINrpZOMJr9ijMU=;
-        b=r3U/7TUvVzpciu1GaqSwQdweCt5f4sO8S7T9e7yZIqw9PJWUSQCncimjfxsfUSPibk
-         5oD0HCdrjYEOHP0xxSHRyAeEQsmTAKg/3xMv/1z9ZEDXCbCOle3RHTUt7v1qsGT/R/dF
-         O43DLNrw8uhUn1l1I12fDW86MGDQvgze0ugElM9rf95RqJBUXDH8E6uEd+kAzyYDj+T4
-         HfTUrfeKO3SS5cUpH+95t/15P29i11EpQFR9RaolTlGQpIA9oA/jG/vBznLJLOnBM4Vj
-         KQgXEdlz9xBdauxaY4SupvWqojyCuRazkMovIIvQm0d8UoQIL1+4Zy0iRn83qh//Boep
-         idHg==
-X-Gm-Message-State: AOAM533XFOFFwvH6V0U4++F+/wZhRfXznL8kqY2vY4w2S/kpbME6kAlW
-        IKAZVcqAnt7ZBId4oH6geUBQfw==
-X-Google-Smtp-Source: ABdhPJzpaRZ20ovy1dpVfBdxXc3ZVF23iR3XDePJsjQUoeSVBm8Osbw6p/Oa6Rqwlvu7+JfquMJWyQ==
-X-Received: by 2002:a17:903:1d0:b029:df:d098:f1cb with SMTP id e16-20020a17090301d0b02900dfd098f1cbmr23104083plh.49.1614011099559;
-        Mon, 22 Feb 2021 08:24:59 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:655e:415b:3b95:bd58])
-        by smtp.gmail.com with ESMTPSA id f2sm21929378pfk.63.2021.02.22.08.24.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Feb 2021 08:24:58 -0800 (PST)
-Date:   Mon, 22 Feb 2021 08:24:51 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Stevens <stevensd@chromium.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=M1O2O9X5RXSfF+m5PX0DyBo6+zLejZgNhGtzl18mwLU=;
+        b=etxFGhzRVOzOE6I41x3MB0k49f3/QwHm2QKqNbX8CbiV7hX8zfP9kSM51IP3mmxEEc
+         0qmH94tvjUP1xDgORlW/WTbzR42ewoTSthSfShKxr6URhtvvZJvegy8RxZnBAJ1jGvxA
+         7gCX5rA/CJKuNyex0gZIr9WxidCXN9dxiEEDobPvqlMqzfrgCaHji15c7KyWY2pKW2DY
+         hOt6994svEDaoXruqusrdGGp+qnWhYZ2+f1z6OLliMzvzqgZLHgqoodM4h/XRAd+lzpF
+         mg7Ppee1J/up557ZNbMud2gv4/wq7KHuEx6aI/ZgRCOkNnIszqzsZeqz6/s7Z4U58aLW
+         lNjQ==
+X-Gm-Message-State: AOAM533IIZPlEv2nKkeZaC0zhf5JHkqNJNBjS/TkITQX0kcd2KGmSqgt
+        Vnzl/BD7ma4SjWWGZ014sl/kyKnAPmnbgX8Lu63C47qYWHK0M81bjJBmf3Fc81Q8UeHdasu1vnu
+        lkM9FU5wE+MoWz/RntA==
+X-Received: by 2002:a17:906:1c4f:: with SMTP id l15mr11171173ejg.148.1614017828673;
+        Mon, 22 Feb 2021 10:17:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzT03kSWOr2tXOOmqkmqccMekugd1GPN0H9nHYrXxVs3CozSxxVXGpHmYF/OdiWxYx0Hw1ilw==
+X-Received: by 2002:a17:906:1c4f:: with SMTP id l15mr11171153ejg.148.1614017828484;
+        Mon, 22 Feb 2021 10:17:08 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id d5sm12773936edu.12.2021.02.22.10.17.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Feb 2021 10:17:07 -0800 (PST)
+Subject: Re: [PATCH v4 0/2] KVM: x86/mmu: Skip mmu_notifier changes when
+ possible
+To:     David Stevens <stevensd@chromium.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
@@ -68,54 +72,52 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Subject: Re: [PATCH v4 2/2] KVM: x86/mmu: Consider the hva in mmu_notifier
- retry
-Message-ID: <YDPa07i3S3Y7/iwy@google.com>
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Stevens <stevensd@google.com>
 References: <20210222024522.1751719-1-stevensd@google.com>
- <20210222024522.1751719-3-stevensd@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7fe10f74-e183-411a-468b-93fcdf786bb6@redhat.com>
+Date:   Mon, 22 Feb 2021 19:17:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210222024522.1751719-3-stevensd@google.com>
+In-Reply-To: <20210222024522.1751719-1-stevensd@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Feb 22, 2021, David Stevens wrote:
-> ---
+On 22/02/21 03:45, David Stevens wrote:
+> These patches reduce how often mmu_notifier updates block guest page
+> faults. The primary benefit of this is the reduction in the likelihood
+> of extreme latency when handling a page fault due to another thread
+> having been preempted while modifying host virtual addresses.
+> 
 > v3 -> v4:
->  - Skip prefetch while invalidations are in progress
+>   - Fix bug by skipping prefetch during invalidation
+> 
+> v2 -> v3:
+>   - Added patch to skip check for MMIO page faults
+>   - Style changes
+> 
+> David Stevens (1):
+>    KVM: x86/mmu: Consider the hva in mmu_notifier retry
+> 
+> Sean Christopherson (1):
+>    KVM: x86/mmu: Skip mmu_notifier check when handling MMIO page fault
+> 
+>   arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
+>   arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
+>   arch/x86/kvm/mmu/mmu.c                 | 23 ++++++++++++++------
+>   arch/x86/kvm/mmu/paging_tmpl.h         |  7 ++++---
+>   include/linux/kvm_host.h               | 25 +++++++++++++++++++++-
+>   virt/kvm/kvm_main.c                    | 29 ++++++++++++++++++++++----
+>   6 files changed, 72 insertions(+), 16 deletions(-)
+> 
 
-Oof, nice catch.
+Rebased, and queued with the fix that Sean suggested.
 
-...
+Paolo
 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 9ac0a727015d..f6aaac729667 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2758,6 +2758,13 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
->  	if (sp->role.level > PG_LEVEL_4K)
->  		return;
->  
-> +	/*
-> +	 * If addresses are being invalidated, skip prefetching to avoid
-> +	 * accidentally prefetching those addresses.
-> +	 */
-> +	if (unlikely(vcpu->kvm->mmu_notifier_count))
-> +		return;
-
-FNAME(pte_prefetch) needs the same check.
-
-Paolo, this brings up a good addition for the work to integrate the mmu notifier
-into the rest of KVM, e.g. for vmcs12 pages.  Ideally, gfn_to_page_many_atomic()
-and __gfn_to_pfn_memslot() would WARN if mmu_notifier_count is non-zero, but
-that will fire all over the place until the nested code properly integrates the
-notifier.  There are a few use cases where racing with the notifier is acceptable,
-e.g. reexecute_instruction(), but hopefully we can address those flows without
-things getting too ugly.
-
-> +
->  	__direct_pte_prefetch(vcpu, sp, sptep);
->  }
