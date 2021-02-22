@@ -2,289 +2,281 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29376321109
-	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Feb 2021 07:53:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8AD5321465
+	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Feb 2021 11:47:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbhBVGw4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 22 Feb 2021 01:52:56 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12592 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229518AbhBVGwz (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Feb 2021 01:52:55 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11M6ig6o181460;
-        Mon, 22 Feb 2021 01:52:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : reply-to : references : mime-version : content-type
- : in-reply-to; s=pp1; bh=4bU8O6VeC5HCUQ/g84Bg+yPcpVPXzrwvztrftIBwMgc=;
- b=KaA6kSVphEEDhCckUBiy50LDK4P94Knp0PghJGMXaRx9GfY5cgw4hJeseJklvXzuLvBj
- 0Z8oX6WKAyPXb6CiZGx4A8o0Pt8WxcUNQP1LJDt60qAViGHIOS8TUAIfWyo11G+l64hJ
- /n0PtxXg4K8m0qnhE8Pbsv9/bNv3USc+tMNNoeES6sVZJCSxj3xD9Fo9Vv47J9ei23At
- uNqZYx6fl3/fQxCuk0n0JMQfwq9LI+4eOI3prZGNSeuKXhk4MqYlF7lnBdIPrJGySMuv
- PbbK/KPaAeNglezYOqk48U+mI47KCRNiQ7dA+hk8Gemr9l1Gx+MjlY/OlzflGlMaJgFc 7A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36v7kyr78p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Feb 2021 01:52:04 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11M6iibt181561;
-        Mon, 22 Feb 2021 01:49:55 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36v7kyr2d1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Feb 2021 01:49:55 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11M6gkra028535;
-        Mon, 22 Feb 2021 06:46:15 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 36tt289brd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Feb 2021 06:46:15 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11M6kCs443385320
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Feb 2021 06:46:12 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1C4B652050;
-        Mon, 22 Feb 2021 06:46:12 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.85.69.50])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id A12A252054;
-        Mon, 22 Feb 2021 06:46:10 +0000 (GMT)
-Date:   Mon, 22 Feb 2021 12:16:08 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
-        mpe@ellerman.id.au, farosas@linux.ibm.com
-Subject: Re: [PATCH v4 2/3] KVM: PPC: Book3S HV: Add support for
- H_RPT_INVALIDATE
-Message-ID: <20210222064608.GB3672042@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <20210215063542.3642366-1-bharata@linux.ibm.com>
- <20210215063542.3642366-3-bharata@linux.ibm.com>
- <YCxlb133Hf6hLjuD@yekko.fritz.box>
+        id S230379AbhBVKro (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Feb 2021 05:47:44 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:15265 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230117AbhBVKri (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Feb 2021 05:47:38 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B60338ba00000>; Mon, 22 Feb 2021 02:46:56 -0800
+Received: from nvdebian.localnet (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 22 Feb
+ 2021 10:46:53 +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
+        <bskeggs@redhat.com>, <akpm@linux-foundation.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
+        <jglisse@redhat.com>, <jgg@nvidia.com>, <daniel@ffwll.ch>
+Subject: Re: [PATCH v2 1/4] hmm: Device exclusive memory access
+Date:   Mon, 22 Feb 2021 21:46:51 +1100
+Message-ID: <67252432.xGUjY6W94y@nvdebian>
+In-Reply-To: <20210219094741.GA641389@infradead.org>
+References: <20210219020750.16444-1-apopple@nvidia.com> <20210219020750.16444-2-apopple@nvidia.com> <20210219094741.GA641389@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YCxlb133Hf6hLjuD@yekko.fritz.box>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-21_14:2021-02-18,2021-02-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- malwarescore=0 mlxlogscore=999 spamscore=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 adultscore=0 bulkscore=0 suspectscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102220057
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1613990816; bh=WSELGhqP+NOSudWxdZmSn1jCecQ9LfJU/HOyyjATzQk=;
+        h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+         MIME-Version:Content-Transfer-Encoding:Content-Type:
+         X-Originating-IP:X-ClientProxiedBy;
+        b=AsDH1KFt7q2fn1GQH1bGZsfxPuP6PWniyR68l2YMD7Q3Cfbq5uK+p+mMUtOfNCzHP
+         a+hSdF72Kju84oKrEh0gg6e8rGRcP4SODxDcOyS/1SQNOgR82RHgMN4+muzfJRKteX
+         TZjWkSDKTi+eWBm5dbyv/oZyE95BVowqo+OXcexYvpYnlUsHqC93D9hf3z7vCcYpXg
+         beQX9uq28IHVckKy1BtFiOs2mBRghniAdXwhBHNF2E6SUF7HvL5sLv5fN7c9Krbh1R
+         iMHvxXCUtmJre53wnpmserXyNhCq0cnsUNF+34d7gdgVUyWwc2BnUqJO0ARndiY3DG
+         gOBglEpWEttmA==
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Feb 17, 2021 at 11:38:07AM +1100, David Gibson wrote:
-> On Mon, Feb 15, 2021 at 12:05:41PM +0530, Bharata B Rao wrote:
-> > Implement H_RPT_INVALIDATE hcall and add KVM capability
-> > KVM_CAP_PPC_RPT_INVALIDATE to indicate the support for the same.
-> > 
-> > This hcall does two types of TLB invalidations:
-> > 
-> > 1. Process-scoped invalidations for guests with LPCR[GTSE]=0.
-> >    This is currently not used in KVM as GTSE is not usually
-> >    disabled in KVM.
-> > 2. Partition-scoped invalidations that an L1 hypervisor does on
-> >    behalf of an L2 guest. This replaces the uses of the existing
-> >    hcall H_TLB_INVALIDATE.
-> > 
-> > In order to handle process scoped invalidations of L2, we
-> > intercept the nested exit handling code in L0 only to handle
-> > H_TLB_INVALIDATE hcall.
-> > 
-> > Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst         | 17 +++++
-> >  arch/powerpc/include/asm/kvm_book3s.h  |  3 +
-> >  arch/powerpc/include/asm/mmu_context.h | 11 +++
-> >  arch/powerpc/kvm/book3s_hv.c           | 91 ++++++++++++++++++++++++
-> >  arch/powerpc/kvm/book3s_hv_nested.c    | 96 ++++++++++++++++++++++++++
-> >  arch/powerpc/kvm/powerpc.c             |  3 +
-> >  arch/powerpc/mm/book3s64/radix_tlb.c   | 25 +++++++
-> >  include/uapi/linux/kvm.h               |  1 +
-> >  8 files changed, 247 insertions(+)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 99ceb978c8b0..416c36aa35d4 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -6038,6 +6038,23 @@ KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR exit notifications which user space
-> >  can then handle to implement model specific MSR handling and/or user notifications
-> >  to inform a user that an MSR was not handled.
-> >  
-> > +7.22 KVM_CAP_PPC_RPT_INVALIDATE
-> > +------------------------------
-> > +
-> > +:Capability: KVM_CAP_PPC_RPT_INVALIDATE
-> > +:Architectures: ppc
-> > +:Type: vm
-> > +
-> > +This capability indicates that the kernel is capable of handling
-> > +H_RPT_INVALIDATE hcall.
-> > +
-> > +In order to enable the use of H_RPT_INVALIDATE in the guest,
-> > +user space might have to advertise it for the guest. For example,
-> > +IBM pSeries (sPAPR) guest starts using it if "hcall-rpt-invalidate" is
-> > +present in the "ibm,hypertas-functions" device-tree property.
-> > +
-> > +This capability is always enabled.
+On Friday, 19 February 2021 8:47:41 PM AEDT Christoph Hellwig wrote:
+> >  			page = migration_entry_to_page(swpent);
+> >  		else if (is_device_private_entry(swpent))
+> >  			page = device_private_entry_to_page(swpent);
+> > +		else if (is_device_exclusive_entry(swpent))
+> > +			page = device_exclusive_entry_to_page(swpent);
 > 
-> I guess that means it's always enabled when it's available - I'm
-> pretty sure it won't be enabled on POWER8 or on PR KVM.
-
-Correct, will reword this and restrict this to POWER9, radix etc
-
+> >  			page = migration_entry_to_page(swpent);
+> >  		else if (is_device_private_entry(swpent))
+> >  			page = device_private_entry_to_page(swpent);
+> > +		else if (is_device_exclusive_entry(swpent))
+> > +			page = device_exclusive_entry_to_page(swpent);
 > 
+> >  		if (is_device_private_entry(entry))
+> >  			page = device_private_entry_to_page(entry);
 > > +
-> >  8. Other capabilities.
-> >  ======================
+> > +		if (is_device_exclusive_entry(entry))
+> > +			page = device_exclusive_entry_to_page(entry);
+> 
+> Any chance we can come up with a clever scheme to avoid all this
+> boilerplate code (and maybe also what it gets compiled to)?
+
+If I open code the entry_to_page() functions as suggested below then these 
+simplify down to single if statements like so:
+
+                if (is_migration_entry(entry) ||
+                    is_device_private_entry(entry) ||
+                    is_device_exclusive_entry(entry))
+                        page = pfn_to_page(swp_offset(entry));
+
+I could simplify further by hiding that in a single static inline like so:
+
+static inline bool is_special_entry(swp_entry_t entry)
+{
+	return is_migration_entry(entry) ||
+			is_device_private_entry(entry) ||
+          is_device_exclusive_entry(entry);
+}
+
+My only concern with doing that is these entries can't *always* be treated the 
+same so it might make it too easy to overlook the subtle differences.
+
+> > diff --git a/include/linux/hmm.h b/include/linux/hmm.h
+> > index 866a0fa104c4..5d28ff6d4d80 100644
+> > --- a/include/linux/hmm.h
+> > +++ b/include/linux/hmm.h
+> > @@ -109,6 +109,10 @@ struct hmm_range {
+> >   */
+> >  int hmm_range_fault(struct hmm_range *range);
 > >  
-> > diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-> > index d32ec9ae73bd..0f1c5fa6e8ce 100644
-> > --- a/arch/powerpc/include/asm/kvm_book3s.h
-> > +++ b/arch/powerpc/include/asm/kvm_book3s.h
-> > @@ -298,6 +298,9 @@ void kvmhv_set_ptbl_entry(unsigned int lpid, u64 dw0, u64 dw1);
-> >  void kvmhv_release_all_nested(struct kvm *kvm);
-> >  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu);
-> >  long kvmhv_do_nested_tlbie(struct kvm_vcpu *vcpu);
-> > +long kvmhv_h_rpti_nested(struct kvm_vcpu *vcpu, unsigned long lpid,
-> > +			 unsigned long type, unsigned long pg_sizes,
-> > +			 unsigned long start, unsigned long end);
-> >  int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu,
-> >  			  u64 time_limit, unsigned long lpcr);
-> >  void kvmhv_save_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr);
-> > diff --git a/arch/powerpc/include/asm/mmu_context.h b/arch/powerpc/include/asm/mmu_context.h
-> > index d5821834dba9..fbf3b5b45fe9 100644
-> > --- a/arch/powerpc/include/asm/mmu_context.h
-> > +++ b/arch/powerpc/include/asm/mmu_context.h
-> > @@ -124,8 +124,19 @@ static inline bool need_extra_context(struct mm_struct *mm, unsigned long ea)
-> >  
-> >  #if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_RADIX_MMU)
-> >  extern void radix_kvm_prefetch_workaround(struct mm_struct *mm);
-> > +void do_h_rpt_invalidate(unsigned long pid, unsigned long lpid,
-> > +			 unsigned long type, unsigned long page_size,
-> > +			 unsigned long psize, unsigned long start,
-> > +			 unsigned long end);
-> >  #else
-> >  static inline void radix_kvm_prefetch_workaround(struct mm_struct *mm) { }
-> > +static inline void do_h_rpt_invalidate(unsigned long pid,
-> > +				       unsigned long lpid,
-> > +				       unsigned long type,
-> > +				       unsigned long page_size,
-> > +				       unsigned long psize,
-> > +				       unsigned long start,
-> > +				       unsigned long end) { }
-> >  #endif
-> >  
-> >  extern void switch_cop(struct mm_struct *next);
-> > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> > index 6f612d240392..802cb77c39cc 100644
-> > --- a/arch/powerpc/kvm/book3s_hv.c
-> > +++ b/arch/powerpc/kvm/book3s_hv.c
-> > @@ -904,6 +904,64 @@ static int kvmppc_get_yield_count(struct kvm_vcpu *vcpu)
-> >  	return yield_count;
-> >  }
-> >  
-> > +static void do_h_rpt_invalidate_prs(unsigned long pid, unsigned long lpid,
-> > +				    unsigned long type, unsigned long pg_sizes,
-> > +				    unsigned long start, unsigned long end)
+> > +int hmm_exclusive_range(struct mm_struct *mm, unsigned long start,
+> > +			unsigned long end, struct page **pages);
+> > +vm_fault_t hmm_remove_exclusive_entry(struct vm_fault *vmf);
+> 
+> Can we avoid the hmm naming for new code (we should probably also kill
+> it off for the existing code)?
+
+Sure. I ended up stuffing it in there for the moment because I didn't know of 
+any other "obvious" spot to put it. How about these for names:
+
+int make_device_exclusive_range(struct mm_struct *mm, unsigned long start,
+			unsigned long end, struct page **pages);
+vm_fault_t remove_device_exclusive_entry(struct vm_fault *vmf);
+
+I am open to any alternative naming suggestions though.
+
+> > +#define free_swap_and_cache(e) ({(is_migration_entry(e) || 
+is_device_private_entry(e) \
+> > +					|| is_device_exclusive_entry(e)); })
+> > +#define swapcache_prepare(e) ({(is_migration_entry(e) || 
+is_device_private_entry(e) \
+> > +					|| is_device_exclusive_entry(e)); })
+> Can you turn these into properly formatted inline functions?  As-is this
+> becomes pretty unreadable.
+
+Ok, if I add a is_special_entry() function as suggested above these could just 
+use that.
+ 
+> > +static inline void make_device_exclusive_entry_read(swp_entry_t *entry)
 > > +{
-> > +	unsigned long psize;
-> > +
-> > +	if (pg_sizes & H_RPTI_PAGE_64K) {
-> > +		psize = rpti_pgsize_to_psize(pg_sizes & H_RPTI_PAGE_64K);
-> > +		do_h_rpt_invalidate(pid, lpid, type, (1UL << 16), psize,
-> > +				    start, end);
-> > +	}
-> > +
-> > +	if (pg_sizes & H_RPTI_PAGE_2M) {
-> > +		psize = rpti_pgsize_to_psize(pg_sizes & H_RPTI_PAGE_2M);
-> > +		do_h_rpt_invalidate(pid, lpid, type, (1UL << 21), psize,
-> > +				    start, end);
-> > +	}
-> > +
-> > +	if (pg_sizes & H_RPTI_PAGE_1G) {
-> > +		psize = rpti_pgsize_to_psize(pg_sizes & H_RPTI_PAGE_1G);
-> > +		do_h_rpt_invalidate(pid, lpid, type, (1UL << 30), psize,
-> > +				    start, end);
-> > +	}
+> > +	*entry = swp_entry(SWP_DEVICE_EXCLUSIVE_READ, swp_offset(*entry));
+> > +}
 > 
-> Hrm.  Here you're stepping through the hcall defined pagesizes, then
-> mapping each one to the Linux internal page size defs.
-> 
-> It might be more elegant to step through mmu_psize_defs table, and
-> conditionally performan an invalidate on that pagesize if the
-> corresponding bit in pg_sizes is set (as noted earlier you could
-> easily add the H_RPTI_PAGE bit to the table).  That way it's a direct
-> table lookup rather than a bunch of ifs or switches.
+> s/make_device_exclusive_entry_read/mark_device_exclusive_entry_readable/
+> ??
 
-Yes, let me give this a try.
+See my next comment.
 
+> > +
+> > +static inline swp_entry_t make_device_exclusive_entry(struct page *page, 
+bool write)
+> > +{
+> > +	return swp_entry(write ? SWP_DEVICE_EXCLUSIVE_WRITE : 
+SWP_DEVICE_EXCLUSIVE_READ,
+> > +			 page_to_pfn(page));
+> > +}
 > 
+> I'd split this into two helpers, which is easier to follow and avoids
+> the pointlessly overlong lines.
+
+I assume you mean separate read and write functions instead of using the write 
+flag?
+
+These are based on the existing device private functions which themselves 
+looked to be based on the migration entry functions. It would be good to keep 
+these consistent so when making the changes above I would also refactor the 
+existing make_device_private_entry() and make_migration_entry() functions to 
+match as well.
+
+As a test I tried refactoring the migration entry functions into the below and 
+it seemed to make things a bit easier to follow if not a little verbose:
+
+static inline int is_writable_migration_entry(swp_entry_t entry);
+static inline swp_entry_t make_readable_migration_entry(pgoff_t offset);
+static inline swp_entry_t make_writable_migration_entry(pgoff_t offset);
+static inline int is_migration_entry(swp_entry_t entry);
+
+So I can do that along with the same refactoring of device private accessor 
+functions as a prep patch if that seems reasonable?
+
+> > +static inline bool is_device_exclusive_entry(swp_entry_t entry)
+> > +{
+> > +	int type = swp_type(entry);
+> > +	return type == SWP_DEVICE_EXCLUSIVE_READ || type == 
+SWP_DEVICE_EXCLUSIVE_WRITE;
+> > +}
+> 
+> Another overly long line.  I also wouldn't bother with the local
+> variable:
+> 
+> 	return swp_type(entry) == SWP_DEVICE_EXCLUSIVE_READ ||
+> 		swp_type(entry) == SWP_DEVICE_EXCLUSIVE_WRITE;
+> 		
+> 
+> > +static inline bool is_write_device_exclusive_entry(swp_entry_t entry)
+> > +{
+> > +	return swp_type(entry) == SWP_DEVICE_EXCLUSIVE_WRITE;
+> > +}
+> 
+> Or reuse these kind of helpers..
+>
+> > +
+> > +static inline unsigned long device_exclusive_entry_to_pfn(swp_entry_t 
+entry)
+> > +{
+> > +	return swp_offset(entry);
 > > +}
 > > +
-> > +static long kvmppc_h_rpt_invalidate(struct kvm_vcpu *vcpu,
-> > +				    unsigned long pid, unsigned long target,
-> > +				    unsigned long type, unsigned long pg_sizes,
-> > +				    unsigned long start, unsigned long end)
+> > +static inline struct page *device_exclusive_entry_to_page(swp_entry_t 
+entry)
 > > +{
-> > +	if (!kvm_is_radix(vcpu->kvm))
-> > +		return H_UNSUPPORTED;
-> > +
-> > +	if (kvmhv_on_pseries())
-> > +		return H_UNSUPPORTED;
+> > +	return pfn_to_page(swp_offset(entry));
+> > +}
 > 
-> This doesn't seem quite right.  If you have multiply nested guests,
-> won't the L2 be issueing H_RPT_INVALIDATE hcalls to the L1 on behalf
-> of the L3?  The L1 would have to implement them by calling the L0, but
-> the L1 can't just reject them, no?
-> 
-> Likewise for the !H_RPTI_TYPE_NESTED case, but on what happens to be a
-> nested guest in any case, couldn't this case legitimately arise and
-> need to be handled?
+> I'd rather open code these two, and as a prep patch also kill off the
+> equivalents for the migration and device private entries, which would
+> actually clean up a lot of the mess mentioned in my first comment above.
 
-The approach is to handle this hcall on behalf of all the nested
-guests in L0 only. I am intercepting the nested exit path precisely
-for this as shown in the below hunk.
+Ok, I have just tried doing that and it ends up being more concise and 
+accurate so I'll add it to the series. 
 
-> > @@ -1573,6 +1640,30 @@ static int kvmppc_handle_nested_exit(struct kvm_vcpu *vcpu)
-> >  		if (!xics_on_xive())
-> >  			kvmppc_xics_rm_complete(vcpu, 0);
-> >  		break;
-> > +	case BOOK3S_INTERRUPT_SYSCALL:
-> > +	{
-> > +		unsigned long req = kvmppc_get_gpr(vcpu, 3);
+> > +static int hmm_exclusive_skip(unsigned long start,
+> > +		      unsigned long end,
+> > +		      __always_unused int depth,
+> > +		      struct mm_walk *walk)
+> > +{
+> > +	struct hmm_exclusive_walk *hmm_exclusive_walk = walk->private;
+> > +	unsigned long addr;
 > > +
-> > +		if (req != H_RPT_INVALIDATE) {
-> > +			r = RESUME_HOST;
-> > +			break;
+> > +	for (addr = start; addr < end; addr += PAGE_SIZE)
+> > +		hmm_exclusive_walk->pages[hmm_exclusive_walk->npages++] = NULL;
+> > +
+> > +	return 0;
+> > +}
+> 
+> Wouldn't pre-zeroing the array be simpler and more efficient?
+
+Good point. I had other code here but I didn't need it and should have just 
+removed what was left.
+
+> > +int hmm_exclusive_range(struct mm_struct *mm, unsigned long start,
+> > +			unsigned long end, struct page **pages)
+> > +{
+> > +	struct hmm_exclusive_walk hmm_exclusive_walk = { .pages = pages, 
+.npages = 0 };
+> > +	int i;
+> > +
+> > +	/* Collect and lock candidate pages */
+> > +	walk_page_range(mm, start, end, &hmm_exclusive_walk_ops, 
+&hmm_exclusive_walk);
+> 
+> Please avoid the overly long lines.
+> 
+> But more importantly:  Unless I'm missing something obvious this
+> walk_page_range call just open codes get_user_pages_fast, why can't you
+> use that?
+
+Good idea, you aren't missing anything although I don't think 
+get_user_pages_fast() will work as the driver needs to be able to operate on a 
+remote mm_struct. 
+
+But something like get_user_pages_remote() would work better than open-coding 
+it.
+
+> > +#if defined(CONFIG_ARCH_ENABLE_THP_MIGRATION) || defined(CONFIG_HUGETLB)
+> > +		if (PageTransHuge(page)) {
+> > +			VM_BUG_ON_PAGE(1, page);
+> > +			continue;
 > > +		}
-> > +
-> > +		/*
-> > +		 * The H_RPT_INVALIDATE hcalls issued by nested
-> > +		 * guest for process scoped invalidations when
-> > +		 * GTSE=0 are handled here.
-> > +		 */
-> > +		do_h_rpt_invalidate_prs(kvmppc_get_gpr(vcpu, 4),
-> > +					vcpu->arch.nested->shadow_lpid,
-> > +					kvmppc_get_gpr(vcpu, 5),
-> > +					kvmppc_get_gpr(vcpu, 6),
-> > +					kvmppc_get_gpr(vcpu, 7),
-> > +					kvmppc_get_gpr(vcpu, 8));
-> > +		kvmppc_set_gpr(vcpu, 3, H_SUCCESS);
-> > +		r = RESUME_GUEST;
-> > +		break;
-> > +	}
-> >  	default:
-> >  		r = RESUME_HOST;
-> >  		break;
+> > +#endif
+> 
+> Doesn't PageTransHuge always return false for that case?  If not
+> shouldn't we make sure it does?
 
-Thanks for your review.
+Right, this is probably an overly defensive check so I'll remove it.
 
-Regards,
-Bharata.
+[snip - will address code format/structure suggestions]
+
+> 
+> try_to_unmap_one has turned into a monster.  A little refactoring to
+> split it into managable pieces would be nice.
+> 
+
+Agreed, adding this it did seem a little unwieldy. I will see if I can do a 
+bit of refactoring for the next version.
+
+ - Alistair
+
+
+
