@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB68A3250D1
-	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Feb 2021 14:49:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68AE93250D2
+	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Feb 2021 14:49:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232000AbhBYNs4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 25 Feb 2021 08:48:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44750 "EHLO
+        id S232008AbhBYNs7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 25 Feb 2021 08:48:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231960AbhBYNsz (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 25 Feb 2021 08:48:55 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A0E2C061794
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:40 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id s16so3208395plr.9
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:40 -0800 (PST)
+        with ESMTP id S231960AbhBYNs6 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 25 Feb 2021 08:48:58 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75629C061574
+        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:43 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id q204so2591131pfq.10
+        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=BdUM20RYIE/jm7f4nL8DUwkMLUwopPt6d3FqQLRKZzI=;
-        b=ay7Nqv9oX16z0rS/UJufxRfupXdWME1rJIFGqpqtUDVXfEr1oqBT+SoH7ICU/HbagX
-         wS9MLNjSHb/zlJZ+/RHKOGNIh2xPg3EFx6iaeH8SoLt8YGHqXd8AS2rkV1Tmct5HQp7q
-         /VdnrVZgRf0nk9aD2Z5jRElOm02p7/TCsNDb9zoWYUQWgrMKQZ/qHsLCCSOWDfgH5dVU
-         jSFW5bhRxGPCp3w6wrKSapS4Vi2imJWEKgM+7IipkaZvPNTzj3pu8saUS+GXsYlmIgt2
-         KlAYtKlxSha494el+4YcidKb+pq1nXcWQBLpMsCgdty8Pru6cYKnp77rZZCiE4p4+U13
-         K07A==
+        bh=nFaLjtbHvhG9RPsmAn2L9v8PlI/yIaIQI9IuG70b8yw=;
+        b=EADf74jia1v+Dl6Sggk63dBVE/91g56OzdKAcCr7OH87ZEbwTUUsyIYSYtUebnuqut
+         RYYC17/N81cipa9HgiuVssN//6TD3rDIDGN1irGlLuJ1m721pGVwnDW5wwwg1dFbp2Ol
+         eWRpz6/s54aUApKSIGxi/DdNTFrEhtFzoMVWVUU4kDY4o34RAc0JhuP9BVP7TJOA88pW
+         NDWGl5cSGpo8WPjtWxVGgM6/eclmiSBMj9hnAnoDD54m77l5KhxFk2yqCA2zNouz7JGW
+         olbzgujULdHZzqDNwVsaXMY7UbfDDxokHWzIWz+0tKBEQGpIzzfN5HqLgUulHtuzhLKF
+         wCdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=BdUM20RYIE/jm7f4nL8DUwkMLUwopPt6d3FqQLRKZzI=;
-        b=Ht1GgZGBU1LXDSc19SHsW2jOXL24dLMv+PYPakfuKI3GCiUqp2InlvmoLs8nArGQvr
-         PSC+bvSE30UTsqKU2c6e/KpBvRqox0Olor+rxs9K1+et4j5wJkaHNB4GADibJpP7ORgL
-         ih8QibeUXGfWm2Zkahb6g0E+A39flGvIE4kTeypOz/I1V3sdoAredMOZ6VeFz0Ui74mS
-         gEv1XR1i5ES5m49jkhneBRDZL6Fb/+IawX2km05NM2rUsZiPp1Ho2xohQzhFmdlzGMXH
-         G45C3Jmtw+rxlRW+D54aqkD105l3UlI7w0m2KkQ0K+ApqZbyCVfbq8cS8SzafDQWaqdN
-         1Y9g==
-X-Gm-Message-State: AOAM533eKfzlRevEQT3eOcnJi8y8i33vkN5tWqAFeCCL6I+onRhJjV4l
-        kOCTrDt3KlmhQZh/PdtfdjIYwjB0xPw=
-X-Google-Smtp-Source: ABdhPJxeiXR7nziq7swxRFZBtB68BlgktFfgZM1CueNq+YO24amjZgqnd2mPjLf4elbkBeSrrgvYBw==
-X-Received: by 2002:a17:902:aa8f:b029:e3:df7f:fd51 with SMTP id d15-20020a170902aa8fb02900e3df7ffd51mr3162731plr.71.1614260919412;
-        Thu, 25 Feb 2021 05:48:39 -0800 (PST)
+        bh=nFaLjtbHvhG9RPsmAn2L9v8PlI/yIaIQI9IuG70b8yw=;
+        b=Z3sAHvNoPs9dUHQ+uXA0wqoG86yE4Olktv9V3JF6/bYOAs5Y9ui4/ArvQQmuNb1REg
+         N8IEKRTLOC5q+YkmVjXEbGbUtEVnQEe/JfegElbytgW/uLVzT4NVc0r/vAovzt4D7qVM
+         P5Q4URUXZRVSrpcxAyMyVFx7TNsCaPGi3c3bu68c2ncJ3DNquduWhUhf5wtYsK/1H5cl
+         hiwFFgg5Rdn6ltRi7MYd3maDLG4Fci6ZfrT5TNcBvhtO/tTAIwQhv/l5Nrun0QZmcBrz
+         HzRpwLoHfH7AD0DBFR7W7Vr7qsysuVkax4Ln76/LVgXQgLb9kBQJ3cqX5rgSdPvgOT3L
+         kqVg==
+X-Gm-Message-State: AOAM530M2pewVmElCRy55VCqTMmYiwHxup6IRBUeh4IbGg+m1LN8NUBv
+        qoLwPnyAL+0mODL9zsqNLhGtPJpHdRA=
+X-Google-Smtp-Source: ABdhPJwUbThXbDyvaI7aS0Fet3uIuMuLbgnDOCcKp5h4bhbUy/L5JdKF4Iq5km8L76+G2R6KN4SepA==
+X-Received: by 2002:a63:1c13:: with SMTP id c19mr2929117pgc.359.1614260922556;
+        Thu, 25 Feb 2021 05:48:42 -0800 (PST)
 Received: from bobo.ibm.com (58-6-239-121.tpgi.com.au. [58.6.239.121])
-        by smtp.gmail.com with ESMTPSA id a9sm5925868pjq.17.2021.02.25.05.48.36
+        by smtp.gmail.com with ESMTPSA id a9sm5925868pjq.17.2021.02.25.05.48.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Feb 2021 05:48:38 -0800 (PST)
+        Thu, 25 Feb 2021 05:48:42 -0800 (PST)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2 28/37] KVM: PPC: Book3S HV P9: Add helpers for OS SPR handling
-Date:   Thu, 25 Feb 2021 23:46:43 +1000
-Message-Id: <20210225134652.2127648-29-npiggin@gmail.com>
+Subject: [PATCH v2 29/37] KVM: PPC: Book3S HV P9: Switch to guest MMU context as late as possible
+Date:   Thu, 25 Feb 2021 23:46:44 +1000
+Message-Id: <20210225134652.2127648-30-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210225134652.2127648-1-npiggin@gmail.com>
 References: <20210225134652.2127648-1-npiggin@gmail.com>
@@ -62,187 +62,97 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This is a first step to wrapping supervisor and user SPR saving and
-loading up into helpers, which will then be called independently in
-bare metal and nested HV cases in order to optimise SPR access.
+Move WARN_ON traps early so they are less likely to get tangled
+on CPU switching to guest. Move MMU context switch as late as
+reasonably possible to minimise code running with guest context
+switched in. This becomes more important when this code may run
+in real-mode, with later changes.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 131 ++++++++++++++++++++++-------------
- 1 file changed, 84 insertions(+), 47 deletions(-)
+ arch/powerpc/kvm/book3s_hv_interrupt.c | 40 +++++++++++++-------------
+ arch/powerpc/kvm/book3s_hv_nested.c    |  1 +
+ 2 files changed, 21 insertions(+), 20 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 94989fe2fdfe..ad16331c3370 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3442,6 +3442,84 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
- 	trace_kvmppc_run_core(vc, 1);
- }
+diff --git a/arch/powerpc/kvm/book3s_hv_interrupt.c b/arch/powerpc/kvm/book3s_hv_interrupt.c
+index dd0a78a69f49..b93d861d8538 100644
+--- a/arch/powerpc/kvm/book3s_hv_interrupt.c
++++ b/arch/powerpc/kvm/book3s_hv_interrupt.c
+@@ -143,8 +143,13 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	if (hdec < 0)
+ 		return BOOK3S_INTERRUPT_HV_DECREMENTER;
  
-+static void load_spr_state(struct kvm_vcpu *vcpu)
-+{
-+	mtspr(SPRN_DSCR, vcpu->arch.dscr);
-+	mtspr(SPRN_IAMR, vcpu->arch.iamr);
-+	mtspr(SPRN_PSPB, vcpu->arch.pspb);
-+	mtspr(SPRN_FSCR, vcpu->arch.fscr);
-+	mtspr(SPRN_TAR, vcpu->arch.tar);
-+	mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
-+	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
-+	mtspr(SPRN_BESCR, vcpu->arch.bescr);
-+	mtspr(SPRN_WORT, vcpu->arch.wort);
-+	mtspr(SPRN_TIDR, vcpu->arch.tid);
-+	/* XXX: DAR, DSISR must be set with MSR[RI] clear (or hstate as appropriate) */
-+	mtspr(SPRN_AMR, vcpu->arch.amr);
-+	mtspr(SPRN_UAMOR, vcpu->arch.uamor);
++	WARN_ON_ONCE(vcpu->arch.shregs.msr & MSR_HV);
++	WARN_ON_ONCE(!(vcpu->arch.shregs.msr & MSR_ME));
 +
-+	if (!(vcpu->arch.ctrl & 1))
-+		mtspr(SPRN_CTRLT, mfspr(SPRN_CTRLF) & ~1);
-+}
-+
-+static void store_spr_state(struct kvm_vcpu *vcpu)
-+{
-+	vcpu->arch.ctrl = mfspr(SPRN_CTRLF);
-+
-+	vcpu->arch.iamr = mfspr(SPRN_IAMR);
-+	vcpu->arch.pspb = mfspr(SPRN_PSPB);
-+	vcpu->arch.fscr = mfspr(SPRN_FSCR);
-+	vcpu->arch.tar = mfspr(SPRN_TAR);
-+	vcpu->arch.ebbhr = mfspr(SPRN_EBBHR);
-+	vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
-+	vcpu->arch.bescr = mfspr(SPRN_BESCR);
-+	vcpu->arch.wort = mfspr(SPRN_WORT);
-+	vcpu->arch.tid = mfspr(SPRN_TIDR);
-+	vcpu->arch.amr = mfspr(SPRN_AMR);
-+	vcpu->arch.uamor = mfspr(SPRN_UAMOR);
-+	vcpu->arch.dscr = mfspr(SPRN_DSCR);
-+}
-+
-+/*
-+ * Privileged (non-hypervisor) host registers to save.
-+ */
-+struct p9_host_os_sprs {
-+	unsigned long dscr;
-+	unsigned long tidr;
-+	unsigned long iamr;
-+	unsigned long amr;
-+	unsigned long fscr;
-+};
-+
-+static void save_p9_host_os_sprs(struct p9_host_os_sprs *host_os_sprs)
-+{
-+	host_os_sprs->dscr = mfspr(SPRN_DSCR);
-+	host_os_sprs->tidr = mfspr(SPRN_TIDR);
-+	host_os_sprs->iamr = mfspr(SPRN_IAMR);
-+	host_os_sprs->amr = mfspr(SPRN_AMR);
-+	host_os_sprs->fscr = mfspr(SPRN_FSCR);
-+}
-+
-+/* vcpu guest regs must already be saved */
-+static void restore_p9_host_os_sprs(struct kvm_vcpu *vcpu,
-+				    struct p9_host_os_sprs *host_os_sprs)
-+{
-+	mtspr(SPRN_PSPB, 0);
-+	mtspr(SPRN_WORT, 0);
-+	mtspr(SPRN_UAMOR, 0);
-+	mtspr(SPRN_PSPB, 0);
-+
-+	mtspr(SPRN_DSCR, host_os_sprs->dscr);
-+	mtspr(SPRN_TIDR, host_os_sprs->tidr);
-+	mtspr(SPRN_IAMR, host_os_sprs->iamr);
-+
-+	if (host_os_sprs->amr != vcpu->arch.amr)
-+		mtspr(SPRN_AMR, host_os_sprs->amr);
-+
-+	if (host_os_sprs->fscr != vcpu->arch.fscr)
-+		mtspr(SPRN_FSCR, host_os_sprs->fscr);
-+}
-+
- /*
-  * Virtual-mode guest entry for POWER9 and later when the host and
-  * guest are both using the radix MMU.  The LPIDR has already been set.
-@@ -3450,11 +3528,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 			 unsigned long lpcr)
- {
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
--	unsigned long host_dscr = mfspr(SPRN_DSCR);
--	unsigned long host_tidr = mfspr(SPRN_TIDR);
--	unsigned long host_iamr = mfspr(SPRN_IAMR);
--	unsigned long host_amr = mfspr(SPRN_AMR);
--	unsigned long host_fscr = mfspr(SPRN_FSCR);
-+	struct p9_host_os_sprs host_os_sprs;
- 	s64 dec;
- 	u64 tb, next_timer;
- 	int trap, save_pmu;
-@@ -3469,6 +3543,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	start_timing(vcpu, &vcpu->arch.rm_entry);
  
- 	vcpu->arch.ceded = 0;
- 
-+	save_p9_host_os_sprs(&host_os_sprs);
++	vcpu->arch.ceded = 0;
 +
- 	kvmhv_save_host_pmu();		/* saves it to PACA kvm_hstate */
+ 	if (vc->tb_offset) {
+ 		u64 new_tb = tb + vc->tb_offset;
+ 		mtspr(SPRN_TBU40, new_tb);
+@@ -193,26 +198,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
  
- 	kvmppc_subcore_enter_guest();
-@@ -3496,22 +3572,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- #endif
- 	mtspr(SPRN_VRSAVE, vcpu->arch.vrsave);
+ 	mtspr(SPRN_HFSCR, vcpu->arch.hfscr);
  
--	mtspr(SPRN_DSCR, vcpu->arch.dscr);
--	mtspr(SPRN_IAMR, vcpu->arch.iamr);
--	mtspr(SPRN_PSPB, vcpu->arch.pspb);
--	mtspr(SPRN_FSCR, vcpu->arch.fscr);
--	mtspr(SPRN_TAR, vcpu->arch.tar);
--	mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
--	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
--	mtspr(SPRN_BESCR, vcpu->arch.bescr);
--	mtspr(SPRN_WORT, vcpu->arch.wort);
--	mtspr(SPRN_TIDR, vcpu->arch.tid);
--	/* XXX: DAR, DSISR must be set with MSR[RI] clear (or hstate as appropriate) */
--	mtspr(SPRN_AMR, vcpu->arch.amr);
--	mtspr(SPRN_UAMOR, vcpu->arch.uamor);
+-	mtspr(SPRN_SPRG0, vcpu->arch.shregs.sprg0);
+-	mtspr(SPRN_SPRG1, vcpu->arch.shregs.sprg1);
+-	mtspr(SPRN_SPRG2, vcpu->arch.shregs.sprg2);
+-	mtspr(SPRN_SPRG3, vcpu->arch.shregs.sprg3);
 -
--	if (!(vcpu->arch.ctrl & 1))
--		mtspr(SPRN_CTRLT, mfspr(SPRN_CTRLF) & ~1);
-+	load_spr_state(vcpu);
- 
- 	/*
- 	 * XXX: must always deal with irq_work_raise via NMI vs setting DEC.
-@@ -3605,34 +3666,10 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	vcpu->arch.dec_expires = dec + tb;
- 	vcpu->cpu = -1;
- 	vcpu->arch.thread_cpu = -1;
--	vcpu->arch.ctrl = mfspr(SPRN_CTRLF);
+-	mtspr(SPRN_AMOR, ~0UL);
 -
--	vcpu->arch.iamr = mfspr(SPRN_IAMR);
--	vcpu->arch.pspb = mfspr(SPRN_PSPB);
--	vcpu->arch.fscr = mfspr(SPRN_FSCR);
--	vcpu->arch.tar = mfspr(SPRN_TAR);
--	vcpu->arch.ebbhr = mfspr(SPRN_EBBHR);
--	vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
--	vcpu->arch.bescr = mfspr(SPRN_BESCR);
--	vcpu->arch.wort = mfspr(SPRN_WORT);
--	vcpu->arch.tid = mfspr(SPRN_TIDR);
--	vcpu->arch.amr = mfspr(SPRN_AMR);
--	vcpu->arch.uamor = mfspr(SPRN_UAMOR);
--	vcpu->arch.dscr = mfspr(SPRN_DSCR);
+-	switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
 -
--	mtspr(SPRN_PSPB, 0);
--	mtspr(SPRN_WORT, 0);
--	mtspr(SPRN_UAMOR, 0);
--	mtspr(SPRN_DSCR, host_dscr);
--	mtspr(SPRN_TIDR, host_tidr);
--	mtspr(SPRN_IAMR, host_iamr);
--	mtspr(SPRN_PSPB, 0);
+-	/*
+-	 * P9 suppresses the HDEC exception when LPCR[HDICE] = 0,
+-	 * so set guest LPCR (with HDICE) before writing HDEC.
+-	 */
+-	mtspr(SPRN_HDEC, hdec);
+-
+-	vcpu->arch.ceded = 0;
+-
+-	WARN_ON_ONCE(vcpu->arch.shregs.msr & MSR_HV);
+-	WARN_ON_ONCE(!(vcpu->arch.shregs.msr & MSR_ME));
+-
+ 	mtspr(SPRN_HSRR0, vcpu->arch.regs.nip);
+ 	mtspr(SPRN_HSRR1, (vcpu->arch.shregs.msr & ~MSR_HV) | MSR_ME);
  
--	if (host_amr != vcpu->arch.amr)
--		mtspr(SPRN_AMR, host_amr);
-+	restore_p9_host_os_sprs(vcpu, &host_os_sprs);
+@@ -231,6 +216,21 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	 */
+ 	mtspr(SPRN_HDSISR, HDSISR_CANARY);
  
--	if (host_fscr != vcpu->arch.fscr)
--		mtspr(SPRN_FSCR, host_fscr);
-+	store_spr_state(vcpu);
++	mtspr(SPRN_SPRG0, vcpu->arch.shregs.sprg0);
++	mtspr(SPRN_SPRG1, vcpu->arch.shregs.sprg1);
++	mtspr(SPRN_SPRG2, vcpu->arch.shregs.sprg2);
++	mtspr(SPRN_SPRG3, vcpu->arch.shregs.sprg3);
++
++	mtspr(SPRN_AMOR, ~0UL);
++
++	switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
++
++	/*
++	 * P9 suppresses the HDEC exception when LPCR[HDICE] = 0,
++	 * so set guest LPCR (with HDICE) before writing HDEC.
++	 */
++	mtspr(SPRN_HDEC, hdec);
++
+ 	__mtmsrd(0, 1); /* clear RI */
  
- 	msr_check_and_set(MSR_FP | MSR_VEC | MSR_VSX);
- 	store_fp_state(&vcpu->arch.fp);
+ 	mtspr(SPRN_DAR, vcpu->arch.shregs.dar);
+diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+index 0cd0e7aad588..cdf3ee2145ab 100644
+--- a/arch/powerpc/kvm/book3s_hv_nested.c
++++ b/arch/powerpc/kvm/book3s_hv_nested.c
+@@ -323,6 +323,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.shregs.msr = vcpu->arch.regs.msr;
+ 	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
+ 		LPCR_LPES | LPCR_MER;
++	/* XXX: set lpcr in sanitise hv regs? Why is it plumbed through? */
+ 	lpcr = (vc->lpcr & ~mask) | (l2_hv.lpcr & mask);
+ 	sanitise_hv_regs(vcpu, &l2_hv);
+ 	restore_hv_regs(vcpu, &l2_hv);
 -- 
 2.23.0
 
