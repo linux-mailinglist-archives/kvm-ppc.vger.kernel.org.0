@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B48C3250F0
-	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Feb 2021 14:54:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE70B3250DA
+	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Feb 2021 14:49:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232447AbhBYNtr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 25 Feb 2021 08:49:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44968 "EHLO
+        id S229566AbhBYNtZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 25 Feb 2021 08:49:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232491AbhBYNtg (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 25 Feb 2021 08:49:36 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FEE5C06178B
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:56 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id u26so3640111pfn.6
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:56 -0800 (PST)
+        with ESMTP id S232237AbhBYNtO (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 25 Feb 2021 08:49:14 -0500
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A10CC061574
+        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:59 -0800 (PST)
+Received: by mail-pg1-x52e.google.com with SMTP id o38so3795497pgm.9
+        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=veJ44tY4H1b4cNQs/+ikD/U07gxfyKVeQOKDpom/Qlo=;
-        b=bIvzWMw7UyfnfE3dxFo/LOmOsyj6lCHMn9htGdUAKrD1h57jVAzaW+cTmRQ6MprAzo
-         LLyROP07D4p09AfGlneIf8mQLUSp9m6C3c6sWlbdp1heDCCCZ73gYVIAs7sPuce9+jm+
-         fvSY7ch69daYTM1WtnyRLkwoTN0CACzuW//5g0Orh4AVzfyu/UuXt554N3qu0lQPdrvw
-         oJlJQ6leXpfEZ5YvHSHxZPUUr1cZUM/TWCblWil0mUD0eOtuIWg51p7g0/2ISSUsWxYN
-         XedrKGPiqh8QZ+k4RpX1k5mNfwRyM7M3yGx3+7rQgo27ZmHQg7HMu1WWFW4BbY5tpJpP
-         uZeg==
+        bh=uEQIGr8Qp8LFoR1y4PL0b7+g3Mw1hvzNAwtrHtHvVdU=;
+        b=lO8j5A1AGxcM10U9YGyU7kGNYkYvI5h+IB9BX3Gy2rw0u8flT32H5Q96VFCkBVzM4i
+         6ubVdEoi4bljklOLXBqtBhol/jlSwhiN6TakhwbID81h8ASr2H33wVAas7Z0T93nVamg
+         UvMuWZRWhIi9Kg8sNEFoVZKkiCpdlGjhNTeyJtWpQNAuqLNzL/cyYDbQ/l+U4TKUJv26
+         QVubzlr1OWdWsOmr9YOELifPL/kRAsA2pMV1ICiRV6SfUcdR+0BpSm+y/2K6tNNPCris
+         HzkmfY8DGYYrUjLD4Opp5zmMtIZYApDHMcimWfPNml9troOZ7jquiptYJz+8zUjHY6Dm
+         D0Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=veJ44tY4H1b4cNQs/+ikD/U07gxfyKVeQOKDpom/Qlo=;
-        b=WUSnq4GAR7kMefAgUtAFuDJrPtDXDD/GOUyce2f/e96ojACf92lcigRpHktVjq+A43
-         yhxMZZgkTP6/u2Y4VEsCmQgRFWMeUlicKln2+0g80WU21oD9DSkoeC9fpzfG3AJ1eBzd
-         XPmXpZiN7WXp03bgLQlXw44KKrEgub1l9TPPvMH9RGZqgNjnPycRDHfWnaPt5y+EZRNo
-         F56sufjP6G3LsFdAvL4WaoxEOhqpaH02LFQxrrq2nnuwomWfnHOg2REJYXn7iOjMFVc6
-         iEw8gdIdpatOpWVdsCCe5qyn3kS64t7q8ZYc/Bl49vZvqkbZxR4Frh5fto9Hgu38gOEQ
-         Tvew==
-X-Gm-Message-State: AOAM531vVo/Ao6AfRDxUW8QJDs7Ck2Of2XzqNLZmQznlXnSiWD6BsegL
-        nrehTduUXbrR94fMRWsnCUfngVnY1+M=
-X-Google-Smtp-Source: ABdhPJxq3tMoWnWb0JY9fjh/na9nQWenmY9OE5PZW5fALA538ouxAlTXUPGyJTgn2rEH91+7PngU5g==
-X-Received: by 2002:a63:2a17:: with SMTP id q23mr3026533pgq.223.1614260935198;
-        Thu, 25 Feb 2021 05:48:55 -0800 (PST)
+        bh=uEQIGr8Qp8LFoR1y4PL0b7+g3Mw1hvzNAwtrHtHvVdU=;
+        b=QbQIZQKkxD+GWwfoNnPV3vV8E+1ST20vGbUtHtcR2kDXTks4ol/0VCiEA1ut1L5ZSN
+         qpOmVUbZ1rgdGF0Yj/dHjqXp35r2XTMcK/hd9+mwW47AQKYTKaWGl4EvNZp5fMZOBMj8
+         mEfvqPB41hxYgMkm7BdK3jsq+XdMS5bS7TkZlgncKGDctNWgBzBuLywNZskfUaIcUEAk
+         JK9og6l9nxXEla+AtuVr2JWfj/oz2MVWq1mAIeAOo8RBYDRpJ0Yu4+MOAie7CtBhoWtn
+         kwH2CWhxb9GzqWU6CGEGEzWerl3+3eQhYW0xYumsftcpJCcQPp+wivQkbbUAdyhgv80b
+         56Sg==
+X-Gm-Message-State: AOAM5326/dDVRgnsNn3v6jr+lC6reJsPwNb19IV/Mzv5GEYj5hHYsD4A
+        4Hs7yDf6L/q831qT3h5NZpUl3ng8cGQ=
+X-Google-Smtp-Source: ABdhPJzTgPyR7/GY4LHlXD8W7cxZ9ohC9HH4hNz/Lz3TX4tnQt7EqG2yJmSc29rGHYiqhEbqva7PhQ==
+X-Received: by 2002:a63:520d:: with SMTP id g13mr3098033pgb.234.1614260938490;
+        Thu, 25 Feb 2021 05:48:58 -0800 (PST)
 Received: from bobo.ibm.com (58-6-239-121.tpgi.com.au. [58.6.239.121])
-        by smtp.gmail.com with ESMTPSA id a9sm5925868pjq.17.2021.02.25.05.48.52
+        by smtp.gmail.com with ESMTPSA id a9sm5925868pjq.17.2021.02.25.05.48.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Feb 2021 05:48:54 -0800 (PST)
+        Thu, 25 Feb 2021 05:48:57 -0800 (PST)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2 33/37] KVM: PPC: Book3S HV: small pseries_do_hcall cleanup
-Date:   Thu, 25 Feb 2021 23:46:48 +1000
-Message-Id: <20210225134652.2127648-34-npiggin@gmail.com>
+Subject: [PATCH v2 34/37] KVM: PPC: Book3S HV: add virtual mode handlers for HPT hcalls and page faults
+Date:   Thu, 25 Feb 2021 23:46:49 +1000
+Message-Id: <20210225134652.2127648-35-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210225134652.2127648-1-npiggin@gmail.com>
 References: <20210225134652.2127648-1-npiggin@gmail.com>
@@ -62,131 +62,166 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Functionality should not be changed.
+In order to support hash guests in the P9 path (which does not do real
+mode hcalls or page fault handling), these real-mode hash specific
+interrupts need to be implemented in virt mode.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 118 +++++++++++++++++++++++++++++++++--
+ 1 file changed, 113 insertions(+), 5 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 1f27187ff1e7..9d2fa21201c1 100644
+index 9d2fa21201c1..1bbc46f2cfbf 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -923,6 +923,7 @@ static int kvmppc_get_yield_count(struct kvm_vcpu *vcpu)
+@@ -935,6 +935,52 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 		return RESUME_HOST;
  
- int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- {
-+	struct kvm *kvm = vcpu->kvm;
- 	unsigned long req = kvmppc_get_gpr(vcpu, 3);
- 	unsigned long target, ret = H_SUCCESS;
- 	int yield_count;
-@@ -938,7 +939,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 	switch (req) {
++	case H_REMOVE:
++		ret = kvmppc_h_remove(vcpu, kvmppc_get_gpr(vcpu, 4),
++					kvmppc_get_gpr(vcpu, 5),
++					kvmppc_get_gpr(vcpu, 6));
++		if (ret == H_TOO_HARD)
++			return RESUME_HOST;
++		break;
++	case H_ENTER:
++		ret = kvmppc_h_enter(vcpu, kvmppc_get_gpr(vcpu, 4),
++					kvmppc_get_gpr(vcpu, 5),
++					kvmppc_get_gpr(vcpu, 6),
++					kvmppc_get_gpr(vcpu, 7));
++		if (ret == H_TOO_HARD)
++			return RESUME_HOST;
++		break;
++	case H_READ:
++		ret = kvmppc_h_read(vcpu, kvmppc_get_gpr(vcpu, 4),
++					kvmppc_get_gpr(vcpu, 5));
++		if (ret == H_TOO_HARD)
++			return RESUME_HOST;
++		break;
++	case H_CLEAR_MOD:
++		ret = kvmppc_h_clear_mod(vcpu, kvmppc_get_gpr(vcpu, 4),
++					kvmppc_get_gpr(vcpu, 5));
++		if (ret == H_TOO_HARD)
++			return RESUME_HOST;
++		break;
++	case H_CLEAR_REF:
++		ret = kvmppc_h_clear_ref(vcpu, kvmppc_get_gpr(vcpu, 4),
++					kvmppc_get_gpr(vcpu, 5));
++		if (ret == H_TOO_HARD)
++			return RESUME_HOST;
++		break;
++	case H_PROTECT:
++		ret = kvmppc_h_protect(vcpu, kvmppc_get_gpr(vcpu, 4),
++					kvmppc_get_gpr(vcpu, 5),
++					kvmppc_get_gpr(vcpu, 6));
++		if (ret == H_TOO_HARD)
++			return RESUME_HOST;
++		break;
++	case H_BULK_REMOVE:
++		ret = kvmppc_h_bulk_remove(vcpu);
++		if (ret == H_TOO_HARD)
++			return RESUME_HOST;
++		break;
++
+ 	case H_CEDE:
  		break;
  	case H_PROD:
- 		target = kvmppc_get_gpr(vcpu, 4);
--		tvcpu = kvmppc_find_vcpu(vcpu->kvm, target);
-+		tvcpu = kvmppc_find_vcpu(kvm, target);
- 		if (!tvcpu) {
- 			ret = H_PARAMETER;
- 			break;
-@@ -952,7 +953,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 		target = kvmppc_get_gpr(vcpu, 4);
- 		if (target == -1)
- 			break;
--		tvcpu = kvmppc_find_vcpu(vcpu->kvm, target);
-+		tvcpu = kvmppc_find_vcpu(kvm, target);
- 		if (!tvcpu) {
- 			ret = H_PARAMETER;
- 			break;
-@@ -968,12 +969,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 					kvmppc_get_gpr(vcpu, 6));
- 		break;
- 	case H_RTAS:
--		if (list_empty(&vcpu->kvm->arch.rtas_tokens))
-+		if (list_empty(&kvm->arch.rtas_tokens))
- 			return RESUME_HOST;
- 
--		idx = srcu_read_lock(&vcpu->kvm->srcu);
-+		idx = srcu_read_lock(&kvm->srcu);
- 		rc = kvmppc_rtas_hcall(vcpu);
--		srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+		srcu_read_unlock(&kvm->srcu, idx);
- 
- 		if (rc == -ENOENT)
- 			return RESUME_HOST;
-@@ -1060,12 +1061,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 
- 	case H_SET_PARTITION_TABLE:
- 		ret = H_FUNCTION;
--		if (nesting_enabled(vcpu->kvm))
-+		if (nesting_enabled(kvm))
- 			ret = kvmhv_set_partition_table(vcpu);
- 		break;
- 	case H_ENTER_NESTED:
- 		ret = H_FUNCTION;
--		if (!nesting_enabled(vcpu->kvm))
-+		if (!nesting_enabled(kvm))
- 			break;
- 		ret = kvmhv_enter_nested_guest(vcpu);
- 		if (ret == H_INTERRUPT) {
-@@ -1080,12 +1081,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 		break;
- 	case H_TLB_INVALIDATE:
- 		ret = H_FUNCTION;
--		if (nesting_enabled(vcpu->kvm))
-+		if (nesting_enabled(kvm))
- 			ret = kvmhv_do_nested_tlbie(vcpu);
- 		break;
- 	case H_COPY_TOFROM_GUEST:
- 		ret = H_FUNCTION;
--		if (nesting_enabled(vcpu->kvm))
-+		if (nesting_enabled(kvm))
- 			ret = kvmhv_copy_tofrom_guest_nested(vcpu);
- 		break;
- 	case H_PAGE_INIT:
-@@ -1096,7 +1097,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 	case H_SVM_PAGE_IN:
- 		ret = H_UNSUPPORTED;
- 		if (kvmppc_get_srr1(vcpu) & MSR_S)
--			ret = kvmppc_h_svm_page_in(vcpu->kvm,
-+			ret = kvmppc_h_svm_page_in(kvm,
- 						   kvmppc_get_gpr(vcpu, 4),
- 						   kvmppc_get_gpr(vcpu, 5),
- 						   kvmppc_get_gpr(vcpu, 6));
-@@ -1104,7 +1105,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 	case H_SVM_PAGE_OUT:
- 		ret = H_UNSUPPORTED;
- 		if (kvmppc_get_srr1(vcpu) & MSR_S)
--			ret = kvmppc_h_svm_page_out(vcpu->kvm,
-+			ret = kvmppc_h_svm_page_out(kvm,
- 						    kvmppc_get_gpr(vcpu, 4),
- 						    kvmppc_get_gpr(vcpu, 5),
- 						    kvmppc_get_gpr(vcpu, 6));
-@@ -1112,12 +1113,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 	case H_SVM_INIT_START:
- 		ret = H_UNSUPPORTED;
- 		if (kvmppc_get_srr1(vcpu) & MSR_S)
--			ret = kvmppc_h_svm_init_start(vcpu->kvm);
-+			ret = kvmppc_h_svm_init_start(kvm);
- 		break;
- 	case H_SVM_INIT_DONE:
- 		ret = H_UNSUPPORTED;
- 		if (kvmppc_get_srr1(vcpu) & MSR_S)
--			ret = kvmppc_h_svm_init_done(vcpu->kvm);
-+			ret = kvmppc_h_svm_init_done(kvm);
- 		break;
- 	case H_SVM_INIT_ABORT:
- 		/*
-@@ -1127,7 +1128,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 		 * Instead the kvm->arch.secure_guest flag is checked inside
- 		 * kvmppc_h_svm_init_abort().
- 		 */
--		ret = kvmppc_h_svm_init_abort(vcpu->kvm);
-+		ret = kvmppc_h_svm_init_abort(kvm);
- 		break;
- 
+@@ -1134,6 +1180,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
  	default:
+ 		return RESUME_HOST;
+ 	}
++	WARN_ON_ONCE(ret == H_TOO_HARD);
+ 	kvmppc_set_gpr(vcpu, 3, ret);
+ 	vcpu->arch.hcall_needed = 0;
+ 	return RESUME_GUEST;
+@@ -1420,19 +1467,80 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
+ 	 * host page has been paged out.  Any other HDSI/HISI interrupts
+ 	 * have been handled already.
+ 	 */
+-	case BOOK3S_INTERRUPT_H_DATA_STORAGE:
+-		r = RESUME_PAGE_FAULT;
+-		if (vcpu->arch.fault_dsisr == HDSISR_CANARY)
++	case BOOK3S_INTERRUPT_H_DATA_STORAGE: {
++		unsigned long vsid;
++		long err;
++
++		if (vcpu->arch.fault_dsisr == HDSISR_CANARY) {
+ 			r = RESUME_GUEST; /* Just retry if it's the canary */
++			break;
++		}
++
++		if (kvm_is_radix(vcpu->kvm)) {
++			r = RESUME_PAGE_FAULT;
++			break;
++		}
++
++		if (!(vcpu->arch.fault_dsisr & (DSISR_NOHPTE | DSISR_PROTFAULT))) {
++			kvmppc_core_queue_data_storage(vcpu, vcpu->arch.fault_dar, vcpu->arch.fault_dsisr);
++			r = RESUME_GUEST;
++			break;
++		}
++		if (!(vcpu->arch.shregs.msr & MSR_DR)) {
++			vsid = vcpu->kvm->arch.vrma_slb_v;
++		} else {
++			vsid = vcpu->arch.fault_gpa;
++		}
++		err = kvmppc_hpte_hv_fault(vcpu, vcpu->arch.fault_dar,
++				vsid, vcpu->arch.fault_dsisr, true);
++		if (err == 0) {
++			r = RESUME_GUEST;
++		} else if (err == -1 || err == -2) {
++			r = RESUME_PAGE_FAULT;
++		} else {
++			kvmppc_core_queue_data_storage(vcpu, vcpu->arch.fault_dar, err);
++			r = RESUME_GUEST;
++		}
+ 		break;
+-	case BOOK3S_INTERRUPT_H_INST_STORAGE:
++	}
++	case BOOK3S_INTERRUPT_H_INST_STORAGE: {
++		unsigned long vsid;
++		long err;
++
+ 		vcpu->arch.fault_dar = kvmppc_get_pc(vcpu);
+ 		vcpu->arch.fault_dsisr = vcpu->arch.shregs.msr &
+ 			DSISR_SRR1_MATCH_64S;
+ 		if (vcpu->arch.shregs.msr & HSRR1_HISI_WRITE)
+ 			vcpu->arch.fault_dsisr |= DSISR_ISSTORE;
+-		r = RESUME_PAGE_FAULT;
++		if (kvm_is_radix(vcpu->kvm)) {
++			r = RESUME_PAGE_FAULT;
++			break;
++		}
++
++		if (!(vcpu->arch.fault_dsisr & SRR1_ISI_NOPT)) {
++			/* XXX: clear DSISR_ISSTORE? */
++			kvmppc_core_queue_inst_storage(vcpu, vcpu->arch.fault_dsisr);
++			r = RESUME_GUEST;
++			break;
++		}
++		if (!(vcpu->arch.shregs.msr & MSR_DR)) {
++			vsid = vcpu->kvm->arch.vrma_slb_v;
++		} else {
++			vsid = vcpu->arch.fault_gpa;
++		}
++		err = kvmppc_hpte_hv_fault(vcpu, vcpu->arch.fault_dar,
++				vsid, vcpu->arch.fault_dsisr, false);
++		if (err == 0) {
++			r = RESUME_GUEST;
++		} else if (err == -1) {
++			r = RESUME_PAGE_FAULT;
++		} else {
++			kvmppc_core_queue_inst_storage(vcpu, err);
++			r = RESUME_GUEST;
++		}
+ 		break;
++	}
++
+ 	/*
+ 	 * This occurs if the guest executes an illegal instruction.
+ 	 * If the guest debug is disabled, generate a program interrupt
 -- 
 2.23.0
 
