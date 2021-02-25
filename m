@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 190B83250C8
-	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Feb 2021 14:49:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50F3A3250D6
+	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Feb 2021 14:49:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231818AbhBYNsn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 25 Feb 2021 08:48:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44692 "EHLO
+        id S231960AbhBYNtO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 25 Feb 2021 08:49:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231604AbhBYNsn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 25 Feb 2021 08:48:43 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8088C061788
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:02 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id l18so3562155pji.3
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:02 -0800 (PST)
+        with ESMTP id S229566AbhBYNtI (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 25 Feb 2021 08:49:08 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6942C0617AA
+        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:05 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id u12so3320002pjr.2
+        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 05:48:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=kbXDPVn/6/K9PcQafkWtS0R94LJwb94j0RZ+KsMZVko=;
-        b=cZG/TmfIJYP9ySL3cURRthWTojPynINIW6XqbZoJb+2omF6EgjZKQ61a8JJDuzRdnr
-         x2VV63vHuuObIA/2cChPJyXmZZdlz3zssKpWwv1u+BBAa9OZ/ekPV4Z22dy4TZ7xe4Op
-         RjENg68UGSrRwE+0RTXgFnQVRzkJfLx/3rgCHv/wI/fphgGFf23U+7MJcxCEvgIkQ+PH
-         iKC1pb7XyL7H9L6eiCAoow9XILu+EUvmCmqRWRLjMJYTkISODOPcg9BEXkh3VKv0FwSb
-         R0BI91c1vvduiIZL4dbjl2hXPCWQ2qmgPhskY0/NSBe7/Ux2aJtfIxt2KqJOldHHi/ur
-         DAMg==
+        bh=q3MbbxrELn+TwojMnsr2Dw3fkqeHU+FUDlPMBwDlaCY=;
+        b=mpNscLPSdgLzWsUAfE8EpRXRIM51BpyecMaKWajFv1yfnBmWJ17F6txO5IPVjUJ74L
+         r5jJWJYgkwBGx10hHRj2advd8SPjai+3tWj3jnG48SQiYw/bHkdJ9czxHN8BWWnZjOI7
+         7mfMQ/xwvhiz8ckx974mi2t3H1AhMbmjYI+XXPpXkt8OY6hz+g+dnCRT1MjHu5NvIy/v
+         WTM4NrDFeV/p3R/4FF912bryse8S5F6W1CUXn/BKF5hnuUHMY0vcga/zvSXtyTfyWZDZ
+         UguZpSvU4Q2Pdys1uOaG6Hf0aQxhBJp8qoqJJhGhNp500fCOdNpdYP3N1NKzOmt7P5GH
+         md6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=kbXDPVn/6/K9PcQafkWtS0R94LJwb94j0RZ+KsMZVko=;
-        b=gALVSzJsrVxYToE+vytk/T+5QC6eYw+GWveu6uowHpV7ZNo0x0pMK+NRvua8M2GulY
-         jxRXGe24DzRjZk7JQ7Q1m83GSrjz3VfZaKYbDcVmZaW6iuh8U0Ok8f7AvvslyY5lylq9
-         wFJkZQkDYSqJAqUWv4dYtMK6Zmc56SzStqaFKF3nNuyJsRWhQY6jW0RN8bw7TCPGnjcq
-         9if9jRvcj5Xum7Y5O6kPemp9CdMJzvqfXmF8iGLqDvBLnLDJ/FaRFa7U81ze0l7WK0tC
-         dNJSE82MMFD9IAeFVAxebsw9llGpfYhw9HEcAEsGgmtUVgG8YWLAIeVeKnFea9tJeH9d
-         csXg==
-X-Gm-Message-State: AOAM531dA128QlB2E5UjGv2Yllz29Am60ST5PtkJihf34EUGXiNE8Q+q
-        0NePpfiOn3BnsXJpxzlR1Eg/PMJwI/w=
-X-Google-Smtp-Source: ABdhPJyc5gaQwKOIAt8FWXSy3UqBYnhW/0DQWRY2+1dIg+EUjt5VYmoWzjive5AP27muZzAdO2kOfA==
-X-Received: by 2002:a17:90a:7f87:: with SMTP id m7mr3354890pjl.64.1614260881707;
-        Thu, 25 Feb 2021 05:48:01 -0800 (PST)
+        bh=q3MbbxrELn+TwojMnsr2Dw3fkqeHU+FUDlPMBwDlaCY=;
+        b=n0bsOgpD55eMNd5R23I6PQffP53pq9juoVVpX/8aZwz/PfPc40iK62vGPi7PBvc5P8
+         jQix8mF0jsH3u2VM56QDYrM9J88ZjsdYc3h7MZOqjqLerYYCI1em/TcfdVJpaeiyJrAn
+         xSjy08M91yzjp8PMrl/BJ3aLi4rnlja/lNHBrNkWYZqsYzZT0dP8HqoaXsuVXs07yM7t
+         kFJjqPM/+kFOntZAYi2IZYIOffqS7ekCOs+TJNRRV7mPN6x3sDoHQSZ07jiY4FHRWaP9
+         nag68Xx5gwy4YiitTqp2oRRQv4/9DpcifR1Ue6OokGaXQyez62k/Csnb9OJrG1mr6Zdr
+         1cVg==
+X-Gm-Message-State: AOAM532u7nTo3G7kU/QaMLhV2IAnjYomF53RAcb4bxvO3Gu5JoEAOOm6
+        JXmQUNjd2aie8KXr329IaTTV2vp88ME=
+X-Google-Smtp-Source: ABdhPJxmjVYicu31+Ovtl+bVMxJEtCuzruCMimQ9v0cIdWxEQisZVMGiS7vRy4ElZuhl5mATjEWgpA==
+X-Received: by 2002:a17:90a:3804:: with SMTP id w4mr3468161pjb.189.1614260885095;
+        Thu, 25 Feb 2021 05:48:05 -0800 (PST)
 Received: from bobo.ibm.com (58-6-239-121.tpgi.com.au. [58.6.239.121])
-        by smtp.gmail.com with ESMTPSA id a9sm5925868pjq.17.2021.02.25.05.47.59
+        by smtp.gmail.com with ESMTPSA id a9sm5925868pjq.17.2021.02.25.05.48.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Feb 2021 05:48:01 -0800 (PST)
+        Thu, 25 Feb 2021 05:48:04 -0800 (PST)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2 17/37] KVM: PPC: Book3S HV P9: Move setting HDEC after switching to guest LPCR
-Date:   Thu, 25 Feb 2021 23:46:32 +1000
-Message-Id: <20210225134652.2127648-18-npiggin@gmail.com>
+Subject: [PATCH v2 18/37] KVM: PPC: Book3S HV P9: Use large decrementer for HDEC
+Date:   Thu, 25 Feb 2021 23:46:33 +1000
+Message-Id: <20210225134652.2127648-19-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210225134652.2127648-1-npiggin@gmail.com>
 References: <20210225134652.2127648-1-npiggin@gmail.com>
@@ -62,63 +62,42 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-LPCR[HDICE]=0 suppresses hypervisor decrementer exceptions on some
-processors, so it must be enabled before HDEC is set.
-
-Rather than set it in the host LPCR then setting HDEC, move the HDEC
-update to after the guest MMU context (including LPCR) is loaded.
-There shouldn't be much concern with delaying HDEC by some 10s or 100s
-of nanoseconds by setting it a bit later.
+On processors that don't suppress the HDEC exceptions when LPCR[HDICE]=0,
+this could help reduce needless guest exits due to leftover exceptions on
+entering the guest.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+ arch/powerpc/include/asm/time.h | 2 ++
+ arch/powerpc/kvm/book3s_hv.c    | 3 ++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/arch/powerpc/include/asm/time.h b/arch/powerpc/include/asm/time.h
+index 8dd3cdb25338..68d94711811e 100644
+--- a/arch/powerpc/include/asm/time.h
++++ b/arch/powerpc/include/asm/time.h
+@@ -18,6 +18,8 @@
+ #include <asm/vdso/timebase.h>
+ 
+ /* time.c */
++extern u64 decrementer_max;
++
+ extern unsigned long tb_ticks_per_jiffy;
+ extern unsigned long tb_ticks_per_usec;
+ extern unsigned long tb_ticks_per_sec;
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index d4770b222d7e..63cc92c45c5d 100644
+index 63cc92c45c5d..913582bd848f 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3490,23 +3490,13 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 		host_dawrx1 = mfspr(SPRN_DAWRX1);
+@@ -3609,7 +3609,8 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+ 		vc->tb_offset_applied = 0;
  	}
  
--	/*
--	 * P8 and P9 suppress the HDEC exception when LPCR[HDICE] = 0,
--	 * so set HDICE before writing HDEC.
--	 */
--	mtspr(SPRN_LPCR, kvm->arch.host_lpcr | LPCR_HDICE);
--	isync();
--
--	hdec = time_limit - mftb();
--	if (hdec < 0) {
--		mtspr(SPRN_LPCR, kvm->arch.host_lpcr);
--		isync();
-+	tb = mftb();
-+	hdec = time_limit - tb;
-+	if (hdec < 0)
- 		return BOOK3S_INTERRUPT_HV_DECREMENTER;
--	}
--	mtspr(SPRN_HDEC, hdec);
+-	mtspr(SPRN_HDEC, 0x7fffffff);
++	/* HDEC must be at least as large as DEC, so decrementer_max fits */
++	mtspr(SPRN_HDEC, decrementer_max);
  
- 	if (vc->tb_offset) {
--		u64 new_tb = mftb() + vc->tb_offset;
-+		u64 new_tb = tb + vc->tb_offset;
- 		mtspr(SPRN_TBU40, new_tb);
- 		tb = mftb();
- 		if ((tb & 0xffffff) < (new_tb & 0xffffff))
-@@ -3549,6 +3539,12 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 
- 	switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
- 
-+	/*
-+	 * P9 suppresses the HDEC exception when LPCR[HDICE] = 0,
-+	 * so set guest LPCR (with HDICE) before writing HDEC.
-+	 */
-+	mtspr(SPRN_HDEC, hdec);
-+
- 	mtspr(SPRN_SRR0, vcpu->arch.shregs.srr0);
- 	mtspr(SPRN_SRR1, vcpu->arch.shregs.srr1);
+ 	switch_mmu_to_host_radix(kvm, host_pidr);
  
 -- 
 2.23.0
