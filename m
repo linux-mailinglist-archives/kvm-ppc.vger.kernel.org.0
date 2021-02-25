@@ -2,114 +2,166 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE206324EB5
-	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Feb 2021 12:00:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32E853250A1
+	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Feb 2021 14:42:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231335AbhBYLAh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 25 Feb 2021 06:00:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37038 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229845AbhBYLAd (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 25 Feb 2021 06:00:33 -0500
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49FD0C061574
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 02:59:53 -0800 (PST)
-Received: by mail-pg1-x536.google.com with SMTP id p21so3523411pgl.12
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 02:59:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=xGroUyWCT31sVVQ60G/9L3y5R8a5+elyKISQ35AcBIU=;
-        b=POgd72FP+RBHr/pG+sArA12DOyP6HehKQMpHUa+aDHxIjKW78C10mclu6bNMzWfYuo
-         7+JW73xrmLqZmzityMUc+37wwQR3CuAwsJ1AfV0JBtYdUB/r9FZ9d2hF/exolZciIrV0
-         ZxDaMA/cZU3ZB00kuF/4wsqMPTW6+h4OLdgTsRa2wmtCEfFRkVbiIow8iLhP+/VzhBAh
-         JycKXsfAzm7SaHRbzwrKVL5zwSGtfQuRDinkFZxpRzEY+95ZCtB7NWx8IQaZjsGTi2Mz
-         f5G9iWiKuCrxaSbaZMiRETqfRllUpMmrmA9NF4bHXmgkASPiTjplPiPBffSZn0/ulGR+
-         t9EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=xGroUyWCT31sVVQ60G/9L3y5R8a5+elyKISQ35AcBIU=;
-        b=EAAI1hmYus0R+JMMIAwLUnE/U/8aCBbXemwdwUpR9FkH1jVtVlCwMH/aPbEh3gY0Dd
-         jxqEdxOOYB5453fTMxN+8F7RXYDp+/ikoHe9eY6YJSbxUWbxcPfpf+NbaeolgvYIYZU4
-         BQPptdEgMQ1t5ivGzqh5AI1OPMEaokvkSiioR/M1fbq5tyQ7gyK69Mf12BaaqsVFaNAw
-         FiKmXqaDIp+wI8lR3JUjuGW+5suIAFZbC1e20LSbAk3Uu/x+AOwH11qOGsIXRUoHpdn7
-         IVogSvo36BLXRN+oRCNR7kbjTWFx6RIyDTCWWCwmOqoYPy/hWL/SFlfS0D7r1TCv2Gsx
-         nPkA==
-X-Gm-Message-State: AOAM532OfBtGOcJrL4Wfra3eBdvOIl5K1rmhPyIqrrBrg6mEQgEXbjVN
-        XzwC6QpAwFDEFJ9Ty+6H9bo=
-X-Google-Smtp-Source: ABdhPJyDnUTqPNUoeLPpGS+f75QJ1DMvUVfllFD2r7Imr2pRu/wAyL9mbvtTSH7CgbzJSKXaNSILPQ==
-X-Received: by 2002:a05:6a00:22ca:b029:1ed:f915:ca98 with SMTP id f10-20020a056a0022cab02901edf915ca98mr2692042pfj.68.1614250792901;
-        Thu, 25 Feb 2021 02:59:52 -0800 (PST)
-Received: from localhost (58-6-239-121.tpgi.com.au. [58.6.239.121])
-        by smtp.gmail.com with ESMTPSA id 67sm6123116pfw.92.2021.02.25.02.59.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Feb 2021 02:59:52 -0800 (PST)
-Date:   Thu, 25 Feb 2021 20:59:46 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 12/13] KVM: PPC: Book3S HV: Move radix MMU switching
- together in the P9 path
-To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org
-References: <20210219063542.1425130-1-npiggin@gmail.com>
-        <20210219063542.1425130-13-npiggin@gmail.com> <878s7dxkxr.fsf@linux.ibm.com>
-In-Reply-To: <878s7dxkxr.fsf@linux.ibm.com>
+        id S232469AbhBYNkX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 25 Feb 2021 08:40:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51626 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230459AbhBYNkV (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 25 Feb 2021 08:40:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614260334;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=lAJU+Kapx1ZmAfsicjpeIBV3nVtHSrGbB3aXfXZpnYs=;
+        b=Vk0TlYNJuUMTTDCwlDqENTN0ZLSepryd5LIQaFT4pGdNJDsunTr/EtVJt302K5CkWrSluo
+        Z5u1Z/C/79/aC2537nW9GN9OnGJACHFVIB6W1NfYgZas22csW4S3GOnKsyA1e9egadg9Gs
+        CyjxFG/inxNR8RGw+U6dLjdwCIX6nkg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-MZzIy0qFOxenNFcSu8XFbw-1; Thu, 25 Feb 2021 08:38:52 -0500
+X-MC-Unique: MZzIy0qFOxenNFcSu8XFbw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A4CCCE646;
+        Thu, 25 Feb 2021 13:38:51 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A5ED819C48;
+        Thu, 25 Feb 2021 13:38:50 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH] Documentation: kvm: fix messy conversion from .txt to .rst
+Date:   Thu, 25 Feb 2021 08:38:50 -0500
+Message-Id: <20210225133850.7946-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Message-Id: <1614250755.4zzkisf6bg.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Fabiano Rosas's message of February 25, 2021 6:36 am:
-> Nicholas Piggin <npiggin@gmail.com> writes:
->=20
->> Switching the MMU from radix<->radix mode is tricky particularly as the
->> MMU can remain enabled and requires a certain sequence of SPR updates.
->> Move these together into their own functions.
->>
->> This also includes the radix TLB check / flush because it's tied in to
->> MMU switching due to tlbiel getting LPID from LPIDR.
->>
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->> ---
->=20
-> <snip>
->=20
->> @@ -4117,7 +4138,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u=
-64 time_limit,
->>  {
->>  	struct kvm_run *run =3D vcpu->run;
->>  	int trap, r, pcpu;
->> -	int srcu_idx, lpid;
->> +	int srcu_idx;
->>  	struct kvmppc_vcore *vc;
->>  	struct kvm *kvm =3D vcpu->kvm;
->>  	struct kvm_nested_guest *nested =3D vcpu->arch.nested;
->> @@ -4191,13 +4212,6 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, =
-u64 time_limit,
->>  	vc->vcore_state =3D VCORE_RUNNING;
->>  	trace_kvmppc_run_core(vc, 0);
->>
->> -	if (cpu_has_feature(CPU_FTR_HVMODE)) {
->> -		lpid =3D nested ? nested->shadow_lpid : kvm->arch.lpid;
->> -		mtspr(SPRN_LPID, lpid);
->> -		isync();
->> -		kvmppc_check_need_tlb_flush(kvm, pcpu, nested);
->> -	}
->> -
->=20
-> What about the counterpart to this^ down below?
->=20
-> 	if (cpu_has_feature(CPU_FTR_HVMODE)) {
-> 		mtspr(SPRN_LPID, kvm->arch.host_lpid);
-> 		isync();
-> 	}
+Building the documentation gives a warning that the KVM_PPC_RESIZE_HPT_PREPARE
+label is defined twice.  The root cause is that the KVM_PPC_RESIZE_HPT_PREPARE
+API is present twice, the second being a mix of the prepare and commit APIs.
+Fix it.
 
-Good catch, you're right that can be removed too.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Documentation/virt/kvm/api.rst | 69 ++++++++--------------------------
+ 1 file changed, 16 insertions(+), 53 deletions(-)
 
-Thanks,
-Nick
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 0717bf523034..80237dee7a96 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -3856,49 +3856,20 @@ base 2 of the page size in the bottom 6 bits.
+          -EFAULT if struct kvm_reinject_control cannot be read,
+ 	 -EINVAL if the supplied shift or flags are invalid,
+ 	 -ENOMEM if unable to allocate the new HPT,
+-	 -ENOSPC if there was a hash collision
+-
+-::
+-
+-  struct kvm_ppc_rmmu_info {
+-	struct kvm_ppc_radix_geom {
+-		__u8	page_shift;
+-		__u8	level_bits[4];
+-		__u8	pad[3];
+-	}	geometries[8];
+-	__u32	ap_encodings[8];
+-  };
+-
+-The geometries[] field gives up to 8 supported geometries for the
+-radix page table, in terms of the log base 2 of the smallest page
+-size, and the number of bits indexed at each level of the tree, from
+-the PTE level up to the PGD level in that order.  Any unused entries
+-will have 0 in the page_shift field.
+-
+-The ap_encodings gives the supported page sizes and their AP field
+-encodings, encoded with the AP value in the top 3 bits and the log
+-base 2 of the page size in the bottom 6 bits.
+-
+-4.102 KVM_PPC_RESIZE_HPT_PREPARE
+---------------------------------
+-
+-:Capability: KVM_CAP_SPAPR_RESIZE_HPT
+-:Architectures: powerpc
+-:Type: vm ioctl
+-:Parameters: struct kvm_ppc_resize_hpt (in)
+-:Returns: 0 on successful completion,
+-	 >0 if a new HPT is being prepared, the value is an estimated
+-         number of milliseconds until preparation is complete,
+-         -EFAULT if struct kvm_reinject_control cannot be read,
+-	 -EINVAL if the supplied shift or flags are invalid,when moving existing
+-         HPT entries to the new HPT,
+-	 -EIO on other error conditions
+ 
+ Used to implement the PAPR extension for runtime resizing of a guest's
+ Hashed Page Table (HPT).  Specifically this starts, stops or monitors
+ the preparation of a new potential HPT for the guest, essentially
+ implementing the H_RESIZE_HPT_PREPARE hypercall.
+ 
++::
++
++  struct kvm_ppc_resize_hpt {
++	__u64 flags;
++	__u32 shift;
++	__u32 pad;
++  };
++
+ If called with shift > 0 when there is no pending HPT for the guest,
+ this begins preparation of a new pending HPT of size 2^(shift) bytes.
+ It then returns a positive integer with the estimated number of
+@@ -3926,14 +3897,6 @@ Normally this will be called repeatedly with the same parameters until
+ it returns <= 0.  The first call will initiate preparation, subsequent
+ ones will monitor preparation until it completes or fails.
+ 
+-::
+-
+-  struct kvm_ppc_resize_hpt {
+-	__u64 flags;
+-	__u32 shift;
+-	__u32 pad;
+-  };
+-
+ 4.103 KVM_PPC_RESIZE_HPT_COMMIT
+ -------------------------------
+ 
+@@ -3956,6 +3919,14 @@ Hashed Page Table (HPT).  Specifically this requests that the guest be
+ transferred to working with the new HPT, essentially implementing the
+ H_RESIZE_HPT_COMMIT hypercall.
+ 
++::
++
++  struct kvm_ppc_resize_hpt {
++	__u64 flags;
++	__u32 shift;
++	__u32 pad;
++  };
++
+ This should only be called after KVM_PPC_RESIZE_HPT_PREPARE has
+ returned 0 with the same parameters.  In other cases
+ KVM_PPC_RESIZE_HPT_COMMIT will return an error (usually -ENXIO or
+@@ -3971,14 +3942,6 @@ HPT and the previous HPT will be discarded.
+ 
+ On failure, the guest will still be operating on its previous HPT.
+ 
+-::
+-
+-  struct kvm_ppc_resize_hpt {
+-	__u64 flags;
+-	__u32 shift;
+-	__u32 pad;
+-  };
+-
+ 4.104 KVM_X86_GET_MCE_CAP_SUPPORTED
+ -----------------------------------
+ 
+-- 
+2.26.2
+
