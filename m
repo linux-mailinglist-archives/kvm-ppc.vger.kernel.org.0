@@ -2,56 +2,56 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 68417325CD5
-	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Feb 2021 06:02:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B4E2325CF9
+	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Feb 2021 06:22:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbhBZFCb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 26 Feb 2021 00:02:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43034 "EHLO
+        id S229498AbhBZFWf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 26 Feb 2021 00:22:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbhBZFCa (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 26 Feb 2021 00:02:30 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DA5DC061574
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 21:01:50 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id g4so5547070pgj.0
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 21:01:50 -0800 (PST)
+        with ESMTP id S229449AbhBZFWe (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 26 Feb 2021 00:22:34 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80101C061574
+        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 21:21:54 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id b8so1879636plh.0
+        for <kvm-ppc@vger.kernel.org>; Thu, 25 Feb 2021 21:21:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=axtens.net; s=google;
         h=from:to:cc:subject:in-reply-to:references:date:message-id
          :mime-version;
-        bh=ONONQmKKLgRI6txfN7nZzG8ZKShi1zdqEa9NKzPqd3E=;
-        b=h+pajDz3m4XZUqTFlaQVxPtcQPzwA7yMI2I9aemClWUrS6jzudQAza5o02EGuf1yRS
-         RgYtUH3aeg41kRTdbDJsZ2OSAPDC92Ddd1Ste5BRlQPqcUC/rxZo++g8uywrFKu0P4Lm
-         LXF4k/Vs2Q/4CuGhvuP7DCmFBE9WsNL76VbjU=
+        bh=G0n0GtXCnVUgNxEQs6ivYCWrbpuorhBY/DfuohJYFLM=;
+        b=kQTrHw3+qJExsopJW13hHe6o+yaiTvQIM8RzPMuNoJHjgIvjpUtfGA/oe7PqlMGzme
+         z+Ox71hBclSBFo+9h9hYPRLh2IADsVEDpBVpBzuDlqNqvD00ImAywrIjAwgF40To92ZB
+         DiwHtptmkvdHCF6XMB2oK6eJBeGmMKPnngC9M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=ONONQmKKLgRI6txfN7nZzG8ZKShi1zdqEa9NKzPqd3E=;
-        b=Ac5VigOBSz384SNojz9I56pDhVt3XN5/Xv2upL7utecwV94f9ZqHKQq2rbJbbKpFdP
-         BktM5SzdFa95D9D+V5wWjjXyE/9CUjKDZB9i63l/WE6wiE0zgQfk4PNBTDdHEClc5wgn
-         GQ0Lg+OSK19WMvUQGnHECYrlH5/8CFnMZAoodlD5B4RpBkwVLw1NK3O+AGDSNHdQTP+W
-         NyFjJffy98gbqYq4/98n+4b8s/hU8l7Tkl32Wobi4N+9C+sNkPmE0EX9a6imzAFV/uN7
-         SpQT/u9DyzKnWfmP+4Jj2YudTpjR+1+YKUwvdvayhIGWAyuIeKtfcieRVcqrpwBr516O
-         SKQQ==
-X-Gm-Message-State: AOAM532/GycOiCMv82sSqg2zoqb0IvNGaxMUBBkGpCDzm1gHRQaZM/y+
-        pvfQ0JanZUXF2HxrI1fMlrW6CnDuZvbsu4EN
-X-Google-Smtp-Source: ABdhPJzgjekTt0EMEqjOTzklf7dGBWjpxXDSUb3/tzvk0WOQlACltMeiroiwrvOEBI7gaeLGoT4BFw==
-X-Received: by 2002:a63:ff53:: with SMTP id s19mr1306250pgk.347.1614315709698;
-        Thu, 25 Feb 2021 21:01:49 -0800 (PST)
+        bh=G0n0GtXCnVUgNxEQs6ivYCWrbpuorhBY/DfuohJYFLM=;
+        b=eoGd0JCR35FLhdhOfE8DvBW6cs67F0BLbeJ/mYxeowWpLWDvnqG4zdaarJC8fLpKTS
+         FOf0V+dsPikV4WIOwu1GOV7YisO8/HX8Gxkug3duA7p83OukYD/nV6nEA0HuMguLEC7H
+         QHspMAEbayXRwex/ALI8XlBrK3oCfcAJcmzQI3pVx1CGeKYXidQGwKZM1/JpFFbo69j4
+         fWy+UojHDPTQH21/olulsLhSf2Y7ZUiK3WxwhgJldaKkyftxmTlCRp6WW7xBncLfCh2c
+         PZm/tUakS2zNI8ZfrlWpO1P0dWEfU2PvUELpk2BVumml+lxFxGhR3dU7lkh+o1iSrU+0
+         9GcQ==
+X-Gm-Message-State: AOAM533k5KNWvJ3sA4/KlQLZp8wFeRw0CqiOSghbzqslVL5aQbgSU+UN
+        cllOwzNYVOBHi6lTGCYco8DECA==
+X-Google-Smtp-Source: ABdhPJwAJ8yfjWTchCphDH+TWvqyIAj8tFTBcC3i25C3OhOMwD2WBbduCpjTqMsT4+0bhS1PDGOHFg==
+X-Received: by 2002:a17:90a:66cd:: with SMTP id z13mr1597599pjl.171.1614316914006;
+        Thu, 25 Feb 2021 21:21:54 -0800 (PST)
 Received: from localhost (2001-44b8-1113-6700-7ad2-5bb3-4fd4-d737.static.ipv6.internode.on.net. [2001:44b8:1113:6700:7ad2:5bb3:4fd4:d737])
-        by smtp.gmail.com with ESMTPSA id h8sm7251059pfv.154.2021.02.25.21.01.48
+        by smtp.gmail.com with ESMTPSA id 192sm5259559pfx.193.2021.02.25.21.21.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Feb 2021 21:01:49 -0800 (PST)
+        Thu, 25 Feb 2021 21:21:53 -0800 (PST)
 From:   Daniel Axtens <dja@axtens.net>
 To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
 Cc:     linuxppc-dev@lists.ozlabs.org, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 01/37] KVM: PPC: Book3S 64: remove unused kvmppc_h_protect argument
-In-Reply-To: <20210225134652.2127648-2-npiggin@gmail.com>
-References: <20210225134652.2127648-1-npiggin@gmail.com> <20210225134652.2127648-2-npiggin@gmail.com>
-Date:   Fri, 26 Feb 2021 16:01:45 +1100
-Message-ID: <878s7ba0cm.fsf@linkitivity.dja.id.au>
+Subject: Re: [PATCH v2 02/37] KVM: PPC: Book3S HV: Fix CONFIG_SPAPR_TCE_IOMMU=n default hcalls
+In-Reply-To: <20210225134652.2127648-3-npiggin@gmail.com>
+References: <20210225134652.2127648-1-npiggin@gmail.com> <20210225134652.2127648-3-npiggin@gmail.com>
+Date:   Fri, 26 Feb 2021 16:21:50 +1100
+Message-ID: <875z2f9zf5.fsf@linkitivity.dja.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
@@ -60,65 +60,41 @@ X-Mailing-List: kvm-ppc@vger.kernel.org
 
 Hi Nick,
 
-> The va argument is not used in the function or set by its asm caller,
-> so remove it to be safe.
+> This config option causes the warning in init_default_hcalls to fire
+> because the TCE handlers are in the default hcall list but not
+> implemented.
 
-Huh, so it isn't. I tracked the original implementation down to commit
-a8606e20e41a ("KVM: PPC: Handle some PAPR hcalls in the kernel") where
-paulus first added the ability to handle it in the kernel - there it
-takes a va argument but even then doesn't do anything with it.
+I checked that the TCE handlers are indeed not defined unless
+CONFIG_SPAPR_TCE_IOMMU=y, and so I can see how you would hit the
+warning.
 
-ajd also pointed out that we don't pass a va when linux is running as a
-guest, and LoPAR does not mention va as an argument.
+This seems like the right solution to me.
 
-One small nit: checkpatch is complaining about spaces vs tabs:
-ERROR: code indent should use tabs where possible
-#25: FILE: arch/powerpc/include/asm/kvm_ppc.h:770:
-+                      unsigned long pte_index, unsigned long avpn);$
-
-WARNING: please, no spaces at the start of a line
-#25: FILE: arch/powerpc/include/asm/kvm_ppc.h:770:
-+                      unsigned long pte_index, unsigned long avpn);$
-
-Once that is resolved,
-  Reviewed-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Axtens <dja@axtens.net>
 
 Kind regards,
-Daniel Axtens
+Daniel
 
+>
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->  arch/powerpc/include/asm/kvm_ppc.h  | 3 +--
->  arch/powerpc/kvm/book3s_hv_rm_mmu.c | 3 +--
->  2 files changed, 2 insertions(+), 4 deletions(-)
+>  arch/powerpc/kvm/book3s_hv.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >
-> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-> index 8aacd76bb702..9531b1c1b190 100644
-> --- a/arch/powerpc/include/asm/kvm_ppc.h
-> +++ b/arch/powerpc/include/asm/kvm_ppc.h
-> @@ -767,8 +767,7 @@ long kvmppc_h_remove(struct kvm_vcpu *vcpu, unsigned long flags,
->                       unsigned long pte_index, unsigned long avpn);
->  long kvmppc_h_bulk_remove(struct kvm_vcpu *vcpu);
->  long kvmppc_h_protect(struct kvm_vcpu *vcpu, unsigned long flags,
-> -                      unsigned long pte_index, unsigned long avpn,
-> -                      unsigned long va);
-> +                      unsigned long pte_index, unsigned long avpn);
->  long kvmppc_h_read(struct kvm_vcpu *vcpu, unsigned long flags,
->                     unsigned long pte_index);
->  long kvmppc_h_clear_ref(struct kvm_vcpu *vcpu, unsigned long flags,
-> diff --git a/arch/powerpc/kvm/book3s_hv_rm_mmu.c b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-> index 88da2764c1bb..7af7c70f1468 100644
-> --- a/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-> +++ b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-> @@ -673,8 +673,7 @@ long kvmppc_h_bulk_remove(struct kvm_vcpu *vcpu)
->  }
->  
->  long kvmppc_h_protect(struct kvm_vcpu *vcpu, unsigned long flags,
-> -		      unsigned long pte_index, unsigned long avpn,
-> -		      unsigned long va)
-> +		      unsigned long pte_index, unsigned long avpn)
->  {
->  	struct kvm *kvm = vcpu->kvm;
->  	__be64 *hpte;
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 13bad6bf4c95..895090636295 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -5369,8 +5369,10 @@ static unsigned int default_hcall_list[] = {
+>  	H_READ,
+>  	H_PROTECT,
+>  	H_BULK_REMOVE,
+> +#ifdef CONFIG_SPAPR_TCE_IOMMU
+>  	H_GET_TCE,
+>  	H_PUT_TCE,
+> +#endif
+>  	H_SET_DABR,
+>  	H_SET_XDABR,
+>  	H_CEDE,
 > -- 
 > 2.23.0
