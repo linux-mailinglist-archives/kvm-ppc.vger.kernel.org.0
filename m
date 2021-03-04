@@ -2,317 +2,430 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C767132CCAB
-	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Mar 2021 07:19:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2FA032CD44
+	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Mar 2021 08:02:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234924AbhCDGSE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 4 Mar 2021 01:18:04 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:4553 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234868AbhCDGR5 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Mar 2021 01:17:57 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B60407b6d0000>; Wed, 03 Mar 2021 22:17:17 -0800
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 4 Mar
- 2021 06:17:17 +0000
-Received: from localhost (172.20.145.6) by DRHQMAIL107.nvidia.com (10.27.9.16)
- with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 4 Mar 2021 06:17:16
- +0000
-From:   Alistair Popple <apopple@nvidia.com>
-To:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
-        <bskeggs@redhat.com>, <akpm@linux-foundation.org>
-CC:     <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
-        <jglisse@redhat.com>, "Alistair Popple" <apopple@nvidia.com>
-Subject: [PATCH v4 8/8] nouveau/svm: Implement atomic SVM access
-Date:   Thu, 4 Mar 2021 17:16:45 +1100
-Message-ID: <20210304061645.29747-9-apopple@nvidia.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210304061645.29747-1-apopple@nvidia.com>
-References: <20210304061645.29747-1-apopple@nvidia.com>
+        id S233349AbhCDHBt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 4 Mar 2021 02:01:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50944 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233089AbhCDHB3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Mar 2021 02:01:29 -0500
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 412E1C061574
+        for <kvm-ppc@vger.kernel.org>; Wed,  3 Mar 2021 23:00:49 -0800 (PST)
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4DrhbK10Ygz9sRf; Thu,  4 Mar 2021 18:00:45 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1614841245;
+        bh=MFvEsPtNECyZ+EAM4aMoblYWUXq/S/CCBpo2A5jbvl0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=O6uN1+arBjrKq0cxxuQLWJ0StQbWyg4OvuQMfhryDBHlVqdO8LjqjQqfSJOyPlvc1
+         bIET68joJALivFHWCYI6kVvdTl9hwmevKCqmq4aHTKNRNw3+agnST1rk+ZM/zFpRNS
+         Df309d+3obRD7C1c3MBbtKgcuwiZGuRRNShkTreQ=
+Date:   Thu, 4 Mar 2021 17:56:26 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Bharata B Rao <bharata@linux.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
+        mpe@ellerman.id.au, farosas@linux.ibm.com
+Subject: Re: [PATCH v5 2/3] KVM: PPC: Book3S HV: Add support for
+ H_RPT_INVALIDATE
+Message-ID: <YECEmkb0mGCJP0M0@yekko.fritz.box>
+References: <20210224082510.3962423-1-bharata@linux.ibm.com>
+ <20210224082510.3962423-3-bharata@linux.ibm.com>
+ <YD2YrkY0cg+uO+wz@yekko.fritz.box>
+ <20210302045853.GC188607@in.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1614838637; bh=qO4yC80uoEqn5XcAiLxVhRuuZamrwUlLIEsRNkFlf1Q=;
-        h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
-         References:MIME-Version:Content-Transfer-Encoding:Content-Type:
-         X-Originating-IP:X-ClientProxiedBy;
-        b=GsQLvPfRvQRfmqf8mKuT920WEkX5vWtgMSh+eV/98GjyrC6JKLo2eo6Yt+DLanQtF
-         IswaFaECLMY1ZolVCUdDD8DV1pf+e/MpArqMrNIVm5DD+FJAXlLYk5h2lgvK2jkZvm
-         F5V3ndKC+Fxo4wdES41b0yxarlcn3yXtR64Dc+91eE5tODMlABwAcbTPE1T7xduP60
-         xZ7OmmDg4X7xwfmh5BFITiCh9iUzg1n5dazObwwoJQXJFMTFG8UTKm97W29zUcxUsh
-         ClcLGfneipAKeHx8lFzI+rb5wJ7h4VZaxETbcJh6ovoy3Au1arwgUwvfZMsQS4eAKh
-         z8x1fii0ZDRvw==
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ZCMh9tBN2+kVRtHm"
+Content-Disposition: inline
+In-Reply-To: <20210302045853.GC188607@in.ibm.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Some NVIDIA GPUs do not support direct atomic access to system memory
-via PCIe. Instead this must be emulated by granting the GPU exclusive
-access to the memory. This is achieved by replacing CPU page table
-entries with special swap entries that fault on userspace access.
 
-The driver then grants the GPU permission to update the page undergoing
-atomic access via the GPU page tables. When CPU access to the page is
-required a CPU fault is raised which calls into the device driver via
-MMU notifiers to revoke the atomic access. The original page table
-entries are then restored allowing CPU access to proceed.
+--ZCMh9tBN2+kVRtHm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Alistair Popple <apopple@nvidia.com>
+On Tue, Mar 02, 2021 at 10:28:53AM +0530, Bharata B Rao wrote:
+> On Tue, Mar 02, 2021 at 12:45:18PM +1100, David Gibson wrote:
+> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/=
+api.rst
+> > > index 45fd862ac128..38ce3f21b21f 100644
+> > > --- a/Documentation/virt/kvm/api.rst
+> > > +++ b/Documentation/virt/kvm/api.rst
+> > > @@ -6225,6 +6225,24 @@ KVM_RUN_BUS_LOCK flag is used to distinguish b=
+etween them.
+> > >  This capability can be used to check / enable 2nd DAWR feature provi=
+ded
+> > >  by POWER10 processor.
+> > > =20
+> > > +7.23 KVM_CAP_PPC_RPT_INVALIDATE
+> > > +------------------------------
+> > > +
+> > > +:Capability: KVM_CAP_PPC_RPT_INVALIDATE
+> > > +:Architectures: ppc
+> > > +:Type: vm
+> > > +
+> > > +This capability indicates that the kernel is capable of handling
+> > > +H_RPT_INVALIDATE hcall.
+> > > +
+> > > +In order to enable the use of H_RPT_INVALIDATE in the guest,
+> > > +user space might have to advertise it for the guest. For example,
+> > > +IBM pSeries (sPAPR) guest starts using it if "hcall-rpt-invalidate" =
+is
+> > > +present in the "ibm,hypertas-functions" device-tree property.
+> > > +
+> > > +This capability is enabled for hypervisors on platforms like POWER9
+> > > +that support radix MMU.
+> >=20
+> > Does this mean that KVM will handle the hypercall, even if not
+> > explicitly enabled by userspace (qemu)?  That's generally not what we
+> > want, since we need to allow qemu to set up backwards compatible
+> > guests.
+>=20
+> This capability only indicates that hypervisor supports the hcall.
+>=20
+> QEMU will check for this and conditionally enable the hcall
+> (via KVM_CAP_PPC_ENABLE_HCALL ioctl). Enabling the hcall is
+> conditional to cap-rpt-invalidate sPAPR machine capability being
+> enabled by the user. Will post a followup QEMU patch shortly.
 
----
+Ok.
 
-v4:
-* Check that page table entries haven't changed before mapping on the
-  device
----
- drivers/gpu/drm/nouveau/include/nvif/if000c.h |   1 +
- drivers/gpu/drm/nouveau/nouveau_svm.c         | 107 ++++++++++++++++--
- drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h |   1 +
- .../drm/nouveau/nvkm/subdev/mmu/vmmgp100.c    |   6 +
- 4 files changed, 107 insertions(+), 8 deletions(-)
+> Older QEMU patch can be found here:
+> https://lists.gnu.org/archive/html/qemu-devel/2021-01/msg00627.html
+>=20
+> >=20
+> > > +
+> > >  8. Other capabilities.
+> > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > =20
+> > > diff --git a/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h b/ar=
+ch/powerpc/include/asm/book3s/64/tlbflush-radix.h
+> > > index 8b33601cdb9d..a46fd37ad552 100644
+> > > --- a/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
+> > > +++ b/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
+> > > @@ -4,6 +4,10 @@
+> > > =20
+> > >  #include <asm/hvcall.h>
+> > > =20
+> > > +#define RIC_FLUSH_TLB 0
+> > > +#define RIC_FLUSH_PWC 1
+> > > +#define RIC_FLUSH_ALL 2
+> > > +
+> > >  struct vm_area_struct;
+> > >  struct mm_struct;
+> > >  struct mmu_gather;
+> > > diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/inc=
+lude/asm/kvm_book3s.h
+> > > index 2f5f919f6cd3..a1515f94400e 100644
+> > > --- a/arch/powerpc/include/asm/kvm_book3s.h
+> > > +++ b/arch/powerpc/include/asm/kvm_book3s.h
+> > > @@ -305,6 +305,9 @@ void kvmhv_set_ptbl_entry(unsigned int lpid, u64 =
+dw0, u64 dw1);
+> > >  void kvmhv_release_all_nested(struct kvm *kvm);
+> > >  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu);
+> > >  long kvmhv_do_nested_tlbie(struct kvm_vcpu *vcpu);
+> > > +long kvmhv_h_rpti_nested(struct kvm_vcpu *vcpu, unsigned long lpid,
+> > > +			 unsigned long type, unsigned long pg_sizes,
+> > > +			 unsigned long start, unsigned long end);
+> > >  int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu,
+> > >  			  u64 time_limit, unsigned long lpcr);
+> > >  void kvmhv_save_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state=
+ *hr);
+> > > diff --git a/arch/powerpc/include/asm/mmu_context.h b/arch/powerpc/in=
+clude/asm/mmu_context.h
+> > > index 652ce85f9410..820caf4e01b7 100644
+> > > --- a/arch/powerpc/include/asm/mmu_context.h
+> > > +++ b/arch/powerpc/include/asm/mmu_context.h
+> > > @@ -124,8 +124,19 @@ static inline bool need_extra_context(struct mm_=
+struct *mm, unsigned long ea)
+> > > =20
+> > >  #if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_RAD=
+IX_MMU)
+> > >  extern void radix_kvm_prefetch_workaround(struct mm_struct *mm);
+> > > +void do_h_rpt_invalidate(unsigned long pid, unsigned long lpid,
+> > > +			 unsigned long type, unsigned long page_size,
+> > > +			 unsigned long psize, unsigned long start,
+> > > +			 unsigned long end);
+> > >  #else
+> > >  static inline void radix_kvm_prefetch_workaround(struct mm_struct *m=
+m) { }
+> > > +static inline void do_h_rpt_invalidate(unsigned long pid,
+> > > +				       unsigned long lpid,
+> > > +				       unsigned long type,
+> > > +				       unsigned long page_size,
+> > > +				       unsigned long psize,
+> > > +				       unsigned long start,
+> > > +				       unsigned long end) { }
+> > >  #endif
+> > > =20
+> > >  extern void switch_cop(struct mm_struct *next);
+> > > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_h=
+v.c
+> > > index 13bad6bf4c95..d83f006fc19d 100644
+> > > --- a/arch/powerpc/kvm/book3s_hv.c
+> > > +++ b/arch/powerpc/kvm/book3s_hv.c
+> > > @@ -921,6 +921,69 @@ static int kvmppc_get_yield_count(struct kvm_vcp=
+u *vcpu)
+> > >  	return yield_count;
+> > >  }
+> > > =20
+> > > +static void do_h_rpt_invalidate_prs(unsigned long pid, unsigned long=
+ lpid,
+> > > +				    unsigned long type, unsigned long pg_sizes,
+> > > +				    unsigned long start, unsigned long end)
+> > > +{
+> > > +	unsigned long psize;
+> > > +	struct mmu_psize_def *def;
+> > > +
+> > > +	for (psize =3D 0; psize < MMU_PAGE_COUNT; psize++) {
+> > > +		def =3D &mmu_psize_defs[psize];
+> > > +		if (pg_sizes & def->h_rpt_pgsize)
+> > > +			do_h_rpt_invalidate(pid, lpid, type,
+> > > +					    (1UL << def->shift), psize,
+> > > +					    start, end);
+> > > +	}
+> > > +}
+> > > +
+> > > +static void kvmppc_nested_rpt_invalidate(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	do_h_rpt_invalidate_prs(kvmppc_get_gpr(vcpu, 4),
+> > > +				vcpu->arch.nested->shadow_lpid,
+> > > +				kvmppc_get_gpr(vcpu, 5),
+> > > +				kvmppc_get_gpr(vcpu, 6),
+> > > +				kvmppc_get_gpr(vcpu, 7),
+> > > +				kvmppc_get_gpr(vcpu, 8));
+> > > +	kvmppc_set_gpr(vcpu, 3, H_SUCCESS);
+> > > +}
+> > > +
+> > > +static long kvmppc_h_rpt_invalidate(struct kvm_vcpu *vcpu,
+> > > +				    unsigned long pid, unsigned long target,
+> > > +				    unsigned long type, unsigned long pg_sizes,
+> > > +				    unsigned long start, unsigned long end)
+> > > +{
+> > > +	if (!kvm_is_radix(vcpu->kvm))
+> > > +		return H_UNSUPPORTED;
+> > > +
+> > > +	/*
+> > > +	 * For nested guests, this hcall is handled in
+> > > +	 * L0. See kvmppc_handle_nested_exit() for details.
+> > > +	 */
+> > > +	if (kvmhv_on_pseries())
+> > > +		return H_UNSUPPORTED;
+> > > +
+> > > +	if (end < start)
+> > > +		return H_P5;
+> > > +
+> > > +	if (type & H_RPTI_TYPE_NESTED) {
+> > > +		if (!nesting_enabled(vcpu->kvm))
+> > > +			return H_FUNCTION;
+> > > +
+> > > +		/* Support only cores as target */
+> > > +		if (target !=3D H_RPTI_TARGET_CMMU)
+> > > +			return H_P2;
+> > > +
+> >=20
+> > IIUC, we'll hit this code path if an L1 calls this on behalf of an L2,
+>=20
+> Correct.
+>=20
+> > whereas we'll hit the nested exit code path going straight to
+> > kvmhv_h_rpti_nested() if an L2 calls it on behalf of an L3.  Is that
+> > right?
+>=20
+> We will hit the nested exit code path when L2 calls it on behalf
+> of L3. Looks like I am not handling this case (hcall issued by
+> L2 on behalf of L3 for handling partition scoped translations)
+> in the nested exit path.
+>=20
+> >=20
+> > > +		return kvmhv_h_rpti_nested(vcpu, pid,
+> > > +					   (type & ~H_RPTI_TYPE_NESTED),
+> > > +					    pg_sizes, start, end);
+> > > +	}
+> > > +
+> > > +	do_h_rpt_invalidate_prs(pid, vcpu->kvm->arch.lpid, type, pg_sizes,
+> > > +				start, end);
+> > > +	return H_SUCCESS;
+> > > +}
+> > > +
+> > >  int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+> > >  {
+> > >  	unsigned long req =3D kvmppc_get_gpr(vcpu, 3);
+> > > @@ -1129,6 +1192,14 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *v=
+cpu)
+> > >  		 */
+> > >  		ret =3D kvmppc_h_svm_init_abort(vcpu->kvm);
+> > >  		break;
+> > > +	case H_RPT_INVALIDATE:
+> > > +		ret =3D kvmppc_h_rpt_invalidate(vcpu, kvmppc_get_gpr(vcpu, 4),
+> > > +					      kvmppc_get_gpr(vcpu, 5),
+> > > +					      kvmppc_get_gpr(vcpu, 6),
+> > > +					      kvmppc_get_gpr(vcpu, 7),
+> > > +					      kvmppc_get_gpr(vcpu, 8),
+> > > +					      kvmppc_get_gpr(vcpu, 9));
+> > > +		break;
+> > > =20
+> > >  	default:
+> > >  		return RESUME_HOST;
+> > > @@ -1175,6 +1246,7 @@ static int kvmppc_hcall_impl_hv(unsigned long c=
+md)
+> > >  	case H_XIRR_X:
+> > >  #endif
+> > >  	case H_PAGE_INIT:
+> > > +	case H_RPT_INVALIDATE:
+> > >  		return 1;
+> > >  	}
+> > > =20
+> > > @@ -1590,6 +1662,24 @@ static int kvmppc_handle_nested_exit(struct kv=
+m_vcpu *vcpu)
+> > >  		if (!xics_on_xive())
+> > >  			kvmppc_xics_rm_complete(vcpu, 0);
+> > >  		break;
+> > > +	case BOOK3S_INTERRUPT_SYSCALL:
+> > > +	{
+> > > +		unsigned long req =3D kvmppc_get_gpr(vcpu, 3);
+> > > +
+> > > +		/*
+> > > +		 * The H_RPT_INVALIDATE hcalls issued by nested
+> > > +		 * guests for process scoped invalidations when
+> > > +		 * GTSE=3D0, are handled here in L0.
+> > > +		 */
+> >=20
+> > What if the L2 is not calling this for the GTSE=3D0 case, but on behalf
+> > of an L3?
+>=20
+> That case would be for flushing partition scoped translations. I am
+> realizing that I am not handling that case, but it should be handled
+> here in the nested hcall exit path.
+>=20
+> Currently I am handling only the hcall requests for process scoped
+> translations from nested guests here.
 
-diff --git a/drivers/gpu/drm/nouveau/include/nvif/if000c.h b/drivers/gpu/dr=
-m/nouveau/include/nvif/if000c.h
-index d6dd40f21eed..9c7ff56831c5 100644
---- a/drivers/gpu/drm/nouveau/include/nvif/if000c.h
-+++ b/drivers/gpu/drm/nouveau/include/nvif/if000c.h
-@@ -77,6 +77,7 @@ struct nvif_vmm_pfnmap_v0 {
- #define NVIF_VMM_PFNMAP_V0_APER                           0x00000000000000=
-f0ULL
- #define NVIF_VMM_PFNMAP_V0_HOST                           0x00000000000000=
-00ULL
- #define NVIF_VMM_PFNMAP_V0_VRAM                           0x00000000000000=
-10ULL
-+#define NVIF_VMM_PFNMAP_V0_A				  0x0000000000000004ULL
- #define NVIF_VMM_PFNMAP_V0_W                              0x00000000000000=
-02ULL
- #define NVIF_VMM_PFNMAP_V0_V                              0x00000000000000=
-01ULL
- #define NVIF_VMM_PFNMAP_V0_NONE                           0x00000000000000=
-00ULL
-diff --git a/drivers/gpu/drm/nouveau/nouveau_svm.c b/drivers/gpu/drm/nouvea=
-u/nouveau_svm.c
-index cd7b47c946cf..6d24424770e4 100644
---- a/drivers/gpu/drm/nouveau/nouveau_svm.c
-+++ b/drivers/gpu/drm/nouveau/nouveau_svm.c
-@@ -35,6 +35,7 @@
- #include <linux/sched/mm.h>
- #include <linux/sort.h>
- #include <linux/hmm.h>
-+#include <linux/rmap.h>
-=20
- struct nouveau_svm {
- 	struct nouveau_drm *drm;
-@@ -421,9 +422,9 @@ nouveau_svm_fault_cmp(const void *a, const void *b)
- 		return ret;
- 	if ((ret =3D (s64)fa->addr - fb->addr))
- 		return ret;
--	/*XXX: atomic? */
--	return (fa->access =3D=3D 0 || fa->access =3D=3D 3) -
--	       (fb->access =3D=3D 0 || fb->access =3D=3D 3);
-+	/* Atomic access (2) has highest priority */
-+	return (-1*(fa->access =3D=3D 2) + (fa->access =3D=3D 0 || fa->access =3D=
-=3D 3)) -
-+	       (-1*(fb->access =3D=3D 2) + (fb->access =3D=3D 0 || fb->access =3D=
-=3D 3));
- }
-=20
- static void
-@@ -555,6 +556,84 @@ static void nouveau_hmm_convert_pfn(struct nouveau_drm=
- *drm,
- 		args->p.phys[0] |=3D NVIF_VMM_PFNMAP_V0_W;
- }
-=20
-+static int nouveau_atomic_range_fault(struct nouveau_svmm *svmm,
-+			       struct nouveau_drm *drm,
-+			       struct nouveau_pfnmap_args *args, u32 size,
-+			       struct svm_notifier *notifier)
-+{
-+	unsigned long timeout =3D
-+		jiffies + msecs_to_jiffies(HMM_RANGE_DEFAULT_TIMEOUT);
-+	struct mm_struct *mm =3D svmm->notifier.mm;
-+	struct page *page;
-+	unsigned long start =3D args->p.addr;
-+	unsigned long notifier_seq;
-+	int ret =3D 0;
-+
-+	ret =3D mmu_interval_notifier_insert(&notifier->notifier, mm,
-+					args->p.addr, args->p.size,
-+					&nouveau_svm_mni_ops);
-+	if (ret)
-+		return ret;
-+
-+	mmap_read_lock(mm);
-+	make_device_exclusive_range(mm, start, start + PAGE_SIZE, &page);
-+	mmap_read_unlock(mm);
-+	if (!page) {
-+		ret =3D -EINVAL;
-+		goto out;
-+	}
-+
-+	while (true) {
-+		if (time_after(jiffies, timeout)) {
-+			ret =3D -EBUSY;
-+			goto out;
-+		}
-+
-+		notifier_seq =3D mmu_interval_read_begin(&notifier->notifier);
-+		if (!check_device_exclusive_range(mm, start, start + PAGE_SIZE,
-+						  &page)) {
-+			mmap_read_lock(mm);
-+			make_device_exclusive_range(mm, start,
-+						    start + PAGE_SIZE, &page);
-+			mmap_read_unlock(mm);
-+			if (!page) {
-+				ret =3D -EINVAL;
-+				goto out;
-+			}
-+			continue;
-+		}
-+		mutex_lock(&svmm->mutex);
-+		if (mmu_interval_read_retry(&notifier->notifier,
-+					    notifier_seq)) {
-+			mutex_unlock(&svmm->mutex);
-+			continue;
-+		}
-+		break;
-+	}
-+
-+	/* Map the page on the GPU. */
-+	args->p.page =3D 12;
-+	args->p.size =3D PAGE_SIZE;
-+	args->p.addr =3D start;
-+	args->p.phys[0] =3D page_to_phys(page) |
-+		NVIF_VMM_PFNMAP_V0_V |
-+		NVIF_VMM_PFNMAP_V0_W |
-+		NVIF_VMM_PFNMAP_V0_A |
-+		NVIF_VMM_PFNMAP_V0_HOST;
-+
-+	svmm->vmm->vmm.object.client->super =3D true;
-+	ret =3D nvif_object_ioctl(&svmm->vmm->vmm.object, args, size, NULL);
-+	svmm->vmm->vmm.object.client->super =3D false;
-+	mutex_unlock(&svmm->mutex);
-+
-+	unlock_page(page);
-+	put_page(page);
-+
-+out:
-+	mmu_interval_notifier_remove(&notifier->notifier);
-+	return ret;
-+}
-+
- static int nouveau_range_fault(struct nouveau_svmm *svmm,
- 			       struct nouveau_drm *drm,
- 			       struct nouveau_pfnmap_args *args, u32 size,
-@@ -637,7 +716,7 @@ nouveau_svm_fault(struct nvif_notify *notify)
- 	unsigned long hmm_flags;
- 	u64 inst, start, limit;
- 	int fi, fn;
--	int replay =3D 0, ret;
-+	int replay =3D 0, atomic =3D 0, ret;
-=20
- 	/* Parse available fault buffer entries into a cache, and update
- 	 * the GET pointer so HW can reuse the entries.
-@@ -718,12 +797,14 @@ nouveau_svm_fault(struct nvif_notify *notify)
- 		/*
- 		 * Determine required permissions based on GPU fault
- 		 * access flags.
--		 * XXX: atomic?
- 		 */
- 		switch (buffer->fault[fi]->access) {
- 		case 0: /* READ. */
- 			hmm_flags =3D HMM_PFN_REQ_FAULT;
- 			break;
-+		case 2: /* ATOMIC. */
-+			atomic =3D true;
-+			break;
- 		case 3: /* PREFETCH. */
- 			hmm_flags =3D 0;
- 			break;
-@@ -739,8 +820,14 @@ nouveau_svm_fault(struct nvif_notify *notify)
- 		}
-=20
- 		notifier.svmm =3D svmm;
--		ret =3D nouveau_range_fault(svmm, svm->drm, &args.i,
--					sizeof(args), hmm_flags, &notifier);
-+		if (atomic)
-+			ret =3D nouveau_atomic_range_fault(svmm, svm->drm,
-+							 &args.i, sizeof(args),
-+							 &notifier);
-+		else
-+			ret =3D nouveau_range_fault(svmm, svm->drm, &args.i,
-+						  sizeof(args), hmm_flags,
-+						  &notifier);
- 		mmput(mm);
-=20
- 		limit =3D args.i.p.addr + args.i.p.size;
-@@ -760,7 +847,11 @@ nouveau_svm_fault(struct nvif_notify *notify)
- 			     !(args.phys[0] & NVIF_VMM_PFNMAP_V0_V)) ||
- 			    (buffer->fault[fi]->access !=3D 0 /* READ. */ &&
- 			     buffer->fault[fi]->access !=3D 3 /* PREFETCH. */ &&
--			     !(args.phys[0] & NVIF_VMM_PFNMAP_V0_W)))
-+			     !(args.phys[0] & NVIF_VMM_PFNMAP_V0_W)) ||
-+			    (buffer->fault[fi]->access !=3D 0 /* READ. */ &&
-+			     buffer->fault[fi]->access !=3D 1 /* WRITE. */ &&
-+			     buffer->fault[fi]->access !=3D 3 /* PREFETCH. */ &&
-+			     !(args.phys[0] & NVIF_VMM_PFNMAP_V0_A)))
- 				break;
- 		}
-=20
-diff --git a/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h b/drivers/gpu/dr=
-m/nouveau/nvkm/subdev/mmu/vmm.h
-index a2b179568970..f6188aa9171c 100644
---- a/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h
-+++ b/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h
-@@ -178,6 +178,7 @@ void nvkm_vmm_unmap_region(struct nvkm_vmm *, struct nv=
-km_vma *);
- #define NVKM_VMM_PFN_APER                                 0x00000000000000=
-f0ULL
- #define NVKM_VMM_PFN_HOST                                 0x00000000000000=
-00ULL
- #define NVKM_VMM_PFN_VRAM                                 0x00000000000000=
-10ULL
-+#define NVKM_VMM_PFN_A					  0x0000000000000004ULL
- #define NVKM_VMM_PFN_W                                    0x00000000000000=
-02ULL
- #define NVKM_VMM_PFN_V                                    0x00000000000000=
-01ULL
- #define NVKM_VMM_PFN_NONE                                 0x00000000000000=
-00ULL
-diff --git a/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmmgp100.c b/drivers/g=
-pu/drm/nouveau/nvkm/subdev/mmu/vmmgp100.c
-index 236db5570771..f02abd9cb4dd 100644
---- a/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmmgp100.c
-+++ b/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmmgp100.c
-@@ -88,6 +88,9 @@ gp100_vmm_pgt_pfn(struct nvkm_vmm *vmm, struct nvkm_mmu_p=
-t *pt,
- 		if (!(*map->pfn & NVKM_VMM_PFN_W))
- 			data |=3D BIT_ULL(6); /* RO. */
-=20
-+		if (!(*map->pfn & NVKM_VMM_PFN_A))
-+			data |=3D BIT_ULL(7); /* Atomic disable. */
-+
- 		if (!(*map->pfn & NVKM_VMM_PFN_VRAM)) {
- 			addr =3D *map->pfn >> NVKM_VMM_PFN_ADDR_SHIFT;
- 			addr =3D dma_map_page(dev, pfn_to_page(addr), 0,
-@@ -322,6 +325,9 @@ gp100_vmm_pd0_pfn(struct nvkm_vmm *vmm, struct nvkm_mmu=
-_pt *pt,
- 		if (!(*map->pfn & NVKM_VMM_PFN_W))
- 			data |=3D BIT_ULL(6); /* RO. */
-=20
-+		if (!(*map->pfn & NVKM_VMM_PFN_A))
-+			data |=3D BIT_ULL(7); /* Atomic disable. */
-+
- 		if (!(*map->pfn & NVKM_VMM_PFN_VRAM)) {
- 			addr =3D *map->pfn >> NVKM_VMM_PFN_ADDR_SHIFT;
- 			addr =3D dma_map_page(dev, pfn_to_page(addr), 0,
+Ok.  At the very least you need to detect and fail for that case.
+
+> >=20
+> > > +		if (req =3D=3D H_RPT_INVALIDATE) {
+> > > +			kvmppc_nested_rpt_invalidate(vcpu);
+> > > +			r =3D RESUME_GUEST;
+> > > +			break;
+> > > +		}
+> > > +
+> > > +		r =3D RESUME_HOST;
+> > > +		break;
+> > > +	}
+> > >  	default:
+> > >  		r =3D RESUME_HOST;
+> > >  		break;
+> > > diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/b=
+ook3s_hv_nested.c
+> > > index 0cd0e7aad588..ca43b2d38dce 100644
+> > > --- a/arch/powerpc/kvm/book3s_hv_nested.c
+> > > +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+> > > @@ -1191,6 +1191,83 @@ long kvmhv_do_nested_tlbie(struct kvm_vcpu *vc=
+pu)
+> > >  	return H_SUCCESS;
+> > >  }
+> > > =20
+> > > +static long do_tlb_invalidate_nested_tlb(struct kvm_vcpu *vcpu,
+> > > +					 unsigned long lpid,
+> > > +					 unsigned long page_size,
+> > > +					 unsigned long ap,
+> > > +					 unsigned long start,
+> > > +					 unsigned long end)
+> > > +{
+> > > +	unsigned long addr =3D start;
+> > > +	int ret;
+> > > +
+> > > +	do {
+> > > +		ret =3D kvmhv_emulate_tlbie_tlb_addr(vcpu, lpid, ap,
+> > > +						   get_epn(addr));
+> > > +		if (ret)
+> > > +			return ret;
+> > > +		addr +=3D page_size;
+> > > +	} while (addr < end);
+> > > +
+> > > +	return ret;
+> > > +}
+> > > +
+> > > +static long do_tlb_invalidate_nested_all(struct kvm_vcpu *vcpu,
+> > > +					 unsigned long lpid)
+> > > +{
+> > > +	struct kvm *kvm =3D vcpu->kvm;
+> > > +	struct kvm_nested_guest *gp;
+> > > +
+> > > +	gp =3D kvmhv_get_nested(kvm, lpid, false);
+> > > +	if (gp) {
+> > > +		kvmhv_emulate_tlbie_lpid(vcpu, gp, RIC_FLUSH_ALL);
+> > > +		kvmhv_put_nested(gp);
+> > > +	}
+> > > +	return H_SUCCESS;
+> > > +}
+> > > +
+> > > +long kvmhv_h_rpti_nested(struct kvm_vcpu *vcpu, unsigned long lpid,
+> > > +			 unsigned long type, unsigned long pg_sizes,
+> > > +			 unsigned long start, unsigned long end)
+> > > +{
+> > > +	struct kvm_nested_guest *gp;
+> > > +	long ret;
+> > > +	unsigned long psize, ap;
+> > > +
+> > > +	/*
+> > > +	 * If L2 lpid isn't valid, we need to return H_PARAMETER.
+> > > +	 *
+> > > +	 * However, nested KVM issues a L2 lpid flush call when creating
+> > > +	 * partition table entries for L2. This happens even before the
+> > > +	 * corresponding shadow lpid is created in HV which happens in
+> > > +	 * H_ENTER_NESTED call. Since we can't differentiate this case from
+> > > +	 * the invalid case, we ignore such flush requests and return succe=
+ss.
+> > > +	 */
+> >=20
+> > What if this is being called on behalf of an L3 or deeper?  Do we need
+> > something to do a translation from L3 to L2 addresses?
+>=20
+> I am not sure, I will have to check if gp->shadow_lpid points to
+> correct nested LPID in all the cases.
+>=20
+> >=20
+> > > +	gp =3D kvmhv_find_nested(vcpu->kvm, lpid);
+> > > +	if (!gp)
+> > > +		return H_SUCCESS;
+>=20
+> Regards,
+> Bharata.
+>=20
+
 --=20
-2.20.1
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--ZCMh9tBN2+kVRtHm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmBAhJgACgkQbDjKyiDZ
+s5KiJQ/+KHQjlD3CiWFD7CmOFHb7RiYJEueoJF1OMRbTgeAJbfV8GtkD8IQ09VWG
+4WVgQPlGYrblKkc1M10lzk3lqC4iV67G4caIzgiNf38O3sA6QdXlR8xA4yoJElKc
+KYu3fag4ydJARpOPsHExKXuXKetEgd3QB0l7VZtgREo4Fo610GIuhicMG0Jr9Lu6
+ECVOr/restGq1wrBkaXrO6YuZBCPoRNqXa4lN23xTd9aa4xeNexm3kt8DsCQCvcl
+i7uc5gMnDvpIf7oMbId6F8EeCL+/Br4yAedtaiOFqpn7UrYNNL93k1rFSODT2Fea
+wWIn2Kp2SO0NJ27KoxuQuNLbKixPIZB1F5UY+PrZUfqS4We1kJD4pyNJ6tFnV7cm
+nYFyVxLjjqI3aMZlhtn/Zzphoq1k6vcGjf0/44lWBErHCXnRfVqz3FPGBt64Jdx9
+6lWOa0+EBuSuxP4omgnFIPj+piBkzqDrgx6fSYnGsJS/M/61H3c/dQr2a6W91qwl
+x1HMINFfSnOIc3FilDdM2p2bYn+XbTW0MOV+cmD9jUMfzRDIjz/d9QFkpajwumKY
+/ztJq7m9XSc6gbMMY+giLK0ruM35NRydRRznDFV1loZ3AwOpKBV/19vwTRrJHr+P
+AMOx6iDJq4nrUux+dFxA9iHPhIuG1gaj33A6YNkYEvl0pJo9DVM=
+=Kd+0
+-----END PGP SIGNATURE-----
+
+--ZCMh9tBN2+kVRtHm--
