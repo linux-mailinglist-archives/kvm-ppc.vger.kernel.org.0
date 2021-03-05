@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D103A32EDDE
-	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Mar 2021 16:09:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 347B732EDE4
+	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Mar 2021 16:09:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229939AbhCEPIq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        id S229940AbhCEPIq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
         Fri, 5 Mar 2021 10:08:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42762 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229940AbhCEPIh (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Mar 2021 10:08:37 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6FC3C061574
-        for <kvm-ppc@vger.kernel.org>; Fri,  5 Mar 2021 07:08:36 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id a4so1564344pgc.11
-        for <kvm-ppc@vger.kernel.org>; Fri, 05 Mar 2021 07:08:36 -0800 (PST)
+        with ESMTP id S230169AbhCEPIk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Mar 2021 10:08:40 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17590C061574
+        for <kvm-ppc@vger.kernel.org>; Fri,  5 Mar 2021 07:08:40 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id d12so2297817pfo.7
+        for <kvm-ppc@vger.kernel.org>; Fri, 05 Mar 2021 07:08:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=9mGOdjU30m0E6b/XzBmpf0ONvoTvN0BDP7Tm5+1bmtw=;
-        b=K6pvWBfcw+XONrUyGb1h6XRowG9L0oy7eoJxSWs8qcI9gctB4aKIDjezhaVYPe4xR1
-         ORTJImycW4l3+Lt+Nw9sT1dVeyXkexbfUfLrApnp7t9FU2i2gbL9a7I+kkjnzaglk9+g
-         3ZBzeb8a2kHVL0aTY2U911u+dcsE31BkP3TpmO9pWrAhYUZLxTWbJGLykJpYHQkmSpAD
-         kOisme458gyHASZ2mT1q/6DaaNsWYg/L+dcuA/OHQqElXupflUGkIRUqGgOXlkmKiMOu
-         KBE26BejFipFAOeRFzn55Cqw51QClzsn3mG8tPU637ziW6BbISfBgFWLfBr/USqq6if7
-         lD3Q==
+        bh=Ng35u+WMA/qGWz587TPAryNNgxNTtoIA/vWcbEoH+FI=;
+        b=C3oJapWjkCMlnytC2LatdI8vXXW0ivp39To+cqTM4bZKxRpgk0A7n6WVxreAzo73x8
+         TexgkpR0Viy4Dm3ugG5xQkb2G2IdupUgc45c0/aBdd5Nn4bFf5VhMO+lfMsxtfNP2dvf
+         e+71fNMkBmQKJ/EYtot7Dh4L24bIZ/cAnoSJ+neqpDfIBmTJleJRxIeEvBpGJnBw9zsg
+         4WlOtGlr00zJFCh80fDEIN3qp7Mx74dB8eIokYOc3hS+OkR575KKLRRV4uEksnIBILgn
+         vGF/Q3Xwtn9fZErzYl8CwU7M96w3uZPxaB1blsMlbmb9gCeyxUHFmnAuCNx7f6CuzxJK
+         sgvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=9mGOdjU30m0E6b/XzBmpf0ONvoTvN0BDP7Tm5+1bmtw=;
-        b=Y6kAUXTl3Z2G16BC9ik2JXMhCoiWo2sRK3YetHwseupAGiq3mzb7ynTLSKC/rwAJZJ
-         WMx+4xPry3vFkOaVlVFvT2vHJT5NMExhHEUQi8xI+WDCQq4glBBeJsscV2GP8eFU93fp
-         nEQhnWjGBR0DEr1nYhsfDvsJRm20StkJxkn4CjPDyqLWK7xdrCFMmjcKgOwcBxOuyPcI
-         9dvZREUq/XqVf0zWs0eSQMhVVmtlbV8gT+kD+bdaLBVjlkNkAUqfo5y57NgQ5evbcoT4
-         aCbRlj7wwT880J39uQDiNAXBLOIchRPPhBQZar2kMf/07yQBNbmntVx0ZzMlqQcayNIZ
-         czww==
-X-Gm-Message-State: AOAM532YlCJRGl8Ma2juCQbjJ0wrAXWXp57SbLv2cp3GkAg0pMBJWFiR
-        D3As7XLbrQrOBG3sE6enUcDK9vHhMUM=
-X-Google-Smtp-Source: ABdhPJy/8rUerfCRqWSrS0HFBWouOkMz3OXqSQI1uxhqs1VwZO4OdAluEl85YmzWszaVjp+C+1tm4w==
-X-Received: by 2002:a63:4658:: with SMTP id v24mr9008126pgk.258.1614956916157;
-        Fri, 05 Mar 2021 07:08:36 -0800 (PST)
+        bh=Ng35u+WMA/qGWz587TPAryNNgxNTtoIA/vWcbEoH+FI=;
+        b=V97+xVoMbzA8QVES4ffoUtjnHkcPGabuejTmiIoHDvVuTB5JVaDrmfMEkLr6edzxnj
+         W1lQpEzVKZkhQTHN50fDPj2IzPcA6FAzH/lrYlcp8EvwMQSy2JfXP91riSnvSU/dHglh
+         FGboj6vZ7OjiW+EX4PdRmKtgqc/p/NMfgbAMzNsBF4/dWoKt2b6nols8C8ZAzEmhNXJZ
+         /rhAKwA7+qlLL8aL1c6IAwgn2aHrvFRRKj0QVlz3V7cHiB/DkkMS1OR8K2ksqPlxD7jk
+         kVF/QuQ23eLvfvHPs4+ogDFviFfICVkU3Q3yZYLXmFm34HD9tgU4aO8/FYu9VZ6LD2mZ
+         gGSQ==
+X-Gm-Message-State: AOAM531x4nBUMnBSMDiVCJTXHvveJAbLJ+P//Bsj8BmR5eGKy79zNr4B
+        ZAOBFtHnBnofQZGYsdsSLUDsXwOL2YM=
+X-Google-Smtp-Source: ABdhPJwh+4+cqQLfeLEqswCg8NCwhljf48NkGzhpsY/+eHliO7mDc3DYeNuh9gCEBdr6fopMoZzzEg==
+X-Received: by 2002:a63:1725:: with SMTP id x37mr9131048pgl.48.1614956919330;
+        Fri, 05 Mar 2021 07:08:39 -0800 (PST)
 Received: from bobo.ibm.com (58-6-239-121.tpgi.com.au. [58.6.239.121])
-        by smtp.gmail.com with ESMTPSA id m5sm1348982pfd.96.2021.03.05.07.08.33
+        by smtp.gmail.com with ESMTPSA id m5sm1348982pfd.96.2021.03.05.07.08.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Mar 2021 07:08:35 -0800 (PST)
+        Fri, 05 Mar 2021 07:08:38 -0800 (PST)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v3 29/41] KVM: PPC: Book3S HV P9: Improve exit timing accounting coverage
-Date:   Sat,  6 Mar 2021 01:06:26 +1000
-Message-Id: <20210305150638.2675513-30-npiggin@gmail.com>
+Subject: [PATCH v3 30/41] KVM: PPC: Book3S HV P9: Move SPR loading after expiry time check
+Date:   Sat,  6 Mar 2021 01:06:27 +1000
+Message-Id: <20210305150638.2675513-31-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210305150638.2675513-1-npiggin@gmail.com>
 References: <20210305150638.2675513-1-npiggin@gmail.com>
@@ -62,54 +62,68 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The C conversion caused exit timing to become a bit cramped. Expand it
-to cover more of the entry and exit code.
+This is wasted work if the time limit is exceeded.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv_interrupt.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/powerpc/kvm/book3s_hv_interrupt.c | 36 ++++++++++++++++----------
+ 1 file changed, 22 insertions(+), 14 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv_interrupt.c b/arch/powerpc/kvm/book3s_hv_interrupt.c
-index 145c634625f8..68514ab5a438 100644
+index 68514ab5a438..d81aef6c69d9 100644
 --- a/arch/powerpc/kvm/book3s_hv_interrupt.c
 +++ b/arch/powerpc/kvm/book3s_hv_interrupt.c
-@@ -148,6 +148,8 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	if (hdec < 0)
- 		return BOOK3S_INTERRUPT_HV_DECREMENTER;
- 
-+	start_timing(vcpu, &vcpu->arch.rm_entry);
-+
- 	if (vc->tb_offset) {
- 		u64 new_tb = tb + vc->tb_offset;
- 		mtspr(SPRN_TBU40, new_tb);
-@@ -198,8 +200,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	 */
- 	mtspr(SPRN_HDEC, hdec);
- 
--	start_timing(vcpu, &vcpu->arch.rm_entry);
+@@ -127,21 +127,16 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	u64 tb, purr, spurr;
+ 	u64 *exsave;
+ 	bool ri_set;
+-	unsigned long msr = mfmsr();
+ 	int trap;
+-	unsigned long host_hfscr = mfspr(SPRN_HFSCR);
+-	unsigned long host_ciabr = mfspr(SPRN_CIABR);
+-	unsigned long host_dawr0 = mfspr(SPRN_DAWR0);
+-	unsigned long host_dawrx0 = mfspr(SPRN_DAWRX0);
+-	unsigned long host_psscr = mfspr(SPRN_PSSCR);
+-	unsigned long host_pidr = mfspr(SPRN_PID);
+-	unsigned long host_dawr1 = 0;
+-	unsigned long host_dawrx1 = 0;
 -
- 	vcpu->arch.ceded = 0;
+-	if (cpu_has_feature(CPU_FTR_DAWR1)) {
+-		host_dawr1 = mfspr(SPRN_DAWR1);
+-		host_dawrx1 = mfspr(SPRN_DAWRX1);
+-	}
++	unsigned long msr;
++	unsigned long host_hfscr;
++	unsigned long host_ciabr;
++	unsigned long host_dawr0;
++	unsigned long host_dawrx0;
++	unsigned long host_psscr;
++	unsigned long host_pidr;
++	unsigned long host_dawr1;
++	unsigned long host_dawrx1;
  
- 	WARN_ON_ONCE(vcpu->arch.shregs.msr & MSR_HV);
-@@ -343,8 +343,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	tb = mftb();
+ 	hdec = time_limit - tb;
+@@ -159,6 +154,19 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 		vc->tb_offset_applied = vc->tb_offset;
+ 	}
  
- 	accumulate_time(vcpu, &vcpu->arch.rm_exit);
- 
--	end_timing(vcpu);
--
- 	/* Advance host PURR/SPURR by the amount used by guest */
- 	purr = mfspr(SPRN_PURR);
- 	spurr = mfspr(SPRN_SPURR);
-@@ -409,6 +407,8 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 
- 	switch_mmu_to_host_radix(kvm, host_pidr);
- 
-+	end_timing(vcpu);
++	msr = mfmsr();
 +
- 	return trap;
- }
- EXPORT_SYMBOL_GPL(kvmhv_vcpu_entry_p9);
++	host_hfscr = mfspr(SPRN_HFSCR);
++	host_ciabr = mfspr(SPRN_CIABR);
++	host_dawr0 = mfspr(SPRN_DAWR0);
++	host_dawrx0 = mfspr(SPRN_DAWRX0);
++	host_psscr = mfspr(SPRN_PSSCR);
++	host_pidr = mfspr(SPRN_PID);
++	if (cpu_has_feature(CPU_FTR_DAWR1)) {
++		host_dawr1 = mfspr(SPRN_DAWR1);
++		host_dawrx1 = mfspr(SPRN_DAWRX1);
++	}
++
+ 	if (vc->pcr)
+ 		mtspr(SPRN_PCR, vc->pcr | PCR_MASK);
+ 	mtspr(SPRN_DPDES, vc->dpdes);
 -- 
 2.23.0
 
