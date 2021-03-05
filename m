@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B5A132E1E6
-	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Mar 2021 06:54:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 383EC32E1F1
+	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Mar 2021 07:03:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229504AbhCEFyM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 5 Mar 2021 00:54:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36726 "EHLO
+        id S229458AbhCEGDc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 5 Mar 2021 01:03:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbhCEFyM (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Mar 2021 00:54:12 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14B32C061574
-        for <kvm-ppc@vger.kernel.org>; Thu,  4 Mar 2021 21:54:12 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id t25so623882pga.2
-        for <kvm-ppc@vger.kernel.org>; Thu, 04 Mar 2021 21:54:12 -0800 (PST)
+        with ESMTP id S229448AbhCEGDc (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Mar 2021 01:03:32 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63764C061574
+        for <kvm-ppc@vger.kernel.org>; Thu,  4 Mar 2021 22:03:32 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id d12so1319842pfo.7
+        for <kvm-ppc@vger.kernel.org>; Thu, 04 Mar 2021 22:03:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=axtens.net; s=google;
         h=from:to:cc:subject:in-reply-to:references:date:message-id
          :mime-version;
-        bh=JqUWCFyVuv0H2Wh1BTSETwqA0oM5AW2lC5rIk29qh1I=;
-        b=bS/oHgGIBkdHm6OegfLS7TFqld9dU5de2E+0ipeJ5c2DZJwTCXhv/sFEchETupGEwx
-         hoYdm/2aWKpups3NTFDHU9b/DwCMkFHppV34jjZSnukXUNsneXqxdGlwt8v2DM9q3P5j
-         C/GhlR9i0bLOnOAWBBb2PKGeA9rwpGoA+/6Ys=
+        bh=rdp7PWtpXvmUGn3d3PjdggcXQvhRMcWQXUln99EH/9I=;
+        b=ptEg+KpzK5q7G5e8Xc5XAj2KGg5K8RBpO0pSyKdxJFfxxUtzZ2k+onRAyIpuTWzg/z
+         fUTLvxyoMDID/zJyxx1xQPyvw3ymbnUpJtF0nTbGSMvG8kXIWfhHhd+HBMMj4f2HgHwf
+         y4qD+fJnU/a7TEotEBuNJKw2M1PnNDeTABg/w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=JqUWCFyVuv0H2Wh1BTSETwqA0oM5AW2lC5rIk29qh1I=;
-        b=UNAfOzuRnfaojXETzTOCXNQaBzXaloXE+bUlL5Z0pOIk3sSx2z7Xyyp4lBZqpXj+AG
-         mpGan3n7ereiAFYX4VYfORj4x0ffcf3uHFzFwolBicLFpPOdm1wQguefaB25bL0iAkf6
-         jUoGi1AOqNn8pF1yzjyU2Hz3SJZ1pqBUG3R2nungrIXhOZpXkDCe90GEkz5ptv/vnJ1P
-         +QIT28PTz7yvItqucJgjgn7Dvtx6GlDM9WRKhoDdarKkddd6iA6bl31Pq3v7YZ8+xs9E
-         fiHoGH2J3XzWfzWFwE8XjPEivIzs6mN2zOcgJHSjFGS5zejfC4V9Bg0nzihmHhcJXEC7
-         eCnQ==
-X-Gm-Message-State: AOAM530pqI6t+SebHe8tQN8hqTTOhOC05YWyfSMarc8H2gt+7IdkY0OH
-        53l+7+0harZ/B59NtyLwLDm1Qfk3GVe10Rz8
-X-Google-Smtp-Source: ABdhPJyDGpsAz2tWTfFnOll45AyL/0CTz1s+BVgn7s9QJrjRSPCA4m2s2JubFx5gysYvABv9uM+tDQ==
-X-Received: by 2002:a63:cc05:: with SMTP id x5mr6778459pgf.254.1614923651586;
-        Thu, 04 Mar 2021 21:54:11 -0800 (PST)
+        bh=rdp7PWtpXvmUGn3d3PjdggcXQvhRMcWQXUln99EH/9I=;
+        b=ABxcLikZTfnTgg/nHTnEmoQ3m5atGLrmElmj3GOlCn6EjgNmEaqsiDUnAUUnIOxJrC
+         Z8c9xlp6lEJVEvzT/Td7KLV/L1Gvni9ueFvd44ldL8xKEl7gb3EVQJjs5IqcUhdPHKOY
+         CWQDGjobvPTOBDqMfiynapVmGYUMnAUb86nvC/zM5vbR/iHPaEcxJwBQWWNuu2VmsYTR
+         +44w9WWRhrYhD3oz5Qpvg/aw3k2ony1f1F39HUavA9ZnROJyGxbyyf1Pb9F2XS12w/Yf
+         gmnkSqs1GCxNVV56lJ/EwlWdlq8r1vCsCQU54z/+EKIEz1HCfFdUuWvxK2pQnks7Cvp4
+         PTtw==
+X-Gm-Message-State: AOAM5336xW8b09HSnamBit6Kiys0gBr24ayu8QWsmSIKq9uWPvsRCsqL
+        b2QdX0V8S0Nc1oVBX/teO/LW/kHxHQoV1EoZ
+X-Google-Smtp-Source: ABdhPJzobPGfgfjOJ1ogHKuAyIGpCQ2a0M1OEPiYJqbfNPUPoJghFDf9SgyhPjVYsXkZDIoWh81vLg==
+X-Received: by 2002:a63:2164:: with SMTP id s36mr7096239pgm.268.1614924211873;
+        Thu, 04 Mar 2021 22:03:31 -0800 (PST)
 Received: from localhost (2001-44b8-1113-6700-7ad2-5bb3-4fd4-d737.static.ipv6.internode.on.net. [2001:44b8:1113:6700:7ad2:5bb3:4fd4:d737])
-        by smtp.gmail.com with ESMTPSA id n184sm1192954pfd.205.2021.03.04.21.54.10
+        by smtp.gmail.com with ESMTPSA id a19sm1111262pff.186.2021.03.04.22.03.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Mar 2021 21:54:11 -0800 (PST)
+        Thu, 04 Mar 2021 22:03:31 -0800 (PST)
 From:   Daniel Axtens <dja@axtens.net>
 To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
 Cc:     linuxppc-dev@lists.ozlabs.org, Nicholas Piggin <npiggin@gmail.com>,
         Fabiano Rosas <farosas@linux.ibm.com>
-Subject: Re: [PATCH v2 07/37] KVM: PPC: Book3S 64: Move GUEST_MODE_SKIP test into KVM
-In-Reply-To: <20210225134652.2127648-8-npiggin@gmail.com>
-References: <20210225134652.2127648-1-npiggin@gmail.com> <20210225134652.2127648-8-npiggin@gmail.com>
-Date:   Fri, 05 Mar 2021 16:54:08 +1100
-Message-ID: <87o8fy87sv.fsf@linkitivity.dja.id.au>
+Subject: Re: [PATCH v2 08/37] KVM: PPC: Book3S 64: add hcall interrupt handler
+In-Reply-To: <20210225134652.2127648-9-npiggin@gmail.com>
+References: <20210225134652.2127648-1-npiggin@gmail.com> <20210225134652.2127648-9-npiggin@gmail.com>
+Date:   Fri, 05 Mar 2021 17:03:28 +1100
+Message-ID: <87lfb287db.fsf@linkitivity.dja.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
@@ -61,98 +61,62 @@ X-Mailing-List: kvm-ppc@vger.kernel.org
 
 Hi Nick,
 
-> -	.if IKVM_SKIP
-> -89:	mtocrf	0x80,r9
-> -	ld	r10,IAREA+EX_CTR(r13)
-> -	mtctr	r10
-> -	ld	r9,IAREA+EX_R9(r13)
-> -	ld	r10,IAREA+EX_R10(r13)
-> -	ld	r11,IAREA+EX_R11(r13)
-> -	ld	r12,IAREA+EX_R12(r13)
-> -	.if IHSRR_IF_HVMODE
-> -	BEGIN_FTR_SECTION
-> -	b	kvmppc_skip_Hinterrupt
-> -	FTR_SECTION_ELSE
-> -	b	kvmppc_skip_interrupt
-> -	ALT_FTR_SECTION_END_IFSET(CPU_FTR_HVMODE | CPU_FTR_ARCH_206)
+> Add a separate hcall entry point. This can be used to deal with the
+> different calling convention.
 
-I was initially concerned that you were pulling out the complexities
-around IHSRR_IF_HVMODE, but I checked exceptions-64s.S and the only
-exception handler that sets IHSRR_IF_HVMODE is hardware_interrupt and
-that does not set IKVM_SKIP, so we are indeed fine to not keep this
-complex little asm section.
+Looks good to me, makes sense, passes checkpatch.
 
-> -	.elseif IHSRR
-> -	b	kvmppc_skip_Hinterrupt
-> -	.else
-> -	b	kvmppc_skip_interrupt
-> -	.endif
-> -	.endif
->  .endm
-
-> +/*
-> + * KVM uses a trick where it is running in MSR[HV]=1 mode in real-mode with the
-> + * guest MMU context loaded, and it sets KVM_GUEST_MODE_SKIP and enables
-> + * MSR[DR]=1 while leaving MSR[IR]=0, so it continues to fetch HV instructions
-> + * but loads and stores will access the guest context. This is used to load
-> + * the faulting instruction without walking page tables.
-> + *
-> + * However the guest context may not be able to translate, or it may cause a
-> + * machine check or other issue, which will result in a fault in the host
-> + * (even with KVM-HV).
-> + *
-> + * These faults are caught here and if the fault was (or was likely) due to
-> + * that load, then we just return with the PC advanced +4 and skip the load,
-> + * which then goes via the slow path.
-> + */
-
-This is a really helpful comment! Thanks!
-
-> +.Lmaybe_skip:
-> +	cmpwi	r12,BOOK3S_INTERRUPT_MACHINE_CHECK
-> +	beq	1f
-> +	cmpwi	r12,BOOK3S_INTERRUPT_DATA_STORAGE
-> +	beq	1f
-> +	cmpwi	r12,BOOK3S_INTERRUPT_DATA_SEGMENT
-> +	beq	1f
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +	/* HSRR interrupts have 2 added to trap vector */
-> +	cmpwi	r12,BOOK3S_INTERRUPT_H_DATA_STORAGE | 0x2
-
-This took me by surprise for a while, but I checked how it works in
-exceptions-64s.S and indeed the GEN_KVM macro will add 0x2 to the IVEC
-if IHSRR is set, and it is set for h_data_storage.
-
-So this checks out to me.
-
-I have checked, to the best of my limited assembler capabilities that
-the logic before and after matches. It seems good to me.
-
-On that limited basis,
 Reviewed-by: Daniel Axtens <dja@axtens.net>
 
 Kind regards,
 Daniel
 
 
-> +	beq	2f
-> +#endif
-> +	b	.Lno_skip
-> +1:	mfspr	r9,SPRN_SRR0
-> +	addi	r9,r9,4
-> +	mtspr	SPRN_SRR0,r9
-> +	ld	r12,HSTATE_SCRATCH0(r13)
-> +	ld	r9,HSTATE_SCRATCH2(r13)
-> +	GET_SCRATCH0(r13)
-> +	RFI_TO_KERNEL
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +2:	mfspr	r9,SPRN_HSRR0
-> +	addi	r9,r9,4
-> +	mtspr	SPRN_HSRR0,r9
-> +	ld	r12,HSTATE_SCRATCH0(r13)
-> +	ld	r9,HSTATE_SCRATCH2(r13)
-> +	GET_SCRATCH0(r13)
-> +	HRFI_TO_KERNEL
-> +#endif
+> Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>  arch/powerpc/kernel/exceptions-64s.S | 4 ++--
+>  arch/powerpc/kvm/book3s_64_entry.S   | 6 +++++-
+>  2 files changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/powerpc/kernel/exceptions-64s.S b/arch/powerpc/kernel/exceptions-64s.S
+> index d956dd9ed61f..9ae463e8522b 100644
+> --- a/arch/powerpc/kernel/exceptions-64s.S
+> +++ b/arch/powerpc/kernel/exceptions-64s.S
+> @@ -1992,13 +1992,13 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+>  	 * Requires __LOAD_FAR_HANDLER beause kvmppc_interrupt lives
+>  	 * outside the head section.
+>  	 */
+> -	__LOAD_FAR_HANDLER(r10, kvmppc_interrupt)
+> +	__LOAD_FAR_HANDLER(r10, kvmppc_hcall)
+>  	mtctr   r10
+>  	ld	r10,PACA_EXGEN+EX_R10(r13)
+>  	bctr
+>  #else
+>  	ld	r10,PACA_EXGEN+EX_R10(r13)
+> -	b       kvmppc_interrupt
+> +	b       kvmppc_hcall
+>  #endif
+>  #endif
+>  
+> diff --git a/arch/powerpc/kvm/book3s_64_entry.S b/arch/powerpc/kvm/book3s_64_entry.S
+> index c1276f616af4..9572f759255c 100644
+> --- a/arch/powerpc/kvm/book3s_64_entry.S
+> +++ b/arch/powerpc/kvm/book3s_64_entry.S
+> @@ -7,9 +7,13 @@
+>  #include <asm/reg.h>
+>  
+>  /*
+> - * This is branched to from interrupt handlers in exception-64s.S which set
+> + * These are branched to from interrupt handlers in exception-64s.S which set
+>   * IKVM_REAL or IKVM_VIRT, if HSTATE_IN_GUEST was found to be non-zero.
+>   */
+> +.global	kvmppc_hcall
+> +.balign IFETCH_ALIGN_BYTES
+> +kvmppc_hcall:
+> +
+>  .global	kvmppc_interrupt
+>  .balign IFETCH_ALIGN_BYTES
+>  kvmppc_interrupt:
 > -- 
 > 2.23.0
