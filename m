@@ -2,208 +2,151 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6D1C33119C
-	for <lists+kvm-ppc@lfdr.de>; Mon,  8 Mar 2021 16:06:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD7AD331232
+	for <lists+kvm-ppc@lfdr.de>; Mon,  8 Mar 2021 16:31:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230135AbhCHPFA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 8 Mar 2021 10:05:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27664 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230144AbhCHPEc (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Mar 2021 10:04:32 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 128F3Q3q067639;
-        Mon, 8 Mar 2021 10:04:23 -0500
+        id S229818AbhCHPaw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 8 Mar 2021 10:30:52 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25798 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229701AbhCHPal (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Mar 2021 10:30:41 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 128FUZi4018858;
+        Mon, 8 Mar 2021 10:30:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=3JQl7+OiQwXd/kxZ3DnL9khjx5cDmaNGOhzng0U0/oE=;
- b=MVEHytM3SERnn5VbNX6mW0IwTs3RHi2yyrNDgNRo89WML/3CL3t5TmVxLdau7CkHYeA8
- LFGzaDDheec9aZlXefnGFdrm6mNLDh+7EPcbXPDSmdSGWK6i3eqiqHi2XhRxoKwOLfeb
- sz7+PL2VLbIA0GRYb/8fqWHM5xyIKWl6zFYKzmEitTgQQvzn+f8l6DGP3T5PeZv3vFyb
- yfd7h4IsRGL/pcSJVSXG3w/QbNasOpxR/30lZl6EtTVHt5vC0YYw+Akb0cFYw7ybMurC
- BG1SrDsIuomJghQFmfb8Xz2u48OHy4vxJt34lcoyHV/cBzttenslXNfHaOoIloVWuCku Vg== 
+ content-type; s=pp1; bh=wkRWd3xQgYN9uzjDFWgUDOIYXOYXqZFeufOwI2e7WFg=;
+ b=VNe1JsKqjbrH5Q+aHEQayWzNC7jGZDi27xpyeQUZBHm2hSc4cytmi6oKK/5jlEuMXqWu
+ GjvFe0Haxsr6CPdB9cGGIJ3HiMxX12i5O4GZMHlrLGSFThjGtBn6kR5XJLxAcehpQZvA
+ s1A3y7oxjkr39SAC3OJHqVsuI9CeKXOL0pta2CcDLtpAlok6dTHVXss0c3+gLE2Ukzbu
+ ZFKwZSYWNrpPp0cWutwlJ6tD2vRgkb9zv8nOQQUZD5ESVpb1utw4EiC7nwqIYw64q6K1
+ 6G02sC2ox3n8nSCm/2SLf5BVkXbi60+3blSs0BUu8TVw0U4nJ0fbhv+hCBOY8xhIJDGb 9g== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 375nqbh977-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37577g78d5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Mar 2021 10:04:23 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 128F3njm069585;
-        Mon, 8 Mar 2021 10:04:23 -0500
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 375nqbh952-1
+        Mon, 08 Mar 2021 10:30:36 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 128FUNQa018732;
+        Mon, 8 Mar 2021 10:30:23 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37577g7803-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Mar 2021 10:04:22 -0500
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 128F2Z6d016583;
-        Mon, 8 Mar 2021 15:04:20 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma05wdc.us.ibm.com with ESMTP id 3741c97b67-1
+        Mon, 08 Mar 2021 10:30:22 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 128FDHuw006100;
+        Mon, 8 Mar 2021 15:26:53 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma04dal.us.ibm.com with ESMTP id 3741c9begg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Mar 2021 15:04:20 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 128F4Jdx34800056
+        Mon, 08 Mar 2021 15:26:53 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 128FQq3M23658898
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 8 Mar 2021 15:04:19 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 20F9FBE059;
-        Mon,  8 Mar 2021 15:04:19 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 73ADEBE065;
-        Mon,  8 Mar 2021 15:04:18 +0000 (GMT)
+        Mon, 8 Mar 2021 15:26:52 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E93307806A;
+        Mon,  8 Mar 2021 15:26:51 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 529FB78060;
+        Mon,  8 Mar 2021 15:26:51 +0000 (GMT)
 Received: from localhost (unknown [9.163.6.5])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Mon,  8 Mar 2021 15:04:18 +0000 (GMT)
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Mon,  8 Mar 2021 15:26:51 +0000 (GMT)
 From:   Fabiano Rosas <farosas@linux.ibm.com>
 To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        paulus@ozlabs.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Do not expose HFSCR sanitisation
- to nested hypervisor
-In-Reply-To: <1615191200.1pjltfhe7o.astroid@bobo.none>
-References: <20210305231055.2913892-1-farosas@linux.ibm.com>
- <1615191200.1pjltfhe7o.astroid@bobo.none>
-Date:   Mon, 08 Mar 2021 12:04:16 -0300
-Message-ID: <87eegpn0un.fsf@linux.ibm.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v3 01/41] KVM: PPC: Book3S HV: Disallow LPCR[AIL] to be
+ set to 1 or 2
+In-Reply-To: <20210305150638.2675513-2-npiggin@gmail.com>
+References: <20210305150638.2675513-1-npiggin@gmail.com>
+ <20210305150638.2675513-2-npiggin@gmail.com>
+Date:   Mon, 08 Mar 2021 12:26:49 -0300
+Message-ID: <87blbtmzt2.fsf@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-08_08:2021-03-08,2021-03-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- suspectscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0 phishscore=0
- malwarescore=0 mlxscore=0 priorityscore=1501 impostorscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103080083
+ definitions=2021-03-08_11:2021-03-08,2021-03-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 impostorscore=0 suspectscore=0 bulkscore=0
+ priorityscore=1501 clxscore=1015 mlxscore=0 phishscore=0 spamscore=0
+ malwarescore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2103080083
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 Nicholas Piggin <npiggin@gmail.com> writes:
 
-> Excerpts from Fabiano Rosas's message of March 6, 2021 9:10 am:
->> As one of the arguments of the H_ENTER_NESTED hypercall, the nested
->> hypervisor (L1) prepares a structure containing the values of various
->> hypervisor-privileged registers with which it wants the nested guest
->> (L2) to run. Since the nested HV runs in supervisor mode it needs the
->> host to write to these registers.
->> 
->> To stop a nested HV manipulating this mechanism and using a nested
->> guest as a proxy to access a facility that has been made unavailable
->> to it, we have a routine that sanitises the values of the HV registers
->> before copying them into the nested guest's vcpu struct.
->> 
->> However, when coming out of the guest the values are copied as they
->> were back into L1 memory, which means that any sanitisation we did
->> during guest entry will be exposed to L1 after H_ENTER_NESTED returns.
->> 
->> This is not a problem by itself, but in the case of the Hypervisor
->> Facility Status and Control Register (HFSCR), we use the intersection
->> between L2 hfscr bits and L1 hfscr bits. That means that L1 could use
->> this to indirectly read the (hv-privileged) value from its vcpu
->> struct.
->> 
->> This patch fixes this by making sure that L1 only gets back the bits
->> that are necessary for regular functioning.
+> These are already disallowed by H_SET_MODE from the guest, also disallow
+> these by updating LPCR directly.
 >
-> The general idea of restricting exposure of HV privileged bits, but
-> for the case of HFSCR a guest can probe the HFCR anyway by testing which 
-> facilities are available (and presumably an HV may need some way to know
-> what features are available for it to advertise to its own guests), so
-> is this necessary? Perhaps a comment would be sufficient.
+> AIL modes can affect the host interrupt behaviour while the guest LPCR
+> value is set, so filter it here too.
 >
-
-Well, I'd be happy to force them through the arduous path then =); and
-there are features that are emulated by the HV which L1 would not be
-able to probe.
-
-I think we should implement a mechanism that stops all leaks now, rather
-than having to ponder about this every time we touch an hv_reg in that
-structure. I'm not too worried about HFSCR specifically.
-
-Let me think about this some more and see if I can make it more generic,
-I realise that sticking the saved_hfscr on the side is not the most
-elegant approach.
-
-> Thanks,
-> Nick
+> Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>  arch/powerpc/kvm/book3s_hv.c        | 11 +++++++++--
+>  arch/powerpc/kvm/book3s_hv_nested.c |  7 +++++--
+>  2 files changed, 14 insertions(+), 4 deletions(-)
 >
->> 
->> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
->> ---
->>  arch/powerpc/kvm/book3s_hv_nested.c | 22 +++++++++++++++++-----
->>  1 file changed, 17 insertions(+), 5 deletions(-)
->> 
->> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
->> index 0cd0e7aad588..860004f46e08 100644
->> --- a/arch/powerpc/kvm/book3s_hv_nested.c
->> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
->> @@ -98,12 +98,20 @@ static void byteswap_hv_regs(struct hv_guest_state *hr)
->>  }
->>  
->>  static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
->> -				 struct hv_guest_state *hr)
->> +				 struct hv_guest_state *hr, u64 saved_hfscr)
->>  {
->>  	struct kvmppc_vcore *vc = vcpu->arch.vcore;
->>  
->> +	/*
->> +	 * During sanitise_hv_regs() we used HFSCR bits from L1 state
->> +	 * to restrict what the L2 state is allowed to be. Since L1 is
->> +	 * not allowed to read this SPR, do not include these
->> +	 * modifications in the return state.
->> +	 */
->> +	hr->hfscr = ((~HFSCR_INTR_CAUSE & saved_hfscr) |
->> +		     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
->> +
->>  	hr->dpdes = vc->dpdes;
->> -	hr->hfscr = vcpu->arch.hfscr;
->>  	hr->purr = vcpu->arch.purr;
->>  	hr->spurr = vcpu->arch.spurr;
->>  	hr->ic = vcpu->arch.ic;
->> @@ -132,12 +140,14 @@ static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
->>  	}
->>  }
->>  
->> -static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
->> +static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr,
->> +			     u64 *saved_hfscr)
->>  {
->>  	/*
->>  	 * Don't let L1 enable features for L2 which we've disabled for L1,
->>  	 * but preserve the interrupt cause field.
->>  	 */
->> +	*saved_hfscr = hr->hfscr;
->>  	hr->hfscr &= (HFSCR_INTR_CAUSE | vcpu->arch.hfscr);
->>  
->>  	/* Don't let data address watchpoint match in hypervisor state */
->> @@ -272,6 +282,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->>  	u64 hdec_exp;
->>  	s64 delta_purr, delta_spurr, delta_ic, delta_vtb;
->>  	u64 mask;
->> +	u64 hfscr;
->>  	unsigned long lpcr;
->>  
->>  	if (vcpu->kvm->arch.l1_ptcr == 0)
->> @@ -324,7 +335,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->>  	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
->>  		LPCR_LPES | LPCR_MER;
->>  	lpcr = (vc->lpcr & ~mask) | (l2_hv.lpcr & mask);
->> -	sanitise_hv_regs(vcpu, &l2_hv);
->> +
->> +	sanitise_hv_regs(vcpu, &l2_hv, &hfscr);
->>  	restore_hv_regs(vcpu, &l2_hv);
->>  
->>  	vcpu->arch.ret = RESUME_GUEST;
->> @@ -345,7 +357,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->>  	delta_spurr = vcpu->arch.spurr - l2_hv.spurr;
->>  	delta_ic = vcpu->arch.ic - l2_hv.ic;
->>  	delta_vtb = vc->vtb - l2_hv.vtb;
->> -	save_hv_return_state(vcpu, vcpu->arch.trap, &l2_hv);
->> +	save_hv_return_state(vcpu, vcpu->arch.trap, &l2_hv, hfscr);
->>  
->>  	/* restore L1 state */
->>  	vcpu->arch.nested = NULL;
->> -- 
->> 2.29.2
->> 
->> 
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 13bad6bf4c95..c40eeb20be39 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -803,7 +803,10 @@ static int kvmppc_h_set_mode(struct kvm_vcpu *vcpu, unsigned long mflags,
+>  		vcpu->arch.dawrx1 = value2;
+>  		return H_SUCCESS;
+>  	case H_SET_MODE_RESOURCE_ADDR_TRANS_MODE:
+> -		/* KVM does not support mflags=2 (AIL=2) */
+> +		/*
+> +		 * KVM does not support mflags=2 (AIL=2) and AIL=1 is reserved.
+> +		 * Keep this in synch with kvmppc_set_lpcr.
+> +		 */
+>  		if (mflags != 0 && mflags != 3)
+>  			return H_UNSUPPORTED_FLAG_START;
+>  		return H_TOO_HARD;
+> @@ -1667,8 +1670,12 @@ static void kvmppc_set_lpcr(struct kvm_vcpu *vcpu, u64 new_lpcr,
+>  	 * On POWER8 and POWER9 userspace can also modify AIL (alt. interrupt loc.).
+>  	 */
+>  	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC;
+> -	if (cpu_has_feature(CPU_FTR_ARCH_207S))
+> +	if (cpu_has_feature(CPU_FTR_ARCH_207S)) {
+>  		mask |= LPCR_AIL;
+> +		/* LPCR[AIL]=1/2 is disallowed */
+> +		if ((new_lpcr & LPCR_AIL) && (new_lpcr & LPCR_AIL) != LPCR_AIL_3)
+> +			new_lpcr &= ~LPCR_AIL;
+> +	}
+>  	/*
+>  	 * On POWER9, allow userspace to enable large decrementer for the
+>  	 * guest, whether or not the host has it enabled.
+> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+> index 2fe1fea4c934..b496079e02f7 100644
+> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+> @@ -139,9 +139,12 @@ static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
+
+We're missing the patch that moves the lpcr setting into
+sanitise_hv_regs.
+
+>  
+>  	/*
+>  	 * Don't let L1 change LPCR bits for the L2 except these:
+> +	 * Keep this in sync with kvmppc_set_lpcr.
+>  	 */
+> -	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
+> -		LPCR_LPES | LPCR_MER;
+> +	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_LD | LPCR_LPES | LPCR_MER;
+
+I think this line's change belongs in patch 33 doesn't it? Otherwise you
+are clearing a bit below that is not present in the mask so it would
+never be used anyway.
+
+> +	/* LPCR[AIL]=1/2 is disallowed */
+> +	if ((hr->lpcr & LPCR_AIL) && (hr->lpcr & LPCR_AIL) != LPCR_AIL_3)
+> +		hr->lpcr &= ~LPCR_AIL;
+>  	hr->lpcr = (vc->lpcr & ~mask) | (hr->lpcr & mask);
+>  
+>  	/*
