@@ -2,279 +2,208 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C8F2330A9B
-	for <lists+kvm-ppc@lfdr.de>; Mon,  8 Mar 2021 10:54:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6D1C33119C
+	for <lists+kvm-ppc@lfdr.de>; Mon,  8 Mar 2021 16:06:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231175AbhCHJxk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 8 Mar 2021 04:53:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53310 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231140AbhCHJxW (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Mar 2021 04:53:22 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F708C06174A
-        for <kvm-ppc@vger.kernel.org>; Mon,  8 Mar 2021 01:53:22 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id lr10-20020a17090b4b8ab02900dd61b95c5eso416673pjb.4
-        for <kvm-ppc@vger.kernel.org>; Mon, 08 Mar 2021 01:53:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=+3GtAD//TqsqPvrxhakSIKvRtv68M6Bg8x+2UbJqxRc=;
-        b=f9kxP9eRIbqZSWUWUE0lLnA0n6HpdO2868u8dDHL1NS0klypeXnyY3D6M7dXxndV4G
-         6dkdsJkUxD+KtqbilIDJkpoN+FBGltrho7pNcDlzhcNeabwUGYHY8lnT/Uht7e2Xjdu9
-         moDNY2117oHAx/q88Rp7xENJYpOSYrNREJLtnhdxh+G90E/N3LseVouA2ozf3/6RL6T6
-         9FDRiPI4kNxnudDcc/952zNYNEJUA8qLpfnPQnCaOaK+OMAGEzExXTXHqh/KPmo3BlKx
-         HtpNRZyKdvrvxGJiK59sttZw0UyO9jJrypCZieLvwl9FK8lCfZlcIZaYltt8SVO1BD9E
-         o/og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=+3GtAD//TqsqPvrxhakSIKvRtv68M6Bg8x+2UbJqxRc=;
-        b=QN8YM0KmihnfIAihssgsIkt7Vv00m1t6n98TjiDBwGwU2+GTR14NeONB/Uh3naEQ26
-         fVu1c0r5HlZm0HM11vD3H78c3ltV6RowvKZKw7X28AcxrQ8LU+OOCNVVV0OyxG44OL8l
-         MdlhEReaNQ8dO+77GUinfC8USYWMldKaq9BRh5us/A2P7u0Lb+9atCCicKDqCg8Npoql
-         dJk3uqo4CbM5T1IvT3Um92rhpS9U8go89GgNIeBZqF/RMezS2/VoNw+/UZhffZihM2FF
-         S8e0rf5mqaLmWKgMAMILPKK6ZVQcj5lZ5pupLtsM8LP544FY9BL4E0dx/eqEQRGght8p
-         MTMg==
-X-Gm-Message-State: AOAM533R7lSxXiB9JjxDh9i5XQ6J6yU2e0F3hOpQT/uGV7QUpKVDbErf
-        z+oFfNy3N8HAQm9airNS+ws=
-X-Google-Smtp-Source: ABdhPJynZ3adx690BRj+0PzUzm+axM3IVgb9utiitUUKoVIQkyxk71ncn6bWvpUhBqnzIWATxRXt3A==
-X-Received: by 2002:a17:90a:9f83:: with SMTP id o3mr23838988pjp.133.1615197202041;
-        Mon, 08 Mar 2021 01:53:22 -0800 (PST)
-Received: from bobo.ozlabs.ibm.com (58-6-239-121.tpgi.com.au. [58.6.239.121])
-        by smtp.gmail.com with ESMTPSA id e63sm1326850pfe.208.2021.03.08.01.53.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Mar 2021 01:53:21 -0800 (PST)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>
-Subject: [RFC PATCH 5/7] KVM: PPC: Remove RECONCILE_IRQ_STATE from guest exit
-Date:   Mon,  8 Mar 2021 19:52:42 +1000
-Message-Id: <20210308095244.3195782-7-npiggin@gmail.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20210308095244.3195782-1-npiggin@gmail.com>
-References: <20210308095244.3195782-1-npiggin@gmail.com>
+        id S230135AbhCHPFA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 8 Mar 2021 10:05:00 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27664 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230144AbhCHPEc (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Mar 2021 10:04:32 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 128F3Q3q067639;
+        Mon, 8 Mar 2021 10:04:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=3JQl7+OiQwXd/kxZ3DnL9khjx5cDmaNGOhzng0U0/oE=;
+ b=MVEHytM3SERnn5VbNX6mW0IwTs3RHi2yyrNDgNRo89WML/3CL3t5TmVxLdau7CkHYeA8
+ LFGzaDDheec9aZlXefnGFdrm6mNLDh+7EPcbXPDSmdSGWK6i3eqiqHi2XhRxoKwOLfeb
+ sz7+PL2VLbIA0GRYb/8fqWHM5xyIKWl6zFYKzmEitTgQQvzn+f8l6DGP3T5PeZv3vFyb
+ yfd7h4IsRGL/pcSJVSXG3w/QbNasOpxR/30lZl6EtTVHt5vC0YYw+Akb0cFYw7ybMurC
+ BG1SrDsIuomJghQFmfb8Xz2u48OHy4vxJt34lcoyHV/cBzttenslXNfHaOoIloVWuCku Vg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 375nqbh977-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Mar 2021 10:04:23 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 128F3njm069585;
+        Mon, 8 Mar 2021 10:04:23 -0500
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 375nqbh952-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Mar 2021 10:04:22 -0500
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 128F2Z6d016583;
+        Mon, 8 Mar 2021 15:04:20 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma05wdc.us.ibm.com with ESMTP id 3741c97b67-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Mar 2021 15:04:20 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 128F4Jdx34800056
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 8 Mar 2021 15:04:19 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 20F9FBE059;
+        Mon,  8 Mar 2021 15:04:19 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 73ADEBE065;
+        Mon,  8 Mar 2021 15:04:18 +0000 (GMT)
+Received: from localhost (unknown [9.163.6.5])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Mon,  8 Mar 2021 15:04:18 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
+        paulus@ozlabs.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Do not expose HFSCR sanitisation
+ to nested hypervisor
+In-Reply-To: <1615191200.1pjltfhe7o.astroid@bobo.none>
+References: <20210305231055.2913892-1-farosas@linux.ibm.com>
+ <1615191200.1pjltfhe7o.astroid@bobo.none>
+Date:   Mon, 08 Mar 2021 12:04:16 -0300
+Message-ID: <87eegpn0un.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-08_08:2021-03-08,2021-03-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0 phishscore=0
+ malwarescore=0 mlxscore=0 priorityscore=1501 impostorscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103080083
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Change KVM to keep the irq soft-mask state hard disabled when entering
-the guest, to avoid "reconciling" the state when exiting the guest.
+Nicholas Piggin <npiggin@gmail.com> writes:
 
-IRQ tracing still has to be updated so host irqs are disabled when the
-guest is exited, but this is now done in C, similarly to Book3S HV.
+> Excerpts from Fabiano Rosas's message of March 6, 2021 9:10 am:
+>> As one of the arguments of the H_ENTER_NESTED hypercall, the nested
+>> hypervisor (L1) prepares a structure containing the values of various
+>> hypervisor-privileged registers with which it wants the nested guest
+>> (L2) to run. Since the nested HV runs in supervisor mode it needs the
+>> host to write to these registers.
+>> 
+>> To stop a nested HV manipulating this mechanism and using a nested
+>> guest as a proxy to access a facility that has been made unavailable
+>> to it, we have a routine that sanitises the values of the HV registers
+>> before copying them into the nested guest's vcpu struct.
+>> 
+>> However, when coming out of the guest the values are copied as they
+>> were back into L1 memory, which means that any sanitisation we did
+>> during guest entry will be exposed to L1 after H_ENTER_NESTED returns.
+>> 
+>> This is not a problem by itself, but in the case of the Hypervisor
+>> Facility Status and Control Register (HFSCR), we use the intersection
+>> between L2 hfscr bits and L1 hfscr bits. That means that L1 could use
+>> this to indirectly read the (hv-privileged) value from its vcpu
+>> struct.
+>> 
+>> This patch fixes this by making sure that L1 only gets back the bits
+>> that are necessary for regular functioning.
+>
+> The general idea of restricting exposure of HV privileged bits, but
+> for the case of HFSCR a guest can probe the HFCR anyway by testing which 
+> facilities are available (and presumably an HV may need some way to know
+> what features are available for it to advertise to its own guests), so
+> is this necessary? Perhaps a comment would be sufficient.
+>
 
-[ I don't have BookE or PR KVM setup to actually test this, it's not
-  so important as the 64e conversion to new interrupt code, but it
-  would be nice if we can get rid of this reconciling from asm entirely ]
----
- arch/powerpc/include/asm/irqflags.h   | 58 ---------------------------
- arch/powerpc/include/asm/kvm_ppc.h    | 22 ----------
- arch/powerpc/kvm/book3s_pr.c          |  8 +++-
- arch/powerpc/kvm/booke.c              |  9 ++++-
- arch/powerpc/kvm/bookehv_interrupts.S |  9 -----
- 5 files changed, 13 insertions(+), 93 deletions(-)
+Well, I'd be happy to force them through the arduous path then =); and
+there are features that are emulated by the HV which L1 would not be
+able to probe.
 
-diff --git a/arch/powerpc/include/asm/irqflags.h b/arch/powerpc/include/asm/irqflags.h
-index 1a6c1ce17735..47d46712928a 100644
---- a/arch/powerpc/include/asm/irqflags.h
-+++ b/arch/powerpc/include/asm/irqflags.h
-@@ -11,64 +11,6 @@
-  */
- #include <asm/hw_irq.h>
- 
--#else
--#ifdef CONFIG_TRACE_IRQFLAGS
--#ifdef CONFIG_IRQSOFF_TRACER
--/*
-- * Since the ftrace irqsoff latency trace checks CALLER_ADDR1,
-- * which is the stack frame here, we need to force a stack frame
-- * in case we came from user space.
-- */
--#define TRACE_WITH_FRAME_BUFFER(func)		\
--	mflr	r0;				\
--	stdu	r1, -STACK_FRAME_OVERHEAD(r1);	\
--	std	r0, 16(r1);			\
--	stdu	r1, -STACK_FRAME_OVERHEAD(r1);	\
--	bl func;				\
--	ld	r1, 0(r1);			\
--	ld	r1, 0(r1);
--#else
--#define TRACE_WITH_FRAME_BUFFER(func)		\
--	bl func;
--#endif
--
--/*
-- * These are calls to C code, so the caller must be prepared for volatiles to
-- * be clobbered.
-- */
--#define TRACE_ENABLE_INTS	TRACE_WITH_FRAME_BUFFER(trace_hardirqs_on)
--#define TRACE_DISABLE_INTS	TRACE_WITH_FRAME_BUFFER(trace_hardirqs_off)
--
--/*
-- * This is used by assembly code to soft-disable interrupts first and
-- * reconcile irq state.
-- *
-- * NB: This may call C code, so the caller must be prepared for volatiles to
-- * be clobbered.
-- */
--#define RECONCILE_IRQ_STATE(__rA, __rB)		\
--	lbz	__rA,PACAIRQSOFTMASK(r13);	\
--	lbz	__rB,PACAIRQHAPPENED(r13);	\
--	andi.	__rA,__rA,IRQS_DISABLED;	\
--	li	__rA,IRQS_DISABLED;		\
--	ori	__rB,__rB,PACA_IRQ_HARD_DIS;	\
--	stb	__rB,PACAIRQHAPPENED(r13);	\
--	bne	44f;				\
--	stb	__rA,PACAIRQSOFTMASK(r13);	\
--	TRACE_DISABLE_INTS;			\
--44:
--
--#else
--#define TRACE_ENABLE_INTS
--#define TRACE_DISABLE_INTS
--
--#define RECONCILE_IRQ_STATE(__rA, __rB)		\
--	lbz	__rA,PACAIRQHAPPENED(r13);	\
--	li	__rB,IRQS_DISABLED;		\
--	ori	__rA,__rA,PACA_IRQ_HARD_DIS;	\
--	stb	__rB,PACAIRQSOFTMASK(r13);	\
--	stb	__rA,PACAIRQHAPPENED(r13)
--#endif
- #endif
- 
- #endif
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index 8aacd76bb702..749c5cadc883 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -996,28 +996,6 @@ static inline void kvmppc_set_sr(struct kvm_vcpu *vcpu, int nr, u32 val)
- 	       vcpu->arch.shared->sr[nr] = cpu_to_le32(val);
- }
- 
--/*
-- * Please call after prepare_to_enter. This function puts the lazy ee and irq
-- * disabled tracking state back to normal mode, without actually enabling
-- * interrupts.
-- */
--static inline void kvmppc_fix_ee_before_entry(void)
--{
--	trace_hardirqs_on();
--
--#ifdef CONFIG_PPC64
--	/*
--	 * To avoid races, the caller must have gone directly from having
--	 * interrupts fully-enabled to hard-disabled.
--	 */
--	WARN_ON(local_paca->irq_happened != PACA_IRQ_HARD_DIS);
--
--	/* Only need to enable IRQs by hard enabling them after this */
--	local_paca->irq_happened = 0;
--	irq_soft_mask_set(IRQS_ENABLED);
--#endif
--}
--
- static inline ulong kvmppc_get_ea_indexed(struct kvm_vcpu *vcpu, int ra, int rb)
- {
- 	ulong ea;
-diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
-index 913944dc3620..40f1f4e207bc 100644
---- a/arch/powerpc/kvm/book3s_pr.c
-+++ b/arch/powerpc/kvm/book3s_pr.c
-@@ -1157,6 +1157,8 @@ int kvmppc_handle_exit_pr(struct kvm_vcpu *vcpu, unsigned int exit_nr)
- 	int r = RESUME_HOST;
- 	int s;
- 
-+	trace_hardirqs_on();
-+
- 	vcpu->stat.sum_exits++;
- 
- 	run->exit_reason = KVM_EXIT_UNKNOWN;
-@@ -1460,7 +1462,7 @@ int kvmppc_handle_exit_pr(struct kvm_vcpu *vcpu, unsigned int exit_nr)
- 			r = s;
- 		else {
- 			/* interrupts now hard-disabled */
--			kvmppc_fix_ee_before_entry();
-+			trace_hardirqs_off();
- 		}
- 
- 		kvmppc_handle_lost_ext(vcpu);
-@@ -1855,10 +1857,12 @@ static int kvmppc_vcpu_run_pr(struct kvm_vcpu *vcpu)
- 	if (kvmppc_get_msr(vcpu) & MSR_FP)
- 		kvmppc_handle_ext(vcpu, BOOK3S_INTERRUPT_FP_UNAVAIL, MSR_FP);
- 
--	kvmppc_fix_ee_before_entry();
-+	trace_hardirqs_on();
- 
- 	ret = __kvmppc_vcpu_run(vcpu);
- 
-+	trace_hardirqs_off();
-+
- 	kvmppc_clear_debug(vcpu);
- 
- 	/* No need for guest_exit. It's done in handle_exit.
-diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-index 7d5fe43f85c4..bcccebee6c3c 100644
---- a/arch/powerpc/kvm/booke.c
-+++ b/arch/powerpc/kvm/booke.c
-@@ -776,10 +776,13 @@ int kvmppc_vcpu_run(struct kvm_vcpu *vcpu)
- 	current->thread.debug = vcpu->arch.dbg_reg;
- 
- 	vcpu->arch.pgdir = vcpu->kvm->mm->pgd;
--	kvmppc_fix_ee_before_entry();
-+
-+	trace_hardirqs_on();
- 
- 	ret = __kvmppc_vcpu_run(vcpu);
- 
-+	trace_hardirqs_off();
-+
- 	/* No need for guest_exit. It's done in handle_exit.
- 	   We also get here with interrupts enabled. */
- 
-@@ -991,6 +994,8 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
- 	u32 last_inst = KVM_INST_FETCH_FAILED;
- 	enum emulation_result emulated = EMULATE_DONE;
- 
-+	trace_hardirqs_on();
-+
- 	/* update before a new last_exit_type is rewritten */
- 	kvmppc_update_timing_stats(vcpu);
- 
-@@ -1357,7 +1362,7 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
- 			r = (s << 2) | RESUME_HOST | (r & RESUME_FLAG_NV);
- 		else {
- 			/* interrupts now hard-disabled */
--			kvmppc_fix_ee_before_entry();
-+			trace_hardirqs_off();
- 			kvmppc_load_guest_fp(vcpu);
- 			kvmppc_load_guest_altivec(vcpu);
- 		}
-diff --git a/arch/powerpc/kvm/bookehv_interrupts.S b/arch/powerpc/kvm/bookehv_interrupts.S
-index 8262c14fc9e6..b5fe6fb53c66 100644
---- a/arch/powerpc/kvm/bookehv_interrupts.S
-+++ b/arch/powerpc/kvm/bookehv_interrupts.S
-@@ -424,15 +424,6 @@ _GLOBAL(kvmppc_resume_host)
- 	mtspr	SPRN_EPCR, r3
- 	isync
- 
--#ifdef CONFIG_64BIT
--	/*
--	 * We enter with interrupts disabled in hardware, but
--	 * we need to call RECONCILE_IRQ_STATE to ensure
--	 * that the software state is kept in sync.
--	 */
--	RECONCILE_IRQ_STATE(r3,r5)
--#endif
--
- 	/* Switch to kernel stack and jump to handler. */
- 	mr	r3, r4
- 	mr	r5, r14 /* intno */
--- 
-2.23.0
+I think we should implement a mechanism that stops all leaks now, rather
+than having to ponder about this every time we touch an hv_reg in that
+structure. I'm not too worried about HFSCR specifically.
 
+Let me think about this some more and see if I can make it more generic,
+I realise that sticking the saved_hfscr on the side is not the most
+elegant approach.
+
+> Thanks,
+> Nick
+>
+>> 
+>> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+>> ---
+>>  arch/powerpc/kvm/book3s_hv_nested.c | 22 +++++++++++++++++-----
+>>  1 file changed, 17 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+>> index 0cd0e7aad588..860004f46e08 100644
+>> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+>> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+>> @@ -98,12 +98,20 @@ static void byteswap_hv_regs(struct hv_guest_state *hr)
+>>  }
+>>  
+>>  static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
+>> -				 struct hv_guest_state *hr)
+>> +				 struct hv_guest_state *hr, u64 saved_hfscr)
+>>  {
+>>  	struct kvmppc_vcore *vc = vcpu->arch.vcore;
+>>  
+>> +	/*
+>> +	 * During sanitise_hv_regs() we used HFSCR bits from L1 state
+>> +	 * to restrict what the L2 state is allowed to be. Since L1 is
+>> +	 * not allowed to read this SPR, do not include these
+>> +	 * modifications in the return state.
+>> +	 */
+>> +	hr->hfscr = ((~HFSCR_INTR_CAUSE & saved_hfscr) |
+>> +		     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
+>> +
+>>  	hr->dpdes = vc->dpdes;
+>> -	hr->hfscr = vcpu->arch.hfscr;
+>>  	hr->purr = vcpu->arch.purr;
+>>  	hr->spurr = vcpu->arch.spurr;
+>>  	hr->ic = vcpu->arch.ic;
+>> @@ -132,12 +140,14 @@ static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
+>>  	}
+>>  }
+>>  
+>> -static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
+>> +static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr,
+>> +			     u64 *saved_hfscr)
+>>  {
+>>  	/*
+>>  	 * Don't let L1 enable features for L2 which we've disabled for L1,
+>>  	 * but preserve the interrupt cause field.
+>>  	 */
+>> +	*saved_hfscr = hr->hfscr;
+>>  	hr->hfscr &= (HFSCR_INTR_CAUSE | vcpu->arch.hfscr);
+>>  
+>>  	/* Don't let data address watchpoint match in hypervisor state */
+>> @@ -272,6 +282,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>>  	u64 hdec_exp;
+>>  	s64 delta_purr, delta_spurr, delta_ic, delta_vtb;
+>>  	u64 mask;
+>> +	u64 hfscr;
+>>  	unsigned long lpcr;
+>>  
+>>  	if (vcpu->kvm->arch.l1_ptcr == 0)
+>> @@ -324,7 +335,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>>  	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
+>>  		LPCR_LPES | LPCR_MER;
+>>  	lpcr = (vc->lpcr & ~mask) | (l2_hv.lpcr & mask);
+>> -	sanitise_hv_regs(vcpu, &l2_hv);
+>> +
+>> +	sanitise_hv_regs(vcpu, &l2_hv, &hfscr);
+>>  	restore_hv_regs(vcpu, &l2_hv);
+>>  
+>>  	vcpu->arch.ret = RESUME_GUEST;
+>> @@ -345,7 +357,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>>  	delta_spurr = vcpu->arch.spurr - l2_hv.spurr;
+>>  	delta_ic = vcpu->arch.ic - l2_hv.ic;
+>>  	delta_vtb = vc->vtb - l2_hv.vtb;
+>> -	save_hv_return_state(vcpu, vcpu->arch.trap, &l2_hv);
+>> +	save_hv_return_state(vcpu, vcpu->arch.trap, &l2_hv, hfscr);
+>>  
+>>  	/* restore L1 state */
+>>  	vcpu->arch.nested = NULL;
+>> -- 
+>> 2.29.2
+>> 
+>> 
