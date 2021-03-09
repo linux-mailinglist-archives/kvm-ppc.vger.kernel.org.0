@@ -2,147 +2,151 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F665331C05
-	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Mar 2021 02:08:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B67E4331C26
+	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Mar 2021 02:12:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229750AbhCIBHn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 8 Mar 2021 20:07:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54322 "EHLO
+        id S230045AbhCIBMG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 8 Mar 2021 20:12:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbhCIBHQ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Mar 2021 20:07:16 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 819E2C06174A
-        for <kvm-ppc@vger.kernel.org>; Mon,  8 Mar 2021 17:07:16 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id e6so7622642pgk.5
-        for <kvm-ppc@vger.kernel.org>; Mon, 08 Mar 2021 17:07:16 -0800 (PST)
+        with ESMTP id S230424AbhCIBLv (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 8 Mar 2021 20:11:51 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE11C06174A
+        for <kvm-ppc@vger.kernel.org>; Mon,  8 Mar 2021 17:11:50 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id n9so6668405pgi.7
+        for <kvm-ppc@vger.kernel.org>; Mon, 08 Mar 2021 17:11:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:subject:to:cc:references:in-reply-to:mime-version
          :message-id:content-transfer-encoding;
-        bh=Wk1gFwIrxLf+tndudWrI/O2U2AkCABbC1w+8Jve6Q/I=;
-        b=JaDOx7HbJudQtPEtCEs6GGJ7g7ZtzTnT6GmnmZtJQzLanHfB49LhYRkF6yQM+XDudH
-         A8ZT0ef5wfUpPaACOcwcujLpSyQIkeppZQdclxxdCFNF3/cCBMbssk7EbW92Gro+rb0r
-         UNndRyZXpqFWRPkaOFZK6dR8QoRBo3T/LxlwAIkoV9IxUsEaQJMz/4Nlor1tOGf6Ntjz
-         /P+LSKdgj82rg9cfWODJW5Doj18oYwxgiV1mjznqQBsuhNZq2hVunZCP6ddnLfMtfbWV
-         /ve76hZrBlZY9D8PU/NHxY1YGBHqY5QxbaWdLohjauYYIDeHlbvoALnoNxnNF+V4qg67
-         mFYw==
+        bh=28UX9SAuxr7c4RCVjVztfqjfgvnWTWbckeqpqgfmyyM=;
+        b=TEHlyRjazhbLO4H4XX0uw/laMvz/dYImGsb/GVkDJDwkPWccAC4ZgtWm8jyZx82gB9
+         KLNPQ6Tvb2aWQQtCiZVeklCs1Guo3oQydsnAqfw8/0Nn6XekdhX2rz126Mk1n9hHKIMR
+         eaqSoBZv65xYmbQGbA8eZXAAfdyG3jrOS7JX3l0xBK7A83xQQjHpe5P68oUy8eNEyMcm
+         Y5RqG3GsXZpGJHWiCszwrMWOS84df57J9Tbj4r3WvRFmogABOTj4IbukwxKiIngLTqAG
+         BlOdTY8cJdq4O7C2YqtlznmFzG6ft1sEiS4Dxk8EkayKU922yMDUxpLvCwgoMsBEN2ia
+         1HVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
          :mime-version:message-id:content-transfer-encoding;
-        bh=Wk1gFwIrxLf+tndudWrI/O2U2AkCABbC1w+8Jve6Q/I=;
-        b=RTXmq8HVXi9Be68uVGF9OS305pH1hYJRcTs/zjHur35HfKYUZMQ3UMq1373bI0A0KD
-         G1fPAZFYqFEoIYUTOcUfZ+cn4MTmqLBoyO2XZ9Y/C+DXLvIev4TIWsMsWPM/lUYuYlXs
-         U+ioC8TLnCGYI1MXBCTbhJdxvQKxOa6tvaEmKUaAW/Kf9d2ht3iRn0R6mkAGMXKQzrTA
-         f1kWYNfWfrA3fXcbdwUtOU/G5z9ODdx+EebBLMH8c4NgpNJIspwK+9Up0fL9FniWd7GC
-         bRNwkm40jh6Fht63iQGh0j6flXsxelRv5VHoRsUeCBvwj41HHo5SMh49DRfm32bfA1fN
-         A8xQ==
-X-Gm-Message-State: AOAM532FwIIhLvjXXd4yoRbIDFSXEG7kfINYYzBIItHK02aov0bqKQaY
-        5zp8cTPcZlZfee2mCegq1k2uB2/acO4=
-X-Google-Smtp-Source: ABdhPJz8PNWozzV4nHM4WDieKH5ZfHtUk5b13eum5F6lFnMGET4J7Bl4puV8MQr/qIpGU0iCIG/VtA==
-X-Received: by 2002:aa7:8ad5:0:b029:1df:5a5a:80e1 with SMTP id b21-20020aa78ad50000b02901df5a5a80e1mr23459375pfd.52.1615252036077;
-        Mon, 08 Mar 2021 17:07:16 -0800 (PST)
+        bh=28UX9SAuxr7c4RCVjVztfqjfgvnWTWbckeqpqgfmyyM=;
+        b=pC8Q8q3PC309otoczQqdDAMloPusLtlOMzq9cWAYhGHRPFrGb69cwame40xvqgr3dX
+         VGZQ0NF/kSO98i7VefaaBhs+jgB6l++7DunYyGFwWWUgjmmSsRftcvZqvd95YztggUDy
+         eneyUhoBx2dINhzJW0RoD12Rw7mnHptJ5N00zS4cHGpGrjM6QD8HQiSO0YTBLcK+5PoD
+         vYaXUqKq5KP59jtEF1uyPoAU1jGt8h5t1T+/1bnWrSwbeYNr8vK+rGQ4kxabcXBzK9Hh
+         U5jqDGhi0Pl6VGLCyUmYtYncj9J2DqBMvF/+iWiDJ6w1IW1C0FsujeF5CH3vJtbbZaWa
+         p/fw==
+X-Gm-Message-State: AOAM530NqehNXvh7OGGJzGG7jPpyM5hbs9NNjlHioeBzGIDEfXocykAY
+        cGJkacRaqm/mNTPFsUmIqoHHGBf74Oc=
+X-Google-Smtp-Source: ABdhPJxZYWBgTRo/fO2yuha3hT89j9eKXmOPLNfjUM5yskDJJWrzQAaqu4/GpdfMDBt54YfUtYPBEQ==
+X-Received: by 2002:a62:cd:0:b029:1ef:55e:e374 with SMTP id 196-20020a6200cd0000b02901ef055ee374mr23949772pfa.31.1615252310457;
+        Mon, 08 Mar 2021 17:11:50 -0800 (PST)
 Received: from localhost (58-6-239-121.tpgi.com.au. [58.6.239.121])
-        by smtp.gmail.com with ESMTPSA id s27sm10687329pgk.77.2021.03.08.17.07.14
+        by smtp.gmail.com with ESMTPSA id a24sm12176735pff.18.2021.03.08.17.11.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Mar 2021 17:07:15 -0800 (PST)
-Date:   Tue, 09 Mar 2021 11:07:09 +1000
+        Mon, 08 Mar 2021 17:11:49 -0800 (PST)
+Date:   Tue, 09 Mar 2021 11:11:44 +1000
 From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Do not expose HFSCR sanitisation to
- nested hypervisor
+Subject: Re: [PATCH v3 01/41] KVM: PPC: Book3S HV: Disallow LPCR[AIL] to be
+ set to 1 or 2
 To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        paulus@ozlabs.org
-References: <20210305231055.2913892-1-farosas@linux.ibm.com>
-        <1615191200.1pjltfhe7o.astroid@bobo.none> <87eegpn0un.fsf@linux.ibm.com>
-In-Reply-To: <87eegpn0un.fsf@linux.ibm.com>
+Cc:     linuxppc-dev@lists.ozlabs.org
+References: <20210305150638.2675513-1-npiggin@gmail.com>
+        <20210305150638.2675513-2-npiggin@gmail.com> <87blbtmzt2.fsf@linux.ibm.com>
+In-Reply-To: <87blbtmzt2.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Message-Id: <1615250895.ey7uv2nfuf.astroid@bobo.none>
+Message-Id: <1615252103.bthxs4rnq2.astroid@bobo.none>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Fabiano Rosas's message of March 9, 2021 1:04 am:
+Excerpts from Fabiano Rosas's message of March 9, 2021 1:26 am:
 > Nicholas Piggin <npiggin@gmail.com> writes:
 >=20
->> Excerpts from Fabiano Rosas's message of March 6, 2021 9:10 am:
->>> As one of the arguments of the H_ENTER_NESTED hypercall, the nested
->>> hypervisor (L1) prepares a structure containing the values of various
->>> hypervisor-privileged registers with which it wants the nested guest
->>> (L2) to run. Since the nested HV runs in supervisor mode it needs the
->>> host to write to these registers.
->>>=20
->>> To stop a nested HV manipulating this mechanism and using a nested
->>> guest as a proxy to access a facility that has been made unavailable
->>> to it, we have a routine that sanitises the values of the HV registers
->>> before copying them into the nested guest's vcpu struct.
->>>=20
->>> However, when coming out of the guest the values are copied as they
->>> were back into L1 memory, which means that any sanitisation we did
->>> during guest entry will be exposed to L1 after H_ENTER_NESTED returns.
->>>=20
->>> This is not a problem by itself, but in the case of the Hypervisor
->>> Facility Status and Control Register (HFSCR), we use the intersection
->>> between L2 hfscr bits and L1 hfscr bits. That means that L1 could use
->>> this to indirectly read the (hv-privileged) value from its vcpu
->>> struct.
->>>=20
->>> This patch fixes this by making sure that L1 only gets back the bits
->>> that are necessary for regular functioning.
+>> These are already disallowed by H_SET_MODE from the guest, also disallow
+>> these by updating LPCR directly.
 >>
->> The general idea of restricting exposure of HV privileged bits, but
->> for the case of HFSCR a guest can probe the HFCR anyway by testing which=
-=20
->> facilities are available (and presumably an HV may need some way to know
->> what features are available for it to advertise to its own guests), so
->> is this necessary? Perhaps a comment would be sufficient.
+>> AIL modes can affect the host interrupt behaviour while the guest LPCR
+>> value is set, so filter it here too.
 >>
+>> Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
+>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> ---
+>>  arch/powerpc/kvm/book3s_hv.c        | 11 +++++++++--
+>>  arch/powerpc/kvm/book3s_hv_nested.c |  7 +++++--
+>>  2 files changed, 14 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+>> index 13bad6bf4c95..c40eeb20be39 100644
+>> --- a/arch/powerpc/kvm/book3s_hv.c
+>> +++ b/arch/powerpc/kvm/book3s_hv.c
+>> @@ -803,7 +803,10 @@ static int kvmppc_h_set_mode(struct kvm_vcpu *vcpu,=
+ unsigned long mflags,
+>>  		vcpu->arch.dawrx1 =3D value2;
+>>  		return H_SUCCESS;
+>>  	case H_SET_MODE_RESOURCE_ADDR_TRANS_MODE:
+>> -		/* KVM does not support mflags=3D2 (AIL=3D2) */
+>> +		/*
+>> +		 * KVM does not support mflags=3D2 (AIL=3D2) and AIL=3D1 is reserved.
+>> +		 * Keep this in synch with kvmppc_set_lpcr.
+>> +		 */
+>>  		if (mflags !=3D 0 && mflags !=3D 3)
+>>  			return H_UNSUPPORTED_FLAG_START;
+>>  		return H_TOO_HARD;
+>> @@ -1667,8 +1670,12 @@ static void kvmppc_set_lpcr(struct kvm_vcpu *vcpu=
+, u64 new_lpcr,
+>>  	 * On POWER8 and POWER9 userspace can also modify AIL (alt. interrupt =
+loc.).
+>>  	 */
+>>  	mask =3D LPCR_DPFD | LPCR_ILE | LPCR_TC;
+>> -	if (cpu_has_feature(CPU_FTR_ARCH_207S))
+>> +	if (cpu_has_feature(CPU_FTR_ARCH_207S)) {
+>>  		mask |=3D LPCR_AIL;
+>> +		/* LPCR[AIL]=3D1/2 is disallowed */
+>> +		if ((new_lpcr & LPCR_AIL) && (new_lpcr & LPCR_AIL) !=3D LPCR_AIL_3)
+>> +			new_lpcr &=3D ~LPCR_AIL;
+>> +	}
+>>  	/*
+>>  	 * On POWER9, allow userspace to enable large decrementer for the
+>>  	 * guest, whether or not the host has it enabled.
+>> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book=
+3s_hv_nested.c
+>> index 2fe1fea4c934..b496079e02f7 100644
+>> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+>> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+>> @@ -139,9 +139,12 @@ static void sanitise_hv_regs(struct kvm_vcpu *vcpu,=
+ struct hv_guest_state *hr)
 >=20
-> Well, I'd be happy to force them through the arduous path then =3D);
+> We're missing the patch that moves the lpcr setting into
+> sanitise_hv_regs.
 
-That's not a very satisifying justification.
+Oh yes sorry, mistyped the format-patch command.
 
-> and
-> there are features that are emulated by the HV which L1 would not be
-> able to probe.
+>> =20
+>>  	/*
+>>  	 * Don't let L1 change LPCR bits for the L2 except these:
+>> +	 * Keep this in sync with kvmppc_set_lpcr.
+>>  	 */
+>> -	mask =3D LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
+>> -		LPCR_LPES | LPCR_MER;
+>> +	mask =3D LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_LD | LPCR_LPES | LPCR_M=
+ER;
+>=20
+> I think this line's change belongs in patch 33 doesn't it? Otherwise you
+> are clearing a bit below that is not present in the mask so it would
+> never be used anyway.
 
-It should be able to trivially by measuring timing.
+Ah yes, thank you. Will fix.
 
 >=20
-> I think we should implement a mechanism that stops all leaks now, rather
-> than having to ponder about this every time we touch an hv_reg in that
-> structure.
-
-This does not follow. There is already a "leak" via a timing or faulting=20
-side channel, so by definition we can't stop all leaks just by filtering=20
-the register value.
-
-So what we need to do first I think is define what the threat is. What=20
-is the problem with the L1 knowing what the HFSCR is? If we can identify
-a threat then we would appear to have much bigger problems. If not, then
-this change can not be justified on the basis of security AFAIKS.
-
-> I'm not too worried about HFSCR specifically.
-
-HFSCR is pretty special because its behaviour makes it quite trivial to
-extrapolate. It also has the fault cause bits in it that aren't being
-sanitised either so that would have to be thought about.
-
-> Let me think about this some more and see if I can make it more generic,
-> I realise that sticking the saved_hfscr on the side is not the most
-> elegant approach.
-
-I would say returning an error from the hcall if the caller tries to=20
-enable an HFSCR bit that it's not allowed to would be the easiest
-approach. At least then a well meaning but optimistic guest won't try
-to enable and advertise missing features to its nested guests and have
-them crash strangely, rather it would just stop up front.
-
-I don't think trying to obscure HFSCR in general will ever be possible=20
-though.
-
-Thanks,
-Nick
+>> +	/* LPCR[AIL]=3D1/2 is disallowed */
+>> +	if ((hr->lpcr & LPCR_AIL) && (hr->lpcr & LPCR_AIL) !=3D LPCR_AIL_3)
+>> +		hr->lpcr &=3D ~LPCR_AIL;
+>>  	hr->lpcr =3D (vc->lpcr & ~mask) | (hr->lpcr & mask);
+>> =20
+>>  	/*
+>=20
