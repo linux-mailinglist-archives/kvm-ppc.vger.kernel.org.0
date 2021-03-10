@@ -2,82 +2,214 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2E3F3338A5
-	for <lists+kvm-ppc@lfdr.de>; Wed, 10 Mar 2021 10:24:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0737133402A
+	for <lists+kvm-ppc@lfdr.de>; Wed, 10 Mar 2021 15:19:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbhCJJYB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 10 Mar 2021 04:24:01 -0500
-Received: from ozlabs.org ([203.11.71.1]:46331 "EHLO ozlabs.org"
+        id S232776AbhCJOTR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 10 Mar 2021 09:19:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36280 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232356AbhCJJYB (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 10 Mar 2021 04:24:01 -0500
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4DwRTq4sC5z9sVS; Wed, 10 Mar 2021 20:23:59 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1615368239; bh=vNOp55tbHRtcADIHuk6QWWg+Ff4RMtHkJEVvcbKDyTY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QkmtQd5SXcntQkKro2P9fzExrRBNHQguaXPp4IkcmaH0niCbBMBvY3YZbP8yWbgVH
-         iLW4MSJq4J+d/8+qbsQJL4SLx9TsJiVMpjL+WUJuZmPF9B+rQGdnlSNpX2MM8Qpz9t
-         nn9B5z7YuA1otYonIQm5unW32o7JXI39fhSei0NUYhaOjbg9Y9i+2tw/R9m74CwG+k
-         DhqvruDo+WEOkXFiHyVfehxI+RYbaxyvVBnCmEf1ENZSEIlUvlF6W6bhSo8briV41J
-         Ow/2pVHL+v6vLMXJ954BzfK2Twxzs9O4g5OIHGXkqTHMBrER7mn3izQKiKzc4e/xcr
-         rrT/HyMqkUEIA==
-Date:   Wed, 10 Mar 2021 20:23:54 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Do not expose HFSCR sanitisation to
- nested hypervisor
-Message-ID: <20210310092354.GA30597@blackberry>
-References: <20210305231055.2913892-1-farosas@linux.ibm.com>
- <1615191200.1pjltfhe7o.astroid@bobo.none>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1615191200.1pjltfhe7o.astroid@bobo.none>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S230373AbhCJOTK (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 10 Mar 2021 09:19:10 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id EF53364FEF;
+        Wed, 10 Mar 2021 14:19:09 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lJzg3-000mQq-PG; Wed, 10 Mar 2021 14:19:07 +0000
+Date:   Wed, 10 Mar 2021 14:19:06 +0000
+Message-ID: <878s6vxfad.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVM ARM <kvmarm@lists.cs.columbia.edu>,
+        Linux MIPS <linux-mips@vger.kernel.org>,
+        KVM PPC <kvm-ppc@vger.kernel.org>,
+        Linux S390 <linux-s390@vger.kernel.org>,
+        Linux kselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: Re: [RFC PATCH 1/4] KVM: stats: Separate statistics name strings from debugfs code
+In-Reply-To: <20210310003024.2026253-2-jingzhangos@google.com>
+References: <20210310003024.2026253-1-jingzhangos@google.com>
+        <20210310003024.2026253-2-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, seanjc@google.com, vkuznets@redhat.com, jmattson@google.com, pshier@google.com, oupton@google.com, rientjes@google.com, eesposit@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Mar 08, 2021 at 06:18:47PM +1000, Nicholas Piggin wrote:
-> Excerpts from Fabiano Rosas's message of March 6, 2021 9:10 am:
-> > As one of the arguments of the H_ENTER_NESTED hypercall, the nested
-> > hypervisor (L1) prepares a structure containing the values of various
-> > hypervisor-privileged registers with which it wants the nested guest
-> > (L2) to run. Since the nested HV runs in supervisor mode it needs the
-> > host to write to these registers.
-> > 
-> > To stop a nested HV manipulating this mechanism and using a nested
-> > guest as a proxy to access a facility that has been made unavailable
-> > to it, we have a routine that sanitises the values of the HV registers
-> > before copying them into the nested guest's vcpu struct.
-> > 
-> > However, when coming out of the guest the values are copied as they
-> > were back into L1 memory, which means that any sanitisation we did
-> > during guest entry will be exposed to L1 after H_ENTER_NESTED returns.
-> > 
-> > This is not a problem by itself, but in the case of the Hypervisor
-> > Facility Status and Control Register (HFSCR), we use the intersection
-> > between L2 hfscr bits and L1 hfscr bits. That means that L1 could use
-> > this to indirectly read the (hv-privileged) value from its vcpu
-> > struct.
-> > 
-> > This patch fixes this by making sure that L1 only gets back the bits
-> > that are necessary for regular functioning.
+Hi Jing,
+
+On Wed, 10 Mar 2021 00:30:21 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> The general idea of restricting exposure of HV privileged bits, but
-> for the case of HFSCR a guest can probe the HFCR anyway by testing which 
-> facilities are available (and presumably an HV may need some way to know
-> what features are available for it to advertise to its own guests), so
-> is this necessary? Perhaps a comment would be sufficient.
+> Prepare the statistics name strings for supporting binary format
+> aggregated statistics data retrieval.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/guest.c    |  47 ++++--
+>  arch/mips/kvm/mips.c      | 114 ++++++++++----
+>  arch/powerpc/kvm/book3s.c | 107 +++++++++----
+>  arch/powerpc/kvm/booke.c  |  84 +++++++---
+>  arch/s390/kvm/kvm-s390.c  | 320 ++++++++++++++++++++++++++------------
+>  arch/x86/kvm/x86.c        | 127 ++++++++++-----
+>  include/linux/kvm_host.h  |  31 +++-
+>  7 files changed, 589 insertions(+), 241 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 9bbd30e62799..fb3aafe76b52 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -28,19 +28,42 @@
+>  
+>  #include "trace.h"
+>  
+> +const char kvm_vm_stat_strings[][KVM_STATS_NAME_LEN] = {
+> +	"remote_tlb_flush",
+> +};
+> +static_assert(sizeof(kvm_vm_stat_strings) ==
+> +		VM_STAT_COUNT * KVM_STATS_NAME_LEN);
+> +
+> +const char kvm_vcpu_stat_strings[][KVM_STATS_NAME_LEN] = {
+> +	"halt_successful_poll",
+> +	"halt_attempted_poll",
+> +	"halt_poll_success_ns",
+> +	"halt_poll_fail_ns",
+> +	"halt_poll_invalid",
+> +	"halt_wakeup",
+> +	"hvc_exit_stat",
+> +	"wfe_exit_stat",
+> +	"wfi_exit_stat",
+> +	"mmio_exit_user",
+> +	"mmio_exit_kernel",
+> +	"exits",
+> +};
+> +static_assert(sizeof(kvm_vcpu_stat_strings) ==
+> +		VCPU_STAT_COUNT * KVM_STATS_NAME_LEN);
+> +
+>  struct kvm_stats_debugfs_item debugfs_entries[] = {
+> -	VCPU_STAT("halt_successful_poll", halt_successful_poll),
+> -	VCPU_STAT("halt_attempted_poll", halt_attempted_poll),
+> -	VCPU_STAT("halt_poll_invalid", halt_poll_invalid),
+> -	VCPU_STAT("halt_wakeup", halt_wakeup),
+> -	VCPU_STAT("hvc_exit_stat", hvc_exit_stat),
+> -	VCPU_STAT("wfe_exit_stat", wfe_exit_stat),
+> -	VCPU_STAT("wfi_exit_stat", wfi_exit_stat),
+> -	VCPU_STAT("mmio_exit_user", mmio_exit_user),
+> -	VCPU_STAT("mmio_exit_kernel", mmio_exit_kernel),
+> -	VCPU_STAT("exits", exits),
+> -	VCPU_STAT("halt_poll_success_ns", halt_poll_success_ns),
+> -	VCPU_STAT("halt_poll_fail_ns", halt_poll_fail_ns),
+> +	VCPU_STAT(halt_successful_poll),
+> +	VCPU_STAT(halt_attempted_poll),
+> +	VCPU_STAT(halt_poll_invalid),
+> +	VCPU_STAT(halt_wakeup),
+> +	VCPU_STAT(hvc_exit_stat),
+> +	VCPU_STAT(wfe_exit_stat),
+> +	VCPU_STAT(wfi_exit_stat),
+> +	VCPU_STAT(mmio_exit_user),
+> +	VCPU_STAT(mmio_exit_kernel),
+> +	VCPU_STAT(exits),
+> +	VCPU_STAT(halt_poll_success_ns),
+> +	VCPU_STAT(halt_poll_fail_ns),
 
-I would see it a bit differently.  From L1's point of view, L0 is the
-hardware.  The situation we have now is akin to writing a value to the
-real HFSCR, then reading HFSCR and finding that some of the facility
-enable bits have magically got set to zero.  That's not the way real
-hardware works, so L0 shouldn't behave that way either, or at least
-not without some strong justification.
+So we now have two arrays that can easily deviate in their order,
+whilst we didn't have that risk before. What is the advantage of doing
+this? The commit message doesn't really say...
 
-Paul.
+[...]
+
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 1b65e7204344..1ea297458306 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1162,6 +1162,18 @@ static inline bool kvm_is_error_gpa(struct kvm *kvm, gpa_t gpa)
+>  	return kvm_is_error_hva(hva);
+>  }
+>  
+> +#define VM_STAT_COUNT		(sizeof(struct kvm_vm_stat)/sizeof(ulong))
+> +#define VCPU_STAT_COUNT		(sizeof(struct kvm_vcpu_stat)/sizeof(u64))
+> +#define KVM_STATS_NAME_LEN	32
+> +
+> +/* Make sure it is synced with fields in struct kvm_vm_stat. */
+> +extern const char kvm_vm_stat_strings[][KVM_STATS_NAME_LEN];
+> +/* Make sure it is synced with fields in struct kvm_vcpu_stat. */
+> +extern const char kvm_vcpu_stat_strings[][KVM_STATS_NAME_LEN];
+> +
+> +#define VM_STAT_NAME(id)        (kvm_vm_stat_strings[id])
+> +#define VCPU_STAT_NAME(id)      (kvm_vcpu_stat_strings[id])
+> +
+>  enum kvm_stat_kind {
+>  	KVM_STAT_VM,
+>  	KVM_STAT_VCPU,
+> @@ -1182,10 +1194,21 @@ struct kvm_stats_debugfs_item {
+>  #define KVM_DBGFS_GET_MODE(dbgfs_item)                                         \
+>  	((dbgfs_item)->mode ? (dbgfs_item)->mode : 0644)
+>  
+> -#define VM_STAT(n, x, ...) 							\
+> -	{ n, offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__ }
+> -#define VCPU_STAT(n, x, ...)							\
+> -	{ n, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__ }
+> +#define VM_STAT(x, ...)                                                        \
+> +	{                                                                      \
+> +		VM_STAT_NAME(offsetof(struct kvm_vm_stat, x)/sizeof(ulong)),   \
+> +		offsetof(struct kvm, stat.x),                                  \
+> +		KVM_STAT_VM,                                                   \
+> +		## __VA_ARGS__                                                 \
+> +	}
+> +
+> +#define VCPU_STAT(x, ...)                                                      \
+> +	{                                                                      \
+> +		VCPU_STAT_NAME(offsetof(struct kvm_vcpu_stat, x)/sizeof(u64)), \
+> +		offsetof(struct kvm_vcpu, stat.x),                             \
+> +		KVM_STAT_VCPU,                                                 \
+> +		## __VA_ARGS__                                                 \
+> +	}
+
+Is there any reason why we want to keep kvm_vm_stat populated with
+ulong, while kvm_vcpu_stat is populated with u64? I have the feeling
+that this is a fairly pointless difference, and that some of the
+macros could be unified.
+
+Also, using names initialisers would help with the readability of the
+macros.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
