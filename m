@@ -2,120 +2,176 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D134338311
-	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Mar 2021 02:14:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D28EF3384BD
+	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Mar 2021 05:43:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229743AbhCLBOD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 11 Mar 2021 20:14:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57360 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229568AbhCLBNu (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 11 Mar 2021 20:13:50 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EE42C061574
-        for <kvm-ppc@vger.kernel.org>; Thu, 11 Mar 2021 17:13:50 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id t37so3992465pga.11
-        for <kvm-ppc@vger.kernel.org>; Thu, 11 Mar 2021 17:13:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=fqgBQHGszJ1FJ/uJtib9M0dApRy7K5pmtaH0QVQ6w/E=;
-        b=vdo0+wYIjZgxN1DHiAduyEanAb6xMs7pl6PHFhUQVCmfAgFSd2RNbjOFKI/L1rY+92
-         hbfV8nmYDxlPo4Ur59e8+a8ppAenabXc2eXQvPMoJwbmuWfNff114lZaw1Rg5sR6Veb2
-         OI5S2IeOA8CDDZ5IpDFo37yWixEWNriAqpJ6r9UfE0wnO8Yhs0TwKr+MnPmlVYzgqDM2
-         DzU85n0RBEbwMOAVZkPrOlO4l2MsSZ34OpXIviaFOUQVRJpLnEP3qbxFhVMudI83LkBZ
-         qhGN/RzbgoWxMqaM4gMi/WK59gHt5PFl0d8MRsPR98rfbbhprDda1yazuiAzRVuoCH40
-         yAyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=fqgBQHGszJ1FJ/uJtib9M0dApRy7K5pmtaH0QVQ6w/E=;
-        b=YtaGx0Nak4NPgCEjm9PYwcd/7AvqUHuNHwCoaX4MPpLFrvVE8WxpHEfH5tmcFDukQT
-         ezSfg8FbIozo34zGQB618KT0Xl6afhI48kt9X3whUDhyzAzAg0fuB+1WaRVNH0EIU8TS
-         kDwQ7LfYzRoruyLJkFaTDH6Rdp638Ve3D+ro07gup+H9vDx/61RZoAr84UiieoeHToju
-         eAvF9PX6UTD4Po+co9djqRiPQQGdwqaUDqLvtGToFJmNya97dd4ugR06rpcMMcuTyH36
-         RGv94HyqwmtZ5ivGucRfUlE55+k576hywyfbhNO+sq9TY7uqRnIoYktU9vP7MQOKyUN7
-         BmyQ==
-X-Gm-Message-State: AOAM532Hji+ngITPBDiI8EQmUtci3iRAfO3vQOjEI1soLjENaiut14QO
-        8Y2InHdXBjoLoehK//PZB1TEqJU8DZU=
-X-Google-Smtp-Source: ABdhPJx249OAggnX/6S8Z7M8WlaUjbknMaYUtqTYcwA9ec64iRZMMUHTncGO8vWthXzdUlABbTCjXA==
-X-Received: by 2002:a62:35c2:0:b029:1f1:3a8b:83d5 with SMTP id c185-20020a6235c20000b02901f13a8b83d5mr10032240pfa.29.1615511629491;
-        Thu, 11 Mar 2021 17:13:49 -0800 (PST)
-Received: from localhost (58-6-239-121.tpgi.com.au. [58.6.239.121])
-        by smtp.gmail.com with ESMTPSA id k8sm277545pjj.31.2021.03.11.17.13.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Mar 2021 17:13:48 -0800 (PST)
-Date:   Fri, 12 Mar 2021 11:13:43 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Do not expose HFSCR sanitisation to
- nested hypervisor
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au
-References: <20210305231055.2913892-1-farosas@linux.ibm.com>
-        <1615191200.1pjltfhe7o.astroid@bobo.none>
-        <20210310092354.GA30597@blackberry>
-In-Reply-To: <20210310092354.GA30597@blackberry>
+        id S231857AbhCLEnV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 11 Mar 2021 23:43:21 -0500
+Received: from mail-dm6nam12on2071.outbound.protection.outlook.com ([40.107.243.71]:37548
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231844AbhCLEmy (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 11 Mar 2021 23:42:54 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ba9YDpVj0NoLxL1uiSod4GaSKUxgfGwxYEO7VhsAQzbVsDEZQ4eV3uUOPwU/zQE0Abg47D6PS1gKAe8sOjQeIoJVoYpkC0Br9jDckGXkUcxoDQOuSR7Ium5WuVyAwFgd5rRjgPdiAHMHSWngL2YD53Xsgm+por79SeCihLKGG9Witl0H186tzB8+3WDw713PQFBkXzuyk5GUU5Sm9eMUrq2S2uJ+H4wjGqtdWrtGd8TblyrsLlIRNmD89w6Fd1gRmJT9u/xMO0fKOdGQqBuTM6zMmaS3T+Dks4VC2OIaCkLG3sL4hKFa33mV99PdffMXWAiGcn89pICbAWfmlUOn+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dTK0VPwwkhLyGgUfm/5MUrWbjzo2X8rxMBnm7Z0Pbns=;
+ b=GRUnR8juX0PDp2MEUVjoXO+YNqykY9SQj7EZ30KKBcfDCkXA0ktItYJEqiyQpfbFMNtaLUyUYExYE7hVdGE6iiV0FIRx856ybbUptGe6MbpDQyUNCgNmkUtbUAZhmNMb9u+PAfO1/r89KLPyBgEf11/z03VFEoXNcYU8F2eZDXEo1hlvxGEeKKM2O1wTTwIp6jPHCVLbR24xXX0km8+AzC2N3DABCsDnbxmtQx5oYXDP86Bf04Q1Xn9lI1/Q47Sob1dH1JK9Js9oN8iSRLpOXYopnccw9BaXMSy3E8mjOSPvHJ9m7GxKix5qhu8MeXyVkwkjrBo36eM9MA8FhqOktQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dTK0VPwwkhLyGgUfm/5MUrWbjzo2X8rxMBnm7Z0Pbns=;
+ b=JKNqqEqntWbJrQKaF+3BthDC8FnakQrPeZc0k+EXqPVTb7BH4i7DGGDpS27iq1P6WCCyco4nnddyPsQ5MQh5M/3RPFo/Iy/KcwyZ884qNeSxbH1ZPgLG0i4nQM8UP8tnFe1mYDMCp+dN+BoIH5nOSBv+UTbwc4AIFg9TOrA3i0ydKgSBoKWrTpXM25eJWIcMadEOQ3w8Zd9STZNwKQ17P3ZRSadphgYhGZx66mO6z39d1hzXoW+1BMhPfpRGsDd2wzeLeYsYs22f30BPj4cduFblhgbijzG+QdfQCVPzNT6css9kWoZ7zz3j684RqPfbPMNUSV0IiTFTafAYktx2dA==
+Received: from BN6PR13CA0011.namprd13.prod.outlook.com (2603:10b6:404:10a::21)
+ by BYAPR12MB3173.namprd12.prod.outlook.com (2603:10b6:a03:13d::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.30; Fri, 12 Mar
+ 2021 04:42:50 +0000
+Received: from BN8NAM11FT043.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:404:10a:cafe::28) by BN6PR13CA0011.outlook.office365.com
+ (2603:10b6:404:10a::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.11 via Frontend
+ Transport; Fri, 12 Mar 2021 04:42:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT043.mail.protection.outlook.com (10.13.177.218) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.3933.31 via Frontend Transport; Fri, 12 Mar 2021 04:42:49 +0000
+Received: from nvdebian.localnet (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 12 Mar
+ 2021 04:42:46 +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     Matthew Wilcox <willy@infradead.org>
+CC:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
+        <bskeggs@redhat.com>, <akpm@linux-foundation.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>, <jglisse@redhat.com>
+Subject: Re: [PATCH v5 1/8] mm: Remove special swap entry functions
+Date:   Fri, 12 Mar 2021 15:42:44 +1100
+Message-ID: <2167899.OcvonqYCbN@nvdebian>
+In-Reply-To: <20210309124949.GJ3479805@casper.infradead.org>
+References: <20210309121505.23608-1-apopple@nvidia.com> <20210309121505.23608-2-apopple@nvidia.com> <20210309124949.GJ3479805@casper.infradead.org>
 MIME-Version: 1.0
-Message-Id: <1615511004.vkyzd3ossi.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fd51258b-0988-4bfa-b5ae-08d8e5114a7e
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3173:
+X-Microsoft-Antispam-PRVS: <BYAPR12MB3173C96F00D6FFFD92B56102DF6F9@BYAPR12MB3173.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WFlhR2qpeQYMK2jDBMXa3uHStYOSv/TSPUvby5N/pt+Rr07nrhSZZ3QnxyHQ8gj+sNTh4sI92wBaI8KT5om9/AfwUdNAHJnwOA92H9AAmlf65crh4EJBkIdbwCzZDZWfP+IhHNavU9F4gExlbJG8jECEQTwQxjRTwqOCEGKXK01zd95wcJLnEy/009lGRBCazaQj7B/TlV9pnc4GthnDFW7g+WjEKjxIaPHubrdlTuCSDlVuS8NJHssD4ybMHHSbPQEw5mK0egYjE95oRg5f38OwYVeBfe9gjs1aKAY1WwE3MzN7G0RyvXujAsAz4JHF9jKUGpL0vaPRP7IYO8KqXXwzRADbXNf8Ld0SnbZnAHf368UbIA2hVHZ5H1OIGu+gh7DiLBT2O0iGsyFT6OIOwd42Vh7d/0JZrm15eRKBvviWT1FbHu72VMqEh1t2Sye6mUe/UcILeIaITjz8XmKAKWRVnSmxZWMYaBegXGOG/udLmOobVMnB/sfvbVxxnnJaELIn76mZmS87lzhuFdoHo/bYRF0tAf2dj/D7YnG1tZbxXx1+yDQh3wp6VEaj76D5RHpjQHvvDJpBIUQfqc3YejcSTIi+5L0g2VkR8xCUeprcMek9zLkTuZzIZJnagszzW3Ekvoco1J4jfpcYbZsdD6XDiZuc/juUoYVoA12POo+tmqkwZm4e04mmm0XlieXq
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(376002)(39860400002)(136003)(396003)(46966006)(36840700001)(36906005)(54906003)(7416002)(426003)(82310400003)(5660300002)(316002)(356005)(36860700001)(6916009)(7636003)(83380400001)(86362001)(47076005)(82740400003)(33716001)(336012)(186003)(478600001)(34020700004)(70206006)(26005)(70586007)(8936002)(2906002)(9576002)(4326008)(9686003)(8676002)(16526019);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2021 04:42:49.8408
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd51258b-0988-4bfa-b5ae-08d8e5114a7e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT043.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3173
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Paul Mackerras's message of March 10, 2021 7:23 pm:
-> On Mon, Mar 08, 2021 at 06:18:47PM +1000, Nicholas Piggin wrote:
->> Excerpts from Fabiano Rosas's message of March 6, 2021 9:10 am:
->> > As one of the arguments of the H_ENTER_NESTED hypercall, the nested
->> > hypervisor (L1) prepares a structure containing the values of various
->> > hypervisor-privileged registers with which it wants the nested guest
->> > (L2) to run. Since the nested HV runs in supervisor mode it needs the
->> > host to write to these registers.
->> >=20
->> > To stop a nested HV manipulating this mechanism and using a nested
->> > guest as a proxy to access a facility that has been made unavailable
->> > to it, we have a routine that sanitises the values of the HV registers
->> > before copying them into the nested guest's vcpu struct.
->> >=20
->> > However, when coming out of the guest the values are copied as they
->> > were back into L1 memory, which means that any sanitisation we did
->> > during guest entry will be exposed to L1 after H_ENTER_NESTED returns.
->> >=20
->> > This is not a problem by itself, but in the case of the Hypervisor
->> > Facility Status and Control Register (HFSCR), we use the intersection
->> > between L2 hfscr bits and L1 hfscr bits. That means that L1 could use
->> > this to indirectly read the (hv-privileged) value from its vcpu
->> > struct.
->> >=20
->> > This patch fixes this by making sure that L1 only gets back the bits
->> > that are necessary for regular functioning.
->>=20
->> The general idea of restricting exposure of HV privileged bits, but
->> for the case of HFSCR a guest can probe the HFCR anyway by testing which=
-=20
->> facilities are available (and presumably an HV may need some way to know
->> what features are available for it to advertise to its own guests), so
->> is this necessary? Perhaps a comment would be sufficient.
->=20
-> I would see it a bit differently.  From L1's point of view, L0 is the
-> hardware.  The situation we have now is akin to writing a value to the
-> real HFSCR, then reading HFSCR and finding that some of the facility
-> enable bits have magically got set to zero.  That's not the way real
-> hardware works, so L0 shouldn't behave that way either, or at least
-> not without some strong justification.
+On Tuesday, 9 March 2021 11:49:49 PM AEDT Matthew Wilcox wrote:
+> On Tue, Mar 09, 2021 at 11:14:58PM +1100, Alistair Popple wrote:
+> > -static inline struct page *migration_entry_to_page(swp_entry_t entry)
+> > -{
+> > -	struct page *p = pfn_to_page(swp_offset(entry));
+> > -	/*
+> > -	 * Any use of migration entries may only occur while the
+> > -	 * corresponding page is locked
+> > -	 */
+> > -	BUG_ON(!PageLocked(compound_head(p)));
+> > -	return p;
+> > -}
+> 
+> > +static inline struct page *pfn_swap_entry_to_page(swp_entry_t entry)
+> > +{
+> > +	struct page *p = pfn_to_page(swp_offset(entry));
+> > +
+> > +	/*
+> > +	 * Any use of migration entries may only occur while the
+> > +	 * corresponding page is locked
+> > +	 */
+> > +	BUG_ON(is_migration_entry(entry) && !PageLocked(compound_head(p)));
+> > +
+> > +	return p;
+> > +}
+> 
+> I appreciate you're only moving this code, but PageLocked includes an
+> implicit compound_head():
 
-But the features disallowed by the L0 have to be viewed as unimplemented=20
-by the hardware so the bits would be reserved, so according to=20
-architecture they actually are allowed to return zero.
+I am happy to clean this up at the same time. It did seem a odd when I added 
+it and I had meant to follow up on it some more.
 
-That's not my concern though, and I do agree it is a bit odd. I don't=20
-have a problem with leaving the FC field value unchanged.
+> 1. __PAGEFLAG(Locked, locked, PF_NO_TAIL)
+> 
+> 2. #define __PAGEFLAG(uname, lname, policy)                                \
+>         TESTPAGEFLAG(uname, lname, policy)                              \
+> 
+> 3. #define TESTPAGEFLAG(uname, lname, policy)                              \
+> static __always_inline int Page##uname(struct page *page)               \
+>         { return test_bit(PG_##lname, &policy(page, 0)->flags); }
+> 
+> 4. #define PF_NO_TAIL(page, enforce) ({                                    \
+>                 VM_BUG_ON_PGFLAGS(enforce && PageTail(page), page);     \
+>                 PF_POISONED_CHECK(compound_head(page)); })
+> 
+> 5. #define PF_POISONED_CHECK(page) ({                                      \
+>                 VM_BUG_ON_PGFLAGS(PagePoisoned(page), page);            \
+>                 page; })
+> 
+> 
+> This macrology isn't easy to understand the first time you read it (nor,
+> indeed, the tenth time), so let me decode it:
+> 
+> Substitute 5 into 4 and remove irrelevancies:
+> 
+> 6. #define PF_NO_TAIL(page, enforce) compound_head(page)
+> 
+> Expand 1 in 2:
+> 
+> 7.	TESTPAGEFLAG(Locked, locked, PF_NO_TAIL)
+> 
+> Expand 7 in 3:
+> 
+> 8. static __always_inline int PageLocked(struct page *page)
+> 	{ return test_bit(PG_locked, &PF_NO_TAIL(page, 0)->flags); }
+> 
+> Expand 6 in 8:
+> 
+> 9. static __always_inline int PageLocked(struct page *page)
+> 	{ return test_bit(PG_locked, &compound_head(page)->flags); }
 
-I think at least printing a warning for unimplemented bits would be good=20
-though.
+Thanks for expanding that out, makes sense and matches my reading as well. 
+Will remove the redundant compound_head() call in PageLocked() for the next 
+revision.
 
-Thanks,
-Nick
+> (in case it's not clear, compound_head() is idempotent.  that is:
+> 	f(f(a)) == f(a))
+
+
+
+
+
