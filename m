@@ -2,130 +2,144 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0BB1338DE6
-	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Mar 2021 13:56:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E6243395E7
+	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Mar 2021 19:11:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230512AbhCLM4B (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 12 Mar 2021 07:56:01 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30732 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231179AbhCLMzg (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 12 Mar 2021 07:55:36 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12CCoVxo098940;
-        Fri, 12 Mar 2021 07:55:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=CZraW3MLXsGZlFWIXQunR5iKvo4efs3ARmrIvH7smV0=;
- b=kdmJmnnsMKXuEmWZOuMf7s7iV6TMAecfmqZhAziTu7p6X4vp9zARCsAJF6RaqIw54sJC
- M6JfXwnR4QJXb+uK+DNNuySj/97U5tk3NZXfsgaQgHGO2DvTx/uaHoiiu/R7kZlTU00/
- zwwUrdboYiCYtvaRFNyMkn+Ffx0XjAEsDIHsCKjtULM4kOPH5NVk44ousNxzgbpJLGBf
- 1rckNi0o3pypo+mokZ/AwPGCL06We013odqVZjAa3FtOrNAYooE/kPlJUxdlYKcRWP/Q
- D9QdvFF/hYlDuxslK4F1sNqYZwSBTzOvF6Vo5dCQa1AIBkPY5atEvMzQ21uy23RD2E3P pQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3774m6s7qq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Mar 2021 07:55:32 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12CCoXfi099116;
-        Fri, 12 Mar 2021 07:55:31 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3774m6s7qb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Mar 2021 07:55:31 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12CCh0xr005916;
-        Fri, 12 Mar 2021 12:55:31 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma02wdc.us.ibm.com with ESMTP id 3768swfevk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Mar 2021 12:55:31 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12CCtPrS31916300
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 12 Mar 2021 12:55:25 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 348D978064;
-        Fri, 12 Mar 2021 12:55:25 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 79AA278063;
-        Fri, 12 Mar 2021 12:55:24 +0000 (GMT)
-Received: from localhost (unknown [9.211.65.7])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Fri, 12 Mar 2021 12:55:24 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v3 23/41] KVM: PPC: Book3S HV P9: Reduce mftb per guest
- entry/exit
-In-Reply-To: <20210305150638.2675513-24-npiggin@gmail.com>
-References: <20210305150638.2675513-1-npiggin@gmail.com>
- <20210305150638.2675513-24-npiggin@gmail.com>
-Date:   Fri, 12 Mar 2021 09:55:22 -0300
-Message-ID: <87y2essf9h.fsf@linux.ibm.com>
+        id S232223AbhCLSLY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 12 Mar 2021 13:11:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42876 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231597AbhCLSLR (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 12 Mar 2021 13:11:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615572676;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SQXRSD89A8xhrCuxpBydg6Y3MyKh1PtNusEjHfIcj18=;
+        b=KZ8yOtidfGUcx654m9Pe4lxyuho4yK6NSU0ZJbKsZ832NWmTMviBuXC7ZIXX9BDoh98D6i
+        1NZIJdP7mBqHMr4r+s4HUF6jJzTXwm6UOuCSZofo0inrTUZk8UyAR2zzPgKPyfIyq44ZJv
+        30HjzYMhdZbmDkjzkQaT/7RRnmXpXuM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-10-acJt6i0xNjiLxn1q1sssBw-1; Fri, 12 Mar 2021 13:11:14 -0500
+X-MC-Unique: acJt6i0xNjiLxn1q1sssBw-1
+Received: by mail-wm1-f69.google.com with SMTP id 73so5671273wma.3
+        for <kvm-ppc@vger.kernel.org>; Fri, 12 Mar 2021 10:11:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SQXRSD89A8xhrCuxpBydg6Y3MyKh1PtNusEjHfIcj18=;
+        b=dsaKU8AJ/rhiibYH/WBRrN+uVftVbolRN4uBpmrp64ek7sfDFqTh/GXP7lvxtHd4uC
+         Nkj7nCTL3p/2/ai53QzLG9lIzn6NhMLZivprlTMWgXZPeRlIpFktIbq1wNxHMFE7GmBW
+         mwQqi6MqjoWxhv4L5VJ1IqLWiyGHBbvn/Vou89eWASCn3OCSAfQGL/pNCxknSQ74Y+tr
+         OfjkGfZvISMXXc63mdh/SlkEH92szq8/RizYismbOyRrG+QBKbrNbCQlexRMNJkA9OVn
+         KxeKvMTQ2MNiWv8mwUQFP1DiEMagGM3GSbNvIVBbQXC9/v6t2X83PjapYcvKg3MaQ/ab
+         RirQ==
+X-Gm-Message-State: AOAM533Xp5yU49sT4gKg1dG5JRgoWvx+OgKwBz5U/DJhLS+hs324LWEN
+        ervyds4wHAHN1ATeYO13sIubzRxqWmNvlvgDgy15yYfs8FnAeXMjIHlBBisKEJPXw6TfUG1oAQd
+        3Mp9V6V0Bl9YQtygtfw==
+X-Received: by 2002:a1c:498b:: with SMTP id w133mr14755122wma.134.1615572673359;
+        Fri, 12 Mar 2021 10:11:13 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx2aInA1bidlltyWIjYrqBjK+SGizjJOOZcscWT2RiFNd2X/0uEYFLiJqfA7xaEL8hELymOZw==
+X-Received: by 2002:a1c:498b:: with SMTP id w133mr14755105wma.134.1615572673180;
+        Fri, 12 Mar 2021 10:11:13 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id y8sm2934326wmi.46.2021.03.12.10.11.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Mar 2021 10:11:12 -0800 (PST)
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVM ARM <kvmarm@lists.cs.columbia.edu>,
+        Linux MIPS <linux-mips@vger.kernel.org>,
+        KVM PPC <kvm-ppc@vger.kernel.org>,
+        Linux S390 <linux-s390@vger.kernel.org>,
+        Linux kselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+References: <20210310003024.2026253-1-jingzhangos@google.com>
+ <20210310003024.2026253-4-jingzhangos@google.com>
+ <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
+ <CAAdAUtjj52+cAhD4KUzAaqrMSJXHD0g=ecQNG-a92Mqn3BCxiQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
+ in binary format
+Message-ID: <ac7462de-1531-5428-5dca-4e3dfb897000@redhat.com>
+Date:   Fri, 12 Mar 2021 19:11:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-12_03:2021-03-10,2021-03-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 spamscore=0 adultscore=0 malwarescore=0 phishscore=0
- clxscore=1015 impostorscore=0 mlxscore=0 bulkscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103120088
+In-Reply-To: <CAAdAUtjj52+cAhD4KUzAaqrMSJXHD0g=ecQNG-a92Mqn3BCxiQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
+On 10/03/21 22:41, Jing Zhang wrote:
+>> I would prefer a completely different interface, where you have a file
+>> descriptor that can be created and associated to a vCPU or VM (or even
+>> to /dev/kvm).  Having a file descriptor is important because the fd can
+>> be passed to a less-privileged process that takes care of gathering the
+>> metrics
+> Separate file descriptor solution is very tempting. We are still considering it
+> seriously. Our biggest concern is that the metrics gathering/handling process
+> is not necessary running on the same node as the one file descriptor belongs to.
+> It scales better to pass metrics data directly than to pass file descriptors.
 
-> mftb is serialising (dispatch next-to-complete) so it is heavy weight
-> for a mfspr. Avoid reading it multiple times in the entry or exit paths.
-> A small number of cycles delay to timers is tolerable.
->
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+If you want to pass metrics data directly, you can just read the file 
+descriptor from your VMM, just like you're using the ioctls now. 
+However the file descriptor also allows a privilege-separated same-host 
+interface.
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+>> 4 bytes flags (always zero)
+>> 4 bytes number of statistics
+>> 4 bytes offset of the first stat description
+>> 4 bytes offset of the first stat value
+>> stat descriptions:
+>>    - 4 bytes for the type (for now always zero: uint64_t)
+>>    - 4 bytes for the flags (for now always zero)
+>>    - length of name
+>>    - name
+>> statistics in 64-bit format
+> 
+> The binary format presented above is very flexible. I understand why it is
+> organized this way.
+> In our situation, the metrics data could be pulled periodically as short as
+> half second. They are used by different kinds of monitors/triggers/alerts.
+> To enhance efficiency and reduce traffic caused by metrics passing, we
+> treat all metrics info/data as two kinds. One is immutable information,
+> which doesn't change in a given system boot. The other is mutable
+> data (statistics data), which is pulled/transferred periodically at a high
+> frequency.
 
-> ---
->  arch/powerpc/kvm/book3s_hv.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index c1965a9d8d00..6f3e3aed99aa 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -3505,12 +3505,13 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->  		host_dawrx1 = mfspr(SPRN_DAWRX1);
->  	}
->
-> -	hdec = time_limit - mftb();
-> +	tb = mftb();
-> +	hdec = time_limit - tb;
->  	if (hdec < 0)
->  		return BOOK3S_INTERRUPT_HV_DECREMENTER;
->
->  	if (vc->tb_offset) {
-> -		u64 new_tb = mftb() + vc->tb_offset;
-> +		u64 new_tb = tb + vc->tb_offset;
->  		mtspr(SPRN_TBU40, new_tb);
->  		tb = mftb();
->  		if ((tb & 0xffffff) < (new_tb & 0xffffff))
-> @@ -3703,7 +3704,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
->  	if (!(vcpu->arch.ctrl & 1))
->  		mtspr(SPRN_CTRLT, mfspr(SPRN_CTRLF) & ~1);
->
-> -	mtspr(SPRN_DEC, vcpu->arch.dec_expires - mftb());
-> +	mtspr(SPRN_DEC, vcpu->arch.dec_expires - tb);
->
->  	if (kvmhv_on_pseries()) {
->  		/*
-> @@ -3837,7 +3838,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
->  	vc->entry_exit_map = 0x101;
->  	vc->in_guest = 0;
->
-> -	mtspr(SPRN_DEC, local_paca->kvm_hstate.dec_expires - mftb());
-> +	mtspr(SPRN_DEC, local_paca->kvm_hstate.dec_expires - tb);
->  	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
->
->  	kvmhv_load_host_pmu();
+The format allows to place the values before the descriptions.  So you 
+could use pread to only read the first part of the file descriptor, and 
+the file_operations implementation would then skip the work of building 
+the immutable data.  It doesn't have to be implemented from the
+beginning like that, but the above format supports it.
+
+Paolo
+
