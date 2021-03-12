@@ -2,337 +2,130 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 097093387C0
-	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Mar 2021 09:40:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0BB1338DE6
+	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Mar 2021 13:56:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232494AbhCLIkL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 12 Mar 2021 03:40:11 -0500
-Received: from mail-dm6nam11on2074.outbound.protection.outlook.com ([40.107.223.74]:3168
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232516AbhCLIjp (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 12 Mar 2021 03:39:45 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cGXm0VkaAHLTFhnr+eMHJ2p7dyDDMjMxf9QGqUZB0IeXsXpYXNE9Sr/duhFyTyo5FgiojQ6frn2EdP705ZsmLOJVC/RLY2iCGMM5QnpYTOw00QNW3AoIJWarT6XPXJ8LYobxY/6K6gsEx0at6mlmVlT5Tfyj5f5xrR6gGK7PHeHRsDgTP5gysY9SU/Kk3k8yXPS9Pf+I5MUBKn1nBSUpIHh7FFZ/uqv6cRFJ1sAgPaRocDKMDHq30ay5VMZT+/OCebcQj4d7WeBnHsRfHkJl+Yy1sLBeR9v4tOwODOV/e8ofQorZUAce0wUijM990uQmOuH9FXXriQ8BpMScBmKfcg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6j8kdX05K9L+Y8AaEl2SlYLFPnXNAjrpx+mjtPQ90mU=;
- b=Q/qACOyk4Q6QLV3dngt6iktj9GQoE4nrh/FlQcfpYh8qNe4n5bVeUt1N+BDJe0veJYxe1qSC4Cl9AqEBf04BfeKsyxrZgtGr0OodKfFcJB2bvLcd8h3Hz4onBENzSCnJyjOj9uV8Ma1QAIm98dqjoCrvQ7Sz30/ggJ+CeMOXm8uIlaBij0BUXESc4n4PUgoHBdW5J+9x4MacZJuDfVRscZw4xgONlLqnui6NE8eRZutJjVSGihD1qxU5L6qRPhPty4LCDAnPbh8VJx86ztr9zh5kTDaCui+GuBHYnw4Laivln2lr/8kF+M9hhvLxSGy8Wb0u3fcrLtgQFvAT7dTshw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6j8kdX05K9L+Y8AaEl2SlYLFPnXNAjrpx+mjtPQ90mU=;
- b=WMBZMmlTqCXqkiEjD9gkzKT7b6X6yr2VAC29g1zJLqNiU0GZbSVJByujxzsmp6nvNtcqzL74sPLUZkRRvlJkkYsLfAPAnpdkKtJWKIwSrRhKtu1rTW5uHhcImWssWFsHQzH/5gzIyhPlqOmbHLW4n5S4FhOhrm+BlKpK2uzYhI0mK3ABDLvN/Ibuv2znmmKeqdgym8MAKYWGZ55L37oER70gf1Da5ywNJBzFcPUoypMlWSeTuvNNnVWCR8WsMYUo5RHosgjRkaokBp0CUlP37j+bV9jNYlpMkSvXo0Gxwo7VhQWxbp+huYK2tn+yL31nV7nMhvWu3yABTQvEM6SizA==
-Received: from DM3PR12CA0054.namprd12.prod.outlook.com (2603:10b6:0:56::22) by
- DM6PR12MB3786.namprd12.prod.outlook.com (2603:10b6:5:14a::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3912.30; Fri, 12 Mar 2021 08:39:42 +0000
-Received: from DM6NAM11FT045.eop-nam11.prod.protection.outlook.com
- (2603:10b6:0:56:cafe::3a) by DM3PR12CA0054.outlook.office365.com
- (2603:10b6:0:56::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend
- Transport; Fri, 12 Mar 2021 08:39:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- DM6NAM11FT045.mail.protection.outlook.com (10.13.173.123) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3933.31 via Frontend Transport; Fri, 12 Mar 2021 08:39:42 +0000
-Received: from localhost (172.20.145.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 12 Mar
- 2021 08:39:41 +0000
-From:   Alistair Popple <apopple@nvidia.com>
-To:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
-        <bskeggs@redhat.com>, <akpm@linux-foundation.org>
-CC:     <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
-        <jglisse@redhat.com>, <jgg@nvidia.com>, <hch@infradead.org>,
-        <daniel@ffwll.ch>, <willy@infradead.org>,
-        Alistair Popple <apopple@nvidia.com>
-Subject: [PATCH v6 8/8] nouveau/svm: Implement atomic SVM access
-Date:   Fri, 12 Mar 2021 19:38:51 +1100
-Message-ID: <20210312083851.15981-9-apopple@nvidia.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210312083851.15981-1-apopple@nvidia.com>
-References: <20210312083851.15981-1-apopple@nvidia.com>
+        id S230512AbhCLM4B (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 12 Mar 2021 07:56:01 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30732 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231179AbhCLMzg (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 12 Mar 2021 07:55:36 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12CCoVxo098940;
+        Fri, 12 Mar 2021 07:55:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=CZraW3MLXsGZlFWIXQunR5iKvo4efs3ARmrIvH7smV0=;
+ b=kdmJmnnsMKXuEmWZOuMf7s7iV6TMAecfmqZhAziTu7p6X4vp9zARCsAJF6RaqIw54sJC
+ M6JfXwnR4QJXb+uK+DNNuySj/97U5tk3NZXfsgaQgHGO2DvTx/uaHoiiu/R7kZlTU00/
+ zwwUrdboYiCYtvaRFNyMkn+Ffx0XjAEsDIHsCKjtULM4kOPH5NVk44ousNxzgbpJLGBf
+ 1rckNi0o3pypo+mokZ/AwPGCL06We013odqVZjAa3FtOrNAYooE/kPlJUxdlYKcRWP/Q
+ D9QdvFF/hYlDuxslK4F1sNqYZwSBTzOvF6Vo5dCQa1AIBkPY5atEvMzQ21uy23RD2E3P pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3774m6s7qq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Mar 2021 07:55:32 -0500
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12CCoXfi099116;
+        Fri, 12 Mar 2021 07:55:31 -0500
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3774m6s7qb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Mar 2021 07:55:31 -0500
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12CCh0xr005916;
+        Fri, 12 Mar 2021 12:55:31 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma02wdc.us.ibm.com with ESMTP id 3768swfevk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Mar 2021 12:55:31 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12CCtPrS31916300
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Mar 2021 12:55:25 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 348D978064;
+        Fri, 12 Mar 2021 12:55:25 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 79AA278063;
+        Fri, 12 Mar 2021 12:55:24 +0000 (GMT)
+Received: from localhost (unknown [9.211.65.7])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Fri, 12 Mar 2021 12:55:24 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v3 23/41] KVM: PPC: Book3S HV P9: Reduce mftb per guest
+ entry/exit
+In-Reply-To: <20210305150638.2675513-24-npiggin@gmail.com>
+References: <20210305150638.2675513-1-npiggin@gmail.com>
+ <20210305150638.2675513-24-npiggin@gmail.com>
+Date:   Fri, 12 Mar 2021 09:55:22 -0300
+Message-ID: <87y2essf9h.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 85b5f4b2-36db-4946-c191-08d8e53261a2
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3786:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB378614CC95B5B6299558203CDF6F9@DM6PR12MB3786.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1850;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uz8GY3RcPRPDfrL8932w0E5QPmzu55p9pupugPEQ3bXt0z1cEoLNhNJbb0lNyKlw8i8Ks/AONmVefduhGfYognBepSzEKjcJdOVEhsXEr+1fCIwaTk5AGk5rgNhHTE5CPhNuEI3loXw3gWtbEuHMateXovX1YwsfQC+GObDczmC30+6xRFe7I3QfrXKN3ty2ulwIW5wmv+sIAnRWiCd17ngc4m7NliJLbj8BMe00QEpoo8wDflydiggioDWwZiRaWmmc/mfxBGHNZldJYPTjNRN4+OTzpk9JqXWak47VOVspGKCxZT8WEDk6B9SQDDFUbotABSLsS4eAxjKEqn9tFMQ9ZAAQ2BpFlCtWHtkTPkOMZE0p6n3OcXlB1+QohH32vVC7fOpvoat6UrGiEbWZSmxvymJpVruo9j1cPu66wZDqGBvlVuJ4mu+zyHLekSDOmsV3KewByDvD/LwSaHGKAcrFLiV4xaYtjCk/GP12JEvrIGoGTe0wxlCc63MCY9gkDRjJn/5Ojy6MBkTVixnPpCWWx3t9QvGPjCo6eoPHojU4X6+Xom+V0cFBFePoeLoH/795kfcJIAhWtwRyDkCUaB7EjQMkTp9OrQD/bbc1dm0nHYUyuAZXvqdGb8fx0CY0MbwQvppVydONS4PzYSQfr+XaZc+kXpDuU8wl3sX/ibKUzcGW1VOHLdKlVA+APLo2qRX6Z4bYqyBnhREcDOirwA==
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(136003)(346002)(376002)(39860400002)(396003)(36840700001)(46966006)(26005)(110136005)(107886003)(83380400001)(36860700001)(8676002)(426003)(316002)(86362001)(336012)(356005)(186003)(34020700004)(54906003)(70586007)(16526019)(36906005)(82310400003)(82740400003)(478600001)(7636003)(1076003)(7416002)(6666004)(70206006)(2616005)(36756003)(4326008)(8936002)(47076005)(2906002)(5660300002)(21314003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2021 08:39:42.0637
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85b5f4b2-36db-4946-c191-08d8e53261a2
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT045.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3786
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-12_03:2021-03-10,2021-03-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 spamscore=0 adultscore=0 malwarescore=0 phishscore=0
+ clxscore=1015 impostorscore=0 mlxscore=0 bulkscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103120088
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Some NVIDIA GPUs do not support direct atomic access to system memory
-via PCIe. Instead this must be emulated by granting the GPU exclusive
-access to the memory. This is achieved by replacing CPU page table
-entries with special swap entries that fault on userspace access.
+Nicholas Piggin <npiggin@gmail.com> writes:
 
-The driver then grants the GPU permission to update the page undergoing
-atomic access via the GPU page tables. When CPU access to the page is
-required a CPU fault is raised which calls into the device driver via
-MMU notifiers to revoke the atomic access. The original page table
-entries are then restored allowing CPU access to proceed.
+> mftb is serialising (dispatch next-to-complete) so it is heavy weight
+> for a mfspr. Avoid reading it multiple times in the entry or exit paths.
+> A small number of cycles delay to timers is tolerable.
+>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-Signed-off-by: Alistair Popple <apopple@nvidia.com>
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 
----
-
-v4:
-* Check that page table entries haven't changed before mapping on the
-  device
----
- drivers/gpu/drm/nouveau/include/nvif/if000c.h |   1 +
- drivers/gpu/drm/nouveau/nouveau_svm.c         | 100 ++++++++++++++++--
- drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h |   1 +
- .../drm/nouveau/nvkm/subdev/mmu/vmmgp100.c    |   6 ++
- 4 files changed, 100 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/gpu/drm/nouveau/include/nvif/if000c.h b/drivers/gpu/drm/nouveau/include/nvif/if000c.h
-index d6dd40f21eed..9c7ff56831c5 100644
---- a/drivers/gpu/drm/nouveau/include/nvif/if000c.h
-+++ b/drivers/gpu/drm/nouveau/include/nvif/if000c.h
-@@ -77,6 +77,7 @@ struct nvif_vmm_pfnmap_v0 {
- #define NVIF_VMM_PFNMAP_V0_APER                           0x00000000000000f0ULL
- #define NVIF_VMM_PFNMAP_V0_HOST                           0x0000000000000000ULL
- #define NVIF_VMM_PFNMAP_V0_VRAM                           0x0000000000000010ULL
-+#define NVIF_VMM_PFNMAP_V0_A				  0x0000000000000004ULL
- #define NVIF_VMM_PFNMAP_V0_W                              0x0000000000000002ULL
- #define NVIF_VMM_PFNMAP_V0_V                              0x0000000000000001ULL
- #define NVIF_VMM_PFNMAP_V0_NONE                           0x0000000000000000ULL
-diff --git a/drivers/gpu/drm/nouveau/nouveau_svm.c b/drivers/gpu/drm/nouveau/nouveau_svm.c
-index a195e48c9aee..16b07d7589d2 100644
---- a/drivers/gpu/drm/nouveau/nouveau_svm.c
-+++ b/drivers/gpu/drm/nouveau/nouveau_svm.c
-@@ -35,6 +35,7 @@
- #include <linux/sched/mm.h>
- #include <linux/sort.h>
- #include <linux/hmm.h>
-+#include <linux/rmap.h>
- 
- struct nouveau_svm {
- 	struct nouveau_drm *drm;
-@@ -421,9 +422,9 @@ nouveau_svm_fault_cmp(const void *a, const void *b)
- 		return ret;
- 	if ((ret = (s64)fa->addr - fb->addr))
- 		return ret;
--	/*XXX: atomic? */
--	return (fa->access == 0 || fa->access == 3) -
--	       (fb->access == 0 || fb->access == 3);
-+	/* Atomic access (2) has highest priority */
-+	return (-1*(fa->access == 2) + (fa->access == 0 || fa->access == 3)) -
-+	       (-1*(fb->access == 2) + (fb->access == 0 || fb->access == 3));
- }
- 
- static void
-@@ -487,6 +488,10 @@ static bool nouveau_svm_range_invalidate(struct mmu_interval_notifier *mni,
- 	struct svm_notifier *sn =
- 		container_of(mni, struct svm_notifier, notifier);
- 
-+	if (range->event == MMU_NOTIFY_EXCLUSIVE &&
-+	    range->owner == sn->svmm->vmm->cli->drm->dev)
-+		return true;
-+
- 	/*
- 	 * serializes the update to mni->invalidate_seq done by caller and
- 	 * prevents invalidation of the PTE from progressing while HW is being
-@@ -555,6 +560,73 @@ static void nouveau_hmm_convert_pfn(struct nouveau_drm *drm,
- 		args->p.phys[0] |= NVIF_VMM_PFNMAP_V0_W;
- }
- 
-+static int nouveau_atomic_range_fault(struct nouveau_svmm *svmm,
-+			       struct nouveau_drm *drm,
-+			       struct nouveau_pfnmap_args *args, u32 size,
-+			       struct svm_notifier *notifier)
-+{
-+	unsigned long timeout =
-+		jiffies + msecs_to_jiffies(HMM_RANGE_DEFAULT_TIMEOUT);
-+	struct mm_struct *mm = svmm->notifier.mm;
-+	struct page *page;
-+	unsigned long start = args->p.addr;
-+	unsigned long notifier_seq;
-+	int ret = 0;
-+
-+	ret = mmu_interval_notifier_insert(&notifier->notifier, mm,
-+					args->p.addr, args->p.size,
-+					&nouveau_svm_mni_ops);
-+	if (ret)
-+		return ret;
-+
-+	while (true) {
-+		if (time_after(jiffies, timeout)) {
-+			ret = -EBUSY;
-+			goto out;
-+		}
-+
-+		notifier_seq = mmu_interval_read_begin(&notifier->notifier);
-+		mmap_read_lock(mm);
-+		make_device_exclusive_range(mm, start, start + PAGE_SIZE,
-+					    &page, drm->dev);
-+		mmap_read_unlock(mm);
-+		if (!page) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
-+		mutex_lock(&svmm->mutex);
-+		if (mmu_interval_read_retry(&notifier->notifier,
-+					    notifier_seq)) {
-+			mutex_unlock(&svmm->mutex);
-+			continue;
-+		}
-+		break;
-+	}
-+
-+	/* Map the page on the GPU. */
-+	args->p.page = 12;
-+	args->p.size = PAGE_SIZE;
-+	args->p.addr = start;
-+	args->p.phys[0] = page_to_phys(page) |
-+		NVIF_VMM_PFNMAP_V0_V |
-+		NVIF_VMM_PFNMAP_V0_W |
-+		NVIF_VMM_PFNMAP_V0_A |
-+		NVIF_VMM_PFNMAP_V0_HOST;
-+
-+	svmm->vmm->vmm.object.client->super = true;
-+	ret = nvif_object_ioctl(&svmm->vmm->vmm.object, args, size, NULL);
-+	svmm->vmm->vmm.object.client->super = false;
-+	mutex_unlock(&svmm->mutex);
-+
-+	unlock_page(page);
-+	put_page(page);
-+
-+out:
-+	mmu_interval_notifier_remove(&notifier->notifier);
-+	return ret;
-+}
-+
- static int nouveau_range_fault(struct nouveau_svmm *svmm,
- 			       struct nouveau_drm *drm,
- 			       struct nouveau_pfnmap_args *args, u32 size,
-@@ -637,7 +709,7 @@ nouveau_svm_fault(struct nvif_notify *notify)
- 	unsigned long hmm_flags;
- 	u64 inst, start, limit;
- 	int fi, fn;
--	int replay = 0, ret;
-+	int replay = 0, atomic = 0, ret;
- 
- 	/* Parse available fault buffer entries into a cache, and update
- 	 * the GET pointer so HW can reuse the entries.
-@@ -718,12 +790,14 @@ nouveau_svm_fault(struct nvif_notify *notify)
- 		/*
- 		 * Determine required permissions based on GPU fault
- 		 * access flags.
--		 * XXX: atomic?
- 		 */
- 		switch (buffer->fault[fi]->access) {
- 		case 0: /* READ. */
- 			hmm_flags = HMM_PFN_REQ_FAULT;
- 			break;
-+		case 2: /* ATOMIC. */
-+			atomic = true;
-+			break;
- 		case 3: /* PREFETCH. */
- 			hmm_flags = 0;
- 			break;
-@@ -739,8 +813,14 @@ nouveau_svm_fault(struct nvif_notify *notify)
- 		}
- 
- 		notifier.svmm = svmm;
--		ret = nouveau_range_fault(svmm, svm->drm, &args.i,
--					sizeof(args), hmm_flags, &notifier);
-+		if (atomic)
-+			ret = nouveau_atomic_range_fault(svmm, svm->drm,
-+							 &args.i, sizeof(args),
-+							 &notifier);
-+		else
-+			ret = nouveau_range_fault(svmm, svm->drm, &args.i,
-+						  sizeof(args), hmm_flags,
-+						  &notifier);
- 		mmput(mm);
- 
- 		limit = args.i.p.addr + args.i.p.size;
-@@ -760,7 +840,11 @@ nouveau_svm_fault(struct nvif_notify *notify)
- 			     !(args.phys[0] & NVIF_VMM_PFNMAP_V0_V)) ||
- 			    (buffer->fault[fi]->access != 0 /* READ. */ &&
- 			     buffer->fault[fi]->access != 3 /* PREFETCH. */ &&
--			     !(args.phys[0] & NVIF_VMM_PFNMAP_V0_W)))
-+			     !(args.phys[0] & NVIF_VMM_PFNMAP_V0_W)) ||
-+			    (buffer->fault[fi]->access != 0 /* READ. */ &&
-+			     buffer->fault[fi]->access != 1 /* WRITE. */ &&
-+			     buffer->fault[fi]->access != 3 /* PREFETCH. */ &&
-+			     !(args.phys[0] & NVIF_VMM_PFNMAP_V0_A)))
- 				break;
- 		}
- 
-diff --git a/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h b/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h
-index a2b179568970..f6188aa9171c 100644
---- a/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h
-+++ b/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h
-@@ -178,6 +178,7 @@ void nvkm_vmm_unmap_region(struct nvkm_vmm *, struct nvkm_vma *);
- #define NVKM_VMM_PFN_APER                                 0x00000000000000f0ULL
- #define NVKM_VMM_PFN_HOST                                 0x0000000000000000ULL
- #define NVKM_VMM_PFN_VRAM                                 0x0000000000000010ULL
-+#define NVKM_VMM_PFN_A					  0x0000000000000004ULL
- #define NVKM_VMM_PFN_W                                    0x0000000000000002ULL
- #define NVKM_VMM_PFN_V                                    0x0000000000000001ULL
- #define NVKM_VMM_PFN_NONE                                 0x0000000000000000ULL
-diff --git a/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmmgp100.c b/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmmgp100.c
-index 236db5570771..f02abd9cb4dd 100644
---- a/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmmgp100.c
-+++ b/drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmmgp100.c
-@@ -88,6 +88,9 @@ gp100_vmm_pgt_pfn(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
- 		if (!(*map->pfn & NVKM_VMM_PFN_W))
- 			data |= BIT_ULL(6); /* RO. */
- 
-+		if (!(*map->pfn & NVKM_VMM_PFN_A))
-+			data |= BIT_ULL(7); /* Atomic disable. */
-+
- 		if (!(*map->pfn & NVKM_VMM_PFN_VRAM)) {
- 			addr = *map->pfn >> NVKM_VMM_PFN_ADDR_SHIFT;
- 			addr = dma_map_page(dev, pfn_to_page(addr), 0,
-@@ -322,6 +325,9 @@ gp100_vmm_pd0_pfn(struct nvkm_vmm *vmm, struct nvkm_mmu_pt *pt,
- 		if (!(*map->pfn & NVKM_VMM_PFN_W))
- 			data |= BIT_ULL(6); /* RO. */
- 
-+		if (!(*map->pfn & NVKM_VMM_PFN_A))
-+			data |= BIT_ULL(7); /* Atomic disable. */
-+
- 		if (!(*map->pfn & NVKM_VMM_PFN_VRAM)) {
- 			addr = *map->pfn >> NVKM_VMM_PFN_ADDR_SHIFT;
- 			addr = dma_map_page(dev, pfn_to_page(addr), 0,
--- 
-2.20.1
-
+> ---
+>  arch/powerpc/kvm/book3s_hv.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index c1965a9d8d00..6f3e3aed99aa 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -3505,12 +3505,13 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+>  		host_dawrx1 = mfspr(SPRN_DAWRX1);
+>  	}
+>
+> -	hdec = time_limit - mftb();
+> +	tb = mftb();
+> +	hdec = time_limit - tb;
+>  	if (hdec < 0)
+>  		return BOOK3S_INTERRUPT_HV_DECREMENTER;
+>
+>  	if (vc->tb_offset) {
+> -		u64 new_tb = mftb() + vc->tb_offset;
+> +		u64 new_tb = tb + vc->tb_offset;
+>  		mtspr(SPRN_TBU40, new_tb);
+>  		tb = mftb();
+>  		if ((tb & 0xffffff) < (new_tb & 0xffffff))
+> @@ -3703,7 +3704,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+>  	if (!(vcpu->arch.ctrl & 1))
+>  		mtspr(SPRN_CTRLT, mfspr(SPRN_CTRLF) & ~1);
+>
+> -	mtspr(SPRN_DEC, vcpu->arch.dec_expires - mftb());
+> +	mtspr(SPRN_DEC, vcpu->arch.dec_expires - tb);
+>
+>  	if (kvmhv_on_pseries()) {
+>  		/*
+> @@ -3837,7 +3838,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+>  	vc->entry_exit_map = 0x101;
+>  	vc->in_guest = 0;
+>
+> -	mtspr(SPRN_DEC, local_paca->kvm_hstate.dec_expires - mftb());
+> +	mtspr(SPRN_DEC, local_paca->kvm_hstate.dec_expires - tb);
+>  	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
+>
+>  	kvmhv_load_host_pmu();
