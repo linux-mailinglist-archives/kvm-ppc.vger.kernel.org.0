@@ -2,179 +2,197 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 965C533F5FF
-	for <lists+kvm-ppc@lfdr.de>; Wed, 17 Mar 2021 17:47:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B047133FB5D
+	for <lists+kvm-ppc@lfdr.de>; Wed, 17 Mar 2021 23:42:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232676AbhCQQqb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 17 Mar 2021 12:46:31 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36438 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232894AbhCQQqT (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 17 Mar 2021 12:46:19 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12HF3NRg032167;
-        Wed, 17 Mar 2021 11:11:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=+qFdfoZE4HH/nkwTIthm2xOy59LKOz3pQdIXAC0i8mA=;
- b=M0aFWnSMhQkLEMwqNbi3NScV/8ZKtJrdu3tkXgdXk7l5p4/1w638CtjWKzVdKnycYrFr
- G3MUPxUI49ymjgrMUy1PaGnobS6ikQi6IBy0w5m82pr6SLKX46WYrmKTIvhliF5Fb4vM
- C1wVUIQ+oiG2HU4zpIa/+sVUyatg0sLFKxJjIhGyLLfibeAzCL4Prp+NuohB4l4b4OE2
- F9se0eJk7aX5iCFSe1LwjCq2mXe1E0k5AZyumKT5dMjuRBt5Ar/UcbXDrSD1nCseIj6w
- 0rnlTGt5J9k44Q+kbsmcMLbyomlJDG9Buc5z5Jy5D5W6XI4VZgwWZ3cOx4KapGvkv73L +Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37be74bc90-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Mar 2021 11:11:25 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12HF42G8035819;
-        Wed, 17 Mar 2021 11:11:25 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37be74bc8b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Mar 2021 11:11:25 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12HExIJR019072;
-        Wed, 17 Mar 2021 15:11:24 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma04dal.us.ibm.com with ESMTP id 37a3gcprk3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Mar 2021 15:11:24 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12HFBNa626018200
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 17 Mar 2021 15:11:23 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4C3B6AC05B;
-        Wed, 17 Mar 2021 15:11:23 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C4DC7AC059;
-        Wed, 17 Mar 2021 15:11:21 +0000 (GMT)
-Received: from skywalker.linux.ibm.com (unknown [9.85.75.186])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 17 Mar 2021 15:11:21 +0000 (GMT)
-X-Mailer: emacs 28.0.50 (via feedmail 11-beta-1 I)
-From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v3 34/41] KVM: PPC: Book3S HV: Remove support for
- dependent threads mode on P9
-In-Reply-To: <20210305150638.2675513-35-npiggin@gmail.com>
+        id S229494AbhCQWlo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 17 Mar 2021 18:41:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48658 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229460AbhCQWlo (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 17 Mar 2021 18:41:44 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E2ECC06174A
+        for <kvm-ppc@vger.kernel.org>; Wed, 17 Mar 2021 15:41:44 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id ha17so1899564pjb.2
+        for <kvm-ppc@vger.kernel.org>; Wed, 17 Mar 2021 15:41:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=5qKr02K2bVnhllOe/YqQUhLLbS1J4T73+XfowCUwmbA=;
+        b=hIclouWkKwCuj4QwesNd+0mocymmv26Je+stRMT6oAgJTH+bZWM+YIuJsnqHB4wOyG
+         elC1UUrOANGredWQM0wtBWuepfloL/NSZFOnYs7HBUrvKvk85mBnh/PhZ81imOxWYOkb
+         kbYS452r+i6BKM0pocqzGpeGxQVwGjD8LS7bFA5nDAm1ltMChq2VwQOZbPRQdn0Q4P9o
+         kxjIdZ+wr0Je/UxfsgEXSgI+s+ZigjB1SkJCP0/nTNNgBYI+eTnea1QoWLxOdZp0KDwq
+         zyxurQDoybtslzgc7KBXO0BsUBo88PCPF9tjJKxhkL3NACWK/+1ScD+1RztGldCye2P+
+         apIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=5qKr02K2bVnhllOe/YqQUhLLbS1J4T73+XfowCUwmbA=;
+        b=aMB+cTWAX1UdfI0izJ1KQ2dYo+PAfLIYvx1KWf2BT6YT8cM/lKShHwIFQrwZ0LGrqv
+         73H5+cEVIFTRZXK18T2Sj8LIGsCBkC9yDTSknH6+PweQiPMH5D+3W8/tTiiHtxJHZ80m
+         NGRQYE0Y5w+s/CjZ1D26UXJ/hiDAE8lyi14f4NC23Lc/wSd3m2s+dcBVT6I07x2EDUW5
+         3doeTFicgAG+kmCigz/Zxaw98l7QuKGfAQdVmuOCzeotXFkxZccIOLkX4NhHpARUJLFx
+         MOoKqQr/mJ+OyHHjBLXL2IeW8drn41bKf5y6sHbWRLbKTWV0WX9cBHjkxBYNEBXPRzuv
+         yEFw==
+X-Gm-Message-State: AOAM531jjUagzKzo1m7QpNXm8s3MyFUUa9IYwW4q/63h88HET+jPXY11
+        vr4gt98VewMc/5CUwgYDFSF08g5LAU8=
+X-Google-Smtp-Source: ABdhPJx6Vv1i7uXKO5DM5+94Xn4Njg4d8rF3eAIABwO7ZB5MAjgOxtvQuzZ3FRljqxpTAXAeG0/Lpg==
+X-Received: by 2002:a17:902:9894:b029:e5:ce48:5808 with SMTP id s20-20020a1709029894b02900e5ce485808mr6471434plp.31.1616020903609;
+        Wed, 17 Mar 2021 15:41:43 -0700 (PDT)
+Received: from localhost ([58.84.78.96])
+        by smtp.gmail.com with ESMTPSA id z1sm116831pfn.127.2021.03.17.15.41.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Mar 2021 15:41:42 -0700 (PDT)
+Date:   Thu, 18 Mar 2021 08:41:37 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v3 19/41] KVM: PPC: Book3S HV P9: Stop handling hcalls in
+ real-mode in the P9 path
+To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org
 References: <20210305150638.2675513-1-npiggin@gmail.com>
- <20210305150638.2675513-35-npiggin@gmail.com>
-Date:   Wed, 17 Mar 2021 20:41:19 +0530
-Message-ID: <87ft0tzug8.fsf@linux.ibm.com>
+        <20210305150638.2675513-20-npiggin@gmail.com> <87o8fh21iq.fsf@linux.ibm.com>
+In-Reply-To: <87o8fh21iq.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-17_07:2021-03-17,2021-03-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 mlxscore=0 clxscore=1011 suspectscore=0 adultscore=0
- priorityscore=1501 phishscore=0 bulkscore=0 impostorscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103170110
+Message-Id: <1616019796.miv3so0mq8.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
+Excerpts from Fabiano Rosas's message of March 18, 2021 2:22 am:
+> Nicholas Piggin <npiggin@gmail.com> writes:
+>=20
+>> In the interest of minimising the amount of code that is run in
+>> "real-mode", don't handle hcalls in real mode in the P9 path.
+>>
+>> POWER8 and earlier are much more expensive to exit from HV real mode
+>> and switch to host mode, because on those processors HV interrupts get
+>> to the hypervisor with the MMU off, and the other threads in the core
+>> need to be pulled out of the guest, and SLBs all need to be saved,
+>> ERATs invalidated, and host SLB reloaded before the MMU is re-enabled
+>> in host mode. Hash guests also require a lot of hcalls to run. The
+>> XICS interrupt controller requires hcalls to run.
+>>
+>> By contrast, POWER9 has independent thread switching, and in radix mode
+>> the hypervisor is already in a host virtual memory mode when the HV
+>> interrupt is taken. Radix + xive guests don't need hcalls to handle
+>> interrupts or manage translations.
+>>
+>> So it's much less important to handle hcalls in real mode in P9.
+>>
+>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> ---
+>=20
+> <snip>
+>=20
+>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+>> index 497f216ad724..1f2ba8955c6a 100644
+>> --- a/arch/powerpc/kvm/book3s_hv.c
+>> +++ b/arch/powerpc/kvm/book3s_hv.c
+>> @@ -1147,7 +1147,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+>>   * This has to be done early, not in kvmppc_pseries_do_hcall(), so
+>>   * that the cede logic in kvmppc_run_single_vcpu() works properly.
+>>   */
+>> -static void kvmppc_nested_cede(struct kvm_vcpu *vcpu)
+>> +static void kvmppc_cede(struct kvm_vcpu *vcpu)
+>=20
+> The comment above needs to be updated I think.
+>=20
+>>  {
+>>  	vcpu->arch.shregs.msr |=3D MSR_EE;
+>>  	vcpu->arch.ceded =3D 1;
+>> @@ -1403,9 +1403,15 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu =
+*vcpu,
+>>  		/* hcall - punt to userspace */
+>>  		int i;
+>>
+>> -		/* hypercall with MSR_PR has already been handled in rmode,
+>> -		 * and never reaches here.
+>> -		 */
+>> +		if (unlikely(vcpu->arch.shregs.msr & MSR_PR)) {
+>> +			/*
+>> +			 * Guest userspace executed sc 1, reflect it back as a
+>> +			 * privileged program check interrupt.
+>> +			 */
+>> +			kvmppc_core_queue_program(vcpu, SRR1_PROGPRIV);
+>> +			r =3D RESUME_GUEST;
+>> +			break;
+>> +		}
+>>
+>>  		run->papr_hcall.nr =3D kvmppc_get_gpr(vcpu, 3);
+>>  		for (i =3D 0; i < 9; ++i)
+>> @@ -3740,15 +3746,36 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu =
+*vcpu, u64 time_limit,
+>>  		/* H_CEDE has to be handled now, not later */
+>>  		if (trap =3D=3D BOOK3S_INTERRUPT_SYSCALL && !vcpu->arch.nested &&
+>>  		    kvmppc_get_gpr(vcpu, 3) =3D=3D H_CEDE) {
+>> -			kvmppc_nested_cede(vcpu);
+>> +			kvmppc_cede(vcpu);
+>>  			kvmppc_set_gpr(vcpu, 3, 0);
+>>  			trap =3D 0;
+>>  		}
+>>  	} else {
+>>  		kvmppc_xive_push_vcpu(vcpu);
+>>  		trap =3D kvmhv_load_hv_regs_and_go(vcpu, time_limit, lpcr);
+>> -		kvmppc_xive_pull_vcpu(vcpu);
+>> +		/* H_CEDE has to be handled now, not later */
+>> +		/* XICS hcalls must be handled before xive is pulled */
+>> +		if (trap =3D=3D BOOK3S_INTERRUPT_SYSCALL &&
+>> +		    !(vcpu->arch.shregs.msr & MSR_PR)) {
+>> +			unsigned long req =3D kvmppc_get_gpr(vcpu, 3);
+>>
+>> +			if (req =3D=3D H_CEDE) {
+>> +				kvmppc_cede(vcpu);
+>> +				kvmppc_xive_cede_vcpu(vcpu); /* may un-cede */
+>> +				kvmppc_set_gpr(vcpu, 3, 0);
+>> +				trap =3D 0;
+>> +			}
+>> +			if (req =3D=3D H_EOI || req =3D=3D H_CPPR ||
+>> +			    req =3D=3D H_IPI || req =3D=3D H_IPOLL ||
+>> +			    req =3D=3D H_XIRR || req =3D=3D H_XIRR_X) {
+>> +				unsigned long ret;
+>> +
+>> +				ret =3D kvmppc_xive_xics_hcall(vcpu, req);
+>> +				kvmppc_set_gpr(vcpu, 3, ret);
+>> +				trap =3D 0;
+>> +			}
+>> +		}
+>=20
+> I tried running L2 with xive=3Doff and this code slows down the boot
+> considerably. I think we're missing a !vcpu->arch.nested in the
+> conditional.
 
-> Radix guest support will be removed from the P7/8 path, so disallow
-> dependent threads mode on P9.
->
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arch/powerpc/include/asm/kvm_host.h |  1 -
->  arch/powerpc/kvm/book3s_hv.c        | 27 +++++----------------------
->  2 files changed, 5 insertions(+), 23 deletions(-)
->
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-> index 05fb00d37609..dd017dfa4e65 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -304,7 +304,6 @@ struct kvm_arch {
->  	u8 fwnmi_enabled;
->  	u8 secure_guest;
->  	u8 svm_enabled;
-> -	bool threads_indep;
->  	bool nested_enable;
->  	bool dawr1_enabled;
->  	pgd_t *pgtable;
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index cb428e2f7140..928ed8180d9d 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -103,13 +103,9 @@ static int target_smt_mode;
->  module_param(target_smt_mode, int, 0644);
->  MODULE_PARM_DESC(target_smt_mode, "Target threads per core (0 = max)");
->  
-> -static bool indep_threads_mode = true;
-> -module_param(indep_threads_mode, bool, S_IRUGO | S_IWUSR);
-> -MODULE_PARM_DESC(indep_threads_mode, "Independent-threads mode (only on POWER9)");
-> -
->  static bool one_vm_per_core;
->  module_param(one_vm_per_core, bool, S_IRUGO | S_IWUSR);
-> -MODULE_PARM_DESC(one_vm_per_core, "Only run vCPUs from the same VM on a core (requires indep_threads_mode=N)");
-> +MODULE_PARM_DESC(one_vm_per_core, "Only run vCPUs from the same VM on a core (requires POWER8 or older)");
+You might be right, the real mode handlers never run if nested is set
+so none of these should run I think.
 
-Isn't this also a security feature, where there was an ask to make sure
-threads/vCPU from other VM won't run on this core? In that context isn't
-this applicable also for P9?
+>=20
+> This may also be missing these checks from kvmppc_pseries_do_hcall:
+>=20
+> 		if (kvmppc_xics_enabled(vcpu)) {
+> 			if (xics_on_xive()) {
+> 				ret =3D H_NOT_AVAILABLE;
+> 				return RESUME_GUEST;
+> 			}
+> 			ret =3D kvmppc_xics_hcall(vcpu, req);
+>                         (...)
 
+Well this is the formerly real-mode part of the hcall, whereas=20
+pseries_do_hcall is the virt-mode handler so it expects the real mode=20
+has already run.
 
->  
->  #ifdef CONFIG_KVM_XICS
->  static const struct kernel_param_ops module_param_ops = {
-> @@ -2227,7 +2223,7 @@ static int kvmppc_set_one_reg_hv(struct kvm_vcpu *vcpu, u64 id,
->   */
->  static int threads_per_vcore(struct kvm *kvm)
->  {
-> -	if (kvm->arch.threads_indep)
-> +	if (cpu_has_feature(CPU_FTR_ARCH_300))
->  		return 1;
->  	return threads_per_subcore;
->  }
-> @@ -4319,7 +4315,7 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
->  	vcpu->arch.state = KVMPPC_VCPU_BUSY_IN_HOST;
->  
->  	do {
-> -		if (kvm->arch.threads_indep && kvm_is_radix(kvm))
-> +		if (kvm_is_radix(kvm))
->  			r = kvmhv_run_single_vcpu(vcpu, ~(u64)0,
->  						  vcpu->arch.vcore->lpcr);
->  		else
-> @@ -4934,21 +4930,8 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
->  	/*
->  	 * Track that we now have a HV mode VM active. This blocks secondary
->  	 * CPU threads from coming online.
-> -	 * On POWER9, we only need to do this if the "indep_threads_mode"
-> -	 * module parameter has been set to N.
->  	 */
-> -	if (cpu_has_feature(CPU_FTR_ARCH_300)) {
-> -		if (!indep_threads_mode && !cpu_has_feature(CPU_FTR_HVMODE)) {
-> -			pr_warn("KVM: Ignoring indep_threads_mode=N in nested hypervisor\n");
-> -			kvm->arch.threads_indep = true;
-> -		} else if (!indep_threads_mode && cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG)) {
-> -			pr_warn("KVM: Ignoring indep_threads_mode=N on pre-DD2.2 POWER9\n");
-> -			kvm->arch.threads_indep = true;
-> -		} else {
-> -			kvm->arch.threads_indep = indep_threads_mode;
-> -		}
-> -	}
-> -	if (!kvm->arch.threads_indep)
-> +	if (!cpu_has_feature(CPU_FTR_ARCH_300))
->  		kvm_hv_vm_activated();
->  
->  	/*
-> @@ -4989,7 +4972,7 @@ static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
->  {
->  	debugfs_remove_recursive(kvm->arch.debugfs_dir);
->  
-> -	if (!kvm->arch.threads_indep)
-> +	if (!cpu_has_feature(CPU_FTR_ARCH_300))
->  		kvm_hv_vm_deactivated();
->  
->  	kvmppc_free_vcores(kvm);
-> -- 
-> 2.23.0
+Hmm, probably it shouldn't be setting trap =3D 0 if it did not handle the
+hcall. I don't know if that's the problem you have or if it's the nested
+test but probably should test for this anyway.
+
+> For H_CEDE there might be a similar situation since we're shadowing the
+> code above that runs after H_ENTER_NESTED by setting trap to 0 here.
+
+Yes.
+
+Thanks,
+Nick
