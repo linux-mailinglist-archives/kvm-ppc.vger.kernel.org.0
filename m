@@ -2,140 +2,115 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 237F3343BEF
-	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Mar 2021 09:40:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 954B4343C9F
+	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Mar 2021 10:21:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbhCVIji (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 22 Mar 2021 04:39:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58118 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbhCVIje (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Mar 2021 04:39:34 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34BE3C061574
-        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 01:39:34 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id f10so1077151pgl.9
-        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 01:39:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=YDk3M29WK38ED6rO/E7cSXZFIP5TSdF9UVZ8+hEukoA=;
-        b=MyXE2Ry4BWBpg8VJu8ZcuHZ1ddGC7IwxI9EwlUHS9BlVnY3EsrdZxmkuJ8FUUGQ0xV
-         FU6m6fxfXGUAQOakMd/HK204nHMiqaqu7fwCa9/7ujHdizbClhGT7WTbrrgfNjNdYM6x
-         KlD4oI0DIKdpWoDMIL0MkyOeNxdVpZFFOz26XTOIihP8t4uLab9lt6uzOmK3SfMZwwta
-         U0MkHPJL19jCN0tA/IjVfhcT8OOtg/JnVJji9OPMav/+QPEaOwDud5jjkew2Yd04vFT5
-         w9ov5DpHmP8rNt1uv8qosGBbZbyjtGib7nNVvfGhIogWIzIjmJGFVTJ99I8ZjJ5kweFR
-         7AXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=YDk3M29WK38ED6rO/E7cSXZFIP5TSdF9UVZ8+hEukoA=;
-        b=HO///waqvipwF7W4NduMbs+zOB3qA+byPLxdnEM7ra0Po4RJ9bvVu2tdIsnT0w/ry1
-         od9HOcVGvljeL7AFUlZhRISb27GlB+jhdSLRMtIjj1auBD0QWBYzGO/fKOXd+j7E6EWo
-         BUR9kVSQBdIclS1Nkhnh6lDJ7g02b3JBouJm9wAuCjiz3UgohZ/ZjEZDVDX7KxdgT8wT
-         xzCGFxfRfQ3dvuS3PuG2nLWBOZyIXd7TnZj521vnYg/Y8lFjk6wBrz9jVUkupxRXLvQc
-         AAcJOUyxEd7PtA5vqe9t6xNW9xVM0LHpVlfDaQ+DeFssO+6JC7AErH5NfcXddMO2pEH9
-         oA4A==
-X-Gm-Message-State: AOAM531MWc63n6GOaUgqQ7fGRy3Up05VJCqatn/uK8JFim9kg8K5XXVU
-        oPL8TuRxrIH2D41KKK5oNCyCRqX9e+y9P7qF
-X-Google-Smtp-Source: ABdhPJw46kRhbdEbKjJn0I7N+u7IU/TkW3uxt0PCicci+R0A+zJinqevR2PWJR6/hp99OWjVc/Yojw==
-X-Received: by 2002:a63:f247:: with SMTP id d7mr7717891pgk.112.1616402373698;
-        Mon, 22 Mar 2021 01:39:33 -0700 (PDT)
-Received: from [192.168.10.23] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
-        by smtp.gmail.com with UTF8SMTPSA id t4sm12976444pjs.12.2021.03.22.01.39.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Mar 2021 01:39:33 -0700 (PDT)
-Message-ID: <21be26e7-d8c9-6681-d89d-4ffdf46d23f7@ozlabs.ru>
-Date:   Mon, 22 Mar 2021 19:39:29 +1100
+        id S230071AbhCVJUh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Mar 2021 05:20:37 -0400
+Received: from mail-bn7nam10on2060.outbound.protection.outlook.com ([40.107.92.60]:49376
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230087AbhCVJUO (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 22 Mar 2021 05:20:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ncU4kAkpGlI8KH59+ib9bu57bA2pCA59eAeXa3jfZl8sbX4I2ihThNsczeJXJUvgQZI05wqzemsAV9H+dUO5bBwY+TI+OpYWiJxbYX9X5/LGKk0+J3x22L11OhelsEECKtYZW3RiKbo+fRkzqGYofBvN9jVe38owM/qljrwmvN3fNssoSgLo+B+Zu9+CYuWZKax9psEXUVTdwqTuDgPAwwOmPHzmm6ko5ENOBfolUEvWdmX0F+tuW+EMl3y1sJUdjIL+VyiJQ6+WJB4x1DHQip3mcmRRmDoHxtGcOq3MTan5H68GsKW1pkIX28im22H7H5ykh7MZl8Pe/oqnNzY/+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7PjgjOoPIn79dcehwmI54t/6L4wBBoa0m84RXRN81Pg=;
+ b=kwp7+eMr0ZktJD8c+2XdRm8Owwuo7jDI3MjqKr5Rk568dmVkiIE5MWQ1cWZcTWKuowP2yH976WFXMEPsnWKJt1ocNW0xdkjMml/gdBTfBXTEDux2PgBh4+o34ky9CJUcBv9hiPh3WOgScXHN9dzXY68J2QYi5ieUVZgr7h/8JWWFciOZgwcdDFVq8Lg4uW1pxHMEUPyGCOGWCn8EwyEaJa1thkhQd5aMyXM6ua93GqIU9JCsDxTQrO3zeB/QOLizN+oWrIbgcEqXBuaVV7GPJs41Fd04/5cM7oPHkTfNLH82caJDvAom5usVNCtFgKLaHugq8nAMjGxM2Airouo2FA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=lists.freedesktop.org
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=none sp=none pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7PjgjOoPIn79dcehwmI54t/6L4wBBoa0m84RXRN81Pg=;
+ b=stog+HaaPlb3GxW4BbXKqcfC3ADcm5TmaMazu2ZgeSHyMqMoMGA1PcBS3pHLp+AzSe/Az7nXyY46LSZPFQuP9GnwLneddjYrBTI3EDxeDcw5uTB2UbxACrro6mW6jB3biXwcfcrX71ZDkPhmSSIg9rl5j8kW48CHbfNG+WwSv+T7NtN4EURjelY2F5yhZ3Nuwl45UI1Ha1peoJNOE2QUqgxN264bE1bgGm4yGKL0nCvRBcey3Zf+uFBGcMPl0A5r1wOc5sWJMyS3IoTGjXXTrKo9V5hejVU2oWEa6X3rw4IC13yrEZWryDi+sth7krjFhuDOpMZNwcVTy2iB1a615A==
+Received: from MWHPR20CA0018.namprd20.prod.outlook.com (2603:10b6:300:13d::28)
+ by DM6PR12MB3257.namprd12.prod.outlook.com (2603:10b6:5:184::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.24; Mon, 22 Mar
+ 2021 09:20:11 +0000
+Received: from CO1NAM11FT019.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:300:13d:cafe::e3) by MWHPR20CA0018.outlook.office365.com
+ (2603:10b6:300:13d::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18 via Frontend
+ Transport; Mon, 22 Mar 2021 09:20:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; lists.freedesktop.org; dkim=none (message not
+ signed) header.d=none;lists.freedesktop.org; dmarc=pass action=none
+ header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ CO1NAM11FT019.mail.protection.outlook.com (10.13.175.57) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.3955.18 via Frontend Transport; Mon, 22 Mar 2021 09:20:10 +0000
+Received: from nvdebian.localnet (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 22 Mar
+ 2021 09:20:07 +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
+        <bskeggs@redhat.com>, <akpm@linux-foundation.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
+        <jglisse@redhat.com>, <jgg@nvidia.com>, <daniel@ffwll.ch>,
+        <willy@infradead.org>
+Subject: Re: [PATCH v6 1/8] mm: Remove special swap entry functions
+Date:   Mon, 22 Mar 2021 20:20:05 +1100
+Message-ID: <13488904.3iE9EkMCc7@nvdebian>
+In-Reply-To: <20210315072757.GA4136862@infradead.org>
+References: <20210312083851.15981-1-apopple@nvidia.com> <20210312083851.15981-2-apopple@nvidia.com> <20210315072757.GA4136862@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:87.0) Gecko/20100101
- Thunderbird/87.0
-Subject: Re: [PATCH v3 20/41] KVM: PPC: Book3S HV P9: Move setting HDEC after
- switching to guest LPCR
-Content-Language: en-US
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org
-References: <20210305150638.2675513-1-npiggin@gmail.com>
- <20210305150638.2675513-21-npiggin@gmail.com>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <20210305150638.2675513-21-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 400be08d-5f3a-43cd-a6be-08d8ed13b172
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3257:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB325797E4F4DF173B5BF601F6DF659@DM6PR12MB3257.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1360;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: C4uG3LeY5M3MA8lEsSXCTnNll2QeHbuRwIyZmLpR09/3PzJEZgxAv7bHsOjRTtH31hwTqIu2kLlHXBeEczQFdo8K/4aXQfDlNfMirdPb3SJ0xNxcI/4yVAI2RwJFpgKo6BdmJG7gGumTpVbyNbkTI/nFlCEt5dZ2ENpSBgy7U6AP2ZxG1hiVpmrlXQ3oyier34gNWhm4esrZCrobKGh/GUp6BbsH1Usmpe5FWKLqViqf8j1hz0xgINhUdMcsU9m49fkw+fUFCcLqY+yALdTyOHztTIdfXM9r3eO+uUQAMJjrk9UOuH7aNlcjwmzUpQyHOors2+2QXzxo3txs2pwl5rh5kj/JramWfmTDXLDG4UufRtRpTW429UYBOjU/ZlMkeTzLU4FoYh+y2/rthpZzMRtFUttizQDmmASwluCk7V/izwH9yLZBHu3PjPSExdTuZYjYU9P+MKf+5ReKPBduuObEsV5hfDmhlPFkHqVpOfmOIOSi4KtfGaB9JKKlkthZ7wjmsRQDiwifW+GYMD4vwXZz5efL2vzriY9pMp0LquELP+3uMaaDrLA6N+gTHcSR7x1UIvp90EpYBzHmjrRYSnEtBUbZamxV5fLqcEouyfYhrXB+9wgInBvCk/YwRJHtlRNFPlexgaf3+wbUUMo7g3u5RyNHGQczbqPWuXRFDabuvuev8Mp0mOhjjnq520vX
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(136003)(39860400002)(346002)(376002)(396003)(36840700001)(46966006)(9686003)(26005)(54906003)(16526019)(5660300002)(186003)(4744005)(47076005)(7416002)(426003)(82310400003)(336012)(36860700001)(2906002)(70586007)(36906005)(316002)(70206006)(8936002)(6916009)(33716001)(8676002)(86362001)(4326008)(478600001)(7636003)(356005)(9576002)(82740400003)(39026012);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2021 09:20:10.8948
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 400be08d-5f3a-43cd-a6be-08d8ed13b172
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT019.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3257
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-
-
-On 06/03/2021 02:06, Nicholas Piggin wrote:
-> LPCR[HDICE]=0 suppresses hypervisor decrementer exceptions on some
-> processors, so it must be enabled before HDEC is set.
-
-Educating myself - is not it a processor bug when it does not suppress 
-hdec exceptions with HDICE=0?
-
-Also, why do we want to enable interrupts before writing HDEC? Enabling 
-it may cause an interrupt right away a
-
-Anyway whatever the answers are, this is not changed by this patch and 
-the change makes sense so
-
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
-
-> Rather than set it in the host LPCR then setting HDEC, move the HDEC
-> update to after the guest MMU context (including LPCR) is loaded.
-> There shouldn't be much concern with delaying HDEC by some 10s or 100s
-> of nanoseconds by setting it a bit later.
+On Monday, 15 March 2021 6:27:57 PM AEDT Christoph Hellwig wrote:
+> On Fri, Mar 12, 2021 at 07:38:44PM +1100, Alistair Popple wrote:
+> > Remove the migration and device private entry_to_page() and
+> > entry_to_pfn() inline functions and instead open code them directly.
+> > This results in shorter code which is easier to understand.
 > 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   arch/powerpc/kvm/book3s_hv.c | 19 +++++++------------
->   1 file changed, 7 insertions(+), 12 deletions(-)
+> I think this commit log should mention pfn_swap_entry_to_page() now.
+
+Will add. Thanks for the review.
+
+> Otherwise looks good:
 > 
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 1f2ba8955c6a..ffde1917ab68 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -3505,20 +3505,9 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->   		host_dawrx1 = mfspr(SPRN_DAWRX1);
->   	}
->   
-> -	/*
-> -	 * P8 and P9 suppress the HDEC exception when LPCR[HDICE] = 0,
-> -	 * so set HDICE before writing HDEC.
-> -	 */
-> -	mtspr(SPRN_LPCR, kvm->arch.host_lpcr | LPCR_HDICE);
-> -	isync();
-> -
->   	hdec = time_limit - mftb();
-> -	if (hdec < 0) {
-> -		mtspr(SPRN_LPCR, kvm->arch.host_lpcr);
-> -		isync();
-> +	if (hdec < 0)
->   		return BOOK3S_INTERRUPT_HV_DECREMENTER;
-> -	}
-> -	mtspr(SPRN_HDEC, hdec);
->   
->   	if (vc->tb_offset) {
->   		u64 new_tb = mftb() + vc->tb_offset;
-> @@ -3564,6 +3553,12 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->   
->   	switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
->   
-> +	/*
-> +	 * P9 suppresses the HDEC exception when LPCR[HDICE] = 0,
-> +	 * so set guest LPCR (with HDICE) before writing HDEC.
-> +	 */
-> +	mtspr(SPRN_HDEC, hdec);
-> +
->   	mtspr(SPRN_SRR0, vcpu->arch.shregs.srr0);
->   	mtspr(SPRN_SRR1, vcpu->arch.shregs.srr1);
->   
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > 
 
--- 
-Alexey
+
+
+
