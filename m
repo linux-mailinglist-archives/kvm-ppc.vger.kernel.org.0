@@ -2,68 +2,66 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D43E34395A
-	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Mar 2021 07:22:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4948343A95
+	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Mar 2021 08:30:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229829AbhCVGWN (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 22 Mar 2021 02:22:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56818 "EHLO
+        id S229665AbhCVHaY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Mar 2021 03:30:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229764AbhCVGVr (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Mar 2021 02:21:47 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A476C061574
-        for <kvm-ppc@vger.kernel.org>; Sun, 21 Mar 2021 23:21:47 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id ay2so5995664plb.3
-        for <kvm-ppc@vger.kernel.org>; Sun, 21 Mar 2021 23:21:47 -0700 (PDT)
+        with ESMTP id S229548AbhCVHaQ (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Mar 2021 03:30:16 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0C69C061574
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 00:30:16 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id v23so6075594ple.9
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 00:30:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=g0SJwkBamDFIg0whiCIvc0w+UZR9SjzysVz6onFjuEM=;
-        b=Ytfi2/G8i8tgGuh2uVqVGkAbHUY4iGxGTEfPYQZ7eMG+GbPmpipy5eTc8V3xFEDAiF
-         ZgqVGViobQQidlGJ4QI1m/qADie38IZRchmFeueYiywM+Q+NU/sNbhMYM0spKJYmfbsn
-         rW/gqyuEdiwK9dZKVYLwZ6CwracumncQQ6UHSOfIkCDTjtNvMPXk+OIu1q1otymlNe/R
-         FkEWG98/nJ4KCjsPmtxv58+aappN2j4PaTS9afevVG/08cpQkSbreI1QhydKBkyPjXeA
-         vQ8QtQSaSj6vV/KBUxuChczkBuCCAAORRvN3+nwmI3QTwD9oEIiIgX/fZA+21k6OdU4S
-         945w==
+        bh=44uLXf9fUq01jayoIUqnJ2o6Rdu+SmU1YK9yqOQ5VFc=;
+        b=DUXBOG2e3DViYXLeEmheH4wdlkVYNOV6CyRCYEXW+O8RGODGVyKzBt9mzE4dTjQiWp
+         K0Qy/wnV/x1nluJanpLkHg52L6W4qSzM8jplOhwBfAswzkLuAi8pfIc+HgMS+Y9RpLdg
+         G98oGgkVHG4rDBu6Bu0go49vGFTiyACNGgHnVfDfjV5K2yiDqiOR+WsxONPFZxB8y3DJ
+         6U2lRj3jZw/K8q6zdQfXabk+y7UjZnEIDc7fNc5njvD/MFJub0u0qT2HpnWRT747XEye
+         WMYLdz/2SJhHKOoWIoKrlZndMuMl8GAJhmFmdfnFwmVgpDUNAEmGI9pjXRfsolWeharP
+         l2HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=g0SJwkBamDFIg0whiCIvc0w+UZR9SjzysVz6onFjuEM=;
-        b=Si5iyMtQo82Tjzcd+3W85m0ABF8VrQw/vfajPxG4+sL+A0gzyrpIxiT4Ddh2xahTFl
-         5KBs3MAzmt8tP5cUuwpTZ2K11omx5a/k39jcGYVteTDTWAfXXenDD2QrOlHkBFUISoqR
-         1pF6UDfM9S1ltd0k3xfbXnRUuVAFShgLPajJi+Tj6xG0BttxBobvCFsgJwene1LGTWVs
-         1fj/XwcrtPXSGYAW9IYjNBVUfb6YfvaOawZUQfQSIiPc/fI5o5rggOaJwV9tUIBEW2UE
-         ccn5L2BgEQQ1WQ7CaS6H+ACU8Rc4oaD/Ybk9C7tXsuxQ/JdRcdy1KFpPT2H8e7GmlPRW
-         xYjg==
-X-Gm-Message-State: AOAM530MJctTncMeDgTN+SA330Zz9UMcn582uI4AZjnfzTppJ5BngBFE
-        +IH9tXWl92JCFOV8n3UAp6PzNA==
-X-Google-Smtp-Source: ABdhPJwzOrpJo7FYCS3ekcCy5pWvbE492WBkIuFyBnWv3J0CXwYA+CiUe+SUBGBYfHJnqvKpDUjO1g==
-X-Received: by 2002:a17:90a:db49:: with SMTP id u9mr11985141pjx.181.1616394107064;
-        Sun, 21 Mar 2021 23:21:47 -0700 (PDT)
+        bh=44uLXf9fUq01jayoIUqnJ2o6Rdu+SmU1YK9yqOQ5VFc=;
+        b=psvXaMcduzEyIUi0SOwszxDXOddvpPvA+pD8Qp/ZgOtc1a7dlAj8+bfTdGfGvVrgbV
+         XmLNUhzE9id92ytGxYPtNDGbNKijMWgBgefZnJaCSXitQFOFkdJ2WkLGMuD/P4BrIOJu
+         8d+7zGWRq49lOb9swHxZJVU20bQTPQADkDD4Vu+qW5XLmPO5Shu32UW6yPo91aHbedZy
+         59NEbRtTUOVpoOQsY9z0u21YKFqivcHks4KphevTv3/0ssmNCEny2d2X6B/AyJjeN2Gg
+         cAec1DqQ1FtzouO+MgAojSV4vvFhSLUw/tuyVzkGrRLuGuHXmd7L+oKGHs1kRh/+dIjo
+         nCBA==
+X-Gm-Message-State: AOAM53363IcDSuXXWja6x3XHG9g9vEYLsEEOrBevL1yzvM9f8Tt/jaXX
+        ZceKso+xZhfX5mGIUahmBM+iwjqke6Pnnt8f
+X-Google-Smtp-Source: ABdhPJyjrCP6FHICL+Zro5pGQfN1u1tGoi+yH6etRgEKOfq3JUVoYS7lFyy7VGUw8ZwzpSfZy50Hwg==
+X-Received: by 2002:a17:902:aa0c:b029:e5:da5f:5f66 with SMTP id be12-20020a170902aa0cb02900e5da5f5f66mr25599992plb.81.1616398216222;
+        Mon, 22 Mar 2021 00:30:16 -0700 (PDT)
 Received: from [192.168.10.23] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
-        by smtp.gmail.com with UTF8SMTPSA id v2sm12260160pjg.34.2021.03.21.23.21.44
+        by smtp.gmail.com with UTF8SMTPSA id d13sm11373422pgb.6.2021.03.22.00.30.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 21 Mar 2021 23:21:46 -0700 (PDT)
-Message-ID: <d98b5556-8b34-cf81-1031-a28197444fdd@ozlabs.ru>
-Date:   Mon, 22 Mar 2021 17:21:42 +1100
+        Mon, 22 Mar 2021 00:30:15 -0700 (PDT)
+Message-ID: <b06ebe14-a714-c882-8bdf-ac41de9a8523@ozlabs.ru>
+Date:   Mon, 22 Mar 2021 18:30:12 +1100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:87.0) Gecko/20100101
  Thunderbird/87.0
-Subject: Re: [PATCH v3 16/41] KVM: PPC: Book3S HV P9: Move radix MMU switching
- instructions together
+Subject: Re: [PATCH v3 19/41] KVM: PPC: Book3S HV P9: Stop handling hcalls in
+ real-mode in the P9 path
 Content-Language: en-US
 To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
 Cc:     linuxppc-dev@lists.ozlabs.org
 References: <20210305150638.2675513-1-npiggin@gmail.com>
- <20210305150638.2675513-17-npiggin@gmail.com>
- <47284fdd-51ef-5ba7-487b-dfb46ec2816e@ozlabs.ru>
- <1616390221.1zx2axnuhk.astroid@bobo.none>
+ <20210305150638.2675513-20-npiggin@gmail.com>
 From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <1616390221.1zx2axnuhk.astroid@bobo.none>
+In-Reply-To: <20210305150638.2675513-20-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -72,186 +70,279 @@ X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
 
-On 22/03/2021 16:25, Nicholas Piggin wrote:
-> Excerpts from Alexey Kardashevskiy's message of March 22, 2021 2:24 pm:
->>
->>
->> On 06/03/2021 02:06, Nicholas Piggin wrote:
->>> Switching the MMU from radix<->radix mode is tricky particularly as the
->>> MMU can remain enabled and requires a certain sequence of SPR updates.
->>> Move these together into their own functions.
->>>
->>> This also includes the radix TLB check / flush because it's tied in to
->>> MMU switching due to tlbiel getting LPID from LPIDR.
->>>
->>> (XXX: isync / hwsync synchronisation TBD)
->>
->>
->> Looks alright but what is this comment about? Is something missing or
->> just sub optimal?
+On 06/03/2021 02:06, Nicholas Piggin wrote:
+> In the interest of minimising the amount of code that is run in
+> "real-mode", don't handle hcalls in real mode in the P9 path.
 > 
-> Ah, yeah the architecture says for example a CSI is required before +
-> after each, but the fine print is that you only need those to separate
-> between previous or subsequent accesses that may use those contexts
-> being switched from/to.
+> POWER8 and earlier are much more expensive to exit from HV real mode
+> and switch to host mode, because on those processors HV interrupts get
+> to the hypervisor with the MMU off, and the other threads in the core
+> need to be pulled out of the guest, and SLBs all need to be saved,
+> ERATs invalidated, and host SLB reloaded before the MMU is re-enabled
+> in host mode. Hash guests also require a lot of hcalls to run. The
+> XICS interrupt controller requires hcalls to run.
 > 
-> Then there is the question of CSI between the instructions so e.g., you
-> don't get the TLB prefetch bug if the mtPIDR could go out of order ahead
-> of the mtLPIDR, but those instructions are serialized so they wouldn't.
+> By contrast, POWER9 has independent thread switching, and in radix mode
+> the hypervisor is already in a host virtual memory mode when the HV
+> interrupt is taken. Radix + xive guests don't need hcalls to handle
+> interrupts or manage translations.
 > 
-> There's possibly a few clarifications coming to the architecture around
-> this as well.
-> 
-> I think things are relatively okay but probably need a bit more
-> commenting to justify where the isyncs() aren't. It's possible we might
-> be able to even remove the isyncs that are there.
-> 
-> Making a like-for-like conversion is a bit tricky because there are
-> possible context synchronising instructions between them already.
-> 
-> Maybe for the first series, I'll just put an isync between all of them,
-> and then a later patch can replace some of them with comments.
-> 
->>
->>
->>>
->>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->>
->>
->>> ---
->>>    arch/powerpc/kvm/book3s_hv.c | 55 +++++++++++++++++++++---------------
->>>    1 file changed, 32 insertions(+), 23 deletions(-)
->>>
->>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
->>> index f1230f9d98ba..b9cae42b9cd5 100644
->>> --- a/arch/powerpc/kvm/book3s_hv.c
->>> +++ b/arch/powerpc/kvm/book3s_hv.c
->>> @@ -3449,12 +3449,38 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
->>>    	trace_kvmppc_run_core(vc, 1);
->>>    }
->>>    
->>> +static void switch_mmu_to_guest_radix(struct kvm *kvm, struct kvm_vcpu *vcpu, u64 lpcr)
->>> +{
->>> +	struct kvmppc_vcore *vc = vcpu->arch.vcore;
->>> +	struct kvm_nested_guest *nested = vcpu->arch.nested;
->>> +	u32 lpid;
->>> +
->>> +	lpid = nested ? nested->shadow_lpid : kvm->arch.lpid;
->>> +
->>> +	mtspr(SPRN_LPID, lpid);
->>> +	mtspr(SPRN_LPCR, lpcr);
->>> +	mtspr(SPRN_PID, vcpu->arch.pid);
->>> +	isync();
->>> +
->>> +	/* TLBIEL must have LPIDR set, so set guest LPID before flushing. */
->>> +	kvmppc_check_need_tlb_flush(kvm, vc->pcpu, nested);
->>> +}
->>> +
->>> +static void switch_mmu_to_host_radix(struct kvm *kvm, u32 pid)
->>> +{
->>> +	mtspr(SPRN_PID, pid);
->>> +	mtspr(SPRN_LPID, kvm->arch.host_lpid);
->>> +	mtspr(SPRN_LPCR, kvm->arch.host_lpcr);
->>> +	isync();
->>> +}
->>> +
->>>    /*
->>>     * Load up hypervisor-mode registers on P9.
->>>     */
->>>    static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->>>    				     unsigned long lpcr)
->>>    {
->>> +	struct kvm *kvm = vcpu->kvm;
->>>    	struct kvmppc_vcore *vc = vcpu->arch.vcore;
->>>    	s64 hdec;
->>>    	u64 tb, purr, spurr;
->>> @@ -3477,12 +3503,12 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->>>    	 * P8 and P9 suppress the HDEC exception when LPCR[HDICE] = 0,
->>>    	 * so set HDICE before writing HDEC.
->>>    	 */
->>> -	mtspr(SPRN_LPCR, vcpu->kvm->arch.host_lpcr | LPCR_HDICE);
->>> +	mtspr(SPRN_LPCR, kvm->arch.host_lpcr | LPCR_HDICE);
->>>    	isync();
->>>    
->>>    	hdec = time_limit - mftb();
->>>    	if (hdec < 0) {
->>> -		mtspr(SPRN_LPCR, vcpu->kvm->arch.host_lpcr);
->>> +		mtspr(SPRN_LPCR, kvm->arch.host_lpcr);
->>>    		isync();
->>>    		return BOOK3S_INTERRUPT_HV_DECREMENTER;
->>>    	}
->>> @@ -3517,7 +3543,6 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->>>    	}
->>>    	mtspr(SPRN_CIABR, vcpu->arch.ciabr);
->>>    	mtspr(SPRN_IC, vcpu->arch.ic);
->>> -	mtspr(SPRN_PID, vcpu->arch.pid);
->>>    
->>>    	mtspr(SPRN_PSSCR, vcpu->arch.psscr | PSSCR_EC |
->>>    	      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
->>> @@ -3531,8 +3556,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->>>    
->>>    	mtspr(SPRN_AMOR, ~0UL);
->>>    
->>> -	mtspr(SPRN_LPCR, lpcr);
->>> -	isync();
->>> +	switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
->>>    
->>>    	kvmppc_xive_push_vcpu(vcpu);
->>>    
->>> @@ -3571,7 +3595,6 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->>>    		mtspr(SPRN_DAWR1, host_dawr1);
->>>    		mtspr(SPRN_DAWRX1, host_dawrx1);
->>>    	}
->>> -	mtspr(SPRN_PID, host_pidr);
->>>    
->>>    	/*
->>>    	 * Since this is radix, do a eieio; tlbsync; ptesync sequence in
->>> @@ -3586,9 +3609,6 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->>>    	if (cpu_has_feature(CPU_FTR_ARCH_31))
->>>    		asm volatile(PPC_CP_ABORT);
->>>    
->>> -	mtspr(SPRN_LPID, vcpu->kvm->arch.host_lpid);	/* restore host LPID */
->>> -	isync();
->>> -
->>>    	vc->dpdes = mfspr(SPRN_DPDES);
->>>    	vc->vtb = mfspr(SPRN_VTB);
->>>    	mtspr(SPRN_DPDES, 0);
->>> @@ -3605,7 +3625,8 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->>>    	}
->>>    
->>>    	mtspr(SPRN_HDEC, 0x7fffffff);
->>> -	mtspr(SPRN_LPCR, vcpu->kvm->arch.host_lpcr);
->>> +
->>> +	switch_mmu_to_host_radix(kvm, host_pidr);
->>>    
->>>    	return trap;
->>>    }
->>> @@ -4138,7 +4159,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
->>>    {
->>>    	struct kvm_run *run = vcpu->run;
->>>    	int trap, r, pcpu;
->>> -	int srcu_idx, lpid;
->>> +	int srcu_idx;
->>>    	struct kvmppc_vcore *vc;
->>>    	struct kvm *kvm = vcpu->kvm;
->>>    	struct kvm_nested_guest *nested = vcpu->arch.nested;
->>> @@ -4212,13 +4233,6 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
->>>    	vc->vcore_state = VCORE_RUNNING;
->>>    	trace_kvmppc_run_core(vc, 0);
->>>    
->>> -	if (cpu_has_feature(CPU_FTR_HVMODE)) {
->>
->>
->> The new location of mtspr(SPRN_LPID, lpid) does not check for
->> CPU_FTR_HVMODE anymore, is this going to work with HV KVM on pseries?
-> 
-> Yes, these are moved to HVMODE specific code now.
+> So it's much less important to handle hcalls in real mode in P9.
 
-ah right, kvmhv_on_pseries() is !cpu_has_feature(CPU_FTR_HVMODE).
+So acde25726bc6034b (which added if(kvm_is_radix(vcpu->kvm))return 
+H_TOO_HARD) can be reverted, pretty much?
 
 
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   arch/powerpc/include/asm/kvm_ppc.h      |  5 +++
+>   arch/powerpc/kvm/book3s_hv.c            | 46 +++++++++++++++----
+>   arch/powerpc/kvm/book3s_hv_rmhandlers.S |  5 +++
+>   arch/powerpc/kvm/book3s_xive.c          | 60 +++++++++++++++++++++++++
+>   4 files changed, 108 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+> index 73b1ca5a6471..db6646c2ade2 100644
+> --- a/arch/powerpc/include/asm/kvm_ppc.h
+> +++ b/arch/powerpc/include/asm/kvm_ppc.h
+> @@ -607,6 +607,7 @@ extern void kvmppc_free_pimap(struct kvm *kvm);
+>   extern int kvmppc_xics_rm_complete(struct kvm_vcpu *vcpu, u32 hcall);
+>   extern void kvmppc_xics_free_icp(struct kvm_vcpu *vcpu);
+>   extern int kvmppc_xics_hcall(struct kvm_vcpu *vcpu, u32 cmd);
+> +extern int kvmppc_xive_xics_hcall(struct kvm_vcpu *vcpu, u32 req);
+>   extern u64 kvmppc_xics_get_icp(struct kvm_vcpu *vcpu);
+>   extern int kvmppc_xics_set_icp(struct kvm_vcpu *vcpu, u64 icpval);
+>   extern int kvmppc_xics_connect_vcpu(struct kvm_device *dev,
+> @@ -639,6 +640,8 @@ static inline int kvmppc_xics_enabled(struct kvm_vcpu *vcpu)
+>   static inline void kvmppc_xics_free_icp(struct kvm_vcpu *vcpu) { }
+>   static inline int kvmppc_xics_hcall(struct kvm_vcpu *vcpu, u32 cmd)
+>   	{ return 0; }
+> +static inline int kvmppc_xive_xics_hcall(struct kvm_vcpu *vcpu, u32 req)
+> +	{ return 0; }
+>   #endif
+>   
+>   #ifdef CONFIG_KVM_XIVE
+> @@ -673,6 +676,7 @@ extern int kvmppc_xive_set_irq(struct kvm *kvm, int irq_source_id, u32 irq,
+>   			       int level, bool line_status);
+>   extern void kvmppc_xive_push_vcpu(struct kvm_vcpu *vcpu);
+>   extern void kvmppc_xive_pull_vcpu(struct kvm_vcpu *vcpu);
+> +extern void kvmppc_xive_cede_vcpu(struct kvm_vcpu *vcpu);
+>   
+>   static inline int kvmppc_xive_enabled(struct kvm_vcpu *vcpu)
+>   {
+> @@ -714,6 +718,7 @@ static inline int kvmppc_xive_set_irq(struct kvm *kvm, int irq_source_id, u32 ir
+>   				      int level, bool line_status) { return -ENODEV; }
+>   static inline void kvmppc_xive_push_vcpu(struct kvm_vcpu *vcpu) { }
+>   static inline void kvmppc_xive_pull_vcpu(struct kvm_vcpu *vcpu) { }
+> +static inline void kvmppc_xive_cede_vcpu(struct kvm_vcpu *vcpu) { }
+>   
+>   static inline int kvmppc_xive_enabled(struct kvm_vcpu *vcpu)
+>   	{ return 0; }
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 497f216ad724..1f2ba8955c6a 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -1147,7 +1147,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+>    * This has to be done early, not in kvmppc_pseries_do_hcall(), so
+>    * that the cede logic in kvmppc_run_single_vcpu() works properly.
+>    */
+> -static void kvmppc_nested_cede(struct kvm_vcpu *vcpu)
+> +static void kvmppc_cede(struct kvm_vcpu *vcpu)
+>   {
+>   	vcpu->arch.shregs.msr |= MSR_EE;
+>   	vcpu->arch.ceded = 1;
+> @@ -1403,9 +1403,15 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
+>   		/* hcall - punt to userspace */
+>   		int i;
+>   
+> -		/* hypercall with MSR_PR has already been handled in rmode,
+> -		 * and never reaches here.
+> -		 */
+> +		if (unlikely(vcpu->arch.shregs.msr & MSR_PR)) {
+> +			/*
+> +			 * Guest userspace executed sc 1, reflect it back as a
+> +			 * privileged program check interrupt.
+> +			 */
+> +			kvmppc_core_queue_program(vcpu, SRR1_PROGPRIV);
+> +			r = RESUME_GUEST;
+> +			break;
+> +		}
+>   
+>   		run->papr_hcall.nr = kvmppc_get_gpr(vcpu, 3);
+>   		for (i = 0; i < 9; ++i)
+> @@ -3740,15 +3746,36 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+>   		/* H_CEDE has to be handled now, not later */
+>   		if (trap == BOOK3S_INTERRUPT_SYSCALL && !vcpu->arch.nested &&
+>   		    kvmppc_get_gpr(vcpu, 3) == H_CEDE) {
+> -			kvmppc_nested_cede(vcpu);
+> +			kvmppc_cede(vcpu);
+>   			kvmppc_set_gpr(vcpu, 3, 0);
+>   			trap = 0;
+>   		}
+>   	} else {
+>   		kvmppc_xive_push_vcpu(vcpu);
+>   		trap = kvmhv_load_hv_regs_and_go(vcpu, time_limit, lpcr);
+> -		kvmppc_xive_pull_vcpu(vcpu);
+> +		/* H_CEDE has to be handled now, not later */
+> +		/* XICS hcalls must be handled before xive is pulled */
+> +		if (trap == BOOK3S_INTERRUPT_SYSCALL &&
+> +		    !(vcpu->arch.shregs.msr & MSR_PR)) {
+> +			unsigned long req = kvmppc_get_gpr(vcpu, 3);
+>   
+> +			if (req == H_CEDE) {
+> +				kvmppc_cede(vcpu);
+> +				kvmppc_xive_cede_vcpu(vcpu); /* may un-cede */
+> +				kvmppc_set_gpr(vcpu, 3, 0);
+> +				trap = 0;
+> +			}
+> +			if (req == H_EOI || req == H_CPPR ||
+
+else if (req == H_EOI ... ?
+
+> +			    req == H_IPI || req == H_IPOLL ||
+> +			    req == H_XIRR || req == H_XIRR_X) {
+> +				unsigned long ret;
+> +
+> +				ret = kvmppc_xive_xics_hcall(vcpu, req);
+> +				kvmppc_set_gpr(vcpu, 3, ret);
+> +				trap = 0;
+> +			}
+> +		}
+> +		kvmppc_xive_pull_vcpu(vcpu);
+>   	}
+>   
+>   	vcpu->arch.slb_max = 0;
+> @@ -4408,8 +4435,11 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
+>   		else
+>   			r = kvmppc_run_vcpu(vcpu);
+>   
+> -		if (run->exit_reason == KVM_EXIT_PAPR_HCALL &&
+> -		    !(vcpu->arch.shregs.msr & MSR_PR)) {
+> +		if (run->exit_reason == KVM_EXIT_PAPR_HCALL) {
+> +			if (WARN_ON_ONCE(vcpu->arch.shregs.msr & MSR_PR)) {
+> +				r = RESUME_GUEST;
+> +				continue;
+> +			}
+>   			trace_kvm_hcall_enter(vcpu);
+>   			r = kvmppc_pseries_do_hcall(vcpu);
+>   			trace_kvm_hcall_exit(vcpu, r);
+> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> index c11597f815e4..2d0d14ed1d92 100644
+> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> @@ -1397,9 +1397,14 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+>   	mr	r4,r9
+>   	bge	fast_guest_return
+>   2:
+> +	/* If we came in through the P9 short path, no real mode hcalls */
+> +	lwz	r0, STACK_SLOT_SHORT_PATH(r1)
+> +	cmpwi	r0, 0
+> +	bne	no_try_real
+>   	/* See if this is an hcall we can handle in real mode */
+>   	cmpwi	r12,BOOK3S_INTERRUPT_SYSCALL
+>   	beq	hcall_try_real_mode
+> +no_try_real:
+>   
+>   	/* Hypervisor doorbell - exit only if host IPI flag set */
+>   	cmpwi	r12, BOOK3S_INTERRUPT_H_DOORBELL
+> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+> index 52cdb9e2660a..1e4871bbcad4 100644
+> --- a/arch/powerpc/kvm/book3s_xive.c
+> +++ b/arch/powerpc/kvm/book3s_xive.c
+> @@ -158,6 +158,40 @@ void kvmppc_xive_pull_vcpu(struct kvm_vcpu *vcpu)
+>   }
+>   EXPORT_SYMBOL_GPL(kvmppc_xive_pull_vcpu);
+>   
+> +void kvmppc_xive_cede_vcpu(struct kvm_vcpu *vcpu)
+> +{
+> +	void __iomem *esc_vaddr = (void __iomem *)vcpu->arch.xive_esc_vaddr;
+> +
+> +	if (!esc_vaddr)
+> +		return;
+> +
+> +	/* we are using XIVE with single escalation */
+> +
+> +	if (vcpu->arch.xive_esc_on) {
+> +		/*
+> +		 * If we still have a pending escalation, abort the cede,
+> +		 * and we must set PQ to 10 rather than 00 so that we don't
+> +		 * potentially end up with two entries for the escalation
+> +		 * interrupt in the XIVE interrupt queue.  In that case
+> +		 * we also don't want to set xive_esc_on to 1 here in
+> +		 * case we race with xive_esc_irq().
+> +		 */
+> +		vcpu->arch.ceded = 0;
+> +		/*
+> +		 * The escalation interrupts are special as we don't EOI them.
+> +		 * There is no need to use the load-after-store ordering offset
+> +		 * to set PQ to 10 as we won't use StoreEOI.
+> +		 */
+> +		__raw_readq(esc_vaddr + XIVE_ESB_SET_PQ_10);
+> +	} else {
+> +		vcpu->arch.xive_esc_on = true;
+> +		mb();
+> +		__raw_readq(esc_vaddr + XIVE_ESB_SET_PQ_00);
+> +	}
+> +	mb();
+
+
+Uff. Thanks for cut-n-pasting the comments, helped a lot to match this c 
+to that asm!
+
+
+> +}
+> +EXPORT_SYMBOL_GPL(kvmppc_xive_cede_vcpu);
+> +
+>   /*
+>    * This is a simple trigger for a generic XIVE IRQ. This must
+>    * only be called for interrupts that support a trigger page
+> @@ -2106,6 +2140,32 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
+>   	return 0;
+>   }
+>   
+> +int kvmppc_xive_xics_hcall(struct kvm_vcpu *vcpu, u32 req)
+> +{
+> +	struct kvmppc_vcore *vc = vcpu->arch.vcore;
+
+
+Can a XIVE enabled guest issue these hcalls? Don't we want if 
+(!kvmppc_xics_enabled(vcpu)) and
+  if (xics_on_xive()) here, as kvmppc_rm_h_xirr() have? Some of these 
+hcalls do write to XIVE registers but some seem to change 
+kvmppc_xive_vcpu. Thanks,
+
+
+
+
+> +
+> +	switch (req) {
+> +	case H_XIRR:
+> +		return xive_vm_h_xirr(vcpu);
+> +	case H_CPPR:
+> +		return xive_vm_h_cppr(vcpu, kvmppc_get_gpr(vcpu, 4));
+> +	case H_EOI:
+> +		return xive_vm_h_eoi(vcpu, kvmppc_get_gpr(vcpu, 4));
+> +	case H_IPI:
+> +		return xive_vm_h_ipi(vcpu, kvmppc_get_gpr(vcpu, 4),
+> +					  kvmppc_get_gpr(vcpu, 5));
+> +	case H_IPOLL:
+> +		return xive_vm_h_ipoll(vcpu, kvmppc_get_gpr(vcpu, 4));
+> +	case H_XIRR_X:
+> +		xive_vm_h_xirr(vcpu);
+> +		kvmppc_set_gpr(vcpu, 5, get_tb() + vc->tb_offset);
+> +		return H_SUCCESS;
+> +	}
+> +
+> +	return H_UNSUPPORTED;
+> +}
+> +EXPORT_SYMBOL_GPL(kvmppc_xive_xics_hcall);
+> +
+>   int kvmppc_xive_debug_show_queues(struct seq_file *m, struct kvm_vcpu *vcpu)
+>   {
+>   	struct kvmppc_xive_vcpu *xc = vcpu->arch.xive_vcpu;
+> 
 
 -- 
 Alexey
