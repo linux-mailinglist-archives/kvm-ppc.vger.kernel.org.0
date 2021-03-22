@@ -2,157 +2,230 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E659B343CFB
-	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Mar 2021 10:39:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A977343DCF
+	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Mar 2021 11:28:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229931AbhCVJjN (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 22 Mar 2021 05:39:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42558 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229760AbhCVJil (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Mar 2021 05:38:41 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29883C061574
-        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 02:38:41 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id g15so10552724pfq.3
-        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 02:38:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=LYfx+Q1yLmXU/wuqtBDKnJDVZV1V/UemyPv+2Y1FQas=;
-        b=C2nhdFwgKhHX5XsZVviN37clt1DPl/7+Xe1SQzJSawGUerDGCrU2z5vm9hbbsx6h5P
-         znk9i3ps09bjwExPNLXFvhIKSwtjtk8E1VHh8fkTbSwzyi8g/0MnQoSJ32bQqiBR6Weh
-         4Q/8sV+de+2tDZ/76dIcQNN7GdmVcD8gxTBkZ/X4A5V/6eQCLLgeyi5RFUIIvHFw8nb0
-         qVGIdTFd0NxQY1FbdsTQlMlXYTLhyGxWTCHxVgT1+YVbipKhVFh/MdU39UXntzOm4qPj
-         8R/MDrrEX9t9E9GE01lM9L+qDQ2bhZh55nfcFT/7sHDriVnwgRebPBliEqsdekOzX6fN
-         6VqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=LYfx+Q1yLmXU/wuqtBDKnJDVZV1V/UemyPv+2Y1FQas=;
-        b=l3KcGSp/XVzyAJLeAGH/UQME4omQj7JjZALdbBtDu47wEMwDCGcvbS8jXOrd7eW4Mb
-         1qpP+N6jx+yEsGzgcyZs9RaT7/pBt6Q5GgB45/FWzEdH8WyEUYLOS8R/mTz2856soMrE
-         7dwVRYUxP38VkhVViEToeQd2DrlykuvLKkjjQ7uR2kx99q9a7pxr1w/9LzDDiEWyqXls
-         mIzYg769xFj9pwtY8xlo+F1zCGp11gpWLlIU2uuvz+cJ/IqF/dB0izERFOBEGLKT5TSI
-         TeF1SQJgYnJhVzd6ErhJkRW4v83eQIXF1Nh2dGvYcIbZ+c13vZatgy2EJNzWH4PTnMdc
-         3aEA==
-X-Gm-Message-State: AOAM531P1rsHw6iMMisOxCseP36jRW2p3sIBELNMn95ngMKVTVgbQG+3
-        TJRQOVSA9mzCucj/iRi7FybVPA==
-X-Google-Smtp-Source: ABdhPJyuJLh+46KJWLP+dgBfoOdbtxWBGPm8/6c+zh7I5jUfPNudFTgRYumfA8si+D40Ty5rnxG3lw==
-X-Received: by 2002:a63:4502:: with SMTP id s2mr22963225pga.94.1616405920731;
-        Mon, 22 Mar 2021 02:38:40 -0700 (PDT)
-Received: from [192.168.10.23] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
-        by smtp.gmail.com with UTF8SMTPSA id v27sm13051901pfi.89.2021.03.22.02.38.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Mar 2021 02:38:40 -0700 (PDT)
-Message-ID: <65ca9c57-c988-dc59-5c93-a2a33adb4b6a@ozlabs.ru>
-Date:   Mon, 22 Mar 2021 20:38:35 +1100
+        id S229962AbhCVK2S (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Mar 2021 06:28:18 -0400
+Received: from mail-dm6nam11on2087.outbound.protection.outlook.com ([40.107.223.87]:18208
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230203AbhCVK15 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 22 Mar 2021 06:27:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=P6RbVX2dRoM+V4SvUxDP68g+oMrypkx+UsLPTEaVlUcuRxx3a/AiD0YMfMRjArvJT1znqmXoXpfDvi+L6DqyUHs4S0Nez/257huEoxtBiQKLArmHAQpgxw3yjcHH9++uikkaUDo9nRqaixW70bxWu+dPp4P3kELOP3sSW5LRw0mjqJR30YPzReSfcb/htvtiiIaKYXIbzRCg/uoQUD2VufVaMevyagd4TDXcitrG4q8b3+0D2HQuzy0PfeTzSjhhIjpiX9xw2vCvBSHpvgfKh5UITIA30p1ZEV0/CeCVn0ekYB0GBzzJ/ABmJOwL9ODddVvDi+hOqP0W+c4i0oYTtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Tu85S1tb13VE2v351z6HKk4HzDVjZgv9QJA4MLE3F3g=;
+ b=FCdnHuNNnhunVQG2WRs5fNwidyTkjgkmypG/PJqKfZkFqDfneK6oXwjTCVT1CddUsTF5+HQRiojaRPSvHocp3+VlsPxWF8SBRYLOQzIOpTTbDhwSbP/PrMfLpuLeu5/HJR9EnqZUgfkrY3Rqdi92Y4r22wq0ipcoZu0YH8YGQYtpKChw0RtGbLMjXxvuGhqyFO2D72mKi/8b7UJ86fs+pLm9D1lQld/bimFqBiOE+wgLTMlitxI+TDGK4eUFZ8cS0du/wF7vR4rVz7FIcxB763TCFXS5be5pxSkQvkw02hea8syPT3UwDSAcROLJZ2foIiWTngFOFA2PPOO+Y8e/9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=lists.freedesktop.org
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=none sp=none pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Tu85S1tb13VE2v351z6HKk4HzDVjZgv9QJA4MLE3F3g=;
+ b=adh8xcAxeXufTzcfBqDpsOiZDq5dPvP3/vDJfxhS4zd0aD7nQ90B1rIwHPv6YDXcUV0V4dFAnCC41cAzFmzhJKQndifOWrT7+cQdUwkZAkMSEl9aq3XUBzc+zW1HXz7oug9XMZAhziudacdGdi/1dQponvIU9+RbmuEvyEvN0eyXAnt1r0e6fIVVungy76ZyEBW/gn1tYrJwu2iNGyborWOE8wgO6+z2pJ27oje2CU6N0/N8N1m5Xlk6BTOq0b8ByS3QfthnDfEZznJI4IeQHDj02qWd7jiWxwOUi1cBY6ntqF92/aLcFiFQrJbsK2ekeQA8qmP1gnaLQtc2mx1sVg==
+Received: from DM5PR15CA0028.namprd15.prod.outlook.com (2603:10b6:4:4b::14) by
+ BL0PR12MB4929.namprd12.prod.outlook.com (2603:10b6:208:1c4::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3955.18; Mon, 22 Mar 2021 10:27:54 +0000
+Received: from DM6NAM11FT009.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:4:4b:cafe::39) by DM5PR15CA0028.outlook.office365.com
+ (2603:10b6:4:4b::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18 via Frontend
+ Transport; Mon, 22 Mar 2021 10:27:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; lists.freedesktop.org; dkim=none (message not
+ signed) header.d=none;lists.freedesktop.org; dmarc=pass action=none
+ header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT009.mail.protection.outlook.com (10.13.173.20) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.3955.18 via Frontend Transport; Mon, 22 Mar 2021 10:27:54 +0000
+Received: from nvdebian.localnet (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 22 Mar
+ 2021 10:27:48 +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
+        <bskeggs@redhat.com>, <akpm@linux-foundation.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
+        <jglisse@redhat.com>, <jgg@nvidia.com>, <daniel@ffwll.ch>,
+        <willy@infradead.org>
+Subject: Re: [PATCH v6 5/8] mm: Device exclusive memory access
+Date:   Mon, 22 Mar 2021 21:27:46 +1100
+Message-ID: <6616451.iqfUG9VtI1@nvdebian>
+In-Reply-To: <20210315074245.GC4136862@infradead.org>
+References: <20210312083851.15981-1-apopple@nvidia.com> <20210312083851.15981-6-apopple@nvidia.com> <20210315074245.GC4136862@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:87.0) Gecko/20100101
- Thunderbird/87.0
-Subject: Re: [PATCH v3 24/41] powerpc: add set_dec_or_work API for safely
- updating decrementer
-Content-Language: en-US
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org
-References: <20210305150638.2675513-1-npiggin@gmail.com>
- <20210305150638.2675513-25-npiggin@gmail.com>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <20210305150638.2675513-25-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3dbf1a86-3994-4f7a-2eb0-08d8ed1d2792
+X-MS-TrafficTypeDiagnostic: BL0PR12MB4929:
+X-Microsoft-Antispam-PRVS: <BL0PR12MB4929A0F578E537132E588809DF659@BL0PR12MB4929.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LO1tcYpP9kaKzCjpWUVxbUT1WQJg5+ARKGz260bLyqaabALLlnEUa/lFoawKA8acwWfOX4LBTo5s7kTNtkolJUVdMLo2uH+LGPPjlAdw1WAGjShO0Dof6mZdVvfwHiQEJAzWNim9UGrpbB//aeIJU0K1bIJfHPpla/+08fvavMX+IldlKRlUU7TxvAez9T4774PzxIXR3l+n3ft0IiNYMlsech65HuLU8+pCPKy8mMho73fZgBUmbwxZg8p1Jy2znkQnDK1/Pmm2ooCAOLRtxN0cVLWULnwrz83ktIKPSBoj9ya1WuFtYb6BkdJRhCY4p+WQStggi9E3CIbmKxv3EtdnXuczCZaNz4+WYMD0FcK2G/S6EhHvs3nlKs1uZ8yGwc7bBbnq8HtP86hCrm5s/NXbkbi2xEC0vWZdWJXbSTWven9AqU17rSwODO+TxvmiIt5JG5u9+lXehK1dEjM6qilI7oUy3IMkXQJF/nInRjP8agz1ECuf4jhGc1+yuHS4QwT9sNAfFxkvH6hw1QqqCdkV03+PQR6YbxLRu/GAVUP6zIDZGvratqASKZE+9KvAX9B5UM8Mqo0EBCMg7kosD1CC0g+KqBdr8BP/1/Hz0CyY70l6lZ7DzNM/UTY9HLb+3XjIy6OXnqVYRmEQdtVmwEyYN96lEqkCwPuzbo17yJMMszdmVAw05Jdz9vxvs0bA
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(396003)(376002)(39860400002)(136003)(346002)(36840700001)(46966006)(316002)(54906003)(8676002)(356005)(4326008)(9576002)(8936002)(7636003)(47076005)(336012)(6916009)(426003)(83380400001)(86362001)(2906002)(36906005)(36860700001)(186003)(478600001)(33716001)(82740400003)(70586007)(9686003)(70206006)(16526019)(5660300002)(82310400003)(26005)(7416002)(39026012);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2021 10:27:54.5462
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3dbf1a86-3994-4f7a-2eb0-08d8ed1d2792
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT009.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4929
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-
-
-On 06/03/2021 02:06, Nicholas Piggin wrote:
-> Decrementer updates must always check for new irq work to avoid an
-> irq work decrementer interrupt being lost.
+On Monday, 15 March 2021 6:42:45 PM AEDT Christoph Hellwig wrote:
+> > +Not all devices support atomic access to system memory. To support atomic
+> > +operations to a shared virtual memory page such a device needs access to 
+that
+> > +page which is exclusive of any userspace access from the CPU. The
+> > +``make_device_exclusive_range()`` function can be used to make a memory 
+range
+> > +inaccessible from userspace.
 > 
-> Add an API for this in the timer code so callers don't have to care
-> about details.
+> s/Not all devices/Some devices/ ?
+
+I will reword this. What I was trying to convey is that devices may have 
+features which allow for atomics to be implemented with SW assistance.
+
+> >  static inline int mm_has_notifiers(struct mm_struct *mm)
+> > @@ -528,7 +534,17 @@ static inline void mmu_notifier_range_init_migrate(
+> >  {
+> >  	mmu_notifier_range_init(range, MMU_NOTIFY_MIGRATE, flags, vma, mm,
+> >  				start, end);
+> > -	range->migrate_pgmap_owner = pgmap;
+> > +	range->owner = pgmap;
+> > +}
+> > +
+> > +static inline void mmu_notifier_range_init_exclusive(
+> > +			struct mmu_notifier_range *range, unsigned int flags,
+> > +			struct vm_area_struct *vma, struct mm_struct *mm,
+> > +			unsigned long start, unsigned long end, void *owner)
+> > +{
+> > +	mmu_notifier_range_init(range, MMU_NOTIFY_EXCLUSIVE, flags, vma, mm,
+> > +				start, end);
+> > +	range->owner = owner;
 > 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> Maybe just replace mmu_notifier_range_init_migrate with a
+> mmu_notifier_range_init_owner helper that takes the owner but does
+> not hard code a type?
 
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Ok. That does result in a function which takes a fair number of arguments, but 
+I guess that's no worse than multiple functions hard coding the different 
+types and it does result in less code overall.
 
-
-> ---
->   arch/powerpc/include/asm/time.h |  9 +++++++++
->   arch/powerpc/kernel/time.c      | 20 +++++++++++---------
->   2 files changed, 20 insertions(+), 9 deletions(-)
+> >  		}
+> > +	} else if (is_device_exclusive_entry(entry)) {
+> > +		page = pfn_swap_entry_to_page(entry);
+> > +
+> > +		get_page(page);
+> > +		rss[mm_counter(page)]++;
+> > +
+> > +		if (is_writable_device_exclusive_entry(entry) &&
+> > +		    is_cow_mapping(vm_flags)) {
+> > +			/*
+> > +			 * COW mappings require pages in both
+> > +			 * parent and child to be set to read.
+> > +			 */
+> > +			entry = make_readable_device_exclusive_entry(
+> > +							swp_offset(entry));
+> > +			pte = swp_entry_to_pte(entry);
+> > +			if (pte_swp_soft_dirty(*src_pte))
+> > +				pte = pte_swp_mksoft_dirty(pte);
+> > +			if (pte_swp_uffd_wp(*src_pte))
+> > +				pte = pte_swp_mkuffd_wp(pte);
+> > +			set_pte_at(src_mm, addr, src_pte, pte);
+> > +		}
 > 
-> diff --git a/arch/powerpc/include/asm/time.h b/arch/powerpc/include/asm/time.h
-> index 0128cd9769bc..d62bde57bf02 100644
-> --- a/arch/powerpc/include/asm/time.h
-> +++ b/arch/powerpc/include/asm/time.h
-> @@ -78,6 +78,15 @@ static inline void set_dec(u64 val)
->   		mtspr(SPRN_DEC, val - 1);
->   }
->   
-> +#ifdef CONFIG_IRQ_WORK
-> +void set_dec_or_work(u64 val);
-> +#else
-> +static inline void set_dec_or_work(u64 val)
-> +{
-> +	set_dec(val);
-> +}
-> +#endif
-> +
->   static inline unsigned long tb_ticks_since(unsigned long tstamp)
->   {
->   	return mftb() - tstamp;
-> diff --git a/arch/powerpc/kernel/time.c b/arch/powerpc/kernel/time.c
-> index c5d524622c17..341cc8442e5e 100644
-> --- a/arch/powerpc/kernel/time.c
-> +++ b/arch/powerpc/kernel/time.c
-> @@ -562,6 +562,15 @@ void arch_irq_work_raise(void)
->   	preempt_enable();
->   }
->   
-> +void set_dec_or_work(u64 val)
-> +{
-> +	set_dec(val);
-> +	/* We may have raced with new irq work */
-> +	if (unlikely(test_irq_work_pending()))
-> +		set_dec(1);
-> +}
-> +EXPORT_SYMBOL_GPL(set_dec_or_work);
-> +
->   #else  /* CONFIG_IRQ_WORK */
->   
->   #define test_irq_work_pending()	0
-> @@ -629,10 +638,7 @@ DEFINE_INTERRUPT_HANDLER_ASYNC(timer_interrupt)
->   	} else {
->   		now = *next_tb - now;
->   		if (now <= decrementer_max)
-> -			set_dec(now);
-> -		/* We may have raced with new irq work */
-> -		if (test_irq_work_pending())
-> -			set_dec(1);
-> +			set_dec_or_work(now);
->   		__this_cpu_inc(irq_stat.timer_irqs_others);
->   	}
->   
-> @@ -874,11 +880,7 @@ static int decrementer_set_next_event(unsigned long evt,
->   				      struct clock_event_device *dev)
->   {
->   	__this_cpu_write(decrementers_next_tb, get_tb() + evt);
-> -	set_dec(evt);
-> -
-> -	/* We may have raced with new irq work */
-> -	if (test_irq_work_pending())
-> -		set_dec(1);
-> +	set_dec_or_work(evt);
->   
->   	return 0;
->   }
+> Just cosmetic, but I wonder if should factor this code block into
+> a little helper.
+
+In that case there are arguably are other bits of this function which should 
+be refactored into helpers as well. Unless you feel strongly about it I would 
+like to leave this as is and put together a future series to fix this and a 
+couple of other areas I've noticed that could do with some refactoring/clean 
+ups.
+
+> > +
+> > +static bool try_to_protect_one(struct page *page, struct vm_area_struct 
+*vma,
+> > +			unsigned long address, void *arg)
+> > +{
+> > +	struct mm_struct *mm = vma->vm_mm;
+> > +	struct page_vma_mapped_walk pvmw = {
+> > +		.page = page,
+> > +		.vma = vma,
+> > +		.address = address,
+> > +	};
+> > +	struct ttp_args *ttp = (struct ttp_args *) arg;
+> 
+> This cast should not be needed.
+> 
+> > +	return ttp.valid && (!page_mapcount(page) ? true : false);
+> 
+> This can be simplified to:
+> 
+> 	return ttp.valid && !page_mapcount(page);
+> 
+> > +	npages = get_user_pages_remote(mm, start, npages,
+> > +				       FOLL_GET | FOLL_WRITE | FOLL_SPLIT_PMD,
+> > +				       pages, NULL, NULL);
+> > +	for (i = 0; i < npages; i++, start += PAGE_SIZE) {
+> > +		if (!trylock_page(pages[i])) {
+> > +			put_page(pages[i]);
+> > +			pages[i] = NULL;
+> > +			continue;
+> > +		}
+> > +
+> > +		if (!try_to_protect(pages[i], mm, start, arg)) {
+> > +			unlock_page(pages[i]);
+> > +			put_page(pages[i]);
+> > +			pages[i] = NULL;
+> > +		}
+> 
+> Should the trylock_page go into try_to_protect to simplify the loop
+> a little?  Also I wonder if we need make_device_exclusive_range or
+> should just open code the get_user_pages_remote + try_to_protect
+> loop in the callers, as that might allow them to also deduct other
+> information about the found pages.
+
+This function has evolved over time and putting the trylock_page into 
+try_to_protect does simplify things nicely. I'm not sure what other 
+information a caller could deduct through open coding though, but I guess in 
+some circumstances it might be possible for callers to skip 
+get_user_pages_remote() which might be a future improvement.
+
+The main reason it looks like this was simply to keep it looking fairly 
+similar to how hmm_range_fault() and migrate_vma() are used with an array of 
+pages (or pfns) which are filled out from the given address range.
+ 
+> Otherwise looks good:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > 
 
--- 
-Alexey
+Thanks.
+
+
+
