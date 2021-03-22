@@ -2,230 +2,237 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A977343DCF
-	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Mar 2021 11:28:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 94FA6344564
+	for <lists+kvm-ppc@lfdr.de>; Mon, 22 Mar 2021 14:19:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229962AbhCVK2S (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 22 Mar 2021 06:28:18 -0400
-Received: from mail-dm6nam11on2087.outbound.protection.outlook.com ([40.107.223.87]:18208
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230203AbhCVK15 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 22 Mar 2021 06:27:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P6RbVX2dRoM+V4SvUxDP68g+oMrypkx+UsLPTEaVlUcuRxx3a/AiD0YMfMRjArvJT1znqmXoXpfDvi+L6DqyUHs4S0Nez/257huEoxtBiQKLArmHAQpgxw3yjcHH9++uikkaUDo9nRqaixW70bxWu+dPp4P3kELOP3sSW5LRw0mjqJR30YPzReSfcb/htvtiiIaKYXIbzRCg/uoQUD2VufVaMevyagd4TDXcitrG4q8b3+0D2HQuzy0PfeTzSjhhIjpiX9xw2vCvBSHpvgfKh5UITIA30p1ZEV0/CeCVn0ekYB0GBzzJ/ABmJOwL9ODddVvDi+hOqP0W+c4i0oYTtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Tu85S1tb13VE2v351z6HKk4HzDVjZgv9QJA4MLE3F3g=;
- b=FCdnHuNNnhunVQG2WRs5fNwidyTkjgkmypG/PJqKfZkFqDfneK6oXwjTCVT1CddUsTF5+HQRiojaRPSvHocp3+VlsPxWF8SBRYLOQzIOpTTbDhwSbP/PrMfLpuLeu5/HJR9EnqZUgfkrY3Rqdi92Y4r22wq0ipcoZu0YH8YGQYtpKChw0RtGbLMjXxvuGhqyFO2D72mKi/8b7UJ86fs+pLm9D1lQld/bimFqBiOE+wgLTMlitxI+TDGK4eUFZ8cS0du/wF7vR4rVz7FIcxB763TCFXS5be5pxSkQvkw02hea8syPT3UwDSAcROLJZ2foIiWTngFOFA2PPOO+Y8e/9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=lists.freedesktop.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=none sp=none pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Tu85S1tb13VE2v351z6HKk4HzDVjZgv9QJA4MLE3F3g=;
- b=adh8xcAxeXufTzcfBqDpsOiZDq5dPvP3/vDJfxhS4zd0aD7nQ90B1rIwHPv6YDXcUV0V4dFAnCC41cAzFmzhJKQndifOWrT7+cQdUwkZAkMSEl9aq3XUBzc+zW1HXz7oug9XMZAhziudacdGdi/1dQponvIU9+RbmuEvyEvN0eyXAnt1r0e6fIVVungy76ZyEBW/gn1tYrJwu2iNGyborWOE8wgO6+z2pJ27oje2CU6N0/N8N1m5Xlk6BTOq0b8ByS3QfthnDfEZznJI4IeQHDj02qWd7jiWxwOUi1cBY6ntqF92/aLcFiFQrJbsK2ekeQA8qmP1gnaLQtc2mx1sVg==
-Received: from DM5PR15CA0028.namprd15.prod.outlook.com (2603:10b6:4:4b::14) by
- BL0PR12MB4929.namprd12.prod.outlook.com (2603:10b6:208:1c4::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3955.18; Mon, 22 Mar 2021 10:27:54 +0000
-Received: from DM6NAM11FT009.eop-nam11.prod.protection.outlook.com
- (2603:10b6:4:4b:cafe::39) by DM5PR15CA0028.outlook.office365.com
- (2603:10b6:4:4b::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18 via Frontend
- Transport; Mon, 22 Mar 2021 10:27:54 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; lists.freedesktop.org; dkim=none (message not
- signed) header.d=none;lists.freedesktop.org; dmarc=pass action=none
- header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- DM6NAM11FT009.mail.protection.outlook.com (10.13.173.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3955.18 via Frontend Transport; Mon, 22 Mar 2021 10:27:54 +0000
-Received: from nvdebian.localnet (172.20.145.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 22 Mar
- 2021 10:27:48 +0000
-From:   Alistair Popple <apopple@nvidia.com>
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
-        <bskeggs@redhat.com>, <akpm@linux-foundation.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
-        <jglisse@redhat.com>, <jgg@nvidia.com>, <daniel@ffwll.ch>,
-        <willy@infradead.org>
-Subject: Re: [PATCH v6 5/8] mm: Device exclusive memory access
-Date:   Mon, 22 Mar 2021 21:27:46 +1100
-Message-ID: <6616451.iqfUG9VtI1@nvdebian>
-In-Reply-To: <20210315074245.GC4136862@infradead.org>
-References: <20210312083851.15981-1-apopple@nvidia.com> <20210312083851.15981-6-apopple@nvidia.com> <20210315074245.GC4136862@infradead.org>
+        id S231502AbhCVNSa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 22 Mar 2021 09:18:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33164 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229472AbhCVNPj (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Mar 2021 09:15:39 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55F3AC061574
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 06:15:38 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id kk2-20020a17090b4a02b02900c777aa746fso8504502pjb.3
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 06:15:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=eWbPIX4LvCYaXMETb/NGTke/4oExib4R55S8CtxwLio=;
+        b=sGmzVSN5gKsNLzmEtRylSxBhciDbMRFIuW5rYoZFUFfEL0YdJNJmTNj5QF1KE3zzJO
+         806h82tnDb2JpKnGMATGhMAy9eCyjkY9+BzFNDtY8VQHDXQpSv7SPtsPz52YIOJ/0nIb
+         ZKojgb/dqFbaSP+Y5+4UcnGxiiG8ZrtEl/bHL34HeGpymkyAxwSQ/QN2rqufNn0Fu117
+         5telPUFzFTmNH3GNVccSFWXrWaUYztymu6pxt+ApzChBDW4lI7YbIL1n5onWhklWF7jm
+         QwSJG4EVb+vd8UNxhQMJLsdFirBU4khJc1iTMr0njX1IUTIVTdZspFxJAjOwXV3K2en4
+         bmOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=eWbPIX4LvCYaXMETb/NGTke/4oExib4R55S8CtxwLio=;
+        b=CmWWj8mAHcp2c46AptHJoQTpunKttRTGICngYUDYrALUncFuf4DLAmYblV39LMOyaQ
+         WJJCOMOqdO6ZX6VDtf7jp4uY6LbN2TZaCDeW1u7xlhx91HmYHdC1RJnQhjXReqe1NxOh
+         GQ59OMC8F9XpBkV6gOnJIPZsYlO1OQDfPSDAa6UCkHZDVCkVv771DhKEWcWeDA6lP++v
+         3b+OLnl+ojspcNndcPjqOxJEuaiuwdZpNPmlbsq7LwP+GNKn33lOm1pRi8MeDlfhdVUc
+         +dXTOf1rJn1hrPBWDOG8QnDmxjvsoKTEFIw3DEjLDhsGhXT28uFFsenrvV62pZV0fSC4
+         zYvg==
+X-Gm-Message-State: AOAM531p3MgzyGQ6jBsx5ez5ggxKMJjmi2YJ79PdLZ9wpuJbLif6wLBh
+        8VTOtjK+NIevMzex0HYjtao0+iTbYvw=
+X-Google-Smtp-Source: ABdhPJyWZpOBADRwJFux8ntisJkX9nMzCcb9dlQHwhkoPRs8mSQXwm5J1CRkMd0A/hzI7YhAr7cREg==
+X-Received: by 2002:a17:90b:f15:: with SMTP id br21mr13469015pjb.234.1616418937853;
+        Mon, 22 Mar 2021 06:15:37 -0700 (PDT)
+Received: from localhost ([58.84.78.96])
+        by smtp.gmail.com with ESMTPSA id m4sm12224419pgu.4.2021.03.22.06.15.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Mar 2021 06:15:36 -0700 (PDT)
+Date:   Mon, 22 Mar 2021 23:15:30 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v3 19/41] KVM: PPC: Book3S HV P9: Stop handling hcalls in
+ real-mode in the P9 path
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org,
+        =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>
+References: <20210305150638.2675513-1-npiggin@gmail.com>
+        <20210305150638.2675513-20-npiggin@gmail.com>
+        <b06ebe14-a714-c882-8bdf-ac41de9a8523@ozlabs.ru>
+In-Reply-To: <b06ebe14-a714-c882-8bdf-ac41de9a8523@ozlabs.ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3dbf1a86-3994-4f7a-2eb0-08d8ed1d2792
-X-MS-TrafficTypeDiagnostic: BL0PR12MB4929:
-X-Microsoft-Antispam-PRVS: <BL0PR12MB4929A0F578E537132E588809DF659@BL0PR12MB4929.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LO1tcYpP9kaKzCjpWUVxbUT1WQJg5+ARKGz260bLyqaabALLlnEUa/lFoawKA8acwWfOX4LBTo5s7kTNtkolJUVdMLo2uH+LGPPjlAdw1WAGjShO0Dof6mZdVvfwHiQEJAzWNim9UGrpbB//aeIJU0K1bIJfHPpla/+08fvavMX+IldlKRlUU7TxvAez9T4774PzxIXR3l+n3ft0IiNYMlsech65HuLU8+pCPKy8mMho73fZgBUmbwxZg8p1Jy2znkQnDK1/Pmm2ooCAOLRtxN0cVLWULnwrz83ktIKPSBoj9ya1WuFtYb6BkdJRhCY4p+WQStggi9E3CIbmKxv3EtdnXuczCZaNz4+WYMD0FcK2G/S6EhHvs3nlKs1uZ8yGwc7bBbnq8HtP86hCrm5s/NXbkbi2xEC0vWZdWJXbSTWven9AqU17rSwODO+TxvmiIt5JG5u9+lXehK1dEjM6qilI7oUy3IMkXQJF/nInRjP8agz1ECuf4jhGc1+yuHS4QwT9sNAfFxkvH6hw1QqqCdkV03+PQR6YbxLRu/GAVUP6zIDZGvratqASKZE+9KvAX9B5UM8Mqo0EBCMg7kosD1CC0g+KqBdr8BP/1/Hz0CyY70l6lZ7DzNM/UTY9HLb+3XjIy6OXnqVYRmEQdtVmwEyYN96lEqkCwPuzbo17yJMMszdmVAw05Jdz9vxvs0bA
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(396003)(376002)(39860400002)(136003)(346002)(36840700001)(46966006)(316002)(54906003)(8676002)(356005)(4326008)(9576002)(8936002)(7636003)(47076005)(336012)(6916009)(426003)(83380400001)(86362001)(2906002)(36906005)(36860700001)(186003)(478600001)(33716001)(82740400003)(70586007)(9686003)(70206006)(16526019)(5660300002)(82310400003)(26005)(7416002)(39026012);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2021 10:27:54.5462
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3dbf1a86-3994-4f7a-2eb0-08d8ed1d2792
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT009.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4929
+Message-Id: <1616417941.ksskhyvg3t.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Monday, 15 March 2021 6:42:45 PM AEDT Christoph Hellwig wrote:
-> > +Not all devices support atomic access to system memory. To support atomic
-> > +operations to a shared virtual memory page such a device needs access to 
-that
-> > +page which is exclusive of any userspace access from the CPU. The
-> > +``make_device_exclusive_range()`` function can be used to make a memory 
-range
-> > +inaccessible from userspace.
-> 
-> s/Not all devices/Some devices/ ?
+Excerpts from Alexey Kardashevskiy's message of March 22, 2021 5:30 pm:
+>=20
+>=20
+> On 06/03/2021 02:06, Nicholas Piggin wrote:
+>> In the interest of minimising the amount of code that is run in
+>> "real-mode", don't handle hcalls in real mode in the P9 path.
+>>=20
+>> POWER8 and earlier are much more expensive to exit from HV real mode
+>> and switch to host mode, because on those processors HV interrupts get
+>> to the hypervisor with the MMU off, and the other threads in the core
+>> need to be pulled out of the guest, and SLBs all need to be saved,
+>> ERATs invalidated, and host SLB reloaded before the MMU is re-enabled
+>> in host mode. Hash guests also require a lot of hcalls to run. The
+>> XICS interrupt controller requires hcalls to run.
+>>=20
+>> By contrast, POWER9 has independent thread switching, and in radix mode
+>> the hypervisor is already in a host virtual memory mode when the HV
+>> interrupt is taken. Radix + xive guests don't need hcalls to handle
+>> interrupts or manage translations.
+>>=20
+>> So it's much less important to handle hcalls in real mode in P9.
+>=20
+> So acde25726bc6034b (which added if(kvm_is_radix(vcpu->kvm))return=20
+> H_TOO_HARD) can be reverted, pretty much?
 
-I will reword this. What I was trying to convey is that devices may have 
-features which allow for atomics to be implemented with SW assistance.
+Yes. Although that calls attention to the fact I missed doing
+a P9 h_random handler in this patch. I'll fix that, then I think
+acde2572 could be reverted entirely.
 
-> >  static inline int mm_has_notifiers(struct mm_struct *mm)
-> > @@ -528,7 +534,17 @@ static inline void mmu_notifier_range_init_migrate(
-> >  {
-> >  	mmu_notifier_range_init(range, MMU_NOTIFY_MIGRATE, flags, vma, mm,
-> >  				start, end);
-> > -	range->migrate_pgmap_owner = pgmap;
-> > +	range->owner = pgmap;
-> > +}
-> > +
-> > +static inline void mmu_notifier_range_init_exclusive(
-> > +			struct mmu_notifier_range *range, unsigned int flags,
-> > +			struct vm_area_struct *vma, struct mm_struct *mm,
-> > +			unsigned long start, unsigned long end, void *owner)
-> > +{
-> > +	mmu_notifier_range_init(range, MMU_NOTIFY_EXCLUSIVE, flags, vma, mm,
-> > +				start, end);
-> > +	range->owner = owner;
-> 
-> Maybe just replace mmu_notifier_range_init_migrate with a
-> mmu_notifier_range_init_owner helper that takes the owner but does
-> not hard code a type?
+[...]
 
-Ok. That does result in a function which takes a fair number of arguments, but 
-I guess that's no worse than multiple functions hard coding the different 
-types and it does result in less code overall.
+>>   	} else {
+>>   		kvmppc_xive_push_vcpu(vcpu);
+>>   		trap =3D kvmhv_load_hv_regs_and_go(vcpu, time_limit, lpcr);
+>> -		kvmppc_xive_pull_vcpu(vcpu);
+>> +		/* H_CEDE has to be handled now, not later */
+>> +		/* XICS hcalls must be handled before xive is pulled */
+>> +		if (trap =3D=3D BOOK3S_INTERRUPT_SYSCALL &&
+>> +		    !(vcpu->arch.shregs.msr & MSR_PR)) {
+>> +			unsigned long req =3D kvmppc_get_gpr(vcpu, 3);
+>>  =20
+>> +			if (req =3D=3D H_CEDE) {
+>> +				kvmppc_cede(vcpu);
+>> +				kvmppc_xive_cede_vcpu(vcpu); /* may un-cede */
+>> +				kvmppc_set_gpr(vcpu, 3, 0);
+>> +				trap =3D 0;
+>> +			}
+>> +			if (req =3D=3D H_EOI || req =3D=3D H_CPPR ||
+>=20
+> else if (req =3D=3D H_EOI ... ?
 
-> >  		}
-> > +	} else if (is_device_exclusive_entry(entry)) {
-> > +		page = pfn_swap_entry_to_page(entry);
-> > +
-> > +		get_page(page);
-> > +		rss[mm_counter(page)]++;
-> > +
-> > +		if (is_writable_device_exclusive_entry(entry) &&
-> > +		    is_cow_mapping(vm_flags)) {
-> > +			/*
-> > +			 * COW mappings require pages in both
-> > +			 * parent and child to be set to read.
-> > +			 */
-> > +			entry = make_readable_device_exclusive_entry(
-> > +							swp_offset(entry));
-> > +			pte = swp_entry_to_pte(entry);
-> > +			if (pte_swp_soft_dirty(*src_pte))
-> > +				pte = pte_swp_mksoft_dirty(pte);
-> > +			if (pte_swp_uffd_wp(*src_pte))
-> > +				pte = pte_swp_mkuffd_wp(pte);
-> > +			set_pte_at(src_mm, addr, src_pte, pte);
-> > +		}
-> 
-> Just cosmetic, but I wonder if should factor this code block into
-> a little helper.
+Hummm, sure.
 
-In that case there are arguably are other bits of this function which should 
-be refactored into helpers as well. Unless you feel strongly about it I would 
-like to leave this as is and put together a future series to fix this and a 
-couple of other areas I've noticed that could do with some refactoring/clean 
-ups.
+[...]
 
-> > +
-> > +static bool try_to_protect_one(struct page *page, struct vm_area_struct 
-*vma,
-> > +			unsigned long address, void *arg)
-> > +{
-> > +	struct mm_struct *mm = vma->vm_mm;
-> > +	struct page_vma_mapped_walk pvmw = {
-> > +		.page = page,
-> > +		.vma = vma,
-> > +		.address = address,
-> > +	};
-> > +	struct ttp_args *ttp = (struct ttp_args *) arg;
-> 
-> This cast should not be needed.
-> 
-> > +	return ttp.valid && (!page_mapcount(page) ? true : false);
-> 
-> This can be simplified to:
-> 
-> 	return ttp.valid && !page_mapcount(page);
-> 
-> > +	npages = get_user_pages_remote(mm, start, npages,
-> > +				       FOLL_GET | FOLL_WRITE | FOLL_SPLIT_PMD,
-> > +				       pages, NULL, NULL);
-> > +	for (i = 0; i < npages; i++, start += PAGE_SIZE) {
-> > +		if (!trylock_page(pages[i])) {
-> > +			put_page(pages[i]);
-> > +			pages[i] = NULL;
-> > +			continue;
-> > +		}
-> > +
-> > +		if (!try_to_protect(pages[i], mm, start, arg)) {
-> > +			unlock_page(pages[i]);
-> > +			put_page(pages[i]);
-> > +			pages[i] = NULL;
-> > +		}
-> 
-> Should the trylock_page go into try_to_protect to simplify the loop
-> a little?  Also I wonder if we need make_device_exclusive_range or
-> should just open code the get_user_pages_remote + try_to_protect
-> loop in the callers, as that might allow them to also deduct other
-> information about the found pages.
+>> +void kvmppc_xive_cede_vcpu(struct kvm_vcpu *vcpu)
+>> +{
+>> +	void __iomem *esc_vaddr =3D (void __iomem *)vcpu->arch.xive_esc_vaddr;
+>> +
+>> +	if (!esc_vaddr)
+>> +		return;
+>> +
+>> +	/* we are using XIVE with single escalation */
+>> +
+>> +	if (vcpu->arch.xive_esc_on) {
+>> +		/*
+>> +		 * If we still have a pending escalation, abort the cede,
+>> +		 * and we must set PQ to 10 rather than 00 so that we don't
+>> +		 * potentially end up with two entries for the escalation
+>> +		 * interrupt in the XIVE interrupt queue.  In that case
+>> +		 * we also don't want to set xive_esc_on to 1 here in
+>> +		 * case we race with xive_esc_irq().
+>> +		 */
+>> +		vcpu->arch.ceded =3D 0;
+>> +		/*
+>> +		 * The escalation interrupts are special as we don't EOI them.
+>> +		 * There is no need to use the load-after-store ordering offset
+>> +		 * to set PQ to 10 as we won't use StoreEOI.
+>> +		 */
+>> +		__raw_readq(esc_vaddr + XIVE_ESB_SET_PQ_10);
+>> +	} else {
+>> +		vcpu->arch.xive_esc_on =3D true;
+>> +		mb();
+>> +		__raw_readq(esc_vaddr + XIVE_ESB_SET_PQ_00);
+>> +	}
+>> +	mb();
+>=20
+>=20
+> Uff. Thanks for cut-n-pasting the comments, helped a lot to match this c=20
+> to that asm!
 
-This function has evolved over time and putting the trylock_page into 
-try_to_protect does simplify things nicely. I'm not sure what other 
-information a caller could deduct through open coding though, but I guess in 
-some circumstances it might be possible for callers to skip 
-get_user_pages_remote() which might be a future improvement.
+Glad it helped.
 
-The main reason it looks like this was simply to keep it looking fairly 
-similar to how hmm_range_fault() and migrate_vma() are used with an array of 
-pages (or pfns) which are filled out from the given address range.
- 
-> Otherwise looks good:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvmppc_xive_cede_vcpu);
+>> +
+>>   /*
+>>    * This is a simple trigger for a generic XIVE IRQ. This must
+>>    * only be called for interrupts that support a trigger page
+>> @@ -2106,6 +2140,32 @@ static int kvmppc_xive_create(struct kvm_device *=
+dev, u32 type)
+>>   	return 0;
+>>   }
+>>  =20
+>> +int kvmppc_xive_xics_hcall(struct kvm_vcpu *vcpu, u32 req)
+>> +{
+>> +	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
+>=20
+>=20
+> Can a XIVE enabled guest issue these hcalls? Don't we want if=20
+> (!kvmppc_xics_enabled(vcpu)) and
+>   if (xics_on_xive()) here, as kvmppc_rm_h_xirr() have? Some of these=20
+> hcalls do write to XIVE registers but some seem to change=20
+> kvmppc_xive_vcpu. Thanks,
 
-Thanks.
+Yes I think you're right, good catch. I'm not completely sure about all=20
+the xive and xics modes but a guest certainly can make any kind of hcall=20
+it likes and we have to sanity check it.
 
+We want to take the hcall here (in replacement of the real mode hcalls)
+with the same condition. So it would be:
 
+        if (!kvmppc_xics_enabled(vcpu))
+                return H_TOO_HARD;
+        if (!xics_on_xive())
+		return H_TOO_HARD;
+=09
+	[ ... process xive_vm_h_xirr / cppr / eoi / etc ]
 
+Right?
+
+Thanks,
+Nick
+
+>=20
+>=20
+>=20
+>=20
+>> +
+>> +	switch (req) {
+>> +	case H_XIRR:
+>> +		return xive_vm_h_xirr(vcpu);
+>> +	case H_CPPR:
+>> +		return xive_vm_h_cppr(vcpu, kvmppc_get_gpr(vcpu, 4));
+>> +	case H_EOI:
+>> +		return xive_vm_h_eoi(vcpu, kvmppc_get_gpr(vcpu, 4));
+>> +	case H_IPI:
+>> +		return xive_vm_h_ipi(vcpu, kvmppc_get_gpr(vcpu, 4),
+>> +					  kvmppc_get_gpr(vcpu, 5));
+>> +	case H_IPOLL:
+>> +		return xive_vm_h_ipoll(vcpu, kvmppc_get_gpr(vcpu, 4));
+>> +	case H_XIRR_X:
+>> +		xive_vm_h_xirr(vcpu);
+>> +		kvmppc_set_gpr(vcpu, 5, get_tb() + vc->tb_offset);
+>> +		return H_SUCCESS;
+>> +	}
+>> +
+>> +	return H_UNSUPPORTED;
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvmppc_xive_xics_hcall);
+>> +
+>>   int kvmppc_xive_debug_show_queues(struct seq_file *m, struct kvm_vcpu =
+*vcpu)
+>>   {
+>>   	struct kvmppc_xive_vcpu *xc =3D vcpu->arch.xive_vcpu;
+>>=20
+>=20
+> --=20
+> Alexey
+>=20
