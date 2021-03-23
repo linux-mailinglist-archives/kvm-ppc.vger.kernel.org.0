@@ -2,216 +2,245 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8F6034676A
-	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Mar 2021 19:18:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 817C1346DA1
+	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Mar 2021 23:57:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230378AbhCWSRt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 23 Mar 2021 14:17:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29146 "EHLO
+        id S234018AbhCWW50 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 23 Mar 2021 18:57:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9378 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231722AbhCWSRc (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 23 Mar 2021 14:17:32 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12NI4lOJ080671;
-        Tue, 23 Mar 2021 14:17:28 -0400
+        by vger.kernel.org with ESMTP id S234070AbhCWW5V (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 23 Mar 2021 18:57:21 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12NMd97E018419;
+        Tue, 23 Mar 2021 18:57:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=nE2BM7jtXZK+omjHyZTslaGaTZV2HHqps9nGRO3/HfE=;
- b=pnjrK5jotrNtqRwSkohvcQTZ/PZEzedxuiIaTHhGpnWtFB8mGWkPqPPA2jVyiUODDVg9
- YhJuJU6/O+S6UanDqWL1+iFWZg5bSegixzmSKgYUZB8ahvE0Cc6l/5rI9fTK3pqJ5a2q
- mVfVw+ze4Rv4ZYtuykvKZLbEO9RBNV+A4MNj31DVthNn1KN78u4+GwHwKs8nF68dTFxY
- D5Gjm53l6OrFFWkzAmV923kuorr3MfBMG5w+7ZbjojO3AwRRmgfFOiC7sMOqqdhgy10/
- XYPbLlenBtakZYxJAo2/BcnA2V5VvcLAbMoyn722bSsVvzOiRczArExKzVHvOuKsy4QG tQ== 
+ content-type; s=pp1; bh=TiEHHsahInRHmSU3qC9dnBo0r1OtAPNnhOmbEM2E9hI=;
+ b=XupEEdYLaCjOzy/ew1+RjZlN5Q9DnLzx951YqD5+GIUkiniZbsCGooFmnrfbo59q+4Ds
+ Fy1WTPAvsqAOxzpklbDmVRnXN9A2YIbvWdelJNzAfgMbI5K8u1M11OTprcQcvrLRliNr
+ Mk0iSb0OLofpso+ovvJYSS8jodzrwvr3fjLCaW2PC/XP5Sle3VYp+0k/D3WfYbuULvoU
+ +2rms2Nqzkfc4Z8dBpFmu1tQpEl6pSF7W/1T1G8l+zYQNVCES7d+kp8id20qN5njNpQK
+ 1E5jD/P+6rBLa82lgzvGaU45Qy9QZOBQO3uCr7+3U0FwdY/QUniMq/C/uQzcp13DmpdT 9A== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37fmkfsnv8-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37fn8uejx2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Mar 2021 14:17:28 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12NI4mM7080772;
-        Tue, 23 Mar 2021 14:17:28 -0400
+        Tue, 23 Mar 2021 18:57:16 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12NMvG83085701;
+        Tue, 23 Mar 2021 18:57:16 -0400
 Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37fmkfsnv1-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37fn8uejww-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Mar 2021 14:17:28 -0400
+        Tue, 23 Mar 2021 18:57:16 -0400
 Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12NIBcRf014684;
-        Tue, 23 Mar 2021 18:17:27 GMT
-Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
-        by ppma05wdc.us.ibm.com with ESMTP id 37dycchu0n-1
+        by ppma05wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12NMpc9a031649;
+        Tue, 23 Mar 2021 22:57:15 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma05wdc.us.ibm.com with ESMTP id 37dycckdme-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Mar 2021 18:17:27 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12NIHQHA21955026
+        Tue, 23 Mar 2021 22:57:15 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12NMvFX234013646
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Mar 2021 18:17:26 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9499FC6057;
-        Tue, 23 Mar 2021 18:17:26 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BD5C7C605A;
-        Tue, 23 Mar 2021 18:17:25 +0000 (GMT)
+        Tue, 23 Mar 2021 22:57:15 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 29E9B112069;
+        Tue, 23 Mar 2021 22:57:15 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 446E3112061;
+        Tue, 23 Mar 2021 22:57:14 +0000 (GMT)
 Received: from localhost (unknown [9.163.8.110])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Tue, 23 Mar 2021 18:17:25 +0000 (GMT)
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Tue, 23 Mar 2021 22:57:13 +0000 (GMT)
 From:   Fabiano Rosas <farosas@linux.ibm.com>
 To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v4 02/46] KVM: PPC: Book3S HV: Add a function to filter
- guest LPCR bits
-In-Reply-To: <20210323010305.1045293-3-npiggin@gmail.com>
+Subject: Re: [PATCH v4 22/46] KVM: PPC: Book3S HV P9: Stop handling hcalls
+ in real-mode in the P9 path
+In-Reply-To: <20210323010305.1045293-23-npiggin@gmail.com>
 References: <20210323010305.1045293-1-npiggin@gmail.com>
- <20210323010305.1045293-3-npiggin@gmail.com>
-Date:   Tue, 23 Mar 2021 15:17:23 -0300
-Message-ID: <87v99henv0.fsf@linux.ibm.com>
+ <20210323010305.1045293-23-npiggin@gmail.com>
+Date:   Tue, 23 Mar 2021 19:57:11 -0300
+Message-ID: <87y2ed5vi0.fsf@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-23_09:2021-03-22,2021-03-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 malwarescore=0 suspectscore=0 mlxlogscore=999
- mlxscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0 clxscore=1015
- adultscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2103230133
+ definitions=2021-03-23_11:2021-03-23,2021-03-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 adultscore=0 priorityscore=1501
+ mlxscore=0 mlxlogscore=999 impostorscore=0 spamscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103230166
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 Nicholas Piggin <npiggin@gmail.com> writes:
 
-> Guest LPCR depends on hardware type, and future changes will add
-> restrictions based on errata and guest MMU mode. Move this logic
-> to a common function and use it for the cases where the guest
-> wants to update its LPCR (or the LPCR of a nested guest).
+> In the interest of minimising the amount of code that is run in
+> "real-mode", don't handle hcalls in real mode in the P9 path.
+>
+> POWER8 and earlier are much more expensive to exit from HV real mode
+> and switch to host mode, because on those processors HV interrupts get
+> to the hypervisor with the MMU off, and the other threads in the core
+> need to be pulled out of the guest, and SLBs all need to be saved,
+> ERATs invalidated, and host SLB reloaded before the MMU is re-enabled
+> in host mode. Hash guests also require a lot of hcalls to run. The
+> XICS interrupt controller requires hcalls to run.
+>
+> By contrast, POWER9 has independent thread switching, and in radix mode
+> the hypervisor is already in a host virtual memory mode when the HV
+> interrupt is taken. Radix + xive guests don't need hcalls to handle
+> interrupts or manage translations.
+>
+> So it's much less important to handle hcalls in real mode in P9.
 >
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
-
 > ---
->  arch/powerpc/include/asm/kvm_book3s.h |  2 +
->  arch/powerpc/kvm/book3s_hv.c          | 60 ++++++++++++++++++---------
->  arch/powerpc/kvm/book3s_hv_nested.c   |  3 +-
->  3 files changed, 45 insertions(+), 20 deletions(-)
->
-> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-> index 2f5f919f6cd3..3eec3ef6f083 100644
-> --- a/arch/powerpc/include/asm/kvm_book3s.h
-> +++ b/arch/powerpc/include/asm/kvm_book3s.h
-> @@ -258,6 +258,8 @@ extern long kvmppc_hv_get_dirty_log_hpt(struct kvm *kvm,
->  extern void kvmppc_harvest_vpa_dirty(struct kvmppc_vpa *vpa,
->  			struct kvm_memory_slot *memslot,
->  			unsigned long *map);
-> +extern unsigned long kvmppc_filter_lpcr_hv(struct kvmppc_vcore *vc,
-> +			unsigned long lpcr);
->  extern void kvmppc_update_lpcr(struct kvm *kvm, unsigned long lpcr,
->  			unsigned long mask);
->  extern void kvmppc_set_fscr(struct kvm_vcpu *vcpu, u64 fscr);
+
+<snip>
+
 > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 13bad6bf4c95..c4539c38c639 100644
+> index fa7614c37e08..17739aaee3d8 100644
 > --- a/arch/powerpc/kvm/book3s_hv.c
 > +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -1635,6 +1635,27 @@ static int kvm_arch_vcpu_ioctl_set_sregs_hv(struct kvm_vcpu *vcpu,
->  	return 0;
+> @@ -1142,12 +1142,13 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
 >  }
 >
-> +/*
-> + * Enforce limits on guest LPCR values based on hardware availability,
-> + * guest configuration, and possibly hypervisor support and security
-> + * concerns.
-> + */
-> +unsigned long kvmppc_filter_lpcr_hv(struct kvmppc_vcore *vc, unsigned long lpcr)
+>  /*
+> - * Handle H_CEDE in the nested virtualization case where we haven't
+> - * called the real-mode hcall handlers in book3s_hv_rmhandlers.S.
+> + * Handle H_CEDE in the P9 path where we don't call the real-mode hcall
+> + * handlers in book3s_hv_rmhandlers.S.
+> + *
+>   * This has to be done early, not in kvmppc_pseries_do_hcall(), so
+>   * that the cede logic in kvmppc_run_single_vcpu() works properly.
+>   */
+> -static void kvmppc_nested_cede(struct kvm_vcpu *vcpu)
+> +static void kvmppc_cede(struct kvm_vcpu *vcpu)
+>  {
+>  	vcpu->arch.shregs.msr |= MSR_EE;
+>  	vcpu->arch.ceded = 1;
+> @@ -1403,9 +1404,15 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
+>  		/* hcall - punt to userspace */
+>  		int i;
+>
+> -		/* hypercall with MSR_PR has already been handled in rmode,
+> -		 * and never reaches here.
+> -		 */
+> +		if (unlikely(vcpu->arch.shregs.msr & MSR_PR)) {
+> +			/*
+> +			 * Guest userspace executed sc 1, reflect it back as a
+> +			 * privileged program check interrupt.
+> +			 */
+> +			kvmppc_core_queue_program(vcpu, SRR1_PROGPRIV);
+> +			r = RESUME_GUEST;
+> +			break;
+> +		}
+
+This patch bypasses sc_1_fast_return so it breaks KVM-PR. L1 loops with
+the following output:
+
+[    9.503929][ T3443] Couldn't emulate instruction 0x4e800020 (op 19 xop 16)
+[    9.503990][ T3443] kvmppc_exit_pr_progint: emulation at 48f4 failed (4e800020)
+[    9.504080][ T3443] Couldn't emulate instruction 0x4e800020 (op 19 xop 16)
+[    9.504170][ T3443] kvmppc_exit_pr_progint: emulation at 48f4 failed (4e800020)
+
+0x4e800020 is a blr after a sc 1 in SLOF.
+
+For KVM-PR we need to inject a 0xc00 at some point, either here or
+before branching to no_try_real in book3s_hv_rmhandlers.S.
+
+>
+>  		run->papr_hcall.nr = kvmppc_get_gpr(vcpu, 3);
+>  		for (i = 0; i < 9; ++i)
+> @@ -3663,6 +3670,12 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+>  	return trap;
+>  }
+>
+> +static inline bool hcall_is_xics(unsigned long req)
 > +{
-> +	/* On POWER8 and above, userspace can modify AIL */
-> +	if (!cpu_has_feature(CPU_FTR_ARCH_207S))
-> +		lpcr &= ~LPCR_AIL;
-> +
-> +	/*
-> +	 * On POWER9, allow userspace to enable large decrementer for the
-> +	 * guest, whether or not the host has it enabled.
-> +	 */
-> +	if (!cpu_has_feature(CPU_FTR_ARCH_300))
-> +		lpcr &= ~LPCR_LD;
-> +
-> +	return lpcr;
+> +	return (req == H_EOI || req == H_CPPR || req == H_IPI ||
+> +		req == H_IPOLL || req == H_XIRR || req == H_XIRR_X);
 > +}
 > +
->  static void kvmppc_set_lpcr(struct kvm_vcpu *vcpu, u64 new_lpcr,
->  		bool preserve_top32)
->  {
-> @@ -1643,6 +1664,23 @@ static void kvmppc_set_lpcr(struct kvm_vcpu *vcpu, u64 new_lpcr,
->  	u64 mask;
->
->  	spin_lock(&vc->lock);
-> +
-> +	/*
-> +	 * Userspace can only modify
-> +	 * DPFD (default prefetch depth), ILE (interrupt little-endian),
-> +	 * TC (translation control), AIL (alternate interrupt location),
-> +	 * LD (large decrementer).
-> +	 * These are subject to restrictions from kvmppc_filter_lcpr_hv().
-> +	 */
-> +	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD;
-> +
-> +	/* Broken 32-bit version of LPCR must not clear top bits */
-> +	if (preserve_top32)
-> +		mask &= 0xFFFFFFFF;
-> +
-> +	new_lpcr = kvmppc_filter_lpcr_hv(vc,
-> +			(vc->lpcr & ~mask) | (new_lpcr & mask));
-> +
->  	/*
->  	 * If ILE (interrupt little-endian) has changed, update the
->  	 * MSR_LE bit in the intr_msr for each vcpu in this vcore.
-> @@ -1661,25 +1699,8 @@ static void kvmppc_set_lpcr(struct kvm_vcpu *vcpu, u64 new_lpcr,
+>  /*
+>   * Virtual-mode guest entry for POWER9 and later when the host and
+>   * guest are both using the radix MMU.  The LPIDR has already been set.
+> @@ -3774,15 +3787,36 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+>  		/* H_CEDE has to be handled now, not later */
+>  		if (trap == BOOK3S_INTERRUPT_SYSCALL && !vcpu->arch.nested &&
+>  		    kvmppc_get_gpr(vcpu, 3) == H_CEDE) {
+> -			kvmppc_nested_cede(vcpu);
+> +			kvmppc_cede(vcpu);
+>  			kvmppc_set_gpr(vcpu, 3, 0);
+>  			trap = 0;
 >  		}
+>  	} else {
+>  		kvmppc_xive_push_vcpu(vcpu);
+>  		trap = kvmhv_load_hv_regs_and_go(vcpu, time_limit, lpcr);
+> +		if (trap == BOOK3S_INTERRUPT_SYSCALL && !vcpu->arch.nested &&
+> +		    !(vcpu->arch.shregs.msr & MSR_PR)) {
+> +			unsigned long req = kvmppc_get_gpr(vcpu, 3);
+> +
+> +			/* H_CEDE has to be handled now, not later */
+> +			if (req == H_CEDE) {
+> +				kvmppc_cede(vcpu);
+> +				kvmppc_xive_cede_vcpu(vcpu); /* may un-cede */
+> +				kvmppc_set_gpr(vcpu, 3, 0);
+> +				trap = 0;
+> +
+> +			/* XICS hcalls must be handled before xive is pulled */
+> +			} else if (hcall_is_xics(req)) {
+> +				int ret;
+> +
+> +				ret = kvmppc_xive_xics_hcall(vcpu, req);
+> +				if (ret != H_TOO_HARD) {
+> +					kvmppc_set_gpr(vcpu, 3, ret);
+> +					trap = 0;
+> +				}
+> +			}
+> +		}
+>  		kvmppc_xive_pull_vcpu(vcpu);
+> -
 >  	}
 >
-> -	/*
-> -	 * Userspace can only modify DPFD (default prefetch depth),
-> -	 * ILE (interrupt little-endian) and TC (translation control).
-> -	 * On POWER8 and POWER9 userspace can also modify AIL (alt. interrupt loc.).
-> -	 */
-> -	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC;
-> -	if (cpu_has_feature(CPU_FTR_ARCH_207S))
-> -		mask |= LPCR_AIL;
-> -	/*
-> -	 * On POWER9, allow userspace to enable large decrementer for the
-> -	 * guest, whether or not the host has it enabled.
-> -	 */
-> -	if (cpu_has_feature(CPU_FTR_ARCH_300))
-> -		mask |= LPCR_LD;
-> +	vc->lpcr = new_lpcr;
+>  	vcpu->arch.slb_max = 0;
+> @@ -4442,8 +4476,11 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
+>  		else
+>  			r = kvmppc_run_vcpu(vcpu);
 >
-> -	/* Broken 32-bit version of LPCR must not clear top bits */
-> -	if (preserve_top32)
-> -		mask &= 0xFFFFFFFF;
-> -	vc->lpcr = (vc->lpcr & ~mask) | (new_lpcr & mask);
->  	spin_unlock(&vc->lock);
->  }
+> -		if (run->exit_reason == KVM_EXIT_PAPR_HCALL &&
+> -		    !(vcpu->arch.shregs.msr & MSR_PR)) {
+> +		if (run->exit_reason == KVM_EXIT_PAPR_HCALL) {
+> +			if (WARN_ON_ONCE(vcpu->arch.shregs.msr & MSR_PR)) {
+> +				r = RESUME_GUEST;
+> +				continue;
+> +			}
+
+Note that this hunk might need to be dropped.
+
+>  			trace_kvm_hcall_enter(vcpu);
+>  			r = kvmppc_pseries_do_hcall(vcpu);
+>  			trace_kvm_hcall_exit(vcpu, r);
+> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> index c11597f815e4..2d0d14ed1d92 100644
+> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> @@ -1397,9 +1397,14 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+>  	mr	r4,r9
+>  	bge	fast_guest_return
+>  2:
+> +	/* If we came in through the P9 short path, no real mode hcalls */
+> +	lwz	r0, STACK_SLOT_SHORT_PATH(r1)
+> +	cmpwi	r0, 0
+> +	bne	no_try_real
+>  	/* See if this is an hcall we can handle in real mode */
+>  	cmpwi	r12,BOOK3S_INTERRUPT_SYSCALL
+>  	beq	hcall_try_real_mode
+> +no_try_real:
 >
-> @@ -4641,8 +4662,9 @@ void kvmppc_update_lpcr(struct kvm *kvm, unsigned long lpcr, unsigned long mask)
->  		struct kvmppc_vcore *vc = kvm->arch.vcores[i];
->  		if (!vc)
->  			continue;
-> +
->  		spin_lock(&vc->lock);
-> -		vc->lpcr = (vc->lpcr & ~mask) | lpcr;
-> +		vc->lpcr = kvmppc_filter_lpcr_hv(vc, (vc->lpcr & ~mask) | lpcr);
->  		spin_unlock(&vc->lock);
->  		if (++cores_done >= kvm->arch.online_vcores)
->  			break;
-> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-> index 2fe1fea4c934..f7b441b3eb17 100644
-> --- a/arch/powerpc/kvm/book3s_hv_nested.c
-> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
-> @@ -142,7 +142,8 @@ static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
->  	 */
->  	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
->  		LPCR_LPES | LPCR_MER;
-> -	hr->lpcr = (vc->lpcr & ~mask) | (hr->lpcr & mask);
-> +	hr->lpcr = kvmppc_filter_lpcr_hv(vc,
-> +			(vc->lpcr & ~mask) | (hr->lpcr & mask));
->
->  	/*
->  	 * Don't let L1 enable features for L2 which we've disabled for L1,
+>  	/* Hypervisor doorbell - exit only if host IPI flag set */
+>  	cmpwi	r12, BOOK3S_INTERRUPT_H_DOORBELL
