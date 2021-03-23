@@ -2,57 +2,59 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94854345472
-	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Mar 2021 02:04:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DA9F34546A
+	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Mar 2021 02:04:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230465AbhCWBDp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        id S229632AbhCWBDp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
         Mon, 22 Mar 2021 21:03:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44758 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230467AbhCWBDe (ORCPT
+        with ESMTP id S230465AbhCWBDe (ORCPT
         <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Mar 2021 21:03:34 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB2BC061756
-        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 18:03:34 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id 11so12532070pfn.9
-        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 18:03:34 -0700 (PDT)
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B83A1C061574
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 18:03:33 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id 32so3910058pgm.1
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 18:03:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=96lVEMoY9hmNRY65UX3KaQpv8EehCYA8LF4BBDNeARg=;
-        b=iSK4Rha4ojQO3w1SlTqJyLAZThuuX0MD2SeDxkMMa5SyRmgHPv3iBkYCzlfYbiXHap
-         4W6LWw3i/tEZ80AXYb8vhj+z4OIw/2cHoNhgnvREZ6nI3HyYkmdU0+YN9LvnGRrXDZTc
-         FxIEzDV3Q/504Hmz2gSgDVsxWLtCn9a2wW0Czckaa2Oi/pZRHkoimiOfAOzWBqEKM+lL
-         9M/HrVUbOMfjB3YR5toJT7fDMxSMAUyWYS33gp+alUPVPNmCYnkh+ow4UGd/Dm+Vyl14
-         feNPyZSeEB4EDqaUvi5/R/YF8Y25mCX3tArhFDkSGaLmabnUiaoUZAY7+NcGPrXyt1+s
-         vMwQ==
+        bh=A/SnEbu0v05VvXraZOiAb1e9wcvWFKJdoZf5OUf6Yb0=;
+        b=JuDOVyXU2df0CU3+R6S09KRDtVt/8n4GJK0Ch+5DH5ljnxTiVaS3sdai/S8/zQzkDD
+         S/ovhELE/16rS+8eVkva1wf/zoK7PIBGgCokdzWtOtpe0eecheLJmvzcPboQHT155fQ4
+         syVRm+RXb+pbaZjR1zC+DPni20iVW2uyH8o+qKlChvamO/vxebQbklnTuFVALfsqy+Cu
+         zr4tlz4DAE4fYc6hBTIq0aWANeo3m/Vjq2xa7xa0N8QkhKqvKWPDFnUURVU6qHVRoHjS
+         BXbiprbmUXW++Q9JDRcNfeCeuwsGUadw2PghxU/OceUoPoshiBy70vJ4HMZZYNIpkdhh
+         uuMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=96lVEMoY9hmNRY65UX3KaQpv8EehCYA8LF4BBDNeARg=;
-        b=DgDM8zuVcJnyRB1IHA+nNZEOt8TmYMhHNTNxKdO8xzUAGv0hnGYMzsuXHJfKyrZkXM
-         aNY2BgVfnKatM2wQMhM7dSRwMfBfTIhR8uhPeU0hLi0PsVL8ik0zhezLzIBhXSWAqwLC
-         +ZmtLYDoYVaWGW9f4cXIbmWXAtoGbX9m6nZx+ZJy6S65P1EDWmAC86zu/BOOvub15etf
-         oQF7hSdw4goloweytiglR4nO5ljbQZ6NqU4jF1grAWGiAoj+7gS+CmMqU2iA6eI14wup
-         nZSrznt8DGZORsmaVEF2PBMIzbqzFm1qLXoZM5i51BrVrMxDpg8KNkjq9M+AtP22qx3f
-         Qtpw==
-X-Gm-Message-State: AOAM531ktf5B9KVUhkZkjR8Vrrqk+0kj7uQsfmbyH+mBCyU296gwA8tC
-        Bl/XuJALe3TIWM+48UCY2//HBoCPWe4=
-X-Google-Smtp-Source: ABdhPJwHaxaBbEuGdovpRjVbFcwmJA1YSF54aKN3EmfRzan+E5ppcHdiDa0PBOZV7uXBrp6yGDN3Rw==
-X-Received: by 2002:a65:6a44:: with SMTP id o4mr1802492pgu.312.1616461409541;
-        Mon, 22 Mar 2021 18:03:29 -0700 (PDT)
+        bh=A/SnEbu0v05VvXraZOiAb1e9wcvWFKJdoZf5OUf6Yb0=;
+        b=GVR9IXYzS8iFpkMEHzC5GN2EFfhRkDbEdZM7e3Ttrmwlfk/TZM8x+tviXJ6vz4EBrF
+         Ap+WRoqwydsRMmH6yK0o90xlFTxlQc8zDRlUvJYyb13EFYGBtWfBybeCBnG0Zq5HbXlr
+         clFzZ3sdXuqcSbWajfYEjJWiMhhZAc7xAUN8DamBFSyNzxd6z+bn8qv+E1xiUpNrbaAX
+         4dM2cnw4gw7heTxELdpDqjUN2f5zG9lgdOlz6nHjdUbmzPsS3MsNuh2dOqgr0RXH9lOs
+         XRHCsl/jO/O1qw2LPPB5RRz8yY+EqhVwCaRr1ax/mMZ60Qu99hR0D7jIeXAhN+K+cp5Q
+         7CrQ==
+X-Gm-Message-State: AOAM530lorUEscwmekV3T1YvAYjuqaZ1m1Vqel2uANd12dPlUjA5P0KH
+        aeD1AqDfoRzz6WBvIzupJD47K7Z88gE=
+X-Google-Smtp-Source: ABdhPJxqJvrbrlx/7iCJz0s11fRARFxYLUUGvx9PFsEE91s5bQ+/yI9/oWpFx6L+15k1SwL7NpEifw==
+X-Received: by 2002:a17:902:c9c3:b029:e6:f027:b01e with SMTP id q3-20020a170902c9c3b02900e6f027b01emr818869pld.74.1616461412848;
+        Mon, 22 Mar 2021 18:03:32 -0700 (PDT)
 Received: from bobo.ibm.com ([58.84.78.96])
-        by smtp.gmail.com with ESMTPSA id e7sm14491894pfc.88.2021.03.22.18.03.27
+        by smtp.gmail.com with ESMTPSA id e7sm14491894pfc.88.2021.03.22.18.03.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Mar 2021 18:03:29 -0700 (PDT)
+        Mon, 22 Mar 2021 18:03:32 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v4 04/46] KVM: PPC: Book3S HV: Prevent radix guests from setting LPCR[TC]
-Date:   Tue, 23 Mar 2021 11:02:23 +1000
-Message-Id: <20210323010305.1045293-5-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Daniel Axtens <dja@axtens.net>
+Subject: [PATCH v4 05/46] KVM: PPC: Book3S HV: Remove redundant mtspr PSPB
+Date:   Tue, 23 Mar 2021 11:02:24 +1000
+Message-Id: <20210323010305.1045293-6-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210323010305.1045293-1-npiggin@gmail.com>
 References: <20210323010305.1045293-1-npiggin@gmail.com>
@@ -62,45 +64,27 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This bit only applies to hash partitions.
+This SPR is set to 0 twice when exiting the guest.
 
+Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
+Reviewed-by: Daniel Axtens <dja@axtens.net>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c        | 6 ++++++
- arch/powerpc/kvm/book3s_hv_nested.c | 3 +--
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index c5de7e3f22b6..1ffb0902e779 100644
+index 1ffb0902e779..7cfaabab2c20 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -1645,6 +1645,12 @@ static int kvm_arch_vcpu_ioctl_set_sregs_hv(struct kvm_vcpu *vcpu,
-  */
- unsigned long kvmppc_filter_lpcr_hv(struct kvmppc_vcore *vc, unsigned long lpcr)
- {
-+	struct kvm *kvm = vc->kvm;
-+
-+	/* LPCR_TC only applies to HPT guests */
-+	if (kvm_is_radix(kvm))
-+		lpcr &= ~LPCR_TC;
-+
- 	/* On POWER8 and above, userspace can modify AIL */
- 	if (!cpu_has_feature(CPU_FTR_ARCH_207S))
- 		lpcr &= ~LPCR_AIL;
-diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-index f7b441b3eb17..851e3f527eb2 100644
---- a/arch/powerpc/kvm/book3s_hv_nested.c
-+++ b/arch/powerpc/kvm/book3s_hv_nested.c
-@@ -140,8 +140,7 @@ static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
- 	/*
- 	 * Don't let L1 change LPCR bits for the L2 except these:
- 	 */
--	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
--		LPCR_LPES | LPCR_MER;
-+	mask = LPCR_DPFD | LPCR_ILE | LPCR_AIL | LPCR_LD | LPCR_LPES | LPCR_MER;
- 	hr->lpcr = kvmppc_filter_lpcr_hv(vc,
- 			(vc->lpcr & ~mask) | (hr->lpcr & mask));
+@@ -3781,7 +3781,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	mtspr(SPRN_DSCR, host_dscr);
+ 	mtspr(SPRN_TIDR, host_tidr);
+ 	mtspr(SPRN_IAMR, host_iamr);
+-	mtspr(SPRN_PSPB, 0);
  
+ 	if (host_amr != vcpu->arch.amr)
+ 		mtspr(SPRN_AMR, host_amr);
 -- 
 2.23.0
 
