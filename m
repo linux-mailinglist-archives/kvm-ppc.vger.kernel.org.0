@@ -2,432 +2,168 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA11C346004
-	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Mar 2021 14:45:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0329346016
+	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Mar 2021 14:48:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231743AbhCWNp0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 23 Mar 2021 09:45:26 -0400
-Received: from 9.mo51.mail-out.ovh.net ([46.105.48.137]:50756 "EHLO
-        9.mo51.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231673AbhCWNpD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 23 Mar 2021 09:45:03 -0400
-X-Greylist: delayed 365 seconds by postgrey-1.27 at vger.kernel.org; Tue, 23 Mar 2021 09:45:03 EDT
-Received: from mxplan5.mail.ovh.net (unknown [10.109.146.140])
-        by mo51.mail-out.ovh.net (Postfix) with ESMTPS id B0F49273504;
-        Tue, 23 Mar 2021 14:38:56 +0100 (CET)
-Received: from kaod.org (37.59.142.102) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Tue, 23 Mar
- 2021 14:38:55 +0100
-Authentication-Results: garm.ovh; auth=pass (GARM-102R00464be326d-43a9-421a-8253-ecaa85fd75eb,
-                    3463118FEE79F4041422E427733B80787D17A221) smtp.auth=clg@kaod.org
-X-OVh-ClientIp: 82.64.250.170
-Subject: Re: [PATCH v4 39/46] KVM: PPC: Book3S HV: Remove virt mode checks
- from real mode handlers
-To:     Nicholas Piggin <npiggin@gmail.com>, <kvm-ppc@vger.kernel.org>
-CC:     <linuxppc-dev@lists.ozlabs.org>
-References: <20210323010305.1045293-1-npiggin@gmail.com>
- <20210323010305.1045293-40-npiggin@gmail.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e19767d1-d1a7-b3b1-fe4d-20a473f579e1@kaod.org>
-Date:   Tue, 23 Mar 2021 14:38:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S230378AbhCWNsF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 23 Mar 2021 09:48:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47828 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231362AbhCWNri (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 23 Mar 2021 09:47:38 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12NDYKjm191958;
+        Tue, 23 Mar 2021 09:47:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=dS5PYmVbk3H/ors98/PXLwF9D17DN5thsm8ab7PkYIA=;
+ b=FBRU6anTuicw3oZAUHSgNc+5qc91L047GScwsU3bzgrvLr/Zw+as/5lhNmaQXyzfF1tc
+ v6Bm1CzCORfRYlla2OtOuRP4hXUTOFxRtRKr+RIdQ3plX1M7OyG7fczsIt5wTX8B03HV
+ ffiAzUnlWdUpy6rRsy7kutBIQ9F5Gu17HwZF+KZE0pbLZubswO+mf+Q/IELPTB+v4+HO
+ zh/oB5LayXMhp7EJhQdmfZLhFToyTY9Cvy7MStJEq9yfT4U9QZqUqmYX4xkR4iXPxwRj
+ BHerhNMKi6RgEmDMF+88/zdDvH6EX/gOez/9x2jEsn1dtmrW1NN2AyWMCW4XChZlJU70 CQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37dxjwuxsv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Mar 2021 09:47:19 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12NDYlBp195919;
+        Tue, 23 Mar 2021 09:47:18 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37dxjwuxry-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Mar 2021 09:47:18 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12NDlFlf031034;
+        Tue, 23 Mar 2021 13:47:16 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03fra.de.ibm.com with ESMTP id 37d9bpss17-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Mar 2021 13:47:16 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12NDkuAn35782988
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Mar 2021 13:46:56 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D93B742042;
+        Tue, 23 Mar 2021 13:47:13 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C7A914203F;
+        Tue, 23 Mar 2021 13:47:11 +0000 (GMT)
+Received: from [172.17.0.2] (unknown [9.40.192.207])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 23 Mar 2021 13:47:11 +0000 (GMT)
+Subject: [PATCH v3 0/3] spapr: nvdimm: Enable sync-dax property for nvdimm
+From:   Shivaprasad G Bhat <sbhat@linux.ibm.com>
+To:     sbhat@linux.vnet.ibm.com, david@gibson.dropbear.id.au,
+        groug@kaod.org, qemu-ppc@nongnu.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, mst@redhat.com, imammedo@redhat.com,
+        xiaoguangrong.eric@gmail.com
+Cc:     qemu-devel@nongnu.org, aneesh.kumar@linux.ibm.com,
+        linux-nvdimm@lists.01.org, kvm-ppc@vger.kernel.org,
+        shivaprasadbhat@gmail.com, bharata@linux.vnet.ibm.com
+Date:   Tue, 23 Mar 2021 09:47:10 -0400
+Message-ID: <161650723087.2959.8703728357980727008.stgit@6532096d84d3>
+User-Agent: StGit/0.21
 MIME-Version: 1.0
-In-Reply-To: <20210323010305.1045293-40-npiggin@gmail.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.102]
-X-ClientProxiedBy: DAG7EX1.mxp5.local (172.16.2.61) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 4080ff06-d285-4031-9bd1-6073eaa0e0da
-X-Ovh-Tracer-Id: 17253290174913612765
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduledrudegiedgheeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhephedtgfethfduhfduteeuhefffefhgfdtudevudevudfgtdfgjedukeffteelkeffnecuffhomhgrihhnpehrmhhhrghnughlvghrshdrshgsnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutddvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehnphhighhgihhnsehgmhgrihhlrdgtohhm
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-23_06:2021-03-22,2021-03-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ impostorscore=0 phishscore=0 adultscore=0 lowpriorityscore=0
+ suspectscore=0 malwarescore=0 mlxscore=0 bulkscore=0 priorityscore=1501
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103230100
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 3/23/21 2:02 AM, Nicholas Piggin wrote:
-> Now that the P7/8 path no longer supports radix, real-mode handlers
-> do not need to deal with being called in virt mode.
-> 
-> This change effectively reverts commit acde25726bc6 ("KVM: PPC: Book3S
-> HV: Add radix checks in real-mode hypercall handlers").
-> 
-> It removes a few more real-mode tests in rm hcall handlers, which also
-> allows the indirect ops for the xive module to be removed from the
-> built-in xics rm handlers.
-> 
-> kvmppc_h_random is renamed to kvmppc_rm_h_random to be a bit more
-> descriptive of its function.
-> 
-> Cc: Cédric Le Goater <clg@kaod.org>
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+The nvdimm devices are expected to ensure write persistence during power
+failure kind of scenarios.
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+The libpmem has architecture specific instructions like dcbf on power
+to flush the cache data to backend nvdimm device during normal writes.
 
-> ---
->  arch/powerpc/include/asm/kvm_ppc.h      | 10 +--
->  arch/powerpc/kvm/book3s.c               | 11 +--
->  arch/powerpc/kvm/book3s_64_vio_hv.c     | 12 ----
->  arch/powerpc/kvm/book3s_hv_builtin.c    | 91 ++++++-------------------
->  arch/powerpc/kvm/book3s_hv_rmhandlers.S |  2 +-
->  arch/powerpc/kvm/book3s_xive.c          | 18 -----
->  arch/powerpc/kvm/book3s_xive.h          |  7 --
->  arch/powerpc/kvm/book3s_xive_native.c   | 10 ---
->  8 files changed, 23 insertions(+), 138 deletions(-)
-> 
-> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-> index db6646c2ade2..5dfb3f167f2c 100644
-> --- a/arch/powerpc/include/asm/kvm_ppc.h
-> +++ b/arch/powerpc/include/asm/kvm_ppc.h
-> @@ -659,8 +659,6 @@ extern int kvmppc_xive_get_xive(struct kvm *kvm, u32 irq, u32 *server,
->  				u32 *priority);
->  extern int kvmppc_xive_int_on(struct kvm *kvm, u32 irq);
->  extern int kvmppc_xive_int_off(struct kvm *kvm, u32 irq);
-> -extern void kvmppc_xive_init_module(void);
-> -extern void kvmppc_xive_exit_module(void);
->  
->  extern int kvmppc_xive_connect_vcpu(struct kvm_device *dev,
->  				    struct kvm_vcpu *vcpu, u32 cpu);
-> @@ -686,8 +684,6 @@ static inline int kvmppc_xive_enabled(struct kvm_vcpu *vcpu)
->  extern int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
->  					   struct kvm_vcpu *vcpu, u32 cpu);
->  extern void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu);
-> -extern void kvmppc_xive_native_init_module(void);
-> -extern void kvmppc_xive_native_exit_module(void);
->  extern int kvmppc_xive_native_get_vp(struct kvm_vcpu *vcpu,
->  				     union kvmppc_one_reg *val);
->  extern int kvmppc_xive_native_set_vp(struct kvm_vcpu *vcpu,
-> @@ -701,8 +697,6 @@ static inline int kvmppc_xive_get_xive(struct kvm *kvm, u32 irq, u32 *server,
->  				       u32 *priority) { return -1; }
->  static inline int kvmppc_xive_int_on(struct kvm *kvm, u32 irq) { return -1; }
->  static inline int kvmppc_xive_int_off(struct kvm *kvm, u32 irq) { return -1; }
-> -static inline void kvmppc_xive_init_module(void) { }
-> -static inline void kvmppc_xive_exit_module(void) { }
->  
->  static inline int kvmppc_xive_connect_vcpu(struct kvm_device *dev,
->  					   struct kvm_vcpu *vcpu, u32 cpu) { return -EBUSY; }
-> @@ -725,8 +719,6 @@ static inline int kvmppc_xive_enabled(struct kvm_vcpu *vcpu)
->  static inline int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
->  			  struct kvm_vcpu *vcpu, u32 cpu) { return -EBUSY; }
->  static inline void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu) { }
-> -static inline void kvmppc_xive_native_init_module(void) { }
-> -static inline void kvmppc_xive_native_exit_module(void) { }
->  static inline int kvmppc_xive_native_get_vp(struct kvm_vcpu *vcpu,
->  					    union kvmppc_one_reg *val)
->  { return 0; }
-> @@ -762,7 +754,7 @@ long kvmppc_rm_h_stuff_tce(struct kvm_vcpu *vcpu,
->  			   unsigned long tce_value, unsigned long npages);
->  long int kvmppc_rm_h_confer(struct kvm_vcpu *vcpu, int target,
->                              unsigned int yield_count);
-> -long kvmppc_h_random(struct kvm_vcpu *vcpu);
-> +long kvmppc_rm_h_random(struct kvm_vcpu *vcpu);
->  void kvmhv_commence_exit(int trap);
->  void kvmppc_realmode_machine_check(struct kvm_vcpu *vcpu);
->  void kvmppc_subcore_enter_guest(void);
-> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-> index 44bf567b6589..1888aedfd410 100644
-> --- a/arch/powerpc/kvm/book3s.c
-> +++ b/arch/powerpc/kvm/book3s.c
-> @@ -1046,13 +1046,10 @@ static int kvmppc_book3s_init(void)
->  #ifdef CONFIG_KVM_XICS
->  #ifdef CONFIG_KVM_XIVE
->  	if (xics_on_xive()) {
-> -		kvmppc_xive_init_module();
->  		kvm_register_device_ops(&kvm_xive_ops, KVM_DEV_TYPE_XICS);
-> -		if (kvmppc_xive_native_supported()) {
-> -			kvmppc_xive_native_init_module();
-> +		if (kvmppc_xive_native_supported())
->  			kvm_register_device_ops(&kvm_xive_native_ops,
->  						KVM_DEV_TYPE_XIVE);
-> -		}
->  	} else
->  #endif
->  		kvm_register_device_ops(&kvm_xics_ops, KVM_DEV_TYPE_XICS);
-> @@ -1062,12 +1059,6 @@ static int kvmppc_book3s_init(void)
->  
->  static void kvmppc_book3s_exit(void)
->  {
-> -#ifdef CONFIG_KVM_XICS
-> -	if (xics_on_xive()) {
-> -		kvmppc_xive_exit_module();
-> -		kvmppc_xive_native_exit_module();
-> -	}
-> -#endif
->  #ifdef CONFIG_KVM_BOOK3S_32_HANDLER
->  	kvmppc_book3s_exit_pr();
->  #endif
-> diff --git a/arch/powerpc/kvm/book3s_64_vio_hv.c b/arch/powerpc/kvm/book3s_64_vio_hv.c
-> index 083a4e037718..dc6591548f0c 100644
-> --- a/arch/powerpc/kvm/book3s_64_vio_hv.c
-> +++ b/arch/powerpc/kvm/book3s_64_vio_hv.c
-> @@ -391,10 +391,6 @@ long kvmppc_rm_h_put_tce(struct kvm_vcpu *vcpu, unsigned long liobn,
->  	/* udbg_printf("H_PUT_TCE(): liobn=0x%lx ioba=0x%lx, tce=0x%lx\n", */
->  	/* 	    liobn, ioba, tce); */
->  
-> -	/* For radix, we might be in virtual mode, so punt */
-> -	if (kvm_is_radix(vcpu->kvm))
-> -		return H_TOO_HARD;
-> -
->  	stt = kvmppc_find_table(vcpu->kvm, liobn);
->  	if (!stt)
->  		return H_TOO_HARD;
-> @@ -489,10 +485,6 @@ long kvmppc_rm_h_put_tce_indirect(struct kvm_vcpu *vcpu,
->  	bool prereg = false;
->  	struct kvmppc_spapr_tce_iommu_table *stit;
->  
-> -	/* For radix, we might be in virtual mode, so punt */
-> -	if (kvm_is_radix(vcpu->kvm))
-> -		return H_TOO_HARD;
-> -
->  	/*
->  	 * used to check for invalidations in progress
->  	 */
-> @@ -602,10 +594,6 @@ long kvmppc_rm_h_stuff_tce(struct kvm_vcpu *vcpu,
->  	long i, ret;
->  	struct kvmppc_spapr_tce_iommu_table *stit;
->  
-> -	/* For radix, we might be in virtual mode, so punt */
-> -	if (kvm_is_radix(vcpu->kvm))
-> -		return H_TOO_HARD;
-> -
->  	stt = kvmppc_find_table(vcpu->kvm, liobn);
->  	if (!stt)
->  		return H_TOO_HARD;
-> diff --git a/arch/powerpc/kvm/book3s_hv_builtin.c b/arch/powerpc/kvm/book3s_hv_builtin.c
-> index 7a0e33a9c980..8d669a0e15f8 100644
-> --- a/arch/powerpc/kvm/book3s_hv_builtin.c
-> +++ b/arch/powerpc/kvm/book3s_hv_builtin.c
-> @@ -34,21 +34,6 @@
->  #include "book3s_xics.h"
->  #include "book3s_xive.h"
->  
-> -/*
-> - * The XIVE module will populate these when it loads
-> - */
-> -unsigned long (*__xive_vm_h_xirr)(struct kvm_vcpu *vcpu);
-> -unsigned long (*__xive_vm_h_ipoll)(struct kvm_vcpu *vcpu, unsigned long server);
-> -int (*__xive_vm_h_ipi)(struct kvm_vcpu *vcpu, unsigned long server,
-> -		       unsigned long mfrr);
-> -int (*__xive_vm_h_cppr)(struct kvm_vcpu *vcpu, unsigned long cppr);
-> -int (*__xive_vm_h_eoi)(struct kvm_vcpu *vcpu, unsigned long xirr);
-> -EXPORT_SYMBOL_GPL(__xive_vm_h_xirr);
-> -EXPORT_SYMBOL_GPL(__xive_vm_h_ipoll);
-> -EXPORT_SYMBOL_GPL(__xive_vm_h_ipi);
-> -EXPORT_SYMBOL_GPL(__xive_vm_h_cppr);
-> -EXPORT_SYMBOL_GPL(__xive_vm_h_eoi);
-> -
->  /*
->   * Hash page table alignment on newer cpus(CPU_FTR_ARCH_206)
->   * should be power of 2.
-> @@ -196,16 +181,9 @@ int kvmppc_hwrng_present(void)
->  }
->  EXPORT_SYMBOL_GPL(kvmppc_hwrng_present);
->  
-> -long kvmppc_h_random(struct kvm_vcpu *vcpu)
-> +long kvmppc_rm_h_random(struct kvm_vcpu *vcpu)
->  {
-> -	int r;
-> -
-> -	/* Only need to do the expensive mfmsr() on radix */
-> -	if (kvm_is_radix(vcpu->kvm) && (mfmsr() & MSR_IR))
-> -		r = powernv_get_random_long(&vcpu->arch.regs.gpr[4]);
-> -	else
-> -		r = powernv_get_random_real_mode(&vcpu->arch.regs.gpr[4]);
-> -	if (r)
-> +	if (powernv_get_random_real_mode(&vcpu->arch.regs.gpr[4]))
->  		return H_SUCCESS;
->  
->  	return H_HARDWARE;
-> @@ -541,22 +519,13 @@ static long kvmppc_read_one_intr(bool *again)
->  }
->  
->  #ifdef CONFIG_KVM_XICS
-> -static inline bool is_rm(void)
-> -{
-> -	return !(mfmsr() & MSR_DR);
-> -}
-> -
->  unsigned long kvmppc_rm_h_xirr(struct kvm_vcpu *vcpu)
->  {
->  	if (!kvmppc_xics_enabled(vcpu))
->  		return H_TOO_HARD;
-> -	if (xics_on_xive()) {
-> -		if (is_rm())
-> -			return xive_rm_h_xirr(vcpu);
-> -		if (unlikely(!__xive_vm_h_xirr))
-> -			return H_NOT_AVAILABLE;
-> -		return __xive_vm_h_xirr(vcpu);
-> -	} else
-> +	if (xics_on_xive())
-> +		return xive_rm_h_xirr(vcpu);
-> +	else
->  		return xics_rm_h_xirr(vcpu);
->  }
->  
-> @@ -565,13 +534,9 @@ unsigned long kvmppc_rm_h_xirr_x(struct kvm_vcpu *vcpu)
->  	if (!kvmppc_xics_enabled(vcpu))
->  		return H_TOO_HARD;
->  	vcpu->arch.regs.gpr[5] = get_tb();
-> -	if (xics_on_xive()) {
-> -		if (is_rm())
-> -			return xive_rm_h_xirr(vcpu);
-> -		if (unlikely(!__xive_vm_h_xirr))
-> -			return H_NOT_AVAILABLE;
-> -		return __xive_vm_h_xirr(vcpu);
-> -	} else
-> +	if (xics_on_xive())
-> +		return xive_rm_h_xirr(vcpu);
-> +	else
->  		return xics_rm_h_xirr(vcpu);
->  }
->  
-> @@ -579,13 +544,9 @@ unsigned long kvmppc_rm_h_ipoll(struct kvm_vcpu *vcpu, unsigned long server)
->  {
->  	if (!kvmppc_xics_enabled(vcpu))
->  		return H_TOO_HARD;
-> -	if (xics_on_xive()) {
-> -		if (is_rm())
-> -			return xive_rm_h_ipoll(vcpu, server);
-> -		if (unlikely(!__xive_vm_h_ipoll))
-> -			return H_NOT_AVAILABLE;
-> -		return __xive_vm_h_ipoll(vcpu, server);
-> -	} else
-> +	if (xics_on_xive())
-> +		return xive_rm_h_ipoll(vcpu, server);
-> +	else
->  		return H_TOO_HARD;
->  }
->  
-> @@ -594,13 +555,9 @@ int kvmppc_rm_h_ipi(struct kvm_vcpu *vcpu, unsigned long server,
->  {
->  	if (!kvmppc_xics_enabled(vcpu))
->  		return H_TOO_HARD;
-> -	if (xics_on_xive()) {
-> -		if (is_rm())
-> -			return xive_rm_h_ipi(vcpu, server, mfrr);
-> -		if (unlikely(!__xive_vm_h_ipi))
-> -			return H_NOT_AVAILABLE;
-> -		return __xive_vm_h_ipi(vcpu, server, mfrr);
-> -	} else
-> +	if (xics_on_xive())
-> +		return xive_rm_h_ipi(vcpu, server, mfrr);
-> +	else
->  		return xics_rm_h_ipi(vcpu, server, mfrr);
->  }
->  
-> @@ -608,13 +565,9 @@ int kvmppc_rm_h_cppr(struct kvm_vcpu *vcpu, unsigned long cppr)
->  {
->  	if (!kvmppc_xics_enabled(vcpu))
->  		return H_TOO_HARD;
-> -	if (xics_on_xive()) {
-> -		if (is_rm())
-> -			return xive_rm_h_cppr(vcpu, cppr);
-> -		if (unlikely(!__xive_vm_h_cppr))
-> -			return H_NOT_AVAILABLE;
-> -		return __xive_vm_h_cppr(vcpu, cppr);
-> -	} else
-> +	if (xics_on_xive())
-> +		return xive_rm_h_cppr(vcpu, cppr);
-> +	else
->  		return xics_rm_h_cppr(vcpu, cppr);
->  }
->  
-> @@ -622,13 +575,9 @@ int kvmppc_rm_h_eoi(struct kvm_vcpu *vcpu, unsigned long xirr)
->  {
->  	if (!kvmppc_xics_enabled(vcpu))
->  		return H_TOO_HARD;
-> -	if (xics_on_xive()) {
-> -		if (is_rm())
-> -			return xive_rm_h_eoi(vcpu, xirr);
-> -		if (unlikely(!__xive_vm_h_eoi))
-> -			return H_NOT_AVAILABLE;
-> -		return __xive_vm_h_eoi(vcpu, xirr);
-> -	} else
-> +	if (xics_on_xive())
-> +		return xive_rm_h_eoi(vcpu, xirr);
-> +	else
->  		return xics_rm_h_eoi(vcpu, xirr);
->  }
->  #endif /* CONFIG_KVM_XICS */
-> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> index b1f3ee16fd84..564ca9feef35 100644
-> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> @@ -2323,7 +2323,7 @@ hcall_real_table:
->  #else
->  	.long	0		/* 0x2fc - H_XIRR_X*/
->  #endif
-> -	.long	DOTSYM(kvmppc_h_random) - hcall_real_table
-> +	.long	DOTSYM(kvmppc_rm_h_random) - hcall_real_table
->  	.globl	hcall_real_table_end
->  hcall_real_table_end:
->  
-> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> index dcc07ceaf5ca..80d32b4eb898 100644
-> --- a/arch/powerpc/kvm/book3s_xive.c
-> +++ b/arch/powerpc/kvm/book3s_xive.c
-> @@ -2358,21 +2358,3 @@ struct kvm_device_ops kvm_xive_ops = {
->  	.get_attr = xive_get_attr,
->  	.has_attr = xive_has_attr,
->  };
-> -
-> -void kvmppc_xive_init_module(void)
-> -{
-> -	__xive_vm_h_xirr = xive_vm_h_xirr;
-> -	__xive_vm_h_ipoll = xive_vm_h_ipoll;
-> -	__xive_vm_h_ipi = xive_vm_h_ipi;
-> -	__xive_vm_h_cppr = xive_vm_h_cppr;
-> -	__xive_vm_h_eoi = xive_vm_h_eoi;
-> -}
-> -
-> -void kvmppc_xive_exit_module(void)
-> -{
-> -	__xive_vm_h_xirr = NULL;
-> -	__xive_vm_h_ipoll = NULL;
-> -	__xive_vm_h_ipi = NULL;
-> -	__xive_vm_h_cppr = NULL;
-> -	__xive_vm_h_eoi = NULL;
-> -}
-> diff --git a/arch/powerpc/kvm/book3s_xive.h b/arch/powerpc/kvm/book3s_xive.h
-> index 86c24a4ad809..afe9eeac6d56 100644
-> --- a/arch/powerpc/kvm/book3s_xive.h
-> +++ b/arch/powerpc/kvm/book3s_xive.h
-> @@ -289,13 +289,6 @@ extern int xive_rm_h_ipi(struct kvm_vcpu *vcpu, unsigned long server,
->  extern int xive_rm_h_cppr(struct kvm_vcpu *vcpu, unsigned long cppr);
->  extern int xive_rm_h_eoi(struct kvm_vcpu *vcpu, unsigned long xirr);
->  
-> -extern unsigned long (*__xive_vm_h_xirr)(struct kvm_vcpu *vcpu);
-> -extern unsigned long (*__xive_vm_h_ipoll)(struct kvm_vcpu *vcpu, unsigned long server);
-> -extern int (*__xive_vm_h_ipi)(struct kvm_vcpu *vcpu, unsigned long server,
-> -			      unsigned long mfrr);
-> -extern int (*__xive_vm_h_cppr)(struct kvm_vcpu *vcpu, unsigned long cppr);
-> -extern int (*__xive_vm_h_eoi)(struct kvm_vcpu *vcpu, unsigned long xirr);
-> -
->  /*
->   * Common Xive routines for XICS-over-XIVE and XIVE native
->   */
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> index 76800c84f2a3..1253666dd4d8 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -1281,13 +1281,3 @@ struct kvm_device_ops kvm_xive_native_ops = {
->  	.has_attr = kvmppc_xive_native_has_attr,
->  	.mmap = kvmppc_xive_native_mmap,
->  };
-> -
-> -void kvmppc_xive_native_init_module(void)
-> -{
-> -	;
-> -}
-> -
-> -void kvmppc_xive_native_exit_module(void)
-> -{
-> -	;
-> -}
-> 
+Qemu - virtual nvdimm devices are memory mapped. The dcbf in the guest
+doesn't traslate to actual flush to the backend file on the host in case
+of file backed v-nvdimms. This is addressed by virtio-pmem in case of x86_64
+by making explicit flushes translating to fdatasync at qemu.
+
+On PAPR, the issue is addressed by adding a new hcall to
+request for an explicit flush from the guest ndctl driver when the backend
+nvdimm cannot ensure write persistence with dcbf alone. So, the approach
+here is to convey when the hcall flush is required in a device tree
+property. The guest makes the hcall when the property is found, instead
+of relying on dcbf.
+
+The first patch adds the necessary asynchronous hcall support infrastructure
+code at the DRC level. Second patch implements the hcall using the
+infrastructure.
+
+Hcall number and semantics finalized, so dropping the RFC prefix.
+
+A new device property sync-dax is added to the nvdimm device. When the 
+sync-dax is off(default), device property "hcall-flush-required" is set,
+and the guest makes hcall H_SCM_FLUSH requesting for an explicit flush. 
+
+By default, sync-dax is "off" on all new pseries machines and prior to
+5.2 its "on",
+
+The below demonstration shows the map_sync behavior with sync-dax on & off.
+(https://github.com/avocado-framework-tests/avocado-misc-tests/blob/master/memory/ndctl.py.data/map_sync.c)
+
+The pmem0 is from nvdimm with With sync-dax=on, and pmem1 is from nvdimm with syn-dax=off, mounted as
+/dev/pmem0 on /mnt1 type xfs (rw,relatime,attr2,dax=always,inode64,logbufs=8,logbsize=32k,noquota)
+/dev/pmem1 on /mnt2 type xfs (rw,relatime,attr2,dax=always,inode64,logbufs=8,logbsize=32k,noquota)
+
+[root@atest-guest ~]# ./mapsync /mnt1/newfile    ----> When sync-dax=off
+[root@atest-guest ~]# ./mapsync /mnt2/newfile    ----> when sync-dax=on
+Failed to mmap  with Operation not supported
+
+The first patch does the header file cleanup necessary for the
+subsequent ones. Second patch implements the hcall, adds the necessary
+vmstate properties to spapr machine structure for carrying the hcall
+status during save-restore. The nature of the hcall being asynchronus,
+the patch uses aio utilities to offload the flush. The third patch adds
+the 'sync-dax' device property and enables the device tree property
+for the guest to utilise the hcall.
+
+---
+v2 - https://lists.gnu.org/archive/html/qemu-devel/2020-11/msg07031.html
+Changes from v2:
+      - Using the thread pool based approach as suggested by Greg
+      - Moved the async hcall handling code to spapr_nvdimm.c along
+        with some simplifications
+      - Added vmstate to preserve the hcall status during save-restore
+        along with pre_save handler code to complete all ongoning flushes.
+      - Added hw_compat magic for sync-dax 'on' on previous machines.
+      - Miscellanious minor fixes.
+
+v1 - https://lists.gnu.org/archive/html/qemu-devel/2020-11/msg06330.html
+Changes from v1
+      - Fixed a missed-out unlock
+      - using QLIST_FOREACH instead of QLIST_FOREACH_SAFE while generating token
+
+Shivaprasad G Bhat (3):
+      spapr: nvdimm: Forward declare and move the definitions
+      spapr: nvdimm: Impletment scm flush hcall
+      spapr: nvdimm: Enable sync-dax device property for nvdimm
+
+
+ hw/core/machine.c             |    1 
+ hw/mem/nvdimm.c               |    1 
+ hw/ppc/spapr.c                |    6 +
+ hw/ppc/spapr_nvdimm.c         |  269 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/mem/nvdimm.h       |   10 ++
+ include/hw/ppc/spapr.h        |   12 ++
+ include/hw/ppc/spapr_nvdimm.h |   34 +++--
+ 7 files changed, 317 insertions(+), 16 deletions(-)
+
+--
+Signature
+
+
 
