@@ -2,113 +2,128 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C66E345B55
-	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Mar 2021 10:50:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41C90345BBE
+	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Mar 2021 11:13:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbhCWJta (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 23 Mar 2021 05:49:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44488 "EHLO
+        id S230063AbhCWKNY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 23 Mar 2021 06:13:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230264AbhCWJtD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 23 Mar 2021 05:49:03 -0400
+        with ESMTP id S229448AbhCWKNR (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 23 Mar 2021 06:13:17 -0400
 Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3196C061574
-        for <kvm-ppc@vger.kernel.org>; Tue, 23 Mar 2021 02:49:03 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id mz6-20020a17090b3786b02900c16cb41d63so9894895pjb.2
-        for <kvm-ppc@vger.kernel.org>; Tue, 23 Mar 2021 02:49:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B67C061574
+        for <kvm-ppc@vger.kernel.org>; Tue, 23 Mar 2021 03:13:17 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id w8so9868545pjf.4
+        for <kvm-ppc@vger.kernel.org>; Tue, 23 Mar 2021 03:13:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=c1kuMFGWEbTOeFhDqSYJCZMejdonWc5t7uysZdJ61Xg=;
-        b=dCwBg30eq7kvsgo/KtoSqLNtbWKmVgtrpPAwvBXo1gnVhDObcOBvp0TsB/tXB0WKsG
-         N9F1Y4uCPGm5Tw/mj409OgYFHHwqIzbjT97f4zKHRPierYL5pOYvT/6dGbSgE0xCRJuR
-         t1lA0LJYXBwyFqgppJh3iQLkTaxJmDfOUKDCDVZ2vgtzB1vSp6IQSDrhjdlZxlE/USAs
-         XDXZcoWoyMO27OuvBRHFCLl+qwv+C+82ZmNrW/V+7GXBC9EOQcznUmmtdT1dBAUE16Ds
-         mDCi2IICdzBPz/4Nj9yOse0QbsugBJyvZEdMI3yGMH3rxn/08FS3FrYsrHUDBNCzH0Zk
-         BX0Q==
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=S0VXCg+nlzBozrdWHXgTNulRU5+BlACmvhzlexa5ah8=;
+        b=MqCkGTz40Bz/d4qLMARgRqU1nV/4StH8XiyPZEAUr/RQZG5lkVX2RmS3LgykzG70Ug
+         IocoZD2rifEiFsAWdKpE989Ee1TlxCMIXDCVylJrw169vOvrQaLOjTob1l/I3wzg7q/b
+         Pl8t+waZGyOwrosjJfXFkOC2aS8+9L/3MNexdzFzjYZV/tNTokRREGSTdG7hS7rzB0wK
+         EJf5frdhAM2v4lpvkglfsQN+CRLjunlNwE6IbUufScfhIvoHBVfxIF21Rpk1XoGXzRSN
+         VtHE+I5PeQBzUJnkHGYlwQPDDGBM8Bgcthp0WytoWAQEl5TEbbbeoG1932UvPBGrSHon
+         mu5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=c1kuMFGWEbTOeFhDqSYJCZMejdonWc5t7uysZdJ61Xg=;
-        b=WOLF1/0CKEGU66qnQQpUbP9pcTRcusxc1b6aDrj0CqRK3j9/4Q8u5b2NzKzqEZ0M0S
-         Sdzhw7inSi8A8oVRZlWVEqwsVeIFhNubjZDs2VGwnuYP1l60S12YlUrNbWhlekKf5qtP
-         8FvnSpnATF28ZIVL39S11hqrMYHQ5CNYwww6R40pBcq08xb7Nw3hXOaX+3Kcna3/JRl3
-         g08IVRwc8XyKmYLFUD9ciGj/dbhXegzBohV6HR8xtSxW2EkW9k45q7g0GBjbtlrFpDUN
-         PW8uV91FtMv4DBCCxGFOdolGaNS6BDtzYYi2HN+Bfy2f8cUfz5vepHtatMXZc9JpSws5
-         CFRQ==
-X-Gm-Message-State: AOAM530lbZyeV+jmvk2izs7gZy/wZHHqIqzTQ/JkoQ4QzAPDzcy6BGXx
-        h/3mD4BkTA9V7GcQvGKULc4=
-X-Google-Smtp-Source: ABdhPJwTA/SMB23drVhANK+kBQOX7U1rMdAEfO8vZlCydkn8E2Fd4H7asUOKskWbdhNlVCco9RxEkg==
-X-Received: by 2002:a17:90a:d801:: with SMTP id a1mr3761057pjv.84.1616492943289;
-        Tue, 23 Mar 2021 02:49:03 -0700 (PDT)
-Received: from localhost ([1.132.174.211])
-        by smtp.gmail.com with ESMTPSA id q95sm2255130pjq.20.2021.03.23.02.49.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Mar 2021 02:49:02 -0700 (PDT)
-Date:   Tue, 23 Mar 2021 19:48:57 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v4 22/46] KVM: PPC: Book3S HV P9: Stop handling hcalls in
- real-mode in the P9 path
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, kvm-ppc@vger.kernel.org
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=S0VXCg+nlzBozrdWHXgTNulRU5+BlACmvhzlexa5ah8=;
+        b=uH6tA10/qcxexiTE9Juq8c9CK9LZI7psIu6QDkp5wk5o+VILoApiV/UV76/lwNNAil
+         SgWldzvU9tIIsk1CLDdnKkSwFVkkFHhVpSjiIsf6fheC/pwS8pn9eV9GdqdaVysDtem/
+         6fiJcmlZWE1ZxDEjR6H4HEgxVNdYWGyI9fO71hauzIpIPGOJ+/9wuh3VZbLzALKRleau
+         4+/eGmvG5bBt6RC8McsY6mjMlinRkqynv/HhVLzytXEB9jbVuflR5SqleE2cfoJFEgxY
+         VvHjvzQAZkOerhNH3XOA6FqQfWIU8FwQKe0KNjIJurrZcMdPhC6/tCCnynxJCB8eP8wt
+         dhBA==
+X-Gm-Message-State: AOAM5327CxkmVNqcJo7cTz6/C01qkvHCigXvqoa+1ovPp3wChkhUtxzD
+        QPSAp3k65rPabczwLOKMkS1F7g==
+X-Google-Smtp-Source: ABdhPJze4HUPAcXMoEk5PkqyXQzhctwqxPR2w4c2vUnIWIqZAwgYV1xsV8DH8J/nVKtG8Bw/NpX9Nw==
+X-Received: by 2002:a17:90b:903:: with SMTP id bo3mr3949176pjb.198.1616494396659;
+        Tue, 23 Mar 2021 03:13:16 -0700 (PDT)
+Received: from [192.168.10.23] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
+        by smtp.gmail.com with UTF8SMTPSA id x4sm15730543pfn.134.2021.03.23.03.13.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Mar 2021 03:13:16 -0700 (PDT)
+Message-ID: <3ca0e504-70df-2a25-12af-a1addac842b6@ozlabs.ru>
+Date:   Tue, 23 Mar 2021 21:13:12 +1100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:87.0) Gecko/20100101
+ Thunderbird/87.0
+Subject: Re: [PATCH v4 28/46] KVM: PPC: Book3S HV P9: Reduce irq_work vs guest
+ decrementer races
+Content-Language: en-US
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
 Cc:     linuxppc-dev@lists.ozlabs.org
 References: <20210323010305.1045293-1-npiggin@gmail.com>
-        <20210323010305.1045293-23-npiggin@gmail.com>
-        <6901d698-f3d8-024b-3aa1-47b157bbd57d@ozlabs.ru>
-        <1616490842.v369xyk7do.astroid@bobo.none>
-        <994fb056-4445-4301-faca-b53394fb6b35@ozlabs.ru>
-In-Reply-To: <994fb056-4445-4301-faca-b53394fb6b35@ozlabs.ru>
-MIME-Version: 1.0
-Message-Id: <1616492251.gsmvgdqq5o.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+ <20210323010305.1045293-29-npiggin@gmail.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <20210323010305.1045293-29-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Alexey Kardashevskiy's message of March 23, 2021 7:24 pm:
->=20
->=20
-> On 23/03/2021 20:16, Nicholas Piggin wrote:
->> Excerpts from Alexey Kardashevskiy's message of March 23, 2021 7:02 pm:
->>>
->>>
->>> On 23/03/2021 12:02, Nicholas Piggin wrote:
->>>> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kv=
-m/book3s_hv_rmhandlers.S
->>>> index c11597f815e4..2d0d14ed1d92 100644
->>>> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
->>>> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
->>>> @@ -1397,9 +1397,14 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
->>>>    	mr	r4,r9
->>>>    	bge	fast_guest_return
->>>>    2:
->>>> +	/* If we came in through the P9 short path, no real mode hcalls */
->>>> +	lwz	r0, STACK_SLOT_SHORT_PATH(r1)
->>>> +	cmpwi	r0, 0
->>>> +	bne	no_try_real
->>>
->>>
->>> btw is mmu on at this point? or it gets enabled by rfid at the end of
->>> guest_exit_short_path?
->>=20
->> Hash guest it's off. Radix guest it can be on or off depending on the
->> interrupt type and MSR and LPCR[AIL] values.
->=20
-> What I meant was - what do we expect here on p9? mmu on? ^w^w^w^w^w^w^w^w=
-^w
 
-P9 radix can be on or off. If the guest had MSR[IR] or MSR[DR] clear, or=20
-if the guest is running AIL=3D0 mode, or if this is a machine check,=20
-system reset, or HMI interrupt then the MMU will be off here.
 
-> I just realized - it is radix so there is no problem with vmalloc=20
-> addresses in real mode as these do not use top 2 bits as on hash and the=20
-> exact mmu state is less important here. Cheers.
+On 23/03/2021 12:02, Nicholas Piggin wrote:
+> irq_work's use of the DEC SPR is racy with guest<->host switch and guest
+> entry which flips the DEC interrupt to guest, which could lose a host
+> work interrupt.
+> 
+> This patch closes one race, and attempts to comment another class of
+> races.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   arch/powerpc/kvm/book3s_hv.c | 15 ++++++++++++++-
+>   1 file changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 1f38a0abc611..989a1ff5ad11 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -3745,6 +3745,18 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+>   	if (!(vcpu->arch.ctrl & 1))
+>   		mtspr(SPRN_CTRLT, mfspr(SPRN_CTRLF) & ~1);
+>   
+> +	/*
+> +	 * When setting DEC, we must always deal with irq_work_raise via NMI vs
+> +	 * setting DEC. The problem occurs right as we switch into guest mode
+> +	 * if a NMI hits and sets pending work and sets DEC, then that will
+> +	 * apply to the guest and not bring us back to the host.
+> +	 *
+> +	 * irq_work_raise could check a flag (or possibly LPCR[HDICE] for
+> +	 * example) and set HDEC to 1? That wouldn't solve the nested hv
+> +	 * case which needs to abort the hcall or zero the time limit.
+> +	 *
+> +	 * XXX: Another day's problem.
+> +	 */
+>   	mtspr(SPRN_DEC, vcpu->arch.dec_expires - tb);
+>   
+>   	if (kvmhv_on_pseries()) {
+> @@ -3879,7 +3891,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+>   	vc->entry_exit_map = 0x101;
+>   	vc->in_guest = 0;
+>   
+> -	mtspr(SPRN_DEC, local_paca->kvm_hstate.dec_expires - tb);
+> +	set_dec_or_work(local_paca->kvm_hstate.dec_expires - tb);
 
-We still can't use vmalloc addresses in real mode on radix because they=20
-don't translate with the page tables.
 
-Thanks,
-Nick
+set_dec_or_work() will write local_paca->kvm_hstate.dec_expires - tb - 1 
+to SPRN_DEC which is not exactly the same, is this still alright?
+
+I asked in v3 but it is probably lost :)
+
+> +
+>   	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
+>   
+>   	kvmhv_load_host_pmu();
+> 
+
+-- 
+Alexey
