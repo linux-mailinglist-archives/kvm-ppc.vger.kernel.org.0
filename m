@@ -2,58 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B6BD34546C
-	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Mar 2021 02:04:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 94854345472
+	for <lists+kvm-ppc@lfdr.de>; Tue, 23 Mar 2021 02:04:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231308AbhCWBDp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        id S230465AbhCWBDp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
         Mon, 22 Mar 2021 21:03:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44732 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230317AbhCWBD2 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Mar 2021 21:03:28 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A1BC061756
-        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 18:03:27 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id c204so12522662pfc.4
-        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 18:03:27 -0700 (PDT)
+        with ESMTP id S230467AbhCWBDe (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 22 Mar 2021 21:03:34 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB2BC061756
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 18:03:34 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id 11so12532070pfn.9
+        for <kvm-ppc@vger.kernel.org>; Mon, 22 Mar 2021 18:03:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Kb34vWpXzgWUzoINnJbe4T3qARQM/1MOi4byEufbLGk=;
-        b=N37jRf32sH+nM4T5mCFVIebh7kiOsFRboJjmJBOb6Qh214ZpzGu7vSUydn/3DwdGS0
-         1LAF3b/kA7Ispthu5NxeIPm6a393TKiq2DOBSbXUCBio6eQFkcJIEHlrzJA7CWGrKW+y
-         OudhzKoFqn5UCY//cG/SkOCSJhK6uKSeGWZeFy1QYj82zHUD5rMis91JHTDGBhX0/Bxw
-         nmVvdvzYGWODHOuDcOhRgvIy4SP/c/D2LLXvA/RUkhp9sWUhQYtPKI4ax/yStWHnRuJ+
-         X22LC0NW19iq49sUaoObJbGiHX5ojbNY40LyzuZr4YqN4iIMuFZlocSGsPQV83h6OIMA
-         P7rQ==
+        bh=96lVEMoY9hmNRY65UX3KaQpv8EehCYA8LF4BBDNeARg=;
+        b=iSK4Rha4ojQO3w1SlTqJyLAZThuuX0MD2SeDxkMMa5SyRmgHPv3iBkYCzlfYbiXHap
+         4W6LWw3i/tEZ80AXYb8vhj+z4OIw/2cHoNhgnvREZ6nI3HyYkmdU0+YN9LvnGRrXDZTc
+         FxIEzDV3Q/504Hmz2gSgDVsxWLtCn9a2wW0Czckaa2Oi/pZRHkoimiOfAOzWBqEKM+lL
+         9M/HrVUbOMfjB3YR5toJT7fDMxSMAUyWYS33gp+alUPVPNmCYnkh+ow4UGd/Dm+Vyl14
+         feNPyZSeEB4EDqaUvi5/R/YF8Y25mCX3tArhFDkSGaLmabnUiaoUZAY7+NcGPrXyt1+s
+         vMwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Kb34vWpXzgWUzoINnJbe4T3qARQM/1MOi4byEufbLGk=;
-        b=l6V9FY0m8zZhi0TTj4jjA9jyWFPYJN1T92dvjeZtEzqFRK/b4r8lCYBlz2PB1XE4Pt
-         f04eLGTH35l/YKmqkHLInULW1BfENuv49T5hGGylTykSO9vFlbTONcLp+EHo5XzvGCP0
-         Mh+hraFDt0NShr+CG0QXTYvjvPhznlWb7/pIad2ip3aYiNrj1ARbFjzI1uK8/YtkL3VG
-         BBbwovQukEJqDGfF4b2fvod++Z/f7Q3NagR6kg94s9xJIwFZ7pgEUd/TkBgh208PQ7Eq
-         3zVex7RV1Rqjha3iw4StWFRpJwn+T7GcjS4d0hdMl578GBLH5B6BqKPfASwJaxWP5c1q
-         3w2A==
-X-Gm-Message-State: AOAM531JpJFRrrh0aBkshQnqJnARfJHel3jz5yHy7OyIdFofeN1tEzr5
-        vNj93qFEMooFEup1eU0MGmzyDRADZMg=
-X-Google-Smtp-Source: ABdhPJw0jC7eGSE+tizBJpsnpVKghO7RDXRyMrrhaMy7VyPtiTOpOreBXVh6VamK/ZHR9pFkWMeWgw==
-X-Received: by 2002:a17:902:d341:b029:e6:9a9f:5614 with SMTP id l1-20020a170902d341b02900e69a9f5614mr2276114plk.48.1616461406873;
-        Mon, 22 Mar 2021 18:03:26 -0700 (PDT)
+        bh=96lVEMoY9hmNRY65UX3KaQpv8EehCYA8LF4BBDNeARg=;
+        b=DgDM8zuVcJnyRB1IHA+nNZEOt8TmYMhHNTNxKdO8xzUAGv0hnGYMzsuXHJfKyrZkXM
+         aNY2BgVfnKatM2wQMhM7dSRwMfBfTIhR8uhPeU0hLi0PsVL8ik0zhezLzIBhXSWAqwLC
+         +ZmtLYDoYVaWGW9f4cXIbmWXAtoGbX9m6nZx+ZJy6S65P1EDWmAC86zu/BOOvub15etf
+         oQF7hSdw4goloweytiglR4nO5ljbQZ6NqU4jF1grAWGiAoj+7gS+CmMqU2iA6eI14wup
+         nZSrznt8DGZORsmaVEF2PBMIzbqzFm1qLXoZM5i51BrVrMxDpg8KNkjq9M+AtP22qx3f
+         Qtpw==
+X-Gm-Message-State: AOAM531ktf5B9KVUhkZkjR8Vrrqk+0kj7uQsfmbyH+mBCyU296gwA8tC
+        Bl/XuJALe3TIWM+48UCY2//HBoCPWe4=
+X-Google-Smtp-Source: ABdhPJwHaxaBbEuGdovpRjVbFcwmJA1YSF54aKN3EmfRzan+E5ppcHdiDa0PBOZV7uXBrp6yGDN3Rw==
+X-Received: by 2002:a65:6a44:: with SMTP id o4mr1802492pgu.312.1616461409541;
+        Mon, 22 Mar 2021 18:03:29 -0700 (PDT)
 Received: from bobo.ibm.com ([58.84.78.96])
-        by smtp.gmail.com with ESMTPSA id e7sm14491894pfc.88.2021.03.22.18.03.24
+        by smtp.gmail.com with ESMTPSA id e7sm14491894pfc.88.2021.03.22.18.03.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Mar 2021 18:03:26 -0700 (PDT)
+        Mon, 22 Mar 2021 18:03:29 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
-        Fabiano Rosas <farosas@linux.ibm.com>
-Subject: [PATCH v4 03/46] KVM: PPC: Book3S HV: Disallow LPCR[AIL] to be set to 1 or 2
-Date:   Tue, 23 Mar 2021 11:02:22 +1000
-Message-Id: <20210323010305.1045293-4-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v4 04/46] KVM: PPC: Book3S HV: Prevent radix guests from setting LPCR[TC]
+Date:   Tue, 23 Mar 2021 11:02:23 +1000
+Message-Id: <20210323010305.1045293-5-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210323010305.1045293-1-npiggin@gmail.com>
 References: <20210323010305.1045293-1-npiggin@gmail.com>
@@ -63,43 +62,45 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-These are already disallowed by H_SET_MODE from the guest, also disallow
-these by updating LPCR directly.
+This bit only applies to hash partitions.
 
-AIL modes can affect the host interrupt behaviour while the guest LPCR
-value is set, so filter it here too.
-
-Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/powerpc/kvm/book3s_hv.c        | 6 ++++++
+ arch/powerpc/kvm/book3s_hv_nested.c | 3 +--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index c4539c38c639..c5de7e3f22b6 100644
+index c5de7e3f22b6..1ffb0902e779 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -803,7 +803,10 @@ static int kvmppc_h_set_mode(struct kvm_vcpu *vcpu, unsigned long mflags,
- 		vcpu->arch.dawrx1 = value2;
- 		return H_SUCCESS;
- 	case H_SET_MODE_RESOURCE_ADDR_TRANS_MODE:
--		/* KVM does not support mflags=2 (AIL=2) */
-+		/*
-+		 * KVM does not support mflags=2 (AIL=2) and AIL=1 is reserved.
-+		 * Keep this in synch with kvmppc_filter_guest_lpcr_hv.
-+		 */
- 		if (mflags != 0 && mflags != 3)
- 			return H_UNSUPPORTED_FLAG_START;
- 		return H_TOO_HARD;
-@@ -1645,6 +1648,8 @@ unsigned long kvmppc_filter_lpcr_hv(struct kvmppc_vcore *vc, unsigned long lpcr)
+@@ -1645,6 +1645,12 @@ static int kvm_arch_vcpu_ioctl_set_sregs_hv(struct kvm_vcpu *vcpu,
+  */
+ unsigned long kvmppc_filter_lpcr_hv(struct kvmppc_vcore *vc, unsigned long lpcr)
+ {
++	struct kvm *kvm = vc->kvm;
++
++	/* LPCR_TC only applies to HPT guests */
++	if (kvm_is_radix(kvm))
++		lpcr &= ~LPCR_TC;
++
  	/* On POWER8 and above, userspace can modify AIL */
  	if (!cpu_has_feature(CPU_FTR_ARCH_207S))
  		lpcr &= ~LPCR_AIL;
-+	if ((lpcr & LPCR_AIL) != LPCR_AIL_3)
-+		lpcr &= ~LPCR_AIL; /* LPCR[AIL]=1/2 is disallowed */
- 
+diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+index f7b441b3eb17..851e3f527eb2 100644
+--- a/arch/powerpc/kvm/book3s_hv_nested.c
++++ b/arch/powerpc/kvm/book3s_hv_nested.c
+@@ -140,8 +140,7 @@ static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
  	/*
- 	 * On POWER9, allow userspace to enable large decrementer for the
+ 	 * Don't let L1 change LPCR bits for the L2 except these:
+ 	 */
+-	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
+-		LPCR_LPES | LPCR_MER;
++	mask = LPCR_DPFD | LPCR_ILE | LPCR_AIL | LPCR_LD | LPCR_LPES | LPCR_MER;
+ 	hr->lpcr = kvmppc_filter_lpcr_hv(vc,
+ 			(vc->lpcr & ~mask) | (hr->lpcr & mask));
+ 
 -- 
 2.23.0
 
