@@ -2,226 +2,80 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BA94347519
-	for <lists+kvm-ppc@lfdr.de>; Wed, 24 Mar 2021 10:54:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09720347DA5
+	for <lists+kvm-ppc@lfdr.de>; Wed, 24 Mar 2021 17:26:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232697AbhCXJx3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 24 Mar 2021 05:53:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13300 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232606AbhCXJxW (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 24 Mar 2021 05:53:22 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12O9jFRC012057;
-        Wed, 24 Mar 2021 05:53:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=ocCPFyKvRr5NDa92QQBD8pRnFYdsyCVfW9sKZswguk0=;
- b=tUpROK0WqJa+voAG+ENkRadSWrtkO9RAklzBs0PS3m4YmO3NEmUMQm7lopSla4ozPz/E
- F1+oEnSdWr4PK+b5NVWAig6STRa5ILZ+Cs1zRtznQwWUJGqogNE8jOOAoGtfK5ys+8Vf
- UuqzQTbBs7wkbONkWwQw5OKMY2/THNhT8YjzrJIfpk5R6yMeJs+aBBF0mdcyE8ov+jCm
- yWukDX8MEoM79x8DCJBBQGsyEPHbdet8oNJO3lGqEhKUStytVaPMbXlMt1aO5vEE+J28
- BYki4B6pJfY2WGtS1EbXkVBGOlB4R4K91mMiidSsr1aOg6eKXj+kpMsqPqzLbko5IHyu +A== 
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37g32kr7b7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Mar 2021 05:53:17 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12O9o4DE018694;
-        Wed, 24 Mar 2021 09:53:15 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04fra.de.ibm.com with ESMTP id 37d9bya6jj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Mar 2021 09:53:15 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12O9qs6x33947976
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 24 Mar 2021 09:52:54 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5BFB152054;
-        Wed, 24 Mar 2021 09:53:12 +0000 (GMT)
-Received: from vajain21.in.ibm.com (unknown [9.77.202.127])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id 62A365204E;
-        Wed, 24 Mar 2021 09:53:09 +0000 (GMT)
-Received: by vajain21.in.ibm.com (sSMTP sendmail emulation); Wed, 24 Mar 2021 15:23:08 +0530
-From:   Vaibhav Jain <vaibhav@linux.ibm.com>
-To:     Shivaprasad G Bhat <sbhat@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-nvdimm@lists.01.org, aneesh.kumar@linux.ibm.com,
-        ellerman@au1.ibm.com
-Cc:     sbhat@linux.vnet.ibm.com, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v2] powerpc/papr_scm: Implement support for H_SCM_FLUSH
- hcall
-In-Reply-To: <161651910115.13873.14215644994307713797.stgit@6532096d84d3>
-References: <161651910115.13873.14215644994307713797.stgit@6532096d84d3>
-Date:   Wed, 24 Mar 2021 15:23:08 +0530
-Message-ID: <87pmzo3mkb.fsf@vajain21.in.ibm.com>
+        id S234343AbhCXQ0R (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 24 Mar 2021 12:26:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47102 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233182AbhCXQZx (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 24 Mar 2021 12:25:53 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 636E8C061763
+        for <kvm-ppc@vger.kernel.org>; Wed, 24 Mar 2021 09:25:52 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id h8so1200619plt.7
+        for <kvm-ppc@vger.kernel.org>; Wed, 24 Mar 2021 09:25:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=4x0pTl7vu9u+HKRmu4XTYvejN4k4GGeXIB+STZwV3gU=;
+        b=h9oN+J12WVhNriNkY7c/yOu/Z4dUkL9/M+vFUkvaqxw/qhHQ558xDA2Voc2vm79bCT
+         IHMpEnJucyJJ6h5t4jU2nbooCQHPvSyIEl1Wg1++4ilwxMLmmCSwrW7mi2zwqkXJaGRP
+         ebbdBtG52+EjmSzOsyj9BS6lSn2y+ziTm5Ku+zKpNM30pIQQ6WjsWILwBY6/nX/2x9T1
+         FH9XlPWl6+jij5SkPzEK2QGWdg8NDNvw/fKjIjXslrMKGS2CPPm2jGk7dwtnS+KtpFAb
+         o1ZIOtHspDM3BScaP7ok1sg7D6ixRV4tc25tujB/d1kD/ljzKoM2tgPMmAij5giZC3db
+         MG+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=4x0pTl7vu9u+HKRmu4XTYvejN4k4GGeXIB+STZwV3gU=;
+        b=SHmzlw42hhOWVTepgXK4k8JGKB7KAdPjJCzWUMnEe4sHg5sQbZ6eIe+hOXMWrEqVcZ
+         XW2uX1SbSqJRNIEIGqDhfqdpVZwD2VxtCBBHU0qmS/R3iqerDegPWgX0eSILhRcuRaWQ
+         J93p/JnC2zUq7FU3BodW38GxvleiDH68IbmfChW+Nc1MEmhj6s/s8LnDz0Fu5b75ZoRe
+         qa48l/Ozl4avyUkLilVU2rQayMo5ZAXRvjfMa5M6SKOuDlkFuLvh4gZuvGzRLiO2Kalz
+         y9S4DTAVkavUzuTgYa1k/PfzFFjR1Yq8p0HQIxvO/y0N4BBgPMBmoZNpqMxzVSwM/3Zw
+         /r4A==
+X-Gm-Message-State: AOAM533GxJp3k5bMfbmn1JdtQttBJVOa1yEozgw8A7WjQwYEgMMyIH/U
+        qHYxaMupG9nQgSttcgB//eE6N1moyEw=
+X-Google-Smtp-Source: ABdhPJzlEk3keginYgtSSKRq6i1wwXwj0Tvn8NcU4HEefS9F6DT4HNdJ4jsyySY7QOBkRMtZjdnFww==
+X-Received: by 2002:a17:902:d888:b029:e6:1ca1:d7f9 with SMTP id b8-20020a170902d888b02900e61ca1d7f9mr4470860plz.17.1616603151443;
+        Wed, 24 Mar 2021 09:25:51 -0700 (PDT)
+Received: from localhost ([1.132.216.217])
+        by smtp.gmail.com with ESMTPSA id a13sm2836081pgm.43.2021.03.24.09.25.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Mar 2021 09:25:50 -0700 (PDT)
+Date:   Thu, 25 Mar 2021 02:25:43 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v4 00/46] KVM: PPC: Book3S: C-ify the P9 entry/exit code
+To:     kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org
+References: <20210323010305.1045293-1-npiggin@gmail.com>
+In-Reply-To: <20210323010305.1045293-1-npiggin@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-24_05:2021-03-24,2021-03-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1011
- bulkscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0 mlxlogscore=999
- adultscore=0 impostorscore=0 spamscore=0 malwarescore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103240073
+Message-Id: <1616602979.lxwl22jihw.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Excerpts from Nicholas Piggin's message of March 23, 2021 11:02 am:
+> I think enough changes and fixes have gone in since last round
+> to repost.
+>=20
+> I put a git tree here to make things easier to get.
+>=20
+> https://github.com/npiggin/linux/tree/kvm-in-c-2
 
-Hi Shiva,
+I just pushed a new tree https://github.com/npiggin/linux/tree/kvm-in-c-3
 
-Thanks for the patch. Few minor review comments:
+This mainly fixes up the compile error with older binutils and PR=3D1=20
+hcall reflection into guest for PR KVM. Haven't been able to completely=20
+test PR KVM because of unrelated connectivity issues but at least the
+PR=3D1 syscall reflection is working again.
 
-Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
-
-> Add support for ND_REGION_ASYNC capability if the device tree
-> indicates 'ibm,hcall-flush-required' property in the NVDIMM node.
-> Flush is done by issuing H_SCM_FLUSH hcall to the hypervisor.
->
-> If the flush request failed, the hypervisor is expected to
-> to reflect the problem in the subsequent dimm health request call.
-s/dimm/nvdimm
-s/health request call/H_SCM_HEALTH hcall/
-
->
-> This patch prevents mmap of namespaces with MAP_SYNC flag if the
-> nvdimm requires explicit flush[1].
-s/explicit/an explicit/
-
->
-> References:
-> [1] https://github.com/avocado-framework-tests/avocado-misc-tests/blob/master/memory/ndctl.py.data/map_sync.c
->
-> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-> ---
-> v1 - https://www.spinics.net/lists/kvm-ppc/msg18272.html
-> Changes from v1:
->        - Hcall semantics finalized, all changes are to accomodate them.
->
->  Documentation/powerpc/papr_hcalls.rst     |   14 ++++++++++
->  arch/powerpc/include/asm/hvcall.h         |    3 +-
->  arch/powerpc/platforms/pseries/papr_scm.c |   39 +++++++++++++++++++++++++++++
->  3 files changed, 55 insertions(+), 1 deletion(-)
->
-> diff --git a/Documentation/powerpc/papr_hcalls.rst b/Documentation/powerpc/papr_hcalls.rst
-> index 48fcf1255a33..648f278eea8f 100644
-> --- a/Documentation/powerpc/papr_hcalls.rst
-> +++ b/Documentation/powerpc/papr_hcalls.rst
-> @@ -275,6 +275,20 @@ Health Bitmap Flags:
->  Given a DRC Index collect the performance statistics for NVDIMM and copy them
->  to the resultBuffer.
->  
-> +**H_SCM_FLUSH**
-> +
-> +| Input: *drcIndex, continue-token*
-> +| Out: *continue-token*
-> +| Return Value: *H_SUCCESS, H_Parameter, H_P2, H_BUSY*
-> +
-> +Given a DRC Index Flush the data to backend NVDIMM device.
-> +
-> +The hcall returns H_BUSY when the flush takes longer time and the hcall needs
-> +to be issued multiple times in order to be completely serviced. The
-> +*continue-token* from the output to be passed in the argument list of
-> +subsequent hcalls to the hypervisor until the hcall is completely serviced
-> +at which point H_SUCCESS or other error is returned by the hypervisor.
-> +
->  References
->  ==========
->  .. [1] "Power Architecture Platform Reference"
-> diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
-> index ed6086d57b22..9f7729a97ebd 100644
-> --- a/arch/powerpc/include/asm/hvcall.h
-> +++ b/arch/powerpc/include/asm/hvcall.h
-> @@ -315,7 +315,8 @@
->  #define H_SCM_HEALTH            0x400
->  #define H_SCM_PERFORMANCE_STATS 0x418
->  #define H_RPT_INVALIDATE	0x448
-> -#define MAX_HCALL_OPCODE	H_RPT_INVALIDATE
-> +#define H_SCM_FLUSH		0x44C
-> +#define MAX_HCALL_OPCODE	H_SCM_FLUSH
->  
->  /* Scope args for H_SCM_UNBIND_ALL */
->  #define H_UNBIND_SCOPE_ALL (0x1)
-> diff --git a/arch/powerpc/platforms/pseries/papr_scm.c b/arch/powerpc/platforms/pseries/papr_scm.c
-> index 835163f54244..f0407e135410 100644
-> --- a/arch/powerpc/platforms/pseries/papr_scm.c
-> +++ b/arch/powerpc/platforms/pseries/papr_scm.c
-> @@ -93,6 +93,7 @@ struct papr_scm_priv {
->  	uint64_t block_size;
->  	int metadata_size;
->  	bool is_volatile;
-> +	bool hcall_flush_required;
->  
->  	uint64_t bound_addr;
->  
-> @@ -117,6 +118,38 @@ struct papr_scm_priv {
->  	size_t stat_buffer_len;
->  };
->  
-> +static int papr_scm_pmem_flush(struct nd_region *nd_region,
-> +			       struct bio *bio __maybe_unused)
-> +{
-> +	struct papr_scm_priv *p = nd_region_provider_data(nd_region);
-> +	unsigned long ret_buf[PLPAR_HCALL_BUFSIZE];
-> +	uint64_t token = 0;
-> +	int64_t rc;
-> +
-Suggest adding a dev_dbg to to indicate a flush request to a drc. That
-way if the loop below gets stuck the issue can be debugged with kernel
-logs.
-> +	do {
-> +		rc = plpar_hcall(H_SCM_FLUSH, ret_buf, p->drc_index, token);
-> +		token = ret_buf[0];
-> +
-> +		/* Check if we are stalled for some time */
-> +		if (H_IS_LONG_BUSY(rc)) {
-> +			msleep(get_longbusy_msecs(rc));
-> +			rc = H_BUSY;
-> +		} else if (rc == H_BUSY) {
-> +			cond_resched();
-> +		}
-> +
-> +	} while (rc == H_BUSY);
-> +
-> +	if (rc) {
-> +		dev_err(&p->pdev->dev, "flush error: %lld", rc);
-> +		rc = -EIO;
-> +	} else {
-> +		dev_dbg(&p->pdev->dev, "flush drc 0x%x complete", p->drc_index);
-> +	}
-> +
-> +	return rc;
-> +}
-> +
->  static LIST_HEAD(papr_nd_regions);
->  static DEFINE_MUTEX(papr_ndr_lock);
->  
-> @@ -943,6 +976,11 @@ static int papr_scm_nvdimm_init(struct papr_scm_priv *p)
->  	ndr_desc.num_mappings = 1;
->  	ndr_desc.nd_set = &p->nd_set;
->  
-> +	if (p->hcall_flush_required) {
-> +		set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> +		ndr_desc.flush = papr_scm_pmem_flush;
-> +	}
-> +
->  	if (p->is_volatile)
->  		p->region = nvdimm_volatile_region_create(p->bus, &ndr_desc);
->  	else {
-> @@ -1088,6 +1126,7 @@ static int papr_scm_probe(struct platform_device *pdev)
->  	p->block_size = block_size;
->  	p->blocks = blocks;
->  	p->is_volatile = !of_property_read_bool(dn, "ibm,cache-flush-required");
-> +	p->hcall_flush_required = of_property_read_bool(dn, "ibm,hcall-flush-required");
->  
->  	/* We just need to ensure that set cookies are unique across */
->  	uuid_parse(uuid_str, (uuid_t *) uuid);
->
->
-
--- 
-Cheers
-~ Vaibhav
+Thanks,
+Nick
