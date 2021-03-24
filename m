@@ -2,254 +2,226 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AAFC347067
-	for <lists+kvm-ppc@lfdr.de>; Wed, 24 Mar 2021 05:10:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BA94347519
+	for <lists+kvm-ppc@lfdr.de>; Wed, 24 Mar 2021 10:54:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230093AbhCXEKN (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 24 Mar 2021 00:10:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54152 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229981AbhCXEJt (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 24 Mar 2021 00:09:49 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12O42V4i152766;
-        Wed, 24 Mar 2021 00:09:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=XY6SbxBdSU2klpbls3BlaTAxr4kI1ilBR3lspyeVJkg=;
- b=gYFx/+qAKWvHmZgaMQC6qriUKz0LBMt2GVe7d+nqwb9Qo+1FPlNk/dROr2U19seSfKCL
- oBXpXIbN8rqo3K2VdbSWe89QR1MWcBicsFHG0pXFScg4dfSTMT6/Xv1w05d5+3U7ZzhY
- m1pnf5zrOPYqiNhThCMbdt8zZCrPvx6/zKlv9rrV9vJtvU8B48koIL0bMqR8G6IHcG87
- coEWKOqq6IymblL7ZBIN0f6X2v0iJRd1uqsA1m0hvr4OVIC+JyZv6RVxzFlhH/pnR2Vw
- cR8urYQwZzSYh+amo/IFNtPeHp345+Mm0rr90s92JprlMEkZG5oA+R47rxIU3NSSlmWt tQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37fsm0dgpr-1
+        id S232697AbhCXJx3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 24 Mar 2021 05:53:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13300 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232606AbhCXJxW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 24 Mar 2021 05:53:22 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12O9jFRC012057;
+        Wed, 24 Mar 2021 05:53:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=ocCPFyKvRr5NDa92QQBD8pRnFYdsyCVfW9sKZswguk0=;
+ b=tUpROK0WqJa+voAG+ENkRadSWrtkO9RAklzBs0PS3m4YmO3NEmUMQm7lopSla4ozPz/E
+ F1+oEnSdWr4PK+b5NVWAig6STRa5ILZ+Cs1zRtznQwWUJGqogNE8jOOAoGtfK5ys+8Vf
+ UuqzQTbBs7wkbONkWwQw5OKMY2/THNhT8YjzrJIfpk5R6yMeJs+aBBF0mdcyE8ov+jCm
+ yWukDX8MEoM79x8DCJBBQGsyEPHbdet8oNJO3lGqEhKUStytVaPMbXlMt1aO5vEE+J28
+ BYki4B6pJfY2WGtS1EbXkVBGOlB4R4K91mMiidSsr1aOg6eKXj+kpMsqPqzLbko5IHyu +A== 
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37g32kr7b7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Mar 2021 00:09:39 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12O49dYs172948;
-        Wed, 24 Mar 2021 00:09:39 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37fsm0dgpa-1
+        Wed, 24 Mar 2021 05:53:17 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12O9o4DE018694;
+        Wed, 24 Mar 2021 09:53:15 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 37d9bya6jj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Mar 2021 00:09:38 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12O47La1012636;
-        Wed, 24 Mar 2021 04:09:37 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 37d9bpt2f5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Mar 2021 04:09:37 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12O49Yf063898014
+        Wed, 24 Mar 2021 09:53:15 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12O9qs6x33947976
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 24 Mar 2021 04:09:34 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C939F4C04A;
-        Wed, 24 Mar 2021 04:09:34 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 889E24C044;
-        Wed, 24 Mar 2021 04:09:31 +0000 (GMT)
-Received: from [9.85.94.223] (unknown [9.85.94.223])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 24 Mar 2021 04:09:31 +0000 (GMT)
-Subject: Re: [PATCH v3 3/3] spapr: nvdimm: Enable sync-dax device property for
- nvdimm
-To:     David Gibson <david@gibson.dropbear.id.au>,
-        Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Cc:     sbhat@linux.vnet.ibm.com, groug@kaod.org, qemu-ppc@nongnu.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
-        imammedo@redhat.com, xiaoguangrong.eric@gmail.com,
-        qemu-devel@nongnu.org, linux-nvdimm@lists.01.org,
-        kvm-ppc@vger.kernel.org, shivaprasadbhat@gmail.com,
-        bharata@linux.vnet.ibm.com
-References: <161650723087.2959.8703728357980727008.stgit@6532096d84d3>
- <161650726635.2959.677683611241665210.stgit@6532096d84d3>
- <YFqtZv6Bt/oiAF6C@yekko.fritz.box>
-From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-Message-ID: <e0241044-f5f5-5708-3ad5-e16920669b92@linux.ibm.com>
-Date:   Wed, 24 Mar 2021 09:39:30 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        Wed, 24 Mar 2021 09:52:54 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5BFB152054;
+        Wed, 24 Mar 2021 09:53:12 +0000 (GMT)
+Received: from vajain21.in.ibm.com (unknown [9.77.202.127])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id 62A365204E;
+        Wed, 24 Mar 2021 09:53:09 +0000 (GMT)
+Received: by vajain21.in.ibm.com (sSMTP sendmail emulation); Wed, 24 Mar 2021 15:23:08 +0530
+From:   Vaibhav Jain <vaibhav@linux.ibm.com>
+To:     Shivaprasad G Bhat <sbhat@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-nvdimm@lists.01.org, aneesh.kumar@linux.ibm.com,
+        ellerman@au1.ibm.com
+Cc:     sbhat@linux.vnet.ibm.com, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2] powerpc/papr_scm: Implement support for H_SCM_FLUSH
+ hcall
+In-Reply-To: <161651910115.13873.14215644994307713797.stgit@6532096d84d3>
+References: <161651910115.13873.14215644994307713797.stgit@6532096d84d3>
+Date:   Wed, 24 Mar 2021 15:23:08 +0530
+Message-ID: <87pmzo3mkb.fsf@vajain21.in.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <YFqtZv6Bt/oiAF6C@yekko.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-24_03:2021-03-23,2021-03-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
- mlxlogscore=999 clxscore=1015 impostorscore=0 suspectscore=0
- malwarescore=0 mlxscore=0 priorityscore=1501 bulkscore=0 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103240029
+ definitions=2021-03-24_05:2021-03-24,2021-03-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1011
+ bulkscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0 mlxlogscore=999
+ adultscore=0 impostorscore=0 spamscore=0 malwarescore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103240073
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 3/24/21 8:39 AM, David Gibson wrote:
-> On Tue, Mar 23, 2021 at 09:47:55AM -0400, Shivaprasad G Bhat wrote:
->> The patch adds the 'sync-dax' property to the nvdimm device.
->>
->> When the sync-dax is 'off', the device tree property
->> "hcall-flush-required" is added to the nvdimm node which makes the
->> guest to issue H_SCM_FLUSH hcalls to request for flushes explicitly.
->> This would be the default behaviour without sync-dax property set
->> for the nvdimm device.
->>
->> The sync-dax="on" would mean the guest need not make flush requests
->> to the qemu. On previous machine versions the sync-dax is set to be
->> "on" by default using the hw_compat magic.
->>
->> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
->> ---
->>   hw/core/machine.c       |    1 +
->>   hw/mem/nvdimm.c         |    1 +
->>   hw/ppc/spapr_nvdimm.c   |   17 +++++++++++++++++
->>   include/hw/mem/nvdimm.h |   10 ++++++++++
->>   include/hw/ppc/spapr.h  |    1 +
->>   5 files changed, 30 insertions(+)
->>
->> diff --git a/hw/core/machine.c b/hw/core/machine.c
->> index 257a664ea2..f843643574 100644
->> --- a/hw/core/machine.c
->> +++ b/hw/core/machine.c
->> @@ -41,6 +41,7 @@ GlobalProperty hw_compat_5_2[] = {
->>       { "PIIX4_PM", "smm-compat", "on"},
->>       { "virtio-blk-device", "report-discard-granularity", "off" },
->>       { "virtio-net-pci", "vectors", "3"},
->> +    { "nvdimm", "sync-dax", "on" },
->>   };
->>   const size_t hw_compat_5_2_len = G_N_ELEMENTS(hw_compat_5_2);
->>   
->> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
->> index 7397b67156..8f0e29b191 100644
->> --- a/hw/mem/nvdimm.c
->> +++ b/hw/mem/nvdimm.c
->> @@ -229,6 +229,7 @@ static void nvdimm_write_label_data(NVDIMMDevice *nvdimm, const void *buf,
->>   
->>   static Property nvdimm_properties[] = {
->>       DEFINE_PROP_BOOL(NVDIMM_UNARMED_PROP, NVDIMMDevice, unarmed, false),
->> +    DEFINE_PROP_BOOL(NVDIMM_SYNC_DAX_PROP, NVDIMMDevice, sync_dax, false),
-> 
-> I'm a bit uncomfortable adding this base NVDIMM property without at
-> least some logic about how it's handled on non-PAPR platforms.
 
-yes these should be specific to PAPR. These are there to handle 
-migration. with older guest. We can use the backing file to determine 
-synchronous dax support. if it is a file backed nvdimm on a fsdax mount 
-point, we can do synchronous dax. If it is one on a non dax file system 
-synchronous dax can be disabled.
+Hi Shiva,
 
-> 
->>       DEFINE_PROP_END_OF_LIST(),
->>   };
->>   
->> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
->> index 883317c1ed..dd1c90251b 100644
->> --- a/hw/ppc/spapr_nvdimm.c
->> +++ b/hw/ppc/spapr_nvdimm.c
->> @@ -125,6 +125,9 @@ static int spapr_dt_nvdimm(SpaprMachineState *spapr, void *fdt,
->>       uint64_t lsize = nvdimm->label_size;
->>       uint64_t size = object_property_get_int(OBJECT(nvdimm), PC_DIMM_SIZE_PROP,
->>                                               NULL);
->> +    bool sync_dax = object_property_get_bool(OBJECT(nvdimm),
->> +                                             NVDIMM_SYNC_DAX_PROP,
->> +                                             &error_abort);
->>   
->>       drc = spapr_drc_by_id(TYPE_SPAPR_DRC_PMEM, slot);
->>       g_assert(drc);
->> @@ -159,6 +162,11 @@ static int spapr_dt_nvdimm(SpaprMachineState *spapr, void *fdt,
->>                                "operating-system")));
->>       _FDT(fdt_setprop(fdt, child_offset, "ibm,cache-flush-required", NULL, 0));
->>   
->> +    if (!sync_dax) {
->> +        _FDT(fdt_setprop(fdt, child_offset, "ibm,hcall-flush-required",
->> +                         NULL, 0));
->> +    }
->> +
->>       return child_offset;
->>   }
->>   
->> @@ -567,10 +575,12 @@ static target_ulong h_scm_flush(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>                                         target_ulong opcode, target_ulong *args)
->>   {
->>       int ret;
->> +    bool sync_dax;
->>       uint32_t drc_index = args[0];
->>       uint64_t continue_token = args[1];
->>       SpaprDrc *drc = spapr_drc_by_index(drc_index);
->>       PCDIMMDevice *dimm;
->> +    NVDIMMDevice *nvdimm;
->>       HostMemoryBackend *backend = NULL;
->>       SpaprNVDIMMDeviceFlushState *state;
->>       ThreadPool *pool = aio_get_thread_pool(qemu_get_aio_context());
->> @@ -580,6 +590,13 @@ static target_ulong h_scm_flush(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>           return H_PARAMETER;
->>       }
->>   
->> +    nvdimm = NVDIMM(drc->dev);
->> +    sync_dax = object_property_get_bool(OBJECT(nvdimm), NVDIMM_SYNC_DAX_PROP,
->> +                                        &error_abort);
->> +    if (sync_dax) {
->> +        return H_UNSUPPORTED;
-> 
-> Do you want to return UNSUPPORTED here, or just H_SUCCESS, since the
-> flush should be a no-op in this case.
+Thanks for the patch. Few minor review comments:
 
+Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
 
-The reason to handle this as error is to indicate the OS that it is 
-using a wrong mechanism to flush.
+> Add support for ND_REGION_ASYNC capability if the device tree
+> indicates 'ibm,hcall-flush-required' property in the NVDIMM node.
+> Flush is done by issuing H_SCM_FLUSH hcall to the hypervisor.
+>
+> If the flush request failed, the hypervisor is expected to
+> to reflect the problem in the subsequent dimm health request call.
+s/dimm/nvdimm
+s/health request call/H_SCM_HEALTH hcall/
 
-> 
->> +    }
->> +
->>       if (continue_token != 0) {
->>           ret = spapr_nvdimm_get_flush_status(continue_token);
->>           if (H_IS_LONG_BUSY(ret)) {
->> diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
->> index bcf62f825c..f82979cf2f 100644
->> --- a/include/hw/mem/nvdimm.h
->> +++ b/include/hw/mem/nvdimm.h
->> @@ -51,6 +51,7 @@ OBJECT_DECLARE_TYPE(NVDIMMDevice, NVDIMMClass, NVDIMM)
->>   #define NVDIMM_LABEL_SIZE_PROP "label-size"
->>   #define NVDIMM_UUID_PROP       "uuid"
->>   #define NVDIMM_UNARMED_PROP    "unarmed"
->> +#define NVDIMM_SYNC_DAX_PROP   "sync-dax"
->>   
->>   struct NVDIMMDevice {
->>       /* private */
->> @@ -85,6 +86,15 @@ struct NVDIMMDevice {
->>        */
->>       bool unarmed;
->>   
->> +    /*
->> +     * On PPC64,
->> +     * The 'off' value results in the hcall-flush-required property set
->> +     * in the device tree for pseries machines. When 'off', the guest
->> +     * initiates explicit flush requests to the backend device ensuring
->> +     * write persistence.
->> +     */
->> +    bool sync_dax;
->> +
->>       /*
->>        * The PPC64 - spapr requires each nvdimm device have a uuid.
->>        */
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 7c27fb3e2d..51c35488a4 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -333,6 +333,7 @@ struct SpaprMachineState {
->>   #define H_P7              -60
->>   #define H_P8              -61
->>   #define H_P9              -62
->> +#define H_UNSUPPORTED     -67
->>   #define H_OVERLAP         -68
->>   #define H_UNSUPPORTED_FLAG -256
->>   #define H_MULTI_THREADS_ACTIVE -9005
->>
->>
-> 
+>
+> This patch prevents mmap of namespaces with MAP_SYNC flag if the
+> nvdimm requires explicit flush[1].
+s/explicit/an explicit/
 
+>
+> References:
+> [1] https://github.com/avocado-framework-tests/avocado-misc-tests/blob/master/memory/ndctl.py.data/map_sync.c
+>
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+> ---
+> v1 - https://www.spinics.net/lists/kvm-ppc/msg18272.html
+> Changes from v1:
+>        - Hcall semantics finalized, all changes are to accomodate them.
+>
+>  Documentation/powerpc/papr_hcalls.rst     |   14 ++++++++++
+>  arch/powerpc/include/asm/hvcall.h         |    3 +-
+>  arch/powerpc/platforms/pseries/papr_scm.c |   39 +++++++++++++++++++++++++++++
+>  3 files changed, 55 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/powerpc/papr_hcalls.rst b/Documentation/powerpc/papr_hcalls.rst
+> index 48fcf1255a33..648f278eea8f 100644
+> --- a/Documentation/powerpc/papr_hcalls.rst
+> +++ b/Documentation/powerpc/papr_hcalls.rst
+> @@ -275,6 +275,20 @@ Health Bitmap Flags:
+>  Given a DRC Index collect the performance statistics for NVDIMM and copy them
+>  to the resultBuffer.
+>  
+> +**H_SCM_FLUSH**
+> +
+> +| Input: *drcIndex, continue-token*
+> +| Out: *continue-token*
+> +| Return Value: *H_SUCCESS, H_Parameter, H_P2, H_BUSY*
+> +
+> +Given a DRC Index Flush the data to backend NVDIMM device.
+> +
+> +The hcall returns H_BUSY when the flush takes longer time and the hcall needs
+> +to be issued multiple times in order to be completely serviced. The
+> +*continue-token* from the output to be passed in the argument list of
+> +subsequent hcalls to the hypervisor until the hcall is completely serviced
+> +at which point H_SUCCESS or other error is returned by the hypervisor.
+> +
+>  References
+>  ==========
+>  .. [1] "Power Architecture Platform Reference"
+> diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
+> index ed6086d57b22..9f7729a97ebd 100644
+> --- a/arch/powerpc/include/asm/hvcall.h
+> +++ b/arch/powerpc/include/asm/hvcall.h
+> @@ -315,7 +315,8 @@
+>  #define H_SCM_HEALTH            0x400
+>  #define H_SCM_PERFORMANCE_STATS 0x418
+>  #define H_RPT_INVALIDATE	0x448
+> -#define MAX_HCALL_OPCODE	H_RPT_INVALIDATE
+> +#define H_SCM_FLUSH		0x44C
+> +#define MAX_HCALL_OPCODE	H_SCM_FLUSH
+>  
+>  /* Scope args for H_SCM_UNBIND_ALL */
+>  #define H_UNBIND_SCOPE_ALL (0x1)
+> diff --git a/arch/powerpc/platforms/pseries/papr_scm.c b/arch/powerpc/platforms/pseries/papr_scm.c
+> index 835163f54244..f0407e135410 100644
+> --- a/arch/powerpc/platforms/pseries/papr_scm.c
+> +++ b/arch/powerpc/platforms/pseries/papr_scm.c
+> @@ -93,6 +93,7 @@ struct papr_scm_priv {
+>  	uint64_t block_size;
+>  	int metadata_size;
+>  	bool is_volatile;
+> +	bool hcall_flush_required;
+>  
+>  	uint64_t bound_addr;
+>  
+> @@ -117,6 +118,38 @@ struct papr_scm_priv {
+>  	size_t stat_buffer_len;
+>  };
+>  
+> +static int papr_scm_pmem_flush(struct nd_region *nd_region,
+> +			       struct bio *bio __maybe_unused)
+> +{
+> +	struct papr_scm_priv *p = nd_region_provider_data(nd_region);
+> +	unsigned long ret_buf[PLPAR_HCALL_BUFSIZE];
+> +	uint64_t token = 0;
+> +	int64_t rc;
+> +
+Suggest adding a dev_dbg to to indicate a flush request to a drc. That
+way if the loop below gets stuck the issue can be debugged with kernel
+logs.
+> +	do {
+> +		rc = plpar_hcall(H_SCM_FLUSH, ret_buf, p->drc_index, token);
+> +		token = ret_buf[0];
+> +
+> +		/* Check if we are stalled for some time */
+> +		if (H_IS_LONG_BUSY(rc)) {
+> +			msleep(get_longbusy_msecs(rc));
+> +			rc = H_BUSY;
+> +		} else if (rc == H_BUSY) {
+> +			cond_resched();
+> +		}
+> +
+> +	} while (rc == H_BUSY);
+> +
+> +	if (rc) {
+> +		dev_err(&p->pdev->dev, "flush error: %lld", rc);
+> +		rc = -EIO;
+> +	} else {
+> +		dev_dbg(&p->pdev->dev, "flush drc 0x%x complete", p->drc_index);
+> +	}
+> +
+> +	return rc;
+> +}
+> +
+>  static LIST_HEAD(papr_nd_regions);
+>  static DEFINE_MUTEX(papr_ndr_lock);
+>  
+> @@ -943,6 +976,11 @@ static int papr_scm_nvdimm_init(struct papr_scm_priv *p)
+>  	ndr_desc.num_mappings = 1;
+>  	ndr_desc.nd_set = &p->nd_set;
+>  
+> +	if (p->hcall_flush_required) {
+> +		set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
+> +		ndr_desc.flush = papr_scm_pmem_flush;
+> +	}
+> +
+>  	if (p->is_volatile)
+>  		p->region = nvdimm_volatile_region_create(p->bus, &ndr_desc);
+>  	else {
+> @@ -1088,6 +1126,7 @@ static int papr_scm_probe(struct platform_device *pdev)
+>  	p->block_size = block_size;
+>  	p->blocks = blocks;
+>  	p->is_volatile = !of_property_read_bool(dn, "ibm,cache-flush-required");
+> +	p->hcall_flush_required = of_property_read_bool(dn, "ibm,hcall-flush-required");
+>  
+>  	/* We just need to ensure that set cookies are unique across */
+>  	uuid_parse(uuid_str, (uuid_t *) uuid);
+>
+>
+
+-- 
+Cheers
+~ Vaibhav
