@@ -2,151 +2,137 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ABC3349FB4
-	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Mar 2021 03:21:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8430C34A8D1
+	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Mar 2021 14:47:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230222AbhCZCVY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 25 Mar 2021 22:21:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35494 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231421AbhCZCUw (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 25 Mar 2021 22:20:52 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F219C061763
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Mar 2021 19:20:52 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id o129so8213180ybg.23
-        for <kvm-ppc@vger.kernel.org>; Thu, 25 Mar 2021 19:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=EpijQ6V8FeVDkD7HX5egdlZ4dc07ENH1xKoxF44zfAY=;
-        b=vurensVFR3hrXyY1NMdpbwaru8VIWvzupZGNxIORfKUkaj6cZcAwrW4S7ZbldvFW0e
-         1pj7Sjtemz800HdNKoZvFp6F7/aMexhzotPHhhv54wbWGG2b5JKTkMRv9BDbN2E4Ey9T
-         8eW4Z03xVOLOX0hzRddgLv1Chs8SDkxnX6z2o6MpxhGggyvr5FcOq858GvWl6ZoPED7P
-         ykGFvoJ6wUIWXZYSEL8RaJGkOTiUZy0E1yO+uZS3qT3g2YOPbNYhWH0rLNLhU1rTGhtk
-         ls/hhgkUIDYTaauJwhgRarI2uGASQOz/snbsTpI3O7d7JXOpGXiLwzhMRARvAh1o2E/F
-         NZog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=EpijQ6V8FeVDkD7HX5egdlZ4dc07ENH1xKoxF44zfAY=;
-        b=bctnXnY2BUWyERIIZ7jim8o9VGn27tJx206tL3mbI8+XUfmHJSzlDU5OvWbPLSF67s
-         dbjfj5+secJnyNzbqDIVTyiKMfjlxFilBQSGtUqCZSEmvKSRZ9gFLNUpNtZbQZJnF7pW
-         X5VJha+LgV3bH3ROxw+4dhigqE0Rt+cFuZSM6cIADnu+3qeIeyxWEJJFjE2wzHgLO2A4
-         VRMJMh0qb7FnKIFJLFl1dkVNd3Ug0nE9YzAkSFE+8ulKnwxdwJAw94YbXI5wPa2lpu9N
-         gjJi8T2cy4+H5v8riKXxrBlQGXnfSpnHFmSxKGfI1pwyJ1kmT0ed7ECf7IrrOJOUkeGu
-         a6Tg==
-X-Gm-Message-State: AOAM533poG0A6Gh+CqFXc+PH5gF1hpn09T3TJoowVjsu5f9vbfGlh+Th
-        msTgcQRDCwxq+S7HNZ0Fe0Gjuh0tmKM=
-X-Google-Smtp-Source: ABdhPJzbNsIM618ZsZ/2M+kNXws+VM2rkDgsqZ/Jk+w2Zs+6fUW+W9XFuUI0Kj8VYAgdnJCOOVd45R9L9lU=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:b1bb:fab2:7ef5:fc7d])
- (user=seanjc job=sendgmr) by 2002:a25:adc5:: with SMTP id d5mr15715734ybe.361.1616725251714;
- Thu, 25 Mar 2021 19:20:51 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Mar 2021 19:19:57 -0700
-In-Reply-To: <20210326021957.1424875-1-seanjc@google.com>
-Message-Id: <20210326021957.1424875-19-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210326021957.1424875-1-seanjc@google.com>
-X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [PATCH 18/18] KVM: x86/mmu: Drop trace_kvm_age_page() tracepoint
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S231214AbhCZNq6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 26 Mar 2021 09:46:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22044 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230282AbhCZNp7 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 26 Mar 2021 09:45:59 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12QDYFhK012278;
+        Fri, 26 Mar 2021 09:45:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=hN0aKM+lO6uutXnfbRXmXi0g8UDR1FbhTJDTauPMVfA=;
+ b=KW5iwY4LBagg3jAZK0EPVylMDgcApBiM/dnAooLxKwxoPpvKN+DEbPEtfWukve5Yo8Hu
+ 1zdlfsK7zLkFdaHRWXk7wW5F+cldOG+WxmVmk3mk9sdzsEVt5IxuhOqrgA62XHWbiG6g
+ 5Tg9HeDylYCJzRdKHA3TPSWXsuqYf9dnDIjKGps8IuO094f10S2jcTWawhpAl9hnTVs4
+ R1Jb7mj+X7VXNPwqw0WeTS1r9VPsIoZi3rLp3CYVfgqlHmDMssFqfjNUTS9st1tEAbuH
+ CrPEQTIp0aptspzugQ9SzEfdW+NDcncZWcDoaJnMUC6T8haHxCqgB9Q4KYgC1BKTFEP/ pg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37hcdufnb5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Mar 2021 09:45:43 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12QDYjL5018182;
+        Fri, 26 Mar 2021 09:45:43 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37hcdufn93-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Mar 2021 09:45:43 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12QDhoJJ028750;
+        Fri, 26 Mar 2021 13:45:40 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 37h14vgc2v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Mar 2021 13:45:40 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12QDjc8T45941002
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 26 Mar 2021 13:45:38 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EE3BD5204E;
+        Fri, 26 Mar 2021 13:45:37 +0000 (GMT)
+Received: from [9.199.49.154] (unknown [9.199.49.154])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A538B52054;
+        Fri, 26 Mar 2021 13:45:33 +0000 (GMT)
+Subject: Re: [PATCH v3 2/3] spapr: nvdimm: Implement H_SCM_FLUSH hcall
+To:     David Gibson <david@gibson.dropbear.id.au>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+Cc:     sbhat@linux.vnet.ibm.com, groug@kaod.org, qemu-ppc@nongnu.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
+        imammedo@redhat.com, xiaoguangrong.eric@gmail.com,
+        qemu-devel@nongnu.org, linux-nvdimm@lists.01.org,
+        kvm-ppc@vger.kernel.org, shivaprasadbhat@gmail.com,
+        bharata@linux.vnet.ibm.com
+References: <161650723087.2959.8703728357980727008.stgit@6532096d84d3>
+ <161650725183.2959.12071056430236337803.stgit@6532096d84d3>
+ <YFqs8M1dHAFhdCL6@yekko.fritz.box>
+ <19b5aa0b-df85-256d-d4c4-eacd0ea8312e@linux.ibm.com>
+ <YFvsmKiXtb+h9HBO@yekko.fritz.box>
+From:   Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Message-ID: <8c642adb-7c07-41e1-07d0-f23bb6c2f865@linux.ibm.com>
+Date:   Fri, 26 Mar 2021 19:15:32 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
+MIME-Version: 1.0
+In-Reply-To: <YFvsmKiXtb+h9HBO@yekko.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: TfjaPP-Svek39ukV1IUMfj-VmbPxt41r
+X-Proofpoint-ORIG-GUID: 9jkdStyqWjplPIyzdFqhl-2TNvJTeUAy
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-26_06:2021-03-26,2021-03-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ priorityscore=1501 spamscore=0 impostorscore=0 phishscore=0
+ mlxlogscore=887 clxscore=1015 lowpriorityscore=0 bulkscore=0
+ malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2103250000 definitions=main-2103260103
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Remove x86's trace_kvm_age_page() tracepoint.  It's mostly redundant with
-the common trace_kvm_age_hva() tracepoint, and if there is a need for the
-extra details, e.g. gfn, referenced, etc... those details should be added
-to the common tracepoint so that all architectures and MMUs benefit from
-the info.
+On 3/25/21 7:21 AM, David Gibson wrote:
+> On Wed, Mar 24, 2021 at 09:34:06AM +0530, Aneesh Kumar K.V wrote:
+>> On 3/24/21 8:37 AM, David Gibson wrote:
+>>> On Tue, Mar 23, 2021 at 09:47:38AM -0400, Shivaprasad G Bhat wrote:
+>>>> The patch adds support for the SCM flush hcall for the nvdimm devices.
+...
+>>>> collects all the hcall states from 'completed' list. The necessary
+>>>> nvdimm flush specific vmstate structures are added to the spapr
+>>>> machine vmstate.
+>>>>
+>>>> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+>>> An overal question: surely the same issue must arise on x86 with
+>>> file-backed NVDIMMs.  How do they handle this case?
+>> On x86 we have different ways nvdimm can be discovered. ACPI NFIT, e820 map
+>> and virtio_pmem. Among these virio_pmem always operated with synchronous dax
+>> disabled and both ACPI and e820 doesn't have the ability to differentiate
+>> support for synchronous dax.
+> Ok.  And for the virtio-pmem case, how are the extra flushes actually
+> done on x86?
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c     |  1 -
- arch/x86/kvm/mmu/tdp_mmu.c |  2 --
- include/trace/events/kvm.h | 24 ------------------------
- 3 files changed, 27 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 2070c7a91fdd..9eded46785b5 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1467,7 +1467,6 @@ static bool kvm_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 	for_each_rmap_spte(rmap_head, &iter, sptep)
- 		young |= mmu_spte_age(sptep);
- 
--	trace_kvm_age_page(gfn, level, slot, young);
- 	return young;
- }
- 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 21bb8b68a553..2941beb6559a 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -949,8 +949,6 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
- 
- 	tdp_mmu_set_spte_no_acc_track(kvm, iter, new_spte);
- 
--	trace_kvm_age_page(iter->gfn, iter->level, range->slot, true);
--
- 	return true;
- }
- 
-diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
-index 200eb7465530..37e1e1a2d67d 100644
---- a/include/trace/events/kvm.h
-+++ b/include/trace/events/kvm.h
-@@ -255,30 +255,6 @@ TRACE_EVENT(kvm_fpu,
- 	TP_printk("%s", __print_symbolic(__entry->load, kvm_fpu_load_symbol))
- );
- 
--TRACE_EVENT(kvm_age_page,
--	TP_PROTO(ulong gfn, int level, struct kvm_memory_slot *slot, int ref),
--	TP_ARGS(gfn, level, slot, ref),
--
--	TP_STRUCT__entry(
--		__field(	u64,	hva		)
--		__field(	u64,	gfn		)
--		__field(	u8,	level		)
--		__field(	u8,	referenced	)
--	),
--
--	TP_fast_assign(
--		__entry->gfn		= gfn;
--		__entry->level		= level;
--		__entry->hva		= ((gfn - slot->base_gfn) <<
--					    PAGE_SHIFT) + slot->userspace_addr;
--		__entry->referenced	= ref;
--	),
--
--	TP_printk("hva %llx gfn %llx level %u %s",
--		  __entry->hva, __entry->gfn, __entry->level,
--		  __entry->referenced ? "YOUNG" : "OLD")
--);
--
- #ifdef CONFIG_KVM_ASYNC_PF
- DECLARE_EVENT_CLASS(kvm_async_get_page_class,
- 
--- 
-2.31.0.291.g576ba9dcdaf-goog
+virtio-pmem device has virtqueue with virtio_pmem_flush() as the handler
+
+which gets called for all flush requests from guest. virtio_pmem_flush() is
+
+offloading the flush to thread pool with a worker doing fsync() and the
+
+completion callback notifying the guest with response.
+
+
+>> With that I would expect users to use virtio_pmem when using using file
+>> backed NVDIMMS
+> So... should we prevent advertising an NVDIMM through ACPI or e820 if
+> it doesn't have sync-dax enabled?
+
+
+Is it possible to have different defaults for sync-dax based on 
+architecture ?
+
+The behaviour on x86 is sync-dax=on for nvdimms. So, it would be correct to
+
+have the default as "on" for x86. For pseries -  "off" for new machines.
+
+Looking at code, I didnt find much ways to achieve this. Can you suggest
+
+what can be done ?
 
