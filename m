@@ -2,124 +2,174 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ACFD83486A7
-	for <lists+kvm-ppc@lfdr.de>; Thu, 25 Mar 2021 02:53:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D29A0349D58
+	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Mar 2021 01:09:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233644AbhCYBw5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 24 Mar 2021 21:52:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57056 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236032AbhCYBw2 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 24 Mar 2021 21:52:28 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F2FFC06174A
-        for <kvm-ppc@vger.kernel.org>; Wed, 24 Mar 2021 18:52:28 -0700 (PDT)
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4F5Slt3rD2z9sWV; Thu, 25 Mar 2021 12:52:26 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1616637146;
-        bh=578Al5e9M3P8A7FL9KWIj1AbQUSGPNviJmWDqgdKWhE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Sv4qKgf3tSVj4hyWiqB27jdFjwm+eu5rdCoZQ3lNNA2nUDlodru3ujxW1ncwJXAln
-         O2CQrs2wZMzFPw8p36uqV8zTbcuRHjgsLNmWcXMlvz2NllvuZgdhLg3+xdV+XeZwbJ
-         kUDByPSU24uc+W4xEsLHaS7ayK3fSmFffTwT8XPg=
-Date:   Thu, 25 Mar 2021 12:51:20 +1100
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-Cc:     Shivaprasad G Bhat <sbhat@linux.ibm.com>, sbhat@linux.vnet.ibm.com,
-        groug@kaod.org, qemu-ppc@nongnu.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, mst@redhat.com, imammedo@redhat.com,
-        xiaoguangrong.eric@gmail.com, qemu-devel@nongnu.org,
-        linux-nvdimm@lists.01.org, kvm-ppc@vger.kernel.org,
-        shivaprasadbhat@gmail.com, bharata@linux.vnet.ibm.com
-Subject: Re: [PATCH v3 2/3] spapr: nvdimm: Implement H_SCM_FLUSH hcall
-Message-ID: <YFvsmKiXtb+h9HBO@yekko.fritz.box>
-References: <161650723087.2959.8703728357980727008.stgit@6532096d84d3>
- <161650725183.2959.12071056430236337803.stgit@6532096d84d3>
- <YFqs8M1dHAFhdCL6@yekko.fritz.box>
- <19b5aa0b-df85-256d-d4c4-eacd0ea8312e@linux.ibm.com>
+        id S229873AbhCZAIq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 25 Mar 2021 20:08:46 -0400
+Received: from mail-bn8nam11on2067.outbound.protection.outlook.com ([40.107.236.67]:17521
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229669AbhCZAIX (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 25 Mar 2021 20:08:23 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nUbjwMnZBPqw6tSNRj/T60PgCbniElmolkVfkLpsaulZylkPZ/J+U4f+8hOcvv8xn2v44BncG0mqkH78A2EGl4n8B0dQqgB+qVMlkstsH/NVEumgPoFdBSH7lR0X1fb8rtvsq1rXIybPlGb1rxArjLdosR7W4CqwrWbby+XaIguUYFeAesxkNWyjlGDr7keWROjqdDmg+le6fKCqDbKOVc2iCfauy0E+/2oAfmOooCbYYcx88XtB+gmfC6DVu/o+eWLLuanmPp5WopBXSaqwqI2CgqTIDuxD7LQFTINbCwJuOBuFDYxxsjIU/zEoolO+f12+1o+7zRSj3PxI22F03A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7HcUM27MO/owEVgYTcHS/zla3mCdFZ6+2LZOtChNB0M=;
+ b=J/iNPHXgIYstLaWEEldZxSx8Wq+yrPxQJ5Zb89W1PbQ1kpYsQCHTuSyKZbJqpVhVuvCNtIR+qEa9C0+N7zTUOC05ditfDGXBNsldMCE6qswo4mBPgspmlW5TDy0a4uaehVfG216Es8F0CNIFIQVpLYeGlYZJaAD3lpug2z27GzPYU4aTAIT7fKbXI8I2BiomC4E9wb6FJlT9gInmL73tZBNBT5X3Az8xuw8oMpIRrUYIrT4BHE6cMv2XJ472DPc4UwerWJGOaijwgcpnwXcxz+ZC6TL2Hl6WLIHzErzq20iVtK9r59DVjb6DG0h+yq5PHa2zDIdyfuqJOo+TRsk6lA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7HcUM27MO/owEVgYTcHS/zla3mCdFZ6+2LZOtChNB0M=;
+ b=dIyS6dAxmeeVSEB1u+ZBotqXhgKiphonVaV+Gj3BPb81X7K6RqEdcKAgS4QUxt3vZadBaJ1PIZK5PHz+5LtATUGGazvf2lMOWRbF0mEKgZplcntgpxj0IUgEuTNi+Qw5U0+paR3p0WVEpjj3kf3umnQYKP8LiO4UX/6PZlEpkk8tPzWuGT3S7uz2jRYWdskggh3O540724aifRsa/HWSfiI801agYOeO5pr2Px3xtgNc2m4Q1a60AvNN50aPlCYAxww8EphcnJM7d7S7SdUrurm6FTifMo9HiSAA07qPBKB7n89tcYPxGujP4Ee04BBdeejFMrnTBQuTF3T8srnrUw==
+Received: from MWHPR10CA0020.namprd10.prod.outlook.com (2603:10b6:301::30) by
+ BYAPR12MB3272.namprd12.prod.outlook.com (2603:10b6:a03:131::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24; Fri, 26 Mar
+ 2021 00:08:21 +0000
+Received: from CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:301:0:cafe::ed) by MWHPR10CA0020.outlook.office365.com
+ (2603:10b6:301::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24 via Frontend
+ Transport; Fri, 26 Mar 2021 00:08:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ CO1NAM11FT065.mail.protection.outlook.com (10.13.174.62) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.3955.18 via Frontend Transport; Fri, 26 Mar 2021 00:08:20 +0000
+Received: from localhost (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 26 Mar
+ 2021 00:08:20 +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
+        <bskeggs@redhat.com>, <akpm@linux-foundation.org>
+CC:     <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
+        <jglisse@redhat.com>, <jgg@nvidia.com>, <hch@infradead.org>,
+        <daniel@ffwll.ch>, <willy@infradead.org>,
+        Alistair Popple <apopple@nvidia.com>
+Subject: [PATCH v7 0/8] Add support for SVM atomics in Nouveau
+Date:   Fri, 26 Mar 2021 11:07:57 +1100
+Message-ID: <20210326000805.2518-1-apopple@nvidia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="u8V1b6udCU1d3X2g"
-Content-Disposition: inline
-In-Reply-To: <19b5aa0b-df85-256d-d4c4-eacd0ea8312e@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ca2ac8f7-a39d-4995-8952-08d8efeb4400
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3272:
+X-Microsoft-Antispam-PRVS: <BYAPR12MB3272D086A6940DDDBBC96B5FDF619@BYAPR12MB3272.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: x3lhGOPOQtaEIY7TyxlUyEJR/2B4zpc4ZkbMpZCxnv30ZCCNBxuDvFTU4ZmQDCyQYU3agjgwghFusOvLtT6+YUGpcwdKM62sPQqLOwDShbPB+/qwNI49SWlIlBE/gWGc3yaUDuJ8Ezda0D6JZp3VY2WPm3L4wJ4js1JWz4U//OvaROMG0DoTHLEYR3lAcQinixZpi3fG8hkwktB69UONGCAJOL/b3hf7b0zjwHPFC/sIV3DOvlsqkdBaH9qxEWkUfePJGpGrSvgOORhL3Un4C2LKUwHF8kXZn47W+cwmGEWbPBbiGlX9p6fBM4xzjczdvH6kFln/RQtptpPgNBDZwymFtJIyvyS9tk3Quyyv/SfANd6lbas8zhR+Xue+h1shqF52fDeuOKXwRB5jvFnSqN8iLoZuCILMErqsPHfbmJwtSaha5Lkkw1TVV7CSADLmUqEocUppfyM2wN0FCTIH9wpQIL5xFe4FUuW+ciJQjbHa0fv7/hI8+5QtYwXYB3kqwC9lu35ZR10wgepRa2qF8uLSrkh3Yi0Sf3WmK7cBGegHEFNHi46S1Pc2/ruyVpVP2xE1/BH22yj9XNz2Tc2sLmaS/fctBru1WUADuPgKi/9uL5VuitTClg52o0xbgQVjddCGGXHvd1A7oB8l4yZoRRHcSux7lpyL0BMqkQjpCcw=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(376002)(396003)(136003)(39860400002)(36840700001)(46966006)(82310400003)(82740400003)(16526019)(7636003)(36756003)(86362001)(356005)(70206006)(83380400001)(47076005)(36860700001)(70586007)(336012)(5660300002)(110136005)(54906003)(478600001)(8936002)(1076003)(6666004)(186003)(26005)(8676002)(2906002)(36906005)(7416002)(2616005)(316002)(426003)(4326008)(107886003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2021 00:08:20.8654
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca2ac8f7-a39d-4995-8952-08d8efeb4400
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3272
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+This is the seventh version of a series to add support to Nouveau for
+atomic memory operations on OpenCL shared virtual memory (SVM) regions.
 
---u8V1b6udCU1d3X2g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This version primarily improves readability of the Nouveau fault priority
+calculation code along with other minor functional and cosmetic
+improvements listed in the changelogs.
 
-On Wed, Mar 24, 2021 at 09:34:06AM +0530, Aneesh Kumar K.V wrote:
-> On 3/24/21 8:37 AM, David Gibson wrote:
-> > On Tue, Mar 23, 2021 at 09:47:38AM -0400, Shivaprasad G Bhat wrote:
-> > > The patch adds support for the SCM flush hcall for the nvdimm devices.
-> > > To be available for exploitation by guest through the next patch.
-> > >=20
-> > > The hcall expects the semantics such that the flush to return
-> > > with H_BUSY when the operation is expected to take longer time along
-> > > with a continue_token. The hcall to be called again providing the
-> > > continue_token to get the status. So, all fresh requsts are put into
-> > > a 'pending' list and flush worker is submitted to the thread pool.
-> > > The thread pool completion callbacks move the requests to 'completed'
-> > > list, which are cleaned up after reporting to guest in subsequent
-> > > hcalls to get the status.
-> > >=20
-> > > The semantics makes it necessary to preserve the continue_tokens
-> > > and their return status even across migrations. So, the pre_save
-> > > handler for the device waits for the flush worker to complete and
-> > > collects all the hcall states from 'completed' list. The necessary
-> > > nvdimm flush specific vmstate structures are added to the spapr
-> > > machine vmstate.
-> > >=20
-> > > Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-> >=20
-> > An overal question: surely the same issue must arise on x86 with
-> > file-backed NVDIMMs.  How do they handle this case?
->=20
-> On x86 we have different ways nvdimm can be discovered. ACPI NFIT, e820 m=
-ap
-> and virtio_pmem. Among these virio_pmem always operated with synchronous =
-dax
-> disabled and both ACPI and e820 doesn't have the ability to differentiate
-> support for synchronous dax.
+Exclusive device access is implemented by adding a new swap entry type
+(SWAP_DEVICE_EXCLUSIVE) which is similar to a migration entry. The main
+difference is that on fault the original entry is immediately restored by
+the fault handler instead of waiting.
 
-Ok.  And for the virtio-pmem case, how are the extra flushes actually
-done on x86?
+Restoring the entry triggers calls to MMU notifers which allows a device
+driver to revoke the atomic access permission from the GPU prior to the CPU
+finalising the entry.
 
-> With that I would expect users to use virtio_pmem when using using file
-> backed NVDIMMS
+Patches 1 & 2 refactor existing migration and device private entry
+functions.
 
-So... should we prevent advertising an NVDIMM through ACPI or e820 if
-it doesn't have sync-dax enabled?
+Patches 3 & 4 rework try_to_unmap_one() by splitting out unrelated
+functionality into separate functions - try_to_migrate_one() and
+try_to_munlock_one(). These should not change any functionality, but any
+help testing would be much appreciated as I have not been able to test
+every usage of try_to_unmap_one().
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Patch 5 contains the bulk of the implementation for device exclusive
+memory.
 
---u8V1b6udCU1d3X2g
-Content-Type: application/pgp-signature; name="signature.asc"
+Patch 6 contains some additions to the HMM selftests to ensure everything
+works as expected.
 
------BEGIN PGP SIGNATURE-----
+Patch 7 is a cleanup for the Nouveau SVM implementation.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmBb7JQACgkQbDjKyiDZ
-s5LqoQ//foDYAQMsvdLPPSSbsp6PPud08mSNYDtj7rJc+hBLEtCTMviBZnOgnX50
-CHqYTgEziP+UZDdlonHVrfWiZY0OGa8u9MZhKFUbaEoabFt1XX33PrVWNu8w9HsP
-CiSpeDmqXvI/eSLqYYK4Z1SvW1OxiSzF0ylx6r7KJTSJvFNvNoyttOfw+ul0PB1e
-nHajD2zgdlS/un7+V1nZfaRJoCbas4UpL813Ise2kv+FIBs3qpwlPeoaPuLCbeah
-jE4MdCzTsiLxbpQuwpWA1UvQnXa/WEKU0tSxkA76t22wL5lyYjFqPGXCdvLgaqJ2
-53tnXPYQthmZ1svoXfS6AK57AtYWtCFehgwv6BF5JusCTk3DBrpBZpXyT12ErLGi
-LZo1noXW3QoppEj3a8V8KApRBkY8erNe6bPov3ERt2RNeD+q+HN6GOeeXsdVGKrN
-YkeL5mAmjjbyvCL5EIYaqb+in45r29nJUncrfhUzizU7aHgFYc9J75YfAR3pXwQ+
-mINgdAqN92+YcePz3iZuj6iFITXO7x13+S7SvD2Tf/vRPkhNzHCiDuV0qIt/Aoh7
-b18oDs9FphX4lzVotPQkbUu5fcna//RqAebW2qSZsfEOQuD5nfLh6KHGYgBRP8UK
-0/Q82yaiXhZ/FQpD54i6VdZqOO7N9vGy+yWzxJIGrCRlruqDVOI=
-=zayB
------END PGP SIGNATURE-----
+Patch 8 contains the implementation of atomic access for the Nouveau
+driver.
 
---u8V1b6udCU1d3X2g--
+This has been tested using the latest upstream Mesa userspace with a simple
+OpenCL test program which checks the results of atomic GPU operations on a
+SVM buffer whilst also writing to the same buffer from the CPU.
+
+Alistair Popple (8):
+  mm: Remove special swap entry functions
+  mm/swapops: Rework swap entry manipulation code
+  mm/rmap: Split try_to_munlock from try_to_unmap
+  mm/rmap: Split migration into its own function
+  mm: Device exclusive memory access
+  mm: Selftests for exclusive device memory
+  nouveau/svm: Refactor nouveau_range_fault
+  nouveau/svm: Implement atomic SVM access
+
+ Documentation/vm/hmm.rst                      |  19 +-
+ arch/s390/mm/pgtable.c                        |   2 +-
+ drivers/gpu/drm/nouveau/include/nvif/if000c.h |   1 +
+ drivers/gpu/drm/nouveau/nouveau_svm.c         | 156 ++++-
+ drivers/gpu/drm/nouveau/nvkm/subdev/mmu/vmm.h |   1 +
+ .../drm/nouveau/nvkm/subdev/mmu/vmmgp100.c    |   6 +
+ fs/proc/task_mmu.c                            |  23 +-
+ include/linux/mmu_notifier.h                  |  26 +-
+ include/linux/rmap.h                          |   9 +-
+ include/linux/swap.h                          |   8 +-
+ include/linux/swapops.h                       | 123 ++--
+ lib/test_hmm.c                                | 126 +++-
+ lib/test_hmm_uapi.h                           |   2 +
+ mm/debug_vm_pgtable.c                         |  12 +-
+ mm/hmm.c                                      |  12 +-
+ mm/huge_memory.c                              |  45 +-
+ mm/hugetlb.c                                  |  10 +-
+ mm/memcontrol.c                               |   2 +-
+ mm/memory.c                                   | 128 +++-
+ mm/migrate.c                                  |  51 +-
+ mm/mprotect.c                                 |  18 +-
+ mm/page_vma_mapped.c                          |  15 +-
+ mm/rmap.c                                     | 604 +++++++++++++++---
+ tools/testing/selftests/vm/hmm-tests.c        | 158 +++++
+ 24 files changed, 1282 insertions(+), 275 deletions(-)
+
+-- 
+2.20.1
+
