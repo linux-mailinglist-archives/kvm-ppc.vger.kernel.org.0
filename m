@@ -2,213 +2,62 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9654434D625
-	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Mar 2021 19:37:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CA0F34DC56
+	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Mar 2021 01:18:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231138AbhC2RhG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 29 Mar 2021 13:37:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48164 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231124AbhC2Rg6 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Mar 2021 13:36:58 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12THX3Cb113118;
-        Mon, 29 Mar 2021 13:36:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
- : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=pp1; bh=MttDJCGARaxpDtVMt/KLSICt/OHkz6lbnzzYLYrPrCo=;
- b=QA2MqWpKs8xty6j31vW9y6CYuQe36GBGmN/fIg8dflwgOEH0acEH1Zamy0LmJAzSXoH4
- aX2yjTY3KEFakG7pdluEps8NY0y4NCykc0z76uZHklvxLFi59Nt/mLv1QfV0xbnpghOO
- NQQTL+Psd04M2WBi21Xvp0dUXlfGWkqLYWVSv092ghNFCgNVdOSIvqip2S+wLMIGCOSE
- MxgPLmOoNy8rDOjtx5Uhzf0lZdS+Z96kIwB0JYyrPwGp/7yHwCujFVzgretg/q0oFsLh
- 4S9UuhFkC5N89TUpFiDFXi3hRHNoZJmuoY/lsy7D3yurpvILMm8a8JZPnEAqOme8wOXT Zg== 
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37jpbvjy6x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 29 Mar 2021 13:36:50 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12THSVNh021091;
-        Mon, 29 Mar 2021 17:36:48 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma05fra.de.ibm.com with ESMTP id 37hvb8h1x8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 29 Mar 2021 17:36:48 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12THakiw54854068
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Mar 2021 17:36:46 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E40AA5204F;
-        Mon, 29 Mar 2021 17:36:45 +0000 (GMT)
-Received: from [172.17.0.3] (unknown [9.40.192.207])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B98B052051;
-        Mon, 29 Mar 2021 17:36:44 +0000 (GMT)
-Subject: [PATCH v3] powerpc/papr_scm: Implement support for H_SCM_FLUSH hcall
-From:   Shivaprasad G Bhat <sbhat@linux.ibm.com>
-To:     sbhat@linux.vnet.ibm.com, linuxppc-dev@lists.ozlabs.org,
-        kvm-ppc@vger.kernel.org, linux-nvdimm@lists.01.org,
-        aneesh.kumar@linux.ibm.com, ellerman@au1.ibm.com
-Cc:     linux-doc@vger.kernel.org, vaibhav@linux.ibm.com
-Date:   Mon, 29 Mar 2021 13:36:43 -0400
-Message-ID: <161703936121.36.7260632399582101498.stgit@e1fbed493c87>
-User-Agent: StGit/0.21
-Content-Type: text/plain; charset="utf-8"
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cLlAuKPSy8G7IVq1hjwRBXmiiyY2AnfD
-X-Proofpoint-ORIG-GUID: cLlAuKPSy8G7IVq1hjwRBXmiiyY2AnfD
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        id S229861AbhC2XRu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 29 Mar 2021 19:17:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46524 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229711AbhC2XRn (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Mar 2021 19:17:43 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2B1CC061762
+        for <kvm-ppc@vger.kernel.org>; Mon, 29 Mar 2021 16:17:42 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id i26so20851838lfl.1
+        for <kvm-ppc@vger.kernel.org>; Mon, 29 Mar 2021 16:17:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=sFO+yW2jCZdBRnXdrq0wXHYP3wv34YwpYnQ4UfitiFY=;
+        b=Qaf9zdqv5yo82PrwdBxCmcFuw1/GqrzLeSY+FRroL+8jhy2VbPpEk6/gM3keviMjj5
+         ORGmnGvRsJPNgJR69VnQmxe4W4VzwaWpGKsdDdSn08sXCduc3a3fJHMM9984hrr79XoA
+         VV8RMIKOJ7avmy6UwurjSuG/G+d2j/qnkNgyGezfP8HMTyzw2EjiX8TeI7ZFVjlj9nif
+         /rzfyA7w8Eum95ooZsHCha0asY8fHQ0GhX/RSMDAs5G/Flb+yFhcFvtUBKpSQdJrFua9
+         ZUUcib8o4nva8rYg7F86y3SEVK+EWmO99ftan+xGciAbgvBXAa/vAhxk3FKpXhc0bQOR
+         hWBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=sFO+yW2jCZdBRnXdrq0wXHYP3wv34YwpYnQ4UfitiFY=;
+        b=EgaBBZoDoRH4leefPOfp8bslXUzJ4+22vQKb8ILP9advQR8S+LzPyOoeHeRwK1Iac0
+         iOXhyAkFU+V+FMEROul4E+Nrmi5I1NLWIpXXUUAh10CggmcA0CwunepOBpd9CPCrX1D1
+         NjvmgO2h0qYiGaIkqmMRjt03bmqdDN23ZRmhEx0NG6p7W7SjUy4yX0gJTIcrJlHXsq0c
+         vqQnXVlz0iIN7xB4tavfA0vCqRREUbBq1KibRwvLAR9IYIXvvcRybaROCQ4lTvIBovgW
+         u2K70ZKqlyGCvvK/LOixgI6bPEg1LwTpsmRI7IedcSL9hg5RiLyZojzpt2LBH+PmHhzz
+         tBvg==
+X-Gm-Message-State: AOAM533PlX5yVm3a8UQ68/Op/e3inblc67MkvZJByezKIzLG+ZXO7r5Q
+        XZrEm6pgeShI44k2a4PMieKAY76wUu2k7Wbx0tq/Mq/S7yBJeQ==
+X-Google-Smtp-Source: ABdhPJwXUTB3xGwKQOzT6aDw1jufSTJ8B9srgp4Puq3KDIPw/uZIRacUJumCdu92ZwZGnzT8bnrJmFQmV6qi1czXn8E=
+X-Received: by 2002:a05:6512:4c4:: with SMTP id w4mr18134688lfq.91.1617059861134;
+ Mon, 29 Mar 2021 16:17:41 -0700 (PDT)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-29_10:2021-03-26,2021-03-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- suspectscore=0 priorityscore=1501 malwarescore=0 clxscore=1015 spamscore=0
- lowpriorityscore=0 bulkscore=0 impostorscore=0 adultscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2103250000 definitions=main-2103290130
+From:   Raz <raziebe@gmail.com>
+Date:   Tue, 30 Mar 2021 02:17:29 +0300
+Message-ID: <CAPB=Z-qtA5Toz-oGmsscb4VZ9ozVhs-nNzbvmsSPD=nvu1fa0w@mail.gmail.com>
+Subject: Question regarding MMIO
+To:     kvm-ppc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Add support for ND_REGION_ASYNC capability if the device tree
-indicates 'ibm,hcall-flush-required' property in the NVDIMM node.
-Flush is done by issuing H_SCM_FLUSH hcall to the hypervisor.
+I have a basic question regarding MMIO access.
+When a command in EL1/EL0 performs an MMIO access, it creates a trap
+to the kvm-hypervisor.
+The command needs to be replayed again:
+ 1. Is the command replayed in EL2 ?
+ 2. If so, how ?
+ 3. If not, how MMIO is implemented in ARMv8 ?
 
-If the flush request failed, the hypervisor is expected to
-to reflect the problem in the subsequent nvdimm H_SCM_HEALTH call.
-
-This patch prevents mmap of namespaces with MAP_SYNC flag if the
-nvdimm requires an explicit flush[1].
-
-References:
-[1] https://github.com/avocado-framework-tests/avocado-misc-tests/blob/master/memory/ndctl.py.data/map_sync.c
-
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
----
-v2 - https://www.spinics.net/lists/kvm-ppc/msg18799.html
-Changes from v2:
-       - Fixed the commit message.
-       - Add dev_dbg before the H_SCM_FLUSH hcall
-
-v1 - https://www.spinics.net/lists/kvm-ppc/msg18272.html
-Changes from v1:
-       - Hcall semantics finalized, all changes are to accomodate them.
-
- Documentation/powerpc/papr_hcalls.rst     |   14 ++++++++++
- arch/powerpc/include/asm/hvcall.h         |    3 +-
- arch/powerpc/platforms/pseries/papr_scm.c |   40 +++++++++++++++++++++++++++++
- 3 files changed, 56 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/powerpc/papr_hcalls.rst b/Documentation/powerpc/papr_hcalls.rst
-index 48fcf1255a33..648f278eea8f 100644
---- a/Documentation/powerpc/papr_hcalls.rst
-+++ b/Documentation/powerpc/papr_hcalls.rst
-@@ -275,6 +275,20 @@ Health Bitmap Flags:
- Given a DRC Index collect the performance statistics for NVDIMM and copy them
- to the resultBuffer.
- 
-+**H_SCM_FLUSH**
-+
-+| Input: *drcIndex, continue-token*
-+| Out: *continue-token*
-+| Return Value: *H_SUCCESS, H_Parameter, H_P2, H_BUSY*
-+
-+Given a DRC Index Flush the data to backend NVDIMM device.
-+
-+The hcall returns H_BUSY when the flush takes longer time and the hcall needs
-+to be issued multiple times in order to be completely serviced. The
-+*continue-token* from the output to be passed in the argument list of
-+subsequent hcalls to the hypervisor until the hcall is completely serviced
-+at which point H_SUCCESS or other error is returned by the hypervisor.
-+
- References
- ==========
- .. [1] "Power Architecture Platform Reference"
-diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
-index ed6086d57b22..9f7729a97ebd 100644
---- a/arch/powerpc/include/asm/hvcall.h
-+++ b/arch/powerpc/include/asm/hvcall.h
-@@ -315,7 +315,8 @@
- #define H_SCM_HEALTH            0x400
- #define H_SCM_PERFORMANCE_STATS 0x418
- #define H_RPT_INVALIDATE	0x448
--#define MAX_HCALL_OPCODE	H_RPT_INVALIDATE
-+#define H_SCM_FLUSH		0x44C
-+#define MAX_HCALL_OPCODE	H_SCM_FLUSH
- 
- /* Scope args for H_SCM_UNBIND_ALL */
- #define H_UNBIND_SCOPE_ALL (0x1)
-diff --git a/arch/powerpc/platforms/pseries/papr_scm.c b/arch/powerpc/platforms/pseries/papr_scm.c
-index 835163f54244..b7a47fcc5aa5 100644
---- a/arch/powerpc/platforms/pseries/papr_scm.c
-+++ b/arch/powerpc/platforms/pseries/papr_scm.c
-@@ -93,6 +93,7 @@ struct papr_scm_priv {
- 	uint64_t block_size;
- 	int metadata_size;
- 	bool is_volatile;
-+	bool hcall_flush_required;
- 
- 	uint64_t bound_addr;
- 
-@@ -117,6 +118,39 @@ struct papr_scm_priv {
- 	size_t stat_buffer_len;
- };
- 
-+static int papr_scm_pmem_flush(struct nd_region *nd_region,
-+			       struct bio *bio __maybe_unused)
-+{
-+	struct papr_scm_priv *p = nd_region_provider_data(nd_region);
-+	unsigned long ret_buf[PLPAR_HCALL_BUFSIZE];
-+	uint64_t token = 0;
-+	int64_t rc;
-+
-+	dev_dbg(&p->pdev->dev, "flush drc 0x%x", p->drc_index);
-+
-+	do {
-+		rc = plpar_hcall(H_SCM_FLUSH, ret_buf, p->drc_index, token);
-+		token = ret_buf[0];
-+
-+		/* Check if we are stalled for some time */
-+		if (H_IS_LONG_BUSY(rc)) {
-+			msleep(get_longbusy_msecs(rc));
-+			rc = H_BUSY;
-+		} else if (rc == H_BUSY) {
-+			cond_resched();
-+		}
-+	} while (rc == H_BUSY);
-+
-+	if (rc) {
-+		dev_err(&p->pdev->dev, "flush error: %lld", rc);
-+		rc = -EIO;
-+	} else {
-+		dev_dbg(&p->pdev->dev, "flush drc 0x%x complete", p->drc_index);
-+	}
-+
-+	return rc;
-+}
-+
- static LIST_HEAD(papr_nd_regions);
- static DEFINE_MUTEX(papr_ndr_lock);
- 
-@@ -943,6 +977,11 @@ static int papr_scm_nvdimm_init(struct papr_scm_priv *p)
- 	ndr_desc.num_mappings = 1;
- 	ndr_desc.nd_set = &p->nd_set;
- 
-+	if (p->hcall_flush_required) {
-+		set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-+		ndr_desc.flush = papr_scm_pmem_flush;
-+	}
-+
- 	if (p->is_volatile)
- 		p->region = nvdimm_volatile_region_create(p->bus, &ndr_desc);
- 	else {
-@@ -1088,6 +1127,7 @@ static int papr_scm_probe(struct platform_device *pdev)
- 	p->block_size = block_size;
- 	p->blocks = blocks;
- 	p->is_volatile = !of_property_read_bool(dn, "ibm,cache-flush-required");
-+	p->hcall_flush_required = of_property_read_bool(dn, "ibm,hcall-flush-required");
- 
- 	/* We just need to ensure that set cookies are unique across */
- 	uuid_parse(uuid_str, (uuid_t *) uuid);
-
-
+thank you
