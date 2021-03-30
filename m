@@ -2,224 +2,260 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8560834F110
-	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Mar 2021 20:37:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38E4634F116
+	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Mar 2021 20:39:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232818AbhC3SdC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 30 Mar 2021 14:33:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42150 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232876AbhC3Scf (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 30 Mar 2021 14:32:35 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27B26C061765
-        for <kvm-ppc@vger.kernel.org>; Tue, 30 Mar 2021 11:32:35 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id e8so17466644iok.5
-        for <kvm-ppc@vger.kernel.org>; Tue, 30 Mar 2021 11:32:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Ry6+wSaahnTAtySVVADqpebYg77xvyK52stUUFNcEOE=;
-        b=LdVURA+kcNmnzr/OmxvAldswhg5Hv5K+yZBcwCjQoMugQeFaMm3UMyYuNoBFuURK7x
-         wW9jUPDk/lN2NWOWWx0C+HM8fHbdwPVXOoGeR3GF2krU9rJukM386cGHQW8I5mKRlRhl
-         FK944SqBcaNxe9bg0srb4MmcOByctpvvrYF/uEDGOooXDy9x7lW0dq8OJxF2/6wG6mh8
-         QUtdaXz6D2omEiXIzbRACVWnf7gARf2rCWDNFLpUCSjV3bjZ6TrZFZVX7zDhTaQ1xch3
-         f/yGaKwbqEli9Uvqsxq31Y2h/cqT4iY2RLC+2faOt9pr4StzcjyvoFLtPEvayIi0J9vr
-         40BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Ry6+wSaahnTAtySVVADqpebYg77xvyK52stUUFNcEOE=;
-        b=dKW1NeGIb73dZEnyukNhZr69sRYs9i/485vt2Znaf4eL/ssbhZPt30N7dc8yu3PTua
-         LV9QHhIa/xxqdP5VhrRcPMj3NjS55oCpS1Aw4OEvPHe1K9G/d96KNzgGh3mqS4cm/XyK
-         AR/CjM62+fJKsdnoeiUY8+FzojYx/2+IB/++BczCzoipHIEH7XVPdfq8vUtMqa/c+PP9
-         OlKDQrP4awXKQPpRjx/9ApB0lVqZ/lf7Dc6lYjJ1+ylCFLVjhdkKilV5raCzq5Imhr4B
-         XVUrWLDdkn0LHz2vSk2A+wFAlPin9wZvSDQu0Joe93ZypV00M3GMOpiUbCNOxBtuoQzj
-         R21g==
-X-Gm-Message-State: AOAM533YNDSnBoCoTnroLuZulxsciycYSdmlb46AFrd9FqFyWrE1H1hN
-        6SGeBLmYJfmYyqXGmVs2DS2DqFGXmYkWU3n94RPkyw==
-X-Google-Smtp-Source: ABdhPJydba/r9kFe0x64VHG21TaCqRbVPKRpUh3kGFyYZT4VeQOXcqv0jV6nWOmc06Khu/5vhjH/mZsKNTnmLddBUEQ=
-X-Received: by 2002:a5d:9959:: with SMTP id v25mr26278546ios.189.1617129153795;
- Tue, 30 Mar 2021 11:32:33 -0700 (PDT)
+        id S231910AbhC3SjA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 30 Mar 2021 14:39:00 -0400
+Received: from mail-dm6nam10on2062.outbound.protection.outlook.com ([40.107.93.62]:19489
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232705AbhC3Sig (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 30 Mar 2021 14:38:36 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UNo0Strg9fTbQd8Qy2+Hm8bG0EZFw2TwiNPTegUS+56QbQHp4MFJi0Gc/iOs5HKJxW/XY8p0ZSmy5hASt/DTKeB+7ijRhNANftcxEO3kYHZQYDXMH3yPQol0f/QVXh1YFjmP5LgzbWFG+UoYDIx/oKZEDflhFw7ROKqIdhStNqDFnr6Cq4psC4fFYzp2779B7wGrX+eJLsuqwV34W12RELgAC0HmFCfi+9ZUmuGbF57hzQk62yOpNRT9rqR4Z68y9ZsheWBNTnedyhjELZ7LoI1EiluOARhI1XSyUZCNnxnYoYBDrUKwSc+TlZgsOmXh+EKRVHHVFRvQPDUv9QcZPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TuCMyZBdqpWAU6luauy2Z+zV56bne3oILQlDe1P51Lk=;
+ b=QzyFEW3ikycacjHQQKJ7v/0VIaWH4ing8ApuIMPeKFHwdYbGji8vVWeOu//ObcP0nCGxgr67XhzUwCiBVxJp1LARjdN3xNhoXhTc1LEcCrtJQ8aN2AqRHcjQ6d3dhFMRy0SNvSeElBe0i2s979szQYj4q2fsXK26nZoA3uCtUYnbtp9mCYWaGBhpXNhbZ6MYuj5l3fsUBnE/JDjg1bCyuBTdfIWBasfC2Eds2Iq66X78C3pQ+KiS6KOorYviFOh4QmfythboSbzDwwHoEzykRjgRfSd0UezB8MWiPK+pNt1ZbGHkjyrrfgNjkKLzTgNPKVSv8xng8hPQH7s9VTspZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TuCMyZBdqpWAU6luauy2Z+zV56bne3oILQlDe1P51Lk=;
+ b=q9KyWBXXoHjxbJdgfdGp2myJLij4S0IEZ111V9yaCVuH5tEr6f3Y31045DkoOHLgPJfbmvcyjUROk0HFtEg79d/jedlnNZJTQu9Qdr7vOF+tlfmPtf+/mwLutde58kRKm/eUVGgwAbZdB2N5QeYKDkdgO9S8zVc/esOqPlceAuPwOjVLIeYlj+AqdEf1lyOCGLQsV+aHD9maHjHq7QDPFalJX6pyAzWORYfeHhYyrKRiZowW6DzRt7Rz3S37CviwS2LOMU6Mp8a+Imwnjq5w5F+OykgrQi95XA5pkExgVusOpUQECrOet5mOwMiscGrqNNM8ry2tdt9iCUASokmE5A==
+Authentication-Results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM5PR12MB1146.namprd12.prod.outlook.com (2603:10b6:3:73::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24; Tue, 30 Mar
+ 2021 18:38:35 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3977.033; Tue, 30 Mar 2021
+ 18:38:35 +0000
+Date:   Tue, 30 Mar 2021 15:38:33 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alistair Popple <apopple@nvidia.com>
+Cc:     linux-mm@kvack.org, nouveau@lists.freedesktop.org,
+        bskeggs@redhat.com, akpm@linux-foundation.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        jhubbard@nvidia.com, rcampbell@nvidia.com, jglisse@redhat.com,
+        hch@infradead.org, daniel@ffwll.ch, willy@infradead.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v7 1/8] mm: Remove special swap entry functions
+Message-ID: <20210330183833.GY2356281@nvidia.com>
+References: <20210326000805.2518-1-apopple@nvidia.com>
+ <20210326000805.2518-2-apopple@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210326000805.2518-2-apopple@nvidia.com>
+X-Originating-IP: [142.162.115.133]
+X-ClientProxiedBy: MN2PR15CA0029.namprd15.prod.outlook.com
+ (2603:10b6:208:1b4::42) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-References: <20210326021957.1424875-1-seanjc@google.com>
-In-Reply-To: <20210326021957.1424875-1-seanjc@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 30 Mar 2021 11:32:22 -0700
-Message-ID: <CANgfPd_gpWsa4F3VdcpoBYqPR4dSBWNYCW1YdeOnu1wQdUz+0A@mail.gmail.com>
-Subject: Re: [PATCH 00/18] KVM: Consolidate and optimize MMU notifiers
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        kvm-ppc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR15CA0029.namprd15.prod.outlook.com (2603:10b6:208:1b4::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend Transport; Tue, 30 Mar 2021 18:38:34 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lRJG5-00603f-AZ; Tue, 30 Mar 2021 15:38:33 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 32a4e87c-61b3-441e-aac1-08d8f3ab0667
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1146:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR12MB114698102F6C1613A421FFBEC27D9@DM5PR12MB1146.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:983;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8R1SOc6pTQIyXL3Kkdoo4oORpLhiqyEL3KCdVG0rPeyFlwUcm9I0CNL4fophcOce/x7sI3m5J9zmMiTpET/9qJSDkTGANlD9Z06vBr4e+19Elx8myI/ylq5PJCJqY9AGPMMnbvNfS0JpItESJyJskCXQnH1K+NdGnLLmQs772z3kLJJRYFZb/4gAf0UkVTMC5xHowjw0dfRbTmNuBr0MIt6xwiUt5M4j0dGhWiC0fMwVAoxVW5B6Znj1FTQjUdjCvtlZZdnVHSN1XF+zFDzgUEwYeKbt+k/RnYc6KAW0JkstqH1V/vd/oS2MekpvQC6USnd/cLUS3bUI3t4LnsAKqbMuw+N3VeY5Mpu56f6h+1jIvFovO/iHuxIkl8x9W4Db3z2uNhlUTrmZo2GGm1aCITXvW1+gvPi6YnxjigBk/JRPGH9Yy+wXjVPewrMW7IOlX2I8aaLqpbWm/xwafp7nWb1NAppVpQ6A5rFEjEU8cudYi83HI7p5qJuWQLBJax1BxkcK2BQ6GlK8CzX4F7Aw9r9LFDLA57PbXIji/UERggJLnuJm6Kzcemzo0Hl243tMW0M2qsutEiPHJTy139ggdXiyAMNqjVb0yh/bxjCBK0JCfD9w4iG4eZdVYfaVU5E7ALLDvDCIzUh5CNyNmmEXjQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(136003)(396003)(39860400002)(346002)(6636002)(4326008)(8936002)(316002)(37006003)(426003)(38100700001)(26005)(7416002)(2616005)(2906002)(86362001)(33656002)(186003)(6862004)(8676002)(5660300002)(478600001)(9746002)(83380400001)(66476007)(1076003)(66946007)(66556008)(9786002)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?XNX6OCrXp6kRxpWvW5eh21NJaLfIv6bh/9tLftc22MGSE2lcAGbacYr+P5vX?=
+ =?us-ascii?Q?Vz6qva8qewoWKI69P1sE8tvU+75rXr1MNrO63vEKhFVSp26Gkjz/DfggdwNh?=
+ =?us-ascii?Q?B8djyQ0f6NREuMOoUDf7feLHTpzVCaL7+Pe5KIwqjuH4RplNovf7zRY4Oqjb?=
+ =?us-ascii?Q?GZjbWhIQiyPqazExzHW7j1SyrwIiKaBCXAFM2V+8WnomB3E6E/fezyo7wrFo?=
+ =?us-ascii?Q?yjdF7rpO4naO7/IMPppIu/Lr9gWWyzS7inAO/3Bu5BFq5rooxbrsUu/P86cx?=
+ =?us-ascii?Q?QblmAIP2i1gyDK+UUNawLF+Yv/BeypczW1stJobEY+zSzreakBdWOwfwyHT0?=
+ =?us-ascii?Q?AJRCo9WJUAhgU5vacLAi/b22ywuaGqP8TJZOox1KtM/xvS2OR2XnYD17lmij?=
+ =?us-ascii?Q?8UMtzA7HMhF+8mWKXJjRWWiHHvKY/nYfPR0DYjpvsfP+UiUImiPSzemXXZdo?=
+ =?us-ascii?Q?ILgjuT2+H4vrzEeKsyqi11p2HYtae4cKivmqfSSKVoVKJYT0Pw1ia5/H9429?=
+ =?us-ascii?Q?pFb+5CqJlVFE6i7Exh9kZCzl4XZUDASCnnrtFiPZ5QebgdiN6ru/zBLke9X1?=
+ =?us-ascii?Q?OYX406YRS6wgXo6gt/saSrOnBy34HKbmqPYY4FB3LzGj5PL2kclab26tEbQ1?=
+ =?us-ascii?Q?Kicd7kjnYmVeCIUwhtvMihObfdaswboFWELbbwFjSNUgSxq5kZgiqh2n+kui?=
+ =?us-ascii?Q?H8b2Ff5WA3/8CkMbdrLXEPNZtagHyWhihQWeun1px0htQxjUz1hh4EMHR1mu?=
+ =?us-ascii?Q?Uj+nV9vhhVF4qt88+peAg2JprUHul3lYAWOSAX6yx0Io4dcLM+dWpXkz5Zo/?=
+ =?us-ascii?Q?qYnRXL+OnU/lFhaqzYo/xjnISOFw6VVTb3esFCkTc9ef8njZzcfwc6bwiazX?=
+ =?us-ascii?Q?tPFUGjnd0AZHz4gG5P3tpAcugbJXxRpxprqmSV3nrkuqEcJmp4ndzOfr4S+t?=
+ =?us-ascii?Q?GXXSt6uw/CQ8b8Wm75X34cPto2lX1x4C5SbLwrY4jQDCxv9L2uNH+TLIGwgU?=
+ =?us-ascii?Q?oGrYQg4DEXyalPlNqeVIO6ws4rL1wnZIxpxEko7ZLCb58nj9n2ceYEyEqjfE?=
+ =?us-ascii?Q?M/wD/F3DZ5GYwwDtZvJy3J5hqbwak+nK9pWaobOeZ7d0qSRYt+kf4fR95aks?=
+ =?us-ascii?Q?q1Yc+ssFw1TgF0AFn95yJNH/YsMOg01WpvVDSXNJdd8pPT0CfKlMBJ5OkXa3?=
+ =?us-ascii?Q?BOzNgszQKb0IvWujSiDBV9AYigB2VDmQMtpfC+ZZhem/ZmppXz7OYZyp+vKm?=
+ =?us-ascii?Q?ktKfdqGxdv57+mXbdHjpjU2JGAaf+T7Jj5RiRjkF+/lY120h94xEp0ig3CH9?=
+ =?us-ascii?Q?FiyMKhX9bpHa5F5QHFnBtqwPFndp2ogYl9PCEd5NT7nDQg=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32a4e87c-61b3-441e-aac1-08d8f3ab0667
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2021 18:38:34.9916
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kYf6o5sVypw6ti1rPFoDYSXxQPWwJcSJ/1cyPfXTeLoE1tVPba5q0RQIPX+QRFkl
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1146
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Mar 25, 2021 at 7:20 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> The end goal of this series is to optimize the MMU notifiers to take
-> mmu_lock if and only if the notification is relevant to KVM, i.e. the hva
-> range overlaps a memslot.   Large VMs (hundreds of vCPUs) are very
-> sensitive to mmu_lock being taken for write at inopportune times, and
-> such VMs also tend to be "static", e.g. backed by HugeTLB with minimal
-> page shenanigans.  The vast majority of notifications for these VMs will
-> be spurious (for KVM), and eliding mmu_lock for spurious notifications
-> avoids an otherwise unacceptable disruption to the guest.
->
-> To get there without potentially degrading performance, e.g. due to
-> multiple memslot lookups, especially on non-x86 where the use cases are
-> largely unknown (from my perspective), first consolidate the MMU notifier
-> logic by moving the hva->gfn lookups into common KVM.
->
-> Applies on my TDP MMU TLB flushing bug fixes[*], which conflict horribly
-> with the TDP MMU changes in this series.  That code applies on kvm/queue
-> (commit 4a98623d5d90, "KVM: x86/mmu: Mark the PAE roots as decrypted for
-> shadow paging").
->
-> Speaking of conflicts, Ben will soon be posting a series to convert a
-> bunch of TDP MMU flows to take mmu_lock only for read.  Presumably there
-> will be an absurd number of conflicts; Ben and I will sort out the
-> conflicts in whichever series loses the race.
->
-> Well tested on Intel and AMD.  Compile tested for arm64, MIPS, PPC,
-> PPC e500, and s390.  Absolutely needs to be tested for real on non-x86,
-> I give it even odds that I introduced an off-by-one bug somewhere.
->
-> [*] https://lkml.kernel.org/r/20210325200119.1359384-1-seanjc@google.com
->
->
-> Patches 1-7 are x86 specific prep patches to play nice with moving
-> the hva->gfn memslot lookups into common code.  There ended up being waaay
-> more of these than I expected/wanted, but I had a hell of a time getting
-> the flushing logic right when shuffling the memslot and address space
-> loops.  In the end, I was more confident I got things correct by batching
-> the flushes.
->
-> Patch 8 moves the existing API prototypes into common code.  It could
-> technically be dropped since the old APIs are gone in the end, but I
-> thought the switch to the new APIs would suck a bit less this way.
+On Fri, Mar 26, 2021 at 11:07:58AM +1100, Alistair Popple wrote:
+> Remove multiple similar inline functions for dealing with different
+> types of special swap entries.
+> 
+> Both migration and device private swap entries use the swap offset to
+> store a pfn. Instead of multiple inline functions to obtain a struct
+> page for each swap entry type use a common function
+> pfn_swap_entry_to_page(). Also open-code the various entry_to_pfn()
+> functions as this results is shorter code that is easier to understand.
+> 
+> Signed-off-by: Alistair Popple <apopple@nvidia.com>
+> Reviewed-by: Ralph Campbell <rcampbell@nvidia.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+> ---
+> 
+> v7:
+> * Reworded commit message to include pfn_swap_entry_to_page()
+> * Added Christoph's Reviewed-by
+> 
+> v6:
+> * Removed redundant compound_page() call from inside PageLocked()
+> * Fixed a minor build issue for s390 reported by kernel test bot
+> 
+> v4:
+> * Added pfn_swap_entry_to_page()
+> * Reinstated check that migration entries point to locked pages
+> * Removed #define swapcache_prepare which isn't needed for CONFIG_SWAP=0
+>   builds
+> ---
+>  arch/s390/mm/pgtable.c  |  2 +-
+>  fs/proc/task_mmu.c      | 23 +++++---------
+>  include/linux/swap.h    |  4 +--
+>  include/linux/swapops.h | 69 ++++++++++++++---------------------------
+>  mm/hmm.c                |  5 ++-
+>  mm/huge_memory.c        |  4 +--
+>  mm/memcontrol.c         |  2 +-
+>  mm/memory.c             | 10 +++---
+>  mm/migrate.c            |  6 ++--
+>  mm/page_vma_mapped.c    |  6 ++--
+>  10 files changed, 50 insertions(+), 81 deletions(-)
 
-Patches 1-8 look good to me. Feel free to add my Reviewed-by tag to those.
-I appreciate the care you took to make all those changes tiny and reviewable.
+Looks good
 
->
-> Patch 9 moves arm64's MMU notifier tracepoints into common code so that
-> they are not lost when arm64 is converted to the new APIs, and so that all
-> architectures can benefit.
->
-> Patch 10 moves x86's memslot walkers into common KVM.  I chose x86 purely
-> because I could actually test it.  All architectures use nearly identical
-> code, so I don't think it actually matters in the end.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-I'm still reviewing 10 and 14-18. 10 is a huge change and the diff is
-pretty hard to parse.
+> diff --git a/mm/hmm.c b/mm/hmm.c
+> index 943cb2ba4442..3b2dda71d0ed 100644
+> --- a/mm/hmm.c
+> +++ b/mm/hmm.c
+> @@ -214,7 +214,7 @@ static inline bool hmm_is_device_private_entry(struct hmm_range *range,
+>  		swp_entry_t entry)
+>  {
+>  	return is_device_private_entry(entry) &&
+> -		device_private_entry_to_page(entry)->pgmap->owner ==
+> +		pfn_swap_entry_to_page(entry)->pgmap->owner ==
+>  		range->dev_private_owner;
+>  }
+>  
+> @@ -257,8 +257,7 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
+>  			cpu_flags = HMM_PFN_VALID;
+>  			if (is_write_device_private_entry(entry))
+>  				cpu_flags |= HMM_PFN_WRITE;
+> -			*hmm_pfn = device_private_entry_to_pfn(entry) |
+> -					cpu_flags;
+> +			*hmm_pfn = swp_offset(entry) | cpu_flags;
 
->
-> Patches 11-13 move arm64, MIPS, and PPC to the new APIs.
->
-> Patch 14 yanks out the old APIs.
->
-> Patch 15 adds the mmu_lock elision, but only for unpaired notifications.
+Though swp_offset() seems poor here
 
-Reading through all this code and considering the changes I'm
-preparing for the TDP MMU have me wondering if it might help to have a
-more general purpose MMU lock context struct which could be embedded
-in the structs added in this patch. I'm thinking something like:
-enum kvm_mmu_lock_mode {
-    KVM_MMU_LOCK_NONE,
-    KVM_MMU_LOCK_READ,
-    KVM_MMU_LOCK_WRITE,
-};
+Something like this seems nicer, maybe as an additional patch in this
+series?
 
-struct kvm_mmu_lock_context {
-    enum kvm_mmu_lock_mode lock_mode;
-    bool can_block;
-    bool can_yield;
-    bool flush;
-};
+diff --git a/mm/hmm.c b/mm/hmm.c
+index 943cb2ba444232..c06cbc4e3981b7 100644
+--- a/mm/hmm.c
++++ b/mm/hmm.c
+@@ -210,14 +210,6 @@ int hmm_vma_handle_pmd(struct mm_walk *walk, unsigned long addr,
+ 		unsigned long end, unsigned long hmm_pfns[], pmd_t pmd);
+ #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
+ 
+-static inline bool hmm_is_device_private_entry(struct hmm_range *range,
+-		swp_entry_t entry)
+-{
+-	return is_device_private_entry(entry) &&
+-		device_private_entry_to_page(entry)->pgmap->owner ==
+-		range->dev_private_owner;
+-}
+-
+ static inline unsigned long pte_to_hmm_pfn_flags(struct hmm_range *range,
+ 						 pte_t pte)
+ {
+@@ -226,6 +218,32 @@ static inline unsigned long pte_to_hmm_pfn_flags(struct hmm_range *range,
+ 	return pte_write(pte) ? (HMM_PFN_VALID | HMM_PFN_WRITE) : HMM_PFN_VALID;
+ }
+ 
++static bool hmm_pte_handle_device_private(struct hmm_range *range, pte_t pte,
++					  unsigned long *hmm_pfn)
++{
++	swp_entry_t entry = pte_to_swp_entry(pte);
++	struct page *device_page;
++	unsigned long cpu_flags;
++
++	if (is_device_private_entry(entry))
++		return false;
++
++	/*
++	 * If the device private page matches the device the caller understands
++	 * then return the private pfn directly. The caller must know what to do
++	 * with it.
++	 */
++	device_page = pfn_swap_entry_to_page(entry);
++	if (device_page->pgmap->owner != range->dev_private_owner)
++		return false;
++
++	cpu_flags = HMM_PFN_VALID;
++	if (is_write_device_private_entry(entry))
++		cpu_flags |= HMM_PFN_WRITE;
++	*hmm_pfn = page_to_pfn(device_page) | cpu_flags;
++	return true;
++}
++
+ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
+ 			      unsigned long end, pmd_t *pmdp, pte_t *ptep,
+ 			      unsigned long *hmm_pfn)
+@@ -247,20 +265,8 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
+ 	}
+ 
+ 	if (!pte_present(pte)) {
+-		swp_entry_t entry = pte_to_swp_entry(pte);
+-
+-		/*
+-		 * Never fault in device private pages, but just report
+-		 * the PFN even if not present.
+-		 */
+-		if (hmm_is_device_private_entry(range, entry)) {
+-			cpu_flags = HMM_PFN_VALID;
+-			if (is_write_device_private_entry(entry))
+-				cpu_flags |= HMM_PFN_WRITE;
+-			*hmm_pfn = device_private_entry_to_pfn(entry) |
+-					cpu_flags;
++		if (hmm_pte_handle_device_private(range, pte, hmm_pfn))
+ 			return 0;
+-		}
+ 
+ 		required_fault =
+ 			hmm_pte_need_fault(hmm_vma_walk, pfn_req_flags, 0);
 
-This could yield some grossly long lines, but it would also have
-potential to unify a bunch of ad-hoc handling.
-The above struct could also fit into a single byte, so it'd be pretty
-easy to pass it around.
-
->
-> Patch 16 adds mmu_lock elision for paired .invalidate_range_{start,end}().
-> This is quite nasty and no small part of me thinks the patch should be
-> burned with fire (I won't spoil it any further), but it's also the most
-> problematic scenario for our particular use case.  :-/
->
-> Patches 17-18 are additional x86 cleanups.
->
-> Sean Christopherson (18):
->   KVM: x86/mmu: Coalesce TDP MMU TLB flushes when zapping collapsible
->     SPTEs
->   KVM: x86/mmu: Move flushing for "slot" handlers to caller for legacy
->     MMU
->   KVM: x86/mmu: Coalesce TLB flushes when zapping collapsible SPTEs
->   KVM: x86/mmu: Coalesce TLB flushes across address spaces for gfn range
->     zap
->   KVM: x86/mmu: Pass address space ID to __kvm_tdp_mmu_zap_gfn_range()
->   KVM: x86/mmu: Pass address space ID to TDP MMU root walkers
->   KVM: x86/mmu: Use leaf-only loop for walking TDP SPTEs when changing
->     SPTE
->   KVM: Move prototypes for MMU notifier callbacks to generic code
->   KVM: Move arm64's MMU notifier trace events to generic code
->   KVM: Move x86's MMU notifier memslot walkers to generic code
->   KVM: arm64: Convert to the gfn-based MMU notifier callbacks
->   KVM: MIPS/MMU: Convert to the gfn-based MMU notifier callbacks
->   KVM: PPC: Convert to the gfn-based MMU notifier callbacks
->   KVM: Kill off the old hva-based MMU notifier callbacks
->   KVM: Take mmu_lock when handling MMU notifier iff the hva hits a
->     memslot
->   KVM: Don't take mmu_lock for range invalidation unless necessary
->   KVM: x86/mmu: Allow yielding during MMU notifier unmap/zap, if
->     possible
->   KVM: x86/mmu: Drop trace_kvm_age_page() tracepoint
->
->  arch/arm64/include/asm/kvm_host.h             |   5 -
->  arch/arm64/kvm/mmu.c                          | 118 ++----
->  arch/arm64/kvm/trace_arm.h                    |  66 ----
->  arch/mips/include/asm/kvm_host.h              |   5 -
->  arch/mips/kvm/mmu.c                           |  97 +----
->  arch/powerpc/include/asm/kvm_book3s.h         |  12 +-
->  arch/powerpc/include/asm/kvm_host.h           |   7 -
->  arch/powerpc/include/asm/kvm_ppc.h            |   9 +-
->  arch/powerpc/kvm/book3s.c                     |  18 +-
->  arch/powerpc/kvm/book3s.h                     |  10 +-
->  arch/powerpc/kvm/book3s_64_mmu_hv.c           |  98 ++---
->  arch/powerpc/kvm/book3s_64_mmu_radix.c        |  25 +-
->  arch/powerpc/kvm/book3s_hv.c                  |  12 +-
->  arch/powerpc/kvm/book3s_pr.c                  |  56 +--
->  arch/powerpc/kvm/e500_mmu_host.c              |  29 +-
->  arch/powerpc/kvm/trace_booke.h                |  15 -
->  arch/x86/include/asm/kvm_host.h               |   6 +-
->  arch/x86/kvm/mmu/mmu.c                        | 180 ++++-----
->  arch/x86/kvm/mmu/mmu_internal.h               |  10 +
->  arch/x86/kvm/mmu/tdp_mmu.c                    | 344 +++++++-----------
->  arch/x86/kvm/mmu/tdp_mmu.h                    |  31 +-
->  include/linux/kvm_host.h                      |  22 +-
->  include/trace/events/kvm.h                    |  90 +++--
->  tools/testing/selftests/kvm/lib/kvm_util.c    |   4 -
->  .../selftests/kvm/lib/x86_64/processor.c      |   2 +
->  virt/kvm/kvm_main.c                           | 312 ++++++++++++----
->  26 files changed, 697 insertions(+), 886 deletions(-)
->
-> --
-> 2.31.0.291.g576ba9dcdaf-goog
->
+Jason
