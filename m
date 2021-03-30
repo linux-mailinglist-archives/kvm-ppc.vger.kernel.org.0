@@ -2,141 +2,189 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45F3134F1E3
-	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Mar 2021 21:59:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6260434F40D
+	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 00:10:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233294AbhC3T6a (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 30 Mar 2021 15:58:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60594 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233288AbhC3T6Z (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 30 Mar 2021 15:58:25 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCD2C061765
-        for <kvm-ppc@vger.kernel.org>; Tue, 30 Mar 2021 12:58:25 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id q5so12864350pfh.10
-        for <kvm-ppc@vger.kernel.org>; Tue, 30 Mar 2021 12:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wTEyxuaapP4d1SHF7RcerzFayP475kgkIctZEDORCvY=;
-        b=envgQwKOhZLGzYbrjTo3+nEI/ILCJz7AV2GNZ37sA4tCFJ/jO9jwiK5voJwg3r/eds
-         n/zOAXzsVLcOacfLuS5VHUc/Z+MqB19zQ52tsRetZLD7hBDRRdqbtww6YeIzEisRIyMw
-         UnfTrppUFQicAdk3Yb3QZQbrg/qIsNA3dGPVEIftHW0s1SOq7Hgyee3Ke9l4JB7cfcim
-         WfxyAvKImmJ2KZPyBj2tHvhaebrjJjZxU5509A9Ch4WA/EkIVJwDkd6/BmVOdrShBU9j
-         tfeAKC2/dsPTX8UPAidLNUSrGVz0OIl962YLH0QZ9VroDrpQvyJk5f+1O5KmnTp/LVWY
-         h0QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wTEyxuaapP4d1SHF7RcerzFayP475kgkIctZEDORCvY=;
-        b=NVdbgKWgKXxNM7RNVKpcc8oMdQwV83UMtowlAtqG4vJqWlcx3hjzTchMWWWLHtQdU/
-         oeqgBTt0Tb7NYkEzIJ0BteX3APp1WzOxNKJuFh+W/wgRJLChtgRLVixVoaO7gDUcVgrr
-         szgYC/8MV8iI2XBybeBi/ZHnYE5M/gbecjXZ6D73y7i3pX0e85FN5gy17avDli2oKegS
-         s9PMmUJg8wYisNO9m/XV1nW9/6J8MjcZPgbj1FdQP611x1KdFEZx/4bAEqIp7a6v6bUD
-         IeShtiMzhgk8PPI5MkYktuWB8aR7s8fgcNJGEO9Tq8MR6pQXbvE3n8SiecuH/YNaKMOC
-         rLpA==
-X-Gm-Message-State: AOAM5324qVyt1feiD1XWMcFwFHe9XBT4qydIWF2apF0HoClXtJlilmbg
-        XcNj9k3ZWp9Mi+TJESpKxAo8DQ==
-X-Google-Smtp-Source: ABdhPJy/H3xYrm77zteXXmXwOlrnRIg3rQpdyEYIba7syOVncG/8FqBI2t2hNnALYH3MbklxzEVjZA==
-X-Received: by 2002:a63:5361:: with SMTP id t33mr29952003pgl.439.1617134304318;
-        Tue, 30 Mar 2021 12:58:24 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id f16sm10723866pfj.220.2021.03.30.12.58.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Mar 2021 12:58:23 -0700 (PDT)
-Date:   Tue, 30 Mar 2021 19:58:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        kvm-ppc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 00/18] KVM: Consolidate and optimize MMU notifiers
-Message-ID: <YGOC2wqn5k9WkY39@google.com>
-References: <20210326021957.1424875-1-seanjc@google.com>
- <CANgfPd_gpWsa4F3VdcpoBYqPR4dSBWNYCW1YdeOnu1wQdUz+0A@mail.gmail.com>
+        id S232840AbhC3WKL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 30 Mar 2021 18:10:11 -0400
+Received: from mail-mw2nam12on2050.outbound.protection.outlook.com ([40.107.244.50]:15988
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232805AbhC3WJk (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 30 Mar 2021 18:09:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bRNrQA/Oi5cuxpS6HmpV7zRHg8xejT9dEb7ORSNVhXprXqcv052wfsuN+eMva+0nsxG1G8ADYlfPuTt1/WyHTy+qTGyeED5zzkmyt5bc/oQR3odOXoktBy9mfLnH5AZ+2BHF9UoykT0EvAQ30OAKGlkUCWfFe3bezrkm5LGLfdmbLxgpTyBm/VbNEZu/+nXEhtdAwe2OUGA6jT91BCs40myyykdYotvjWaHFNxiE2d2xlFSheVV0x1xXP6n+5Q10FrroRtYh+j5GJWRT4pa29g9aAce6j+xopZ9Br7tUj/FaV2B3abRDa7202djRW0FwWDScPyibwyksoM978IYtUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xJ1JAfsJORwWdshubQnbDAwf1W6d2RocMsXTaMqmGiw=;
+ b=JpGVVuDjJLXPJlDqHdbbL9C2J6CdrP6yZ1h7z5XwUcxk3iYLjWa0FbmiRZCIvrOB8L59uPbNRevrYkxeeCq7jQfVg+aQg273LA+1W5t9qXO+HajNX/9i0Nv9QrOW5smEN2YrvDBBELTbXuRuDH8GIxsZBRgs0ExidyVWDFDnVr2eM3lg38tqBHfcNRfeSEP7b/OQwZQQp/p6YgH9kK8UkFUnI7f9glyk8JDhtelDUyfCS6vf1YErRZrKOIFpvy9M6IO2mGsYLWaTn44eLFKuuNky9sC1s8a88xqEMQXqkvFYXjfHQpglrHQxl1zIKzEtcG65NdrCAWuKhlMWW5ysBQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=infradead.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xJ1JAfsJORwWdshubQnbDAwf1W6d2RocMsXTaMqmGiw=;
+ b=TVuLXsKf1qR3Q9oTlVGt4WJj9f0czS75gGJXWHc1Jg1y5CJ7M2jWR07CjDmIKFaJUET08ZJns0m0xrmkXT8CKxOZnKf6q3Pnmp1XUFFuRM+I7992PgPvbCGRWnG+f1qux3BjkxIkhq7LvYA+GsvDe+g9r24G1Z3Iugxj0OCMs2i8ecrsv/IPLtMownnGY8OdO54Ksn80geJEaMUtMa/PxO6LJ2K80YRxbpkYOAvT0xFUUOGD3X9TgjEdxPtZGAsJbDtw6gCD49MDu/vbJMXE9kSdrhwkTSshI+XQMx95Th4ePtxOAIC/mtxhs2QbgzuCFLI5oE5/ra3OXlNDZQIlMQ==
+Received: from MW3PR05CA0009.namprd05.prod.outlook.com (2603:10b6:303:2b::14)
+ by BN9PR12MB5273.namprd12.prod.outlook.com (2603:10b6:408:11e::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25; Tue, 30 Mar
+ 2021 22:09:37 +0000
+Received: from CO1NAM11FT064.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:2b:cafe::1) by MW3PR05CA0009.outlook.office365.com
+ (2603:10b6:303:2b::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.16 via Frontend
+ Transport; Tue, 30 Mar 2021 22:09:37 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ CO1NAM11FT064.mail.protection.outlook.com (10.13.175.77) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.3955.18 via Frontend Transport; Tue, 30 Mar 2021 22:09:36 +0000
+Received: from nvdebian.localnet (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 30 Mar
+ 2021 22:09:32 +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
+        <bskeggs@redhat.com>, <akpm@linux-foundation.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
+        <jglisse@redhat.com>, <hch@infradead.org>, <daniel@ffwll.ch>,
+        <willy@infradead.org>, "Christoph Hellwig" <hch@lst.de>
+Subject: Re: [PATCH v7 3/8] mm/rmap: Split try_to_munlock from try_to_unmap
+Date:   Wed, 31 Mar 2021 09:09:30 +1100
+Message-ID: <12442194.rtmf8Ope3M@nvdebian>
+In-Reply-To: <20210330184903.GZ2356281@nvidia.com>
+References: <20210326000805.2518-1-apopple@nvidia.com> <20210326000805.2518-4-apopple@nvidia.com> <20210330184903.GZ2356281@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd_gpWsa4F3VdcpoBYqPR4dSBWNYCW1YdeOnu1wQdUz+0A@mail.gmail.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e03d9d71-c8cc-4dcf-0833-08d8f3c88152
+X-MS-TrafficTypeDiagnostic: BN9PR12MB5273:
+X-Microsoft-Antispam-PRVS: <BN9PR12MB527314172FA5E3CFCEC7BC17DF7D9@BN9PR12MB5273.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 96AaGFDMJi2edGAm/6hBmrLBfuI7h8DjfKUBnB1BDvUDzk5XqOBUg9XLzTm1umd9/BjcyIjia3mHPrIdt1/1n0GrjvPB3u8g4EXRCiMMzfhhzv3ZRR54EncpfXA5gDK7En1JbIFRCmi7oYVLQVVWuROrcgVT1E2dVUZmhWlhhmGk0bz3mKqhjj4XdReApwHEpVSqh2VFD8zF50OMsJJhmnn7ZGkuQwOMnj0bzzDgyq/vM69bjB49tPf02VkgzNXAqSRMx55A5TduW8Ey4BrRJualzYLd3x5dW7PnnpPDLjiysAOhGD44LV3gRi3Z523UAhBsbHwldbDjgDF8sqOr8TwzHUfJhkm88EGL78rkzuobONpLtAVL/y2W1DZG7CW2NLn/TogNkSLXddqyD6ZAXq1zNrukPkq0nNtiKZlgr3hKyIoVJ5PXJtN8UxEBeeIn+kBRFastWTH3wy7lWPeckbx1wVhaObDST7w5hkvMVXkp/7Fn0YpBwuhqDRABcSEx/Lw5y9sIfV/rCFuP31GBOeyuPOQuYcnbB/of4pMmxTXNtqKUS5LxbupR5D6QOoImmynWKxsi4TYujOsBBDZgDa+3nTkUKrRdMrmM0/6piuMbgaX2yAKOF5QBxE6yZU5LiSMRGCoRRdHxcqSEPffX5BDO1hvmzB/guMZKImh8pAERB8iX2ePeDA0+GsqP8fIU
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(396003)(346002)(136003)(376002)(39860400002)(46966006)(36840700001)(16526019)(4326008)(9686003)(26005)(83380400001)(33716001)(186003)(336012)(356005)(7636003)(86362001)(316002)(6636002)(6862004)(82740400003)(7416002)(8676002)(478600001)(54906003)(36860700001)(47076005)(36906005)(5660300002)(8936002)(82310400003)(70206006)(2906002)(70586007)(426003)(9576002)(39026012);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2021 22:09:36.0451
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e03d9d71-c8cc-4dcf-0833-08d8f3c88152
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT064.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5273
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Mar 30, 2021, Ben Gardon wrote:
-> On Thu, Mar 25, 2021 at 7:20 PM Sean Christopherson <seanjc@google.com> wrote:
-> > Patch 10 moves x86's memslot walkers into common KVM.  I chose x86 purely
-> > because I could actually test it.  All architectures use nearly identical
-> > code, so I don't think it actually matters in the end.
+On Wednesday, 31 March 2021 5:49:03 AM AEDT Jason Gunthorpe wrote:
+> On Fri, Mar 26, 2021 at 11:08:00AM +1100, Alistair Popple wrote:
 > 
-> I'm still reviewing 10 and 14-18. 10 is a huge change and the diff is
-> pretty hard to parse.
-
-Ya :-/  I don't see an easy way to break it up without creating a massive diff,
-e.g. it could be staged in x86 and moved to common, but I don't think that would
-fundamentally change the diff.  Although I admittedly didn't spend _that_ much
-time thinking about how to break it up.
-
-> > Patches 11-13 move arm64, MIPS, and PPC to the new APIs.
-> >
-> > Patch 14 yanks out the old APIs.
-> >
-> > Patch 15 adds the mmu_lock elision, but only for unpaired notifications.
+> > +static bool try_to_munlock_one(struct page *page, struct vm_area_struct 
+*vma,
+> > +		     unsigned long address, void *arg)
+> > +{
 > 
-> Reading through all this code and considering the changes I'm
-> preparing for the TDP MMU have me wondering if it might help to have a
-> more general purpose MMU lock context struct which could be embedded
-> in the structs added in this patch. I'm thinking something like:
-> enum kvm_mmu_lock_mode {
->     KVM_MMU_LOCK_NONE,
->     KVM_MMU_LOCK_READ,
->     KVM_MMU_LOCK_WRITE,
-> };
+> Is this function name right?
+
+Perhaps. This is called from try_to_munlock() hence the name, but see below 
+for some commentary on that naming.
+
+> > +	struct page_vma_mapped_walk pvmw = {
+> > +		.page = page,
+> > +		.vma = vma,
+> > +		.address = address,
+> > +	};
+> > +
+> > +	/* munlock has nothing to gain from examining un-locked vmas */
+> > +	if (!(vma->vm_flags & VM_LOCKED))
+> > +		return true;
+> > +
+> > +	while (page_vma_mapped_walk(&pvmw)) {
+> > +		/* PTE-mapped THP are never mlocked */
+> > +		if (!PageTransCompound(page)) {
+> > +			/*
+> > +			 * Holding pte lock, we do *not* need
+> > +			 * mmap_lock here
+> > +			 */
+> > +			mlock_vma_page(page);
 > 
-> struct kvm_mmu_lock_context {
->     enum kvm_mmu_lock_mode lock_mode;
->     bool can_block;
->     bool can_yield;
-
-Not that it matters right now, but can_block and can_yield are the same thing.
-I considered s/can_yield/can_block to make it all consistent, but that felt like
-unnecessary thrash.
-
->     bool flush;
-
-Drat.  This made me realize that the 'struct kvm_gfn_range' passed to arch code
-isn't tagged 'const'.  I thought I had done that, but obviously not.
-
-Anyways, what I was going to say before that realization is that the downside to
-putting flush into kvm_gfn_range is that it would have to lose its 'const'
-qualifier.  That's all a moot point if it's not easily constified though.
-
-Const aside, my gut reaction is that it will probably be cleaner to keep the
-flush stuff in arch code, separate from the kvm_gfn_range passed in by common
-KVM.  Looping 'flush' back into the helpers is x86 specific at this point, and
-AFAICT that's not likely to change any time soon.
-
-For rwlock support, if we get to the point where kvm_age_gfn() and/or
-kvm_test_age_gfn() can take mmu_lock for read, then it definitely makes sense to
-track locking in kvm_gfn_range, assuming it isn't the sole entity that prevents
-consifying kvm_range_range.
-
-> };
+> Because the only action this function seems to take is to call
+> *mlock*_vma_page()
 > 
-> This could yield some grossly long lines, but it would also have
-> potential to unify a bunch of ad-hoc handling.
-> The above struct could also fit into a single byte, so it'd be pretty
-> easy to pass it around.
+> > +		}
+> > +		page_vma_mapped_walk_done(&pvmw);
+> > +
+> > +		/* found a mlocked page, no point continuing munlock check */
+> > +		return false;
+> > +	}
+> > +
+> > +	return true;
+> > +}
+> > +
+> >  /**
+> >   * try_to_munlock - try to munlock a page
+> >   * @page: the page to be munlocked
+> > @@ -1796,8 +1821,7 @@ bool try_to_unmap(struct page *page, enum ttu_flags 
+flags)
+> >  void try_to_munlock(struct page *page)
+> >  {
+> 
+> But this is also called try_to_munlock ??
+
+As far as I can tell this has always been called try_to_munlock() even though 
+it appears to do the opposite.
+
+> /**
+>  * try_to_munlock - try to munlock a page
+>  * @page: the page to be munlocked
+>  *
+>  * Called from munlock code.  Checks all of the VMAs mapping the page
+>  * to make sure nobody else has this page mlocked. The page will be
+>  * returned with PG_mlocked cleared if no other vmas have it mlocked.
+>  */
+
+In other words it sets PG_mlocked if one or more vmas has it mlocked. So 
+try_to_mlock() might be a better name, except that seems to have the potential 
+for confusion as well because it's only called from the munlock code path and 
+never for mlock.
+
+> So what clears PG_mlocked on this call path?
+
+See munlock_vma_page(). munlock works by clearing PG_mlocked, then calling 
+try_to_munlock to check if any VMAs still need it locked in which case 
+PG_mlocked gets set again. There are no other callers of try_to_munlock().
+
+> Something needs attention here..
+
+I think the code is correct, but perhaps the naming could be better. Would be 
+interested hearing any thoughts on renaming try_to_munlock() to try_to_mlock() 
+as the current name appears based on the context it is called from (munlock) 
+rather than what it does (mlock).
+
+ - Alistair
+
+> Jason
+> 
+
+
+
+
