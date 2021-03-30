@@ -2,187 +2,223 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1B4934F4AE
-	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 00:57:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EC6434F543
+	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 02:05:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233114AbhC3W4l (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 30 Mar 2021 18:56:41 -0400
-Received: from mail-eopbgr700070.outbound.protection.outlook.com ([40.107.70.70]:44576
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233132AbhC3W43 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 30 Mar 2021 18:56:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hPvSdKzPlv1nJJzpFE8HhQvT+t5TOjpX43WwnRifFGNVSmPbdO67AvesS2QAcRqqy+WcyiR4V50tN8c2GZt/GxC/VJCTIXJHtUHeYX1TXechY10LAvpmQRtr9ojSib93/0eoNQVMwyYSTC2GUOCDz6GoUjCB6XlTiLXt1JpSKvp5BJpXpe7w0wi8C5q5sBL5a64pn6nrzfwK7v6CgWM2+UiIB+t71GiVNGhefh7zVoyQ2PMicy1ZG314+mviYcavMvInlXmRhotJxkhanRy8fH1awHERRSl4IzpWNzKXHMsa/6nNcH94OY2gTR1F7JVz0LbXEHqSEe85PuAn2ksSqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cpi7+2Q3W8AlMH/coytc85wXVzRatzANM0nrEySTwVk=;
- b=cLcy1oxLqy0H/emsHxpqZPZZPeempy1kPxBqERUiVVr94ZeYAxiNoGxopb1VBMO7iQv+rT6rSkwymyXvDYRaqkL4Aa/GQnF2nCkCkTYZ02oukIItfxUjsuKGu1nNJ7j7kSQdH+VW8yyV5t8wpJl/EPSGLV+Urk1f5+T9tcyONhj62drv696crRqMoZwOworWbqK0IsOluOzMNPwzPwgYUfDaG/Zrt3K421hTf+bk4zLd1OlZeZqOy1ZuNJTgFbIWZzgSMo9N8H4KlvTUzP6b+QMgMSlSHSVOdFnShm/KIMbOBuwCeYz9vbqsjWR90QFrDiltvoSr+B4B+pdYFHtjxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=infradead.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cpi7+2Q3W8AlMH/coytc85wXVzRatzANM0nrEySTwVk=;
- b=D/u8EzOEf8VjPjS1cxTUs8IYcjL+Xx35S/BpOyFiChErDbHZ1CSG2F2Qs/PC8ynmZODbs/FAvTBrDRao+k7dHY+4EwNyokiZ9L7lqMMAHyCWn6lZi50WrBOUiisx2vX8SmialSNIgJGj5EZu8n6yAjTL4WEsoOZiVK9mNgYNNR4H8nVGxTfB7Sgdxr0C2kVQE8RXJeLTrmxib56mXR0vy8ki4WmKS5TmEZbyoJtm5kgpHldp74gaLvH5cO/RtYKICv/7okwFp9wptwek33X+Pz3eKhvN8Ps+Bzidi3wYZ84ZONAShNL33njeva+Pl8Ds7W2PLjUo03/7oqIkSvnTcQ==
-Received: from BN6PR13CA0018.namprd13.prod.outlook.com (2603:10b6:404:10a::28)
- by DM6PR12MB4139.namprd12.prod.outlook.com (2603:10b6:5:214::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24; Tue, 30 Mar
- 2021 22:56:27 +0000
-Received: from BN8NAM11FT029.eop-nam11.prod.protection.outlook.com
- (2603:10b6:404:10a:cafe::f6) by BN6PR13CA0018.outlook.office365.com
- (2603:10b6:404:10a::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.16 via Frontend
- Transport; Tue, 30 Mar 2021 22:56:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- BN8NAM11FT029.mail.protection.outlook.com (10.13.177.68) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3955.18 via Frontend Transport; Tue, 30 Mar 2021 22:56:26 +0000
-Received: from nvdebian.localnet (172.20.145.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 30 Mar
- 2021 22:56:23 +0000
-From:   Alistair Popple <apopple@nvidia.com>
-To:     John Hubbard <jhubbard@nvidia.com>
-CC:     Jason Gunthorpe <jgg@nvidia.com>, <linux-mm@kvack.org>,
-        <nouveau@lists.freedesktop.org>, <bskeggs@redhat.com>,
-        <akpm@linux-foundation.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <rcampbell@nvidia.com>,
-        <jglisse@redhat.com>, <hch@infradead.org>, <daniel@ffwll.ch>,
-        <willy@infradead.org>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v7 3/8] mm/rmap: Split try_to_munlock from try_to_unmap
-Date:   Wed, 31 Mar 2021 09:56:20 +1100
-Message-ID: <12636584.zsJ0Sx4KLp@nvdebian>
-In-Reply-To: <bce0605a-336f-99ba-5b65-a8e5a7e49e00@nvidia.com>
-References: <20210326000805.2518-1-apopple@nvidia.com> <20210330222440.GC2356281@nvidia.com> <bce0605a-336f-99ba-5b65-a8e5a7e49e00@nvidia.com>
+        id S232401AbhCaAEe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 30 Mar 2021 20:04:34 -0400
+Received: from ozlabs.org ([203.11.71.1]:42797 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232367AbhCaAEK (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 30 Mar 2021 20:04:10 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4F96492fX7z9shx; Wed, 31 Mar 2021 11:04:09 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1617149049;
+        bh=KKbWb1jeZ7gWEamN12RZBI5mqQukpe0Qp9oQlldnmn8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=LSWWjhJ+ukQXA3xz5bLB5x0QIjWDVsP0MwO9H13F3IG40dRb/BP650WHF02h71EeD
+         Eu6rRE7PgthkEELUk31MlSI6FbQNo1P3s5lhRZ3xo1zl8bpbauzrtwpkmAqCSwPXoM
+         HK8rM3t0kRpvDvSRK3P+G76aGSd60rmIFuUvA90s=
+Date:   Wed, 31 Mar 2021 10:49:07 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Vaibhav Jain <vaibhav@linux.ibm.com>
+Cc:     Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
+        kvm-ppc@vger.kernel.org, qemu-ppc@nongnu.org, mst@redhat.com,
+        imammedo@redhat.com, xiaoguangrong.eric@gmail.com,
+        shivaprasadbhat@gmail.com, bharata@linux.vnet.ibm.com,
+        aneesh.kumar@linux.ibm.com, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com
+Subject: Re: [PATCH] ppc/spapr: Add support for implement support for
+ H_SCM_HEALTH
+Message-ID: <YGO488mqe2RMHBiu@yekko.fritz.box>
+References: <20210329162259.536964-1-vaibhav@linux.ibm.com>
+ <20210330161437.45872897@bahia.lan>
+ <87r1jwpo3p.fsf@vajain21.in.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a22db820-06fd-4788-658d-08d8f3cf0c8b
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4139:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB41394768A8A0A783BD70C9A7DF7D9@DM6PR12MB4139.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HRjVnFfdanjDSrRKE1YZnq3AN3oh7bHoCbPyLEjC33HeMz8iJH9GgBlCzCIsoW1Z3/24HHckunGGkXZheJ10XsskLx9RRIu71gP7MtA8B4Bm96oBuRyg7J5p7Ux0qvZzBfbm/bbjwWqmqTWnHW13iZ5DWMiLVbZ7saZVphP1Zt1EUcyomsRA6/rIs7D39ZDk92B9cvmyLdDSRsypgYdJVm1uyrXQa2oRqEQUjlCp1yhB8J+Oo2+y8WXsc+e1GG2q+3YLY3hXClc6VqASixRzKy4bzzEryQ5Uu2wGMd/ZocPHZGGEGmOZ8hXvLh/LGErfsXIgv0kbY+Y/jMXmK4mDLx8OP5WKUEyHv7U2Fa9ClqVBUSE2cSTmoUhj9mluZ8ng7RU649vZ19wDkpWFsDpYmcPkZAj+vf1kuvTGY4bV7NMJwicxdjfD/RJ59Q1C7pfJwNQ3gi0wEgw3k2j3lckUBil5bLoog8g2aQEk8jwsSHZwB58R8foAac1hcgQQAydy7yYDfGOcEE2tcY3zesd9GpgI6MDsgbzXe9Px61o0Frj/FFAVaMvgcnrOLcrhfoXQlyUVLb91+fKBxe/+W1PNYqCH0zzA9WEPlF/aECe/bL16yBZRFOzEESdjn1oioYyZqFM5J1pfjOAA1B7EOMh9bz6JV7YQRrPuXGoqCqW6dCE++q9TnpuPHVrrHeJzPPV0
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(136003)(346002)(39860400002)(376002)(396003)(46966006)(36840700001)(83380400001)(336012)(8936002)(36860700001)(6862004)(8676002)(478600001)(33716001)(16526019)(26005)(356005)(54906003)(426003)(186003)(47076005)(70206006)(9576002)(2906002)(7416002)(4326008)(316002)(53546011)(82740400003)(5660300002)(7636003)(9686003)(86362001)(70586007)(82310400003)(6636002)(36906005)(39026012);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2021 22:56:26.5438
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a22db820-06fd-4788-658d-08d8f3cf0c8b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT029.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4139
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="f7ONA1GK+uW2NGpv"
+Content-Disposition: inline
+In-Reply-To: <87r1jwpo3p.fsf@vajain21.in.ibm.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wednesday, 31 March 2021 9:43:19 AM AEDT John Hubbard wrote:
-> On 3/30/21 3:24 PM, Jason Gunthorpe wrote:
-> ...
-> >> As far as I can tell this has always been called try_to_munlock() even 
-though
-> >> it appears to do the opposite.
-> > 
-> > Maybe we should change it then?
-> > 
-> >>> /**
-> >>>   * try_to_munlock - try to munlock a page
-> >>>   * @page: the page to be munlocked
-> >>>   *
-> >>>   * Called from munlock code.  Checks all of the VMAs mapping the page
-> >>>   * to make sure nobody else has this page mlocked. The page will be
-> >>>   * returned with PG_mlocked cleared if no other vmas have it mlocked.
-> >>>   */
-> >>
-> >> In other words it sets PG_mlocked if one or more vmas has it mlocked. So
-> >> try_to_mlock() might be a better name, except that seems to have the 
-potential
-> >> for confusion as well because it's only called from the munlock code path 
-and
-> >> never for mlock.
-> > 
-> > That explanation makes more sense.. This function looks like it is
-> > 'set PG_mlocked of the page if any vm->flags has VM_LOCKED'
-> > 
-> > Maybe call it check_vm_locked or something then and reword the above
-> > comment?
-> > 
-> > (and why is it OK to read vm->flags for this without any locking?)
-> > 
-> >>> Something needs attention here..
-> >>
-> >> I think the code is correct, but perhaps the naming could be better. 
-Would be
-> >> interested hearing any thoughts on renaming try_to_munlock() to 
-try_to_mlock()
-> >> as the current name appears based on the context it is called from 
-(munlock)
-> >> rather than what it does (mlock).
-> > 
-> > The point of this patch is to make it clearer, after all, so I'd
-> > change something and maybe slightly clarify the comment.
-> > 
 
-Yep, agree with that.
- 
-> I'd add that, after looking around the calling code, this is a really 
-unhappy
-> pre-existing situation. Anyone reading this has to remember at which point 
-in the
-> call stack the naming transitions from "do the opposite of what the name 
-says",
-> to "do what the name says".
->
-> +1 for renaming "munlock*" items to "mlock*", where applicable. good grief.
+--f7ONA1GK+uW2NGpv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-At least the situation was weird enough to prompt further investigation :) 
+On Tue, Mar 30, 2021 at 10:37:06PM +0530, Vaibhav Jain wrote:
+>=20
+> Thanks for looking into this patch Greg. My responses below inline.
+>=20
+>=20
+> Greg Kurz <groug@kaod.org> writes:
+>=20
+> > Hi Vaibhav,
+> >
+> > Great to see you around :-)
+>=20
+> :-)
+>=20
+> >
+> > On Mon, 29 Mar 2021 21:52:59 +0530
+> > Vaibhav Jain <vaibhav@linux.ibm.com> wrote:
+> >
+> >> Add support for H_SCM_HEALTH hcall described at [1] for spapr
+> >> nvdimms. This enables guest to detect the 'unarmed' status of a
+> >> specific spapr nvdimm identified by its DRC and if its unarmed, mark
+> >> the region backed by the nvdimm as read-only.
+> >>=20
+> >
+> > Any chance that you can provide the documentation of this new hcall ?
+> >
+> H_SCM_HEALTH specifications is already documented in linux kernel
+> documentation at
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
+ocumentation/powerpc/papr_hcalls.rst
 
-Renaming to mlock* doesn't feel like the right solution to me either though. I 
-am not sure if you saw me responding to myself earlier but I am thinking 
-renaming try_to_munlock() -> page_mlocked() and try_to_munlock_one() -> 
-page_mlock_one() might be better. Thoughts?
+Putting a reference to that in the commit message would be a good idea.
 
-This is actually inspired from a suggestion in Documentation/vm/unevictable-
-lru.rst which warns about this problem:
+> That documentation was added when kernel support for H_SCM_HEALTH hcall
+> support was implemented in 5.9 kernel.=20
+>=20
+> >> The patch adds h_scm_health() to handle the H_SCM_HEALTH hcall which
+> >> returns two 64-bit bitmaps (health bitmap, health bitmap mask) derived
+> >> from 'struct nvdimm->unarmed' member.
+> >>=20
+> >> Linux kernel side changes to enable handling of 'unarmed' nvdimms for
+> >> ppc64 are proposed at [2].
+> >>=20
+> >> References:
+> >> [1] "Hypercall Op-codes (hcalls)"
+> >>     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git=
+/tree/Documentation/powerpc/papr_hcalls.rst
+> >>=20
+> >> [2] "powerpc/papr_scm: Mark nvdimm as unarmed if needed during probe"
+> >>     https://lore.kernel.org/linux-nvdimm/20210329113103.476760-1-vaibh=
+av@linux.ibm.com/
+> >>=20
+> >> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+> >> ---
+> >>  hw/ppc/spapr_nvdimm.c  | 30 ++++++++++++++++++++++++++++++
+> >>  include/hw/ppc/spapr.h |  4 ++--
+> >>  2 files changed, 32 insertions(+), 2 deletions(-)
+> >>=20
+> >> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+> >> index b46c36917c..e38740036d 100644
+> >> --- a/hw/ppc/spapr_nvdimm.c
+> >> +++ b/hw/ppc/spapr_nvdimm.c
+> >> @@ -31,6 +31,13 @@
+> >>  #include "qemu/range.h"
+> >>  #include "hw/ppc/spapr_numa.h"
+> >> =20
+> >> +/* DIMM health bitmap bitmap indicators */
+> >> +/* SCM device is unable to persist memory contents */
+> >> +#define PAPR_PMEM_UNARMED (1ULL << (63 - 0))
+> >
+> > This looks like PPC_BIT(0).
+> >
+> Yes, right. Will update the patch in v2 to use the PPC_BIT macro.
+>=20
+> >> +
+> >> +/* Bits status indicators for health bitmap indicating unarmed dimm */
+> >> +#define PAPR_PMEM_UNARMED_MASK (PAPR_PMEM_UNARMED)
+> >> +
+> >>  bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice =
+*nvdimm,
+> >>                             uint64_t size, Error **errp)
+> >>  {
+> >> @@ -467,6 +474,28 @@ static target_ulong h_scm_unbind_all(PowerPCCPU *=
+cpu, SpaprMachineState *spapr,
+> >>      return H_SUCCESS;
+> >>  }
+> >> =20
+> >> +static target_ulong h_scm_health(PowerPCCPU *cpu, SpaprMachineState *=
+spapr,
+> >> +                                 target_ulong opcode, target_ulong *a=
+rgs)
+> >> +{
+> >> +    uint32_t drc_index =3D args[0];
+> >> +    SpaprDrc *drc =3D spapr_drc_by_index(drc_index);
+> >> +    NVDIMMDevice *nvdimm;
+> >> +
+> >> +    if (drc && spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PMEM)=
+ {
+> >> +        return H_PARAMETER;
+> >> +    }
+> >> +
+> >> +    nvdimm =3D NVDIMM(drc->dev);
+> >
+> > Yeah as already suggested by Shiva, drc->dev should be checked like
+> > in h_scm_bind_mem().
+> >
+> Yes, will send a v2 with this case handled.
+>=20
+> >> +
+> >> +    /* Check if the nvdimm is unarmed and send its status via health =
+bitmaps */
+> >> +    args[0] =3D nvdimm->unarmed ? PAPR_PMEM_UNARMED_MASK : 0;
+> >> +
+> >
+> > Shouldn't ^^ use PAPR_PMEM_UNARMED then ?
+> >
+> >> +    /* health bitmap mask same as the health bitmap */
+> >> +    args[1] =3D args[0];
+> >> +
+> >
+> > If so, it seems that PAPR_PMEM_UNARMED_MASK isn't even needed.
+>=20
+> Definition of these defines are similar to what kernel implementation
+> uses at
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/a=
+rch/powerpc/platforms/pseries/papr_scm.c#n53
+>=20
+> Since unarmed condition can also arise due to an unhealthy nvdimm hence
+> the kernel implementation uses a mask thats composed of two bits
+> PPC_BIT(0) and PPC_BIT(6) being set. Though we arent using PPC_BIT(6)
+> right now in qemu, it will change in future when better nvdimm health
+> reporting will be done. Hence kept the PPC_BIT(0) define as well as the
+> mask to mimic the kernel definitions.
+>=20
+> >
+> > Having access to the excerpts from the PAPR addendum that describes
+> > this hcall would _really_ help in reviewing.
+> >
+> The kernel documentation for H_SCM_HEALTH mentioned above captures most
+> if not all parts of the PAPR addendum for this hcall. I believe it
+> contains enough information to review the patch. If you still need more
+> info than please let me know.
 
-try_to_munlock() Reverse Map Scan
----------------------------------
+We've missed the qemu-6.0 cutoff, so this will be 6.1 material.  I'll
+await v2 for further review.
 
-.. warning::
-   [!] TODO/FIXME: a better name might be page_mlocked() - analogous to the
-   page_referenced() reverse map walker.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> Although, it seems reasonable to tack such renaming patches onto the tail 
-end
-> of this series. But whatever works.
+--f7ONA1GK+uW2NGpv
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Unless anyone objects strongly I will roll the rename into this patch as there 
-is only one caller of try_to_munlock.
+-----BEGIN PGP SIGNATURE-----
 
- - Alistair
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmBjuPIACgkQbDjKyiDZ
+s5JzlA//T11BtMlXSLbvRPM52bSDvooPztpoMZGvaRtj7YJPJXsAUH76v4/XcFfl
+lZ2ZELMyuQc4Dms4Ylff1/srXq73eC8p/GYIt9K5iAU7NZop5hbcFiaWv5FaU7um
+CzimfPN8g+sPj0+O06O6oAELVTZZvcsdLn7Tq+alVegvg2vtfHesQklH7tHqVox3
+FRrxrxmEpAHsaVVfZKqyOrrjEVwtcFpeh9cnqgWGtbJuF6rFuqMoNzLeyUJ6k4Ea
+Z8vA0sj9wOP2uR2yROp6+R3+YKOlUZfMRxXO2Yqt50ePVwcaIA/fWZV5hNHGFu5V
+D+I53u8lBZ6oFStXlBUREp+DtUMj0RH+l8jHfMKJnYIdu1jixWa8yh6qQibQ4+A4
+tOzWCn5ipL2L48kAbq9xBZisz4c3v9BxF8UlluV21QmEtZZCd6P3Sjdg7Cf4Tsg+
+AtSC+jfUIKzPi8QLeGmvJDDGQocvr/4WZ7D0EkZmpa7vwnviQfN6slyYj1fSIF2h
+kV8sBi5AkqZAKGexeDHTdihR/AT64EdcRNM+1EFBXc+ZSXk/guGX7efmwWfBLW81
+k0zjUyCongXcMAvotY3GI9DEEepaMJW1yN1aqrc3mqUt5dx8dv2JwaOvdF3TI84J
+G9m6vGW92xUU2eyLIphMqgkHLVJzixEpFeHLBrTTKupLMD9BoOY=
+=jjbl
+-----END PGP SIGNATURE-----
 
-> thanks,
-> 
-
-
-
-
+--f7ONA1GK+uW2NGpv--
