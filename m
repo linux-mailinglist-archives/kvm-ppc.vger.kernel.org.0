@@ -2,105 +2,147 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94DDB34FD3B
-	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 11:42:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6019F34FD98
+	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 11:59:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234697AbhCaJlh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 31 Mar 2021 05:41:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56059 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234933AbhCaJlL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 31 Mar 2021 05:41:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617183670;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=13ETPGXsf76nLgxQSYUcOfnDRwF5dXOwh3DpIOsgydE=;
-        b=RI1K6Fssqt7hUlhyzbMKI4QBb13TuCj0sR1qxdT2zpsJX5eEBTwH41nrGg66jFIFLks5cj
-        wCA6xSTfgSkES/2Pm4VJzUOZgswA9oFGBYwpb5jxIlH51xia4Lg1awqDbGr1lQIba67LE1
-        H3Cr9eOiXaYTJa6fel6vf9JWsjenQoY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-u1M4M-LEOPCz8l3VZnOeJw-1; Wed, 31 Mar 2021 05:41:08 -0400
-X-MC-Unique: u1M4M-LEOPCz8l3VZnOeJw-1
-Received: by mail-ej1-f70.google.com with SMTP id fy8so534320ejb.19
-        for <kvm-ppc@vger.kernel.org>; Wed, 31 Mar 2021 02:41:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=13ETPGXsf76nLgxQSYUcOfnDRwF5dXOwh3DpIOsgydE=;
-        b=rbclDGB3WTXuttBhDusAJbu5IhX+Up9q8mE/wdN3ohnYYpLFcKWklG4aP7SyR4+NfZ
-         ZcR2xqu3PZZULsk3XQ+9sMlk03qJ+0vQEeioM8pQDhuy4cx5xtamf3st9wRKsoti7tIf
-         aZQREJ1e/VVRz9iURvUiyqefzIdK4mtM3ZAwM+bsHVmfqnSIZjt5H02QmGVK/N5KYbzr
-         CocSWGXKB13+vadjolwv4sRLIqBOtSQzzGTdPSeT5SZhTp9nu8W0rFDbn3KDfN2L2ilj
-         RumrFC0mZmboMXkUB6dNB96u/9Mc46kbJDUFOOH6fxwqnOKephRSgQQWD5kCCJ/npj2H
-         82Bg==
-X-Gm-Message-State: AOAM5308cBo3fKCkw3Yzn6T2mPXbQgLdl5DkgGWpT32XEc38yd1cHH3H
-        e1frGUnoc9SE445lY/d3HOQ6EJ1iTYhvqc7ElC8UoaLjsfFuAuiKgYBq3rz8XkrlrmSXf2nE2Pf
-        3embN6ZmXCFPdemEr5Q==
-X-Received: by 2002:a17:906:2bc3:: with SMTP id n3mr2580924ejg.418.1617183667249;
-        Wed, 31 Mar 2021 02:41:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwSsS0Tsx00ZWZ0/lu50AT1LbGXR9x8m5wdROjQWRD+Wcg6SCBEWtjgSLJ9LavhsubZOMOLAQ==
-X-Received: by 2002:a17:906:2bc3:: with SMTP id n3mr2580906ejg.418.1617183667053;
-        Wed, 31 Mar 2021 02:41:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id t15sm1151761edc.34.2021.03.31.02.41.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Mar 2021 02:41:05 -0700 (PDT)
-Subject: Re: [PATCH 00/18] KVM: Consolidate and optimize MMU notifiers
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>
-References: <20210326021957.1424875-1-seanjc@google.com>
- <a2ca8cb2-5c91-b971-9b6e-65cf9ee97ffa@redhat.com>
- <e50f6f28c0446cd328e475859ef05dc4@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <569a089e-471f-8182-cdb2-74188f0cc81d@redhat.com>
-Date:   Wed, 31 Mar 2021 11:41:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S234890AbhCaJ6n (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 31 Mar 2021 05:58:43 -0400
+Received: from ozlabs.org ([203.11.71.1]:44145 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234375AbhCaJ6Z (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 31 Mar 2021 05:58:25 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4F9MFl5f6mz9sVb;
+        Wed, 31 Mar 2021 20:58:19 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1617184704;
+        bh=62LWuEyrUicGCyza4BxPmll8qguht3fvwrGpruDriEg=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=arHGUZR1viBTEjAXyUIXP/+nurc8liOgRj9c7NVvad7Troem8hU1kwlNCpaPBAsvP
+         1h82bqXhyB0I38ZWIKd5XW11wZbDamjeJrkS5CklXHx2aXl5h7xCWoIgoqNN2NX2xj
+         JatIx753TUP6rLjQavrVe45YO6cLoJa8gbI5xBD8pxTHRVpg3/FerLrPmJ1IEZvc4U
+         EpNsaSsCol6UEeUCC/mpwSAtrIdglSlvti1NNnYfURnRwbWrtdAaJPS3ggS/AoRxvg
+         /LU6rDVZzYU4KI3q+NJ76VlazhqDSEURUWAmKq9SDpRWQGPaIc/f7b6atnYaEsYJaw
+         2Jux27y1mafQw==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Xiongwei Song <sxwjean@me.com>, benh@kernel.crashing.org,
+        paulus@samba.org, oleg@redhat.com, npiggin@gmail.com,
+        christophe.leroy@csgroup.eu, msuchanek@suse.de,
+        aneesh.kumar@linux.ibm.com, ravi.bangoria@linux.ibm.com,
+        mikey@neuling.org, haren@linux.ibm.com, alistair@popple.id.au,
+        jniethe5@gmail.com, peterz@infradead.org, leobras.c@gmail.com,
+        akpm@linux-foundation.org, rppt@kernel.org, peterx@redhat.com,
+        atrajeev@linux.vnet.ibm.com, maddy@linux.ibm.com,
+        kjain@linux.ibm.com, kan.liang@linux.intel.com, aik@ozlabs.ru,
+        pmladek@suse.com, john.ogness@linutronix.de
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, Xiongwei Song <sxwjean@gmail.com>
+Subject: Re: [PATCH v2] powerpc/traps: Enhance readability for trap types
+In-Reply-To: <20210330150425.10145-1-sxwjean@me.com>
+References: <20210330150425.10145-1-sxwjean@me.com>
+Date:   Wed, 31 Mar 2021 20:58:17 +1100
+Message-ID: <875z17y79i.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <e50f6f28c0446cd328e475859ef05dc4@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 31/03/21 11:34, Marc Zyngier wrote:
-> 
->> Queued and 1-9 and 18, thanks.  There's a small issue in patch 10 that
->> prevented me from committing 10-15, but they mostly look good.
-> 
-> Can you please push the resulting merge somewhere?
-> 
-> I'm concerned that it will conflict in interesting way with other stuff
-> that is on its way on the arm64 side, not to mentiobn that this hasn't
-> been tested at all on anything but x86 (and given the series was posted
-> on Friday, that's a bit of a short notice).
+Xiongwei Song <sxwjean@me.com> writes:
+> From: Xiongwei Song <sxwjean@gmail.com>
+>
+> Create a new header named traps.h, define macros to list ppc exception
+> types in traps.h, replace the reference of the real trap values with
+> these macros.
 
-Yes, I will push it shortly to kvm/queue.  Note that the patches I have 
-pushed are x86 only apart from changes to tracepoints.  The rest will 
-certainly need a lot more baking, which is also why I got rid quickly of 
-the easy ones.
+Personally I find the hex values easier to recognise, but I realise
+that's probably not true of other people :)
 
-Paolo
+...
+> diff --git a/arch/powerpc/include/asm/traps.h b/arch/powerpc/include/asm/traps.h
+> new file mode 100644
+> index 000000000000..a31b6122de23
+> --- /dev/null
+> +++ b/arch/powerpc/include/asm/traps.h
+> @@ -0,0 +1,19 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef _ASM_PPC_TRAPS_H
+> +#define _ASM_PPC_TRAPS_H
+> +
+> +#define TRAP_RESET   0x100 /* System reset */
+> +#define TRAP_MCE     0x200 /* Machine check */
+> +#define TRAP_DSI     0x300 /* Data storage */
+> +#define TRAP_DSEGI   0x380 /* Data segment */
+> +#define TRAP_ISI     0x400 /* Instruction storage */
+> +#define TRAP_ISEGI   0x480 /* Instruction segment */
+> +#define TRAP_ALIGN   0x600 /* Alignment */
+> +#define TRAP_PROG    0x700 /* Program */
+> +#define TRAP_DEC     0x900 /* Decrementer */
+> +#define TRAP_SYSCALL 0xc00 /* System call */
+> +#define TRAP_TRACEI  0xd00 /* Trace */
+> +#define TRAP_FPA     0xe00 /* Floating-point Assist */
+> +#define TRAP_PMI     0xf00 /* Performance monitor */
 
+I know the macro is called TRAP and the field in pt_regs is called trap,
+but the terminology in the architecture is "exception", and we already
+have many uses of that. In particular we have a lot of uses of "exc" as
+an abbreviation for "exception". So I think I'd rather we use that than
+"TRAP".
+
+I think we should probably use the names from the ISA, unless they are
+really over long.
+
+Which are:
+
+  0x100   System Reset
+  0x200   Machine Check
+  0x300   Data Storage
+  0x380   Data Segment
+  0x400   Instruction Storage
+  0x480   Instruction Segment
+  0x500   External
+  0x600   Alignment
+  0x700   Program
+  0x800   Floating-Point Unavailable
+  0x900   Decrementer
+  0x980   Hypervisor Decrementer
+  0xA00   Directed Privileged Doorbell
+  0xC00   System Call
+  0xD00   Trace
+  0xE00   Hypervisor Data Storage
+  0xE20   Hypervisor Instruction Storage
+  0xE40   Hypervisor Emulation Assistance
+  0xE60   Hypervisor Maintenance
+  0xE80   Directed Hypervisor Doorbell
+  0xEA0   Hypervisor Virtualization
+  0xF00   Performance Monitor
+  0xF20   Vector Unavailable
+  0xF40   VSX Unavailable
+  0xF60   Facility Unavailable
+  0xF80   Hypervisor Facility Unavailable
+  0xFA0   Directed Ultravisor Doorbell
+
+
+So perhaps:
+
+  EXC_SYSTEM_RESET
+  EXC_MACHINE_CHECK
+  EXC_DATA_STORAGE
+  EXC_DATA_SEGMENT
+  EXC_INST_STORAGE
+  EXC_INST_SEGMENT
+  EXC_EXTERNAL_INTERRUPT
+  EXC_ALIGNMENT
+  EXC_PROGRAM_CHECK
+  EXC_FP_UNAVAILABLE
+  EXC_DECREMENTER
+  EXC_HV_DECREMENTER
+  EXC_SYSTEM_CALL
+  EXC_HV_DATA_STORAGE
+  EXC_PERF_MONITOR
+
+
+cheers
