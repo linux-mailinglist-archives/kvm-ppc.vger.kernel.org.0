@@ -2,147 +2,106 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6019F34FD98
-	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 11:59:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B59C934FDF4
+	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 12:21:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234890AbhCaJ6n (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 31 Mar 2021 05:58:43 -0400
-Received: from ozlabs.org ([203.11.71.1]:44145 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234375AbhCaJ6Z (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 31 Mar 2021 05:58:25 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S234887AbhCaKVB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 31 Mar 2021 06:21:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29434 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234375AbhCaKUx (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 31 Mar 2021 06:20:53 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12VA4BOU048660;
+        Wed, 31 Mar 2021 06:20:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : content-type :
+ mime-version; s=pp1; bh=p6YVCg1411fVcZy23Dy4j74YNztaVR4TyNA+hmWAe84=;
+ b=WAynXgSflsuTxDXIW+ATC2sSrpvYsTXv+wt3bUM3j9bXyijEzZeooSooOMB7BXL8WOfP
+ QAU7pzV/q7me3vT6rcwBDipcEpyj/TY/+O+0eTRYObrIDLkFzLaq/6FuBzImGynnQyBc
+ EfScxLCJNv/0yK65B0QZ6UcBsNxj5LZ35vJtSCwpHk96wfZ/CYqWeMmwbZQKQjsD7hPL
+ a9qiSO5mlNoCHsudJXrBxxJLecrPVS8tcRs6nLg0tNOPAz7lZtp6BznPiT3Y4QKRZiOu
+ a/rxYcDqrX/5aZHidrOdI2FnH5twuFw5oxmZbTTNzovIAiSf0v/YgQOpsknJQVMqUki1 aw== 
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37mb3h8wdt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 31 Mar 2021 06:20:46 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12VA8Z0d007092;
+        Wed, 31 Mar 2021 10:20:45 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 37maaqr8w5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 31 Mar 2021 10:20:44 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12VAKgeR33489384
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 31 Mar 2021 10:20:42 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A49C042042;
+        Wed, 31 Mar 2021 10:20:42 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 53D7142052;
+        Wed, 31 Mar 2021 10:20:42 +0000 (GMT)
+Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 31 Mar 2021 10:20:42 +0000 (GMT)
+Received: from localhost (unknown [9.206.131.146])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4F9MFl5f6mz9sVb;
-        Wed, 31 Mar 2021 20:58:19 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1617184704;
-        bh=62LWuEyrUicGCyza4BxPmll8qguht3fvwrGpruDriEg=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=arHGUZR1viBTEjAXyUIXP/+nurc8liOgRj9c7NVvad7Troem8hU1kwlNCpaPBAsvP
-         1h82bqXhyB0I38ZWIKd5XW11wZbDamjeJrkS5CklXHx2aXl5h7xCWoIgoqNN2NX2xj
-         JatIx753TUP6rLjQavrVe45YO6cLoJa8gbI5xBD8pxTHRVpg3/FerLrPmJ1IEZvc4U
-         EpNsaSsCol6UEeUCC/mpwSAtrIdglSlvti1NNnYfURnRwbWrtdAaJPS3ggS/AoRxvg
-         /LU6rDVZzYU4KI3q+NJ76VlazhqDSEURUWAmKq9SDpRWQGPaIc/f7b6atnYaEsYJaw
-         2Jux27y1mafQw==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Xiongwei Song <sxwjean@me.com>, benh@kernel.crashing.org,
-        paulus@samba.org, oleg@redhat.com, npiggin@gmail.com,
-        christophe.leroy@csgroup.eu, msuchanek@suse.de,
-        aneesh.kumar@linux.ibm.com, ravi.bangoria@linux.ibm.com,
-        mikey@neuling.org, haren@linux.ibm.com, alistair@popple.id.au,
-        jniethe5@gmail.com, peterz@infradead.org, leobras.c@gmail.com,
-        akpm@linux-foundation.org, rppt@kernel.org, peterx@redhat.com,
-        atrajeev@linux.vnet.ibm.com, maddy@linux.ibm.com,
-        kjain@linux.ibm.com, kan.liang@linux.intel.com, aik@ozlabs.ru,
-        pmladek@suse.com, john.ogness@linutronix.de
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Xiongwei Song <sxwjean@gmail.com>
-Subject: Re: [PATCH v2] powerpc/traps: Enhance readability for trap types
-In-Reply-To: <20210330150425.10145-1-sxwjean@me.com>
-References: <20210330150425.10145-1-sxwjean@me.com>
-Date:   Wed, 31 Mar 2021 20:58:17 +1100
-Message-ID: <875z17y79i.fsf@mpe.ellerman.id.au>
-MIME-Version: 1.0
+        by ozlabs.au.ibm.com (Postfix) with ESMTPSA id 8CEDE60599;
+        Wed, 31 Mar 2021 21:20:40 +1100 (AEDT)
+From:   Michael Ellerman <ellerman@au1.ibm.com>
+To:     "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
+        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
+        sbhat@linux.vnet.ibm.com, linuxppc-dev@lists.ozlabs.org,
+        kvm-ppc@vger.kernel.org, linux-nvdimm@lists.01.org
+Cc:     linux-doc@vger.kernel.org, vaibhav@linux.ibm.com
+Subject: Re: [PATCH v3] powerpc/papr_scm: Implement support for H_SCM_FLUSH
+ hcall
+In-Reply-To: <87mtul6xzj.fsf@linux.ibm.com>
+References: <161703936121.36.7260632399582101498.stgit@e1fbed493c87>
+ <87mtul6xzj.fsf@linux.ibm.com>
+Date:   Wed, 31 Mar 2021 21:20:36 +1100
+Message-ID: <87zgyjwrnv.fsf@mpe.ellerman.id.au>
 Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kI7olCKHAEIbR5wjk2XHs2J1MqGiFAtQ
+X-Proofpoint-GUID: kI7olCKHAEIbR5wjk2XHs2J1MqGiFAtQ
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-31_03:2021-03-30,2021-03-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ mlxscore=0 phishscore=0 malwarescore=0 bulkscore=0 lowpriorityscore=0
+ suspectscore=0 clxscore=1011 adultscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2103300000 definitions=main-2103310073
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Xiongwei Song <sxwjean@me.com> writes:
-> From: Xiongwei Song <sxwjean@gmail.com>
+"Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com> writes:
+> Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
 >
-> Create a new header named traps.h, define macros to list ppc exception
-> types in traps.h, replace the reference of the real trap values with
-> these macros.
+>> Add support for ND_REGION_ASYNC capability if the device tree
+>> indicates 'ibm,hcall-flush-required' property in the NVDIMM node.
+>> Flush is done by issuing H_SCM_FLUSH hcall to the hypervisor.
+>>
+>> If the flush request failed, the hypervisor is expected to
+>> to reflect the problem in the subsequent nvdimm H_SCM_HEALTH call.
+>>
+>> This patch prevents mmap of namespaces with MAP_SYNC flag if the
+>> nvdimm requires an explicit flush[1].
+>>
+>> References:
+>> [1] https://github.com/avocado-framework-tests/avocado-misc-tests/blob/master/memory/ndctl.py.data/map_sync.c
+>
+>
+> Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
 
-Personally I find the hex values easier to recognise, but I realise
-that's probably not true of other people :)
+Do we need an ack from nvdimm folks on this?
 
-...
-> diff --git a/arch/powerpc/include/asm/traps.h b/arch/powerpc/include/asm/traps.h
-> new file mode 100644
-> index 000000000000..a31b6122de23
-> --- /dev/null
-> +++ b/arch/powerpc/include/asm/traps.h
-> @@ -0,0 +1,19 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_PPC_TRAPS_H
-> +#define _ASM_PPC_TRAPS_H
-> +
-> +#define TRAP_RESET   0x100 /* System reset */
-> +#define TRAP_MCE     0x200 /* Machine check */
-> +#define TRAP_DSI     0x300 /* Data storage */
-> +#define TRAP_DSEGI   0x380 /* Data segment */
-> +#define TRAP_ISI     0x400 /* Instruction storage */
-> +#define TRAP_ISEGI   0x480 /* Instruction segment */
-> +#define TRAP_ALIGN   0x600 /* Alignment */
-> +#define TRAP_PROG    0x700 /* Program */
-> +#define TRAP_DEC     0x900 /* Decrementer */
-> +#define TRAP_SYSCALL 0xc00 /* System call */
-> +#define TRAP_TRACEI  0xd00 /* Trace */
-> +#define TRAP_FPA     0xe00 /* Floating-point Assist */
-> +#define TRAP_PMI     0xf00 /* Performance monitor */
-
-I know the macro is called TRAP and the field in pt_regs is called trap,
-but the terminology in the architecture is "exception", and we already
-have many uses of that. In particular we have a lot of uses of "exc" as
-an abbreviation for "exception". So I think I'd rather we use that than
-"TRAP".
-
-I think we should probably use the names from the ISA, unless they are
-really over long.
-
-Which are:
-
-  0x100   System Reset
-  0x200   Machine Check
-  0x300   Data Storage
-  0x380   Data Segment
-  0x400   Instruction Storage
-  0x480   Instruction Segment
-  0x500   External
-  0x600   Alignment
-  0x700   Program
-  0x800   Floating-Point Unavailable
-  0x900   Decrementer
-  0x980   Hypervisor Decrementer
-  0xA00   Directed Privileged Doorbell
-  0xC00   System Call
-  0xD00   Trace
-  0xE00   Hypervisor Data Storage
-  0xE20   Hypervisor Instruction Storage
-  0xE40   Hypervisor Emulation Assistance
-  0xE60   Hypervisor Maintenance
-  0xE80   Directed Hypervisor Doorbell
-  0xEA0   Hypervisor Virtualization
-  0xF00   Performance Monitor
-  0xF20   Vector Unavailable
-  0xF40   VSX Unavailable
-  0xF60   Facility Unavailable
-  0xF80   Hypervisor Facility Unavailable
-  0xFA0   Directed Ultravisor Doorbell
-
-
-So perhaps:
-
-  EXC_SYSTEM_RESET
-  EXC_MACHINE_CHECK
-  EXC_DATA_STORAGE
-  EXC_DATA_SEGMENT
-  EXC_INST_STORAGE
-  EXC_INST_SEGMENT
-  EXC_EXTERNAL_INTERRUPT
-  EXC_ALIGNMENT
-  EXC_PROGRAM_CHECK
-  EXC_FP_UNAVAILABLE
-  EXC_DECREMENTER
-  EXC_HV_DECREMENTER
-  EXC_SYSTEM_CALL
-  EXC_HV_DATA_STORAGE
-  EXC_PERF_MONITOR
-
+Or is it entirely powerpc internal (seems like it from the diffstat)?
 
 cheers
