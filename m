@@ -2,55 +2,56 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6478134FAD2
-	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 09:53:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E5E634FAED
+	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 09:58:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233925AbhCaHwu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 31 Mar 2021 03:52:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29704 "EHLO
+        id S234190AbhCaH5j (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 31 Mar 2021 03:57:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25175 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234240AbhCaHwj (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 31 Mar 2021 03:52:39 -0400
+        by vger.kernel.org with ESMTP id S234153AbhCaH5Y (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 31 Mar 2021 03:57:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617177158;
+        s=mimecast20190719; t=1617177444;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pQ5Qm7wzrETleGdIZygb6hZggBdQLM72Jyc7tGd4rCA=;
-        b=Pb3MkZ12nIe29/GyrQ+y0lVTcOrMgo2tE3vlLkV3c/ihfKSnePv8774ZAXxRdPr+7GnsGf
-        XXadNkkv7SvdOV27vfK5ejdf/j7kaA8JH+L3uvlDRhCIbMxUVrsifa3/b/U8i6x4G0WdGe
-        YbljWw7v2BsVSyCfU5+LH/r2sHrkPs8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-9peA4BoZOp-6Itl8a2GEfw-1; Wed, 31 Mar 2021 03:52:36 -0400
-X-MC-Unique: 9peA4BoZOp-6Itl8a2GEfw-1
-Received: by mail-wm1-f72.google.com with SMTP id c9so125359wme.5
-        for <kvm-ppc@vger.kernel.org>; Wed, 31 Mar 2021 00:52:36 -0700 (PDT)
+        bh=QzUhMnMU3zQi7kbLUex8emke2jBdKMAGI8Tet8F4dtw=;
+        b=PICz9S+uBtGk/mte47jDU1AGrkdflPKcD5bU88EEagj46Oqn1uIHDo/bIGCl0/x62ltz4e
+        NzPRIUwYEUu16rBRMCTz5vVNLPe0CGgBV1F7pjtpj10uBlurF3ClfpS7Il8yt2yAXV0gqB
+        PjSHJgEzf/9ugPVOYl1jllwv0YcX9co=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-gTSCp6CrPx6vtGMuu-xjgQ-1; Wed, 31 Mar 2021 03:57:22 -0400
+X-MC-Unique: gTSCp6CrPx6vtGMuu-xjgQ-1
+Received: by mail-wm1-f70.google.com with SMTP id n17so130086wmi.2
+        for <kvm-ppc@vger.kernel.org>; Wed, 31 Mar 2021 00:57:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=pQ5Qm7wzrETleGdIZygb6hZggBdQLM72Jyc7tGd4rCA=;
-        b=q7I479wAIR+IZiTz8XDzARIBl4z771dIZ95G3sjNYeG5iuQW9Zs6u+Ne8cfluRPOWH
-         9qBv7MqGXTh1uOv7IPS75CX+Lyvab7bi2B6Au/Y1vQ5Ld1z5WhxwCOo+X8FxJSU+JxvC
-         LCSxvRMZ1Mgg5s0ZOPq2VcDSv/kP8eWIR80s2LDy1E3qCxUUKFxVL4aQ4iLT5J3QrI3l
-         SViTnoOxcM9Kq/gaZPnrhbi9O8PwENDBfSrk4DyN1wIPMsK+Ck/Ty2pWspkjpi/jLKdg
-         VRR0x+5LIHyDe++NBcbm/4mgZfbYOrzbdjJqFxQpL4tgZivGJwLOjFqBlq6x+KgYvnj8
-         ERvA==
-X-Gm-Message-State: AOAM532Dx3I1ftrEHSIqYZpds553MbsgxcJqW63o0cDw3sruRETYxBsF
-        /4164x8gHDjtuE3P9Y9yrZgUBs9e2stIk7hH9RY3afOYcQKBFGD+LP+V15JuYOQ3+6IFtasTYo/
-        d64ZAFIxv/vgALE7vOw==
-X-Received: by 2002:a1c:dfc1:: with SMTP id w184mr1947748wmg.21.1617177155318;
-        Wed, 31 Mar 2021 00:52:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyrEJ16pEEpfSd4UOjbnqA+7pbiSAPPFNpTAPEwcpv0H2fU5p4zyKOS02szcKvl3Y4jdrVOKQ==
-X-Received: by 2002:a1c:dfc1:: with SMTP id w184mr1947732wmg.21.1617177155168;
-        Wed, 31 Mar 2021 00:52:35 -0700 (PDT)
+        bh=QzUhMnMU3zQi7kbLUex8emke2jBdKMAGI8Tet8F4dtw=;
+        b=qLWq/W03jzO49tR33cBc8mk07SIBFACcXyLBlgij9otbOHS3SN68ex1GY8tcuyCZD8
+         Fr59Ui583W80KEZdytaxtJu9qi+VOZkQ9fzJmzXHTFF1TyHlfvGhAbZ62wi74i30k+0x
+         VOOdXwdI+EEAEC0sp8NVcQ6ejb85BocEBBvbvaFXT2+RKumx/1htgflisbdyHDtAKQqa
+         MbELQSOC6n8kB9yGpXhmLf51484PT8INqdFTgfjlU0GRfM/hU0aYUSgH5KxIzEN1SkPz
+         3EoWnGWX4faGoJMyCE2dUPzHd93bjfTU2vt2JIeH+9lIdhXdKf7smDVfG5lUD9u9alOH
+         boWg==
+X-Gm-Message-State: AOAM533Ej0qxmWBj0ipbh5t6EmicoTBzMqB6d/OIn2FCitPp61y5K2Us
+        DQcqyUdrb5HHiPuPN09x2NXDq9XJYpiFLszrvEY7gH9iF5xLF2tvagFrIyDuw03tuV6Hs1evAme
+        wO3j2aPEkgTZwQvnKOw==
+X-Received: by 2002:a05:600c:190a:: with SMTP id j10mr1935781wmq.140.1617177441042;
+        Wed, 31 Mar 2021 00:57:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyg+EcdGfruRX3HrpM78c15MOqjXD+Pq6QPq9lrCE+nNtYrHVJVg0glnjf7PSn4UemOs7R8Kw==
+X-Received: by 2002:a05:600c:190a:: with SMTP id j10mr1935760wmq.140.1617177440807;
+        Wed, 31 Mar 2021 00:57:20 -0700 (PDT)
 Received: from [192.168.10.118] ([93.56.169.140])
-        by smtp.gmail.com with ESMTPSA id b17sm2793386wrt.17.2021.03.31.00.52.31
+        by smtp.gmail.com with ESMTPSA id b65sm2631515wmh.4.2021.03.31.00.57.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Mar 2021 00:52:33 -0700 (PDT)
+        Wed, 31 Mar 2021 00:57:19 -0700 (PDT)
+Subject: Re: [PATCH 00/18] KVM: Consolidate and optimize MMU notifiers
 To:     Sean Christopherson <seanjc@google.com>,
         Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
@@ -68,48 +69,86 @@ Cc:     James Morse <james.morse@arm.com>,
         kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
         Ben Gardon <bgardon@google.com>
 References: <20210326021957.1424875-1-seanjc@google.com>
- <20210326021957.1424875-11-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 10/18] KVM: Move x86's MMU notifier memslot walkers to
- generic code
-Message-ID: <ba3f7a9c-0b59-cbeb-5d46-4236cde2c51f@redhat.com>
-Date:   Wed, 31 Mar 2021 09:52:30 +0200
+Message-ID: <a2ca8cb2-5c91-b971-9b6e-65cf9ee97ffa@redhat.com>
+Date:   Wed, 31 Mar 2021 09:57:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210326021957.1424875-11-seanjc@google.com>
+In-Reply-To: <20210326021957.1424875-1-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 On 26/03/21 03:19, Sean Christopherson wrote:
-> +#ifdef KVM_ARCH_WANT_NEW_MMU_NOTIFIER_APIS
-> +	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
-> +#else
->   	struct kvm *kvm = mmu_notifier_to_kvm(mn);
->   	int idx;
->  	trace_kvm_set_spte_hva(address);
->  
-> 	idx = srcu_read_lock(&kvm->srcu);
+> The end goal of this series is to optimize the MMU notifiers to take
+> mmu_lock if and only if the notification is relevant to KVM, i.e. the hva
+> range overlaps a memslot.   Large VMs (hundreds of vCPUs) are very
+> sensitive to mmu_lock being taken for write at inopportune times, and
+> such VMs also tend to be "static", e.g. backed by HugeTLB with minimal
+> page shenanigans.  The vast majority of notifications for these VMs will
+> be spurious (for KVM), and eliding mmu_lock for spurious notifications
+> avoids an otherwise unacceptable disruption to the guest.
 > 
-> 	KVM_MMU_LOCK(kvm);
+> To get there without potentially degrading performance, e.g. due to
+> multiple memslot lookups, especially on non-x86 where the use cases are
+> largely unknown (from my perspective), first consolidate the MMU notifier
+> logic by moving the hva->gfn lookups into common KVM.
 > 
-> 	kvm->mmu_notifier_seq++;
+> Applies on my TDP MMU TLB flushing bug fixes[*], which conflict horribly
+> with the TDP MMU changes in this series.  That code applies on kvm/queue
+> (commit 4a98623d5d90, "KVM: x86/mmu: Mark the PAE roots as decrypted for
+> shadow paging").
 > 
-> 	if (kvm_set_spte_hva(kvm, address, pte))
-> 		kvm_flush_remote_tlbs(kvm);
+> Speaking of conflicts, Ben will soon be posting a series to convert a
+> bunch of TDP MMU flows to take mmu_lock only for read.  Presumably there
+> will be an absurd number of conflicts; Ben and I will sort out the
+> conflicts in whichever series loses the race.
 > 
->   	KVM_MMU_UNLOCK(kvm);
->   	srcu_read_unlock(&kvm->srcu, idx);
-> +#endif
+> Well tested on Intel and AMD.  Compile tested for arm64, MIPS, PPC,
+> PPC e500, and s390.  Absolutely needs to be tested for real on non-x86,
+> I give it even odds that I introduced an off-by-one bug somewhere.
+> 
+> [*] https://lkml.kernel.org/r/20210325200119.1359384-1-seanjc@google.com
+> 
+> 
+> Patches 1-7 are x86 specific prep patches to play nice with moving
+> the hva->gfn memslot lookups into common code.  There ended up being waaay
+> more of these than I expected/wanted, but I had a hell of a time getting
+> the flushing logic right when shuffling the memslot and address space
+> loops.  In the end, I was more confident I got things correct by batching
+> the flushes.
+> 
+> Patch 8 moves the existing API prototypes into common code.  It could
+> technically be dropped since the old APIs are gone in the end, but I
+> thought the switch to the new APIs would suck a bit less this way.
+> 
+> Patch 9 moves arm64's MMU notifier tracepoints into common code so that
+> they are not lost when arm64 is converted to the new APIs, and so that all
+> architectures can benefit.
+> 
+> Patch 10 moves x86's memslot walkers into common KVM.  I chose x86 purely
+> because I could actually test it.  All architectures use nearly identical
+> code, so I don't think it actually matters in the end.
+> 
+> Patches 11-13 move arm64, MIPS, and PPC to the new APIs.
+> 
+> Patch 14 yanks out the old APIs.
+> 
+> Patch 15 adds the mmu_lock elision, but only for unpaired notifications.
+> 
+> Patch 16 adds mmu_lock elision for paired .invalidate_range_{start,end}().
+> This is quite nasty and no small part of me thinks the patch should be
+> burned with fire (I won't spoil it any further), but it's also the most
+> problematic scenario for our particular use case.  :-/
+> 
+> Patches 17-18 are additional x86 cleanups.
 
-The kvm->mmu_notifier_seq is missing in the new API side.  I guess you 
-can add an argument to __kvm_handle_hva_range and handle it also in 
-patch 15 ("KVM: Take mmu_lock when handling MMU notifier iff the hva 
-hits a memslot").
+Queued and 1-9 and 18, thanks.  There's a small issue in patch 10 that 
+prevented me from committing 10-15, but they mostly look good.
 
 Paolo
 
