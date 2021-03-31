@@ -2,132 +2,164 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33B6B3501A8
-	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 15:46:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F016A350461
+	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 18:21:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235865AbhCaNqX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 31 Mar 2021 09:46:23 -0400
-Received: from mail-mw2nam12on2061.outbound.protection.outlook.com ([40.107.244.61]:61184
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235793AbhCaNqI (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 31 Mar 2021 09:46:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OORG9tZ3d0HtmXhGuuKzx1tPZAK3ci3dSrGD5yxggZQ92przGB1I8+McP3WtgquhBR703zlw6OxkqujPIMnBGryYpeCuRL24cuoAuVZalR+c2kI09Km5tbmbDh6Iu5dNcVW4Y8SrYgzCPYFiG4zKXyk+mhVcUL9ib/wJv6MlPPMZF4XJp5Vllt1x4BAFRoCDdtnhifIZY4BdFl0eqS+RY+RCJ+7MK+4xoqKZufeRfy6TsvxOgNnqAHXsK4SvDlK6txS8e7/GyDxRQj7ENI/Br2Qi5O0O82WHieZaAOR5Booq6j3aY5XQlQHiWEe5na56BbnTVMrJZSvbnBwBPruMFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5TkDJd2X/C8+bAdlrTGnrbdd2Ga7H+R6q19g1qFkoKQ=;
- b=d5sbjAgb/1vvXRjgfAOBSO8mWrXbTcUgNYMG2VaKiiorXSNOMhPptaaIjspO+ra2eQGFyO499FrwagWJAJjdrysDlguZyPDh26b4xFTHfv1E26SW4OEjFUAKjfxMKHIffMT0kWs2VwQkJ/Y1R7yjoXvy80gMx9JLLpuaR4mZX9HYwayMw9Cn+VjvpK1N0Dj5S+QIcNSKdmz4XB3oRcisN0LL8QRQAyd4F2kDJS906UyHispCS6amVYlHATXWYgDyNJhwF6cqudLbssFmkSDjh9aaVzrLaEMhSs7bNTRmVp8mbjrn1CrYoa1omFNI7okItkWf6qup3peguND2oX54Kw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5TkDJd2X/C8+bAdlrTGnrbdd2Ga7H+R6q19g1qFkoKQ=;
- b=opPC5rTtwCR4n7ZQ7xpv4ajRhKMcDNcmP11XKeyPF3uvvfm3ciOrjH6AfcRgjf/fdcnUWIS0+Ax8l1niL6co+P0UHgeU3TcNGB+yeJtkICZh+im/8macbeHZeTTiyWSy0hEkmDRBUmNhvIKxf4epXRykfoJrf2DhOMfKtyziqCniGQX2VjhDpP5/ho5SY6u8lGCW/KPyaRGUDQD7qwvHferzBdFOZs6HhvahC/xBjb0xg+GrMuqGAbdvu4krTQfGD/AX9lx+cchnROxaxxcrOshQiS9jv8ItDHiPngubjJgA8jwF4hSspD2MJ35HNSkivYTSkwT1rByWfA3+n30roQ==
-Authentication-Results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB3827.namprd12.prod.outlook.com (2603:10b6:a03:1ab::16)
- by BYAPR12MB2901.namprd12.prod.outlook.com (2603:10b6:a03:138::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.30; Wed, 31 Mar
- 2021 13:46:06 +0000
-Received: from BY5PR12MB3827.namprd12.prod.outlook.com
- ([fe80::4c46:77c0:7d7:7e43]) by BY5PR12MB3827.namprd12.prod.outlook.com
- ([fe80::4c46:77c0:7d7:7e43%6]) with mapi id 15.20.3977.033; Wed, 31 Mar 2021
- 13:46:06 +0000
-Date:   Wed, 31 Mar 2021 10:46:04 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alistair Popple <apopple@nvidia.com>
-Cc:     linux-mm@kvack.org, nouveau@lists.freedesktop.org,
-        bskeggs@redhat.com, akpm@linux-foundation.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        jhubbard@nvidia.com, rcampbell@nvidia.com, jglisse@redhat.com,
-        hch@infradead.org, daniel@ffwll.ch, willy@infradead.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v7 5/8] mm: Device exclusive memory access
-Message-ID: <20210331134604.GK1463678@nvidia.com>
-References: <20210326000805.2518-1-apopple@nvidia.com>
- <2521635.masqiumSp9@nvdebian>
- <20210331131854.GI1463678@nvidia.com>
- <2124945.3NMGunUBXV@nvdebian>
+        id S233735AbhCaQU6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 31 Mar 2021 12:20:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41576 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232406AbhCaQU0 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 31 Mar 2021 12:20:26 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0FE3C061760
+        for <kvm-ppc@vger.kernel.org>; Wed, 31 Mar 2021 09:20:25 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id f3so5338908pgv.0
+        for <kvm-ppc@vger.kernel.org>; Wed, 31 Mar 2021 09:20:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hbFgBS0tsmLZecdBb34MxnZHD2vsOnYlgFmBhEC+AGM=;
+        b=W6gYHfyq+FLodOWhD9srXTh8aaio7ufLJGiEJEiMEepafRE4jD5CPt2u6zyCqNkmEf
+         RBW97ptdPXvm5UekA+1t/rKsqmWK0oYE75ZvbG8qPcwUeH2CNY8N2JYzQdJbcC/FqLox
+         DcD9DWu45srgtpcHvYUIYloa787DwMs9RQszqMJAGT7a/cdNDkSzvp8GETRb/h8dEjgP
+         8s6cZSDU08hOz+njpFIAcEg7jI2UFPlQ/B0ogtWJ4tAdwpEoVAvBIo0c7kJY+qV4PKbI
+         5JrEg5cZ6lg6SU1xy6TAmWN7lx027fNcjkiELq9jkPTEPVzyTbPPJIMZcf+zN1WRmx+V
+         ubUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hbFgBS0tsmLZecdBb34MxnZHD2vsOnYlgFmBhEC+AGM=;
+        b=YqnGc3D5JgdJLf/j9/0vMu7REEvmjNLYvJZaDIhNB+ea4w4wteUNT94r6CaUU/nI90
+         Q8kawBP8Sj4lfDvvHdhYOs12ZIT3BFreo0WwQPlL8MW9NsO1KsX6Sf/lLO1Wsxsnp06I
+         GFxfW68WD5tQhODC1HulhadUCxCfLK5yLfWxrHRWeDdsaeI+GEAdDJHdaH1AoqjOHXs4
+         NGx4Er/lFLUgTw3o6llJUnUPkTIWsaq8M5olEBThMcef5n8N1YInRXCaBs9WpPnkRyhk
+         hcsX/eqCRZ+AkU3q8RuSP0V1E5Vh4nm4E2zwGVGsWoxun8//Hm3ntnFXFerhJhQemCpV
+         XfEg==
+X-Gm-Message-State: AOAM5302kCmKwa8bAqbiNr9ddfuVrXMYoN7IcsAkOPWqBhKJDvn7ReGA
+        p8/qI9HbRm2qzdvtXP6yqSkwYA==
+X-Google-Smtp-Source: ABdhPJyEnoIvLhWAi7NNGEWROpPtFz0kvkUm7Uq+sDDKk3AwLz6Jre1P4F3JOHb9hmWMRVWQ5USifw==
+X-Received: by 2002:a65:428b:: with SMTP id j11mr3941343pgp.47.1617207624928;
+        Wed, 31 Mar 2021 09:20:24 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id h19sm2862436pfc.172.2021.03.31.09.20.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Mar 2021 09:20:24 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 16:20:20 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH 10/18] KVM: Move x86's MMU notifier memslot walkers to
+ generic code
+Message-ID: <YGShRP9E49p3vcos@google.com>
+References: <20210326021957.1424875-1-seanjc@google.com>
+ <20210326021957.1424875-11-seanjc@google.com>
+ <ba3f7a9c-0b59-cbeb-5d46-4236cde2c51f@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2124945.3NMGunUBXV@nvdebian>
-X-Originating-IP: [142.162.115.133]
-X-ClientProxiedBy: BL1PR13CA0183.namprd13.prod.outlook.com
- (2603:10b6:208:2be::8) To BY5PR12MB3827.namprd12.prod.outlook.com
- (2603:10b6:a03:1ab::16)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0183.namprd13.prod.outlook.com (2603:10b6:208:2be::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.8 via Frontend Transport; Wed, 31 Mar 2021 13:46:06 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lRbAa-006Lc8-C2; Wed, 31 Mar 2021 10:46:04 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b667bd60-cbbf-48cc-d3ea-08d8f44b5569
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2901:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BYAPR12MB290100AC8F29D3DEAF31CCAFC27C9@BYAPR12MB2901.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3736OGcHm7QPzJovqMgbIiQ79J6T9XV2CIUIoNJgTyqEz3JIU5b731TM6AbJjfUhH6cUgUSwI28BCnWM63vNxiLOTX35Qqoh9x+x6Q85aptfMVdRio3+5Y80u9Ri5FXc1tI6UnxDaBSEIelrlDQt+fqHOYwEMr+de2iJhWAJtiP7drZToIwcAIIFvajHBJXnmDDjyXy6Zxd5z9PScsa6vmMWEZOEeoxllb88mzWgjRAHQW3Kg54Pxw1IbOAqRluQBT+hEGd+p+bwexLMZYGxvvqY8MZIwqAL5iD7gSjCvhgU2KvG27keuOCT4+44bTy88ycjGcdxinZsjdaHXHRDLkjj7hYrto30GYoXjVl51ZRzZq2ZT1GUyqQxEdqIEVk/yLSpEtbQsOW8+jfuW0KwmGE/xX+oRfRoJoSE36hdGITgt5AuJzLDAJJxa2RgqRucnOiH8RhuB01teKh6SQXT/zSEZ2/SSFEZlZe1nX1/gXir0xQrEPSZFpY2cik+VOM0Zk0OnlDep/f2x8Ln0O9tgLL7QUrBojwX2hxxAKgPh5N/lIxVS6KUju8m4dqU1vF7p+LUu0F2A83t/6tzOmsZSM2RneBgprdDrFM0mX1fnBauryl1G/rYYD0t7QG0c7lWkbz1mLhIcBNADnnL0rkx0/WnyQM0RsEWYgl0vpYlpqY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB3827.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(376002)(396003)(366004)(346002)(6862004)(2616005)(1076003)(186003)(9746002)(9786002)(33656002)(83380400001)(8936002)(66556008)(4744005)(38100700001)(4326008)(6636002)(86362001)(5660300002)(478600001)(2906002)(36756003)(37006003)(316002)(8676002)(66476007)(426003)(66946007)(26005)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?ZZNzjHTa16Va3EZF854Ny6DLBpCpmVQ+g0q+dpS+OeuObxKlKp5m7mT8nipS?=
- =?us-ascii?Q?eyWOC1YCm6wJ4lVr4241hC1MRJiztFCmBShXThaSW8HlEnDPfscn27FRiEeS?=
- =?us-ascii?Q?5paNCq3GPG7mHMQMLlhTTlaXZ61gcJAu62+FLW7ZI8T2kXYik20iTbKcC2hu?=
- =?us-ascii?Q?PSG9HMvrylA5nJlNIItA1pBunVWmLJGJMMusZiDa8kypZhVQSadgrzsLm1rU?=
- =?us-ascii?Q?PbZBqrgONeNZab+X7jwnVN5xf+2XBDoMIOvx4voJImwDzEnWdY3McTbzWhp+?=
- =?us-ascii?Q?D2GFmFwYVa5O9g1smUmsKrhInra3yVBpQG33vhlBnHruRz9TZrXv5Bt0kBWI?=
- =?us-ascii?Q?sCJujdagfe7lTU9i9UDzINLzCMNgGv1EVX+PjZ2t7sn+fKd5ggrUyqCbSqn6?=
- =?us-ascii?Q?vAB0hVxuRM8ObDy7Uwt0YoUfnOrySKU4pk3sPankMMGLlBC9xHgwJ/9DFnol?=
- =?us-ascii?Q?gEfvI7Qx4Ydrqh4jCqMGVV/GicwH53p3URR/k3LNYV7k7kA0qDpdEBG5hDl0?=
- =?us-ascii?Q?f8EuF5hK8p5kv4s5kQE05n/brC0xzUWZFlLb5+9NywHly9Xgd+2HiBJNhV06?=
- =?us-ascii?Q?32aE+Mm+uIFIaCdL9qhwo1VhFLsvUhRFLtnaM/Daeq9UwwazGWLu3emxJonJ?=
- =?us-ascii?Q?QsiCwyC83oTfcdB51UYAxggPZ4nJ9fIp+pgbHwnbrsgXpcu7kNdyQNKLTdja?=
- =?us-ascii?Q?TahipukJ8Y1NeYKwjTgmENia3uK5VyvbQpkRXAJYUTX2uDLV40pM5V3w/x8C?=
- =?us-ascii?Q?pPhBgjKdRt4Uw1IQ0oCMwkGuDTFqQcOzTEBuvrwKxP93VL/y+9+sJgjTzw4E?=
- =?us-ascii?Q?BF52VW53GxJwDHPCg4uWdCjRJ5jZ42mZMuMVH0Pr7qB/tiNRFJ91pz90Z2ux?=
- =?us-ascii?Q?iDhb3zxvJeKAx8aUiLjsQH+Z0UvBheBwSPwAciwb/w6ksOZ4vVsOz6xEbvT7?=
- =?us-ascii?Q?7dDr/rETi1OX9S8UeuB7Xgk6AaYi+uDBAfscDO3fmXdMACihCjUIp58NZdTa?=
- =?us-ascii?Q?VMnzCnF4a3DDqHjmT0wRLujaUVcWMyVYPBA6cJJcwbjndvQjQtGpJmPf9b9d?=
- =?us-ascii?Q?1ObxMUVto44Zq7JuJGFG6meNBPWjLLbD+DILquqPDpWBE/A91Fw6WjC0oSrI?=
- =?us-ascii?Q?8T7zsU65MXFcl+Mjb7FVnRbH0KaMBUbT1GySvKvL1sOHOsl+Hmud3vJGzD4w?=
- =?us-ascii?Q?oyCGFNRSwghEZviGW8buOlnBrB6Cmt3RrJSHi8HlvkYNeXzD1qBcIH+a60vv?=
- =?us-ascii?Q?S4YaKGOj4NhkGvmyOP3kjwX8Fyc2/AgFmDOfK+WIesL6OZOyT1NH95mQK7cv?=
- =?us-ascii?Q?R4HXm5wraVzLf3bbxhV3m66J2J2NF/tAzEo8zorrSKm5Tw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b667bd60-cbbf-48cc-d3ea-08d8f44b5569
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB3827.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2021 13:46:06.8407
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Auuf1ZyTbG7zHermtVtDrb/12zR8ElOjZGnEy38lE4CWllK1fvkCODKDoQ6yfDED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB2901
+In-Reply-To: <ba3f7a9c-0b59-cbeb-5d46-4236cde2c51f@redhat.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Apr 01, 2021 at 12:27:52AM +1100, Alistair Popple wrote:
-> On Thursday, 1 April 2021 12:18:54 AM AEDT Jason Gunthorpe wrote:
-> > On Wed, Mar 31, 2021 at 11:59:28PM +1100, Alistair Popple wrote:
+On Wed, Mar 31, 2021, Paolo Bonzini wrote:
+> On 26/03/21 03:19, Sean Christopherson wrote:
+> > +#ifdef KVM_ARCH_WANT_NEW_MMU_NOTIFIER_APIS
+> > +	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
+> > +#else
+> >   	struct kvm *kvm = mmu_notifier_to_kvm(mn);
+> >   	int idx;
+> >  	trace_kvm_set_spte_hva(address);
+> > 	idx = srcu_read_lock(&kvm->srcu);
 > > 
-> > > I guess that makes sense as the split could go either way at the
-> > > moment but I should add a check to make sure this isn't used with
-> > > pinned pages anyway.
+> > 	KVM_MMU_LOCK(kvm);
 > > 
-> > Is it possible to have a pinned page under one of these things? If I
-> > pin it before you migrate it then it remains pinned but hidden under
-> > the swap entry?
+> > 	kvm->mmu_notifier_seq++;
+> > 
+> > 	if (kvm_set_spte_hva(kvm, address, pte))
+> > 		kvm_flush_remote_tlbs(kvm);
+> > 
+> >   	KVM_MMU_UNLOCK(kvm);
+> >   	srcu_read_unlock(&kvm->srcu, idx);
+> > +#endif
 > 
-> At the moment yes. But I had planned (and this reminded me) to add a check to 
-> prevent marking pinned pages for exclusive access. 
+> The kvm->mmu_notifier_seq is missing in the new API side.  I guess you can
+> add an argument to __kvm_handle_hva_range and handle it also in patch 15
+> ("KVM: Take mmu_lock when handling MMU notifier iff the hva hits a
+> memslot").
 
-How do you even do that without races with GUP fast?
+Yikes.  Superb eyes!
 
-Jason
+That does bring up an oddity I discovered when digging into this.  Every call
+to .change_pte() is bookended by .invalidate_range_{start,end}(), i.e. the above
+missing kvm->mmu_notifier_seq++ is benign because kvm->mmu_notifier_count is
+guaranteed to be non-zero.
+
+I'm also fairly certain it means kvm_set_spte_gfn() is effectively dead code on
+_all_ architectures.  x86 and MIPS are clearcut nops if the old SPTE is
+not-present, and that's guaranteed due to the prior invalidation.  PPC simply
+unmaps the SPTE, which again should be a nop due to the invalidation.  arm64 is
+a bit murky, but if I'm reading the code correctly, it's also a nop because
+kvm_pgtable_stage2_map() is called without a cache pointer, which I think means
+it will map an entry if and only if an existing PTE was found.
+
+I haven't actually tested the above analysis, e.g. by asserting that
+kvm->mmu_notifier_count is indeed non-zero.  I'll do that sooner than later.
+But, given the shortlog of commit:
+
+  6bdb913f0a70 ("mm: wrap calls to set_pte_at_notify with invalidate_range_start
+                 and invalidate_range_end")
+
+I'm fairly confident my analysis is correct.  And if so, it also means that the
+whole point of adding .change_pte() in the first place (for KSM, commit
+828502d30073, "ksm: add mmu_notifier set_pte_at_notify()"), has since been lost.
+
+When it was originally added, .change_pte() was a pure alternative to
+invalidating the entry.
+
+  void __mmu_notifier_change_pte(struct mm_struct *mm, unsigned long address,
+                               pte_t pte)
+  {
+        struct mmu_notifier *mn;
+        struct hlist_node *n;
+
+        rcu_read_lock();
+        hlist_for_each_entry_rcu(mn, n, &mm->mmu_notifier_mm->list, hlist) {
+                if (mn->ops->change_pte)
+                        mn->ops->change_pte(mn, mm, address, pte);
+                /*
+                 * Some drivers don't have change_pte,
+                 * so we must call invalidate_page in that case.
+                 */
+                else if (mn->ops->invalidate_page)
+                        mn->ops->invalidate_page(mn, mm, address);
+        }
+        rcu_read_unlock();
+  }
+
+The aforementioned commit 6bdb913f0a70 wrapped set_pte_at_notify() with
+invalidate_range_{start,end}() so that .invalidate_page() implementations could
+sleep.  But, no one noticed that in doing so, .change_pte() was completely
+neutered.
+
+Assuming all of the above is correct, I'm very tempted to rip out .change_pte()
+entirely.  It's been dead weight for 8+ years and no one has complained about
+KSM+KVM performance (I'd also be curious to know how much performance was gained
+by shaving VM-Exits).  As KVM is the only user of .change_pte(), dropping it in
+KVM would mean the entire MMU notifier could also go away.
