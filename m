@@ -2,266 +2,148 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25255350F10
-	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 08:31:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DE8F351086
+	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 10:02:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233102AbhDAGbA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 1 Apr 2021 02:31:00 -0400
-Received: from 5.mo51.mail-out.ovh.net ([188.165.49.213]:44954 "EHLO
-        5.mo51.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232585AbhDAGa2 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 02:30:28 -0400
-X-Greylist: delayed 2284 seconds by postgrey-1.27 at vger.kernel.org; Thu, 01 Apr 2021 02:30:27 EDT
-Received: from mxplan5.mail.ovh.net (unknown [10.109.156.35])
-        by mo51.mail-out.ovh.net (Postfix) with ESMTPS id DF2D327A912;
-        Thu,  1 Apr 2021 07:51:57 +0200 (CEST)
-Received: from kaod.org (37.59.142.106) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Thu, 1 Apr 2021
- 07:51:56 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-106R006286b2b47-9e79-43ca-b58f-aa332cd287af,
-                    A2907451AC51A4EFF4C4D6DD6E02A54F207D12BE) smtp.auth=groug@kaod.org
-X-OVh-ClientIp: 78.197.208.248
-Date:   Thu, 1 Apr 2021 07:51:55 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     David Gibson <david@gibson.dropbear.id.au>
-CC:     Vaibhav Jain <vaibhav@linux.ibm.com>, <qemu-devel@nongnu.org>,
-        <kvm-ppc@vger.kernel.org>, <qemu-ppc@nongnu.org>, <mst@redhat.com>,
-        <imammedo@redhat.com>, <xiaoguangrong.eric@gmail.com>,
-        <shivaprasadbhat@gmail.com>, <bharata@linux.vnet.ibm.com>,
-        <aneesh.kumar@linux.ibm.com>, <ehabkost@redhat.com>,
-        <marcel.apfelbaum@gmail.com>
-Subject: Re: [PATCH v2] ppc/spapr: Add support for implement support for
- H_SCM_HEALTH
-Message-ID: <20210401075155.44b9267d@bahia.lan>
-In-Reply-To: <YGUvQ0XD+pQvWC/9@yekko.fritz.box>
-References: <20210401010519.7225-1-vaibhav@linux.ibm.com>
-        <YGUvQ0XD+pQvWC/9@yekko.fritz.box>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S233570AbhDAICH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 1 Apr 2021 04:02:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46976 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233383AbhDAIBf (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 04:01:35 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56500C0613E6;
+        Thu,  1 Apr 2021 01:01:35 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id a12so845353pfc.7;
+        Thu, 01 Apr 2021 01:01:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=VuqpEl+COxSpxljOZtUJakmvEG5/ezz2fhanp9Quy0o=;
+        b=LYBtBnVlJSsTvZ0wDUXosTU4G1ikc07HV2CSmX5/KXHqeoms8yNKR4YVhxpyLnmnSU
+         icYlO0MaTxc+8bX1TbWJX8R1j7CdaPsBtp3g4/vXCmxEnQRBXqETzhtIjfIeotXNKvBN
+         RbXIRE1rjsf1TXkoyxgIewKopOSUU95bYWviCpfHzbYxKF1oHfrsde6QMGJZ7Yqn1UOH
+         fSMTuMbEadDX2gOzV/54ysjQRTPhKusXv3kNwcdPajac5QdmkpwJwGiJMEwK/kSUsVST
+         omsbnkLvToLZFE2BB51rQp9zTQQKsTf4JOv9WJYkIbV9hHSDzCkAEi+XX26qQQD45Bkb
+         X4TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=VuqpEl+COxSpxljOZtUJakmvEG5/ezz2fhanp9Quy0o=;
+        b=M8FrVCwG6aeB5ryhU2th55LTJgXweKijdbwV6voVKvY81V3uCLDVbQU1BTo5J8JF4A
+         TkQ09+jaKbdMZPnyKIXUjQVwmahvU/HdyTBOmpuZVLB94V92p3uRo0KCdb7Z6CXaVxSu
+         SpqG/9nBtHdFVAq41OnVWEwYScHlts10rbg4jMUph1Emu5VsC3u1tzib1v+vPx5v8eHQ
+         X4HjMZTE9oJR1uJrNhdSfHyRqXR+9gzRXeZqgiviS8qplMzbIQcchbzqAEdSVnU8VzGp
+         WdHnlSDIgNS1IWTnki/LmGZUMnKalML08R/d6PPCWXTd3eTHUDNvrgnncbSQgCa8Bfmo
+         19NA==
+X-Gm-Message-State: AOAM533HFDtYbA6SqDJ8dwV6PxKwR7e6XNlT34+ooTiCfugSqcDc6Boo
+        f+ryqt2gKopRh40cOeYEyf8=
+X-Google-Smtp-Source: ABdhPJwMz1GwlXfgz1SdhGlLswPr5wIx2hZQ7NHtvAFR2ElNpBNVDmIG+zYj5puoQmvjP6+Tp7fPPw==
+X-Received: by 2002:a63:6683:: with SMTP id a125mr6320563pgc.382.1617264094938;
+        Thu, 01 Apr 2021 01:01:34 -0700 (PDT)
+Received: from localhost ([1.132.249.187])
+        by smtp.gmail.com with ESMTPSA id l22sm5084316pjl.14.2021.04.01.01.01.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Apr 2021 01:01:34 -0700 (PDT)
+Date:   Thu, 01 Apr 2021 18:01:29 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2] powerpc/traps: Enhance readability for trap types
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Segher Boessenkool <segher@kernel.crashing.org>
+Cc:     aik@ozlabs.ru, akpm@linux-foundation.org, alistair@popple.id.au,
+        aneesh.kumar@linux.ibm.com, atrajeev@linux.vnet.ibm.com,
+        benh@kernel.crashing.org, christophe.leroy@csgroup.eu,
+        haren@linux.ibm.com, jniethe5@gmail.com, john.ogness@linutronix.de,
+        kan.liang@linux.intel.com, kjain@linux.ibm.com,
+        kvm-ppc@vger.kernel.org, leobras.c@gmail.com,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        maddy@linux.ibm.com, mikey@neuling.org, msuchanek@suse.de,
+        oleg@redhat.com, paulus@samba.org, peterx@redhat.com,
+        peterz@infradead.org, pmladek@suse.com,
+        ravi.bangoria@linux.ibm.com, rppt@kernel.org,
+        Xiongwei Song <sxwjean@gmail.com>,
+        Xiongwei Song <sxwjean@me.com>
+References: <20210330150425.10145-1-sxwjean@me.com>
+        <875z17y79i.fsf@mpe.ellerman.id.au>
+        <20210331212550.GD13863@gate.crashing.org>
+        <87im5620f3.fsf@mpe.ellerman.id.au>
+In-Reply-To: <87im5620f3.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/7qo0K+59=sl2FU82aBhc9E8";
-        protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Originating-IP: [37.59.142.106]
-X-ClientProxiedBy: DAG6EX1.mxp5.local (172.16.2.51) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: d02a1d92-91ff-4346-b061-cafd730401e7
-X-Ovh-Tracer-Id: 6880655809270487483
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduledrudeifedgleelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtihesghdtreerredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepgfejudetffetgfekveekvefhieekheekgefgvdelleelhffggeetfeeigffhleegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepmhgrrhgtvghlrdgrphhfvghlsggruhhmsehgmhgrihhlrdgtohhm
+Message-Id: <1617262858.ls37f2d81f.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
---Sig_/7qo0K+59=sl2FU82aBhc9E8
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, 1 Apr 2021 13:26:11 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Thu, Apr 01, 2021 at 06:35:19AM +0530, Vaibhav Jain wrote:
-> > Add support for H_SCM_HEALTH hcall described at [1] for spapr
-> > nvdimms. This enables guest to detect the 'unarmed' status of a
-> > specific spapr nvdimm identified by its DRC and if its unarmed, mark
-> > the region backed by the nvdimm as read-only.
-> >=20
-> > The patch adds h_scm_health() to handle the H_SCM_HEALTH hcall which
-> > returns two 64-bit bitmaps (health bitmap, health bitmap mask) derived
-> > from 'struct nvdimm->unarmed' member.
-> >=20
-> > Linux kernel side changes to enable handling of 'unarmed' nvdimms for
-> > ppc64 are proposed at [2].
-> >=20
-> > References:
-> > [1] "Hypercall Op-codes (hcalls)"
-> >     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/=
-tree/Documentation/powerpc/papr_hcalls.rst#n220
-> > [2] "powerpc/papr_scm: Mark nvdimm as unarmed if needed during probe"
-> >     https://lore.kernel.org/linux-nvdimm/20210329113103.476760-1-vaibha=
-v@linux.ibm.com/
-> >=20
-> > Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+Excerpts from Michael Ellerman's message of April 1, 2021 12:39 pm:
+> Segher Boessenkool <segher@kernel.crashing.org> writes:
+>> On Wed, Mar 31, 2021 at 08:58:17PM +1100, Michael Ellerman wrote:
+>>> So perhaps:
+>>>=20
+>>>   EXC_SYSTEM_RESET
+>>>   EXC_MACHINE_CHECK
+>>>   EXC_DATA_STORAGE
+>>>   EXC_DATA_SEGMENT
+>>>   EXC_INST_STORAGE
+>>>   EXC_INST_SEGMENT
+>>>   EXC_EXTERNAL_INTERRUPT
+>>>   EXC_ALIGNMENT
+>>>   EXC_PROGRAM_CHECK
+>>>   EXC_FP_UNAVAILABLE
+>>>   EXC_DECREMENTER
+>>>   EXC_HV_DECREMENTER
+>>>   EXC_SYSTEM_CALL
+>>>   EXC_HV_DATA_STORAGE
+>>>   EXC_PERF_MONITOR
+>>
+>> These are interrupt (vectors), not exceptions.  It doesn't matter all
+>> that much, but confusing things more isn't useful either!  There can be
+>> multiple exceptions that all can trigger the same interrupt.
 >=20
-> As well as the handful of comments below, this will definitely need to
-> wait for ppc-6.1 at this point.
+> Yeah I know, but I think that ship has already sailed as far as the
+> naming we have in the kernel.
+
+It has, but there are also several other ships also sailing in different=20
+directions. It could be worse though, at least they are not sideways in=20
+the Suez.
+
+> We have over 250 uses of "exc", and several files called "exception"
+> something.
 >=20
-> > ---
-> > Changelog
-> >=20
-> > v2:
-> > * Added a check for drc->dev to ensure that the dimm is plugged in
-> >   when servicing H_SCM_HEALTH. [ Shiva ]
-> > * Instead of accessing the 'nvdimm->unarmed' member directly use the
-> >   object_property_get_bool accessor to fetch it. [ Shiva ]
-> > * Update the usage of PAPR_PMEM_UNARMED* macros [ Greg ]
-> > * Updated patch description reference#1 to point appropriate section
-> >   in the documentation. [ Greg ]
-> > ---
-> >  hw/ppc/spapr_nvdimm.c  | 38 ++++++++++++++++++++++++++++++++++++++
-> >  include/hw/ppc/spapr.h |  3 ++-
-> >  2 files changed, 40 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-> > index b46c36917c..34096e4718 100644
-> > --- a/hw/ppc/spapr_nvdimm.c
-> > +++ b/hw/ppc/spapr_nvdimm.c
-> > @@ -31,6 +31,13 @@
-> >  #include "qemu/range.h"
-> >  #include "hw/ppc/spapr_numa.h"
-> > =20
-> > +/* DIMM health bitmap bitmap indicators. Taken from kernel's papr_scm.=
-c */
-> > +/* SCM device is unable to persist memory contents */
-> > +#define PAPR_PMEM_UNARMED (1ULL << (63 - 0))
+> Using "interrupt" can also be confusing because Linux uses that to mean
+> "external interrupt".
 >=20
-> You can use PPC_BIT() for more clarity here.
->=20
+> But I dunno, maybe INT or VEC is clearer? .. or TRAP :)
 
-I had already suggested PPC_BIT(0) but since this macro was copied
-from the kernel source, I've let Vaibhav decide whether to use
-PPC_BIT() or keep the macro and comment it comes from the kernel.
+We actually already have defines that follow Segher's suggestion, it's=20
+just that they're hidden away in a KVM header.
 
-I agree I prefer PPC_BIT(0) :-)
+#define BOOK3S_INTERRUPT_SYSTEM_RESET   0x100
+#define BOOK3S_INTERRUPT_MACHINE_CHECK  0x200
+#define BOOK3S_INTERRUPT_DATA_STORAGE   0x300
+#define BOOK3S_INTERRUPT_DATA_SEGMENT   0x380
+#define BOOK3S_INTERRUPT_INST_STORAGE   0x400
+#define BOOK3S_INTERRUPT_INST_SEGMENT   0x480
+#define BOOK3S_INTERRUPT_EXTERNAL       0x500
+#define BOOK3S_INTERRUPT_EXTERNAL_HV    0x502
+#define BOOK3S_INTERRUPT_ALIGNMENT      0x600
 
-> > +/* Bits status indicators for health bitmap indicating unarmed dimm */
-> > +#define PAPR_PMEM_UNARMED_MASK (PAPR_PMEM_UNARMED)
->=20
-> I'm not sure why you want two equal #defines here.
->=20
+It would take just a small amount of work to move these to general=20
+powerpc header, add #ifdefs for Book E/S where the numbers differ,
+and remove the BOOK3S_ prefix.
 
-Especially, this define doesn't make sense for the hypervisor IMHO.
+I don't mind INTERRUPT_ but INT_ would be okay too. VEC_ actually
+doesn't match what Book E does (which is some weirdness to map some
+of them to match Book S but not all, arguably we should clean that
+up too and just use vector numbers consistently, but the INTERRUPT_
+prefix would still be valid if we did that).
 
-It is _just_ the mask of bits for the "unarmed" state in the kernel.
+BookE KVM entry will still continue to use a different convention
+there so I would leave all those KVM defines in place for now, we
+might do another pass on them later.
 
-> > +
-> >  bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *=
-nvdimm,
-> >                             uint64_t size, Error **errp)
-> >  {
-> > @@ -467,6 +474,36 @@ static target_ulong h_scm_unbind_all(PowerPCCPU *c=
-pu, SpaprMachineState *spapr,
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > +static target_ulong h_scm_health(PowerPCCPU *cpu, SpaprMachineState *s=
-papr,
-> > +                                 target_ulong opcode, target_ulong *ar=
-gs)
-> > +{
-> > +    uint32_t drc_index =3D args[0];
-> > +    SpaprDrc *drc =3D spapr_drc_by_index(drc_index);
-> > +    NVDIMMDevice *nvdimm;
-> > +
-> > +    if (drc && spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PMEM) {
->=20
-> This will fail badly if !drc (given index is way out of bounds).  I'm
-> pretty sure you want
-> 	if (!drc || spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PMEM) {
->=20
->=20
-> > +        return H_PARAMETER;
-> > +    }
-> > +
-> > +    /* Ensure that the dimm is plugged in */
-> > +    if (!drc->dev) {
-> > +        return H_HARDWARE;
->=20
-> H_HARDWARE doesn't seem right - it's the guest that has chosen to
-> attempt this on an unplugged LMB, not the (virtual) hardware's fault.
->=20
-
-Yes. As already suggested, simply do the same as in other hcall
-implementations in this file, e.g. from h_scm_bind_mem() :
-
-    if (!drc || !drc->dev ||
-        spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PMEM) {
-        return H_PARAMETER;
-    }
-
-> > +    }
-> > +
-> > +    nvdimm =3D NVDIMM(drc->dev);
-> > +
-> > +    args[0] =3D 0;
-> > +    /* Check if the nvdimm is unarmed and send its status via health b=
-itmaps */
-
-Not sure this comment is super useful.
-
-> > +    if (object_property_get_bool(OBJECT(nvdimm), NVDIMM_UNARMED_PROP, =
-NULL)) {
-> > +        args[0] |=3D PAPR_PMEM_UNARMED;
-> > +    }
-> > +
-> > +    /* Update the health bitmap with the applicable mask */
-> > +    args[1] =3D PAPR_PMEM_UNARMED_MASK;
-
-I still think this is a misuse of PAPR_PMEM_UNARMED_MASK... The
-meaning of args[1] is "health-bit-valid-bitmap indicate which
-bits in health-bitmap are valid" according to the documentation.
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Doc=
-umentation/powerpc/papr_hcalls.rst#n228
-
-Without any further detail, I tend to consider this as a hint
-to the guest on the bits supported by the hypervisor. Since
-we can only set PAPR_PMEM_UNARMED, for now, args[1] should
-be set to just that bit PAPR_PMEM_UNARMED. Other bits can
-be added later if QEMU supports more of them.
-
-> > +
-> > +    return H_SUCCESS;
-> > +}
-> > +
-> >  static void spapr_scm_register_types(void)
-> >  {
-> >      /* qemu/scm specific hcalls */
-> > @@ -475,6 +512,7 @@ static void spapr_scm_register_types(void)
-> >      spapr_register_hypercall(H_SCM_BIND_MEM, h_scm_bind_mem);
-> >      spapr_register_hypercall(H_SCM_UNBIND_MEM, h_scm_unbind_mem);
-> >      spapr_register_hypercall(H_SCM_UNBIND_ALL, h_scm_unbind_all);
-> > +    spapr_register_hypercall(H_SCM_HEALTH, h_scm_health);
-> >  }
-> > =20
-> >  type_init(spapr_scm_register_types)
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index 47cebaf3ac..6e1eafb05d 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -538,8 +538,9 @@ struct SpaprMachineState {
-> >  #define H_SCM_BIND_MEM          0x3EC
-> >  #define H_SCM_UNBIND_MEM        0x3F0
-> >  #define H_SCM_UNBIND_ALL        0x3FC
-> > +#define H_SCM_HEALTH            0x400
-> > =20
-> > -#define MAX_HCALL_OPCODE        H_SCM_UNBIND_ALL
-> > +#define MAX_HCALL_OPCODE        H_SCM_HEALTH
-> > =20
-> >  /* The hcalls above are standardized in PAPR and implemented by pHyp
-> >   * as well.
->=20
-
-
---Sig_/7qo0K+59=sl2FU82aBhc9E8
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAmBlX3sACgkQcdTV5YIv
-c9YBlA//S0kZnzRddcnbSPO/BIdgPu/FpvEbVCzApps8NIrR/lNT59nRz2+B62Lq
-vKwq+ueubX/Hj3ipYRMeIQouk7FsJNi+ZbDvvlO4htEeNrswm7BOMUIMZRJt2+Cz
-NDNfkQwfCPIdKPWiUUGIv6ZOSESMcaHBs6VrVeqiqPG+YOmXcrhwDtjEk+fw1NCf
-iX6inkhCeBcK+C7L+YcwXIypyAL28PWUwAyEHjk6M+TQGa+WXo4QiUSYyJnXr+no
-um8RqSdSejrcmM4DEtEi8k+Rg9Yr3nf2fc4vGXiT1eqbkHSATg9gy6lO7fZOp0p8
-nQPWY95Q7ghm7CSUpwTJv2bjL0bDVGIJ0/kD4m4+MhrBSnAapM/Hr8FtY18DvKng
-5qSApuVDlY0XwUEPXtKBahIHlwT1o0O/EozsA8ybVx7TsXJBZ1gLbfqNOQn1UTDi
-01QviqIKCAROXt4tBRqr2l359XoD1So/e5BoEPP71Dfi1LipOoMM9chuRB58cD+D
-qI+sDH9kcxiQMUEhjUSqXo53ADHFFexK8LIYL0h51fDBT4P0/4mYT9zwlWEIXRCo
-0AHdhgYWpby09pS8N8A8BQStTnQC306i5C34bPnYFbs8t25QFL4BY7B44qzb3aF+
-52yfDjcBtBy85NuNPlQitbwIkG5KyQUUZ5HBu2y7UCrsx7S/L5w=
-=Qqjn
------END PGP SIGNATURE-----
-
---Sig_/7qo0K+59=sl2FU82aBhc9E8--
+Thanks,
+Nick
