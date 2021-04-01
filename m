@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86646351843
-	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 19:48:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F043D35182C
+	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 19:48:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236353AbhDARoX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 1 Apr 2021 13:44:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57186 "EHLO
+        id S236256AbhDARoO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 1 Apr 2021 13:44:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234940AbhDARl1 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 13:41:27 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C88CAC00F7CF
-        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 08:05:48 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id x21-20020a17090a5315b029012c4a622e4aso1176137pjh.2
-        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 08:05:48 -0700 (PDT)
+        with ESMTP id S234667AbhDARjD (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 13:39:03 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AA9BC00F7D2
+        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 08:05:56 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id y32so1683030pga.11
+        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 08:05:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=LDEkLrbLG9R2apsCK2gnQqMuFPbkZM9kNaSGb4ipSQE=;
-        b=MgCVQ0kn2v3ELNofv7xq5fBlGyvWfZEGUNanq46SCXMsQE0oiIM/eqHlk7YpAHmATC
-         Qpw0xJ/QwV1vmlqTDp1btFY/wp9rMbHEfr/B4gu9NhZXgYm0FnzRqqOTF2M+EMFHnjSq
-         lAKl+YmAMBz/ZsBBKBXFBrjB2vukooMmlKjRFJlO6Ll1k+ep5rImn0W/CBMD+a7kWeF8
-         JnyO7adnb3BDl4HccDK1lX2ZCk8Yk2k5xA9mfDPmJJC2adgt/Px2ymGaKE5zBw3XWcAI
-         KLxsQWWJmX8UGyuK54TYC8hBSwSQkAb58hxrQQEGvQqlClVKEbazdPxWiSLrF6BRui/n
-         G3KA==
+        bh=50wI4g94uBoPMDWP5CQyWSU8mLhPtuvsQ4KwM3oKed4=;
+        b=cdIRn0hwtvftPic4GPsZFEVE2jO6ffKRNKGVXil7S7w+HtrPf0uBZuTOfLvbL0y7GP
+         85iHVnL7V70mMCs+3Y5SBr1cFpXEQqhpQU3HVwnE1aG5F3JCxPZjsUlO9JkoQ3uCR0YW
+         BWsELXizPG0pKiSAxsCVcOaLXJ4IrY1mx6uv7shLU+hDMuMlDVCng1RKuvRdGccTwqNS
+         uwi7IzAlwkpHfggO+0BFT/PUsFd27cc89wvGuru9iMZyB0/WU0xv1vPJJRZ+B77hNBPS
+         FGLdAvQnML3i/6cJqwXSBmJvJ2L20AE8DrYKVJNs/UEdY2CRQItrgvihgiGXPii5pOIZ
+         PFqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=LDEkLrbLG9R2apsCK2gnQqMuFPbkZM9kNaSGb4ipSQE=;
-        b=iA3S2eutkVrVqhHYLVxZMyQmRlJvNlMav4ZkpBmbaIbhhOUbOEEeyYT9aRZ46PHEcK
-         Uhb+7nPAJUwOiOKThB7ALA3uijTWBBRr3gFA9PY9V03dwKsCvBvfboAraL4poGMNozzK
-         Yxt0OM4VOOGb3s/zzCbjeWPxicFMhj3omM6UZ8Sl47tpPDaPaAv25h8BM2OHz060NF5y
-         zcJvvotdOPOEX9u4LOFaca7a3TvIqKLMeq4OrSS1IfHr6phOmMvNu5PbAFYqUqhzF5Ic
-         F7+jD3bN2M2NdGXleIseIoMcP5aOOsz9ha2s0KUSuDV1wNZADrnXjQ7T40nxJIjFoEot
-         puIQ==
-X-Gm-Message-State: AOAM531GmuS9aegtrt3Mw6G5TEGnCUKM9f4cAWT8Ossb1a22le1Ez61Z
-        XbXxxGpM+tKwUuRoHbhfZT9WbcGzbEs=
-X-Google-Smtp-Source: ABdhPJx8eQfJk4OchZktXu7GJIRr/s2T1IVbVUBSSyYAgKydMCloANXTahawxOY9BOfFVNlvFPEiiQ==
-X-Received: by 2002:a17:90b:357:: with SMTP id fh23mr9140000pjb.169.1617289548274;
-        Thu, 01 Apr 2021 08:05:48 -0700 (PDT)
+        bh=50wI4g94uBoPMDWP5CQyWSU8mLhPtuvsQ4KwM3oKed4=;
+        b=g5LUd3FrTcT8W4BF035LrKSaQYX7/tUE3jmxaYiwiwD49ytRoPPVFZr1qSwnO+d5y4
+         D05o/dcvxtMWnWQUqFSK1MV8cyvSNV/Yxt8utNHaCxYHY18R14BO9cENquLwzBeutOfA
+         8iIuMU4n5/PJpK29b58RkrdSIYXSJAhADo9eGIT2SrPdMrVUNtqfAyi0AHxUfyNESqVz
+         eWTLFH6B8ldRmiAfbYu2moxiga1XAiKHJDkI4c2t4FluUKSnJig5f4df6QiC+8RUlw7b
+         UZ2NaFuZKG1Owl0vMC3J4Rg6AC0/2ybXuAWi6+9C+48WVLtOxoodokTrKJn7t7uX7NW8
+         aM7A==
+X-Gm-Message-State: AOAM531B1GVGqR5gizIRYdFOvQ2KYXRtmUxanFEbX2rjHTHjlnKV9FeQ
+        3y5sWHjdFz/IEr9tI+qH1ybVkVXQgX0=
+X-Google-Smtp-Source: ABdhPJygWx5zzxGBLyX84fdQN1TZJrY9lWy1HSRfN1NIK332rZsKQwmBaHIIr9Zeb7//6d+2CwV6UA==
+X-Received: by 2002:a05:6a00:13a3:b029:203:5c4d:7a22 with SMTP id t35-20020a056a0013a3b02902035c4d7a22mr7850200pfg.22.1617289555988;
+        Thu, 01 Apr 2021 08:05:55 -0700 (PDT)
 Received: from bobo.ibm.com ([1.128.218.207])
-        by smtp.gmail.com with ESMTPSA id l3sm5599632pju.44.2021.04.01.08.05.46
+        by smtp.gmail.com with ESMTPSA id l3sm5599632pju.44.2021.04.01.08.05.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Apr 2021 08:05:48 -0700 (PDT)
+        Thu, 01 Apr 2021 08:05:55 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v5 44/48] KVM: PPC: Book3S HV: small pseries_do_hcall cleanup
-Date:   Fri,  2 Apr 2021 01:03:21 +1000
-Message-Id: <20210401150325.442125-45-npiggin@gmail.com>
+Subject: [PATCH v5 47/48] KVM: PPC: Book3S HV P9: implement hash host / hash guest support
+Date:   Fri,  2 Apr 2021 01:03:24 +1000
+Message-Id: <20210401150325.442125-48-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210401150325.442125-1-npiggin@gmail.com>
 References: <20210401150325.442125-1-npiggin@gmail.com>
@@ -62,131 +62,130 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Functionality should not be changed.
+This additionally has to save and restore the host SLB, and also
+ensure that the MMU is off while switching into the guest SLB.
+
+P9 and later CPUs now always go via the P9 path.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+ arch/powerpc/kvm/book3s_64_entry.S     |  6 +++++
+ arch/powerpc/kvm/book3s_hv.c           |  4 ++-
+ arch/powerpc/kvm/book3s_hv_interrupt.c | 35 ++++++++++++++++++++++----
+ 3 files changed, 39 insertions(+), 6 deletions(-)
 
+diff --git a/arch/powerpc/kvm/book3s_64_entry.S b/arch/powerpc/kvm/book3s_64_entry.S
+index 45743f5aff64..ee6345266280 100644
+--- a/arch/powerpc/kvm/book3s_64_entry.S
++++ b/arch/powerpc/kvm/book3s_64_entry.S
+@@ -347,6 +347,12 @@ kvmppc_p9_exit_interrupt:
+  * effort for a small bit of code. Lots of other things to do first.
+  */
+ kvmppc_p9_bad_interrupt:
++BEGIN_MMU_FTR_SECTION
++	/*
++	 * Hash host doesn't try to recover MMU (requires host SLB reload)
++	 */
++	b	.
++END_MMU_FTR_SECTION_IFCLR(MMU_FTR_TYPE_RADIX)
+ 	/*
+ 	 * Set GUEST_MODE_NONE so the handler won't branch to KVM, and clear
+ 	 * MSR_RI in r12 ([H]SRR1) so the handler won't try to return.
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index f4fa39f4cd4c..8416ec0d88bc 100644
+index 728e98bb61eb..a25583204829 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -925,6 +925,7 @@ static int kvmppc_get_yield_count(struct kvm_vcpu *vcpu)
+@@ -4480,7 +4480,7 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.state = KVMPPC_VCPU_BUSY_IN_HOST;
  
- int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 	do {
+-		if (radix_enabled())
++		if (cpu_has_feature(CPU_FTR_ARCH_300))
+ 			r = kvmhv_run_single_vcpu(vcpu, ~(u64)0,
+ 						  vcpu->arch.vcore->lpcr);
+ 		else
+@@ -5569,6 +5569,8 @@ static int kvmhv_enable_nested(struct kvm *kvm)
+ 		return -EPERM;
+ 	if (!cpu_has_feature(CPU_FTR_ARCH_300))
+ 		return -ENODEV;
++	if (!radix_enabled())
++		return -ENODEV;
+ 
+ 	/* kvm == NULL means the caller is testing if the capability exists */
+ 	if (kvm)
+diff --git a/arch/powerpc/kvm/book3s_hv_interrupt.c b/arch/powerpc/kvm/book3s_hv_interrupt.c
+index 9b093167dd79..f57abd3d0c47 100644
+--- a/arch/powerpc/kvm/book3s_hv_interrupt.c
++++ b/arch/powerpc/kvm/book3s_hv_interrupt.c
+@@ -150,7 +150,7 @@ static void switch_mmu_to_guest_hpt(struct kvm *kvm, struct kvm_vcpu *vcpu, u64
+ 	 */
+ }
+ 
+-static void switch_mmu_to_host_radix(struct kvm *kvm, u32 pid)
++static void switch_mmu_to_host(struct kvm *kvm, u32 pid)
  {
-+	struct kvm *kvm = vcpu->kvm;
- 	unsigned long req = kvmppc_get_gpr(vcpu, 3);
- 	unsigned long target, ret = H_SUCCESS;
- 	int yield_count;
-@@ -940,7 +941,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 		break;
- 	case H_PROD:
- 		target = kvmppc_get_gpr(vcpu, 4);
--		tvcpu = kvmppc_find_vcpu(vcpu->kvm, target);
-+		tvcpu = kvmppc_find_vcpu(kvm, target);
- 		if (!tvcpu) {
- 			ret = H_PARAMETER;
- 			break;
-@@ -954,7 +955,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 		target = kvmppc_get_gpr(vcpu, 4);
- 		if (target == -1)
- 			break;
--		tvcpu = kvmppc_find_vcpu(vcpu->kvm, target);
-+		tvcpu = kvmppc_find_vcpu(kvm, target);
- 		if (!tvcpu) {
- 			ret = H_PARAMETER;
- 			break;
-@@ -970,12 +971,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 					kvmppc_get_gpr(vcpu, 6));
- 		break;
- 	case H_RTAS:
--		if (list_empty(&vcpu->kvm->arch.rtas_tokens))
-+		if (list_empty(&kvm->arch.rtas_tokens))
- 			return RESUME_HOST;
+ 	isync();
+ 	mtspr(SPRN_PID, pid);
+@@ -159,6 +159,23 @@ static void switch_mmu_to_host_radix(struct kvm *kvm, u32 pid)
+ 	isync();
+ 	mtspr(SPRN_LPCR, kvm->arch.host_lpcr);
+ 	isync();
++
++	if (!radix_enabled())
++		slb_restore_bolted_realmode();
++}
++
++static void save_clear_host_mmu(struct kvm *kvm)
++{
++	if (!radix_enabled()) {
++		/*
++		 * Hash host could save and restore host SLB entries to
++		 * reduce SLB fault overheads of VM exits, but for now the
++		 * existing code clears all entries and restores just the
++		 * bolted ones when switching back to host.
++		 */
++		mtslb(0, 0, 0);
++		slb_invalidate(6);
++	}
+ }
  
--		idx = srcu_read_lock(&vcpu->kvm->srcu);
-+		idx = srcu_read_lock(&kvm->srcu);
- 		rc = kvmppc_rtas_hcall(vcpu);
--		srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+		srcu_read_unlock(&kvm->srcu, idx);
+ static void save_clear_guest_mmu(struct kvm *kvm, struct kvm_vcpu *vcpu)
+@@ -293,15 +310,23 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	mtspr(SPRN_AMOR, ~0UL);
  
- 		if (rc == -ENOENT)
- 			return RESUME_HOST;
-@@ -1062,12 +1063,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_GUEST_HV_FAST;
++
++	/*
++	 * Hash host, hash guest, or radix guest with prefetch bug, all have
++	 * to disable the MMU before switching to guest MMU state.
++	 */
++	if (!radix_enabled() || !kvm_is_radix(kvm) ||
++			cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
++		__mtmsrd(msr & ~(MSR_IR|MSR_DR|MSR_RI), 0);
++
++	save_clear_host_mmu(kvm);
++
+ 	if (kvm_is_radix(kvm)) {
+-		if (cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
+-			__mtmsrd(msr & ~(MSR_IR|MSR_DR|MSR_RI), 0);
+ 		switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
+ 		if (!cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
+ 			__mtmsrd(0, 1); /* clear RI */
  
- 	case H_SET_PARTITION_TABLE:
- 		ret = H_FUNCTION;
--		if (nesting_enabled(vcpu->kvm))
-+		if (nesting_enabled(kvm))
- 			ret = kvmhv_set_partition_table(vcpu);
- 		break;
- 	case H_ENTER_NESTED:
- 		ret = H_FUNCTION;
--		if (!nesting_enabled(vcpu->kvm))
-+		if (!nesting_enabled(kvm))
- 			break;
- 		ret = kvmhv_enter_nested_guest(vcpu);
- 		if (ret == H_INTERRUPT) {
-@@ -1082,12 +1083,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 		break;
- 	case H_TLB_INVALIDATE:
- 		ret = H_FUNCTION;
--		if (nesting_enabled(vcpu->kvm))
-+		if (nesting_enabled(kvm))
- 			ret = kvmhv_do_nested_tlbie(vcpu);
- 		break;
- 	case H_COPY_TOFROM_GUEST:
- 		ret = H_FUNCTION;
--		if (nesting_enabled(vcpu->kvm))
-+		if (nesting_enabled(kvm))
- 			ret = kvmhv_copy_tofrom_guest_nested(vcpu);
- 		break;
- 	case H_PAGE_INIT:
-@@ -1098,7 +1099,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 	case H_SVM_PAGE_IN:
- 		ret = H_UNSUPPORTED;
- 		if (kvmppc_get_srr1(vcpu) & MSR_S)
--			ret = kvmppc_h_svm_page_in(vcpu->kvm,
-+			ret = kvmppc_h_svm_page_in(kvm,
- 						   kvmppc_get_gpr(vcpu, 4),
- 						   kvmppc_get_gpr(vcpu, 5),
- 						   kvmppc_get_gpr(vcpu, 6));
-@@ -1106,7 +1107,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 	case H_SVM_PAGE_OUT:
- 		ret = H_UNSUPPORTED;
- 		if (kvmppc_get_srr1(vcpu) & MSR_S)
--			ret = kvmppc_h_svm_page_out(vcpu->kvm,
-+			ret = kvmppc_h_svm_page_out(kvm,
- 						    kvmppc_get_gpr(vcpu, 4),
- 						    kvmppc_get_gpr(vcpu, 5),
- 						    kvmppc_get_gpr(vcpu, 6));
-@@ -1114,12 +1115,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 	case H_SVM_INIT_START:
- 		ret = H_UNSUPPORTED;
- 		if (kvmppc_get_srr1(vcpu) & MSR_S)
--			ret = kvmppc_h_svm_init_start(vcpu->kvm);
-+			ret = kvmppc_h_svm_init_start(kvm);
- 		break;
- 	case H_SVM_INIT_DONE:
- 		ret = H_UNSUPPORTED;
- 		if (kvmppc_get_srr1(vcpu) & MSR_S)
--			ret = kvmppc_h_svm_init_done(vcpu->kvm);
-+			ret = kvmppc_h_svm_init_done(kvm);
- 		break;
- 	case H_SVM_INIT_ABORT:
- 		/*
-@@ -1129,7 +1130,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
- 		 * Instead the kvm->arch.secure_guest flag is checked inside
- 		 * kvmppc_h_svm_init_abort().
- 		 */
--		ret = kvmppc_h_svm_init_abort(vcpu->kvm);
-+		ret = kvmppc_h_svm_init_abort(kvm);
- 		break;
+ 	} else {
+-		__mtmsrd(msr & ~(MSR_IR|MSR_DR|MSR_RI), 0);
+ 		switch_mmu_to_guest_hpt(kvm, vcpu, lpcr);
+ 	}
  
- 	default:
+@@ -487,7 +512,7 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	mtspr(SPRN_HDEC, decrementer_max);
+ 
+ 	save_clear_guest_mmu(kvm, vcpu);
+-	switch_mmu_to_host_radix(kvm, host_pidr);
++	switch_mmu_to_host(kvm, host_pidr);
+ 	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_NONE;
+ 
+ 	/*
 -- 
 2.23.0
 
