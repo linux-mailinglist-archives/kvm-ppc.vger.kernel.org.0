@@ -2,96 +2,86 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9B2A3512B2
-	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 11:48:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DBD93512B6
+	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 11:50:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233637AbhDAJsV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 1 Apr 2021 05:48:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42228 "EHLO
+        id S232585AbhDAJt5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 1 Apr 2021 05:49:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232585AbhDAJr4 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 05:47:56 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13629C0613E6
-        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 02:47:56 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id x126so1044045pfc.13
-        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 02:47:56 -0700 (PDT)
+        with ESMTP id S233629AbhDAJta (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 05:49:30 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27915C0613E6
+        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 02:49:30 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id ay2so757039plb.3
+        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 02:49:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:subject:to:cc:references:in-reply-to:mime-version
          :message-id:content-transfer-encoding;
-        bh=e28mP4vqW0wK0RDVgiCQ9UNycWD3MSCRgzIo6Rq/6EE=;
-        b=r8PmL1JInEYuHXsXziEAl4FhtQ8tkm5YYezN1iNK5USe1peYsO5pAm/JfujCotTziZ
-         caItmqZEM77iVQAhb23OiUA9AZZkaeOrOCh/MWjSVkmZDQgB+CvzYfO433X5ggtfiMQf
-         NIGv+sfgiHJ1PrpidFSEB/rnFKG8QWoL25bya+lcXhPZOizyQM6ATdqb3FmfMlSav8sG
-         97KveMpQhPCOcF2qLsigKfgpWHniO5WqOSsL1jT9aCVAAotDPIeGs3nRuU4c3lZzlNf6
-         qzJxTcpz4l11hXEbkXECesLXgr50mBN/tk+445gLEQ28DnO1JUlpDvaUFgXQDq0RwEQG
-         KK1Q==
+        bh=LWrLsc7U/Y59RvQVrIOPJZyoQyt2UXhRFGQ6YveYHww=;
+        b=FIEsx+EncqLUUJj9AjtyYn3npxPJJollHq6dZ56xEFFvX53Z8iHWgUCb8JqqcgSUSs
+         PjPzwePxZHLRi269igCb6iVW4e00T56HvL7cZdP+dIL+eU+funRd//JeHZQLTNmpAwzP
+         mlwDeIiBq8qrjSVWYqa11U2dUH0jgISgxL7QcXYWJjF6FzZljBYMhb1myHJNzq7ZcnKe
+         so3NBZpu26MkGF6tQXhuZk9qhXVcfS8GVr8z4FKEyGgyYchKWMlWCPcloOLC42HcDQK4
+         kiPNIEHPZBClEcojcEw/KYOOiFYJ8bxEoxYxY4ekkgrgqcmKDIHBa7k1BOTHmHWM1SKZ
+         z6MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
          :mime-version:message-id:content-transfer-encoding;
-        bh=e28mP4vqW0wK0RDVgiCQ9UNycWD3MSCRgzIo6Rq/6EE=;
-        b=F9TRJUuTt04zoOsu89HCNoUVfIMgiIeXvGFqvHQavANUtSKPLABa3C6JlYUj43acGI
-         E5JTzaJPbBabxFUIWLtrq8Ih1Npnuqp6NfCVN+ORLc3FX5uzr3Uz9UaYvWWhX94aoBs2
-         NDHM95q2oX2PWMSV9K9MR5JuRC/0Y6Py86reVuu7AUzYvMgRv2XCK289kJZpeDeubDuk
-         U+8bOMoYNTRO8y3SzL1CUxqBEc654RCzN+OU+XnRBaAMhlRtXvImQf4xGbou7Dgf38Ol
-         aWm/ezTgMfa06m+UIGOXL4IwFet4SNgAPHy/JAAwG0ICAz3x+ANuO+9HiPomiih3qRV3
-         +NaA==
-X-Gm-Message-State: AOAM532ogu2nqe21ZmR8QCEoAEmhMxfyYPP4M4hsHtIq+HyyuF4vi1GL
-        HE9u/J0xBTE84qzVyPaXtjQS8Mc7UnHnRA==
-X-Google-Smtp-Source: ABdhPJz+WaoWgQlCxrZ2aX6kZeOc8PjTx0Uv4z/wkSQMW/gQi0ep/6WO1H8Hi0ezqCZrQ9b0AeHMpw==
-X-Received: by 2002:a65:6483:: with SMTP id e3mr6858076pgv.208.1617270475657;
-        Thu, 01 Apr 2021 02:47:55 -0700 (PDT)
-Received: from localhost ([1.128.222.172])
-        by smtp.gmail.com with ESMTPSA id ch15sm4703580pjb.46.2021.04.01.02.47.54
+        bh=LWrLsc7U/Y59RvQVrIOPJZyoQyt2UXhRFGQ6YveYHww=;
+        b=tUI6EJUCEb0j6Zq1udZXCnknmJnn5XCztXY0u0zOoxr0sk3fN5x+ecxLN65XTCZ3/y
+         xzu1vuUm5K/mVNekIiUHtpOms9nk6nJ2mz219jTjOFEEv6buGleyeB6FHD7PkNkHDJRv
+         mIr7oDF/i3q81toYQJkw9xFQUjaza/qkPsQx8nnsW1Kl8eVAXPeVEi0fR/Vor03wILub
+         U6eMRwLZxn6jzPiemFU75iU6h5737Gv9GxD286Lm8G3gYoTHooWCdVO2yDO15TPDvCE5
+         hIvS3RIo6bKOZ2A52JlwFLa9Fojx1/t3NeqtF+tBp2M1PoHVQj6WDgZgwqvyNkEL4GG9
+         oiBQ==
+X-Gm-Message-State: AOAM532zoXjWu1x1pd9gmZHqC1I7S+t+EjVpT3BWC7TyTvYzAWLwvDMN
+        e3KpbXa4XZjqyIedZOGSNts/0FgDDR0QkA==
+X-Google-Smtp-Source: ABdhPJyoham8uTT+KgHOmDWwfrW4nRhuzu5ssWNL2ldPpSoB4ofe5HKDsyD/SvBLKfDeqyditEt7aA==
+X-Received: by 2002:a17:902:23:b029:e7:32b7:e760 with SMTP id 32-20020a1709020023b02900e732b7e760mr7069600pla.55.1617270569806;
+        Thu, 01 Apr 2021 02:49:29 -0700 (PDT)
+Received: from localhost ([1.128.219.229])
+        by smtp.gmail.com with ESMTPSA id gz12sm5099146pjb.33.2021.04.01.02.49.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Apr 2021 02:47:55 -0700 (PDT)
-Date:   Thu, 01 Apr 2021 19:47:49 +1000
+        Thu, 01 Apr 2021 02:49:29 -0700 (PDT)
+Date:   Thu, 01 Apr 2021 19:49:24 +1000
 From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v4 09/46] powerpc/64s: remove KVM SKIP test from
- instruction breakpoint handler
+Subject: Re: [PATCH v4 11/46] KVM: PPC: Book3S HV: Ensure MSR[HV] is always
+ clear in guest MSR
 To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Daniel Axtens <dja@axtens.net>,
-        Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 References: <20210323010305.1045293-1-npiggin@gmail.com>
-        <20210323010305.1045293-10-npiggin@gmail.com>
-        <YGQAfCOAR5Hfj13u@thinks.paulus.ozlabs.org>
-In-Reply-To: <YGQAfCOAR5Hfj13u@thinks.paulus.ozlabs.org>
+        <20210323010305.1045293-12-npiggin@gmail.com>
+        <YGQBdVntWnG/ewtj@thinks.paulus.ozlabs.org>
+In-Reply-To: <YGQBdVntWnG/ewtj@thinks.paulus.ozlabs.org>
 MIME-Version: 1.0
-Message-Id: <1617270447.zkb024siva.astroid@bobo.none>
+Message-Id: <1617270525.5034ks2srs.astroid@bobo.none>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Paul Mackerras's message of March 31, 2021 2:54 pm:
-> On Tue, Mar 23, 2021 at 11:02:28AM +1000, Nicholas Piggin wrote:
->> The code being executed in KVM_GUEST_MODE_SKIP is hypervisor code with
->> MSR[IR]=3D0, so the faults of concern are the d-side ones caused by acce=
-ss
->> to guest context by the hypervisor.
+Excerpts from Paul Mackerras's message of March 31, 2021 2:58 pm:
+> On Tue, Mar 23, 2021 at 11:02:30AM +1000, Nicholas Piggin wrote:
+>> Rather than clear the HV bit from the MSR at guest entry, make it clear
+>> that the hypervisor does not allow the guest to set the bit.
 >>=20
->> Instruction breakpoint interrupts are not a concern here. It's unlikely
->> any good would come of causing breaks in this code, but skipping the
->> instruction that caused it won't help matters (e.g., skip the mtmsr that
->> sets MSR[DR]=3D0 or clears KVM_GUEST_MODE_SKIP).
->>=20
->> Reviewed-by: Daniel Axtens <dja@axtens.net>
->> Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> The HV clear is kept in guest entry for now, but a future patch will
+>> warn if it's not present.
 >=20
-> It might be worth noting in the commit message that the 0x1300
-> interrupt was dropped from the architecture a long time ago and is not
-> generated by P7, P8, P9 or P10.
+> Will warn if it *is* present, surely?
 
-Good background, I'll add that.
+Just making sure you were awake, definitely wasn't a copy-paste bug...
 
 Thanks,
 Nick
 
+>=20
+>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 >=20
 > Acked-by: Paul Mackerras <paulus@ozlabs.org>
 >=20
