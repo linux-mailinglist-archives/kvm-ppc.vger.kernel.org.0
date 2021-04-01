@@ -2,167 +2,143 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BEFD6351841
-	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 19:48:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A398D3518E3
+	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 19:49:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236346AbhDARoW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 1 Apr 2021 13:44:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57200 "EHLO
+        id S235005AbhDARsC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 1 Apr 2021 13:48:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234872AbhDARk6 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 13:40:58 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on20601.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eaa::601])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F54DC05BD1A;
-        Thu,  1 Apr 2021 05:55:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MGzWC5xQkrPoKeGNrjfeqZ5ROQtlX6ZKUaXI7U3HMQ5SI1P+eI/TO4f9IN/BRuv21UvZbSTBsZls7kMAVtYLgn04+JWLpd3AezGZ/syuSVIDnaMvDx15RS3OjYBhtHwUhUWQM9PuFYaHsTr/zUrUi8HqJ7NKowhhAh2N88qt4yccbklZtphWpkY7IMRlG4a8b1n3+EPbcJz7rLOB5RTb/pLzWKYg7StiYMMpcDJB4rHepRqn8JJSPspUmFeLN5f92jXyoeQ7MtE0JrP/RhUZtg5/41dXRw8J9MeiEd1PY3v+IRlNClXwVrNd5yUV/2WCGoJPuvcSnHaVF8jWbTsqEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/anNxsoy5vzfvhIHE3TZV7QT/7MV5nFOcgmLayLRY48=;
- b=IP5+RoM6LGxDFn7Nw3iIO8m8jgKppP/29VlYgKRFcgANASdnn0lbAzUorzlm83t4byl5R4dsmpPQ7KVkAjByu79nDpBwa0zIOhry4/u42c59iEGq7YOkoYGrXjH/sUsHPZkNJYPlzE7EmnyFf2aC6OjAs+XmIfA/OmKaNKevR4P1+NlPkesVLGSFvS1LDcpW+xwA/a1BJru2QqsddUOY9CBcz/X2a+UzM8BIdZjst2TNeTDeIhaIRwxVH+kueSZbBW/SSFrUkQr4nvrxA3kW3X3dLjFqSGdoJBWpELkd3/VJZAG0tmzDnh1tbwWuk9t8vcz+nYPKvzuNPLLxSgItuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/anNxsoy5vzfvhIHE3TZV7QT/7MV5nFOcgmLayLRY48=;
- b=LUfjBEmC2Cc9lxEVmd5cM7ADR/xsayJ0vjavNaAvCS5kxR02KpPtyFJh5QM1sDY7kZPwUlOmfFKYK3k0QVe10tgxsaoP690aCSwDTQ4v0yms84qhRUpdSldK4yOeKOH3f4AM78GDk/pABPZYvKg1J9hB857boJ9CbSekV5xT/DQUhAeHm+Iq8/IYH/YLToruk7vyRopWTcrDnl0YeokUH3Da7JmAwgBtDBjPD8Ald/vWz9sUcpBd7gMLMLGxxWwydhgcEbA0SzWvstxr0AMXYa83uKs66rDgZDtC9g+iFVQ9wN8hHPsm+3lxOpWGTR4TgnRx4PbI+QqXb5z1YvZXgA==
-Authentication-Results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB4619.namprd12.prod.outlook.com (2603:10b6:5:7c::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25; Thu, 1 Apr
- 2021 11:55:25 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3999.028; Thu, 1 Apr 2021
- 11:55:25 +0000
-Date:   Thu, 1 Apr 2021 08:55:23 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alistair Popple <apopple@nvidia.com>
-Cc:     linux-mm@kvack.org, nouveau@lists.freedesktop.org,
-        bskeggs@redhat.com, akpm@linux-foundation.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        jhubbard@nvidia.com, rcampbell@nvidia.com, jglisse@redhat.com,
-        hch@infradead.org, daniel@ffwll.ch, willy@infradead.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v7 5/8] mm: Device exclusive memory access
-Message-ID: <20210401115523.GZ1463678@nvidia.com>
-References: <20210326000805.2518-1-apopple@nvidia.com>
- <35941260.J9UuDlmC3F@nvdebian>
- <20210401004813.GT1463678@nvidia.com>
- <9244031.kThbcIvB84@nvdebian>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9244031.kThbcIvB84@nvdebian>
-X-Originating-IP: [142.162.115.133]
-X-ClientProxiedBy: MN2PR20CA0019.namprd20.prod.outlook.com
- (2603:10b6:208:e8::32) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        with ESMTP id S234081AbhDARlk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 13:41:40 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C07C7C0F26D6
+        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 08:03:39 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id l123so156096pfl.8
+        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 08:03:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=1Lonny+8YXdFwRIoOFSgIHHCV4tfZl5PHVskAqriodI=;
+        b=EB5XdagdnHKZEFml3Dn+U/CaFOZK+fYjCXM5zF06Gt3F4Rd/frq64n2gwSamblUE1q
+         A6U5QUdaDVuDssB29OGKTMNGaCv5uok0xeY91qsl2mm9Jh7GtJzmZvF98ba0rjDYvlCz
+         c7TINB6AA+OjVUPLmAXLBndgyYk1YbUgRd78M6i8TYQyR86AKHK8SLas/P/cRDKHHJpE
+         fD3p2xA5vstdVWCsHZgCSqPpcI5ubBxSox/qcJbYz3SfjVOUrP9irkdenoW6lU8dRegg
+         JZJ0/tHJ0XaSjTlebIv9KqRKKf0GgxnztWm3ki6yFGjmJ8SCy8GJ4hK+mnrdR0jaop1z
+         lTgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=1Lonny+8YXdFwRIoOFSgIHHCV4tfZl5PHVskAqriodI=;
+        b=VoCRSHU3Z2rfxrdcU4IGJ7oGTNsM2p5G/e2FnOrwpJgqPzexc1LMxEU9GeNLrhqXX5
+         CbiQVcggnSGeAkhr9Ev+A7TUJ2Z8xzup/zrM/yW61h0b3GVkBiw94SMtMhkss7dz4sc4
+         I2a1L5A2im5Vnf/MySgp+EhcjR+7/inyzXwOiNlawCHk1OxDSmBzIKgaB4Io3MmBVsP4
+         ZaRL7m+bOlE72Qk5Z4+vEIAeRTawitHxbJaj3j4XvHjQ9fnxQqs6wVm+3PrBNZJT5Zgf
+         w6KU2LIJsIlhBy8AWGMda4TYjEYrfjL7hFFAvWikc4AR81si6KFe1S7+YuZCZX+svyok
+         AAjA==
+X-Gm-Message-State: AOAM530lrkHfNZhxYOcXSpMP2DjPM4mWJH/P4nR+QnVFLLVlSNQC2V1U
+        nqlzYYyaEfOU87wNCWT9WQpq7xrBlrs=
+X-Google-Smtp-Source: ABdhPJx8m1h0BooMt+CnVS6OeabR7Up19Bge48DS3WHrToR37uKEL7NBIu7AaqOCINAfSleVTlt7eA==
+X-Received: by 2002:a05:6a00:706:b029:217:9e8d:f9cc with SMTP id 6-20020a056a000706b02902179e8df9ccmr8025886pfl.1.1617289419122;
+        Thu, 01 Apr 2021 08:03:39 -0700 (PDT)
+Received: from bobo.ibm.com ([1.128.218.207])
+        by smtp.gmail.com with ESMTPSA id l3sm5599632pju.44.2021.04.01.08.03.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Apr 2021 08:03:38 -0700 (PDT)
+From:   Nicholas Piggin <npiggin@gmail.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+        Fabiano Rosas <farosas@linux.ibm.com>
+Subject: [PATCH v5 01/48] KVM: PPC: Book3S HV: Nested move LPCR sanitising to sanitise_hv_regs
+Date:   Fri,  2 Apr 2021 01:02:38 +1000
+Message-Id: <20210401150325.442125-2-npiggin@gmail.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20210401150325.442125-1-npiggin@gmail.com>
+References: <20210401150325.442125-1-npiggin@gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR20CA0019.namprd20.prod.outlook.com (2603:10b6:208:e8::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28 via Frontend Transport; Thu, 1 Apr 2021 11:55:25 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lRvv1-006jEO-G9; Thu, 01 Apr 2021 08:55:23 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 91971180-879c-40af-4e05-08d8f505092a
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4619:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4619B5F96C108221BFCB491BC27B9@DM6PR12MB4619.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fNVOEFDIyINxpvvyudo3HUcTq03h3ntJy+THrHyDNw2lLFvSVYoIREpmdCvn3Rl5V5P6/yBDU2bbK6eVIszZuOGTVgiCyq+TT5JljueOvS0UfDCogpWQBQkQbv1TfkpEK2/fQJLtlWnCGLBcZctZLXBb/YCqEca65emIhxdLKhlQU4d5qACMEV/N9YxTr493x4+jGLNGuyxpSqg1LjxQQHuKtIObMaJ9hnzueTMap+RcuGDEihP/7I329wE2krwjghs1O8srtLvb0IgBHPLWyI0OczkPvNgcujR1aQIV0TdG9ZHJfSQ0s8JZ8Y48YLUkTCeUZ+/O1AvHLVVrwVffN0+WMUoVbLhUswT59xRKS1mVaANfBsaiAs6Bh/B6+F5/h02NUY1tGvpG6mWuwGaT9jRDfmA0B8kYNzPx9u9c2BNNTKY63Jo5yBVGAJqGdYL2Za9tUC8sxfS4bPDYT5hh4pAk4d+xWrnIx7YlXTGYAO6EQZknQddW52aDAiZwd78Bq2V0hRLamKy86gfJAn/ttTiiN9r9w5xnafWuj3TR/BeSQzZgUSGoUns6hTC9ctvApy/0sF6lfDjaBtYI1WtKzhxV2MPVpO+LYNHukeBci9jQ8oZZPSQqzGzIwybc5+QWuwmfNJynlv1DsE3fONY8hiJKvW4lI+ARHdmOZ2nNyoo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(396003)(376002)(136003)(366004)(1076003)(316002)(33656002)(4326008)(186003)(66946007)(9746002)(5660300002)(86362001)(37006003)(2616005)(26005)(83380400001)(38100700001)(36756003)(6862004)(478600001)(66476007)(426003)(2906002)(66556008)(6636002)(9786002)(8936002)(7416002)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?FrSGC0T4QimKulGn7nJDJu2YCqkkVTf21itqOLon+0rGZ5PSfNshf1/sCZuF?=
- =?us-ascii?Q?Gr0mmiTIg1zBVkxsIQMrsSx/S1ts46y+6TVveH9fnO0V1Gegt77H0dN3b9+U?=
- =?us-ascii?Q?Gf5lf3B1tfL9PemcO0bSb4WaOdp7kSCsJ8CQFwWaiWu8+PzS6SwnUGy3+aoq?=
- =?us-ascii?Q?r3UhA2qui/LlukRU0l/Dahm1yLemu11zS+XvCgtHPhw1GeTMRmcAG8XdJ5KX?=
- =?us-ascii?Q?J/U/Rnr7Crme8T0FdCUwwwjwv73fQZszD8HEFLt6kNATaLAYDS1AxfkzBgMb?=
- =?us-ascii?Q?CSm+/LWivnh/cp2ESfOu1CctSj3jjxVBBkZBjcWRrOeq1OZ/8uQ4wjf+af/C?=
- =?us-ascii?Q?ia3v62n0WkkyVWDrOQpC2bTTwQpYHgX1BK3IbVM89HPcW2Qin/hEbZi+Q8I+?=
- =?us-ascii?Q?nHzqmLQsQyVMMy+NNuW/mEVN/4jtMyb6PgLGcQCRu4ZCQTlOEZI9nwiAmlvj?=
- =?us-ascii?Q?kqla4aQoUQ71WyO0og5jbLQqOKuqvdRjo0m5mnv8+i3nUs0ngksbTMVlOdSX?=
- =?us-ascii?Q?oKuzOhgJi68nQFt+IjDSmpe5pvl2j8CTTX6ztIqDU7OhdrzfThj1JaQtl0QE?=
- =?us-ascii?Q?KxTHm/qnzww9uHZ9xLUi5ZejcvU3JlpADTQyJ2UgNoXoSbdb7B+X/58g9pjr?=
- =?us-ascii?Q?9n+AEnkZoa2Bn3xsw09lxpAj3aMDFp6AANLJMxv76QZiq3ME9ur9NUtF4+bk?=
- =?us-ascii?Q?rymwl7KZgqEi/+9CmMQ8oSv+ys7U5XgZQCYpb35OGqqxtZrc4B9ianpB5yK8?=
- =?us-ascii?Q?qbW1TGNqbsHepst/X4pTSgubJ9QQKhEbypS7cXtBLMPooChWIhGDcehwGZqq?=
- =?us-ascii?Q?NgD8o/c0h52C12aHCKoXp1ofi/zeIzvWW5kDxOso7qSfCR6f/umITYmfz2RV?=
- =?us-ascii?Q?t7/HWj07H1RzamsnO7DscWOu5Z/hHgLKS7+UeLq9XEg+yBcxYyz8tOd2YGC0?=
- =?us-ascii?Q?ULy8Ib/+Ukdl5SHjSzTKk69IpZsAaAAZD6HbYL0SJJ6PaGvzsk4at/4JveEt?=
- =?us-ascii?Q?GbsQ3utDRCE0i0xzz9Oli0oVTuLWlYBCJiNalHRQWocjNl3hIU0l+yXXVzuw?=
- =?us-ascii?Q?Jk6ngZGpsHxfvCwjj6oykAlOWRAnYBF1O4MWGtX2TkI8i5IXNfuV1W6R7BT1?=
- =?us-ascii?Q?PwqBe9jAT/EJ2ARBZjz4fuaUdEGyjzJd1F4+FXKHFzunDyLLAeLkgYgnomm0?=
- =?us-ascii?Q?y7qfiFN1Y2D1u4E+RZm0Lv2KAOFT/Yb3SqEcck3hNHZ0dxyCP4jnumlOpzWW?=
- =?us-ascii?Q?53tque2LaVp7RKtMx2S7g0PrtI/NrNq76+6T6Kfar0hGRzAcsge9UN8IY6Q7?=
- =?us-ascii?Q?repubB0L+EFogLDSvJNsPdGhC196JeiQ0tXdW5SFfUhVgQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91971180-879c-40af-4e05-08d8f505092a
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2021 11:55:25.3722
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1LWivyd5MErq9MyDKtkkmYd8RuuHLRHSgxJk6pGjCfgGuq5bjCrIKRYKK8CIMSLP
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4619
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Apr 01, 2021 at 01:20:05PM +1100, Alistair Popple wrote:
-> On Thursday, 1 April 2021 11:48:13 AM AEDT Jason Gunthorpe wrote:
-> > On Thu, Apr 01, 2021 at 11:45:57AM +1100, Alistair Popple wrote:
-> > > On Thursday, 1 April 2021 12:46:04 AM AEDT Jason Gunthorpe wrote:
-> > > > On Thu, Apr 01, 2021 at 12:27:52AM +1100, Alistair Popple wrote:
-> > > > > On Thursday, 1 April 2021 12:18:54 AM AEDT Jason Gunthorpe wrote:
-> > > > > > On Wed, Mar 31, 2021 at 11:59:28PM +1100, Alistair Popple wrote:
-> > > > > > 
-> > > > > > > I guess that makes sense as the split could go either way at the
-> > > > > > > moment but I should add a check to make sure this isn't used with
-> > > > > > > pinned pages anyway.
-> > > > > > 
-> > > > > > Is it possible to have a pinned page under one of these things? If I
-> > > > > > pin it before you migrate it then it remains pinned but hidden under
-> > > > > > the swap entry?
-> > > > > 
-> > > > > At the moment yes. But I had planned (and this reminded me) to add a 
-> check 
-> > > to 
-> > > > > prevent marking pinned pages for exclusive access. 
-> > > > 
-> > > > How do you even do that without races with GUP fast?
-> > > 
-> > > Unless I've missed something I think I've convinced myself it should be 
-> safe 
-> > > to do the pin check after make_device_exclusive() has replaced all the 
-> PTEs 
-> > > with exclusive entries.
-> > > 
-> > > GUP fast sequence:
-> > > 1. Read PTE
-> > > 2. Pin page
-> > > 3. Check PTE
-> > > 4. if PTE changed -> unpin and fallback
-> > > 
-> > > If make_device_exclusive() runs after (1) it will either succeed or see 
-> the 
-> > > pin from (2) and fail (as desired). GUP should always see the PTE change 
-> and 
-> > > fallback which will revoke the exclusive access.
-> > 
-> > AFAICT the user can trigger fork at that instant and fork will try to
-> > copy the desposited migration entry before it has been checked
-> 
-> In that case the child will get a read-only exclusive entry and eventually a 
-> page copy via do_wp_page() 
+This will get a bit more complicated in future patches. Move it
+into the helper function.
 
-Having do_wp_page() do a copy is a security bug. We closed it with the
-at-fork checks.
+This change allows the L1 hypervisor to determine some of the LPCR
+bits that the L0 is using to run it, which could be a privilege
+violation (LPCR is HV-privileged), although the same problem exists
+now for HFSCR for example. Discussion of the HV privilege issue is
+ongoing and can be resolved with a later change.
 
-Jason
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ arch/powerpc/kvm/book3s_hv_nested.c | 27 +++++++++++++++++++++------
+ 1 file changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+index 0cd0e7aad588..3060e5deffc8 100644
+--- a/arch/powerpc/kvm/book3s_hv_nested.c
++++ b/arch/powerpc/kvm/book3s_hv_nested.c
+@@ -132,8 +132,27 @@ static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
+ 	}
+ }
+ 
++/*
++ * This can result in some L0 HV register state being leaked to an L1
++ * hypervisor when the hv_guest_state is copied back to the guest after
++ * being modified here.
++ *
++ * There is no known problem with such a leak, and in many cases these
++ * register settings could be derived by the guest by observing behaviour
++ * and timing, interrupts, etc., but it is an issue to consider.
++ */
+ static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
+ {
++	struct kvmppc_vcore *vc = vcpu->arch.vcore;
++	u64 mask;
++
++	/*
++	 * Don't let L1 change LPCR bits for the L2 except these:
++	 */
++	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
++		LPCR_LPES | LPCR_MER;
++	hr->lpcr = (vc->lpcr & ~mask) | (hr->lpcr & mask);
++
+ 	/*
+ 	 * Don't let L1 enable features for L2 which we've disabled for L1,
+ 	 * but preserve the interrupt cause field.
+@@ -271,8 +290,6 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+ 	u64 hv_ptr, regs_ptr;
+ 	u64 hdec_exp;
+ 	s64 delta_purr, delta_spurr, delta_ic, delta_vtb;
+-	u64 mask;
+-	unsigned long lpcr;
+ 
+ 	if (vcpu->kvm->arch.l1_ptcr == 0)
+ 		return H_NOT_AVAILABLE;
+@@ -321,9 +338,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.nested_vcpu_id = l2_hv.vcpu_token;
+ 	vcpu->arch.regs = l2_regs;
+ 	vcpu->arch.shregs.msr = vcpu->arch.regs.msr;
+-	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
+-		LPCR_LPES | LPCR_MER;
+-	lpcr = (vc->lpcr & ~mask) | (l2_hv.lpcr & mask);
++
+ 	sanitise_hv_regs(vcpu, &l2_hv);
+ 	restore_hv_regs(vcpu, &l2_hv);
+ 
+@@ -335,7 +350,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+ 			r = RESUME_HOST;
+ 			break;
+ 		}
+-		r = kvmhv_run_single_vcpu(vcpu, hdec_exp, lpcr);
++		r = kvmhv_run_single_vcpu(vcpu, hdec_exp, l2_hv.lpcr);
+ 	} while (is_kvmppc_resume_guest(r));
+ 
+ 	/* save L2 state for return */
+-- 
+2.23.0
+
