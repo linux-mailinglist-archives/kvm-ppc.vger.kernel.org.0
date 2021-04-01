@@ -2,119 +2,137 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20FD73509BB
-	for <lists+kvm-ppc@lfdr.de>; Wed, 31 Mar 2021 23:48:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FF8A350B5A
+	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 02:47:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229812AbhCaVr7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 31 Mar 2021 17:47:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56310 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231156AbhCaVr4 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 31 Mar 2021 17:47:56 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A815C061760
-        for <kvm-ppc@vger.kernel.org>; Wed, 31 Mar 2021 14:47:56 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id a22-20020a17090aa516b02900c1215e9b33so1898923pjq.5
-        for <kvm-ppc@vger.kernel.org>; Wed, 31 Mar 2021 14:47:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8xelLMkxcC6WtOofiMih6F32tqKnPtSyw2jgK+CDHu4=;
-        b=lRekl3fx/1xVTY4VSWAcqWY60kFcYfE3ex87ZMiyF3YMama3alXemQAvey4ua2Q2NU
-         eIzwbu8ulmg+dSFPJ/LLw9M8TUwNtZ6Kf+zsLYX2btGWc+Mt6r+WqI3nE4cuuPodpDWB
-         vkPyVKuV4l3DmqBnpyedy5K2ELlMSQALGThaUNGPrMsL7lsHqmcjeklTCzt6GLWxXFOh
-         fcNEDPnE/MDmfK1tIflC1u5mhPxRa8t1lqjHjJZcz8mlLg7SmVa3KnKTiibQ3TVoVdfM
-         W0WQ/smihKucHGWCEceoSVORhE99fiU+/wSW3je405yKPyFBfEyxm9lRJkvzLqkv3YeD
-         nlyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8xelLMkxcC6WtOofiMih6F32tqKnPtSyw2jgK+CDHu4=;
-        b=HCD5XqKkql7KbiBmJiGWorPBL2lRWfexATt+2+SkxxzgpkaELxSHUW+Y9GtazsCZnX
-         y6+lYrHYnoyXRMOEdxBGglALxVb3vkO+ZUhRnfYSDc2PPOoUjv0hlCOeueR+UpdGQkgL
-         z1N/fxzYuxdosgI+iw8AL5zNLwJJLUMhj8CxX/wLH84eHcsLjRQjdHAOcghfbcndDMN0
-         YWZGvqZ3+DCdlTIeEbX95/OQe+ASKZvRI1ZUOoSgFWKsq0CL2Fg1r6JZPPSgGjqXEN9+
-         90TPEG+nA5dL9DotHwjhElFNvF1oquS59KZLMcCXyBJmLmFnJbk93ooh1SdywTIOFnyo
-         7SXg==
-X-Gm-Message-State: AOAM533wbYXUcgPvPMDo2Qbs7sc1tmtZJokgpoYyBEhEf3/+j5wOTDQq
-        8yLYtjTZj0upK6PR5RF0IHXy8A==
-X-Google-Smtp-Source: ABdhPJyZugl5lfedBulyUfvB1YGfF9LGCaOpUeSH521YqKnnt+A07YJz3hlU79HRomGEJDuqkrmSZg==
-X-Received: by 2002:a17:90b:1987:: with SMTP id mv7mr5273831pjb.152.1617227275455;
-        Wed, 31 Mar 2021 14:47:55 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id a30sm3300970pfr.66.2021.03.31.14.47.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Mar 2021 14:47:54 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 21:47:51 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 16/18] KVM: Don't take mmu_lock for range invalidation
- unless necessary
-Message-ID: <YGTuB3/JRvUwH64K@google.com>
-References: <20210326021957.1424875-1-seanjc@google.com>
- <20210326021957.1424875-17-seanjc@google.com>
- <6e7dc7d0-f5dc-85d9-1c50-d23b761b5ff3@redhat.com>
- <YGSmMeSOPcjxRwf6@google.com>
- <56ea69fe-87b0-154b-e286-efce9233864e@redhat.com>
- <YGTRzf/4i9Y8XR2c@google.com>
- <0e30625f-934d-9084-e293-cb3bcbc9e4b8@redhat.com>
- <YGTkLMAzk88wOiZm@google.com>
- <345ab567-386f-9080-f9cb-0e17fa90a852@redhat.com>
+        id S232492AbhDAAqg (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 31 Mar 2021 20:46:36 -0400
+Received: from mail-bn7nam10on2042.outbound.protection.outlook.com ([40.107.92.42]:4736
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230073AbhDAAqH (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 31 Mar 2021 20:46:07 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R0EFZsRHuAzc3tMved96zuBYBl5NlZhIaZo23wO/IDZWpGCYKDnMukW2tBKkWZZWR/dFZNuBf5ikniyLRJEkqOotuGEL09ul2yTN7NPOQ0eyVtmU8IXcf+zbq+91WZIEETeYYJcPpb9G/YKbbX9BH3rBlYHadMaLR3avOk2UQ5d8YvCmKrV5eFWoYCkT9yhq5WiV/R231MTJw0lXn1FYglCRnoCbkUlZwflajWFHTREesFetptaI76ojIk/mF4UJE9aIBRpZEsBZMT3NYEYyBv7B/5x75e2uaxHKrl6sm9KmKy+xYpZ3qAR7l8N3rGVVaeGenCKvPDzeYEox+jbBtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=02dqO4PC113SnNoKYRD+v4Jz0t8gBaTnBaGti0otKxg=;
+ b=Dh8NzFKnfBSYHbFRVaXq5QoKXQyp9U7IebgXlVRk3e8FCg+8lIZGwB5wLPmRq3l8WUDsyumY5XrqimYSPhZGcpVZptJ5GPihixnleLluP9G23YcILsjP1iG9pc3uj5JmrEIPyOLyfZHa33tSeDX+VRptX3z0j8s8vfZWNxJXL0JrIwKKH+CynUJELVTGwTPISTL+3AnN+ht7bcdv3yqwr07TrwQUf/Fn5BIonabMOv6aulwr59+xXXrRPqzmA2a4YGkVkxY5Fj5nlzlaO2lZsUn4TmwYcH1wdVD5bCFQVhAky6OIs9JyM9dnQy79I6doYMuxmiYceuiRpK2jSNTrzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=infradead.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=02dqO4PC113SnNoKYRD+v4Jz0t8gBaTnBaGti0otKxg=;
+ b=W78ahZZqCXEfWmX8+zuL7Bm1gB2PN4i8ypE409XbpV8HyFbCZvSyr/BgcuHmHYh0iMwmJuLCcZZsi+29iCZW1wX8+bQ1vKp5ID4QltRFfKrPSfs5q4Qr7kjJUmfYeTFk9ELOjyyr1EN7z7cZYGtoZXJ0l3aRxCeilPaRLO8MhPRaYSRPx2V/vw0kRVLP39UCEClPxHaHKmetcHEGdkf+zIYlAiq4AkmDdzVg9riZaeWZcaAt+OZLiDFoT/imdRzoq6N5eBxg1uV3gIm2ITpsaKRvMuyo5oE3oGz4vZpxrvXUCOpGpKkMHAWOwbPLW4RSXneh3kKqImKW+frzJMk/ng==
+Received: from MW4PR04CA0053.namprd04.prod.outlook.com (2603:10b6:303:6a::28)
+ by SN6PR12MB2622.namprd12.prod.outlook.com (2603:10b6:805:72::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.29; Thu, 1 Apr
+ 2021 00:46:05 +0000
+Received: from CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:6a:cafe::90) by MW4PR04CA0053.outlook.office365.com
+ (2603:10b6:303:6a::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28 via Frontend
+ Transport; Thu, 1 Apr 2021 00:46:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ CO1NAM11FT065.mail.protection.outlook.com (10.13.174.62) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.3999.28 via Frontend Transport; Thu, 1 Apr 2021 00:46:03 +0000
+Received: from nvdebian.localnet (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 1 Apr
+ 2021 00:45:59 +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     <linux-mm@kvack.org>, <nouveau@lists.freedesktop.org>,
+        <bskeggs@redhat.com>, <akpm@linux-foundation.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm-ppc@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <jhubbard@nvidia.com>, <rcampbell@nvidia.com>,
+        <jglisse@redhat.com>, <hch@infradead.org>, <daniel@ffwll.ch>,
+        <willy@infradead.org>, "Christoph Hellwig" <hch@lst.de>
+Subject: Re: [PATCH v7 5/8] mm: Device exclusive memory access
+Date:   Thu, 1 Apr 2021 11:45:57 +1100
+Message-ID: <35941260.J9UuDlmC3F@nvdebian>
+In-Reply-To: <20210331134604.GK1463678@nvidia.com>
+References: <20210326000805.2518-1-apopple@nvidia.com> <2124945.3NMGunUBXV@nvdebian> <20210331134604.GK1463678@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <345ab567-386f-9080-f9cb-0e17fa90a852@redhat.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 18e4ec86-f40a-4d16-04e4-08d8f4a786e6
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2622:
+X-Microsoft-Antispam-PRVS: <SN6PR12MB26224C80274B4A5038000C8DDF7B9@SN6PR12MB2622.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +7zgNVU6kzXagGya9Md1qxWL8t946Q5MwzkB/MSIhLk86SDO+RSFa/H62t3ixR9+22DI+cavyIoac8kH7/b1LSqzkchCHRyTW5PXgYDmFw85M5ILqkoA55Hz+Eec5PXWrI3PCnBMwvNc4HZFz2gk5IaKLMekeWGCnlIlCfp4LkgOGqCuynzgJkcpjc0pOEwePkpRIANNPLdk9q9AHG0umAngJM3HIJp2LEfMfe4QJYsQhRnSB866EBp/vP5JziSxOEVyGNhyN1xcobVGU+g1EjMfV3E4azK/omZrC/WiL/QiJy52uhnSYiZpDllY+M7NdwjTVaOFUDsM5tc9gyVobahEzNRyghNSEO2ajmpdgO4OzyBKmpOrj+xHZF8xm6sTEJSCObgKSsGz9YMFGFfQVDmU5qmrSSKdi9rxMx8PKuXIMlgkd5GH1rCcKbRaPs5f5KmiESOz/h9MH2MXemKmeu4nsi/eEibxwgXEpJy3S+M0UW2fBIIlga2imeujTlsbhOiFzFHHJQQXhefdhqzjLrrgJJ2uxyprwPfc5DPp0nL5HI7rIwP17QInwKYiy6Q7PyqdUghMads5x8P9t4kQFf09+k1nI2zTN8w2KQON35qsuqHsL8ek++L2qL2hVqFlwQ90Iy3zl382NQKFg5n96tMiDQUV0wZ8oXXTJBqnSBuEPmdLBaN+18A7IMOkxlpz
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(186003)(82310400003)(16526019)(9576002)(356005)(83380400001)(336012)(86362001)(8676002)(7636003)(6862004)(498600001)(426003)(5660300002)(8936002)(7416002)(70206006)(54906003)(47076005)(36906005)(2906002)(36860700001)(33716001)(26005)(70586007)(4326008)(9686003)(6636002)(39026012);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2021 00:46:03.1763
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18e4ec86-f40a-4d16-04e4-08d8f4a786e6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2622
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Mar 31, 2021, Paolo Bonzini wrote:
-> On 31/03/21 23:05, Sean Christopherson wrote:
-> > > Wouldn't it be incorrect to lock a mutex (e.g. inside*another*  MMU
-> > > notifier's invalidate callback) while holding an rwlock_t?  That makes sense
-> > > because anybody that's busy waiting in write_lock potentially cannot be
-> > > preempted until the other task gets the mutex.  This is a potential
-> > > deadlock.
+On Thursday, 1 April 2021 12:46:04 AM AEDT Jason Gunthorpe wrote:
+> On Thu, Apr 01, 2021 at 12:27:52AM +1100, Alistair Popple wrote:
+> > On Thursday, 1 April 2021 12:18:54 AM AEDT Jason Gunthorpe wrote:
+> > > On Wed, Mar 31, 2021 at 11:59:28PM +1100, Alistair Popple wrote:
+> > > 
+> > > > I guess that makes sense as the split could go either way at the
+> > > > moment but I should add a check to make sure this isn't used with
+> > > > pinned pages anyway.
+> > > 
+> > > Is it possible to have a pinned page under one of these things? If I
+> > > pin it before you migrate it then it remains pinned but hidden under
+> > > the swap entry?
 > > 
-> > Yes?  I don't think I follow your point though.  Nesting a spinlock or rwlock
-> > inside a rwlock is ok, so long as the locks are always taken in the same order,
-> > i.e. it's never mmu_lock -> mmu_notifier_slots_lock.
+> > At the moment yes. But I had planned (and this reminded me) to add a check 
+to 
+> > prevent marking pinned pages for exclusive access. 
 > 
-> *Another* MMU notifier could nest a mutex inside KVM's rwlock.
-> 
-> But... is it correct that the MMU notifier invalidate callbacks are always
-> called with the mmap_sem taken (sometimes for reading, e.g.
-> try_to_merge_with_ksm_page->try_to_merge_one_page->write_protect_page)?
+> How do you even do that without races with GUP fast?
 
-No :-(
+Unless I've missed something I think I've convinced myself it should be safe 
+to do the pin check after make_device_exclusive() has replaced all the PTEs 
+with exclusive entries.
 
-File-based invalidations through the rmaps do not take mmap_sem.  They get at
-the VMAs via the address_space's interval tree, which is protected by its own
-i_mmap_rwsem.
+GUP fast sequence:
+1. Read PTE
+2. Pin page
+3. Check PTE
+4. if PTE changed -> unpin and fallback
 
-E.g. try_to_unmap() -> rmap_walk_file() -> try_to_unmap_one() 
+If make_device_exclusive() runs after (1) it will either succeed or see the 
+pin from (2) and fail (as desired). GUP should always see the PTE change and 
+fallback which will revoke the exclusive access.
 
-> We could take it temporarily in install_memslots, since the MMU notifier's mm
-> is stored in kvm->mm.
+ - Alistair
+
+> Jason
 > 
-> In this case, a pair of kvm_mmu_notifier_lock/unlock functions would be the
-> best way to abstract it.
-> 
-> Paolo
-> 
+
+
+
+
