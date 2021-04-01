@@ -2,152 +2,199 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35AF5350B60
-	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 02:49:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCBD4350B7C
+	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 03:06:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229959AbhDAAsv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 31 Mar 2021 20:48:51 -0400
-Received: from mail-bn7nam10on2060.outbound.protection.outlook.com ([40.107.92.60]:40417
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229497AbhDAAsR (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 31 Mar 2021 20:48:17 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dOTr05b4kS9A0kcDoqed+/fCoqVC/7877eugNT0137vw/iKaO7Hihv+xNIhneHeBbGddpGBspaqJJuafzRQyUajdpSt3lStiSW6iEHrpjLKBQPJu7KH29TPAuZKTSorf8pZwt8jhQ0PZCl/W/jjXTVzUNLKjJKvu39Oatkr2/Pg53oFIbKsZP5TCVA7wC2+p43AHc92y92Fn1fzME3/kFVKWzQttJwgnapHGHJl74ZWGWRqIsoShm7y50jwxuC3M0bdgtMIO7trMIcEl3UHJp9NOXgFivPPODDEioW3zsQx9iiUYhmyyFOlK2YyaKzoUUai45OUvACr0HvfY0SEjhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Bz98JO7Rw9cgfIpVlh5EBQkXIWFdkRDK6RFd3k/v4Fc=;
- b=NjqeWkKf6bAmVyjtn0UmeRw2Y32IboQISCcKq+3uaKw6HFdE1B8nyXH9+M14bg4jgA7dzUtpNSM49Y4fWsBnmxpXdYbP9C47mv8N3AjIKltLtIMOKGCAERpTCn/YFTKdso+HdDyzNERh+T6zb5SiSiSdpmKtTRTUIqw9PFSnq13tbDNhjeGuvhKnpWEbOrqqS//AiuRXOzj19+f1ji2S53IwmTMsqhxIj9/gD7nvSVV7C08VFWEYrDGUag4/DMF9JmxWFqBpJqE98S7doIIKGa2F7IgJGLugtNs9ABygZcW98TjCD0qcBXvaj/GMqtSY/e8V75Wq3GZAswFk3WZgqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Bz98JO7Rw9cgfIpVlh5EBQkXIWFdkRDK6RFd3k/v4Fc=;
- b=i/174J+krKtdZVcmGrUluXy0yJX2y3PTX6HE2bdzRu7H6y/8u3NwJISPKwXhZnSt0Y8Qp2XXveU6tBQsCLPts3mxyaT4oEZd3elf+NsoFfnLG1JJ9eqm7WvFnA0EuOX0jEsLDwo71S/sWnQRxouCNI6orHQjmI4754q2TfMFSCtOrQr3C3srqLWSMHCNUgCskAqcLgLidiuSSLg3hAz5Mo43X9zSUL/1fOa+uPZktZotAQ90L9Jov3q27gT3VQcMaIggRUsSfOMk/QoRURAycM/by3x4+roHtyoB3JWU06njOfuXkDB1xTKbn68ODRSiyhP1/fO2kOaPuFf4WdtUDw==
-Authentication-Results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB4402.namprd12.prod.outlook.com (2603:10b6:5:2a5::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.27; Thu, 1 Apr
- 2021 00:48:15 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3999.028; Thu, 1 Apr 2021
- 00:48:15 +0000
-Date:   Wed, 31 Mar 2021 21:48:13 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alistair Popple <apopple@nvidia.com>
-Cc:     linux-mm@kvack.org, nouveau@lists.freedesktop.org,
-        bskeggs@redhat.com, akpm@linux-foundation.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        jhubbard@nvidia.com, rcampbell@nvidia.com, jglisse@redhat.com,
-        hch@infradead.org, daniel@ffwll.ch, willy@infradead.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v7 5/8] mm: Device exclusive memory access
-Message-ID: <20210401004813.GT1463678@nvidia.com>
-References: <20210326000805.2518-1-apopple@nvidia.com>
- <2124945.3NMGunUBXV@nvdebian>
- <20210331134604.GK1463678@nvidia.com>
- <35941260.J9UuDlmC3F@nvdebian>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <35941260.J9UuDlmC3F@nvdebian>
-X-Originating-IP: [142.162.115.133]
-X-ClientProxiedBy: BL1PR13CA0035.namprd13.prod.outlook.com
- (2603:10b6:208:257::10) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S229497AbhDABGT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 31 Mar 2021 21:06:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:17618 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229486AbhDABF4 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 31 Mar 2021 21:05:56 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13113YIj111381;
+        Wed, 31 Mar 2021 21:05:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=lqGRzVm48nouvVTLixPfttRJPvqeBGwFOk4tCZ8RI+s=;
+ b=VK6gntUqwjcJNMGYeAE3rvn0zQJLI7p00QyOkBppTPRwltnLs/yYx+NmKutxQ8MwNXGd
+ PdV12/mI7sM+E6plQN/wkH/xKEB7neBg0Be8MY75ouHhPlXi0KSRyHzBxC/AUUuEvWEH
+ tAW/pv4Z4nzhunKIEq+7cDrYlEYoLDyJuKPPD776kSWZsivuzuuriBRWKK0eapCDQqT0
+ Y6APwTtuzlHDqj6/hn16PInEUXBfEjWk/EkERKatmJV8C1AgOJXWslN/yzyRAA4TCdey
+ xBLW/aZ1EIxb4k9SLxA2IMHnWHsiyp17PkA36goedpPPMSqAFT9bI7eHTf/m1K9wgjqE zw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37n2edabm1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 31 Mar 2021 21:05:30 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1311599j118797;
+        Wed, 31 Mar 2021 21:05:30 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37n2edabkg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 31 Mar 2021 21:05:30 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 1310w7lY030504;
+        Thu, 1 Apr 2021 01:05:28 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 37n28tr2be-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Apr 2021 01:05:28 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 131155Ik26280294
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 1 Apr 2021 01:05:05 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 39AF8AE045;
+        Thu,  1 Apr 2021 01:05:25 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2CC0DAE057;
+        Thu,  1 Apr 2021 01:05:21 +0000 (GMT)
+Received: from vajain21.in.ibm.com (unknown [9.199.43.15])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Thu,  1 Apr 2021 01:05:20 +0000 (GMT)
+Received: by vajain21.in.ibm.com (sSMTP sendmail emulation); Thu, 01 Apr 2021 06:35:20 +0530
+From:   Vaibhav Jain <vaibhav@linux.ibm.com>
+To:     qemu-devel@nongnu.org, kvm-ppc@vger.kernel.org,
+        qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mst@redhat.com,
+        imammedo@redhat.com, xiaoguangrong.eric@gmail.com
+Cc:     Vaibhav Jain <vaibhav@linux.ibm.com>, shivaprasadbhat@gmail.com,
+        bharata@linux.vnet.ibm.com, aneesh.kumar@linux.ibm.com,
+        groug@kaod.org, ehabkost@redhat.com, marcel.apfelbaum@gmail.com
+Subject: [PATCH v2] ppc/spapr: Add support for implement support for H_SCM_HEALTH
+Date:   Thu,  1 Apr 2021 06:35:19 +0530
+Message-Id: <20210401010519.7225-1-vaibhav@linux.ibm.com>
+X-Mailer: git-send-email 2.30.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: uDpwi3j0r4DXPqXow9P6f_3Y3rdCSgSp
+X-Proofpoint-GUID: LErx0t8uYbRbtOyN-vR0khyzSqv2Q-DP
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0035.namprd13.prod.outlook.com (2603:10b6:208:257::10) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.16 via Frontend Transport; Thu, 1 Apr 2021 00:48:14 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lRlVN-006Z2B-Pv; Wed, 31 Mar 2021 21:48:13 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 42981125-12dd-49f0-5d63-08d8f4a7d566
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4402:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB44028848F511BEA2DCFD3C26C27B9@DM6PR12MB4402.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DjxOcP4LY4OrfH23Hwf21uheIVMd7I/hcaJiZJBzvUXz9f43G382B+dyFOk7Ss4x0HAWYZpcvircUrZd6W7gs8qxFjytLur9dVGd80zgIQ+5RrDwafS5t2UN5Ws6lFXt/w7t298EPpSMR6u/lTIKbsvnUqqX8E0JASc0fbU527H8duHHz7mo+2XFC5TLN0xa80RYVwEtD4ZUsjhKOHtjWudU+hH1r+bTvk8M3OtRc2bG12mnMmkbUKBSUQAmOowVUavhBDULHPXkLqcc3xo1zVCIBX+9w4w4tVrHwYS9kiyj8UFApzlK61Fp70hFEwATLH9CesBP4mEa712yi9J76eddt31sf6w80CGU+A5BwXHALOFhD72BuKrsBwY9903639rnOXW4c09+3s6+eR9i82CWURIW2ogeBvgiNy9oIZo6YY9Kj4vCulXIDQlGBNzXekkNZEAf5Rh/oshmnKtcCrl42n57X1pDVnh5m0ltiSsN4JbYrFrOcQKkC4vgv+wTvJ1yn7J1XAfZNtDLBpp2aUm275k9+NKaryjMdZA3dB5Umc0h85m3uYhbuQ7cibAox4jQ1GisUbNoSuFnNBGwVQRDnD4hNFyKogX0LUEZCQRGdYYG16qEPIjomS/YTbjVVn+x5CwgM6n4i8oPtv/fG5o74fp5aQP2dlB0Dq8sWoM=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(2616005)(2906002)(426003)(9786002)(6862004)(9746002)(6636002)(36756003)(7416002)(66946007)(86362001)(26005)(38100700001)(33656002)(66556008)(4326008)(8936002)(186003)(5660300002)(1076003)(8676002)(83380400001)(37006003)(66476007)(498600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?lEx2oTexgFZdT3BrobyUhqtm8q8YzB2tW/kwCH7j2EgU23wShM61IuiqjU16?=
- =?us-ascii?Q?5sLkf8KUCGTVLsLFcNzIymHSaiyiwmf3zVQ99VQ/yWXd3yOm2cX+WapzDvcd?=
- =?us-ascii?Q?Z2H8IF7uXenpTdnCdpq1fXchC2QPR43Mzow0+7ZKEmVuQqh+LRxZPiKhfu2I?=
- =?us-ascii?Q?QH6/LIZ5O/nkCuh5/VctsKNdd9N1ufwG5A3UX4W38hEBMVQ3iRW//kqKA9xm?=
- =?us-ascii?Q?2/4mH+w0UWG5oF8NB3afwEsW2kdMVGg1N9M+ljdcw/K326p0XtrIE4/FWN9n?=
- =?us-ascii?Q?NAdN8Ro0Eu4DO7D+KCWK5R/Jwx5k4v9ETqY6+/X1W6fITcrGOO4UPQQrOSm6?=
- =?us-ascii?Q?7XOpRIMpw7rGM7eDGwSvm+AYwtbsOkxV8QEoZNN8SeAxe4bUee6b0F+Yydl/?=
- =?us-ascii?Q?Mbeh/ls6MVymOD7WeyZrKJgewaDQ8I15MMwllnJA2FytftBdi9hf1cQW/VDv?=
- =?us-ascii?Q?zkVebFBm15qlChPiMgQozv2vaCX0EhqAeS2y7fZONc8O7NhSuNqu0o3e7Njk?=
- =?us-ascii?Q?RQTd0cNGm+50le+bhoZI8OEVvGhH08wRPclwK9szGgpXHZCR4FVdWmx/s7dp?=
- =?us-ascii?Q?o/qPL/ke5mzM4rRFb6W8VjY49ByfmwS/5bPgw9XEYvcGmpG6rdNnSTapPMf0?=
- =?us-ascii?Q?XnFDF/JzR5emzmSMgv86PT4HtLFpkkpAUeE/X4yp1gI9SCfyNBgLInHanSvT?=
- =?us-ascii?Q?l22mi8QI/aDC/ROflHDhE5IYuG97j2SBWaY56Vk7TOZC9bcd6MFbi9g6+Zur?=
- =?us-ascii?Q?A4Bh01AS++kZHsrukbkwMLSUp8RR+4M7ET78A5nPJHiNp7dolvYscZCcESWM?=
- =?us-ascii?Q?JbF/t7AJOtlNGisN4LJsQMLOKhENXp1WVX7kYDhaGppH2kA3VpvFLY5cpCOG?=
- =?us-ascii?Q?yeAAEOs+f5jFYjwEkEnjOkmAyH3yaW45yADgSj43r7E/1nw/yvWZgQmdrrqm?=
- =?us-ascii?Q?vTxrf7LBPm9/FBwtwyLepUaKvHzHsAJPC20hnobtOyg9RcHO92PuKp4H4WXa?=
- =?us-ascii?Q?6p9K2KOsFffG22GtUCLCxVKbMEf3q1i8Jjb8ARjwde/JvIq9yzzcD3Gt7JHC?=
- =?us-ascii?Q?ADjYQCvLlzmL6vlaH10Fee5EqlDYYfqwETM0RKGGRVaxTSNpIcM1dq1L4JAI?=
- =?us-ascii?Q?SLIk4ic93TqRH+oRijXLHQUEJGRJs1+0GfVpVoYqjfk6CXfygYRZ4RPAKXUt?=
- =?us-ascii?Q?WZwcAOUOj/UjcBbZUM0Cy9iLHndJtwy/Z6aXeP5pNvD518MwUK9sVhdeHIwV?=
- =?us-ascii?Q?x5V1mCcCmM1z4c35QxRwcABm6FncycuxC9/vuiK9BW64oHXwRsrvBRWnJcPQ?=
- =?us-ascii?Q?fFpo/Cs2zXKODDLPsXFI5FNzNx/EM0w4hS7E7vNiLHudaQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42981125-12dd-49f0-5d63-08d8f4a7d566
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2021 00:48:15.2764
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9ddPwW3SODqDtjKE9BPzQsSDITial4Mn724XIUUoKzpSxwwY44v63KClh4EWpQ+M
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4402
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-31_11:2021-03-31,2021-03-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ impostorscore=0 adultscore=0 clxscore=1015 spamscore=0 mlxscore=0
+ mlxlogscore=999 phishscore=0 priorityscore=1501 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2103310000 definitions=main-2104010004
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Apr 01, 2021 at 11:45:57AM +1100, Alistair Popple wrote:
-> On Thursday, 1 April 2021 12:46:04 AM AEDT Jason Gunthorpe wrote:
-> > On Thu, Apr 01, 2021 at 12:27:52AM +1100, Alistair Popple wrote:
-> > > On Thursday, 1 April 2021 12:18:54 AM AEDT Jason Gunthorpe wrote:
-> > > > On Wed, Mar 31, 2021 at 11:59:28PM +1100, Alistair Popple wrote:
-> > > > 
-> > > > > I guess that makes sense as the split could go either way at the
-> > > > > moment but I should add a check to make sure this isn't used with
-> > > > > pinned pages anyway.
-> > > > 
-> > > > Is it possible to have a pinned page under one of these things? If I
-> > > > pin it before you migrate it then it remains pinned but hidden under
-> > > > the swap entry?
-> > > 
-> > > At the moment yes. But I had planned (and this reminded me) to add a check 
-> to 
-> > > prevent marking pinned pages for exclusive access. 
-> > 
-> > How do you even do that without races with GUP fast?
-> 
-> Unless I've missed something I think I've convinced myself it should be safe 
-> to do the pin check after make_device_exclusive() has replaced all the PTEs 
-> with exclusive entries.
-> 
-> GUP fast sequence:
-> 1. Read PTE
-> 2. Pin page
-> 3. Check PTE
-> 4. if PTE changed -> unpin and fallback
-> 
-> If make_device_exclusive() runs after (1) it will either succeed or see the 
-> pin from (2) and fail (as desired). GUP should always see the PTE change and 
-> fallback which will revoke the exclusive access.
+Add support for H_SCM_HEALTH hcall described at [1] for spapr
+nvdimms. This enables guest to detect the 'unarmed' status of a
+specific spapr nvdimm identified by its DRC and if its unarmed, mark
+the region backed by the nvdimm as read-only.
 
-AFAICT the user can trigger fork at that instant and fork will try to
-copy the desposited migration entry before it has been checked
+The patch adds h_scm_health() to handle the H_SCM_HEALTH hcall which
+returns two 64-bit bitmaps (health bitmap, health bitmap mask) derived
+from 'struct nvdimm->unarmed' member.
 
-Jason
+Linux kernel side changes to enable handling of 'unarmed' nvdimms for
+ppc64 are proposed at [2].
+
+References:
+[1] "Hypercall Op-codes (hcalls)"
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/powerpc/papr_hcalls.rst#n220
+[2] "powerpc/papr_scm: Mark nvdimm as unarmed if needed during probe"
+    https://lore.kernel.org/linux-nvdimm/20210329113103.476760-1-vaibhav@linux.ibm.com/
+
+Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+---
+Changelog
+
+v2:
+* Added a check for drc->dev to ensure that the dimm is plugged in
+  when servicing H_SCM_HEALTH. [ Shiva ]
+* Instead of accessing the 'nvdimm->unarmed' member directly use the
+  object_property_get_bool accessor to fetch it. [ Shiva ]
+* Update the usage of PAPR_PMEM_UNARMED* macros [ Greg ]
+* Updated patch description reference#1 to point appropriate section
+  in the documentation. [ Greg ]
+---
+ hw/ppc/spapr_nvdimm.c  | 38 ++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |  3 ++-
+ 2 files changed, 40 insertions(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+index b46c36917c..34096e4718 100644
+--- a/hw/ppc/spapr_nvdimm.c
++++ b/hw/ppc/spapr_nvdimm.c
+@@ -31,6 +31,13 @@
+ #include "qemu/range.h"
+ #include "hw/ppc/spapr_numa.h"
+ 
++/* DIMM health bitmap bitmap indicators. Taken from kernel's papr_scm.c */
++/* SCM device is unable to persist memory contents */
++#define PAPR_PMEM_UNARMED (1ULL << (63 - 0))
++
++/* Bits status indicators for health bitmap indicating unarmed dimm */
++#define PAPR_PMEM_UNARMED_MASK (PAPR_PMEM_UNARMED)
++
+ bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
+                            uint64_t size, Error **errp)
+ {
+@@ -467,6 +474,36 @@ static target_ulong h_scm_unbind_all(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     return H_SUCCESS;
+ }
+ 
++static target_ulong h_scm_health(PowerPCCPU *cpu, SpaprMachineState *spapr,
++                                 target_ulong opcode, target_ulong *args)
++{
++    uint32_t drc_index = args[0];
++    SpaprDrc *drc = spapr_drc_by_index(drc_index);
++    NVDIMMDevice *nvdimm;
++
++    if (drc && spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PMEM) {
++        return H_PARAMETER;
++    }
++
++    /* Ensure that the dimm is plugged in */
++    if (!drc->dev) {
++        return H_HARDWARE;
++    }
++
++    nvdimm = NVDIMM(drc->dev);
++
++    args[0] = 0;
++    /* Check if the nvdimm is unarmed and send its status via health bitmaps */
++    if (object_property_get_bool(OBJECT(nvdimm), NVDIMM_UNARMED_PROP, NULL)) {
++        args[0] |= PAPR_PMEM_UNARMED;
++    }
++
++    /* Update the health bitmap with the applicable mask */
++    args[1] = PAPR_PMEM_UNARMED_MASK;
++
++    return H_SUCCESS;
++}
++
+ static void spapr_scm_register_types(void)
+ {
+     /* qemu/scm specific hcalls */
+@@ -475,6 +512,7 @@ static void spapr_scm_register_types(void)
+     spapr_register_hypercall(H_SCM_BIND_MEM, h_scm_bind_mem);
+     spapr_register_hypercall(H_SCM_UNBIND_MEM, h_scm_unbind_mem);
+     spapr_register_hypercall(H_SCM_UNBIND_ALL, h_scm_unbind_all);
++    spapr_register_hypercall(H_SCM_HEALTH, h_scm_health);
+ }
+ 
+ type_init(spapr_scm_register_types)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 47cebaf3ac..6e1eafb05d 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -538,8 +538,9 @@ struct SpaprMachineState {
+ #define H_SCM_BIND_MEM          0x3EC
+ #define H_SCM_UNBIND_MEM        0x3F0
+ #define H_SCM_UNBIND_ALL        0x3FC
++#define H_SCM_HEALTH            0x400
+ 
+-#define MAX_HCALL_OPCODE        H_SCM_UNBIND_ALL
++#define MAX_HCALL_OPCODE        H_SCM_HEALTH
+ 
+ /* The hcalls above are standardized in PAPR and implemented by pHyp
+  * as well.
+-- 
+2.30.2
+
