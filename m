@@ -2,443 +2,191 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 035C435183F
-	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 19:48:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86646351843
+	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 19:48:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236331AbhDARoV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 1 Apr 2021 13:44:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57240 "EHLO
+        id S236353AbhDARoX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 1 Apr 2021 13:44:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234854AbhDARkx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 13:40:53 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04125C00F7CB
-        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 08:05:38 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id a12so1674067pfc.7
-        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 08:05:37 -0700 (PDT)
+        with ESMTP id S234940AbhDARl1 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 13:41:27 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C88CAC00F7CF
+        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 08:05:48 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id x21-20020a17090a5315b029012c4a622e4aso1176137pjh.2
+        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 08:05:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=GnCWFJRKc/vkSBSwWx3nu8T+6ga7M9PuaG2PxvMJzgE=;
-        b=tRif4nQ1oRFkVt8HpgZh4xeS+VCSaqxvPyuViqthTCJ139KlWUBM84i3wcVNwZlzYb
-         akz97oNI+/X0+d1GjurDQliiVWI55jpjf8q+YnpjLqqx5wmo1YHLCzi8VwGlWCVculAo
-         GTtP91yl06Fj1CETz8d7DhYeo84wP17ssX740NE10rUIqNcYtjMqtbui3jDezryROAss
-         eOsY/Avz+QUkCymegxVoy/z2JKJMVWaLKzOBcDJxoOQvGCyW5Pm0b4hQp+0Zvl/SUvSO
-         wCslrKyA03tBEDauzUn8o0BNR2zvM03VWUIw0qrITXVqBMZ85yixVBIOSTGPidYlvGky
-         bH/w==
+        bh=LDEkLrbLG9R2apsCK2gnQqMuFPbkZM9kNaSGb4ipSQE=;
+        b=MgCVQ0kn2v3ELNofv7xq5fBlGyvWfZEGUNanq46SCXMsQE0oiIM/eqHlk7YpAHmATC
+         Qpw0xJ/QwV1vmlqTDp1btFY/wp9rMbHEfr/B4gu9NhZXgYm0FnzRqqOTF2M+EMFHnjSq
+         lAKl+YmAMBz/ZsBBKBXFBrjB2vukooMmlKjRFJlO6Ll1k+ep5rImn0W/CBMD+a7kWeF8
+         JnyO7adnb3BDl4HccDK1lX2ZCk8Yk2k5xA9mfDPmJJC2adgt/Px2ymGaKE5zBw3XWcAI
+         KLxsQWWJmX8UGyuK54TYC8hBSwSQkAb58hxrQQEGvQqlClVKEbazdPxWiSLrF6BRui/n
+         G3KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=GnCWFJRKc/vkSBSwWx3nu8T+6ga7M9PuaG2PxvMJzgE=;
-        b=CC02Bd0AByTQjQDdTYUwTZDlABMn3aO1jukBRUJn7edTILzVsmutHOTZWBOl3wpcd/
-         nGnl/w6k/fmADMMceYS7jRKAUUZ08HvtgonnY0zncqCEcYE3+WCEgE0sX1tD7sA5LrPF
-         ZQLkon7kFmFv15M2MiJh06UZWfZr6psp5G1/WidNJv//jIGYmdTtuMGU8h0Tk/Zxx7PV
-         OBAwMYHkQp6as/bq98oH+iYlmY9jBBEhRrKqNn+HcV2vHGY9+YWO28cSqQiNTVe6S/08
-         9cH0waGaATrLP9+4duKYvrkE8XDvR/iL6Hl3EGtx/28yPc0ocO94m+P/LSrmkQsMVMLE
-         NNWA==
-X-Gm-Message-State: AOAM532eI6zojYF0PcQYq5c4CXYi4Juh/8qe7A//lH9SGwwJXx2B+c2q
-        uM45pWlP3f5Ud8xPg2Y9b+BWOtXkSMg=
-X-Google-Smtp-Source: ABdhPJzIzjnHBzJOzuoHQpjQqz13wbfxT/PFXW22Bkt63HPpSx6hejdBQUP2UzEvzdtbeFW0B7blnQ==
-X-Received: by 2002:a63:8c0b:: with SMTP id m11mr7770340pgd.306.1617289537340;
-        Thu, 01 Apr 2021 08:05:37 -0700 (PDT)
+        bh=LDEkLrbLG9R2apsCK2gnQqMuFPbkZM9kNaSGb4ipSQE=;
+        b=iA3S2eutkVrVqhHYLVxZMyQmRlJvNlMav4ZkpBmbaIbhhOUbOEEeyYT9aRZ46PHEcK
+         Uhb+7nPAJUwOiOKThB7ALA3uijTWBBRr3gFA9PY9V03dwKsCvBvfboAraL4poGMNozzK
+         Yxt0OM4VOOGb3s/zzCbjeWPxicFMhj3omM6UZ8Sl47tpPDaPaAv25h8BM2OHz060NF5y
+         zcJvvotdOPOEX9u4LOFaca7a3TvIqKLMeq4OrSS1IfHr6phOmMvNu5PbAFYqUqhzF5Ic
+         F7+jD3bN2M2NdGXleIseIoMcP5aOOsz9ha2s0KUSuDV1wNZADrnXjQ7T40nxJIjFoEot
+         puIQ==
+X-Gm-Message-State: AOAM531GmuS9aegtrt3Mw6G5TEGnCUKM9f4cAWT8Ossb1a22le1Ez61Z
+        XbXxxGpM+tKwUuRoHbhfZT9WbcGzbEs=
+X-Google-Smtp-Source: ABdhPJx8eQfJk4OchZktXu7GJIRr/s2T1IVbVUBSSyYAgKydMCloANXTahawxOY9BOfFVNlvFPEiiQ==
+X-Received: by 2002:a17:90b:357:: with SMTP id fh23mr9140000pjb.169.1617289548274;
+        Thu, 01 Apr 2021 08:05:48 -0700 (PDT)
 Received: from bobo.ibm.com ([1.128.218.207])
-        by smtp.gmail.com with ESMTPSA id l3sm5599632pju.44.2021.04.01.08.05.34
+        by smtp.gmail.com with ESMTPSA id l3sm5599632pju.44.2021.04.01.08.05.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Apr 2021 08:05:37 -0700 (PDT)
+        Thu, 01 Apr 2021 08:05:48 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
-        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Subject: [PATCH v5 40/48] KVM: PPC: Book3S HV: Remove virt mode checks from real mode handlers
-Date:   Fri,  2 Apr 2021 01:03:17 +1000
-Message-Id: <20210401150325.442125-41-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v5 44/48] KVM: PPC: Book3S HV: small pseries_do_hcall cleanup
+Date:   Fri,  2 Apr 2021 01:03:21 +1000
+Message-Id: <20210401150325.442125-45-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210401150325.442125-1-npiggin@gmail.com>
 References: <20210401150325.442125-1-npiggin@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Now that the P7/8 path no longer supports radix, real-mode handlers
-do not need to deal with being called in virt mode.
+Functionality should not be changed.
 
-This change effectively reverts commit acde25726bc6 ("KVM: PPC: Book3S
-HV: Add radix checks in real-mode hypercall handlers").
-
-It removes a few more real-mode tests in rm hcall handlers, which also
-allows the indirect ops for the xive module to be removed from the
-built-in xics rm handlers.
-
-kvmppc_h_random is renamed to kvmppc_rm_h_random to be a bit more
-descriptive of its function.
-
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/include/asm/kvm_ppc.h      | 10 +--
- arch/powerpc/kvm/book3s.c               | 11 +--
- arch/powerpc/kvm/book3s_64_vio_hv.c     | 12 ----
- arch/powerpc/kvm/book3s_hv_builtin.c    | 91 ++++++-------------------
- arch/powerpc/kvm/book3s_hv_rmhandlers.S |  2 +-
- arch/powerpc/kvm/book3s_xive.c          | 18 -----
- arch/powerpc/kvm/book3s_xive.h          |  7 --
- arch/powerpc/kvm/book3s_xive_native.c   | 10 ---
- 8 files changed, 23 insertions(+), 138 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index cbd8deba2e8a..896e309431fb 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -660,8 +660,6 @@ extern int kvmppc_xive_get_xive(struct kvm *kvm, u32 irq, u32 *server,
- 				u32 *priority);
- extern int kvmppc_xive_int_on(struct kvm *kvm, u32 irq);
- extern int kvmppc_xive_int_off(struct kvm *kvm, u32 irq);
--extern void kvmppc_xive_init_module(void);
--extern void kvmppc_xive_exit_module(void);
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index f4fa39f4cd4c..8416ec0d88bc 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -925,6 +925,7 @@ static int kvmppc_get_yield_count(struct kvm_vcpu *vcpu)
  
- extern int kvmppc_xive_connect_vcpu(struct kvm_device *dev,
- 				    struct kvm_vcpu *vcpu, u32 cpu);
-@@ -687,8 +685,6 @@ static inline int kvmppc_xive_enabled(struct kvm_vcpu *vcpu)
- extern int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
- 					   struct kvm_vcpu *vcpu, u32 cpu);
- extern void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu);
--extern void kvmppc_xive_native_init_module(void);
--extern void kvmppc_xive_native_exit_module(void);
- extern int kvmppc_xive_native_get_vp(struct kvm_vcpu *vcpu,
- 				     union kvmppc_one_reg *val);
- extern int kvmppc_xive_native_set_vp(struct kvm_vcpu *vcpu,
-@@ -702,8 +698,6 @@ static inline int kvmppc_xive_get_xive(struct kvm *kvm, u32 irq, u32 *server,
- 				       u32 *priority) { return -1; }
- static inline int kvmppc_xive_int_on(struct kvm *kvm, u32 irq) { return -1; }
- static inline int kvmppc_xive_int_off(struct kvm *kvm, u32 irq) { return -1; }
--static inline void kvmppc_xive_init_module(void) { }
--static inline void kvmppc_xive_exit_module(void) { }
- 
- static inline int kvmppc_xive_connect_vcpu(struct kvm_device *dev,
- 					   struct kvm_vcpu *vcpu, u32 cpu) { return -EBUSY; }
-@@ -726,8 +720,6 @@ static inline int kvmppc_xive_enabled(struct kvm_vcpu *vcpu)
- static inline int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
- 			  struct kvm_vcpu *vcpu, u32 cpu) { return -EBUSY; }
- static inline void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu) { }
--static inline void kvmppc_xive_native_init_module(void) { }
--static inline void kvmppc_xive_native_exit_module(void) { }
- static inline int kvmppc_xive_native_get_vp(struct kvm_vcpu *vcpu,
- 					    union kvmppc_one_reg *val)
- { return 0; }
-@@ -763,7 +755,7 @@ long kvmppc_rm_h_stuff_tce(struct kvm_vcpu *vcpu,
- 			   unsigned long tce_value, unsigned long npages);
- long int kvmppc_rm_h_confer(struct kvm_vcpu *vcpu, int target,
-                             unsigned int yield_count);
--long kvmppc_h_random(struct kvm_vcpu *vcpu);
-+long kvmppc_rm_h_random(struct kvm_vcpu *vcpu);
- void kvmhv_commence_exit(int trap);
- void kvmppc_realmode_machine_check(struct kvm_vcpu *vcpu);
- void kvmppc_subcore_enter_guest(void);
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 1658f899e289..d3bd509b4093 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -1052,13 +1052,10 @@ static int kvmppc_book3s_init(void)
- #ifdef CONFIG_KVM_XICS
- #ifdef CONFIG_KVM_XIVE
- 	if (xics_on_xive()) {
--		kvmppc_xive_init_module();
- 		kvm_register_device_ops(&kvm_xive_ops, KVM_DEV_TYPE_XICS);
--		if (kvmppc_xive_native_supported()) {
--			kvmppc_xive_native_init_module();
-+		if (kvmppc_xive_native_supported())
- 			kvm_register_device_ops(&kvm_xive_native_ops,
- 						KVM_DEV_TYPE_XIVE);
--		}
- 	} else
- #endif
- 		kvm_register_device_ops(&kvm_xics_ops, KVM_DEV_TYPE_XICS);
-@@ -1068,12 +1065,6 @@ static int kvmppc_book3s_init(void)
- 
- static void kvmppc_book3s_exit(void)
+ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
  {
--#ifdef CONFIG_KVM_XICS
--	if (xics_on_xive()) {
--		kvmppc_xive_exit_module();
--		kvmppc_xive_native_exit_module();
--	}
--#endif
- #ifdef CONFIG_KVM_BOOK3S_32_HANDLER
- 	kvmppc_book3s_exit_pr();
- #endif
-diff --git a/arch/powerpc/kvm/book3s_64_vio_hv.c b/arch/powerpc/kvm/book3s_64_vio_hv.c
-index 083a4e037718..dc6591548f0c 100644
---- a/arch/powerpc/kvm/book3s_64_vio_hv.c
-+++ b/arch/powerpc/kvm/book3s_64_vio_hv.c
-@@ -391,10 +391,6 @@ long kvmppc_rm_h_put_tce(struct kvm_vcpu *vcpu, unsigned long liobn,
- 	/* udbg_printf("H_PUT_TCE(): liobn=0x%lx ioba=0x%lx, tce=0x%lx\n", */
- 	/* 	    liobn, ioba, tce); */
++	struct kvm *kvm = vcpu->kvm;
+ 	unsigned long req = kvmppc_get_gpr(vcpu, 3);
+ 	unsigned long target, ret = H_SUCCESS;
+ 	int yield_count;
+@@ -940,7 +941,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 		break;
+ 	case H_PROD:
+ 		target = kvmppc_get_gpr(vcpu, 4);
+-		tvcpu = kvmppc_find_vcpu(vcpu->kvm, target);
++		tvcpu = kvmppc_find_vcpu(kvm, target);
+ 		if (!tvcpu) {
+ 			ret = H_PARAMETER;
+ 			break;
+@@ -954,7 +955,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 		target = kvmppc_get_gpr(vcpu, 4);
+ 		if (target == -1)
+ 			break;
+-		tvcpu = kvmppc_find_vcpu(vcpu->kvm, target);
++		tvcpu = kvmppc_find_vcpu(kvm, target);
+ 		if (!tvcpu) {
+ 			ret = H_PARAMETER;
+ 			break;
+@@ -970,12 +971,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 					kvmppc_get_gpr(vcpu, 6));
+ 		break;
+ 	case H_RTAS:
+-		if (list_empty(&vcpu->kvm->arch.rtas_tokens))
++		if (list_empty(&kvm->arch.rtas_tokens))
+ 			return RESUME_HOST;
  
--	/* For radix, we might be in virtual mode, so punt */
--	if (kvm_is_radix(vcpu->kvm))
--		return H_TOO_HARD;
--
- 	stt = kvmppc_find_table(vcpu->kvm, liobn);
- 	if (!stt)
- 		return H_TOO_HARD;
-@@ -489,10 +485,6 @@ long kvmppc_rm_h_put_tce_indirect(struct kvm_vcpu *vcpu,
- 	bool prereg = false;
- 	struct kvmppc_spapr_tce_iommu_table *stit;
+-		idx = srcu_read_lock(&vcpu->kvm->srcu);
++		idx = srcu_read_lock(&kvm->srcu);
+ 		rc = kvmppc_rtas_hcall(vcpu);
+-		srcu_read_unlock(&vcpu->kvm->srcu, idx);
++		srcu_read_unlock(&kvm->srcu, idx);
  
--	/* For radix, we might be in virtual mode, so punt */
--	if (kvm_is_radix(vcpu->kvm))
--		return H_TOO_HARD;
--
- 	/*
- 	 * used to check for invalidations in progress
- 	 */
-@@ -602,10 +594,6 @@ long kvmppc_rm_h_stuff_tce(struct kvm_vcpu *vcpu,
- 	long i, ret;
- 	struct kvmppc_spapr_tce_iommu_table *stit;
+ 		if (rc == -ENOENT)
+ 			return RESUME_HOST;
+@@ -1062,12 +1063,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
  
--	/* For radix, we might be in virtual mode, so punt */
--	if (kvm_is_radix(vcpu->kvm))
--		return H_TOO_HARD;
--
- 	stt = kvmppc_find_table(vcpu->kvm, liobn);
- 	if (!stt)
- 		return H_TOO_HARD;
-diff --git a/arch/powerpc/kvm/book3s_hv_builtin.c b/arch/powerpc/kvm/book3s_hv_builtin.c
-index 7a0e33a9c980..8d669a0e15f8 100644
---- a/arch/powerpc/kvm/book3s_hv_builtin.c
-+++ b/arch/powerpc/kvm/book3s_hv_builtin.c
-@@ -34,21 +34,6 @@
- #include "book3s_xics.h"
- #include "book3s_xive.h"
+ 	case H_SET_PARTITION_TABLE:
+ 		ret = H_FUNCTION;
+-		if (nesting_enabled(vcpu->kvm))
++		if (nesting_enabled(kvm))
+ 			ret = kvmhv_set_partition_table(vcpu);
+ 		break;
+ 	case H_ENTER_NESTED:
+ 		ret = H_FUNCTION;
+-		if (!nesting_enabled(vcpu->kvm))
++		if (!nesting_enabled(kvm))
+ 			break;
+ 		ret = kvmhv_enter_nested_guest(vcpu);
+ 		if (ret == H_INTERRUPT) {
+@@ -1082,12 +1083,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 		break;
+ 	case H_TLB_INVALIDATE:
+ 		ret = H_FUNCTION;
+-		if (nesting_enabled(vcpu->kvm))
++		if (nesting_enabled(kvm))
+ 			ret = kvmhv_do_nested_tlbie(vcpu);
+ 		break;
+ 	case H_COPY_TOFROM_GUEST:
+ 		ret = H_FUNCTION;
+-		if (nesting_enabled(vcpu->kvm))
++		if (nesting_enabled(kvm))
+ 			ret = kvmhv_copy_tofrom_guest_nested(vcpu);
+ 		break;
+ 	case H_PAGE_INIT:
+@@ -1098,7 +1099,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 	case H_SVM_PAGE_IN:
+ 		ret = H_UNSUPPORTED;
+ 		if (kvmppc_get_srr1(vcpu) & MSR_S)
+-			ret = kvmppc_h_svm_page_in(vcpu->kvm,
++			ret = kvmppc_h_svm_page_in(kvm,
+ 						   kvmppc_get_gpr(vcpu, 4),
+ 						   kvmppc_get_gpr(vcpu, 5),
+ 						   kvmppc_get_gpr(vcpu, 6));
+@@ -1106,7 +1107,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 	case H_SVM_PAGE_OUT:
+ 		ret = H_UNSUPPORTED;
+ 		if (kvmppc_get_srr1(vcpu) & MSR_S)
+-			ret = kvmppc_h_svm_page_out(vcpu->kvm,
++			ret = kvmppc_h_svm_page_out(kvm,
+ 						    kvmppc_get_gpr(vcpu, 4),
+ 						    kvmppc_get_gpr(vcpu, 5),
+ 						    kvmppc_get_gpr(vcpu, 6));
+@@ -1114,12 +1115,12 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 	case H_SVM_INIT_START:
+ 		ret = H_UNSUPPORTED;
+ 		if (kvmppc_get_srr1(vcpu) & MSR_S)
+-			ret = kvmppc_h_svm_init_start(vcpu->kvm);
++			ret = kvmppc_h_svm_init_start(kvm);
+ 		break;
+ 	case H_SVM_INIT_DONE:
+ 		ret = H_UNSUPPORTED;
+ 		if (kvmppc_get_srr1(vcpu) & MSR_S)
+-			ret = kvmppc_h_svm_init_done(vcpu->kvm);
++			ret = kvmppc_h_svm_init_done(kvm);
+ 		break;
+ 	case H_SVM_INIT_ABORT:
+ 		/*
+@@ -1129,7 +1130,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+ 		 * Instead the kvm->arch.secure_guest flag is checked inside
+ 		 * kvmppc_h_svm_init_abort().
+ 		 */
+-		ret = kvmppc_h_svm_init_abort(vcpu->kvm);
++		ret = kvmppc_h_svm_init_abort(kvm);
+ 		break;
  
--/*
-- * The XIVE module will populate these when it loads
-- */
--unsigned long (*__xive_vm_h_xirr)(struct kvm_vcpu *vcpu);
--unsigned long (*__xive_vm_h_ipoll)(struct kvm_vcpu *vcpu, unsigned long server);
--int (*__xive_vm_h_ipi)(struct kvm_vcpu *vcpu, unsigned long server,
--		       unsigned long mfrr);
--int (*__xive_vm_h_cppr)(struct kvm_vcpu *vcpu, unsigned long cppr);
--int (*__xive_vm_h_eoi)(struct kvm_vcpu *vcpu, unsigned long xirr);
--EXPORT_SYMBOL_GPL(__xive_vm_h_xirr);
--EXPORT_SYMBOL_GPL(__xive_vm_h_ipoll);
--EXPORT_SYMBOL_GPL(__xive_vm_h_ipi);
--EXPORT_SYMBOL_GPL(__xive_vm_h_cppr);
--EXPORT_SYMBOL_GPL(__xive_vm_h_eoi);
--
- /*
-  * Hash page table alignment on newer cpus(CPU_FTR_ARCH_206)
-  * should be power of 2.
-@@ -196,16 +181,9 @@ int kvmppc_hwrng_present(void)
- }
- EXPORT_SYMBOL_GPL(kvmppc_hwrng_present);
- 
--long kvmppc_h_random(struct kvm_vcpu *vcpu)
-+long kvmppc_rm_h_random(struct kvm_vcpu *vcpu)
- {
--	int r;
--
--	/* Only need to do the expensive mfmsr() on radix */
--	if (kvm_is_radix(vcpu->kvm) && (mfmsr() & MSR_IR))
--		r = powernv_get_random_long(&vcpu->arch.regs.gpr[4]);
--	else
--		r = powernv_get_random_real_mode(&vcpu->arch.regs.gpr[4]);
--	if (r)
-+	if (powernv_get_random_real_mode(&vcpu->arch.regs.gpr[4]))
- 		return H_SUCCESS;
- 
- 	return H_HARDWARE;
-@@ -541,22 +519,13 @@ static long kvmppc_read_one_intr(bool *again)
- }
- 
- #ifdef CONFIG_KVM_XICS
--static inline bool is_rm(void)
--{
--	return !(mfmsr() & MSR_DR);
--}
--
- unsigned long kvmppc_rm_h_xirr(struct kvm_vcpu *vcpu)
- {
- 	if (!kvmppc_xics_enabled(vcpu))
- 		return H_TOO_HARD;
--	if (xics_on_xive()) {
--		if (is_rm())
--			return xive_rm_h_xirr(vcpu);
--		if (unlikely(!__xive_vm_h_xirr))
--			return H_NOT_AVAILABLE;
--		return __xive_vm_h_xirr(vcpu);
--	} else
-+	if (xics_on_xive())
-+		return xive_rm_h_xirr(vcpu);
-+	else
- 		return xics_rm_h_xirr(vcpu);
- }
- 
-@@ -565,13 +534,9 @@ unsigned long kvmppc_rm_h_xirr_x(struct kvm_vcpu *vcpu)
- 	if (!kvmppc_xics_enabled(vcpu))
- 		return H_TOO_HARD;
- 	vcpu->arch.regs.gpr[5] = get_tb();
--	if (xics_on_xive()) {
--		if (is_rm())
--			return xive_rm_h_xirr(vcpu);
--		if (unlikely(!__xive_vm_h_xirr))
--			return H_NOT_AVAILABLE;
--		return __xive_vm_h_xirr(vcpu);
--	} else
-+	if (xics_on_xive())
-+		return xive_rm_h_xirr(vcpu);
-+	else
- 		return xics_rm_h_xirr(vcpu);
- }
- 
-@@ -579,13 +544,9 @@ unsigned long kvmppc_rm_h_ipoll(struct kvm_vcpu *vcpu, unsigned long server)
- {
- 	if (!kvmppc_xics_enabled(vcpu))
- 		return H_TOO_HARD;
--	if (xics_on_xive()) {
--		if (is_rm())
--			return xive_rm_h_ipoll(vcpu, server);
--		if (unlikely(!__xive_vm_h_ipoll))
--			return H_NOT_AVAILABLE;
--		return __xive_vm_h_ipoll(vcpu, server);
--	} else
-+	if (xics_on_xive())
-+		return xive_rm_h_ipoll(vcpu, server);
-+	else
- 		return H_TOO_HARD;
- }
- 
-@@ -594,13 +555,9 @@ int kvmppc_rm_h_ipi(struct kvm_vcpu *vcpu, unsigned long server,
- {
- 	if (!kvmppc_xics_enabled(vcpu))
- 		return H_TOO_HARD;
--	if (xics_on_xive()) {
--		if (is_rm())
--			return xive_rm_h_ipi(vcpu, server, mfrr);
--		if (unlikely(!__xive_vm_h_ipi))
--			return H_NOT_AVAILABLE;
--		return __xive_vm_h_ipi(vcpu, server, mfrr);
--	} else
-+	if (xics_on_xive())
-+		return xive_rm_h_ipi(vcpu, server, mfrr);
-+	else
- 		return xics_rm_h_ipi(vcpu, server, mfrr);
- }
- 
-@@ -608,13 +565,9 @@ int kvmppc_rm_h_cppr(struct kvm_vcpu *vcpu, unsigned long cppr)
- {
- 	if (!kvmppc_xics_enabled(vcpu))
- 		return H_TOO_HARD;
--	if (xics_on_xive()) {
--		if (is_rm())
--			return xive_rm_h_cppr(vcpu, cppr);
--		if (unlikely(!__xive_vm_h_cppr))
--			return H_NOT_AVAILABLE;
--		return __xive_vm_h_cppr(vcpu, cppr);
--	} else
-+	if (xics_on_xive())
-+		return xive_rm_h_cppr(vcpu, cppr);
-+	else
- 		return xics_rm_h_cppr(vcpu, cppr);
- }
- 
-@@ -622,13 +575,9 @@ int kvmppc_rm_h_eoi(struct kvm_vcpu *vcpu, unsigned long xirr)
- {
- 	if (!kvmppc_xics_enabled(vcpu))
- 		return H_TOO_HARD;
--	if (xics_on_xive()) {
--		if (is_rm())
--			return xive_rm_h_eoi(vcpu, xirr);
--		if (unlikely(!__xive_vm_h_eoi))
--			return H_NOT_AVAILABLE;
--		return __xive_vm_h_eoi(vcpu, xirr);
--	} else
-+	if (xics_on_xive())
-+		return xive_rm_h_eoi(vcpu, xirr);
-+	else
- 		return xics_rm_h_eoi(vcpu, xirr);
- }
- #endif /* CONFIG_KVM_XICS */
-diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index 3b68b4817d6d..7a0e26c9fab9 100644
---- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-+++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -2323,7 +2323,7 @@ hcall_real_table:
- #else
- 	.long	0		/* 0x2fc - H_XIRR_X*/
- #endif
--	.long	DOTSYM(kvmppc_h_random) - hcall_real_table
-+	.long	DOTSYM(kvmppc_rm_h_random) - hcall_real_table
- 	.globl	hcall_real_table_end
- hcall_real_table_end:
- 
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index 24c07094651a..9268d386b128 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -2352,21 +2352,3 @@ struct kvm_device_ops kvm_xive_ops = {
- 	.get_attr = xive_get_attr,
- 	.has_attr = xive_has_attr,
- };
--
--void kvmppc_xive_init_module(void)
--{
--	__xive_vm_h_xirr = xive_vm_h_xirr;
--	__xive_vm_h_ipoll = xive_vm_h_ipoll;
--	__xive_vm_h_ipi = xive_vm_h_ipi;
--	__xive_vm_h_cppr = xive_vm_h_cppr;
--	__xive_vm_h_eoi = xive_vm_h_eoi;
--}
--
--void kvmppc_xive_exit_module(void)
--{
--	__xive_vm_h_xirr = NULL;
--	__xive_vm_h_ipoll = NULL;
--	__xive_vm_h_ipi = NULL;
--	__xive_vm_h_cppr = NULL;
--	__xive_vm_h_eoi = NULL;
--}
-diff --git a/arch/powerpc/kvm/book3s_xive.h b/arch/powerpc/kvm/book3s_xive.h
-index 86c24a4ad809..afe9eeac6d56 100644
---- a/arch/powerpc/kvm/book3s_xive.h
-+++ b/arch/powerpc/kvm/book3s_xive.h
-@@ -289,13 +289,6 @@ extern int xive_rm_h_ipi(struct kvm_vcpu *vcpu, unsigned long server,
- extern int xive_rm_h_cppr(struct kvm_vcpu *vcpu, unsigned long cppr);
- extern int xive_rm_h_eoi(struct kvm_vcpu *vcpu, unsigned long xirr);
- 
--extern unsigned long (*__xive_vm_h_xirr)(struct kvm_vcpu *vcpu);
--extern unsigned long (*__xive_vm_h_ipoll)(struct kvm_vcpu *vcpu, unsigned long server);
--extern int (*__xive_vm_h_ipi)(struct kvm_vcpu *vcpu, unsigned long server,
--			      unsigned long mfrr);
--extern int (*__xive_vm_h_cppr)(struct kvm_vcpu *vcpu, unsigned long cppr);
--extern int (*__xive_vm_h_eoi)(struct kvm_vcpu *vcpu, unsigned long xirr);
--
- /*
-  * Common Xive routines for XICS-over-XIVE and XIVE native
-  */
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index 76800c84f2a3..1253666dd4d8 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -1281,13 +1281,3 @@ struct kvm_device_ops kvm_xive_native_ops = {
- 	.has_attr = kvmppc_xive_native_has_attr,
- 	.mmap = kvmppc_xive_native_mmap,
- };
--
--void kvmppc_xive_native_init_module(void)
--{
--	;
--}
--
--void kvmppc_xive_native_exit_module(void)
--{
--	;
--}
+ 	default:
 -- 
 2.23.0
 
