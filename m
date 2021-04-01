@@ -2,57 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F756351B9C
-	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 20:11:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCE43351BB5
+	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 20:11:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235407AbhDASJH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 1 Apr 2021 14:09:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34360 "EHLO
+        id S234414AbhDASKv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 1 Apr 2021 14:10:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234697AbhDASBI (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 14:01:08 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7629BC0F26F1
-        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 08:04:55 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id t18so1297650pjs.3
-        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 08:04:55 -0700 (PDT)
+        with ESMTP id S234804AbhDASGk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 14:06:40 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9093C0F26F4
+        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 08:05:04 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id x126so1652841pfc.13
+        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 08:05:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=u8vp9roVuaRmhfBRtCwb/lKR6w+iZpeDEIXPZDywVoQ=;
-        b=hfyiHCMbXdtonpwpG1ansFgGIxJ9EjEmvStKFVtVkMmmCcOVrtKL/TWWQDh3eh9jyr
-         ZTBcAIfCS5H5Itbzd8ARniWW9Yf0QfXwiy6ubkLOUl9IofTc45yWwXlsAnoDQg2ABSKv
-         O/dZJUZsLt0Ol9wD/phH08OYNhwvF7Mmr70JSEVMQlGtqWA74WXGwjrpQJCB/T/BeoGe
-         8wB+7whCnLI8TH111Y6LCo2efFhqdlgrgYkfSLgGohXByRexyOzWqb+Q5+gJDgwIqhXY
-         VOz5EMmPc/KF1S78Z60eY9jkkIpZJA4FU+6+ORDms0bvFnSqCxu4jkA4pWpw6UgvX3AU
-         oU5Q==
+        bh=q4fgmV/3XV+48nC3cNxw1X5+GU534mYi5sD1C83lc+s=;
+        b=TDEwc9YeeBBmqq7MEN1e/fuAml2ZZjFA7LGujh1rLMDTt+hQnMgwU9RUmNq9rAKUBX
+         DODeq7+m050gJUW9gceGC4R26aVrcKNA3jLBjOESoelObyAqp4WlqVtlmVnUCR0vGi1t
+         G2nuIjdOfv0MkBmSn/wQ8IzOQTUwUZP6YOqNl2JP5j0bviZv/hC7aX1m6OA80b0O2SqY
+         OHrIlgQwa2a6Q6zPsUbhSNBNtZ02wyCyLlqeYA3XrZwbVoRjId40Gs5H9q+26ilBcNLr
+         VjTH1Er+J06z9BWiKeQuMB50wS6cT+6913J2aRv2l7QRjQzJE55IvTQazM/1pJzst3Xd
+         6anA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=u8vp9roVuaRmhfBRtCwb/lKR6w+iZpeDEIXPZDywVoQ=;
-        b=No9fBf4T+QJcHsF+R8s3RwvSqseJVYesnNKnHrFn7Fns8f0SMOG82tf7DfKzFOxtWc
-         KsMMvXGhogwUh36Gsj3hZm9z1pan2HA00oXPEZBWHp10jIgrmjuSp6oC8ToZ63tBN7IC
-         70Zo5xAxeSMBSh6tXBBBF2Tf5X3YuUyOsGBQgIs4P6t6kfoVl8Sw8KOCtcYL/fGa+qWV
-         7PuGZW8T5fhZnF01i8EnAAl0HKdIfFwKS2T5+F8YFHeCQ9qkJm4Gqvy9XfBZqZQDNF6u
-         4suii+Lygjd5+gAcVc/5F7WaKssU6prGs0MoYtI8KLIU7E9pB9BfEKOCiRQU/zJBMcAS
-         5BBw==
-X-Gm-Message-State: AOAM533ekAOFW5Bbry7YZaJVgNQkk+2aLZuS95ILtcRS2arnImLtqW97
-        dvzOF9sufGOAwVnNVXHSkpm3mESMOXs=
-X-Google-Smtp-Source: ABdhPJwtiAqSy7ggl5dRplnMo1pOdemOcDfqBG87KJseRlzov9cX6dEamRmHv7jHFxMGSDJE0mwxCw==
-X-Received: by 2002:a17:902:c084:b029:e7:32bd:6bc6 with SMTP id j4-20020a170902c084b02900e732bd6bc6mr8272375pld.58.1617289494852;
-        Thu, 01 Apr 2021 08:04:54 -0700 (PDT)
+        bh=q4fgmV/3XV+48nC3cNxw1X5+GU534mYi5sD1C83lc+s=;
+        b=LrJNr3XXL50vd9/JRX7WQtr5jY2GOivuvSUKd3FXWoNJsGxVdkvmjGWKk/SUzAqEDB
+         2dw1JzIAwDOztay+F/XbcAjEixfGEq2h24o8QqKs/iH9stUdj9+0VUMd7ojr8Ogy0XUZ
+         imEVztoF+1N3qvrQS7n2V6Mq0StV7k/geTXjx811LJ1PYO6gTRh8wm6DNbFtaZDAgZJe
+         uWyVg5uWHHgXvFAeKlsqFq62USDgIyZcfJTwlQsLbFmObw4tTG3qm6VaQMNKuQxdDRXO
+         MAkeuf5GmaZ5+slkXUc8vxhnw2qU4DW0ZMuUvtlLwyn5gnG07hpqwQRgUZt7k1V38PjN
+         7SOQ==
+X-Gm-Message-State: AOAM5304h1NLI5GQmjbV73in8q5vAQWHrIo1H7kBXS3JqiRlHLgWh8IP
+        MhNxDnzynOs6EPtp9Q9/ludJWH9cv5g=
+X-Google-Smtp-Source: ABdhPJwPoTXLdkt/dX23LTNqkNvKDKBJwh3bcHsDIxILvPa0jaQCii3N9KRxEZoV4OX84UPLlTkl6g==
+X-Received: by 2002:a05:6a00:2b4:b029:1f6:6f37:ef92 with SMTP id q20-20020a056a0002b4b02901f66f37ef92mr7872629pfs.56.1617289504093;
+        Thu, 01 Apr 2021 08:05:04 -0700 (PDT)
 Received: from bobo.ibm.com ([1.128.218.207])
-        by smtp.gmail.com with ESMTPSA id l3sm5599632pju.44.2021.04.01.08.04.52
+        by smtp.gmail.com with ESMTPSA id l3sm5599632pju.44.2021.04.01.08.05.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Apr 2021 08:04:54 -0700 (PDT)
+        Thu, 01 Apr 2021 08:05:03 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v5 25/48] KVM: PPC: Book3S HV P9: Use host timer accounting to avoid decrementer read
-Date:   Fri,  2 Apr 2021 01:03:02 +1000
-Message-Id: <20210401150325.442125-26-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: [PATCH v5 28/48] KMV: PPC: Book3S HV: Use set_dec to set decrementer to host
+Date:   Fri,  2 Apr 2021 01:03:05 +1000
+Message-Id: <20210401150325.442125-29-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210401150325.442125-1-npiggin@gmail.com>
 References: <20210401150325.442125-1-npiggin@gmail.com>
@@ -62,80 +63,33 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-There is no need to save away the host DEC value, as it is derived
-from the host timer subsystem, which maintains the next timer time.
+The host Linux timer code arms the decrementer with the value
+'decrementers_next_tb - current_tb' using set_dec(), which stores
+val - 1 on Book3S-64, which is not quite the same as what KVM does
+to re-arm the host decrementer when exiting the guest.
 
+This shouldn't be a significant change, but it makes the logic match
+and avoids this small extra change being brought into the next patch.
+
+Suggested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/include/asm/time.h |  5 +++++
- arch/powerpc/kernel/time.c      |  1 +
- arch/powerpc/kvm/book3s_hv.c    | 14 +++++++-------
- 3 files changed, 13 insertions(+), 7 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/include/asm/time.h b/arch/powerpc/include/asm/time.h
-index 68d94711811e..0128cd9769bc 100644
---- a/arch/powerpc/include/asm/time.h
-+++ b/arch/powerpc/include/asm/time.h
-@@ -101,6 +101,11 @@ extern void __init time_init(void);
- 
- DECLARE_PER_CPU(u64, decrementers_next_tb);
- 
-+static inline u64 timer_get_next_tb(void)
-+{
-+	return __this_cpu_read(decrementers_next_tb);
-+}
-+
- /* Convert timebase ticks to nanoseconds */
- unsigned long long tb_to_ns(unsigned long long tb_ticks);
- 
-diff --git a/arch/powerpc/kernel/time.c b/arch/powerpc/kernel/time.c
-index fc42594c8223..8b9b38a8ce57 100644
---- a/arch/powerpc/kernel/time.c
-+++ b/arch/powerpc/kernel/time.c
-@@ -109,6 +109,7 @@ struct clock_event_device decrementer_clockevent = {
- EXPORT_SYMBOL(decrementer_clockevent);
- 
- DEFINE_PER_CPU(u64, decrementers_next_tb);
-+EXPORT_SYMBOL_GPL(decrementers_next_tb);
- static DEFINE_PER_CPU(struct clock_event_device, decrementers);
- 
- #define XSEC_PER_SEC (1024*1024)
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 7afa2e7a2867..dc1232d2a198 100644
+index 6cfac8f553f6..8c8df88eec8c 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3697,16 +3697,15 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	unsigned long host_amr = mfspr(SPRN_AMR);
- 	unsigned long host_fscr = mfspr(SPRN_FSCR);
- 	s64 dec;
--	u64 tb;
-+	u64 tb, next_timer;
- 	int trap, save_pmu;
- 
--	dec = mfspr(SPRN_DEC);
- 	tb = mftb();
--	if (dec < 0)
-+	next_timer = timer_get_next_tb();
-+	if (tb >= next_timer)
- 		return BOOK3S_INTERRUPT_HV_DECREMENTER;
--	local_paca->kvm_hstate.dec_expires = dec + tb;
--	if (local_paca->kvm_hstate.dec_expires < time_limit)
--		time_limit = local_paca->kvm_hstate.dec_expires;
-+	if (next_timer < time_limit)
-+		time_limit = next_timer;
- 
- 	vcpu->arch.ceded = 0;
- 
-@@ -3889,7 +3888,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	vc->entry_exit_map = 0x101;
+@@ -3902,7 +3902,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
  	vc->in_guest = 0;
  
--	mtspr(SPRN_DEC, local_paca->kvm_hstate.dec_expires - mftb());
-+	next_timer = timer_get_next_tb();
-+	mtspr(SPRN_DEC, next_timer - mftb());
- 	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
- 
- 	kvmhv_load_host_pmu();
+ 	next_timer = timer_get_next_tb();
+-	mtspr(SPRN_DEC, next_timer - tb);
++	set_dec(next_timer - tb);
+ 	/* We may have raced with new irq work */
+ 	if (test_irq_work_pending())
+ 		set_dec(1);
 -- 
 2.23.0
 
