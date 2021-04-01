@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B2D7351BB6
-	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 20:11:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A472D3519ED
+	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Apr 2021 20:04:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234718AbhDASKw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 1 Apr 2021 14:10:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35612 "EHLO
+        id S234651AbhDAR47 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 1 Apr 2021 13:56:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231836AbhDASGn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 14:06:43 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4F82C00F7CD
-        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 08:05:43 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id t20so1144236plr.13
-        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 08:05:43 -0700 (PDT)
+        with ESMTP id S234914AbhDARwe (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 13:52:34 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF5DC00F7CE
+        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 08:05:46 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id c17so1672906pfn.6
+        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 08:05:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=IJEvM9Y0R5fJ4PQtNl58AGya3n8tEM4D8HRDtgMTjFU=;
-        b=T9kUlkqWDb/nXLcrousYt/NW/TzNk3XUjpCSLg/sHkNR2JwOIf54mk8rdsopmYzAdt
-         1zFZH0+78dPyQmBB/Uqg4Pm826/tjXGCeBHVWl+4HcvOIqTfTXwPsewrigchORMpSK/8
-         4XKgjFpIVD9D5VyzrX2yi+ilGbz4KgFT3CXN9+hZ1wv9Klyp9nlr+9HOUtu3a/MPAUBh
-         LNHFdr4JiHhRid3q/tHcO32pAoVqQIC/S0zkgUz52aw5+GpZ8cXg5iR9y3lXlSDb0Z6U
-         J7dLLvz1HZqo+W0Ti+ZxtbWlRl97fYKOXWiefATLFFeVKhubQEj5snlkNHct6iWd2bqG
-         F9Bg==
+        bh=puIw6o5we11S+Q3MLTh61PKAuyf9CU/jVlPkn7xSoS8=;
+        b=SKiBiR/2Q2aiA23Dorrvkz3EPlAAZXWfclRRRM2Cd0B13XSSR4Gtrwzr00tLhdsPAl
+         TdE8bg3tMoLUwUMo1jGiGSmxmtqhSQmZTbWYD8wHES48mQWlWwrBBX3Qx8N7JAsCIRBx
+         akuyOsS+wRLQBClogC79ET71nmP8Ww70igHQ9drMUJYW7biWEqpTsOMrN+wO2gRUp4wR
+         Icnu/siWxO0tSJn7tPZZcY7oCLVr/a2QgmInrQbJMOZC3VYtEha4sV23bnKxCSp6Z1BX
+         jthn7qnHiu/Esnxd3IW1UTlOwF3mj24tHn0zw3FjtnyrILcxSgjUMxbBboEZEXlAHItO
+         JCfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=IJEvM9Y0R5fJ4PQtNl58AGya3n8tEM4D8HRDtgMTjFU=;
-        b=X8UjRXVWyiFU30Chv5njFrEnxOeFFr7shcaGY12KA9CHPPj2gNk8SraRk/5PX98PVc
-         fdCGNI6jtRR0gJ4iot/W8gvWC5eUkzbdQ6eEZbL3NspyiMuJjc5+Yz6z5uZCoyK/1KVy
-         tXQvalfdBsPwU4CyCCVgx5iw/2D30L9cddbc4RZYXmGMTjRbcd3sSOAF5OOmuLX8XYpa
-         ThbteNsXjyW2nK+IxZBrHNYQDqkdFkoXpYvRZLHhXqDL6P3Ln6EL754m3nQrtaOhP5F5
-         tlP/PkX2010wW18nm7p88B9wbXuHpSUdwOIj34fiULT14dCeresJ+/hwMNYdvvqWWC7Y
-         NIKA==
-X-Gm-Message-State: AOAM533HFgTJXhftBwRhGEV4ZRVkv9HrtlJj/gnmpQ5lWdBiyIxQy2ee
-        T750sw3tl4nONTpuiGiKGGAZuh99zB8=
-X-Google-Smtp-Source: ABdhPJxPEwsgOyPs2T5PvbzFgO/8a1P4XdC7Uk6GoRvFgIxVlYoP+7h+QRj553dcVSnuw8Rpllab9A==
-X-Received: by 2002:a17:90a:8a8b:: with SMTP id x11mr9217633pjn.151.1617289543199;
-        Thu, 01 Apr 2021 08:05:43 -0700 (PDT)
+        bh=puIw6o5we11S+Q3MLTh61PKAuyf9CU/jVlPkn7xSoS8=;
+        b=CMjfi8TVvlzCI7Hhd2mSh3hrO0U996+7hnRxDVD9LHVH4mwdcUO9o9SY4nC6aOv9Z/
+         GsyD/Ww0flMFOBlSrZbN1lFXwmRDpBrn2yblzitOowyPmnIrQGVZU5Y6ZVZqbSkwnX9C
+         6fdOfej34vyKuiDG6MzczASzGZHFpWwV4XCrhZY+RdZ2+WSOsULp/rlY6fZWvRUXMRj8
+         CvvRCp/wUV20V6Bt0InGj47/VOVcJ/WBIISck65oYTUqXozuvNf2C8MR/W77e2EUFI/O
+         CXHXM1flHwUbqVZZ2faKvK7pFDJUM65j4Svz3FHCthD69y0eMjseH44eynVwTC1h0seU
+         yZgA==
+X-Gm-Message-State: AOAM530JyaGxG8RzX5dyPf+KV8jkuvHTM0wg6lu2RFq7aRZLMg2HnGG+
+        GKw5f5yeO1pbrTIM8uDEZJS3a1z0OgM=
+X-Google-Smtp-Source: ABdhPJwhJblL2WhYBcTqAUUegpI7fKr0iy5JjeM+fGae2o4TbxvLVtKqnTlovtm2SnJqIEpazVFqnQ==
+X-Received: by 2002:a62:190a:0:b029:221:cd7d:7927 with SMTP id 10-20020a62190a0000b0290221cd7d7927mr7762455pfz.27.1617289545724;
+        Thu, 01 Apr 2021 08:05:45 -0700 (PDT)
 Received: from bobo.ibm.com ([1.128.218.207])
-        by smtp.gmail.com with ESMTPSA id l3sm5599632pju.44.2021.04.01.08.05.40
+        by smtp.gmail.com with ESMTPSA id l3sm5599632pju.44.2021.04.01.08.05.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Apr 2021 08:05:42 -0700 (PDT)
+        Thu, 01 Apr 2021 08:05:45 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v5 42/48] KVM: PPC: Book3S HV: Radix guests should not have userspace hcalls reflected to them
-Date:   Fri,  2 Apr 2021 01:03:19 +1000
-Message-Id: <20210401150325.442125-43-npiggin@gmail.com>
+Subject: [PATCH v5 43/48] KVM: PPC: Book3S HV P9: Allow all P9 processors to enable nested HV
+Date:   Fri,  2 Apr 2021 01:03:20 +1000
+Message-Id: <20210401150325.442125-44-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210401150325.442125-1-npiggin@gmail.com>
 References: <20210401150325.442125-1-npiggin@gmail.com>
@@ -62,46 +62,28 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The reflection of sc 1 hcalls from PR=1 userspace is required to support
-PR KVM. Radix guests don't support PR KVM nor do they support nested
-hash guests, so this sc 1 reflection can be removed from radix guests.
-Cause a privileged program check instead, which is less surprising.
+All radix guests go via the P9 path now, so there is no need to limit
+nested HV to processors that support "mixed mode" MMU. Remove the
+restriction.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index ae5ad93a623f..f4d6ec6c4710 100644
+index f4d6ec6c4710..f4fa39f4cd4c 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -1403,11 +1403,20 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
- 		int i;
+@@ -5446,7 +5446,7 @@ static int kvmhv_enable_nested(struct kvm *kvm)
+ {
+ 	if (!nested)
+ 		return -EPERM;
+-	if (!cpu_has_feature(CPU_FTR_ARCH_300) || no_mixing_hpt_and_radix)
++	if (!cpu_has_feature(CPU_FTR_ARCH_300))
+ 		return -ENODEV;
  
- 		if (unlikely(vcpu->arch.shregs.msr & MSR_PR)) {
--			/*
--			 * Guest userspace executed sc 1, reflect it back as a
--			 * syscall as it may be a PR KVM hcall.
--			 */
--			kvmppc_core_queue_syscall(vcpu);
-+			if (!kvmhv_vcpu_is_radix(vcpu)) {
-+				/*
-+				 * Guest userspace executed sc 1, reflect it
-+				 * back as a syscall as it may be a PR KVM
-+				 * hcall.
-+				 */
-+				kvmppc_core_queue_syscall(vcpu);
-+			} else {
-+				/*
-+				 * radix guests can not run PR KVM so send a
-+				 * program check.
-+				 */
-+				kvmppc_core_queue_program(vcpu, SRR1_PROGPRIV);
-+			}
- 			r = RESUME_GUEST;
- 			break;
- 		}
+ 	/* kvm == NULL means the caller is testing if the capability exists */
 -- 
 2.23.0
 
