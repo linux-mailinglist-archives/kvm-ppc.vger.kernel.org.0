@@ -2,207 +2,163 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 337D4352A0C
-	for <lists+kvm-ppc@lfdr.de>; Fri,  2 Apr 2021 13:04:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B2A0352A12
+	for <lists+kvm-ppc@lfdr.de>; Fri,  2 Apr 2021 13:09:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbhDBLEL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 2 Apr 2021 07:04:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58178 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbhDBLEJ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 2 Apr 2021 07:04:09 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36407C0613E6
-        for <kvm-ppc@vger.kernel.org>; Fri,  2 Apr 2021 04:04:09 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id f10so3359166pgl.9
-        for <kvm-ppc@vger.kernel.org>; Fri, 02 Apr 2021 04:04:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=l+pBbsZFC2SHjuGWVG0sbsUApIv+xlAUGq0SRGB29is=;
-        b=SYkEOADBfBbtbxDuwzTPIhEkisTALOFsbWjFUcqUeRSgRa3bitNdwqeEJVOhna8oEe
-         3JkifqlzHHGnVujb8HRA/GqKzvfDBGvfmpcCr0iIrgwASnXyHW+7/PD9FQmfzu/8ru/6
-         M7OxvS0pMcA0wbhek+cVQlAlc/vlCj5feuPc3P8sgsPl0LE3QUxciILPYK2IlXvCM/Lu
-         Fs82mjkGAJvrH3vjf2mMxfNnpWJ4YRUGEptD8fpBFhdBmARBS6486iYoYiYNhfutEeq/
-         gUXC6LdAKB0CuE5/2867NLBFnVrJlNnwd3QJUeiFoA6Ahj/8w9HDY96jiUFFHLhL9zkl
-         JkCg==
+        id S235077AbhDBLJE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 2 Apr 2021 07:09:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40451 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235014AbhDBLJE (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 2 Apr 2021 07:09:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617361742;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0hU09Gh7VhRgV7xvcyXGklubADiCKUnFuUwdUO/8C8M=;
+        b=UxcHE4k6GwY9MYg/uAEe5hAlPDPoWQv7OAg989pxTX0HFhBeGBA1Dz6MjVqf/zAU+ez2et
+        od5P+hrS1kojTc466ck8TYVDb5HQvySiVyUmuKGNgVLYmkecYLAlcWxw2+N4eLrwVPrfht
+        eeSMR971gsnGVuAU2SjxJHJrYg0PLc8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-iVfHpmj3MKKhGf_DQgwpaA-1; Fri, 02 Apr 2021 07:09:01 -0400
+X-MC-Unique: iVfHpmj3MKKhGf_DQgwpaA-1
+Received: by mail-wm1-f71.google.com with SMTP id a17so2090320wme.4
+        for <kvm-ppc@vger.kernel.org>; Fri, 02 Apr 2021 04:09:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=l+pBbsZFC2SHjuGWVG0sbsUApIv+xlAUGq0SRGB29is=;
-        b=H8racsE/E+uSb+P283su7G79Kk95wRpm+IF0WBuc+YrbBxQOdm53wpkYp5Gr2liCuK
-         7yM/DDqq8fK0Pr0ZryQAB9wl5bmnX8uD1xuitfYBH/1PTeY8b3RuNGqF+gVuRPmtVaGj
-         6CCCgDP3UONBiI7H6tfJet1da7yQXAMHsxUXgPsXMBymr/mh4QeDmEz7iSpo02WOBqPG
-         gUZXaiBcIPx37vU1CNax03wpwVs4W8bEuXEMvBHcJ85vDoFHB4jpVIPoFTdO/M/pvV1/
-         2NmC6Y+qfYt5hdGqqJGMay5yr+74uNUn0neX5etewasKeuMwyEhrKKsFVVuNhLnxP/iV
-         3qGQ==
-X-Gm-Message-State: AOAM533phUcn+NV1jSgP7cf/OtxCuDMcVXqzWJPmyjwenad6H3fpa6rG
-        kRpGqiPe2vZuujqKtBVpnRBxIyE341z1TA==
-X-Google-Smtp-Source: ABdhPJyYboW4B/fuT0xzRIX6oTfpJTjyzW868FmGg3/7fB2OSArF18CEb900fCMfL/K2IarZxQd2vg==
-X-Received: by 2002:a05:6a00:16c2:b029:228:964e:8b36 with SMTP id l2-20020a056a0016c2b0290228964e8b36mr11916051pfc.11.1617361448600;
-        Fri, 02 Apr 2021 04:04:08 -0700 (PDT)
-Received: from localhost ([1.128.189.0])
-        by smtp.gmail.com with ESMTPSA id gm10sm7880866pjb.4.2021.04.02.04.04.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Apr 2021 04:04:08 -0700 (PDT)
-Date:   Fri, 02 Apr 2021 21:04:02 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v5 29/48] powerpc: add set_dec_or_work API for safely
- updating decrementer
-To:     kvm-ppc@vger.kernel.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-References: <20210401150325.442125-1-npiggin@gmail.com>
-        <20210401150325.442125-30-npiggin@gmail.com>
-In-Reply-To: <20210401150325.442125-30-npiggin@gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0hU09Gh7VhRgV7xvcyXGklubADiCKUnFuUwdUO/8C8M=;
+        b=az9zBA+ELhI19wl79rpvZtlz78eUUadZpx62ra0BOjfInxSyPOzqDnUbVDmHervV8g
+         19+BUtCFYa+oUlp5iFzADwu0qTZPpSCmKMBzFg1uwkzTFHRJbJx+ukfDBJYlzj+oab1T
+         OyzZXTYXu7GKc7GT9Fw66eZ0rE1Ey9EdIq16zcgfgvWQyV/kJSyYT4W29fqbhnRucqEQ
+         x7K5Or/8Bt5P745yKdM+4OvxwsEuqmh0P7NObM1rkqIxX/xqiPog1zAlDUbe+387RzRv
+         Swoyo4bEtVj8W3YRwbXUQmuzbNMAReqEXaU3qjjIos7+x3cpr7yZq78nNwdbVt4TPdXI
+         mBqA==
+X-Gm-Message-State: AOAM531u4BfP+x9I4VDTQT/kvM934buE2SZg92CniEoBwpwqqS+icUCj
+        dNFCYwGmWxK0NhSRKzdCVSO+Gwv1y4qGXu1r68Epwesm+2QP/nV4nkVhcvvAxCHen/U4j3WJ50G
+        fq7xGaqHxkfksj8GH8g==
+X-Received: by 2002:a7b:c407:: with SMTP id k7mr12554646wmi.136.1617361740010;
+        Fri, 02 Apr 2021 04:09:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwTzlBVbJGp7zOm3yypid9AymbapTJgMzZcFAv4/0wGVk1JV0HTRbkNFWcPN0Mr5tyDof6yiw==
+X-Received: by 2002:a7b:c407:: with SMTP id k7mr12554609wmi.136.1617361739749;
+        Fri, 02 Apr 2021 04:08:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id p17sm11190916wmq.47.2021.04.02.04.08.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Apr 2021 04:08:59 -0700 (PDT)
+Subject: Re: [PATCH v2 01/10] KVM: Assert that notifier count is elevated in
+ .change_pte()
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+References: <20210402005658.3024832-1-seanjc@google.com>
+ <20210402005658.3024832-2-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3fb5283e-21f0-8eb2-03ab-96113ca1f463@redhat.com>
+Date:   Fri, 2 Apr 2021 13:08:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Message-Id: <1617361096.5h9n7tf1is.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20210402005658.3024832-2-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Nicholas Piggin's message of April 2, 2021 1:03 am:
-> Decrementer updates must always check for new irq work to avoid an
-> irq work decrementer interrupt being lost.
->=20
-> Add an API for this in the timer code so callers don't have to care
-> about details.
-
-Oh I forgot to update the changelog for this, it's significantly
-changed, so I better withdraw the Reviewed-by as well. I think this
-re-arm API is the better one, there's no reason it can't all be in
-the host time.c code.
-
-This implementation also avoids what used to be inevitable double
-interrupt to take a host timer from guest (first hdec to get into
-the host and set dec to some -ve value, then taking that dec as
-soon as we enable interrupts) by just marking the dec pending in
-that case, so it gets replayed when we enable irqs.
-
-Thanks,
-Nick
-
->=20
-> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+On 02/04/21 02:56, Sean Christopherson wrote:
+> In KVM's .change_pte() notification callback, replace the notifier
+> sequence bump with a WARN_ON assertion that the notifier count is
+> elevated.  An elevated count provides stricter protections than bumping
+> the sequence, and the sequence is guarnateed to be bumped before the
+> count hits zero.
+> 
+> When .change_pte() was added by commit 828502d30073 ("ksm: add
+> mmu_notifier set_pte_at_notify()"), bumping the sequence was necessary
+> as .change_pte() would be invoked without any surrounding notifications.
+> 
+> However, since commit 6bdb913f0a70 ("mm: wrap calls to set_pte_at_notify
+> with invalidate_range_start and invalidate_range_end"), all calls to
+> .change_pte() are guaranteed to be bookended by start() and end(), and
+> so are guaranteed to run with an elevated notifier count.
+> 
+> Note, wrapping .change_pte() with .invalidate_range_{start,end}() is a
+> bug of sorts, as invalidating the secondary MMU's (KVM's) PTE defeats
+> the purpose of .change_pte().  Every arch's kvm_set_spte_hva() assumes
+> .change_pte() is called when the relevant SPTE is present in KVM's MMU,
+> as the original goal was to accelerate Kernel Samepage Merging (KSM) by
+> updating KVM's SPTEs without requiring a VM-Exit (due to invalidating
+> the SPTE).  I.e. it means that .change_pte() is effectively dead code
+> on _all_ architectures.
+> 
+> x86 and MIPS are clearcut nops if the old SPTE is not-present, and that
+> is guaranteed due to the prior invalidation.  PPC simply unmaps the SPTE,
+> which again should be a nop due to the invalidation.  arm64 is a bit
+> murky, but it's also likely a nop because kvm_pgtable_stage2_map() is
+> called without a cache pointer, which means it will map an entry if and
+> only if an existing PTE was found.
+> 
+> For now, take advantage of the bug to simplify future consolidation of
+> KVMs's MMU notifier code.   Doing so will not greatly complicate fixing
+> .change_pte(), assuming it's even worth fixing.  .change_pte() has been
+> broken for 8+ years and no one has complained.  Even if there are
+> KSM+KVM users that care deeply about its performance, the benefits of
+> avoiding VM-Exits via .change_pte() need to be reevaluated to justify
+> the added complexity and testing burden.  Ripping out .change_pte()
+> entirely would be a lot easier.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/powerpc/include/asm/time.h |  4 ++++
->  arch/powerpc/kernel/time.c      | 41 +++++++++++++++++++++++++--------
->  arch/powerpc/kvm/book3s_hv.c    |  6 +----
->  3 files changed, 37 insertions(+), 14 deletions(-)
->=20
-> diff --git a/arch/powerpc/include/asm/time.h b/arch/powerpc/include/asm/t=
-ime.h
-> index 0128cd9769bc..924b2157882f 100644
-> --- a/arch/powerpc/include/asm/time.h
-> +++ b/arch/powerpc/include/asm/time.h
-> @@ -106,6 +106,10 @@ static inline u64 timer_get_next_tb(void)
->  	return __this_cpu_read(decrementers_next_tb);
->  }
-> =20
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +void timer_rearm_host_dec(u64 now);
-> +#endif
+>   virt/kvm/kvm_main.c | 9 +++++++--
+>   1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d1de843b7618..8df091950161 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -461,12 +461,17 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+>   
+>   	trace_kvm_set_spte_hva(address);
+>   
+> +	/*
+> +	 * .change_pte() must be bookended by .invalidate_range_{start,end}(),
+
+Changed to "surrounded" for the benefit of non-native speakers. :)
+
+Paolo
+
+> +	 * and so always runs with an elevated notifier count.  This obviates
+> +	 * the need to bump the sequence count.
+> +	 */
+> +	WARN_ON_ONCE(!kvm->mmu_notifier_count);
 > +
->  /* Convert timebase ticks to nanoseconds */
->  unsigned long long tb_to_ns(unsigned long long tb_ticks);
-> =20
-> diff --git a/arch/powerpc/kernel/time.c b/arch/powerpc/kernel/time.c
-> index 8b9b38a8ce57..8bbcc6be40c0 100644
-> --- a/arch/powerpc/kernel/time.c
-> +++ b/arch/powerpc/kernel/time.c
-> @@ -563,13 +563,43 @@ void arch_irq_work_raise(void)
->  	preempt_enable();
->  }
-> =20
-> +static void set_dec_or_work(u64 val)
-> +{
-> +	set_dec(val);
-> +	/* We may have raced with new irq work */
-> +	if (unlikely(test_irq_work_pending()))
-> +		set_dec(1);
-> +}
-> +
->  #else  /* CONFIG_IRQ_WORK */
-> =20
->  #define test_irq_work_pending()	0
->  #define clear_irq_work_pending()
-> =20
-> +static void set_dec_or_work(u64 val)
-> +{
-> +	set_dec(val);
-> +}
->  #endif /* CONFIG_IRQ_WORK */
-> =20
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +void timer_rearm_host_dec(u64 now)
-> +{
-> +	u64 *next_tb =3D this_cpu_ptr(&decrementers_next_tb);
-> +
-> +	WARN_ON_ONCE(!arch_irqs_disabled());
-> +	WARN_ON_ONCE(mfmsr() & MSR_EE);
-> +
-> +	if (now >=3D *next_tb) {
-> +		now =3D *next_tb - now;
-> +		set_dec_or_work(now);
-> +	} else {
-> +		local_paca->irq_happened |=3D PACA_IRQ_DEC;
-> +	}
-> +}
-> +EXPORT_SYMBOL_GPL(timer_rearm_host_dec);
-> +#endif
-> +
->  /*
->   * timer_interrupt - gets called when the decrementer overflows,
->   * with interrupts disabled.
-> @@ -630,10 +660,7 @@ DEFINE_INTERRUPT_HANDLER_ASYNC(timer_interrupt)
->  	} else {
->  		now =3D *next_tb - now;
->  		if (now <=3D decrementer_max)
-> -			set_dec(now);
-> -		/* We may have raced with new irq work */
-> -		if (test_irq_work_pending())
-> -			set_dec(1);
-> +			set_dec_or_work(now);
->  		__this_cpu_inc(irq_stat.timer_irqs_others);
->  	}
-> =20
-> @@ -875,11 +902,7 @@ static int decrementer_set_next_event(unsigned long =
-evt,
->  				      struct clock_event_device *dev)
->  {
->  	__this_cpu_write(decrementers_next_tb, get_tb() + evt);
-> -	set_dec(evt);
+>   	idx = srcu_read_lock(&kvm->srcu);
+>   
+>   	KVM_MMU_LOCK(kvm);
+>   
+> -	kvm->mmu_notifier_seq++;
 > -
-> -	/* We may have raced with new irq work */
-> -	if (test_irq_work_pending())
-> -		set_dec(1);
-> +	set_dec_or_work(evt);
-> =20
->  	return 0;
->  }
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 8c8df88eec8c..287042b4afb5 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -3901,11 +3901,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *v=
-cpu, u64 time_limit,
->  	vc->entry_exit_map =3D 0x101;
->  	vc->in_guest =3D 0;
-> =20
-> -	next_timer =3D timer_get_next_tb();
-> -	set_dec(next_timer - tb);
-> -	/* We may have raced with new irq work */
-> -	if (test_irq_work_pending())
-> -		set_dec(1);
-> +	timer_rearm_host_dec(tb);
->  	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
-> =20
->  	kvmhv_load_host_pmu();
-> --=20
-> 2.23.0
->=20
->=20
+>   	if (kvm_set_spte_hva(kvm, address, pte))
+>   		kvm_flush_remote_tlbs(kvm);
+>   
+> 
+
