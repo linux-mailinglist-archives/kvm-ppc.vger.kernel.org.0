@@ -2,96 +2,241 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B2C13528E6
-	for <lists+kvm-ppc@lfdr.de>; Fri,  2 Apr 2021 11:36:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E95E352988
+	for <lists+kvm-ppc@lfdr.de>; Fri,  2 Apr 2021 12:08:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235092AbhDBJfn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 2 Apr 2021 05:35:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47939 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234856AbhDBJfn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 2 Apr 2021 05:35:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617356141;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Pp7i/Rq4quxGmDckgflEr0uWdxRmtTCzqRhgMxNYmVI=;
-        b=HVPYN/Au8+htd9ozI7CJcI37JaDjISuq37mWdtpqa/zOK42jRLGj6Si29q4dCiWzSg4mpJ
-        agh6jnX3ATyM4dITwS+yl74k8eyMBbJRSuQmjNkz59f7zy0WsDAbRon3UxIgMNSXQTIPlR
-        +XIDXvb4p63KP5XM53tgVgWNchAkt8o=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-511-FCxP7f2pM4GazxXbsPDlkw-1; Fri, 02 Apr 2021 05:35:39 -0400
-X-MC-Unique: FCxP7f2pM4GazxXbsPDlkw-1
-Received: by mail-wr1-f72.google.com with SMTP id p12so4114783wrn.18
-        for <kvm-ppc@vger.kernel.org>; Fri, 02 Apr 2021 02:35:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Pp7i/Rq4quxGmDckgflEr0uWdxRmtTCzqRhgMxNYmVI=;
-        b=GNeVclAIn7DGU9Pf3687qo7t8CGz7wyObhrsaroAVlwjAo0sHuMUY9W2NRT1Ais5W9
-         eXYgXBGJutiH7Xd1cIY60/KgIx+Ylxu3429RpaRp5jUvjCc4ziLK+42CLqesuKYTlF/4
-         dNKXgnV2os+g1TWx85Q6qReGjnZBG+h+OuZJRwdZeKdIJo93bDllVEyb/itVlYoVW35V
-         CcU7hWyW/G3qeqRyM/276Ck8nUeAq0+Whhm1w/EKmNiZ7bcevCvS8y3hLfUgtcWBOgh/
-         Gie5AsHAs/Yu8TOuVLiCVW/cEiZdqupfFC5dX3bevZ60XTKJuqfznLqEKxiHoldlQrC4
-         thUQ==
-X-Gm-Message-State: AOAM530EWOQ2q2zTc2ZcZhkxugthHnH18pq9ytZ/WEDlSk/zLoytJUyY
-        oG/NTUq3wY8Mg8Q3F9XMX6XyzuoPgN30gh5RwxS+v7SRgcEyM3zk5tSV1TnTS3PnJVG+r6Bvijf
-        M0V2snVEsTH/eRYoU+w==
-X-Received: by 2002:a05:6000:1a8a:: with SMTP id f10mr14051203wry.232.1617356138339;
-        Fri, 02 Apr 2021 02:35:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy3IM+fWBMIWWC0dXiX9SYqbGiBYCoQN4BHK3a4+s4pude6jmvmdlBwOmMacbQNHjcYC5pL4Q==
-X-Received: by 2002:a05:6000:1a8a:: with SMTP id f10mr14051180wry.232.1617356138121;
-        Fri, 02 Apr 2021 02:35:38 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id x6sm11605403wmj.32.2021.04.02.02.35.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Apr 2021 02:35:37 -0700 (PDT)
-Subject: Re: [PATCH v2 07/10] KVM: Move MMU notifier's mmu_lock acquisition
- into common helper
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>
-References: <20210402005658.3024832-1-seanjc@google.com>
- <20210402005658.3024832-8-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a30f556a-40b2-f703-f0ee-b985989ee4b7@redhat.com>
-Date:   Fri, 2 Apr 2021 11:35:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S234563AbhDBKIL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 2 Apr 2021 06:08:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:65156 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234207AbhDBKIK (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 2 Apr 2021 06:08:10 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 132A48KA085706;
+        Fri, 2 Apr 2021 06:07:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : content-type :
+ mime-version; s=pp1; bh=dfBZQZbwH63kFfNtpHbfhFDnx/mOnkv423VTL2mzO6c=;
+ b=nH7oY8q3NjdMnzK1Bjifz8bzlMIFkJQx0SOwtTRoPdXOMX44mLHzbkKVSAZwad0vylpA
+ NSP+dXsWVKlwsgIxfBQTStZwgJ1FouxLgx4/OrWeZDLnB13cdlVeyToNvM0iauX4aOjE
+ KbriafkZsdBCZy++//Y4gHhA2jhlOihwZe5Ue8hueNo66njcL+k2Ig+NogdAG4qzzaqD
+ j8G7WleCn/E76C9rlJbQhCkZYhLjd9xmipxUYnjKuYRIO7DBHQq6bubDgVCJo3R+58Uf
+ crAEDh53kKx8c2++Ectm0pfAHw+oEFHtoupgzio0UuITX87it0fiTCRJNTL/YMWdcWSq KQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37nxbxky74-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 02 Apr 2021 06:07:59 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 132A5KQk090558;
+        Fri, 2 Apr 2021 06:07:59 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37nxbxky6n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 02 Apr 2021 06:07:58 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 132A2H6d001160;
+        Fri, 2 Apr 2021 10:07:56 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 37n28rs6jk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 02 Apr 2021 10:07:56 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 132A7YZo24052188
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 2 Apr 2021 10:07:34 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A298A405F;
+        Fri,  2 Apr 2021 10:07:54 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 74DBDA405B;
+        Fri,  2 Apr 2021 10:07:49 +0000 (GMT)
+Received: from vajain21.in.ibm.com (unknown [9.102.3.66])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Fri,  2 Apr 2021 10:07:49 +0000 (GMT)
+Received: by vajain21.in.ibm.com (sSMTP sendmail emulation); Fri, 02 Apr 2021 15:37:48 +0530
+From:   Vaibhav Jain <vaibhav@linux.ibm.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     qemu-devel@nongnu.org, kvm-ppc@vger.kernel.org,
+        qemu-ppc@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+        xiaoguangrong.eric@gmail.com, shivaprasadbhat@gmail.com,
+        bharata@linux.vnet.ibm.com, aneesh.kumar@linux.ibm.com,
+        groug@kaod.org, ehabkost@redhat.com, marcel.apfelbaum@gmail.com
+Subject: Re: [PATCH v2] ppc/spapr: Add support for implement support for
+ H_SCM_HEALTH
+In-Reply-To: <YGUvQ0XD+pQvWC/9@yekko.fritz.box>
+References: <20210401010519.7225-1-vaibhav@linux.ibm.com>
+ <YGUvQ0XD+pQvWC/9@yekko.fritz.box>
+Date:   Fri, 02 Apr 2021 15:37:48 +0530
+Message-ID: <877dll2e4r.fsf@vajain21.in.ibm.com>
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 8bDj3V53zwy9pFjJ29xmjoFe819og9_n
+X-Proofpoint-ORIG-GUID: M-VIMb7_gdNGnmNW2kBwgCO8SrLqhMd9
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-In-Reply-To: <20210402005658.3024832-8-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-04-02_06:2021-04-01,2021-04-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 impostorscore=0 suspectscore=0 bulkscore=0
+ phishscore=0 adultscore=0 mlxscore=0 malwarescore=0 clxscore=1015
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2103310000 definitions=main-2104020070
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 02/04/21 02:56, Sean Christopherson wrote:
-> +		.handler	= (void *)kvm_null_fn,
-> +		.on_lock	= kvm_dec_notifier_count,
-> +		.flush_on_ret	= true,
 
-Doesn't really matter since the handler is null, but I think it's 
-cleaner to have false here.
+Hi David,
 
-Paolo
+Thanks for looking into this patch
 
+David Gibson <david@gibson.dropbear.id.au> writes:
+
+> On Thu, Apr 01, 2021 at 06:35:19AM +0530, Vaibhav Jain wrote:
+>> Add support for H_SCM_HEALTH hcall described at [1] for spapr
+>> nvdimms. This enables guest to detect the 'unarmed' status of a
+>> specific spapr nvdimm identified by its DRC and if its unarmed, mark
+>> the region backed by the nvdimm as read-only.
+>> 
+>> The patch adds h_scm_health() to handle the H_SCM_HEALTH hcall which
+>> returns two 64-bit bitmaps (health bitmap, health bitmap mask) derived
+>> from 'struct nvdimm->unarmed' member.
+>> 
+>> Linux kernel side changes to enable handling of 'unarmed' nvdimms for
+>> ppc64 are proposed at [2].
+>> 
+>> References:
+>> [1] "Hypercall Op-codes (hcalls)"
+>>     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/powerpc/papr_hcalls.rst#n220
+>> [2] "powerpc/papr_scm: Mark nvdimm as unarmed if needed during probe"
+>>     https://lore.kernel.org/linux-nvdimm/20210329113103.476760-1-vaibhav@linux.ibm.com/
+>> 
+>> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+>
+> As well as the handful of comments below, this will definitely need to
+> wait for ppc-6.1 at this point.
+>
+Sure
+>> ---
+>> Changelog
+>> 
+>> v2:
+>> * Added a check for drc->dev to ensure that the dimm is plugged in
+>>   when servicing H_SCM_HEALTH. [ Shiva ]
+>> * Instead of accessing the 'nvdimm->unarmed' member directly use the
+>>   object_property_get_bool accessor to fetch it. [ Shiva ]
+>> * Update the usage of PAPR_PMEM_UNARMED* macros [ Greg ]
+>> * Updated patch description reference#1 to point appropriate section
+>>   in the documentation. [ Greg ]
+>> ---
+>>  hw/ppc/spapr_nvdimm.c  | 38 ++++++++++++++++++++++++++++++++++++++
+>>  include/hw/ppc/spapr.h |  3 ++-
+>>  2 files changed, 40 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+>> index b46c36917c..34096e4718 100644
+>> --- a/hw/ppc/spapr_nvdimm.c
+>> +++ b/hw/ppc/spapr_nvdimm.c
+>> @@ -31,6 +31,13 @@
+>>  #include "qemu/range.h"
+>>  #include "hw/ppc/spapr_numa.h"
+>>  
+>> +/* DIMM health bitmap bitmap indicators. Taken from kernel's papr_scm.c */
+>> +/* SCM device is unable to persist memory contents */
+>> +#define PAPR_PMEM_UNARMED (1ULL << (63 - 0))
+>
+> You can use PPC_BIT() for more clarity here.
+>
+Sure, will address this in v3
+>> +/* Bits status indicators for health bitmap indicating unarmed dimm */
+>> +#define PAPR_PMEM_UNARMED_MASK (PAPR_PMEM_UNARMED)
+>
+> I'm not sure why you want two equal #defines here.
+>
+Will address this in v3. Switched to a single define.
+>> +
+>>  bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
+>>                             uint64_t size, Error **errp)
+>>  {
+>> @@ -467,6 +474,36 @@ static target_ulong h_scm_unbind_all(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>>      return H_SUCCESS;
+>>  }
+>>  
+>> +static target_ulong h_scm_health(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>> +                                 target_ulong opcode, target_ulong *args)
+>> +{
+>> +    uint32_t drc_index = args[0];
+>> +    SpaprDrc *drc = spapr_drc_by_index(drc_index);
+>> +    NVDIMMDevice *nvdimm;
+>> +
+>> +    if (drc && spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PMEM) {
+>
+> This will fail badly if !drc (given index is way out of bounds).  I'm
+> pretty sure you want
+> 	if (!drc || spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PMEM) {
+>
+>
+Thanks for catching this. I have fixed this in v3
+>> +        return H_PARAMETER;
+>> +    }
+>> +
+>> +    /* Ensure that the dimm is plugged in */
+>> +    if (!drc->dev) {
+>> +        return H_HARDWARE;
+>
+> H_HARDWARE doesn't seem right - it's the guest that has chosen to
+> attempt this on an unplugged LMB, not the (virtual) hardware's fault.
+>
+Agree, addressed this in v3
+>> +    }
+>> +
+>> +    nvdimm = NVDIMM(drc->dev);
+>> +
+>> +    args[0] = 0;
+>> +    /* Check if the nvdimm is unarmed and send its status via health bitmaps */
+>> +    if (object_property_get_bool(OBJECT(nvdimm), NVDIMM_UNARMED_PROP, NULL)) {
+>> +        args[0] |= PAPR_PMEM_UNARMED;
+>> +    }
+>> +
+>> +    /* Update the health bitmap with the applicable mask */
+>> +    args[1] = PAPR_PMEM_UNARMED_MASK;
+>> +
+>> +    return H_SUCCESS;
+>> +}
+>> +
+>>  static void spapr_scm_register_types(void)
+>>  {
+>>      /* qemu/scm specific hcalls */
+>> @@ -475,6 +512,7 @@ static void spapr_scm_register_types(void)
+>>      spapr_register_hypercall(H_SCM_BIND_MEM, h_scm_bind_mem);
+>>      spapr_register_hypercall(H_SCM_UNBIND_MEM, h_scm_unbind_mem);
+>>      spapr_register_hypercall(H_SCM_UNBIND_ALL, h_scm_unbind_all);
+>> +    spapr_register_hypercall(H_SCM_HEALTH, h_scm_health);
+>>  }
+>>  
+>>  type_init(spapr_scm_register_types)
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index 47cebaf3ac..6e1eafb05d 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -538,8 +538,9 @@ struct SpaprMachineState {
+>>  #define H_SCM_BIND_MEM          0x3EC
+>>  #define H_SCM_UNBIND_MEM        0x3F0
+>>  #define H_SCM_UNBIND_ALL        0x3FC
+>> +#define H_SCM_HEALTH            0x400
+>>  
+>> -#define MAX_HCALL_OPCODE        H_SCM_UNBIND_ALL
+>> +#define MAX_HCALL_OPCODE        H_SCM_HEALTH
+>>  
+>>  /* The hcalls above are standardized in PAPR and implemented by pHyp
+>>   * as well.
+>
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
+
+-- 
+Cheers
+~ Vaibhav
