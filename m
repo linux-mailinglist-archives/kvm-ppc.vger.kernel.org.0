@@ -2,168 +2,144 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 338B135247F
-	for <lists+kvm-ppc@lfdr.de>; Fri,  2 Apr 2021 02:36:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E4E33524B7
+	for <lists+kvm-ppc@lfdr.de>; Fri,  2 Apr 2021 02:57:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231168AbhDBAgw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 1 Apr 2021 20:36:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35942 "EHLO
+        id S233701AbhDBA5D (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 1 Apr 2021 20:57:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231160AbhDBAgw (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 20:36:52 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08408C0613E6;
-        Thu,  1 Apr 2021 17:36:52 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id i6so2648086pgs.1;
-        Thu, 01 Apr 2021 17:36:52 -0700 (PDT)
+        with ESMTP id S231168AbhDBA5C (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Apr 2021 20:57:02 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA24AC0613E6
+        for <kvm-ppc@vger.kernel.org>; Thu,  1 Apr 2021 17:57:01 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 125so4617878ybd.17
+        for <kvm-ppc@vger.kernel.org>; Thu, 01 Apr 2021 17:57:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=mHTyduBV8QUncoW717T6beBC22w2IZVY/ijF4hpWxGA=;
-        b=HjxdSQ7Em1sGaJLSqIRFvOZc1jv3Oi4ZrUw/yKg63yuR7RoFq/k1PM14qEQ0KEogo9
-         fp+5ClfYUlMHEff7uYKEy2p+WZ4YJjDzq3uMvNUT9eMU4cjWwnFb6WMUtxIL7fWRZ/kO
-         KpwKjsAX6Z/sYGxUdDJk/o90TDCH2dZR8zNeqhPC6QpV+jkZMhwTse7QoTS3i0FgTo8v
-         FXfIKyzJSANQM5ZZaZzqb3ofD9MNuRkgiF1Eb9aj8N/D4fvsprzgVZlqbLbiL3HW5rU5
-         XAggGW6Sk66ett192EbU3F/X17FsG8H/Kxfnf55dXhD4/no31Djvx7jelJb9jqjBZe1e
-         6IrQ==
+        d=google.com; s=20161025;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=FViJNMuAQXVG92IcJ9ASyfw+gqYDqmookinTy4APMz8=;
+        b=tM5HW6/xk4O5sMn2fgKiWu76aEhiiETLruJpg/eDqJDR4WtSvS9+XoKICGLJgo/aR9
+         PHUygm3nt6Iyd9H+hRkE+aN2uWXSniHsrGAukhueCHEWKNiGLvDdvm/C35c51KL7qq/J
+         fgt3utJuyw2N+OiFjKc36bNdeTZMCG2OXJjHEkQxFIqyXipTvjAOsKRQR3H93WpjXiTJ
+         zZlKgCHu1/48AstcZ0TNb2v8J6l74NmyyCG68O3osE84/6JpVuFsdO2EgEGawRt1qn/R
+         MTRQMS94V9rHBAev+i0CHpGE75U1N9vbPoIhstygJ3ud1d//b6oFND6DleWTsUfEpKQo
+         REdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=mHTyduBV8QUncoW717T6beBC22w2IZVY/ijF4hpWxGA=;
-        b=QTANmAso8IfmpqEAbkWfdCK2KB/MgHE1A96Dyl6PqzOMpjOjOpW9Kww5yTvZim/828
-         dZ0sPQEB0r/OjCxDcHAgLHXtO+sjzYTqKOVMXFx4TsZfjM5NSn3beh6yTzTZyTEE1szA
-         PrNqRAtlVQ0RyN9EafEdkmVG2pike6cByQzyRD5AZhIJZBI0fm5Vv9n/SgB4heaF9wL8
-         FLdD7YJ7CXwRPas1B5ZH1WB0CHBCwPo49MSU8O57WjNIAwhCjFl3IXVMPZeQLkng0FD9
-         iB8nThCA2shEK8F8EoF+PBLBkwZp4qdSoMm2Bt7unyIdNCZTRQ32h/Kzwls2fm6tZCXt
-         dlUg==
-X-Gm-Message-State: AOAM533VdTdrCV5uWav4MrXh+zZkXlA+w4ltf89Lz25783D9CT1fUCVh
-        M4tub6JHZ99oaCa7Uhr643A=
-X-Google-Smtp-Source: ABdhPJzbvBbwx7VuBDpNxt3r39dNZxIn24MT44kQ2ysEs5seZxJ8UK6xP577pFsYiVsxPTaEfw0ZnQ==
-X-Received: by 2002:a63:4502:: with SMTP id s2mr10219216pga.94.1617323811574;
-        Thu, 01 Apr 2021 17:36:51 -0700 (PDT)
-Received: from localhost ([1.128.157.222])
-        by smtp.gmail.com with ESMTPSA id w18sm6196736pjh.19.2021.04.01.17.36.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Apr 2021 17:36:51 -0700 (PDT)
-Date:   Fri, 02 Apr 2021 10:36:45 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2] powerpc/traps: Enhance readability for trap types
-To:     Segher Boessenkool <segher@kernel.crashing.org>,
-        Xiongwei Song <sxwjean@gmail.com>
-Cc:     aik@ozlabs.ru, akpm@linux-foundation.org, alistair@popple.id.au,
-        aneesh.kumar@linux.ibm.com, atrajeev@linux.vnet.ibm.com,
-        benh@kernel.crashing.org, christophe.leroy@csgroup.eu,
-        haren@linux.ibm.com, jniethe5@gmail.com, john.ogness@linutronix.de,
-        kan.liang@linux.intel.com, kjain@linux.ibm.com,
-        kvm-ppc@vger.kernel.org, leobras.c@gmail.com,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        maddy@linux.ibm.com, mikey@neuling.org,
-        Michael Ellerman <mpe@ellerman.id.au>, msuchanek@suse.de,
-        oleg@redhat.com, paulus@samba.org, peterx@redhat.com,
-        peterz@infradead.org, pmladek@suse.com,
-        ravi.bangoria@linux.ibm.com, rppt@kernel.org,
-        Xiongwei Song <sxwjean@me.com>
-References: <20210330150425.10145-1-sxwjean@me.com>
-        <875z17y79i.fsf@mpe.ellerman.id.au>
-        <20210331212550.GD13863@gate.crashing.org>
-        <CAEVVKH8XDiEGHjXj6sJAHynhwqKWpNqj_Ws03AqwNjR8OmHf5w@mail.gmail.com>
-        <20210401161131.GE13863@gate.crashing.org>
-In-Reply-To: <20210401161131.GE13863@gate.crashing.org>
-MIME-Version: 1.0
-Message-Id: <1617322416.z3cicnpfxy.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=FViJNMuAQXVG92IcJ9ASyfw+gqYDqmookinTy4APMz8=;
+        b=SVRKB1xgdgyECDM08yJ0gqJQS5hkCAbM8iZ67RJNF4CQGD2dSDzZMcHwM3SAYmprdD
+         fSgGSmUbo2RGzqQtyLglMPb2Kj8zkaV59uh8k1+EngN32zyEoksbzf+BNdYJYlFEk7Cu
+         xYzliR4Y0Qgzvm9TmlbrK0M5Ia7mmMi7TeE1ZVq8leJeqZ0RQNqipcipb9sEAhcN4rFa
+         eKdXugzLSJWblGNpLedpFWG36dDBkP/cM2946w2GtdcBKGtvRFPek73EUqo467lAZoe4
+         d2DUmJclLSJV0q8+jh53Wk9TN/EYn/eGOMXr1v8MUWdtOvg0NTdgUK8yiZY9D2f33eZ8
+         b22g==
+X-Gm-Message-State: AOAM531y5aAUB1w31TIxOoEa2CgDd4UHS5BZ1fLaluuHnEXpLkX9CV2R
+        +Wm6jZJyAuPmIm9WUVvf5RkV/K43Pro=
+X-Google-Smtp-Source: ABdhPJzX9kzo85wBh2DvMcR2Y9UxX/gVfIA/wY1qXyxNt7lm9J3jjA4HAyWrYbcDrQf6yDOm390BaT3pn8k=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:c0b4:8b8:bb34:6a56])
+ (user=seanjc job=sendgmr) by 2002:a25:a187:: with SMTP id a7mr8464267ybi.377.1617325020964;
+ Thu, 01 Apr 2021 17:57:00 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu,  1 Apr 2021 17:56:48 -0700
+Message-Id: <20210402005658.3024832-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
+Subject: [PATCH v2 00/10] KVM: Consolidate and optimize MMU notifiers
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Segher Boessenkool's message of April 2, 2021 2:11 am:
-> On Thu, Apr 01, 2021 at 10:55:58AM +0800, Xiongwei Song wrote:
->> Segher Boessenkool <segher@kernel.crashing.org> =E4=BA=8E2021=E5=B9=B44=
-=E6=9C=881=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=886:15=E5=86=99=E9=81=
-=93=EF=BC=9A
->>=20
->> > On Wed, Mar 31, 2021 at 08:58:17PM +1100, Michael Ellerman wrote:
->> > > So perhaps:
->> > >
->> > >   EXC_SYSTEM_RESET
->> > >   EXC_MACHINE_CHECK
->> > >   EXC_DATA_STORAGE
->> > >   EXC_DATA_SEGMENT
->> > >   EXC_INST_STORAGE
->> > >   EXC_INST_SEGMENT
->> > >   EXC_EXTERNAL_INTERRUPT
->> > >   EXC_ALIGNMENT
->> > >   EXC_PROGRAM_CHECK
->> > >   EXC_FP_UNAVAILABLE
->> > >   EXC_DECREMENTER
->> > >   EXC_HV_DECREMENTER
->> > >   EXC_SYSTEM_CALL
->> > >   EXC_HV_DATA_STORAGE
->> > >   EXC_PERF_MONITOR
->> >
->> > These are interrupt (vectors), not exceptions.  It doesn't matter all
->> > that much, but confusing things more isn't useful either!  There can b=
-e
->> > multiple exceptions that all can trigger the same interrupt.
->> >
->> >  When looking at the reference manual of e500 and e600 from NXP
->>  official, they call them as interrupts.While looking at the "The
->> Programming Environments"
->>  that is also from NXP, they call them exceptions. Looks like there is
->>  no explicit distinction between interrupts and exceptions.
->=20
-> The architecture documents have always called it interrupts.  The PEM
-> says it calls them exceptions instead, but they are called interrupts in
-> the architecture (and the PEM says that, too).
->=20
->> Here is the "The Programming Environments" link:
->> https://www.nxp.com.cn/docs/en/user-guide/MPCFPE_AD_R1.pdf
->=20
-> That document is 24 years old.  The architecture is still published,
-> new versions regularly.
->=20
->> As far as I know, the values of interrupts or exceptions above are defin=
-ed
->> explicitly in reference manual or the programming environments.
->=20
-> They are defined in the architecture.
->=20
->> Could
->> you please provide more details about multiple exceptions with the same
->> interrupts?
->=20
-> The simplest example is 700, program interrupt.  There are many causes
-> for it, including all the exceptions in FPSCR: VX, ZX, OX, UX, XX, and
-> VX is actually divided into nine separate cases itself.  There also are
-> the various causes of privileged instruction type program interrupts,
-> and  the trap type program interrupt, but the FEX ones are most obvious
-> here.
+The end goal of this series is to optimize the MMU notifiers to take
+mmu_lock if and only if the notification is relevant to KVM, i.e. the hva
+range overlaps a memslot.   Large VMs (hundreds of vCPUs) are very
+sensitive to mmu_lock being taken for write at inopportune times, and
+such VMs also tend to be "static", e.g. backed by HugeTLB with minimal
+page shenanigans.  The vast majority of notifications for these VMs will
+be spurious (for KVM), and eliding mmu_lock for spurious notifications
+avoids an otherwise unacceptable disruption to the guest.
 
-Also:
+To get there without potentially degrading performance, e.g. due to
+multiple memslot lookups, especially on non-x86 where the use cases are
+largely unknown (from my perspective), first consolidate the MMU notifier
+logic by moving the hva->gfn lookups into common KVM.
 
-* Some interrupts have no corresponding exception (system call and=20
-system call vectored). This is not just semantics or a bug in the ISA
-because it is different from other synchronous interrupts: instructions=20
-which cause exceptions (e.g., a page fault) do not complete before=20
-taking the interrupt whereas sc does.
+Based on kvm/queue, commit 5f986f748438 ("KVM: x86: dump_vmcs should
+include the autoload/autostore MSR lists").
 
-* It's quite usual for an exception to not cause an interrupt=20
-immediately (MSR[EE]=3D0, HMEER) or never cause one and be cleared by=20
-other means (msgclr, mtDEC, mtHMER, etc).
+Well tested on Intel and AMD.  Compile tested for arm64, MIPS, PPC,
+PPC e500, and s390.  Absolutely needs to be tested for real on non-x86,
+I give it even odds that I introduced an off-by-one bug somewhere.
 
-* It's possible for an exception to cause different interrupts!
-A decrementer exception usually causes a decrementer interrupt, but it
-can cause a system reset interrupt if the processor was in a power
-saving mode. A data storage exception can cause a DSI or HDSI interrupt
-depending on LPCR settings, and many other examples.
+v2:
+ - Drop the patches that have already been pushed to kvm/queue.
+ - Drop two selftest changes that had snuck in via "git commit -a".
+ - Add a patch to assert that mmu_notifier_count is elevated when
+   .change_pte() runs. [Paolo]
+ - Split out moving KVM_MMU_(UN)LOCK() to __kvm_handle_hva_range() to a
+   separate patch.  Opted not to squash it with the introduction of the
+   common hva walkers (patch 02), as that prevented sharing code between
+   the old and new APIs. [Paolo]
+ - Tweak the comment in kvm_vm_destroy() above the smashing of the new
+   slots lock. [Paolo]
+ - Make mmu_notifier_slots_lock unconditional to avoid #ifdefs. [Paolo]
 
-So I agree with Segher on this. We should use interrupt for interrupts,=20
-reduce exception except where we really mean it, and move away from vec=20
-and trap (I've got this wrong in the past too I admit). We don't have to=20
-do it all immediately, but new code should go in this direction.
+v1:
+ - https://lkml.kernel.org/r/20210326021957.1424875-1-seanjc@google.com
 
-Thanks,
-Nick
+Sean Christopherson (10):
+  KVM: Assert that notifier count is elevated in .change_pte()
+  KVM: Move x86's MMU notifier memslot walkers to generic code
+  KVM: arm64: Convert to the gfn-based MMU notifier callbacks
+  KVM: MIPS/MMU: Convert to the gfn-based MMU notifier callbacks
+  KVM: PPC: Convert to the gfn-based MMU notifier callbacks
+  KVM: Kill off the old hva-based MMU notifier callbacks
+  KVM: Move MMU notifier's mmu_lock acquisition into common helper
+  KVM: Take mmu_lock when handling MMU notifier iff the hva hits a
+    memslot
+  KVM: Don't take mmu_lock for range invalidation unless necessary
+  KVM: x86/mmu: Allow yielding during MMU notifier unmap/zap, if
+    possible
+
+ arch/arm64/kvm/mmu.c                   | 117 +++------
+ arch/mips/kvm/mmu.c                    |  97 ++------
+ arch/powerpc/include/asm/kvm_book3s.h  |  12 +-
+ arch/powerpc/include/asm/kvm_ppc.h     |   9 +-
+ arch/powerpc/kvm/book3s.c              |  18 +-
+ arch/powerpc/kvm/book3s.h              |  10 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  98 ++------
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  25 +-
+ arch/powerpc/kvm/book3s_hv.c           |  12 +-
+ arch/powerpc/kvm/book3s_pr.c           |  56 ++---
+ arch/powerpc/kvm/e500_mmu_host.c       |  27 +-
+ arch/x86/kvm/mmu/mmu.c                 | 127 ++++------
+ arch/x86/kvm/mmu/tdp_mmu.c             | 245 +++++++------------
+ arch/x86/kvm/mmu/tdp_mmu.h             |  14 +-
+ include/linux/kvm_host.h               |  22 +-
+ virt/kvm/kvm_main.c                    | 325 +++++++++++++++++++------
+ 16 files changed, 552 insertions(+), 662 deletions(-)
+
+-- 
+2.31.0.208.g409f899ff0-goog
+
