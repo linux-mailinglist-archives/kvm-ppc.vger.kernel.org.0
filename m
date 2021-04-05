@@ -2,57 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77F9B353AA1
-	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:21:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 964C9353AA2
+	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:21:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231845AbhDEBVg (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 4 Apr 2021 21:21:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39986 "EHLO
+        id S231847AbhDEBVp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 4 Apr 2021 21:21:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231841AbhDEBVf (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:21:35 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFDEAC061756
-        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:21:29 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id a6so1597699pls.1
-        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:21:29 -0700 (PDT)
+        with ESMTP id S231841AbhDEBVk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:21:40 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77114C061756
+        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:21:33 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id y2so4928828plg.5
+        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:21:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=/MfbnRN8dnuzRj+Aq/3W1T9BSSMMXrvqkGuD+Sv636E=;
-        b=Y30UY1OgHfg+ZONfB5UWRtxeu1z7SAmRVSRRpwSWYu1X0M60zAQm/dxBMlFadC71Xn
-         gFCwn0aAoi9Uz7cgoch+a4fOwIZt71Qj0R7R9Gz4T2voCbECnuPZQISATswKeUw7kBpn
-         LO22W8C4/aUDRo15mnzq51q96lAbgtQ4POROIHidD+OeV60hA2ptBmJwu1nBbZcv3qYg
-         EmLlAu1bKtBwHCrjsXywZXuJrkx0OyhUeZ8LkNv1DbzdjT+xfCMTyvC3gtCxZW7bL4Dj
-         s4zHNWdxewjs0waBce7pteF4al5f/fLN4BLTiq2pnGnGXqGZ774f48hz0uGzIaMdJ71w
-         kxag==
+        bh=UTdFrL60rN3R2a4gJO4rGMS50+4Qry4ThLyQTVbs3+w=;
+        b=tSmSaEhmk9tUFLcu1b7wpbjcIvl6TNiIA+rpbb9nvW7B9ScMmNz07Ey/y8XAsmiNw1
+         G7YKBEtHvp0pZ4b3F/xxk+Xk4E3di2GhxWEhcQg8gPQzdT2HhlMmdK8REEr48UHfbZAW
+         0ciO2fcd1J6cVtkMm9fde2IGaMfhyIJH7UjBlCNcQhbdiY49BX2LIIlGfY1e7eGEuSSN
+         4tdkYuQzzsGadDF+7nBm/TzqGOLa7Tof31Jmu4llRWEkritWt8cnIOmrMsAwUE01WhHd
+         G/Imu4r0SZyiDJ8+X1hgwY1eRXEgTksVs82drRyx6LtkY8u/zIyYg1HnRtoALHbB6Xe+
+         3suA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=/MfbnRN8dnuzRj+Aq/3W1T9BSSMMXrvqkGuD+Sv636E=;
-        b=cHbefwt+6/sXZ8V/vkQlQNd8dVcpQEZS/vj5L3NcKbsaMhEvyGTQstvMyoTejqYC5J
-         b+z43vTeUEot1cvc5e5kz/avd34G7xxBxLziqAuaSObywKL6NpN2qo3HGXNh4JhgIxTs
-         5tdjxGv3AMua8a9xZF+gOR4bN+9lqO6g1W3igv6adDzqjndyuz7JxRaD5YaH+jTGDssL
-         QqfP4GWP+qeJZk0/cHLcP7NxlyoCWlkRKrMxu9R5tfiu6pTStUNfAxPVm+GHhN/aDUnO
-         aMqrocc0cO5haYLy+drUSp9LxhW7NTlegP7MJvI9KGx6f4/HcGdPIR0XIB6EkJsZ1jz0
-         Ecvw==
-X-Gm-Message-State: AOAM531FO1R06hCaWjBdMyuKjPIYz/GMa0YTZFfTD4xM9UGBokiIGt0V
-        gOKK74+ZxU9YQgf42bTQbYKo9NwtA/hSVA==
-X-Google-Smtp-Source: ABdhPJxFZ92JUxArnB0Kjn4AsWGbEnW4X0TXT/LT+PNWX5v4UnSYf00JBDJV/2+536BmLm/nculj2Q==
-X-Received: by 2002:a17:90a:9f8d:: with SMTP id o13mr23645774pjp.25.1617585689484;
-        Sun, 04 Apr 2021 18:21:29 -0700 (PDT)
+        bh=UTdFrL60rN3R2a4gJO4rGMS50+4Qry4ThLyQTVbs3+w=;
+        b=cTs2qaLSvyd+yQPnuBAdb7I7lrYu0yOKuFXjXYDkV+zq+nQgCEvZp7iMUYr8FFwC1q
+         87TbLmwjdCVEw8g0DiKT5IIree/aXBU2EJM+0m6kVRCkUCwNE9KUrbY8NR3UyRH7V8IR
+         yqHwoBao9tdyJzVOlizaQtZ/saiJ/+6zSNZBO/QCongTlUvnYGAzXRjM/aGP2ER+g+bw
+         Yl6fVJ4jXZEvtETjheJjQ29ncNyQ9XxhcqMhiFs4W7DVHpiIgr/aoYG8p7RpQ2/ta6qJ
+         Hc0tdJycJTV/tS/4IElexSDGsRXzTY3SMhCFPGSi/hdXEpVGhmYpaGyKWH0TNcVfBb6y
+         h7jg==
+X-Gm-Message-State: AOAM531tgQfi2s8aqnH8in+19V0frsReMnppWsOEn7uTb4jnVllVClqV
+        a5yabwN/kx+dvl5Vd2ayOfe5MJZ493lwjQ==
+X-Google-Smtp-Source: ABdhPJzt4Nw7omWht0GkfIRhyfsUb8mGIt3gtOEO5he5gZ3Pvyl5AH54D5QTOU0D0ZDar/Lg6ND29A==
+X-Received: by 2002:a17:90a:5d14:: with SMTP id s20mr24457309pji.6.1617585692953;
+        Sun, 04 Apr 2021 18:21:32 -0700 (PDT)
 Received: from bobo.ibm.com ([1.132.215.134])
-        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.21.26
+        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.21.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Apr 2021 18:21:29 -0700 (PDT)
+        Sun, 04 Apr 2021 18:21:32 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v6 25/48] KVM: PPC: Book3S HV P9: Use host timer accounting to avoid decrementer read
-Date:   Mon,  5 Apr 2021 11:19:25 +1000
-Message-Id: <20210405011948.675354-26-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+        Fabiano Rosas <farosas@linux.ibm.com>
+Subject: [PATCH v6 26/48] KVM: PPC: Book3S HV P9: Reduce mftb per guest entry/exit
+Date:   Mon,  5 Apr 2021 11:19:26 +1000
+Message-Id: <20210405011948.675354-27-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210405011948.675354-1-npiggin@gmail.com>
 References: <20210405011948.675354-1-npiggin@gmail.com>
@@ -62,77 +63,51 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-There is no need to save away the host DEC value, as it is derived
-from the host timer subsystem, which maintains the next timer time.
+mftb is serialising (dispatch next-to-complete) so it is heavy weight
+for a mfspr. Avoid reading it multiple times in the entry or exit paths.
+A small number of cycles delay to timers is tolerable.
 
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/include/asm/time.h |  5 +++++
- arch/powerpc/kernel/time.c      |  1 +
- arch/powerpc/kvm/book3s_hv.c    | 14 +++++++-------
- 3 files changed, 13 insertions(+), 7 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/time.h b/arch/powerpc/include/asm/time.h
-index 68d94711811e..0128cd9769bc 100644
---- a/arch/powerpc/include/asm/time.h
-+++ b/arch/powerpc/include/asm/time.h
-@@ -101,6 +101,11 @@ extern void __init time_init(void);
- 
- DECLARE_PER_CPU(u64, decrementers_next_tb);
- 
-+static inline u64 timer_get_next_tb(void)
-+{
-+	return __this_cpu_read(decrementers_next_tb);
-+}
-+
- /* Convert timebase ticks to nanoseconds */
- unsigned long long tb_to_ns(unsigned long long tb_ticks);
- 
-diff --git a/arch/powerpc/kernel/time.c b/arch/powerpc/kernel/time.c
-index fc42594c8223..8b9b38a8ce57 100644
---- a/arch/powerpc/kernel/time.c
-+++ b/arch/powerpc/kernel/time.c
-@@ -109,6 +109,7 @@ struct clock_event_device decrementer_clockevent = {
- EXPORT_SYMBOL(decrementer_clockevent);
- 
- DEFINE_PER_CPU(u64, decrementers_next_tb);
-+EXPORT_SYMBOL_GPL(decrementers_next_tb);
- static DEFINE_PER_CPU(struct clock_event_device, decrementers);
- 
- #define XSEC_PER_SEC (1024*1024)
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 3029ffb4b792..5c4ccebce682 100644
+index 5c4ccebce682..f4e5a64457e6 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3703,16 +3703,15 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	unsigned long host_amr = mfspr(SPRN_AMR);
- 	unsigned long host_fscr = mfspr(SPRN_FSCR);
- 	s64 dec;
--	u64 tb;
-+	u64 tb, next_timer;
- 	int trap, save_pmu;
+@@ -3557,12 +3557,13 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
+ 		host_dawrx1 = mfspr(SPRN_DAWRX1);
+ 	}
  
--	dec = mfspr(SPRN_DEC);
- 	tb = mftb();
--	if (dec < 0)
-+	next_timer = timer_get_next_tb();
-+	if (tb >= next_timer)
+-	hdec = time_limit - mftb();
++	tb = mftb();
++	hdec = time_limit - tb;
+ 	if (hdec < 0)
  		return BOOK3S_INTERRUPT_HV_DECREMENTER;
--	local_paca->kvm_hstate.dec_expires = dec + tb;
--	if (local_paca->kvm_hstate.dec_expires < time_limit)
--		time_limit = local_paca->kvm_hstate.dec_expires;
-+	if (next_timer < time_limit)
-+		time_limit = next_timer;
  
- 	vcpu->arch.ceded = 0;
+ 	if (vc->tb_offset) {
+-		u64 new_tb = mftb() + vc->tb_offset;
++		u64 new_tb = tb + vc->tb_offset;
+ 		mtspr(SPRN_TBU40, new_tb);
+ 		tb = mftb();
+ 		if ((tb & 0xffffff) < (new_tb & 0xffffff))
+@@ -3760,7 +3761,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	if (!(vcpu->arch.ctrl & 1))
+ 		mtspr(SPRN_CTRLT, mfspr(SPRN_CTRLF) & ~1);
  
-@@ -3895,7 +3894,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	vc->entry_exit_map = 0x101;
+-	mtspr(SPRN_DEC, vcpu->arch.dec_expires - mftb());
++	mtspr(SPRN_DEC, vcpu->arch.dec_expires - tb);
+ 
+ 	if (kvmhv_on_pseries()) {
+ 		/*
+@@ -3895,7 +3896,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
  	vc->in_guest = 0;
  
--	mtspr(SPRN_DEC, local_paca->kvm_hstate.dec_expires - mftb());
-+	next_timer = timer_get_next_tb();
-+	mtspr(SPRN_DEC, next_timer - mftb());
+ 	next_timer = timer_get_next_tb();
+-	mtspr(SPRN_DEC, next_timer - mftb());
++	mtspr(SPRN_DEC, next_timer - tb);
  	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
  
  	kvmhv_load_host_pmu();
