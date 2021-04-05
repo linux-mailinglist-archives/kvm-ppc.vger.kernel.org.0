@@ -2,230 +2,173 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 108CC353A9A
-	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:21:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09D11353A9B
+	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:21:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231840AbhDEBVP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 4 Apr 2021 21:21:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39902 "EHLO
+        id S231842AbhDEBVT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 4 Apr 2021 21:21:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231775AbhDEBVP (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:21:15 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97313C061756
-        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:21:09 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id il9-20020a17090b1649b0290114bcb0d6c2so7101595pjb.0
-        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:21:09 -0700 (PDT)
+        with ESMTP id S231775AbhDEBVS (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:21:18 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C213C061756
+        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:21:13 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id j6-20020a17090adc86b02900cbfe6f2c96so5074397pjv.1
+        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:21:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=oFmaJjBp09ty+mQfvxR7OURCiJbmuhIiXXzajeTk/cc=;
-        b=emC1GlsJVEoBKH3tpRm428lR5Q278lI0ICrGiVJe7NkjyOX0Bl8emZC0wATx2YWgEx
-         hnoVt3ZwFnFxtq3wxFlLENUAcPa+LOXRPxatyLbvw3wYcafTntKow1UBSbToWr0xWugM
-         a3XmrmzrXBwKuFMP2N8GekmvlEi7LXzJRg1rwr5GiW01u9n/Dexr3lx5IGG778+gcBPA
-         gXuHuVkNsi7hNfvKBwI2GpcqNnEdHCpjYv0PoYRDJEkb8u67VFsPLqRzdISPYa0xxs3m
-         KxWsN1h9clM1G41eZk/lFHksJk/wnKHpJ4fHo3PbUk0FEbF8E9IqzjIBnYix1L3S26om
-         Il3A==
+        bh=iJ6ODLaZGRZoX5kuCv+hNtwVVZa1NGvMNfJW5zA4O7A=;
+        b=tnf57h3hsYSAPnNoIVDX0DRnOFYV1zcFOYHbsShspfQ1OXRzvw6Cx0p5hn91bFEwuL
+         jQkeo79AtuCmMr5eIxTRgO5a86edi3F2rjTi/b1lsy6klNLup8OcUcVTvcjW8+eAl73Y
+         Vcu3AGuVKqJqsjyI9zXvgJvjjRWRGdpVkjpGKCOn5giuqzRzO/MsAM7vUrNBIn3pTrA8
+         Q350EFaEhPTWBQ2Ta5TU7B8Jx53/K4rdWhSnEIdtHxJcViIZPd26R7/d/HeWsNOmFn8r
+         MvX5wjCqCqFCh25kvxdSsoervBlE5s6reuzgQNC7ER8ABBC2EpmNMxsZld2e0nfOSGx5
+         C8gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=oFmaJjBp09ty+mQfvxR7OURCiJbmuhIiXXzajeTk/cc=;
-        b=fzsZ0RDDdgFC+lAC1Jc4FbH6F/GNBQuDG7KPGUIRRtUoSOguRtqXS+OJlCXUQ1zYH5
-         qyv4QeulFy8FI1RNbYpXnV/vspgeYnavlRLHHSgdrjfi3tFr6I/Jfx+4W+3l0YreillY
-         LwtcH5+dVZkYflYIqQv5hikcSXMormigTZaIT5BIg1jJuCtB9OXdgwTSQQFcIjQCdmnd
-         Ae0M1L52Ng255dUaY/V4gWUGHcjD6GuQzejQp4P/GyHQZGp1dKsNUW0SVr4ULLl8NjAv
-         Gi0Rr29lZiwxhNbAX83BKblGtCKw2L6ZpLqg7pUZ/0ZxEdXZFr4eW+GSp2swj806eDBO
-         cb5Q==
-X-Gm-Message-State: AOAM530imJoFypf+gFjgN2Ob06HiA/9A/dUzL+h0YrrNu2XIa2qkg3z5
-        NY1Vu6kbiiFdX6KwtD/PMppc6DYFQ5qrnw==
-X-Google-Smtp-Source: ABdhPJxlXA2dMaC1bmiPAnD/aJpjmgpVbcqRhVvmwr0FERrSeu3xkAl+9eh7rOLt8mBiijtZJh+SlA==
-X-Received: by 2002:a17:90a:7786:: with SMTP id v6mr24154111pjk.16.1617585669004;
-        Sun, 04 Apr 2021 18:21:09 -0700 (PDT)
+        bh=iJ6ODLaZGRZoX5kuCv+hNtwVVZa1NGvMNfJW5zA4O7A=;
+        b=Yfv6NTsgxg84HD0uttwsvzJeT07txhdu55L72kheVQ5gueJfbHwqC1HHfzw8O+jrA3
+         IQgBwOGLq45tE2sJ7w+m+vpk/2Va5zz9THdJW7XQxd93QTHxSHBTpUA02083ti4zPDds
+         y/CWspLx+asPBY6jjRa7KtOGlX3Jp9J2FJOJh2HXfo9OlVSQstPhah5F7oH0NMj5TYse
+         NPPfx4ZPSFdpAt1KB6PYl45JufoR39FiEnXpkp21X6jv3yQ0ECbAbD5+v3W+0gDVbeE8
+         mUA4KqSHqlbQaY6iTgIvIckpLoEnxuJu47BhryYVTNVshmBn56PaIT2yNMyBiOp74Yvz
+         1juA==
+X-Gm-Message-State: AOAM5315O7uxLzRfwT7Ou8T0vEvZeEHSn+5rziV7ducYg7Wn3rBhmDtl
+        w0dXZdH4mbudoM9FcnYVgGnbXf0bWzg2MQ==
+X-Google-Smtp-Source: ABdhPJwqhx+v1wv801r8ZoWRW5tqE3CVkxURxTh6TXVJm/2NlVOoco3OJeN4roQWCu0HQumw+yjBqg==
+X-Received: by 2002:a17:902:9a0a:b029:e6:bf00:8a36 with SMTP id v10-20020a1709029a0ab02900e6bf008a36mr22035803plp.51.1617585672919;
+        Sun, 04 Apr 2021 18:21:12 -0700 (PDT)
 Received: from bobo.ibm.com ([1.132.215.134])
-        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.21.06
+        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.21.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Apr 2021 18:21:08 -0700 (PDT)
+        Sun, 04 Apr 2021 18:21:12 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
         Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: [PATCH v6 19/48] KVM: PPC: Book3S HV P9: Move radix MMU switching instructions together
-Date:   Mon,  5 Apr 2021 11:19:19 +1000
-Message-Id: <20210405011948.675354-20-npiggin@gmail.com>
+Subject: [PATCH v6 20/48] KVM: PPC: Book3S HV P9: implement kvmppc_xive_pull_vcpu in C
+Date:   Mon,  5 Apr 2021 11:19:20 +1000
+Message-Id: <20210405011948.675354-21-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210405011948.675354-1-npiggin@gmail.com>
 References: <20210405011948.675354-1-npiggin@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Switching the MMU from radix<->radix mode is tricky particularly as the
-MMU can remain enabled and requires a certain sequence of SPR updates.
-Move these together into their own functions.
+This is more symmetric with kvmppc_xive_push_vcpu. The extra test in
+the asm will go away in a later change.
 
-This also includes the radix TLB check / flush because it's tied in to
-MMU switching due to tlbiel getting LPID from LPIDR.
-
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 66 +++++++++++++++++++++++-------------
- 1 file changed, 43 insertions(+), 23 deletions(-)
+ arch/powerpc/include/asm/kvm_ppc.h      |  2 ++
+ arch/powerpc/kvm/book3s_hv.c            |  2 ++
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S |  5 ++++
+ arch/powerpc/kvm/book3s_xive.c          | 31 +++++++++++++++++++++++++
+ 4 files changed, 40 insertions(+)
 
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index 9531b1c1b190..73b1ca5a6471 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -672,6 +672,7 @@ extern int kvmppc_xive_set_icp(struct kvm_vcpu *vcpu, u64 icpval);
+ extern int kvmppc_xive_set_irq(struct kvm *kvm, int irq_source_id, u32 irq,
+ 			       int level, bool line_status);
+ extern void kvmppc_xive_push_vcpu(struct kvm_vcpu *vcpu);
++extern void kvmppc_xive_pull_vcpu(struct kvm_vcpu *vcpu);
+ 
+ static inline int kvmppc_xive_enabled(struct kvm_vcpu *vcpu)
+ {
+@@ -712,6 +713,7 @@ static inline int kvmppc_xive_set_icp(struct kvm_vcpu *vcpu, u64 icpval) { retur
+ static inline int kvmppc_xive_set_irq(struct kvm *kvm, int irq_source_id, u32 irq,
+ 				      int level, bool line_status) { return -ENODEV; }
+ static inline void kvmppc_xive_push_vcpu(struct kvm_vcpu *vcpu) { }
++static inline void kvmppc_xive_pull_vcpu(struct kvm_vcpu *vcpu) { }
+ 
+ static inline int kvmppc_xive_enabled(struct kvm_vcpu *vcpu)
+ 	{ return 0; }
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index ed77aff9cdb6..3424b1bfa98e 100644
+index 3424b1bfa98e..6ca47f26a397 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3478,12 +3478,49 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
- 	trace_kvmppc_run_core(vc, 1);
- }
+@@ -3605,6 +3605,8 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
  
-+static void switch_mmu_to_guest_radix(struct kvm *kvm, struct kvm_vcpu *vcpu, u64 lpcr)
-+{
-+	struct kvmppc_vcore *vc = vcpu->arch.vcore;
-+	struct kvm_nested_guest *nested = vcpu->arch.nested;
-+	u32 lpid;
+ 	trap = __kvmhv_vcpu_entry_p9(vcpu);
+ 
++	kvmppc_xive_pull_vcpu(vcpu);
 +
-+	lpid = nested ? nested->shadow_lpid : kvm->arch.lpid;
+ 	/* Advance host PURR/SPURR by the amount used by guest */
+ 	purr = mfspr(SPRN_PURR);
+ 	spurr = mfspr(SPRN_SPURR);
+diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+index 75405ef53238..c11597f815e4 100644
+--- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
++++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+@@ -1442,6 +1442,11 @@ guest_exit_cont:		/* r9 = vcpu, r12 = trap, r13 = paca */
+ 	bl	kvmhv_accumulate_time
+ #endif
+ #ifdef CONFIG_KVM_XICS
++	/* If we came in through the P9 short path, xive pull is done in C */
++	lwz	r0, STACK_SLOT_SHORT_PATH(r1)
++	cmpwi	r0, 0
++	bne	1f
++
+ 	/* We are exiting, pull the VP from the XIVE */
+ 	lbz	r0, VCPU_XIVE_PUSHED(r9)
+ 	cmpwi	cr0, r0, 0
+diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+index e7219b6f5f9a..741bf1f4387a 100644
+--- a/arch/powerpc/kvm/book3s_xive.c
++++ b/arch/powerpc/kvm/book3s_xive.c
+@@ -127,6 +127,37 @@ void kvmppc_xive_push_vcpu(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvmppc_xive_push_vcpu);
+ 
++/*
++ * Pull a vcpu's context from the XIVE on guest exit.
++ * This assumes we are in virtual mode (MMU on)
++ */
++void kvmppc_xive_pull_vcpu(struct kvm_vcpu *vcpu)
++{
++	void __iomem *tima = local_paca->kvm_hstate.xive_tima_virt;
++
++	if (!vcpu->arch.xive_pushed)
++		return;
 +
 +	/*
-+	 * All the isync()s are overkill but trivially follow the ISA
-+	 * requirements. Some can likely be replaced with justification
-+	 * comment for why they are not needed.
++	 * Should not have been pushed if there is no tima
 +	 */
-+	isync();
-+	mtspr(SPRN_LPID, lpid);
-+	isync();
-+	mtspr(SPRN_LPCR, lpcr);
-+	isync();
-+	mtspr(SPRN_PID, vcpu->arch.pid);
-+	isync();
++	if (WARN_ON(!tima))
++		return;
 +
-+	/* TLBIEL must have LPIDR set, so set guest LPID before flushing. */
-+	kvmppc_check_need_tlb_flush(kvm, vc->pcpu, nested);
-+}
++	eieio();
++	/* First load to pull the context, we ignore the value */
++	__raw_readl(tima + TM_SPC_PULL_OS_CTX);
++	/* Second load to recover the context state (Words 0 and 1) */
++	vcpu->arch.xive_saved_state.w01 = __raw_readq(tima + TM_QW1_OS);
 +
-+static void switch_mmu_to_host_radix(struct kvm *kvm, u32 pid)
-+{
-+	isync();
-+	mtspr(SPRN_PID, pid);
-+	isync();
-+	mtspr(SPRN_LPID, kvm->arch.host_lpid);
-+	isync();
-+	mtspr(SPRN_LPCR, kvm->arch.host_lpcr);
-+	isync();
++	/* Fixup some of the state for the next load */
++	vcpu->arch.xive_saved_state.lsmfb = 0;
++	vcpu->arch.xive_saved_state.ack = 0xff;
++	vcpu->arch.xive_pushed = 0;
++	eieio();
 +}
++EXPORT_SYMBOL_GPL(kvmppc_xive_pull_vcpu);
 +
  /*
-  * Load up hypervisor-mode registers on P9.
-  */
- static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 				     unsigned long lpcr)
- {
-+	struct kvm *kvm = vcpu->kvm;
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
- 	s64 hdec;
- 	u64 tb, purr, spurr;
-@@ -3506,12 +3543,12 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 	 * P8 and P9 suppress the HDEC exception when LPCR[HDICE] = 0,
- 	 * so set HDICE before writing HDEC.
- 	 */
--	mtspr(SPRN_LPCR, vcpu->kvm->arch.host_lpcr | LPCR_HDICE);
-+	mtspr(SPRN_LPCR, kvm->arch.host_lpcr | LPCR_HDICE);
- 	isync();
- 
- 	hdec = time_limit - mftb();
- 	if (hdec < 0) {
--		mtspr(SPRN_LPCR, vcpu->kvm->arch.host_lpcr);
-+		mtspr(SPRN_LPCR, kvm->arch.host_lpcr);
- 		isync();
- 		return BOOK3S_INTERRUPT_HV_DECREMENTER;
- 	}
-@@ -3546,7 +3583,6 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 	}
- 	mtspr(SPRN_CIABR, vcpu->arch.ciabr);
- 	mtspr(SPRN_IC, vcpu->arch.ic);
--	mtspr(SPRN_PID, vcpu->arch.pid);
- 
- 	mtspr(SPRN_PSSCR, vcpu->arch.psscr | PSSCR_EC |
- 	      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
-@@ -3560,8 +3596,7 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 
- 	mtspr(SPRN_AMOR, ~0UL);
- 
--	mtspr(SPRN_LPCR, lpcr);
--	isync();
-+	switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
- 
- 	kvmppc_xive_push_vcpu(vcpu);
- 
-@@ -3600,7 +3635,6 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 		mtspr(SPRN_DAWR1, host_dawr1);
- 		mtspr(SPRN_DAWRX1, host_dawrx1);
- 	}
--	mtspr(SPRN_PID, host_pidr);
- 
- 	/*
- 	 * Since this is radix, do a eieio; tlbsync; ptesync sequence in
-@@ -3615,9 +3649,6 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 	if (cpu_has_feature(CPU_FTR_ARCH_31))
- 		asm volatile(PPC_CP_ABORT);
- 
--	mtspr(SPRN_LPID, vcpu->kvm->arch.host_lpid);	/* restore host LPID */
--	isync();
--
- 	vc->dpdes = mfspr(SPRN_DPDES);
- 	vc->vtb = mfspr(SPRN_VTB);
- 	mtspr(SPRN_DPDES, 0);
-@@ -3634,7 +3665,8 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 	}
- 
- 	mtspr(SPRN_HDEC, 0x7fffffff);
--	mtspr(SPRN_LPCR, vcpu->kvm->arch.host_lpcr);
-+
-+	switch_mmu_to_host_radix(kvm, host_pidr);
- 
- 	return trap;
- }
-@@ -4167,7 +4199,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- {
- 	struct kvm_run *run = vcpu->run;
- 	int trap, r, pcpu;
--	int srcu_idx, lpid;
-+	int srcu_idx;
- 	struct kvmppc_vcore *vc;
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_nested_guest *nested = vcpu->arch.nested;
-@@ -4241,13 +4273,6 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 	vc->vcore_state = VCORE_RUNNING;
- 	trace_kvmppc_run_core(vc, 0);
- 
--	if (cpu_has_feature(CPU_FTR_HVMODE)) {
--		lpid = nested ? nested->shadow_lpid : kvm->arch.lpid;
--		mtspr(SPRN_LPID, lpid);
--		isync();
--		kvmppc_check_need_tlb_flush(kvm, pcpu, nested);
--	}
--
- 	guest_enter_irqoff();
- 
- 	srcu_idx = srcu_read_lock(&kvm->srcu);
-@@ -4266,11 +4291,6 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 
- 	srcu_read_unlock(&kvm->srcu, srcu_idx);
- 
--	if (cpu_has_feature(CPU_FTR_HVMODE)) {
--		mtspr(SPRN_LPID, kvm->arch.host_lpid);
--		isync();
--	}
--
- 	set_irq_happened(trap);
- 
- 	kvmppc_set_host_core(pcpu);
+  * This is a simple trigger for a generic XIVE IRQ. This must
+  * only be called for interrupts that support a trigger page
 -- 
 2.23.0
 
