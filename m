@@ -2,58 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 964C9353AA2
-	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:21:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 330B4353AA3
+	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:21:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231847AbhDEBVp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 4 Apr 2021 21:21:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40004 "EHLO
+        id S231841AbhDEBVr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 4 Apr 2021 21:21:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231841AbhDEBVk (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:21:40 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77114C061756
-        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:21:33 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id y2so4928828plg.5
-        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:21:33 -0700 (PDT)
+        with ESMTP id S231555AbhDEBVo (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:21:44 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E1AC0613E6
+        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:21:36 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id w10so1676810pgh.5
+        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:21:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=UTdFrL60rN3R2a4gJO4rGMS50+4Qry4ThLyQTVbs3+w=;
-        b=tSmSaEhmk9tUFLcu1b7wpbjcIvl6TNiIA+rpbb9nvW7B9ScMmNz07Ey/y8XAsmiNw1
-         G7YKBEtHvp0pZ4b3F/xxk+Xk4E3di2GhxWEhcQg8gPQzdT2HhlMmdK8REEr48UHfbZAW
-         0ciO2fcd1J6cVtkMm9fde2IGaMfhyIJH7UjBlCNcQhbdiY49BX2LIIlGfY1e7eGEuSSN
-         4tdkYuQzzsGadDF+7nBm/TzqGOLa7Tof31Jmu4llRWEkritWt8cnIOmrMsAwUE01WhHd
-         G/Imu4r0SZyiDJ8+X1hgwY1eRXEgTksVs82drRyx6LtkY8u/zIyYg1HnRtoALHbB6Xe+
-         3suA==
+        bh=f+RLgCMRv6O15PdiYr5GNGDONEdfPWC0BUYjL4OnyJc=;
+        b=XqqXjBvasFw+mvDlcQ/12Ge0gaQq5Ipff7tNUFiI3mRhX47BqpZrogoLW4VASjLw3j
+         tL3M9YM3GURnZw2ivDP3VxuN0HOsRwtSQcY0APA+mrh2Jv292Afv0Y5Xgfz3//5zOlKo
+         AYBcAeIzBKO2s8x3cqimf8adjZBB5tB0Zo+Dko78tC0g/wPhgmTfuCQJcmT6NzdnM0Q2
+         nSQHn/ZKxKNawFQ4OLk0D5X9CZ63MKrAs+aTIz+x82dufca/xjOo+vBWkkqD9GKktmsj
+         0pmi2e8IeXlB7vXQ+FUr/ng6M9whqx3GjWpvgRu3cYYSiR3xGyhd5HuQXzLh+3CeveT+
+         1fBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=UTdFrL60rN3R2a4gJO4rGMS50+4Qry4ThLyQTVbs3+w=;
-        b=cTs2qaLSvyd+yQPnuBAdb7I7lrYu0yOKuFXjXYDkV+zq+nQgCEvZp7iMUYr8FFwC1q
-         87TbLmwjdCVEw8g0DiKT5IIree/aXBU2EJM+0m6kVRCkUCwNE9KUrbY8NR3UyRH7V8IR
-         yqHwoBao9tdyJzVOlizaQtZ/saiJ/+6zSNZBO/QCongTlUvnYGAzXRjM/aGP2ER+g+bw
-         Yl6fVJ4jXZEvtETjheJjQ29ncNyQ9XxhcqMhiFs4W7DVHpiIgr/aoYG8p7RpQ2/ta6qJ
-         Hc0tdJycJTV/tS/4IElexSDGsRXzTY3SMhCFPGSi/hdXEpVGhmYpaGyKWH0TNcVfBb6y
-         h7jg==
-X-Gm-Message-State: AOAM531tgQfi2s8aqnH8in+19V0frsReMnppWsOEn7uTb4jnVllVClqV
-        a5yabwN/kx+dvl5Vd2ayOfe5MJZ493lwjQ==
-X-Google-Smtp-Source: ABdhPJzt4Nw7omWht0GkfIRhyfsUb8mGIt3gtOEO5he5gZ3Pvyl5AH54D5QTOU0D0ZDar/Lg6ND29A==
-X-Received: by 2002:a17:90a:5d14:: with SMTP id s20mr24457309pji.6.1617585692953;
-        Sun, 04 Apr 2021 18:21:32 -0700 (PDT)
+        bh=f+RLgCMRv6O15PdiYr5GNGDONEdfPWC0BUYjL4OnyJc=;
+        b=PDwL0bY+8LwV2C6UyjrQsS2mTZ3XT9j/7+XE8eazgzX5AczUuA+SkAIFza6Zd7vo47
+         9fcBioV3O/n2lkjYUJlRp8iog6rKSTA3ZbKf9ZxukAUKUo6mplBWotqBpW6/NSRnu2b2
+         IR9CX5Tps5iluHdoZMAqby/yF9Nu9Uzk0K831LrHRtBVcz9WNfxX3CLRHhCnYpUkNs85
+         p0P3KQC8rBwbTQMu6os3Duuo/dgwz3vv0I155/tFeyVYdugpLacRToc2QfxJfTHrZGMC
+         xNLUyneGuY6dsmMkwUVDyPdy289maox1nadunWrNsNBH1zn/BweTGdR75Vf5JrRtHIrh
+         vjsA==
+X-Gm-Message-State: AOAM533ikK2S4Pd8uhCrrsqdYKitxuw7VlfKqJfpb+IPFLA3hmjeNACk
+        RMG/jg2yQu2/wTjjgubWZfEp9/Mrv4iYew==
+X-Google-Smtp-Source: ABdhPJxhaCnIkBD0fPONlRhruTAvtVBHOrnpyr67ZOIEYp3UTwNJ2MhnxAyUI+9q04Ln6f7WDgKoyQ==
+X-Received: by 2002:a65:41c6:: with SMTP id b6mr20794644pgq.7.1617585695980;
+        Sun, 04 Apr 2021 18:21:35 -0700 (PDT)
 Received: from bobo.ibm.com ([1.132.215.134])
-        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.21.30
+        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.21.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Apr 2021 18:21:32 -0700 (PDT)
+        Sun, 04 Apr 2021 18:21:35 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
-        Fabiano Rosas <farosas@linux.ibm.com>
-Subject: [PATCH v6 26/48] KVM: PPC: Book3S HV P9: Reduce mftb per guest entry/exit
-Date:   Mon,  5 Apr 2021 11:19:26 +1000
-Message-Id: <20210405011948.675354-27-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v6 27/48] KVM: PPC: Book3S HV P9: Reduce irq_work vs guest decrementer races
+Date:   Mon,  5 Apr 2021 11:19:27 +1000
+Message-Id: <20210405011948.675354-28-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210405011948.675354-1-npiggin@gmail.com>
 References: <20210405011948.675354-1-npiggin@gmail.com>
@@ -63,51 +62,48 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-mftb is serialising (dispatch next-to-complete) so it is heavy weight
-for a mfspr. Avoid reading it multiple times in the entry or exit paths.
-A small number of cycles delay to timers is tolerable.
+irq_work's use of the DEC SPR is racy with guest<->host switch and guest
+entry which flips the DEC interrupt to guest, which could lose a host
+work interrupt.
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+This patch closes one race, and attempts to comment another class of
+races.
+
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 5c4ccebce682..f4e5a64457e6 100644
+index f4e5a64457e6..dae59f05ef50 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3557,12 +3557,13 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
- 		host_dawrx1 = mfspr(SPRN_DAWRX1);
- 	}
- 
--	hdec = time_limit - mftb();
-+	tb = mftb();
-+	hdec = time_limit - tb;
- 	if (hdec < 0)
- 		return BOOK3S_INTERRUPT_HV_DECREMENTER;
- 
- 	if (vc->tb_offset) {
--		u64 new_tb = mftb() + vc->tb_offset;
-+		u64 new_tb = tb + vc->tb_offset;
- 		mtspr(SPRN_TBU40, new_tb);
- 		tb = mftb();
- 		if ((tb & 0xffffff) < (new_tb & 0xffffff))
-@@ -3760,7 +3761,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+@@ -3761,6 +3761,18 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
  	if (!(vcpu->arch.ctrl & 1))
  		mtspr(SPRN_CTRLT, mfspr(SPRN_CTRLF) & ~1);
  
--	mtspr(SPRN_DEC, vcpu->arch.dec_expires - mftb());
-+	mtspr(SPRN_DEC, vcpu->arch.dec_expires - tb);
++	/*
++	 * When setting DEC, we must always deal with irq_work_raise via NMI vs
++	 * setting DEC. The problem occurs right as we switch into guest mode
++	 * if a NMI hits and sets pending work and sets DEC, then that will
++	 * apply to the guest and not bring us back to the host.
++	 *
++	 * irq_work_raise could check a flag (or possibly LPCR[HDICE] for
++	 * example) and set HDEC to 1? That wouldn't solve the nested hv
++	 * case which needs to abort the hcall or zero the time limit.
++	 *
++	 * XXX: Another day's problem.
++	 */
+ 	mtspr(SPRN_DEC, vcpu->arch.dec_expires - tb);
  
  	if (kvmhv_on_pseries()) {
- 		/*
-@@ -3895,7 +3896,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	vc->in_guest = 0;
+@@ -3897,6 +3909,9 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
  
  	next_timer = timer_get_next_tb();
--	mtspr(SPRN_DEC, next_timer - mftb());
-+	mtspr(SPRN_DEC, next_timer - tb);
+ 	mtspr(SPRN_DEC, next_timer - tb);
++	/* We may have raced with new irq work */
++	if (test_irq_work_pending())
++		set_dec(1);
  	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
  
  	kvmhv_load_host_pmu();
