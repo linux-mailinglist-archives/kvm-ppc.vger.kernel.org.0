@@ -2,59 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 419DB353A88
-	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:20:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC3AD353A89
+	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:20:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231824AbhDEBUQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 4 Apr 2021 21:20:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39656 "EHLO
+        id S231826AbhDEBUZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 4 Apr 2021 21:20:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231823AbhDEBUQ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:20:16 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E78FFC061756
-        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:20:10 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id il9-20020a17090b1649b0290114bcb0d6c2so7100798pjb.0
-        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:20:10 -0700 (PDT)
+        with ESMTP id S231656AbhDEBUY (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:20:24 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD4BCC061756
+        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:20:14 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id g35so2418127pgg.9
+        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:20:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=OfjZBYhIkDtimAOFPQqSOyFCP6WGylRgGDnOYsNsrRY=;
-        b=Ia1SRBaNSSim5ddLtX57Kg+v5iFWsYO3Uoyt8Cwc/KA7JJ4DsJCpGkOxQ8Uau4m+8U
-         bvpiz+9xI+6am6uHbDy01kyJnbLHE+DdeWkByXrlVxqgBbgmvRcBOJzewToKrPE6cQud
-         nBwob2tEPStDffdYMeTktHNm+FmE8JZ3NWAeY/Okf9hgscz5ASZNbeKMxOYDfuxriHdU
-         Dgya82Ib0V0yoVlRI+Wz+R8pbWOwWLSD+frSh5dG94y41MP+pGTmYaJjOdBUssx5Q+4P
-         Lf1VGjKyprF443OeOEA2YJIh3OtS+6TvwUyRIMANUR8P5DH3H7lIv7WWyzbreJv5/UKU
-         7ujA==
+        bh=2ljQ2o/1KJXmV5budvf2xHhIW20DBRLuADvMqiJ21X0=;
+        b=jteegXL22i+h9UVPqzn2fKvO68awdCVK3/kmTXzoyUnBcLbviueKoFI+ypqp8rvTw3
+         Q+wiC7tzAFBILyZdrXGElHnzu2vR4ujsIz1szk24wBflaorLv9Sc57jZ3fIY8ylC4LnX
+         ckclJGWyS2ugmRrEJM2liYX4/0e3ILdx4973YzOEcwakKJ8abSW06w397K1P/SH6Ld90
+         wZkVMRsWCh5SPnaYm4WgEhuL9rKuFyMLq+IyUDFdv210jbVe+1zcvlRM+7nvlcIud5xc
+         RunY0YAzhPRN7YiyWhtnfdFB34KPQGDpjxc/dwqUjSrr9YGFXuED5iB2JA1BCaH5ZK5N
+         hXnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=OfjZBYhIkDtimAOFPQqSOyFCP6WGylRgGDnOYsNsrRY=;
-        b=KQeSsfD8j/bejtS5Y7YtZgqMrhfXiQF4L2POT1YbuOksZISKHbRzjmh3oQ/aZJIMUp
-         fjwlonFl1e3j+Kq7xEedJ969ig5jd+5uVx6eqcrM/OHUy9dgyCdjxK+gqIUMqxwtpq31
-         ODuM2caKF5omAquk6oXW/HgNAM3UBAhG21ceBA20i9b1pXNhPqMGrFJQU77VpCcZXyq4
-         TGE9jAm+ojrbMI2cGgdp9NUotXUGN6MPy9dIcvUnVkU3JK59OV8LrtMTJNwOaB2cPVKN
-         frszNAbOzmtQsfpPnp2evg7HT1CicShM0zJj88ho6IrytSd9nsE3uY+XMbXV0IrSskO7
-         /nyQ==
-X-Gm-Message-State: AOAM5323MGIz9BqUcikuloCx/3b0NvZZyOYiQRAhxdc0lN3FTWUWCQJ2
-        LXWYKRvubrkdHL7gwxU9a+PgpZ4ndmps1A==
-X-Google-Smtp-Source: ABdhPJwLOBc7+aa0W2w927sGnl26UcGB/vIhK+cm1ecZtNxEWHUlVlipg0jT1jyE22ABhG826u6aVw==
-X-Received: by 2002:a17:90a:f2cf:: with SMTP id gt15mr7466893pjb.49.1617585610438;
-        Sun, 04 Apr 2021 18:20:10 -0700 (PDT)
+        bh=2ljQ2o/1KJXmV5budvf2xHhIW20DBRLuADvMqiJ21X0=;
+        b=i4KFz35LKWmGjEdLeID2YDSCRPkD/PiE0S0k/MJZAGTjtgC+t64lNRi9hNnVXXqulR
+         sr9rthj5uqyNfDw4mYAX72+RgSKhQd4fsp3KWsKNemJ9WKrYoOU1JM39UXw2IplL39Q9
+         md6PiRHguFwFeDePUH0X8U0tnej3A/+GgdMSEHXHocj/n2oyQs/ViDIa5gcLItZUIGDa
+         OABwJEvu8PbNbBgAnML+5ESa9JaqU9FEOi0ssiInPUEDUwz7Yd6VVWYmrI6nH7Bq6hGP
+         H2e74W1gfEnOYXI20PEzeS3U64LF+IomCZ23EFxOvorKVVJfPlGSBDasebr653Nh1OKq
+         nC1w==
+X-Gm-Message-State: AOAM531cddICPVgtvypDfIvzITRQ8aH9AIPMHApJ0dqS0VQZEStXIxDH
+        Y7erzPpNnjN7NUF2vRHPx63TKOpAtPA3SQ==
+X-Google-Smtp-Source: ABdhPJy4e6XKE8ykNm7P8y7vG58oHuwFcXPgmxUmMJ1wX3FpQZ9izeGtMahOaoXNWJTWTTcgx2o7LQ==
+X-Received: by 2002:a65:6645:: with SMTP id z5mr20660659pgv.273.1617585614266;
+        Sun, 04 Apr 2021 18:20:14 -0700 (PDT)
 Received: from bobo.ibm.com ([1.132.215.134])
-        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.20.07
+        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.20.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Apr 2021 18:20:10 -0700 (PDT)
+        Sun, 04 Apr 2021 18:20:14 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Fabiano Rosas <farosas@linux.ibm.com>
-Subject: [PATCH v6 03/48] KVM: PPC: Book3S HV: Disallow LPCR[AIL] to be set to 1 or 2
-Date:   Mon,  5 Apr 2021 11:19:03 +1000
-Message-Id: <20210405011948.675354-4-npiggin@gmail.com>
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: [PATCH v6 04/48] KVM: PPC: Book3S HV: Prevent radix guests setting LPCR[TC]
+Date:   Mon,  5 Apr 2021 11:19:04 +1000
+Message-Id: <20210405011948.675354-5-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210405011948.675354-1-npiggin@gmail.com>
 References: <20210405011948.675354-1-npiggin@gmail.com>
@@ -64,44 +63,30 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-These are already disallowed by H_SET_MODE from the guest, also disallow
-these by updating LPCR directly.
+Prevent radix guests setting LPCR[TC]. This bit only applies to hash
+partitions.
 
-AIL modes can affect the host interrupt behaviour while the guest LPCR
-value is set, so filter it here too.
-
-Acked-by: Paul Mackerras <paulus@ozlabs.org>
-Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/powerpc/kvm/book3s_hv.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index d2c7626cb960..daded8949a39 100644
+index daded8949a39..a6b5d79d9306 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -803,7 +803,10 @@ static int kvmppc_h_set_mode(struct kvm_vcpu *vcpu, unsigned long mflags,
- 		vcpu->arch.dawrx1 = value2;
- 		return H_SUCCESS;
- 	case H_SET_MODE_RESOURCE_ADDR_TRANS_MODE:
--		/* KVM does not support mflags=2 (AIL=2) */
-+		/*
-+		 * KVM does not support mflags=2 (AIL=2) and AIL=1 is reserved.
-+		 * Keep this in synch with kvmppc_filter_guest_lpcr_hv.
-+		 */
- 		if (mflags != 0 && mflags != 3)
- 			return H_UNSUPPORTED_FLAG_START;
- 		return H_TOO_HARD;
-@@ -1645,6 +1648,8 @@ unsigned long kvmppc_filter_lpcr_hv(struct kvm *kvm, unsigned long lpcr)
+@@ -1645,6 +1645,10 @@ static int kvm_arch_vcpu_ioctl_set_sregs_hv(struct kvm_vcpu *vcpu,
+  */
+ unsigned long kvmppc_filter_lpcr_hv(struct kvm *kvm, unsigned long lpcr)
+ {
++	/* LPCR_TC only applies to HPT guests */
++	if (kvm_is_radix(kvm))
++		lpcr &= ~LPCR_TC;
++
  	/* On POWER8 and above, userspace can modify AIL */
  	if (!cpu_has_feature(CPU_FTR_ARCH_207S))
  		lpcr &= ~LPCR_AIL;
-+	if ((lpcr & LPCR_AIL) != LPCR_AIL_3)
-+		lpcr &= ~LPCR_AIL; /* LPCR[AIL]=1/2 is disallowed */
- 
- 	/*
- 	 * On POWER9, allow userspace to enable large decrementer for the
 -- 
 2.23.0
 
