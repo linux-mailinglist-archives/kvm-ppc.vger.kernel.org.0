@@ -2,58 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42230353AA4
-	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:21:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 215D0353AA5
+	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:21:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231852AbhDEBVs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 4 Apr 2021 21:21:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40028 "EHLO
+        id S231555AbhDEBVu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 4 Apr 2021 21:21:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231851AbhDEBVr (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:21:47 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C93F2C061756
-        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:21:39 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id q5so7186063pfh.10
-        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:21:39 -0700 (PDT)
+        with ESMTP id S231848AbhDEBVs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:21:48 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F4C2C0613E6
+        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:21:43 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id t20so4905745plr.13
+        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:21:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=+yz3nCHgncTH1iYxogo/O0czpRYa7H+0gjI15C0SIns=;
-        b=tTgscvMkNalSwwTNq71/3p8BkL40aWAK/vQgyTG0WMQCn5gWjt9K6vG0CmxuIDZr/e
-         1etwZED7jEAYE7P5CChqkKaLiEYM+Jn+990O4da6mdvImhCuvSMu+pMjDGq9CX6LNzxy
-         urBXqWrP5l43MRHkctsoxSPuFKRKk617Bo0WfySnBQLK8IJ0b1X9oZO/zvV7v7OkUF4q
-         rZCwKXPlmDony8iIiegr9MmEO129bxBlpQxW08twke97y1uEUGd7+XB+zh/ysKGCOI+p
-         fq4iV+GhdPk/C1oX/ySjB13HfTilsZS2ZISqv+FoAfM1lqBMwrU47TXYneKvUloeHUz+
-         ZFTA==
+        bh=Cd6t9aTE+ivLiFaiPdzeNP2ex++q6hisetNhEX3OXsw=;
+        b=LREuIrsaCjYT8AboqP4MfBoV3/XCl++F7ttb+RX3mwsD7vP8v3Oi5X4r2DkyjSN431
+         kWuZhm87hRLZoDBzJ7Qk3mAS5tUITmf0Bx7rCWjlkNinF1Icsvp1y4Cm1+duLvyGJ8Q9
+         MIFUrWTaBhIaerG22AxSTpmupYLeDBIF0JE9R73FN6YUW8Nx4TfmTQ3928+YarBHemHH
+         LQvAyO77o/tu+Ujdq/B3mjz7jmTmtT9LojRX93w4HFU5LB2EkW024lWque8r28DP9pEs
+         LU6R5QthVPPq51WFAI7UnKjnuz3btLRbw22aQulnkrOBvV9Iy37OiZLnDMVGGezxxgQK
+         p6fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=+yz3nCHgncTH1iYxogo/O0czpRYa7H+0gjI15C0SIns=;
-        b=gX977CVXcIjrS+ayS1KS/Ooh03LWYG6uQuRe0VnUBAFThthjT2oSceAxmhFsGv9fL/
-         jGeP/Xp31B34Y61qMc0bIAK8+bNgtn2FA0AxPmI6yLfZe2KVko6t73CMOqs+eT5YtZt4
-         UCfdhMbnadMqhEVfJHSHN3SWgemwegSFQHwNOOfRwWBjhKdvdeay+BaIYVPwPSeANSPa
-         CupV1LPkJKAxKlRbjlvktu4EEFfPvxAoOalbGaydrTby0Ja4/ec9U/E7UVp79jzOtEPT
-         fUhsZ21idaP0b4rvUxUd8RRUdPsllGEaEv2LrnEjAyY8pkGLtdCrbYwK5WV0x3nJi7J9
-         SgxQ==
-X-Gm-Message-State: AOAM531qRgTMgu1LX6SwqtMFQflX27qXWEU5DYAh38BeUQJ9kswKaBzr
-        fTrACkxLbh7n9UJTDOwgo4eXJK88Zi/MQg==
-X-Google-Smtp-Source: ABdhPJxG/XX78xpw1PSF9I438oh7eHsSm3t8WDghRmuYLmmb29ptdu+WOVjzBD9Zt2FgGGlgszJo1Q==
-X-Received: by 2002:a62:8f4a:0:b029:20a:448e:7018 with SMTP id n71-20020a628f4a0000b029020a448e7018mr21215419pfd.62.1617585699303;
-        Sun, 04 Apr 2021 18:21:39 -0700 (PDT)
+        bh=Cd6t9aTE+ivLiFaiPdzeNP2ex++q6hisetNhEX3OXsw=;
+        b=ozuLVaI0oyjeFHDaXUp9bi0vnDw8X0xul8UecE+uy5klGzmB/WpN4e7/5YJuF+FOjB
+         np2LAaPYlCHyvKtZZcFDuUS5qDQlI6uizOy1JiqUhtC/lo2YIMz2WQHNtimavHeYBlqs
+         q2INGDteG7nKpwGjZeF1FafkZmZacQrx2dpGj2WFdFRMYLY4r7vxms6W/aXiq+8d6J4K
+         LSqtp5vs7GsvORa1JMWQ3YviTXU2QglKBhvcXoHej/Py8TRudywLR1oTTOf+XVuZ9JH5
+         GE8AJu7HP/iPpzyvurLe1OKRyzx4SFf+ELVGxTyl4meLfXIQ2WAhLti5cqfE9zCfErQN
+         dLUQ==
+X-Gm-Message-State: AOAM531a8IouN/PfTgQDUjRBhvmL3CDssG2O1e4/vMYCF6uGCdnGAP+w
+        tRkHy9YVwEJnuzCiUsDGtS8FHEyvpwVPNw==
+X-Google-Smtp-Source: ABdhPJy6xdTPqpr/7ODLjZgW9V1v5ekNi6yVVZF4iPqdbpjZdSsV1KfahPb5OxVnyQg0k3af88ZEyg==
+X-Received: by 2002:a17:90b:4d0f:: with SMTP id mw15mr24363649pjb.92.1617585702565;
+        Sun, 04 Apr 2021 18:21:42 -0700 (PDT)
 Received: from bobo.ibm.com ([1.132.215.134])
-        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.21.36
+        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.21.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Apr 2021 18:21:39 -0700 (PDT)
+        Sun, 04 Apr 2021 18:21:42 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
-        Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: [PATCH v6 28/48] KMV: PPC: Book3S HV: Use set_dec to set decrementer to host
-Date:   Mon,  5 Apr 2021 11:19:28 +1000
-Message-Id: <20210405011948.675354-29-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v6 29/48] powerpc/time: add API for KVM to re-arm the host timer/decrementer
+Date:   Mon,  5 Apr 2021 11:19:29 +1000
+Message-Id: <20210405011948.675354-30-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210405011948.675354-1-npiggin@gmail.com>
 References: <20210405011948.675354-1-npiggin@gmail.com>
@@ -63,33 +62,129 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The host Linux timer code arms the decrementer with the value
-'decrementers_next_tb - current_tb' using set_dec(), which stores
-val - 1 on Book3S-64, which is not quite the same as what KVM does
-to re-arm the host decrementer when exiting the guest.
+Rather than have KVM look up the host timer and fiddle with the
+irq-work internal details, have the powerpc/time.c code provide a
+function for KVM to re-arm the Linux timer code when exiting a
+guest.
 
-This shouldn't be a significant change, but it makes the logic match
-and avoids this small extra change being brought into the next patch.
+This is implementation has an improvement over existing code of
+marking a decrementer interrupt as soft-pending if a timer has
+expired, rather than setting DEC to a -ve value, which tended to
+cause host timers to take two interrupts (first hdec to exit the
+guest, then the immediate dec).
 
-Suggested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/powerpc/include/asm/time.h |  4 ++++
+ arch/powerpc/kernel/time.c      | 41 +++++++++++++++++++++++++--------
+ arch/powerpc/kvm/book3s_hv.c    |  6 +----
+ 3 files changed, 37 insertions(+), 14 deletions(-)
 
+diff --git a/arch/powerpc/include/asm/time.h b/arch/powerpc/include/asm/time.h
+index 0128cd9769bc..924b2157882f 100644
+--- a/arch/powerpc/include/asm/time.h
++++ b/arch/powerpc/include/asm/time.h
+@@ -106,6 +106,10 @@ static inline u64 timer_get_next_tb(void)
+ 	return __this_cpu_read(decrementers_next_tb);
+ }
+ 
++#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
++void timer_rearm_host_dec(u64 now);
++#endif
++
+ /* Convert timebase ticks to nanoseconds */
+ unsigned long long tb_to_ns(unsigned long long tb_ticks);
+ 
+diff --git a/arch/powerpc/kernel/time.c b/arch/powerpc/kernel/time.c
+index 8b9b38a8ce57..8bbcc6be40c0 100644
+--- a/arch/powerpc/kernel/time.c
++++ b/arch/powerpc/kernel/time.c
+@@ -563,13 +563,43 @@ void arch_irq_work_raise(void)
+ 	preempt_enable();
+ }
+ 
++static void set_dec_or_work(u64 val)
++{
++	set_dec(val);
++	/* We may have raced with new irq work */
++	if (unlikely(test_irq_work_pending()))
++		set_dec(1);
++}
++
+ #else  /* CONFIG_IRQ_WORK */
+ 
+ #define test_irq_work_pending()	0
+ #define clear_irq_work_pending()
+ 
++static void set_dec_or_work(u64 val)
++{
++	set_dec(val);
++}
+ #endif /* CONFIG_IRQ_WORK */
+ 
++#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
++void timer_rearm_host_dec(u64 now)
++{
++	u64 *next_tb = this_cpu_ptr(&decrementers_next_tb);
++
++	WARN_ON_ONCE(!arch_irqs_disabled());
++	WARN_ON_ONCE(mfmsr() & MSR_EE);
++
++	if (now >= *next_tb) {
++		now = *next_tb - now;
++		set_dec_or_work(now);
++	} else {
++		local_paca->irq_happened |= PACA_IRQ_DEC;
++	}
++}
++EXPORT_SYMBOL_GPL(timer_rearm_host_dec);
++#endif
++
+ /*
+  * timer_interrupt - gets called when the decrementer overflows,
+  * with interrupts disabled.
+@@ -630,10 +660,7 @@ DEFINE_INTERRUPT_HANDLER_ASYNC(timer_interrupt)
+ 	} else {
+ 		now = *next_tb - now;
+ 		if (now <= decrementer_max)
+-			set_dec(now);
+-		/* We may have raced with new irq work */
+-		if (test_irq_work_pending())
+-			set_dec(1);
++			set_dec_or_work(now);
+ 		__this_cpu_inc(irq_stat.timer_irqs_others);
+ 	}
+ 
+@@ -875,11 +902,7 @@ static int decrementer_set_next_event(unsigned long evt,
+ 				      struct clock_event_device *dev)
+ {
+ 	__this_cpu_write(decrementers_next_tb, get_tb() + evt);
+-	set_dec(evt);
+-
+-	/* We may have raced with new irq work */
+-	if (test_irq_work_pending())
+-		set_dec(1);
++	set_dec_or_work(evt);
+ 
+ 	return 0;
+ }
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index dae59f05ef50..65ddae3958ab 100644
+index 65ddae3958ab..353a0c8b79fa 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3908,7 +3908,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+@@ -3907,11 +3907,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	vc->entry_exit_map = 0x101;
  	vc->in_guest = 0;
  
- 	next_timer = timer_get_next_tb();
--	mtspr(SPRN_DEC, next_timer - tb);
-+	set_dec(next_timer - tb);
- 	/* We may have raced with new irq work */
- 	if (test_irq_work_pending())
- 		set_dec(1);
+-	next_timer = timer_get_next_tb();
+-	set_dec(next_timer - tb);
+-	/* We may have raced with new irq work */
+-	if (test_irq_work_pending())
+-		set_dec(1);
++	timer_rearm_host_dec(tb);
+ 	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
+ 
+ 	kvmhv_load_host_pmu();
 -- 
 2.23.0
 
