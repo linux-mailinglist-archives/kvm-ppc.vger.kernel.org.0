@@ -2,59 +2,60 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFE59353A8D
-	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:20:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 692F1353A8F
+	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:20:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231828AbhDEBUg (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 4 Apr 2021 21:20:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39736 "EHLO
+        id S231830AbhDEBUo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 4 Apr 2021 21:20:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231827AbhDEBUf (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:20:35 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9472BC061756
-        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:20:30 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id w10so1675739pgh.5
-        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:20:30 -0700 (PDT)
+        with ESMTP id S231827AbhDEBUn (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:20:43 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B0CC061756
+        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:20:35 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id t24so1192464pjw.4
+        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:20:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=z2fLHBAlH6bMHiwD8ZSE8QbPd3NRupfIKb21fqNXnZg=;
-        b=e8CUUZP4iaV+gW+BtowJx1AyJ3m/Ri0uxOf/sCp9zB7xk7RBRD6Uza50KgP3YgvzB1
-         mpUvJj9rSjaxtYn1V1J4eEbJbEKHHDaK02sGf8IiJbGHEVsevUs+siSc1gPbvf8uehVV
-         PcnvbSfIr2qAze0h4EZKr++J9GDyd21pREMud5dnakft0jBNwi1159pp56AUovUwKJiX
-         3tetKg4XAqeWRWb6a6obmaLAzvxtstMzFDDa2deF9dtdT9lIYCKawxmjZkyvABD1XBar
-         CXwKuvM7aBUBpIjTOQ6UkHUpyyAxU4B2HwZUB6QL0Eod+oicIS5ea9ElrtlvlVPFblZ4
-         lqUw==
+        bh=d/LPXjK92NbOrRa0PeaBki14cO228KIgPnhx2QtNvNo=;
+        b=DDRSr5jwRsiT2dvsHefsVNe0wEkujn8kPwsfJQ1nnAy+62x3pXmdNkjnm44KI9+rud
+         KsF3F+5HLP0oyZIj3lZ6A9MGMjmgAympt3R+Ao4H3V2h4sC2m8mCrdC1lylRDYA1j0R0
+         xmaTR9qItovcvzQ3hdtgbNdIETV67gm7f4X5EOXvIWUZIPgj16dSTrs7RGGoQZlSlJrs
+         c6x3AMkXABxiBV0yc4H5C63zN2HTAYEt35PBVo4FPAgG9aO+8KMHSCX1817tut0mDrIe
+         /nxa4EDEKJmg8LN3+ChotvsWKOp4JAHjZi2PVzpcSKKro7Zu4WaeNQfkiBg8mWX0iamM
+         uA6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=z2fLHBAlH6bMHiwD8ZSE8QbPd3NRupfIKb21fqNXnZg=;
-        b=DeIHEu2pHQ5sWhRy2i84KuSooiJecLsVMF0PM93udJf6oukAJ2iTIA0PDlS+cuOt2Q
-         WxJikREGbSUIjUcrp93MiEwNiU916wNOCuprNouKrpvlNMOIld4hMWUy7AAxW+yWcnb+
-         nW4ZVUJ4ngugD/vXc1R3eGj75wQmjT24S22m5E89t+0rq4304yzaanNXJKa/ayEjrH2V
-         iA6/0uVrCIxZVrQ87G8ktrR/47h3bkb6zUEVLlNwC7qCmD64XCy+cgEl4/ZbvueCyrAV
-         g7IN5h8yL5cFR4azfAoRKOqSi7v9W/9KI75USMDOqg7gNr6XWB/uQ74ALu/h6R1pdXNk
-         Ow1w==
-X-Gm-Message-State: AOAM531ZlGVXDZPGs1YdsNTW80+Xv2acoGlxB0uq5cX1VAyMSSvKP6Ok
-        /iaU5RU4R2RKVr9DibcApyFE/9gSPCctSw==
-X-Google-Smtp-Source: ABdhPJxv/d+H/pav+GLr07qdpRh1R0m5IeEnIE0Oey9cIjcnLA8r9QXq7CzegkEoEWf0qP+uaGdaqA==
-X-Received: by 2002:a63:43c2:: with SMTP id q185mr20716518pga.41.1617585630041;
-        Sun, 04 Apr 2021 18:20:30 -0700 (PDT)
+        bh=d/LPXjK92NbOrRa0PeaBki14cO228KIgPnhx2QtNvNo=;
+        b=m1GKHCWWMUb/jpPxKFdxR2wuNgFTP0+ioOO33aaj9L9Zon60SS/KBUhDWuOjDl6l6N
+         xVdUPsuFCFSpuFnNHJIllSO3DoZKNxP4dVkpehq42RpiRoBr/tYF35jFR6aB9GOU79/0
+         sTFA4H7NY+VOPgyIUiDPxo0aFG19J2/RyiLOKNJbrRZawkscTPqrZa/i10SbZxIZoHzB
+         AybXHJQREghqlcfyk4xszAHSrZChmmhNRd+glevaMFy7WEnEV8DztCkB2bRFlgr6kVXi
+         lk/GRVaB6IKUjMoZ4Wt/P7UZiyXhQ4lzmcIYcSmFuBCBbeNQR64m5drmHl15QlR3/Qsn
+         CFSQ==
+X-Gm-Message-State: AOAM5309LwqXYXDPmqn7r3MzO3mMbxpxhJ3PUy593TGT4acr5CgoYNqy
+        DFu2gVgJNq6iW8Xkb9AlIz0pf57fN64X2g==
+X-Google-Smtp-Source: ABdhPJys3TkaeqCURnzpiDgIzaQ9FVU//McEKHlQFYV6EF3gG7ZW8hRaiHX3Ai1aQf9Q/dZjLFy3eg==
+X-Received: by 2002:a17:90a:fa7:: with SMTP id 36mr8541313pjz.80.1617585634599;
+        Sun, 04 Apr 2021 18:20:34 -0700 (PDT)
 Received: from bobo.ibm.com ([1.132.215.134])
-        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.20.26
+        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.20.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Apr 2021 18:20:29 -0700 (PDT)
+        Sun, 04 Apr 2021 18:20:34 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
         Paul Mackerras <paulus@ozlabs.org>,
+        Daniel Axtens <dja@axtens.net>,
         Fabiano Rosas <farosas@linux.ibm.com>
-Subject: [PATCH v6 08/48] powerpc/64s: Remove KVM handler support from CBE_RAS interrupts
-Date:   Mon,  5 Apr 2021 11:19:08 +1000
-Message-Id: <20210405011948.675354-9-npiggin@gmail.com>
+Subject: [PATCH v6 09/48] powerpc/64s: remove KVM SKIP test from instruction breakpoint handler
+Date:   Mon,  5 Apr 2021 11:19:09 +1000
+Message-Id: <20210405011948.675354-10-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210405011948.675354-1-npiggin@gmail.com>
 References: <20210405011948.675354-1-npiggin@gmail.com>
@@ -64,46 +65,42 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Cell does not support KVM.
+The code being executed in KVM_GUEST_MODE_SKIP is hypervisor code with
+MSR[IR]=0, so the faults of concern are the d-side ones caused by access
+to guest context by the hypervisor.
+
+Instruction breakpoint interrupts are not a concern here. It's unlikely
+any good would come of causing breaks in this code, but skipping the
+instruction that caused it won't help matters (e.g., skip the mtmsr that
+sets MSR[DR]=0 or clears KVM_GUEST_MODE_SKIP).
+
+ [Paul notes: the 0x1300 interrupt was dropped from the architecture a
+  long time ago and is not generated by P7, P8, P9 or P10.]
+
+In fact it does not exist in ISA v2.01, which is the earliest supported
+now, but did exist in 600 series designs (some of the earliest 64-bit
+powerpcs), so it could probably be removed entirely.
 
 Acked-by: Paul Mackerras <paulus@ozlabs.org>
+Reviewed-by: Daniel Axtens <dja@axtens.net>
 Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kernel/exceptions-64s.S | 6 ------
- 1 file changed, 6 deletions(-)
+ arch/powerpc/kernel/exceptions-64s.S | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/arch/powerpc/kernel/exceptions-64s.S b/arch/powerpc/kernel/exceptions-64s.S
-index 8082b690e874..a0515cb829c2 100644
+index a0515cb829c2..c9c446ccff54 100644
 --- a/arch/powerpc/kernel/exceptions-64s.S
 +++ b/arch/powerpc/kernel/exceptions-64s.S
-@@ -2530,8 +2530,6 @@ EXC_VIRT_NONE(0x5100, 0x100)
- INT_DEFINE_BEGIN(cbe_system_error)
- 	IVEC=0x1200
- 	IHSRR=1
+@@ -2553,7 +2553,6 @@ EXC_VIRT_NONE(0x5200, 0x100)
+ INT_DEFINE_BEGIN(instruction_breakpoint)
+ 	IVEC=0x1300
+ #ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
 -	IKVM_SKIP=1
--	IKVM_REAL=1
- INT_DEFINE_END(cbe_system_error)
- 
- EXC_REAL_BEGIN(cbe_system_error, 0x1200, 0x100)
-@@ -2701,8 +2699,6 @@ EXC_COMMON_BEGIN(denorm_exception_common)
- INT_DEFINE_BEGIN(cbe_maintenance)
- 	IVEC=0x1600
- 	IHSRR=1
--	IKVM_SKIP=1
--	IKVM_REAL=1
- INT_DEFINE_END(cbe_maintenance)
- 
- EXC_REAL_BEGIN(cbe_maintenance, 0x1600, 0x100)
-@@ -2754,8 +2750,6 @@ EXC_COMMON_BEGIN(altivec_assist_common)
- INT_DEFINE_BEGIN(cbe_thermal)
- 	IVEC=0x1800
- 	IHSRR=1
--	IKVM_SKIP=1
--	IKVM_REAL=1
- INT_DEFINE_END(cbe_thermal)
- 
- EXC_REAL_BEGIN(cbe_thermal, 0x1800, 0x100)
+ 	IKVM_REAL=1
+ #endif
+ INT_DEFINE_END(instruction_breakpoint)
 -- 
 2.23.0
 
