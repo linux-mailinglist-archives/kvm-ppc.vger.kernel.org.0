@@ -2,60 +2,59 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 248FD353A8A
-	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:20:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9443353A8B
+	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:20:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231656AbhDEBUZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 4 Apr 2021 21:20:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39692 "EHLO
+        id S231829AbhDEBUc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 4 Apr 2021 21:20:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231823AbhDEBUY (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:20:24 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E220BC0613E6
-        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:20:18 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id kk2-20020a17090b4a02b02900c777aa746fso5057532pjb.3
-        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:20:18 -0700 (PDT)
+        with ESMTP id S231827AbhDEBU2 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:20:28 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04E70C061756
+        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:20:23 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id g10so4917157plt.8
+        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:20:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=r+tYArWWu4RNguNhduAefXr3uYY9Yl8n8bH2Jfs1pRM=;
-        b=a4aZwsMyJMu0C2njYTAugBqlrA3Wtd9fBeEXZbaMVzQOqhS+VRBfLESrOHM1kj2r7H
-         vmFtmrCzQ31NDpX0fzyY8EKDYYaGe0+1w0ED3QEeMuCZzW7SknzsWnHvnnrLircpqAwc
-         rPb6x6I0KwMLWFWLAPmPH04RzAGG2S0niXJJ1rOF4EQb/fLFRPVKwtjOVAk821DfMJsB
-         onLP78tagVcZCDjvieZJYCvfh8XDODx6koYytXN/NuEYRrHTTdKXn/lOD8h8CsFRFZGA
-         YjVtgegcvRsVuG4w1KsIoqxxBPOiQNOPo8cVC7xY39RYeZ5Ovu+CPGAA3AHFlMCVJ1bM
-         GiXg==
+        bh=kcMSsKOd9XJdn7alZvC43Pwxot302AJo0nnXaxeTFDs=;
+        b=oFuGn8uX+ROQHvXOx9JhZf+MLrC6LVCvFmuGEVKre8zV53rMFZFlLyFkqKvEA8ZnGP
+         bqIT3G31WiEYLEOKfDo/DpHuT9SoQrqcXnMI5U6n3tXaleXSBO8ARK/SVPWFRVciRGft
+         VoxiJ7SVLJM8DXFqm2pnSRp0bpKeizMkh++ZVQLPeDpI0hZ6P1PP/ePO8VaemLvmww+Z
+         07h5qNP6YFA6R+Q4oJftIcT8xlMN7ed+OEZR3SKciXmMAD6xoPqGbvYWgoZjGHBLqlN1
+         7YpYmiQEsz0KBBP02dr0kXBE1zoQlD+Q2NKTDK9M44NBanc1JhVBc1jcwh7NDnK3akkH
+         BkVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=r+tYArWWu4RNguNhduAefXr3uYY9Yl8n8bH2Jfs1pRM=;
-        b=A85s3/+r3yEKE4fS1Y7AqCdFZLmaWcM1obHL3CN9rdFZJPHsQ69fafPDBQ5lSHUZvx
-         j80AtQU6WYbb/T4v6kcEFzCHAxwtQ2ems/jkTh3ZV9ccW1CfLc8RXvdA2l260141yNu4
-         e63f0dZY+9VHxlt343Qpg2qi3ZxT9hAesqcsFKDa4ZLgZzWybZ9DN3hSTbtCIYy8asWe
-         NmfyZW3EP2cezBjEsimnhm/uB30TUzBiPNbShHdKz8AO+WGg0wKEfTRji+NWD/r6vB2c
-         Kr5vadQSfiyG+MQ6QuFxpN866Ko9h6ihIoxzGKBQfTeOfUymsdeHt60JECkEMhcMxGhY
-         iWcg==
-X-Gm-Message-State: AOAM5335e9SScvBnYGj9Zc/AE74dpNKJzKPOlQmUChGXKr6PRoXnw/Gr
-        AwxSgkgtAUv/SyRGjIisZiSJxWu5WnbtSQ==
-X-Google-Smtp-Source: ABdhPJxO8avvP6Fy4tA7YQlADYX9ZQy7YGylbO9U124A+gY/JoOQkUkjK0BQQdv2Uk4srQBOb+VDMw==
-X-Received: by 2002:a17:90a:4309:: with SMTP id q9mr12625678pjg.40.1617585618454;
-        Sun, 04 Apr 2021 18:20:18 -0700 (PDT)
+        bh=kcMSsKOd9XJdn7alZvC43Pwxot302AJo0nnXaxeTFDs=;
+        b=PXG1uesfEpRwqbIb/d1d7T+9HYh+ms8fx2kJFxovyL9yaubpXC/zTxjWYo3APyKRt8
+         pZcFRJIo7zJ7t1BWC1w8mpaSq2hhjUDiVYIQcfnowZTHphkniEyhU9WByWlSBS7S6SBv
+         vhsDlyu4ZMFARfAaAZRlbyxg8/XA3mQUdB93kbtm/G7V6G4Pgo6FEGeUFUweepBi1NgZ
+         VMQ3dqsMn8rLXaZR22YLI8Iu/do8HP+ruFl5Y8iazySITRXcBo3muaYC5keMTlufFCgx
+         IlIH6NwW9YpTuNR4GSrYxzf8FV/dRpDc3tmYNqKU7BmHv6+xRUU49gZ9DKWhNoAQXNb8
+         tjEw==
+X-Gm-Message-State: AOAM531GOa7lgoTx0GkM6PPGuLWRk22ilw0lWoaZNhWh6qcIBgOcPaF+
+        KO3Nojt/OwWXgkdqLWXv1vCHgftErjC5Jg==
+X-Google-Smtp-Source: ABdhPJzu6OWLDH6qzyRrj0OWZN7Ppb3avbojcT1MReb+hAokjIRNAbh9i0Xlz//auLea/i8zqZPdSg==
+X-Received: by 2002:a17:90a:5d14:: with SMTP id s20mr24453563pji.6.1617585622570;
+        Sun, 04 Apr 2021 18:20:22 -0700 (PDT)
 Received: from bobo.ibm.com ([1.132.215.134])
-        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.20.14
+        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.20.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Apr 2021 18:20:18 -0700 (PDT)
+        Sun, 04 Apr 2021 18:20:22 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
         Paul Mackerras <paulus@ozlabs.org>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
         Daniel Axtens <dja@axtens.net>
-Subject: [PATCH v6 05/48] KVM: PPC: Book3S HV: Remove redundant mtspr PSPB
-Date:   Mon,  5 Apr 2021 11:19:05 +1000
-Message-Id: <20210405011948.675354-6-npiggin@gmail.com>
+Subject: [PATCH v6 06/48] KVM: PPC: Book3S HV: remove unused kvmppc_h_protect argument
+Date:   Mon,  5 Apr 2021 11:19:06 +1000
+Message-Id: <20210405011948.675354-7-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210405011948.675354-1-npiggin@gmail.com>
 References: <20210405011948.675354-1-npiggin@gmail.com>
@@ -65,28 +64,45 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This SPR is set to 0 twice when exiting the guest.
+The va argument is not used in the function or set by its asm caller,
+so remove it to be safe.
 
 Acked-by: Paul Mackerras <paulus@ozlabs.org>
-Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
 Reviewed-by: Daniel Axtens <dja@axtens.net>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 1 -
- 1 file changed, 1 deletion(-)
+ arch/powerpc/include/asm/kvm_ppc.h  | 3 +--
+ arch/powerpc/kvm/book3s_hv_rm_mmu.c | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index a6b5d79d9306..8bc2a5ee9ece 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3787,7 +3787,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	mtspr(SPRN_DSCR, host_dscr);
- 	mtspr(SPRN_TIDR, host_tidr);
- 	mtspr(SPRN_IAMR, host_iamr);
--	mtspr(SPRN_PSPB, 0);
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index 8aacd76bb702..9531b1c1b190 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -767,8 +767,7 @@ long kvmppc_h_remove(struct kvm_vcpu *vcpu, unsigned long flags,
+                      unsigned long pte_index, unsigned long avpn);
+ long kvmppc_h_bulk_remove(struct kvm_vcpu *vcpu);
+ long kvmppc_h_protect(struct kvm_vcpu *vcpu, unsigned long flags,
+-                      unsigned long pte_index, unsigned long avpn,
+-                      unsigned long va);
++                      unsigned long pte_index, unsigned long avpn);
+ long kvmppc_h_read(struct kvm_vcpu *vcpu, unsigned long flags,
+                    unsigned long pte_index);
+ long kvmppc_h_clear_ref(struct kvm_vcpu *vcpu, unsigned long flags,
+diff --git a/arch/powerpc/kvm/book3s_hv_rm_mmu.c b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
+index 88da2764c1bb..7af7c70f1468 100644
+--- a/arch/powerpc/kvm/book3s_hv_rm_mmu.c
++++ b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
+@@ -673,8 +673,7 @@ long kvmppc_h_bulk_remove(struct kvm_vcpu *vcpu)
+ }
  
- 	if (host_amr != vcpu->arch.amr)
- 		mtspr(SPRN_AMR, host_amr);
+ long kvmppc_h_protect(struct kvm_vcpu *vcpu, unsigned long flags,
+-		      unsigned long pte_index, unsigned long avpn,
+-		      unsigned long va)
++		      unsigned long pte_index, unsigned long avpn)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	__be64 *hpte;
 -- 
 2.23.0
 
