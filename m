@@ -2,236 +2,217 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50DF535360A
-	for <lists+kvm-ppc@lfdr.de>; Sun,  4 Apr 2021 02:48:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8200353A85
+	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Apr 2021 03:20:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236641AbhDDAso (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 3 Apr 2021 20:48:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35414 "EHLO
+        id S231819AbhDEBUG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 4 Apr 2021 21:20:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236526AbhDDAso (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 3 Apr 2021 20:48:44 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECEA7C061756
-        for <kvm-ppc@vger.kernel.org>; Sat,  3 Apr 2021 17:48:40 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id x21-20020a17090a5315b029012c4a622e4aso4197218pjh.2
-        for <kvm-ppc@vger.kernel.org>; Sat, 03 Apr 2021 17:48:40 -0700 (PDT)
+        with ESMTP id S231809AbhDEBUF (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 4 Apr 2021 21:20:05 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5588C061756
+        for <kvm-ppc@vger.kernel.org>; Sun,  4 Apr 2021 18:20:00 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id x26so464229pfn.0
+        for <kvm-ppc@vger.kernel.org>; Sun, 04 Apr 2021 18:20:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=5sj9nqmanNLXtOTWzV/X0F+zWCZ8SHkvEivksnNLpW4=;
-        b=l/1YNP9tv3kzpV79s6fOxeVnD96Xr8/ky/8M90sQhxBKuL9cryGea4Ks65y2UWImvy
-         u6hI+9aUkt3IGWUyGwBEtTI+JDKE2kTzUJqX4dtFH1mnbF6xpLQP2nbaEM3umt+QBccs
-         CF5IYYIeuUieDbE05lNnX/ZzIvd3YKJ6fXzzxFz/rWzbD7USqjtzjtJBnBsGbtvf9wtM
-         UJtfUX3/0eb7TzgucpIbNVQR6VzMAWLVBnSw8RUyP9awQmK4ZH5E/72orOno8THg0X1K
-         bJMtRh21pz0jvcKPVnCaOUixu0ax+m2edALPYyhN0WhCCKIDqpVSIoJSqltNDhfy/mUs
-         ZzaQ==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=89D5oB20Yk7SvhPXJDnEzHQ/SJWU+2gNh2+j+d+qtcQ=;
+        b=N2rJ/3VMbmrEl/xVGbkQLgNOYyxZ08BX8my7F002I2/GJ+aav9Oo14+D83NyzipNNy
+         h9V+lPdTdK1DcMK0fDJtwlCDfu1NGxAjHA+xqFeIjQFJyyKOcxAG34afNX5oTEw7EB7b
+         C0Bmc184V2ap4XwXIsTKexo2d99UPfy9nbG+NuNaWleTI3K+wyI6QVvHj1FvRVlp9Ayd
+         aD+xAgz90QNa9Y48WajC4KgaEq7XWGKV4q0uXtTM+COu4eVYozRG03InO9/9tmLaPnIu
+         WSY4wnVLTjol2iRv59Jjy+YoL7sU4TbptDGO38P+mGei7rCIwuHmeGGvqrOQbornG5Uz
+         Ho+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=5sj9nqmanNLXtOTWzV/X0F+zWCZ8SHkvEivksnNLpW4=;
-        b=qbQAnQHNC+8Nbz60p4PP0+QbRHqTttR+XYDbkzUS3636Jc09tFsdIr3/yrGT9r1yHF
-         IEOKjqafJlPBJD4oWiKm9Gtn06q8B387lNBYy29cH30iyFX9c5UKjG/1Ydw7r0uQufnR
-         e721KT6NVi17aOmuPh2do+Bz5TWSl3K5QuT7QQUr6De25Olfa3vnMsCYIjIoS52ra8la
-         NxS8xHXAXcMBCyoRkDe1uQhQePbB25fOCtY0iwf8LbSaz1NImx7QUvUOf1dpzA0hGNoL
-         I/8lHvPAzAvmxikCoEMqoXnk6MLl+gpGKhPMAKwo/Rywuin+c8ycKn40OhvTEVjk5hAL
-         RN8Q==
-X-Gm-Message-State: AOAM533/PozJKRLPGNJZtare3VCEeSYLndVWWoEK6reZsoxsAICiSs7k
-        H+MuYYQavgPnPQifrIaxp+P1BI88OcAJlw==
-X-Google-Smtp-Source: ABdhPJz1BQ6818NuJtxPjChi0IrsYIss9TXGirQfc52qNJhI80xCdas1oC4d5az0lSLOaHWjrJeTag==
-X-Received: by 2002:a17:902:7b90:b029:e6:f01d:9db2 with SMTP id w16-20020a1709027b90b02900e6f01d9db2mr18377010pll.69.1617497320424;
-        Sat, 03 Apr 2021 17:48:40 -0700 (PDT)
-Received: from localhost ([1.132.159.109])
-        by smtp.gmail.com with ESMTPSA id t7sm11100865pfg.69.2021.04.03.17.48.38
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=89D5oB20Yk7SvhPXJDnEzHQ/SJWU+2gNh2+j+d+qtcQ=;
+        b=iIUOfzeowOq9cbqcRRlxOKNTHeqbwfo0dfIJWOGRnNRTvVuyIq+LAVmNBlfO68GjPV
+         0kuQ3ZVWkX0mTsY4aapU7LwwpwK16N1n5dIBngVKF2ppLMGP5FXIDaXlDTfrDbYNUZpV
+         5QLgZw/IpCm7/ilLdvqsr89lq7YATFBRvIu8f3Dhcf2yy7ZRdk/dX9zb7XG1QyR4fN/k
+         R8KGYspbcCHPjBcrSqQt/luEs+L7a+qEp6pd6HAQcpR05drsvYUufndqwCaS2M2tm9bg
+         hmV08kr14TMgHkKSfp7dToFYF+wGN9pYGd5Kuq92880LUOHY6MXh7loh8o0iBOR6rMdq
+         c7Hw==
+X-Gm-Message-State: AOAM531Qh761PGR037uo2s/5CCSX6jdpwrya0usSB/cpvL7GvUd2lHEI
+        uQA7sX9BJKs/ouA6lIDOtYVbTLcg13EoEQ==
+X-Google-Smtp-Source: ABdhPJwCNJHnappHNR+KEwUFIJVFln31JD2rf+KgxV690PSJguwOBAxfHZjEmnM4MwFgVMaQ05eaXg==
+X-Received: by 2002:a63:e814:: with SMTP id s20mr21054362pgh.85.1617585599890;
+        Sun, 04 Apr 2021 18:19:59 -0700 (PDT)
+Received: from bobo.ibm.com ([1.132.215.134])
+        by smtp.gmail.com with ESMTPSA id e3sm14062536pfm.43.2021.04.04.18.19.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Apr 2021 17:48:39 -0700 (PDT)
-Date:   Sun, 04 Apr 2021 10:48:33 +1000
+        Sun, 04 Apr 2021 18:19:59 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v5 41/48] KVM: PPC: Book3S HV: Remove unused nested HV
- tests in XICS emulation
-To:     =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>,
-        kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org
-References: <20210401150325.442125-1-npiggin@gmail.com>
-        <20210401150325.442125-42-npiggin@gmail.com>
-        <9a8250f2-72a6-32df-ab01-36f8d16e73df@kaod.org>
-In-Reply-To: <9a8250f2-72a6-32df-ab01-36f8d16e73df@kaod.org>
+To:     kvm-ppc@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v6 00/48] KVM: PPC: Book3S: C-ify the P9 entry/exit code
+Date:   Mon,  5 Apr 2021 11:19:00 +1000
+Message-Id: <20210405011948.675354-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Message-Id: <1617496786.gl0te7k1yh.astroid@bobo.none>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from C=C3=A9dric Le Goater's message of April 3, 2021 2:32 am:
-> On 4/1/21 5:03 PM, Nicholas Piggin wrote:
->> Commit f3c18e9342a44 ("KVM: PPC: Book3S HV: Use XICS hypercalls when
->> running as a nested hypervisor") added nested HV tests in XICS
->> hypercalls, but not all are required.
->>=20
->> * icp_eoi is only called by kvmppc_deliver_irq_passthru which is only
->>   called by kvmppc_check_passthru which is only caled by
->>   kvmppc_read_one_intr.
->>=20
->> * kvmppc_read_one_intr is only called by kvmppc_read_intr which is only
->>   called by the L0 HV rmhandlers code.
->>=20
->> * kvmhv_rm_send_ipi is called by:
->>   - kvmhv_interrupt_vcore which is only called by kvmhv_commence_exit
->>     which is only called by the L0 HV rmhandlers code.
->>   - icp_send_hcore_msg which is only called by icp_rm_set_vcpu_irq.
->>   - icp_rm_set_vcpu_irq which is only called by icp_rm_try_update
->>   - icp_rm_set_vcpu_irq is not nested HV safe because it writes to
->>     LPCR directly without a kvmhv_on_pseries test. Nested handlers
->>     should not in general be using the rm handlers.
->>=20
->> The important test seems to be in kvmppc_ipi_thread, which sends the
->> virt-mode H_IPI handler kick to use smp_call_function rather than
->> msgsnd.
->>=20
->> Cc: C=C3=A9dric Le Goater <clg@kaod.org>
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->> ---
->>  arch/powerpc/kvm/book3s_hv_builtin.c | 44 +++++-----------------------
->>  arch/powerpc/kvm/book3s_hv_rm_xics.c | 15 ----------
->>  2 files changed, 8 insertions(+), 51 deletions(-)
->=20
-> So, now, the L1 is not limited to XICS anymore and we can use the XIVE=20
-> native interrupt mode with an L2 using XICS in KVM or XIVE in QEMU.
-> Is that correct ?  =20
+Git tree here
 
-The intention was to only remove dead code and no change.
-Perhaps I'm missing something or an earlier patch incorrectly made some
-of these paths dead but I don't see it.
+https://github.com/npiggin/linux/tree/kvm-in-c-v6
 
-> It seems you removed all the XICS hcalls under kvmhv_on_pseries().
+This fixes a couple of bugs with the POWER7/8 path and now a
+POWER8 SMT guest boots and runs again.
 
-From what I could work out, kvmhv_on_pseries can never be true for the
-ones I removed.
+Main changes since v5:
+- Fixed changelog and subject for patch to re-arm host timer.
+- Fixed compile error with !HV [kernel test robot]
+- Rearranged syscall interrupt reflection changes (now it's disabled in
+  the new P9 path, and reflection is later enabled for hash rather than
+  enabling by default and later disabling for radix).
+- Fixed P9 hash ISI handler was testing MSR_DR, should be MSR_IR for
+  using the VRMA segment descriptor. Is this even needed for P9 hash
+  or does ASDR provide it for MMU=off faults?
+- Fixed POWER8 path fault and cede/nap handler bugs, guests now work
+  again on POWER8 including SMT guests.
+- Removed a bit more dead code from the P7/8 path (ultravisor).
+- Improved changelog and comments.
+
+Main changes since v4:
+- Accounted for reviews so far. Comment and changelog fixes.
+- Fix PR KVM register clobber [Paul]
+- Fix HPT guest LPCR[TC] not set [Paul]
+- Added comment about nested guest HV SPR leak issue [Paul]
+- Improve misc comments and changelogs [Paul and Alexey]
+- Fix decrementer_max export compile error [Alexey]
+- Fixed issue with set_dec() not being identical to mtDEC causing
+  a patch to have an unintended change [Alexey]
+- Re-add a patch to stop reflecting PR=1 sc 1, but only do it for radix.
+
+Main changes since v3:
+- Hopefully fixed LPCR sanising [from Fabiano review]
+- Added MSR[HV] clearing of guest MSR (like MSR[ME] setting).
+- Restored a lost comment about PPR saving, improved comments a bit
+  [Daniel review]
+- Added isyncs, removed XXX isync comment.
+- Fixed cede comment [Fabiano]
+- In stop handling real mode handlers patch, fixed problem of nested
+  hcall handler calling cede and xics hcalls and consuming them
+  [Fabiano]
+- Filter xics hcalls from being consumed if !kvmppc_xics_enabled
+  [Fabiano, Alexey noticed and Cedric provided the right recipe and
+   comment]
+- Removed some more of radix, nested, and virt mode paths from the
+  P7/8 code [noticed by Alexey].
+- Rebased on 5.12-rc4
+- Hopefully I responded to all reviews and collected all reviewed-bys.
 
 Thanks,
 Nick
 
->=20
-> C.
->=20
-> =20
->> diff --git a/arch/powerpc/kvm/book3s_hv_builtin.c b/arch/powerpc/kvm/boo=
-k3s_hv_builtin.c
->> index 8d669a0e15f8..259492bb4153 100644
->> --- a/arch/powerpc/kvm/book3s_hv_builtin.c
->> +++ b/arch/powerpc/kvm/book3s_hv_builtin.c
->> @@ -199,15 +199,6 @@ void kvmhv_rm_send_ipi(int cpu)
->>  	void __iomem *xics_phys;
->>  	unsigned long msg =3D PPC_DBELL_TYPE(PPC_DBELL_SERVER);
->> =20
->> -	/* For a nested hypervisor, use the XICS via hcall */
->> -	if (kvmhv_on_pseries()) {
->> -		unsigned long retbuf[PLPAR_HCALL_BUFSIZE];
->> -
->> -		plpar_hcall_raw(H_IPI, retbuf, get_hard_smp_processor_id(cpu),
->> -				IPI_PRIORITY);
->> -		return;
->> -	}
->> -
->>  	/* On POWER9 we can use msgsnd for any destination cpu. */
->>  	if (cpu_has_feature(CPU_FTR_ARCH_300)) {
->>  		msg |=3D get_hard_smp_processor_id(cpu);
->> @@ -420,19 +411,12 @@ static long kvmppc_read_one_intr(bool *again)
->>  		return 1;
->> =20
->>  	/* Now read the interrupt from the ICP */
->> -	if (kvmhv_on_pseries()) {
->> -		unsigned long retbuf[PLPAR_HCALL_BUFSIZE];
->> -
->> -		rc =3D plpar_hcall_raw(H_XIRR, retbuf, 0xFF);
->> -		xirr =3D cpu_to_be32(retbuf[0]);
->> -	} else {
->> -		xics_phys =3D local_paca->kvm_hstate.xics_phys;
->> -		rc =3D 0;
->> -		if (!xics_phys)
->> -			rc =3D opal_int_get_xirr(&xirr, false);
->> -		else
->> -			xirr =3D __raw_rm_readl(xics_phys + XICS_XIRR);
->> -	}
->> +	xics_phys =3D local_paca->kvm_hstate.xics_phys;
->> +	rc =3D 0;
->> +	if (!xics_phys)
->> +		rc =3D opal_int_get_xirr(&xirr, false);
->> +	else
->> +		xirr =3D __raw_rm_readl(xics_phys + XICS_XIRR);
->>  	if (rc < 0)
->>  		return 1;
->> =20
->> @@ -461,13 +445,7 @@ static long kvmppc_read_one_intr(bool *again)
->>  	 */
->>  	if (xisr =3D=3D XICS_IPI) {
->>  		rc =3D 0;
->> -		if (kvmhv_on_pseries()) {
->> -			unsigned long retbuf[PLPAR_HCALL_BUFSIZE];
->> -
->> -			plpar_hcall_raw(H_IPI, retbuf,
->> -					hard_smp_processor_id(), 0xff);
->> -			plpar_hcall_raw(H_EOI, retbuf, h_xirr);
->> -		} else if (xics_phys) {
->> +		if (xics_phys) {
->>  			__raw_rm_writeb(0xff, xics_phys + XICS_MFRR);
->>  			__raw_rm_writel(xirr, xics_phys + XICS_XIRR);
->>  		} else {
->> @@ -493,13 +471,7 @@ static long kvmppc_read_one_intr(bool *again)
->>  			/* We raced with the host,
->>  			 * we need to resend that IPI, bummer
->>  			 */
->> -			if (kvmhv_on_pseries()) {
->> -				unsigned long retbuf[PLPAR_HCALL_BUFSIZE];
->> -
->> -				plpar_hcall_raw(H_IPI, retbuf,
->> -						hard_smp_processor_id(),
->> -						IPI_PRIORITY);
->> -			} else if (xics_phys)
->> +			if (xics_phys)
->>  				__raw_rm_writeb(IPI_PRIORITY,
->>  						xics_phys + XICS_MFRR);
->>  			else
->> diff --git a/arch/powerpc/kvm/book3s_hv_rm_xics.c b/arch/powerpc/kvm/boo=
-k3s_hv_rm_xics.c
->> index c2c9c733f359..0a11ec88a0ae 100644
->> --- a/arch/powerpc/kvm/book3s_hv_rm_xics.c
->> +++ b/arch/powerpc/kvm/book3s_hv_rm_xics.c
->> @@ -141,13 +141,6 @@ static void icp_rm_set_vcpu_irq(struct kvm_vcpu *vc=
-pu,
->>  		return;
->>  	}
->> =20
->> -	if (xive_enabled() && kvmhv_on_pseries()) {
->> -		/* No XICS access or hypercalls available, too hard */
->> -		this_icp->rm_action |=3D XICS_RM_KICK_VCPU;
->> -		this_icp->rm_kick_target =3D vcpu;
->> -		return;
->> -	}
->> -
->>  	/*
->>  	 * Check if the core is loaded,
->>  	 * if not, find an available host core to post to wake the VCPU,
->> @@ -771,14 +764,6 @@ static void icp_eoi(struct irq_chip *c, u32 hwirq, =
-__be32 xirr, bool *again)
->>  	void __iomem *xics_phys;
->>  	int64_t rc;
->> =20
->> -	if (kvmhv_on_pseries()) {
->> -		unsigned long retbuf[PLPAR_HCALL_BUFSIZE];
->> -
->> -		iosync();
->> -		plpar_hcall_raw(H_EOI, retbuf, hwirq);
->> -		return;
->> -	}
->> -
->>  	rc =3D pnv_opal_pci_msi_eoi(c, hwirq);
->> =20
->>  	if (rc)
->>=20
->=20
->=20
+Nicholas Piggin (48):
+  KVM: PPC: Book3S HV: Nested move LPCR sanitising to sanitise_hv_regs
+  KVM: PPC: Book3S HV: Add a function to filter guest LPCR bits
+  KVM: PPC: Book3S HV: Disallow LPCR[AIL] to be set to 1 or 2
+  KVM: PPC: Book3S HV: Prevent radix guests setting LPCR[TC]
+  KVM: PPC: Book3S HV: Remove redundant mtspr PSPB
+  KVM: PPC: Book3S HV: remove unused kvmppc_h_protect argument
+  KVM: PPC: Book3S HV: Fix CONFIG_SPAPR_TCE_IOMMU=n default hcalls
+  powerpc/64s: Remove KVM handler support from CBE_RAS interrupts
+  powerpc/64s: remove KVM SKIP test from instruction breakpoint handler
+  KVM: PPC: Book3S HV: Ensure MSR[ME] is always set in guest MSR
+  KVM: PPC: Book3S HV: Ensure MSR[HV] is always clear in guest MSR
+  KVM: PPC: Book3S 64: move KVM interrupt entry to a common entry point
+  KVM: PPC: Book3S 64: Move GUEST_MODE_SKIP test into KVM
+  KVM: PPC: Book3S 64: add hcall interrupt handler
+  KVM: PPC: Book3S 64: Move hcall early register setup to KVM
+  KVM: PPC: Book3S 64: Move interrupt early register setup to KVM
+  KVM: PPC: Book3S 64: move bad_host_intr check to HV handler
+  KVM: PPC: Book3S 64: Minimise hcall handler calling convention
+    differences
+  KVM: PPC: Book3S HV P9: Move radix MMU switching instructions together
+  KVM: PPC: Book3S HV P9: implement kvmppc_xive_pull_vcpu in C
+  KVM: PPC: Book3S HV P9: Move xive vcpu context management into
+    kvmhv_p9_guest_entry
+  KVM: PPC: Book3S HV P9: Stop handling hcalls in real-mode in the P9
+    path
+  KVM: PPC: Book3S HV P9: Move setting HDEC after switching to guest
+    LPCR
+  KVM: PPC: Book3S HV P9: Use large decrementer for HDEC
+  KVM: PPC: Book3S HV P9: Use host timer accounting to avoid decrementer
+    read
+  KVM: PPC: Book3S HV P9: Reduce mftb per guest entry/exit
+  KVM: PPC: Book3S HV P9: Reduce irq_work vs guest decrementer races
+  KMV: PPC: Book3S HV: Use set_dec to set decrementer to host
+  powerpc/time: add API for KVM to re-arm the host timer/decrementer
+  KVM: PPC: Book3S HV P9: Implement the rest of the P9 path in C
+  KVM: PPC: Book3S HV P9: inline kvmhv_load_hv_regs_and_go into
+    __kvmhv_vcpu_entry_p9
+  KVM: PPC: Book3S HV P9: Read machine check registers while MSR[RI] is
+    0
+  KVM: PPC: Book3S HV P9: Improve exit timing accounting coverage
+  KVM: PPC: Book3S HV P9: Move SPR loading after expiry time check
+  KVM: PPC: Book3S HV P9: Add helpers for OS SPR handling
+  KVM: PPC: Book3S HV P9: Switch to guest MMU context as late as
+    possible
+  KVM: PPC: Book3S HV: Implement radix prefetch workaround by disabling
+    MMU
+  KVM: PPC: Book3S HV: Remove support for dependent threads mode on P9
+  KVM: PPC: Book3S HV: Remove radix guest support from P7/8 path
+  KVM: PPC: Book3S HV: Remove virt mode checks from real mode handlers
+  KVM: PPC: Book3S HV: Remove unused nested HV tests in XICS emulation
+  KVM: PPC: Book3S HV P9: Allow all P9 processors to enable nested HV
+  KVM: PPC: Book3S HV: small pseries_do_hcall cleanup
+  KVM: PPC: Book3S HV: add virtual mode handlers for HPT hcalls and page
+    faults
+  KVM: PPC: Book3S HV P9: Reflect userspace hcalls to hash guests to
+    support PR KVM
+  KVM: PPC: Book3S HV P9: implement hash guest support
+  KVM: PPC: Book3S HV P9: implement hash host / hash guest support
+  KVM: PPC: Book3S HV: remove ISA v3.0 and v3.1 support from P7/8 path
+
+ arch/powerpc/include/asm/asm-prototypes.h |   3 +-
+ arch/powerpc/include/asm/exception-64s.h  |  13 +
+ arch/powerpc/include/asm/kvm_asm.h        |   3 +-
+ arch/powerpc/include/asm/kvm_book3s.h     |   2 +
+ arch/powerpc/include/asm/kvm_book3s_64.h  |   8 +
+ arch/powerpc/include/asm/kvm_host.h       |   8 +-
+ arch/powerpc/include/asm/kvm_ppc.h        |  21 +-
+ arch/powerpc/include/asm/mmu_context.h    |   6 -
+ arch/powerpc/include/asm/time.h           |  11 +
+ arch/powerpc/kernel/asm-offsets.c         |   1 -
+ arch/powerpc/kernel/exceptions-64s.S      | 257 ++-----
+ arch/powerpc/kernel/security.c            |   5 +-
+ arch/powerpc/kernel/time.c                |  43 +-
+ arch/powerpc/kvm/Makefile                 |   4 +
+ arch/powerpc/kvm/book3s.c                 |  17 +-
+ arch/powerpc/kvm/book3s_64_entry.S        | 409 +++++++++++
+ arch/powerpc/kvm/book3s_64_vio_hv.c       |  12 -
+ arch/powerpc/kvm/book3s_hv.c              | 782 ++++++++++++----------
+ arch/powerpc/kvm/book3s_hv_builtin.c      | 138 +---
+ arch/powerpc/kvm/book3s_hv_interrupt.c    | 529 +++++++++++++++
+ arch/powerpc/kvm/book3s_hv_interrupts.S   |   9 +-
+ arch/powerpc/kvm/book3s_hv_nested.c       |  37 +-
+ arch/powerpc/kvm/book3s_hv_ras.c          |   2 +
+ arch/powerpc/kvm/book3s_hv_rm_mmu.c       |  15 +-
+ arch/powerpc/kvm/book3s_hv_rm_xics.c      |  15 -
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 682 +------------------
+ arch/powerpc/kvm/book3s_segment.S         |   3 +
+ arch/powerpc/kvm/book3s_xive.c            | 113 +++-
+ arch/powerpc/kvm/book3s_xive.h            |   7 -
+ arch/powerpc/kvm/book3s_xive_native.c     |  10 -
+ arch/powerpc/mm/book3s64/radix_pgtable.c  |  27 +-
+ arch/powerpc/mm/book3s64/radix_tlb.c      |  46 --
+ arch/powerpc/mm/mmu_context.c             |   4 +-
+ arch/powerpc/platforms/powernv/idle.c     |  52 +-
+ 34 files changed, 1735 insertions(+), 1559 deletions(-)
+ create mode 100644 arch/powerpc/kvm/book3s_64_entry.S
+ create mode 100644 arch/powerpc/kvm/book3s_hv_interrupt.c
+
+-- 
+2.23.0
+
