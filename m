@@ -2,240 +2,190 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6988D355482
-	for <lists+kvm-ppc@lfdr.de>; Tue,  6 Apr 2021 15:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D244D355E21
+	for <lists+kvm-ppc@lfdr.de>; Tue,  6 Apr 2021 23:47:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344318AbhDFNCy (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 6 Apr 2021 09:02:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52458 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233048AbhDFNCy (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 6 Apr 2021 09:02:54 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD988C06174A
-        for <kvm-ppc@vger.kernel.org>; Tue,  6 Apr 2021 06:02:46 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id v10so10366085pfn.5
-        for <kvm-ppc@vger.kernel.org>; Tue, 06 Apr 2021 06:02:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=M9XWbSlqZBle5z6Rn68Dc9W+emscH1TqVCAuWTrNVxs=;
-        b=H5SZwL0LBZzUNCWbZzMG5TQb2+5ORC/1DeNLYVbU8tG6VMzAUPhcvFHToMhA3qQC/7
-         8M5KzbC1imidLCjh2NgBxCQvjkFuX0+IWJorOLFqlYjoE+abAAYZtqMNy/KhdwLc4Drw
-         SoCEq1ZOSmq9irNILSzO1In+DbtzQkd5TGh1yr3Yz85ktJd5dfnzrwtWKiRBrftxyH7m
-         uVkp+l8YBW2qYqm861upx3wHdrPqksH1aHgJQX8N9w4BYzjrbkENgiiRb5hBjHX7Srng
-         iC0D44TVQnmXsBwetYL4o19GrY1MZYBBCRMK+AyxGWi5Te6gUJwPZn785jyeJLpHVN2Z
-         3c7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=M9XWbSlqZBle5z6Rn68Dc9W+emscH1TqVCAuWTrNVxs=;
-        b=rfbkhuRT9ZXy6Cc/gPLfD3rSMD7Vp8t4P1yygQED13ZmsSd4k9vnc35m06Ep7ANhW5
-         XjTeAKE45btTtAZd7bjRul/iGai7IBjPoJWeuwnjlTOp1/b5LfTBCnzKqmL9VV3exv0W
-         DlBd9sthLukIOBO+jGuHH+TUmh7YEcHjZAxU9ywL+AI4F/LUfFs5/UXhUjXLNROZ2F6Y
-         wTmEweQ1Z48kDNIx211zSwSaUoexNDIC3U27Z2adBp2b9vFzCT5fgePpYeI1fH8ecD6M
-         1ANNtElyuQdUu3AuIBVKliiupHW65XMXjoiJOTxg3GPOmQ9VsG7xrUS9rWZset1JndLn
-         1fbQ==
-X-Gm-Message-State: AOAM532OUBq5+GSaeCPkKKPNZ9emGmT4lyBXLst86+I8Nri5lhO6jjCs
-        Nvnmt4vxnk1yiIJV3LpRjCqRHGCd6Lkk6g==
-X-Google-Smtp-Source: ABdhPJykH7D2WzRN1jNoNyfTfuPtBCCWTZuwKt12Q5XiA9U5ToJQ/4b0+HZ7uhCr1iANjgtj2s0dMQ==
-X-Received: by 2002:a62:347:0:b029:23f:7001:c0e6 with SMTP id 68-20020a6203470000b029023f7001c0e6mr2663882pfd.75.1617714166048;
-        Tue, 06 Apr 2021 06:02:46 -0700 (PDT)
-Received: from localhost ([1.132.179.35])
-        by smtp.gmail.com with ESMTPSA id l10sm17891125pfc.125.2021.04.06.06.02.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Apr 2021 06:02:45 -0700 (PDT)
-Date:   Tue, 06 Apr 2021 23:02:39 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v6 30/48] KVM: PPC: Book3S HV P9: Implement the rest of
- the P9 path in C
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-References: <20210405011948.675354-1-npiggin@gmail.com>
-        <20210405011948.675354-31-npiggin@gmail.com>
-        <YGwNRUahuv42VZPR@thinks.paulus.ozlabs.org>
-        <1617699912.sfw989xp02.astroid@bobo.none>
-In-Reply-To: <1617699912.sfw989xp02.astroid@bobo.none>
+        id S242947AbhDFVrM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 6 Apr 2021 17:47:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1896 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242246AbhDFVrL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 6 Apr 2021 17:47:11 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 136LWfxM106686;
+        Tue, 6 Apr 2021 17:46:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=mGktAcrLcOpEP+nsaANmuUZjME08s/ZgNGfFlHOKbb4=;
+ b=DjQ097fZM5nVBjE9PZI/dEi475enolde4ctxV2OTYFnjgVrQY2+AHLgVZWjjOMGcF5g7
+ CcQsKpSn60mt1/IcUlgawsY4BumdvjjnO9Hzru/8rqIgJM6D0WdF1SPLgu+Z3eaqQKbA
+ X4iHbnHyFyBwlEBXCAbF9SASMM2hLaCDOp+3MjchBy3KZdQaqcast6/GFrUrdvSt0IOi
+ Er6BkG2ZjhgawpGq/jEPY3I2OkEumnW7bt3Hp1iEmuvgWZCdbafg+UbsaeUp3bcxDgGl
+ JUn3UHsJe5ul5vIuFwBvgrnBG8MqovAtaWfRTzOQoLsZQ9aJCaPwIF/2bXoOoYxJ5wIk Uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37rvmewg5y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Apr 2021 17:46:53 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 136LXjFh109310;
+        Tue, 6 Apr 2021 17:46:52 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37rvmewg5r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Apr 2021 17:46:52 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 136LbFgH010657;
+        Tue, 6 Apr 2021 21:46:52 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma01dal.us.ibm.com with ESMTP id 37rvs11a6v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Apr 2021 21:46:51 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 136LkpSO26411420
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 6 Apr 2021 21:46:51 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2B912AC05B;
+        Tue,  6 Apr 2021 21:46:51 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 87C4EAC059;
+        Tue,  6 Apr 2021 21:46:49 +0000 (GMT)
+Received: from farosas.linux.ibm.com.com (unknown [9.211.132.106])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  6 Apr 2021 21:46:49 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
+        mpe@ellerman.id.au, npiggin@gmail.com
+Subject: [PATCH v2] KVM: PPC: Book3S HV: Sanitise vcpu registers in nested path
+Date:   Tue,  6 Apr 2021 18:46:45 -0300
+Message-Id: <20210406214645.3315819-1-farosas@linux.ibm.com>
+X-Mailer: git-send-email 2.29.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0MmRAJqkltXuiq_ICfivqNeMcmaxnquu
+X-Proofpoint-ORIG-GUID: CrNUWjlEo1Mo662JQjgJMEoKGyAnkfBb
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Message-Id: <1617713818.l4464kzxzg.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-04-06_07:2021-04-06,2021-04-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 spamscore=0 impostorscore=0 mlxscore=0 adultscore=0
+ phishscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
+ mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104060000 definitions=main-2104060145
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Nicholas Piggin's message of April 6, 2021 7:12 pm:
-> Excerpts from Paul Mackerras's message of April 6, 2021 5:27 pm:
->> On Mon, Apr 05, 2021 at 11:19:30AM +1000, Nicholas Piggin wrote:
->>> Almost all logic is moved to C, by introducing a new in_guest mode for
->>> the P9 path that branches very early in the KVM interrupt handler to
->>> P9 exit code.
->>>=20
->>> The main P9 entry and exit assembly is now only about 160 lines of low
->>> level stack setup and register save/restore, plus a bad-interrupt
->>> handler.
->>>=20
->>> There are two motivations for this, the first is just make the code mor=
-e
->>> maintainable being in C. The second is to reduce the amount of code
->>> running in a special KVM mode, "realmode". In quotes because with radix
->>> it is no longer necessarily real-mode in the MMU, but it still has to b=
-e
->>> treated specially because it may be in real-mode, and has various
->>> important registers like PID, DEC, TB, etc set to guest. This is hostil=
-e
->>> to the rest of Linux and can't use arbitrary kernel functionality or be
->>> instrumented well.
->>>=20
->>> This initial patch is a reasonably faithful conversion of the asm code,
->>> but it does lack any loop to return quickly back into the guest without
->>> switching out of realmode in the case of unimportant or easily handled
->>> interrupts. As explained in previous changes, handling HV interrupts
->>> in real mode is not so important for P9.
->>>=20
->>> Use of Linux 64s interrupt entry code register conventions including
->>> paca EX_ save areas are brought into the KVM code. There is no point
->>> shuffling things into different paca save areas and making up a
->>> different calling convention for KVM.
->>>=20
->>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->>=20
->> [snip]
->>=20
->>> +/*
->>> + * Took an interrupt somewhere right before HRFID to guest, so registe=
-rs are
->>> + * in a bad way. Return things hopefully enough to run host virtual co=
-de and
->>> + * run the Linux interrupt handler (SRESET or MCE) to print something =
-useful.
->>> + *
->>> + * We could be really clever and save all host registers in known loca=
-tions
->>> + * before setting HSTATE_IN_GUEST, then restoring them all here, and s=
-etting
->>> + * return address to a fixup that sets them up again. But that's a lot=
- of
->>> + * effort for a small bit of code. Lots of other things to do first.
->>> + */
->>> +kvmppc_p9_bad_interrupt:
->>> +	/*
->>> +	 * Set GUEST_MODE_NONE so the handler won't branch to KVM, and clear
->>> +	 * MSR_RI in r12 ([H]SRR1) so the handler won't try to return.
->>> +	 */
->>> +	li	r10,KVM_GUEST_MODE_NONE
->>> +	stb	r10,HSTATE_IN_GUEST(r13)
->>> +	li	r10,MSR_RI
->>> +	andc	r12,r12,r10
->>> +
->>> +	/*
->>> +	 * Clean up guest registers to give host a chance to run.
->>> +	 */
->>> +	li	r10,0
->>> +	mtspr	SPRN_AMR,r10
->>> +	mtspr	SPRN_IAMR,r10
->>> +	mtspr	SPRN_CIABR,r10
->>> +	mtspr	SPRN_DAWRX0,r10
->>> +BEGIN_FTR_SECTION
->>> +	mtspr	SPRN_DAWRX1,r10
->>> +END_FTR_SECTION_IFSET(CPU_FTR_DAWR1)
->>> +	mtspr	SPRN_PID,r10
->>> +
->>> +	/*
->>> +	 * Switch to host MMU mode
->>> +	 */
->>> +	ld	r10, HSTATE_KVM_VCPU(r13)
->>> +	ld	r10, VCPU_KVM(r10)
->>> +	lwz	r10, KVM_HOST_LPID(r10)
->>> +	mtspr	SPRN_LPID,r10
->>> +
->>> +	ld	r10, HSTATE_KVM_VCPU(r13)
->>> +	ld	r10, VCPU_KVM(r10)
->>> +	ld	r10, KVM_HOST_LPCR(r10)
->>> +	mtspr	SPRN_LPCR,r10
->>> +
->>> +	/*
->>> +	 * Go back to interrupt handler
->>> +	 */
->>> +	ld	r10,HSTATE_SCRATCH0(r13)
->>> +	cmpwi	r10,BOOK3S_INTERRUPT_MACHINE_CHECK
->>> +	beq	machine_check_common
->>> +
->>> +	ld	r10,HSTATE_SCRATCH0(r13)
->>> +	cmpwi	r10,BOOK3S_INTERRUPT_SYSTEM_RESET
->>> +	beq	system_reset_common
->>> +
->>> +	b	.
->>=20
->> So you only handle machine check and system reset here?  I would think
->> that program check would also be useful, for the cases where people
->> put BUG_ON in sensitive places (see below).  DSI and ISI could also be
->> useful for the null pointer dereference cases, I would think.
->=20
-> Those ones have their own stack, so a bit simpler to run them (and
-> they obviously have to be handled as they are NMIs). I'll see if we
-> can do something to improve the others a bit. Maybe just call program
-> check for any other exception might work, making sure that it'll use
-> the emergency stack rather than something that looks like a kernel
-> stack but is a guest value, I'll see what we can get to work.
+As one of the arguments of the H_ENTER_NESTED hypercall, the nested
+hypervisor (L1) prepares a structure containing the values of various
+hypervisor-privileged registers with which it wants the nested guest
+(L2) to run. Since the nested HV runs in supervisor mode it needs the
+host to write to these registers.
 
-So program check isn't tested in virt mode, and neither are ISI or
-DSI unless PR is possible, so the bad host interrupt check in
-rmhandlers doesn't really catch those cases either.
+To stop a nested HV manipulating this mechanism and using a nested
+guest as a proxy to access a facility that has been made unavailable
+to it, we have a routine that sanitises the values of the HV registers
+before copying them into the nested guest's vcpu struct.
 
-We may want to improve on that but I might wait until after this
-series.
+However, when coming out of the guest the values are copied as they
+were back into L1 memory, which means that any sanitisation we did
+during guest entry will be exposed to L1 after H_ENTER_NESTED returns.
 
-I did get rid of the BUG_ON though.
+This patch alters this sanitisation to have effect on the vcpu->arch
+registers directly before entering and after exiting the guest,
+leaving the structure that is copied back into L1 unchanged (except
+when we really want L1 to access the value, e.g the Cause bits of
+HFSCR).
 
-Thanks,
-Nick
+Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+---
+I'm taking another shot at fixing this locally without resorting to
+more complex things such as error handling and feature
+advertisement/negotiation.
 
->>> +static inline void mtslb(unsigned int idx, u64 slbee, u64 slbev)
->>> +{
->>> +	BUG_ON((slbee & 0xfff) !=3D idx);
->>> +
->>> +	asm volatile("slbmte %0,%1" :: "r" (slbev), "r" (slbee));
->>> +}
->>=20
->> Using BUG_ON here feels dangerous, and the condition it is testing is
->> certainly not one where the host kernel is in such trouble that it
->> can't continue to run.  If the index was wrong then at worst the guest
->> kernel would be in trouble.  So I don't believe BUG_ON is appropriate.
->=20
-> Yeah good point, some of it was a bit of development paranoia but I=20
-> do have to go through and tighten these up.
->=20
->>> +
->>> +/*
->>> + * Malicious or buggy radix guests may have inserted SLB entries
->>> + * (only 0..3 because radix always runs with UPRT=3D1), so these must
->>> + * be cleared here to avoid side-channels. slbmte is used rather
->>> + * than slbia, as it won't clear cached translations.
->>> + */
->>> +static void radix_clear_slb(void)
->>> +{
->>> +	u64 slbee, slbev;
->>> +	int i;
->>> +
->>> +	for (i =3D 0; i < 4; i++) {
->>> +		mfslb(i, &slbee, &slbev);
->>> +		if (unlikely(slbee || slbev)) {
->>> +			slbee =3D i;
->>> +			slbev =3D 0;
->>> +			mtslb(i, slbee, slbev);
->>> +		}
->>> +	}
->>=20
->> Are four slbmfee + slbmfev really faster than four slbmte?
->=20
-> I'd thought yes if they behaved similarly to mfspr, but from the look of=20
-> some workbooks it doesn't look like it's quite that simple.
->=20
-> I'll have to measure it.
->=20
-> Thanks,
-> Nick
->=20
+Changes since v1:
+
+- made the change more generic, not only applies to hfscr anymore;
+- sanitisation is now done directly on the vcpu struct, l2_hv is left unchanged;
+
+v1:
+
+https://lkml.kernel.org/r/20210305231055.2913892-1-farosas@linux.ibm.com
+---
+ arch/powerpc/kvm/book3s_hv_nested.c | 33 +++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 7 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+index 0cd0e7aad588..a60fccb2c4f2 100644
+--- a/arch/powerpc/kvm/book3s_hv_nested.c
++++ b/arch/powerpc/kvm/book3s_hv_nested.c
+@@ -132,21 +132,37 @@ static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
+ 	}
+ }
+ 
+-static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
++static void sanitise_vcpu_entry_state(struct kvm_vcpu *vcpu,
++				      const struct hv_guest_state *l2_hv,
++				      const struct hv_guest_state *l1_hv)
+ {
+ 	/*
+ 	 * Don't let L1 enable features for L2 which we've disabled for L1,
+ 	 * but preserve the interrupt cause field.
+ 	 */
+-	hr->hfscr &= (HFSCR_INTR_CAUSE | vcpu->arch.hfscr);
++	vcpu->arch.hfscr = l2_hv->hfscr & (HFSCR_INTR_CAUSE | l1_hv->hfscr);
+ 
+ 	/* Don't let data address watchpoint match in hypervisor state */
+-	hr->dawrx0 &= ~DAWRX_HYP;
+-	hr->dawrx1 &= ~DAWRX_HYP;
++	vcpu->arch.dawrx0 = l2_hv->dawrx0 & ~DAWRX_HYP;
++	vcpu->arch.dawrx1 = l2_hv->dawrx1 & ~DAWRX_HYP;
+ 
+ 	/* Don't let completed instruction address breakpt match in HV state */
+-	if ((hr->ciabr & CIABR_PRIV) == CIABR_PRIV_HYPER)
+-		hr->ciabr &= ~CIABR_PRIV;
++	if ((l2_hv->ciabr & CIABR_PRIV) == CIABR_PRIV_HYPER)
++		vcpu->arch.ciabr = l2_hv->ciabr & ~CIABR_PRIV;
++}
++
++
++/*
++ * During sanitise_vcpu_entry_state() we might have used bits from L1
++ * state to restrict what the L2 state is allowed to be. Since L1 is
++ * not allowed to read the HV registers, do not include these
++ * modifications in the return state.
++ */
++static void sanitise_vcpu_return_state(struct kvm_vcpu *vcpu,
++				       const struct hv_guest_state *l2_hv)
++{
++	vcpu->arch.hfscr = ((~HFSCR_INTR_CAUSE & l2_hv->hfscr) |
++			(HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
+ }
+ 
+ static void restore_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
+@@ -324,9 +340,10 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+ 	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
+ 		LPCR_LPES | LPCR_MER;
+ 	lpcr = (vc->lpcr & ~mask) | (l2_hv.lpcr & mask);
+-	sanitise_hv_regs(vcpu, &l2_hv);
+ 	restore_hv_regs(vcpu, &l2_hv);
+ 
++	sanitise_vcpu_entry_state(vcpu, &l2_hv, &saved_l1_hv);
++
+ 	vcpu->arch.ret = RESUME_GUEST;
+ 	vcpu->arch.trap = 0;
+ 	do {
+@@ -338,6 +355,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+ 		r = kvmhv_run_single_vcpu(vcpu, hdec_exp, lpcr);
+ 	} while (is_kvmppc_resume_guest(r));
+ 
++	sanitise_vcpu_return_state(vcpu, &l2_hv);
++
+ 	/* save L2 state for return */
+ 	l2_regs = vcpu->arch.regs;
+ 	l2_regs.msr = vcpu->arch.shregs.msr;
+-- 
+2.29.2
+
