@@ -2,215 +2,344 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BA89357D6A
-	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Apr 2021 09:33:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60501359378
+	for <lists+kvm-ppc@lfdr.de>; Fri,  9 Apr 2021 05:59:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229834AbhDHHeI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 8 Apr 2021 03:34:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45240 "EHLO
+        id S232844AbhDID5l (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 8 Apr 2021 23:57:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbhDHHeI (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Apr 2021 03:34:08 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3DFCC061760
-        for <kvm-ppc@vger.kernel.org>; Thu,  8 Apr 2021 00:33:57 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id nh5so654675pjb.5
-        for <kvm-ppc@vger.kernel.org>; Thu, 08 Apr 2021 00:33:57 -0700 (PDT)
+        with ESMTP id S232662AbhDID5k (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Apr 2021 23:57:40 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47919C061760
+        for <kvm-ppc@vger.kernel.org>; Thu,  8 Apr 2021 20:57:27 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id l123so3340847pfl.8
+        for <kvm-ppc@vger.kernel.org>; Thu, 08 Apr 2021 20:57:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=b1oLjlIsgitDb5EJtnbTFGlBtjw+XjDzzBBpX2iJwBY=;
-        b=VPzMe9QUBkn9qJfqHorOnyqESfqCO0bxrO4dY1yt3RWimBcpjEbEgWdGImU3j0BR3w
-         yDEbpzzGqut4358jwhL5xaUnYJaOGYymHonVBB0jNlYsI4H0aodFCLTajF6Ijnba35PA
-         k4owITnJswQslKK15oBLvoWmsU5XIu1kynuvvqG5guLzoRS8jqiUJURz2uGd6NG0r2R+
-         nous2z5+BTgYscnfh7cbOQhPm16B5HWbJOrJC2lrfJNEaeYMDijNKmwfK4JC+Hx8m9of
-         wj9TXgZAaZiyhRAmkH9zW+lfu5c6aMIA9o+4o5jbQ+xsyQYIPq0Ne+4+xV5pMrCq3BsK
-         Bc4Q==
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=sTuKXeqs4vGlv7gCUQOfs7Ilffg3WNzY8KFtcbdEsSI=;
+        b=s7c8Hs+5n4/rA3kb6HNEAghmy1Sd7eCaWSpDSlt53n4KhVGqvw6W8AUo/Y8+SP5qrC
+         y6aVw8xUpJyDfQQY0hvqh0pm3Qk4TpY02Tm2LRRIn65PVQGmTgL5cNet3IKfPZDve3zq
+         Shl9g28wGXxY6G9Wu1PYQjFLPywQ9oX5zn2epxP9HyRS/4mPvk6LW/PGnUOe9f1Jx9AI
+         32zyEZ23zP7/t1j2QiKjqs06BXSuxhDr40tFDJbU9kr/0khQXqRaOz0snNWGepUFzH5x
+         FSL6oF/0kSuo2xtBAoach4Hz1S5TXn+8x7nvXzOvQq6mtFH3s2WN08swNPaFWj1sQ2qg
+         ABLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=b1oLjlIsgitDb5EJtnbTFGlBtjw+XjDzzBBpX2iJwBY=;
-        b=FPb/ihP0c492BzjI29STw0yklVWa4la0Oew07zzNNjcTSOYTDM0GFY5oPj/hCIDCH0
-         RdQqzirLRVjMBPOPmfYhtlX9mFhjVWA8OJrQSezVE6/3gnxMxQEIKSIIc3U1+2pYudC+
-         ssPCapfk4GFxZJ7Zb3nbJSTAoR9mgVIvw3xCI/qTzOLmBpc+GA2gPCEWHUUxUQreLJUn
-         ioFw7tSHqWKaUgRJm42OIDMqOKQ2A/20JG7c90uN0qio62xFGRTYoqZqMG96AWkitBZZ
-         G+7nNvWjCp+EYNxH9WQIkJDMMJznvQDg+gWTF4hTA7PEaIYlk4j2khDMFe/ax6ZYpVKD
-         OtEA==
-X-Gm-Message-State: AOAM531xp5RMkv+ZU2ADo/MmFr3+1ZwcihDlT9sr1YDzVY97fTCKWf4Q
-        vOTJ4gyYHEl30XRJUmLL3voSHMv6ALm6wA==
-X-Google-Smtp-Source: ABdhPJwxD3KihNbb56pJTvytWfoled7A0JyKnIF/FN3FEKfLz1VZiF9auQQMyIIqyJ3zgG76Gh24Kw==
-X-Received: by 2002:a17:90a:d350:: with SMTP id i16mr7158192pjx.226.1617867237041;
-        Thu, 08 Apr 2021 00:33:57 -0700 (PDT)
-Received: from localhost (193-116-90-211.tpgi.com.au. [193.116.90.211])
-        by smtp.gmail.com with ESMTPSA id d13sm24310988pgb.6.2021.04.08.00.33.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Apr 2021 00:33:56 -0700 (PDT)
-Date:   Thu, 08 Apr 2021 17:33:50 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v6 00/48] KVM: PPC: Book3S: C-ify the P9 entry/exit code
-To:     kvm-ppc@vger.kernel.org
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=sTuKXeqs4vGlv7gCUQOfs7Ilffg3WNzY8KFtcbdEsSI=;
+        b=XOAkdyOiVIm88uhKEXFp4lh3ZozoD1XOeY+i9n3l4qWBJfgwk3t0FDsU8SQ2OYngY7
+         D/nqKaD/aC8nEcgh8pVJZ6Se0/tPxOC/aY8R8UqaO1fjeI/VUTRAt0KT2h6nXtW8/kaS
+         1BmNP6wDCmgp3yvXkJyvf/Rvo1dt6xu8nrBqmlmBmcLrGBsBryzXkRgiQ9oaBVcXDCBR
+         eV03GEITyOwmdu1H3IBY7K3qyuUadYENlyDLFapqFEWQU0oKrfJfsKQLVN7/MAZKwHKq
+         ogkEdRpf8JGditb/GvvODt9uQcF1bH7xJ9/wdd7ow089UEQ7qRI5X6gN02VJs9iukQt+
+         TBfQ==
+X-Gm-Message-State: AOAM530PkbB06rzFxtyTMWVj0htBKQ011QaoCTSkkX5g/R8Jen6ErHbg
+        LH3OphV/08wt2OjLAEDFvlDprg==
+X-Google-Smtp-Source: ABdhPJwZkfp6NWM4mPCyuiNlF+EVTy7QAQO1I1RyXTo/635IiH1iZRHqmNfJF0xKFVjTSbVcZwF+lQ==
+X-Received: by 2002:a63:e64b:: with SMTP id p11mr11030898pgj.10.1617940646792;
+        Thu, 08 Apr 2021 20:57:26 -0700 (PDT)
+Received: from localhost (ppp121-45-194-51.cbr-trn-nor-bras38.tpg.internode.on.net. [121.45.194.51])
+        by smtp.gmail.com with UTF8SMTPSA id k1sm739846pff.160.2021.04.08.20.57.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Apr 2021 20:57:26 -0700 (PDT)
+Message-ID: <e3be3cb3-23a1-2e28-1bda-a7437f2fd2ca@ozlabs.ru>
+Date:   Fri, 9 Apr 2021 13:57:22 +1000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:88.0) Gecko/20100101
+ Thunderbird/88.0
+Subject: Re: [PATCH v6 30/48] KVM: PPC: Book3S HV P9: Implement the rest of
+ the P9 path in C
+Content-Language: en-US
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
 Cc:     linuxppc-dev@lists.ozlabs.org
 References: <20210405011948.675354-1-npiggin@gmail.com>
-In-Reply-To: <20210405011948.675354-1-npiggin@gmail.com>
-MIME-Version: 1.0
-Message-Id: <1617865149.sj1ljwsvhh.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+ <20210405011948.675354-31-npiggin@gmail.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <20210405011948.675354-31-npiggin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Nicholas Piggin's message of April 5, 2021 11:19 am:
-> Git tree here
->=20
-> https://github.com/npiggin/linux/tree/kvm-in-c-v6
->=20
 
-In the interest of making things more managable, I would like to submit=20
-some initial things for merge, which have mostly had pretty good review
-(I'll repost them in a new series or set of series if there is no
-objection, rather than pick from this series).
 
-> Nicholas Piggin (48):
->   KVM: PPC: Book3S HV: Nested move LPCR sanitising to sanitise_hv_regs
->   KVM: PPC: Book3S HV: Add a function to filter guest LPCR bits
->   KVM: PPC: Book3S HV: Disallow LPCR[AIL] to be set to 1 or 2
->   KVM: PPC: Book3S HV: Prevent radix guests setting LPCR[TC]
->   KVM: PPC: Book3S HV: Remove redundant mtspr PSPB
->   KVM: PPC: Book3S HV: remove unused kvmppc_h_protect argument
->   KVM: PPC: Book3S HV: Fix CONFIG_SPAPR_TCE_IOMMU=3Dn default hcalls
->   powerpc/64s: Remove KVM handler support from CBE_RAS interrupts
->   powerpc/64s: remove KVM SKIP test from instruction breakpoint handler
->   KVM: PPC: Book3S HV: Ensure MSR[ME] is always set in guest MSR
->   KVM: PPC: Book3S HV: Ensure MSR[HV] is always clear in guest MSR
+On 05/04/2021 11:19, Nicholas Piggin wrote:
+> Almost all logic is moved to C, by introducing a new in_guest mode for
+> the P9 path that branches very early in the KVM interrupt handler to
+> P9 exit code.
+> 
+> The main P9 entry and exit assembly is now only about 160 lines of low
+> level stack setup and register save/restore, plus a bad-interrupt
+> handler.
+> 
+> There are two motivations for this, the first is just make the code more
+> maintainable being in C. The second is to reduce the amount of code
+> running in a special KVM mode, "realmode". In quotes because with radix
+> it is no longer necessarily real-mode in the MMU, but it still has to be
+> treated specially because it may be in real-mode, and has various
+> important registers like PID, DEC, TB, etc set to guest. This is hostile
+> to the rest of Linux and can't use arbitrary kernel functionality or be
+> instrumented well.
+> 
+> This initial patch is a reasonably faithful conversion of the asm code,
+> but it does lack any loop to return quickly back into the guest without
+> switching out of realmode in the case of unimportant or easily handled
+> interrupts. As explained in previous changes, handling HV interrupts
+> in real mode is not so important for P9.
+> 
+> Use of Linux 64s interrupt entry code register conventions including
+> paca EX_ save areas are brought into the KVM code. There is no point
+> shuffling things into different paca save areas and making up a
+> different calling convention for KVM.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   arch/powerpc/include/asm/asm-prototypes.h |   3 +-
+>   arch/powerpc/include/asm/kvm_asm.h        |   3 +-
+>   arch/powerpc/include/asm/kvm_book3s_64.h  |   8 +
+>   arch/powerpc/include/asm/kvm_host.h       |   7 +-
+>   arch/powerpc/kernel/security.c            |   5 +-
+>   arch/powerpc/kvm/Makefile                 |   1 +
+>   arch/powerpc/kvm/book3s_64_entry.S        | 247 ++++++++++++++++++++++
+>   arch/powerpc/kvm/book3s_hv.c              |   9 +-
+>   arch/powerpc/kvm/book3s_hv_interrupt.c    | 218 +++++++++++++++++++
+>   arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 125 +----------
+>   10 files changed, 501 insertions(+), 125 deletions(-)
+>   create mode 100644 arch/powerpc/kvm/book3s_hv_interrupt.c
+> 
+> diff --git a/arch/powerpc/include/asm/asm-prototypes.h b/arch/powerpc/include/asm/asm-prototypes.h
+> index 939f3c94c8f3..7c74c80ed994 100644
+> --- a/arch/powerpc/include/asm/asm-prototypes.h
+> +++ b/arch/powerpc/include/asm/asm-prototypes.h
+> @@ -122,6 +122,7 @@ extern s32 patch__call_flush_branch_caches3;
+>   extern s32 patch__flush_count_cache_return;
+>   extern s32 patch__flush_link_stack_return;
+>   extern s32 patch__call_kvm_flush_link_stack;
+> +extern s32 patch__call_kvm_flush_link_stack_p9;
+>   extern s32 patch__memset_nocache, patch__memcpy_nocache;
+>   
+>   extern long flush_branch_caches;
+> @@ -142,7 +143,7 @@ void kvmhv_load_host_pmu(void);
+>   void kvmhv_save_guest_pmu(struct kvm_vcpu *vcpu, bool pmu_in_use);
+>   void kvmhv_load_guest_pmu(struct kvm_vcpu *vcpu);
+>   
+> -int __kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu);
+> +void kvmppc_p9_enter_guest(struct kvm_vcpu *vcpu);
+>   
+>   long kvmppc_h_set_dabr(struct kvm_vcpu *vcpu, unsigned long dabr);
+>   long kvmppc_h_set_xdabr(struct kvm_vcpu *vcpu, unsigned long dabr,
+> diff --git a/arch/powerpc/include/asm/kvm_asm.h b/arch/powerpc/include/asm/kvm_asm.h
+> index a3633560493b..b4f9996bd331 100644
+> --- a/arch/powerpc/include/asm/kvm_asm.h
+> +++ b/arch/powerpc/include/asm/kvm_asm.h
+> @@ -146,7 +146,8 @@
+>   #define KVM_GUEST_MODE_GUEST	1
+>   #define KVM_GUEST_MODE_SKIP	2
+>   #define KVM_GUEST_MODE_GUEST_HV	3
+> -#define KVM_GUEST_MODE_HOST_HV	4
+> +#define KVM_GUEST_MODE_GUEST_HV_FAST	4 /* ISA v3.0 with host radix mode */
+> +#define KVM_GUEST_MODE_HOST_HV	5
+>   
+>   #define KVM_INST_FETCH_FAILED	-1
+>   
+> diff --git a/arch/powerpc/include/asm/kvm_book3s_64.h b/arch/powerpc/include/asm/kvm_book3s_64.h
+> index 9bb9bb370b53..c214bcffb441 100644
+> --- a/arch/powerpc/include/asm/kvm_book3s_64.h
+> +++ b/arch/powerpc/include/asm/kvm_book3s_64.h
+> @@ -153,9 +153,17 @@ static inline bool kvmhv_vcpu_is_radix(struct kvm_vcpu *vcpu)
+>   	return radix;
+>   }
+>   
+> +int __kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu);
+> +
+>   #define KVM_DEFAULT_HPT_ORDER	24	/* 16MB HPT by default */
+>   #endif
+>   
+> +/*
+> + * Invalid HDSISR value which is used to indicate when HW has not set the reg.
+> + * Used to work around an errata.
+> + */
+> +#define HDSISR_CANARY	0x7fff
+> +
+>   /*
+>    * We use a lock bit in HPTE dword 0 to synchronize updates and
+>    * accesses to each HPTE, and another bit to indicate non-present
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index 05fb00d37609..fa0083345b11 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -690,7 +690,12 @@ struct kvm_vcpu_arch {
+>   	ulong fault_dar;
+>   	u32 fault_dsisr;
+>   	unsigned long intr_msr;
+> -	ulong fault_gpa;	/* guest real address of page fault (POWER9) */
+> +	/*
+> +	 * POWER9 and later, fault_gpa contains the guest real address of page
+> +	 * fault for a radix guest, or segment descriptor (equivalent to result
+> +	 * from slbmfev of SLB entry that translated the EA) for hash guests.
+> +	 */
+> +	ulong fault_gpa;
+>   #endif
+>   
+>   #ifdef CONFIG_BOOKE
+> diff --git a/arch/powerpc/kernel/security.c b/arch/powerpc/kernel/security.c
+> index e4e1a94ccf6a..3a607c11f20f 100644
+> --- a/arch/powerpc/kernel/security.c
+> +++ b/arch/powerpc/kernel/security.c
+> @@ -430,16 +430,19 @@ device_initcall(stf_barrier_debugfs_init);
+>   
+>   static void update_branch_cache_flush(void)
+>   {
+> -	u32 *site;
+> +	u32 *site, __maybe_unused *site2;
+>   
+>   #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+>   	site = &patch__call_kvm_flush_link_stack;
+> +	site2 = &patch__call_kvm_flush_link_stack_p9;
+>   	// This controls the branch from guest_exit_cont to kvm_flush_link_stack
+>   	if (link_stack_flush_type == BRANCH_CACHE_FLUSH_NONE) {
+>   		patch_instruction_site(site, ppc_inst(PPC_INST_NOP));
+> +		patch_instruction_site(site2, ppc_inst(PPC_INST_NOP));
+>   	} else {
+>   		// Could use HW flush, but that could also flush count cache
+>   		patch_branch_site(site, (u64)&kvm_flush_link_stack, BRANCH_SET_LINK);
+> +		patch_branch_site(site2, (u64)&kvm_flush_link_stack, BRANCH_SET_LINK);
+>   	}
+>   #endif
+>   
+> diff --git a/arch/powerpc/kvm/Makefile b/arch/powerpc/kvm/Makefile
+> index cdd119028f64..ca7c86aa9360 100644
+> --- a/arch/powerpc/kvm/Makefile
+> +++ b/arch/powerpc/kvm/Makefile
+> @@ -88,6 +88,7 @@ kvm-book3s_64-builtin-tm-objs-$(CONFIG_PPC_TRANSACTIONAL_MEM) += \
+>   
+>   ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+>   kvm-book3s_64-builtin-objs-$(CONFIG_KVM_BOOK3S_64_HANDLER) += \
+> +	book3s_hv_interrupt.o \
+>   	book3s_hv_hmi.o \
+>   	book3s_hv_rmhandlers.o \
+>   	book3s_hv_rm_mmu.o \
+> diff --git a/arch/powerpc/kvm/book3s_64_entry.S b/arch/powerpc/kvm/book3s_64_entry.S
+> index 0c79c89c6a4b..d98ad580fd98 100644
+> --- a/arch/powerpc/kvm/book3s_64_entry.S
+> +++ b/arch/powerpc/kvm/book3s_64_entry.S
+> @@ -1,11 +1,16 @@
+>   /* SPDX-License-Identifier: GPL-2.0-only */
+>   #include <asm/asm-offsets.h>
+>   #include <asm/cache.h>
+> +#include <asm/code-patching-asm.h>
+>   #include <asm/exception-64s.h>
+> +#include <asm/export.h>
+>   #include <asm/kvm_asm.h>
+>   #include <asm/kvm_book3s_asm.h>
+> +#include <asm/mmu.h>
+>   #include <asm/ppc_asm.h>
+> +#include <asm/ptrace.h>
+>   #include <asm/reg.h>
+> +#include <asm/ultravisor-api.h>
+>   
+>   /*
+>    * These are branched to from interrupt handlers in exception-64s.S which set
+> @@ -29,10 +34,15 @@
+>   .global	kvmppc_hcall
+>   .balign IFETCH_ALIGN_BYTES
+>   kvmppc_hcall:
+> +	lbz	r10,HSTATE_IN_GUEST(r13)
+> +	cmpwi	r10,KVM_GUEST_MODE_GUEST_HV_FAST
+> +	beq	kvmppc_p9_exit_hcall
+>   	ld	r10,PACA_EXGEN+EX_R13(r13)
+>   	SET_SCRATCH0(r10)
+>   	li	r10,0xc00
+>   	/* Now we look like kvmppc_interrupt */
+> +	li	r11,PACA_EXGEN
+> +	b	1f
+>   
+>   /*
+>    * KVM interrupt entry occurs after GEN_INT_ENTRY runs, and follows that
+> @@ -53,6 +63,12 @@ kvmppc_hcall:
+>   .global	kvmppc_interrupt
+>   .balign IFETCH_ALIGN_BYTES
+>   kvmppc_interrupt:
+> +	std	r10,HSTATE_SCRATCH0(r13)
+> +	lbz	r10,HSTATE_IN_GUEST(r13)
+> +	cmpwi	r10,KVM_GUEST_MODE_GUEST_HV_FAST
+> +	beq	kvmppc_p9_exit_interrupt
+> +	ld	r10,HSTATE_SCRATCH0(r13)
+> +	lbz	r11,HSTATE_IN_GUEST(r13)
+>   	li	r11,PACA_EXGEN
+>   	cmpdi	r10,0x200
+>   	bgt+	1f
+> @@ -154,3 +170,234 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+>   	GET_SCRATCH0(r13)
+>   	HRFI_TO_KERNEL
+>   #endif
+> +
+> +/* Stack frame offsets for kvmppc_hv_entry */
+> +#define SFS			(144 + STACK_FRAME_MIN_SIZE)
+> +#define STACK_SLOT_NVGPRS	(SFS - 144)	/* 18 gprs */
+> +
+> +/*
+> + * void kvmppc_p9_enter_guest(struct vcpu *vcpu);
+> + *
+> + * Enter the guest on a ISAv3.0 or later system where we have exactly
+> + * one vcpu per vcore, and both the host and guest are radix, and threads
+> + * are set to "indepdent mode".
+> + */
+> +.balign	IFETCH_ALIGN_BYTES
+> +_GLOBAL(kvmppc_p9_enter_guest)
+> +EXPORT_SYMBOL_GPL(kvmppc_p9_enter_guest)
+> +	mflr	r0
+> +	std	r0,PPC_LR_STKOFF(r1)
+> +	stdu	r1,-SFS(r1)
+> +
+> +	std	r1,HSTATE_HOST_R1(r13)
+> +
+> +	mfcr	r4
+> +	stw	r4,SFS+8(r1)
+> +
+> +	reg = 14
+> +	.rept	18
+> +	std	reg,STACK_SLOT_NVGPRS + ((reg - 14) * 8)(r1)
+> +	reg = reg + 1
+> +	.endr
+> +
+> +	ld	r4,VCPU_LR(r3)
+> +	mtlr	r4
+> +	ld	r4,VCPU_CTR(r3)
+> +	mtctr	r4
+> +	ld	r4,VCPU_XER(r3)
+> +	mtspr	SPRN_XER,r4
+> +
+> +	ld	r1,VCPU_CR(r3)
+> +
+> +BEGIN_FTR_SECTION
+> +	ld	r4,VCPU_CFAR(r3)
+> +	mtspr	SPRN_CFAR,r4
+> +END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
+> +BEGIN_FTR_SECTION
+> +	ld	r4,VCPU_PPR(r3)
+> +	mtspr	SPRN_PPR,r4
+> +END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+> +
+> +	reg = 4
+> +	.rept	28
+> +	ld	reg,__VCPU_GPR(reg)(r3)
+> +	reg = reg + 1
+> +	.endr
+> +
+> +	ld	r4,VCPU_KVM(r3)
+> +	lbz	r4,KVM_SECURE_GUEST(r4)
 
-1-11 are pretty small, mostly isolated improvements.
 
->   KVM: PPC: Book3S 64: move KVM interrupt entry to a common entry point
->   KVM: PPC: Book3S 64: Move GUEST_MODE_SKIP test into KVM
->   KVM: PPC: Book3S 64: add hcall interrupt handler
->   KVM: PPC: Book3S 64: Move hcall early register setup to KVM
->   KVM: PPC: Book3S 64: Move interrupt early register setup to KVM
->   KVM: PPC: Book3S 64: move bad_host_intr check to HV handler
->   KVM: PPC: Book3S 64: Minimise hcall handler calling convention
->     differences
+This does not compile when CONFIG_KVM_BOOK3S_HV_POSSIBLE is not defined.
 
-12-18 includes all the exception-64s.S <-> KVM API changes required. I=20
-think these changes are improvements in their own right, certainly the=20
-exception-64s.S side is far nicer.
 
->   KVM: PPC: Book3S HV P9: Move radix MMU switching instructions together
-
-19 I would like to include because these MMU SPRs have a special=20
-relationship that can't just be set in any order. This code is also much=20
-better suited to sim and prototyping work for proposed changes to the=20
-MMU context switching architecture.
-
->   KVM: PPC: Book3S HV P9: implement kvmppc_xive_pull_vcpu in C
->   KVM: PPC: Book3S HV P9: Move xive vcpu context management into
->     kvmhv_p9_guest_entry
-
-20-21 are stand-alone, I think they're good. Existing asm is duplicated=20
-in C but the C documents it and anyway matches its inverse which is=20
-already in C.
-
-And I think it's better to be doing CI MMIOs while we're still mostly in=20
-host context.
-
->   KVM: PPC: Book3S HV P9: Stop handling hcalls in real-mode in the P9
->     path
-
-22 move down together with Implement the rest of the P9 path in C.
-
->   KVM: PPC: Book3S HV P9: Move setting HDEC after switching to guest
->     LPCR
->   KVM: PPC: Book3S HV P9: Use large decrementer for HDEC
->   KVM: PPC: Book3S HV P9: Use host timer accounting to avoid decrementer
->     read
->   KVM: PPC: Book3S HV P9: Reduce mftb per guest entry/exit
->   KVM: PPC: Book3S HV P9: Reduce irq_work vs guest decrementer races
->   KMV: PPC: Book3S HV: Use set_dec to set decrementer to host
->   powerpc/time: add API for KVM to re-arm the host timer/decrementer
-
-23-29 try to get all these timekeeping things in. They ended up being=20
-mostly unrelated to the C conversion but the way I started out writing=20
-the C conversion, these changes fell out and ended up collecting here. I=20
-think they're generally improvements.
-
-That leaves about 20 patches remaining. Of those, only about the first 5=20
-are necessary to reimplement the existing P9 path functionality in C,=20
-which is a lot less scary than nearly 50.
-
-Thanks,
-Nick
-
->   KVM: PPC: Book3S HV P9: Implement the rest of the P9 path in C
->   KVM: PPC: Book3S HV P9: inline kvmhv_load_hv_regs_and_go into
->     __kvmhv_vcpu_entry_p9
->   KVM: PPC: Book3S HV P9: Read machine check registers while MSR[RI] is
->     0
->   KVM: PPC: Book3S HV P9: Improve exit timing accounting coverage
->   KVM: PPC: Book3S HV P9: Move SPR loading after expiry time check
->   KVM: PPC: Book3S HV P9: Add helpers for OS SPR handling
->   KVM: PPC: Book3S HV P9: Switch to guest MMU context as late as
->     possible
->   KVM: PPC: Book3S HV: Implement radix prefetch workaround by disabling
->     MMU
->   KVM: PPC: Book3S HV: Remove support for dependent threads mode on P9
->   KVM: PPC: Book3S HV: Remove radix guest support from P7/8 path
->   KVM: PPC: Book3S HV: Remove virt mode checks from real mode handlers
->   KVM: PPC: Book3S HV: Remove unused nested HV tests in XICS emulation
->   KVM: PPC: Book3S HV P9: Allow all P9 processors to enable nested HV
->   KVM: PPC: Book3S HV: small pseries_do_hcall cleanup
->   KVM: PPC: Book3S HV: add virtual mode handlers for HPT hcalls and page
->     faults
->   KVM: PPC: Book3S HV P9: Reflect userspace hcalls to hash guests to
->     support PR KVM
->   KVM: PPC: Book3S HV P9: implement hash guest support
->   KVM: PPC: Book3S HV P9: implement hash host / hash guest support
->   KVM: PPC: Book3S HV: remove ISA v3.0 and v3.1 support from P7/8 path
->=20
->  arch/powerpc/include/asm/asm-prototypes.h |   3 +-
->  arch/powerpc/include/asm/exception-64s.h  |  13 +
->  arch/powerpc/include/asm/kvm_asm.h        |   3 +-
->  arch/powerpc/include/asm/kvm_book3s.h     |   2 +
->  arch/powerpc/include/asm/kvm_book3s_64.h  |   8 +
->  arch/powerpc/include/asm/kvm_host.h       |   8 +-
->  arch/powerpc/include/asm/kvm_ppc.h        |  21 +-
->  arch/powerpc/include/asm/mmu_context.h    |   6 -
->  arch/powerpc/include/asm/time.h           |  11 +
->  arch/powerpc/kernel/asm-offsets.c         |   1 -
->  arch/powerpc/kernel/exceptions-64s.S      | 257 ++-----
->  arch/powerpc/kernel/security.c            |   5 +-
->  arch/powerpc/kernel/time.c                |  43 +-
->  arch/powerpc/kvm/Makefile                 |   4 +
->  arch/powerpc/kvm/book3s.c                 |  17 +-
->  arch/powerpc/kvm/book3s_64_entry.S        | 409 +++++++++++
->  arch/powerpc/kvm/book3s_64_vio_hv.c       |  12 -
->  arch/powerpc/kvm/book3s_hv.c              | 782 ++++++++++++----------
->  arch/powerpc/kvm/book3s_hv_builtin.c      | 138 +---
->  arch/powerpc/kvm/book3s_hv_interrupt.c    | 529 +++++++++++++++
->  arch/powerpc/kvm/book3s_hv_interrupts.S   |   9 +-
->  arch/powerpc/kvm/book3s_hv_nested.c       |  37 +-
->  arch/powerpc/kvm/book3s_hv_ras.c          |   2 +
->  arch/powerpc/kvm/book3s_hv_rm_mmu.c       |  15 +-
->  arch/powerpc/kvm/book3s_hv_rm_xics.c      |  15 -
->  arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 682 +------------------
->  arch/powerpc/kvm/book3s_segment.S         |   3 +
->  arch/powerpc/kvm/book3s_xive.c            | 113 +++-
->  arch/powerpc/kvm/book3s_xive.h            |   7 -
->  arch/powerpc/kvm/book3s_xive_native.c     |  10 -
->  arch/powerpc/mm/book3s64/radix_pgtable.c  |  27 +-
->  arch/powerpc/mm/book3s64/radix_tlb.c      |  46 --
->  arch/powerpc/mm/mmu_context.c             |   4 +-
->  arch/powerpc/platforms/powernv/idle.c     |  52 +-
->  34 files changed, 1735 insertions(+), 1559 deletions(-)
->  create mode 100644 arch/powerpc/kvm/book3s_64_entry.S
->  create mode 100644 arch/powerpc/kvm/book3s_hv_interrupt.c
->=20
-> --=20
-> 2.23.0
->=20
->=20
+-- 
+Alexey
