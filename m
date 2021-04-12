@@ -2,110 +2,105 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D3D435B847
-	for <lists+kvm-ppc@lfdr.de>; Mon, 12 Apr 2021 03:49:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAF9F35BB3C
+	for <lists+kvm-ppc@lfdr.de>; Mon, 12 Apr 2021 09:51:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236273AbhDLBtu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 11 Apr 2021 21:49:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58016 "EHLO
+        id S237011AbhDLHv1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 12 Apr 2021 03:51:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236377AbhDLBtr (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 11 Apr 2021 21:49:47 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F18D2C061574
-        for <kvm-ppc@vger.kernel.org>; Sun, 11 Apr 2021 18:49:28 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id k8so8181492pgf.4
-        for <kvm-ppc@vger.kernel.org>; Sun, 11 Apr 2021 18:49:28 -0700 (PDT)
+        with ESMTP id S236936AbhDLHv1 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 12 Apr 2021 03:51:27 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D012FC061574
+        for <kvm-ppc@vger.kernel.org>; Mon, 12 Apr 2021 00:51:09 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id a12so8660755pfc.7
+        for <kvm-ppc@vger.kernel.org>; Mon, 12 Apr 2021 00:51:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=SrGG57sCJsQ8pkpP+3mT7sg63D+3Ca06l9D6kjJ6tqw=;
-        b=vGp7Me7om9cdFzBdOGxgR7OLxv7BopSYT5hdQT1LGRCoYIbbqpNA3VGdLIt7Dw0FkC
-         DJWxCWLmNqzExkIFKOqQDGgYk6CVirQ3fR/a1+UGoek7boS9IRiCtCxITLnQ/ULkzNsb
-         /J8vNc3Fvw/5p1cpzhO/wh0zxBoUvPnEafKakczeIQaPprv3zb0ZcpqygIviQ7XDBJtO
-         yaLzRoo5tzNnbrQytROss9GyS+tE4i387QxKgFaIrIFRgO6C/E6VBmhRfPdvi8O7Sdqv
-         X0+qbLHRWug9oEs1/3hnf8Cz//0AKUysW1vqpiVaOBf0DYlnxRk7gVS/OpDodrexIsUf
-         d6Ow==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ghAZbXCnYZv5OC+rtIwdziC8cQB3Sr8op6xK0fZMBD0=;
+        b=J15qDNvNiePUPTiNhNaWD5Wbd6HvlV7qiMPXaiov0HPCr2EL5luqhLhX3bb2rXX/EI
+         eBhYpWPxcBkZI3KrLq0QqdU1ZbsdYXEY/o7SSNGRhrk1QjXFSwtiknkcYArMQpqQH/8g
+         ncAkBu4sZDb/864NS3XwubuhuA5qIPF/NFKLHhJ2AtcvTzqltgMTeyvnsccxFt1ReiQG
+         A2ib/0frOKUf4zhKHLTW4Phy+8VDMwec68iENR54vvoWszW3sB50xWOk3wqZKiNBe8Ck
+         YLmzvBkFGhlpV1mzhukkjMaFFdyBzwCKYCzGLlz/0IIQlIS61pC1YL9e2q/quCw64yF/
+         7neA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=SrGG57sCJsQ8pkpP+3mT7sg63D+3Ca06l9D6kjJ6tqw=;
-        b=a3tsm8I3ku07SDsdCf+Zjqk5T3sYnZsyyoXOJr4nZaAMRwV83mEDfHHWd0GgBXTH6D
-         E7EbWsbN1C1eeg4YBMaCvNoxiZc8/CbkLBPCT11qasiA18zWY6yS72dgZX8jMrVxIVJ8
-         5ToiBWs5BI2MZcqDrlTIMGl7WyeOdNjdIyzSZ/G1JSR1itaFaOfB6SoBtyq3tg2Qsdc/
-         3LiOGbNLEp8ZQGQTWGiPIIzCNPA5gDneD0EYFaVOLXPWAiRspIDvPrPk0o5glpLjN7D+
-         k4lUYAtfE8fSfQF91ASGOuNeQLhMkIz9AOzySSWOASsE1TxeKCB6CdnwB48DSr/TfShP
-         hp5Q==
-X-Gm-Message-State: AOAM532VZhrDqxvbNoj0kkRGKyHeFdSA2CCR71MrUH+Uur1Co8k+vq8H
-        hNohkGo8Y3s5ZzjKgwJdQXlQnA4zwI8=
-X-Google-Smtp-Source: ABdhPJw3ZMdGiv+pO6hLANfM5DZrtutZPxb6wmVxQnFeXntYKqtXZQN53v9QtdoFZphST5/uIwMcIw==
-X-Received: by 2002:a63:1a50:: with SMTP id a16mr25388216pgm.92.1618192168509;
-        Sun, 11 Apr 2021 18:49:28 -0700 (PDT)
-Received: from bobo.ibm.com (193-116-90-211.tpgi.com.au. [193.116.90.211])
-        by smtp.gmail.com with ESMTPSA id m9sm9502345pgt.65.2021.04.11.18.49.26
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ghAZbXCnYZv5OC+rtIwdziC8cQB3Sr8op6xK0fZMBD0=;
+        b=NCk0ohwAqHfgFZNZ2JhrqVOURudM7gmUgLQUJVNxzWF1sGmynqwWL0z8JJnvUqylSu
+         7egJHVLnJYBubxJhIGL0u0stiB0YqgD2y1/NgFmp1CILJN/JXBbYc9zDD4OhXkGk51P+
+         mn5tdxtg9CbyYZ2/Kq3uJUvCVEfzqK4pXlLRe+ZGd1aBgP6C/fJZN+WQnVNmSKg5Zc4f
+         dmRFCayfQwPbpGNU/rLmTYYz/tyx7fkh2MJ3hJrpjQPwEwiauKXZ0mt15gAv1xYNWFm3
+         nwKmGL4RaP0We/ofzMiPtlpkr2EOwfPwXyV9L1/+fhc9PXSv7GrnXw0n7JU2JF4J6LTG
+         Ta9Q==
+X-Gm-Message-State: AOAM531eBZTD3mHRqutluPLUKtRmuqnfERYrsOT2nZ6J80aqi06tkunL
+        oRfW2SiUjHY5egLUm37ZNUAKtdawBsY=
+X-Google-Smtp-Source: ABdhPJzxcnnIBC9LkW1u96hVOEfdPeulPsnwRQTsPa+PuYMmzfVDOmE0o0ryvRjgLrW2Px94cPAiQg==
+X-Received: by 2002:a63:3e4b:: with SMTP id l72mr25143629pga.203.1618213869155;
+        Mon, 12 Apr 2021 00:51:09 -0700 (PDT)
+Received: from bobo.ozlabs.ibm.com (193-116-90-211.tpgi.com.au. [193.116.90.211])
+        by smtp.gmail.com with ESMTPSA id i18sm606180pfq.168.2021.04.12.00.51.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Apr 2021 18:49:28 -0700 (PDT)
+        Mon, 12 Apr 2021 00:51:08 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
-        Paul Mackerras <paulus@ozlabs.org>
-Subject: [PATCH v1 12/12] KVM: PPC: Book3S HV: Ensure MSR[HV] is always clear in guest MSR
-Date:   Mon, 12 Apr 2021 11:48:45 +1000
-Message-Id: <20210412014845.1517916-13-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v1 0/7] KVM / 64s interrupt handling changes
+Date:   Mon, 12 Apr 2021 17:50:56 +1000
+Message-Id: <20210412075103.1533302-1-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20210412014845.1517916-1-npiggin@gmail.com>
-References: <20210412014845.1517916-1-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Rather than clear the HV bit from the MSR at guest entry, make it clear
-that the hypervisor does not allow the guest to set the bit.
+This is the second batch of patches split from the big KVM in C
+series.
 
-The HV clear is kept in guest entry for now, but a future patch will
-warn if it is set.
+This implements all the changes to exception-64s.S required for the
+subsequent C conversion. I think they stand on their own as good
+patches.
 
-Acked-by: Paul Mackerras <paulus@ozlabs.org>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- arch/powerpc/kvm/book3s_hv_builtin.c | 4 ++--
- arch/powerpc/kvm/book3s_hv_nested.c  | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+The main things done here are to make the code more amenable to
+adding different KVM interrupt handlers (rather than just PR and
+HV), and moving a lot of KVM specific code out of exceptions-64s.S
+and moving it to arch/powerpc/kvm/book3s_64_entry.S. Calling
+convention between those files is changed to mostly match the
+exception-64s.S "GEN_INT_ENTRY" convention, so that's a change but
+now you only have to remember that one for both cases (either
+branching to KVM handler or continuing to GEN_COMMON handler).
 
-diff --git a/arch/powerpc/kvm/book3s_hv_builtin.c b/arch/powerpc/kvm/book3s_hv_builtin.c
-index 41cb03d0bde4..7a0e33a9c980 100644
---- a/arch/powerpc/kvm/book3s_hv_builtin.c
-+++ b/arch/powerpc/kvm/book3s_hv_builtin.c
-@@ -662,8 +662,8 @@ static void kvmppc_end_cede(struct kvm_vcpu *vcpu)
- 
- void kvmppc_set_msr_hv(struct kvm_vcpu *vcpu, u64 msr)
- {
--	/* Guest must always run with ME enabled. */
--	msr = msr | MSR_ME;
-+	/* Guest must always run with ME enabled, HV disabled. */
-+	msr = (msr | MSR_ME) & ~MSR_HV;
- 
- 	/*
- 	 * Check for illegal transactional state bit combination
-diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-index fb03085c902b..60724f674421 100644
---- a/arch/powerpc/kvm/book3s_hv_nested.c
-+++ b/arch/powerpc/kvm/book3s_hv_nested.c
-@@ -344,8 +344,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
- 	vcpu->arch.nested_vcpu_id = l2_hv.vcpu_token;
- 	vcpu->arch.regs = l2_regs;
- 
--	/* Guest must always run with ME enabled. */
--	vcpu->arch.shregs.msr = vcpu->arch.regs.msr | MSR_ME;
-+	/* Guest must always run with ME enabled, HV disabled. */
-+	vcpu->arch.shregs.msr = (vcpu->arch.regs.msr | MSR_ME) & ~MSR_HV;
- 
- 	sanitise_hv_regs(vcpu, &l2_hv);
- 	restore_hv_regs(vcpu, &l2_hv);
+This is tested with HV KVM, nested HV under radix L0+L1, and nested
+PR KVM under HPT guest. All seems to be working okay.
+
+Thanks,
+Nick
+
+Nicholas Piggin (7):
+  KVM: PPC: Book3S 64: move KVM interrupt entry to a common entry point
+  KVM: PPC: Book3S 64: Move GUEST_MODE_SKIP test into KVM
+  KVM: PPC: Book3S 64: add hcall interrupt handler
+  KVM: PPC: Book3S 64: Move hcall early register setup to KVM
+  KVM: PPC: Book3S 64: Move interrupt early register setup to KVM
+  KVM: PPC: Book3S 64: move bad_host_intr check to HV handler
+  KVM: PPC: Book3S 64: Minimise hcall handler calling convention
+    differences
+
+ arch/powerpc/include/asm/exception-64s.h |  13 ++
+ arch/powerpc/kernel/exceptions-64s.S     | 250 ++++-------------------
+ arch/powerpc/kvm/Makefile                |   3 +
+ arch/powerpc/kvm/book3s_64_entry.S       | 158 ++++++++++++++
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S  |  13 +-
+ arch/powerpc/kvm/book3s_segment.S        |   3 +
+ 6 files changed, 220 insertions(+), 220 deletions(-)
+ create mode 100644 arch/powerpc/kvm/book3s_64_entry.S
+
 -- 
 2.23.0
 
