@@ -2,53 +2,53 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2571835EC1E
-	for <lists+kvm-ppc@lfdr.de>; Wed, 14 Apr 2021 07:21:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA5B335F0B2
+	for <lists+kvm-ppc@lfdr.de>; Wed, 14 Apr 2021 11:21:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230375AbhDNFVY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 14 Apr 2021 01:21:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43594 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1347126AbhDNFVX (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 14 Apr 2021 01:21:23 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13E53Gq6095394;
-        Wed, 14 Apr 2021 01:20:49 -0400
+        id S239481AbhDNJWK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 14 Apr 2021 05:22:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55404 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230247AbhDNJWK (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 14 Apr 2021 05:22:10 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13E9ItNg044547;
+        Wed, 14 Apr 2021 05:21:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : in-reply-to : references : date : message-id : content-type :
- mime-version; s=pp1; bh=+vwG3u3iIJPG/PKR7v/p3EeHOl8MGusq6Iepzq3DwWU=;
- b=d4TX/QcPMfADRL9KVfaRYfODhn4FsZ2yB3WSPGXXB4nFc2beLvn30zwl+oklMmtt6mSR
- 11PYEgFTpFXqkKHLdAmMT6sGMvv0r6cBTkKZLGiuQ0hlWW+F2mDckPnt6ik1OCre3grF
- Dhl5T5mJZIkXhBtXEthFFupbPwX1pm7jRsat1gWC9dvlQgkOUup5NFynLRMmeVRNfd0i
- OIkKrihKI54UV8F0kuneP75CzFcyK+e8Gi01DNj5RyWGiyGET4ZWDXZ5ew2PobLD9wjK
- 39gnGHtqQd/iGeVLbG4yt4ya73Z5Ze0m3DKpPXzHM6fcyXyPDVSk3Ks8D9HvQmzosQCe SA== 
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37vjtuxtu3-1
+ mime-version; s=pp1; bh=EPNGEDtpOfcUlGXIeH34u9IMk2OhUx9OVMDjhXgSY6E=;
+ b=Mw1BLnbOyIU2sHatRI2SBZNld0yBRYHVaQ67Kbjq+5lSA97SjjEuPd+aRZAMZ1JajftM
+ JlCJi+4z/r8ao9qVXNc27E2jqGsU7SYzky+HT0DqQW29nt80AJ9PoXT5AEBY6xyfBAqT
+ JPuVwwpH6qgHA/PVlxSyixN6kAnFZirDu62aFib2lYZz8vRYoXBBSjbBrEq903/ZiXDG
+ WBtmwkyW3Cx8T3KldFxBUzle5njvCvPF3Mgoc9Yg6fPIxj8pCmigjTX795xQfSl7Mhe0
+ Eysm6koq6IxHae/KqJ50Wr9b758FdQGijQSIvNodNWHdOLYb2iRyw5BUrV8Byhg7bJXf ew== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37wwn601fa-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 14 Apr 2021 01:20:49 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13E5HuEY003027;
-        Wed, 14 Apr 2021 05:20:48 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma01dal.us.ibm.com with ESMTP id 37u3n9p3yu-1
+        Wed, 14 Apr 2021 05:21:45 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13E9IOl5014673;
+        Wed, 14 Apr 2021 09:21:43 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 37u3n8b688-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 14 Apr 2021 05:20:48 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13E5KlWw19595690
+        Wed, 14 Apr 2021 09:21:43 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13E9LIJB28442968
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 14 Apr 2021 05:20:48 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C688D112063;
-        Wed, 14 Apr 2021 05:20:47 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C2749112061;
-        Wed, 14 Apr 2021 05:20:44 +0000 (GMT)
-Received: from skywalker.linux.ibm.com (unknown [9.77.205.193])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 14 Apr 2021 05:20:44 +0000 (GMT)
-X-Mailer: emacs 27.2 (via feedmail 11-beta-1 I)
-From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-To:     Vaibhav Jain <vaibhav@linux.ibm.com>,
+        Wed, 14 Apr 2021 09:21:18 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7B430A4064;
+        Wed, 14 Apr 2021 09:21:40 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BE1AFA4054;
+        Wed, 14 Apr 2021 09:21:37 +0000 (GMT)
+Received: from vajain21.in.ibm.com (unknown [9.85.72.167])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Wed, 14 Apr 2021 09:21:37 +0000 (GMT)
+Received: by vajain21.in.ibm.com (sSMTP sendmail emulation); Wed, 14 Apr 2021 14:51:36 +0530
+From:   Vaibhav Jain <vaibhav@linux.ibm.com>
+To:     "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
         Shivaprasad G Bhat <sbhat@linux.ibm.com>,
         sbhat@linux.vnet.ibm.com, linuxppc-dev@lists.ozlabs.org,
         kvm-ppc@vger.kernel.org, linux-nvdimm@lists.01.org,
@@ -56,107 +56,129 @@ To:     Vaibhav Jain <vaibhav@linux.ibm.com>,
 Cc:     linux-doc@vger.kernel.org
 Subject: Re: [PATCH v3] powerpc/papr_scm: Implement support for H_SCM_FLUSH
  hcall
-In-Reply-To: <87sg3ujmrm.fsf@vajain21.in.ibm.com>
+In-Reply-To: <877dl530id.fsf@linux.ibm.com>
 References: <161703936121.36.7260632399582101498.stgit@e1fbed493c87>
- <87sg3ujmrm.fsf@vajain21.in.ibm.com>
-Date:   Wed, 14 Apr 2021 10:50:42 +0530
-Message-ID: <877dl530id.fsf@linux.ibm.com>
+ <87sg3ujmrm.fsf@vajain21.in.ibm.com> <877dl530id.fsf@linux.ibm.com>
+Date:   Wed, 14 Apr 2021 14:51:36 +0530
+Message-ID: <87o8ehjk67.fsf@vajain21.in.ibm.com>
 Content-Type: text/plain
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8ZQICP9aX4lphGsoIi4A2MSJqLUmlzWR
-X-Proofpoint-ORIG-GUID: 8ZQICP9aX4lphGsoIi4A2MSJqLUmlzWR
+X-Proofpoint-GUID: QU2-Dpz_DZFHz8o9MVMVVZ18AoGIeW2Y
+X-Proofpoint-ORIG-GUID: QU2-Dpz_DZFHz8o9MVMVVZ18AoGIeW2Y
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-14_01:2021-04-13,2021-04-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- priorityscore=1501 impostorscore=0 suspectscore=0 bulkscore=0 adultscore=0
- mlxscore=0 mlxlogscore=999 clxscore=1015 phishscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104140034
+ definitions=2021-04-14_06:2021-04-14,2021-04-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ malwarescore=0 mlxscore=0 lowpriorityscore=0 adultscore=0 spamscore=0
+ clxscore=1015 priorityscore=1501 impostorscore=0 bulkscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104140060
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Vaibhav Jain <vaibhav@linux.ibm.com> writes:
+"Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com> writes:
 
-> Hi Shiva,
+> Vaibhav Jain <vaibhav@linux.ibm.com> writes:
 >
-> Apologies for a late review but something just caught my eye while
-> working on a different patch.
+>> Hi Shiva,
+>>
+>> Apologies for a late review but something just caught my eye while
+>> working on a different patch.
+>>
+>> Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
+>>
+>>> Add support for ND_REGION_ASYNC capability if the device tree
+>>> indicates 'ibm,hcall-flush-required' property in the NVDIMM node.
+>>> Flush is done by issuing H_SCM_FLUSH hcall to the hypervisor.
+>>>
+>>> If the flush request failed, the hypervisor is expected to
+>>> to reflect the problem in the subsequent nvdimm H_SCM_HEALTH call.
+>>>
+>>> This patch prevents mmap of namespaces with MAP_SYNC flag if the
+>>> nvdimm requires an explicit flush[1].
+>>>
+>>> References:
+>>> [1] https://github.com/avocado-framework-tests/avocado-misc-tests/blob/master/memory/ndctl.py.data/map_sync.c
+>>>
+>>> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+>>> ---
+>>> v2 - https://www.spinics.net/lists/kvm-ppc/msg18799.html
+>>> Changes from v2:
+>>>        - Fixed the commit message.
+>>>        - Add dev_dbg before the H_SCM_FLUSH hcall
+>>>
+>>> v1 - https://www.spinics.net/lists/kvm-ppc/msg18272.html
+>>> Changes from v1:
+>>>        - Hcall semantics finalized, all changes are to accomodate them.
+>>>
+>>>  Documentation/powerpc/papr_hcalls.rst     |   14 ++++++++++
+>>>  arch/powerpc/include/asm/hvcall.h         |    3 +-
+>>>  arch/powerpc/platforms/pseries/papr_scm.c |   40 +++++++++++++++++++++++++++++
+>>>  3 files changed, 56 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/Documentation/powerpc/papr_hcalls.rst b/Documentation/powerpc/papr_hcalls.rst
+>>> index 48fcf1255a33..648f278eea8f 100644
+>>> --- a/Documentation/powerpc/papr_hcalls.rst
+>>> +++ b/Documentation/powerpc/papr_hcalls.rst
+>>> @@ -275,6 +275,20 @@ Health Bitmap Flags:
+>>>  Given a DRC Index collect the performance statistics for NVDIMM and copy them
+>>>  to the resultBuffer.
+>>>  
+>>> +**H_SCM_FLUSH**
+>>> +
+>>> +| Input: *drcIndex, continue-token*
+>>> +| Out: *continue-token*
+>>> +| Return Value: *H_SUCCESS, H_Parameter, H_P2, H_BUSY*
+>>> +
+>>> +Given a DRC Index Flush the data to backend NVDIMM device.
+>>> +
+>>> +The hcall returns H_BUSY when the flush takes longer time and the hcall needs
+>>> +to be issued multiple times in order to be completely serviced. The
+>>> +*continue-token* from the output to be passed in the argument list of
+>>> +subsequent hcalls to the hypervisor until the hcall is completely serviced
+>>> +at which point H_SUCCESS or other error is returned by the hypervisor.
+>>> +
+>> Does the hcall semantic also include measures to trigger a barrier/fence
+>> (like pm_wmb()) so that all the stores before the hcall are gauranteed
+>> to have hit the pmem controller ?
 >
-> Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
->
->> Add support for ND_REGION_ASYNC capability if the device tree
->> indicates 'ibm,hcall-flush-required' property in the NVDIMM node.
->> Flush is done by issuing H_SCM_FLUSH hcall to the hypervisor.
->>
->> If the flush request failed, the hypervisor is expected to
->> to reflect the problem in the subsequent nvdimm H_SCM_HEALTH call.
->>
->> This patch prevents mmap of namespaces with MAP_SYNC flag if the
->> nvdimm requires an explicit flush[1].
->>
->> References:
->> [1] https://github.com/avocado-framework-tests/avocado-misc-tests/blob/master/memory/ndctl.py.data/map_sync.c
->>
->> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
->> ---
->> v2 - https://www.spinics.net/lists/kvm-ppc/msg18799.html
->> Changes from v2:
->>        - Fixed the commit message.
->>        - Add dev_dbg before the H_SCM_FLUSH hcall
->>
->> v1 - https://www.spinics.net/lists/kvm-ppc/msg18272.html
->> Changes from v1:
->>        - Hcall semantics finalized, all changes are to accomodate them.
->>
->>  Documentation/powerpc/papr_hcalls.rst     |   14 ++++++++++
->>  arch/powerpc/include/asm/hvcall.h         |    3 +-
->>  arch/powerpc/platforms/pseries/papr_scm.c |   40 +++++++++++++++++++++++++++++
->>  3 files changed, 56 insertions(+), 1 deletion(-)
->>
->> diff --git a/Documentation/powerpc/papr_hcalls.rst b/Documentation/powerpc/papr_hcalls.rst
->> index 48fcf1255a33..648f278eea8f 100644
->> --- a/Documentation/powerpc/papr_hcalls.rst
->> +++ b/Documentation/powerpc/papr_hcalls.rst
->> @@ -275,6 +275,20 @@ Health Bitmap Flags:
->>  Given a DRC Index collect the performance statistics for NVDIMM and copy them
->>  to the resultBuffer.
->>  
->> +**H_SCM_FLUSH**
->> +
->> +| Input: *drcIndex, continue-token*
->> +| Out: *continue-token*
->> +| Return Value: *H_SUCCESS, H_Parameter, H_P2, H_BUSY*
->> +
->> +Given a DRC Index Flush the data to backend NVDIMM device.
->> +
->> +The hcall returns H_BUSY when the flush takes longer time and the hcall needs
->> +to be issued multiple times in order to be completely serviced. The
->> +*continue-token* from the output to be passed in the argument list of
->> +subsequent hcalls to the hypervisor until the hcall is completely serviced
->> +at which point H_SUCCESS or other error is returned by the hypervisor.
->> +
-> Does the hcall semantic also include measures to trigger a barrier/fence
-> (like pm_wmb()) so that all the stores before the hcall are gauranteed
-> to have hit the pmem controller ?
+> It is upto the hypervisor to implement the right sequence to ensure the
+> guarantee. The hcall doesn't expect the store to reach the platform
+> buffers.
 
-It is upto the hypervisor to implement the right sequence to ensure the
-guarantee. The hcall doesn't expect the store to reach the platform
-buffers.
+Since the asyc_flush function is also called for performing
+deep_flush from libnvdimm and as the hcall doesnt gaurantee stores to
+reach the platform buffers, hence papr_scm_pmem_flush() should issue
+pm_wmb() before the hcall.
 
+This would ensure papr_scm_pmem_flush() semantics are consistent that to
+generic_nvdimm_flush().
+
+Also, adding the statement "The hcall doesn't expect the store to reach
+the platform buffers" to the hcall documentation would be good to have.
 
 >
-> If not then the papr_scm_pmem_flush() introduced below should issue a
-> fence like pm_wmb() before issuing the flush hcall.
 >
-> If yes then this behaviour should also be documented with the hcall
-> semantics above.
+>>
+>> If not then the papr_scm_pmem_flush() introduced below should issue a
+>> fence like pm_wmb() before issuing the flush hcall.
+>>
+>> If yes then this behaviour should also be documented with the hcall
+>> semantics above.
+>>
 >
+> IIUC fdatasync on the backend file is enough to ensure the
+> guaraantee. Such a request will have REQ_PREFLUSH and REQ_FUA which will
+> do the necessary barrier on the backing device holding the backend file.
+>
+Right, but thats assuming nvdimm is backed by a regular file in
+hypervisor which may not always be the case.
 
-IIUC fdatasync on the backend file is enough to ensure the
-guaraantee. Such a request will have REQ_PREFLUSH and REQ_FUA which will
-do the necessary barrier on the backing device holding the backend file.
 
--aneesh
+> -aneesh
+
+-- 
+Cheers
+~ Vaibhav
