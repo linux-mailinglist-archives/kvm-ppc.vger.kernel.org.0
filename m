@@ -2,169 +2,154 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11070366DC1
-	for <lists+kvm-ppc@lfdr.de>; Wed, 21 Apr 2021 16:10:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1ADC369918
+	for <lists+kvm-ppc@lfdr.de>; Fri, 23 Apr 2021 20:17:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239546AbhDUOKm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 21 Apr 2021 10:10:42 -0400
-Received: from 9.mo51.mail-out.ovh.net ([46.105.48.137]:36366 "EHLO
-        9.mo51.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239480AbhDUOKm (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 21 Apr 2021 10:10:42 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.1.237])
-        by mo51.mail-out.ovh.net (Postfix) with ESMTPS id 21C372811BB;
-        Wed, 21 Apr 2021 15:31:45 +0200 (CEST)
-Received: from kaod.org (37.59.142.104) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Wed, 21 Apr
- 2021 15:31:45 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-104R005fde4d96d-4b09-4c53-bf41-50ee194d27e8,
-                    3FD145AD23CDC28BEDADD0458B38E3079EC5C648) smtp.auth=clg@kaod.org
-X-OVh-ClientIp: 90.89.73.13
-Subject: Re: [PATCH v1] KVM: PPC: Book3S HV P9: implement
- kvmppc_xive_pull_vcpu in C
-To:     Nicholas Piggin <npiggin@gmail.com>, <kvm-ppc@vger.kernel.org>
-CC:     <linuxppc-dev@lists.ozlabs.org>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <20210413133802.1691660-1-npiggin@gmail.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <18f75805-160b-b8c0-b8df-84fc801af93e@kaod.org>
-Date:   Wed, 21 Apr 2021 15:31:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-MIME-Version: 1.0
-In-Reply-To: <20210413133802.1691660-1-npiggin@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.104]
-X-ClientProxiedBy: DAG8EX1.mxp5.local (172.16.2.71) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 51411077-147f-4b63-a934-da58dbb75886
-X-Ovh-Tracer-Id: 2972657230926482400
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduledrvddtkedgieeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhephedtgfethfduhfduteeuhefffefhgfdtudevudevudfgtdfgjedukeffteelkeffnecuffhomhgrihhnpehrmhhhrghnughlvghrshdrshgsnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehnphhighhgihhnsehgmhgrihhlrdgtohhm
+        id S243571AbhDWSSL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 23 Apr 2021 14:18:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36606 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243642AbhDWSSI (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 23 Apr 2021 14:18:08 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A86FC06138E
+        for <kvm-ppc@vger.kernel.org>; Fri, 23 Apr 2021 11:17:31 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id p14-20020a17090a428eb02900fc9e178ef3so23744462pjg.5
+        for <kvm-ppc@vger.kernel.org>; Fri, 23 Apr 2021 11:17:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=jZ9aELeTtebSkfbpomfAFciujOueU+/1u2IVpj9kO9Q=;
+        b=RyBxs7miM4jdCQ3yugSc8OvrTlv5u+dF3p+Ra7seVMrj1RVtjB+pFXakJoRIl1jsLS
+         4JBtMKLiNnj9NnUNB9BsPmg2GgDdmytyBuu/qlKens774np+kb3bnNCuXir7AcEhlc1/
+         MMqfYw4RQYaFjE94XkSwKSrhOxKcqkWzlvWkJUaoPIQajn3YTSQmT7PSjqoq+mzFElwD
+         Nmi2pZp5/s1xwbLuQYIu7SednNnDgqlgHAbjSb3Ng+chogeOuRdzvwODmr0TjSFEqRbh
+         /2xlGDh8qLD5AOsfQQHMcbZvPA7WcxPJHgBTYDJjHZfxvE6utLgsp5D6rJBK8yPps95G
+         xQ1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=jZ9aELeTtebSkfbpomfAFciujOueU+/1u2IVpj9kO9Q=;
+        b=ZZbqERW+uPJVXOe8nRzyFIJRWzNhSoHCAFSSJcscdrlnRjP0mH5cqYrJS+PdXl3bj9
+         /MKb7FmVheECQgKkj5P2tk7hvoZ4Gdo/s5ELDH3TOarJotLoIbpyO5OsT9Bzu3JnUwIe
+         P2XRWarFWMubs0sZNapEMXP+HSbAEXJQPZn8wSZ2uomEYAXiDCe9P21bXLJ3EPb9CnEO
+         cA/Lidzj4lnDD/w9n6C5F5gtdkcad5f5f+JdzSBuiUSlnG5iBBfDQoVZ/I2zo81SZJNO
+         sb/1NXJXk0mIXdem0+e7KCMZXa7krpfR6WMeu9DlbBX0G7i5OpHZGFHOEDBjJoqC08Y8
+         +3ZA==
+X-Gm-Message-State: AOAM532NQVIGwmIEEGAmTUjdjC9JfOWLCw5/jP3KkjAwfxdgN6rNmnJf
+        n223Uwvn4S+s9247CRvp3h5M5OSWDwLsTavJlw==
+X-Google-Smtp-Source: ABdhPJybLPMWN/SpAe3p+WeheeiGCmvt6zlmflTWrm4w6vD8liP2VaphrDYff46dFN5dJ0IrExvz0uL99CbVXXMV7Q==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:90b:e98:: with SMTP id
+ fv24mr1049588pjb.1.1619201850403; Fri, 23 Apr 2021 11:17:30 -0700 (PDT)
+Date:   Fri, 23 Apr 2021 18:17:23 +0000
+Message-Id: <20210423181727.596466-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
+Subject: [PATCH v3 0/4] KVM statistics data fd-based binary interface
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 4/13/21 3:38 PM, Nicholas Piggin wrote:
-> This is more symmetric with kvmppc_xive_push_vcpu, and has the advantage
-> that it runs with the MMU on.
-> 
-> The extra test added to the asm will go away with a future change.
-> 
-> Reviewed-by: Cédric Le Goater <clg@kaod.org>
-> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
-> Another bit that came from the KVM Cify series.
-> 
-> Thanks,
-> Nick
-> 
->  arch/powerpc/include/asm/kvm_ppc.h      |  2 ++
->  arch/powerpc/kvm/book3s_hv.c            |  2 ++
->  arch/powerpc/kvm/book3s_hv_rmhandlers.S |  5 ++++
->  arch/powerpc/kvm/book3s_xive.c          | 31 +++++++++++++++++++++++++
->  4 files changed, 40 insertions(+)
-> 
-> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-> index 9531b1c1b190..73b1ca5a6471 100644
-> --- a/arch/powerpc/include/asm/kvm_ppc.h
-> +++ b/arch/powerpc/include/asm/kvm_ppc.h
-> @@ -672,6 +672,7 @@ extern int kvmppc_xive_set_icp(struct kvm_vcpu *vcpu, u64 icpval);
->  extern int kvmppc_xive_set_irq(struct kvm *kvm, int irq_source_id, u32 irq,
->  			       int level, bool line_status);
->  extern void kvmppc_xive_push_vcpu(struct kvm_vcpu *vcpu);
-> +extern void kvmppc_xive_pull_vcpu(struct kvm_vcpu *vcpu);
->  
->  static inline int kvmppc_xive_enabled(struct kvm_vcpu *vcpu)
->  {
-> @@ -712,6 +713,7 @@ static inline int kvmppc_xive_set_icp(struct kvm_vcpu *vcpu, u64 icpval) { retur
->  static inline int kvmppc_xive_set_irq(struct kvm *kvm, int irq_source_id, u32 irq,
->  				      int level, bool line_status) { return -ENODEV; }
->  static inline void kvmppc_xive_push_vcpu(struct kvm_vcpu *vcpu) { }
-> +static inline void kvmppc_xive_pull_vcpu(struct kvm_vcpu *vcpu) { }
->  
->  static inline int kvmppc_xive_enabled(struct kvm_vcpu *vcpu)
->  	{ return 0; }
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 4a532410e128..981bcaf787a8 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -3570,6 +3570,8 @@ static int kvmhv_load_hv_regs_and_go(struct kvm_vcpu *vcpu, u64 time_limit,
->  
->  	trap = __kvmhv_vcpu_entry_p9(vcpu);
->  
-> +	kvmppc_xive_pull_vcpu(vcpu);
-> +
->  	/* Advance host PURR/SPURR by the amount used by guest */
->  	purr = mfspr(SPRN_PURR);
->  	spurr = mfspr(SPRN_SPURR);
-> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> index 75405ef53238..c11597f815e4 100644
-> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-> @@ -1442,6 +1442,11 @@ guest_exit_cont:		/* r9 = vcpu, r12 = trap, r13 = paca */
->  	bl	kvmhv_accumulate_time
->  #endif
->  #ifdef CONFIG_KVM_XICS
-> +	/* If we came in through the P9 short path, xive pull is done in C */
-> +	lwz	r0, STACK_SLOT_SHORT_PATH(r1)
-> +	cmpwi	r0, 0
-> +	bne	1f
-> +
->  	/* We are exiting, pull the VP from the XIVE */
->  	lbz	r0, VCPU_XIVE_PUSHED(r9)
->  	cmpwi	cr0, r0, 0
-> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> index e7219b6f5f9a..741bf1f4387a 100644
-> --- a/arch/powerpc/kvm/book3s_xive.c
-> +++ b/arch/powerpc/kvm/book3s_xive.c
-> @@ -127,6 +127,37 @@ void kvmppc_xive_push_vcpu(struct kvm_vcpu *vcpu)
->  }
->  EXPORT_SYMBOL_GPL(kvmppc_xive_push_vcpu);
->  
-> +/*
-> + * Pull a vcpu's context from the XIVE on guest exit.
-> + * This assumes we are in virtual mode (MMU on)
-> + */
-> +void kvmppc_xive_pull_vcpu(struct kvm_vcpu *vcpu)
-> +{
-> +	void __iomem *tima = local_paca->kvm_hstate.xive_tima_virt;
-> +
-> +	if (!vcpu->arch.xive_pushed)
-> +		return;
-> +
-> +	/*
-> +	 * Should not have been pushed if there is no tima
-> +	 */
-> +	if (WARN_ON(!tima))
-> +		return;
-> +
-> +	eieio();
-> +	/* First load to pull the context, we ignore the value */
-> +	__raw_readl(tima + TM_SPC_PULL_OS_CTX);
-> +	/* Second load to recover the context state (Words 0 and 1) */
-> +	vcpu->arch.xive_saved_state.w01 = __raw_readq(tima + TM_QW1_OS);
+This patchset provides a file descriptor for every VM and VCPU to read
+KVM statistics data in binary format.
+It is meant to provide a lightweight, flexible, scalable and efficient
+lock-free solution for user space telemetry applications to pull the
+statistics data periodically for large scale systems. The pulling
+frequency could be as high as a few times per second.
+In this patchset, every statistics data are treated to have some
+attributes as below:
+  * architecture dependent or common
+  * VM statistics data or VCPU statistics data
+  * type: cumulative, instantaneous,
+  * unit: none for simple counter, nanosecond, microsecond,
+    millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
+Since no lock/synchronization is used, the consistency between all
+the statistics data is not guaranteed. That means not all statistics
+data are read out at the exact same time, since the statistics date
+are still being updated by KVM subsystems while they are read out.
 
-This load could be removed on P10, since HW is configured to do the same.
-It should save a few cycles.
+---
 
-C. 
+* v2 -> v3
+  - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock" between
+    install_new_memslots and MMU notifier")
+  - Resolve some nitpicks about format
 
-> +	/* Fixup some of the state for the next load */
-> +	vcpu->arch.xive_saved_state.lsmfb = 0;
-> +	vcpu->arch.xive_saved_state.ack = 0xff;
-> +	vcpu->arch.xive_pushed = 0;
-> +	eieio();
-> +}
-> +EXPORT_SYMBOL_GPL(kvmppc_xive_pull_vcpu);
-> +
->  /*
->   * This is a simple trigger for a generic XIVE IRQ. This must
->   * only be called for interrupts that support a trigger page
-> 
+* v1 -> v2
+  - Use ARRAY_SIZE to count the number of stats descriptors
+  - Fix missing `size` field initialization in macro STATS_DESC
+
+[1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+[2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (4):
+  KVM: stats: Separate common stats from architecture specific ones
+  KVM: stats: Add fd-based API to read binary stats data
+  KVM: stats: Add documentation for statistics data binary interface
+  KVM: selftests: Add selftest for KVM statistics data binary interface
+
+ Documentation/virt/kvm/api.rst                | 171 ++++++++
+ arch/arm64/include/asm/kvm_host.h             |   9 +-
+ arch/arm64/kvm/guest.c                        |  42 +-
+ arch/mips/include/asm/kvm_host.h              |   9 +-
+ arch/mips/kvm/mips.c                          |  67 +++-
+ arch/powerpc/include/asm/kvm_host.h           |   9 +-
+ arch/powerpc/kvm/book3s.c                     |  68 +++-
+ arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+ arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+ arch/powerpc/kvm/booke.c                      |  63 ++-
+ arch/s390/include/asm/kvm_host.h              |   9 +-
+ arch/s390/kvm/kvm-s390.c                      | 133 ++++++-
+ arch/x86/include/asm/kvm_host.h               |   9 +-
+ arch/x86/kvm/x86.c                            |  71 +++-
+ include/linux/kvm_host.h                      | 132 ++++++-
+ include/linux/kvm_types.h                     |  12 +
+ include/uapi/linux/kvm.h                      |  50 +++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+ .../selftests/kvm/kvm_bin_form_stats.c        | 370 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  11 +
+ virt/kvm/kvm_main.c                           | 237 ++++++++++-
+ 24 files changed, 1405 insertions(+), 90 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
+
+
+base-commit: edf408f5257ba39e63781b820528e1ce1ec0f543
+-- 
+2.31.1.498.g6c1eba8ee3d-goog
 
