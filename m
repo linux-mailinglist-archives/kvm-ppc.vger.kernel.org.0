@@ -2,145 +2,163 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 551CF36EE36
-	for <lists+kvm-ppc@lfdr.de>; Thu, 29 Apr 2021 18:33:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0AF736F117
+	for <lists+kvm-ppc@lfdr.de>; Thu, 29 Apr 2021 22:37:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233077AbhD2Qdu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 29 Apr 2021 12:33:50 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5168 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232724AbhD2Qdu (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 29 Apr 2021 12:33:50 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13TGWciS000811;
-        Thu, 29 Apr 2021 12:32:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=TKa6vFQRppYLh2+mwZthIR6zPZEfRNZrMya+Tyu1qcg=;
- b=TuIWnYI+ZZIsvN7CbPAbatYU5csnKyf/+0dIyiQxl+bWWfCJxcUEythsxnLFCGQaV5d5
- 0uR0ti6YHNwNeSrZqAxKt2go6uoQ/whl912nDZEXxr3q87npqfoLygIXbsfUZ7UGlTua
- XDVvBLZAu+CuUWU96BP6i20bVMKlxt42Ppb8WdUq9tzkFzQ4fUjxT9+xBqCI048wVl73
- he5JB++KbkJJAqRivqaEc1ylzWRM4mgQNe7nde9BIFyiCDb2gD6o5JLuHh+bWM+TzY+m
- G5U3hUiM/zBxCRgO2w2s9o6oh6kWx2X3ahnI2W71v/YNooYxkChwg14qsNJPYLt7ZUD0 tg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38807d8av1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Apr 2021 12:32:40 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13TGWdmg000842;
-        Thu, 29 Apr 2021 12:32:39 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38807d8au4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Apr 2021 12:32:39 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13TGO8Tt010918;
-        Thu, 29 Apr 2021 16:32:34 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 384ay8jhhn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Apr 2021 16:32:34 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13TGWVn226738988
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Apr 2021 16:32:31 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B697AA4054;
-        Thu, 29 Apr 2021 16:32:31 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 49C57A405F;
-        Thu, 29 Apr 2021 16:32:24 +0000 (GMT)
-Received: from [9.85.83.17] (unknown [9.85.83.17])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 29 Apr 2021 16:32:24 +0000 (GMT)
-Subject: Re: [PATCH v4 0/3] nvdimm: Enable sync-dax property for nvdimm
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Cc:     david@gibson.dropbear.id.au, groug@kaod.org, qemu-ppc@nongnu.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
-        imammedo@redhat.com, xiaoguangrong.eric@gmail.com,
-        peter.maydell@linaro.org, eblake@redhat.com, qemu-arm@nongnu.org,
-        richard.henderson@linaro.org, pbonzini@redhat.com,
-        haozhong.zhang@intel.com, shameerali.kolothum.thodi@huawei.com,
-        kwangwoo.lee@sk.com, armbru@redhat.com, qemu-devel@nongnu.org,
-        linux-nvdimm@lists.01.org, kvm-ppc@vger.kernel.org,
-        shivaprasadbhat@gmail.com, bharata@linux.vnet.ibm.com
-References: <161966810162.652.13723419108625443430.stgit@17be908f7c1c>
- <YIrW4bwbR1R0CWm/@stefanha-x1.localdomain>
-From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-Message-ID: <433e352d-5341-520c-5c57-79650277a719@linux.ibm.com>
-Date:   Thu, 29 Apr 2021 22:02:23 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-MIME-Version: 1.0
-In-Reply-To: <YIrW4bwbR1R0CWm/@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Vs4gmYYnxxjSSi7Ue87hSFLIW-pbo7R3
-X-Proofpoint-ORIG-GUID: JEqIWA59kgKo8hFInSvLjaNQgNU_Sg5Z
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-29_08:2021-04-28,2021-04-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1011
- adultscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
- malwarescore=0 spamscore=0 mlxlogscore=999 phishscore=0 bulkscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104290102
+        id S233762AbhD2Uid (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 29 Apr 2021 16:38:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37160 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233176AbhD2Uic (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 29 Apr 2021 16:38:32 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5776BC06138C
+        for <kvm-ppc@vger.kernel.org>; Thu, 29 Apr 2021 13:37:44 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id cu23-20020a17090afa97b0290152471ab665so14232921pjb.8
+        for <kvm-ppc@vger.kernel.org>; Thu, 29 Apr 2021 13:37:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=AGPbcGDitssQwR2vRkOkuDZa9dX2kbuG1ibqn3VGykk=;
+        b=vKUaHf8Js7ssAthsBYE69zLm1fhKC668a4XSogrAS2/Dj/o0DGFMmmsqCnsDdBK3r8
+         fU72HhuLV+N91HbI4pSgh5Tv0i1PzUEBWXj5fFX67L+XU+lVL8pWWznsP0NVQAQ5lUN8
+         tnGqagWLjEKhm+kdYP0z5D1VFGd6D7c5iZaQMTCVsEY02BoS0mnuzX3PxsSzTzAH96TW
+         tg88Vd5GmUxj49R4qFOrP19khvrv7Uk7Z12xOA/41VGF6xIzWWzGX5Ujhfw/yE2w/sDo
+         5qe4eKKz4NBm3zmwuvIwm9mkX7c0VkNxwjlxlY2NlKl+E9wZZUof0MbYVFwoGUhzfAhm
+         LpEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=AGPbcGDitssQwR2vRkOkuDZa9dX2kbuG1ibqn3VGykk=;
+        b=HRLgl1uxck/E/6dJ5qCdjO6gaAr3RC6Psdbv1kWiGhHq4ZyydL9OS3gKCz/gUVX53/
+         vS5nzalGyTAmt8iEbhRr62sFwhAwXcLsEzupSQ6XONFvvkjteo1PD/tNCfjpZEqYMalz
+         n+NA2Kn9DES09gKIFa6Qpk9uvlfutvWySZ0TLcIHr7tnctD9t2aBu4RpLCfeqUAjqk/d
+         EfYbEmuKnD0+5FmpLfaz4oqVr05Hlm5KjBeBf/PSNJ5efk0cod+UIbraPlqCbAQ7H2lb
+         0PdVzN4ioseKZqNHROXYXTd6Eep7n19QDmxL3Hus9HqArTH3bpwBdGN6UBS1YE0LcVps
+         ezNw==
+X-Gm-Message-State: AOAM53270rXnLc+MHwpuPk4oxWIVbXkn7/QxVBp4SyQgadjEij3xFpLH
+        xNtLkZtwOPGqZF8MQWWnlK7P6/ndJ1BApfcqsg==
+X-Google-Smtp-Source: ABdhPJxa1nzLFdFJjcOVu7fh1Y6W8Fs7WxRv4NSYd6yoIxBYT8+4qmIZrtv36CAWNU9/OaCLxfjmfxSFKptxvj1z1A==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:aa7:8e0d:0:b029:214:a511:d88b with
+ SMTP id c13-20020aa78e0d0000b0290214a511d88bmr1651129pfr.2.1619728663762;
+ Thu, 29 Apr 2021 13:37:43 -0700 (PDT)
+Date:   Thu, 29 Apr 2021 20:37:36 +0000
+Message-Id: <20210429203740.1935629-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.527.g47e6f16901-goog
+Subject: [PATCH v4 0/4] KVM statistics data fd-based binary interface
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 4/29/21 9:25 PM, Stefan Hajnoczi wrote:
-> On Wed, Apr 28, 2021 at 11:48:21PM -0400, Shivaprasad G Bhat wrote:
->> The nvdimm devices are expected to ensure write persistence during power
->> failure kind of scenarios.
->>
->> The libpmem has architecture specific instructions like dcbf on POWER
->> to flush the cache data to backend nvdimm device during normal writes
->> followed by explicit flushes if the backend devices are not synchronous
->> DAX capable.
->>
->> Qemu - virtual nvdimm devices are memory mapped. The dcbf in the guest
->> and the subsequent flush doesn't traslate to actual flush to the backend
->> file on the host in case of file backed v-nvdimms. This is addressed by
->> virtio-pmem in case of x86_64 by making explicit flushes translating to
->> fsync at qemu.
->>
->> On SPAPR, the issue is addressed by adding a new hcall to
->> request for an explicit flush from the guest ndctl driver when the backend
->> nvdimm cannot ensure write persistence with dcbf alone. So, the approach
->> here is to convey when the hcall flush is required in a device tree
->> property. The guest makes the hcall when the property is found, instead
->> of relying on dcbf.
-> 
-> Sorry, I'm not very familiar with SPAPR. Why add a hypercall when the
-> virtio-nvdimm device already exists?
-> 
+This patchset provides a file descriptor for every VM and VCPU to read
+KVM statistics data in binary format.
+It is meant to provide a lightweight, flexible, scalable and efficient
+lock-free solution for user space telemetry applications to pull the
+statistics data periodically for large scale systems. The pulling
+frequency could be as high as a few times per second.
+In this patchset, every statistics data are treated to have some
+attributes as below:
+  * architecture dependent or common
+  * VM statistics data or VCPU statistics data
+  * type: cumulative, instantaneous,
+  * unit: none for simple counter, nanosecond, microsecond,
+    millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
+Since no lock/synchronization is used, the consistency between all
+the statistics data is not guaranteed. That means not all statistics
+data are read out at the exact same time, since the statistics date
+are still being updated by KVM subsystems while they are read out.
 
-On virtualized ppc64 platforms, guests use papr_scm.ko kernel drive for 
-persistent memory support. This was done such that we can use one kernel 
-driver to support persistent memory with multiple hypervisors. To avoid 
-supporting multiple drivers in the guest, -device nvdimm Qemu 
-command-line results in Qemu using PAPR SCM backend. What this patch 
-series does is to make sure we expose the correct synchronous fault 
-support, when we back such nvdimm device with a file.
+---
 
-The existing PAPR SCM backend enables persistent memory support with the 
-help of multiple hypercall.
+* v3 -> v4
+  - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Use C-stype comments in the whole patch
+  - Fix wrong count for x86 VCPU stats descriptors
+  - Fix KVM stats data size counting and validity check in selftest
 
-#define H_SCM_READ_METADATA     0x3E4
-#define H_SCM_WRITE_METADATA    0x3E8
-#define H_SCM_BIND_MEM          0x3EC
-#define H_SCM_UNBIND_MEM        0x3F0
-#define H_SCM_UNBIND_ALL        0x3FC
+* v2 -> v3
+  - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Resolve some nitpicks about format
 
-Most of them are already implemented in Qemu. This patch series 
-implements H_SCM_FLUSH hypercall.
+* v1 -> v2
+  - Use ARRAY_SIZE to count the number of stats descriptors
+  - Fix missing `size` field initialization in macro STATS_DESC
+
+[1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+[2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+[3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (4):
+  KVM: stats: Separate common stats from architecture specific ones
+  KVM: stats: Add fd-based API to read binary stats data
+  KVM: stats: Add documentation for statistics data binary interface
+  KVM: selftests: Add selftest for KVM statistics data binary interface
+
+ Documentation/virt/kvm/api.rst                | 171 ++++++++
+ arch/arm64/include/asm/kvm_host.h             |   9 +-
+ arch/arm64/kvm/guest.c                        |  42 +-
+ arch/mips/include/asm/kvm_host.h              |   9 +-
+ arch/mips/kvm/mips.c                          |  67 ++-
+ arch/powerpc/include/asm/kvm_host.h           |   9 +-
+ arch/powerpc/kvm/book3s.c                     |  68 +++-
+ arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+ arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+ arch/powerpc/kvm/booke.c                      |  63 ++-
+ arch/s390/include/asm/kvm_host.h              |   9 +-
+ arch/s390/kvm/kvm-s390.c                      | 133 +++++-
+ arch/x86/include/asm/kvm_host.h               |   9 +-
+ arch/x86/kvm/x86.c                            |  71 +++-
+ include/linux/kvm_host.h                      | 132 +++++-
+ include/linux/kvm_types.h                     |  12 +
+ include/uapi/linux/kvm.h                      |  50 +++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+ .../selftests/kvm/kvm_bin_form_stats.c        | 380 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  11 +
+ virt/kvm/kvm_main.c                           | 237 ++++++++++-
+ 24 files changed, 1415 insertions(+), 90 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
 
 
-
-
--aneesh
+base-commit: 9f242010c3b46e63bc62f08fff42cef992d3801b
+-- 
+2.31.1.527.g47e6f16901-goog
 
