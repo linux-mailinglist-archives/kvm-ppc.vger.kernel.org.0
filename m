@@ -2,39 +2,61 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E51136EDB4
-	for <lists+kvm-ppc@lfdr.de>; Thu, 29 Apr 2021 17:55:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 551CF36EE36
+	for <lists+kvm-ppc@lfdr.de>; Thu, 29 Apr 2021 18:33:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233132AbhD2P4R (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 29 Apr 2021 11:56:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43773 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232004AbhD2P4Q (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 29 Apr 2021 11:56:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619711729;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gV1rD9bP2auaigdAbuGR4mySJTtzY5Cye9xn+YBFw4I=;
-        b=ale+RNCBzti8iTEyMH0IiXc8pSPECAbPhzHnwRtN7MmK2OR6Y19Va8KmPgVUugp8Eip+dG
-        VS39VFlNfhBHY1xkDtPdkCUJLHEPtCxTYMa0sMt0WzaPhBR2TKwXk3sIOps5e3ioAceQN5
-        Q5GEtS+c+4jJPH1DcV4nI6llyPDRyBI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-548-RWF37mhfMXigVq3nHW7iqA-1; Thu, 29 Apr 2021 11:55:27 -0400
-X-MC-Unique: RWF37mhfMXigVq3nHW7iqA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E6B08026BB;
-        Thu, 29 Apr 2021 15:55:25 +0000 (UTC)
-Received: from localhost (ovpn-115-28.ams2.redhat.com [10.36.115.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E21A319C59;
-        Thu, 29 Apr 2021 15:55:14 +0000 (UTC)
-Date:   Thu, 29 Apr 2021 16:55:13 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Shivaprasad G Bhat <sbhat@linux.ibm.com>
+        id S233077AbhD2Qdu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 29 Apr 2021 12:33:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5168 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232724AbhD2Qdu (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 29 Apr 2021 12:33:50 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13TGWciS000811;
+        Thu, 29 Apr 2021 12:32:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=TKa6vFQRppYLh2+mwZthIR6zPZEfRNZrMya+Tyu1qcg=;
+ b=TuIWnYI+ZZIsvN7CbPAbatYU5csnKyf/+0dIyiQxl+bWWfCJxcUEythsxnLFCGQaV5d5
+ 0uR0ti6YHNwNeSrZqAxKt2go6uoQ/whl912nDZEXxr3q87npqfoLygIXbsfUZ7UGlTua
+ XDVvBLZAu+CuUWU96BP6i20bVMKlxt42Ppb8WdUq9tzkFzQ4fUjxT9+xBqCI048wVl73
+ he5JB++KbkJJAqRivqaEc1ylzWRM4mgQNe7nde9BIFyiCDb2gD6o5JLuHh+bWM+TzY+m
+ G5U3hUiM/zBxCRgO2w2s9o6oh6kWx2X3ahnI2W71v/YNooYxkChwg14qsNJPYLt7ZUD0 tg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38807d8av1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 29 Apr 2021 12:32:40 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13TGWdmg000842;
+        Thu, 29 Apr 2021 12:32:39 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38807d8au4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 29 Apr 2021 12:32:39 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13TGO8Tt010918;
+        Thu, 29 Apr 2021 16:32:34 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 384ay8jhhn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 29 Apr 2021 16:32:34 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13TGWVn226738988
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 29 Apr 2021 16:32:31 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B697AA4054;
+        Thu, 29 Apr 2021 16:32:31 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 49C57A405F;
+        Thu, 29 Apr 2021 16:32:24 +0000 (GMT)
+Received: from [9.85.83.17] (unknown [9.85.83.17])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 29 Apr 2021 16:32:24 +0000 (GMT)
+Subject: Re: [PATCH v4 0/3] nvdimm: Enable sync-dax property for nvdimm
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Shivaprasad G Bhat <sbhat@linux.ibm.com>
 Cc:     david@gibson.dropbear.id.au, groug@kaod.org, qemu-ppc@nongnu.org,
         ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
         imammedo@redhat.com, xiaoguangrong.eric@gmail.com,
@@ -42,69 +64,83 @@ Cc:     david@gibson.dropbear.id.au, groug@kaod.org, qemu-ppc@nongnu.org,
         richard.henderson@linaro.org, pbonzini@redhat.com,
         haozhong.zhang@intel.com, shameerali.kolothum.thodi@huawei.com,
         kwangwoo.lee@sk.com, armbru@redhat.com, qemu-devel@nongnu.org,
-        aneesh.kumar@linux.ibm.com, linux-nvdimm@lists.01.org,
-        kvm-ppc@vger.kernel.org, shivaprasadbhat@gmail.com,
-        bharata@linux.vnet.ibm.com
-Subject: Re: [PATCH v4 0/3] nvdimm: Enable sync-dax property for nvdimm
-Message-ID: <YIrW4bwbR1R0CWm/@stefanha-x1.localdomain>
+        linux-nvdimm@lists.01.org, kvm-ppc@vger.kernel.org,
+        shivaprasadbhat@gmail.com, bharata@linux.vnet.ibm.com
 References: <161966810162.652.13723419108625443430.stgit@17be908f7c1c>
+ <YIrW4bwbR1R0CWm/@stefanha-x1.localdomain>
+From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+Message-ID: <433e352d-5341-520c-5c57-79650277a719@linux.ibm.com>
+Date:   Thu, 29 Apr 2021 22:02:23 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Rcrw00CWvSVPCG9y"
-Content-Disposition: inline
-In-Reply-To: <161966810162.652.13723419108625443430.stgit@17be908f7c1c>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <YIrW4bwbR1R0CWm/@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Vs4gmYYnxxjSSi7Ue87hSFLIW-pbo7R3
+X-Proofpoint-ORIG-GUID: JEqIWA59kgKo8hFInSvLjaNQgNU_Sg5Z
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-29_08:2021-04-28,2021-04-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1011
+ adultscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
+ malwarescore=0 spamscore=0 mlxlogscore=999 phishscore=0 bulkscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104290102
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On 4/29/21 9:25 PM, Stefan Hajnoczi wrote:
+> On Wed, Apr 28, 2021 at 11:48:21PM -0400, Shivaprasad G Bhat wrote:
+>> The nvdimm devices are expected to ensure write persistence during power
+>> failure kind of scenarios.
+>>
+>> The libpmem has architecture specific instructions like dcbf on POWER
+>> to flush the cache data to backend nvdimm device during normal writes
+>> followed by explicit flushes if the backend devices are not synchronous
+>> DAX capable.
+>>
+>> Qemu - virtual nvdimm devices are memory mapped. The dcbf in the guest
+>> and the subsequent flush doesn't traslate to actual flush to the backend
+>> file on the host in case of file backed v-nvdimms. This is addressed by
+>> virtio-pmem in case of x86_64 by making explicit flushes translating to
+>> fsync at qemu.
+>>
+>> On SPAPR, the issue is addressed by adding a new hcall to
+>> request for an explicit flush from the guest ndctl driver when the backend
+>> nvdimm cannot ensure write persistence with dcbf alone. So, the approach
+>> here is to convey when the hcall flush is required in a device tree
+>> property. The guest makes the hcall when the property is found, instead
+>> of relying on dcbf.
+> 
+> Sorry, I'm not very familiar with SPAPR. Why add a hypercall when the
+> virtio-nvdimm device already exists?
+> 
 
---Rcrw00CWvSVPCG9y
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On virtualized ppc64 platforms, guests use papr_scm.ko kernel drive for 
+persistent memory support. This was done such that we can use one kernel 
+driver to support persistent memory with multiple hypervisors. To avoid 
+supporting multiple drivers in the guest, -device nvdimm Qemu 
+command-line results in Qemu using PAPR SCM backend. What this patch 
+series does is to make sure we expose the correct synchronous fault 
+support, when we back such nvdimm device with a file.
 
-On Wed, Apr 28, 2021 at 11:48:21PM -0400, Shivaprasad G Bhat wrote:
-> The nvdimm devices are expected to ensure write persistence during power
-> failure kind of scenarios.
->=20
-> The libpmem has architecture specific instructions like dcbf on POWER
-> to flush the cache data to backend nvdimm device during normal writes
-> followed by explicit flushes if the backend devices are not synchronous
-> DAX capable.
->=20
-> Qemu - virtual nvdimm devices are memory mapped. The dcbf in the guest
-> and the subsequent flush doesn't traslate to actual flush to the backend
-> file on the host in case of file backed v-nvdimms. This is addressed by
-> virtio-pmem in case of x86_64 by making explicit flushes translating to
-> fsync at qemu.
->=20
-> On SPAPR, the issue is addressed by adding a new hcall to
-> request for an explicit flush from the guest ndctl driver when the backend
-> nvdimm cannot ensure write persistence with dcbf alone. So, the approach
-> here is to convey when the hcall flush is required in a device tree
-> property. The guest makes the hcall when the property is found, instead
-> of relying on dcbf.
+The existing PAPR SCM backend enables persistent memory support with the 
+help of multiple hypercall.
 
-Sorry, I'm not very familiar with SPAPR. Why add a hypercall when the
-virtio-nvdimm device already exists?
+#define H_SCM_READ_METADATA     0x3E4
+#define H_SCM_WRITE_METADATA    0x3E8
+#define H_SCM_BIND_MEM          0x3EC
+#define H_SCM_UNBIND_MEM        0x3F0
+#define H_SCM_UNBIND_ALL        0x3FC
 
-Stefan
+Most of them are already implemented in Qemu. This patch series 
+implements H_SCM_FLUSH hypercall.
 
---Rcrw00CWvSVPCG9y
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmCK1uEACgkQnKSrs4Gr
-c8g/QAf/Zl3J7k2z3nQpWi/HcgKIqmiZ/gYlHxU610TnzxB0pWJfprNzeuJEWeaC
-tT9RloGdmS+KmKkKjX7LQplDEry2hc6tEbyUfj3YemUW5Lz8gouaagtSkfLOFsVb
-Gpd74EcslwzSzeTmaczXTLP6MVsNaLBJx94C2/tIouGbAZwHcXSWPk/czqFm3YfL
-1Zddp77kaNiEOxk62DmL2+iW5NHzNNNzQZyMOod6el05nvuCQrobqzu3HuJ9LklE
-CWyi3GbrFLVIsB/xFKIGykaCOaQLpdc/KP6ckdN4mWTStJv9DUCd4ypomrhd1utY
-NaKyqhVKEC95PHCEz1YZk9BP8SwUlg==
-=jrRj
------END PGP SIGNATURE-----
 
---Rcrw00CWvSVPCG9y--
+-aneesh
 
