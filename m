@@ -2,144 +2,93 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B80136F665
-	for <lists+kvm-ppc@lfdr.de>; Fri, 30 Apr 2021 09:28:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E7C736F9C2
+	for <lists+kvm-ppc@lfdr.de>; Fri, 30 Apr 2021 14:07:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbhD3H3l (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 30 Apr 2021 03:29:41 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:58223 "EHLO ozlabs.org"
+        id S230020AbhD3MIL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 30 Apr 2021 08:08:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36930 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229628AbhD3H3k (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 30 Apr 2021 03:29:40 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4FWkWQ6CW9z9t0G; Fri, 30 Apr 2021 17:28:50 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1619767730;
-        bh=gLPJgqKD8Jy0MZ43/eLWhxb9UN2yUXhRzMXzf/L4RqA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bkK4V86JuRTxdSdg1PNzLWfbnzF5aA3mWq9gSOaJ9zWZq/3VI/3Jamwq9QCbsHUtJ
-         sINIc0FTwhcoOshvMl6yI6RiJdS8BkI5EfMoGSAmP7UqoR9wK6l+au5Aq8IdYJji8l
-         kIHavOtWW6jfirQaLdmCPEPOwknnsqQYYdl1MOwQ=
-Date:   Fri, 30 Apr 2021 14:27:18 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Shivaprasad G Bhat <sbhat@linux.ibm.com>, groug@kaod.org,
-        qemu-ppc@nongnu.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, mst@redhat.com, imammedo@redhat.com,
-        xiaoguangrong.eric@gmail.com, peter.maydell@linaro.org,
-        eblake@redhat.com, qemu-arm@nongnu.org,
-        richard.henderson@linaro.org, pbonzini@redhat.com,
-        haozhong.zhang@intel.com, shameerali.kolothum.thodi@huawei.com,
-        kwangwoo.lee@sk.com, armbru@redhat.com, qemu-devel@nongnu.org,
-        linux-nvdimm@lists.01.org, kvm-ppc@vger.kernel.org,
-        shivaprasadbhat@gmail.com, bharata@linux.vnet.ibm.com
-Subject: Re: [PATCH v4 0/3] nvdimm: Enable sync-dax property for nvdimm
-Message-ID: <YIuHJkwkDiHONYwp@yekko>
-References: <161966810162.652.13723419108625443430.stgit@17be908f7c1c>
- <YIrW4bwbR1R0CWm/@stefanha-x1.localdomain>
- <433e352d-5341-520c-5c57-79650277a719@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="l6FM2Up3jgp91K+8"
-Content-Disposition: inline
-In-Reply-To: <433e352d-5341-520c-5c57-79650277a719@linux.ibm.com>
+        id S229911AbhD3MIL (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 30 Apr 2021 08:08:11 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B66D361059;
+        Fri, 30 Apr 2021 12:07:22 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lcRvU-00ABa7-Gh; Fri, 30 Apr 2021 13:07:20 +0100
+Date:   Fri, 30 Apr 2021 13:07:19 +0100
+Message-ID: <87bl9wnfgo.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: Re: [PATCH v4 1/4] KVM: stats: Separate common stats from architecture specific ones
+In-Reply-To: <20210429203740.1935629-2-jingzhangos@google.com>
+References: <20210429203740.1935629-1-jingzhangos@google.com>
+        <20210429203740.1935629-2-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, seanjc@google.com, vkuznets@redhat.com, jmattson@google.com, pshier@google.com, oupton@google.com, rientjes@google.com, eesposit@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Thu, 29 Apr 2021 21:37:37 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
 
---l6FM2Up3jgp91K+8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +struct kvm_vm_stat_common {
+> +	ulong remote_tlb_flush;
+> +};
+> +
+> +struct kvm_vcpu_stat_common {
+> +	u64 halt_successful_poll;
+> +	u64 halt_attempted_poll;
+> +	u64 halt_poll_invalid;
+> +	u64 halt_wakeup;
+> +	u64 halt_poll_success_ns;
+> +	u64 halt_poll_fail_ns;
+> +};
 
-On Thu, Apr 29, 2021 at 10:02:23PM +0530, Aneesh Kumar K.V wrote:
-> On 4/29/21 9:25 PM, Stefan Hajnoczi wrote:
-> > On Wed, Apr 28, 2021 at 11:48:21PM -0400, Shivaprasad G Bhat wrote:
-> > > The nvdimm devices are expected to ensure write persistence during po=
-wer
-> > > failure kind of scenarios.
-> > >=20
-> > > The libpmem has architecture specific instructions like dcbf on POWER
-> > > to flush the cache data to backend nvdimm device during normal writes
-> > > followed by explicit flushes if the backend devices are not synchrono=
-us
-> > > DAX capable.
-> > >=20
-> > > Qemu - virtual nvdimm devices are memory mapped. The dcbf in the guest
-> > > and the subsequent flush doesn't traslate to actual flush to the back=
-end
-> > > file on the host in case of file backed v-nvdimms. This is addressed =
-by
-> > > virtio-pmem in case of x86_64 by making explicit flushes translating =
-to
-> > > fsync at qemu.
-> > >=20
-> > > On SPAPR, the issue is addressed by adding a new hcall to
-> > > request for an explicit flush from the guest ndctl driver when the ba=
-ckend
-> > > nvdimm cannot ensure write persistence with dcbf alone. So, the appro=
-ach
-> > > here is to convey when the hcall flush is required in a device tree
-> > > property. The guest makes the hcall when the property is found, inste=
-ad
-> > > of relying on dcbf.
-> >=20
-> > Sorry, I'm not very familiar with SPAPR. Why add a hypercall when the
-> > virtio-nvdimm device already exists?
-> >=20
->=20
-> On virtualized ppc64 platforms, guests use papr_scm.ko kernel drive for
-> persistent memory support. This was done such that we can use one kernel
-> driver to support persistent memory with multiple hypervisors. To avoid
-> supporting multiple drivers in the guest, -device nvdimm Qemu command-line
-> results in Qemu using PAPR SCM backend. What this patch series does is to
-> make sure we expose the correct synchronous fault support, when we back s=
-uch
-> nvdimm device with a file.
->=20
-> The existing PAPR SCM backend enables persistent memory support with the
-> help of multiple hypercall.
->=20
-> #define H_SCM_READ_METADATA     0x3E4
-> #define H_SCM_WRITE_METADATA    0x3E8
-> #define H_SCM_BIND_MEM          0x3EC
-> #define H_SCM_UNBIND_MEM        0x3F0
-> #define H_SCM_UNBIND_ALL        0x3FC
->=20
-> Most of them are already implemented in Qemu. This patch series implements
-> H_SCM_FLUSH hypercall.
+Why can't we make everything a u64? Is there anything that really
+needs to be a ulong? On most architectures, they are the same anyway,
+so we might as well bite the bullet.
 
-The overall point here is that we didn't define the hypercall.  It was
-defined in order to support NVDIMM/pmem devices under PowerVM.  For
-uniformity between PowerVM and KVM guests, we want to support the same
-hypercall interface on KVM/qemu as well.
+	M.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---l6FM2Up3jgp91K+8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmCLhyUACgkQbDjKyiDZ
-s5LgyhAAlNOzpM9+rzQIM9pfnH1Lo94q3+xqmzvHym9PAdeCUa+jekMI00mK5CRI
-buhl3VZG783nan5KYvVEIfblxCN2ENHrcoKM/rVNF6QsGkIQGVfCo1kE2Se1kwZS
-dDxcyXK/ASz+ryFQAIUvA5LA2/pyR3AsMVOqCcX9DgZjXm1JZt6dE2byZu8+CJXg
-oNlXuJab1+vPwBsMV1tITKUic4Zn1WJQSXZ/sn59uEGW69gG1QK113LQtpLqO1r/
-R10btoJgqHquWZMQl807XiDqtLzEs/L+UlKKpmR1uD+jZSRy3L/ir9Rf+QeM4DtL
-eGsYndvYaDkxmuE4rtDCxBOMi2GNragtsPOHUuNUd4PaA4K/r0EWpNDHJbcKG04X
-boMlF+wiM9EyNZyqa6vlULBkDTvgYA3y8MD0QO+jwHggAOsj8UyBIKn2XascQC+u
-mWMJJgeEBgq+IiEhnNj3OfOh5GgJiEUHsRj4FomiAWu125NNN0aNK9uXthhd4DGO
-RcekZfaPQOkPJh2WG+ZOAreNqdt6aEaJ95lVXD4l9yYh5Vn29wuon5BmvPEfCroW
-wUFAbvJSBiXzIXEggoKnQzsPiG6VPenAHanBVTXvHXHN2InCqcNWdwTw5XgrAKn+
-lfTdvqXV93uHpQqbjPiiGMzUGoFsFvQFkvZ6H8NnvOQAS78FXus=
-=86vq
------END PGP SIGNATURE-----
-
---l6FM2Up3jgp91K+8--
+-- 
+Without deviation from the norm, progress is not possible.
