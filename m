@@ -2,201 +2,164 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 295263705A2
-	for <lists+kvm-ppc@lfdr.de>; Sat,  1 May 2021 06:48:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8E8D370776
+	for <lists+kvm-ppc@lfdr.de>; Sat,  1 May 2021 15:56:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbhEAEtP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 1 May 2021 00:49:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37404 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbhEAEtO (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 1 May 2021 00:49:14 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40F7BC06174A
-        for <kvm-ppc@vger.kernel.org>; Fri, 30 Apr 2021 21:48:25 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id s20so49375plr.13
-        for <kvm-ppc@vger.kernel.org>; Fri, 30 Apr 2021 21:48:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=Vve40T7v4v8sPBu5ZCJti+LTma9Wj/95l94bxGIOxwQ=;
-        b=aYMb0FicCqqAY2CBZS7UN9m57q78PA4YYBWswN9i8Dcl+uGScrayqt25tJ5fFcpPuJ
-         obaahCy/PTXHbZucyrGGwgp4exclGiK5BBWP4NDNSHDq6V1Yp/3SeWwxLW1ks6YU+17T
-         Bd+ZffFmu6UZadwthE+KcKaOSL62UWX5/Y6vACFLXOYjyGJktr2U57CkzotFT6kAx3Hk
-         20ZbY4HyeDtH+zeGUvsVstVJpVrJOSJ/ySVUZcsX9Q1mEecWbriZ5zTj6+KJCKzWzYGO
-         oC4mSbrZ7tpBOjxKQGspOVhP28g8hBTbq7IW9usImHqa0K3cP00z4q6elny2JFsKxpWW
-         7djA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=Vve40T7v4v8sPBu5ZCJti+LTma9Wj/95l94bxGIOxwQ=;
-        b=D27Zy5naMMBRzrlkcrmn4XD2zT8sfaNR0dJ0ItdCvAhKenxWXrFjURrbTka6gcHbS1
-         DgZD9lyfQODIBx//UDS5fR+HFHy3d2csXjDRJVFsuyL7AiJ7i97YZQTFkjXKTF6VsKlK
-         u3aSBpjysuSZp37Pk7KULJZvXdC89fJ9EoqEU5OF0zbqBLWI7hVexTmp+QoKOs4Z8+/H
-         WvRHBwzVCzmDK43+rIAyFakAv1TT1Hw6M3tgYV3a0olm2Vuf1nkRekHb9TDzkGGfsbkr
-         J0AHGWGLH0NEOzDCgQlyRAimqv3hjPPrzH7UG37wEvOQsAKeYNznmKIlhe66LToEztBL
-         CaLA==
-X-Gm-Message-State: AOAM531lcfW6MDCyIfT+E1J45MU1ILkf0lp50ZHTHVyq5DDX1XoYMex8
-        RWW5CShkIaH8Iafp9L+Fo4eA/0ViXm8=
-X-Google-Smtp-Source: ABdhPJyOFe9iA+1R8quHO2lV+HuAcLeerjAKwAuBtc4DTr68hFVUALTTvde42YCpEPiuELD2sHbNtQ==
-X-Received: by 2002:a17:90a:4748:: with SMTP id y8mr8620782pjg.31.1619844504683;
-        Fri, 30 Apr 2021 21:48:24 -0700 (PDT)
-Received: from localhost ([61.68.127.20])
-        by smtp.gmail.com with ESMTPSA id 23sm3662091pfz.91.2021.04.30.21.48.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Apr 2021 21:48:24 -0700 (PDT)
-Date:   Sat, 01 May 2021 14:48:19 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v3 1/2] KVM: PPC: Book3S HV: Sanitise vcpu registers in
- nested path
-To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        paulus@ozlabs.org
-References: <20210415230948.3563415-1-farosas@linux.ibm.com>
-        <20210415230948.3563415-2-farosas@linux.ibm.com>
-In-Reply-To: <20210415230948.3563415-2-farosas@linux.ibm.com>
+        id S232136AbhEAN5V (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 1 May 2021 09:57:21 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43436 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232107AbhEAN5V (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 1 May 2021 09:57:21 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 141DXOEH043051;
+        Sat, 1 May 2021 09:56:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=zfHDntymIWxlMHIRQDwwFhACh84asPFqu9RpJfxBHps=;
+ b=n7rQN3weXvrCKFBt6ElPWi7qHx5eLAktVxRyy5J4kIKMD6i/fV75C+BH8x/fewMuQYxT
+ 9gLw8Z+gxUNSiJVm0ZjaH59EM7L5g56Jq85i69icBcFM/3oKM/27xz6d9na5rbEoJni1
+ 54lcCw+e8tFXQT+VypEaJDEQahJthdRcpLUwzMx2C7cRSTNQF8PVs4RgcveNc4ePFGdr
+ Sk71s/3EFhlaDw3ebOM0iDG/9QKM5YqjiuDbOVtqpCTASOVfduwaAxHcdsZgaXGDsZJq
+ +VzuwDzqK6kj/HbSULbzVM2IRor06S2ONLJ9BMp5OEAOvdG0d9i3yTJE3uKCPaEX/HiK +w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38979e8ums-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 01 May 2021 09:56:04 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 141DXxci047260;
+        Sat, 1 May 2021 09:56:03 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38979e8um9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 01 May 2021 09:56:03 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 141DrPv9012695;
+        Sat, 1 May 2021 13:56:01 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma02fra.de.ibm.com with ESMTP id 388xm882f0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 01 May 2021 13:56:01 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 141DtwQI53412284
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 1 May 2021 13:55:58 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6A670A405F;
+        Sat,  1 May 2021 13:55:58 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 45A05A4054;
+        Sat,  1 May 2021 13:55:53 +0000 (GMT)
+Received: from [9.85.73.140] (unknown [9.85.73.140])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sat,  1 May 2021 13:55:53 +0000 (GMT)
+Subject: Re: [PATCH v4 0/3] nvdimm: Enable sync-dax property for nvdimm
+To:     Dan Williams <dan.j.williams@intel.com>,
+        Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Cc:     David Gibson <david@gibson.dropbear.id.au>,
+        Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        marcel.apfelbaum@gmail.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        peter.maydell@linaro.org, Eric Blake <eblake@redhat.com>,
+        qemu-arm@nongnu.org, richard.henderson@linaro.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Haozhong Zhang <haozhong.zhang@intel.com>,
+        shameerali.kolothum.thodi@huawei.com, kwangwoo.lee@sk.com,
+        Markus Armbruster <armbru@redhat.com>,
+        Qemu Developers <qemu-devel@nongnu.org>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        kvm-ppc@vger.kernel.org, shivaprasadbhat@gmail.com,
+        bharata@linux.vnet.ibm.com
+References: <161966810162.652.13723419108625443430.stgit@17be908f7c1c>
+ <CAPcyv4gwkyDBG7EZOth-kcZR8Fb+RgGXY=Y9vbuHXAz3PAnLVw@mail.gmail.com>
+From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+Message-ID: <5d70bf0e-290f-405a-f525-7b4710408332@linux.ibm.com>
+Date:   Sat, 1 May 2021 19:25:52 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Message-Id: <1619844035.sdrijkoiu4.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAPcyv4gwkyDBG7EZOth-kcZR8Fb+RgGXY=Y9vbuHXAz3PAnLVw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 9Gawgb4RCDulWYDsGhHOAhxANDP54XpS
+X-Proofpoint-GUID: uxCnoSiDh3NYfGBrFgcCF0DOw-3ZgAqh
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-01_07:2021-04-30,2021-05-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 bulkscore=0 malwarescore=0 phishscore=0 clxscore=1015
+ mlxlogscore=999 impostorscore=0 mlxscore=0 priorityscore=1501
+ suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2105010096
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Fabiano Rosas's message of April 16, 2021 9:09 am:
-> As one of the arguments of the H_ENTER_NESTED hypercall, the nested
-> hypervisor (L1) prepares a structure containing the values of various
-> hypervisor-privileged registers with which it wants the nested guest
-> (L2) to run. Since the nested HV runs in supervisor mode it needs the
-> host to write to these registers.
->=20
-> To stop a nested HV manipulating this mechanism and using a nested
-> guest as a proxy to access a facility that has been made unavailable
-> to it, we have a routine that sanitises the values of the HV registers
-> before copying them into the nested guest's vcpu struct.
->=20
-> However, when coming out of the guest the values are copied as they
-> were back into L1 memory, which means that any sanitisation we did
-> during guest entry will be exposed to L1 after H_ENTER_NESTED returns.
->=20
-> This patch alters this sanitisation to have effect on the vcpu->arch
-> registers directly before entering and after exiting the guest,
-> leaving the structure that is copied back into L1 unchanged (except
-> when we really want L1 to access the value, e.g the Cause bits of
-> HFSCR).
->=20
-> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
-> ---
->  arch/powerpc/kvm/book3s_hv_nested.c | 55 ++++++++++++++++++-----------
->  1 file changed, 34 insertions(+), 21 deletions(-)
->=20
-> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3=
-s_hv_nested.c
-> index 0cd0e7aad588..270552dd42c5 100644
-> --- a/arch/powerpc/kvm/book3s_hv_nested.c
-> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
-> @@ -102,8 +102,17 @@ static void save_hv_return_state(struct kvm_vcpu *vc=
-pu, int trap,
->  {
->  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
-> =20
-> +	/*
-> +	 * When loading the hypervisor-privileged registers to run L2,
-> +	 * we might have used bits from L1 state to restrict what the
-> +	 * L2 state is allowed to be. Since L1 is not allowed to read
-> +	 * the HV registers, do not include these modifications in the
-> +	 * return state.
-> +	 */
-> +	hr->hfscr =3D ((~HFSCR_INTR_CAUSE & hr->hfscr) |
-> +		     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
-> +
->  	hr->dpdes =3D vc->dpdes;
-> -	hr->hfscr =3D vcpu->arch.hfscr;
->  	hr->purr =3D vcpu->arch.purr;
->  	hr->spurr =3D vcpu->arch.spurr;
->  	hr->ic =3D vcpu->arch.ic;
+On 5/1/21 12:44 AM, Dan Williams wrote:
+> Some corrections to terminology confusion below...
 
-The below parts of the patch I have no problem with, I think it's good to=20
-be able to restore the hv_guest_state for return, e.g., for cases where=20
-the L0 might emulate some HV behaviour transparently it will be useful,
-at least.
+.......
 
-Thanks,
-Nick
+> 
+>> file on the host in case of file backed v-nvdimms. This is addressed by
+>> virtio-pmem in case of x86_64 by making explicit flushes translating to
+>> fsync at qemu.
+> 
+> Note that virtio-pmem was a proposal for a specific optimization of
+> allowing guests to share page cache. The virtio-pmem approach is not
+> to be confused with actual persistent memory.
+> 
 
-> @@ -132,24 +141,7 @@ static void save_hv_return_state(struct kvm_vcpu *vc=
-pu, int trap,
->  	}
->  }
-> =20
-> -static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_stat=
-e *hr)
-> -{
-> -	/*
-> -	 * Don't let L1 enable features for L2 which we've disabled for L1,
-> -	 * but preserve the interrupt cause field.
-> -	 */
-> -	hr->hfscr &=3D (HFSCR_INTR_CAUSE | vcpu->arch.hfscr);
-> -
-> -	/* Don't let data address watchpoint match in hypervisor state */
-> -	hr->dawrx0 &=3D ~DAWRX_HYP;
-> -	hr->dawrx1 &=3D ~DAWRX_HYP;
-> -
-> -	/* Don't let completed instruction address breakpt match in HV state */
-> -	if ((hr->ciabr & CIABR_PRIV) =3D=3D CIABR_PRIV_HYPER)
-> -		hr->ciabr &=3D ~CIABR_PRIV;
-> -}
-> -
-> -static void restore_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state=
- *hr)
-> +static void restore_hv_regs(struct kvm_vcpu *vcpu, const struct hv_guest=
-_state *hr)
->  {
->  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
-> =20
-> @@ -261,6 +253,27 @@ static int kvmhv_write_guest_state_and_regs(struct k=
-vm_vcpu *vcpu,
->  				     sizeof(struct pt_regs));
->  }
-> =20
-> +static void load_l2_hv_regs(struct kvm_vcpu *vcpu,
-> +			    const struct hv_guest_state *l2_hv,
-> +			    const struct hv_guest_state *l1_hv)
-> +{
-> +	restore_hv_regs(vcpu, l2_hv);
-> +
-> +	/*
-> +	 * Don't let L1 enable features for L2 which we've disabled for L1,
-> +	 * but preserve the interrupt cause field.
-> +	 */
-> +	vcpu->arch.hfscr =3D l2_hv->hfscr & (HFSCR_INTR_CAUSE | l1_hv->hfscr);
-> +
-> +	/* Don't let data address watchpoint match in hypervisor state */
-> +	vcpu->arch.dawrx0 =3D l2_hv->dawrx0 & ~DAWRX_HYP;
-> +	vcpu->arch.dawrx1 =3D l2_hv->dawrx1 & ~DAWRX_HYP;
-> +
-> +	/* Don't let completed instruction address breakpt match in HV state */
-> +	if ((l2_hv->ciabr & CIABR_PRIV) =3D=3D CIABR_PRIV_HYPER)
-> +		vcpu->arch.ciabr =3D l2_hv->ciabr & ~CIABR_PRIV;
-> +}
-> +
->  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->  {
->  	long int err, r;
-> @@ -324,8 +337,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->  	mask =3D LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
->  		LPCR_LPES | LPCR_MER;
->  	lpcr =3D (vc->lpcr & ~mask) | (l2_hv.lpcr & mask);
-> -	sanitise_hv_regs(vcpu, &l2_hv);
-> -	restore_hv_regs(vcpu, &l2_hv);
-> +
-> +	load_l2_hv_regs(vcpu, &l2_hv, &saved_l1_hv);
-> =20
->  	vcpu->arch.ret =3D RESUME_GUEST;
->  	vcpu->arch.trap =3D 0;
-> --=20
-> 2.29.2
->=20
->=20
+.....
+
+>>
+>> A new device property sync-dax is added to the nvdimm device. When the
+>> sync-dax is 'writeback'(default for PPC), device property
+>> "hcall-flush-required" is set, and the guest makes hcall H_SCM_FLUSH
+>> requesting for an explicit flush.
+> 
+> I'm not sure "sync-dax" is a suitable name for the property of the
+> guest persistent memory. There is no requirement that the
+> memory-backend file for a guest be a dax-capable file. It's also
+> implementation specific what hypercall needs to be invoked for a given
+> occurrence of "sync-dax". What does that map to on non-PPC platforms
+> for example? It seems to me that an "nvdimm" device presents the
+> synchronous usage model and a whole other device type implements an
+> async-hypercall setup that the guest happens to service with its
+> nvdimm stack, but it's not an "nvdimm" anymore at that point.
+> 
+
+What is attempted here is to use the same guest driver papr_scm.ko 
+support the usecase of sharing page cache from the host instead of 
+depending on a new guest driver virtio-pmem. This also try to correctly 
+indicate to the guest that an usage like
+
+-object memory-backend-file,id=memnvdimm1,mem-path=file_name
+-device nvdimm,memdev=memnvdimm1
+
+correctly indicate to the guest that we are indeed sharing page cache 
+and not really emulating a persistent memory.
+
+W.r.t non ppc platforms, it was discussed earlier and one of the 
+suggestion there was to mark that as "unsafe".
+
+Any suggestion for an alternate property name than "sync-dax"?
+
+>> sync-dax is "unsafe" on all other platforms(x86, ARM) and old pseries machines
+>> prior to 5.2 on PPC. sync-dax="writeback" on ARM and x86_64 is prevented
+>> now as the flush semantics are unimplemented.
+> 
+> "sync-dax" has no meaning on its own, I think this needs an explicit
+> mechanism to convey both the "not-sync" property *and* the callback
+> method, it shouldn't be inferred by arch type.
+
+Won't a non-sync property imply that guest needs to do a callback to 
+ensure persistence? Hence they are related?
+
+
+-aneesh
