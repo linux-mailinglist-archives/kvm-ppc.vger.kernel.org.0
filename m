@@ -2,205 +2,140 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5A3837256D
-	for <lists+kvm-ppc@lfdr.de>; Tue,  4 May 2021 07:26:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A551372592
+	for <lists+kvm-ppc@lfdr.de>; Tue,  4 May 2021 07:44:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbhEDF1Z (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 4 May 2021 01:27:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49708 "EHLO
+        id S229753AbhEDFpB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 4 May 2021 01:45:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbhEDF1Z (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 4 May 2021 01:27:25 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B577C061574
-        for <kvm-ppc@vger.kernel.org>; Mon,  3 May 2021 22:26:30 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id e2so4195219plh.8
-        for <kvm-ppc@vger.kernel.org>; Mon, 03 May 2021 22:26:30 -0700 (PDT)
+        with ESMTP id S229499AbhEDFpB (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 4 May 2021 01:45:01 -0400
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B773C061574
+        for <kvm-ppc@vger.kernel.org>; Mon,  3 May 2021 22:44:06 -0700 (PDT)
+Received: by mail-il1-x12a.google.com with SMTP id b17so5443138ilh.6
+        for <kvm-ppc@vger.kernel.org>; Mon, 03 May 2021 22:44:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=6z5nHoo/tCCuNRDjKYAHjek4wA0FT8tyb9dnvsuvr2k=;
-        b=QGVxmngjWiP1gR5vT6ekl/Axm+mWdgujfYBQYZLdQEnQzPxsP1eCAtkxm/uOUOHByQ
-         C41Slr1ld2UoE5I9Md+rVhAcAT0UWG0saKrWzNe1y9qO7GDSTQn5ElPHKP7CA6AO46Qp
-         xU9EUk7K3Wnl6zY5YRo2ndPxL+NDgCk+Cl3crTaCf27vmUbh8QQA36octLumN7DtNkOh
-         pdAuhSvnK6GdGUASZ6RZun3uYo7f7FBPwu8JDZfT/0rvm54kPcFArah7xzXNI65kD4Sw
-         yYIg5Aqw4CMK9JuSJJGET9GH1sL+jWAXrbDaOXCoozfEgaRGP20483g3Z3WSDhfRSY/x
-         s4IA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=G9ESRXefOvFcFU8JizCeiw+vMSlHN+RPYh9AjhBOqb8=;
+        b=G5DClEfzuTVYVNRsJKfQJ2Q1QTCN37SlLVFqqvhciqDzHPQ8XnFr/N9dHmw9TTfN0E
+         VggOshctvx5Zzn4ijwk+NXVBCytTblKaq5629URM4CAT21Wbb2K9q3OQm/ndSud7R3pE
+         8cgnqNtHpaIC1YNScouwr2wZWkYcGdwQZSsGoF6WGwomhGjRvhMdi/9TicMzEkGUDxc6
+         zJ8OI1WwyGfzkvfPkukevttNOdxFfQwLEtQXFuzGhjhm5GOeN4+Hy6JHPr6Y4VolxemC
+         tHlCiWuXhyS3cTMq8rUTYfA5+F1p+otPe2Ke3gKn0kOznsDMJABwwOg5LUijFQ8jZu7y
+         Lsxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=6z5nHoo/tCCuNRDjKYAHjek4wA0FT8tyb9dnvsuvr2k=;
-        b=iwKASlgm0RCimFLy8MPpiQ8PqL6KZUBni7PUnJc5vxID0mcQCmmm4Lb+rsMoVq915s
-         nh6iJTUc4hEzHCg1g44vUcfTDekKw1K7Hk4vnp8VZkzwgsTgIH+e1t/DiiNnVX/erP+N
-         c+cW9fG51fYHT5s0oFY/vDyvjB426VKpnhADLqhyXi2Y6s8qylnbvh0B2IslxnOD4DNR
-         KPCHUFmi2eeapMSy6M7Vue2CUit6oxfcryDExs6fElqQCgvyfdcplqdUDk03rf1KIDyT
-         hUiUm4eOQ7kt/6D43xsU5I21YiDtMzsM6tghqxnh7urqG/4yTIhRoYRXVFPZYa9npM2p
-         UOcg==
-X-Gm-Message-State: AOAM531hZKvsQiS+LLvUb4O6l6oa/f7aBLEoPCrmgnc26q3u/b/zeWqo
-        TOpsOOJtRqfDB5TNmXYO+Lv+uuoD3Is=
-X-Google-Smtp-Source: ABdhPJyiwoYCCGL9IF5a52YArUljkVB5biWW9/k/HSb5pPmATWfTVGVJpDd7Mv0Hoh1/M9oSyVTtoA==
-X-Received: by 2002:a17:902:7683:b029:ec:a434:1921 with SMTP id m3-20020a1709027683b02900eca4341921mr23873281pll.67.1620105989826;
-        Mon, 03 May 2021 22:26:29 -0700 (PDT)
-Received: from localhost ([61.68.127.20])
-        by smtp.gmail.com with ESMTPSA id v22sm10920069pff.105.2021.05.03.22.26.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 May 2021 22:26:29 -0700 (PDT)
-Date:   Tue, 04 May 2021 15:26:24 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v3 1/2] KVM: PPC: Book3S HV: Sanitise vcpu registers in
- nested path
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au
-References: <20210415230948.3563415-1-farosas@linux.ibm.com>
-        <20210415230948.3563415-2-farosas@linux.ibm.com>
-        <1619833560.k4eybr40bg.astroid@bobo.none>
-        <YJDNbFQlB9DHnI6Z@thinks.paulus.ozlabs.org>
-In-Reply-To: <YJDNbFQlB9DHnI6Z@thinks.paulus.ozlabs.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=G9ESRXefOvFcFU8JizCeiw+vMSlHN+RPYh9AjhBOqb8=;
+        b=q+Cr8YvcDRIPxLXXxlJtD6jTexGXHbeTwQ/UaGDNm8LEWvgBX2GXwcOicQ7Mt1Dvzk
+         fLAzChYQ+lCfaZzoUTJQA83i97qAmPfSdwKxiJY0dZqk0Xb2BDbBC0baTSZNLZO/u97z
+         gR76u5sEqWqWJuUZ3k7lXnL+jL2NI7K3tiA/Dqe4qLZoOqIIhcXkX276sLg2QU22QeD1
+         5PCxvYgn819KRfITpVktYNKyZB5o+cgpL3SrLqwFxgV5/sAb2CxRmUeAjXgh/4tfoLkl
+         IZfuFn/6+17Qv/SBFTM13Z9s+40rz4v3Gh6a9ayXObGEgye1kGMnVqQTomKqBL+93zjh
+         yNiA==
+X-Gm-Message-State: AOAM531Zu6g4OmJp9lHDCMPniT1fr3CPS8QczReloQqckI1R9NeTN5VR
+        kVjlLV+w8r4WiqcVpF0GLv8A+3S2T2zmdpM3TVM=
+X-Google-Smtp-Source: ABdhPJzC6alOzJqNjv57N04F4U3tHUEdbtp1zl/QgLQrapXHd+EvE5w35e9Iti1fnaIY0tTwULyBboMTw8lYepmsnxs=
+X-Received: by 2002:a05:6e02:160d:: with SMTP id t13mr19821606ilu.85.1620107045748;
+ Mon, 03 May 2021 22:44:05 -0700 (PDT)
 MIME-Version: 1.0
-Message-Id: <1620105163.ok9nw6k5yz.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <161966810162.652.13723419108625443430.stgit@17be908f7c1c>
+ <CAPcyv4gwkyDBG7EZOth-kcZR8Fb+RgGXY=Y9vbuHXAz3PAnLVw@mail.gmail.com>
+ <bca3512d-5437-e8e6-68ae-0c9b887115f9@linux.ibm.com> <CAPcyv4hAOC89JOXr-ZCps=n8gEKD5W0jmGU1Enfo8ECVMf3veQ@mail.gmail.com>
+ <d21fcac6-6a54-35fd-3088-6c56b85fbf25@linux.ibm.com>
+In-Reply-To: <d21fcac6-6a54-35fd-3088-6c56b85fbf25@linux.ibm.com>
+From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date:   Tue, 4 May 2021 07:43:53 +0200
+Message-ID: <CAM9Jb+g8bKF0Z7za4sZpc2tZ01Sp4c4FEaV65He8w1+QOL3_yw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] nvdimm: Enable sync-dax property for nvdimm
+To:     "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Eric Blake <eblake@redhat.com>, qemu-arm@nongnu.org,
+        richard.henderson@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Haozhong Zhang <haozhong.zhang@intel.com>,
+        shameerali.kolothum.thodi@huawei.com, kwangwoo.lee@sk.com,
+        Markus Armbruster <armbru@redhat.com>,
+        Qemu Developers <qemu-devel@nongnu.org>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        kvm-ppc@vger.kernel.org, shivaprasadbhat@gmail.com,
+        bharata@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Paul Mackerras's message of May 4, 2021 2:28 pm:
-> On Sat, May 01, 2021 at 11:58:36AM +1000, Nicholas Piggin wrote:
->> Excerpts from Fabiano Rosas's message of April 16, 2021 9:09 am:
->> > As one of the arguments of the H_ENTER_NESTED hypercall, the nested
->> > hypervisor (L1) prepares a structure containing the values of various
->> > hypervisor-privileged registers with which it wants the nested guest
->> > (L2) to run. Since the nested HV runs in supervisor mode it needs the
->> > host to write to these registers.
->> >=20
->> > To stop a nested HV manipulating this mechanism and using a nested
->> > guest as a proxy to access a facility that has been made unavailable
->> > to it, we have a routine that sanitises the values of the HV registers
->> > before copying them into the nested guest's vcpu struct.
->> >=20
->> > However, when coming out of the guest the values are copied as they
->> > were back into L1 memory, which means that any sanitisation we did
->> > during guest entry will be exposed to L1 after H_ENTER_NESTED returns.
->> >=20
->> > This patch alters this sanitisation to have effect on the vcpu->arch
->> > registers directly before entering and after exiting the guest,
->> > leaving the structure that is copied back into L1 unchanged (except
->> > when we really want L1 to access the value, e.g the Cause bits of
->> > HFSCR).
->> >=20
->> > Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
->> > ---
->> >  arch/powerpc/kvm/book3s_hv_nested.c | 55 ++++++++++++++++++----------=
--
->> >  1 file changed, 34 insertions(+), 21 deletions(-)
->> >=20
->> > diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/bo=
-ok3s_hv_nested.c
->> > index 0cd0e7aad588..270552dd42c5 100644
->> > --- a/arch/powerpc/kvm/book3s_hv_nested.c
->> > +++ b/arch/powerpc/kvm/book3s_hv_nested.c
->> > @@ -102,8 +102,17 @@ static void save_hv_return_state(struct kvm_vcpu =
-*vcpu, int trap,
->> >  {
->> >  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
->> > =20
->> > +	/*
->> > +	 * When loading the hypervisor-privileged registers to run L2,
->> > +	 * we might have used bits from L1 state to restrict what the
->> > +	 * L2 state is allowed to be. Since L1 is not allowed to read
->> > +	 * the HV registers, do not include these modifications in the
->> > +	 * return state.
->> > +	 */
->> > +	hr->hfscr =3D ((~HFSCR_INTR_CAUSE & hr->hfscr) |
->> > +		     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
->> > +
->> >  	hr->dpdes =3D vc->dpdes;
->> > -	hr->hfscr =3D vcpu->arch.hfscr;
->> >  	hr->purr =3D vcpu->arch.purr;
->> >  	hr->spurr =3D vcpu->arch.spurr;
->> >  	hr->ic =3D vcpu->arch.ic;
->>=20
->> Do we still have the problem here that hfac interrupts due to bits clear=
-ed
->> by the hfscr sanitisation would have the cause bits returned to the L1,
->> so in theory it could probe hfscr directly that way? I don't see a good
->> solution to this except either have the L0 intercept these faults and do
->> "something" transparent, or return error from H_ENTER_NESTED (which woul=
-d
->> also allow trivial probing of the facilities).
->=20
-> It seems to me that there are various specific reasons why L0 would
-> clear HFSCR bits, and if we think about the specific reasons, what we
-> should do becomes clear.  (I say "L0" but in fact the same reasoning
-> applies to any hypervisor that lets its guest do hypervisor-ish
-> things.)
->=20
-> 1. Emulating a version of the architecture which doesn't have the
-> feature in question - in that case the bit should appear to L1 as a
-> reserved bit in HFSCR (i.e. always read 0), the associated facility
-> code should never appear in the top 8 bits of any HFSCR value that L1
-> sees, and any HFU interrupt received by L0 for the facility should be
-> changed into an illegal instruction interrupt (or HEAI) forwarded to
-> L1.  In this case the real HFSCR should always have the enable bit for
-> the facility set to 0.
->=20
-> 2. Lazy save/restore of the state associated with a facility - in this
-> case, while the system is in the "lazy" state (i.e. the state is not
-> that of the currently running guest), the real HFSCR bit for the
-> facility should be 0.  On an HFU interrupt for the facility, L0 looks
-> at L1's HFSCR value: if it's 0, forward the HFU interrupt to L1; if
-> it's 1, load up the facility state, set the facility's bit in HFSCR,
-> and resume the guest.
->=20
-> 3. Emulating a facility in software - in this case, the real HFSCR
-> bit for the facility would always be 0.  On an HFU interrupt, L0 reads
-> the instruction and emulates it, then resumes the guest.
->=20
-> One thing this all makes clear is that the IC field of the "virtual"
-> HFSCR value seen by L1 should only ever be changed when L0 forwards a
-> HFU interrupt to L1.
->=20
-> In fact we currently never do (1) or (2), and we only do (3) for
-> msgsndp etc., so this discussion is mostly theoretical.
+> > The proposal that "sync-dax=unsafe" for non-PPC architectures, is a
+> > fundamental misrepresentation of how this is supposed to work. Rather
+> > than make "sync-dax" a first class citizen of the device-description
+> > interface I'm proposing that you make this a separate device-type.
+> > This also solves the problem that "sync-dax" with an implicit
+> > architecture backend assumption is not precise, but a new "non-nvdimm"
+> > device type would make it explicit what the host is advertising to the
+> > guest.
+> >
+>
+> Currently, users can use a virtualized nvdimm support in Qemu to share
+> host page cache to the guest via the below command
+>
+> -object memory-backend-file,id=memnvdimm1,mem-path=file_name_in_host_fs
+> -device nvdimm,memdev=memnvdimm1
+>
+> Such usage can results in wrong application behavior because there is no
+> hint to the application/guest OS that a cpu cache flush is not
+> sufficient to ensure persistence.
+>
+> I understand that virio-pmem is suggested as an alternative for that.
+> But why not fix virtualized nvdimm if platforms can express the details.
+>
+> ie, can ACPI indicate to the guest OS that the device need a flush
+> mechanism to ensure persistence in the above case?
+>
+> What this patch series did was to express that property via a device
+> tree node and guest driver enables a hypercall based flush mechanism to
+> ensure persistence.
 
-Yeah it's somewhat theoretical, and I guess I mostly agree with you.
+Would VIRTIO (entirely asynchronous, no trap at host side) based
+mechanism is better
+than hyper-call based? Registering memory can be done any way. We
+implemented virtio-pmem
+flush mechanisms with below considerations:
 
-Missing is the case where the L0 does not implement a feature at all.
-Let's say TM is broken so it disables it, or nobody uses TAR so it=20
-doesn't bother to switch it.
+- Proper semantic for guest flush requests.
+- Efficient mechanism for performance pov.
 
-In those cases what do you tell the L1 if it enables a bit that you
-don't support at all, and it takes a fault?
+I am just asking myself if we have platform agnostic mechanism already
+there, maybe
+we can extend it to suit our needs? Maybe I am missing some points here.
 
-I guess the right thing to do is advertise that to the guest by some
-other means, and expect it does the right thing. And you could have
-the proviso in the nested HV specification that the returned IC field
-might trip for a feature you enabled in the L1 HFSCR.
-
->=20
->> Returning an hfac interrupt to a hypervisor that thought it enabled the=20
->> bit would be strange. But so does appearing to modify the register=20
->> underneath it and then returning a fault.
->=20
-> I don't think we should ever do either of those things.  The closest
-> would be (1) above, but in that case the fault has to be either an
-> illegal instruction type program interrupt, or a HEAI.
->=20
->> I think the sanest thing would actually be to return failure from the=20
->> hcall.
->=20
-> I don't think we should do that either.
-
-I still think it's preferable for case 4. No point waiting for the
-guest to boot and some user program eventually hits a bad instruction,
-even if it was due to some host vs guest configuration problem.
-
-At any rate, this patch 1 not overwriting the L2 HV state with the
-sanitization step is fine and clearly required for any kind of non
-trivial handling of missing bits.
-
-Thanks,
-Nick
+> >> On PPC, the default is "sync-dax=writeback" - so the ND_REGION_ASYNC
+> >>
+> >> is set for the region and the guest makes hcalls to issue fsync on the host.
+> >>
+> >>
+> >> Are you suggesting me to keep it "unsafe" as default for all architectures
+> >>
+> >> including PPC and a user can set it to "writeback" if desired.
+> >
+> > No, I am suggesting that "sync-dax" is insufficient to convey this
+> > property. This behavior warrants its own device type, not an ambiguous
+> > property of the memory-backend-file with implicit architecture
+> > assumptions attached.
+> >
+>
+> Why is it insufficient?  Is it because other architectures don't have an
+> ability express this detail to guest OS? Isn't that an arch limitations?
