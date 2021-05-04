@@ -2,164 +2,205 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00210372541
-	for <lists+kvm-ppc@lfdr.de>; Tue,  4 May 2021 06:59:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5A3837256D
+	for <lists+kvm-ppc@lfdr.de>; Tue,  4 May 2021 07:26:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbhEDFAh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 4 May 2021 01:00:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13060 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229499AbhEDFAg (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 4 May 2021 01:00:36 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1444iRKt193915;
-        Tue, 4 May 2021 00:59:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=m2H0GCtMdQ905kNTgd/JP2rl9St7NsiZkP1diU1RmKw=;
- b=TEUcDBlwAwCVZ4tRy9ptx7SMtnJnRGMPcMNhGrCRjiKkOy/dDxjGfw4O+Q9fzpswX9hq
- g7AnY8xso0WcpJniOXVzNwQ7fjraDPfdXfBBHxnNVV3zrD2ltDjmcsTUHvnuCDSidqxY
- Ekb+A5ib1QKL53dpR9xdvVLLOEbQJf8i7uk0PwvpE+SgUclFq3LSbB/uMyGQifoKtq3r
- FUkDT5PRlpgAtADX9YdRSJdL11flMK1A/B6BYoSK9zKzgG4WMW6gd4QNkc3/HmBEd7iQ
- /6ONVHVGHAJNq8j1eZ2qYOPoxUdBjgjTlwEE/JteusXAy6B3wPVGykTStVhAqQcHAvu8 ww== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38aygjg6wt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 May 2021 00:59:21 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1444wg6s032689;
-        Tue, 4 May 2021 00:59:21 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38aygjg6w3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 May 2021 00:59:21 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 1444xJF3013407;
-        Tue, 4 May 2021 04:59:19 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 388x8h8j47-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 May 2021 04:59:19 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1444xGvx34079222
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 May 2021 04:59:16 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A924E42041;
-        Tue,  4 May 2021 04:59:16 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 376C44203F;
-        Tue,  4 May 2021 04:59:12 +0000 (GMT)
-Received: from [9.199.50.4] (unknown [9.199.50.4])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 May 2021 04:59:12 +0000 (GMT)
-Subject: Re: [PATCH v4 0/3] nvdimm: Enable sync-dax property for nvdimm
-To:     Dan Williams <dan.j.williams@intel.com>,
-        Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Cc:     David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        marcel.apfelbaum@gmail.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Eric Blake <eblake@redhat.com>, qemu-arm@nongnu.org,
-        richard.henderson@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Haozhong Zhang <haozhong.zhang@intel.com>,
-        shameerali.kolothum.thodi@huawei.com, kwangwoo.lee@sk.com,
-        Markus Armbruster <armbru@redhat.com>,
-        Qemu Developers <qemu-devel@nongnu.org>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        kvm-ppc@vger.kernel.org, shivaprasadbhat@gmail.com,
-        bharata@linux.vnet.ibm.com
-References: <161966810162.652.13723419108625443430.stgit@17be908f7c1c>
- <CAPcyv4gwkyDBG7EZOth-kcZR8Fb+RgGXY=Y9vbuHXAz3PAnLVw@mail.gmail.com>
- <bca3512d-5437-e8e6-68ae-0c9b887115f9@linux.ibm.com>
- <CAPcyv4hAOC89JOXr-ZCps=n8gEKD5W0jmGU1Enfo8ECVMf3veQ@mail.gmail.com>
-From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-Message-ID: <d21fcac6-6a54-35fd-3088-6c56b85fbf25@linux.ibm.com>
-Date:   Tue, 4 May 2021 10:29:11 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S229719AbhEDF1Z (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 4 May 2021 01:27:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49708 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229499AbhEDF1Z (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 4 May 2021 01:27:25 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B577C061574
+        for <kvm-ppc@vger.kernel.org>; Mon,  3 May 2021 22:26:30 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id e2so4195219plh.8
+        for <kvm-ppc@vger.kernel.org>; Mon, 03 May 2021 22:26:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=6z5nHoo/tCCuNRDjKYAHjek4wA0FT8tyb9dnvsuvr2k=;
+        b=QGVxmngjWiP1gR5vT6ekl/Axm+mWdgujfYBQYZLdQEnQzPxsP1eCAtkxm/uOUOHByQ
+         C41Slr1ld2UoE5I9Md+rVhAcAT0UWG0saKrWzNe1y9qO7GDSTQn5ElPHKP7CA6AO46Qp
+         xU9EUk7K3Wnl6zY5YRo2ndPxL+NDgCk+Cl3crTaCf27vmUbh8QQA36octLumN7DtNkOh
+         pdAuhSvnK6GdGUASZ6RZun3uYo7f7FBPwu8JDZfT/0rvm54kPcFArah7xzXNI65kD4Sw
+         yYIg5Aqw4CMK9JuSJJGET9GH1sL+jWAXrbDaOXCoozfEgaRGP20483g3Z3WSDhfRSY/x
+         s4IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=6z5nHoo/tCCuNRDjKYAHjek4wA0FT8tyb9dnvsuvr2k=;
+        b=iwKASlgm0RCimFLy8MPpiQ8PqL6KZUBni7PUnJc5vxID0mcQCmmm4Lb+rsMoVq915s
+         nh6iJTUc4hEzHCg1g44vUcfTDekKw1K7Hk4vnp8VZkzwgsTgIH+e1t/DiiNnVX/erP+N
+         c+cW9fG51fYHT5s0oFY/vDyvjB426VKpnhADLqhyXi2Y6s8qylnbvh0B2IslxnOD4DNR
+         KPCHUFmi2eeapMSy6M7Vue2CUit6oxfcryDExs6fElqQCgvyfdcplqdUDk03rf1KIDyT
+         hUiUm4eOQ7kt/6D43xsU5I21YiDtMzsM6tghqxnh7urqG/4yTIhRoYRXVFPZYa9npM2p
+         UOcg==
+X-Gm-Message-State: AOAM531hZKvsQiS+LLvUb4O6l6oa/f7aBLEoPCrmgnc26q3u/b/zeWqo
+        TOpsOOJtRqfDB5TNmXYO+Lv+uuoD3Is=
+X-Google-Smtp-Source: ABdhPJyiwoYCCGL9IF5a52YArUljkVB5biWW9/k/HSb5pPmATWfTVGVJpDd7Mv0Hoh1/M9oSyVTtoA==
+X-Received: by 2002:a17:902:7683:b029:ec:a434:1921 with SMTP id m3-20020a1709027683b02900eca4341921mr23873281pll.67.1620105989826;
+        Mon, 03 May 2021 22:26:29 -0700 (PDT)
+Received: from localhost ([61.68.127.20])
+        by smtp.gmail.com with ESMTPSA id v22sm10920069pff.105.2021.05.03.22.26.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 May 2021 22:26:29 -0700 (PDT)
+Date:   Tue, 04 May 2021 15:26:24 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v3 1/2] KVM: PPC: Book3S HV: Sanitise vcpu registers in
+ nested path
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au
+References: <20210415230948.3563415-1-farosas@linux.ibm.com>
+        <20210415230948.3563415-2-farosas@linux.ibm.com>
+        <1619833560.k4eybr40bg.astroid@bobo.none>
+        <YJDNbFQlB9DHnI6Z@thinks.paulus.ozlabs.org>
+In-Reply-To: <YJDNbFQlB9DHnI6Z@thinks.paulus.ozlabs.org>
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4hAOC89JOXr-ZCps=n8gEKD5W0jmGU1Enfo8ECVMf3veQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: BNnxxzZrrD-sq9EhyaMEh4Q4j-zG-p0v
-X-Proofpoint-ORIG-GUID: 002b9ZvWVgbyy83xiE_uyAvrr1UxNmU5
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-04_01:2021-05-03,2021-05-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 impostorscore=0 mlxscore=0 adultscore=0 suspectscore=0
- bulkscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2105040033
+Message-Id: <1620105163.ok9nw6k5yz.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 5/4/21 1:11 AM, Dan Williams wrote:
-> On Mon, May 3, 2021 at 7:06 AM Shivaprasad G Bhat <sbhat@linux.ibm.com> wrote:
->>
+Excerpts from Paul Mackerras's message of May 4, 2021 2:28 pm:
+> On Sat, May 01, 2021 at 11:58:36AM +1000, Nicholas Piggin wrote:
+>> Excerpts from Fabiano Rosas's message of April 16, 2021 9:09 am:
+>> > As one of the arguments of the H_ENTER_NESTED hypercall, the nested
+>> > hypervisor (L1) prepares a structure containing the values of various
+>> > hypervisor-privileged registers with which it wants the nested guest
+>> > (L2) to run. Since the nested HV runs in supervisor mode it needs the
+>> > host to write to these registers.
+>> >=20
+>> > To stop a nested HV manipulating this mechanism and using a nested
+>> > guest as a proxy to access a facility that has been made unavailable
+>> > to it, we have a routine that sanitises the values of the HV registers
+>> > before copying them into the nested guest's vcpu struct.
+>> >=20
+>> > However, when coming out of the guest the values are copied as they
+>> > were back into L1 memory, which means that any sanitisation we did
+>> > during guest entry will be exposed to L1 after H_ENTER_NESTED returns.
+>> >=20
+>> > This patch alters this sanitisation to have effect on the vcpu->arch
+>> > registers directly before entering and after exiting the guest,
+>> > leaving the structure that is copied back into L1 unchanged (except
+>> > when we really want L1 to access the value, e.g the Cause bits of
+>> > HFSCR).
+>> >=20
+>> > Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+>> > ---
+>> >  arch/powerpc/kvm/book3s_hv_nested.c | 55 ++++++++++++++++++----------=
+-
+>> >  1 file changed, 34 insertions(+), 21 deletions(-)
+>> >=20
+>> > diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/bo=
+ok3s_hv_nested.c
+>> > index 0cd0e7aad588..270552dd42c5 100644
+>> > --- a/arch/powerpc/kvm/book3s_hv_nested.c
+>> > +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+>> > @@ -102,8 +102,17 @@ static void save_hv_return_state(struct kvm_vcpu =
+*vcpu, int trap,
+>> >  {
+>> >  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
+>> > =20
+>> > +	/*
+>> > +	 * When loading the hypervisor-privileged registers to run L2,
+>> > +	 * we might have used bits from L1 state to restrict what the
+>> > +	 * L2 state is allowed to be. Since L1 is not allowed to read
+>> > +	 * the HV registers, do not include these modifications in the
+>> > +	 * return state.
+>> > +	 */
+>> > +	hr->hfscr =3D ((~HFSCR_INTR_CAUSE & hr->hfscr) |
+>> > +		     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
+>> > +
+>> >  	hr->dpdes =3D vc->dpdes;
+>> > -	hr->hfscr =3D vcpu->arch.hfscr;
+>> >  	hr->purr =3D vcpu->arch.purr;
+>> >  	hr->spurr =3D vcpu->arch.spurr;
+>> >  	hr->ic =3D vcpu->arch.ic;
+>>=20
+>> Do we still have the problem here that hfac interrupts due to bits clear=
+ed
+>> by the hfscr sanitisation would have the cause bits returned to the L1,
+>> so in theory it could probe hfscr directly that way? I don't see a good
+>> solution to this except either have the L0 intercept these faults and do
+>> "something" transparent, or return error from H_ENTER_NESTED (which woul=
+d
+>> also allow trivial probing of the facilities).
+>=20
+> It seems to me that there are various specific reasons why L0 would
+> clear HFSCR bits, and if we think about the specific reasons, what we
+> should do becomes clear.  (I say "L0" but in fact the same reasoning
+> applies to any hypervisor that lets its guest do hypervisor-ish
+> things.)
+>=20
+> 1. Emulating a version of the architecture which doesn't have the
+> feature in question - in that case the bit should appear to L1 as a
+> reserved bit in HFSCR (i.e. always read 0), the associated facility
+> code should never appear in the top 8 bits of any HFSCR value that L1
+> sees, and any HFU interrupt received by L0 for the facility should be
+> changed into an illegal instruction interrupt (or HEAI) forwarded to
+> L1.  In this case the real HFSCR should always have the enable bit for
+> the facility set to 0.
+>=20
+> 2. Lazy save/restore of the state associated with a facility - in this
+> case, while the system is in the "lazy" state (i.e. the state is not
+> that of the currently running guest), the real HFSCR bit for the
+> facility should be 0.  On an HFU interrupt for the facility, L0 looks
+> at L1's HFSCR value: if it's 0, forward the HFU interrupt to L1; if
+> it's 1, load up the facility state, set the facility's bit in HFSCR,
+> and resume the guest.
+>=20
+> 3. Emulating a facility in software - in this case, the real HFSCR
+> bit for the facility would always be 0.  On an HFU interrupt, L0 reads
+> the instruction and emulates it, then resumes the guest.
+>=20
+> One thing this all makes clear is that the IC field of the "virtual"
+> HFSCR value seen by L1 should only ever be changed when L0 forwards a
+> HFU interrupt to L1.
+>=20
+> In fact we currently never do (1) or (2), and we only do (3) for
+> msgsndp etc., so this discussion is mostly theoretical.
 
+Yeah it's somewhat theoretical, and I guess I mostly agree with you.
 
-.....
+Missing is the case where the L0 does not implement a feature at all.
+Let's say TM is broken so it disables it, or nobody uses TAR so it=20
+doesn't bother to switch it.
 
-> 
-> The proposal that "sync-dax=unsafe" for non-PPC architectures, is a
-> fundamental misrepresentation of how this is supposed to work. Rather
-> than make "sync-dax" a first class citizen of the device-description
-> interface I'm proposing that you make this a separate device-type.
-> This also solves the problem that "sync-dax" with an implicit
-> architecture backend assumption is not precise, but a new "non-nvdimm"
-> device type would make it explicit what the host is advertising to the
-> guest.
-> 
+In those cases what do you tell the L1 if it enables a bit that you
+don't support at all, and it takes a fault?
 
-Currently, users can use a virtualized nvdimm support in Qemu to share 
-host page cache to the guest via the below command
+I guess the right thing to do is advertise that to the guest by some
+other means, and expect it does the right thing. And you could have
+the proviso in the nested HV specification that the returned IC field
+might trip for a feature you enabled in the L1 HFSCR.
 
--object memory-backend-file,id=memnvdimm1,mem-path=file_name_in_host_fs
--device nvdimm,memdev=memnvdimm1
+>=20
+>> Returning an hfac interrupt to a hypervisor that thought it enabled the=20
+>> bit would be strange. But so does appearing to modify the register=20
+>> underneath it and then returning a fault.
+>=20
+> I don't think we should ever do either of those things.  The closest
+> would be (1) above, but in that case the fault has to be either an
+> illegal instruction type program interrupt, or a HEAI.
+>=20
+>> I think the sanest thing would actually be to return failure from the=20
+>> hcall.
+>=20
+> I don't think we should do that either.
 
-Such usage can results in wrong application behavior because there is no 
-hint to the application/guest OS that a cpu cache flush is not 
-sufficient to ensure persistence.
+I still think it's preferable for case 4. No point waiting for the
+guest to boot and some user program eventually hits a bad instruction,
+even if it was due to some host vs guest configuration problem.
 
-I understand that virio-pmem is suggested as an alternative for that. 
-But why not fix virtualized nvdimm if platforms can express the details.
+At any rate, this patch 1 not overwriting the L2 HV state with the
+sanitization step is fine and clearly required for any kind of non
+trivial handling of missing bits.
 
-ie, can ACPI indicate to the guest OS that the device need a flush 
-mechanism to ensure persistence in the above case?
-
-What this patch series did was to express that property via a device 
-tree node and guest driver enables a hypercall based flush mechanism to 
-ensure persistence.
-
-
-....
-
->>
->> On PPC, the default is "sync-dax=writeback" - so the ND_REGION_ASYNC
->>
->> is set for the region and the guest makes hcalls to issue fsync on the host.
->>
->>
->> Are you suggesting me to keep it "unsafe" as default for all architectures
->>
->> including PPC and a user can set it to "writeback" if desired.
-> 
-> No, I am suggesting that "sync-dax" is insufficient to convey this
-> property. This behavior warrants its own device type, not an ambiguous
-> property of the memory-backend-file with implicit architecture
-> assumptions attached.
-> 
-
-Why is it insufficient?  Is it because other architectures don't have an 
-ability express this detail to guest OS? Isn't that an arch limitations?
-
--aneesh
+Thanks,
+Nick
