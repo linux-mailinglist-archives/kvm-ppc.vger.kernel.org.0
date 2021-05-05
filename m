@@ -2,128 +2,227 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 68B6A3732F7
-	for <lists+kvm-ppc@lfdr.de>; Wed,  5 May 2021 02:12:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01B1D373AED
+	for <lists+kvm-ppc@lfdr.de>; Wed,  5 May 2021 14:17:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230328AbhEEANO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 4 May 2021 20:13:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46958 "EHLO
+        id S233322AbhEEMSa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 5 May 2021 08:18:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbhEEANO (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 4 May 2021 20:13:14 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C0BC061574
-        for <kvm-ppc@vger.kernel.org>; Tue,  4 May 2021 17:12:18 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id n2so129046ejy.7
-        for <kvm-ppc@vger.kernel.org>; Tue, 04 May 2021 17:12:18 -0700 (PDT)
+        with ESMTP id S233518AbhEEMRx (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 5 May 2021 08:17:53 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E31C06138F;
+        Wed,  5 May 2021 05:15:26 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id p17so697332pjz.3;
+        Wed, 05 May 2021 05:15:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mrhPGvHlIr/7Xl07KopUpg5Wy5+M8jpP25va8IasNzg=;
-        b=ys+mX2vjpVaHSm7uh4IF90K03qF8UO6+a+0ebX5KU1ZijOGMP4kfzLs1RFCxZyrgsP
-         PnvWNqYQApCNMTQy31WzhCPH7jUamZ/bGcwJrJUnfMQY3wLMt/+S6T88WJDDOHfWfpo6
-         EVfI3XUkaiUSsMd4pJ9dS5/ddHvJFAfAXnJpaB7W9UppuibzBN862gncviGxGSw32K6l
-         PTCdTreJnYdWHAJIB4HVUchsIz4d2D72WXAMySFB4+I8cOve8BVey0bLrVThPx7LIoaK
-         5mWvy3Dzl+FSUCPmf+vHyOiSicq+flEw6O+TRYIsfOJQYwIkdLQJlLIWsndp5KRNzg/P
-         WBRQ==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oyHwnIbZLLevfNDzdT6CM1DYrT1P/eF7j4L5Cf+qIR4=;
+        b=SXSIIPseqld8EsKpB9fNO9vdeGXr/v8noETf6vr642IHwFrh+spYCo9atcasz023yS
+         qVySb6P9Rie9BqVrrHATGQ9EatZvDd6J12fGDf944ukVwjuZXIWPZIvwkD0LC7kAM+03
+         aTZBk6o02Zaxp5+pSZ471MByxYyjc3/h4fj6C1dO10L0Jk6e2zsID1tuuoIBvIgJrkk9
+         9Tqok7EnUvdb0Kg4cj8GnzYuGcZ6il4/WoqmPmIADolprN+RSdPhML+S9G3SknGuVeZm
+         crO5+UMTC5IW7UvqqR1KRd5ZaRUaIiIpBBzx0WaMxG7Ij91x1/Nw+8OcCNTLNhKrRHnB
+         qD+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mrhPGvHlIr/7Xl07KopUpg5Wy5+M8jpP25va8IasNzg=;
-        b=RoISPHuKkK2Qwt9tHIvUpUrHoGU208ce87ODkmCOBz5sOxuUUCsJ+kmYgw4/IO6xmP
-         7rqhFHyviA2ySw4AyDCpBRTJ2agsoD+UnJzmfOjOZgn4EDwOm80+Bd6tONLY7fkdoAhK
-         8D/43qKyZP6lR6ik6n2MhzZJLBgYYdb0SAqcCaYC+bGesJc/OsyX4WukLWiP8vf60jNb
-         oA0JjroEleKWnpjlaiCOZwniipCjpTasRufpZ7MEi5V9U7NvWyg0iVdWlaKcvY6cZ4UQ
-         HTio53JbOJrwtv6EG0ux7W1GH7hG7Gg83Vs8b+1IZGLKE+a3lIXLMZzzlC47jW9hhHvn
-         KhaA==
-X-Gm-Message-State: AOAM532hTd5M54PS2NnMq5mU1PYHEZNDoUh/T0F98WO/bbfkUpqdXuoh
-        U9P1huQE/FUGKE3gko91nGkcNM2KNgLoKUTzaGJjnQ==
-X-Google-Smtp-Source: ABdhPJzbcZp8fgji7EBWOpiIEfEVjWfOuXNO53F1TLCgNI9zX3VJkgmXm7g3xjmN0SZVleyyejvSiS6aZECF7977N9M=
-X-Received: by 2002:a17:906:a20b:: with SMTP id r11mr24797391ejy.323.1620173537351;
- Tue, 04 May 2021 17:12:17 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oyHwnIbZLLevfNDzdT6CM1DYrT1P/eF7j4L5Cf+qIR4=;
+        b=j0XYQp1xlXSpUoRY3e/HuIf5AmkPOa28QHjjgvtejm/D2xEF7oTUTU9dZ82vvBmxW0
+         kF7CiNcFL4+3GjerTRvVgKLgeiyFHEsPaKGs0sgNn3P/RGOIave7SkaFOFV/8c+p21k5
+         UX7ObuvgklNrDrwvl1gwDo9Yn6hyZQ9dC7qe0GBNFQfg8jZ9xI1jRG5R1ZXIu4WDbkvQ
+         L42LoUIgv0z8xLiZRh33XflzpIXv6O1DycY5fXgHRgnqlz4lB1FzpHKOMqrjuEW4QLKQ
+         3cGPbfX7XrbR0zP7pyoGwg+PuvGQ9+pFlm+z2bHstBHsrLyd1RDPh7NxUJRuGigkIVOc
+         s5jw==
+X-Gm-Message-State: AOAM533F152lJlkxqE3RiENP+7gksnM1Ohc3xK4biqF1RFUPfTtxjEWF
+        FZy0DXPfeGmB+6QK2KevEb9NsqiK7a4=
+X-Google-Smtp-Source: ABdhPJwqGY80yo9FMB+w8ED2zdJKVQ2H2OOCk9+HBaaFhnPzYsKRiWudVo7ZrYUfKFfCx45R6y5zTg==
+X-Received: by 2002:a17:902:8b86:b029:e5:bef6:56b0 with SMTP id ay6-20020a1709028b86b02900e5bef656b0mr30448266plb.76.1620216926016;
+        Wed, 05 May 2021 05:15:26 -0700 (PDT)
+Received: from bobo.ozlabs.ibm.com ([61.68.127.20])
+        by smtp.gmail.com with ESMTPSA id cv24sm14655694pjb.7.2021.05.05.05.15.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 May 2021 05:15:25 -0700 (PDT)
+From:   Nicholas Piggin <npiggin@gmail.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org,
+        Sean Christopherson <seanjc@google.com>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Bharata B Rao <bharata@linux.ibm.com>
+Subject: [PATCH] KVM: PPC: Book3S HV: Fix conversion to gfn-based MMU notifier callbacks
+Date:   Wed,  5 May 2021 22:15:09 +1000
+Message-Id: <20210505121509.1470207-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-References: <161966810162.652.13723419108625443430.stgit@17be908f7c1c>
- <CAPcyv4gwkyDBG7EZOth-kcZR8Fb+RgGXY=Y9vbuHXAz3PAnLVw@mail.gmail.com>
- <bca3512d-5437-e8e6-68ae-0c9b887115f9@linux.ibm.com> <CAPcyv4hAOC89JOXr-ZCps=n8gEKD5W0jmGU1Enfo8ECVMf3veQ@mail.gmail.com>
- <d21fcac6-6a54-35fd-3088-6c56b85fbf25@linux.ibm.com> <CAM9Jb+g8bKF0Z7za4sZpc2tZ01Sp4c4FEaV65He8w1+QOL3_yw@mail.gmail.com>
- <023e584a-6110-4d17-7fec-ca715226f869@linux.ibm.com>
-In-Reply-To: <023e584a-6110-4d17-7fec-ca715226f869@linux.ibm.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Tue, 4 May 2021 17:12:19 -0700
-Message-ID: <CAPcyv4hEhZoma=t=EtDXGr9r-i5K0GP01NU=jyDOmdp1YHn2rw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] nvdimm: Enable sync-dax property for nvdimm
-To:     "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
-Cc:     Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Eric Blake <eblake@redhat.com>, qemu-arm@nongnu.org,
-        richard.henderson@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Haozhong Zhang <haozhong.zhang@intel.com>,
-        shameerali.kolothum.thodi@huawei.com, kwangwoo.lee@sk.com,
-        Markus Armbruster <armbru@redhat.com>,
-        Qemu Developers <qemu-devel@nongnu.org>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        kvm-ppc@vger.kernel.org, shivaprasadbhat@gmail.com,
-        bharata@linux.vnet.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, May 4, 2021 at 2:03 AM Aneesh Kumar K.V
-<aneesh.kumar@linux.ibm.com> wrote:
->
-> On 5/4/21 11:13 AM, Pankaj Gupta wrote:
-> ....
->
-> >>
-> >> What this patch series did was to express that property via a device
-> >> tree node and guest driver enables a hypercall based flush mechanism to
-> >> ensure persistence.
-> >
-> > Would VIRTIO (entirely asynchronous, no trap at host side) based
-> > mechanism is better
-> > than hyper-call based? Registering memory can be done any way. We
-> > implemented virtio-pmem
-> > flush mechanisms with below considerations:
-> >
-> > - Proper semantic for guest flush requests.
-> > - Efficient mechanism for performance pov.
-> >
->
-> sure, virio-pmem can be used as an alternative.
->
-> > I am just asking myself if we have platform agnostic mechanism already
-> > there, maybe
-> > we can extend it to suit our needs? Maybe I am missing some points here.
-> >
->
-> What is being attempted in this series is to indicate to the guest OS
-> that the backing device/file used for emulated nvdimm device cannot
-> guarantee the persistence via cpu cache flush instructions.
+Commit b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier
+callbacks") causes unmap_gfn_range and age_gfn callbacks to only work
+on the first gfn in the range. It also makes the aging callbacks call
+into both radix and hash aging functions for radix guests. Fix this.
 
-Right, the detail I am arguing is that it should be a device
-description, not a backend file property. In other words this proposal
-is advocating this:
+Add warnings for the single-gfn calls that have been converted to range
+callbacks, in case they ever receieve ranges greater than 1.
 
--object memory-backend-file,id=mem1,share,sync-dax=$sync-dax,mem-path=$path
--device nvdimm,memdev=mem1
+Fixes: b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier callbacks")
+Reported-by: Bharata B Rao <bharata@linux.ibm.com>
+Tested-by: Bharata B Rao <bharata@linux.ibm.com>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+The e500 change in that commit also looks suspicious, why is it okay
+to remove kvm_flush_remote_tlbs() there? Also is the the change from
+returning false to true intended?
 
-...and I am advocating for reusing or duplicating the virtio-pmem
-model like this:
+Thanks,
+Nick
 
--object memory-backend-file,id=mem1,share,mem-path=$path
--device spapr-hcall,memdev=mem1
+ arch/powerpc/include/asm/kvm_book3s.h  |  2 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    | 46 ++++++++++++++++++--------
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  5 ++-
+ 3 files changed, 36 insertions(+), 17 deletions(-)
 
-...because the interface to the guest is the device, not the
-memory-backend-file.
+diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
+index a6e9a5585e61..e6b53c6e21e3 100644
+--- a/arch/powerpc/include/asm/kvm_book3s.h
++++ b/arch/powerpc/include/asm/kvm_book3s.h
+@@ -210,7 +210,7 @@ extern void kvmppc_free_pgtable_radix(struct kvm *kvm, pgd_t *pgd,
+ 				      unsigned int lpid);
+ extern int kvmppc_radix_init(void);
+ extern void kvmppc_radix_exit(void);
+-extern bool kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
++extern void kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 			    unsigned long gfn);
+ extern bool kvm_age_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 			  unsigned long gfn);
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index b7bd9ca040b8..2d9193cd73be 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -795,7 +795,7 @@ static void kvmppc_unmap_hpte(struct kvm *kvm, unsigned long i,
+ 	}
+ }
+ 
+-static bool kvm_unmap_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
++static void kvm_unmap_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 			    unsigned long gfn)
+ {
+ 	unsigned long i;
+@@ -829,15 +829,21 @@ static bool kvm_unmap_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 		unlock_rmap(rmapp);
+ 		__unlock_hpte(hptep, be64_to_cpu(hptep[0]));
+ 	}
+-	return false;
+ }
+ 
+ bool kvm_unmap_gfn_range_hv(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+-	if (kvm_is_radix(kvm))
+-		return kvm_unmap_radix(kvm, range->slot, range->start);
++	gfn_t gfn;
++
++	if (kvm_is_radix(kvm)) {
++		for (gfn = range->start; gfn < range->end; gfn++)
++			kvm_unmap_radix(kvm, range->slot, gfn);
++	} else {
++		for (gfn = range->start; gfn < range->end; gfn++)
++			kvm_unmap_rmapp(kvm, range->slot, range->start);
++	}
+ 
+-	return kvm_unmap_rmapp(kvm, range->slot, range->start);
++	return false;
+ }
+ 
+ void kvmppc_core_flush_memslot_hv(struct kvm *kvm,
+@@ -924,10 +930,18 @@ static bool kvm_age_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 
+ bool kvm_age_gfn_hv(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+-	if (kvm_is_radix(kvm))
+-		kvm_age_radix(kvm, range->slot, range->start);
++	gfn_t gfn;
++	bool ret = false;
+ 
+-	return kvm_age_rmapp(kvm, range->slot, range->start);
++	if (kvm_is_radix(kvm)) {
++		for (gfn = range->start; gfn < range->end; gfn++)
++			ret |= kvm_age_radix(kvm, range->slot, gfn);
++	} else {
++		for (gfn = range->start; gfn < range->end; gfn++)
++			ret |= kvm_age_rmapp(kvm, range->slot, gfn);
++	}
++
++	return ret;
+ }
+ 
+ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
+@@ -965,18 +979,24 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 
+ bool kvm_test_age_gfn_hv(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+-	if (kvm_is_radix(kvm))
+-		kvm_test_age_radix(kvm, range->slot, range->start);
++	WARN_ON(range->start + 1 != range->end);
+ 
+-	return kvm_test_age_rmapp(kvm, range->slot, range->start);
++	if (kvm_is_radix(kvm))
++		return kvm_test_age_radix(kvm, range->slot, range->start);
++	else
++		return kvm_test_age_rmapp(kvm, range->slot, range->start);
+ }
+ 
+ bool kvm_set_spte_gfn_hv(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
++	WARN_ON(range->start + 1 != range->end);
++
+ 	if (kvm_is_radix(kvm))
+-		return kvm_unmap_radix(kvm, range->slot, range->start);
++		kvm_unmap_radix(kvm, range->slot, range->start);
++	else
++		kvm_unmap_rmapp(kvm, range->slot, range->start);
+ 
+-	return kvm_unmap_rmapp(kvm, range->slot, range->start);
++	return false;
+ }
+ 
+ static int vcpus_running(struct kvm *kvm)
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index ec4f58fa9f5a..d909c069363e 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -993,7 +993,7 @@ int kvmppc_book3s_radix_page_fault(struct kvm_vcpu *vcpu,
+ }
+ 
+ /* Called with kvm->mmu_lock held */
+-bool kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
++void kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 		     unsigned long gfn)
+ {
+ 	pte_t *ptep;
+@@ -1002,14 +1002,13 @@ bool kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 
+ 	if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE) {
+ 		uv_page_inval(kvm->arch.lpid, gpa, PAGE_SHIFT);
+-		return false;
++		return;
+ 	}
+ 
+ 	ptep = find_kvm_secondary_pte(kvm, gpa, &shift);
+ 	if (ptep && pte_present(*ptep))
+ 		kvmppc_unmap_pte(kvm, ptep, gpa, shift, memslot,
+ 				 kvm->arch.lpid);
+-	return false;
+ }
+ 
+ /* Called with kvm->mmu_lock held */
+-- 
+2.23.0
+
