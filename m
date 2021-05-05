@@ -2,227 +2,125 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 01B1D373AED
-	for <lists+kvm-ppc@lfdr.de>; Wed,  5 May 2021 14:17:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DF91373ED6
+	for <lists+kvm-ppc@lfdr.de>; Wed,  5 May 2021 17:47:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233322AbhEEMSa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 5 May 2021 08:18:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35504 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233518AbhEEMRx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 5 May 2021 08:17:53 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E31C06138F;
-        Wed,  5 May 2021 05:15:26 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id p17so697332pjz.3;
-        Wed, 05 May 2021 05:15:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oyHwnIbZLLevfNDzdT6CM1DYrT1P/eF7j4L5Cf+qIR4=;
-        b=SXSIIPseqld8EsKpB9fNO9vdeGXr/v8noETf6vr642IHwFrh+spYCo9atcasz023yS
-         qVySb6P9Rie9BqVrrHATGQ9EatZvDd6J12fGDf944ukVwjuZXIWPZIvwkD0LC7kAM+03
-         aTZBk6o02Zaxp5+pSZ471MByxYyjc3/h4fj6C1dO10L0Jk6e2zsID1tuuoIBvIgJrkk9
-         9Tqok7EnUvdb0Kg4cj8GnzYuGcZ6il4/WoqmPmIADolprN+RSdPhML+S9G3SknGuVeZm
-         crO5+UMTC5IW7UvqqR1KRd5ZaRUaIiIpBBzx0WaMxG7Ij91x1/Nw+8OcCNTLNhKrRHnB
-         qD+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=oyHwnIbZLLevfNDzdT6CM1DYrT1P/eF7j4L5Cf+qIR4=;
-        b=j0XYQp1xlXSpUoRY3e/HuIf5AmkPOa28QHjjgvtejm/D2xEF7oTUTU9dZ82vvBmxW0
-         kF7CiNcFL4+3GjerTRvVgKLgeiyFHEsPaKGs0sgNn3P/RGOIave7SkaFOFV/8c+p21k5
-         UX7ObuvgklNrDrwvl1gwDo9Yn6hyZQ9dC7qe0GBNFQfg8jZ9xI1jRG5R1ZXIu4WDbkvQ
-         L42LoUIgv0z8xLiZRh33XflzpIXv6O1DycY5fXgHRgnqlz4lB1FzpHKOMqrjuEW4QLKQ
-         3cGPbfX7XrbR0zP7pyoGwg+PuvGQ9+pFlm+z2bHstBHsrLyd1RDPh7NxUJRuGigkIVOc
-         s5jw==
-X-Gm-Message-State: AOAM533F152lJlkxqE3RiENP+7gksnM1Ohc3xK4biqF1RFUPfTtxjEWF
-        FZy0DXPfeGmB+6QK2KevEb9NsqiK7a4=
-X-Google-Smtp-Source: ABdhPJwqGY80yo9FMB+w8ED2zdJKVQ2H2OOCk9+HBaaFhnPzYsKRiWudVo7ZrYUfKFfCx45R6y5zTg==
-X-Received: by 2002:a17:902:8b86:b029:e5:bef6:56b0 with SMTP id ay6-20020a1709028b86b02900e5bef656b0mr30448266plb.76.1620216926016;
-        Wed, 05 May 2021 05:15:26 -0700 (PDT)
-Received: from bobo.ozlabs.ibm.com ([61.68.127.20])
-        by smtp.gmail.com with ESMTPSA id cv24sm14655694pjb.7.2021.05.05.05.15.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 May 2021 05:15:25 -0700 (PDT)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org,
-        Sean Christopherson <seanjc@google.com>,
-        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Bharata B Rao <bharata@linux.ibm.com>
-Subject: [PATCH] KVM: PPC: Book3S HV: Fix conversion to gfn-based MMU notifier callbacks
-Date:   Wed,  5 May 2021 22:15:09 +1000
-Message-Id: <20210505121509.1470207-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.23.0
-MIME-Version: 1.0
+        id S233494AbhEEPsB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 5 May 2021 11:48:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42332 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229797AbhEEPsA (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 5 May 2021 11:48:00 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 145Fan3h035719;
+        Wed, 5 May 2021 11:46:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=pp1; bh=bjz0D+dyoNUijWoLP3EIMpTRfNvW0o6rDQrR5crAExc=;
+ b=ncbaJFVZPAc+B3SmVRqwEKC/NKYCGSKztaHHNP+/p+VRl5LaHfjHfI0BsNBRx5gnehNM
+ 9GDloemceANIFJSA8KbExPzo7K+WWe7HaSSNlIKflGcNaaAwtCBq+ugSs+r8jVNCdm/m
+ zJ5Izyq8JKvVKi/9UDMyrma8rTZ3pz39YiQsnRxMB6088kuHeD9+ChGp4pwsAXmKVyWh
+ zm4W7ZNu4g0FE9/UL2sa6aR4RPnaihGxZlqkVZwCoVVYeHdCwmlEXzlhh9zBCtLX99mV
+ Od2HUM6UgmkDIr7Y20R2cVXI0zV+S2tgV6m2TCuvb5KyibEuq6zteR1oak4eJwcTEQ43 /Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38bwnm17tk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 05 May 2021 11:46:54 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 145Fb4Ii039973;
+        Wed, 5 May 2021 11:46:53 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 38bwnm17sr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 05 May 2021 11:46:53 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 145Fc18C005701;
+        Wed, 5 May 2021 15:46:52 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 38bedxrd0j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 05 May 2021 15:46:51 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 145FkNvq22413730
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 5 May 2021 15:46:23 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B9020AE045;
+        Wed,  5 May 2021 15:46:48 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 10962AE04D;
+        Wed,  5 May 2021 15:46:47 +0000 (GMT)
+Received: from bharata.ibmuc.com (unknown [9.85.85.70])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  5 May 2021 15:46:46 +0000 (GMT)
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
+        mpe@ellerman.id.au, david@gibson.dropbear.id.au,
+        farosas@linux.ibm.com, Bharata B Rao <bharata@linux.ibm.com>
+Subject: [PATCH v7 0/6] Support for H_RPT_INVALIDATE in PowerPC KVM
+Date:   Wed,  5 May 2021 21:16:36 +0530
+Message-Id: <20210505154642.178702-1-bharata@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: emvM_ZSY_xJaC1ezJTn3bqKA0J6OD7YQ
+X-Proofpoint-ORIG-GUID: DfLJh-1De-GEUROqED1vpo08e4peA5__
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-05-05_09:2021-05-05,2021-05-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1011
+ lowpriorityscore=0 adultscore=0 spamscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=790 suspectscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2105050112
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Commit b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier
-callbacks") causes unmap_gfn_range and age_gfn callbacks to only work
-on the first gfn in the range. It also makes the aging callbacks call
-into both radix and hash aging functions for radix guests. Fix this.
+This patchset adds support for the new hcall H_RPT_INVALIDATE
+and replaces the nested tlb flush calls with this new hcall
+if support for the same exists.
 
-Add warnings for the single-gfn calls that have been converted to range
-callbacks, in case they ever receieve ranges greater than 1.
+Changes in v7:
+-------------
+- Fixed a bug where LPID of nested guest was being fetched
+  wrongly in the process scoped invalidation part of nested
+  guest exit handler.
+  (In kvmppc_nested_h_rpt_invalidate() of patch 4/6)
+- Moved the movement of RIC_FLUSH_ definitions to appropriate
+  patch.
 
-Fixes: b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier callbacks")
-Reported-by: Bharata B Rao <bharata@linux.ibm.com>
-Tested-by: Bharata B Rao <bharata@linux.ibm.com>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
-The e500 change in that commit also looks suspicious, why is it okay
-to remove kvm_flush_remote_tlbs() there? Also is the the change from
-returning false to true intended?
+v6: https://lore.kernel.org/linuxppc-dev/20210311083939.595568-1-bharata@linux.ibm.com/
 
-Thanks,
-Nick
+Aneesh Kumar K.V (1):
+  KVM: PPC: Book3S HV: Fix comments of H_RPT_INVALIDATE arguments
 
- arch/powerpc/include/asm/kvm_book3s.h  |  2 +-
- arch/powerpc/kvm/book3s_64_mmu_hv.c    | 46 ++++++++++++++++++--------
- arch/powerpc/kvm/book3s_64_mmu_radix.c |  5 ++-
- 3 files changed, 36 insertions(+), 17 deletions(-)
+Bharata B Rao (5):
+  powerpc/book3s64/radix: Add H_RPT_INVALIDATE pgsize encodings to
+    mmu_psize_def
+  KVM: PPC: Book3S HV: Add support for H_RPT_INVALIDATE
+  KVM: PPC: Book3S HV: Nested support in H_RPT_INVALIDATE
+  KVM: PPC: Book3S HV: Add KVM_CAP_PPC_RPT_INVALIDATE capability
+  KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in nested KVM
 
-diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-index a6e9a5585e61..e6b53c6e21e3 100644
---- a/arch/powerpc/include/asm/kvm_book3s.h
-+++ b/arch/powerpc/include/asm/kvm_book3s.h
-@@ -210,7 +210,7 @@ extern void kvmppc_free_pgtable_radix(struct kvm *kvm, pgd_t *pgd,
- 				      unsigned int lpid);
- extern int kvmppc_radix_init(void);
- extern void kvmppc_radix_exit(void);
--extern bool kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
-+extern void kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 			    unsigned long gfn);
- extern bool kvm_age_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 			  unsigned long gfn);
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-index b7bd9ca040b8..2d9193cd73be 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-@@ -795,7 +795,7 @@ static void kvmppc_unmap_hpte(struct kvm *kvm, unsigned long i,
- 	}
- }
- 
--static bool kvm_unmap_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
-+static void kvm_unmap_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 			    unsigned long gfn)
- {
- 	unsigned long i;
-@@ -829,15 +829,21 @@ static bool kvm_unmap_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 		unlock_rmap(rmapp);
- 		__unlock_hpte(hptep, be64_to_cpu(hptep[0]));
- 	}
--	return false;
- }
- 
- bool kvm_unmap_gfn_range_hv(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	if (kvm_is_radix(kvm))
--		return kvm_unmap_radix(kvm, range->slot, range->start);
-+	gfn_t gfn;
-+
-+	if (kvm_is_radix(kvm)) {
-+		for (gfn = range->start; gfn < range->end; gfn++)
-+			kvm_unmap_radix(kvm, range->slot, gfn);
-+	} else {
-+		for (gfn = range->start; gfn < range->end; gfn++)
-+			kvm_unmap_rmapp(kvm, range->slot, range->start);
-+	}
- 
--	return kvm_unmap_rmapp(kvm, range->slot, range->start);
-+	return false;
- }
- 
- void kvmppc_core_flush_memslot_hv(struct kvm *kvm,
-@@ -924,10 +930,18 @@ static bool kvm_age_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 
- bool kvm_age_gfn_hv(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	if (kvm_is_radix(kvm))
--		kvm_age_radix(kvm, range->slot, range->start);
-+	gfn_t gfn;
-+	bool ret = false;
- 
--	return kvm_age_rmapp(kvm, range->slot, range->start);
-+	if (kvm_is_radix(kvm)) {
-+		for (gfn = range->start; gfn < range->end; gfn++)
-+			ret |= kvm_age_radix(kvm, range->slot, gfn);
-+	} else {
-+		for (gfn = range->start; gfn < range->end; gfn++)
-+			ret |= kvm_age_rmapp(kvm, range->slot, gfn);
-+	}
-+
-+	return ret;
- }
- 
- static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
-@@ -965,18 +979,24 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 
- bool kvm_test_age_gfn_hv(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	if (kvm_is_radix(kvm))
--		kvm_test_age_radix(kvm, range->slot, range->start);
-+	WARN_ON(range->start + 1 != range->end);
- 
--	return kvm_test_age_rmapp(kvm, range->slot, range->start);
-+	if (kvm_is_radix(kvm))
-+		return kvm_test_age_radix(kvm, range->slot, range->start);
-+	else
-+		return kvm_test_age_rmapp(kvm, range->slot, range->start);
- }
- 
- bool kvm_set_spte_gfn_hv(struct kvm *kvm, struct kvm_gfn_range *range)
- {
-+	WARN_ON(range->start + 1 != range->end);
-+
- 	if (kvm_is_radix(kvm))
--		return kvm_unmap_radix(kvm, range->slot, range->start);
-+		kvm_unmap_radix(kvm, range->slot, range->start);
-+	else
-+		kvm_unmap_rmapp(kvm, range->slot, range->start);
- 
--	return kvm_unmap_rmapp(kvm, range->slot, range->start);
-+	return false;
- }
- 
- static int vcpus_running(struct kvm *kvm)
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index ec4f58fa9f5a..d909c069363e 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -993,7 +993,7 @@ int kvmppc_book3s_radix_page_fault(struct kvm_vcpu *vcpu,
- }
- 
- /* Called with kvm->mmu_lock held */
--bool kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
-+void kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 		     unsigned long gfn)
- {
- 	pte_t *ptep;
-@@ -1002,14 +1002,13 @@ bool kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 
- 	if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE) {
- 		uv_page_inval(kvm->arch.lpid, gpa, PAGE_SHIFT);
--		return false;
-+		return;
- 	}
- 
- 	ptep = find_kvm_secondary_pte(kvm, gpa, &shift);
- 	if (ptep && pte_present(*ptep))
- 		kvmppc_unmap_pte(kvm, ptep, gpa, shift, memslot,
- 				 kvm->arch.lpid);
--	return false;
- }
- 
- /* Called with kvm->mmu_lock held */
+ Documentation/virt/kvm/api.rst                |  18 +++
+ arch/powerpc/include/asm/book3s/64/mmu.h      |   1 +
+ .../include/asm/book3s/64/tlbflush-radix.h    |   4 +
+ arch/powerpc/include/asm/hvcall.h             |   4 +-
+ arch/powerpc/include/asm/kvm_book3s.h         |   3 +
+ arch/powerpc/include/asm/mmu_context.h        |  11 ++
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        |  27 +++-
+ arch/powerpc/kvm/book3s_hv.c                  | 106 ++++++++++++
+ arch/powerpc/kvm/book3s_hv_nested.c           | 116 ++++++++++++-
+ arch/powerpc/kvm/powerpc.c                    |   3 +
+ arch/powerpc/mm/book3s64/radix_pgtable.c      |   5 +
+ arch/powerpc/mm/book3s64/radix_tlb.c          | 152 +++++++++++++++++-
+ include/uapi/linux/kvm.h                      |   1 +
+ 13 files changed, 438 insertions(+), 13 deletions(-)
+
 -- 
-2.23.0
+2.26.2
 
