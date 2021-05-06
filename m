@@ -2,180 +2,74 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FAF5374F65
-	for <lists+kvm-ppc@lfdr.de>; Thu,  6 May 2021 08:33:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CE85375500
+	for <lists+kvm-ppc@lfdr.de>; Thu,  6 May 2021 15:43:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231514AbhEFGeA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 6 May 2021 02:34:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39344 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231192AbhEFGeA (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 6 May 2021 02:34:00 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14663X5c158955;
-        Thu, 6 May 2021 02:32:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : reply-to : references : mime-version : content-type
- : in-reply-to; s=pp1; bh=/lqywWXU1QOtDH96Pd9RQfLDomVZ3ekD3975awYwYiM=;
- b=XYwi4BBmMnt77fBuhWqJpnwPvb6Z7Oee4V5i1K7gY8eftREp4KoWqujJBQDQohPWDbZu
- kehm82jGn99rKWU5wd3RuU8Rrq72+vgTldyAzc6z31wtDwxz2SEe3giVpeFlwLm5iAW8
- yDgQpRDWKUs2FeYCQb05PwTbfDezpMaafFkK8mEPXEoz36CzAiLlBE6LmKPjm6U2haZ3
- A1uQp1GfOM3AQIEUismpGLx3ITGMionmC5dqgyGmPNY00VM5RLIGtlEzqpwvFoJtFyRV
- +e/f2RK01PK11odkphHCyD674320P51BLVANHgKGRdvjUvlpQ6dvnVqjhOWN16gWZG1d CA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38c78adbud-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 May 2021 02:32:54 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14663rGl162378;
-        Thu, 6 May 2021 02:32:54 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38c78adbtk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 May 2021 02:32:53 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 1466SFDh027800;
-        Thu, 6 May 2021 06:32:51 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 38beeegntk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 May 2021 06:32:51 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1466Wmsc29491628
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 6 May 2021 06:32:48 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7024CA4069;
-        Thu,  6 May 2021 06:32:48 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6BC14A407A;
-        Thu,  6 May 2021 06:31:31 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.199.39.47])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu,  6 May 2021 06:31:31 +0000 (GMT)
-Date:   Thu, 6 May 2021 12:01:28 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        aneesh.kumar@linux.ibm.com, david@gibson.dropbear.id.au,
-        farosas@linux.ibm.com, mpe@ellerman.id.au, paulus@ozlabs.org
-Subject: Re: [PATCH v7 3/6] KVM: PPC: Book3S HV: Add support for
- H_RPT_INVALIDATE
-Message-ID: <20210506063128.GA185649@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <20210505154642.178702-1-bharata@linux.ibm.com>
- <20210505154642.178702-4-bharata@linux.ibm.com>
- <1620279244.mpmwjm8qjk.astroid@bobo.none>
+        id S234072AbhEFNoR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 6 May 2021 09:44:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36912 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234326AbhEFNoQ (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 6 May 2021 09:44:16 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CCCFC061763;
+        Thu,  6 May 2021 06:43:18 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4FbZXf5l85z9sW4;
+        Thu,  6 May 2021 23:43:14 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1620308595;
+        bh=Lw/D96fhOtgNxgz0JM0qlpti1j2019x8fmayev0jvJk=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=XFMVVAI31LtODRi2pRyNyxlQEViG8JGbJt4DnYi5zSBNmg/LbRw4d7ebS42h3FaXm
+         86h27rf2o2ARQl+2j89Ac3EXzZ6/Lc92PIDSSqtCqF/my0RDFW5KzQhk/laUJ0RB3x
+         fFeD827idy7WTW3AnQoauclxhb1r4rCzyxEABmGSn5wQwGjd7J9K5EArOo/ibwKqK+
+         fuJYR9YX6hX8i0k+ng6vLrR/PaegSUykaXpMg+slm7IBSoTNpaTYz7T0dSmBK987/c
+         XOeTa1je9q7CMDny79hz98g4PETEynYBismkRdM4yoFqsx2+ycO+JHZGnBg+wk+rcY
+         pbB/qwmePEULA==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Bharata B Rao <bharata@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix conversion to gfn-based MMU
+ notifier callbacks
+In-Reply-To: <9e0a256b-fb5a-4468-ed21-68d524d6ea56@redhat.com>
+References: <20210505121509.1470207-1-npiggin@gmail.com>
+ <9e0a256b-fb5a-4468-ed21-68d524d6ea56@redhat.com>
+Date:   Thu, 06 May 2021 23:43:10 +1000
+Message-ID: <87pmy47zbl.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1620279244.mpmwjm8qjk.astroid@bobo.none>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: mRzw4a-KMVj4GlV6TW9lfUAjsOR4Yjqp
-X-Proofpoint-ORIG-GUID: rZMGu99A1R8gblI9xJQ79oamojS1wvCj
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-06_05:2021-05-05,2021-05-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- phishscore=0 bulkscore=0 spamscore=0 adultscore=0 lowpriorityscore=0
- priorityscore=1501 impostorscore=0 clxscore=1015 malwarescore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2105060041
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, May 06, 2021 at 03:45:21PM +1000, Nicholas Piggin wrote:
-> Excerpts from Bharata B Rao's message of May 6, 2021 1:46 am:
-> >  
-> > +static long kvmppc_h_rpt_invalidate(struct kvm_vcpu *vcpu,
-> > +				    unsigned long id, unsigned long target,
-> > +				    unsigned long type, unsigned long pg_sizes,
-> > +				    unsigned long start, unsigned long end)
-> > +{
-> > +	unsigned long psize;
-> > +	struct mmu_psize_def *def;
-> > +
-> > +	if (!kvm_is_radix(vcpu->kvm))
-> > +		return H_UNSUPPORTED;
-> > +
-> > +	if (end < start)
-> > +		return H_P5;
-> > +
-> > +	/*
-> > +	 * Partition-scoped invalidation for nested guests.
-> > +	 * Not yet supported
-> > +	 */
-> > +	if (type & H_RPTI_TYPE_NESTED)
-> > +		return H_P3;
-> > +
-> > +	/*
-> > +	 * Process-scoped invalidation for L1 guests.
-> > +	 */
-> > +	for (psize = 0; psize < MMU_PAGE_COUNT; psize++) {
-> > +		def = &mmu_psize_defs[psize];
-> > +		if (!(pg_sizes & def->h_rpt_pgsize))
-> > +			continue;
-> 
-> Not that it really matters but why did you go this approach rather than
-> use a bitmask iteration over h_rpt_pgsize?
+Paolo Bonzini <pbonzini@redhat.com> writes:
+> On 05/05/21 14:15, Nicholas Piggin wrote:
+>> Commit b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier
+>> callbacks") causes unmap_gfn_range and age_gfn callbacks to only work
+>> on the first gfn in the range. It also makes the aging callbacks call
+>> into both radix and hash aging functions for radix guests. Fix this.
+>> 
+>> Add warnings for the single-gfn calls that have been converted to range
+>> callbacks, in case they ever receieve ranges greater than 1.
+>> 
+>> Fixes: b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier callbacks")
+>> Reported-by: Bharata B Rao <bharata@linux.ibm.com>
+>> Tested-by: Bharata B Rao <bharata@linux.ibm.com>
+>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>
+> Sorry for the breakage.  I queued this patch.
 
-If you are asking why I am not just looping over the hcall argument
-@pg_sizes bitmask then, I was doing that in my earlier version. But
-David suggested that it would be good to have page size encodings
-of H_RPT_INVALIDATE within mmu_pgsize_defs[]. Based on this, I am
-populating mmu_pgsize_defs[] during radix page size initialization
-and using that here to check for those page sizes that have been set
-in @pg_sizes.
+Thanks. Are you planning to send it to Linus before rc1?
 
-> 
-> I would actually prefer to put this loop into the TLB invalidation code
-> itself.
+If not I can pick it up as I already have some things in my next and am
+intending to send a pull request anyway.
 
-Yes, I could easily move it there.
-
-> 
-> The reason is that not all flush types are based on page size. You only
-> need to do IS=1/2/3 flushes once and it takes out all page sizes.
-
-I see. So we have to do explicit flushing for different page sizes
-only if we are doing range based invalidation (IS=0). For rest of
-the cases (IS=1/2/3), that's not necessary.
-
-> 
-> You don't need to do all these optimisations right now, but it would
-> be good to make them possible to implement.
-
-Sure.
-
-> > +void do_h_rpt_invalidate_prt(unsigned long pid, unsigned long lpid,
-> > +			     unsigned long type, unsigned long page_size,
-> > +			     unsigned long psize, unsigned long start,
-> > +			     unsigned long end)
-> > +{
-> > +	/*
-> > +	 * A H_RPTI_TYPE_ALL request implies RIC=3, hence
-> > +	 * do a single IS=1 based flush.
-> > +	 */
-> > +	if ((type & H_RPTI_TYPE_ALL) == H_RPTI_TYPE_ALL) {
-> > +		_tlbie_pid_lpid(pid, lpid, RIC_FLUSH_ALL);
-> > +		return;
-> > +	}
-> > +
-> > +	if (type & H_RPTI_TYPE_PWC)
-> > +		_tlbie_pid_lpid(pid, lpid, RIC_FLUSH_PWC);
-> > +
-> > +	if (start == 0 && end == -1) /* PID */
-> > +		_tlbie_pid_lpid(pid, lpid, RIC_FLUSH_TLB);
-> > +	else /* EA */
-> > +		_tlbie_va_range_lpid(start, end, pid, lpid, page_size,
-> > +				     psize, false);
-> 
-> At least one thing that is probably needed is to use the 
-> single_page_flush_ceiling to flip the va range flush over to a pid 
-> flush, so the guest can't cause problems in the hypervisor with an 
-> enormous range.
-
-Yes, makes sense. I shall do this and the above as later optimizations.
-
-Regards,
-Bharata.
+cheers
