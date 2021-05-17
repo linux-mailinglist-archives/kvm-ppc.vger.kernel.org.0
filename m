@@ -2,133 +2,171 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23DEE38289D
-	for <lists+kvm-ppc@lfdr.de>; Mon, 17 May 2021 11:42:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA83A383999
+	for <lists+kvm-ppc@lfdr.de>; Mon, 17 May 2021 18:23:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236068AbhEQJoL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 17 May 2021 05:44:11 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.53]:27289 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236192AbhEQJoL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 17 May 2021 05:44:11 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1621244566; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=Bb80fHfWsl2as0Bzja3tmAaZ9msvugut1/sG21fSivbAd+Ci5k77xAo1vY49KvSfgL
-    0p1ngQsBhhrOgCyHGtGJt7POPNMLCrSwCP7FmFYtj4UEeG6UrKB+2V+THYr5/sTQ8pHg
-    r1L90+LASdtNq/zM+pNkqkVifhFFcZNc02UaNyRHHBg3dCBrC3uLnqAEmO7NC9UcYjw+
-    kjnO3Xq+09ADSVK4eWN86kCuCWI3x8UVM5XBeSFnS0YgZ8OpPqU6PMDrTyDUgQgRe7l/
-    MohnAOn0DN8gIkZEQjGd9HC8NIaespq7X2HMW7tchJRsGvqXKX0Qj9s83U0Wr0t4glAH
-    f80Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1621244566;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:Date:Message-ID:From:References:Cc:To:Subject:Cc:Date:
-    From:Subject:Sender;
-    bh=Rl/Gdkc7egQWIBOSMIJX1XaY9AiyuXx2nuAj0o6wsks=;
-    b=GbXH6pkiDdNME/8kFE6Qgu3m1019Wh/liU76uViiBP95222qAhDpDa7NJlV6Vqev71
-    fOXPzyMrQ/nf3aiYwmn6NSitros3S/UylHr5EKMGOZ3SZJ73f4iibNixWEPo+x40cmaI
-    2WmN9/vcSZztAAE6GSJXwK7JXvqLs+O25/zMM5IO3+k/vIHJoHebeEIONdAxTQHk5nax
-    z97Ga1P153ZgFz4kaLzGY/HPejuGbojafCwD94sykMSX3SLV2FMGAb6C7sL4PZLC5w+m
-    TFpjwvmyjw1b00bhuL2aSf/qz7yPAOTL8hyTBbJL5eGCecSnh4q84O7QVEFbjLPcx8Qc
-    b6WQ==
-ARC-Authentication-Results: i=1; strato.com;
-    dkim=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1621244566;
-    s=strato-dkim-0002; d=xenosoft.de;
-    h=In-Reply-To:Date:Message-ID:From:References:Cc:To:Subject:Cc:Date:
-    From:Subject:Sender;
-    bh=Rl/Gdkc7egQWIBOSMIJX1XaY9AiyuXx2nuAj0o6wsks=;
-    b=b8luP57gpmrZBcfUwwdMzFRTcocewx8zMH8sYzg/rMu7djzRfVaOPgagdkh2b2hNk1
-    IXPyIVybF5pmseiY4Psw66sZ818HgedyFsIG/8uG38vhnYXAEy3rhgKMzDEx9OxsOo2b
-    JolbvIS4ZDkobhCeK0QWL34vUXsTsvkq2mXdAR6FklDAcfMQc4Iblh1hTtCV6qMcV9zy
-    CSj1XROYuldh+sNEcqgp0QDVL9iTKYrZr08jpsJJBIoFnj1yXqP2tEof4WxxpO6vJVN9
-    e91+l1MaKn+s6p8rmBMBbXIr6Qvw0Eixs3N/6pnbS6tkJHYh2udlv9zYAZEq3RQbMaZ2
-    wyXw==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHfJ+Dkjp5DdBJSrwuuqxvPhbL1/HFNrQWNLFP5JgxJd3+MH2JA=="
-X-RZG-CLASS-ID: mo00
-Received: from Christians-iMac.fritz.box
-    by smtp.strato.de (RZmta 47.26.0 AUTH)
-    with ESMTPSA id f051dfx4H9gj0nU
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Mon, 17 May 2021 11:42:45 +0200 (CEST)
-Subject: Re: [FSL P50x0] KVM HV doesn't work anymore
-To:     Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Cc:     Darren Stevens <darren@stevens-zone.net>,
-        Christian Zigotzky <info@xenosoft.de>,
-        mad skateman <madskateman@gmail.com>,
-        "R.T.Dickinson" <rtd2@xtra.co.nz>
-References: <04526309-4653-3349-b6de-e7640c2258d6@xenosoft.de>
- <34617b1b-e213-668b-05f6-6fce7b549bf0@xenosoft.de>
- <9af2c1c9-2caf-120b-2f97-c7722274eee3@csgroup.eu>
- <199da427-9511-34fe-1a9e-08e24995ea85@xenosoft.de>
- <1621236734.xfc1uw04eb.astroid@bobo.none>
-From:   Christian Zigotzky <chzigotzky@xenosoft.de>
-Message-ID: <e6ed7674-3df9-ec3e-8bcf-dcd8ff0fecf8@xenosoft.de>
-Date:   Mon, 17 May 2021 11:42:45 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <1621236734.xfc1uw04eb.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: de-DE
+        id S243358AbhEQQZD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 17 May 2021 12:25:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37254 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346319AbhEQQY2 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 17 May 2021 12:24:28 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54BE6C034612
+        for <kvm-ppc@vger.kernel.org>; Mon, 17 May 2021 07:53:20 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id z13-20020a25ad8d0000b02904f9f8375b61so9683842ybi.20
+        for <kvm-ppc@vger.kernel.org>; Mon, 17 May 2021 07:53:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=4HJ66++ZeWXgUMvYaSH59XIw9b5t7+bKx/IVCdRe4G0=;
+        b=tEchB3/NvHaS2iYBDSPPFoO6QDvpctN/kh8GNdmz+3BV51fgxznShQgFUWKmVHsnCB
+         aIexAfoWXg6sUKvOWx3mQ0ROzie/dXZfhTjzynlDE/FK5ic3y2TmhEJfI8B7wwhTPFpn
+         5h+DUByZwY/YPA72ASBm/UMCFkrOZA/0KTlulemK4yZ/LlMl38QNjbYECaAyv39jZ2PN
+         kDcNISNoaDXMKrAuVsEts6T5iHO9gRSmdqijjd9/w146GvRse1G4R+oaPhYi9pQfgSH5
+         oDg000282+nVSW7qP3y3olOlbJ9JWfuRlxcA2Gv3VnuXIzwfdrZZ4BCdlEpRaNi4S8X0
+         BP7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=4HJ66++ZeWXgUMvYaSH59XIw9b5t7+bKx/IVCdRe4G0=;
+        b=bBhgz69CfA1cKOAg610PZrtKtA6AuVnNmIqlVzdlBgjj8miBxESkgKUkTvSfuPb2I3
+         P/1pzxP9d1oH0GC/VOR1iuWsV7gMlSPsghkPoH2m/TH8/b2EM+WxCoTzCdPxD7wekHgG
+         MgFQQHlG96BC6uHEHL/4mDx6hcwKdZzsQUOL8vJjJiaEyySF6gtiRjaa7IFQKjy35MtP
+         YTVOJGAaQUdLXWJqMhOvyqzKJTJ/BrKiyqOmztq0ePRho1Rjal7Ojun/o9CbLxA6xgrm
+         vJ05vXsNb5hfuWj8zN2TuL2Mnkx8mJFb5Ofz1JY7vKNfoSc08HdOeezgfr0COx2lO52f
+         6WCA==
+X-Gm-Message-State: AOAM5317g4yUSqo783cU/J/ETYkse58VZ/n02vgViEE1soDQDtGpeS8P
+        SWgiLxQ8Yg35IKPdglKwS7c0O7THScjWWXTAUg==
+X-Google-Smtp-Source: ABdhPJxVSYPxCoq4VDHfaNcpUYnOeavMMHtUfXfKI9+aR8ach/FPO0fxCU0HVpVBmnunXxkvJEfDJDgTUXDf+b1H8A==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a5b:1c8:: with SMTP id
+ f8mr317938ybp.44.1621263199546; Mon, 17 May 2021 07:53:19 -0700 (PDT)
+Date:   Mon, 17 May 2021 14:53:10 +0000
+Message-Id: <20210517145314.157626-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.751.gd2f1c929bd-goog
+Subject: [PATCH v5 0/4] KVM statistics data fd-based binary interface
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 17 May 2021 at 09:42am, Nicholas Piggin wrote:
-> Excerpts from Christian Zigotzky's message of May 15, 2021 11:46 pm:
->> On 15 May 2021 at 12:08pm Christophe Leroy wrote:
->>>
->>> Le 15/05/2021 à 11:48, Christian Zigotzky a écrit :
->>>> Hi All,
->>>>
->>>> I bisected today [1] and the bisecting itself was OK but the
->>>> reverting of the bad commit doesn't solve the issue. Do you have an
->>>> idea which commit could be resposible for this issue? Maybe the
->>>> bisecting wasn't successful. I will look in the kernel git log. Maybe
->>>> there is a commit that affected KVM HV on FSL P50x0 machines.
->>> If the uImage doesn't load, it may be because of the size of uImage.
->>>
->>> See https://github.com/linuxppc/issues/issues/208
->>>
->>> Is there a significant size difference with and without KVM HV ?
->>>
->>> Maybe you can try to remove another option to reduce the size of the
->>> uImage.
->> I tried it but it doesn't solve the issue. The uImage works without KVM
->> HV in a virtual e5500 QEMU machine.
-> Any more progress with this? I would say that bisect might have just
-> been a bit unstable and maybe by chance some things did not crash so
-> it's pointing to the wrong patch.
->
-> Upstream merge of powerpc-5.13-1 was good and powerpc-5.13-2 was bad?
->
-> Between that looks like some KVM MMU rework. You could try the patch
-> before this one b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU
-> notifier callbacks"). That won't revert cleanly so just try run the
-> tree at that point. If it works, test the patch and see if it fails.
->
-> Thanks,
-> Nick
-Hi Nick,
+This patchset provides a file descriptor for every VM and VCPU to read
+KVM statistics data in binary format.
+It is meant to provide a lightweight, flexible, scalable and efficient
+lock-free solution for user space telemetry applications to pull the
+statistics data periodically for large scale systems. The pulling
+frequency could be as high as a few times per second.
+In this patchset, every statistics data are treated to have some
+attributes as below:
+  * architecture dependent or common
+  * VM statistics data or VCPU statistics data
+  * type: cumulative, instantaneous,
+  * unit: none for simple counter, nanosecond, microsecond,
+    millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
+Since no lock/synchronization is used, the consistency between all
+the statistics data is not guaranteed. That means not all statistics
+data are read out at the exact same time, since the statistics date
+are still being updated by KVM subsystems while they are read out.
 
-Thanks a lot for your answer. Yes, there is a little bit of progress. 
-The RC2 of kernel 5.13 successfully boots with -smp 3 in a virtual e5500 
-QEMU machine.
--smp 4 doesn't work anymore since the PowerPC updates 5.13-2. I used 
--smp 4 before 5.13 because my FSL P5040 machine has 4 cores.
+---
 
-Could you please post a patch for reverting the commit before 
-b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier callbacks")?
+* v4 -> v5
+  - Rebase to kvm/queue, commit a4345a7cecfb ("Merge tag
+    'kvmarm-fixes-5.13-1'")
+  - Change maximum stats name length to 48
+  - Replace VM_STATS_COMMON/VCPU_STATS_COMMON macros with stats
+    descriptor definition macros.
+  - Fixed some errors/warnings reported by checkpatch.pl
 
-Thanks in advance,
+* v3 -> v4
+  - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Use C-stype comments in the whole patch
+  - Fix wrong count for x86 VCPU stats descriptors
+  - Fix KVM stats data size counting and validity check in selftest
 
-Christian
+* v2 -> v3
+  - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Resolve some nitpicks about format
 
+* v1 -> v2
+  - Use ARRAY_SIZE to count the number of stats descriptors
+  - Fix missing `size` field initialization in macro STATS_DESC
+
+[1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+[2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+[3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
+[4] https://lore.kernel.org/kvm/20210429203740.1935629-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (4):
+  KVM: stats: Separate common stats from architecture specific ones
+  KVM: stats: Add fd-based API to read binary stats data
+  KVM: stats: Add documentation for statistics data binary interface
+  KVM: selftests: Add selftest for KVM statistics data binary interface
+
+ Documentation/virt/kvm/api.rst                | 171 ++++++++
+ arch/arm64/include/asm/kvm_host.h             |   9 +-
+ arch/arm64/kvm/guest.c                        |  38 +-
+ arch/mips/include/asm/kvm_host.h              |   9 +-
+ arch/mips/kvm/mips.c                          |  64 ++-
+ arch/powerpc/include/asm/kvm_host.h           |   9 +-
+ arch/powerpc/kvm/book3s.c                     |  64 ++-
+ arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+ arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+ arch/powerpc/kvm/booke.c                      |  59 ++-
+ arch/s390/include/asm/kvm_host.h              |   9 +-
+ arch/s390/kvm/kvm-s390.c                      | 129 +++++-
+ arch/x86/include/asm/kvm_host.h               |   9 +-
+ arch/x86/kvm/x86.c                            |  67 +++-
+ include/linux/kvm_host.h                      | 136 ++++++-
+ include/linux/kvm_types.h                     |  12 +
+ include/uapi/linux/kvm.h                      |  50 +++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+ .../selftests/kvm/kvm_bin_form_stats.c        | 379 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
+ virt/kvm/kvm_main.c                           | 237 ++++++++++-
+ 24 files changed, 1396 insertions(+), 90 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
+
+
+base-commit: a4345a7cecfb91ae78cd43d26b0c6a956420761a
+-- 
+2.31.1.751.gd2f1c929bd-goog
 
