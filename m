@@ -2,203 +2,135 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73395387867
-	for <lists+kvm-ppc@lfdr.de>; Tue, 18 May 2021 14:04:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0739387D61
+	for <lists+kvm-ppc@lfdr.de>; Tue, 18 May 2021 18:27:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244866AbhERMFn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 18 May 2021 08:05:43 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8812 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242885AbhERMFf (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 18 May 2021 08:05:35 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 14IC3d60115358;
-        Tue, 18 May 2021 08:03:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
- : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Y7Py4PLn2Xa4gLUzgFQ0syP3xHf3zMkOqJFeWIq/rCc=;
- b=OwiJOwGWa8l4OqOo+GXehOQOeHqqDHJ7aBx3OGaMIa5IY/3keCZYaOVvqJe3BF+AF5PV
- suqPNI3FWioKUMeh4CUKMRGx+PWK3T8Ud2WyFtXIMnHPF0QOMO5WhCa9bTkSjlvh3Io2
- 1KiSelaYDj9pMaIchlvIRQ+F1h4l02fo/3YHCt4b77I/iA3CFIoSFN+NNrnXY1Ho+RrM
- xytt/icl/aSRBBPhzyA/n4SAYeSuFLTH3vmgbYpCLXBiQdwKfdNiX3peFQ/ZtrhjSwF5
- xgbsRHseGLSxREwPos0eA7DoN/ag/xcV4zrNvjvoliBjP9ecb5IQeBU95vIQUZdocMC/ 1g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38md080du1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 08:03:54 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14IC3re8116660;
-        Tue, 18 May 2021 08:03:53 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38md080dst-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 08:03:53 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14IC20vk018196;
-        Tue, 18 May 2021 12:03:51 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma01fra.de.ibm.com with ESMTP id 38m1gv0589-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 May 2021 12:03:51 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 14IC3mLN41812326
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 May 2021 12:03:48 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5F864204C;
-        Tue, 18 May 2021 12:03:48 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 931DF4204B;
-        Tue, 18 May 2021 12:03:47 +0000 (GMT)
-Received: from [172.17.0.2] (unknown [9.40.192.207])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 May 2021 12:03:47 +0000 (GMT)
-Subject: [PATCH v5 3/3] spapr: nvdimm: Introduce spapr-nvdimm device
-From:   Shivaprasad G Bhat <sbhat@linux.ibm.com>
-To:     david@gibson.dropbear.id.au, groug@kaod.org, qemu-ppc@nongnu.org
-Cc:     qemu-devel@nongnu.org, aneesh.kumar@linux.ibm.com,
-        nvdimm@lists.linux.dev, kvm-ppc@vger.kernel.org,
-        shivaprasadbhat@gmail.com, bharata@linux.vnet.ibm.com
-Date:   Tue, 18 May 2021 08:03:46 -0400
-Message-ID: <162133941905.610.8271873318598392825.stgit@4f1e6f2bd33e>
-In-Reply-To: <162133924680.610.15121309741756314238.stgit@4f1e6f2bd33e>
-References: <162133924680.610.15121309741756314238.stgit@4f1e6f2bd33e>
-User-Agent: StGit/0.21
+        id S1350604AbhERQ27 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 18 May 2021 12:28:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53924 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350617AbhERQ24 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 18 May 2021 12:28:56 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D0CC061761
+        for <kvm-ppc@vger.kernel.org>; Tue, 18 May 2021 09:27:35 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id e11so12278160ljn.13
+        for <kvm-ppc@vger.kernel.org>; Tue, 18 May 2021 09:27:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oCHyX25nut1dXgrfKvPYZ4vLHkOFpNujX0A0DBHr6zA=;
+        b=QQnYdPNPVB26qj7Ys12iD114pAArbDt9pCpdKRPqNfNWWhY6L+RXxxCV1QAy/7013Y
+         rdZk/pvPuSWTxe5cV2yVN+qzIuhMHB4f9KgRvwVOE/0zgJoS7f6OtPQbeyQnK4rfmDao
+         We7oSlerhFdZBoJUU0HWqL/We+yx8/1Dxdqx9Jnb4CK44kTGNedTGWoQSELf0ZxgymsI
+         J5/nIa007Ed7SFBCwXhYwUMbb5gVF31pqKkXp8whelqyoYug4VtfNU8WqB1K1vW7oS2l
+         S522kEQZFPyDnmehv/a8zHfx/8wTBn4kn/r33mvqZuzzfh4tlyZWPaiBDgcCUkvsH1yW
+         0Y8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oCHyX25nut1dXgrfKvPYZ4vLHkOFpNujX0A0DBHr6zA=;
+        b=hJI6EH1Tw2OZkq4xDZyaRh+B6jGXgwHKTon2Ml1DTvf5PgL3qxrWLi/vkb42X0vLsF
+         138iUY58/ccqZv9Vl4haCgkF99Ubaizn779Qq/BsGIaQ+ZDJ+Zb6gT2+nGG3+LO6O44p
+         yAdayl7cRNJz9a1qVtoVQuPBYA5KONO90lCwgEL5rh62gNv/sAbz0PZUux55Zz6J6fOk
+         Edg4P0U0ENtYwS0ZOGasakumKdGX1XyW6s6w++CWBMo6h2jvOtKKOWOBOTGwjCKG19Vb
+         1H+mMBsCFSSQHaGIxvETX9eW5gJ6OJNbPwwxB9MqCdinQX104yJYwjgTgBJ+Pq+lotoK
+         OOvg==
+X-Gm-Message-State: AOAM533T32ttN5RuJtjRXy0Gmi36DuHYYr5UU3Ds3dzVxicezEiiUT5A
+        XjsIZFFm2ILr3sQCku5eN8pjbSs+RwJ7bF/e+zRp1w==
+X-Google-Smtp-Source: ABdhPJwMrV1eLucK07ggc7pKZYp2/4fRRvxCRtyoN4tBFxgPe2X3AL8Bz64jmu1CM19fdZ3EtBoPQ6h8vlutNeAyWRM=
+X-Received: by 2002:a2e:81d0:: with SMTP id s16mr4934378ljg.74.1621355253213;
+ Tue, 18 May 2021 09:27:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: R7hDVuiW2Zb2uX5bnprOYpvS0t-OXP_b
-X-Proofpoint-GUID: gRCXZ_SrvcqOsgv4VD8cVYQGM-Fvqfpf
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-05-18_04:2021-05-18,2021-05-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- impostorscore=0 mlxscore=0 mlxlogscore=932 priorityscore=1501 spamscore=0
- malwarescore=0 lowpriorityscore=0 clxscore=1015 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2105180086
+References: <20210517145314.157626-1-jingzhangos@google.com>
+ <20210517145314.157626-2-jingzhangos@google.com> <CALzav=dGT7B7FWw_d5v3QaJxgfp6TZv7E4fdchG_7LKh+C17gg@mail.gmail.com>
+ <CAAdAUtjyFhuh4iFJJOkkO20XXKqbcRO-S0ziFfUW1rHL-bkeZw@mail.gmail.com>
+In-Reply-To: <CAAdAUtjyFhuh4iFJJOkkO20XXKqbcRO-S0ziFfUW1rHL-bkeZw@mail.gmail.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 18 May 2021 09:27:06 -0700
+Message-ID: <CALzav=dHjy8wnLckxifrjVDfVNBmqHcJgeS7PK6BnAp6UCyO5A@mail.gmail.com>
+Subject: Re: [PATCH v5 1/4] KVM: stats: Separate common stats from
+ architecture specific ones
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-If the device backend is not persistent memory for the nvdimm, there is
-need for explicit IO flushes on the backend to ensure persistence.
+On Mon, May 17, 2021 at 5:10 PM Jing Zhang <jingzhangos@google.com> wrote:
+<snip>
+> Actually the definition of kvm_{vcpu,vm}_stat are arch specific. There is
+> no real structure for arch agnostic stats. Most of the stats in common
+> structures are arch agnostic, but not all of them.
+> There are some benefits to put all common stats in a separate structure.
+> e.g. if we want to add a stat in kvm_main.c, we only need to add this stat
+> in the common structure, don't have to update all kvm_{vcpu,vm}_stat
+> definition for all architectures.
 
-On SPAPR, the issue is addressed by adding a new hcall to request for
-an explicit flush from the guest when the backend is not pmem. So, the
-approach here is to convey when the hcall flush is required in a device
-tree property. The guest once it knows the device backend is not pmem,
-makes the hcall whenever flush is required.
+I meant rename the existing arch-specific struct kvm_{vcpu,vm}_stat to
+kvm_{vcpu,vm}_stat_arch and rename struct kvm_{vcpu,vm}_stat_common to
+kvm_{vcpu,vm}_stat.
 
-To set the device tree property, the patch introduces a new papr specific
-device type inheriting the nvdimm device. When the backend doesn't have
-pmem="yes", the device tree property "ibm,hcall-flush-required" is set,
-and the guest makes hcall H_SCM_FLUSH requesting for an explicit flush.
+So in  include/linux/kvm_types.h you'd have:
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
----
- hw/ppc/spapr_nvdimm.c         |   46 +++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr_nvdimm.h |    4 ++++
- 2 files changed, 50 insertions(+)
+struct kvm_vm_stat {
+  ulong remote_tlb_flush;
+  struct kvm_vm_stat_arch arch;
+};
 
-diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-index d460a098c0..9a04df4c47 100644
---- a/hw/ppc/spapr_nvdimm.c
-+++ b/hw/ppc/spapr_nvdimm.c
-@@ -54,6 +54,8 @@ bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
- {
-     const MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
-     const MachineState *ms = MACHINE(hotplug_dev);
-+    PCDIMMDevice *dimm = PC_DIMM(nvdimm);
-+    MemoryRegion *mr = host_memory_backend_get_memory(dimm->hostmem);
-     g_autofree char *uuidstr = NULL;
-     QemuUUID uuid;
-     int ret;
-@@ -91,6 +93,14 @@ bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
-         return false;
-     }
- 
-+    if (object_dynamic_cast(OBJECT(nvdimm), TYPE_SPAPR_NVDIMM) &&
-+        (memory_region_get_fd(mr) < 0)) {
-+        error_setg(errp, "spapr-nvdimm device requires the "
-+                   "memdev %s to be of memory-backend-file type",
-+                   object_get_canonical_path_component(OBJECT(dimm->hostmem)));
-+        return false;
-+    }
-+
-     return true;
- }
- 
-@@ -162,6 +172,21 @@ static int spapr_dt_nvdimm(SpaprMachineState *spapr, void *fdt,
-                              "operating-system")));
-     _FDT(fdt_setprop(fdt, child_offset, "ibm,cache-flush-required", NULL, 0));
- 
-+    if (object_dynamic_cast(OBJECT(nvdimm), TYPE_SPAPR_NVDIMM)) {
-+        bool is_pmem = false;
-+#ifdef CONFIG_LIBPMEM
-+        PCDIMMDevice *dimm = PC_DIMM(nvdimm);
-+        HostMemoryBackend *hostmem = dimm->hostmem;
-+
-+        is_pmem = object_property_get_bool(OBJECT(hostmem), "pmem",
-+                                           &error_abort);
-+#endif
-+        if (!is_pmem) {
-+            _FDT(fdt_setprop(fdt, child_offset, "ibm,hcall-flush-required",
-+                             NULL, 0));
-+        }
-+    }
-+
-     return child_offset;
- }
- 
-@@ -585,7 +610,16 @@ static target_ulong h_scm_flush(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     }
- 
-     dimm = PC_DIMM(drc->dev);
-+    if (!object_dynamic_cast(OBJECT(dimm), TYPE_SPAPR_NVDIMM)) {
-+        return H_PARAMETER;
-+    }
-+
-     backend = MEMORY_BACKEND(dimm->hostmem);
-+#ifdef CONFIG_LIBPMEM
-+    if (object_property_get_bool(OBJECT(backend), "pmem", &error_abort)) {
-+        return H_UNSUPPORTED;
-+    }
-+#endif
-     fd = memory_region_get_fd(&backend->mr);
- 
-     if (fd < 0) {
-@@ -766,3 +800,15 @@ static void spapr_scm_register_types(void)
- }
- 
- type_init(spapr_scm_register_types)
-+
-+static TypeInfo spapr_nvdimm_info = {
-+    .name          = TYPE_SPAPR_NVDIMM,
-+    .parent        = TYPE_NVDIMM,
-+};
-+
-+static void spapr_nvdimm_register_types(void)
-+{
-+    type_register_static(&spapr_nvdimm_info);
-+}
-+
-+type_init(spapr_nvdimm_register_types)
-diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvdimm.h
-index 24d8e37b33..fb4e56418e 100644
---- a/include/hw/ppc/spapr_nvdimm.h
-+++ b/include/hw/ppc/spapr_nvdimm.h
-@@ -13,6 +13,10 @@
- #include "hw/mem/nvdimm.h"
- #include "migration/vmstate.h"
- 
-+#define TYPE_SPAPR_NVDIMM "spapr-nvdimm"
-+OBJECT_DECLARE_SIMPLE_TYPE(SpaprNVDIMMDevice, SPAPR_NVDIMM)
-+
-+typedef struct SpaprNVDIMMDevice  SpaprNVDIMMDevice;
- typedef struct SpaprDrc SpaprDrc;
- typedef struct SpaprMachineState SpaprMachineState;
- 
+struct kvm_vcpu_stat {
+  u64 halt_successful_poll;
+  u64 halt_attempted_poll;
+  u64 halt_poll_invalid;
+  u64 halt_wakeup;
+  u64 halt_poll_success_ns;
+  u64 halt_poll_fail_ns;
+  struct kvm_vcpu_stat_arch arch;
+};
 
+And in arch/x86/include/asm/kvm_host.h you'd have:
 
+struct kvm_vm_stat_arch {
+  ulong mmu_shadow_zapped;
+  ...
+};
+
+struct kvm_vcpu_stat_arch {
+  u64 pf_fixed;
+  u64 pf_guest;
+  u64 tlb_flush;
+  ...
+};
+
+You still have the same benefits of having an arch-neutral place to
+store stats but the struct layout more closely resembles struct
+kvm_vcpu and struct kvm.
