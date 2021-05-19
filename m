@@ -2,56 +2,60 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 234823888D1
-	for <lists+kvm-ppc@lfdr.de>; Wed, 19 May 2021 09:57:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 755AF388D43
+	for <lists+kvm-ppc@lfdr.de>; Wed, 19 May 2021 13:52:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234405AbhESH6d (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 19 May 2021 03:58:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36214 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243639AbhESH6d (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 May 2021 03:58:33 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D688C06175F
-        for <kvm-ppc@vger.kernel.org>; Wed, 19 May 2021 00:57:14 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id b13-20020a17090a8c8db029015cd97baea9so3122390pjo.0
-        for <kvm-ppc@vger.kernel.org>; Wed, 19 May 2021 00:57:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=KhG7DdiIupXeHhCtT3OzrIBr8xIgzyTCtv60R9AOj28=;
-        b=OR0eliZr0wy/juooXT/WN9fNlZ1v+u38YQwZuxS0rVatYjKFsRf9/Lz33Y15Tvki+D
-         0YhA0mtJF8GYUcmnT4LflZv06fK+up0uZrCxcXfsRySFKMfkwR3nNHd40WNXYzGq1gVS
-         Y9ofSfBi2bvTI0nY/7PO0/js4np2UQlIdMWPwAO/e+oABp52H6GKs4eqk6+AEvfvYXCW
-         qo8mCljXrRnBN4yGKow6W3yT5lHJysfgy5YZOM8mKM2eVu7gnklYhMNmvzTQzBi1b4Ix
-         0KBRJ/9A/NjqnSyEiOFSlUOuF8q9FejwqkwMUVMT9F9vwril5flxM4gH0RpKkhliduOZ
-         dB2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=KhG7DdiIupXeHhCtT3OzrIBr8xIgzyTCtv60R9AOj28=;
-        b=rhCtS0vfc4Zqk8FxeSwc2vT+8+MmFJux+0A62pPHKy0HgQKjuB4J2wr6o4H7iDZOj2
-         UobV93IHle/HbdUB5p5ExMLUZyRVqZfrLMBGyPT2ZpR493iriV3YbNiM+Q7nKHjp2Bzt
-         Ma2bmbM5s5ZZPOy1gLAjCAWn+v1obT5Oduzkm1/aa9P7MSodD4l5e/pq6Lbl4u9gTXYy
-         q8yTWVmSumpVA3d4owed7qlN9LRhN/ToroTYpx/WOIm8dEKR0sFQ8v4NDV6A3tBaHNRa
-         QUb8082vssip9ixAioxHSiJM3gIO125c6XwEnfB7KA5KoUPO0xe6hOUVBCwz3qF3R0TB
-         wWag==
-X-Gm-Message-State: AOAM5314zrIgxnScuMGlCr/7pbZ1N1L1fJAvJmWwMLHjuJVvMMnWP7V9
-        Sgw3zHcynFugIYIL/RrghKw=
-X-Google-Smtp-Source: ABdhPJwodw2G3AahH5x15v3WvTxAdf5SvVJDcjC0WYbwBARN1Msn6qODLQ/HYJ6/ayY/vCex5tJS2Q==
-X-Received: by 2002:a17:902:e04f:b029:eb:66b0:6d08 with SMTP id x15-20020a170902e04fb02900eb66b06d08mr9485408plx.50.1621411033621;
-        Wed, 19 May 2021 00:57:13 -0700 (PDT)
-Received: from localhost (14-201-155-8.tpgi.com.au. [14.201.155.8])
-        by smtp.gmail.com with ESMTPSA id n20sm14926827pjq.45.2021.05.19.00.57.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 00:57:13 -0700 (PDT)
-Date:   Wed, 19 May 2021 17:57:08 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
+        id S1345230AbhESLxp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 19 May 2021 07:53:45 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.53]:31069 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229508AbhESLxo (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 May 2021 07:53:44 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1621425137; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=jI38wZBHTCRDplP91ndDQ4WC1vFffPW1zcTAPw6BB3Pyp5+f7HCkpv/U5Weg0jbufM
+    AiMpbg0s9dwNs7uTW2TwurEvuDaCT6723HCmcgZ0+rqfMuvrVpW7DInbXo8uXhmFBezv
+    04UD3dcu/sMHjwmxU0Ly0aZyni8O0ZLbIfJPPridqxp8drvIDUKBIMbJL/TLRqklJGR7
+    KvBFXgK+tZoIKThFe9sh+0iPUMcUnToP5p7zVVNVcDquzVo01PKkV46Zm4scLuMEFT34
+    t6fod1CJaygr9zRbrKatmscXWXiHAFUoQE+2NPaGDGmXokGGTsyZoptTnyA2+7d7DCNC
+    xiRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1621425137;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:Date:Message-ID:From:References:Cc:To:Subject:Cc:Date:
+    From:Subject:Sender;
+    bh=pfRboCO9rmBGzYQrUB0iPICyNMC4oZ5fcKmhzF7+HYU=;
+    b=ovvVBGss3bxLqqvHsWeBgxkR3LrVLID5nKk7mfDC2CMY9Y2mdjaE7x59s5igHW7Qx6
+    u6MwXbMj3c1iu96vi65q06c29g5sNRmwopJ1OqaVE5hGFrKTj7Dck9TpwKpO72SVxckF
+    5W/hovjVDCafXQcMAqG582VxxWUQM6yP9ZQ0vC6f7Bvl9DHLEWNy+lqr6shadMxCy8St
+    NJzf/dFe4rDGTgsvGxIxYF/Aoe2y2PiYepIMv3SZj6EGe62N3QJTcyZzy1Hqauuvbtj6
+    V+g5xYwgX9Nmu7eNnRDez+z/arOn/VeYPV7ENscBfKIRbknj6RxW+u/nWfxcDyq0qwut
+    Dqug==
+ARC-Authentication-Results: i=1; strato.com;
+    dkim=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1621425137;
+    s=strato-dkim-0002; d=xenosoft.de;
+    h=In-Reply-To:Date:Message-ID:From:References:Cc:To:Subject:Cc:Date:
+    From:Subject:Sender;
+    bh=pfRboCO9rmBGzYQrUB0iPICyNMC4oZ5fcKmhzF7+HYU=;
+    b=dGIC66MH6GNjjwiY0zKEe4vnpF7U9pR/wxc0VPm/hZqWhFPJgdFSsH5Q6HHLaF1mUB
+    t5CvrfWYOuQLwkqB+s4sEVoGOI7v5bOcW9xGihXZmznO1kWz9mxIrsybhskGnQd1KBSA
+    vnKFk9pk4pKkI8QITamEnWWjEfM5ZYNUqkwjknlC5K6seHxNJdpIvOWti+0BVbf0uzfk
+    jbklvIBN4ZeQMMQh2j2MGitQ8vSDkpI78uUAzLNKqbTkbd+zdZHferHLKwNiOitGVlgf
+    wd5I5v4iMqFhEARSdNMWAlpqfhxOo0Vjqno141ef991LCkHzgq/BmmxS2k1ZI1MCSwqK
+    ig6w==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHfJ+Dkjp5DdBJSrwuuqxvPgGIu/IwJXRU14Nr6IowH7cx9oU"
+X-RZG-CLASS-ID: mo00
+Received: from [IPv6:2a02:8109:89c0:ebfc:e411:e463:f7e:f91a]
+    by smtp.strato.de (RZmta 47.26.1 AUTH)
+    with ESMTPSA id i0437dx4JBqH01n
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Wed, 19 May 2021 13:52:17 +0200 (CEST)
 Subject: Re: [FSL P50x0] KVM HV doesn't work anymore
-To:     Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Christian Zigotzky <chzigotzky@xenosoft.de>,
+To:     Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
         "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
         linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 Cc:     Darren Stevens <darren@stevens-zone.net>,
@@ -59,70 +63,71 @@ Cc:     Darren Stevens <darren@stevens-zone.net>,
         mad skateman <madskateman@gmail.com>,
         "R.T.Dickinson" <rtd2@xtra.co.nz>
 References: <04526309-4653-3349-b6de-e7640c2258d6@xenosoft.de>
-        <34617b1b-e213-668b-05f6-6fce7b549bf0@xenosoft.de>
-        <9af2c1c9-2caf-120b-2f97-c7722274eee3@csgroup.eu>
-        <199da427-9511-34fe-1a9e-08e24995ea85@xenosoft.de>
-        <1621236734.xfc1uw04eb.astroid@bobo.none>
-        <e6ed7674-3df9-ec3e-8bcf-dcd8ff0fecf8@xenosoft.de>
-In-Reply-To: <e6ed7674-3df9-ec3e-8bcf-dcd8ff0fecf8@xenosoft.de>
+ <34617b1b-e213-668b-05f6-6fce7b549bf0@xenosoft.de>
+ <9af2c1c9-2caf-120b-2f97-c7722274eee3@csgroup.eu>
+ <199da427-9511-34fe-1a9e-08e24995ea85@xenosoft.de>
+ <1621236734.xfc1uw04eb.astroid@bobo.none>
+ <e6ed7674-3df9-ec3e-8bcf-dcd8ff0fecf8@xenosoft.de>
+ <1621410977.cgh0d6nvlo.astroid@bobo.none>
+From:   Christian Zigotzky <chzigotzky@xenosoft.de>
+Message-ID: <acf63821-2030-90fa-f178-b2baeb0c4784@xenosoft.de>
+Date:   Wed, 19 May 2021 13:52:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Message-Id: <1621410977.cgh0d6nvlo.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1621410977.cgh0d6nvlo.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: de-DE
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Christian Zigotzky's message of May 17, 2021 7:42 pm:
-> On 17 May 2021 at 09:42am, Nicholas Piggin wrote:
->> Excerpts from Christian Zigotzky's message of May 15, 2021 11:46 pm:
->>> On 15 May 2021 at 12:08pm Christophe Leroy wrote:
->>>>
->>>> Le 15/05/2021 =C3=A0 11:48, Christian Zigotzky a =C3=A9crit=C2=A0:
->>>>> Hi All,
->>>>>
->>>>> I bisected today [1] and the bisecting itself was OK but the
->>>>> reverting of the bad commit doesn't solve the issue. Do you have an
->>>>> idea which commit could be resposible for this issue? Maybe the
->>>>> bisecting wasn't successful. I will look in the kernel git log. Maybe
->>>>> there is a commit that affected KVM HV on FSL P50x0 machines.
->>>> If the uImage doesn't load, it may be because of the size of uImage.
->>>>
->>>> See https://github.com/linuxppc/issues/issues/208
->>>>
->>>> Is there a significant size difference with and without KVM HV ?
->>>>
->>>> Maybe you can try to remove another option to reduce the size of the
->>>> uImage.
->>> I tried it but it doesn't solve the issue. The uImage works without KVM
->>> HV in a virtual e5500 QEMU machine.
->> Any more progress with this? I would say that bisect might have just
->> been a bit unstable and maybe by chance some things did not crash so
->> it's pointing to the wrong patch.
+On 19 May 2021 at 09:57 am, Nicholas Piggin wrote:
+> Excerpts from Christian Zigotzky's message of May 17, 2021 7:42 pm:
+>> On 17 May 2021 at 09:42am, Nicholas Piggin wrote:
+>>> Excerpts from Christian Zigotzky's message of May 15, 2021 11:46 pm:
+>>>> I tried it but it doesn't solve the issue. The uImage works without 
+>>>> KVM
+>>>> HV in a virtual e5500 QEMU machine.
+>>> Any more progress with this? I would say that bisect might have just
+>>> been a bit unstable and maybe by chance some things did not crash so
+>>> it's pointing to the wrong patch.
+>>>
+>>> Upstream merge of powerpc-5.13-1 was good and powerpc-5.13-2 was bad?
+>>>
+>>> Between that looks like some KVM MMU rework. You could try the patch
+>>> before this one b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU
+>>> notifier callbacks"). That won't revert cleanly so just try run the
+>>> tree at that point. If it works, test the patch and see if it fails.
+>>>
+>>> Thanks,
+>>> Nick
+>> Hi Nick,
 >>
->> Upstream merge of powerpc-5.13-1 was good and powerpc-5.13-2 was bad?
+>> Thanks a lot for your answer. Yes, there is a little bit of progress.
+>> The RC2 of kernel 5.13 successfully boots with -smp 3 in a virtual e5500
+>> QEMU machine.
+>> -smp 4 doesn't work anymore since the PowerPC updates 5.13-2. I used
+>> -smp 4 before 5.13 because my FSL P5040 machine has 4 cores.
 >>
->> Between that looks like some KVM MMU rework. You could try the patch
->> before this one b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU
->> notifier callbacks"). That won't revert cleanly so just try run the
->> tree at that point. If it works, test the patch and see if it fails.
->>
->> Thanks,
->> Nick
-> Hi Nick,
->=20
-> Thanks a lot for your answer. Yes, there is a little bit of progress.=20
-> The RC2 of kernel 5.13 successfully boots with -smp 3 in a virtual e5500=20
-> QEMU machine.
-> -smp 4 doesn't work anymore since the PowerPC updates 5.13-2. I used=20
-> -smp 4 before 5.13 because my FSL P5040 machine has 4 cores.
->=20
-> Could you please post a patch for reverting the commit before=20
-> b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier callbacks"=
-)?
+>> Could you please post a patch for reverting the commit before
+>> b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier callbacks")?
+> You could `git checkout b1c5356e873c~1`
+>
+> Thanks,
+> Nick
+Hi Nick,
 
-You could `git checkout b1c5356e873c~1`
+Thanks for your answer. I checked out the commit b1c5356e873c~1 (HEAD is 
+now at d923ff258423 KVM: MIPS/MMU: Convert to the gfn-based MMU notifier 
+callbacks).
+The kernel boots with '-smp 4' without any problems.
+After that I patched with the probable first bad commit (KVM: PPC: 
+Convert to the gfn-based MMU notifier callbacks). The kernel also boots 
+with this patch. That means, this isn't the first bad commit.
+Further information: 
+https://forum.hyperion-entertainment.com/viewtopic.php?p=53267#p53267
 
-Thanks,
-Nick
->=20
+Cheers,
+Christian
