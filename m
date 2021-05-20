@@ -2,145 +2,327 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F3C13899A1
-	for <lists+kvm-ppc@lfdr.de>; Thu, 20 May 2021 01:08:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3310389C6D
+	for <lists+kvm-ppc@lfdr.de>; Thu, 20 May 2021 06:22:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229976AbhESXJU (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 19 May 2021 19:09:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46726 "EHLO
+        id S229436AbhETEXT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 20 May 2021 00:23:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230020AbhESXJT (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 19 May 2021 19:09:19 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 571FDC061574
-        for <kvm-ppc@vger.kernel.org>; Wed, 19 May 2021 16:07:58 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id b13-20020a17090a8c8db029015cd97baea9so4284373pjo.0
-        for <kvm-ppc@vger.kernel.org>; Wed, 19 May 2021 16:07:58 -0700 (PDT)
+        with ESMTP id S229458AbhETEXR (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 20 May 2021 00:23:17 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A90EDC061761
+        for <kvm-ppc@vger.kernel.org>; Wed, 19 May 2021 21:21:55 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id x18so7132268pfi.9
+        for <kvm-ppc@vger.kernel.org>; Wed, 19 May 2021 21:21:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=cymZYvTpVQSrTcAXUybuDxB8tbOvF2n109X7Qd3QHII=;
-        b=gC9WAZKA86C7gWqhb8VQik/Nw0aVcDfyRtgnUlSQUhYLb+icQldwNoYlZNHNWSKujx
-         mMkCPDYMYrEaWepeJ9NpoPz0+do8WExDObJLAI6dVu/IAoRAnPh9WhUklCV+rrs40fsw
-         V4q98u4GS+4aM1gaoFUbygPc0ST+S1aTIuZb5SzWTkB0W6CVQUFYGnAUZrI2iEgRx8DT
-         UYaSatelKvAy3OZ9fYU98UdOnjaXFhr1mqydtIbUlQOgiZc2t1sQDAH6nEnzOdw6t1F4
-         6KBQ0+gIPPwc0Ao5IR5PAcsPSOIrXeCprsfIjtU52w4RnJIrvgzQgwmkRIUzM6rYAi3m
-         OW5g==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=DoLjvzR9Ycpjqcta0VpSiJR4Bdnq46dPXdEKwxdkZyE=;
+        b=KhAuP9uJ0n9pmyTFOxYfvk0m31c9RU1ZSXij+ksAklnEMQOxYzFB8F2NghHrxa0v/q
+         wL/kdDf2JVSyJJnvOnZAZnOHIQwbe3g3IwaONeGKzObQDxihAExXUsj1UNM+FeUaxaCB
+         cs3C6C6BObrMp27EBsoNGKxVfSeEpoLskJddVXnFZCV4+9TX18AgZvLNSOzUDsw9nUkg
+         P0OgZzuc4/aPq+MHVU37o5Rsxp6/Gh/tbpXovUKYmvQmUWUws3uSDkvk9k13v3DQr1VX
+         qJrP3ehBjk3P/TTsuttFjfSyzxtdq7PiNymDcP30iofWSZVHWs4jHZoUb0uN7/oXndKL
+         vkZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=cymZYvTpVQSrTcAXUybuDxB8tbOvF2n109X7Qd3QHII=;
-        b=M2yDDmCZUxOLhQcevZ+nsHFe2xkRfcy3cCEuv7HCsUI/Bb7DUx+si4U1FCogA+VK1F
-         EelZUg0IbiflF0v4og8sh9zj7SCvqemdS6yBtxFLljXi2nmy5HTPXmoOheCuTnDNoVjU
-         ZQ51x/rsr4l26sLsx39vwIwtSZ7Mk4yHzRRodKrdPGb351verGFDt+7zJKbnVLxvyGkp
-         FvPcbeOHpegjOtlU2FzoAxJXV5jvIChMklY703IFWmWdfSWfNm1YexEFvpYdgzvXnOZn
-         oW6MjR51nEOxVCHXW8WtdDL3XqMGNOJMl6y7QNgprFzHNb+1UFnGVKv2VzDvQv7/aRfd
-         X/Kw==
-X-Gm-Message-State: AOAM5313eLOe+QqvhHb3jegqDrA8mJKEhkqbenw6ktCNMHghEoV4SpzN
-        PiwYn9EDfPjd99YK3rWuFyGroJHO/dNZWQ==
-X-Google-Smtp-Source: ABdhPJy+WYY8IkzRFV/hh4NfJvnY+fXH3wMeNL+ToKcyRCO3c3nZKI4q9nf0D2FNohwdwfn5U/Dgaw==
-X-Received: by 2002:a17:902:dcce:b029:ef:339:fa6a with SMTP id t14-20020a170902dcceb02900ef0339fa6amr2130593pll.24.1621465677922;
-        Wed, 19 May 2021 16:07:57 -0700 (PDT)
-Received: from localhost (60-241-27-127.tpgi.com.au. [60.241.27.127])
-        by smtp.gmail.com with ESMTPSA id ch24sm5254090pjb.18.2021.05.19.16.07.56
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DoLjvzR9Ycpjqcta0VpSiJR4Bdnq46dPXdEKwxdkZyE=;
+        b=gO0xM7ZKzNb72CSGJ0kjESS1gAlJIAyVAgbCrZoKHhM71vJXFnQJG2id79ECnuCekM
+         u6HIkU4MQNOTU7lDFmygVSBzgdz/qTG3fxBmEfKMUMCaEBbaQ3Fsz2XWIKIu7G1iu1Jj
+         5g4ZALW8r8d6HOM4aHd+raIi+dZ8mtIfNVVNcVHxUtZW3cpvWHOkDqbMPmgtGZ8GIvu1
+         IwkSL4XtPowAGGeI4OhjO5Iw2MxZfOjFM3uy3Z2ItsOvIpuWC9yfT0vQvdRA4+Se81Ta
+         Zr/a6fYgVsEy+8goFdcRmoAlFQE/yuuoy4VFXhJUC1xwPSPHKrNG+rJSzfB77t1Lp+gV
+         5Bjg==
+X-Gm-Message-State: AOAM531K/Bw1H7JANwn2Djbtp+CO1tLemCWYqCwt3fwZMYJqrtGXKVkf
+        oADpnt6MYmjtpVE11esXZ962gA==
+X-Google-Smtp-Source: ABdhPJyUT/W5KKf6QPkIVjnToQh3ryfQCsYn+WRFe/r3PlLYmoitMteeLZgd2ATqkGcuRlOqcbdSDw==
+X-Received: by 2002:a62:860b:0:b029:28e:d45b:4d2e with SMTP id x11-20020a62860b0000b029028ed45b4d2emr2616829pfd.70.1621484514603;
+        Wed, 19 May 2021 21:21:54 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id j23sm738541pfh.179.2021.05.19.21.21.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 16:07:57 -0700 (PDT)
-Date:   Thu, 20 May 2021 09:07:51 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [FSL P50x0] KVM HV doesn't work anymore
-To:     Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Christian Zigotzky <chzigotzky@xenosoft.de>,
-        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Cc:     Darren Stevens <darren@stevens-zone.net>,
-        Christian Zigotzky <info@xenosoft.de>,
-        mad skateman <madskateman@gmail.com>,
-        "R.T.Dickinson" <rtd2@xtra.co.nz>
-References: <04526309-4653-3349-b6de-e7640c2258d6@xenosoft.de>
-        <34617b1b-e213-668b-05f6-6fce7b549bf0@xenosoft.de>
-        <9af2c1c9-2caf-120b-2f97-c7722274eee3@csgroup.eu>
-        <199da427-9511-34fe-1a9e-08e24995ea85@xenosoft.de>
-        <1621236734.xfc1uw04eb.astroid@bobo.none>
-        <e6ed7674-3df9-ec3e-8bcf-dcd8ff0fecf8@xenosoft.de>
-        <1621410977.cgh0d6nvlo.astroid@bobo.none>
-        <acf63821-2030-90fa-f178-b2baeb0c4784@xenosoft.de>
-In-Reply-To: <acf63821-2030-90fa-f178-b2baeb0c4784@xenosoft.de>
+        Wed, 19 May 2021 21:21:53 -0700 (PDT)
+Date:   Wed, 19 May 2021 21:21:50 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: Re: [PATCH v5 2/4] KVM: stats: Add fd-based API to read binary stats
+ data
+Message-ID: <YKXj3gHvUoLnojzB@google.com>
+References: <20210517145314.157626-1-jingzhangos@google.com>
+ <20210517145314.157626-3-jingzhangos@google.com>
 MIME-Version: 1.0
-Message-Id: <1621464963.g8v9ejlhyh.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210517145314.157626-3-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Christian Zigotzky's message of May 19, 2021 9:52 pm:
-> On 19 May 2021 at 09:57 am, Nicholas Piggin wrote:
->> Excerpts from Christian Zigotzky's message of May 17, 2021 7:42 pm:
->>> On 17 May 2021 at 09:42am, Nicholas Piggin wrote:
->>>> Excerpts from Christian Zigotzky's message of May 15, 2021 11:46 pm:
->>>>> I tried it but it doesn't solve the issue. The uImage works without=20
->>>>> KVM
->>>>> HV in a virtual e5500 QEMU machine.
->>>> Any more progress with this? I would say that bisect might have just
->>>> been a bit unstable and maybe by chance some things did not crash so
->>>> it's pointing to the wrong patch.
->>>>
->>>> Upstream merge of powerpc-5.13-1 was good and powerpc-5.13-2 was bad?
->>>>
->>>> Between that looks like some KVM MMU rework. You could try the patch
->>>> before this one b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU
->>>> notifier callbacks"). That won't revert cleanly so just try run the
->>>> tree at that point. If it works, test the patch and see if it fails.
->>>>
->>>> Thanks,
->>>> Nick
->>> Hi Nick,
->>>
->>> Thanks a lot for your answer. Yes, there is a little bit of progress.
->>> The RC2 of kernel 5.13 successfully boots with -smp 3 in a virtual e550=
-0
->>> QEMU machine.
->>> -smp 4 doesn't work anymore since the PowerPC updates 5.13-2. I used
->>> -smp 4 before 5.13 because my FSL P5040 machine has 4 cores.
->>>
->>> Could you please post a patch for reverting the commit before
->>> b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier callback=
-s")?
->> You could `git checkout b1c5356e873c~1`
->>
->> Thanks,
->> Nick
-> Hi Nick,
->=20
-> Thanks for your answer. I checked out the commit b1c5356e873c~1 (HEAD is=20
-> now at d923ff258423 KVM: MIPS/MMU: Convert to the gfn-based MMU notifier=20
-> callbacks).
-> The kernel boots with '-smp 4' without any problems.
-> After that I patched with the probable first bad commit (KVM: PPC:=20
-> Convert to the gfn-based MMU notifier callbacks). The kernel also boots=20
-> with this patch. That means, this isn't the first bad commit.
-> Further information:=20
-> https://forum.hyperion-entertainment.com/viewtopic.php?p=3D53267#p53267
+On Mon, May 17, 2021 at 02:53:12PM +0000, Jing Zhang wrote:
+> Provides a file descriptor per VM to read VM stats info/data.
+> Provides a file descriptor per vCPU to read vCPU stats info/data.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/guest.c    |  26 +++++
+>  arch/mips/kvm/mips.c      |  52 +++++++++
+>  arch/powerpc/kvm/book3s.c |  52 +++++++++
+>  arch/powerpc/kvm/booke.c  |  45 ++++++++
+>  arch/s390/kvm/kvm-s390.c  | 117 ++++++++++++++++++++
+>  arch/x86/kvm/x86.c        |  53 +++++++++
+>  include/linux/kvm_host.h  | 127 ++++++++++++++++++++++
+>  include/uapi/linux/kvm.h  |  50 +++++++++
+>  virt/kvm/kvm_main.c       | 223 ++++++++++++++++++++++++++++++++++++++
+>  9 files changed, 745 insertions(+)
+> 
+  
+> +static ssize_t kvm_vcpu_stats_read(struct file *file, char __user *user_buffer,
+> +			      size_t size, loff_t *offset)
+> +{
+> +	char id[KVM_STATS_ID_MAXLEN];
+> +	struct kvm_vcpu *vcpu = file->private_data;
+> +	ssize_t copylen, len, remain = size;
+> +	size_t size_header, size_desc, size_stats;
+> +	loff_t pos = *offset;
+> +	char __user *dest = user_buffer;
+> +	void *src;
 
-Hmm, okay that probably rules out those notifier changes then.
+Nit. Better to do pointer arithmetic on a "char *".  Note that gcc and
+clang will do the expected thing.
 
-Can you remind me were you able to rule these out as suspects?
+> +
+> +	snprintf(id, sizeof(id), "kvm-%d/vcpu-%d",
+> +			task_pid_nr(current), vcpu->vcpu_id);
+> +	size_header = sizeof(kvm_vcpu_stats_header);
+> +	size_desc =
+> +		kvm_vcpu_stats_header.count * sizeof(struct _kvm_stats_desc);
+> +	size_stats = sizeof(vcpu->stat);
+> +
+> +	len = sizeof(id) + size_header + size_desc + size_stats - pos;
+> +	len = min(len, remain);
+> +	if (len <= 0)
+> +		return 0;
+> +	remain = len;
 
-8f6cc75a97d1 powerpc: move norestart trap flag to bit 0
-8dc7f0229b78 powerpc: remove partial register save logic
-c45ba4f44f6b powerpc: clean up do_page_fault
-d738ee8d56de powerpc/64e/interrupt: handle bad_page_fault in C
-ceff77efa4f8 powerpc/64e/interrupt: Use new interrupt context tracking sche=
-me
-097157e16cf8 powerpc/64e/interrupt: reconcile irq soft-mask state in C
-3db8aa10de9a powerpc/64e/interrupt: NMI save irq soft-mask state in C
-0c2472de23ae powerpc/64e/interrupt: use new interrupt return
-dc6231821a14 powerpc/interrupt: update common interrupt code for
-4228b2c3d20e powerpc/64e/interrupt: always save nvgprs on interrupt
-5a5a893c4ad8 powerpc/syscall: switch user_exit_irqoff and trace_hardirqs_of=
-f order
+If 'desc_offset' is not right after the header, then the 'len'
+calculation is missing the gap into account. For example, assuming there
+is a gap of 0x1000000 between the header and the descriptors:
 
-Thanks,
-Nick
+	desc_offset = sizeof(id) + size_header + 0x1000000
+
+and the user calls the ioctl with enough space for the whole file,
+including the gap:
+
+	*offset = 0
+	size = sizeof(id) + size_header + size_desc + size_stats + 0x1000000
+
+then 'remain' gets the wrong size:
+
+	remain = sizeof(id) + size_header + size_desc + size_stats
+
+and ... (more below)
+
+> +
+> +	/* Copy kvm vcpu stats header id string */
+> +	copylen = sizeof(id) - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)id + pos;
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vcpu stats header */
+> +	copylen = sizeof(id) + size_header - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)&kvm_vcpu_stats_header;
+> +		src += pos - sizeof(id);
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vcpu stats descriptors */
+> +	copylen = kvm_vcpu_stats_header.desc_offset + size_desc - pos;
+
+This would be the state at this point:
+
+	pos	= sizeof(id) + size_header
+	copylen	= sizeof(id) + size_header + 0x1000000 + size_desc - (sizeof(id) + size_header)
+		= 0x1000000 + size_desc
+	remain	= size_desc + size_stats
+
+> +	copylen = min(copylen, remain);
+
+	copylen = size_desc + size_stats
+
+which is not enough to copy the descriptors (and the data).
+
+> +	if (copylen > 0) {
+> +		src = (void *)&kvm_vcpu_stats_desc;
+> +		src += pos - kvm_vcpu_stats_header.desc_offset;
+
+Moreover, src also needs to take the gap into account.
+
+	src	= &kvm_vcpu_stats_desc + (sizeof(id) + size_header) - (sizeof(id) + size_header + 0x1000000)
+		= &kvm_vcpu_stats_desc - 0x1000000
+
+Otherwise, src ends up pointing at the wrong place.
+
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vcpu stats values */
+> +	copylen = kvm_vcpu_stats_header.data_offset + size_stats - pos;
+
+The same problem occurs here. There is a potential gap before
+data_offset that needs to be taken into account for src and len.
+
+Would it be possible to just ensure that there is no gap? maybe even
+remove data_offset and desc_offset and always place them adjacent, and
+have the descriptors right after the header.
+
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)&vcpu->stat;
+> +		src += pos - kvm_vcpu_stats_header.data_offset;
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +
+> +	*offset = pos;
+> +	return len;
+> +}
+> +
+>  
+
+
+
+> +static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
+> +			      size_t size, loff_t *offset)
+> +{
+
+Consider moving the common code between kvm_vcpu_stats_read and this one
+into some function that takes pointers to header, desc, and data. Unless
+there is something vcpu or vm specific besides that.
+
+> +	char id[KVM_STATS_ID_MAXLEN];
+> +	struct kvm *kvm = file->private_data;
+> +	ssize_t copylen, len, remain = size;
+> +	size_t size_header, size_desc, size_stats;
+> +	loff_t pos = *offset;
+> +	char __user *dest = user_buffer;
+> +	void *src;
+> +
+> +	snprintf(id, sizeof(id), "kvm-%d", task_pid_nr(current));
+> +	size_header = sizeof(kvm_vm_stats_header);
+> +	size_desc = kvm_vm_stats_header.count * sizeof(struct _kvm_stats_desc);
+> +	size_stats = sizeof(kvm->stat);
+> +
+> +	len = sizeof(id) + size_header + size_desc + size_stats - pos;
+> +	len = min(len, remain);
+> +	if (len <= 0)
+> +		return 0;
+> +	remain = len;
+> +
+> +	/* Copy kvm vm stats header id string */
+> +	copylen = sizeof(id) - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)id + pos;
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vm stats header */
+> +	copylen = sizeof(id) + size_header - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)&kvm_vm_stats_header;
+> +		src += pos - sizeof(id);
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vm stats descriptors */
+> +	copylen = kvm_vm_stats_header.desc_offset + size_desc - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)&kvm_vm_stats_desc;
+> +		src += pos - kvm_vm_stats_header.desc_offset;
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +	/* Copy kvm vm stats values */
+> +	copylen = kvm_vm_stats_header.data_offset + size_stats - pos;
+> +	copylen = min(copylen, remain);
+> +	if (copylen > 0) {
+> +		src = (void *)&kvm->stat;
+> +		src += pos - kvm_vm_stats_header.data_offset;
+> +		if (copy_to_user(dest, src, copylen))
+> +			return -EFAULT;
+> +		remain -= copylen;
+> +		pos += copylen;
+> +		dest += copylen;
+> +	}
+> +
+> +	*offset = pos;
+> +	return len;
+> +}
+> +
+> -- 
+> 2.31.1.751.gd2f1c929bd-goog
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
