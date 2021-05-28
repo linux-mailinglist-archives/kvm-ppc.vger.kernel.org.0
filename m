@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 01FAA393F57
-	for <lists+kvm-ppc@lfdr.de>; Fri, 28 May 2021 11:08:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03FC3393F65
+	for <lists+kvm-ppc@lfdr.de>; Fri, 28 May 2021 11:08:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236657AbhE1JIq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 28 May 2021 05:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45266 "EHLO
+        id S236497AbhE1JKD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 28 May 2021 05:10:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236523AbhE1JI2 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 28 May 2021 05:08:28 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FA70C061763
-        for <kvm-ppc@vger.kernel.org>; Fri, 28 May 2021 02:06:53 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id r1so2040789pgk.8
-        for <kvm-ppc@vger.kernel.org>; Fri, 28 May 2021 02:06:53 -0700 (PDT)
+        with ESMTP id S236435AbhE1JJi (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 28 May 2021 05:09:38 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85568C0613CE
+        for <kvm-ppc@vger.kernel.org>; Fri, 28 May 2021 02:07:58 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id f22so2801326pfn.0
+        for <kvm-ppc@vger.kernel.org>; Fri, 28 May 2021 02:07:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=AWipQFhJnjMhlV5h42SKDn1wpSlrbpzkPc9SX58WizI=;
-        b=j/QhhpoOC5RsGSxmvO18bgiilwDJSLAzVMWDwwKCzaJA4Xuo1vX9LXmKdOayvdHgvF
-         mayHKib2d1xo1wiXkXm7rcOH5bpbQKTMV1sxO/LBmBIvG/VopvVcSgmwsT0w2cvSKbtt
-         39aWphOe4mINSTFGJXDqR/SLKxRkzEHoSwPYY5N5PpiEmGUt8qWY7lBd6lIFXwJIo1SU
-         cVgp313rKwE4pFQVuw0KaTFNAYfurnimoPQcSEWWO10es364Tm+yiq96MHhPOFQLogSF
-         71YbSss2BwmyZR6os8QKDTJQMOdnfl+cQLMZWISrWykJtbYmWH+weReTbbonZhgr81jh
-         ZEpg==
+        b=ISt7XqrJ7kW2dpSU0QdVeRQrlJ00m5iIBjw0v0kHrQ9KcKe2+5fqz0+/FpevY1B+Em
+         59fRi1eY0JvDCOKlisOWkQgTqteBtW+6YS0NQ3Exfrgilsq2vzqAu8qHQVKcgmru966y
+         7hu5UkZpok5FquOQb0R6sGsr2rznh7aQaEa8Tny5wScXTMbV0AGpxQ3thCY4RQDTDkpN
+         ec7efIY9xozbusYqShp5CBXFqKdM0PAJ6x7/BiNm+6UI17SJlQ5LgY8+/sD22oFznTHK
+         hb22wl5MOv4SHx7ee0Qt0ZsLhntPvC87cAy9VMUcG9KnpmtiRsyte0yLLxr54f51wDJP
+         D7Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=AWipQFhJnjMhlV5h42SKDn1wpSlrbpzkPc9SX58WizI=;
-        b=MAPu2D8Y6pQtPuRwvmR6bjEkhZKWadwVGPuGhQhicohDgdpt0ON9/I/W8X5qXXmiec
-         Ffzs/zCTeSz3GAzxK6QdjmUNWvBqwIxD6dYDAvDREUw0kGDE0HgqxhxTGCtglbhRvdCI
-         ZXsRvRy/QMEgtYukn34ybPBzn2qXpCB/Sz8DilYWrxBvypDwPBK9XyYOC69PSXocoYgA
-         71NzxhKPqS5HZPyofZIdxX+Xk1fEFpULmKsV5ZI0PjRwauSPWPsHfRDSbvUnY5uR5yEF
-         njMCaHvnDHxNHgAkdc/g29Jj7lbiGpnZKYJeyf6Y9McU1QsAVr/TeSliWVWYpjDzsNMt
-         BMgw==
-X-Gm-Message-State: AOAM532l5BzEdmBhel9olWsIVl8AHE/1ZCriJw9RpNgIQOVQNbG96hSs
-        G3dF2bljRrhNTVSLhvpHwCKGPQpuprw=
-X-Google-Smtp-Source: ABdhPJw2lqNt97YYi8TEnCaZG3TaYjVSEA/sNkb8GtOHq3ZRbk3Zy0shNJfDphp1PCk5PMROyBO1tA==
-X-Received: by 2002:a62:4ed1:0:b029:2e4:df13:fbd8 with SMTP id c200-20020a624ed10000b02902e4df13fbd8mr2834473pfb.68.1622192812376;
-        Fri, 28 May 2021 02:06:52 -0700 (PDT)
+        b=c9GoZ6yP1j3lvpxLsW4bkNkdSqBNCJONDRbi4eUiyJJokVdCDjctyZZ1ID7C7gdKGn
+         Ht+EjDeEAKyN/LtRWTzFUYIcJ+UiFQ0muIQDrK9w/gjchDJvo/l+JcqY6YR361LxjZy4
+         J6CIgwOpCkERv3mFpJnGkQ7rZc49VlzYOeB8sLdIE4ytxq+bI7qiU5yZP1vtN1tRZ5Ut
+         Mv3u4wGhZFMrhBkVU856vcZMOrlaatqHXMXUb7uxB7FS5cmhTw7rNhIGwCchLXg8/q5l
+         uJuqumlERmrEQ+/yADD9RSjKpdgZmcKIx89FB5kx7kArj1OeH2iXuqP30aouSQxro9MQ
+         8zBQ==
+X-Gm-Message-State: AOAM532gLi1kSNt8tcc+glZXjvfwagGZMPHydCRcjnTbYaq4YclRUs6V
+        /xilTT5nfhMqrbqnFLnht6bvGu7QCQ8=
+X-Google-Smtp-Source: ABdhPJyXY4O90i/lp/8klMZ2eVFn0DBPRyuV+NbKriqL0kCJBc2rvAk3dbe2bwLyi/C9nr87UX9mcw==
+X-Received: by 2002:a63:1149:: with SMTP id 9mr8045242pgr.156.1622192878203;
+        Fri, 28 May 2021 02:07:58 -0700 (PDT)
 Received: from bobo.ibm.com (124-169-110-219.tpgi.com.au. [124.169.110.219])
-        by smtp.gmail.com with ESMTPSA id x187sm3745694pfc.104.2021.05.28.02.06.50
+        by smtp.gmail.com with ESMTPSA id a2sm3624183pfv.156.2021.05.28.02.07.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 May 2021 02:06:51 -0700 (PDT)
+        Fri, 28 May 2021 02:07:57 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
 Subject: [PATCH v7 00/32] KVM: PPC: Book3S: C-ify the P9 entry/exit code
-Date:   Fri, 28 May 2021 19:06:11 +1000
-Message-Id: <20210528090643.3541902-1-npiggin@gmail.com>
+Date:   Fri, 28 May 2021 19:07:20 +1000
+Message-Id: <20210528090752.3542186-1-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
