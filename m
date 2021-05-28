@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B8AE393F88
-	for <lists+kvm-ppc@lfdr.de>; Fri, 28 May 2021 11:09:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1388393F89
+	for <lists+kvm-ppc@lfdr.de>; Fri, 28 May 2021 11:09:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233882AbhE1JKy (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 28 May 2021 05:10:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45762 "EHLO
+        id S234510AbhE1JKz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 28 May 2021 05:10:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234618AbhE1JKu (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 28 May 2021 05:10:50 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F2A4C06174A
-        for <kvm-ppc@vger.kernel.org>; Fri, 28 May 2021 02:09:15 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id l70so2077248pga.1
-        for <kvm-ppc@vger.kernel.org>; Fri, 28 May 2021 02:09:15 -0700 (PDT)
+        with ESMTP id S230080AbhE1JKw (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 28 May 2021 05:10:52 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 566DFC0613CE
+        for <kvm-ppc@vger.kernel.org>; Fri, 28 May 2021 02:09:17 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id 29so2036046pgu.11
+        for <kvm-ppc@vger.kernel.org>; Fri, 28 May 2021 02:09:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=UGz/HAp1NItotHcRKLsEnmJH5HYG4lZgXTmVtlYQJbk=;
-        b=hU0+7MFNAtXEyPvK/pkRuzKMQJLG95d3n80Q9/nRmQiCUDa5gLEaM37i4+9mrxhSax
-         7mEPIleoPtTPO10emg9LEwYw6bMPoMTxpEMWNMuXpx0CTt25l1cVJbGMsK9K5TPc1xjE
-         8xH/Z2tMT1X4G51TbgabYtkzGF/ACm+UND3sqjuJS9Uup6gUMKImA9FZdIz0p2qxAy96
-         yl/cHQDQ0YKJKKQpD4YEcH3NLeqjwK46P3L8P2FKBQyDLF831fqlXDJRSGAmvAdYaHM1
-         YNn/B4Sst+6bo+3h2fPc81pSHJCGGfxsOATtnXqoynPXS7S6x6XnZupu4BM+yMSMQb3x
-         sZqw==
+        bh=odpgGURx+7R/s14DvMRfmE9djTm9dneqqyjT3+mISFI=;
+        b=KN841DqOJiH/xnJThwxvJzFd0pT/GlYidUp24Nm6pgNYMbZAstELwFavSXl99NQ858
+         L9f33GruY9fiHIrsF0HHoxylu7sSKXuQYcVgxtD1peulOBVVErHoDdx2Ec6a4EZkinzh
+         +pnCZi56uMhaAZo6rwWK7uO/x7gR16XUKl6OU/wOnLw08iKz3G4Lv+t32SKzXihu5W1Q
+         mi/+yf5K81qv2VCH9CVusVmPDteTsPUSLqB178Jx9ucx0QF8OKahORmxIrJ/jyjzLLiU
+         IhUqf3NX+6rw6Ed8X7bQ8qxtSiiwWTNqQ1cErQRUoY1UuZWDPCia0rcMC70NSNTeU+2s
+         VokQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=UGz/HAp1NItotHcRKLsEnmJH5HYG4lZgXTmVtlYQJbk=;
-        b=pktXg2SsVzZyvUIa0F4ppRkvsLY1tkPcIZFPrIIVMh5HRhG2nTxQC/uizxZu8/pme2
-         MNw3xwzwkheknyxVDY0X5QCpEyT2co5m2HxokvXffN0zMdZ2Qns+0K0NR1HTPyFyz3Kv
-         /uwnlMKPdhK9ADHZ+hPKkwEQ7sHmOsPlcqLRb6HnR7DtEiCpjsQjS4CTzRCgwRRwaZJp
-         eu9L4BNY+9kMjxMXnU1CwQwvSLf8FwUcDDPnaXA6h6XuTNvsV5e2m79JwG4gXO3kpUdZ
-         ABLwzuuG/lmWrd9ccicQ95Htv3nZKBnj/aXAHs7oDgAyaCj8tHJe1OmAXLnsBNiyyLS9
-         eOtw==
-X-Gm-Message-State: AOAM533LiUWiiFPY64ADgrGfGZm36vItaLPVllu4IoGmQlMv/3O9yaaN
-        Bh3ZWEwTnUYiKYTnwrd8DSebooNQM1M=
-X-Google-Smtp-Source: ABdhPJy4MK+tcDHSQWlT04NChwHyViYRH39PKrHsme+04ofOgUFkle99DMQ9VHboDfzfDJIOo2Xd8Q==
-X-Received: by 2002:a05:6a00:84f:b029:2be:3b80:e9eb with SMTP id q15-20020a056a00084fb02902be3b80e9ebmr2953525pfk.39.1622192954433;
-        Fri, 28 May 2021 02:09:14 -0700 (PDT)
+        bh=odpgGURx+7R/s14DvMRfmE9djTm9dneqqyjT3+mISFI=;
+        b=bJLh37LBbsR39pPbtndayF/bblfkUo/+WdLDIU7edip24g3gZhjCB1aqP3WQBcF4WQ
+         VD6g/bXrT+mwb8+lTi0G445ZA46Y7YvfbXeTU6k9512zNYbsOE7K/lVbcbUMCt2+27Yc
+         eZAqtm1Yr3a63xIlJSeVCsbNVZJV5DfGGbZelAAx0c/JS4z9y8SNlCjL7jb0PMr2NLjV
+         tpHaneIoe8SHEPZJ+9rkrnbBwHM2tgHI1UW16T2IMmBr/SofVGMET8foAKJPO0dImkXP
+         fDA3xPgSippAS/AcJaDfBpj6HpS02n1JG9GOo7eZpPy9znOCD1KszXoRFfm6egVMvWxa
+         5dIw==
+X-Gm-Message-State: AOAM532wNba2Af46KtVP2x/hTVgn8QWHlJ+Lfk8g8GIiJRRpqPGduOSw
+        a9qBmccFNLm6QfAM2Ei4g7ez7Trfv0s=
+X-Google-Smtp-Source: ABdhPJzZlRCZA7VNlCYYAIueTKD7jVKJgSB8Clp8xTk61pwf0O3s/fNxcQEViBP7N8hS62FTMceAIQ==
+X-Received: by 2002:a62:a101:0:b029:2e8:e878:bdc0 with SMTP id b1-20020a62a1010000b02902e8e878bdc0mr2863001pff.38.1622192956718;
+        Fri, 28 May 2021 02:09:16 -0700 (PDT)
 Received: from bobo.ibm.com (124-169-110-219.tpgi.com.au. [124.169.110.219])
-        by smtp.gmail.com with ESMTPSA id a2sm3624183pfv.156.2021.05.28.02.09.12
+        by smtp.gmail.com with ESMTPSA id a2sm3624183pfv.156.2021.05.28.02.09.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 May 2021 02:09:14 -0700 (PDT)
+        Fri, 28 May 2021 02:09:16 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v7 30/32] KVM: PPC: Book3S HV P9: implement hash guest support
-Date:   Fri, 28 May 2021 19:07:50 +1000
-Message-Id: <20210528090752.3542186-31-npiggin@gmail.com>
+Subject: [PATCH v7 31/32] KVM: PPC: Book3S HV P9: implement hash host / hash guest support
+Date:   Fri, 28 May 2021 19:07:51 +1000
+Message-Id: <20210528090752.3542186-32-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210528090752.3542186-1-npiggin@gmail.com>
 References: <20210528090752.3542186-1-npiggin@gmail.com>
@@ -62,376 +62,185 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Implement hash guest support. Guest entry/exit has to restore and
-save/clear the SLB, plus several other bits to accommodate hash guests
-in the P9 path. Radix host, hash guest support is removed from the P7/8
-path.
+Implement support for hash guests under hash host. This has to save and
+restore the host SLB, and ensure that the MMU is off while switching
+into the guest SLB.
 
-The HPT hcalls and faults are not handled in real mode, which is a
-performance regression. A worst-case fork/exit microbenchmark takes 3x
-longer after this patch. kbuild benchmark performance is in the noise,
-but the slowdown is likely to be noticed somewhere.
-
-For now, accept this penalty for the benefit of simplifying the P7/8
-paths and unifying P9 hash with the new code, because hash is a less
-important configuration than radix on processors that support it. Hash
-will benefit from future optimisations to this path, including possibly
-a faster path to handle such hcalls and interrupts without doing a full
-exit.
+POWER9 and later CPUs now always go via the P9 path. The "fast" guest
+mode is now renamed to the P9 mode, which is consistent with its
+functionality and the rest of the naming.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/include/asm/kvm_asm.h      |  2 +-
- arch/powerpc/kvm/book3s_64_entry.S      |  2 +-
- arch/powerpc/kvm/book3s_hv.c            | 20 +++--
- arch/powerpc/kvm/book3s_hv_p9_entry.c   | 97 ++++++++++++++++++++-----
- arch/powerpc/kvm/book3s_hv_rm_mmu.c     |  4 +
- arch/powerpc/kvm/book3s_hv_rmhandlers.S | 14 +---
- 6 files changed, 101 insertions(+), 38 deletions(-)
+ arch/powerpc/include/asm/kvm_asm.h    |  2 +-
+ arch/powerpc/kvm/book3s_64_entry.S    | 15 +++++++----
+ arch/powerpc/kvm/book3s_hv.c          |  4 ++-
+ arch/powerpc/kvm/book3s_hv_p9_entry.c | 36 ++++++++++++++++++++++-----
+ 4 files changed, 44 insertions(+), 13 deletions(-)
 
 diff --git a/arch/powerpc/include/asm/kvm_asm.h b/arch/powerpc/include/asm/kvm_asm.h
-index f4ae37810aa9..e479487488f4 100644
+index e479487488f4..fbbf3cec92e9 100644
 --- a/arch/powerpc/include/asm/kvm_asm.h
 +++ b/arch/powerpc/include/asm/kvm_asm.h
 @@ -147,7 +147,7 @@
  #define KVM_GUEST_MODE_SKIP	2
  #define KVM_GUEST_MODE_GUEST_HV	3
  #define KVM_GUEST_MODE_HOST_HV	4
--#define KVM_GUEST_MODE_HV_FAST	5 /* ISA >= v3.0 host+guest radix */
-+#define KVM_GUEST_MODE_HV_FAST	5 /* ISA >= v3.0 host radix */
+-#define KVM_GUEST_MODE_HV_FAST	5 /* ISA >= v3.0 host radix */
++#define KVM_GUEST_MODE_HV_P9	5 /* ISA >= v3.0 path */
  
  #define KVM_INST_FETCH_FAILED	-1
  
 diff --git a/arch/powerpc/kvm/book3s_64_entry.S b/arch/powerpc/kvm/book3s_64_entry.S
-index bac664c1a9f7..7322fea971e4 100644
+index 7322fea971e4..983b8c18bc31 100644
 --- a/arch/powerpc/kvm/book3s_64_entry.S
 +++ b/arch/powerpc/kvm/book3s_64_entry.S
-@@ -184,7 +184,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+@@ -36,7 +36,7 @@
+ kvmppc_hcall:
+ #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+ 	lbz	r10,HSTATE_IN_GUEST(r13)
+-	cmpwi	r10,KVM_GUEST_MODE_HV_FAST
++	cmpwi	r10,KVM_GUEST_MODE_HV_P9
+ 	beq	kvmppc_p9_exit_hcall
+ #endif
+ 	ld	r10,PACA_EXGEN+EX_R13(r13)
+@@ -68,7 +68,7 @@ kvmppc_interrupt:
+ #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+ 	std	r10,HSTATE_SCRATCH0(r13)
+ 	lbz	r10,HSTATE_IN_GUEST(r13)
+-	cmpwi	r10,KVM_GUEST_MODE_HV_FAST
++	cmpwi	r10,KVM_GUEST_MODE_HV_P9
+ 	beq	kvmppc_p9_exit_interrupt
+ 	ld	r10,HSTATE_SCRATCH0(r13)
+ #endif
+@@ -183,8 +183,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
+ /*
   * void kvmppc_p9_enter_guest(struct vcpu *vcpu);
   *
-  * Enter the guest on a ISAv3.0 or later system where we have exactly
-- * one vcpu per vcore, and both the host and guest are radix.
-+ * one vcpu per vcore, and the host is radix.
+- * Enter the guest on a ISAv3.0 or later system where we have exactly
+- * one vcpu per vcore, and the host is radix.
++ * Enter the guest on a ISAv3.0 or later system.
   */
  .balign	IFETCH_ALIGN_BYTES
  _GLOBAL(kvmppc_p9_enter_guest)
+@@ -284,7 +283,7 @@ kvmppc_p9_exit_hcall:
+ .balign	IFETCH_ALIGN_BYTES
+ kvmppc_p9_exit_interrupt:
+ 	/*
+-	 * If set to KVM_GUEST_MODE_HV_FAST but we're still in the
++	 * If set to KVM_GUEST_MODE_HV_P9 but we're still in the
+ 	 * hypervisor, that means we can't return from the entry stack.
+ 	 */
+ 	rldicl. r10,r12,64-MSR_HV_LG,63
+@@ -358,6 +357,12 @@ kvmppc_p9_exit_interrupt:
+  * effort for a small bit of code. Lots of other things to do first.
+  */
+ kvmppc_p9_bad_interrupt:
++BEGIN_MMU_FTR_SECTION
++	/*
++	 * Hash host doesn't try to recover MMU (requires host SLB reload)
++	 */
++	b	.
++END_MMU_FTR_SECTION_IFCLR(MMU_FTR_TYPE_RADIX)
+ 	/*
+ 	 * Clean up guest registers to give host a chance to run.
+ 	 */
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 493f67f27d06..662f599bdc0e 100644
+index 662f599bdc0e..045458e7192a 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3875,7 +3875,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 		}
- 		kvmppc_xive_pull_vcpu(vcpu);
- 
--		vcpu->arch.slb_max = 0;
-+		if (kvm_is_radix(vcpu->kvm))
-+			vcpu->arch.slb_max = 0;
- 	}
- 
- 	dec = mfspr(SPRN_DEC);
-@@ -4110,7 +4111,6 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- /*
-  * This never fails for a radix guest, as none of the operations it does
-  * for a radix guest can fail or have a way to report failure.
-- * kvmhv_run_single_vcpu() relies on this fact.
-  */
- static int kvmhv_setup_mmu(struct kvm_vcpu *vcpu)
- {
-@@ -4289,8 +4289,15 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 	vc->runner = vcpu;
- 
- 	/* See if the MMU is ready to go */
--	if (!kvm->arch.mmu_ready)
--		kvmhv_setup_mmu(vcpu);
-+	if (!kvm->arch.mmu_ready) {
-+		r = kvmhv_setup_mmu(vcpu);
-+		if (r) {
-+			run->exit_reason = KVM_EXIT_FAIL_ENTRY;
-+			run->fail_entry.hardware_entry_failure_reason = 0;
-+			vcpu->arch.ret = r;
-+			return r;
-+		}
-+	}
- 
- 	if (need_resched())
- 		cond_resched();
-@@ -4303,7 +4310,8 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 	preempt_disable();
- 	pcpu = smp_processor_id();
- 	vc->pcpu = pcpu;
--	kvmppc_prepare_radix_vcpu(vcpu, pcpu);
-+	if (kvm_is_radix(kvm))
-+		kvmppc_prepare_radix_vcpu(vcpu, pcpu);
- 
- 	local_irq_disable();
- 	hard_irq_disable();
-@@ -4503,7 +4511,7 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
+@@ -4511,7 +4511,7 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
  	vcpu->arch.state = KVMPPC_VCPU_BUSY_IN_HOST;
  
  	do {
--		if (kvm_is_radix(kvm))
-+		if (radix_enabled())
+-		if (radix_enabled())
++		if (cpu_has_feature(CPU_FTR_ARCH_300))
  			r = kvmhv_run_single_vcpu(vcpu, ~(u64)0,
  						  vcpu->arch.vcore->lpcr);
  		else
+@@ -5599,6 +5599,8 @@ static int kvmhv_enable_nested(struct kvm *kvm)
+ 		return -EPERM;
+ 	if (!cpu_has_feature(CPU_FTR_ARCH_300))
+ 		return -ENODEV;
++	if (!radix_enabled())
++		return -ENODEV;
+ 
+ 	/* kvm == NULL means the caller is testing if the capability exists */
+ 	if (kvm)
 diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-index 178f771e299c..4460f1c23a9d 100644
+index 4460f1c23a9d..83f592eadcd2 100644
 --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
 +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-@@ -4,6 +4,7 @@
- #include <asm/asm-prototypes.h>
- #include <asm/dbell.h>
- #include <asm/kvm_ppc.h>
-+#include <asm/ppc-opcode.h>
+@@ -130,7 +130,7 @@ static void switch_mmu_to_guest_hpt(struct kvm *kvm, struct kvm_vcpu *vcpu, u64
+ 	isync();
+ }
  
- #ifdef CONFIG_KVM_BOOK3S_HV_EXIT_TIMING
- static void __start_timing(struct kvm_vcpu *vcpu, struct kvmhv_tb_accumulator *next)
-@@ -55,6 +56,12 @@ static void __accumulate_time(struct kvm_vcpu *vcpu, struct kvmhv_tb_accumulator
- #define accumulate_time(vcpu, next) do {} while (0)
- #endif
- 
-+static inline void mfslb(unsigned int idx, u64 *slbee, u64 *slbev)
-+{
-+	asm volatile("slbmfev  %0,%1" : "=r" (*slbev) : "r" (idx));
-+	asm volatile("slbmfee  %0,%1" : "=r" (*slbee) : "r" (idx));
-+}
-+
- static inline void mtslb(u64 slbee, u64 slbev)
+-static void switch_mmu_to_host_radix(struct kvm *kvm, u32 pid)
++static void switch_mmu_to_host(struct kvm *kvm, u32 pid)
  {
- 	asm volatile("slbmte %0,%1" :: "r" (slbev), "r" (slbee));
-@@ -65,6 +72,12 @@ static inline void clear_slb_entry(unsigned int idx)
- 	mtslb(idx, 0);
- }
- 
-+static inline void slb_clear_invalidate_partition(void)
-+{
-+	clear_slb_entry(0);
-+	asm volatile(PPC_SLBIA(6));
+ 	isync();
+ 	mtspr(SPRN_PID, pid);
+@@ -139,6 +139,22 @@ static void switch_mmu_to_host_radix(struct kvm *kvm, u32 pid)
+ 	isync();
+ 	mtspr(SPRN_LPCR, kvm->arch.host_lpcr);
+ 	isync();
++
++	if (!radix_enabled())
++		slb_restore_bolted_realmode();
 +}
 +
- /*
-  * Malicious or buggy radix guests may have inserted SLB entries
-  * (only 0..3 because radix always runs with UPRT=1), so these must
-@@ -81,7 +94,6 @@ static void radix_clear_slb(void)
- 
- static void switch_mmu_to_guest_radix(struct kvm *kvm, struct kvm_vcpu *vcpu, u64 lpcr)
- {
--	struct kvmppc_vcore *vc = vcpu->arch.vcore;
- 	struct kvm_nested_guest *nested = vcpu->arch.nested;
- 	u32 lpid;
- 
-@@ -99,9 +111,23 @@ static void switch_mmu_to_guest_radix(struct kvm *kvm, struct kvm_vcpu *vcpu, u6
- 	isync();
- 	mtspr(SPRN_PID, vcpu->arch.pid);
- 	isync();
-+}
- 
--	/* TLBIEL must have LPIDR set, so set guest LPID before flushing. */
--	kvmppc_check_need_tlb_flush(kvm, vc->pcpu, nested);
-+static void switch_mmu_to_guest_hpt(struct kvm *kvm, struct kvm_vcpu *vcpu, u64 lpcr)
++static void save_clear_host_mmu(struct kvm *kvm)
 +{
-+	u32 lpid;
-+	int i;
-+
-+	lpid = kvm->arch.lpid;
-+
-+	mtspr(SPRN_LPID, lpid);
-+	mtspr(SPRN_LPCR, lpcr);
-+	mtspr(SPRN_PID, vcpu->arch.pid);
-+
-+	for (i = 0; i < vcpu->arch.slb_max; i++)
-+		mtslb(vcpu->arch.slb[i].orige, vcpu->arch.slb[i].origv);
-+
-+	isync();
- }
- 
- static void switch_mmu_to_host_radix(struct kvm *kvm, u32 pid)
-@@ -115,9 +141,36 @@ static void switch_mmu_to_host_radix(struct kvm *kvm, u32 pid)
- 	isync();
- }
- 
-+static void save_clear_guest_mmu(struct kvm *kvm, struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_is_radix(kvm)) {
-+		radix_clear_slb();
-+	} else {
-+		int i;
-+		int nr = 0;
-+
++	if (!radix_enabled()) {
 +		/*
-+		 * This must run before switching to host (radix host can't
-+		 * access all SLBs).
++		 * Hash host could save and restore host SLB entries to
++		 * reduce SLB fault overheads of VM exits, but for now the
++		 * existing code clears all entries and restores just the
++		 * bolted ones when switching back to host.
 +		 */
-+		for (i = 0; i < vcpu->arch.slb_nr; i++) {
-+			u64 slbee, slbev;
-+			mfslb(i, &slbee, &slbev);
-+			if (slbee & SLB_ESID_V) {
-+				vcpu->arch.slb[nr].orige = slbee | i;
-+				vcpu->arch.slb[nr].origv = slbev;
-+				nr++;
-+			}
-+		}
-+		vcpu->arch.slb_max = nr;
 +		slb_clear_invalidate_partition();
 +	}
-+}
-+
- int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpcr)
- {
- 	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_nested_guest *nested = vcpu->arch.nested;
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
- 	s64 hdec;
- 	u64 tb, purr, spurr;
-@@ -218,10 +271,21 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ }
+ 
+ static void save_clear_guest_mmu(struct kvm *kvm, struct kvm_vcpu *vcpu)
+@@ -271,16 +287,24 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
  
  	mtspr(SPRN_AMOR, ~0UL);
  
--	if (cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
-+	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_HV_FAST;
-+	if (kvm_is_radix(kvm)) {
-+		if (cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
-+			__mtmsrd(msr & ~(MSR_IR|MSR_DR|MSR_RI), 0);
-+		switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
-+		if (!cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
-+			__mtmsrd(0, 1); /* clear RI */
-+
-+	} else {
- 		__mtmsrd(msr & ~(MSR_IR|MSR_DR|MSR_RI), 0);
-+		switch_mmu_to_guest_hpt(kvm, vcpu, lpcr);
-+	}
- 
--	switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
-+	/* TLBIEL uses LPID=LPIDR, so run this after setting guest LPID */
-+	kvmppc_check_need_tlb_flush(kvm, vc->pcpu, nested);
- 
- 	/*
- 	 * P9 suppresses the HDEC exception when LPCR[HDICE] = 0,
-@@ -229,9 +293,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	 */
- 	mtspr(SPRN_HDEC, hdec);
- 
--	if (!cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
--		__mtmsrd(0, 1); /* clear RI */
--
- 	mtspr(SPRN_DAR, vcpu->arch.shregs.dar);
- 	mtspr(SPRN_DSISR, vcpu->arch.shregs.dsisr);
- 	mtspr(SPRN_SRR0, vcpu->arch.shregs.srr0);
-@@ -239,10 +300,7 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 
- 	accumulate_time(vcpu, &vcpu->arch.guest_time);
- 
 -	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_HV_FAST;
- 	kvmppc_p9_enter_guest(vcpu);
--	// Radix host and guest means host never runs with guest MMU state
--	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_NONE;
++	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_HV_P9;
++
++	/*
++	 * Hash host, hash guest, or radix guest with prefetch bug, all have
++	 * to disable the MMU before switching to guest MMU state.
++	 */
++	if (!radix_enabled() || !kvm_is_radix(kvm) ||
++			cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
++		__mtmsrd(msr & ~(MSR_IR|MSR_DR|MSR_RI), 0);
++
++	save_clear_host_mmu(kvm);
++
+ 	if (kvm_is_radix(kvm)) {
+-		if (cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
+-			__mtmsrd(msr & ~(MSR_IR|MSR_DR|MSR_RI), 0);
+ 		switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
+ 		if (!cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
+ 			__mtmsrd(0, 1); /* clear RI */
  
- 	accumulate_time(vcpu, &vcpu->arch.rm_intr);
- 
-@@ -343,8 +401,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- #endif
+ 	} else {
+-		__mtmsrd(msr & ~(MSR_IR|MSR_DR|MSR_RI), 0);
+ 		switch_mmu_to_guest_hpt(kvm, vcpu, lpcr);
  	}
  
--	radix_clear_slb();
--
- 	accumulate_time(vcpu, &vcpu->arch.rm_exit);
- 
- 	/* Advance host PURR/SPURR by the amount used by guest */
-@@ -378,11 +434,14 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 		mtspr(SPRN_DAWRX1, host_dawrx1);
- 	}
- 
--	/*
--	 * Since this is radix, do a eieio; tlbsync; ptesync sequence in
--	 * case we interrupted the guest between a tlbie and a ptesync.
--	 */
--	asm volatile("eieio; tlbsync; ptesync");
-+	if (kvm_is_radix(kvm)) {
-+		/*
-+		 * Since this is radix, do a eieio; tlbsync; ptesync sequence
-+		 * in case we interrupted the guest between a tlbie and a
-+		 * ptesync.
-+		 */
-+		asm volatile("eieio; tlbsync; ptesync");
-+	}
- 
- 	/*
- 	 * cp_abort is required if the processor supports local copy-paste
-@@ -408,7 +467,9 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 
+@@ -468,7 +492,7 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
  	mtspr(SPRN_HDEC, 0x7fffffff);
  
-+	save_clear_guest_mmu(kvm, vcpu);
- 	switch_mmu_to_host_radix(kvm, host_pidr);
-+	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_NONE;
+ 	save_clear_guest_mmu(kvm, vcpu);
+-	switch_mmu_to_host_radix(kvm, host_pidr);
++	switch_mmu_to_host(kvm, host_pidr);
+ 	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_NONE;
  
  	/*
- 	 * If we are in real mode, only switch MMU on after the MMU is
-diff --git a/arch/powerpc/kvm/book3s_hv_rm_mmu.c b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-index 9b8c2c41fa5f..7b23fe6e9ca0 100644
---- a/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-+++ b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-@@ -46,6 +46,10 @@ static int global_invalidates(struct kvm *kvm)
- 	else
- 		global = 1;
- 
-+	/* LPID has been switched to host if in virt mode so can't do local */
-+	if (!global && (mfmsr() & (MSR_IR|MSR_DR)))
-+		global = 1;
-+
- 	if (!global) {
- 		/* any other core might now have stale TLB entries... */
- 		smp_wmb();
-diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index 33aa0ef496e5..f7b45c3bff64 100644
---- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-+++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -888,14 +888,11 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_ARCH_300)
- 	cmpdi	r3, 512		/* 1 microsecond */
- 	blt	hdec_soon
- 
--	/* For hash guest, clear out and reload the SLB */
--BEGIN_MMU_FTR_SECTION
--	/* Radix host won't have populated the SLB, so no need to clear */
-+	/* Clear out and reload the SLB */
- 	li	r6, 0
- 	slbmte	r6, r6
- 	PPC_SLBIA(6)
- 	ptesync
--END_MMU_FTR_SECTION_IFCLR(MMU_FTR_TYPE_RADIX)
- 
- 	/* Load up guest SLB entries (N.B. slb_max will be 0 for radix) */
- 	lwz	r5,VCPU_SLB_MAX(r4)
-@@ -1373,9 +1370,6 @@ guest_exit_cont:		/* r9 = vcpu, r12 = trap, r13 = paca */
- 	stw	r5,VCPU_SLB_MAX(r9)
- 
- 	/* load host SLB entries */
--BEGIN_MMU_FTR_SECTION
--	b	guest_bypass
--END_MMU_FTR_SECTION_IFSET(MMU_FTR_TYPE_RADIX)
- 	ld	r8,PACA_SLBSHADOWPTR(r13)
- 
- 	.rept	SLB_NUM_BOLTED
-@@ -3131,10 +3125,6 @@ END_FTR_SECTION_IFSET(CPU_FTR_DAWR1)
- 	PPC_SLBIA(6)
- 	ptesync
- 
--BEGIN_MMU_FTR_SECTION
--	b	4f
--END_MMU_FTR_SECTION_IFSET(MMU_FTR_TYPE_RADIX)
--
- 	/* load host SLB entries */
- 	ld	r8, PACA_SLBSHADOWPTR(r13)
- 	.rept	SLB_NUM_BOLTED
-@@ -3148,7 +3138,7 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_TYPE_RADIX)
- 3:	addi	r8, r8, 16
- 	.endr
- 
--4:	lwz	r7, KVM_HOST_LPID(r10)
-+	lwz	r7, KVM_HOST_LPID(r10)
- 	mtspr	SPRN_LPID, r7
- 	mtspr	SPRN_PID, r0
- 	ld	r8, KVM_HOST_LPCR(r10)
 -- 
 2.23.0
 
