@@ -2,159 +2,113 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26803394FEA
-	for <lists+kvm-ppc@lfdr.de>; Sun, 30 May 2021 08:49:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13E323954ED
+	for <lists+kvm-ppc@lfdr.de>; Mon, 31 May 2021 07:10:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229550AbhE3GvC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 30 May 2021 02:51:02 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.164]:36767 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbhE3GvB (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 30 May 2021 02:51:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1622357350; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=SDGISMNF5AhJDcRi0hRuHpnsMC/8JlcSylVUyeFODFGOvCWVPySv1WUHSYZde+EaBG
-    17gE51H2xqm/6SDTI/MgqX1sBb+RmDKFJH9XN+WZoUuvVuIhjPzc0vuGs036imP1/uDh
-    Tl7D/n8wi0K0wUm5DnpQMJVFpxag2NIAMv9p+suvFuvPJ2+JCr1c41bivldMsFlES+cz
-    CAciFLmfX7JU+9RtuJSQO/hPbJyTy+JvJkNjxjStFbPgcKK3Kp6XncyvFAKaLRCS5lBG
-    Aijp327SPJ9aiyHO6XWmhI9TFyN9Hn8dGMmO6PmP0YbnPdw5zKPMxG2k+QoZ7QWYSd2V
-    H8dg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1622357350;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:Date:Message-ID:From:References:Cc:To:Subject:Cc:Date:
-    From:Subject:Sender;
-    bh=WRXVmiroGZ+6WgAUp6EaN5e8szeqUQhfW9upgdZTFkE=;
-    b=Obd+PwVB89qls5iAMkRZxnUAsK8iQ8Nn208D2Hs0NgRGjjjU/Ky33fQJ2MM/jE2cdZ
-    No4Wp57QXdgLvzW0KEywrlKW+RS34A1RwqwGWXajV0IxNs0l1VOggupBUAfdYgmATdVH
-    SsvGc/xNJi8yQuLI4RlSPPF+TZIvar6rm270eyOqz9JkdtGqr6IHaGQiVgHk2NH1qsNb
-    x4jyttMgb2MdSB5ruUOu9Wabc9SNRmjd/Yx4Ctr3DtA1jurg687X375XJ0yaWL7Nks1p
-    OjHR3Wx3kkiJaJKOSi14ra/tfCnlt5EeFwSS+9yR7Sicp7+tMfqUJdNGA5kdHKI+tsqi
-    mSKw==
-ARC-Authentication-Results: i=1; strato.com;
-    dkim=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1622357350;
-    s=strato-dkim-0002; d=xenosoft.de;
-    h=In-Reply-To:Date:Message-ID:From:References:Cc:To:Subject:Cc:Date:
-    From:Subject:Sender;
-    bh=WRXVmiroGZ+6WgAUp6EaN5e8szeqUQhfW9upgdZTFkE=;
-    b=JGU6Qunlk2k9DY769tcpOZYgwDpL1EdgGZplO2DsEVGVFmgxIc9HnA5pup89KP3G9W
-    6lx55EVKyNmQf/Fe7Nr5kFBMX7DCnzqhCopZdq4Cn7fbWMKLbIVX0fYRGUfJUoBvPJnv
-    qUFqLtaXFY50pvvIMIRajnUxNN1kX5ORAgP71H22Gx3QlB/hbRso5Yrlon8kSyMeDQno
-    QEMS3zku1Wgc1WlTWHhrIJc7vkpBUO4TKgqs/NOTtYjWm2j1ZRjpgxlpMLSZ8XNR9LGG
-    aGNIG6J+Ciq+xDD9A8zKI1L6O2JbT6YSFIqiw9EaINlu/Ynt0XDXGMO+nED+p5fwxh3t
-    K7nQ==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHfJ+Dkjp5DdBJSrwuuqxvPhUJhBnUfFi1Ts+UyTUShcsiNoeag=="
-X-RZG-CLASS-ID: mo00
-Received: from Christians-iMac.fritz.box
-    by smtp.strato.de (RZmta 47.26.3 AUTH)
-    with ESMTPSA id Y04da1x4U6nA6kX
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Sun, 30 May 2021 08:49:10 +0200 (CEST)
-Subject: Re: [FSL P50x0] KVM HV doesn't work anymore
-To:     Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Cc:     Darren Stevens <darren@stevens-zone.net>,
-        Christian Zigotzky <info@xenosoft.de>,
-        mad skateman <madskateman@gmail.com>,
-        "R.T.Dickinson" <rtd2@xtra.co.nz>
-References: <04526309-4653-3349-b6de-e7640c2258d6@xenosoft.de>
- <34617b1b-e213-668b-05f6-6fce7b549bf0@xenosoft.de>
- <9af2c1c9-2caf-120b-2f97-c7722274eee3@csgroup.eu>
- <199da427-9511-34fe-1a9e-08e24995ea85@xenosoft.de>
- <1621236734.xfc1uw04eb.astroid@bobo.none>
- <e6ed7674-3df9-ec3e-8bcf-dcd8ff0fecf8@xenosoft.de>
- <1621410977.cgh0d6nvlo.astroid@bobo.none>
- <acf63821-2030-90fa-f178-b2baeb0c4784@xenosoft.de>
- <1621464963.g8v9ejlhyh.astroid@bobo.none>
-From:   Christian Zigotzky <chzigotzky@xenosoft.de>
-Message-ID: <91b8ea0f-0666-7bf7-a526-b3d4f183d4d6@xenosoft.de>
-Date:   Sun, 30 May 2021 08:49:09 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
+        id S229803AbhEaFMe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 31 May 2021 01:12:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59980 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229717AbhEaFMe (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 31 May 2021 01:12:34 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A4E0C061574
+        for <kvm-ppc@vger.kernel.org>; Sun, 30 May 2021 22:10:54 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id q25so8160240pfn.1
+        for <kvm-ppc@vger.kernel.org>; Sun, 30 May 2021 22:10:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:mime-version:message-id
+         :content-transfer-encoding;
+        bh=PAK5QRH91z+SCdu4kLR38Pqrk3fpvtvISw5Hj9SsWJ0=;
+        b=oq5k9ewNsSUbHLRvZgMCB+vJKXOo0oXERnKNr+wVWFftSTq8LTCXHOTWDipsVmWnIt
+         nWnXly+209ocRsLTcyoVnZXQk0ZX+/6PUNjduWxXJpVjHLLi2qYSFVKRvP3WaaP+1Sq+
+         LfdrebX73vtOfHUV4J3Fry7uaf1h5ETPYk9pzJnXNctF9id7MFkjx/waLPkIt/s+g0un
+         C4OmHrzbpMXm2z8V65PXbLQg/hPiRRgKdODp1xd/3KI8xKhDwLZgkEMIHcNOf847APgM
+         +hLzE1EGJryc4dfCpmMSheoEChbq2nbnjKnw0Od7Xg4Ovh/degUUQIFanGSSnKeRj5mM
+         84yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:mime-version:message-id
+         :content-transfer-encoding;
+        bh=PAK5QRH91z+SCdu4kLR38Pqrk3fpvtvISw5Hj9SsWJ0=;
+        b=p8C32Sf54aayBXggM7rjfkC7bNRXbzqJfVIDpVBZp0LNgWBUk6MoT5ZTCQAcXKudOB
+         f30Wq8NZzA6nRLURs6G4b8qJqlH3JGN3sqmVTaKYNQyaWibDuycTwtWvsexGHGjQSy0E
+         8ypWQi3GlzsVf6W55WUMbDD5ofnMPNSkw2vKMJIMMI99TXWDvhxDOiyhiQpckUd82aLP
+         RP8S/5YTWHkMmzMXA6GoABLS1zfB2qoCpYedulvWrMwnpuD2ARcZ9HckajqMeaI/ePIY
+         aVQFi1Pll90LfkbCxwgOI3pTEN8tNQulT3IIna21QRD2MndPp0/aSWqUA/w7stxpunLa
+         ZrCQ==
+X-Gm-Message-State: AOAM532krF4Eu1MQXFctDoxUEd0pKSxG5WynB6473Y7sN404eE4CIZJ5
+        BoJCHEqMjZp7eysjA578b9SAwEAQGxN4+g==
+X-Google-Smtp-Source: ABdhPJz3WLaprqRlHSivGpGW7g2Df2bvrcm2q37q1FVoPodDrTe+qx4E6ODXFXRoA7m9Q12agbMvMQ==
+X-Received: by 2002:a62:6458:0:b029:2e9:c637:975c with SMTP id y85-20020a6264580000b02902e9c637975cmr5674084pfb.53.1622437853234;
+        Sun, 30 May 2021 22:10:53 -0700 (PDT)
+Received: from localhost (60-241-69-122.static.tpgi.com.au. [60.241.69.122])
+        by smtp.gmail.com with ESMTPSA id h76sm10688227pfe.161.2021.05.30.22.10.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 May 2021 22:10:52 -0700 (PDT)
+Date:   Mon, 31 May 2021 15:10:47 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: KVM P9 optimisation series
+To:     kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org
 MIME-Version: 1.0
-In-Reply-To: <1621464963.g8v9ejlhyh.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: de-DE
+Message-Id: <1622436567.2f2wupw6c6.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 20 May 21 at 01:07am, Nicholas Piggin wrote:
-> Excerpts from Christian Zigotzky's message of May 19, 2021 9:52 pm:
->> On 19 May 2021 at 09:57 am, Nicholas Piggin wrote:
->>> Excerpts from Christian Zigotzky's message of May 17, 2021 7:42 pm:
->>>> On 17 May 2021 at 09:42am, Nicholas Piggin wrote:
->>>>> Excerpts from Christian Zigotzky's message of May 15, 2021 11:46 pm:
->>>>>> I tried it but it doesn't solve the issue. The uImage works without
->>>>>> KVM
->>>>>> HV in a virtual e5500 QEMU machine.
->>>>> Any more progress with this? I would say that bisect might have just
->>>>> been a bit unstable and maybe by chance some things did not crash so
->>>>> it's pointing to the wrong patch.
->>>>>
->>>>> Upstream merge of powerpc-5.13-1 was good and powerpc-5.13-2 was bad?
->>>>>
->>>>> Between that looks like some KVM MMU rework. You could try the patch
->>>>> before this one b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU
->>>>> notifier callbacks"). That won't revert cleanly so just try run the
->>>>> tree at that point. If it works, test the patch and see if it fails.
->>>>>
->>>>> Thanks,
->>>>> Nick
->>>> Hi Nick,
->>>>
->>>> Thanks a lot for your answer. Yes, there is a little bit of progress.
->>>> The RC2 of kernel 5.13 successfully boots with -smp 3 in a virtual e5500
->>>> QEMU machine.
->>>> -smp 4 doesn't work anymore since the PowerPC updates 5.13-2. I used
->>>> -smp 4 before 5.13 because my FSL P5040 machine has 4 cores.
->>>>
->>>> Could you please post a patch for reverting the commit before
->>>> b1c5356e873c ("KVM: PPC: Convert to the gfn-based MMU notifier callbacks")?
->>> You could `git checkout b1c5356e873c~1`
->>>
->>> Thanks,
->>> Nick
->> Hi Nick,
->>
->> Thanks for your answer. I checked out the commit b1c5356e873c~1 (HEAD is
->> now at d923ff258423 KVM: MIPS/MMU: Convert to the gfn-based MMU notifier
->> callbacks).
->> The kernel boots with '-smp 4' without any problems.
->> After that I patched with the probable first bad commit (KVM: PPC:
->> Convert to the gfn-based MMU notifier callbacks). The kernel also boots
->> with this patch. That means, this isn't the first bad commit.
->> Further information:
->> https://forum.hyperion-entertainment.com/viewtopic.php?p=53267#p53267
-> Hmm, okay that probably rules out those notifier changes then.
->
-> Can you remind me were you able to rule these out as suspects?
->
-> 8f6cc75a97d1 powerpc: move norestart trap flag to bit 0
-> 8dc7f0229b78 powerpc: remove partial register save logic
-> c45ba4f44f6b powerpc: clean up do_page_fault
-> d738ee8d56de powerpc/64e/interrupt: handle bad_page_fault in C
-> ceff77efa4f8 powerpc/64e/interrupt: Use new interrupt context tracking scheme
-> 097157e16cf8 powerpc/64e/interrupt: reconcile irq soft-mask state in C
-> 3db8aa10de9a powerpc/64e/interrupt: NMI save irq soft-mask state in C
-> 0c2472de23ae powerpc/64e/interrupt: use new interrupt return
-> dc6231821a14 powerpc/interrupt: update common interrupt code for
-> 4228b2c3d20e powerpc/64e/interrupt: always save nvgprs on interrupt
-> 5a5a893c4ad8 powerpc/syscall: switch user_exit_irqoff and trace_hardirqs_off order
->
-> Thanks,
-> Nick
-Hi Nick,
+I have put my current series here
 
-Thanks for your answer. Smp 4 still doesn't work on quad core e5500 
-CPUs. I use -smp 3 currently. Shall I checkout the commits above (in 
-your last answer) and test them? Do you prefer a commit for testing?
+https://github.com/npiggin/linux/tree/kvm-in-c-new
+
+It contains existing Cify series plus about 50 patches, it's getting=20
+fairly stable with both L0 and L1 hypervisors. The aim of the series
+is to speed up the P9 entry/exit code and also simplify things where
+possible.
+
+It does this in several main ways:
+
+- Rearrange code to optimise SPR accesses. Mainly, avoid scoreboard
+  stalls.
+
+- Test SPR values to avoid mtSPRs where possible. mtSPRs are expensive.
+
+- Reduce mftb. mftb is expensive.
+
+- Demand fault certain facilities to avoid saving and/or restoring them
+  (at the cost of fault when they are used, but this is mitigated over
+  a number of entries, like the facilities when context switching=20
+  processes). PM, TM, and EBB so far.
+
+- Defer some sequences that are made just in case a guest is interrupted
+  in the middle of a critical section to the case where the guest is
+  scheduled on a different CPU, rather than every time (at the cost of
+  an extra IPI in this case). Namely the tlbsync sequence for radix with
+  GTSE, which is very expensive.
+
+- Reduce barriers, atomics, start shedding some of vcore complexity to
+  reduce path length, locking, etc.
+
+So far this speeds up the full entry/exit cycle (measured by guest=20
+spinning in 'sc 1' to cause exits, with a host hack make it exit rather
+than SIGILL), by about 2x on P9 and more on a P10.
+
+There is some more that can be done (xive optimisation, more complexity
+reduction, removing another mftb) but there are not many easy gains left
+here. The big thing which is not yet addressed is a light weight exit
+that does not switch all context each time. That will take a bit more
+design to get working really well, so I prefer to do that over a longer
+period perhaps with the help of some realistic workloads. It's very
+simple to hack something up to work fast with a few TCE or HPT hcalls
+for example, but really we may prefer on balance to do something which
+is slightly slower for those but works for other host interrupts like=20
+timers, device irqs, IPIs, partition scope page faults, etc.
+
+I will submit this after the first Cify series is accepted into the
+powerpc/kvm tree.
 
 Thanks,
-Christian
+Nick
