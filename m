@@ -2,113 +2,71 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13E323954ED
-	for <lists+kvm-ppc@lfdr.de>; Mon, 31 May 2021 07:10:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CEA1397D18
+	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Jun 2021 01:39:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229803AbhEaFMe (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 31 May 2021 01:12:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59980 "EHLO
+        id S235160AbhFAXkn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 1 Jun 2021 19:40:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbhEaFMe (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 31 May 2021 01:12:34 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A4E0C061574
-        for <kvm-ppc@vger.kernel.org>; Sun, 30 May 2021 22:10:54 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id q25so8160240pfn.1
-        for <kvm-ppc@vger.kernel.org>; Sun, 30 May 2021 22:10:53 -0700 (PDT)
+        with ESMTP id S235134AbhFAXkn (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 1 Jun 2021 19:40:43 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00E7C061574
+        for <kvm-ppc@vger.kernel.org>; Tue,  1 Jun 2021 16:38:59 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id a4so207540ljd.5
+        for <kvm-ppc@vger.kernel.org>; Tue, 01 Jun 2021 16:38:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:mime-version:message-id
-         :content-transfer-encoding;
-        bh=PAK5QRH91z+SCdu4kLR38Pqrk3fpvtvISw5Hj9SsWJ0=;
-        b=oq5k9ewNsSUbHLRvZgMCB+vJKXOo0oXERnKNr+wVWFftSTq8LTCXHOTWDipsVmWnIt
-         nWnXly+209ocRsLTcyoVnZXQk0ZX+/6PUNjduWxXJpVjHLLi2qYSFVKRvP3WaaP+1Sq+
-         LfdrebX73vtOfHUV4J3Fry7uaf1h5ETPYk9pzJnXNctF9id7MFkjx/waLPkIt/s+g0un
-         C4OmHrzbpMXm2z8V65PXbLQg/hPiRRgKdODp1xd/3KI8xKhDwLZgkEMIHcNOf847APgM
-         +hLzE1EGJryc4dfCpmMSheoEChbq2nbnjKnw0Od7Xg4Ovh/degUUQIFanGSSnKeRj5mM
-         84yQ==
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=B2PaLi7oXvFmWaByjFopf8bMZiskZ7jNsrvCbPcpC6M=;
+        b=ecO6cD2cyPx82xkn88vpOQbd+XPrfG34JcB+uNxNoB9ITQiAufHhHQMU5+eEsL/EG0
+         M4C6HPlq+PFXEKby/mNkM9vU02gcOKzwx3SBYZI9hibVN8mGg+H53IvdFCfkiMEmBhP2
+         mVMqHXF5E1jJBmOSp90mFoj+Ra/Tvx7/IDVe9qsCG3u7IX41+ShNyxY+By5MZHt9ZcUI
+         26n1yH17KtMqcLWdV94RUPsMpbKipmLsBYPLFMlN62E0rtVQw0MZiUH3SCyU/hbUyPU+
+         NTLs0oYr2jNwYXIkAlrjZBZWzi/x/CR7C7QFOEGAIKosEgka1uWZB+w6iWw1v9d5Ff35
+         8etg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:mime-version:message-id
-         :content-transfer-encoding;
-        bh=PAK5QRH91z+SCdu4kLR38Pqrk3fpvtvISw5Hj9SsWJ0=;
-        b=p8C32Sf54aayBXggM7rjfkC7bNRXbzqJfVIDpVBZp0LNgWBUk6MoT5ZTCQAcXKudOB
-         f30Wq8NZzA6nRLURs6G4b8qJqlH3JGN3sqmVTaKYNQyaWibDuycTwtWvsexGHGjQSy0E
-         8ypWQi3GlzsVf6W55WUMbDD5ofnMPNSkw2vKMJIMMI99TXWDvhxDOiyhiQpckUd82aLP
-         RP8S/5YTWHkMmzMXA6GoABLS1zfB2qoCpYedulvWrMwnpuD2ARcZ9HckajqMeaI/ePIY
-         aVQFi1Pll90LfkbCxwgOI3pTEN8tNQulT3IIna21QRD2MndPp0/aSWqUA/w7stxpunLa
-         ZrCQ==
-X-Gm-Message-State: AOAM532krF4Eu1MQXFctDoxUEd0pKSxG5WynB6473Y7sN404eE4CIZJ5
-        BoJCHEqMjZp7eysjA578b9SAwEAQGxN4+g==
-X-Google-Smtp-Source: ABdhPJz3WLaprqRlHSivGpGW7g2Df2bvrcm2q37q1FVoPodDrTe+qx4E6ODXFXRoA7m9Q12agbMvMQ==
-X-Received: by 2002:a62:6458:0:b029:2e9:c637:975c with SMTP id y85-20020a6264580000b02902e9c637975cmr5674084pfb.53.1622437853234;
-        Sun, 30 May 2021 22:10:53 -0700 (PDT)
-Received: from localhost (60-241-69-122.static.tpgi.com.au. [60.241.69.122])
-        by smtp.gmail.com with ESMTPSA id h76sm10688227pfe.161.2021.05.30.22.10.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 May 2021 22:10:52 -0700 (PDT)
-Date:   Mon, 31 May 2021 15:10:47 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: KVM P9 optimisation series
-To:     kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=B2PaLi7oXvFmWaByjFopf8bMZiskZ7jNsrvCbPcpC6M=;
+        b=Z+5QPKJ9SFue3wqEaSDT6CF/DOjWdtWuEVm3cO0JttyGasv+Py7yRluUEQHPLzSTzJ
+         6h2G1UqXfR3FRnk0ZlfLhmBzV3O+jIYSH1U81ns7rb14xjky6+GxHj7u78JJjE0kQB/9
+         5aGrXXPCbjC7JymPLuK0vBg/5dMnfZJVpWTsl9Bi3h7As9QZnXU2pxxHnsL7q4U3dpLc
+         1nZszOFeyNtglcBhmr5HGz6Nwi0z8yZ4WEg6b44QhIEdDX0ocIvg/MFJ0A6OSNcEp8rA
+         PLEiRk4U275UKqLGZL1fegYTUQp+cUc5saQNDTsopnBZr3ySuqK1ghyleT7CPoHEbVdX
+         PD5w==
+X-Gm-Message-State: AOAM531WqegrAVhVMu75bQoEtUgxb79uMEC1EabzAobIrgkgG9u6E9p/
+        Vk6FMhWIsXkDKMQmJZ7QzAjeynkSubb7vTpgErA=
+X-Google-Smtp-Source: ABdhPJwdBrNPjcPz6yiM1H7KqsqxsGzJ2O1bCWL3HBp5UEmnfFFqfRJLhj0TgVzevjYe1fWrdB1rLFXjwnHSgI9Lp08=
+X-Received: by 2002:a2e:b4c2:: with SMTP id r2mr479188ljm.313.1622590738204;
+ Tue, 01 Jun 2021 16:38:58 -0700 (PDT)
 MIME-Version: 1.0
-Message-Id: <1622436567.2f2wupw6c6.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Received: by 2002:ab0:4a46:0:0:0:0:0 with HTTP; Tue, 1 Jun 2021 16:38:53 -0700 (PDT)
+Reply-To: mrschantalawrence@gmail.com
+From:   mrs chantal <roggerwoods6@gmail.com>
+Date:   Tue, 1 Jun 2021 16:38:53 -0700
+Message-ID: <CAPHCW_4RY0QkdWzNS_L_4s7JbUN53_DfTT8m5Efjz2QNJvsgGA@mail.gmail.com>
+Subject: Good day To You,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-I have put my current series here
+-- 
+hello....
 
-https://github.com/npiggin/linux/tree/kvm-in-c-new
 
-It contains existing Cify series plus about 50 patches, it's getting=20
-fairly stable with both L0 and L1 hypervisors. The aim of the series
-is to speed up the P9 entry/exit code and also simplify things where
-possible.
+You have been compensated with the sum of 5.7 million dollars
 
-It does this in several main ways:
+in this united nation the payment will be issue into atm visa card and
 
-- Rearrange code to optimise SPR accesses. Mainly, avoid scoreboard
-  stalls.
+send to you from the santander bank we need your address and your
 
-- Test SPR values to avoid mtSPRs where possible. mtSPRs are expensive.
+whatsapp
+number
 
-- Reduce mftb. mftb is expensive.
 
-- Demand fault certain facilities to avoid saving and/or restoring them
-  (at the cost of fault when they are used, but this is mitigated over
-  a number of entries, like the facilities when context switching=20
-  processes). PM, TM, and EBB so far.
-
-- Defer some sequences that are made just in case a guest is interrupted
-  in the middle of a critical section to the case where the guest is
-  scheduled on a different CPU, rather than every time (at the cost of
-  an extra IPI in this case). Namely the tlbsync sequence for radix with
-  GTSE, which is very expensive.
-
-- Reduce barriers, atomics, start shedding some of vcore complexity to
-  reduce path length, locking, etc.
-
-So far this speeds up the full entry/exit cycle (measured by guest=20
-spinning in 'sc 1' to cause exits, with a host hack make it exit rather
-than SIGILL), by about 2x on P9 and more on a P10.
-
-There is some more that can be done (xive optimisation, more complexity
-reduction, removing another mftb) but there are not many easy gains left
-here. The big thing which is not yet addressed is a light weight exit
-that does not switch all context each time. That will take a bit more
-design to get working really well, so I prefer to do that over a longer
-period perhaps with the help of some realistic workloads. It's very
-simple to hack something up to work fast with a few TCE or HPT hcalls
-for example, but really we may prefer on balance to do something which
-is slightly slower for those but works for other host interrupts like=20
-timers, device irqs, IPIs, partition scope page faults, etc.
-
-I will submit this after the first Cify series is accepted into the
-powerpc/kvm tree.
-
-Thanks,
-Nick
+here is my email address   mrschantalawrence75@gmail.com
