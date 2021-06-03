@@ -2,212 +2,288 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64D96399498
-	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Jun 2021 22:35:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7AAC39A604
+	for <lists+kvm-ppc@lfdr.de>; Thu,  3 Jun 2021 18:43:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbhFBUgv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 2 Jun 2021 16:36:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13730 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229576AbhFBUgu (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 2 Jun 2021 16:36:50 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 152KXtwV003966;
-        Wed, 2 Jun 2021 16:34:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=WR4LexuXoTCZFyWiZjqC0zplJ1d+4BlNbURpiGO6aqs=;
- b=RlndGsIBvJlCN8kgc33q9zMJqHUuR+wag5L/7ALiAynCuR7apsehaTMQvOs40noP26BQ
- RakvlWKbBMGGMlUMuf8pfWvX2La3N36yi0liu8xoOAAU0FujMQh3f7KmED9zkOWJNFz7
- ZAuZw5ka4o/HnL2QEWu0VmcQDF9z1a8DEUawrrAEtKJ+T3e2fPzmNLvvUbHvvTjUHx76
- 3Xv/E6jOqjC+l64K7RlNzUlY5J7x2zfpOcRwv81AX1dxWYMw4Dd9FwrOQQELnUTdSxdu
- yfDCGxN9ifbed9kPYlYIjScc8s30Uc8LUhwV0ndL6vB6ibMtGuqrLW4nBXAq8Kz2zlag KQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38xfkctfjv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Jun 2021 16:34:58 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 152KYvmA009756;
-        Wed, 2 Jun 2021 16:34:57 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 38xfkctfjf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Jun 2021 16:34:57 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 152KT6nW030367;
-        Wed, 2 Jun 2021 20:34:56 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02wdc.us.ibm.com with ESMTP id 38ud89tdd2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 02 Jun 2021 20:34:56 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 152KYu6B24904144
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 2 Jun 2021 20:34:56 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1CA7CAC065;
-        Wed,  2 Jun 2021 20:34:56 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 57BE6AC064;
-        Wed,  2 Jun 2021 20:34:55 +0000 (GMT)
-Received: from localhost (unknown [9.211.44.140])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Wed,  2 Jun 2021 20:34:54 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@ozlabs.org>,
-        Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix TLB management on SMT8 POWER9
- and POWER10 processors
-In-Reply-To: <20210602040441.3984352-1-npiggin@gmail.com>
-References: <20210602040441.3984352-1-npiggin@gmail.com>
-Date:   Wed, 02 Jun 2021 17:34:52 -0300
-Message-ID: <875yywvwcz.fsf@linux.ibm.com>
+        id S229695AbhFCQph (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 3 Jun 2021 12:45:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45050 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229762AbhFCQph (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 3 Jun 2021 12:45:37 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF88C061756
+        for <kvm-ppc@vger.kernel.org>; Thu,  3 Jun 2021 09:43:52 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id r1so5581171pgk.8
+        for <kvm-ppc@vger.kernel.org>; Thu, 03 Jun 2021 09:43:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9Q2DATu13P1pzwQHWEVjGMuJXKz5nnidG53u8t/T69Y=;
+        b=oZWknSmeVZZfZwya3xUfjHMkrSowYXFuz2O2dLlUa9GiJ/jfDEeFrwHMXwjBA4wEI+
+         KgJVTITaDxvaEi2nzAHfwWTEAk9ONAyP6YJm2+/EYC4K3inpb83m3E64GzZtZ9U1kDBl
+         lZo5D5cvDzPWuhMzO9hZfc3PzZmWok9dwf5rg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9Q2DATu13P1pzwQHWEVjGMuJXKz5nnidG53u8t/T69Y=;
+        b=gsNAczI+77TN0X3XWiG2aUatlKMb8r9n84Cb7Oh2p8G3Kc6Y+xCZdDH7WsCPmi16cs
+         ac/iSciZDD2uUnLYOA+Jl8XzQk922TyxazO2HanF+wbwspu0JQKsJsxRkSGQSk3/vhc9
+         rb5IB0Yu7PU8zBv8cYGwUmv+I6ZL008YSBVUq3Hp5gFPa76iEpTGA7JeEu2a2Yx9VEmL
+         gFBIVkRSIOtQ84QcDRKhilSeCBdAdJdhrQx064q6n3fe7eACSLCewpvztBf9zBzkjqGw
+         16liOzr/qXDImxzcquMjmVTZ22oMhO1XRkRFEQApkSiCHfYRJZG6WxAqMZC0yvFNd3H8
+         BkyQ==
+X-Gm-Message-State: AOAM530jLJ8zFilv24m8BLO1E5BfpWtz43aXhJ2fbf3A1q6RHabswcQx
+        fLcwV6he/Hf5mmrqb4xcGy3PsTE311lr1g==
+X-Google-Smtp-Source: ABdhPJx7I5PtkMSKl9b8zDas4WwIKw7SMCpW5CkmtGzDxyA7T/ENxk1ZY0pC15QcFzNPM4JDV5yvgQ==
+X-Received: by 2002:a63:dc4e:: with SMTP id f14mr368523pgj.378.1622738632157;
+        Thu, 03 Jun 2021 09:43:52 -0700 (PDT)
+Received: from senozhatsky.flets-east.jp ([2409:10:2e40:5100:1585:76c1:e367:901a])
+        by smtp.gmail.com with ESMTPSA id 76sm2749589pfy.82.2021.06.03.09.43.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jun 2021 09:43:51 -0700 (PDT)
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Suleiman Souhlal <suleiman@google.com>, x86@kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [RFC][PATCH] kvm: add suspend pm-notifier
+Date:   Fri,  4 Jun 2021 01:43:15 +0900
+Message-Id: <20210603164315.682994-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.32.0.rc0.204.g9fa02ecfa5-goog
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: HJj4FdsWh6kbQ0-tHnr7-SlX0FnoNEQ0
-X-Proofpoint-ORIG-GUID: aM5Qy0dbzY7ALDs7Yu-xJZlzUSKiwrMn
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-06-02_10:2021-06-02,2021-06-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- spamscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- clxscore=1011 adultscore=0 priorityscore=1501 impostorscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2106020129
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
+Add KVM suspend/hibernate PM-notifier which lets architectures
+to implement arch-specific VM suspend code. For instance, on x86
+this sets PVCLOCK_GUEST_STOPPED on all the VCPUs.
 
-> From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
->
-> The POWER9 vCPU TLB management code assumes all threads in a core share
-> a TLB, and that TLBIEL execued by one thread will invalidate TLBs for
-> all threads. This is not the case for SMT8 capable POWER9 and POWER10
-> (big core) processors, where the TLB is split between groups of threads.
-> This results in TLB multi-hits, random data corruption, etc.
->
-> Fix this by introducing cpu_first_tlb_thread_sibling etc., to determine
-> which siblings share TLBs, and use that in the guest TLB flushing code.
->
-> [npiggin@gmail.com: add changelog and comment]
->
-> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Our case is that user puts the host system into sleep multiple
+times a day (e.g. closes the laptop's lid) so we need a reliable
+way to suspend VMs properly.
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+---
+ arch/arm64/kvm/arm.c       |  4 ++++
+ arch/mips/kvm/mips.c       |  4 ++++
+ arch/powerpc/kvm/powerpc.c |  4 ++++
+ arch/s390/kvm/kvm-s390.c   |  4 ++++
+ arch/x86/kvm/x86.c         | 21 ++++++++++++++++++++
+ include/linux/kvm_host.h   |  8 ++++++++
+ virt/kvm/kvm_main.c        | 40 ++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 85 insertions(+)
 
-> ---
->  arch/powerpc/include/asm/cputhreads.h | 30 +++++++++++++++++++++++++++
->  arch/powerpc/kvm/book3s_hv.c          | 13 ++++++------
->  arch/powerpc/kvm/book3s_hv_builtin.c  |  2 +-
->  arch/powerpc/kvm/book3s_hv_rm_mmu.c   |  2 +-
->  4 files changed, 39 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/powerpc/include/asm/cputhreads.h b/arch/powerpc/include/asm/cputhreads.h
-> index 98c8bd155bf9..b167186aaee4 100644
-> --- a/arch/powerpc/include/asm/cputhreads.h
-> +++ b/arch/powerpc/include/asm/cputhreads.h
-> @@ -98,6 +98,36 @@ static inline int cpu_last_thread_sibling(int cpu)
->  	return cpu | (threads_per_core - 1);
->  }
->
-> +/*
-> + * tlb_thread_siblings are siblings which share a TLB. This is not
-> + * architected, is not something a hypervisor could emulate and a future
-> + * CPU may change behaviour even in compat mode, so this should only be
-> + * used on PowerNV, and only with care.
-> + */
-> +static inline int cpu_first_tlb_thread_sibling(int cpu)
-> +{
-> +	if (cpu_has_feature(CPU_FTR_ARCH_300) && (threads_per_core == 8))
-> +		return cpu & ~0x6;	/* Big Core */
-> +	else
-> +		return cpu_first_thread_sibling(cpu);
-> +}
-> +
-> +static inline int cpu_last_tlb_thread_sibling(int cpu)
-> +{
-> +	if (cpu_has_feature(CPU_FTR_ARCH_300) && (threads_per_core == 8))
-> +		return cpu | 0x6;	/* Big Core */
-> +	else
-> +		return cpu_last_thread_sibling(cpu);
-> +}
-> +
-> +static inline int cpu_tlb_thread_sibling_step(void)
-> +{
-> +	if (cpu_has_feature(CPU_FTR_ARCH_300) && (threads_per_core == 8))
-> +		return 2;		/* Big Core */
-> +	else
-> +		return 1;
-> +}
-> +
->  static inline u32 get_tensr(void)
->  {
->  #ifdef	CONFIG_BOOKE
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 28a80d240b76..0a8398a63f80 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -2657,7 +2657,7 @@ static void radix_flush_cpu(struct kvm *kvm, int cpu, struct kvm_vcpu *vcpu)
->  	cpumask_t *cpu_in_guest;
->  	int i;
->
-> -	cpu = cpu_first_thread_sibling(cpu);
-> +	cpu = cpu_first_tlb_thread_sibling(cpu);
->  	if (nested) {
->  		cpumask_set_cpu(cpu, &nested->need_tlb_flush);
->  		cpu_in_guest = &nested->cpu_in_guest;
-> @@ -2671,9 +2671,10 @@ static void radix_flush_cpu(struct kvm *kvm, int cpu, struct kvm_vcpu *vcpu)
->  	 * the other side is the first smp_mb() in kvmppc_run_core().
->  	 */
->  	smp_mb();
-> -	for (i = 0; i < threads_per_core; ++i)
-> -		if (cpumask_test_cpu(cpu + i, cpu_in_guest))
-> -			smp_call_function_single(cpu + i, do_nothing, NULL, 1);
-> +	for (i = cpu; i <= cpu_last_tlb_thread_sibling(cpu);
-> +					i += cpu_tlb_thread_sibling_step())
-> +		if (cpumask_test_cpu(i, cpu_in_guest))
-> +			smp_call_function_single(i, do_nothing, NULL, 1);
->  }
->
->  static void kvmppc_prepare_radix_vcpu(struct kvm_vcpu *vcpu, int pcpu)
-> @@ -2704,8 +2705,8 @@ static void kvmppc_prepare_radix_vcpu(struct kvm_vcpu *vcpu, int pcpu)
->  	 */
->  	if (prev_cpu != pcpu) {
->  		if (prev_cpu >= 0 &&
-> -		    cpu_first_thread_sibling(prev_cpu) !=
-> -		    cpu_first_thread_sibling(pcpu))
-> +		    cpu_first_tlb_thread_sibling(prev_cpu) !=
-> +		    cpu_first_tlb_thread_sibling(pcpu))
->  			radix_flush_cpu(kvm, prev_cpu, vcpu);
->  		if (nested)
->  			nested->prev_cpu[vcpu->arch.nested_vcpu_id] = pcpu;
-> diff --git a/arch/powerpc/kvm/book3s_hv_builtin.c b/arch/powerpc/kvm/book3s_hv_builtin.c
-> index 7a0e33a9c980..3edc25c89092 100644
-> --- a/arch/powerpc/kvm/book3s_hv_builtin.c
-> +++ b/arch/powerpc/kvm/book3s_hv_builtin.c
-> @@ -800,7 +800,7 @@ void kvmppc_check_need_tlb_flush(struct kvm *kvm, int pcpu,
->  	 * Thus we make all 4 threads use the same bit.
->  	 */
->  	if (cpu_has_feature(CPU_FTR_ARCH_300))
-> -		pcpu = cpu_first_thread_sibling(pcpu);
-> +		pcpu = cpu_first_tlb_thread_sibling(pcpu);
->
->  	if (nested)
->  		need_tlb_flush = &nested->need_tlb_flush;
-> diff --git a/arch/powerpc/kvm/book3s_hv_rm_mmu.c b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-> index 7af7c70f1468..407dbf21bcbc 100644
-> --- a/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-> +++ b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-> @@ -67,7 +67,7 @@ static int global_invalidates(struct kvm *kvm)
->  		 * so use the bit for the first thread to represent the core.
->  		 */
->  		if (cpu_has_feature(CPU_FTR_ARCH_300))
-> -			cpu = cpu_first_thread_sibling(cpu);
-> +			cpu = cpu_first_tlb_thread_sibling(cpu);
->  		cpumask_clear_cpu(cpu, &kvm->arch.need_tlb_flush);
->  	}
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 1126eae27400..547dbe44d039 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1311,6 +1311,10 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+ 	}
+ }
+ 
++void kvm_arch_pm_notifier(struct kvm *kvm)
++{
++}
++
+ long kvm_arch_vm_ioctl(struct file *filp,
+ 		       unsigned int ioctl, unsigned long arg)
+ {
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 4d4af97dcc88..d4408acd2be6 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -980,6 +980,10 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+ 	kvm_flush_remote_tlbs(kvm);
+ }
+ 
++void kvm_arch_pm_notifier(struct kvm *kvm)
++{
++}
++
+ long kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+ {
+ 	long r;
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index a2a68a958fa0..96e8a7b6fcf0 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -2334,6 +2334,10 @@ static int kvmppc_get_cpu_char(struct kvm_ppc_cpu_char *cp)
+ }
+ #endif
+ 
++void kvm_arch_pm_notifier(struct kvm *kvm)
++{
++}
++
+ long kvm_arch_vm_ioctl(struct file *filp,
+                        unsigned int ioctl, unsigned long arg)
+ {
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 1296fc10f80c..c5f86fc1e497 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2367,6 +2367,10 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+ 	return r;
+ }
+ 
++void kvm_arch_pm_notifier(struct kvm *kvm)
++{
++}
++
+ long kvm_arch_vm_ioctl(struct file *filp,
+ 		       unsigned int ioctl, unsigned long arg)
+ {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index bbc4e04e67ad..3f3d6497593f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5613,6 +5613,27 @@ static int kvm_vm_ioctl_set_msr_filter(struct kvm *kvm, void __user *argp)
+ 	return 0;
+ }
+ 
++void kvm_arch_pm_notifier(struct kvm *kvm)
++{
++#ifdef CONFIG_PM
++	int c;
++
++	mutex_lock(&kvm->lock);
++	for (c = 0; c < kvm->created_vcpus; c++) {
++		struct kvm_vcpu *vcpu = kvm->vcpus[c];
++		int r;
++
++		if (!vcpu)
++			continue;
++		r = kvm_set_guest_paused(vcpu);
++		if (!r)
++			continue;
++		pr_err("Failed to suspend VCPU-%d: %d\n", vcpu->vcpu_id,  r);
++	}
++	mutex_unlock(&kvm->lock);
++#endif
++}
++
+ long kvm_arch_vm_ioctl(struct file *filp,
+ 		       unsigned int ioctl, unsigned long arg)
+ {
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 2f34487e21f2..86695320a6b7 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -37,6 +37,8 @@
+ #include <asm/kvm_host.h>
+ #include <linux/kvm_dirty_ring.h>
+ 
++#include <linux/notifier.h>
++
+ #ifndef KVM_MAX_VCPU_ID
+ #define KVM_MAX_VCPU_ID KVM_MAX_VCPUS
+ #endif
+@@ -579,6 +581,10 @@ struct kvm {
+ 	pid_t userspace_pid;
+ 	unsigned int max_halt_poll_ns;
+ 	u32 dirty_ring_size;
++
++#ifdef CONFIG_PM
++	struct notifier_block pm_notifier;
++#endif
+ };
+ 
+ #define kvm_err(fmt, ...) \
+@@ -992,6 +998,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu);
+ 
++void kvm_arch_pm_notifier(struct kvm *kvm);
++
+ #ifdef __KVM_HAVE_ARCH_VCPU_DEBUGFS
+ void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry);
+ #endif
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6b4feb92dc79..86925ab7d162 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -51,6 +51,7 @@
+ #include <linux/io.h>
+ #include <linux/lockdep.h>
+ #include <linux/kthread.h>
++#include <linux/suspend.h>
+ 
+ #include <asm/processor.h>
+ #include <asm/ioctl.h>
+@@ -779,6 +780,43 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
+ 
+ #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
+ 
++#ifdef CONFIG_PM
++static int kvm_pm_notifier_call(struct notifier_block *bl,
++				unsigned long state,
++				void *unused)
++{
++	struct kvm *kvm = container_of(bl, struct kvm, pm_notifier);
++
++	switch (state) {
++	case PM_HIBERNATION_PREPARE:
++	case PM_SUSPEND_PREPARE:
++		kvm_arch_pm_notifier(kvm);
++		break;
++	}
++	return NOTIFY_DONE;
++}
++
++static void kvm_init_pm_notifier(struct kvm *kvm)
++{
++	kvm->pm_notifier.notifier_call = kvm_pm_notifier_call;
++	kvm->pm_notifier.priority = INT_MAX;
++	register_pm_notifier(&kvm->pm_notifier);
++}
++
++static void kvm_destroy_pm_notifier(struct kvm *kvm)
++{
++	unregister_pm_notifier(&kvm->pm_notifier);
++}
++#else
++static void kvm_init_pm_notifier(struct kvm *kvm)
++{
++}
++
++static void kvm_destroy_pm_notifier(struct kvm *kvm)
++{
++}
++#endif /* CONFIG_PM */
++
+ static struct kvm_memslots *kvm_alloc_memslots(void)
+ {
+ 	int i;
+@@ -962,6 +1000,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ 	mutex_unlock(&kvm_lock);
+ 
+ 	preempt_notifier_inc();
++	kvm_init_pm_notifier(kvm);
+ 
+ 	return kvm;
+ 
+@@ -1009,6 +1048,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
+ 	int i;
+ 	struct mm_struct *mm = kvm->mm;
+ 
++	kvm_destroy_pm_notifier(kvm);
+ 	kvm_uevent_notify_change(KVM_EVENT_DESTROY_VM, kvm);
+ 	kvm_destroy_vm_debugfs(kvm);
+ 	kvm_arch_sync_events(kvm);
+-- 
+2.32.0.rc0.204.g9fa02ecfa5-goog
+
