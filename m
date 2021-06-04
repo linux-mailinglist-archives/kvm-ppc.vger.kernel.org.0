@@ -2,89 +2,65 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0FDD39AF1F
-	for <lists+kvm-ppc@lfdr.de>; Fri,  4 Jun 2021 02:40:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F24F639B134
+	for <lists+kvm-ppc@lfdr.de>; Fri,  4 Jun 2021 06:06:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229791AbhFDAmX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 3 Jun 2021 20:42:23 -0400
-Received: from mail-pl1-f181.google.com ([209.85.214.181]:35338 "EHLO
-        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbhFDAmW (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 3 Jun 2021 20:42:22 -0400
-Received: by mail-pl1-f181.google.com with SMTP id t21so3783153plo.2
-        for <kvm-ppc@vger.kernel.org>; Thu, 03 Jun 2021 17:40:37 -0700 (PDT)
+        id S229573AbhFDEIn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 4 Jun 2021 00:08:43 -0400
+Received: from mail-pg1-f175.google.com ([209.85.215.175]:39764 "EHLO
+        mail-pg1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229445AbhFDEIn (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 4 Jun 2021 00:08:43 -0400
+Received: by mail-pg1-f175.google.com with SMTP id v14so6807894pgi.6
+        for <kvm-ppc@vger.kernel.org>; Thu, 03 Jun 2021 21:06:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hsyO5EEm3dG2GUVsZApwZQUFiUjt1oJTpcTgXFZNdfs=;
-        b=BlYNVPE305FbxEUMO5lSCEn5LG3JutO1Lg3tWns9s0oCrpDQwG+i6qmuM/hisKYpP+
-         y5qZfeRJIC4++esHrRYMFwklEwa2AsIP8FI2G+izcydAmHDQpIvGWGtM265YiTqVep0S
-         1wPk4/uTSpfKNxeIwC0sNPU2Zfv4gAByw74Ls=
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=piuzvh+WATuDoi0VnCZDJuZVA8Lq1gkoxAyrgcRzpJw=;
+        b=QNUoo1t1NRaS08Tzq4T1bEJxpIpI19pmDP/R4+UNEO8f8OvBGUmanUdKhfotaW2S2K
+         VNd6K9cDTgjoLbTonijFDYveWQkYCF2diTybNpt2BS1ZkEL8bms/i393pLEzKwNpwWrw
+         ++dCyEW8dz997TfV4j+jLzZPHcQY0/1GKDRjso0N3KxovT/4OXSwPJeivvUKqI8n+9qu
+         zO5xUyil2Sw0jYdxdVUyMKHpa1kYuCdh7Bg/WqKq7W5vo9eIEIRrS9GEYcF9nFwzARsB
+         MI/gSgBa5+WuprmaSoiQBqSSo0MMXa+AoKMl7yHTJc1WuB1Ni506pjoT2bzMV/ZPzD0E
+         D/qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hsyO5EEm3dG2GUVsZApwZQUFiUjt1oJTpcTgXFZNdfs=;
-        b=NzRr0CSRLSUsjnUbDELOeEynfM71OcWelPSCpZKHtbYDAqwRddWpYNHZYHutA7smPR
-         s55W792+GAD8mzKIQFFTa1fo/JXDPa0K1Q4pUB3e0hBp80cCNLj9DLUYoFB+/e7Tvt97
-         LDFFaUIe3DTG0b0D4OshpHBo5TOEpjNaiKAn94StimxzA+javUwyS12EslzFsXOEq9ej
-         YRj6NXdFOhqJmxjUMDH7aljxkFOHvRX3V69Mn5bWa6jSqzTzKRK6mcmHe65BHA0oRKsq
-         N25lha1NM+CQopMfpwK8/tN4PffDT9cRZmbnms5NDd4tWDN10+MAY8SA9A8DwzHDER3+
-         NePg==
-X-Gm-Message-State: AOAM533tzp4fTj2VAZgfKOpi//6MbifUSZkILBd/HVKph+rWRMHSQvKk
-        621J+76sPTVZ0M0mpcY95WPR4g==
-X-Google-Smtp-Source: ABdhPJwUR3L1tC9qXtsxtXxpLe8tNcJAE3/COLahbUTOQi2i1KnLOCdr6jBvw3P/Ytpi3HasD6ls1Q==
-X-Received: by 2002:a17:90a:7345:: with SMTP id j5mr13827315pjs.64.1622767177417;
-        Thu, 03 Jun 2021 17:39:37 -0700 (PDT)
-Received: from google.com ([2409:10:2e40:5100:36b:f5b6:c380:9ccf])
-        by smtp.gmail.com with ESMTPSA id j16sm3074017pjn.55.2021.06.03.17.39.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jun 2021 17:39:36 -0700 (PDT)
-Date:   Fri, 4 Jun 2021 09:39:29 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Suleiman Souhlal <suleiman@google.com>, x86@kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [RFC][PATCH] kvm: add suspend pm-notifier
-Message-ID: <YLl2QeoziEVHvRAO@google.com>
-References: <20210603164315.682994-1-senozhatsky@chromium.org>
- <YLkRB3qxjrXB99He@hirez.programming.kicks-ass.net>
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=piuzvh+WATuDoi0VnCZDJuZVA8Lq1gkoxAyrgcRzpJw=;
+        b=jIDOPON9M/KIk8g4tpOCxzDDSqzVMkUMENO4xA1DHTrDc1QO2Ju4v+2H/te38rd6h3
+         wmAgUm2FgKfzy5bhqR1zeAdgdoM+4gMIH+xaB1IvXgN5HW2x/5L9G1htJf4RjzARCWY9
+         8TYxbVjJe2JhPjDXORV9yovJysGluIY0tAOvkQiZgRIGJnbiP3GtOQJ+aei/QI57LJvF
+         Cmn543wgLK4cIVGpRHYAee3O/PiSLHsdwde9Ein22fXZwnsWLkAUD93OfTXF94pw5KFB
+         z3vO++Gi1AleVEpl+MLJnnhWUxKuT4APVJy9h0gBIj5iBnQf/YZbSZCym/5zGtXbhyhD
+         GuNw==
+X-Gm-Message-State: AOAM532THreeOMPzT7fH5ZLK3PA4SoOsBfdYdnGffejNeVFZ3/wbjYDS
+        fEX/Q8tSNz2NWhZr8mUi0xX6KwOu0M9SftT0U2w=
+X-Google-Smtp-Source: ABdhPJy9/zj10ujkEVeZKKRWBO1ZJl7A4fEIUWxhB3tlOP8Kr9NS+o38Xhrh+zYrcj7XE92Z9DprtTya33wWz7U+6is=
+X-Received: by 2002:a63:b10:: with SMTP id 16mr2892700pgl.90.1622779547497;
+ Thu, 03 Jun 2021 21:05:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YLkRB3qxjrXB99He@hirez.programming.kicks-ass.net>
+Received: by 2002:a17:90b:3596:0:0:0:0 with HTTP; Thu, 3 Jun 2021 21:05:46
+ -0700 (PDT)
+Reply-To: mrschantalawrence75@gmail.com
+From:   mrs chantal <alfredjjames19@gmail.com>
+Date:   Thu, 3 Jun 2021 21:05:46 -0700
+Message-ID: <CAHgmNPWz2hOAheA-_FfxS1bNBEO3979bRAat9XepEYC3py3rig@mail.gmail.com>
+Subject: Good day To You,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On (21/06/03 19:27), Peter Zijlstra wrote:
-> On Fri, Jun 04, 2021 at 01:43:15AM +0900, Sergey Senozhatsky wrote:
-[..]
-> >  
-> > +void kvm_arch_pm_notifier(struct kvm *kvm)
-> > +{
-> > +}
-> > +
-> >  long kvm_arch_vm_ioctl(struct file *filp,
-> >  		       unsigned int ioctl, unsigned long arg)
-> >  {
-> 
-> What looks like you wants a __weak function.
+-- 
+hello....
 
-True. Thanks for the suggestion.
 
-I thought about it, but I recalled that tglx had  __strong opinions
-on __weak functions.
+You have been compensated with the sum of 5.7 million dollars in this
+united nation the payment will be issue into atm visa card and send to
+you from the santander bank we need your address and your whatsapp
+number
+
+
+here is my email address   mrschantalawrence75@gmail.com
