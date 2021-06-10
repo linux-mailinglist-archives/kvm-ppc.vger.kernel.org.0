@@ -2,57 +2,55 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB50D3A3073
-	for <lists+kvm-ppc@lfdr.de>; Thu, 10 Jun 2021 18:23:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCCF23A3121
+	for <lists+kvm-ppc@lfdr.de>; Thu, 10 Jun 2021 18:43:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230462AbhFJQZV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 10 Jun 2021 12:25:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29754 "EHLO
+        id S231845AbhFJQo4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 10 Jun 2021 12:44:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26562 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230355AbhFJQZU (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 10 Jun 2021 12:25:20 -0400
+        by vger.kernel.org with ESMTP id S231880AbhFJQoJ (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 10 Jun 2021 12:44:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1623342204;
+        s=mimecast20190719; t=1623343331;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xaDYl3mAKqwxB1xdG6u3uJxh4rz2ERkYQsFm9BataQM=;
-        b=RcUaiJYaTmpDK2vFq31FTH8lpVUFoRXy8gGjrzhYHUkPDcOXv1l6Fuix/xerJJyovJx2IG
-        9NNyjZSp/iG8n/nmwrus2FM7E+HUqNIQSWILsCjk+8pO4nR6XwE0ULebAPBJJc/HIutIrn
-        SY3rnmLjpr1flQOijzm2KYGqV2/AtHA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-Hk-Zx35cNdK2s-HAEZMhCA-1; Thu, 10 Jun 2021 12:23:22 -0400
-X-MC-Unique: Hk-Zx35cNdK2s-HAEZMhCA-1
-Received: by mail-wm1-f69.google.com with SMTP id v2-20020a7bcb420000b0290146b609814dso3270744wmj.0
-        for <kvm-ppc@vger.kernel.org>; Thu, 10 Jun 2021 09:23:22 -0700 (PDT)
+        bh=FTYsk+3ZrtMDgibB9knYQRxYmGEpuIUf1VdElxSCW6k=;
+        b=TrMQDsKp+FKHxX4nb0ERe0QpfAZo046yyVth6XhXZarsIKikOxe2S4GuwEE4mHX8KJm5Dl
+        R0b7PJQ5LXGxbyXL+DLdbs65laG56d1Sq+pM+SZEBBBKmUnoyC72EXFFILSHrXk6rwnVxm
+        HAsklXT37ERwhPDBTzggcxIgBGi4SWc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-IIjRmO0XOCK4q35NK1WAGA-1; Thu, 10 Jun 2021 12:42:10 -0400
+X-MC-Unique: IIjRmO0XOCK4q35NK1WAGA-1
+Received: by mail-wm1-f71.google.com with SMTP id m31-20020a05600c3b1fb02901bd331ed39fso660466wms.0
+        for <kvm-ppc@vger.kernel.org>; Thu, 10 Jun 2021 09:42:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:to:references:from:subject:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=xaDYl3mAKqwxB1xdG6u3uJxh4rz2ERkYQsFm9BataQM=;
-        b=HaxiDteHinRaeCAzlSFcskC/R04hfbdH9J8poZvY7mL1tM14qP9DnYiubxqQPlgwpz
-         IIJ/TpsTOK7oxlmrkVtweeEWvmTQkMHkT08UvFad1SsGKh8NNTp5xULSPQYp8FOd+Iu6
-         CPPY0jT6DPRLp27n8Y/aUhwSNaXtVpBBHiHDRBkbwcPYYi70nFSe0IkC8NKdSRTWNE1n
-         RTfJ5y9bPGzUNuQjHSgs4GWGzioT148VWs9K8L5mn5gDSJH5WSvaKSMai3oBaA3aY1I0
-         zaTZwSGvQ/sOYp+0S3Rh1tWvXMkw94zi/hivfZ9l6uZ+aHPXC3EdgQO4mHWiPmPcP2fE
-         yKOw==
-X-Gm-Message-State: AOAM531X7wGgaruHo/kXRB8A9Zr/2XduDd1fop0N00rbUlZjbkaO8eef
-        PkYUuBVeAdb3q00/ot/WlMjOuhjyiJSZLkhhh0m3oSAx6EPiYMvMuhgwbSsZsE7Tcx0/9jhgO55
-        d3UZf2iJksofQgaiSEA==
-X-Received: by 2002:adf:de91:: with SMTP id w17mr6484925wrl.352.1623342201701;
-        Thu, 10 Jun 2021 09:23:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzimm0IhzRGX0own3XmAQS7AEY/ooW0Iee1AKpx0NvxC3qE+jaJNCMXAZvHTl29Jx/k7NJRTg==
-X-Received: by 2002:adf:de91:: with SMTP id w17mr6484880wrl.352.1623342201486;
-        Thu, 10 Jun 2021 09:23:21 -0700 (PDT)
+        bh=FTYsk+3ZrtMDgibB9knYQRxYmGEpuIUf1VdElxSCW6k=;
+        b=gUlTb3hFrod0qFv56lA3p66w5ljEAjsJBc1/2EAsgjP9J3/EgAjKskyrQVJCWXCame
+         50WtS5H0mw4OcCN38ndpfz6o0dmKZviHikYaRcxix+j6TvERrYWH3n96EUqwxNbIx4j7
+         ymclys8grgGFKBwO3EuJR3s1S9R7+prRA7XDQGHL7aH7sJ3SHDgwR4F29kbBewTBrcTq
+         PTfIytefcFsayvevm5nAwtiIul6ltgPmqZNrHhyque+25AZJ17ZzLOBw6tOsgO+cXFJl
+         7/JLFstPmxG9X6BmM0A6G/BN9+ehwhJQULCyE5sXp2PWX3qDmwL3O5rYJqXTr47BykpD
+         MAiw==
+X-Gm-Message-State: AOAM532GpvGD8UOTVs1mIQtQEyVXcx2Cd4O/Ui6tEk3b+5ZUG10NMjSx
+        h8tEGpKR2UlgRn/+DzVwH/DJNrPp8hgUWMZC7B8JhzNhDXtD5MPJ8cd7sce4bz5MPFy0Rc97RHC
+        jM8AuzOd9bSGGaqnWAg==
+X-Received: by 2002:adf:ab49:: with SMTP id r9mr6556040wrc.237.1623343329064;
+        Thu, 10 Jun 2021 09:42:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwT8GKTcc6CtIM2Omfzfm3HSpY3IDEVA0VZ0HkqF8YvTQlmVrTL+SEqxKoSDnFCTA+GbV+zog==
+X-Received: by 2002:adf:ab49:: with SMTP id r9mr6556002wrc.237.1623343328880;
+        Thu, 10 Jun 2021 09:42:08 -0700 (PDT)
 Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.gmail.com with ESMTPSA id o9sm3760703wri.68.2021.06.10.09.23.19
+        by smtp.gmail.com with ESMTPSA id f13sm4050941wrt.86.2021.06.10.09.42.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Jun 2021 09:23:20 -0700 (PDT)
-Subject: Re: [PATCH v7 2/4] KVM: stats: Add fd-based API to read binary stats
- data
+        Thu, 10 Jun 2021 09:42:08 -0700 (PDT)
 To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
         KVMARM <kvmarm@lists.cs.columbia.edu>,
         LinuxMIPS <linux-mips@vger.kernel.org>,
@@ -86,49 +84,62 @@ To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
 References: <20210603211426.790093-1-jingzhangos@google.com>
  <20210603211426.790093-3-jingzhangos@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e3b2b3ab-88a2-827c-7775-10be63158ff3@redhat.com>
-Date:   Thu, 10 Jun 2021 18:23:19 +0200
+Subject: Re: [PATCH v7 2/4] KVM: stats: Add fd-based API to read binary stats
+ data
+Message-ID: <345170fd-636c-f1be-7dc3-69467e51d872@redhat.com>
+Date:   Thu, 10 Jun 2021 18:42:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
 In-Reply-To: <20210603211426.790093-3-jingzhangos@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 On 03/06/21 23:14, Jing Zhang wrote:
-> +#define DEFINE_VM_STATS_DESC(...) {					       \
-> +	STATS_DESC_COUNTER("remote_tlb_flush"),				       \
-> +	## __VA_ARGS__							       \
-> +}
+> +struct _kvm_stats_header {
+> +	__u32 name_size;
+> +	__u32 count;
+> +	__u32 desc_offset;
+> +	__u32 data_offset;
+> +};
 > +
-> +#define DEFINE_VCPU_STATS_DESC(...) {					       \
-> +	STATS_DESC_COUNTER("halt_successful_poll"),			       \
-> +	STATS_DESC_COUNTER("halt_attempted_poll"),			       \
-> +	STATS_DESC_COUNTER("halt_poll_invalid"),			       \
-> +	STATS_DESC_COUNTER("halt_wakeup"),				       \
-> +	STATS_DESC_TIME_NSEC("halt_poll_success_ns"),			       \
-> +	STATS_DESC_TIME_NSEC("halt_poll_fail_ns"),			       \
-> +	## __VA_ARGS__							       \
 
-Let's instead put this (note it's without braces) in macros like these
+Keeping this struct in sync with kvm_stats_header is a bit messy.  If 
+you move the id at the end of the header, however, you can use the same 
+trick with the zero-sized array that you used for _kvm_stats_desc.
 
-#define KVM_GENERIC_VM_STATS()							\
-	STATS_DESC_COUNTER("remote_tlb_flush"),
+> +struct kvm_vm_stats_data {
+> +	unsigned long value[0];
+> +};
+> +
 
-#define KVM_GENERIC_VCPU_STATS(...)						\
-	STATS_DESC_COUNTER("halt_successful_poll"),				\
-	STATS_DESC_COUNTER("halt_attempted_poll"),				\
-	STATS_DESC_COUNTER("halt_poll_invalid"),				\
-	STATS_DESC_COUNTER("halt_wakeup"),					\
-	STATS_DESC_TIME_NSEC("halt_poll_success_ns"),				\
-	STATS_DESC_TIME_NSEC("halt_poll_fail_ns"),
+I posted the patch to switch the VM statistics to 64-bit; you can rebase 
+on top of it.
 
-and it can be used in the arch files.  In fact it can even be added in patch 1 and
-switched to STATS_DESC_* here.
+> +#define KVM_GET_STATS_FD  _IOR(KVMIO,  0xcc, struct kvm_stats_header)
+
+This should be _IO(KVMIO, 0xcc) since it does not have an argument.
+
+> +#define STATS_DESC(stat, type, unit, scale, exp)			       \
+> +	{								       \
+> +		{							       \
+> +			.flags = type | unit | scale,			       \
+> +			.exponent = exp,				       \
+> +			.size = 1					       \
+> +		},							       \
+> +		.name = stat,						       \
+
+Here you can use
+
+	type | BUILD_BUG_ON_ZERO(type & ~KVM_STATS_TYPE_MASK) |
+	unit | BUILD_BUG_ON_ZERO(unit & ~KVM_STATS_UNIT_MASK) |
+	scale | BUILD_BUG_ON_ZERO(scale & ~KVM_STATS_SCALE_MASK) |
+
+to get a little bit of type checking.
 
 Paolo
 
