@@ -2,145 +2,149 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AE223A39AD
-	for <lists+kvm-ppc@lfdr.de>; Fri, 11 Jun 2021 04:25:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3998E3A3C71
+	for <lists+kvm-ppc@lfdr.de>; Fri, 11 Jun 2021 08:58:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230297AbhFKC1K (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 10 Jun 2021 22:27:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34600 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbhFKC1J (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 10 Jun 2021 22:27:09 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74877C061574
-        for <kvm-ppc@vger.kernel.org>; Thu, 10 Jun 2021 19:24:57 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id s14so3187918pfd.9
-        for <kvm-ppc@vger.kernel.org>; Thu, 10 Jun 2021 19:24:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=lWU4Vw0CGzQdddd7531AABGYy3FLb0CgVBwzysYGHYA=;
-        b=I6ibkR1f0h0wumnTnmTl44RwOrJeQ04rA21yaUsHN0zd0m9JbQc+v0uw9/gE62YLcz
-         CklpqIuzOcj1S3pvKA+fyfdsheWl3CJLU8H1PfXUHzgCvHpPY8MU7Uf6kfbF181q6pX3
-         IunZswNAMoSi/XRgUCBVU4Shg/NRVsElcZGOCgsyIwZh/tF5JmxO9B75pTf8Cwos/oDg
-         QKCkxxqQ99Xqc3cI6T8d3fa/sg3VvaNq8s/PoWIP3d5g58z3ARISNbxPnSjXFbElv502
-         Kz5K+iVH0j0EojnZqJbI70iPouED4wauLPGM7hg6PlP0gaKyHDdP43A22/CSZvmkeVQV
-         kV4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=lWU4Vw0CGzQdddd7531AABGYy3FLb0CgVBwzysYGHYA=;
-        b=OXYKCD4SvSnYovhnTB+UKBLSqSCJtpTrt2bubFiBrotvnh+zLi5hpGNN+tII7iEynn
-         DRXw+ElD6axJCjujgqAqvbknXDFxq6eA8Ap+S4o/WDXkFokHNHzLn5THHbTWwLvC4foJ
-         RbCzJY/3n6MDsfh6MOlpua8BGZU1BBPCCKlfo23+U2B6EeIQtZQ6e3TUYUSm5mL4PSA9
-         mNf4iCcl09jg+IsL25XDLk8g5YH5vXi/DByEmotW8mN3R/Viog/e/XiXCr15y/9KkR3E
-         IBTdAmS2IV0rPK4+aDbDM+e8eJVsZY6Q4efERvD5DYqUIcyzbGnzF9eF8pC2hyg9wliD
-         l9jg==
-X-Gm-Message-State: AOAM532D9ovZp3PilI8bD6JrKYa1WUgziONAFhjplXNcfp2MiwOmMcYu
-        7admND4g2PF277kvmjH9LZ4=
-X-Google-Smtp-Source: ABdhPJz57Cm9SUiVdKRM7MoGvcOhd0hkvt4CITORQXOWGm2kw0Vh1lSZXAwJIWizsPnbtxdb7qifbQ==
-X-Received: by 2002:a62:5547:0:b029:2ec:8f20:4e2 with SMTP id j68-20020a6255470000b02902ec8f2004e2mr5913590pfb.71.1623378294499;
-        Thu, 10 Jun 2021 19:24:54 -0700 (PDT)
-Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
-        by smtp.gmail.com with ESMTPSA id f17sm3668935pgm.37.2021.06.10.19.24.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jun 2021 19:24:53 -0700 (PDT)
-Date:   Fri, 11 Jun 2021 12:24:48 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [FSL P50x0] KVM HV doesn't work anymore
-To:     Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Christian Zigotzky <chzigotzky@xenosoft.de>,
-        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Cc:     Darren Stevens <darren@stevens-zone.net>,
-        Christian Zigotzky <info@xenosoft.de>,
-        mad skateman <madskateman@gmail.com>,
-        "R.T.Dickinson" <rtd2@xtra.co.nz>
-References: <04526309-4653-3349-b6de-e7640c2258d6@xenosoft.de>
-        <34617b1b-e213-668b-05f6-6fce7b549bf0@xenosoft.de>
-        <9af2c1c9-2caf-120b-2f97-c7722274eee3@csgroup.eu>
-        <199da427-9511-34fe-1a9e-08e24995ea85@xenosoft.de>
-        <1621236734.xfc1uw04eb.astroid@bobo.none>
-        <e6ed7674-3df9-ec3e-8bcf-dcd8ff0fecf8@xenosoft.de>
-        <1621410977.cgh0d6nvlo.astroid@bobo.none>
-        <acf63821-2030-90fa-f178-b2baeb0c4784@xenosoft.de>
-        <1621464963.g8v9ejlhyh.astroid@bobo.none>
-        <f437d727-8bc7-6467-6134-4e84942628f1@xenosoft.de>
-        <b3821ab6-f3b4-ee51-93a2-064c09bc4278@xenosoft.de>
-In-Reply-To: <b3821ab6-f3b4-ee51-93a2-064c09bc4278@xenosoft.de>
+        id S231319AbhFKHAD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 11 Jun 2021 03:00:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1164 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229530AbhFKHAC (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 11 Jun 2021 03:00:02 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15B6YtBQ080598;
+        Fri, 11 Jun 2021 02:57:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=x2xZ8XW9WOlZgpL4aLbZYg/Ju2cVBYzwiLpywQISssA=;
+ b=Jao9RDxibOOCkpgwk1W1fIzhpbkPyTfHJB5ql7F0L6x0KgEKJsNocQWwtFvh3m27qYxr
+ gtdyCo/2HTMz1nCv3MgEvN728epbiu71Dv9OcZL4HMCSm5tU6vlm0emUm0TO2l2DKllO
+ 0ZKKkbV2N2IFoDLSxaYnbCe8Vl7n+4RzPBnYtdyBVEUIWzjPf0PApJJ8QPvvwXWfSmMd
+ gjG/8ectYTd2wcYUJjs2Wd9ZrIIICyfzFTdptBUoQvu4b+g6IlvkWyRT5Hk6sUPNc/no
+ h1/idS3znYORahlfyCRQf/tMpVwNtalshpNp5gvo1NaI93JFDLPLbImKuhOS5Zt9jHr3 5Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3942ch92v4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 02:57:27 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15B6lIHj122714;
+        Fri, 11 Jun 2021 02:57:26 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3942ch92tm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 02:57:26 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15B6qTPE007568;
+        Fri, 11 Jun 2021 06:57:22 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma02fra.de.ibm.com with ESMTP id 392e798uvh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Jun 2021 06:57:22 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15B6vJBO12517788
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Jun 2021 06:57:19 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3EB2E42063;
+        Fri, 11 Jun 2021 06:57:19 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EEABD4205F;
+        Fri, 11 Jun 2021 06:57:17 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.35.90])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 11 Jun 2021 06:57:17 +0000 (GMT)
+Subject: Re: [PATCH v7 1/4] KVM: stats: Separate generic stats from
+ architecture specific ones
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20210603211426.790093-1-jingzhangos@google.com>
+ <20210603211426.790093-2-jingzhangos@google.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <03f3fa03-6f61-7864-4867-3dc332a9d6f3@de.ibm.com>
+Date:   Fri, 11 Jun 2021 08:57:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Message-Id: <1623377186.j5de3q1s8g.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20210603211426.790093-2-jingzhangos@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: d3UCT33oCNg1P-mCe7sviD_VHD-SZPdw
+X-Proofpoint-GUID: MYLFLX6kyCj9CQSWdCtzS3DAmN7ceq-J
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-06-11_01:2021-06-11,2021-06-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 mlxscore=0 adultscore=0 malwarescore=0 spamscore=0
+ bulkscore=0 clxscore=1011 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2106110042
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Christian Zigotzky's message of June 7, 2021 5:21 pm:
-> On 02 June 2021 at 01:26pm, Christian Zigotzky wrote:
->> On 20 May 2021 at 01:07am, Nicholas Piggin wrote:
->>> Hmm, okay that probably rules out those notifier changes then.
->>> Can you remind me were you able to rule these out as suspects?
->>>
->>> 8f6cc75a97d1 powerpc: move norestart trap flag to bit 0
->>> 8dc7f0229b78 powerpc: remove partial register save logic
->>> c45ba4f44f6b powerpc: clean up do_page_fault
->>> d738ee8d56de powerpc/64e/interrupt: handle bad_page_fault in C
->>> ceff77efa4f8 powerpc/64e/interrupt: Use new interrupt context=20
->>> tracking scheme
->>> 097157e16cf8 powerpc/64e/interrupt: reconcile irq soft-mask state in C
->>> 3db8aa10de9a powerpc/64e/interrupt: NMI save irq soft-mask state in C
->>> 0c2472de23ae powerpc/64e/interrupt: use new interrupt return
->>> dc6231821a14 powerpc/interrupt: update common interrupt code for
->>> 4228b2c3d20e powerpc/64e/interrupt: always save nvgprs on interrupt
->>> 5a5a893c4ad8 powerpc/syscall: switch user_exit_irqoff and=20
->>> trace_hardirqs_off order
->>>
->>> Thanks,
->>> Nick
->> Hi Nick,
->>
->> I tested these commits above today and all works with -smp 4. [1]
->>
->> Smp 4 still doesn't work with the RC4 of kernel 5.13 on quad core=20
->> e5500 CPUs with KVM HV. I use -smp 3 currently.
->>
->> What shall I test next?
->>
->> Thanks,
->> Christian
->>
->> [1] https://forum.hyperion-entertainment.com/viewtopic.php?p=3D53367#p53=
-367
-> Hi All,
->=20
-> I tested the RC5 of kernel 5.13 today. Unfortunately the KVM HV issue=20
-> still exists.
-> I also figured out, that '-smp 2' doesn't work either.
->=20
-> Summary:
->=20
-> -smp 1 -> works
-> -smp 2 -> doesn't work
-> -smp 3 -> works
-> -smp 4 -> doesn't work
 
-Sorry, I'm not able to see anything, if the KVM patches were okay and=20
-the 64e interrupt series. I don't know why the -smp behaviour would make
 
-I can't think of why the -smp behaviour would make a difference except=20
-for a strange race. Doing another bisect might be the only way to get
-to the bottom of it.
+On 03.06.21 23:14, Jing Zhang wrote:
+> Put all generic statistics in a separate structure to ease
+> statistics handling for the incoming new statistics API.
+> 
+> No functional change intended.
+> 
+> Reviewed-by: David Matlack <dmatlack@google.com>
+> Reviewed-by: Ricardo Koller <ricarkol@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+[...]
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 8925f3969478..9b4473f76e56 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+[...]
+> @@ -755,12 +750,12 @@ struct kvm_vcpu_arch {
+>   };
+>   
+>   struct kvm_vm_stat {
+> +	struct kvm_vm_stat_generic generic;
 
-But before that you could try get some data about why the guest stops?
-Get some samples of CPU registers when it gets stuck and see if you can
-see if it is stuck in a loop of interupts or something.
+s390 does not have remote_tlb_flush. I guess this does not hurt?
 
-I don't know if qemu can log much from KVM execution so you might have
-to just run info registers a dozen times on each CPU (`cpu 1` will=20
-change to CPU 1 in the qemu monitor).
-
-Thanks,
-Nick
+>   	u64 inject_io;
+>   	u64 inject_float_mchk;
+>   	u64 inject_pfault_done;
+>   	u64 inject_service_signal;
+>   	u64 inject_virtio;
+> -	u64 remote_tlb_flush;
+>   };
+[...]
+> +struct kvm_vm_stat_generic {
+> +	ulong remote_tlb_flush;
+> +};
