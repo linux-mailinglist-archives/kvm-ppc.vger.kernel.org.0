@@ -2,550 +2,285 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DF153A9C5C
-	for <lists+kvm-ppc@lfdr.de>; Wed, 16 Jun 2021 15:43:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEBC83A9EDE
+	for <lists+kvm-ppc@lfdr.de>; Wed, 16 Jun 2021 17:21:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233268AbhFPNpQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 16 Jun 2021 09:45:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2120 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233489AbhFPNpM (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 16 Jun 2021 09:45:12 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15GDYFlC123163;
-        Wed, 16 Jun 2021 09:42:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : subject :
- date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=8DtMCMqgeX2BO51SEIzg5IKwtyEVpnzZVrii7iY3v14=;
- b=H/npBXYAr4kMfYzG2vTqI9UTDMb5adS4OTif5NJCwNB94mswKKyyj7uKrrg6AbZ8NgwX
- xylOO4IUDYdyJ6jeQ0fXhuNGjKoa4sKQVtSVvdRM718vXPHusi6VpFCvUIt9gR28Jszv
- HA7NKGO5/VvrxQh+BFRXXjQ2m9JYoN2VD4yUN55s6Vu14+xdjtbij6e4Pm6OqTxkFFk3
- QNKoT6len/Y243K+0DSxhvPw6yI1c+i+ZJXvQqNAASg90qOxTmf/2wAvaeVDLdkzkmZ/
- cKcVmgU0JGvzMJKNG59hpudVZnpJ3OsEvuxfrap/zjYfSg3QZMi+gaBkQDsDG7f2NAN2 eQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 397exgq0hn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Jun 2021 09:42:50 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15GDYdRm124903;
-        Wed, 16 Jun 2021 09:42:49 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 397exgq0h8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Jun 2021 09:42:49 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15GDglf4023313;
-        Wed, 16 Jun 2021 13:42:47 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06fra.de.ibm.com with ESMTP id 394m6h9608-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Jun 2021 13:42:47 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15GDfcTF27984230
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Jun 2021 13:41:38 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2B972A4040;
-        Wed, 16 Jun 2021 13:42:45 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 93EB2A404D;
-        Wed, 16 Jun 2021 13:42:43 +0000 (GMT)
-Received: from pratiks-thinkpad.ibmuc.com (unknown [9.79.208.82])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 16 Jun 2021 13:42:43 +0000 (GMT)
-From:   "Pratik R. Sampat" <psampat@linux.ibm.com>
-To:     mpe@ellerman.id.au, benh@kernel.crashing.org, paulus@samba.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, psampat@linux.ibm.com,
-        pratik.r.sampat@gmail.com
-Subject: [PATCH 1/1] powerpc/pseries: Interface to represent PAPR firmware attributes
-Date:   Wed, 16 Jun 2021 19:12:40 +0530
-Message-Id: <20210616134240.62195-2-psampat@linux.ibm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210616134240.62195-1-psampat@linux.ibm.com>
-References: <20210616134240.62195-1-psampat@linux.ibm.com>
+        id S234554AbhFPPX1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 16 Jun 2021 11:23:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46456 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234002AbhFPPXZ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 16 Jun 2021 11:23:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E3DA761246;
+        Wed, 16 Jun 2021 15:21:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1623856879;
+        bh=Ysmx0bFk+wbRk28MtWEq6ruWchrpD+dum7bhYb0jMdE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RQkL6gyQxSQhyd+2jxDjeoOoK0fYnWug3hfxK1KVZ9e132O5SxsFdZqck/U70uRWi
+         A+eoeEE4+5LL1ydFo3L2X0GN3ZO9AeHTq/XpCt3U53QuB2gt9ritgm7QtWMUHfF3rR
+         41KO4ALsrR3E5SCJpDymLaSyvxylhbilGzwyuC0M=
+Date:   Wed, 16 Jun 2021 17:21:17 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v9 3/5] KVM: stats: Add documentation for statistics data
+ binary interface
+Message-ID: <YMoW7SBqO9EPgCXw@kroah.com>
+References: <20210614212155.1670777-1-jingzhangos@google.com>
+ <20210614212155.1670777-4-jingzhangos@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ixIkH9VUeuRvX4TNNfY9w2W6C8VnWomG
-X-Proofpoint-GUID: k11_G_oOH2hPOVclozNhydpiRU13z2EX
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-06-16_07:2021-06-15,2021-06-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- lowpriorityscore=0 malwarescore=0 adultscore=0 mlxlogscore=999
- priorityscore=1501 mlxscore=0 bulkscore=0 impostorscore=0 clxscore=1015
- spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106160078
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210614212155.1670777-4-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Adds a generic interface to represent the energy and frequency related
-PAPR attributes on the system using the new H_CALL
-"H_GET_ENERGY_SCALE_INFO".
+On Mon, Jun 14, 2021 at 09:21:53PM +0000, Jing Zhang wrote:
+> Update KVM API documentation for binary statistics.
 
-H_GET_EM_PARMS H_CALL was previously responsible for exporting this
-information in the lparcfg, however the H_GET_EM_PARMS H_CALL
-will be deprecated P10 onwards.
+You should write more here.  See my comment at the bottom...
 
-The H_GET_ENERGY_SCALE_INFO H_CALL is of the following call format:
-hcall(
-  uint64 H_GET_ENERGY_SCALE_INFO,  // Get energy scale info
-  uint64 flags,           // Per the flag request
-  uint64 firstAttributeId,// The attribute id
-  uint64 bufferAddress,   // Guest physical address of the output buffer
-  uint64 bufferSize       // The size in bytes of the output buffer
-);
+> 
+> Reviewed-by: David Matlack <dmatlack@google.com>
+> Reviewed-by: Ricardo Koller <ricarkol@google.com>
+> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 177 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 176 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index e328caa35d6c..35ee52dbec89 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5034,7 +5034,6 @@ see KVM_XEN_VCPU_SET_ATTR above.
+>  The KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST type may not be used
+>  with the KVM_XEN_VCPU_GET_ATTR ioctl.
+>  
+> -
+>  4.131 KVM_GET_SREGS2
+>  ------------------
+>  
+> @@ -5081,6 +5080,174 @@ Writes special registers into the vcpu.
+>  See KVM_GET_SREGS2 for the data structures.
+>  This ioctl (when supported) replaces the KVM_SET_SREGS.
+>  
+> +4.133 KVM_GET_STATS_FD
+> +----------------------
+> +
+> +:Capability: KVM_CAP_STATS_BINARY_FD
+> +:Architectures: all
+> +:Type: vm ioctl, vcpu ioctl
+> +:Parameters: none
+> +:Returns: statistics file descriptor on success, < 0 on error
+> +
+> +Errors:
+> +
+> +  ======     ======================================================
+> +  ENOMEM     if the fd could not be created due to lack of memory
+> +  EMFILE     if the number of opened files exceeds the limit
+> +  ======     ======================================================
+> +
+> +The file descriptor can be used to read VM/vCPU statistics data in binary
+> +format. The file data is organized into three blocks as below:
+> ++-------------+
+> +|   Header    |
+> ++-------------+
+> +| Descriptors |
+> ++-------------+
+> +| Stats Data  |
+> ++-------------+
+> +
+> +The Header block is always at the start of the file. It is only needed to be
+> +read one time for the lifetime of the file descriptor.
+> +It is in the form of ``struct kvm_stats_header`` as below::
+> +
+> +	#define KVM_STATS_ID_MAXLEN		64
+> +
+> +	struct kvm_stats_header {
+> +		__u32 name_size;
+> +		__u32 count;
+> +		__u32 desc_offset;
+> +		__u32 data_offset;
+> +		char id[0];
+> +	};
+> +
+> +The ``id`` field is identification for the corresponding KVM statistics. For
+> +VM statistics, it is in the form of "kvm-{kvm pid}", like "kvm-12345". For
+> +VCPU statistics, it is in the form of "kvm-{kvm pid}/vcpu-{vcpu id}", like
+> +"kvm-12345/vcpu-12".
+> +
+> +The ``name_size`` field is the size (byte) of the statistics name string
+> +(including trailing '\0') appended to the end of every statistics descriptor.
+> +
+> +The ``count`` field is the number of statistics.
+> +
+> +The ``desc_offset`` field is the offset of the Descriptors block from the start
+> +of the file indicated by the file descriptor.
+> +
+> +The ``data_offset`` field is the offset of the Stats Data block from the start
+> +of the file indicated by the file descriptor.
+> +
+> +The Descriptors block is only needed to be read once for the lifetime of the
+> +file descriptor. It is an array of ``struct kvm_stats_desc`` as shown in
+> +below code block::
+> +
+> +	#define KVM_STATS_TYPE_SHIFT		0
+> +	#define KVM_STATS_TYPE_MASK		(0xF << KVM_STATS_TYPE_SHIFT)
+> +	#define KVM_STATS_TYPE_CUMULATIVE	(0x0 << KVM_STATS_TYPE_SHIFT)
+> +	#define KVM_STATS_TYPE_INSTANT		(0x1 << KVM_STATS_TYPE_SHIFT)
+> +	#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_INSTANT
+> +
+> +	#define KVM_STATS_UNIT_SHIFT		4
+> +	#define KVM_STATS_UNIT_MASK		(0xF << KVM_STATS_UNIT_SHIFT)
+> +	#define KVM_STATS_UNIT_NONE		(0x0 << KVM_STATS_UNIT_SHIFT)
+> +	#define KVM_STATS_UNIT_BYTES		(0x1 << KVM_STATS_UNIT_SHIFT)
+> +	#define KVM_STATS_UNIT_SECONDS		(0x2 << KVM_STATS_UNIT_SHIFT)
+> +	#define KVM_STATS_UNIT_CYCLES		(0x3 << KVM_STATS_UNIT_SHIFT)
+> +	#define KVM_STATS_UNIT_MAX		KVM_STATS_UNIT_CYCLES
+> +
+> +	#define KVM_STATS_BASE_SHIFT		8
+> +	#define KVM_STATS_BASE_MASK		(0xF << KVM_STATS_BASE_SHIFT)
+> +	#define KVM_STATS_BASE_POW10		(0x0 << KVM_STATS_BASE_SHIFT)
+> +	#define KVM_STATS_BASE_POW2		(0x1 << KVM_STATS_BASE_SHIFT)
+> +	#define KVM_STATS_BASE_MAX		KVM_STATS_BASE_POW2
+> +
+> +	struct kvm_stats_desc {
+> +		__u32 flags;
+> +		__s16 exponent;
+> +		__u16 size;
+> +		__u32 offset;
+> +		__u32 unused;
+> +		char name[0];
+> +	};
+> +
+> +The ``flags`` field contains the type and unit of the statistics data described
+> +by this descriptor. The following flags are supported:
+> +
+> +Bits 0-3 of ``flags`` encode the type:
+> +  * ``KVM_STATS_TYPE_CUMULATIVE``
+> +    The statistics data is cumulative. The value of data can only be increased.
+> +    Most of the counters used in KVM are of this type.
+> +    The corresponding ``count`` field for this type is always 1.
+> +  * ``KVM_STATS_TYPE_INSTANT``
+> +    The statistics data is instantaneous. Its value can be increased or
+> +    decreased. This type is usually used as a measurement of some resources,
+> +    like the number of dirty pages, the number of large pages, etc.
+> +    The corresponding ``count`` field for this type is always 1.
+> +
+> +Bits 4-7 of ``flags`` encode the unit:
+> +  * ``KVM_STATS_UNIT_NONE``
+> +    There is no unit for the value of statistics data. This usually means that
+> +    the value is a simple counter of an event.
+> +  * ``KVM_STATS_UNIT_BYTES``
+> +    It indicates that the statistics data is used to measure memory size, in the
+> +    unit of Byte, KiByte, MiByte, GiByte, etc. The unit of the data is
+> +    determined by the ``exponent`` field in the descriptor. The
+> +    ``KVM_STATS_BASE_POW2`` flag is valid in this case. The unit of the data is
+> +    determined by ``pow(2, exponent)``. For example, if value is 10,
+> +    ``exponent`` is 20, which means the unit of statistics data is MiByte, we
+> +    can get the statistics data in the unit of Byte by
+> +    ``value * pow(2, exponent) = 10 * pow(2, 20) = 10 MiByte`` which is
+> +    10 * 1024 * 1024 Bytes.
+> +  * ``KVM_STATS_UNIT_SECONDS``
+> +    It indicates that the statistics data is used to measure time/latency, in
+> +    the unit of nanosecond, microsecond, millisecond and second. The unit of the
+> +    data is determined by the ``exponent`` field in the descriptor. The
+> +    ``KVM_STATS_BASE_POW10`` flag is valid in this case. The unit of the data
+> +    is determined by ``pow(10, exponent)``. For example, if value is 2000000,
+> +    ``exponent`` is -6, which means the unit of statistics data is microsecond,
+> +    we can get the statistics data in the unit of second by
+> +    ``value * pow(10, exponent) = 2000000 * pow(10, -6) = 2 seconds``.
+> +  * ``KVM_STATS_UNIT_CYCLES``
+> +    It indicates that the statistics data is used to measure CPU clock cycles.
+> +    The ``KVM_STATS_BASE_POW10`` flag is valid in this case. For example, if
+> +    value is 200, ``exponent`` is 4, we can get the number of CPU clock cycles
+> +    by ``value * pow(10, exponent) = 200 * pow(10, 4) = 2000000``.
+> +
+> +Bits 8-11 of ``flags`` encode the base:
+> +  * ``KVM_STATS_BASE_POW10``
+> +    The scale is based on power of 10. It is used for measurement of time and
+> +    CPU clock cycles.
+> +  * ``KVM_STATS_BASE_POW2``
+> +    The scale is based on power of 2. It is used for measurement of memory size.
+> +
+> +The ``exponent`` field is the scale of corresponding statistics data. For
+> +example, if the unit is ``KVM_STATS_UNIT_BYTES``, the base is
+> +``KVM_STATS_BASE_POW2``, the ``exponent`` is 10, then we know that the real
+> +unit of the statistics data is KBytes a.k.a pow(2, 10) = 1024 bytes.
+> +
+> +The ``size`` field is the number of values (u64) of this statistics data. Its
+> +value is usually 1 for most of simple statistics.
+> +
+> +The ``offset`` field is the offset from the start of Data Block to the start of
+> +the corresponding statistics data.
+> +
+> +The ``unused`` fields are reserved for future support for other types of
+> +statistics data, like log/linear histogram.
+> +
+> +The ``name`` field points to the name string of the statistics data. The name
+> +string starts at the end of ``struct kvm_stats_desc``.
+> +The maximum length (including trailing '\0') is indicated by ``name_size``
+> +in ``struct kvm_stats_header``.
+> +
+> +The Stats Data block contains an array of data values of type ``struct
+> +kvm_vm_stats_data`` or ``struct kvm_vcpu_stats_data``. It would be read by
+> +userspace periodically to pull statistics data.
+> +The order of data value in Stats Data block is the same as the order of
+> +descriptors in Descriptors block.
+> +  * Statistics data for VM/VCPU::
+> +
+> +	struct kvm_stats_data {
+> +		__u64 value[0];
+> +	};
 
-This H_CALL can query either all the attributes at once with
-firstAttributeId = 0, flags = 0 as well as query only one attribute
-at a time with firstAttributeId = id
+I forgot to comment on this one, sorry for the delay.
 
-The output buffer consists of the following
-1. number of attributes              - 8 bytes
-2. array offset to the data location - 8 bytes
-3. version info                      - 1 byte
-4. A data array of size num attributes, which contains the following:
-  a. attribute ID              - 8 bytes
-  b. attribute value in number - 8 bytes
-  c. attribute name in string  - 64 bytes
-  d. attribute value in string - 64 bytes
+Why are you "inventing" your own schema format here for this?  Why not
+use a well-known or at least well-designed/implemented one that we have
+in userspace already?
 
-The new H_CALL exports information in direct string value format, hence
-a new interface has been introduced in
-/sys/firmware/papr/energy_scale_info to export this information to
-userspace in an extensible pass-through format.
+There are a few that I would love to see in the kernel, varlink being
+the best example.  We have kernel examples of this and I would consider
+using that as a transport for sysfs-like data in the future, but never
+got around to it.
 
-The H_CALL returns the name, numeric value and string value (if exists)
+So again, why reinvent the wheel to create a custom api when you could
+use an existing one?
 
-The format of exposing the sysfs information is as follows:
-/sys/firmware/papr/energy_scale_info/
-   |-- <id>/
-     |-- desc
-     |-- value
-     |-- value_desc (if exists)
-   |-- <id>/
-     |-- desc
-     |-- value
-     |-- value_desc (if exists)
-...
+thanks,
 
-The energy information that is exported is useful for userspace tools
-such as powerpc-utils. Currently these tools infer the
-"power_mode_data" value in the lparcfg, which in turn is obtained from
-the to be deprecated H_GET_EM_PARMS H_CALL.
-On future platforms, such userspace utilities will have to look at the
-data returned from the new H_CALL being populated in this new sysfs
-interface and report this information directly without the need of
-interpretation.
-
-Signed-off-by: Pratik R. Sampat <psampat@linux.ibm.com>
----
- .../sysfs-firmware-papr-energy-scale-info     |  26 ++
- arch/powerpc/include/asm/hvcall.h             |  21 +-
- arch/powerpc/kvm/trace_hv.h                   |   1 +
- arch/powerpc/platforms/pseries/Makefile       |   3 +-
- .../pseries/papr_platform_attributes.c        | 292 ++++++++++++++++++
- 5 files changed, 341 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/ABI/testing/sysfs-firmware-papr-energy-scale-info
- create mode 100644 arch/powerpc/platforms/pseries/papr_platform_attributes.c
-
-diff --git a/Documentation/ABI/testing/sysfs-firmware-papr-energy-scale-info b/Documentation/ABI/testing/sysfs-firmware-papr-energy-scale-info
-new file mode 100644
-index 000000000000..499bc1ae173a
---- /dev/null
-+++ b/Documentation/ABI/testing/sysfs-firmware-papr-energy-scale-info
-@@ -0,0 +1,26 @@
-+What:		/sys/firmware/papr/energy_scale_info
-+Date:		June 2021
-+Contact:	Linux for PowerPC mailing list <linuxppc-dev@ozlabs.org>
-+Description:	Director hosting a set of platform attributes on Linux
-+		running as a PAPR guest.
-+
-+		Each file in a directory contains a platform
-+		attribute hierarchy pertaining to performance/
-+		energy-savings mode and processor frequency.
-+
-+What:		/sys/firmware/papr/energy_scale_info/<id>
-+		/sys/firmware/papr/energy_scale_info/<id>/desc
-+		/sys/firmware/papr/energy_scale_info/<id>/value
-+		/sys/firmware/papr/energy_scale_info/<id>/value_desc
-+Date:		June 2021
-+Contact:	Linux for PowerPC mailing list <linuxppc-dev@ozlabs.org>
-+Description:	PAPR attributes directory for POWERVM servers
-+
-+		This directory provides PAPR information. It
-+		contains below sysfs attributes:
-+
-+		- desc: File contains the name of attribute <id>
-+
-+		- value: Numeric value of attribute <id>
-+
-+		- value_desc: String value of attribute <id>
-diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
-index e3b29eda8074..19a2a8c77a49 100644
---- a/arch/powerpc/include/asm/hvcall.h
-+++ b/arch/powerpc/include/asm/hvcall.h
-@@ -316,7 +316,8 @@
- #define H_SCM_PERFORMANCE_STATS 0x418
- #define H_RPT_INVALIDATE	0x448
- #define H_SCM_FLUSH		0x44C
--#define MAX_HCALL_OPCODE	H_SCM_FLUSH
-+#define H_GET_ENERGY_SCALE_INFO	0x450
-+#define MAX_HCALL_OPCODE	H_GET_ENERGY_SCALE_INFO
- 
- /* Scope args for H_SCM_UNBIND_ALL */
- #define H_UNBIND_SCOPE_ALL (0x1)
-@@ -631,6 +632,24 @@ struct hv_gpci_request_buffer {
- 	uint8_t bytes[HGPCI_MAX_DATA_BYTES];
- } __packed;
- 
-+#define MAX_EM_ATTRS	10
-+#define MAX_EM_DATA_BYTES \
-+	(sizeof(struct energy_scale_attributes) * MAX_EM_ATTRS)
-+struct energy_scale_attributes {
-+	__be64 attr_id;
-+	__be64 attr_value;
-+	unsigned char attr_desc[64];
-+	unsigned char attr_value_desc[64];
-+} __packed;
-+
-+struct hv_energy_scale_buffer {
-+	__be64 num_attr;
-+	__be64 array_offset;
-+	__u8 data_header_version;
-+	unsigned char data[MAX_EM_DATA_BYTES];
-+} __packed;
-+
-+
- #endif /* __ASSEMBLY__ */
- #endif /* __KERNEL__ */
- #endif /* _ASM_POWERPC_HVCALL_H */
-diff --git a/arch/powerpc/kvm/trace_hv.h b/arch/powerpc/kvm/trace_hv.h
-index 830a126e095d..38cd0ed0a617 100644
---- a/arch/powerpc/kvm/trace_hv.h
-+++ b/arch/powerpc/kvm/trace_hv.h
-@@ -115,6 +115,7 @@
- 	{H_VASI_STATE,			"H_VASI_STATE"}, \
- 	{H_ENABLE_CRQ,			"H_ENABLE_CRQ"}, \
- 	{H_GET_EM_PARMS,		"H_GET_EM_PARMS"}, \
-+	{H_GET_ENERGY_SCALE_INFO,	"H_GET_ENERGY_SCALE_INFO"}, \
- 	{H_SET_MPP,			"H_SET_MPP"}, \
- 	{H_GET_MPP,			"H_GET_MPP"}, \
- 	{H_HOME_NODE_ASSOCIATIVITY,	"H_HOME_NODE_ASSOCIATIVITY"}, \
-diff --git a/arch/powerpc/platforms/pseries/Makefile b/arch/powerpc/platforms/pseries/Makefile
-index c8a2b0b05ac0..d14fca89ac25 100644
---- a/arch/powerpc/platforms/pseries/Makefile
-+++ b/arch/powerpc/platforms/pseries/Makefile
-@@ -6,7 +6,8 @@ obj-y			:= lpar.o hvCall.o nvram.o reconfig.o \
- 			   of_helpers.o \
- 			   setup.o iommu.o event_sources.o ras.o \
- 			   firmware.o power.o dlpar.o mobility.o rng.o \
--			   pci.o pci_dlpar.o eeh_pseries.o msi.o
-+			   pci.o pci_dlpar.o eeh_pseries.o msi.o \
-+			   papr_platform_attributes.o
- obj-$(CONFIG_SMP)	+= smp.o
- obj-$(CONFIG_SCANLOG)	+= scanlog.o
- obj-$(CONFIG_KEXEC_CORE)	+= kexec.o
-diff --git a/arch/powerpc/platforms/pseries/papr_platform_attributes.c b/arch/powerpc/platforms/pseries/papr_platform_attributes.c
-new file mode 100644
-index 000000000000..498c74a5e9ab
---- /dev/null
-+++ b/arch/powerpc/platforms/pseries/papr_platform_attributes.c
-@@ -0,0 +1,292 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * PAPR platform energy attributes driver
-+ *
-+ * This driver creates a sys file at /sys/firmware/papr/ which contains
-+ * files keyword - value pairs that specify energy configuration of the system.
-+ *
-+ * Copyright 2021 IBM Corp.
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/types.h>
-+#include <linux/errno.h>
-+#include <linux/init.h>
-+#include <linux/seq_file.h>
-+#include <linux/slab.h>
-+#include <linux/uaccess.h>
-+#include <linux/hugetlb.h>
-+#include <asm/lppaca.h>
-+#include <asm/hvcall.h>
-+#include <asm/firmware.h>
-+#include <asm/time.h>
-+#include <asm/prom.h>
-+#include <asm/vdso_datapage.h>
-+#include <asm/vio.h>
-+#include <asm/mmu.h>
-+#include <asm/machdep.h>
-+#include <asm/drmem.h>
-+
-+#include "pseries.h"
-+
-+#define MAX_ATTRS	3
-+#define MAX_NAME_LEN	16
-+
-+struct papr_attr {
-+	u64 id;
-+	struct kobj_attribute attr;
-+};
-+struct papr_group {
-+	char name[MAX_NAME_LEN];
-+	struct attribute_group pg;
-+	struct papr_attr *pgattrs;
-+} *pgs;
-+
-+struct kobject *papr_kobj;
-+struct kobject *escale_kobj;
-+struct hv_energy_scale_buffer *em_buf;
-+struct energy_scale_attributes *ea;
-+
-+static ssize_t papr_show_desc(struct kobject *kobj,
-+			       struct kobj_attribute *attr,
-+			       char *buf)
-+{
-+	struct papr_attr *pattr = container_of(attr, struct papr_attr, attr);
-+	int idx, ret = 0;
-+
-+	/*
-+	 * We do not expect the name to change, hence use the old value
-+	 * and save a HCALL
-+	 */
-+	for (idx = 0; idx < be64_to_cpu(em_buf->num_attr); idx++) {
-+		if (pattr->id == be64_to_cpu(ea[idx].attr_id)) {
-+			ret = sprintf(buf, "%s\n", ea[idx].attr_desc);
-+			if (ret < 0)
-+				ret = -EIO;
-+			break;
-+		}
-+	}
-+
-+	return ret;
-+}
-+
-+static ssize_t papr_show_value(struct kobject *kobj,
-+				struct kobj_attribute *attr,
-+				char *buf)
-+{
-+	struct papr_attr *pattr = container_of(attr, struct papr_attr, attr);
-+	struct hv_energy_scale_buffer *t_buf;
-+	struct energy_scale_attributes *t_ea;
-+	int data_offset, ret = 0;
-+
-+	t_buf = kmalloc(sizeof(*t_buf), GFP_KERNEL);
-+	if (t_buf == NULL)
-+		return -ENOMEM;
-+
-+	ret = plpar_hcall_norets(H_GET_ENERGY_SCALE_INFO, 0,
-+				 pattr->id, virt_to_phys(t_buf),
-+				 sizeof(*t_buf));
-+
-+	if (ret != H_SUCCESS) {
-+		pr_warn("hcall failed: H_GET_ENERGY_SCALE_INFO");
-+		goto out;
-+	}
-+
-+	data_offset = be64_to_cpu(t_buf->array_offset) -
-+			(sizeof(t_buf->num_attr) +
-+			sizeof(t_buf->array_offset) +
-+			sizeof(t_buf->data_header_version));
-+
-+	t_ea = (struct energy_scale_attributes *) &t_buf->data[data_offset];
-+
-+	ret = sprintf(buf, "%llu\n", be64_to_cpu(t_ea->attr_value));
-+	if (ret < 0)
-+		ret = -EIO;
-+out:
-+	kfree(t_buf);
-+
-+	return ret;
-+}
-+
-+static ssize_t papr_show_value_desc(struct kobject *kobj,
-+				     struct kobj_attribute *attr,
-+				     char *buf)
-+{
-+	struct papr_attr *pattr = container_of(attr, struct papr_attr, attr);
-+	struct hv_energy_scale_buffer *t_buf;
-+	struct energy_scale_attributes *t_ea;
-+	int data_offset, ret = 0;
-+
-+	t_buf = kmalloc(sizeof(*t_buf), GFP_KERNEL);
-+	if (t_buf == NULL)
-+		return -ENOMEM;
-+
-+	ret = plpar_hcall_norets(H_GET_ENERGY_SCALE_INFO, 0,
-+				 pattr->id, virt_to_phys(t_buf),
-+				 sizeof(*t_buf));
-+
-+	if (ret != H_SUCCESS) {
-+		pr_warn("hcall failed: H_GET_ENERGY_SCALE_INFO");
-+		goto out;
-+	}
-+
-+	data_offset = be64_to_cpu(t_buf->array_offset) -
-+			(sizeof(t_buf->num_attr) +
-+			sizeof(t_buf->array_offset) +
-+			sizeof(t_buf->data_header_version));
-+
-+	t_ea = (struct energy_scale_attributes *) &t_buf->data[data_offset];
-+
-+	ret = sprintf(buf, "%s\n", t_ea->attr_value_desc);
-+	if (ret < 0)
-+		ret = -EIO;
-+out:
-+	kfree(t_buf);
-+
-+	return ret;
-+}
-+
-+static struct papr_ops_info {
-+	const char *attr_name;
-+	ssize_t (*show)(struct kobject *kobj, struct kobj_attribute *attr,
-+			char *buf);
-+} ops_info[] = {
-+	{ "desc", papr_show_desc },
-+	{ "value", papr_show_value },
-+	{ "value_desc", papr_show_value_desc },
-+};
-+
-+static void add_attr(u64 id, int index, struct papr_attr *attr)
-+{
-+	attr->id = id;
-+	sysfs_attr_init(&attr->attr.attr);
-+	attr->attr.attr.name = ops_info[index].attr_name;
-+	attr->attr.attr.mode = 0444;
-+	attr->attr.show = ops_info[index].show;
-+}
-+
-+static int add_attr_group(u64 id, int len, struct papr_group *pg,
-+			  bool show_val_desc)
-+{
-+	int i;
-+
-+	for (i = 0; i < len; i++) {
-+		if (!strcmp(ops_info[i].attr_name, "value_desc") &&
-+		    !show_val_desc) {
-+			continue;
-+		}
-+		add_attr(id, i, &pg->pgattrs[i]);
-+		pg->pg.attrs[i] = &pg->pgattrs[i].attr.attr;
-+	}
-+
-+	return sysfs_create_group(escale_kobj, &pg->pg);
-+}
-+
-+
-+static int __init papr_init(void)
-+{
-+	uint64_t num_attr;
-+	int ret, idx, i, data_offset;
-+
-+	em_buf = kmalloc(sizeof(*em_buf), GFP_KERNEL);
-+	if (em_buf == NULL)
-+		return -ENOMEM;
-+	/*
-+	 * hcall(
-+	 * uint64 H_GET_ENERGY_SCALE_INFO,  // Get energy scale info
-+	 * uint64 flags,            // Per the flag request
-+	 * uint64 firstAttributeId, // The attribute id
-+	 * uint64 bufferAddress,    // Guest physical address of the output buffer
-+	 * uint64 bufferSize);      // The size in bytes of the output buffer
-+	 */
-+	ret = plpar_hcall_norets(H_GET_ENERGY_SCALE_INFO, 0, 0,
-+				 virt_to_phys(em_buf), sizeof(*em_buf));
-+
-+	if (!firmware_has_feature(FW_FEATURE_LPAR) || ret != H_SUCCESS ||
-+	    em_buf->data_header_version != 0x1) {
-+		pr_warn("hcall failed: H_GET_ENERGY_SCALE_INFO");
-+		goto out;
-+	}
-+
-+	num_attr = be64_to_cpu(em_buf->num_attr);
-+
-+	/*
-+	 * Typecast the energy buffer to the attribute structure at the offset
-+	 * specified in the buffer
-+	 */
-+	data_offset = be64_to_cpu(em_buf->array_offset) -
-+			(sizeof(em_buf->num_attr) +
-+			sizeof(em_buf->array_offset) +
-+			sizeof(em_buf->data_header_version));
-+
-+	ea = (struct energy_scale_attributes *) &em_buf->data[data_offset];
-+
-+	pgs = kcalloc(num_attr, sizeof(*pgs), GFP_KERNEL);
-+	if (!pgs)
-+		goto out_pgs;
-+
-+	papr_kobj = kobject_create_and_add("papr", firmware_kobj);
-+	if (!papr_kobj) {
-+		pr_warn("kobject_create_and_add papr failed\n");
-+		goto out_kobj;
-+	}
-+
-+	escale_kobj = kobject_create_and_add("energy_scale_info", papr_kobj);
-+	if (!escale_kobj) {
-+		pr_warn("kobject_create_and_add energy_scale_info failed\n");
-+		goto out_ekobj;
-+	}
-+
-+	for (idx = 0; idx < num_attr; idx++) {
-+		char buf[4];
-+		bool show_val_desc = true;
-+
-+		pgs[idx].pgattrs = kcalloc(MAX_ATTRS,
-+					   sizeof(*pgs[idx].pgattrs),
-+					   GFP_KERNEL);
-+		if (!pgs[idx].pgattrs)
-+			goto out_kobj;
-+
-+		pgs[idx].pg.attrs = kcalloc(MAX_ATTRS + 1,
-+					    sizeof(*pgs[idx].pg.attrs),
-+					    GFP_KERNEL);
-+		if (!pgs[idx].pg.attrs) {
-+			kfree(pgs[idx].pgattrs);
-+			goto out_kobj;
-+		}
-+
-+		sprintf(buf, "%lld", be64_to_cpu(ea[idx].attr_id));
-+		pgs[idx].pg.name = buf;
-+
-+		/* Do not add the value description if it does not exist */
-+		if (strlen(ea[idx].attr_value_desc) == 0)
-+			show_val_desc = false;
-+
-+		if (add_attr_group(be64_to_cpu(ea[idx].attr_id),
-+				   MAX_ATTRS, &pgs[idx], show_val_desc)) {
-+			pr_warn("Failed to create papr attribute group %s\n",
-+				pgs[idx].pg.name);
-+			goto out_pgattrs;
-+		}
-+	}
-+
-+	return 0;
-+
-+out_pgattrs:
-+	for (i = 0; i < MAX_ATTRS; i++) {
-+		kfree(pgs[i].pgattrs);
-+		kfree(pgs[i].pg.attrs);
-+	}
-+out_ekobj:
-+	kobject_put(escale_kobj);
-+out_kobj:
-+	kobject_put(papr_kobj);
-+out_pgs:
-+	kfree(pgs);
-+out:
-+	kfree(em_buf);
-+
-+	return -ENOMEM;
-+}
-+
-+machine_device_initcall(pseries, papr_init);
--- 
-2.30.2
-
+greg k-h
