@@ -2,161 +2,105 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D7BF3A83B1
-	for <lists+kvm-ppc@lfdr.de>; Tue, 15 Jun 2021 17:09:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3758E3A8D28
+	for <lists+kvm-ppc@lfdr.de>; Wed, 16 Jun 2021 02:03:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231396AbhFOPLw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 15 Jun 2021 11:11:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33058 "EHLO mail.kernel.org"
+        id S231143AbhFPAFV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 15 Jun 2021 20:05:21 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:59133 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231384AbhFOPLw (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 15 Jun 2021 11:11:52 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BD5D361607;
-        Tue, 15 Jun 2021 15:09:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623769788;
-        bh=xZ2c9FIXhMbs/nAc5HgGETR1BJI49Ytt9JNbgvnEq8M=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=pFxQ1DygVFWH6WhCEX1XkUcl+Um8krpg8kri6TPmzs528TAujGfdcjpnjcg2KXZG5
-         m8fismt/jkHNtUTH4mo9gOv3T2gUTN9YPc5tbRKnC2fXpIeVe505oO1u1CQKUhoDlI
-         q1xmmN3Qxf13g8YVhK1iSRuklfGGvn4Roa6BiVsVfJh5dQ2JhIbsU1RUr8ACquizSj
-         rEpd1EhiBo5l+Y/67fU3/tP/OC4smDsGEQj3pK3kbNmHqX+yuEXyPdP4+v8a82rD6J
-         Sdr1IszhSvhHjgJfc5vg5FQzVYLogNsbJDqIvov7ic7OT6ZjVRCOrKGdnu9xRc5G0U
-         giQEYxgp0utVQ==
-Date:   Tue, 15 Jun 2021 10:09:46 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     linuxppc-dev@lists.ozlabs.org,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, Yongji Xie <elohimes@gmail.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Gavin Shan <gwshan@linux.vnet.ibm.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Russell Currey <ruscur@russell.cc>, linux-pci@vger.kernel.org,
-        Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH kernel v2] powerpc/powernv: Reserve a hole which appears
- after enabling IOV
-Message-ID: <20210615150946.GA2881072@bjorn-Precision-5520>
+        id S229811AbhFPAFU (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Tue, 15 Jun 2021 20:05:20 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4G4QPY3GL1z9sRf;
+        Wed, 16 Jun 2021 10:03:13 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1623801794;
+        bh=KmCcyhOsKNECgzYxI+K5ya4vSQmMsByh3se6X2pbJxM=;
+        h=From:To:Subject:In-Reply-To:References:Date:From;
+        b=rG6PucE0qnbHJUQsvwl61MI2R9+EKUsLHuXThKkh4sR+mivSWBIX8eHcWOAIVQeAV
+         hYq5tfNwGZcoeUxw5jEemyogZ5jTLz3BqeMacEF57e6N4c69y0NQ3iaF+wkY9xRLd5
+         TM5DHyfPwavFJvWg/0fnbiPmU8iQSo+IY+Fmkm1q0FPI/0MT2rk6WHol+cMCjKU82j
+         dZ7/+M1HXINretSGpODV3QZ2TRBg71n1msiqCqEBL6ZKOmMgpQFOTKjaftIkloyCki
+         d8evTzOeecYjGmj/qYcDi+DIGb3LF7S2ftniv3ZqxUnit0MHeAEQv3x1pR61hc2T/f
+         DvyjZYQDftt/g==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Fabiano Rosas <farosas@linux.ibm.com>,
+        Pratik Sampat <psampat@linux.ibm.com>,
+        benh@kernel.crashing.org, paulus@samba.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pratik.r.sampat@gmail.com
+Subject: Re: [RFC] powerpc/pseries: Interface to represent PAPR firmware
+ attributes
+In-Reply-To: <87tum6vb58.fsf@linux.ibm.com>
+References: <20210604163501.51511-1-psampat@linux.ibm.com>
+ <87wnr4uhs9.fsf@linux.ibm.com>
+ <5c9cb57b-e9d8-0361-8be7-60dc9618db34@linux.ibm.com>
+ <87tum6vb58.fsf@linux.ibm.com>
+Date:   Wed, 16 Jun 2021 10:03:11 +1000
+Message-ID: <875yyeu14w.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170927065231.20382-1-aik@ozlabs.ru>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Sep 27, 2017 at 04:52:31PM +1000, Alexey Kardashevskiy wrote:
-> In order to make generic IOV code work, the physical function IOV BAR
-> should start from offset of the first VF. Since M64 segments share
-> PE number space across PHB, and some PEs may be in use at the time
-> when IOV is enabled, the existing code shifts the IOV BAR to the index
-> of the first PE/VF. This creates a hole in IOMEM space which can be
-> potentially taken by some other device.
-> 
-> This reserves a temporary hole on a parent and releases it when IOV is
-> disabled; the temporary resources are stored in pci_dn to avoid
-> kmalloc/free.
-> 
-> Cc: linux-pci@vger.kernel.org
-> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Cc: Bjorn Helgaas <bhelgaas@google.com>
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> 
-> I assume this goes to powerpc next branch but before this I'd like to
-> get Bjorn's opinion as he continously commented on this bit.
-> 
-> This is the diff in /proc/iomem:
-> 
-> @@ -11,6 +11,7 @@
->          200800000000-200bffffffff : 0000:04:00.0
->  210000000000-21fdffffffff : /pciex@3fffe40100000
->    210000000000-21fdfff0ffff : PCI Bus 0001:01
-> +    210000000000-210009ffffff : pnv_iov_reserved
->      21000a000000-2101ffffffff : 0001:01:00.0
->        21000a000000-21000bffffff : 0001:01:00.2
->          21000a000000-21000bffffff : mlx5_core
-> 
-> ---
-> Changes:
-> v2:
-> * changed order - now devm_release_resource() is called before
-> pci_update_resource(). Strangely the opposite did not produce a warning
-> but still
-> ---
->  arch/powerpc/include/asm/pci-bridge.h     |  1 +
->  arch/powerpc/platforms/powernv/pci-ioda.c | 24 +++++++++++++++++++++---
->  2 files changed, 22 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/powerpc/include/asm/pci-bridge.h b/arch/powerpc/include/asm/pci-bridge.h
-> index 0b8aa1fe2d5f..62ed83db04ae 100644
-> --- a/arch/powerpc/include/asm/pci-bridge.h
-> +++ b/arch/powerpc/include/asm/pci-bridge.h
-> @@ -218,6 +218,7 @@ struct pci_dn {
->  #endif
->  	struct list_head child_list;
->  	struct list_head list;
-> +	struct resource holes[PCI_SRIOV_NUM_BARS];
->  };
->  
->  /* Get the pointer to a device_node's pci_dn */
-> diff --git a/arch/powerpc/platforms/powernv/pci-ioda.c b/arch/powerpc/platforms/powernv/pci-ioda.c
-> index 57f9e55f4352..d66a758b8efb 100644
-> --- a/arch/powerpc/platforms/powernv/pci-ioda.c
-> +++ b/arch/powerpc/platforms/powernv/pci-ioda.c
-> @@ -1002,9 +1002,12 @@ static int pnv_pci_vf_resource_shift(struct pci_dev *dev, int offset)
->  	}
->  
->  	/*
-> -	 * After doing so, there would be a "hole" in the /proc/iomem when
-> -	 * offset is a positive value. It looks like the device return some
-> -	 * mmio back to the system, which actually no one could use it.
-> +	 * Since M64 BAR shares segments among all possible 256 PEs,
-> +	 * we have to shift the beginning of PF IOV BAR to make it start from
-> +	 * the segment which belongs to the PE number assigned to the first VF.
-> +	 * This creates a "hole" in the /proc/iomem which could be used for
-> +	 * allocating other resources so we reserve this area below and
-> +	 * release when IOV is released.
->  	 */
->  	for (i = 0; i < PCI_SRIOV_NUM_BARS; i++) {
->  		res = &dev->resource[i + PCI_IOV_RESOURCES];
-> @@ -1018,7 +1021,22 @@ static int pnv_pci_vf_resource_shift(struct pci_dev *dev, int offset)
->  		dev_info(&dev->dev, "VF BAR%d: %pR shifted to %pR (%sabling %d VFs shifted by %d)\n",
->  			 i, &res2, res, (offset > 0) ? "En" : "Dis",
->  			 num_vfs, offset);
-> +
-> +		if (offset < 0) {
-> +			devm_release_resource(&dev->dev, &pdn->holes[i]);
-> +			memset(&pdn->holes[i], 0, sizeof(pdn->holes[i]));
-> +		}
-> +
->  		pci_update_resource(dev, i + PCI_IOV_RESOURCES);
-> +
-> +		if (offset > 0) {
-> +			pdn->holes[i].start = res2.start;
-> +			pdn->holes[i].end = res2.start + size * offset - 1;
-> +			pdn->holes[i].flags = IORESOURCE_BUS;
-> +			pdn->holes[i].name = "pnv_iov_reserved";
-> +			devm_request_resource(&dev->dev, res->parent,
-> +					&pdn->holes[i]);
+Fabiano Rosas <farosas@linux.ibm.com> writes:
+> Pratik Sampat <psampat@linux.ibm.com> writes:
+...
+>>>
+>>>> The new H_CALL exports information in direct string value format, hence
+>>>> a new interface has been introduced in /sys/firmware/papr to export
+>>> Hm.. Maybe this should be something less generic than "papr"?
+>>
+>> The interface naming was inspired from /sys/firmware/opal's naming convention.
+>> We believed the name PAPR could serve as more generic name to be used by both
+>> Linux running on PHYP and linux on KVM.
+>
+> Right, I agree with that rationale, but /opal has identifiable elements
+> in it whereas /papr would have the generic "attr_X_name", which does not
+> give much hint about what they are.
+>
+> We also expect people to iterate the "attr_X_*" files, so if we decide
+> to add something else under /papr in the future, that would potentially
+> cause issues with any tool that just lists the content of the directory.
+>
+> So maybe we should be proactive and put the hcall stuff inside a
+> subdirectory already. /papr/energy_scale_attrs comes to mind, but I
+> don't have a strong opinion on the particular name.
 
-Does this actually work as you intended?  It looks wrong to set
-"pdn->holes[i].flags = IORESOURCE_BUS" and then use res->parent,
-an IORESOURCE_MEM resource, as the root.
+Maybe we should use the descriptive part of the hcall.
 
-I didn't figure out what actually happens.  Maybe nothing, since I
-don't see anything in the
+So H_GET_ENERGY_SCALE_INFO -> ../papr/energy_scale_info/
 
-  devm_request_resource
-    request_resource_conflict
-      __request_resource
+That should help avoid any naming confusion, because every hcall should
+have a unique name.
 
-path that actually *looks* at "flags".  But it doesn't look right.
+In future if there's ever a H_GET_ENERGY_SCALE_INFO_2 we would then have
+to decide if we expose that as a separate directory, or more likely we
+would handle that in the kernel and continue to use the existing sysfs
+name.
 
-> +		}
->  	}
->  	return 0;
->  }
-> -- 
-> 2.11.0
-> 
+...
+
+> Based on all the new information you provided, I'd say present all the
+> data and group it under the ID:
+>
+> /sys/firmware/papr/energy_scale_attrs/
+>    |-- <id>/
+>      |-- desc
+>      |-- value
+>      |-- value_desc
+>    |-- <id>/
+>      |-- desc
+>      |-- value
+>      |-- value_desc
+
+Yeah that seems reasonable.
+
+I'd think we should just omit the value_desc if it's empty.
+
+cheers
