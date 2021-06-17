@@ -2,33 +2,64 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97BB63AAD76
-	for <lists+kvm-ppc@lfdr.de>; Thu, 17 Jun 2021 09:24:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D317B3AB26C
+	for <lists+kvm-ppc@lfdr.de>; Thu, 17 Jun 2021 13:23:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230075AbhFQH0j (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 17 Jun 2021 03:26:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50350 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229580AbhFQH0i (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 17 Jun 2021 03:26:38 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B5C0A61241;
-        Thu, 17 Jun 2021 07:24:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1623914671;
-        bh=kNxTxEwPcYv3NN2DfpZ8GnBN8QRikI5mGsAdJMShdj8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=vmjn0HbF4vDkLycAFVfFgocX33s32jQVUNaGP0J3DSVKZAgg2IaQrobYDvDawDma7
-         x3ikJMr5SuhJwFPLP6HEpPDeER5nEM2UPQEAeKtSe//vF6YDonr90WBlk5yNgc90ZN
-         Ffb7TLPNWmUzQseIO/Xbs7cENsIfzLUJos/2MPo0=
-Date:   Thu, 17 Jun 2021 09:24:28 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Jing Zhang <jingzhangos@google.com>
+        id S231147AbhFQLZW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 17 Jun 2021 07:25:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36441 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232478AbhFQLZW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 17 Jun 2021 07:25:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1623928994;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QeoOEjtdTbZHikE6qVHZkIHtsqJ8oL1MWdn59al3yJU=;
+        b=KiOL1LFF+OgPuMHfkFB29XSzACHA+dYkMsh4QdObGEwoiC4M9Cfx+eOeqjszUd5dEgyNOb
+        fPv/7ChKcrC6RcOYFSrd+Zw8I1AF5l/fsHPV8Au8xZn5ScOAr/yTefDhHvahW5X+WAX4wp
+        mSHHZ+3mKmhpt8vpyrvzGhh/MARfuH0=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-2x6qlpWyP3iTS5r2WD4NMA-1; Thu, 17 Jun 2021 07:23:13 -0400
+X-MC-Unique: 2x6qlpWyP3iTS5r2WD4NMA-1
+Received: by mail-ej1-f72.google.com with SMTP id mh17-20020a170906eb91b0290477da799023so1352983ejb.1
+        for <kvm-ppc@vger.kernel.org>; Thu, 17 Jun 2021 04:23:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QeoOEjtdTbZHikE6qVHZkIHtsqJ8oL1MWdn59al3yJU=;
+        b=Dhhgcdrm73nGl3AWBK9Du3jzPj5DAgiPt1OGFTJyDxHIiMw/+3mD88nskHqX2Q3qjv
+         Iz/iLWR5G60n9ZMY8LpnuuvYDbo4NXDyEIhXqU23hi7IReWPAdEYMicMojx+wfV4xgRA
+         bwe7lekL5LFlCEJnqiaQxSjw3g3IZFUz7jBgMiHvnRmWIvyJ6DbwXBfpJ1sZ7TABnbbi
+         KVP2xsFJFSBSCkUGkBun60TGu/8sf5JBqfWKyAmCGc1bv24pfStlXKvRHB6e/SLF8tof
+         11CWiuj6/5F/cerRxFD0IsjyrF5LAyjdibfJ1194aGQQ9M7ivmVmsCeuVbkLV7Wom9eR
+         Ri/g==
+X-Gm-Message-State: AOAM531mkDnY9dtRI2Vs8Qh2UTWfBm+gRO+F5gw4tKo+EwI1Om8nkfao
+        dHssdOebK+AG8XdHGbnXFcOnjPYtFG6tG2vz1LE3ti6W9K33AKaq28+BT12rs77sjmWIm5Ol8aw
+        dMAywuGWt/4/tpHYSlw==
+X-Received: by 2002:a05:6402:268f:: with SMTP id w15mr5799047edd.228.1623928793192;
+        Thu, 17 Jun 2021 04:19:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzc8lc8kbfFsQbKsVnuEADgPqEmYVAvmC/1IvjtxjrXOO4gKYpFUgt0NPkDolV15GoZuo9rTg==
+X-Received: by 2002:a05:6402:268f:: with SMTP id w15mr5799027edd.228.1623928793011;
+        Thu, 17 Jun 2021 04:19:53 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id e18sm3537900ejh.64.2021.06.17.04.19.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jun 2021 04:19:52 -0700 (PDT)
+Subject: Re: [PATCH v10 3/5] KVM: stats: Add documentation for binary
+ statistics interface
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        Jing Zhang <jingzhangos@google.com>
 Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
         LinuxMIPS <linux-mips@vger.kernel.org>,
         KVMPPC <kvm-ppc@vger.kernel.org>,
         LinuxS390 <linux-s390@vger.kernel.org>,
         Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
@@ -54,119 +85,41 @@ Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
         Ricardo Koller <ricarkol@google.com>,
         Krish Sadhukhan <krish.sadhukhan@oracle.com>,
         Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v10 2/5] KVM: stats: Add fd-based API to read binary
- stats data
-Message-ID: <YMr4rArKvj3obDEM@kroah.com>
 References: <20210617044146.2667540-1-jingzhangos@google.com>
- <20210617044146.2667540-3-jingzhangos@google.com>
+ <20210617044146.2667540-4-jingzhangos@google.com>
+ <YMrmqOxDWJ2/8sfD@kroah.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <be506135-5bc3-31bd-1b20-063f01f41df1@redhat.com>
+Date:   Thu, 17 Jun 2021 13:19:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210617044146.2667540-3-jingzhangos@google.com>
+In-Reply-To: <YMrmqOxDWJ2/8sfD@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 04:41:43AM +0000, Jing Zhang wrote:
-> Provides a file descriptor per VM to read VM stats info/data.
-> Provides a file descriptor per vCPU to read vCPU stats info/data.
+On 17/06/21 08:07, Greg KH wrote:
+>> The statistics data itself could be read out by userspace telemetry
+>> periodically without any extra parsing or setup effort.
+> Do you have a pointer to userspace code that can do such a thing that
+> others can use?  We do not like adding apis to the kernel without at
+> least seeing the user of those apis, especially for complex things like
+> this.
+> 
+> Ideally you would include some library code in the kernel tree itself
+> that everyone can use for this for their own programs.  You have
+> provided a test which is great, but how do we know it works for "real"
+> usages?
 
-Shouldn't this be two separate patches, one for each thing as these are
-two different features being added?
+I am pretty sure that Google is using this internally, but we are also 
+going to work on QEMU and Libvirt support for this.
 
-Anyway, an implementation question for both of these:
+As for the rest, thanks for the review---I'll let Jing act on it and 
+only add my own remarks in a couple places.
 
-> +static ssize_t kvm_stats_read(struct _kvm_stats_header *header,
-> +		struct _kvm_stats_desc *desc, void *stats, size_t size_stats,
-> +		char __user *user_buffer, size_t size, loff_t *offset)
-> +{
-> +	ssize_t copylen, len, remain = size;
+Paolo
 
-You are "burying" the fact that remain is initialized here, not nice, I
-totally missed it when reading this the first time.
-
-This should be:
-	ssize_t copylen;
-	ssize_t len;
-	ssize_t remain = size;
-to be obvious.
-
-Remember you will be looking at this code for the next 20 years, make it
-easy to read.
-
-> +	size_t size_header, size_desc;
-> +	loff_t pos = *offset;
-> +	char __user *dest = user_buffer;
-> +	void *src;
-> +
-> +	size_header = sizeof(*header);
-> +	size_desc = header->header.count * sizeof(*desc);
-> +
-> +	len = size_header + size_desc + size_stats - pos;
-> +	len = min(len, remain);
-> +	if (len <= 0)
-> +		return 0;
-> +	remain = len;
-> +
-> +	/* Copy kvm stats header */
-> +	copylen = size_header - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)header + pos;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-
-I thought you said that you would not provide the header for each read,
-if you keep reading from the fd.  It looks like you are adding it here
-to each read, or is there some "magic" with pos happening here that I do
-not understand?
-
-And if there is "magic" with pos, you should document it as it's not
-very obvious :)
-
-> +	/* Copy kvm stats descriptors */
-> +	copylen = header->header.desc_offset + size_desc - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)desc + pos - header->header.desc_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +	/* Copy kvm stats values */
-
-New lines between code blocks of doing things?
-
-And again, why copy the decriptor again?  or is it being skipped
-somehow?  Ah, I think I see how it's being skipped, if I look really
-closely.  But again, it's not obvious, and I could be wrong.  Please
-document this REALLY well.
-
-Write code for the developer first, compiler second.  Again, you are
-going to be maintaining it for 20+ years, think of your future self...
-
-
-> +	copylen = header->header.data_offset + size_stats - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = stats + pos - header->header.data_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +
-> +	*offset = pos;
-> +	return len;
-> +}
-
-thanks,
-
-greg k-h
