@@ -2,377 +2,149 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D02C3AC6B4
-	for <lists+kvm-ppc@lfdr.de>; Fri, 18 Jun 2021 11:02:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79B5D3ACB11
+	for <lists+kvm-ppc@lfdr.de>; Fri, 18 Jun 2021 14:34:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232369AbhFRJE4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 18 Jun 2021 05:04:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40270 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232103AbhFRJEz (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 18 Jun 2021 05:04:55 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15I8f19g019814;
-        Fri, 18 Jun 2021 05:02:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : reply-to : references : mime-version : content-type
- : content-transfer-encoding : in-reply-to; s=pp1;
- bh=Pg0zM2dtclEhNemHoloIgjkrcrHg3YgthVTEdexPR3Q=;
- b=A0NJRJ2UvBHSYvFx9rxZJNgJVhwYjsGajwzIanPS8xX4jwVsPSH9C2sVmEgxDqbvSLXx
- ETvdxX7aWUWc4GQ9GZQII/UCLhnGI6aV0GxQjq2kAMnrOYx/DSik1bctmTnWCl2QFh6N
- Kt02HIE01mWPstj+H94XwVBs4noVgfUVLqEwRlw/ck+tBws/XRGw4Esel6pVftaInODL
- WTpdJzJoAAje0suLLpUbXlhSnF7LMOg5GuvT7DRY5yDPRA0KXdHDHcw5G0/ThSYO2wBW
- caf/nG4poSpFmCZo/XeLkosEa4hAq76UuWSCsLcQnuH6Kddz9aadD1nHy6YPmmqtreKA QQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 398p4t3tkv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Jun 2021 05:02:22 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15I8fYgQ020677;
-        Fri, 18 Jun 2021 05:02:21 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 398p4t3tkc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Jun 2021 05:02:21 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15I8wDLW000742;
-        Fri, 18 Jun 2021 09:02:19 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma01dal.us.ibm.com with ESMTP id 394mjb3t2j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Jun 2021 09:02:19 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15I92IIj35127640
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Jun 2021 09:02:19 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D91F7AC069;
-        Fri, 18 Jun 2021 09:02:18 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AEA66AC068;
-        Fri, 18 Jun 2021 09:02:17 +0000 (GMT)
-Received: from sofia.ibm.com (unknown [9.85.91.58])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 18 Jun 2021 09:02:17 +0000 (GMT)
-Received: by sofia.ibm.com (Postfix, from userid 1000)
-        id 6520A2E2D42; Fri, 18 Jun 2021 14:32:08 +0530 (IST)
-Date:   Fri, 18 Jun 2021 14:32:08 +0530
-From:   Gautham R Shenoy <ego@linux.vnet.ibm.com>
-To:     "Pratik R. Sampat" <psampat@linux.ibm.com>
-Cc:     mpe@ellerman.id.au, benh@kernel.crashing.org, paulus@samba.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pratik.r.sampat@gmail.com
-Subject: Re: [PATCH 1/1] powerpc/pseries: Interface to represent PAPR
- firmware attributes
-Message-ID: <20210618090208.GA17177@in.ibm.com>
-Reply-To: ego@linux.vnet.ibm.com
-References: <20210616134240.62195-1-psampat@linux.ibm.com>
- <20210616134240.62195-2-psampat@linux.ibm.com>
+        id S230315AbhFRMgv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 18 Jun 2021 08:36:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47346 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231676AbhFRMgo (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 18 Jun 2021 08:36:44 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C6FBC06175F
+        for <kvm-ppc@vger.kernel.org>; Fri, 18 Jun 2021 05:34:33 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id z22so13785074ljh.8
+        for <kvm-ppc@vger.kernel.org>; Fri, 18 Jun 2021 05:34:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nZ8eZKcheetAVVtntDyOPDczvB8LGNmHxynp06Hwje4=;
+        b=gem9n2oV7siw83AG8SlRs8mVxwOwxCy2gN2ftYt8Cz67bhgXmc2w00MxcPfoZ9mJpB
+         sg/wSDsX34t83RRTKbk6Qs27kQStSxWG3HjPj6/XU2HOoxB14lnA7+ishARi3u47qouL
+         A9ohAwN083OUKOdmoDlEFBPNodXkFN6VPz2ttTDC0uxV7v+gu+6Hw710eM5GaIYooO8/
+         4DUDPjLNVyihbqd7JbECs734pUsTIHIC8tGN5Xt1IgghNHNM+TbucaOhD480OZ4REs27
+         VL6ufqWcV+HYsEvcDPLjJJRwT4Lbxi6EUqfyDmTWaim1b0e8tq3/RkTCwRFcYY1isfOT
+         aZhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nZ8eZKcheetAVVtntDyOPDczvB8LGNmHxynp06Hwje4=;
+        b=NppzKHNIDcCVROYVHnitRaNE919G7MjjSfV3e3fzlkYrx5FJm5PC6kBhQcz6ksw8sU
+         /WJT18QbL6QTdGdS9UPaHXQKA5PrSR4j1HSa5maT0BnXZcag4WRtvNzVa1jEDTZReKFC
+         R5pj/phcGmg1EZDvqyJPb8ERRbjDw8cVpJ8iF/q473KfILz4XhJUZrER6WBEteOw2e0z
+         274wmyyuinEOyAdJFtsqhDiTjdMDBKWyS0Z5fnlC9SxW4gWjiexNiPTvFUfQpT3yAm9v
+         xNAkIdbEfmc+CB3Mqxe2hXLucD9dONt2+QjR2VV67oTdz9Kjx6zAo3TUfFn8kP6SojVg
+         nX8g==
+X-Gm-Message-State: AOAM53326PJAqCkSKwYLsBPwgk/xSb9s5DSi1p8AMZ5zY6DeKx6PNkeV
+        ubZSRrveqnZSjgiQ/ZG02ee6nzB2IV/cW21tOyBCOw==
+X-Google-Smtp-Source: ABdhPJy/SmtmBEa6EeaTOLzSOUyOJ0FCW1v/VcB96xzGJFrUogLnnlSkPebfytnB2OvvIcWiKdLH+1HCeEh87E18VuA=
+X-Received: by 2002:a2e:bf21:: with SMTP id c33mr9245298ljr.28.1624019671303;
+ Fri, 18 Jun 2021 05:34:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210616134240.62195-2-psampat@linux.ibm.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: OZwy5X-67dE-h8POmSsMm9x8h7FhaL6K
-X-Proofpoint-ORIG-GUID: bp2lgI44CtKvYTYD999DUF78QxHG2Ryi
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-17_17:2021-06-15,2021-06-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- clxscore=1011 bulkscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0
- priorityscore=1501 mlxlogscore=999 phishscore=0 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2106180048
+References: <20210618044819.3690166-1-jingzhangos@google.com>
+ <20210618044819.3690166-4-jingzhangos@google.com> <YMxD/NxAvKkXB2iM@kroah.com>
+In-Reply-To: <YMxD/NxAvKkXB2iM@kroah.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Fri, 18 Jun 2021 07:34:19 -0500
+Message-ID: <CAAdAUti86QZY+KT+NLnLyYf0P09_p5AWhXMmT7+mSt1r=OVEfA@mail.gmail.com>
+Subject: Re: [PATCH v11 3/7] KVM: stats: Support binary stats retrieval for a VM
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Jun 16, 2021 at 07:12:40PM +0530, Pratik R. Sampat wrote:
-> Adds a generic interface to represent the energy and frequency related
-> PAPR attributes on the system using the new H_CALL
-> "H_GET_ENERGY_SCALE_INFO".
-> 
-> H_GET_EM_PARMS H_CALL was previously responsible for exporting this
-> information in the lparcfg, however the H_GET_EM_PARMS H_CALL
-> will be deprecated P10 onwards.
-> 
-> The H_GET_ENERGY_SCALE_INFO H_CALL is of the following call format:
-> hcall(
->   uint64 H_GET_ENERGY_SCALE_INFO,  // Get energy scale info
->   uint64 flags,           // Per the flag request
->   uint64 firstAttributeId,// The attribute id
->   uint64 bufferAddress,   // Guest physical address of the output buffer
->   uint64 bufferSize       // The size in bytes of the output buffer
-> );
-> 
-> This H_CALL can query either all the attributes at once with
-> firstAttributeId = 0, flags = 0 as well as query only one attribute
-> at a time with firstAttributeId = id
+On Fri, Jun 18, 2021 at 1:58 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+> On Fri, Jun 18, 2021 at 04:48:15AM +0000, Jing Zhang wrote:
+> > Add a VM ioctl to get a statistics file descriptor by which a read
+> > functionality is provided for userspace to read out VM stats header,
+> > descriptors and data.
+> > Define VM statistics descriptors and header for all architectures.
+> >
+> > Reviewed-by: David Matlack <dmatlack@google.com>
+> > Reviewed-by: Ricardo Koller <ricarkol@google.com>
+> > Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> > Reviewed-by: Fuad Tabba <tabba@google.com>
+> > Tested-by: Fuad Tabba <tabba@google.com> #arm64
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/kvm/guest.c    | 14 +++++++++++++
+> >  arch/mips/kvm/mips.c      | 14 +++++++++++++
+> >  arch/powerpc/kvm/book3s.c | 16 +++++++++++++++
+> >  arch/powerpc/kvm/booke.c  | 16 +++++++++++++++
+> >  arch/s390/kvm/kvm-s390.c  | 19 +++++++++++++++++
+> >  arch/x86/kvm/x86.c        | 24 ++++++++++++++++++++++
+> >  include/linux/kvm_host.h  |  6 ++++++
+> >  virt/kvm/kvm_main.c       | 43 +++++++++++++++++++++++++++++++++++++++
+> >  8 files changed, 152 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index 4962331d01e6..f456d1defe2b 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -28,6 +28,20 @@
+> >
+> >  #include "trace.h"
+> >
+> > +struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+> > +     KVM_GENERIC_VM_STATS()
+> > +};
+> > +static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> > +             sizeof(struct kvm_vm_stat) / sizeof(u64));
+> > +
+> > +struct kvm_stats_header kvm_vm_stats_header = {
+>
+> Can this be const?
+>
+> > +     .name_size = KVM_STATS_NAME_LEN,
+> > +     .count = ARRAY_SIZE(kvm_vm_stats_desc),
+> > +     .desc_offset = sizeof(struct kvm_stats_header) + KVM_STATS_ID_MAXLEN,
+> > +     .data_offset = sizeof(struct kvm_stats_header) + KVM_STATS_ID_MAXLEN +
+> > +                    sizeof(kvm_vm_stats_desc),
+> > +};
+>
+> If it can't be const, what is modified in it that prevents that from
+> happening?
+>
+> thanks,
+>
+> greg k-h
+Yes, it can be const.
 
-
-For a single attribute, the “firstAttributeId” must be set by the
-caller to the attribute id to retrieve and the “singleAttribute” field
-in “flags” must also be set to a 1.
-
-If we don't set the "flags" to 1, while specifying a firstAttributeId,
-the hypervisor will populate the buffer with the details pertaining to
-all the attributes beginning with firstAttributeId.
-
-
-
-> 
-> The output buffer consists of the following
-> 1. number of attributes              - 8 bytes
-> 2. array offset to the data location - 8 bytes
-> 3. version info                      - 1 byte
-> 4. A data array of size num attributes, which contains the following:
->   a. attribute ID              - 8 bytes
->   b. attribute value in number - 8 bytes
->   c. attribute name in string  - 64 bytes
->   d. attribute value in string - 64 bytes
-> 
-[..snip..]
-
-> +
-> +static ssize_t papr_show_value(struct kobject *kobj,
-> +				struct kobj_attribute *attr,
-> +				char *buf)
-> +{
-> +	struct papr_attr *pattr = container_of(attr, struct papr_attr, attr);
-> +	struct hv_energy_scale_buffer *t_buf;
-> +	struct energy_scale_attributes *t_ea;
-> +	int data_offset, ret = 0;
-> +
-> +	t_buf = kmalloc(sizeof(*t_buf), GFP_KERNEL);
-> +	if (t_buf == NULL)
-> +		return -ENOMEM;
-> +
-> +	ret = plpar_hcall_norets(H_GET_ENERGY_SCALE_INFO, 0,
-> +				 pattr->id, virt_to_phys(t_buf),
-> +				 sizeof(*t_buf));
-> +
-
-
-In this case, since we are interested in only one attribute, we can
-make the call
-
-	ret = plpar_hcall_norets(H_GET_ENERGY_SCALE_INFO, 1,
-				 pattr->id, virt_to_phys(t_buf),
-				 sizeof(*t_buf));
-
-setting flags=1.
-
-Same in the function papr_show_value_desc() below
-
---
-Thanks and Regards
-gautham.
-
-
-> +	if (ret != H_SUCCESS) {
-> +		pr_warn("hcall failed: H_GET_ENERGY_SCALE_INFO");
-> +		goto out;
-> +	}
-> +
-> +	data_offset = be64_to_cpu(t_buf->array_offset) -
-> +			(sizeof(t_buf->num_attr) +
-> +			sizeof(t_buf->array_offset) +
-> +			sizeof(t_buf->data_header_version));
-> +
-> +	t_ea = (struct energy_scale_attributes *) &t_buf->data[data_offset];
-> +
-> +	ret = sprintf(buf, "%llu\n", be64_to_cpu(t_ea->attr_value));
-> +	if (ret < 0)
-> +		ret = -EIO;
-> +out:
-> +	kfree(t_buf);
-> +
-> +	return ret;
-> +}
-> +
-> +static ssize_t papr_show_value_desc(struct kobject *kobj,
-> +				     struct kobj_attribute *attr,
-> +				     char *buf)
-> +{
-> +	struct papr_attr *pattr = container_of(attr, struct papr_attr, attr);
-> +	struct hv_energy_scale_buffer *t_buf;
-> +	struct energy_scale_attributes *t_ea;
-> +	int data_offset, ret = 0;
-> +
-> +	t_buf = kmalloc(sizeof(*t_buf), GFP_KERNEL);
-> +	if (t_buf == NULL)
-> +		return -ENOMEM;
-> +
-> +	ret = plpar_hcall_norets(H_GET_ENERGY_SCALE_INFO, 0,
-> +				 pattr->id, virt_to_phys(t_buf),
-> +				 sizeof(*t_buf));
-> +
-> +	if (ret != H_SUCCESS) {
-> +		pr_warn("hcall failed: H_GET_ENERGY_SCALE_INFO");
-> +		goto out;
-> +	}
-> +
-> +	data_offset = be64_to_cpu(t_buf->array_offset) -
-> +			(sizeof(t_buf->num_attr) +
-> +			sizeof(t_buf->array_offset) +
-> +			sizeof(t_buf->data_header_version));
-> +
-> +	t_ea = (struct energy_scale_attributes *) &t_buf->data[data_offset];
-> +
-> +	ret = sprintf(buf, "%s\n", t_ea->attr_value_desc);
-> +	if (ret < 0)
-> +		ret = -EIO;
-> +out:
-> +	kfree(t_buf);
-> +
-> +	return ret;
-> +}
-> +
-> +static struct papr_ops_info {
-> +	const char *attr_name;
-> +	ssize_t (*show)(struct kobject *kobj, struct kobj_attribute *attr,
-> +			char *buf);
-> +} ops_info[] = {
-> +	{ "desc", papr_show_desc },
-> +	{ "value", papr_show_value },
-> +	{ "value_desc", papr_show_value_desc },
-> +};
-> +
-> +static void add_attr(u64 id, int index, struct papr_attr *attr)
-> +{
-> +	attr->id = id;
-> +	sysfs_attr_init(&attr->attr.attr);
-> +	attr->attr.attr.name = ops_info[index].attr_name;
-> +	attr->attr.attr.mode = 0444;
-> +	attr->attr.show = ops_info[index].show;
-> +}
-> +
-> +static int add_attr_group(u64 id, int len, struct papr_group *pg,
-> +			  bool show_val_desc)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < len; i++) {
-> +		if (!strcmp(ops_info[i].attr_name, "value_desc") &&
-> +		    !show_val_desc) {
-> +			continue;
-> +		}
-> +		add_attr(id, i, &pg->pgattrs[i]);
-> +		pg->pg.attrs[i] = &pg->pgattrs[i].attr.attr;
-> +	}
-> +
-> +	return sysfs_create_group(escale_kobj, &pg->pg);
-> +}
-> +
-> +
-> +static int __init papr_init(void)
-> +{
-> +	uint64_t num_attr;
-> +	int ret, idx, i, data_offset;
-> +
-> +	em_buf = kmalloc(sizeof(*em_buf), GFP_KERNEL);
-> +	if (em_buf == NULL)
-> +		return -ENOMEM;
-> +	/*
-> +	 * hcall(
-> +	 * uint64 H_GET_ENERGY_SCALE_INFO,  // Get energy scale info
-> +	 * uint64 flags,            // Per the flag request
-> +	 * uint64 firstAttributeId, // The attribute id
-> +	 * uint64 bufferAddress,    // Guest physical address of the output buffer
-> +	 * uint64 bufferSize);      // The size in bytes of the output buffer
-> +	 */
-> +	ret = plpar_hcall_norets(H_GET_ENERGY_SCALE_INFO, 0, 0,
-> +				 virt_to_phys(em_buf), sizeof(*em_buf));
-> +
-> +	if (!firmware_has_feature(FW_FEATURE_LPAR) || ret != H_SUCCESS ||
-> +	    em_buf->data_header_version != 0x1) {
-> +		pr_warn("hcall failed: H_GET_ENERGY_SCALE_INFO");
-> +		goto out;
-> +	}
-> +
-> +	num_attr = be64_to_cpu(em_buf->num_attr);
-> +
-> +	/*
-> +	 * Typecast the energy buffer to the attribute structure at the offset
-> +	 * specified in the buffer
-> +	 */
-> +	data_offset = be64_to_cpu(em_buf->array_offset) -
-> +			(sizeof(em_buf->num_attr) +
-> +			sizeof(em_buf->array_offset) +
-> +			sizeof(em_buf->data_header_version));
-> +
-> +	ea = (struct energy_scale_attributes *) &em_buf->data[data_offset];
-> +
-> +	pgs = kcalloc(num_attr, sizeof(*pgs), GFP_KERNEL);
-> +	if (!pgs)
-> +		goto out_pgs;
-> +
-> +	papr_kobj = kobject_create_and_add("papr", firmware_kobj);
-> +	if (!papr_kobj) {
-> +		pr_warn("kobject_create_and_add papr failed\n");
-> +		goto out_kobj;
-> +	}
-> +
-> +	escale_kobj = kobject_create_and_add("energy_scale_info", papr_kobj);
-> +	if (!escale_kobj) {
-> +		pr_warn("kobject_create_and_add energy_scale_info failed\n");
-> +		goto out_ekobj;
-> +	}
-> +
-> +	for (idx = 0; idx < num_attr; idx++) {
-> +		char buf[4];
-> +		bool show_val_desc = true;
-> +
-> +		pgs[idx].pgattrs = kcalloc(MAX_ATTRS,
-> +					   sizeof(*pgs[idx].pgattrs),
-> +					   GFP_KERNEL);
-> +		if (!pgs[idx].pgattrs)
-> +			goto out_kobj;
-> +
-> +		pgs[idx].pg.attrs = kcalloc(MAX_ATTRS + 1,
-> +					    sizeof(*pgs[idx].pg.attrs),
-> +					    GFP_KERNEL);
-> +		if (!pgs[idx].pg.attrs) {
-> +			kfree(pgs[idx].pgattrs);
-> +			goto out_kobj;
-> +		}
-> +
-> +		sprintf(buf, "%lld", be64_to_cpu(ea[idx].attr_id));
-> +		pgs[idx].pg.name = buf;
-> +
-> +		/* Do not add the value description if it does not exist */
-> +		if (strlen(ea[idx].attr_value_desc) == 0)
-> +			show_val_desc = false;
-> +
-> +		if (add_attr_group(be64_to_cpu(ea[idx].attr_id),
-> +				   MAX_ATTRS, &pgs[idx], show_val_desc)) {
-> +			pr_warn("Failed to create papr attribute group %s\n",
-> +				pgs[idx].pg.name);
-> +			goto out_pgattrs;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +
-> +out_pgattrs:
-> +	for (i = 0; i < MAX_ATTRS; i++) {
-> +		kfree(pgs[i].pgattrs);
-> +		kfree(pgs[i].pg.attrs);
-> +	}
-> +out_ekobj:
-> +	kobject_put(escale_kobj);
-> +out_kobj:
-> +	kobject_put(papr_kobj);
-> +out_pgs:
-> +	kfree(pgs);
-> +out:
-> +	kfree(em_buf);
-> +
-> +	return -ENOMEM;
-> +}
-> +
-> +machine_device_initcall(pseries, papr_init);
-> -- 
-> 2.30.2
-> 
+Thanks,
+Jing
