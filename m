@@ -2,258 +2,116 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76F3F3AF242
-	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Jun 2021 19:47:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 373303AF42F
+	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Jun 2021 20:05:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231500AbhFURtO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 21 Jun 2021 13:49:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47534 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230330AbhFURtO (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 21 Jun 2021 13:49:14 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51879C06175F
-        for <kvm-ppc@vger.kernel.org>; Mon, 21 Jun 2021 10:46:59 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id r5so31616780lfr.5
-        for <kvm-ppc@vger.kernel.org>; Mon, 21 Jun 2021 10:46:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FMJXegssnqpONPLczONIAO8+jgmEKTYKlSdaRff4HUA=;
-        b=bNnoexmihOl1CcryhmVv36Rjanlk/iMAQl9bFfd16w6MuIODaXTieL65lPs2H7bZqv
-         f4O/tDRcz3FqQQQHU2/x2rEqppsTSRBVDIcu34r6zucvqCEGlw7ds3oDBKxxxd9U3EsL
-         2uYRLNUwZ0cRhWENyKTyDpB/KmIUvLAZr8XAid4Q9hSdSFw3/scA7J2S3Kj1NIWtou6Q
-         W3DlJBdFka6CzOO2Rk1prqJgmgxeF0x4EwoFNqgNwBklgsMCSt7W/OWl/rvlLreJaSrL
-         CN1sbpdr5mYRX+7OaFrBeBrpgv76v9WvPMsA4Y8e5GMCkTOTc0MY/N5AmptXL4pRTLqa
-         YU7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FMJXegssnqpONPLczONIAO8+jgmEKTYKlSdaRff4HUA=;
-        b=BMHHF2/OyVRNWUcasFKgy82LT4ao/sR/J3IQAcCI55uibeRSeZj7c1/GMmIunppAUQ
-         z3g5QbjZ/VSBA7Oj8TxqEpbEjXaj9M808MHD/M0PYFIDt8PMwrprVh4ADvpJS3XHHNA9
-         L8rh9HZ5KHHguBELiuQE0nV01jo6T7vIwhK6nd0uEhN0SDR7MD5vmniWCS6CFzSzZ7Et
-         dEszvZim6r7IOnxxbKUJlM2kwX8PBuQBEAbCy4nL0HZtIv+e1JcELpvobheRQkzCIvo4
-         FAZvovp6eJQHtfvLC+7//mGZpyKwjSehrA2bx0CTHEa06JYqt1vYaG9WzvWc4mPquUZv
-         2xXQ==
-X-Gm-Message-State: AOAM530CQ5x9BlxBU5GuSSu7YwFQD3jEh2XkenDgBfVhkDTzJGlH17WP
-        a6nEx5SXkn6NcYENh3BtBfS8PRecteU5/aUPlHR3TOA79ME=
-X-Google-Smtp-Source: ABdhPJw5v74BJ4gFYne3uXqh8PwWAuCMlEwFfkqB3Kiz6G0K+WI5o4O+lwaJJg7O9+CNG6Qd/LAnulE6vGeoMEPuXcs=
-X-Received: by 2002:a05:6512:3187:: with SMTP id i7mr6455431lfe.106.1624297617286;
- Mon, 21 Jun 2021 10:46:57 -0700 (PDT)
+        id S233984AbhFUSHF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 21 Jun 2021 14:07:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45462 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234355AbhFUSFI (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 21 Jun 2021 14:05:08 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 53FC560698;
+        Mon, 21 Jun 2021 18:01:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1624298519;
+        bh=kkst86FkoHM+pRUOoeZDPqsO3ZnzxMS988/ImEZ57Lo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QODfhnKyo0ngjkOIeYBrnKGsMkqNVm66f1zG/7m94jOrmv659GzDGw6t+QxZxuCL8
+         L6viQNkCYFvFeTQjdurCYqOJ13GPbxi26WAo+TV3zgmU9+tgLG1b/zWE8hPfXY9T9z
+         LE4XiZOpSFQXrjvNKG63mr03i2MiN6fIOPkmjjt1boDFTfsx422lNGAcTqeQDrnWVj
+         4mYPzAyTeWuUgRwTy1mMRB7syGJOh1pXyn6/+wMa0aD4Rd6piDnm+WaxFB28ohbUMk
+         16F5DZk63cE0D8oQ/fPeqYQp7wE37tE5A3AS7T7TlRKNVzeP6JZCpZqNalFB66i3kv
+         3ddJI7/xTyoBQ==
+Date:   Mon, 21 Jun 2021 11:01:54 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+        kernel test robot <lkp@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        clang-built-linux@googlegroups.com, kbuild-all@lists.01.org,
+        Kees Cook <keescook@chromium.org>,
+        linux-kernel@vger.kernel.org,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
+Subject: Re: arch/powerpc/kvm/book3s_hv_nested.c:264:6: error: stack frame
+ size of 2304 bytes in function 'kvmhv_enter_nested_guest'
+Message-ID: <YNDUEoanTqvayZ5P@archlinux-ax161>
+References: <202104031853.vDT0Qjqj-lkp@intel.com>
+ <1624232938.d90brlmh3p.astroid@bobo.none>
+ <e6167885-30e5-d149-bcde-3e9ad9f5d381@kernel.org>
+ <87im273604.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-References: <20210618222709.1858088-1-jingzhangos@google.com>
- <20210618222709.1858088-3-jingzhangos@google.com> <0cde024e-a234-9a10-5157-d17ba423939e@redhat.com>
-In-Reply-To: <0cde024e-a234-9a10-5157-d17ba423939e@redhat.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Mon, 21 Jun 2021 12:46:46 -0500
-Message-ID: <CAAdAUtiL6DwJDWLLmUqct6B6n7Zaa2DyPhpwKZKb=cpRH+8+vQ@mail.gmail.com>
-Subject: Re: [PATCH v12 2/7] KVM: stats: Add fd-based API to read binary stats data
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Fuad Tabba <tabba@google.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87im273604.fsf@mpe.ellerman.id.au>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Jun 21, 2021 at 11:54 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 19/06/21 00:27, Jing Zhang wrote:
-> > +/**
-> > + * kvm_stats_read() - Common vm/vcpu stats read function to userspace.
->
-> Common function to read from the binary statistics file descriptor.
->
-> > + * @id: identification string of the stats
-> > + * @header: stats header for a vm or a vcpu
-> > + * @desc: start address of an array of stats descriptors for a vm or a vcpu
-> > + * @stats: start address of stats data block for a vm or a vcpu
-> > + * @size_stats: the size of stats data block pointed by @stats
-> > + * @user_buffer: start address of userspace buffer
-> > + * @size: requested read size from userspace
-> > + * @offset: the start position from which the content will be read for the
-> > + *          corresponding vm or vcp file descriptor
-> > + *
-> > + * The file content of a vm/vcpu file descriptor is now defined as below:
-> > + * +-------------+
-> > + * |   Header    |
-> > + * +-------------+
-> > + * |  id string  |
-> > + * +-------------+
-> > + * | Descriptors |
-> > + * +-------------+
-> > + * | Stats Data  |
-> > + * +-------------+
-> > + * Although this function allows userspace to read any amount of data (as long
-> > + * as in the limit) from any position, the typical usage would follow below
-> > + * steps:
-> > + * 1. Read header from offset 0. Get the offset of descriptors and stats data
-> > + *    and some other necessary information. This is a one-time work for the
-> > + *    lifecycle of the corresponding vm/vcpu stats fd.
-> > + * 2. Read id string from its offset. This is a one-time work for the lifecycle
-> > + *    of the corresponding vm/vcpu stats fd.
-> > + * 3. Read descriptors from its offset and discover all the stats by parsing
-> > + *    descriptors. This is a one-time work for the lifecycle of the
-> > + *    corresponding vm/vcpu stats fd.
-> > + * 4. Periodically read stats data from its offset using pread.
-> > + *
-> > + * Return: the number of bytes that has been successfully read
-> > + */
-> > +ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
-> > +                    const struct _kvm_stats_desc *desc,
-> > +                    void *stats, size_t size_stats,
-> > +                    char __user *user_buffer, size_t size, loff_t *offset)
->
->
-> You can replace the header argument with just the number of descriptors,
-> and then construct the header in the "if" statement below that copies it
-> to userspace:
->
-> const struct kvm_stats_header kvm_vm_stats_header = {
->         .name_size = KVM_STATS_NAME_SIZE,
->         .num_desc = num_desc,
-The problem is how we calculate the number of descriptors, which needs the
-size of the descriptor array for each architecture.
-Define another global variable to export the size of descriptor array?
->         .id_offset = size_header,
->         .desc_offset = size_header + KVM_STATS_NAME_SIZE,
->         .data_offset = size_header + KVM_STATS_NAME_SIZE +
->                        size_desc,
-> };
->
-> Of course size_header can be assigned with sizeof (struct kvm_stats_header).
->
-> This removes the definition of the header in each architecture.
->
-> Paolo
->
-> > +{
-> > +     ssize_t len;
-> > +     ssize_t copylen;
-> > +     ssize_t remain = size;
-> > +     size_t size_desc;
-> > +     size_t size_header;
-> > +     void *src;
-> > +     loff_t pos = *offset;
-> > +     char __user *dest = user_buffer;
-> > +
-> > +     size_header = sizeof(*header);
-> > +     size_desc = header->num_desc * sizeof(*desc);
-> > +
-> > +     len = KVM_STATS_NAME_SIZE + size_header + size_desc + size_stats - pos;
-> > +     len = min(len, remain);
-> > +     if (len <= 0)
-> > +             return 0;
-> > +     remain = len;
-> > +
-> > +     /*
-> > +      * Copy kvm stats header.
-> > +      * The header is the first block of content userspace usually read out.
-> > +      * The pos is 0 and the copylen and remain would be the size of header.
-> > +      * The copy of the header would be skipped if offset is larger than the
-> > +      * size of header. That usually happens when userspace reads stats
-> > +      * descriptors and stats data.
-> > +      */
-> > +     copylen = size_header - pos;
-> > +     copylen = min(copylen, remain);
-> > +     if (copylen > 0) {
-> > +             src = (void *)header + pos;
-> > +             if (copy_to_user(dest, src, copylen))
-> > +                     return -EFAULT;
-> > +             remain -= copylen;
-> > +             pos += copylen;
-> > +             dest += copylen;
-> > +     }
-> > +
-> > +     /*
-> > +      * Copy kvm stats header id string.
-> > +      * The id string is unique for every vm/vcpu, which is stored in kvm
-> > +      * and kvm_vcpu structure.
-> > +      * The id string is part of the stat header from the perspective of
-> > +      * userspace, it is usually read out together with previous constant
-> > +      * header part and could be skipped for later descriptors and stats
-> > +      * data readings.
-> > +      */
-> > +     copylen = size_header + KVM_STATS_NAME_SIZE - pos;
->
-> Should use header->id_offset instead of size_header here and in the
-> computation of src.
->
-> > +     copylen = min(copylen, remain);
-> > +     if (copylen > 0) {
-> > +             src = id + pos - size_header;
-> > +             if (copy_to_user(dest, src, copylen))
-> > +                     return -EFAULT;
-> > +             remain -= copylen;
-> > +             pos += copylen;
-> > +             dest += copylen;
-> > +     }
-> > +
-> > +     /*
-> > +      * Copy kvm stats descriptors.
-> > +      * The descriptors copy would be skipped in the typical case that
-> > +      * userspace periodically read stats data, since the pos would be
-> > +      * greater than the end address of descriptors
-> > +      * (header->header.desc_offset + size_desc) causing copylen <= 0.
-> > +      */
-> > +     copylen = header->desc_offset + size_desc - pos;
-> > +     copylen = min(copylen, remain);
-> > +     if (copylen > 0) {
-> > +             src = (void *)desc + pos - header->desc_offset;
-> > +             if (copy_to_user(dest, src, copylen))
-> > +                     return -EFAULT;
-> > +             remain -= copylen;
-> > +             pos += copylen;
-> > +             dest += copylen;
-> > +     }
-> > +
-> > +     /* Copy kvm stats values */
-> > +     copylen = header->data_offset + size_stats - pos;
-> > +     copylen = min(copylen, remain);
-> > +     if (copylen > 0) {
-> > +             src = stats + pos - header->data_offset;
-> > +             if (copy_to_user(dest, src, copylen))
-> > +                     return -EFAULT;
-> > +             remain -= copylen;
-> > +             pos += copylen;
-> > +             dest += copylen;
-> > +     }
-> > +
-> > +     *offset = pos;
-> > +     return len;
-> > +}
->
-Thanks,
-Jing
+On Mon, Jun 21, 2021 at 07:46:03PM +1000, Michael Ellerman wrote:
+> Nathan Chancellor <nathan@kernel.org> writes:
+> > On 6/20/2021 4:59 PM, Nicholas Piggin wrote:
+> >> Excerpts from kernel test robot's message of April 3, 2021 8:47 pm:
+> >>> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+> >>> head:   d93a0d43e3d0ba9e19387be4dae4a8d5b175a8d7
+> >>> commit: 97e4910232fa1f81e806aa60c25a0450276d99a2 linux/compiler-clang.h: define HAVE_BUILTIN_BSWAP*
+> >>> date:   3 weeks ago
+> >>> config: powerpc64-randconfig-r006-20210403 (attached as .config)
+> >>> compiler: clang version 13.0.0 (https://github.com/llvm/llvm-project 0fe8af94688aa03c01913c2001d6a1a911f42ce6)
+> >>> reproduce (this is a W=1 build):
+> >>>          wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+> >>>          chmod +x ~/bin/make.cross
+> >>>          # install powerpc64 cross compiling tool for clang build
+> >>>          # apt-get install binutils-powerpc64-linux-gnu
+> >>>          # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=97e4910232fa1f81e806aa60c25a0450276d99a2
+> >>>          git remote add linus https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> >>>          git fetch --no-tags linus master
+> >>>          git checkout 97e4910232fa1f81e806aa60c25a0450276d99a2
+> >>>          # save the attached .config to linux build tree
+> >>>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=powerpc64
+> >>>
+> >>> If you fix the issue, kindly add following tag as appropriate
+> >>> Reported-by: kernel test robot <lkp@intel.com>
+> >>>
+> >>> All errors (new ones prefixed by >>):
+> >>>
+> >>>>> arch/powerpc/kvm/book3s_hv_nested.c:264:6: error: stack frame size of 2304 bytes in function 'kvmhv_enter_nested_guest' [-Werror,-Wframe-larger-than=]
+> >>>     long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+> >>>          ^
+> >>>     1 error generated.
+> >>>
+> >>>
+> >>> vim +/kvmhv_enter_nested_guest +264 arch/powerpc/kvm/book3s_hv_nested.c
+> >> 
+> >> Not much changed here recently. It's not that big a concern because it's
+> >> only called in the KVM ioctl path, not in any deep IO paths or anything,
+> >> and doesn't recurse. Might be a bit of inlining or stack spilling put it
+> >> over the edge.
+> >
+> > It appears to be the fact that LLVM's PowerPC backend does not emit 
+> > efficient byteswap assembly:
+> >
+> > https://github.com/ClangBuiltLinux/linux/issues/1292
+> >
+> > https://bugs.llvm.org/show_bug.cgi?id=49610
+> >
+> >> powerpc does make it an error though, would be good to avoid that so the
+> >> robot doesn't keep tripping over.
+> >
+> > Marking byteswap_pt_regs as 'noinline_for_stack' drastically reduces the 
+> > stack usage. If that is an acceptable solution, I can send it along 
+> > tomorrow.
+> 
+> Yeah that should be OK. Can you post the before/after disassembly when
+> you post the patch?
+> 
+> It should just be two extra function calls, which shouldn't be enough
+> overhead to be measurable.
+
+The diff is pretty large so I have attached it here along with the full
+disassembly of the files before and after the patch I am about to send.
+I will reply to this message so the history is there.
+
+Cheers,
+Nathan
