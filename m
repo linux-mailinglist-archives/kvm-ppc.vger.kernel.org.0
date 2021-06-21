@@ -2,264 +2,341 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 653C53AF112
-	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Jun 2021 18:55:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89BB13AF18A
+	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Jun 2021 19:12:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232323AbhFUQ5f (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 21 Jun 2021 12:57:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21648 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233247AbhFUQ40 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 21 Jun 2021 12:56:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624294451;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=V6zZE8akrhvGvHpQPlV5MKIUMKjEzy8+Ripv6n6JNYY=;
-        b=fW7Mo9ND6ub6LGGRCgjSbkynPZkdJMzMIn8TAqO1PQkzFlHKocC5Nn5Mu7g3++x3uH9z+D
-        3Rl3MX97V9+VxByKgss24c+vinxjtj9qVuF5UHCAHINlf9t/yJvIxqUmjrBZyIeuFKQ5ce
-        gKqdxupMIZbmYIrXBJQyqhTKwDEI2VY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-599-KCPl2TvUPT-G2RKyM_gcHw-1; Mon, 21 Jun 2021 12:54:09 -0400
-X-MC-Unique: KCPl2TvUPT-G2RKyM_gcHw-1
-Received: by mail-wm1-f70.google.com with SMTP id v2-20020a7bcb420000b0290146b609814dso246164wmj.0
-        for <kvm-ppc@vger.kernel.org>; Mon, 21 Jun 2021 09:54:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=V6zZE8akrhvGvHpQPlV5MKIUMKjEzy8+Ripv6n6JNYY=;
-        b=Uex6+K8g3ir9vfRXtLsLTgEKBuDFR0VuRLP7wWsCt9dBaGcWhxwuDBC/cAHAxAbyLA
-         i8c1VLaWCm7LdmWJegrjAuSqQwYEEJdsDrFmNIxRFvu9ab0ovrZmyi7eOl2lQHGOHqLc
-         w6lGTNDON4duaBneRGNTiRIps8j+79iGzkVkLYP8j5fjx29SF6gUaCoJy1KDcEqj+EuX
-         FxoohZFSQAanH2NjrghIyc4pyzXKFgIIDUUKARRMGuOBAGxzS3eXNw7FNg19Y59bktMX
-         eDji8YnzNEiA5AMwS0/KhjsnXpV5zTEplKgmu5JPOvs0cOE6fjiV6vsCigeP/u2cWMFG
-         hu2w==
-X-Gm-Message-State: AOAM532Rs7lq/Vk2y4m6Na5EawbVGF1kJ/Nokw5N2qVbkUMXtRNMgLjD
-        BH6sC0JWvV4TvY+NY50ZUSATSfi9S/zxPDfNDGVkv+F9gwyVIcXLLGtrFljGSJ72js+XRJVCTeQ
-        jrIMealt53kSG7/Wx+g==
-X-Received: by 2002:adf:c790:: with SMTP id l16mr30126570wrg.121.1624294448714;
-        Mon, 21 Jun 2021 09:54:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFGKeK1C9aLsbZ5fRG1HBzWUJ6GrPEryjqbjN7Js4Yi7goQyQWGV98j24oQrMV7cmBtu0WdQ==
-X-Received: by 2002:adf:c790:: with SMTP id l16mr30126528wrg.121.1624294448496;
-        Mon, 21 Jun 2021 09:54:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p11sm8468508wre.57.2021.06.21.09.54.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Jun 2021 09:54:07 -0700 (PDT)
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Fuad Tabba <tabba@google.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-References: <20210618222709.1858088-1-jingzhangos@google.com>
- <20210618222709.1858088-3-jingzhangos@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v12 2/7] KVM: stats: Add fd-based API to read binary stats
- data
-Message-ID: <0cde024e-a234-9a10-5157-d17ba423939e@redhat.com>
-Date:   Mon, 21 Jun 2021 18:54:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S230392AbhFURPC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 21 Jun 2021 13:15:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53840 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230059AbhFURPC (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 21 Jun 2021 13:15:02 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7AE3260FF2;
+        Mon, 21 Jun 2021 17:12:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1624295567;
+        bh=8VLeKNLmsN8yXnBWPFldftKQFXRHteWlP0dfds+25Uo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZgsKpayFEaDCuVwz+OZinwWFqETsbJtTXJCiFObQdpFQX7NCwkGyNry1/4i+bxPwc
+         IgneRIQNtPf1tAqhMbCdTltryRoFFaERZhcV+IWsxlIeKJ+seoRPFfTOkft47bDJwH
+         9loBYe1aYLli1xB+U8ukIQQV93f7z/3US/mhPwRknJRw++1PwN2toUr3ytEzC1EpYb
+         5ZQ235QrnKRv7K6+p1Zt4S1PGDuJzSNmNtpUaSIugYEPniQnHLU7/Ud4GpOwlcPkRY
+         UcQIyMjxEP7Gb9a+wLXbspLqnDFlI70JkE1gfXsteZFJrJ8dr1a5TR4s45WBmY+lwM
+         qM4gNqlhViH2w==
+Date:   Mon, 21 Jun 2021 10:12:42 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Bharata B Rao <bharata@linux.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        farosas@linux.ibm.com, aneesh.kumar@linux.ibm.com,
+        npiggin@gmail.com, david@gibson.dropbear.id.au
+Subject: Re: [PATCH v8 4/6] KVM: PPC: Book3S HV: Nested support in
+ H_RPT_INVALIDATE
+Message-ID: <YNDIitJ3Hn1/G8Jw@Ryzen-9-3900X.localdomain>
+References: <20210621085003.904767-1-bharata@linux.ibm.com>
+ <20210621085003.904767-5-bharata@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210618222709.1858088-3-jingzhangos@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210621085003.904767-5-bharata@linux.ibm.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 19/06/21 00:27, Jing Zhang wrote:
-> +/**
-> + * kvm_stats_read() - Common vm/vcpu stats read function to userspace.
-
-Common function to read from the binary statistics file descriptor.
-
-> + * @id: identification string of the stats
-> + * @header: stats header for a vm or a vcpu
-> + * @desc: start address of an array of stats descriptors for a vm or a vcpu
-> + * @stats: start address of stats data block for a vm or a vcpu
-> + * @size_stats: the size of stats data block pointed by @stats
-> + * @user_buffer: start address of userspace buffer
-> + * @size: requested read size from userspace
-> + * @offset: the start position from which the content will be read for the
-> + *          corresponding vm or vcp file descriptor
+On Mon, Jun 21, 2021 at 02:20:01PM +0530, Bharata B Rao wrote:
+> Enable support for process-scoped invalidations from nested
+> guests and partition-scoped invalidations for nested guests.
+> 
+> Process-scoped invalidations for any level of nested guests
+> are handled by implementing H_RPT_INVALIDATE handler in the
+> nested guest exit path in L0.
+> 
+> Partition-scoped invalidation requests are forwarded to the
+> right nested guest, handled there and passed down to L0
+> for eventual handling.
+> 
+> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+> Signed-off-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+> 	[Nested guest partition-scoped invalidation changes]
+> ---
+>  .../include/asm/book3s/64/tlbflush-radix.h    |   4 +
+>  arch/powerpc/include/asm/kvm_book3s.h         |   3 +
+>  arch/powerpc/kvm/book3s_hv.c                  |  59 ++++++++-
+>  arch/powerpc/kvm/book3s_hv_nested.c           | 117 ++++++++++++++++++
+>  arch/powerpc/mm/book3s64/radix_tlb.c          |   4 -
+>  5 files changed, 180 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h b/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
+> index 8b33601cdb9d..a46fd37ad552 100644
+> --- a/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
+> +++ b/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
+> @@ -4,6 +4,10 @@
+>  
+>  #include <asm/hvcall.h>
+>  
+> +#define RIC_FLUSH_TLB 0
+> +#define RIC_FLUSH_PWC 1
+> +#define RIC_FLUSH_ALL 2
+> +
+>  struct vm_area_struct;
+>  struct mm_struct;
+>  struct mmu_gather;
+> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
+> index e6b53c6e21e3..caaa0f592d8e 100644
+> --- a/arch/powerpc/include/asm/kvm_book3s.h
+> +++ b/arch/powerpc/include/asm/kvm_book3s.h
+> @@ -307,6 +307,9 @@ void kvmhv_set_ptbl_entry(unsigned int lpid, u64 dw0, u64 dw1);
+>  void kvmhv_release_all_nested(struct kvm *kvm);
+>  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu);
+>  long kvmhv_do_nested_tlbie(struct kvm_vcpu *vcpu);
+> +long do_h_rpt_invalidate_pat(struct kvm_vcpu *vcpu, unsigned long lpid,
+> +			     unsigned long type, unsigned long pg_sizes,
+> +			     unsigned long start, unsigned long end);
+>  int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu,
+>  			  u64 time_limit, unsigned long lpcr);
+>  void kvmhv_save_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr);
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 7e6da4687d88..3d5b8ba3786d 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -925,6 +925,34 @@ static int kvmppc_get_yield_count(struct kvm_vcpu *vcpu)
+>  	return yield_count;
+>  }
+>  
+> +/*
+> + * H_RPT_INVALIDATE hcall handler for nested guests.
 > + *
-> + * The file content of a vm/vcpu file descriptor is now defined as below:
-> + * +-------------+
-> + * |   Header    |
-> + * +-------------+
-> + * |  id string  |
-> + * +-------------+
-> + * | Descriptors |
-> + * +-------------+
-> + * | Stats Data  |
-> + * +-------------+
-> + * Although this function allows userspace to read any amount of data (as long
-> + * as in the limit) from any position, the typical usage would follow below
-> + * steps:
-> + * 1. Read header from offset 0. Get the offset of descriptors and stats data
-> + *    and some other necessary information. This is a one-time work for the
-> + *    lifecycle of the corresponding vm/vcpu stats fd.
-> + * 2. Read id string from its offset. This is a one-time work for the lifecycle
-> + *    of the corresponding vm/vcpu stats fd.
-> + * 3. Read descriptors from its offset and discover all the stats by parsing
-> + *    descriptors. This is a one-time work for the lifecycle of the
-> + *    corresponding vm/vcpu stats fd.
-> + * 4. Periodically read stats data from its offset using pread.
-> + *
-> + * Return: the number of bytes that has been successfully read
+> + * Handles only nested process-scoped invalidation requests in L0.
 > + */
-> +ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
-> +		       const struct _kvm_stats_desc *desc,
-> +		       void *stats, size_t size_stats,
-> +		       char __user *user_buffer, size_t size, loff_t *offset)
-
-
-You can replace the header argument with just the number of descriptors, 
-and then construct the header in the "if" statement below that copies it 
-to userspace:
-
-const struct kvm_stats_header kvm_vm_stats_header = {
-	.name_size = KVM_STATS_NAME_SIZE,
-	.num_desc = num_desc,
-	.id_offset = size_header,
-	.desc_offset = size_header + KVM_STATS_NAME_SIZE,
-	.data_offset = size_header + KVM_STATS_NAME_SIZE +
-		       size_desc,
-};
-
-Of course size_header can be assigned with sizeof (struct kvm_stats_header).
-
-This removes the definition of the header in each architecture.
-
-Paolo
-
+> +static int kvmppc_nested_h_rpt_invalidate(struct kvm_vcpu *vcpu)
 > +{
-> +	ssize_t len;
-> +	ssize_t copylen;
-> +	ssize_t remain = size;
-> +	size_t size_desc;
-> +	size_t size_header;
-> +	void *src;
-> +	loff_t pos = *offset;
-> +	char __user *dest = user_buffer;
-> +
-> +	size_header = sizeof(*header);
-> +	size_desc = header->num_desc * sizeof(*desc);
-> +
-> +	len = KVM_STATS_NAME_SIZE + size_header + size_desc + size_stats - pos;
-> +	len = min(len, remain);
-> +	if (len <= 0)
-> +		return 0;
-> +	remain = len;
+> +	unsigned long type = kvmppc_get_gpr(vcpu, 6);
+> +	unsigned long pid, pg_sizes, start, end;
 > +
 > +	/*
-> +	 * Copy kvm stats header.
-> +	 * The header is the first block of content userspace usually read out.
-> +	 * The pos is 0 and the copylen and remain would be the size of header.
-> +	 * The copy of the header would be skipped if offset is larger than the
-> +	 * size of header. That usually happens when userspace reads stats
-> +	 * descriptors and stats data.
+> +	 * The partition-scoped invalidations aren't handled here in L0.
 > +	 */
-> +	copylen = size_header - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)header + pos;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
+> +	if (type & H_RPTI_TYPE_NESTED)
+> +		return RESUME_HOST;
 > +
-> +	/*
-> +	 * Copy kvm stats header id string.
-> +	 * The id string is unique for every vm/vcpu, which is stored in kvm
-> +	 * and kvm_vcpu structure.
-> +	 * The id string is part of the stat header from the perspective of
-> +	 * userspace, it is usually read out together with previous constant
-> +	 * header part and could be skipped for later descriptors and stats
-> +	 * data readings.
-> +	 */
-> +	copylen = size_header + KVM_STATS_NAME_SIZE - pos;
-
-Should use header->id_offset instead of size_header here and in the 
-computation of src.
-
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = id + pos - size_header;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
+> +	pid = kvmppc_get_gpr(vcpu, 4);
+> +	pg_sizes = kvmppc_get_gpr(vcpu, 7);
+> +	start = kvmppc_get_gpr(vcpu, 8);
+> +	end = kvmppc_get_gpr(vcpu, 9);
 > +
-> +	/*
-> +	 * Copy kvm stats descriptors.
-> +	 * The descriptors copy would be skipped in the typical case that
-> +	 * userspace periodically read stats data, since the pos would be
-> +	 * greater than the end address of descriptors
-> +	 * (header->header.desc_offset + size_desc) causing copylen <= 0.
-> +	 */
-> +	copylen = header->desc_offset + size_desc - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)desc + pos - header->desc_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
+> +	do_h_rpt_invalidate_prt(pid, vcpu->arch.nested->shadow_lpid,
+> +				type, pg_sizes, start, end);
 > +
-> +	/* Copy kvm stats values */
-> +	copylen = header->data_offset + size_stats - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = stats + pos - header->data_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +
-> +	*offset = pos;
-> +	return len;
+> +	kvmppc_set_gpr(vcpu, 3, H_SUCCESS);
+> +	return RESUME_GUEST;
 > +}
+> +
+>  static long kvmppc_h_rpt_invalidate(struct kvm_vcpu *vcpu,
+>  				    unsigned long id, unsigned long target,
+>  				    unsigned long type, unsigned long pg_sizes,
+> @@ -938,10 +966,18 @@ static long kvmppc_h_rpt_invalidate(struct kvm_vcpu *vcpu,
+>  
+>  	/*
+>  	 * Partition-scoped invalidation for nested guests.
+> -	 * Not yet supported
+>  	 */
+> -	if (type & H_RPTI_TYPE_NESTED)
+> -		return H_P3;
+> +	if (type & H_RPTI_TYPE_NESTED) {
+> +		if (!nesting_enabled(vcpu->kvm))
+> +			return H_FUNCTION;
+> +
+> +		/* Support only cores as target */
+> +		if (target != H_RPTI_TARGET_CMMU)
+> +			return H_P2;
+> +
+> +		return do_h_rpt_invalidate_pat(vcpu, id, type, pg_sizes,
+> +					       start, end);
+> +	}
+>  
+>  	/*
+>  	 * Process-scoped invalidation for L1 guests.
+> @@ -1629,6 +1665,23 @@ static int kvmppc_handle_nested_exit(struct kvm_vcpu *vcpu)
+>  		if (!xics_on_xive())
+>  			kvmppc_xics_rm_complete(vcpu, 0);
+>  		break;
+> +	case BOOK3S_INTERRUPT_SYSCALL:
+> +	{
+> +		unsigned long req = kvmppc_get_gpr(vcpu, 3);
+> +
+> +		/*
+> +		 * The H_RPT_INVALIDATE hcalls issued by nested
+> +		 * guests for process-scoped invalidations when
+> +		 * GTSE=0, are handled here in L0.
+> +		 */
+> +		if (req == H_RPT_INVALIDATE) {
+> +			r = kvmppc_nested_h_rpt_invalidate(vcpu);
+> +			break;
+> +		}
+> +
+> +		r = RESUME_HOST;
+> +		break;
+> +	}
+>  	default:
+>  		r = RESUME_HOST;
+>  		break;
+> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+> index 60724f674421..056d3df68de1 100644
+> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+> @@ -1214,6 +1214,123 @@ long kvmhv_do_nested_tlbie(struct kvm_vcpu *vcpu)
+>  	return H_SUCCESS;
+>  }
+>  
+> +static long do_tlb_invalidate_nested_tlb(struct kvm_vcpu *vcpu,
+> +					 unsigned long lpid,
+> +					 unsigned long page_size,
+> +					 unsigned long ap,
+> +					 unsigned long start,
+> +					 unsigned long end)
+> +{
+> +	unsigned long addr = start;
+> +	int ret;
+> +
+> +	do {
+> +		ret = kvmhv_emulate_tlbie_tlb_addr(vcpu, lpid, ap,
+> +						   get_epn(addr));
+> +		if (ret)
+> +			return ret;
+> +		addr += page_size;
+> +	} while (addr < end);
+> +
+> +	return ret;
+> +}
+> +
+> +static long do_tlb_invalidate_nested_all(struct kvm_vcpu *vcpu,
+> +					 unsigned long lpid, unsigned long ric)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct kvm_nested_guest *gp;
+> +
+> +	gp = kvmhv_get_nested(kvm, lpid, false);
+> +	if (gp) {
+> +		kvmhv_emulate_tlbie_lpid(vcpu, gp, ric);
+> +		kvmhv_put_nested(gp);
+> +	}
+> +	return H_SUCCESS;
+> +}
+> +
+> +/*
+> + * Number of pages above which we invalidate the entire LPID rather than
+> + * flush individual pages.
+> + */
+> +static unsigned long tlb_range_flush_page_ceiling __read_mostly = 33;
+> +
+> +/*
+> + * Performs partition-scoped invalidations for nested guests
+> + * as part of H_RPT_INVALIDATE hcall.
+> + */
+> +long do_h_rpt_invalidate_pat(struct kvm_vcpu *vcpu, unsigned long lpid,
+> +			     unsigned long type, unsigned long pg_sizes,
+> +			     unsigned long start, unsigned long end)
+> +{
+> +	struct kvm_nested_guest *gp;
+> +	long ret;
+> +	unsigned long psize, ap;
+> +
+> +	/*
+> +	 * If L2 lpid isn't valid, we need to return H_PARAMETER.
+> +	 *
+> +	 * However, nested KVM issues a L2 lpid flush call when creating
+> +	 * partition table entries for L2. This happens even before the
+> +	 * corresponding shadow lpid is created in HV which happens in
+> +	 * H_ENTER_NESTED call. Since we can't differentiate this case from
+> +	 * the invalid case, we ignore such flush requests and return success.
+> +	 */
+> +	gp = kvmhv_find_nested(vcpu->kvm, lpid);
+> +	if (!gp)
+> +		return H_SUCCESS;
+> +
+> +	/*
+> +	 * A flush all request can be handled by a full lpid flush only.
+> +	 */
+> +	if ((type & H_RPTI_TYPE_NESTED_ALL) == H_RPTI_TYPE_NESTED_ALL)
+> +		return do_tlb_invalidate_nested_all(vcpu, lpid, RIC_FLUSH_ALL);
+> +
+> +	/*
+> +	 * We don't need to handle a PWC flush like process table here,
+> +	 * because intermediate partition scoped table in nested guest doesn't
+> +	 * really have PWC. Only level we have PWC is in L0 and for nested
+> +	 * invalidate at L0 we always do kvm_flush_lpid() which does
+> +	 * radix__flush_all_lpid(). For range invalidate at any level, we
+> +	 * are not removing the higher level page tables and hence there is
+> +	 * no PWC invalidate needed.
+> +	 *
+> +	 * if (type & H_RPTI_TYPE_PWC) {
+> +	 *	ret = do_tlb_invalidate_nested_all(vcpu, lpid, RIC_FLUSH_PWC);
+> +	 *	if (ret)
+> +	 *		return H_P4;
+> +	 * }
+> +	 */
+> +
+> +	if (start == 0 && end == -1)
+> +		return do_tlb_invalidate_nested_all(vcpu, lpid, RIC_FLUSH_TLB);
+> +
+> +	if (type & H_RPTI_TYPE_TLB) {
+> +		struct mmu_psize_def *def;
+> +		bool flush_lpid;
+> +		unsigned long nr_pages;
+> +
+> +		for (psize = 0; psize < MMU_PAGE_COUNT; psize++) {
+> +			def = &mmu_psize_defs[psize];
+> +			if (!(pg_sizes & def->h_rpt_pgsize))
+> +				continue;
+> +
+> +			nr_pages = (end - start) >> def->shift;
+> +			flush_lpid = nr_pages > tlb_range_flush_page_ceiling;
+> +			if (flush_lpid)
+> +				return do_tlb_invalidate_nested_all(vcpu, lpid,
+> +								RIC_FLUSH_TLB);
+> +
+> +			ret = do_tlb_invalidate_nested_tlb(vcpu, lpid,
+> +							   (1UL << def->shift),
+> +							   ap, start, end);
 
+I have not seen this reported yet so apologies if it has and there is a
+fix I am missing:
+
+arch/powerpc/kvm/book3s_hv_nested.c:1334:11: error: variable 'ap' is uninitialized when used here [-Werror,-Wuninitialized]
+                                                           ap, start, end);
+                                                           ^~
+arch/powerpc/kvm/book3s_hv_nested.c:1276:25: note: initialize the variable 'ap' to silence this warning
+        unsigned long psize, ap;
+                               ^
+                                = 0
+1 error generated.
+
+Cheers,
+Nathan
+
+> +			if (ret)
+> +				return H_P4;
+> +		}
+> +	}
+> +	return H_SUCCESS;
+> +}
+> +
+>  /* Used to convert a nested guest real address to a L1 guest real address */
+>  static int kvmhv_translate_addr_nested(struct kvm_vcpu *vcpu,
+>  				       struct kvm_nested_guest *gp,
+> diff --git a/arch/powerpc/mm/book3s64/radix_tlb.c b/arch/powerpc/mm/book3s64/radix_tlb.c
+> index cdd98b9e7b15..4f38cf34ea40 100644
+> --- a/arch/powerpc/mm/book3s64/radix_tlb.c
+> +++ b/arch/powerpc/mm/book3s64/radix_tlb.c
+> @@ -20,10 +20,6 @@
+>  
+>  #include "internal.h"
+>  
+> -#define RIC_FLUSH_TLB 0
+> -#define RIC_FLUSH_PWC 1
+> -#define RIC_FLUSH_ALL 2
+> -
+>  /*
+>   * tlbiel instruction for radix, set invalidation
+>   * i.e., r=1 and is=01 or is=10 or is=11
+> -- 
+> 2.31.1
