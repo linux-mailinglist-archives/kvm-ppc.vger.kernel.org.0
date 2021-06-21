@@ -2,341 +2,110 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89BB13AF18A
-	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Jun 2021 19:12:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2E8C3AF233
+	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Jun 2021 19:42:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230392AbhFURPC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 21 Jun 2021 13:15:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53840 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230059AbhFURPC (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 21 Jun 2021 13:15:02 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7AE3260FF2;
-        Mon, 21 Jun 2021 17:12:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1624295567;
-        bh=8VLeKNLmsN8yXnBWPFldftKQFXRHteWlP0dfds+25Uo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZgsKpayFEaDCuVwz+OZinwWFqETsbJtTXJCiFObQdpFQX7NCwkGyNry1/4i+bxPwc
-         IgneRIQNtPf1tAqhMbCdTltryRoFFaERZhcV+IWsxlIeKJ+seoRPFfTOkft47bDJwH
-         9loBYe1aYLli1xB+U8ukIQQV93f7z/3US/mhPwRknJRw++1PwN2toUr3ytEzC1EpYb
-         5ZQ235QrnKRv7K6+p1Zt4S1PGDuJzSNmNtpUaSIugYEPniQnHLU7/Ud4GpOwlcPkRY
-         UcQIyMjxEP7Gb9a+wLXbspLqnDFlI70JkE1gfXsteZFJrJ8dr1a5TR4s45WBmY+lwM
-         qM4gNqlhViH2w==
-Date:   Mon, 21 Jun 2021 10:12:42 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Bharata B Rao <bharata@linux.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        farosas@linux.ibm.com, aneesh.kumar@linux.ibm.com,
-        npiggin@gmail.com, david@gibson.dropbear.id.au
-Subject: Re: [PATCH v8 4/6] KVM: PPC: Book3S HV: Nested support in
- H_RPT_INVALIDATE
-Message-ID: <YNDIitJ3Hn1/G8Jw@Ryzen-9-3900X.localdomain>
-References: <20210621085003.904767-1-bharata@linux.ibm.com>
- <20210621085003.904767-5-bharata@linux.ibm.com>
+        id S231367AbhFURpD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 21 Jun 2021 13:45:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46552 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231279AbhFURpC (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 21 Jun 2021 13:45:02 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6792AC06175F
+        for <kvm-ppc@vger.kernel.org>; Mon, 21 Jun 2021 10:42:46 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id h15so12987121lfv.12
+        for <kvm-ppc@vger.kernel.org>; Mon, 21 Jun 2021 10:42:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qfK/SVz4it+B5UPXi3JJjfN4xS2rz4IlLdh/dhi7P/A=;
+        b=pywx1GKnLV8rMPGg0yESPQxjjJELUUA6eFGxQfp1SLreFtlNjvMnVkBKCsMTmOd55H
+         L2Ov1NYXG6PlckYJH8Gw//+mcOBRMDwUXKZ+OXAi5Nyj1KRLWBLsJCtqGFb1mQ50QAep
+         +66Iks8s9xqkwilngZ/CjQPCJsYngQFefHmEiKXBRFcuGdGgcDy7nbwnYmWpFSIzb8JM
+         Cjf5+S39y3LrfjOsEEnW09/kn8GvhArY29GOk3d0VywwjXhx383+3K6zA3KOodjnfkQi
+         8CQsP6Ze09t1BHzCBmmEOfUrgWwOaLawqHrTy11NMe7lYNZNHRIg3ZSNWKHZDD1fW8kp
+         ZZaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qfK/SVz4it+B5UPXi3JJjfN4xS2rz4IlLdh/dhi7P/A=;
+        b=OZrpBCY5cemL7MPtzCN3XCOR2zARVlldPw0/+3jgU5rj2j6JtKPFTSDqWMnX9qALQB
+         jr0+T71g3xnmQEmu4WnV/LzcXiatIGy4A8Hff0FuMKXjJ77tK+2xT3dcDR0wU5i6+bdB
+         E3kQtg/nhHjQbURov+xn02RMDiNJTn6tVqBjTi1tXXinv/B1gqjguygRud0el2Dggc2y
+         EVPVhG89bytAecMWsg9ABKsFGaE36jHrYf0h/6ipfvnOEZi0bg2TaD4vpaxT1J4bbL0G
+         iooPJvPs+dJ/NoospNgsonsSNbWrGDEpcAc5UT0dihv6EH5MPoI/q07iZQJN7I/jJVoJ
+         n3MA==
+X-Gm-Message-State: AOAM533f/HrsGUW/hw+cLOrYvbiQDzeWTuOxUY9RoUesN9/U5qrzbWfZ
+        O1VYTdi1eIBWK7akGKmB2wMKGE7At/klswXicdaKpA==
+X-Google-Smtp-Source: ABdhPJze+ab86EoUTOPQeCvTUOFZdayN8Zdi+mpGgTYzSXakq0/1emu/tNIwi9+QdEI2rk/c2bFMigguUMCYbOuXxYw=
+X-Received: by 2002:a05:6512:39ca:: with SMTP id k10mr15161030lfu.473.1624297364420;
+ Mon, 21 Jun 2021 10:42:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210621085003.904767-5-bharata@linux.ibm.com>
+References: <20210618222709.1858088-1-jingzhangos@google.com>
+ <20210618222709.1858088-5-jingzhangos@google.com> <d8bb52e6-3d1c-7008-388f-699f1a872e80@redhat.com>
+In-Reply-To: <d8bb52e6-3d1c-7008-388f-699f1a872e80@redhat.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Mon, 21 Jun 2021 12:42:33 -0500
+Message-ID: <CAAdAUtiC68ViKRH=1_N9VPzNszZHUN5Yc0GNXJ3BFL+8=tz0Gw@mail.gmail.com>
+Subject: Re: [PATCH v12 4/7] KVM: stats: Support binary stats retrieval for a VCPU
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Fuad Tabba <tabba@google.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Jun 21, 2021 at 02:20:01PM +0530, Bharata B Rao wrote:
-> Enable support for process-scoped invalidations from nested
-> guests and partition-scoped invalidations for nested guests.
-> 
-> Process-scoped invalidations for any level of nested guests
-> are handled by implementing H_RPT_INVALIDATE handler in the
-> nested guest exit path in L0.
-> 
-> Partition-scoped invalidation requests are forwarded to the
-> right nested guest, handled there and passed down to L0
-> for eventual handling.
-> 
-> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-> Signed-off-by: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
-> 	[Nested guest partition-scoped invalidation changes]
-> ---
->  .../include/asm/book3s/64/tlbflush-radix.h    |   4 +
->  arch/powerpc/include/asm/kvm_book3s.h         |   3 +
->  arch/powerpc/kvm/book3s_hv.c                  |  59 ++++++++-
->  arch/powerpc/kvm/book3s_hv_nested.c           | 117 ++++++++++++++++++
->  arch/powerpc/mm/book3s64/radix_tlb.c          |   4 -
->  5 files changed, 180 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h b/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
-> index 8b33601cdb9d..a46fd37ad552 100644
-> --- a/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
-> +++ b/arch/powerpc/include/asm/book3s/64/tlbflush-radix.h
-> @@ -4,6 +4,10 @@
->  
->  #include <asm/hvcall.h>
->  
-> +#define RIC_FLUSH_TLB 0
-> +#define RIC_FLUSH_PWC 1
-> +#define RIC_FLUSH_ALL 2
-> +
->  struct vm_area_struct;
->  struct mm_struct;
->  struct mmu_gather;
-> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-> index e6b53c6e21e3..caaa0f592d8e 100644
-> --- a/arch/powerpc/include/asm/kvm_book3s.h
-> +++ b/arch/powerpc/include/asm/kvm_book3s.h
-> @@ -307,6 +307,9 @@ void kvmhv_set_ptbl_entry(unsigned int lpid, u64 dw0, u64 dw1);
->  void kvmhv_release_all_nested(struct kvm *kvm);
->  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu);
->  long kvmhv_do_nested_tlbie(struct kvm_vcpu *vcpu);
-> +long do_h_rpt_invalidate_pat(struct kvm_vcpu *vcpu, unsigned long lpid,
-> +			     unsigned long type, unsigned long pg_sizes,
-> +			     unsigned long start, unsigned long end);
->  int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu,
->  			  u64 time_limit, unsigned long lpcr);
->  void kvmhv_save_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr);
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 7e6da4687d88..3d5b8ba3786d 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -925,6 +925,34 @@ static int kvmppc_get_yield_count(struct kvm_vcpu *vcpu)
->  	return yield_count;
->  }
->  
-> +/*
-> + * H_RPT_INVALIDATE hcall handler for nested guests.
-> + *
-> + * Handles only nested process-scoped invalidation requests in L0.
-> + */
-> +static int kvmppc_nested_h_rpt_invalidate(struct kvm_vcpu *vcpu)
-> +{
-> +	unsigned long type = kvmppc_get_gpr(vcpu, 6);
-> +	unsigned long pid, pg_sizes, start, end;
-> +
-> +	/*
-> +	 * The partition-scoped invalidations aren't handled here in L0.
-> +	 */
-> +	if (type & H_RPTI_TYPE_NESTED)
-> +		return RESUME_HOST;
-> +
-> +	pid = kvmppc_get_gpr(vcpu, 4);
-> +	pg_sizes = kvmppc_get_gpr(vcpu, 7);
-> +	start = kvmppc_get_gpr(vcpu, 8);
-> +	end = kvmppc_get_gpr(vcpu, 9);
-> +
-> +	do_h_rpt_invalidate_prt(pid, vcpu->arch.nested->shadow_lpid,
-> +				type, pg_sizes, start, end);
-> +
-> +	kvmppc_set_gpr(vcpu, 3, H_SUCCESS);
-> +	return RESUME_GUEST;
-> +}
-> +
->  static long kvmppc_h_rpt_invalidate(struct kvm_vcpu *vcpu,
->  				    unsigned long id, unsigned long target,
->  				    unsigned long type, unsigned long pg_sizes,
-> @@ -938,10 +966,18 @@ static long kvmppc_h_rpt_invalidate(struct kvm_vcpu *vcpu,
->  
->  	/*
->  	 * Partition-scoped invalidation for nested guests.
-> -	 * Not yet supported
->  	 */
-> -	if (type & H_RPTI_TYPE_NESTED)
-> -		return H_P3;
-> +	if (type & H_RPTI_TYPE_NESTED) {
-> +		if (!nesting_enabled(vcpu->kvm))
-> +			return H_FUNCTION;
-> +
-> +		/* Support only cores as target */
-> +		if (target != H_RPTI_TARGET_CMMU)
-> +			return H_P2;
-> +
-> +		return do_h_rpt_invalidate_pat(vcpu, id, type, pg_sizes,
-> +					       start, end);
-> +	}
->  
->  	/*
->  	 * Process-scoped invalidation for L1 guests.
-> @@ -1629,6 +1665,23 @@ static int kvmppc_handle_nested_exit(struct kvm_vcpu *vcpu)
->  		if (!xics_on_xive())
->  			kvmppc_xics_rm_complete(vcpu, 0);
->  		break;
-> +	case BOOK3S_INTERRUPT_SYSCALL:
-> +	{
-> +		unsigned long req = kvmppc_get_gpr(vcpu, 3);
-> +
-> +		/*
-> +		 * The H_RPT_INVALIDATE hcalls issued by nested
-> +		 * guests for process-scoped invalidations when
-> +		 * GTSE=0, are handled here in L0.
-> +		 */
-> +		if (req == H_RPT_INVALIDATE) {
-> +			r = kvmppc_nested_h_rpt_invalidate(vcpu);
-> +			break;
-> +		}
-> +
-> +		r = RESUME_HOST;
-> +		break;
-> +	}
->  	default:
->  		r = RESUME_HOST;
->  		break;
-> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-> index 60724f674421..056d3df68de1 100644
-> --- a/arch/powerpc/kvm/book3s_hv_nested.c
-> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
-> @@ -1214,6 +1214,123 @@ long kvmhv_do_nested_tlbie(struct kvm_vcpu *vcpu)
->  	return H_SUCCESS;
->  }
->  
-> +static long do_tlb_invalidate_nested_tlb(struct kvm_vcpu *vcpu,
-> +					 unsigned long lpid,
-> +					 unsigned long page_size,
-> +					 unsigned long ap,
-> +					 unsigned long start,
-> +					 unsigned long end)
-> +{
-> +	unsigned long addr = start;
-> +	int ret;
-> +
-> +	do {
-> +		ret = kvmhv_emulate_tlbie_tlb_addr(vcpu, lpid, ap,
-> +						   get_epn(addr));
-> +		if (ret)
-> +			return ret;
-> +		addr += page_size;
-> +	} while (addr < end);
-> +
-> +	return ret;
-> +}
-> +
-> +static long do_tlb_invalidate_nested_all(struct kvm_vcpu *vcpu,
-> +					 unsigned long lpid, unsigned long ric)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct kvm_nested_guest *gp;
-> +
-> +	gp = kvmhv_get_nested(kvm, lpid, false);
-> +	if (gp) {
-> +		kvmhv_emulate_tlbie_lpid(vcpu, gp, ric);
-> +		kvmhv_put_nested(gp);
-> +	}
-> +	return H_SUCCESS;
-> +}
-> +
-> +/*
-> + * Number of pages above which we invalidate the entire LPID rather than
-> + * flush individual pages.
-> + */
-> +static unsigned long tlb_range_flush_page_ceiling __read_mostly = 33;
-> +
-> +/*
-> + * Performs partition-scoped invalidations for nested guests
-> + * as part of H_RPT_INVALIDATE hcall.
-> + */
-> +long do_h_rpt_invalidate_pat(struct kvm_vcpu *vcpu, unsigned long lpid,
-> +			     unsigned long type, unsigned long pg_sizes,
-> +			     unsigned long start, unsigned long end)
-> +{
-> +	struct kvm_nested_guest *gp;
-> +	long ret;
-> +	unsigned long psize, ap;
-> +
-> +	/*
-> +	 * If L2 lpid isn't valid, we need to return H_PARAMETER.
-> +	 *
-> +	 * However, nested KVM issues a L2 lpid flush call when creating
-> +	 * partition table entries for L2. This happens even before the
-> +	 * corresponding shadow lpid is created in HV which happens in
-> +	 * H_ENTER_NESTED call. Since we can't differentiate this case from
-> +	 * the invalid case, we ignore such flush requests and return success.
-> +	 */
-> +	gp = kvmhv_find_nested(vcpu->kvm, lpid);
-> +	if (!gp)
-> +		return H_SUCCESS;
-> +
-> +	/*
-> +	 * A flush all request can be handled by a full lpid flush only.
-> +	 */
-> +	if ((type & H_RPTI_TYPE_NESTED_ALL) == H_RPTI_TYPE_NESTED_ALL)
-> +		return do_tlb_invalidate_nested_all(vcpu, lpid, RIC_FLUSH_ALL);
-> +
-> +	/*
-> +	 * We don't need to handle a PWC flush like process table here,
-> +	 * because intermediate partition scoped table in nested guest doesn't
-> +	 * really have PWC. Only level we have PWC is in L0 and for nested
-> +	 * invalidate at L0 we always do kvm_flush_lpid() which does
-> +	 * radix__flush_all_lpid(). For range invalidate at any level, we
-> +	 * are not removing the higher level page tables and hence there is
-> +	 * no PWC invalidate needed.
-> +	 *
-> +	 * if (type & H_RPTI_TYPE_PWC) {
-> +	 *	ret = do_tlb_invalidate_nested_all(vcpu, lpid, RIC_FLUSH_PWC);
-> +	 *	if (ret)
-> +	 *		return H_P4;
-> +	 * }
-> +	 */
-> +
-> +	if (start == 0 && end == -1)
-> +		return do_tlb_invalidate_nested_all(vcpu, lpid, RIC_FLUSH_TLB);
-> +
-> +	if (type & H_RPTI_TYPE_TLB) {
-> +		struct mmu_psize_def *def;
-> +		bool flush_lpid;
-> +		unsigned long nr_pages;
-> +
-> +		for (psize = 0; psize < MMU_PAGE_COUNT; psize++) {
-> +			def = &mmu_psize_defs[psize];
-> +			if (!(pg_sizes & def->h_rpt_pgsize))
-> +				continue;
-> +
-> +			nr_pages = (end - start) >> def->shift;
-> +			flush_lpid = nr_pages > tlb_range_flush_page_ceiling;
-> +			if (flush_lpid)
-> +				return do_tlb_invalidate_nested_all(vcpu, lpid,
-> +								RIC_FLUSH_TLB);
-> +
-> +			ret = do_tlb_invalidate_nested_tlb(vcpu, lpid,
-> +							   (1UL << def->shift),
-> +							   ap, start, end);
+On Mon, Jun 21, 2021 at 11:46 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 19/06/21 00:27, Jing Zhang wrote:
+> > +     struct kvm_vcpu_stat stat;
+> >       struct kvm_dirty_ring dirty_ring;
+> > +     char stats_id[KVM_STATS_NAME_SIZE];
+>
+> I think stats_id needs to be part of the usercopy region too.
+>
+> You can also use
+>
+> offsetofend(struct kvm_vcpu, stats_id) - offsetof(struct kvm_vcpu, arch)
+>
+> to compute the size.
+Sure! Will do.
+>
+> Paolo
+>
 
-I have not seen this reported yet so apologies if it has and there is a
-fix I am missing:
-
-arch/powerpc/kvm/book3s_hv_nested.c:1334:11: error: variable 'ap' is uninitialized when used here [-Werror,-Wuninitialized]
-                                                           ap, start, end);
-                                                           ^~
-arch/powerpc/kvm/book3s_hv_nested.c:1276:25: note: initialize the variable 'ap' to silence this warning
-        unsigned long psize, ap;
-                               ^
-                                = 0
-1 error generated.
-
-Cheers,
-Nathan
-
-> +			if (ret)
-> +				return H_P4;
-> +		}
-> +	}
-> +	return H_SUCCESS;
-> +}
-> +
->  /* Used to convert a nested guest real address to a L1 guest real address */
->  static int kvmhv_translate_addr_nested(struct kvm_vcpu *vcpu,
->  				       struct kvm_nested_guest *gp,
-> diff --git a/arch/powerpc/mm/book3s64/radix_tlb.c b/arch/powerpc/mm/book3s64/radix_tlb.c
-> index cdd98b9e7b15..4f38cf34ea40 100644
-> --- a/arch/powerpc/mm/book3s64/radix_tlb.c
-> +++ b/arch/powerpc/mm/book3s64/radix_tlb.c
-> @@ -20,10 +20,6 @@
->  
->  #include "internal.h"
->  
-> -#define RIC_FLUSH_TLB 0
-> -#define RIC_FLUSH_PWC 1
-> -#define RIC_FLUSH_ALL 2
-> -
->  /*
->   * tlbiel instruction for radix, set invalidation
->   * i.e., r=1 and is=01 or is=10 or is=11
-> -- 
-> 2.31.1
+Thanks,
+Jing
