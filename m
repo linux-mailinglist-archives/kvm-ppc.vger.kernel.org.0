@@ -2,247 +2,129 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A678E3AE2E2
-	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Jun 2021 07:53:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7089D3AE542
+	for <lists+kvm-ppc@lfdr.de>; Mon, 21 Jun 2021 10:50:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229597AbhFUFzl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 21 Jun 2021 01:55:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56954 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229576AbhFUFzk (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Mon, 21 Jun 2021 01:55:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1B3B76113C;
-        Mon, 21 Jun 2021 05:53:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1624254806;
-        bh=VNjmysMr5aFo5Y2ewZkvwCDsHp1Bte5+E7/g36fuzzU=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=P5Wn0abpDffObFsODQBb46AJG5uEv9KMlhwnpO5l3hywP10zpyQgChYxpIIvT6C+0
-         lIo0YRD1ngL1aAg252d8jh7E4Fdvn3Je8gTBRPMY0eyJ0HVzsZYrdXjOMBPrYR5juR
-         1cpMKVxm1MJEk99eC7lX/XYt77ZMMYExCYEwTr2vdNrtReY6oB1tmI7ApA4kpu/ue+
-         WQldb9mRpxM6zrO+/H7AtSpmfqkknVPQoc9/jGqChsLrnxefRVe4ZsvqzB6bjwOEbl
-         xhiUYqIn2Vc6Yyi+ktmhCNjBNK1eQfkq4XSPDDbZBahco7TTJc4KsCJa4rdZbq6MEq
-         hnUmFO4HxHgtQ==
-Subject: Re: arch/powerpc/kvm/book3s_hv_nested.c:264:6: error: stack frame
- size of 2304 bytes in function 'kvmhv_enter_nested_guest'
-To:     Nicholas Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
-        kernel test robot <lkp@intel.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        clang-built-linux@googlegroups.com, kbuild-all@lists.01.org,
-        Kees Cook <keescook@chromium.org>,
-        linux-kernel@vger.kernel.org,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-References: <202104031853.vDT0Qjqj-lkp@intel.com>
- <1624232938.d90brlmh3p.astroid@bobo.none>
-From:   Nathan Chancellor <nathan@kernel.org>
-Message-ID: <e6167885-30e5-d149-bcde-3e9ad9f5d381@kernel.org>
-Date:   Sun, 20 Jun 2021 22:53:22 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S229618AbhFUIwn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 21 Jun 2021 04:52:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2714 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229937AbhFUIwm (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 21 Jun 2021 04:52:42 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15L8XV93183046;
+        Mon, 21 Jun 2021 04:50:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=pp1; bh=veGlPVlCtZqhaBqdj3dROkMnCIGJlqvmFjU72GF2qC8=;
+ b=tT1nz/yxhDaOtHUiOBkZATORtWplnNf2xZULDUiyZk/CdfFtoIsf6QRn+Ty2bYuhUXXV
+ OAC6H8nLHiRSFDFfUb4cw0EoiAKqOG96ERV87WKhhbjXQ+wlTIHeuQQ0keWbmJi/SfN7
+ 76rdDXhwni8Cv/x94Lf+vpURJghojq3SFct+iB0V5wlEPdIXhxC30Roi96l5Ts4r4GIn
+ 4o6HVjV6QIJQEiynktlHzm5oNia/IsaW+jxFVEg/yhK5aDVJcuTsgDYuKnjcRdAr59Mt
+ oex4Hpd0igS6ewCN73F9md1JlYdzS2WRUxZrSpr8ifhDp0vRvYEY1LWrQEBPVuOSi0pQ pw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39aq868mxx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Jun 2021 04:50:14 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15L8XUbU183021;
+        Mon, 21 Jun 2021 04:50:14 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39aq868mx7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Jun 2021 04:50:14 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15L8lO7k012519;
+        Mon, 21 Jun 2021 08:50:12 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3998788e0r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 21 Jun 2021 08:50:12 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15L8o94O23855500
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 21 Jun 2021 08:50:09 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 75066A4057;
+        Mon, 21 Jun 2021 08:50:09 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B9EFFA4053;
+        Mon, 21 Jun 2021 08:50:07 +0000 (GMT)
+Received: from bharata.ibmuc.com (unknown [9.85.82.83])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 21 Jun 2021 08:50:07 +0000 (GMT)
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
+        mpe@ellerman.id.au, david@gibson.dropbear.id.au,
+        farosas@linux.ibm.com, Bharata B Rao <bharata@linux.ibm.com>
+Subject: [PATCH v8 0/6] Support for H_RPT_INVALIDATE in PowerPC KVM
+Date:   Mon, 21 Jun 2021 14:19:57 +0530
+Message-Id: <20210621085003.904767-1-bharata@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: igsdm_EUCAfZPxzeuaZDGTKqsBIjenEa
+X-Proofpoint-ORIG-GUID: wHle3_GDcoOzE6DC-VafdhIfajFb7pOG
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-In-Reply-To: <1624232938.d90brlmh3p.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-21_02:2021-06-20,2021-06-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ mlxlogscore=912 clxscore=1011 impostorscore=0 lowpriorityscore=0
+ bulkscore=0 malwarescore=0 priorityscore=1501 mlxscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106210049
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 6/20/2021 4:59 PM, Nicholas Piggin wrote:
-> Excerpts from kernel test robot's message of April 3, 2021 8:47 pm:
->> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
->> head:   d93a0d43e3d0ba9e19387be4dae4a8d5b175a8d7
->> commit: 97e4910232fa1f81e806aa60c25a0450276d99a2 linux/compiler-clang.h: define HAVE_BUILTIN_BSWAP*
->> date:   3 weeks ago
->> config: powerpc64-randconfig-r006-20210403 (attached as .config)
->> compiler: clang version 13.0.0 (https://github.com/llvm/llvm-project 0fe8af94688aa03c01913c2001d6a1a911f42ce6)
->> reproduce (this is a W=1 build):
->>          wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->>          chmod +x ~/bin/make.cross
->>          # install powerpc64 cross compiling tool for clang build
->>          # apt-get install binutils-powerpc64-linux-gnu
->>          # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=97e4910232fa1f81e806aa60c25a0450276d99a2
->>          git remote add linus https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
->>          git fetch --no-tags linus master
->>          git checkout 97e4910232fa1f81e806aa60c25a0450276d99a2
->>          # save the attached .config to linux build tree
->>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=powerpc64
->>
->> If you fix the issue, kindly add following tag as appropriate
->> Reported-by: kernel test robot <lkp@intel.com>
->>
->> All errors (new ones prefixed by >>):
->>
->>>> arch/powerpc/kvm/book3s_hv_nested.c:264:6: error: stack frame size of 2304 bytes in function 'kvmhv_enter_nested_guest' [-Werror,-Wframe-larger-than=]
->>     long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->>          ^
->>     1 error generated.
->>
->>
->> vim +/kvmhv_enter_nested_guest +264 arch/powerpc/kvm/book3s_hv_nested.c
-> 
-> Not much changed here recently. It's not that big a concern because it's
-> only called in the KVM ioctl path, not in any deep IO paths or anything,
-> and doesn't recurse. Might be a bit of inlining or stack spilling put it
-> over the edge.
+This patchset adds support for the new hcall H_RPT_INVALIDATE
+and replaces the nested tlb flush calls with this new hcall
+if support for the same exists.
 
-It appears to be the fact that LLVM's PowerPC backend does not emit 
-efficient byteswap assembly:
+Changes in v8:
+-------------
+- Used tlb_single_page_flush_ceiling in the process-scoped range
+  flush routine to switch to full PID invalation if
+  the number of pages is above the threshold
+- Moved iterating over page sizes into the actual routine that
+  handles the eventual flushing thereby limiting the page size
+  iteration only to range based flushing
+- Converted #if 0 section into a comment section to avoid
+  checkpatch from complaining.
+- Used a threshold in the partition-scoped range flushing
+  to switch to full LPID invalidation
 
-https://github.com/ClangBuiltLinux/linux/issues/1292
+v7: https://lore.kernel.org/linuxppc-dev/20210505154642.178702-1-bharata@linux.ibm.com/
 
-https://bugs.llvm.org/show_bug.cgi?id=49610
+Aneesh Kumar K.V (1):
+  KVM: PPC: Book3S HV: Fix comments of H_RPT_INVALIDATE arguments
 
-> powerpc does make it an error though, would be good to avoid that so the
-> robot doesn't keep tripping over.
+Bharata B Rao (5):
+  powerpc/book3s64/radix: Add H_RPT_INVALIDATE pgsize encodings to
+    mmu_psize_def
+  KVM: PPC: Book3S HV: Add support for H_RPT_INVALIDATE
+  KVM: PPC: Book3S HV: Nested support in H_RPT_INVALIDATE
+  KVM: PPC: Book3S HV: Add KVM_CAP_PPC_RPT_INVALIDATE capability
+  KVM: PPC: Book3S HV: Use H_RPT_INVALIDATE in nested KVM
 
-Marking byteswap_pt_regs as 'noinline_for_stack' drastically reduces the 
-stack usage. If that is an acceptable solution, I can send it along 
-tomorrow.
+ Documentation/virt/kvm/api.rst                |  18 ++
+ arch/powerpc/include/asm/book3s/64/mmu.h      |   1 +
+ .../include/asm/book3s/64/tlbflush-radix.h    |   4 +
+ arch/powerpc/include/asm/hvcall.h             |   4 +-
+ arch/powerpc/include/asm/kvm_book3s.h         |   3 +
+ arch/powerpc/include/asm/mmu_context.h        |   9 +
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        |  27 ++-
+ arch/powerpc/kvm/book3s_hv.c                  |  89 +++++++++
+ arch/powerpc/kvm/book3s_hv_nested.c           | 129 ++++++++++++-
+ arch/powerpc/kvm/powerpc.c                    |   3 +
+ arch/powerpc/mm/book3s64/radix_pgtable.c      |   5 +
+ arch/powerpc/mm/book3s64/radix_tlb.c          | 176 +++++++++++++++++-
+ include/uapi/linux/kvm.h                      |   1 +
+ 13 files changed, 456 insertions(+), 13 deletions(-)
 
-Cheers,
-Nathan
+-- 
+2.31.1
 
-> Thanks,
-> Nick
-> 
-> 
->>
->> afe75049303f75 Ravi Bangoria        2020-12-16  263
->> 360cae313702cd Paul Mackerras       2018-10-08 @264  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
->> 360cae313702cd Paul Mackerras       2018-10-08  265  {
->> 360cae313702cd Paul Mackerras       2018-10-08  266  	long int err, r;
->> 360cae313702cd Paul Mackerras       2018-10-08  267  	struct kvm_nested_guest *l2;
->> 360cae313702cd Paul Mackerras       2018-10-08  268  	struct pt_regs l2_regs, saved_l1_regs;
->> afe75049303f75 Ravi Bangoria        2020-12-16  269  	struct hv_guest_state l2_hv = {0}, saved_l1_hv;
->> 360cae313702cd Paul Mackerras       2018-10-08  270  	struct kvmppc_vcore *vc = vcpu->arch.vcore;
->> 360cae313702cd Paul Mackerras       2018-10-08  271  	u64 hv_ptr, regs_ptr;
->> 360cae313702cd Paul Mackerras       2018-10-08  272  	u64 hdec_exp;
->> 360cae313702cd Paul Mackerras       2018-10-08  273  	s64 delta_purr, delta_spurr, delta_ic, delta_vtb;
->> 360cae313702cd Paul Mackerras       2018-10-08  274  	u64 mask;
->> 360cae313702cd Paul Mackerras       2018-10-08  275  	unsigned long lpcr;
->> 360cae313702cd Paul Mackerras       2018-10-08  276
->> 360cae313702cd Paul Mackerras       2018-10-08  277  	if (vcpu->kvm->arch.l1_ptcr == 0)
->> 360cae313702cd Paul Mackerras       2018-10-08  278  		return H_NOT_AVAILABLE;
->> 360cae313702cd Paul Mackerras       2018-10-08  279
->> 360cae313702cd Paul Mackerras       2018-10-08  280  	/* copy parameters in */
->> 360cae313702cd Paul Mackerras       2018-10-08  281  	hv_ptr = kvmppc_get_gpr(vcpu, 4);
->> 1508c22f112ce1 Alexey Kardashevskiy 2020-06-09  282  	regs_ptr = kvmppc_get_gpr(vcpu, 5);
->> 1508c22f112ce1 Alexey Kardashevskiy 2020-06-09  283  	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
->> afe75049303f75 Ravi Bangoria        2020-12-16  284  	err = kvmhv_read_guest_state_and_regs(vcpu, &l2_hv, &l2_regs,
->> afe75049303f75 Ravi Bangoria        2020-12-16  285  					      hv_ptr, regs_ptr);
->> 1508c22f112ce1 Alexey Kardashevskiy 2020-06-09  286  	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
->> 360cae313702cd Paul Mackerras       2018-10-08  287  	if (err)
->> 360cae313702cd Paul Mackerras       2018-10-08  288  		return H_PARAMETER;
->> 1508c22f112ce1 Alexey Kardashevskiy 2020-06-09  289
->> 10b5022db7861a Suraj Jitindar Singh 2018-10-08  290  	if (kvmppc_need_byteswap(vcpu))
->> 10b5022db7861a Suraj Jitindar Singh 2018-10-08  291  		byteswap_hv_regs(&l2_hv);
->> afe75049303f75 Ravi Bangoria        2020-12-16  292  	if (l2_hv.version > HV_GUEST_STATE_VERSION)
->> 360cae313702cd Paul Mackerras       2018-10-08  293  		return H_P2;
->> 360cae313702cd Paul Mackerras       2018-10-08  294
->> 10b5022db7861a Suraj Jitindar Singh 2018-10-08  295  	if (kvmppc_need_byteswap(vcpu))
->> 10b5022db7861a Suraj Jitindar Singh 2018-10-08  296  		byteswap_pt_regs(&l2_regs);
->> 9d0b048da788c1 Suraj Jitindar Singh 2018-10-08  297  	if (l2_hv.vcpu_token >= NR_CPUS)
->> 9d0b048da788c1 Suraj Jitindar Singh 2018-10-08  298  		return H_PARAMETER;
->> 9d0b048da788c1 Suraj Jitindar Singh 2018-10-08  299
->> 360cae313702cd Paul Mackerras       2018-10-08  300  	/* translate lpid */
->> 360cae313702cd Paul Mackerras       2018-10-08  301  	l2 = kvmhv_get_nested(vcpu->kvm, l2_hv.lpid, true);
->> 360cae313702cd Paul Mackerras       2018-10-08  302  	if (!l2)
->> 360cae313702cd Paul Mackerras       2018-10-08  303  		return H_PARAMETER;
->> 360cae313702cd Paul Mackerras       2018-10-08  304  	if (!l2->l1_gr_to_hr) {
->> 360cae313702cd Paul Mackerras       2018-10-08  305  		mutex_lock(&l2->tlb_lock);
->> 360cae313702cd Paul Mackerras       2018-10-08  306  		kvmhv_update_ptbl_cache(l2);
->> 360cae313702cd Paul Mackerras       2018-10-08  307  		mutex_unlock(&l2->tlb_lock);
->> 360cae313702cd Paul Mackerras       2018-10-08  308  	}
->> 360cae313702cd Paul Mackerras       2018-10-08  309
->> 360cae313702cd Paul Mackerras       2018-10-08  310  	/* save l1 values of things */
->> 360cae313702cd Paul Mackerras       2018-10-08  311  	vcpu->arch.regs.msr = vcpu->arch.shregs.msr;
->> 360cae313702cd Paul Mackerras       2018-10-08  312  	saved_l1_regs = vcpu->arch.regs;
->> 360cae313702cd Paul Mackerras       2018-10-08  313  	kvmhv_save_hv_regs(vcpu, &saved_l1_hv);
->> 360cae313702cd Paul Mackerras       2018-10-08  314
->> 360cae313702cd Paul Mackerras       2018-10-08  315  	/* convert TB values/offsets to host (L0) values */
->> 360cae313702cd Paul Mackerras       2018-10-08  316  	hdec_exp = l2_hv.hdec_expiry - vc->tb_offset;
->> 360cae313702cd Paul Mackerras       2018-10-08  317  	vc->tb_offset += l2_hv.tb_offset;
->> 360cae313702cd Paul Mackerras       2018-10-08  318
->> 360cae313702cd Paul Mackerras       2018-10-08  319  	/* set L1 state to L2 state */
->> 360cae313702cd Paul Mackerras       2018-10-08  320  	vcpu->arch.nested = l2;
->> 360cae313702cd Paul Mackerras       2018-10-08  321  	vcpu->arch.nested_vcpu_id = l2_hv.vcpu_token;
->> 360cae313702cd Paul Mackerras       2018-10-08  322  	vcpu->arch.regs = l2_regs;
->> 360cae313702cd Paul Mackerras       2018-10-08  323  	vcpu->arch.shregs.msr = vcpu->arch.regs.msr;
->> 360cae313702cd Paul Mackerras       2018-10-08  324  	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
->> 360cae313702cd Paul Mackerras       2018-10-08  325  		LPCR_LPES | LPCR_MER;
->> 360cae313702cd Paul Mackerras       2018-10-08  326  	lpcr = (vc->lpcr & ~mask) | (l2_hv.lpcr & mask);
->> 73937deb4b2d7f Suraj Jitindar Singh 2018-10-08  327  	sanitise_hv_regs(vcpu, &l2_hv);
->> 360cae313702cd Paul Mackerras       2018-10-08  328  	restore_hv_regs(vcpu, &l2_hv);
->> 360cae313702cd Paul Mackerras       2018-10-08  329
->> 360cae313702cd Paul Mackerras       2018-10-08  330  	vcpu->arch.ret = RESUME_GUEST;
->> 360cae313702cd Paul Mackerras       2018-10-08  331  	vcpu->arch.trap = 0;
->> 360cae313702cd Paul Mackerras       2018-10-08  332  	do {
->> 360cae313702cd Paul Mackerras       2018-10-08  333  		if (mftb() >= hdec_exp) {
->> 360cae313702cd Paul Mackerras       2018-10-08  334  			vcpu->arch.trap = BOOK3S_INTERRUPT_HV_DECREMENTER;
->> 360cae313702cd Paul Mackerras       2018-10-08  335  			r = RESUME_HOST;
->> 360cae313702cd Paul Mackerras       2018-10-08  336  			break;
->> 360cae313702cd Paul Mackerras       2018-10-08  337  		}
->> 8c99d34578628b Tianjia Zhang        2020-04-27  338  		r = kvmhv_run_single_vcpu(vcpu, hdec_exp, lpcr);
->> 360cae313702cd Paul Mackerras       2018-10-08  339  	} while (is_kvmppc_resume_guest(r));
->> 360cae313702cd Paul Mackerras       2018-10-08  340
->> 360cae313702cd Paul Mackerras       2018-10-08  341  	/* save L2 state for return */
->> 360cae313702cd Paul Mackerras       2018-10-08  342  	l2_regs = vcpu->arch.regs;
->> 360cae313702cd Paul Mackerras       2018-10-08  343  	l2_regs.msr = vcpu->arch.shregs.msr;
->> 360cae313702cd Paul Mackerras       2018-10-08  344  	delta_purr = vcpu->arch.purr - l2_hv.purr;
->> 360cae313702cd Paul Mackerras       2018-10-08  345  	delta_spurr = vcpu->arch.spurr - l2_hv.spurr;
->> 360cae313702cd Paul Mackerras       2018-10-08  346  	delta_ic = vcpu->arch.ic - l2_hv.ic;
->> 360cae313702cd Paul Mackerras       2018-10-08  347  	delta_vtb = vc->vtb - l2_hv.vtb;
->> 360cae313702cd Paul Mackerras       2018-10-08  348  	save_hv_return_state(vcpu, vcpu->arch.trap, &l2_hv);
->> 360cae313702cd Paul Mackerras       2018-10-08  349
->> 360cae313702cd Paul Mackerras       2018-10-08  350  	/* restore L1 state */
->> 360cae313702cd Paul Mackerras       2018-10-08  351  	vcpu->arch.nested = NULL;
->> 360cae313702cd Paul Mackerras       2018-10-08  352  	vcpu->arch.regs = saved_l1_regs;
->> 360cae313702cd Paul Mackerras       2018-10-08  353  	vcpu->arch.shregs.msr = saved_l1_regs.msr & ~MSR_TS_MASK;
->> 360cae313702cd Paul Mackerras       2018-10-08  354  	/* set L1 MSR TS field according to L2 transaction state */
->> 360cae313702cd Paul Mackerras       2018-10-08  355  	if (l2_regs.msr & MSR_TS_MASK)
->> 360cae313702cd Paul Mackerras       2018-10-08  356  		vcpu->arch.shregs.msr |= MSR_TS_S;
->> 360cae313702cd Paul Mackerras       2018-10-08  357  	vc->tb_offset = saved_l1_hv.tb_offset;
->> 360cae313702cd Paul Mackerras       2018-10-08  358  	restore_hv_regs(vcpu, &saved_l1_hv);
->> 360cae313702cd Paul Mackerras       2018-10-08  359  	vcpu->arch.purr += delta_purr;
->> 360cae313702cd Paul Mackerras       2018-10-08  360  	vcpu->arch.spurr += delta_spurr;
->> 360cae313702cd Paul Mackerras       2018-10-08  361  	vcpu->arch.ic += delta_ic;
->> 360cae313702cd Paul Mackerras       2018-10-08  362  	vc->vtb += delta_vtb;
->> 360cae313702cd Paul Mackerras       2018-10-08  363
->> 360cae313702cd Paul Mackerras       2018-10-08  364  	kvmhv_put_nested(l2);
->> 360cae313702cd Paul Mackerras       2018-10-08  365
->> 360cae313702cd Paul Mackerras       2018-10-08  366  	/* copy l2_hv_state and regs back to guest */
->> 10b5022db7861a Suraj Jitindar Singh 2018-10-08  367  	if (kvmppc_need_byteswap(vcpu)) {
->> 10b5022db7861a Suraj Jitindar Singh 2018-10-08  368  		byteswap_hv_regs(&l2_hv);
->> 10b5022db7861a Suraj Jitindar Singh 2018-10-08  369  		byteswap_pt_regs(&l2_regs);
->> 10b5022db7861a Suraj Jitindar Singh 2018-10-08  370  	}
->> 1508c22f112ce1 Alexey Kardashevskiy 2020-06-09  371  	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
->> afe75049303f75 Ravi Bangoria        2020-12-16  372  	err = kvmhv_write_guest_state_and_regs(vcpu, &l2_hv, &l2_regs,
->> afe75049303f75 Ravi Bangoria        2020-12-16  373  					       hv_ptr, regs_ptr);
->> 1508c22f112ce1 Alexey Kardashevskiy 2020-06-09  374  	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
->> 360cae313702cd Paul Mackerras       2018-10-08  375  	if (err)
->> 360cae313702cd Paul Mackerras       2018-10-08  376  		return H_AUTHORITY;
->> 360cae313702cd Paul Mackerras       2018-10-08  377
->> 360cae313702cd Paul Mackerras       2018-10-08  378  	if (r == -EINTR)
->> 360cae313702cd Paul Mackerras       2018-10-08  379  		return H_INTERRUPT;
->> 360cae313702cd Paul Mackerras       2018-10-08  380
->> 873db2cd9a6d7f Suraj Jitindar Singh 2018-12-14  381  	if (vcpu->mmio_needed) {
->> 873db2cd9a6d7f Suraj Jitindar Singh 2018-12-14  382  		kvmhv_nested_mmio_needed(vcpu, regs_ptr);
->> 873db2cd9a6d7f Suraj Jitindar Singh 2018-12-14  383  		return H_TOO_HARD;
->> 873db2cd9a6d7f Suraj Jitindar Singh 2018-12-14  384  	}
->> 873db2cd9a6d7f Suraj Jitindar Singh 2018-12-14  385
->> 360cae313702cd Paul Mackerras       2018-10-08  386  	return vcpu->arch.trap;
->> 360cae313702cd Paul Mackerras       2018-10-08  387  }
->> 360cae313702cd Paul Mackerras       2018-10-08  388
->>
->> :::::: The code at line 264 was first introduced by commit
->> :::::: 360cae313702cdd0b90f82c261a8302fecef030a KVM: PPC: Book3S HV: Nested guest entry via hypercall
->>
->> :::::: TO: Paul Mackerras <paulus@ozlabs.org>
->> :::::: CC: Michael Ellerman <mpe@ellerman.id.au>
->>
->> ---
->> 0-DAY CI Kernel Test Service, Intel Corporation
->> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
->>
