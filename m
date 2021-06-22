@@ -2,118 +2,173 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94EA13B0221
-	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Jun 2021 12:59:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AD903B0EF6
+	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Jun 2021 22:47:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230094AbhFVLB5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 22 Jun 2021 07:01:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53176 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230103AbhFVLB4 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Jun 2021 07:01:56 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217D8C061756
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 03:59:40 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id u190so12926545pgd.8
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 03:59:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=DsgwPnyTUdZa/AjF9rolFYob05oJxOKI9sd1Aj7QIvU=;
-        b=ucZqRXDFh94YgWql53590Q3D8VYn+GfCLaFLyfmEV/pP6B4GTcK3tHBtN8YOvG/UzT
-         ynJXuf7oZzwUA3gkpncYJZVl6vs1bCZsBft8oTvxYORveU5rkkJ42MBznDYstWCtO11i
-         V2NdYExIWgcTWPaUKsCALKuV9vJlQ5XI0wsNMNrvbTM9CPfLErZQnSt/4zG1J39nhgkE
-         gaanD15Um/cCohGx/ujb2OJQVLygwybI9XDBWo8gO+IgTZF4MO5567wLdtTf2H+FyQZg
-         qmVFviWNuJJDYftUI9fNLKVBGG8poc+mC9zHHLLDORuNMQlbAcPRje0NKrUbe6217IQF
-         0ogQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=DsgwPnyTUdZa/AjF9rolFYob05oJxOKI9sd1Aj7QIvU=;
-        b=MNYVaRXwUW7nndORM6/yNC0ZLifHq8Jw7vXUaVzZyygBz62NT4jlTu61nAH5/O1R77
-         DxNbQS/d9d3XHH/vjaKHXQdgW+D0DyDJJxY6rq1MDoTAxAg5xkv5qemFeh0Lkpyt01bq
-         b/zn7IA3vUg5oyOkX+wDubzOv8TUZDApcgQH+9vmod3SSqlqUqhIxfvGF9Av71cfvJJM
-         xMeFknRdYq/tulz7nufStFfA5VlXUwKL+LHWOvwRLXF9hgFQG8E7n+VPCSaPr0aLmLdr
-         oJU6iuw0G9E8gXnyjgNVTs3kElCIcNEc60F54z78GeR+0A/7n4oun/jVUVBNkXmtI3s2
-         eq6A==
-X-Gm-Message-State: AOAM531SoYmLZxxPmy1IQzOulAd/xsWphdZH3x0KkZRyIxSXb1ZepzKv
-        hQArmWitNoQAeEtyP8iuqYPUR3qvvDU=
-X-Google-Smtp-Source: ABdhPJwt2bqZQu7WX7dsPof+cuDJrpVVgvI/q3zgbiyq8PMYIVs6AhCdF/59Mgz7LoEmAp52obMLFg==
-X-Received: by 2002:aa7:8806:0:b029:302:f067:7b52 with SMTP id c6-20020aa788060000b0290302f0677b52mr3131946pfo.13.1624359579612;
-        Tue, 22 Jun 2021 03:59:39 -0700 (PDT)
-Received: from bobo.ozlabs.ibm.com (60-242-147-73.tpgi.com.au. [60.242.147.73])
-        by smtp.gmail.com with ESMTPSA id l6sm5623621pgh.34.2021.06.22.03.59.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jun 2021 03:59:39 -0700 (PDT)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [RFC PATCH 43/43] KVM: PPC: Book3S HV P9: Optimise hash guest SLB saving
-Date:   Tue, 22 Jun 2021 20:57:36 +1000
-Message-Id: <20210622105736.633352-44-npiggin@gmail.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20210622105736.633352-1-npiggin@gmail.com>
-References: <20210622105736.633352-1-npiggin@gmail.com>
+        id S229667AbhFVUtW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 22 Jun 2021 16:49:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4176 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229567AbhFVUtW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Jun 2021 16:49:22 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15MKYFBW040774
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 16:47:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=e0H9LtcT1SLUHo80QKR8WFbqXSXaELy9ljflqQ772w8=;
+ b=EduRNmr4jDj32iKjI8KIQV1I+P0y2PQVuGWoq4luKgDNvS9yEB/NFOZYdNDA1A2pOrR1
+ I7BNByzWtATKWD4Kmg7cCSa1jjPpD6hN/VkhW6Mmevh2zfQ4D6x7yUlipz+J2s2xjsss
+ XH5+0jpY/4/fcSJriahK8aEWUx9sHyJSYoq11sZ/OR2HEaZ8uTwwAi9RLS3glipHoZpX
+ SupcakLGlChp0sOqWXwWEGEPrQCfjibCs3kCvgkCzGduy+K8F6wCjx7t0lynzgnmH09u
+ nrqAip+682bRnMntoGYtC4E+VNSt0ZeXMPJ9w1mlZZ7xBt6ATxq/We5PJXqv6ZIc6+Tl RA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39bngrasvf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 16:47:05 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15MKac25051701
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 16:47:05 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39bngrasv5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 16:47:05 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15MKc3O4015968;
+        Tue, 22 Jun 2021 20:47:04 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma01wdc.us.ibm.com with ESMTP id 399878tu24-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Jun 2021 20:47:04 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15MKl3mV35127554
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Jun 2021 20:47:03 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C9B86AE05C;
+        Tue, 22 Jun 2021 20:47:03 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 07D79AE05F;
+        Tue, 22 Jun 2021 20:47:03 +0000 (GMT)
+Received: from localhost (unknown [9.211.80.241])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Tue, 22 Jun 2021 20:47:02 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV Nested: Reflect L2 PMU in-use to L0
+ when L2 SPRs are live
+In-Reply-To: <20210619133415.20016-1-npiggin@gmail.com>
+References: <20210619133415.20016-1-npiggin@gmail.com>
+Date:   Tue, 22 Jun 2021 17:47:00 -0300
+Message-ID: <87lf71oce3.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 5kN519VdRXOK3Gw-mtSApZUaXJzKwh-K
+X-Proofpoint-GUID: NNaPlF0N5yVr-e5J8o6x38jGkAsANT3Q
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-22_12:2021-06-22,2021-06-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ bulkscore=0 mlxlogscore=999 adultscore=0 priorityscore=1501 phishscore=0
+ spamscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106220123
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-slbmfee/slbmfev instructions are very expensive, moreso than a regular
-mfspr instruction, so minimising them significantly improves hash guest
-exit performance. The slbmfev is only required if slbmfee found a valid
-SLB entry.
+Nicholas Piggin <npiggin@gmail.com> writes:
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- arch/powerpc/kvm/book3s_hv_p9_entry.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+> After the L1 saves its PMU SPRs but before loading the L2's PMU SPRs,
+> switch the pmcregs_in_use field in the L1 lppaca to the value advertised
+> by the L2 in its VPA. On the way out of the L2, set it back after saving
+> the L2 PMU registers (if they were in-use).
+>
+> This transfers the PMU liveness indication between the L1 and L2 at the
+> points where the registers are not live.
+>
+> This fixes the nested HV bug for which a workaround was added to the L0
+> HV by commit 63279eeb7f93a ("KVM: PPC: Book3S HV: Always save guest pmu
+> for guest capable of nesting"), which explains the problem in detail.
+> That workaround is no longer required for guests that include this bug
+> fix.
+>
+> Fixes: 360cae313702 ("KVM: PPC: Book3S HV: Nested guest entry via hypercall")
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-index 3fffcec67ff8..5e9e9f809297 100644
---- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
-+++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-@@ -459,10 +459,22 @@ static void __accumulate_time(struct kvm_vcpu *vcpu, struct kvmhv_tb_accumulator
- #define accumulate_time(vcpu, next) do {} while (0)
- #endif
- 
--static inline void mfslb(unsigned int idx, u64 *slbee, u64 *slbev)
-+static inline u64 mfslbv(unsigned int idx)
- {
--	asm volatile("slbmfev  %0,%1" : "=r" (*slbev) : "r" (idx));
--	asm volatile("slbmfee  %0,%1" : "=r" (*slbee) : "r" (idx));
-+	u64 slbev;
-+
-+	asm volatile("slbmfev  %0,%1" : "=r" (slbev) : "r" (idx));
-+
-+	return slbev;
-+}
-+
-+static inline u64 mfslbe(unsigned int idx)
-+{
-+	u64 slbee;
-+
-+	asm volatile("slbmfee  %0,%1" : "=r" (slbee) : "r" (idx));
-+
-+	return slbee;
- }
- 
- static inline void mtslb(u64 slbee, u64 slbev)
-@@ -592,8 +604,10 @@ static void save_clear_guest_mmu(struct kvm *kvm, struct kvm_vcpu *vcpu)
- 		 */
- 		for (i = 0; i < vcpu->arch.slb_nr; i++) {
- 			u64 slbee, slbev;
--			mfslb(i, &slbee, &slbev);
-+
-+			slbee = mfslbe(i);
- 			if (slbee & SLB_ESID_V) {
-+				slbev = mfslbv(i);
- 				vcpu->arch.slb[nr].orige = slbee | i;
- 				vcpu->arch.slb[nr].origv = slbev;
- 				nr++;
--- 
-2.23.0
+I don't know much about the performance monitor facility, but the patch
+seems sane overall.
 
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+
+> ---
+> I have a later performance patch that reverts the workaround, but it
+> would be good to fix the nested HV first so there is some lead time for
+> the fix to percolate.
+>
+> Thanks,
+> Nick
+>
+>  arch/powerpc/include/asm/pmc.h |  7 +++++++
+>  arch/powerpc/kvm/book3s_hv.c   | 15 +++++++++++++++
+>  2 files changed, 22 insertions(+)
+>
+> diff --git a/arch/powerpc/include/asm/pmc.h b/arch/powerpc/include/asm/pmc.h
+> index c6bbe9778d3c..3c09109e708e 100644
+> --- a/arch/powerpc/include/asm/pmc.h
+> +++ b/arch/powerpc/include/asm/pmc.h
+> @@ -34,6 +34,13 @@ static inline void ppc_set_pmu_inuse(int inuse)
+>  #endif
+>  }
+>
+> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+> +static inline int ppc_get_pmu_inuse(void)
+> +{
+> +	return get_paca()->pmcregs_in_use;
+> +}
+> +#endif
+> +
+>  extern void power4_enable_pmcs(void);
+>
+>  #else /* CONFIG_PPC64 */
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 0d6edb136bd4..e66f96fb6eed 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -59,6 +59,7 @@
+>  #include <asm/kvm_book3s.h>
+>  #include <asm/mmu_context.h>
+>  #include <asm/lppaca.h>
+> +#include <asm/pmc.h>
+>  #include <asm/processor.h>
+>  #include <asm/cputhreads.h>
+>  #include <asm/page.h>
+> @@ -3761,6 +3762,16 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+>  	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
+>  		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
+>
+> +#ifdef CONFIG_PPC_PSERIES
+> +	if (kvmhv_on_pseries()) {
+> +		if (vcpu->arch.vpa.pinned_addr) {
+> +			struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
+> +			get_lppaca()->pmcregs_in_use = lp->pmcregs_in_use;
+> +		} else {
+> +			get_lppaca()->pmcregs_in_use = 1;
+> +		}
+> +	}
+> +#endif
+>  	kvmhv_load_guest_pmu(vcpu);
+>
+>  	msr_check_and_set(MSR_FP | MSR_VEC | MSR_VSX);
+> @@ -3895,6 +3906,10 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+>  	save_pmu |= nesting_enabled(vcpu->kvm);
+>
+>  	kvmhv_save_guest_pmu(vcpu, save_pmu);
+> +#ifdef CONFIG_PPC_PSERIES
+> +	if (kvmhv_on_pseries())
+> +		get_lppaca()->pmcregs_in_use = ppc_get_pmu_inuse();
+> +#endif
+>
+>  	vc->entry_exit_map = 0x101;
+>  	vc->in_guest = 0;
