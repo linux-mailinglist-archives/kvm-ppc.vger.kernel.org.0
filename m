@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1B393B0209
-	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Jun 2021 12:58:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED4FC3B020A
+	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Jun 2021 12:58:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230052AbhFVLBM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 22 Jun 2021 07:01:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52978 "EHLO
+        id S230054AbhFVLBO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 22 Jun 2021 07:01:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbhFVLBL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Jun 2021 07:01:11 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01200C061574
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 03:58:56 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id z3-20020a17090a3983b029016bc232e40bso2024523pjb.4
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 03:58:55 -0700 (PDT)
+        with ESMTP id S229567AbhFVLBN (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Jun 2021 07:01:13 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DAE1C061574
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 03:58:58 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id d12so2207843pgd.9
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 03:58:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=LZ/Q2wlJYTRY51R/HLVZw7HLKfFNvyfgVBWwpbB+uT4=;
-        b=S/YLtteYiOL2aNTUceWfaeH9HUfKvLtv5Ty2V331KPbizZ9JXfOf14ANbu6gyJptDS
-         jOJpsldpKQLUReBpOPxFlOndmD+dr47rGX5TMhjadCQFjsAFQH3jk8vqPbqeCH8kumAC
-         WXkkiAY7aMAhQr+HsJMGZuNzBLnV0Juej08SIg1qKw5fH9jgSDwQJGHF9sikgbL1MoFX
-         LcH3v4bCeIHcPC4yoL4TikMgDj9a6ERurpb/JOShjQkO0972f9zzXk+vQNB4XFGIH81e
-         HQEQao9Szt9YijOkdVAmWnsV860pVMP6ab5SLzMsp0KZk3PDyF2rvDPN9AgIfgxFgMQe
-         P/Lg==
+        bh=fJodkEL3mlkd09uEBZ0qy1MXGKcAacqn5bf7t2b6BD4=;
+        b=LbsTxDlX3EJ/YgLJJ6Oo476zONcdaSAtPw7RTLXiDsSaaTi9AGcN0AU1IQPF+ExvKR
+         0Sh++pLlOCTwvZhw0FaY+/TRTuSW8rmUEh/OE05n19IJZofbgPO6k9x8VKNypzDsy3u0
+         SZOgOVtNkqJQ5m61Oej2SvlIM1TGnFAnoz8QcAkfCEaAfZBxILcIaccNL5lDl8YTamy5
+         ZiOtSLQukq8USI0Ku+dlD0tUUPc8w50zCynW/tJUgxjtHObhEyppnVmZiilvNIFs2Is6
+         0C+q+HVqgaYsJDg7BV3sTybVibd5FIC4reueexqHOIAZXATnSaymT5OViadml64bqEsH
+         QfWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=LZ/Q2wlJYTRY51R/HLVZw7HLKfFNvyfgVBWwpbB+uT4=;
-        b=OAAM0dzSYGcElI4RHRMJzCF5R6JwFZgdfx9dFikdnqaOpSldqKZlLh7DUbKpjq9wU+
-         eiCDlDRxrRCXumi3fUMEAlKPfdgXF6PTlUCrYuQD2Ks8uvllVJLjfJLid2JUIV876KzO
-         VQbrkCoUIZ88sgyIgoJT8cexW3kD0e05lrFFjgQBMu2r+D2CyL/uGPGx5mY/MHGjoiHX
-         WTAHxEVd93WxYMhdATWmqwqCsqBT15M3uG4vFarRzHkdR3w4UHylxWllBXkwQ03YcZE5
-         VHMRp/0BHa3qChVZL2lOCQpC5waEfvfBgReiPbm5w3Ti+/WacxvVhAvAKcess91gYy0h
-         WyUA==
-X-Gm-Message-State: AOAM531/ibypjrE3UOvX4BmV3RPlEc2b+/MiH+qAKSPmWghoPm3l2vfB
-        v6suZuW+dPv0yz1okghcSylGMf775oQ=
-X-Google-Smtp-Source: ABdhPJxtw1jziJy+5t8nGmb+P6yCLD9qDeGo2QipQg0AdXYj+iV8rkd18t2wwXZyTXVaPfANuq0Vwg==
-X-Received: by 2002:a17:90a:694d:: with SMTP id j13mr3275599pjm.99.1624359535478;
-        Tue, 22 Jun 2021 03:58:55 -0700 (PDT)
+        bh=fJodkEL3mlkd09uEBZ0qy1MXGKcAacqn5bf7t2b6BD4=;
+        b=K4rx/1wZwSd9ffQZqxHHoeJSc+PK7/a50749M80D/KgRyAZsc4JDYbejdwDyEcxSY2
+         Vyp4aBv3ABPUfFnKIbMHoTf2WWJ7BlKYde2Gzb7SiotaU+cSK0kP/qjvOakd9Hzf2OzS
+         CHWZGQrYvmKxkrK6XxnjVz+OFvkoalj6ZB+6Ji8xTp5SD2NW4AxULdEhCVnQpnywS29L
+         LR9hs22rN/QU+E/K/NaKdYOQHAOKRBT8G8R/8sMNg656cH0a+1moIzDJJssW/BIxGb9X
+         uDLkCBgd26zj8Okum/WnT0v2/FM1NXqc9AvamEP8TBTFVXNtHS7of2DKWjucvfiIHgYj
+         Rc3w==
+X-Gm-Message-State: AOAM533Sg7hXSBk3Dq2GDsyrbkAwOesCKZJCtW6Mp4OqLgeTTU0gFm7I
+        zajVvsde7ac6Ugo3rgularMU2yWiMDs=
+X-Google-Smtp-Source: ABdhPJygGW0fZVLDBJVE3wO94MhuNwPdJ3LH/1XjLnBXyOHKiG3WU0l9aO70MrwzHx/ApHkeUWjaYw==
+X-Received: by 2002:a63:be45:: with SMTP id g5mr3168250pgo.311.1624359537779;
+        Tue, 22 Jun 2021 03:58:57 -0700 (PDT)
 Received: from bobo.ozlabs.ibm.com (60-242-147-73.tpgi.com.au. [60.242.147.73])
-        by smtp.gmail.com with ESMTPSA id l6sm5623621pgh.34.2021.06.22.03.58.53
+        by smtp.gmail.com with ESMTPSA id l6sm5623621pgh.34.2021.06.22.03.58.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jun 2021 03:58:55 -0700 (PDT)
+        Tue, 22 Jun 2021 03:58:57 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [RFC PATCH 24/43] KVM: PPC: Book3S HV P9: Only execute mtSPR if the value changed
-Date:   Tue, 22 Jun 2021 20:57:17 +1000
-Message-Id: <20210622105736.633352-25-npiggin@gmail.com>
+Subject: [RFC PATCH 25/43] KVM: PPC: Book3S HV P9: Juggle SPR switching around
+Date:   Tue, 22 Jun 2021 20:57:18 +1000
+Message-Id: <20210622105736.633352-26-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210622105736.633352-1-npiggin@gmail.com>
 References: <20210622105736.633352-1-npiggin@gmail.com>
@@ -62,136 +62,55 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Keep better track of the current SPR value in places where
-they are to be loaded with a new context, to reduce expensive
-mtSPR operations.
-
--73 cycles (7354) POWER9 virt-mode NULL hcall
+This juggles SPR switching on the entry and exit sides to be more
+symmetric, which makes the next refactoring patch possible with no
+functional change.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 64 ++++++++++++++++++++++--------------
- 1 file changed, 39 insertions(+), 25 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 8c6ba04e1fdf..612b70216e75 100644
+index 612b70216e75..a780a9b9effd 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3905,19 +3905,28 @@ static void switch_pmu_to_host(struct kvm_vcpu *vcpu,
- 	}
- }
+@@ -4069,7 +4069,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
+ 		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
  
--static void load_spr_state(struct kvm_vcpu *vcpu)
-+static void load_spr_state(struct kvm_vcpu *vcpu,
-+				struct p9_host_os_sprs *host_os_sprs)
- {
--	mtspr(SPRN_DSCR, vcpu->arch.dscr);
--	mtspr(SPRN_IAMR, vcpu->arch.iamr);
--	mtspr(SPRN_PSPB, vcpu->arch.pspb);
--	mtspr(SPRN_FSCR, vcpu->arch.fscr);
- 	mtspr(SPRN_TAR, vcpu->arch.tar);
- 	mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
- 	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
- 	mtspr(SPRN_BESCR, vcpu->arch.bescr);
--	mtspr(SPRN_TIDR, vcpu->arch.tid);
--	mtspr(SPRN_AMR, vcpu->arch.amr);
--	mtspr(SPRN_UAMOR, vcpu->arch.uamor);
-+
-+	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-+		mtspr(SPRN_TIDR, vcpu->arch.tid);
-+	if (host_os_sprs->iamr != vcpu->arch.iamr)
-+		mtspr(SPRN_IAMR, vcpu->arch.iamr);
-+	if (host_os_sprs->amr != vcpu->arch.amr)
-+		mtspr(SPRN_AMR, vcpu->arch.amr);
-+	if (vcpu->arch.uamor != 0)
-+		mtspr(SPRN_UAMOR, vcpu->arch.uamor);
-+	if (host_os_sprs->fscr != vcpu->arch.fscr)
-+		mtspr(SPRN_FSCR, vcpu->arch.fscr);
-+	if (host_os_sprs->dscr != vcpu->arch.dscr)
-+		mtspr(SPRN_DSCR, vcpu->arch.dscr);
-+	if (vcpu->arch.pspb != 0)
-+		mtspr(SPRN_PSPB, vcpu->arch.pspb);
+-	switch_pmu_to_guest(vcpu, &host_os_sprs);
++	load_spr_state(vcpu, &host_os_sprs);
  
- 	/*
- 	 * DAR, DSISR, and for nested HV, SPRGs must be set with MSR[RI]
-@@ -3932,28 +3941,31 @@ static void load_spr_state(struct kvm_vcpu *vcpu)
- 
- static void store_spr_state(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.ctrl = mfspr(SPRN_CTRLF);
--
--	vcpu->arch.iamr = mfspr(SPRN_IAMR);
--	vcpu->arch.pspb = mfspr(SPRN_PSPB);
--	vcpu->arch.fscr = mfspr(SPRN_FSCR);
- 	vcpu->arch.tar = mfspr(SPRN_TAR);
- 	vcpu->arch.ebbhr = mfspr(SPRN_EBBHR);
- 	vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
- 	vcpu->arch.bescr = mfspr(SPRN_BESCR);
--	vcpu->arch.tid = mfspr(SPRN_TIDR);
-+
-+	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-+		vcpu->arch.tid = mfspr(SPRN_TIDR);
-+	vcpu->arch.iamr = mfspr(SPRN_IAMR);
- 	vcpu->arch.amr = mfspr(SPRN_AMR);
- 	vcpu->arch.uamor = mfspr(SPRN_UAMOR);
-+	vcpu->arch.fscr = mfspr(SPRN_FSCR);
- 	vcpu->arch.dscr = mfspr(SPRN_DSCR);
-+	vcpu->arch.pspb = mfspr(SPRN_PSPB);
-+
-+	vcpu->arch.ctrl = mfspr(SPRN_CTRLF);
- }
- 
- static void save_p9_host_os_sprs(struct p9_host_os_sprs *host_os_sprs)
- {
--	host_os_sprs->dscr = mfspr(SPRN_DSCR);
--	host_os_sprs->tidr = mfspr(SPRN_TIDR);
-+	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-+		host_os_sprs->tidr = mfspr(SPRN_TIDR);
- 	host_os_sprs->iamr = mfspr(SPRN_IAMR);
- 	host_os_sprs->amr = mfspr(SPRN_AMR);
- 	host_os_sprs->fscr = mfspr(SPRN_FSCR);
-+	host_os_sprs->dscr = mfspr(SPRN_DSCR);
- }
- 
- /* vcpu guest regs must already be saved */
-@@ -3962,18 +3974,20 @@ static void restore_p9_host_os_sprs(struct kvm_vcpu *vcpu,
- {
- 	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
- 
--	mtspr(SPRN_PSPB, 0);
--	mtspr(SPRN_UAMOR, 0);
--
--	mtspr(SPRN_DSCR, host_os_sprs->dscr);
--	mtspr(SPRN_TIDR, host_os_sprs->tidr);
--	mtspr(SPRN_IAMR, host_os_sprs->iamr);
--
-+	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-+		mtspr(SPRN_TIDR, host_os_sprs->tidr);
-+	if (host_os_sprs->iamr != vcpu->arch.iamr)
-+		mtspr(SPRN_IAMR, host_os_sprs->iamr);
-+	if (vcpu->arch.uamor != 0)
-+		mtspr(SPRN_UAMOR, 0);
- 	if (host_os_sprs->amr != vcpu->arch.amr)
- 		mtspr(SPRN_AMR, host_os_sprs->amr);
--
- 	if (host_os_sprs->fscr != vcpu->arch.fscr)
- 		mtspr(SPRN_FSCR, host_os_sprs->fscr);
-+	if (host_os_sprs->dscr != vcpu->arch.dscr)
-+		mtspr(SPRN_DSCR, host_os_sprs->dscr);
-+	if (vcpu->arch.pspb != 0)
-+		mtspr(SPRN_PSPB, 0);
- 
- 	/* Save guest CTRL register, set runlatch to 1 */
- 	if (!(vcpu->arch.ctrl & 1))
-@@ -4063,7 +4077,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	load_fp_state(&vcpu->arch.fp);
+ #ifdef CONFIG_ALTIVEC
+@@ -4077,7 +4077,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
  #endif
  	mtspr(SPRN_VRSAVE, vcpu->arch.vrsave);
  
--	load_spr_state(vcpu);
-+	load_spr_state(vcpu, &host_os_sprs);
+-	load_spr_state(vcpu, &host_os_sprs);
++	switch_pmu_to_guest(vcpu, &host_os_sprs);
  
  	if (kvmhv_on_pseries()) {
  		/*
+@@ -4177,6 +4177,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 			vcpu->arch.slb_max = 0;
+ 	}
+ 
++	switch_pmu_to_host(vcpu, &host_os_sprs);
++
+ 	store_spr_state(vcpu);
+ 
+ 	store_fp_state(&vcpu->arch.fp);
+@@ -4191,8 +4193,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 
+ 	vcpu_vpa_increment_dispatch(vcpu);
+ 
+-	switch_pmu_to_host(vcpu, &host_os_sprs);
+-
+ 	timer_rearm_host_dec(*tb);
+ 
+ 	restore_p9_host_os_sprs(vcpu, &host_os_sprs);
 -- 
 2.23.0
 
