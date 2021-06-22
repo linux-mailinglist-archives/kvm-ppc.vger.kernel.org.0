@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D79CE3B01FA
-	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Jun 2021 12:58:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB9EC3B01FC
+	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Jun 2021 12:58:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbhFVLAl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 22 Jun 2021 07:00:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52840 "EHLO
+        id S229922AbhFVLAm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 22 Jun 2021 07:00:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229922AbhFVLAk (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Jun 2021 07:00:40 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDAC2C061574
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 03:58:23 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id g4so11889046pjk.0
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 03:58:23 -0700 (PDT)
+        with ESMTP id S230032AbhFVLAm (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Jun 2021 07:00:42 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 815DAC061574
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 03:58:26 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id i4so6539835plt.12
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 03:58:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ExYg3HaSa6NEA2tye6Hf9NRWHYIufYXyPQWVG5gVKAs=;
-        b=pKc3jKCm1nmrCd9j+U3DfYamb8eMv2gDY9XlER9uPR7FkXGUxtseEFiyChLsMn/uhj
-         JYuI/SDRwrYuw5u/zUP+ul0nTcVc1irSrRz96thfHNuiSX1k4b6ZbPm/2J7rGMV5kHo0
-         f/ttR7plf1+1+6CUdZNa3Ga3IdcfaCjIzIICWHKZnW8W5UDCxim7LuyYhjT6o/nV8dsl
-         Oe2JiTRLg8YJ/e8BX4qWwejFvIH6ZRe5arfEdj5Z7k5U+OPLJKJRBLQljTqoiMbrMNkO
-         iUw2PlidFZiKBOW1l+jBMoJUeUAhZezg8n4N+L072PC7zfY8h2QPnrDeMwZGqrTpbqO9
-         sB6w==
+        bh=XeckW1SELkzqZtdQyYlPpbgjiGzhPPr2SL3SVbOXvdk=;
+        b=bWtxCbT8rwIKOB7gt8CU2C3NrB1/QC3aINzcoW5cjrqo7mUgwrwIPxMmCvVuA0w4cf
+         5HUQDQm2TIgwLRsEQdIK8H2b9r6kI1PCQwWhfTYuWSKypIqsiUqOsKHZZrLPdXsveSum
+         w/8SoU5j8Ynh6dl6vAqmAsv98bpbAxBd5UyyEmmQSCxZdOhCIJGY0xllAtXdBukn5afc
+         DiGKmuY93/CuB1JKJW1UGT/hskEpibhxE/5nt2l0GH/iKGqIHF7aWhQ+NlL91ycfh4Fb
+         zWLIV/OqAJ3YDAicke+KcgrDZiqGoZZIMqnPtFuyA59hT//0T6xHINmkwdlPZb97udA3
+         Z4GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ExYg3HaSa6NEA2tye6Hf9NRWHYIufYXyPQWVG5gVKAs=;
-        b=DBCOhOXsNTwyB6MfXNDxc4P/EPitGJ2p2I1NSH2/jy4YOYY0RC8x1I/jG2wDs/WvBj
-         fTbMXqT8vqYCTdPBw9ELQfEdIZKNWT48zLUjXmNl6uoSTW7jZj6UTqpm2e3EiO9GJHN5
-         P5EXiyuOpa0FlGF0+pdazVlLPtbN/zlDukTsSRob38Xx1SCAchau6tsgChyZSq8b97in
-         pQVF5o3168td/89UtwxERk0U0rz2GeON1fPCmMYISfZz/tjC1bqQiPz3oWzzLBrtaNwh
-         HNekPunGXcsfBX16qtizRV1KIamD+jyyECkKuWT23+5lEg99OJ0U8m7sBvzHdIjxv97s
-         TRmw==
-X-Gm-Message-State: AOAM530pp4CpMtsPsO/O8Bk0xd+mK8zIhXMjMUYMBaK5MWjcZhDbgfOl
-        a/4uBhcahO+j/B08abkQdpe9GHvbgNA=
-X-Google-Smtp-Source: ABdhPJw8JCxPtWi4Z4NkqAEfJHWyLSnjh2s8Ho1DQotswBflA/J/klnhFFhlqdEhNJrtGCbEsge/pw==
-X-Received: by 2002:a17:902:728e:b029:101:c3b7:a47f with SMTP id d14-20020a170902728eb0290101c3b7a47fmr22200728pll.21.1624359503092;
-        Tue, 22 Jun 2021 03:58:23 -0700 (PDT)
+        bh=XeckW1SELkzqZtdQyYlPpbgjiGzhPPr2SL3SVbOXvdk=;
+        b=XCGXHQL8zPSl6oRWLi+muLMtInjLc6SItt5xRcns5OtC+TO9Hrjsqnwely3qTF70/r
+         G207dy/1XgF/2Q+eXmOk/ROnvCmYfu2fTRhQ/AcLGh8PCWwnFS5+O3tDmdYT8ezCeWnw
+         LMlC7Gga0TSvWhl0+uu4L+/Ootqi9BHxQ4mHbNgor4CUWvveGuna2fo9pRnHN/MqqZL4
+         xbgIMNy+Leq+O1lzmNbOQHfQtiKbjv/U5PMKyCY5qaRsx8ity/BcsYMhFFpZkJFIFuxb
+         rrm/6aSsGm5MYnjhOAAFRs8iz0oGuZIoElwOFthcjKXR9qLLNw66mjhpPvkTc+IL3YTf
+         dAJg==
+X-Gm-Message-State: AOAM530+00lBZ/4zn2LDzdXIgDsHMD0SE3ferEkPvugfjkqbjelymMYt
+        r2BLEeUJcbsR1g7g91t1BfUl7qnRIOU=
+X-Google-Smtp-Source: ABdhPJwrvayOCZ/rKcVBT7/kWwv/S4SY4OZnIWwvy5U1sMYsfU0+O9b+jLN7128qkA2N515M/xCEdQ==
+X-Received: by 2002:a17:902:c641:b029:122:6927:6e50 with SMTP id s1-20020a170902c641b029012269276e50mr10457543pls.6.1624359505798;
+        Tue, 22 Jun 2021 03:58:25 -0700 (PDT)
 Received: from bobo.ozlabs.ibm.com (60-242-147-73.tpgi.com.au. [60.242.147.73])
-        by smtp.gmail.com with ESMTPSA id l6sm5623621pgh.34.2021.06.22.03.58.21
+        by smtp.gmail.com with ESMTPSA id l6sm5623621pgh.34.2021.06.22.03.58.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jun 2021 03:58:22 -0700 (PDT)
+        Tue, 22 Jun 2021 03:58:25 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [RFC PATCH 11/43] KVM: PPC: Book3S HV P9: Implement PMU save/restore in C
-Date:   Tue, 22 Jun 2021 20:57:04 +1000
-Message-Id: <20210622105736.633352-12-npiggin@gmail.com>
+Subject: [RFC PATCH 12/43] KVM: PPC: Book3S HV P9: Factor out yield_count increment
+Date:   Tue, 22 Jun 2021 20:57:05 +1000
+Message-Id: <20210622105736.633352-13-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210622105736.633352-1-npiggin@gmail.com>
 References: <20210622105736.633352-1-npiggin@gmail.com>
@@ -62,451 +62,62 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Implement the P9 path PMU save/restore code in C, and remove the
-POWER9/10 code from the P7/8 path assembly.
-
--449 cycles (8533) POWER9 virt-mode NULL hcall
+Factor duplicated code into a helper function.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/include/asm/asm-prototypes.h |   5 -
- arch/powerpc/kvm/book3s_hv.c              | 205 ++++++++++++++++++++--
- arch/powerpc/kvm/book3s_hv_interrupts.S   |  13 +-
- arch/powerpc/kvm/book3s_hv_rmhandlers.S   |  43 +----
- 4 files changed, 200 insertions(+), 66 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/asm-prototypes.h b/arch/powerpc/include/asm/asm-prototypes.h
-index 02ee6f5ac9fe..928db8ef9a5a 100644
---- a/arch/powerpc/include/asm/asm-prototypes.h
-+++ b/arch/powerpc/include/asm/asm-prototypes.h
-@@ -136,11 +136,6 @@ static inline void kvmppc_restore_tm_hv(struct kvm_vcpu *vcpu, u64 msr,
- 					bool preserve_nv) { }
- #endif /* CONFIG_PPC_TRANSACTIONAL_MEM */
- 
--void kvmhv_save_host_pmu(void);
--void kvmhv_load_host_pmu(void);
--void kvmhv_save_guest_pmu(struct kvm_vcpu *vcpu, bool pmu_in_use);
--void kvmhv_load_guest_pmu(struct kvm_vcpu *vcpu);
--
- void kvmppc_p9_enter_guest(struct kvm_vcpu *vcpu);
- 
- long kvmppc_h_set_dabr(struct kvm_vcpu *vcpu, unsigned long dabr);
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index f7349d150828..b1b94b3563b7 100644
+index b1b94b3563b7..38d8afa16839 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3635,6 +3635,188 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
- 	trace_kvmppc_run_core(vc, 1);
+@@ -3896,6 +3896,16 @@ static inline bool hcall_is_xics(unsigned long req)
+ 		req == H_IPOLL || req == H_XIRR || req == H_XIRR_X;
  }
  
-+/*
-+ * Privileged (non-hypervisor) host registers to save.
-+ */
-+struct p9_host_os_sprs {
-+	unsigned long dscr;
-+	unsigned long tidr;
-+	unsigned long iamr;
-+	unsigned long amr;
-+	unsigned long fscr;
-+
-+	unsigned int pmc1;
-+	unsigned int pmc2;
-+	unsigned int pmc3;
-+	unsigned int pmc4;
-+	unsigned int pmc5;
-+	unsigned int pmc6;
-+	unsigned long mmcr0;
-+	unsigned long mmcr1;
-+	unsigned long mmcr2;
-+	unsigned long mmcr3;
-+	unsigned long mmcra;
-+	unsigned long siar;
-+	unsigned long sier1;
-+	unsigned long sier2;
-+	unsigned long sier3;
-+	unsigned long sdar;
-+};
-+
-+static void freeze_pmu(unsigned long mmcr0, unsigned long mmcra)
++static void vcpu_vpa_increment_dispatch(struct kvm_vcpu *vcpu)
 +{
-+	if (!(mmcr0 & MMCR0_FC))
-+		goto do_freeze;
-+	if (mmcra & MMCRA_SAMPLE_ENABLE)
-+		goto do_freeze;
-+	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-+		if (!(mmcr0 & MMCR0_PMCCEXT))
-+			goto do_freeze;
-+		if (!(mmcra & MMCRA_BHRB_DISABLE))
-+			goto do_freeze;
-+	}
-+	return;
-+
-+do_freeze:
-+	mmcr0 = MMCR0_FC;
-+	mmcra = 0;
-+	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-+		mmcr0 |= MMCR0_PMCCEXT;
-+		mmcra = MMCRA_BHRB_DISABLE;
-+	}
-+
-+	mtspr(SPRN_MMCR0, mmcr0);
-+	mtspr(SPRN_MMCRA, mmcra);
-+	isync();
-+}
-+
-+static void save_p9_host_pmu(struct p9_host_os_sprs *host_os_sprs)
-+{
-+	if (ppc_get_pmu_inuse()) {
-+		/*
-+		 * It might be better to put PMU handling (at least for the
-+		 * host) in the perf subsystem because it knows more about what
-+		 * is being used.
-+		 */
-+
-+		/* POWER9, POWER10 do not implement HPMC or SPMC */
-+
-+		host_os_sprs->mmcr0 = mfspr(SPRN_MMCR0);
-+		host_os_sprs->mmcra = mfspr(SPRN_MMCRA);
-+
-+		freeze_pmu(host_os_sprs->mmcr0, host_os_sprs->mmcra);
-+
-+		host_os_sprs->pmc1 = mfspr(SPRN_PMC1);
-+		host_os_sprs->pmc2 = mfspr(SPRN_PMC2);
-+		host_os_sprs->pmc3 = mfspr(SPRN_PMC3);
-+		host_os_sprs->pmc4 = mfspr(SPRN_PMC4);
-+		host_os_sprs->pmc5 = mfspr(SPRN_PMC5);
-+		host_os_sprs->pmc6 = mfspr(SPRN_PMC6);
-+		host_os_sprs->mmcr1 = mfspr(SPRN_MMCR1);
-+		host_os_sprs->mmcr2 = mfspr(SPRN_MMCR2);
-+		host_os_sprs->sdar = mfspr(SPRN_SDAR);
-+		host_os_sprs->siar = mfspr(SPRN_SIAR);
-+		host_os_sprs->sier1 = mfspr(SPRN_SIER);
-+
-+		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-+			host_os_sprs->mmcr3 = mfspr(SPRN_MMCR3);
-+			host_os_sprs->sier2 = mfspr(SPRN_SIER2);
-+			host_os_sprs->sier3 = mfspr(SPRN_SIER3);
-+		}
++	struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
++	if (lp) {
++		u32 yield_count = be32_to_cpu(lp->yield_count) + 1;
++		lp->yield_count = cpu_to_be32(yield_count);
++		vcpu->arch.vpa.dirty = 1;
 +	}
 +}
 +
-+static void load_p9_guest_pmu(struct kvm_vcpu *vcpu)
-+{
-+	mtspr(SPRN_PMC1, vcpu->arch.pmc[0]);
-+	mtspr(SPRN_PMC2, vcpu->arch.pmc[1]);
-+	mtspr(SPRN_PMC3, vcpu->arch.pmc[2]);
-+	mtspr(SPRN_PMC4, vcpu->arch.pmc[3]);
-+	mtspr(SPRN_PMC5, vcpu->arch.pmc[4]);
-+	mtspr(SPRN_PMC6, vcpu->arch.pmc[5]);
-+	mtspr(SPRN_MMCR1, vcpu->arch.mmcr[1]);
-+	mtspr(SPRN_MMCR2, vcpu->arch.mmcr[2]);
-+	mtspr(SPRN_SDAR, vcpu->arch.sdar);
-+	mtspr(SPRN_SIAR, vcpu->arch.siar);
-+	mtspr(SPRN_SIER, vcpu->arch.sier[0]);
-+
-+	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-+		mtspr(SPRN_MMCR3, vcpu->arch.mmcr[4]);
-+		mtspr(SPRN_SIER2, vcpu->arch.sier[1]);
-+		mtspr(SPRN_SIER3, vcpu->arch.sier[2]);
-+	}
-+
-+	/* Set MMCRA then MMCR0 last */
-+	mtspr(SPRN_MMCRA, vcpu->arch.mmcra);
-+	mtspr(SPRN_MMCR0, vcpu->arch.mmcr[0]);
-+	/* No isync necessary because we're starting counters */
-+}
-+
-+static void save_p9_guest_pmu(struct kvm_vcpu *vcpu)
-+{
-+	struct lppaca *lp;
-+	int save_pmu = 1;
-+
-+	lp = vcpu->arch.vpa.pinned_addr;
-+	if (lp)
-+		save_pmu = lp->pmcregs_in_use;
-+
-+	if (save_pmu) {
-+		vcpu->arch.mmcr[0] = mfspr(SPRN_MMCR0);
-+		vcpu->arch.mmcra = mfspr(SPRN_MMCRA);
-+
-+		freeze_pmu(vcpu->arch.mmcr[0], vcpu->arch.mmcra);
-+
-+		vcpu->arch.pmc[0] = mfspr(SPRN_PMC1);
-+		vcpu->arch.pmc[1] = mfspr(SPRN_PMC2);
-+		vcpu->arch.pmc[2] = mfspr(SPRN_PMC3);
-+		vcpu->arch.pmc[3] = mfspr(SPRN_PMC4);
-+		vcpu->arch.pmc[4] = mfspr(SPRN_PMC5);
-+		vcpu->arch.pmc[5] = mfspr(SPRN_PMC6);
-+		vcpu->arch.mmcr[1] = mfspr(SPRN_MMCR1);
-+		vcpu->arch.mmcr[2] = mfspr(SPRN_MMCR2);
-+		vcpu->arch.sdar = mfspr(SPRN_SDAR);
-+		vcpu->arch.siar = mfspr(SPRN_SIAR);
-+		vcpu->arch.sier[0] = mfspr(SPRN_SIER);
-+
-+		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-+			vcpu->arch.mmcr[3] = mfspr(SPRN_MMCR3);
-+			vcpu->arch.sier[1] = mfspr(SPRN_SIER2);
-+			vcpu->arch.sier[2] = mfspr(SPRN_SIER3);
-+		}
-+	} else {
-+		freeze_pmu(mfspr(SPRN_MMCR0), mfspr(SPRN_MMCRA));
-+	}
-+}
-+
-+static void load_p9_host_pmu(struct p9_host_os_sprs *host_os_sprs)
-+{
-+	if (ppc_get_pmu_inuse()) {
-+		mtspr(SPRN_PMC1, host_os_sprs->pmc1);
-+		mtspr(SPRN_PMC2, host_os_sprs->pmc2);
-+		mtspr(SPRN_PMC3, host_os_sprs->pmc3);
-+		mtspr(SPRN_PMC4, host_os_sprs->pmc4);
-+		mtspr(SPRN_PMC5, host_os_sprs->pmc5);
-+		mtspr(SPRN_PMC6, host_os_sprs->pmc6);
-+		mtspr(SPRN_MMCR1, host_os_sprs->mmcr1);
-+		mtspr(SPRN_MMCR2, host_os_sprs->mmcr2);
-+		mtspr(SPRN_SDAR, host_os_sprs->sdar);
-+		mtspr(SPRN_SIAR, host_os_sprs->siar);
-+		mtspr(SPRN_SIER, host_os_sprs->sier1);
-+
-+		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-+			mtspr(SPRN_MMCR3, host_os_sprs->mmcr3);
-+			mtspr(SPRN_SIER2, host_os_sprs->sier2);
-+			mtspr(SPRN_SIER3, host_os_sprs->sier3);
-+		}
-+
-+		/* Set MMCRA then MMCR0 last */
-+		mtspr(SPRN_MMCRA, host_os_sprs->mmcra);
-+		mtspr(SPRN_MMCR0, host_os_sprs->mmcr0);
-+		isync();
-+	}
-+}
-+
- static void load_spr_state(struct kvm_vcpu *vcpu)
- {
- 	mtspr(SPRN_DSCR, vcpu->arch.dscr);
-@@ -3677,17 +3859,6 @@ static void store_spr_state(struct kvm_vcpu *vcpu)
- 	vcpu->arch.dscr = mfspr(SPRN_DSCR);
- }
+ /*
+  * Guest entry for POWER9 and later CPUs.
+  */
+@@ -3926,12 +3936,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	vc->entry_exit_map = 1;
+ 	vc->in_guest = 1;
  
--/*
-- * Privileged (non-hypervisor) host registers to save.
-- */
--struct p9_host_os_sprs {
--	unsigned long dscr;
--	unsigned long tidr;
--	unsigned long iamr;
--	unsigned long amr;
--	unsigned long fscr;
--};
--
- static void save_p9_host_os_sprs(struct p9_host_os_sprs *host_os_sprs)
- {
- 	host_os_sprs->dscr = mfspr(SPRN_DSCR);
-@@ -3735,7 +3906,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	struct p9_host_os_sprs host_os_sprs;
- 	s64 dec;
- 	u64 tb, next_timer;
--	int trap, save_pmu;
-+	int trap;
+-	if (vcpu->arch.vpa.pinned_addr) {
+-		struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
+-		u32 yield_count = be32_to_cpu(lp->yield_count) + 1;
+-		lp->yield_count = cpu_to_be32(yield_count);
+-		vcpu->arch.vpa.dirty = 1;
+-	}
++	vcpu_vpa_increment_dispatch(vcpu);
  
- 	WARN_ON_ONCE(vcpu->arch.ceded);
- 
-@@ -3748,7 +3919,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 
- 	save_p9_host_os_sprs(&host_os_sprs);
- 
--	kvmhv_save_host_pmu();		/* saves it to PACA kvm_hstate */
-+	save_p9_host_pmu(&host_os_sprs);
- 
- 	kvmppc_subcore_enter_guest();
- 
-@@ -3776,7 +3947,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 		}
- 	}
- #endif
--	kvmhv_load_guest_pmu(vcpu);
-+	load_p9_guest_pmu(vcpu);
- 
- 	msr_check_and_set(MSR_FP | MSR_VEC | MSR_VSX);
- 	load_fp_state(&vcpu->arch.fp);
-@@ -3898,16 +4069,14 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	if (cpu_has_feature(CPU_FTR_TM) ||
+ 	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
+@@ -4069,12 +4074,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
  	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
  		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
  
--	save_pmu = 1;
- 	if (vcpu->arch.vpa.pinned_addr) {
- 		struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
- 		u32 yield_count = be32_to_cpu(lp->yield_count) + 1;
- 		lp->yield_count = cpu_to_be32(yield_count);
- 		vcpu->arch.vpa.dirty = 1;
--		save_pmu = lp->pmcregs_in_use;
- 	}
+-	if (vcpu->arch.vpa.pinned_addr) {
+-		struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
+-		u32 yield_count = be32_to_cpu(lp->yield_count) + 1;
+-		lp->yield_count = cpu_to_be32(yield_count);
+-		vcpu->arch.vpa.dirty = 1;
+-	}
++	vcpu_vpa_increment_dispatch(vcpu);
  
--	kvmhv_save_guest_pmu(vcpu, save_pmu);
-+	save_p9_guest_pmu(vcpu);
+ 	save_p9_guest_pmu(vcpu);
  #ifdef CONFIG_PPC_PSERIES
- 	if (kvmhv_on_pseries())
- 		get_lppaca()->pmcregs_in_use = ppc_get_pmu_inuse();
-@@ -3920,7 +4089,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 
- 	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
- 
--	kvmhv_load_host_pmu();
-+	load_p9_host_pmu(&host_os_sprs);
- 
- 	kvmppc_subcore_exit_guest();
- 
-diff --git a/arch/powerpc/kvm/book3s_hv_interrupts.S b/arch/powerpc/kvm/book3s_hv_interrupts.S
-index 4444f83cb133..59d89e4b154a 100644
---- a/arch/powerpc/kvm/book3s_hv_interrupts.S
-+++ b/arch/powerpc/kvm/book3s_hv_interrupts.S
-@@ -104,7 +104,10 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
- 	mtlr	r0
- 	blr
- 
--_GLOBAL(kvmhv_save_host_pmu)
-+/*
-+ * void kvmhv_save_host_pmu(void)
-+ */
-+kvmhv_save_host_pmu:
- BEGIN_FTR_SECTION
- 	/* Work around P8 PMAE bug */
- 	li	r3, -1
-@@ -138,14 +141,6 @@ BEGIN_FTR_SECTION
- 	std	r8, HSTATE_MMCR2(r13)
- 	std	r9, HSTATE_SIER(r13)
- END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
--BEGIN_FTR_SECTION
--	mfspr	r5, SPRN_MMCR3
--	mfspr	r6, SPRN_SIER2
--	mfspr	r7, SPRN_SIER3
--	std	r5, HSTATE_MMCR3(r13)
--	std	r6, HSTATE_SIER2(r13)
--	std	r7, HSTATE_SIER3(r13)
--END_FTR_SECTION_IFSET(CPU_FTR_ARCH_31)
- 	mfspr	r3, SPRN_PMC1
- 	mfspr	r5, SPRN_PMC2
- 	mfspr	r6, SPRN_PMC3
-diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index 007f87b97184..0eb06734bc26 100644
---- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-+++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -2780,10 +2780,11 @@ kvmppc_msr_interrupt:
- 	blr
- 
- /*
-+ * void kvmhv_load_guest_pmu(struct kvm_vcpu *vcpu)
-+ *
-  * Load up guest PMU state.  R3 points to the vcpu struct.
-  */
--_GLOBAL(kvmhv_load_guest_pmu)
--EXPORT_SYMBOL_GPL(kvmhv_load_guest_pmu)
-+kvmhv_load_guest_pmu:
- 	mr	r4, r3
- 	mflr	r0
- 	li	r3, 1
-@@ -2817,27 +2818,17 @@ END_FTR_SECTION_IFSET(CPU_FTR_PMAO_BUG)
- 	mtspr	SPRN_MMCRA, r6
- 	mtspr	SPRN_SIAR, r7
- 	mtspr	SPRN_SDAR, r8
--BEGIN_FTR_SECTION
--	ld      r5, VCPU_MMCR + 24(r4)
--	ld      r6, VCPU_SIER + 8(r4)
--	ld      r7, VCPU_SIER + 16(r4)
--	mtspr   SPRN_MMCR3, r5
--	mtspr   SPRN_SIER2, r6
--	mtspr   SPRN_SIER3, r7
--END_FTR_SECTION_IFSET(CPU_FTR_ARCH_31)
- BEGIN_FTR_SECTION
- 	ld	r5, VCPU_MMCR + 16(r4)
- 	ld	r6, VCPU_SIER(r4)
- 	mtspr	SPRN_MMCR2, r5
- 	mtspr	SPRN_SIER, r6
--BEGIN_FTR_SECTION_NESTED(96)
- 	lwz	r7, VCPU_PMC + 24(r4)
- 	lwz	r8, VCPU_PMC + 28(r4)
- 	ld	r9, VCPU_MMCRS(r4)
- 	mtspr	SPRN_SPMC1, r7
- 	mtspr	SPRN_SPMC2, r8
- 	mtspr	SPRN_MMCRS, r9
--END_FTR_SECTION_NESTED(CPU_FTR_ARCH_300, 0, 96)
- END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
- 	mtspr	SPRN_MMCR0, r3
- 	isync
-@@ -2845,10 +2836,11 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
- 	blr
- 
- /*
-+ * void kvmhv_load_host_pmu(void)
-+ *
-  * Reload host PMU state saved in the PACA by kvmhv_save_host_pmu.
-  */
--_GLOBAL(kvmhv_load_host_pmu)
--EXPORT_SYMBOL_GPL(kvmhv_load_host_pmu)
-+kvmhv_load_host_pmu:
- 	mflr	r0
- 	lbz	r4, PACA_PMCINUSE(r13) /* is the host using the PMU? */
- 	cmpwi	r4, 0
-@@ -2886,25 +2878,18 @@ BEGIN_FTR_SECTION
- 	mtspr	SPRN_MMCR2, r8
- 	mtspr	SPRN_SIER, r9
- END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
--BEGIN_FTR_SECTION
--	ld      r5, HSTATE_MMCR3(r13)
--	ld      r6, HSTATE_SIER2(r13)
--	ld      r7, HSTATE_SIER3(r13)
--	mtspr   SPRN_MMCR3, r5
--	mtspr   SPRN_SIER2, r6
--	mtspr   SPRN_SIER3, r7
--END_FTR_SECTION_IFSET(CPU_FTR_ARCH_31)
- 	mtspr	SPRN_MMCR0, r3
- 	isync
- 	mtlr	r0
- 23:	blr
- 
- /*
-+ * void kvmhv_save_guest_pmu(struct kvm_vcpu *vcpu, bool pmu_in_use)
-+ *
-  * Save guest PMU state into the vcpu struct.
-  * r3 = vcpu, r4 = full save flag (PMU in use flag set in VPA)
-  */
--_GLOBAL(kvmhv_save_guest_pmu)
--EXPORT_SYMBOL_GPL(kvmhv_save_guest_pmu)
-+kvmhv_save_guest_pmu:
- 	mr	r9, r3
- 	mr	r8, r4
- BEGIN_FTR_SECTION
-@@ -2953,14 +2938,6 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
- BEGIN_FTR_SECTION
- 	std	r10, VCPU_MMCR + 16(r9)
- END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
--BEGIN_FTR_SECTION
--	mfspr   r5, SPRN_MMCR3
--	mfspr   r6, SPRN_SIER2
--	mfspr   r7, SPRN_SIER3
--	std     r5, VCPU_MMCR + 24(r9)
--	std     r6, VCPU_SIER + 8(r9)
--	std     r7, VCPU_SIER + 16(r9)
--END_FTR_SECTION_IFSET(CPU_FTR_ARCH_31)
- 	std	r7, VCPU_SIAR(r9)
- 	std	r8, VCPU_SDAR(r9)
- 	mfspr	r3, SPRN_PMC1
-@@ -2978,7 +2955,6 @@ END_FTR_SECTION_IFSET(CPU_FTR_ARCH_31)
- BEGIN_FTR_SECTION
- 	mfspr	r5, SPRN_SIER
- 	std	r5, VCPU_SIER(r9)
--BEGIN_FTR_SECTION_NESTED(96)
- 	mfspr	r6, SPRN_SPMC1
- 	mfspr	r7, SPRN_SPMC2
- 	mfspr	r8, SPRN_MMCRS
-@@ -2987,7 +2963,6 @@ BEGIN_FTR_SECTION_NESTED(96)
- 	std	r8, VCPU_MMCRS(r9)
- 	lis	r4, 0x8000
- 	mtspr	SPRN_MMCRS, r4
--END_FTR_SECTION_NESTED(CPU_FTR_ARCH_300, 0, 96)
- END_FTR_SECTION_IFSET(CPU_FTR_ARCH_207S)
- 22:	blr
- 
 -- 
 2.23.0
 
