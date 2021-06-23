@@ -2,173 +2,226 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AD903B0EF6
-	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Jun 2021 22:47:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C8D63B1426
+	for <lists+kvm-ppc@lfdr.de>; Wed, 23 Jun 2021 08:47:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbhFVUtW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 22 Jun 2021 16:49:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4176 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229567AbhFVUtW (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Jun 2021 16:49:22 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15MKYFBW040774
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 16:47:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=e0H9LtcT1SLUHo80QKR8WFbqXSXaELy9ljflqQ772w8=;
- b=EduRNmr4jDj32iKjI8KIQV1I+P0y2PQVuGWoq4luKgDNvS9yEB/NFOZYdNDA1A2pOrR1
- I7BNByzWtATKWD4Kmg7cCSa1jjPpD6hN/VkhW6Mmevh2zfQ4D6x7yUlipz+J2s2xjsss
- XH5+0jpY/4/fcSJriahK8aEWUx9sHyJSYoq11sZ/OR2HEaZ8uTwwAi9RLS3glipHoZpX
- SupcakLGlChp0sOqWXwWEGEPrQCfjibCs3kCvgkCzGduy+K8F6wCjx7t0lynzgnmH09u
- nrqAip+682bRnMntoGYtC4E+VNSt0ZeXMPJ9w1mlZZ7xBt6ATxq/We5PJXqv6ZIc6+Tl RA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39bngrasvf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 16:47:05 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15MKac25051701
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Jun 2021 16:47:05 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39bngrasv5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 16:47:05 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15MKc3O4015968;
-        Tue, 22 Jun 2021 20:47:04 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma01wdc.us.ibm.com with ESMTP id 399878tu24-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Jun 2021 20:47:04 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15MKl3mV35127554
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Jun 2021 20:47:03 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C9B86AE05C;
-        Tue, 22 Jun 2021 20:47:03 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07D79AE05F;
-        Tue, 22 Jun 2021 20:47:03 +0000 (GMT)
-Received: from localhost (unknown [9.211.80.241])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Tue, 22 Jun 2021 20:47:02 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV Nested: Reflect L2 PMU in-use to L0
- when L2 SPRs are live
-In-Reply-To: <20210619133415.20016-1-npiggin@gmail.com>
-References: <20210619133415.20016-1-npiggin@gmail.com>
-Date:   Tue, 22 Jun 2021 17:47:00 -0300
-Message-ID: <87lf71oce3.fsf@linux.ibm.com>
+        id S229934AbhFWGtd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 23 Jun 2021 02:49:33 -0400
+Received: from ozlabs.org ([203.11.71.1]:40527 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229660AbhFWGtd (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 23 Jun 2021 02:49:33 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4G8v2W0GvHz9sWk;
+        Wed, 23 Jun 2021 16:47:15 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1624430835;
+        bh=cfdZDPaNgewJgbrEDz9CrXOtl9f4wxZsiDWM3b0oOsc=;
+        h=From:To:Subject:In-Reply-To:References:Date:From;
+        b=HHLjOHa0l8wehDoQRoUmB7K89vAt7AGtQnqrO1GoYx8127aX/N0e97UuEFpUjJLnS
+         DzTQiXYykMDaFRljVWd4wcpcnfWpp34x3a8OMmErz7HmqlIcsEy7Nf3Epenl3ET23l
+         dgEZptDLeRXB96fP/y3FXZfYpwqnUshpKu+/NwiaElSLcy+oYvQjaKqsOXKwwcN7T8
+         lZqGgdoHrN1DvEafmfA6/l7JfwVt3Qt4cUoSq9NlkS43SieSWMMnuWADtPnRFB2o33
+         uS7tVKSgV73CpLQY4N2LuihYkdpXAxMqMfBtPWgbUwKj8UvWBRMQeCLBA5xDQD/qut
+         wMjSRJMqF0ywg==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     bharata@linux.ibm.com, Nathan Chancellor <nathan@kernel.org>,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        farosas@linux.ibm.com, aneesh.kumar@linux.ibm.com,
+        npiggin@gmail.com, david@gibson.dropbear.id.au
+Subject: Re: [PATCH v8 4/6] KVM: PPC: Book3S HV: Nested support in
+ H_RPT_INVALIDATE
+In-Reply-To: <YNGNWRsUgRiMqrGs@in.ibm.com>
+References: <20210621085003.904767-1-bharata@linux.ibm.com>
+ <20210621085003.904767-5-bharata@linux.ibm.com>
+ <YNDIitJ3Hn1/G8Jw@Ryzen-9-3900X.localdomain> <YNFom3Ojb4TGsKj2@in.ibm.com>
+ <YNGNWRsUgRiMqrGs@in.ibm.com>
+Date:   Wed, 23 Jun 2021 16:47:12 +1000
+Message-ID: <87o8bx13in.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5kN519VdRXOK3Gw-mtSApZUaXJzKwh-K
-X-Proofpoint-GUID: NNaPlF0N5yVr-e5J8o6x38jGkAsANT3Q
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-22_12:2021-06-22,2021-06-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- bulkscore=0 mlxlogscore=999 adultscore=0 priorityscore=1501 phishscore=0
- spamscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106220123
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
-
-> After the L1 saves its PMU SPRs but before loading the L2's PMU SPRs,
-> switch the pmcregs_in_use field in the L1 lppaca to the value advertised
-> by the L2 in its VPA. On the way out of the L2, set it back after saving
-> the L2 PMU registers (if they were in-use).
+Bharata B Rao <bharata@linux.ibm.com> writes:
+> On Tue, Jun 22, 2021 at 10:05:45AM +0530, Bharata B Rao wrote:
+>> On Mon, Jun 21, 2021 at 10:12:42AM -0700, Nathan Chancellor wrote:
+>> > I have not seen this reported yet so apologies if it has and there is a
+>> > fix I am missing:
+>> > 
+>> > arch/powerpc/kvm/book3s_hv_nested.c:1334:11: error: variable 'ap' is uninitialized when used here [-Werror,-Wuninitialized]
+>> >                                                            ap, start, end);
+>> >                                                            ^~
+>> > arch/powerpc/kvm/book3s_hv_nested.c:1276:25: note: initialize the variable 'ap' to silence this warning
+>> >         unsigned long psize, ap;
+>> >                                ^
+>> >                                 = 0
+>> 
+>> Thanks for catching this, this wasn't caught in my environment.
+>> 
+>> I will repost the series with proper initialization to ap.
 >
-> This transfers the PMU liveness indication between the L1 and L2 at the
-> points where the registers are not live.
+> Michael,
 >
-> This fixes the nested HV bug for which a workaround was added to the L0
-> HV by commit 63279eeb7f93a ("KVM: PPC: Book3S HV: Always save guest pmu
-> for guest capable of nesting"), which explains the problem in detail.
-> That workaround is no longer required for guests that include this bug
-> fix.
+> Here is the fix for this on top of powerpc/next. If it is easier
+> and cleaner to fold this into the original series and re-post
+> the whole series against any updated tree, let me know.
+
+Thanks. I squashed this in.
+
+cheers
+
+> From 2e7198e28c0d1137f3230d4645e9cfddaccf4987 Mon Sep 17 00:00:00 2001
+> From: Bharata B Rao <bharata@linux.ibm.com>
+> Date: Tue, 22 Jun 2021 12:07:01 +0530
+> Subject: [PATCH 1/1] KVM: PPC: Book3S HV: Use proper ap value in
+>  H_RPT_INVALIDATE
 >
-> Fixes: 360cae313702 ("KVM: PPC: Book3S HV: Nested guest entry via hypercall")
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-
-I don't know much about the performance monitor facility, but the patch
-seems sane overall.
-
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
-
+> The ap value that is used when performing range based partition
+> scoped invalidations for the nested guests wasn't initialized
+> correctly.
+>
+> Fix this and while we are here, reorganize the routine that does
+> this invalidation for better readability.
+>
+> Fixes: 0e67d866cb32 ("KVM: PPC: Book3S HV: Nested support in H_RPT_INVALIDATE")
+> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
 > ---
-> I have a later performance patch that reverts the workaround, but it
-> would be good to fix the nested HV first so there is some lead time for
-> the fix to percolate.
+>  arch/powerpc/kvm/book3s_hv_nested.c | 90 +++++++++++++----------------
+>  1 file changed, 40 insertions(+), 50 deletions(-)
 >
-> Thanks,
-> Nick
->
->  arch/powerpc/include/asm/pmc.h |  7 +++++++
->  arch/powerpc/kvm/book3s_hv.c   | 15 +++++++++++++++
->  2 files changed, 22 insertions(+)
->
-> diff --git a/arch/powerpc/include/asm/pmc.h b/arch/powerpc/include/asm/pmc.h
-> index c6bbe9778d3c..3c09109e708e 100644
-> --- a/arch/powerpc/include/asm/pmc.h
-> +++ b/arch/powerpc/include/asm/pmc.h
-> @@ -34,6 +34,13 @@ static inline void ppc_set_pmu_inuse(int inuse)
->  #endif
+> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+> index d78efb5f5bb3..3a06ac0b53e2 100644
+> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+> @@ -1222,27 +1222,6 @@ long kvmhv_do_nested_tlbie(struct kvm_vcpu *vcpu)
+>  	return H_SUCCESS;
 >  }
->
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +static inline int ppc_get_pmu_inuse(void)
+>  
+> -static long do_tlb_invalidate_nested_tlb(struct kvm_vcpu *vcpu,
+> -					 unsigned long lpid,
+> -					 unsigned long page_size,
+> -					 unsigned long ap,
+> -					 unsigned long start,
+> -					 unsigned long end)
+> -{
+> -	unsigned long addr = start;
+> -	int ret;
+> -
+> -	do {
+> -		ret = kvmhv_emulate_tlbie_tlb_addr(vcpu, lpid, ap,
+> -						   get_epn(addr));
+> -		if (ret)
+> -			return ret;
+> -		addr += page_size;
+> -	} while (addr < end);
+> -
+> -	return ret;
+> -}
+> -
+>  static long do_tlb_invalidate_nested_all(struct kvm_vcpu *vcpu,
+>  					 unsigned long lpid, unsigned long ric)
+>  {
+> @@ -1263,6 +1242,42 @@ static long do_tlb_invalidate_nested_all(struct kvm_vcpu *vcpu,
+>   */
+>  static unsigned long tlb_range_flush_page_ceiling __read_mostly = 33;
+>  
+> +static long do_tlb_invalidate_nested_tlb(struct kvm_vcpu *vcpu,
+> +					 unsigned long lpid,
+> +					 unsigned long pg_sizes,
+> +					 unsigned long start,
+> +					 unsigned long end)
 > +{
-> +	return get_paca()->pmcregs_in_use;
-> +}
-> +#endif
+> +	int ret = H_P4;
+> +	unsigned long addr, nr_pages;
+> +	struct mmu_psize_def *def;
+> +	unsigned long psize, ap, page_size;
+> +	bool flush_lpid;
 > +
->  extern void power4_enable_pmcs(void);
->
->  #else /* CONFIG_PPC64 */
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 0d6edb136bd4..e66f96fb6eed 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -59,6 +59,7 @@
->  #include <asm/kvm_book3s.h>
->  #include <asm/mmu_context.h>
->  #include <asm/lppaca.h>
-> +#include <asm/pmc.h>
->  #include <asm/processor.h>
->  #include <asm/cputhreads.h>
->  #include <asm/page.h>
-> @@ -3761,6 +3762,16 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
->  	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
->  		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
->
-> +#ifdef CONFIG_PPC_PSERIES
-> +	if (kvmhv_on_pseries()) {
-> +		if (vcpu->arch.vpa.pinned_addr) {
-> +			struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
-> +			get_lppaca()->pmcregs_in_use = lp->pmcregs_in_use;
-> +		} else {
-> +			get_lppaca()->pmcregs_in_use = 1;
-> +		}
+> +	for (psize = 0; psize < MMU_PAGE_COUNT; psize++) {
+> +		def = &mmu_psize_defs[psize];
+> +		if (!(pg_sizes & def->h_rpt_pgsize))
+> +			continue;
+> +
+> +		nr_pages = (end - start) >> def->shift;
+> +		flush_lpid = nr_pages > tlb_range_flush_page_ceiling;
+> +		if (flush_lpid)
+> +			return do_tlb_invalidate_nested_all(vcpu, lpid,
+> +							RIC_FLUSH_TLB);
+> +		addr = start;
+> +		ap = mmu_get_ap(psize);
+> +		page_size = 1UL << def->shift;
+> +		do {
+> +			ret = kvmhv_emulate_tlbie_tlb_addr(vcpu, lpid, ap,
+> +						   get_epn(addr));
+> +			if (ret)
+> +				return H_P4;
+> +			addr += page_size;
+> +		} while (addr < end);
 > +	}
-> +#endif
->  	kvmhv_load_guest_pmu(vcpu);
->
->  	msr_check_and_set(MSR_FP | MSR_VEC | MSR_VSX);
-> @@ -3895,6 +3906,10 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
->  	save_pmu |= nesting_enabled(vcpu->kvm);
->
->  	kvmhv_save_guest_pmu(vcpu, save_pmu);
-> +#ifdef CONFIG_PPC_PSERIES
-> +	if (kvmhv_on_pseries())
-> +		get_lppaca()->pmcregs_in_use = ppc_get_pmu_inuse();
-> +#endif
->
->  	vc->entry_exit_map = 0x101;
->  	vc->in_guest = 0;
+> +	return ret;
+> +}
+> +
+>  /*
+>   * Performs partition-scoped invalidations for nested guests
+>   * as part of H_RPT_INVALIDATE hcall.
+> @@ -1271,10 +1286,6 @@ long do_h_rpt_invalidate_pat(struct kvm_vcpu *vcpu, unsigned long lpid,
+>  			     unsigned long type, unsigned long pg_sizes,
+>  			     unsigned long start, unsigned long end)
+>  {
+> -	struct kvm_nested_guest *gp;
+> -	long ret;
+> -	unsigned long psize, ap;
+> -
+>  	/*
+>  	 * If L2 lpid isn't valid, we need to return H_PARAMETER.
+>  	 *
+> @@ -1284,8 +1295,7 @@ long do_h_rpt_invalidate_pat(struct kvm_vcpu *vcpu, unsigned long lpid,
+>  	 * H_ENTER_NESTED call. Since we can't differentiate this case from
+>  	 * the invalid case, we ignore such flush requests and return success.
+>  	 */
+> -	gp = kvmhv_find_nested(vcpu->kvm, lpid);
+> -	if (!gp)
+> +	if (!kvmhv_find_nested(vcpu->kvm, lpid))
+>  		return H_SUCCESS;
+>  
+>  	/*
+> @@ -1313,29 +1323,9 @@ long do_h_rpt_invalidate_pat(struct kvm_vcpu *vcpu, unsigned long lpid,
+>  	if (start == 0 && end == -1)
+>  		return do_tlb_invalidate_nested_all(vcpu, lpid, RIC_FLUSH_TLB);
+>  
+> -	if (type & H_RPTI_TYPE_TLB) {
+> -		struct mmu_psize_def *def;
+> -		bool flush_lpid;
+> -		unsigned long nr_pages;
+> -
+> -		for (psize = 0; psize < MMU_PAGE_COUNT; psize++) {
+> -			def = &mmu_psize_defs[psize];
+> -			if (!(pg_sizes & def->h_rpt_pgsize))
+> -				continue;
+> -
+> -			nr_pages = (end - start) >> def->shift;
+> -			flush_lpid = nr_pages > tlb_range_flush_page_ceiling;
+> -			if (flush_lpid)
+> -				return do_tlb_invalidate_nested_all(vcpu, lpid,
+> -								RIC_FLUSH_TLB);
+> -
+> -			ret = do_tlb_invalidate_nested_tlb(vcpu, lpid,
+> -							   (1UL << def->shift),
+> -							   ap, start, end);
+> -			if (ret)
+> -				return H_P4;
+> -		}
+> -	}
+> +	if (type & H_RPTI_TYPE_TLB)
+> +		return do_tlb_invalidate_nested_tlb(vcpu, lpid, pg_sizes,
+> +						    start, end);
+>  	return H_SUCCESS;
+>  }
+>  
+> -- 
+> 2.31.1
