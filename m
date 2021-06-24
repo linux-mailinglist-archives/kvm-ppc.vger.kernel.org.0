@@ -2,64 +2,63 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B7C73B32AA
-	for <lists+kvm-ppc@lfdr.de>; Thu, 24 Jun 2021 17:35:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DB1E3B32B8
+	for <lists+kvm-ppc@lfdr.de>; Thu, 24 Jun 2021 17:36:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232029AbhFXPhx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 24 Jun 2021 11:37:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26497 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232377AbhFXPhw (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 24 Jun 2021 11:37:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624548932;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=f6k4ykVaPXFxqKCeveqsqgjZTsHJh+2Hx0FU9Hu8Shk=;
-        b=fEwzt1Ur7YqA7l19kiUugGJRO/H/dvI+1x7GM/mgPG5F4QUtx+W0HI8u0m96/5ozq+RbCi
-        3T32lRrJx4rRV1849gEUVzpzd6XTkxIEo+A3krIkt30LVuyZwN1CrpHJ1JLiekYIoTO7Y8
-        Rdl2pVPnEFdzKdgoXeuqVj9b84ScU3Q=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-453-OqLOZcMJMXeBDnIOELGdaw-1; Thu, 24 Jun 2021 11:35:29 -0400
-X-MC-Unique: OqLOZcMJMXeBDnIOELGdaw-1
-Received: by mail-wr1-f71.google.com with SMTP id d9-20020adffbc90000b029011a3b249b10so2328044wrs.3
-        for <kvm-ppc@vger.kernel.org>; Thu, 24 Jun 2021 08:35:28 -0700 (PDT)
+        id S230087AbhFXPjF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 24 Jun 2021 11:39:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59788 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232273AbhFXPjE (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 24 Jun 2021 11:39:04 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73DC6C061756
+        for <kvm-ppc@vger.kernel.org>; Thu, 24 Jun 2021 08:36:45 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id x22so3139195pll.11
+        for <kvm-ppc@vger.kernel.org>; Thu, 24 Jun 2021 08:36:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=oSmcLkLaYmb30K4x2o5V0PgF5sReFf2n8jT9UaERRsg=;
+        b=bSQo4DhU2KuL3CjUZN64j4WcwdggQch/R7XnEdix2NVuOf40qPGfYHBno8Xm619GAr
+         wg2kvoNy4VPNerE1UJQqTO/mn+wSl2WW8B9f7dL8xOzOgdg74JEfehGKdbWSQ0+1rr/t
+         2LEY4HKbsscIOGINiR9uO5OVpBxOglyxXqSvwqqzzZpKt1BhIehu/QDEuFSbgcAbmd1A
+         2Vn5BfcWryEpw7ny/6e9BAwB13V5uLq3/TeIlPL3nNBaDSZ9vfocg3yuStOuQjDnW2a3
+         vbLINUOPqFtht9Zb0kQj2xFTxtidhP/wmPjkGUm290ZvEfhGiSSc1t+MN7azCayA+NIy
+         PYiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=f6k4ykVaPXFxqKCeveqsqgjZTsHJh+2Hx0FU9Hu8Shk=;
-        b=Ga9eAH3hgycCh5NP+/gp3E5l8h8p/FKejI/Qkm+hsONFk4vJqcM9mWfxZKuX1YedKF
-         CZX3D4xYw3dHpCFiC4gL4uFrvFJvXZ4FzOJ3clWjoLx22w/9d8+nSE/WIWaK+JcknmXR
-         U0bxkfPQY5GgRS/t5diQhvxiEIsjb52SqkbtPkSLtidXIXR26kXZQ2ghmEMlOp4uMJg5
-         tcAdVdk5no0Bpa0SIC5n6kmsHwLakfmFUWuihaW7mKbBi9hJBKK+ewlN2HeBkFUmleyq
-         zgCbk2Xj0Uajdph+cSPW3kpIReuyspZVov11UmPHxky2gOvgm3SCP7arwl1NXi44lYPh
-         8bGw==
-X-Gm-Message-State: AOAM530wtjorQzhHyeIFZnQ9Mf0uNUsVA+eKLnJbfgpZAeBelH3TerZy
-        icbri0PksEcBH0rtTUjPuZkG+OrHQf9IXrnJRRdTDXgNQfYOe9vyGvTqh1ra+qFH1IySR7F7lWl
-        UNx9bpd4HXqc9YD1/JQ==
-X-Received: by 2002:a05:6000:1251:: with SMTP id j17mr5373908wrx.122.1624548927961;
-        Thu, 24 Jun 2021 08:35:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwBnDqu4vf3bAIylFJkD7JiEEmgRW9T3VoP4swdNx5pmdzHboAZtCJNJi7bVPTY8V2i+hs/AQ==
-X-Received: by 2002:a05:6000:1251:: with SMTP id j17mr5373864wrx.122.1624548927675;
-        Thu, 24 Jun 2021 08:35:27 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id v18sm4013288wrv.24.2021.06.24.08.35.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Jun 2021 08:35:27 -0700 (PDT)
-To:     Nicholas Piggin <npiggin@gmail.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=oSmcLkLaYmb30K4x2o5V0PgF5sReFf2n8jT9UaERRsg=;
+        b=Ww1QSN2/h68TDG7/cPa2GxfN7Z0uGfhq/jKU3DxQqUy7XkHI4RfR77qZixkelp16xQ
+         Dj4qZOMZOSFXOukFodMXyOiBVlyD5visoAIk4FAmRpEV1TJLSxTrsS3KNIjNuoI/z5c/
+         Pn8PISqIcbAXSFGqDehBDiMQEWCsGgwpGlQZjZI+VrQsMSofzTtkmoPRYGSs5Ehxj5U6
+         +9MjAi5Vj8MQ43BeHErhtB16npkBOFWPY4T6M7t22uT/NlfN0Ln94BgP845HvMKd23OD
+         ul8ZflEGHPj676ifrc3H7nFmHRdA/z9f10R2foWHX5sjsLGLmDx795vRgsJrZgEmD5ZH
+         FPTg==
+X-Gm-Message-State: AOAM533x8sHUZe8/pdtBGgiGttn7dXPua8yG5lz/ppmlvz5diNrNre6k
+        DW1Dd/3ssbSaorJUHO91GvcMcQ==
+X-Google-Smtp-Source: ABdhPJxfmbtVti63yi0rwniZ/V3vp7ddChowhbbwk916pZwapRYWPu+wwBqr+2N8fYjWJaOb0U93+Q==
+X-Received: by 2002:a17:90a:8542:: with SMTP id a2mr14115924pjw.185.1624549004763;
+        Thu, 24 Jun 2021 08:36:44 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p1sm3132065pfp.137.2021.06.24.08.36.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jun 2021 08:36:44 -0700 (PDT)
+Date:   Thu, 24 Jun 2021 15:36:40 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Huacai Chen <chenhuacai@kernel.org>,
         Marc Zyngier <maz@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
         David Stevens <stevensd@chromium.org>,
         Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
         dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
         intel-gvt-dev@lists.freedesktop.org,
         James Morse <james.morse@arm.com>,
@@ -68,58 +67,33 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Sean Christopherson <seanjc@google.com>,
-        David Stevens <stevensd@google.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 1/6] KVM: x86/mmu: release audited pfns
+Message-ID: <YNSmiOsmJin4UPcG@google.com>
 References: <20210624035749.4054934-1-stevensd@google.com>
- <1624530624.8jff1f4u11.astroid@bobo.none>
- <1624534759.nj0ylor2eh.astroid@bobo.none>
- <0d3a699a-15eb-9f1b-0735-79d14736f38c@redhat.com>
- <1624539354.6zggpdrdbw.astroid@bobo.none>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 0/6] KVM: Remove uses of struct page from x86 and arm64
- MMU
-Message-ID: <81d99029-ec40-19c5-5647-20607d78dab0@redhat.com>
-Date:   Thu, 24 Jun 2021 17:35:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ <20210624035749.4054934-2-stevensd@google.com>
+ <1624524156.04etgk7zmz.astroid@bobo.none>
+ <4816287a-b9a9-d3f4-f844-06922d696e06@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1624539354.6zggpdrdbw.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4816287a-b9a9-d3f4-f844-06922d696e06@redhat.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 24/06/21 14:57, Nicholas Piggin wrote:
-> KVM: Fix page ref underflow for regions with valid but non-refcounted pages
-
-It doesn't really fix the underflow, it disallows mapping them in the 
-first place.  Since in principle things can break, I'd rather be 
-explicit, so let's go with "KVM: do not allow mapping valid but 
-non-reference-counted pages".
-
-> It's possible to create a region which maps valid but non-refcounted
-> pages (e.g., tail pages of non-compound higher order allocations). These
-> host pages can then be returned by gfn_to_page, gfn_to_pfn, etc., family
-> of APIs, which take a reference to the page, which takes it from 0 to 1.
-> When the reference is dropped, this will free the page incorrectly.
+On Thu, Jun 24, 2021, Paolo Bonzini wrote:
+> On 24/06/21 10:43, Nicholas Piggin wrote:
+> > Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
+> > > From: David Stevens <stevensd@chromium.org>
+> > 
+> > Changelog? This looks like a bug, should it have a Fixes: tag?
 > 
-> Fix this by only taking a reference on the page if it was non-zero,
+> Probably has been there forever... The best way to fix the bug would be to
+> nuke mmu_audit.c, which I've threatened to do many times but never followed
+> up on.
 
-s/on the page/on valid pages/ (makes clear that invalid pages are fine 
-without refcounting).
-
-Thank you *so* much, I'm awful at Linux mm.
-
-Paolo
-
-> which indicates it is participating in normal refcounting (and can be
-> released with put_page).
-> 
-> Signed-off-by: Nicholas Piggin<npiggin@gmail.com>
-
+Yar.  It has only survived because it hasn't required any maintenance.
