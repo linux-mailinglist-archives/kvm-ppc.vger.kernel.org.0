@@ -2,66 +2,129 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AE9D3B1DCE
-	for <lists+kvm-ppc@lfdr.de>; Wed, 23 Jun 2021 17:48:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AE2F3B25C5
+	for <lists+kvm-ppc@lfdr.de>; Thu, 24 Jun 2021 05:59:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231133AbhFWPuo convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm-ppc@lfdr.de>); Wed, 23 Jun 2021 11:50:44 -0400
-Received: from [183.90.58.236] ([183.90.58.236]:45614 "EHLO ns1.zackeruz.tk"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229523AbhFWPun (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Wed, 23 Jun 2021 11:50:43 -0400
-Received: from johnlewis.com (unknown [192.168.20.1])
-        by ns1.zackeruz.tk (Postfix) with ESMTPSA id 5D93484618A
-        for <kvm-ppc@vger.kernel.org>; Wed, 23 Jun 2021 23:48:24 +0800 (+08)
-Reply-To: robert_turner@johnlewis-trading.com,
-          pippawicks.sales@johnlewis-trading.com
-From:   John Lewis & Partnersip <robert.turner107@johnlewis.com>
-To:     kvm-ppc@vger.kernel.org
-Subject: 6/23/2021 Product Inquiry 
-Date:   23 Jun 2021 15:48:23 +0000
-Message-ID: <20210623094114.16CCABFB516E91D2@johnlewis.com>
+        id S229505AbhFXEBl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 24 Jun 2021 00:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42918 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229448AbhFXEBh (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 24 Jun 2021 00:01:37 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319A3C061760
+        for <kvm-ppc@vger.kernel.org>; Wed, 23 Jun 2021 20:59:18 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id y14so3588042pgs.12
+        for <kvm-ppc@vger.kernel.org>; Wed, 23 Jun 2021 20:59:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BxIaFDPbAuZHR6J/S83W0A67K8R9coNY4bId9HsipsE=;
+        b=RBtU16Scd9URJKreXZFwanEfHJ1XRZJXhO4qEt4uU8YvBtSRsG8M0Msq7z7U3gBGbw
+         UdDX7s8F5odJ8nqB9b8EVGbHLmPHB74/ZvZg8RK4YeZb6UMq7MIYumlvjDcfnL6WHIaV
+         l3qHnUTf57CgLtDUOfr/2EStz1LFXjnziJK6o=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BxIaFDPbAuZHR6J/S83W0A67K8R9coNY4bId9HsipsE=;
+        b=MeLEbL45DCRhIlE7SvjhAvgblRvCZqoSDkEvxMwQoE3U2J4wcqxKpqKT+ZP5Gi0bWJ
+         GEyqYW1tGe2G2P6ZP1BthVQhuji4h60qi1eaf00cebtoIJZo3ye02joEIEDOzPBg7qiF
+         rkB9F7xVgq/UGnADRe6fLkQPrWFAmV4469Bjs2sodVz0h66cHO+cdoQU3yuhgqNTwyLo
+         BoBqcLQIbUhT9UkCqttN1tDSKyfojCzECeP9zBLotygagFreoI9COixNJBgMmg0aNXPU
+         +vDFcrLAPCqq06OgQZONb91CUqiimHCCBLUZeuM9I5kOdmRSBWtfr/CvYfzlJ+rGQQ1O
+         qFnA==
+X-Gm-Message-State: AOAM531NjEf4U5lJxgx6QSW5569lGl9L0CvhJZDvAbELwVYQUEBMDP1f
+        81uhES+C8Gep6UiwhJ8LD7VY/w==
+X-Google-Smtp-Source: ABdhPJw/0bUD4wxiHYbbe+W1J6aaPXVUUYjx3vGkULT22ezX3dEs1tG4sWixYLws/tdmOS++kmqsRg==
+X-Received: by 2002:aa7:96fc:0:b029:2e9:e827:928f with SMTP id i28-20020aa796fc0000b02902e9e827928fmr2818805pfq.49.1624507157546;
+        Wed, 23 Jun 2021 20:59:17 -0700 (PDT)
+Received: from localhost ([2401:fa00:8f:203:5038:6344:7f10:3690])
+        by smtp.gmail.com with UTF8SMTPSA id j15sm1163260pfh.194.2021.06.23.20.59.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Jun 2021 20:59:16 -0700 (PDT)
+From:   David Stevens <stevensd@chromium.org>
+X-Google-Original-From: David Stevens <stevensd@google.com>
+To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        David Stevens <stevensd@google.com>
+Subject: [PATCH 0/6] KVM: Remove uses of struct page from x86 and arm64 MMU
+Date:   Thu, 24 Jun 2021 12:57:43 +0900
+Message-Id: <20210624035749.4054934-1-stevensd@google.com>
+X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Dear kvm-ppc
+KVM supports mapping VM_IO and VM_PFNMAP memory into the guest by using
+follow_pte in gfn_to_pfn. However, the resolved pfns may not have
+assoicated struct pages, so they should not be passed to pfn_to_page.
+This series removes such calls from the x86 and arm64 secondary MMU. To
+do this, this series modifies gfn_to_pfn to return a struct page in
+addition to a pfn, if the hva was resolved by gup. This allows the
+caller to call put_page only when necessated by gup.
 
-The famous brand John Lewis Partnership, is UK's largest multi-
-channel retailer with over 126 shops and multiple expansion in 
-Africa furnished by European/Asian/American products. We are 
-sourcing new products to attract new customers and also retain 
-our existing ones, create new partnerships with companies dealing 
-with different kinds of goods globally.
+This series provides a helper function that unwraps the new return type
+of gfn_to_pfn to provide behavior identical to the old behavior. As I
+have no hardware to test powerpc/mips changes, the function is used
+there for minimally invasive changes. Additionally, as gfn_to_page and
+gfn_to_pfn_cache are not integrated with mmu notifier, they cannot be
+easily changed over to only use pfns.
 
-Your company's products are of interest to our market as we have 
-an amazing market for your products.
+This addresses CVE-2021-22543 on x86 and arm64.
 
-Provide us your current catalog through email to review more. We 
-hope to be able to order with you and start a long-term friendly,
-respectable and solid business partnership. Please we would 
-appreciate it if you could send us your stock availability via 
-email if any.
+David Stevens (6):
+  KVM: x86/mmu: release audited pfns
+  KVM: mmu: also return page from gfn_to_pfn
+  KVM: x86/mmu: avoid struct page in MMU
+  KVM: arm64/mmu: avoid struct page in MMU
+  KVM: mmu: remove over-aggressive warnings
+  drm/i915/gvt: use gfn_to_pfn's page instead of pfn
 
-Our payment terms are 15 days net in Europe, 30 days Net in UK 
-and 30 days net in Asia/USA as we operate with over 5297 
-suppliers around the globe for the past 50 years now. For 
-immediate response Send your reply to robert_turner@johnlewis-
-trading.com for us to be able to 
-treat with care and urgency.
+ arch/arm64/kvm/mmu.c                   |  42 +++++----
+ arch/mips/kvm/mmu.c                    |   3 +-
+ arch/powerpc/kvm/book3s.c              |   3 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |   5 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |   5 +-
+ arch/powerpc/kvm/book3s_hv_uvmem.c     |   4 +-
+ arch/powerpc/kvm/e500_mmu_host.c       |   2 +-
+ arch/x86/kvm/mmu/mmu.c                 |  60 ++++++------
+ arch/x86/kvm/mmu/mmu_audit.c           |  13 ++-
+ arch/x86/kvm/mmu/mmu_internal.h        |   3 +-
+ arch/x86/kvm/mmu/paging_tmpl.h         |  36 +++++---
+ arch/x86/kvm/mmu/tdp_mmu.c             |   7 +-
+ arch/x86/kvm/mmu/tdp_mmu.h             |   4 +-
+ arch/x86/kvm/x86.c                     |   9 +-
+ drivers/gpu/drm/i915/gvt/gtt.c         |  12 ++-
+ drivers/gpu/drm/i915/gvt/hypercall.h   |   3 +-
+ drivers/gpu/drm/i915/gvt/kvmgt.c       |  12 +--
+ drivers/gpu/drm/i915/gvt/mpt.h         |   8 +-
+ include/linux/kvm_host.h               |  27 ++++--
+ include/linux/kvm_types.h              |   5 +
+ virt/kvm/kvm_main.c                    | 123 +++++++++++++------------
+ 21 files changed, 212 insertions(+), 174 deletions(-)
 
+-- 
+2.32.0.93.g670b81a890-goog
 
-Best Regards
-
-Rob Turner
-Head Of Procurement Operations
-John Lewis & Partners.
-robert_turner@johnlewis-trading.com
-Tel: +44-7451-274090
-WhatsApp: +447497483925
-www.johnlewis.com
-REGISTERED OFFICE: 171 VICTORIA STREET, LONDON SW1E 5NN 
