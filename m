@@ -2,150 +2,306 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42DF33B880C
-	for <lists+kvm-ppc@lfdr.de>; Wed, 30 Jun 2021 19:51:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A96D63B8913
+	for <lists+kvm-ppc@lfdr.de>; Wed, 30 Jun 2021 21:17:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232663AbhF3Rxw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 30 Jun 2021 13:53:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36084 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232409AbhF3Rxt (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 30 Jun 2021 13:53:49 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15UHX6pM120910;
-        Wed, 30 Jun 2021 13:51:18 -0400
+        id S233488AbhF3TT6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 30 Jun 2021 15:19:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46800 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S233400AbhF3TT6 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 30 Jun 2021 15:19:58 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15UJ37gb116195;
+        Wed, 30 Jun 2021 15:17:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=KulXAAPQyyaVzsyC3ZAdvmjJRu4vu262LNdjxNoomlY=;
- b=Mh5ZktC4rQLYzgF100jeq5rXO16jx5tx/TDJCaZ6/vvrnzKO13XVPeegzGqVfFph6n2F
- 5TOmjABsA6xo/QxyzUYHhSoBUK/aifzignFJORAlDAltZjI/IyP5e/UcKg++5EFnb0PF
- FF8ffxNhOc8fUxLlH1Xvuuf0My24JdHKwU7pyvQRqgKNpKac0fHTTmqYwoAHzZLLXcgu
- 8jeh1xti8jZMSO5vWEixm1vQ6If0KpjMyKPmDCbczc/IfRd50qO6IdT4SKgE3doBZLI4
- dR5YeJHFfEjCL2ezVj5lVnojKWa0YQYRhPOPHKA6AKFtV+Lcp3wN9mzSqx7LkhswAf0q dg== 
+ content-type; s=pp1; bh=ugoQz0fmFbVQS5r+dE9ci650QmRURYsZuJCJ+WzRfzM=;
+ b=Erx7ZDezMMjFI9j5Xr/j6zd2n5/1JtKCqnifgsGHNJyLT6J+9JinTVa8E6fRrFdgqnfq
+ AP9nL08bqzDOfFL8lKsiekAiGytEiWJ+PYWfFeRGq1W5qW25xpkKf2lDhWBcGY0YfBhD
+ SibqTIWRvbvqfkEBX6Kcf0L8tY28QS1V3iUL7VJm5Ewyzb8x502uh1rm2RI5rJl5KZWc
+ asAltlP3L/NCciFvXYhTwrKJLYgAsC4CPvz2zkNOIpMIFXIwKAzWC3xQtEgVbKMDnN8w
+ FV3dHqcAUVhRwITlDBijj4rsV7BALG+copqymGXsTEHfCRdpQb+dDzVQFqAs/eZLKO+Z EA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39gtcyx08d-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39gx00s67w-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Jun 2021 13:51:18 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15UHYYGo130488;
-        Wed, 30 Jun 2021 13:51:17 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39gtcyx085-1
+        Wed, 30 Jun 2021 15:17:25 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15UJ3XM8118598;
+        Wed, 30 Jun 2021 15:17:24 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39gx00s67j-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Jun 2021 13:51:17 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15UHlYpP009917;
-        Wed, 30 Jun 2021 17:51:16 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma04wdc.us.ibm.com with ESMTP id 39duvd6hjg-1
+        Wed, 30 Jun 2021 15:17:24 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15UJ6xxM003166;
+        Wed, 30 Jun 2021 19:17:24 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma03dal.us.ibm.com with ESMTP id 39duve0vr0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Jun 2021 17:51:16 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15UHpGs036110744
+        Wed, 30 Jun 2021 19:17:24 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15UJHN0K34210110
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 30 Jun 2021 17:51:16 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0923FAE014;
-        Wed, 30 Jun 2021 17:51:16 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C899AE01D;
-        Wed, 30 Jun 2021 17:51:15 +0000 (GMT)
+        Wed, 30 Jun 2021 19:17:23 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 225B9AC05F;
+        Wed, 30 Jun 2021 19:17:23 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 32167AC060;
+        Wed, 30 Jun 2021 19:17:22 +0000 (GMT)
 Received: from localhost (unknown [9.211.127.242])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Wed, 30 Jun 2021 17:51:14 +0000 (GMT)
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Wed, 30 Jun 2021 19:17:21 +0000 (GMT)
 From:   Fabiano Rosas <farosas@linux.ibm.com>
 To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [RFC PATCH 38/43] KVM: PPC: Book3S HV P9: Test dawr_enabled()
- before saving host DAWR SPRs
-In-Reply-To: <20210622105736.633352-39-npiggin@gmail.com>
+Subject: Re: [RFC PATCH 08/43] powerpc/64s: Keep AMOR SPR a constant ~0 at
+ runtime
+In-Reply-To: <20210622105736.633352-9-npiggin@gmail.com>
 References: <20210622105736.633352-1-npiggin@gmail.com>
- <20210622105736.633352-39-npiggin@gmail.com>
-Date:   Wed, 30 Jun 2021 14:51:12 -0300
-Message-ID: <87eecj2qcv.fsf@linux.ibm.com>
+ <20210622105736.633352-9-npiggin@gmail.com>
+Date:   Wed, 30 Jun 2021 16:17:19 -0300
+Message-ID: <87bl7n2mdc.fsf@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: vi8tPx_MaTLmOYWy0QHjxKzZNbv5Gr67
-X-Proofpoint-GUID: 9RAFkHmZE4ndMuz5Dvnbo_tNbD7ljEFM
+X-Proofpoint-GUID: qIWhGWiZT7Lw7hez-FKXOrSqaoxQSHOC
+X-Proofpoint-ORIG-GUID: gJHPgmLm61zKmowQQPTRLjRuTeEpwosU
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-30_08:2021-06-30,2021-06-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 spamscore=0
- mlxscore=0 suspectscore=0 mlxlogscore=999 bulkscore=0 phishscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106300097
+ definitions=2021-06-30_11:2021-06-30,2021-06-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ clxscore=1015 priorityscore=1501 phishscore=0 lowpriorityscore=0
+ mlxlogscore=999 spamscore=0 impostorscore=0 suspectscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106300106
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 Nicholas Piggin <npiggin@gmail.com> writes:
 
-> Some of the DAWR SPR access is already predicated on dawr_enabled(),
-> apply this to the remainder of the accesses.
+> This register controls supervisor SPR modifications, and as such is only
+> relevant for KVM. KVM always sets AMOR to ~0 on guest entry, and never
+> restores it coming back out to the host, so it can be kept constant and
+> avoid the mtSPR in KVM guest entry.
+>
+> -21 cycles (9116) cycles POWER9 virt-mode NULL hcall
 >
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+
 > ---
->  arch/powerpc/kvm/book3s_hv_p9_entry.c | 34 ++++++++++++++++-----------
->  1 file changed, 20 insertions(+), 14 deletions(-)
+>  arch/powerpc/kernel/cpu_setup_power.c    |  8 ++++++++
+>  arch/powerpc/kernel/dt_cpu_ftrs.c        |  2 ++
+>  arch/powerpc/kvm/book3s_hv_p9_entry.c    |  2 --
+>  arch/powerpc/kvm/book3s_hv_rmhandlers.S  |  2 --
+>  arch/powerpc/mm/book3s64/radix_pgtable.c | 15 ---------------
+>  arch/powerpc/platforms/powernv/idle.c    |  8 +++-----
+>  6 files changed, 13 insertions(+), 24 deletions(-)
 >
+> diff --git a/arch/powerpc/kernel/cpu_setup_power.c b/arch/powerpc/kernel/cpu_setup_power.c
+> index 3cca88ee96d7..a29dc8326622 100644
+> --- a/arch/powerpc/kernel/cpu_setup_power.c
+> +++ b/arch/powerpc/kernel/cpu_setup_power.c
+> @@ -137,6 +137,7 @@ void __setup_cpu_power7(unsigned long offset, struct cpu_spec *t)
+>  		return;
+>
+>  	mtspr(SPRN_LPID, 0);
+> +	mtspr(SPRN_AMOR, ~0);
+>  	mtspr(SPRN_PCR, PCR_MASK);
+>  	init_LPCR_ISA206(mfspr(SPRN_LPCR), LPCR_LPES1 >> LPCR_LPES_SH);
+>  }
+> @@ -150,6 +151,7 @@ void __restore_cpu_power7(void)
+>  		return;
+>
+>  	mtspr(SPRN_LPID, 0);
+> +	mtspr(SPRN_AMOR, ~0);
+>  	mtspr(SPRN_PCR, PCR_MASK);
+>  	init_LPCR_ISA206(mfspr(SPRN_LPCR), LPCR_LPES1 >> LPCR_LPES_SH);
+>  }
+> @@ -164,6 +166,7 @@ void __setup_cpu_power8(unsigned long offset, struct cpu_spec *t)
+>  		return;
+>
+>  	mtspr(SPRN_LPID, 0);
+> +	mtspr(SPRN_AMOR, ~0);
+>  	mtspr(SPRN_PCR, PCR_MASK);
+>  	init_LPCR_ISA206(mfspr(SPRN_LPCR) | LPCR_PECEDH, 0); /* LPES = 0 */
+>  	init_HFSCR();
+> @@ -184,6 +187,7 @@ void __restore_cpu_power8(void)
+>  		return;
+>
+>  	mtspr(SPRN_LPID, 0);
+> +	mtspr(SPRN_AMOR, ~0);
+>  	mtspr(SPRN_PCR, PCR_MASK);
+>  	init_LPCR_ISA206(mfspr(SPRN_LPCR) | LPCR_PECEDH, 0); /* LPES = 0 */
+>  	init_HFSCR();
+> @@ -202,6 +206,7 @@ void __setup_cpu_power9(unsigned long offset, struct cpu_spec *t)
+>  	mtspr(SPRN_PSSCR, 0);
+>  	mtspr(SPRN_LPID, 0);
+>  	mtspr(SPRN_PID, 0);
+> +	mtspr(SPRN_AMOR, ~0);
+>  	mtspr(SPRN_PCR, PCR_MASK);
+>  	init_LPCR_ISA300((mfspr(SPRN_LPCR) | LPCR_PECEDH | LPCR_PECE_HVEE |\
+>  			 LPCR_HVICE | LPCR_HEIC) & ~(LPCR_UPRT | LPCR_HR), 0);
+> @@ -223,6 +228,7 @@ void __restore_cpu_power9(void)
+>  	mtspr(SPRN_PSSCR, 0);
+>  	mtspr(SPRN_LPID, 0);
+>  	mtspr(SPRN_PID, 0);
+> +	mtspr(SPRN_AMOR, ~0);
+>  	mtspr(SPRN_PCR, PCR_MASK);
+>  	init_LPCR_ISA300((mfspr(SPRN_LPCR) | LPCR_PECEDH | LPCR_PECE_HVEE |\
+>  			 LPCR_HVICE | LPCR_HEIC) & ~(LPCR_UPRT | LPCR_HR), 0);
+> @@ -242,6 +248,7 @@ void __setup_cpu_power10(unsigned long offset, struct cpu_spec *t)
+>  	mtspr(SPRN_PSSCR, 0);
+>  	mtspr(SPRN_LPID, 0);
+>  	mtspr(SPRN_PID, 0);
+> +	mtspr(SPRN_AMOR, ~0);
+>  	mtspr(SPRN_PCR, PCR_MASK);
+>  	init_LPCR_ISA300((mfspr(SPRN_LPCR) | LPCR_PECEDH | LPCR_PECE_HVEE |\
+>  			 LPCR_HVICE | LPCR_HEIC) & ~(LPCR_UPRT | LPCR_HR), 0);
+> @@ -264,6 +271,7 @@ void __restore_cpu_power10(void)
+>  	mtspr(SPRN_PSSCR, 0);
+>  	mtspr(SPRN_LPID, 0);
+>  	mtspr(SPRN_PID, 0);
+> +	mtspr(SPRN_AMOR, ~0);
+>  	mtspr(SPRN_PCR, PCR_MASK);
+>  	init_LPCR_ISA300((mfspr(SPRN_LPCR) | LPCR_PECEDH | LPCR_PECE_HVEE |\
+>  			 LPCR_HVICE | LPCR_HEIC) & ~(LPCR_UPRT | LPCR_HR), 0);
+> diff --git a/arch/powerpc/kernel/dt_cpu_ftrs.c b/arch/powerpc/kernel/dt_cpu_ftrs.c
+> index 358aee7c2d79..0a6b36b4bda8 100644
+> --- a/arch/powerpc/kernel/dt_cpu_ftrs.c
+> +++ b/arch/powerpc/kernel/dt_cpu_ftrs.c
+> @@ -80,6 +80,7 @@ static void __restore_cpu_cpufeatures(void)
+>  	mtspr(SPRN_LPCR, system_registers.lpcr);
+>  	if (hv_mode) {
+>  		mtspr(SPRN_LPID, 0);
+> +		mtspr(SPRN_AMOR, ~0);
+>  		mtspr(SPRN_HFSCR, system_registers.hfscr);
+>  		mtspr(SPRN_PCR, system_registers.pcr);
+>  	}
+> @@ -216,6 +217,7 @@ static int __init feat_enable_hv(struct dt_cpu_feature *f)
+>  	}
+>
+>  	mtspr(SPRN_LPID, 0);
+> +	mtspr(SPRN_AMOR, ~0);
+>
+>  	lpcr = mfspr(SPRN_LPCR);
+>  	lpcr &=  ~LPCR_LPES0; /* HV external interrupts */
 > diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-> index 7aa72efcac6c..f305d1d6445c 100644
+> index c4f3e066fcb4..a3281f0c9214 100644
 > --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
 > +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-> @@ -638,13 +638,16 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+> @@ -286,8 +286,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+>  	mtspr(SPRN_SPRG2, vcpu->arch.shregs.sprg2);
+>  	mtspr(SPRN_SPRG3, vcpu->arch.shregs.sprg3);
 >
->  	host_hfscr = mfspr(SPRN_HFSCR);
->  	host_ciabr = mfspr(SPRN_CIABR);
-> -	host_dawr0 = mfspr(SPRN_DAWR0);
-> -	host_dawrx0 = mfspr(SPRN_DAWRX0);
->  	host_psscr = mfspr(SPRN_PSSCR);
->  	host_pidr = mfspr(SPRN_PID);
-> -	if (cpu_has_feature(CPU_FTR_DAWR1)) {
-> -		host_dawr1 = mfspr(SPRN_DAWR1);
-> -		host_dawrx1 = mfspr(SPRN_DAWRX1);
-> +
-> +	if (dawr_enabled()) {
-> +		host_dawr0 = mfspr(SPRN_DAWR0);
-> +		host_dawrx0 = mfspr(SPRN_DAWRX0);
-> +		if (cpu_has_feature(CPU_FTR_DAWR1)) {
-> +			host_dawr1 = mfspr(SPRN_DAWR1);
-> +			host_dawrx1 = mfspr(SPRN_DAWRX1);
-
-The userspace needs to enable DAWR1 via KVM_CAP_PPC_DAWR1. That cap is
-not even implemented in QEMU currently, so we never allow the guest to
-set vcpu->arch.dawr1. If we check for kvm->arch.dawr1_enabled instead of
-the CPU feature, we could shave some more time here.
-
-> +		}
+> -	mtspr(SPRN_AMOR, ~0UL);
+> -
+>  	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_HV_P9;
+>
+>  	/*
+> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> index 8dd437d7a2c6..007f87b97184 100644
+> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> @@ -772,10 +772,8 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
+>  	/* Restore AMR and UAMOR, set AMOR to all 1s */
+>  	ld	r5,VCPU_AMR(r4)
+>  	ld	r6,VCPU_UAMOR(r4)
+> -	li	r7,-1
+>  	mtspr	SPRN_AMR,r5
+>  	mtspr	SPRN_UAMOR,r6
+> -	mtspr	SPRN_AMOR,r7
+>
+>  	/* Restore state of CTRL run bit; assume 1 on entry */
+>  	lwz	r5,VCPU_CTRL(r4)
+> diff --git a/arch/powerpc/mm/book3s64/radix_pgtable.c b/arch/powerpc/mm/book3s64/radix_pgtable.c
+> index fe236c38ce00..b985cfead5d7 100644
+> --- a/arch/powerpc/mm/book3s64/radix_pgtable.c
+> +++ b/arch/powerpc/mm/book3s64/radix_pgtable.c
+> @@ -566,18 +566,6 @@ void __init radix__early_init_devtree(void)
+>  	return;
+>  }
+>
+> -static void radix_init_amor(void)
+> -{
+> -	/*
+> -	* In HV mode, we init AMOR (Authority Mask Override Register) so that
+> -	* the hypervisor and guest can setup IAMR (Instruction Authority Mask
+> -	* Register), enable key 0 and set it to 1.
+> -	*
+> -	* AMOR = 0b1100 .... 0000 (Mask for key 0 is 11)
+> -	*/
+> -	mtspr(SPRN_AMOR, (3ul << 62));
+> -}
+> -
+>  void __init radix__early_init_mmu(void)
+>  {
+>  	unsigned long lpcr;
+> @@ -638,7 +626,6 @@ void __init radix__early_init_mmu(void)
+>  		lpcr = mfspr(SPRN_LPCR);
+>  		mtspr(SPRN_LPCR, lpcr | LPCR_UPRT | LPCR_HR);
+>  		radix_init_partition_table();
+> -		radix_init_amor();
+>  	} else {
+>  		radix_init_pseries();
+>  	}
+> @@ -662,8 +649,6 @@ void radix__early_init_mmu_secondary(void)
+>
+>  		set_ptcr_when_no_uv(__pa(partition_tb) |
+>  				    (PATB_SIZE_SHIFT - 12));
+> -
+> -		radix_init_amor();
 >  	}
 >
->  	local_paca->kvm_hstate.host_purr = mfspr(SPRN_PURR);
-> @@ -951,15 +954,18 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
->  	mtspr(SPRN_HFSCR, host_hfscr);
->  	if (vcpu->arch.ciabr != host_ciabr)
->  		mtspr(SPRN_CIABR, host_ciabr);
-> -	if (vcpu->arch.dawr0 != host_dawr0)
-> -		mtspr(SPRN_DAWR0, host_dawr0);
-> -	if (vcpu->arch.dawrx0 != host_dawrx0)
-> -		mtspr(SPRN_DAWRX0, host_dawrx0);
-> -	if (cpu_has_feature(CPU_FTR_DAWR1)) {
-> -		if (vcpu->arch.dawr1 != host_dawr1)
-> -			mtspr(SPRN_DAWR1, host_dawr1);
-> -		if (vcpu->arch.dawrx1 != host_dawrx1)
-> -			mtspr(SPRN_DAWRX1, host_dawrx1);
-> +
-> +	if (dawr_enabled()) {
-> +		if (vcpu->arch.dawr0 != host_dawr0)
-> +			mtspr(SPRN_DAWR0, host_dawr0);
-> +		if (vcpu->arch.dawrx0 != host_dawrx0)
-> +			mtspr(SPRN_DAWRX0, host_dawrx0);
-> +		if (cpu_has_feature(CPU_FTR_DAWR1)) {
-> +			if (vcpu->arch.dawr1 != host_dawr1)
-> +				mtspr(SPRN_DAWR1, host_dawr1);
-> +			if (vcpu->arch.dawrx1 != host_dawrx1)
-> +				mtspr(SPRN_DAWRX1, host_dawrx1);
-> +		}
+>  	radix__switch_mmu_context(NULL, &init_mm);
+> diff --git a/arch/powerpc/platforms/powernv/idle.c b/arch/powerpc/platforms/powernv/idle.c
+> index 180baecad914..f791ca041854 100644
+> --- a/arch/powerpc/platforms/powernv/idle.c
+> +++ b/arch/powerpc/platforms/powernv/idle.c
+> @@ -306,8 +306,8 @@ struct p7_sprs {
+>  	/* per thread SPRs that get lost in shallow states */
+>  	u64 amr;
+>  	u64 iamr;
+> -	u64 amor;
+>  	u64 uamor;
+> +	/* amor is restored to constant ~0 */
+>  };
+>
+>  static unsigned long power7_idle_insn(unsigned long type)
+> @@ -378,7 +378,6 @@ static unsigned long power7_idle_insn(unsigned long type)
+>  	if (cpu_has_feature(CPU_FTR_ARCH_207S)) {
+>  		sprs.amr	= mfspr(SPRN_AMR);
+>  		sprs.iamr	= mfspr(SPRN_IAMR);
+> -		sprs.amor	= mfspr(SPRN_AMOR);
+>  		sprs.uamor	= mfspr(SPRN_UAMOR);
 >  	}
 >
->  	if (vc->dpdes)
+> @@ -397,7 +396,7 @@ static unsigned long power7_idle_insn(unsigned long type)
+>  			 */
+>  			mtspr(SPRN_AMR,		sprs.amr);
+>  			mtspr(SPRN_IAMR,	sprs.iamr);
+> -			mtspr(SPRN_AMOR,	sprs.amor);
+> +			mtspr(SPRN_AMOR,	~0);
+>  			mtspr(SPRN_UAMOR,	sprs.uamor);
+>  		}
+>  	}
+> @@ -687,7 +686,6 @@ static unsigned long power9_idle_stop(unsigned long psscr)
+>
+>  	sprs.amr	= mfspr(SPRN_AMR);
+>  	sprs.iamr	= mfspr(SPRN_IAMR);
+> -	sprs.amor	= mfspr(SPRN_AMOR);
+>  	sprs.uamor	= mfspr(SPRN_UAMOR);
+>
+>  	srr1 = isa300_idle_stop_mayloss(psscr);		/* go idle */
+> @@ -708,7 +706,7 @@ static unsigned long power9_idle_stop(unsigned long psscr)
+>  		 */
+>  		mtspr(SPRN_AMR,		sprs.amr);
+>  		mtspr(SPRN_IAMR,	sprs.iamr);
+> -		mtspr(SPRN_AMOR,	sprs.amor);
+> +		mtspr(SPRN_AMOR,	~0);
+>  		mtspr(SPRN_UAMOR,	sprs.uamor);
+>
+>  		/*
