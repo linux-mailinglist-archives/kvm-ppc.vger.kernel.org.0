@@ -2,53 +2,143 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33DF03B7294
-	for <lists+kvm-ppc@lfdr.de>; Tue, 29 Jun 2021 14:53:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 271C13B87B4
+	for <lists+kvm-ppc@lfdr.de>; Wed, 30 Jun 2021 19:30:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233077AbhF2Mzn convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm-ppc@lfdr.de>); Tue, 29 Jun 2021 08:55:43 -0400
-Received: from [218.75.92.58] ([218.75.92.58]:65339 "EHLO WIN-VTPUBHNS72V"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232908AbhF2Mzm (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 29 Jun 2021 08:55:42 -0400
-Received: from [192.168.43.47] (Unknown [197.210.85.75])
-        by WIN-VTPUBHNS72V with ESMTPA
-        ; Thu, 24 Jun 2021 20:46:52 +0800
-Message-ID: <79609568-9801-474E-8400-B64109D588A6@WIN-VTPUBHNS72V>
-Content-Type: text/plain; charset="iso-8859-1"
+        id S232785AbhF3Rcm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 30 Jun 2021 13:32:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39578 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232773AbhF3Rci (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 30 Jun 2021 13:32:38 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15UH7GKW106220;
+        Wed, 30 Jun 2021 13:30:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=WZ3w+RODafL5y18kvDvJn/UdBKwDfIPBsMZAkgtJJJQ=;
+ b=GxSI988iES4C3792unFdf8RItHZ9sPWvjwrkJOvkDdiBH242Wr0PD5hhYYOtboT/wH8K
+ Yt405V3SRcRIZ76Tbwqq02s8fG9U7g8kXHX2DnVqIAsnraor83hltCoZlLLd1Vfir6fV
+ +yTCs4xkdBce3x2u9sOQgcuHABfsDvapTXdv8QEN6T/G/AWUg/rhOCCqCHL5RwOEi2Ac
+ 7jBqv9tZYcm9V+Js98l3rli4SwDxyBb4TWW8uUw/XLd3tEXq3uXUGTaATMOSA6rPHvex
+ Bd2OSHfFyP3fX6M+LXpnKXe6jNo49dkM/xtqU3UEAcPaGPBIkvyGus9DD2moAdmoBDxR ew== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39gr8220cv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Jun 2021 13:30:04 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15UH7YIP108047;
+        Wed, 30 Jun 2021 13:30:04 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39gr8220c6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Jun 2021 13:30:04 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15UHQlgR014172;
+        Wed, 30 Jun 2021 17:30:03 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma03dal.us.ibm.com with ESMTP id 39duvdw510-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Jun 2021 17:30:03 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15UHU2cR29098440
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Jun 2021 17:30:02 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 44A2BAC078;
+        Wed, 30 Jun 2021 17:30:02 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4F160AC06E;
+        Wed, 30 Jun 2021 17:30:01 +0000 (GMT)
+Received: from localhost (unknown [9.211.127.242])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Wed, 30 Jun 2021 17:30:00 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [RFC PATCH 01/43] powerpc/64s: Remove WORT SPR from POWER9/10
+In-Reply-To: <20210622105736.633352-2-npiggin@gmail.com>
+References: <20210622105736.633352-1-npiggin@gmail.com>
+ <20210622105736.633352-2-npiggin@gmail.com>
+Date:   Wed, 30 Jun 2021 14:29:58 -0300
+Message-ID: <87h7hf2rc9.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: URGENT ATTENTION
-To:     Recipients <wjjt@wjjt.cn>
-From:   "Andres Auchincloss" <wjjt@wjjt.cn>
-Date:   Thu, 24 Jun 2021 14:46:28 +0200
-Reply-To: andresauchincloss926@gmail.com
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: bjeRlbqWXmRVp7VIhx4GuPf3Hvz1DybD
+X-Proofpoint-GUID: EZ706S26gw8VJfrhbVCt5PJf6P1H2UiG
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-30_08:2021-06-30,2021-06-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 adultscore=0 mlxlogscore=999 malwarescore=0 clxscore=1015
+ impostorscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106300096
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi,
+Nicholas Piggin <npiggin@gmail.com> writes:
 
-I will like to use this opportunity to wish you a productive time in 2021 and also confide in you to finalize this transaction of mutual benefits. It may seem strange to you, but it is real. This is a transaction that has no risk at all, due process shall be followed and it shall be carried out under the ambit of the financial laws. Being the Chief Financial Officer, BP Plc. I want to trust and put in your care Eighteen Million British Pounds Sterling, The funds were acquired from an over-invoiced payment from a past contract executed in one of my departments.
+> This register is not architected and not implemented in POWER9 or 10,
+> it just reads back zeroes for compatibility.
+>
+> -78 cycles (9255) cycles POWER9 virt-mode NULL hcall
+>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-I can't successfully achieve this transaction without presenting you as foreign contractor who will provide a bank account to receive the funds.
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 
-Documentation for the claim of the funds will be legally processed and documented, so I will need your full cooperation on this matter for our mutual benefits. We will discuss details if you are interested to work with me to secure this funds. I will appreciate your prompt response in every bit of our communication. Stay Blessed and Stay Safe.
-
-
-
-Best Regards
-
-
-
-
-Tel: +1 (587) 770-0485
-Andres .B. Auchincloss
-Chief financial officerBP Petroleum p.l.c.
-
-
-
-
-                                  Copyright ©? 1996-2021
-
+> ---
+>  arch/powerpc/kvm/book3s_hv.c          | 3 ---
+>  arch/powerpc/platforms/powernv/idle.c | 2 --
+>  2 files changed, 5 deletions(-)
+>
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 9228042bd54f..97f3d6d54b61 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -3640,7 +3640,6 @@ static void load_spr_state(struct kvm_vcpu *vcpu)
+>  	mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
+>  	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
+>  	mtspr(SPRN_BESCR, vcpu->arch.bescr);
+> -	mtspr(SPRN_WORT, vcpu->arch.wort);
+>  	mtspr(SPRN_TIDR, vcpu->arch.tid);
+>  	mtspr(SPRN_AMR, vcpu->arch.amr);
+>  	mtspr(SPRN_UAMOR, vcpu->arch.uamor);
+> @@ -3667,7 +3666,6 @@ static void store_spr_state(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.ebbhr = mfspr(SPRN_EBBHR);
+>  	vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
+>  	vcpu->arch.bescr = mfspr(SPRN_BESCR);
+> -	vcpu->arch.wort = mfspr(SPRN_WORT);
+>  	vcpu->arch.tid = mfspr(SPRN_TIDR);
+>  	vcpu->arch.amr = mfspr(SPRN_AMR);
+>  	vcpu->arch.uamor = mfspr(SPRN_UAMOR);
+> @@ -3699,7 +3697,6 @@ static void restore_p9_host_os_sprs(struct kvm_vcpu *vcpu,
+>  				    struct p9_host_os_sprs *host_os_sprs)
+>  {
+>  	mtspr(SPRN_PSPB, 0);
+> -	mtspr(SPRN_WORT, 0);
+>  	mtspr(SPRN_UAMOR, 0);
+>
+>  	mtspr(SPRN_DSCR, host_os_sprs->dscr);
+> diff --git a/arch/powerpc/platforms/powernv/idle.c b/arch/powerpc/platforms/powernv/idle.c
+> index 528a7e0cf83a..180baecad914 100644
+> --- a/arch/powerpc/platforms/powernv/idle.c
+> +++ b/arch/powerpc/platforms/powernv/idle.c
+> @@ -667,7 +667,6 @@ static unsigned long power9_idle_stop(unsigned long psscr)
+>  		sprs.purr	= mfspr(SPRN_PURR);
+>  		sprs.spurr	= mfspr(SPRN_SPURR);
+>  		sprs.dscr	= mfspr(SPRN_DSCR);
+> -		sprs.wort	= mfspr(SPRN_WORT);
+>  		sprs.ciabr	= mfspr(SPRN_CIABR);
+>
+>  		sprs.mmcra	= mfspr(SPRN_MMCRA);
+> @@ -785,7 +784,6 @@ static unsigned long power9_idle_stop(unsigned long psscr)
+>  	mtspr(SPRN_PURR,	sprs.purr);
+>  	mtspr(SPRN_SPURR,	sprs.spurr);
+>  	mtspr(SPRN_DSCR,	sprs.dscr);
+> -	mtspr(SPRN_WORT,	sprs.wort);
+>  	mtspr(SPRN_CIABR,	sprs.ciabr);
+>
+>  	mtspr(SPRN_MMCRA,	sprs.mmcra);
