@@ -2,129 +2,110 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06F9F3B89A2
-	for <lists+kvm-ppc@lfdr.de>; Wed, 30 Jun 2021 22:18:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A516D3B8E86
+	for <lists+kvm-ppc@lfdr.de>; Thu,  1 Jul 2021 10:04:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234022AbhF3UUo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 30 Jun 2021 16:20:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19806 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233942AbhF3UUo (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 30 Jun 2021 16:20:44 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15UK35kJ037385;
-        Wed, 30 Jun 2021 16:18:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=7wf03PiE1c9kqRaVvhtlBkbkPosAfroaG7+MMf3oy/0=;
- b=AaCZhNZcmdW5IlqCTMMQgVgnJmlhDEaWaBZTmj39KsCbbSBVyDpmEL8SyjHbNcmcYHMU
- Tz86nM+9RfI3y4tc/hOgcDCj11f0G8HxRRhYm2KdXf9HHGgBJIkM75TtdpHMgYl2+RBV
- EVrW1QtUOeMO0sEYKyf1ZnctIyvDAnG+rMuZ5nlINmwDGvrRWEiNlE7Kpfc0ur37bk9A
- mqaH8/zRJ1BO0o41UOa3OPA54SGOVPSyQgtyBtV3z5Wko45lM1Atpysw7Zh9mFefjPkR
- tYMHGUWw3qn+ca9MiobGpjM7k9LqlthXxvUwMV+PlL9loDTOGDdpYpII/BOF2jRleA8n DQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39gv00xga2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Jun 2021 16:18:09 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15UK3BQZ037966;
-        Wed, 30 Jun 2021 16:18:09 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39gv00xg9p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Jun 2021 16:18:09 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15UKHZ9a009407;
-        Wed, 30 Jun 2021 20:18:08 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma04dal.us.ibm.com with ESMTP id 39ekxdg1g3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Jun 2021 20:18:08 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15UKI7SH37290382
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 30 Jun 2021 20:18:07 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A1B5CAE017;
-        Wed, 30 Jun 2021 20:18:07 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DEB69AE012;
-        Wed, 30 Jun 2021 20:18:06 +0000 (GMT)
-Received: from localhost (unknown [9.211.127.242])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Wed, 30 Jun 2021 20:18:06 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [RFC PATCH 19/43] KVM: PPC: Book3S HV P9: Add
- kvmppc_stop_thread to match kvmppc_start_thread
-In-Reply-To: <20210622105736.633352-20-npiggin@gmail.com>
+        id S234839AbhGAIHL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 1 Jul 2021 04:07:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60436 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234833AbhGAIHL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 1 Jul 2021 04:07:11 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38E41C061756
+        for <kvm-ppc@vger.kernel.org>; Thu,  1 Jul 2021 01:04:40 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id ie21so2035406pjb.0
+        for <kvm-ppc@vger.kernel.org>; Thu, 01 Jul 2021 01:04:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=GGDX6c3bWhp7+8s6wd+GJQxCKEIt/gtf69ReO690w1w=;
+        b=VjgAcxihyQIog9dGE5EjIb7vXiLlq2IKfLNfadzuCIf/7v+Dqla3Cs6DSdwfAcu+4j
+         TL2Pk6MagG17KtwbpNcg5Yj3VQgHEalcu2PdgVADu6KaPz5eCuLamj975dJ8+kNWxuxl
+         rmMRB/YkJ3/Y2y8yVkOSFATAB7FO3/RBn1HkY0GtgdJsqFPyW+pZhgo6TZjZo0gAM4yg
+         iqGZZj2nQIL8mr2K6Y6RpoRd29/txwfmjQKcHF0Fe9YjYooIIfG2VLpxvdZp2t4uG9SV
+         3g8LOMtOH6cKWHV0i55DFq4KbZB12ATaKvk10kcH/uI0Wtc6zHE1AIE4Vt8GPBZE5z3f
+         wzVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=GGDX6c3bWhp7+8s6wd+GJQxCKEIt/gtf69ReO690w1w=;
+        b=lsozsfeltUFLTHRsop3XFn6ReLS64OIyR4hiUMxMR0LLPCqUcsi7tniCdB6u66niXA
+         Q6Fl3Q3UZcyphhQgXkFMJ7kG1SrnwJnv5kQX905BJEgwxnsn6fGnvLBcG8lUifZECuAZ
+         GO4uOr6YPbDWebrXtduxcfpjkyDhQlqg6kQkQth6wOA/+kLPsWhOzN2h5RjI2AofKWMT
+         IfPp9veBatQp7oLv7mnJEUUFE7m49uEuBITHRJ7K08aLzhzOj3Fqao9XK3oSnalpb65d
+         v9wt7qxlsisV5BPmFQrGr8OTJoOeW2744Hxhc7qT8xHlAiPCGollb9bmYPJ99TcPBcCO
+         L6LA==
+X-Gm-Message-State: AOAM5321SqW5Kdcd7/Ql+TpIO3S6I43VnTintv2cJGXwGId9eKolPFVt
+        xyHozERb98ztVv6XBUssFZc=
+X-Google-Smtp-Source: ABdhPJy66zGDfZrtRFftH1eqP3NOTctLY3VHlG1fDFrfRRfYgFwB34hOHPS08TPbtp8YePzWaUjJ4Q==
+X-Received: by 2002:a17:90a:a395:: with SMTP id x21mr43858670pjp.63.1625126679747;
+        Thu, 01 Jul 2021 01:04:39 -0700 (PDT)
+Received: from localhost (220-244-87-52.tpgi.com.au. [220.244.87.52])
+        by smtp.gmail.com with ESMTPSA id s63sm15836688pfb.195.2021.07.01.01.04.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jul 2021 01:04:39 -0700 (PDT)
+Date:   Thu, 01 Jul 2021 18:04:34 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [RFC PATCH 38/43] KVM: PPC: Book3S HV P9: Test dawr_enabled()
+ before saving host DAWR SPRs
+To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org
 References: <20210622105736.633352-1-npiggin@gmail.com>
- <20210622105736.633352-20-npiggin@gmail.com>
-Date:   Wed, 30 Jun 2021 17:18:04 -0300
-Message-ID: <875yxv2jk3.fsf@linux.ibm.com>
+        <20210622105736.633352-39-npiggin@gmail.com> <87eecj2qcv.fsf@linux.ibm.com>
+In-Reply-To: <87eecj2qcv.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qwAEti7QCOEKTy5GYGsF2E4tCfuTdzKe
-X-Proofpoint-ORIG-GUID: A-H3EHDvlkgfVRn4mE2cSYf0bdTV6BhM
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-30_11:2021-06-30,2021-06-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- priorityscore=1501 adultscore=0 lowpriorityscore=0 suspectscore=0
- mlxlogscore=999 impostorscore=0 malwarescore=0 spamscore=0 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106300111
+Message-Id: <1625126603.992wxhpa1l.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
+Excerpts from Fabiano Rosas's message of July 1, 2021 3:51 am:
+> Nicholas Piggin <npiggin@gmail.com> writes:
+>=20
+>> Some of the DAWR SPR access is already predicated on dawr_enabled(),
+>> apply this to the remainder of the accesses.
+>>
+>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> ---
+>>  arch/powerpc/kvm/book3s_hv_p9_entry.c | 34 ++++++++++++++++-----------
+>>  1 file changed, 20 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/bo=
+ok3s_hv_p9_entry.c
+>> index 7aa72efcac6c..f305d1d6445c 100644
+>> --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
+>> +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
+>> @@ -638,13 +638,16 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64=
+ time_limit, unsigned long lpc
+>>
+>>  	host_hfscr =3D mfspr(SPRN_HFSCR);
+>>  	host_ciabr =3D mfspr(SPRN_CIABR);
+>> -	host_dawr0 =3D mfspr(SPRN_DAWR0);
+>> -	host_dawrx0 =3D mfspr(SPRN_DAWRX0);
+>>  	host_psscr =3D mfspr(SPRN_PSSCR);
+>>  	host_pidr =3D mfspr(SPRN_PID);
+>> -	if (cpu_has_feature(CPU_FTR_DAWR1)) {
+>> -		host_dawr1 =3D mfspr(SPRN_DAWR1);
+>> -		host_dawrx1 =3D mfspr(SPRN_DAWRX1);
+>> +
+>> +	if (dawr_enabled()) {
+>> +		host_dawr0 =3D mfspr(SPRN_DAWR0);
+>> +		host_dawrx0 =3D mfspr(SPRN_DAWRX0);
+>> +		if (cpu_has_feature(CPU_FTR_DAWR1)) {
+>> +			host_dawr1 =3D mfspr(SPRN_DAWR1);
+>> +			host_dawrx1 =3D mfspr(SPRN_DAWRX1);
+>=20
+> The userspace needs to enable DAWR1 via KVM_CAP_PPC_DAWR1. That cap is
+> not even implemented in QEMU currently, so we never allow the guest to
+> set vcpu->arch.dawr1. If we check for kvm->arch.dawr1_enabled instead of
+> the CPU feature, we could shave some more time here.
 
-> Small cleanup makes it a bit easier to match up entry and exit
-> operations.
->
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Ah good point, yes let's do that.
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
-
-> ---
->  arch/powerpc/kvm/book3s_hv.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index b8b0695a9312..86c85e303a6d 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -2948,6 +2948,13 @@ static void kvmppc_start_thread(struct kvm_vcpu *vcpu, struct kvmppc_vcore *vc)
->  		kvmppc_ipi_thread(cpu);
->  }
->
-> +/* Old path does this in asm */
-> +static void kvmppc_stop_thread(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->cpu = -1;
-> +	vcpu->arch.thread_cpu = -1;
-> +}
-> +
->  static void kvmppc_wait_for_nap(int n_threads)
->  {
->  	int cpu = smp_processor_id();
-> @@ -4154,8 +4161,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
->  		dec = (s32) dec;
->  	tb = mftb();
->  	vcpu->arch.dec_expires = dec + tb;
-> -	vcpu->cpu = -1;
-> -	vcpu->arch.thread_cpu = -1;
->
->  	store_spr_state(vcpu);
->
-> @@ -4627,6 +4632,8 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
->
->  	guest_exit_irqoff();
->
-> +	kvmppc_stop_thread(vcpu);
-> +
->  	powerpc_local_irq_pmu_restore(flags);
->
->  	cpumask_clear_cpu(pcpu, &kvm->arch.cpu_in_guest);
+Thanks,
+Nick
