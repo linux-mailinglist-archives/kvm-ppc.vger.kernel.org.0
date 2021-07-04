@@ -2,27 +2,27 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31D103BB09B
-	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Jul 2021 01:09:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46F8D3BB16F
+	for <lists+kvm-ppc@lfdr.de>; Mon,  5 Jul 2021 01:10:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231640AbhGDXJC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 4 Jul 2021 19:09:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47684 "EHLO mail.kernel.org"
+        id S231490AbhGDXLy (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 4 Jul 2021 19:11:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50748 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230426AbhGDXIb (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:08:31 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EC6366135D;
-        Sun,  4 Jul 2021 23:05:53 +0000 (UTC)
+        id S232429AbhGDXKV (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:10:21 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 05A0D613F1;
+        Sun,  4 Jul 2021 23:07:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625439955;
-        bh=zxbU8zaBt1w+L+IKw1t2pzXZmeXv+kr2pAwY6N1KjPA=;
+        s=k20201202; t=1625440064;
+        bh=TeS1jW1j4sQ5G8Qr8eFp7lgoNjFKRAYDAzBbtGLfIXc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Kmcg4U9C7un3NzwKwnWWCgpSbHGcNke3go4vvjbi0b3xXmKbNpdmWZcU6QV00NIqz
-         ZGm0hjHkVnWJHKEJq+DZuyAduCa2BI6DOLyqHzaTD/aZJ4HmC03tBXwN4TnjZmahit
-         rAL9W+WwdggvH0bhbuQP9c21aASjABE7VhqxmbhR/+NtXh9M3PSWJu1b2/yGsuXNKn
-         iDP68wDkSz182j1xVNcYodm4idEn17UJa7f1xL0+RIQneez72b+mXSxAD8NwkrpxlN
-         0J5aXzwAn45OlQf9UMXaAb023wt9WMGbajWlmkeYHKpjfZ34PDFHXJ0hdIdi/vn9u7
-         2gBwrnxXHKChQ==
+        b=Z0BrSuJVzroRsuBu1zzfKZzrtvSQRCpHB4Lo3RwvzBgMkD5JmeLFvmMEYJvQ+A6mj
+         5FQTo0xoWSFRGAsCzzpJaQ9JdrCr9hu4DU8im8IxaNsSMU2v/1W6E8DTifd4sQyMCl
+         sAuBISTaaWtTglXHKppW5Yk7PJAO4vYYuzojzv95Wr5zFffETNfWPiEPyDIT/s0EhE
+         n40X+9eFTbRu++wCs+YuBoo+RY+4SiaX2eMP75xwy+9Csn0FggKAEOFEZ5d9rDee8b
+         Z6FrFuVWfThQoG/ksqpOllhZXTKRuS+YmptqG13qVZQYvu/QO8JVQbxmTdOypa3L6R
+         op98d8oCMrOOg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
@@ -32,12 +32,12 @@ Cc:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Sasha Levin <sashal@kernel.org>, linuxppc-dev@lists.ozlabs.org,
         kvm-ppc@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 69/85] KVM: PPC: Book3S HV: Fix TLB management on SMT8 POWER9 and POWER10 processors
-Date:   Sun,  4 Jul 2021 19:04:04 -0400
-Message-Id: <20210704230420.1488358-69-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.12 65/80] KVM: PPC: Book3S HV: Fix TLB management on SMT8 POWER9 and POWER10 processors
+Date:   Sun,  4 Jul 2021 19:06:01 -0400
+Message-Id: <20210704230616.1489200-65-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210704230420.1488358-1-sashal@kernel.org>
-References: <20210704230420.1488358-1-sashal@kernel.org>
+In-Reply-To: <20210704230616.1489200-1-sashal@kernel.org>
+References: <20210704230616.1489200-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -116,10 +116,10 @@ index 98c8bd155bf9..b167186aaee4 100644
  {
  #ifdef	CONFIG_BOOKE
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index bc0813644666..67cc164c4ac1 100644
+index 60c5bc0c130c..1c6e0a52fb53 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -2657,7 +2657,7 @@ static void radix_flush_cpu(struct kvm *kvm, int cpu, struct kvm_vcpu *vcpu)
+@@ -2619,7 +2619,7 @@ static void radix_flush_cpu(struct kvm *kvm, int cpu, struct kvm_vcpu *vcpu)
  	cpumask_t *cpu_in_guest;
  	int i;
  
@@ -128,7 +128,7 @@ index bc0813644666..67cc164c4ac1 100644
  	if (nested) {
  		cpumask_set_cpu(cpu, &nested->need_tlb_flush);
  		cpu_in_guest = &nested->cpu_in_guest;
-@@ -2671,9 +2671,10 @@ static void radix_flush_cpu(struct kvm *kvm, int cpu, struct kvm_vcpu *vcpu)
+@@ -2633,9 +2633,10 @@ static void radix_flush_cpu(struct kvm *kvm, int cpu, struct kvm_vcpu *vcpu)
  	 * the other side is the first smp_mb() in kvmppc_run_core().
  	 */
  	smp_mb();
@@ -142,7 +142,7 @@ index bc0813644666..67cc164c4ac1 100644
  }
  
  static void kvmppc_prepare_radix_vcpu(struct kvm_vcpu *vcpu, int pcpu)
-@@ -2704,8 +2705,8 @@ static void kvmppc_prepare_radix_vcpu(struct kvm_vcpu *vcpu, int pcpu)
+@@ -2666,8 +2667,8 @@ static void kvmppc_prepare_radix_vcpu(struct kvm_vcpu *vcpu, int pcpu)
  	 */
  	if (prev_cpu != pcpu) {
  		if (prev_cpu >= 0 &&
@@ -154,10 +154,10 @@ index bc0813644666..67cc164c4ac1 100644
  		if (nested)
  			nested->prev_cpu[vcpu->arch.nested_vcpu_id] = pcpu;
 diff --git a/arch/powerpc/kvm/book3s_hv_builtin.c b/arch/powerpc/kvm/book3s_hv_builtin.c
-index 7a0e33a9c980..3edc25c89092 100644
+index 158d309b42a3..b5e5d07cb40f 100644
 --- a/arch/powerpc/kvm/book3s_hv_builtin.c
 +++ b/arch/powerpc/kvm/book3s_hv_builtin.c
-@@ -800,7 +800,7 @@ void kvmppc_check_need_tlb_flush(struct kvm *kvm, int pcpu,
+@@ -797,7 +797,7 @@ void kvmppc_check_need_tlb_flush(struct kvm *kvm, int pcpu,
  	 * Thus we make all 4 threads use the same bit.
  	 */
  	if (cpu_has_feature(CPU_FTR_ARCH_300))
@@ -167,10 +167,10 @@ index 7a0e33a9c980..3edc25c89092 100644
  	if (nested)
  		need_tlb_flush = &nested->need_tlb_flush;
 diff --git a/arch/powerpc/kvm/book3s_hv_rm_mmu.c b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-index 7a0f12404e0e..502d9ebe3ae4 100644
+index 88da2764c1bb..3ddc83d2e849 100644
 --- a/arch/powerpc/kvm/book3s_hv_rm_mmu.c
 +++ b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-@@ -56,7 +56,7 @@ static int global_invalidates(struct kvm *kvm)
+@@ -67,7 +67,7 @@ static int global_invalidates(struct kvm *kvm)
  		 * so use the bit for the first thread to represent the core.
  		 */
  		if (cpu_has_feature(CPU_FTR_ARCH_300))
