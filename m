@@ -2,165 +2,121 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E0C43BF278
-	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 01:31:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 152613BF3EF
+	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 04:23:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230146AbhGGXeB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 7 Jul 2021 19:34:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48644 "EHLO
+        id S230349AbhGHCZk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 7 Jul 2021 22:25:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230029AbhGGXeA (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 7 Jul 2021 19:34:00 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06CCFC06175F
-        for <kvm-ppc@vger.kernel.org>; Wed,  7 Jul 2021 16:31:19 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id v7so3993910pgl.2
-        for <kvm-ppc@vger.kernel.org>; Wed, 07 Jul 2021 16:31:19 -0700 (PDT)
+        with ESMTP id S230208AbhGHCZk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 7 Jul 2021 22:25:40 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3E17C06175F
+        for <kvm-ppc@vger.kernel.org>; Wed,  7 Jul 2021 19:22:58 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d12so4102758pfj.2
+        for <kvm-ppc@vger.kernel.org>; Wed, 07 Jul 2021 19:22:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=sBp/KCSLuBhwQ1kjw0+4NY8DmxOjGcK1rRA8bKsITnw=;
-        b=kuLWnef3pLZ8qeP5DH+PH5NFPQJ1juHZpaYreL5Q29lynQZY7sseOR9V1uUdcBpTEE
-         zycmoJq3i/5tfjFJK8FfHikoBsIOigAhkcK9uH1jkmJ3QP79KQuMcNXzm1i6Ng71PZZ5
-         NycUjxLm1bn8jp1Grh2HMprni1gEr2c+cO+SxmQ7RrwOJsYmz9xQSY8p8NAW94mFD+Uw
-         eCd7clemXqEm4rmMLc5J1cjZxPZTclF8hNjqTwpq0AxdYBYTFrzjgYgEry4ftdMbdac0
-         +F4pBj2q7mrKif8TN662ESizNbVcYmmpXx7b5Ewjn3ToOeTUmcMjL6VV+Fw7dIzyuV3+
-         7wyQ==
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=L9ZzMO/peqn6RjqikFr8dYXKCUUURvXv/xvzuiz9Gcg=;
+        b=sqVUCblt6YbpHOIC+8fh382fu2yduVloIOccYtsHNuLy2665lyxR/g9GUDe1Vs8ofD
+         rNTEBWrbzY8rTWdro1WR+QUkgdghK7JSomCw03NMBMLeBmBbdMWfZ0kMaBVrjUnFFn/J
+         FU1RcHjuhD8ylUQJDGUtnTvwx3g+QA4XhcOhCxIyYi603WD91GSzxNFAVmoWdaivaeIy
+         T33502MZo28xIZfltFPmhbQjx7010qn0AvjbLVqcXb9b91n44dvvFki8ErUCSJoCi0dK
+         3zJaqUxx059uCRPY+5JWgl4dcioI4VYaXheUxR4r0am2vwZ9Ji/RuXSflMzz5+HfPKnm
+         ZmGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sBp/KCSLuBhwQ1kjw0+4NY8DmxOjGcK1rRA8bKsITnw=;
-        b=egpDPuZ4/7t0bhXC06DUev43Sdh+5anmlODgGsHP+CwR0oJwWxf6wD6CdCqaIS27Jp
-         8FJNRLUWRBYQENGYsTDsLcOUNEQpmJTBjjsbeNdvOJUen0GmOpjylxvkiFS5xBNzj+20
-         hUXghF6ShocrGF7vs+g5GDzwL/+oOxONNCqmHT42XtQa1L668qf0Al+u/7xRdA4W9wn4
-         3h25psVtb2LdpB0fYCQfnHtj/061EgDJCsgPQYnG7yyd06cri7VngALgUo9vm7W5iNSm
-         qwORZ4GcuLdB+Kr+asNpaOG128dbB/ZAWMg4crMy4b73It4OlzO+D5qWQtkLDZWpaPVU
-         8W4g==
-X-Gm-Message-State: AOAM5310hegPNhPrxVj1AippTPitmYMXlEJZyVdJ+Yql7MBVc+tJoDwb
-        z7YTf7wgwVuFUCU5TI5i5aHToQ==
-X-Google-Smtp-Source: ABdhPJwBR3MXtssGiOQ4tmIkIfl0zyd5DUts1bTMC6/CWU0frjjxFd/fsHeeX1f34L5W3CCEsIOTrQ==
-X-Received: by 2002:a63:d14c:: with SMTP id c12mr28274938pgj.412.1625700679242;
-        Wed, 07 Jul 2021 16:31:19 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id e2sm378871pgh.5.2021.07.07.16.31.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jul 2021 16:31:18 -0700 (PDT)
-Date:   Wed, 7 Jul 2021 23:31:14 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>
-Subject: Re: [PATCH v1 2/4] KVM: stats: Update doc for histogram statistics
-Message-ID: <YOY5QndV0O3giRJ2@google.com>
-References: <20210706180350.2838127-1-jingzhangos@google.com>
- <20210706180350.2838127-3-jingzhangos@google.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=L9ZzMO/peqn6RjqikFr8dYXKCUUURvXv/xvzuiz9Gcg=;
+        b=UZBO4JJe37eTWMw+JB+F2HaDmcklJCaPXpXVD1k6dH3gsKfYlViV1nDleFFSPlv599
+         Wto/RsVQWpz5SQG4ygZi39DdV/qsoQnjOqLaNYUrbNfsKVwIwDogmR6lMzWbH9hZhKzu
+         soadtscDJlOLVWJ5uwhkW7oBULiWirjMWz4Y9ueVMgOvyQp2vndwgSQKxQdiovPkJHZI
+         edgc8SlSUCnvIwF5vN2VHRKgSEwxiXcWMqsgLQrEHfm6Usy8Z4q0ZlCjLo5Mdq/jAq7i
+         zRqUn2CdlBvTlxSe491cZeTyBD//Yu7sS4uxFr9+h+DkWWtJrDaXiyKxEe8J3whoe5G3
+         fV4w==
+X-Gm-Message-State: AOAM533cque+luUTy4/eUJn2eq9AD/54nszm2CDb9m249Cz9YCNGeLKg
+        Gdy0vb2KmT/tdWL8XT7PqVMu0g==
+X-Google-Smtp-Source: ABdhPJxjwp0VZUWtk582B8D83sqx5L5ovUaeeEilDOLIBZHiqCNSo05hlDyZZDoZ78ZHZjAgPKJ/9g==
+X-Received: by 2002:a63:1308:: with SMTP id i8mr29514509pgl.19.1625710978256;
+        Wed, 07 Jul 2021 19:22:58 -0700 (PDT)
+Received: from [192.168.10.23] (219-90-184-65.ip.adam.com.au. [219.90.184.65])
+        by smtp.gmail.com with UTF8SMTPSA id j15sm7712642pjn.28.2021.07.07.19.22.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Jul 2021 19:22:57 -0700 (PDT)
+Message-ID: <894b13be-20a3-6855-0136-6419700fa3e9@ozlabs.ru>
+Date:   Thu, 8 Jul 2021 12:22:53 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210706180350.2838127-3-jingzhangos@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101
+ Thunderbird/89.0
+Subject: Re: [PATCH kernel] KVM: PPC: Book3S HV: Make unique debugfs nodename
+Content-Language: en-US
+To:     Fabiano Rosas <farosas@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Paul Mackerras <paulus@ozlabs.org>
+References: <20210707041344.3803554-1-aik@ozlabs.ru>
+ <87zguynhfo.fsf@linux.ibm.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <87zguynhfo.fsf@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Jul 06, 2021 at 06:03:48PM +0000, Jing Zhang wrote:
-> Add documentations for linear and logarithmic histogram statistics.
-> Add binary stats capability text which is missing during merge of
-> the binary stats patch.
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  Documentation/virt/kvm/api.rst | 36 +++++++++++++++++++++++++++++++---
->  1 file changed, 33 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 3b6e3b1628b4..948d33c26704 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5171,6 +5171,9 @@ by a string of size ``name_size``.
->  	#define KVM_STATS_TYPE_CUMULATIVE	(0x0 << KVM_STATS_TYPE_SHIFT)
->  	#define KVM_STATS_TYPE_INSTANT		(0x1 << KVM_STATS_TYPE_SHIFT)
->  	#define KVM_STATS_TYPE_PEAK		(0x2 << KVM_STATS_TYPE_SHIFT)
-> +	#define KVM_STATS_TYPE_LINEAR_HIST	(0x3 << KVM_STATS_TYPE_SHIFT)
-> +	#define KVM_STATS_TYPE_LOG_HIST		(0x4 << KVM_STATS_TYPE_SHIFT)
-> +	#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_LOG_HIST
->  
->  	#define KVM_STATS_UNIT_SHIFT		4
->  	#define KVM_STATS_UNIT_MASK		(0xF << KVM_STATS_UNIT_SHIFT)
-> @@ -5178,11 +5181,13 @@ by a string of size ``name_size``.
->  	#define KVM_STATS_UNIT_BYTES		(0x1 << KVM_STATS_UNIT_SHIFT)
->  	#define KVM_STATS_UNIT_SECONDS		(0x2 << KVM_STATS_UNIT_SHIFT)
->  	#define KVM_STATS_UNIT_CYCLES		(0x3 << KVM_STATS_UNIT_SHIFT)
-> +	#define KVM_STATS_UNIT_MAX		KVM_STATS_UNIT_CYCLES
->  
->  	#define KVM_STATS_BASE_SHIFT		8
->  	#define KVM_STATS_BASE_MASK		(0xF << KVM_STATS_BASE_SHIFT)
->  	#define KVM_STATS_BASE_POW10		(0x0 << KVM_STATS_BASE_SHIFT)
->  	#define KVM_STATS_BASE_POW2		(0x1 << KVM_STATS_BASE_SHIFT)
-> +	#define KVM_STATS_BASE_MAX		KVM_STATS_BASE_POW2
->  
->  	struct kvm_stats_desc {
->  		__u32 flags;
-> @@ -5214,6 +5219,22 @@ Bits 0-3 of ``flags`` encode the type:
->      represents a peak value for a measurement, for example the maximum number
->      of items in a hash table bucket, the longest time waited and so on.
->      The corresponding ``size`` field for this type is always 1.
-> +  * ``KVM_STATS_TYPE_LINEAR_HIST``
-> +    The statistics data is in the form of linear histogram. The number of
-> +    buckets is specified by the ``size`` field. The size of buckets is specified
-> +    by the ``hist_param`` field. The range of the Nth bucket (1 <= N < ``size``)
-> +    is [``hist_param``*(N-1), ``hist_param``*N), while the range of the last
-> +    bucket is [``hist_param``*(``size``-1), +INF). (+INF means positive infinity
-> +    value.) The bucket value indicates how many times the statistics data is in
-> +    the bucket's range.
-> +  * ``KVM_STATS_TYPE_LOG_HIST``
-> +    The statistics data is in the form of logarithmic histogram. The number of
-> +    buckets is specified by the ``size`` field. The base of logarithm is
-> +    specified by the ``hist_param`` field. The range of the Nth bucket (1 < N <
-> +    ``size``) is [pow(``hist_param``, N-2), pow(``hist_param``, N-1)). The range
-> +    of the first bucket is [0, 1), while the range of the last bucket is
-> +    [pow(``hist_param``, ``size``-2), +INF). The bucket value indicates how many
-> +    times the statistics data is in the bucket's range.
->  
->  Bits 4-7 of ``flags`` encode the unit:
->    * ``KVM_STATS_UNIT_NONE``
-> @@ -5246,9 +5267,10 @@ unsigned 64bit data.
->  The ``offset`` field is the offset from the start of Data Block to the start of
->  the corresponding statistics data.
->  
-> -The ``unused`` field is reserved for future support for other types of
-> -statistics data, like log/linear histogram. Its value is always 0 for the types
-> -defined above.
-> +The ``hist_param`` field is used as a parameter for histogram statistics data.
-> +For linear histogram statistics data, it indicates the size of a bucket. For
-> +logarithmic histogram statistics data, it indicates the base of the logarithm.
-> +Only base of 2 is supported fo logarithmic histogram.
->  
->  The ``name`` field is the name string of the statistics data. The name string
->  starts at the end of ``struct kvm_stats_desc``.  The maximum length including
-> @@ -7182,3 +7204,11 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
->  of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
->  the hypercalls whose corresponding bit is in the argument, and return
->  ENOSYS for the others.
-> +
-> +8.35 KVM_CAP_STATS_BINARY_FD
-> +----------------------------
-> +
-> +:Architectures: all
-> +
-> +This capability indicates the feature that userspace can get a file descriptor
-> +for every VM and VCPU to read statistics data in binary format.
 
-This should probably be in a separate patch with a Fixes tag.
 
-Fixes: fdc09ddd4064 ("KVM: stats: Add documentation for binary statistics interface")
-
-> -- 
-> 2.32.0.93.g670b81a890-goog
+On 08/07/2021 03:48, Fabiano Rosas wrote:
+> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
 > 
+>> Currently it is vm-$currentpid which works as long as there is just one
+>> VM per the userspace (99.99% cases) but produces a bunch
+>> of "debugfs: Directory 'vm16679' with parent 'kvm' already present!"
+>> when syzkaller (syscall fuzzer) is running so only one VM is present in
+>> the debugfs for a given process.
+>>
+>> This changes the debugfs node to include the LPID which alone should be
+>> system wide unique. This leaves the existing pid for the convenience of
+>> matching the VM's debugfs with the running userspace process (QEMU).
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> 
+> Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+
+thanks.
+
+Strangely it also fixes a bunch of
+
+BUG: unable to handle kernel NULL pointer dereference in corrupted
+BUG: unable to handle kernel paging request in corrupted
+
+I was having 3 of these for every hour of running syzkaller and not 
+anymore with this patch.
+
+
+> 
+>> ---
+>>   arch/powerpc/kvm/book3s_hv.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+>> index 1d1fcc290fca..0223ddc0eed0 100644
+>> --- a/arch/powerpc/kvm/book3s_hv.c
+>> +++ b/arch/powerpc/kvm/book3s_hv.c
+>> @@ -5227,7 +5227,7 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+>>   	/*
+>>   	 * Create a debugfs directory for the VM
+>>   	 */
+>> -	snprintf(buf, sizeof(buf), "vm%d", current->pid);
+>> +	snprintf(buf, sizeof(buf), "vm%d-lp%ld", current->pid, lpid);
+>>   	kvm->arch.debugfs_dir = debugfs_create_dir(buf, kvm_debugfs_dir);
+>>   	kvmppc_mmu_debugfs_init(kvm);
+>>   	if (radix_enabled())
+
+-- 
+Alexey
