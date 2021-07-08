@@ -2,164 +2,209 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFDC33C152D
-	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 16:29:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF8703C1896
+	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 19:46:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231785AbhGHOcV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 8 Jul 2021 10:32:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49194 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231779AbhGHOcV (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Jul 2021 10:32:21 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C361C061574
-        for <kvm-ppc@vger.kernel.org>; Thu,  8 Jul 2021 07:29:38 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id a18so16189588lfs.10
-        for <kvm-ppc@vger.kernel.org>; Thu, 08 Jul 2021 07:29:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KlZJUqaLgsBO7mX3KI8iI1wIxb+SgVZoM88aZKw+rzA=;
-        b=obWPsghibGoeU7rd3DensnAXBnHvwcxiIoKHrfURhiEUGBvfx5jrCXoh4K+JYC/OOz
-         7ZTtmjLST2bp4ANmZsR2f0WoB75kcsJ93MscKpT4kwOP80YTAcguMNu5sKnIiWprpcql
-         PNtHAJD+L7aKWTxcThzPzvOj26jSDSHcf5W/cCTgMsgBAG/4kLEd3h3+xtgm3y0wfjEe
-         G+Fz1MmJaiaJlPSpBQqZZfX6dPKZLVCBl3eH4QX9W9j3oDv6pEuY1J3Ihh/LapbI6wIp
-         8hnZyKa/5C+ded+7G8att1ZG++q/hdXFyOZpMxTnYasV5ka8Zgwh3M1TxoZS4umQOSTQ
-         Kdhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KlZJUqaLgsBO7mX3KI8iI1wIxb+SgVZoM88aZKw+rzA=;
-        b=pK87hVd2ZqQ6SXS2hF93nKgdh1YMmE1EPWydJNLrnjT18D0gPCrq2xpQHFwTVO405c
-         MJzoi7HOcIGQqjTcRcdjAc3u7D8YMQOvos1fu9Ge24wM6Xd6H63dL/nWqQYlxAE0o7BM
-         trdjKcAQyem1T4ZTVDLj18guUIsXNXIamiQtPdb1isC2v2vKFY2Z1Ss7tK8wklROae0S
-         i1yynipRLTksMetwqj4kNtEzaZZtPnCSb6lO5y6DXkqEMu1HtAeyqJ6naac9siOM7f2e
-         NljcgvN1p/A5sYgkI9urWY3uB4UPLkYxFp1GBmH3IAobQNtZYzuxk+1onia2rZzTVJDQ
-         H87w==
-X-Gm-Message-State: AOAM533ISYI2LrBB5XVkQ3ayWGxrb7ewIbUVs+JKP5Wjx2mPUF/ucQ+I
-        /9S1gKpHVP4+HQrLMYHLaYadaBSqlovVk9oifaeRSw==
-X-Google-Smtp-Source: ABdhPJwJ/gHUqnQQLrEM6QdPY6amGL54L7H/DfwpiDkcpLDdlO7X6rs7//kecyIH8fJQDv9E7jx6T2rRQARezra5svE=
-X-Received: by 2002:a2e:3513:: with SMTP id z19mr15574170ljz.256.1625754576203;
- Thu, 08 Jul 2021 07:29:36 -0700 (PDT)
+        id S229566AbhGHRs4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 8 Jul 2021 13:48:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56284 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229469AbhGHRsz (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Jul 2021 13:48:55 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 168HX6eL142007;
+        Thu, 8 Jul 2021 13:46:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=HumTD5dmqMHM+IL75USGD7DZmNOf9ty3CPFf2Nd/5Uo=;
+ b=k15KPhk4Rd0N9c8ObrEYh4WGBP1iQqr3NnDjztU2xFaJfKcfTtanUYRTpFLzgifpC2OH
+ SpllDxG6dlwW3wm0zgp7rg42Qy+DgxU/ZegJzWm+UNmXf1/oUjMbCIbJHKj/mr7RFz4Y
+ 8ABBCfxbr0l+FVNQE6GCMFCzxlJIFVGequL6F253wxzsJxbSKac1QE5UimP4YQnnG44j
+ BjM+G0gutYjp06/9sk3t/W6ehBNbpYX/hBIk0yt36m5MIo0QosUt19ydmpc8qAQhr68o
+ 1zfTiJPW0xKfScWqtobVENGQGkPr+PYa3sOTSiweTHbVgDWzODHfUWMT32rNG+FMahES DA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39nhkj0e84-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Jul 2021 13:46:08 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 168HXIdf142526;
+        Thu, 8 Jul 2021 13:46:08 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39nhkj0e7p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Jul 2021 13:46:08 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 168HjXt7030825;
+        Thu, 8 Jul 2021 17:46:07 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma04dal.us.ibm.com with ESMTP id 39jfhegwn7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Jul 2021 17:46:07 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 168Hk7UU52822330
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 8 Jul 2021 17:46:07 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DA0CFAC06A;
+        Thu,  8 Jul 2021 17:46:06 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0B1CDAC060;
+        Thu,  8 Jul 2021 17:46:06 +0000 (GMT)
+Received: from localhost (unknown [9.211.64.106])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Thu,  8 Jul 2021 17:46:05 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [RFC PATCH 34/43] KVM: PPC: Book3S HV P9: Demand fault EBB
+ facility registers
+In-Reply-To: <20210622105736.633352-35-npiggin@gmail.com>
+References: <20210622105736.633352-1-npiggin@gmail.com>
+ <20210622105736.633352-35-npiggin@gmail.com>
+Date:   Thu, 08 Jul 2021 14:46:03 -0300
+Message-ID: <87v95kog10.fsf@linux.ibm.com>
 MIME-Version: 1.0
-References: <20210706180350.2838127-1-jingzhangos@google.com>
- <20210706180350.2838127-3-jingzhangos@google.com> <YOY5QndV0O3giRJ2@google.com>
-In-Reply-To: <YOY5QndV0O3giRJ2@google.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 8 Jul 2021 09:29:24 -0500
-Message-ID: <CAAdAUtiA91MzByviP=0VEtiHi2dAp9PryKmgD1p+qE4Re9HCJg@mail.gmail.com>
-Subject: Re: [PATCH v1 2/4] KVM: stats: Update doc for histogram statistics
-To:     David Matlack <dmatlack@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SN-I4IBP-dEh2VrHg_C2om3dlXZlGbdN
+X-Proofpoint-ORIG-GUID: GaLm_k-_nZy4_-BQGIweMJI2VR4u55jg
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-08_10:2021-07-08,2021-07-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 mlxlogscore=999 impostorscore=0 spamscore=0
+ malwarescore=0 suspectscore=0 bulkscore=0 phishscore=0 mlxscore=0
+ clxscore=1015 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2107080093
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Jul 7, 2021 at 6:31 PM David Matlack <dmatlack@google.com> wrote:
+Nicholas Piggin <npiggin@gmail.com> writes:
+
+> Use HFSCR facility disabling to implement demand faulting for EBB, with
+> a hysteresis counter similar to the load_fp etc counters in context
+> switching that implement the equivalent demand faulting for userspace
+> facilities.
 >
-> On Tue, Jul 06, 2021 at 06:03:48PM +0000, Jing Zhang wrote:
-> > Add documentations for linear and logarithmic histogram statistics.
-> > Add binary stats capability text which is missing during merge of
-> > the binary stats patch.
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst | 36 +++++++++++++++++++++++++++++++---
-> >  1 file changed, 33 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 3b6e3b1628b4..948d33c26704 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -5171,6 +5171,9 @@ by a string of size ``name_size``.
-> >       #define KVM_STATS_TYPE_CUMULATIVE       (0x0 << KVM_STATS_TYPE_SHIFT)
-> >       #define KVM_STATS_TYPE_INSTANT          (0x1 << KVM_STATS_TYPE_SHIFT)
-> >       #define KVM_STATS_TYPE_PEAK             (0x2 << KVM_STATS_TYPE_SHIFT)
-> > +     #define KVM_STATS_TYPE_LINEAR_HIST      (0x3 << KVM_STATS_TYPE_SHIFT)
-> > +     #define KVM_STATS_TYPE_LOG_HIST         (0x4 << KVM_STATS_TYPE_SHIFT)
-> > +     #define KVM_STATS_TYPE_MAX              KVM_STATS_TYPE_LOG_HIST
-> >
-> >       #define KVM_STATS_UNIT_SHIFT            4
-> >       #define KVM_STATS_UNIT_MASK             (0xF << KVM_STATS_UNIT_SHIFT)
-> > @@ -5178,11 +5181,13 @@ by a string of size ``name_size``.
-> >       #define KVM_STATS_UNIT_BYTES            (0x1 << KVM_STATS_UNIT_SHIFT)
-> >       #define KVM_STATS_UNIT_SECONDS          (0x2 << KVM_STATS_UNIT_SHIFT)
-> >       #define KVM_STATS_UNIT_CYCLES           (0x3 << KVM_STATS_UNIT_SHIFT)
-> > +     #define KVM_STATS_UNIT_MAX              KVM_STATS_UNIT_CYCLES
-> >
-> >       #define KVM_STATS_BASE_SHIFT            8
-> >       #define KVM_STATS_BASE_MASK             (0xF << KVM_STATS_BASE_SHIFT)
-> >       #define KVM_STATS_BASE_POW10            (0x0 << KVM_STATS_BASE_SHIFT)
-> >       #define KVM_STATS_BASE_POW2             (0x1 << KVM_STATS_BASE_SHIFT)
-> > +     #define KVM_STATS_BASE_MAX              KVM_STATS_BASE_POW2
-> >
-> >       struct kvm_stats_desc {
-> >               __u32 flags;
-> > @@ -5214,6 +5219,22 @@ Bits 0-3 of ``flags`` encode the type:
-> >      represents a peak value for a measurement, for example the maximum number
-> >      of items in a hash table bucket, the longest time waited and so on.
-> >      The corresponding ``size`` field for this type is always 1.
-> > +  * ``KVM_STATS_TYPE_LINEAR_HIST``
-> > +    The statistics data is in the form of linear histogram. The number of
-> > +    buckets is specified by the ``size`` field. The size of buckets is specified
-> > +    by the ``hist_param`` field. The range of the Nth bucket (1 <= N < ``size``)
-> > +    is [``hist_param``*(N-1), ``hist_param``*N), while the range of the last
-> > +    bucket is [``hist_param``*(``size``-1), +INF). (+INF means positive infinity
-> > +    value.) The bucket value indicates how many times the statistics data is in
-> > +    the bucket's range.
-> > +  * ``KVM_STATS_TYPE_LOG_HIST``
-> > +    The statistics data is in the form of logarithmic histogram. The number of
-> > +    buckets is specified by the ``size`` field. The base of logarithm is
-> > +    specified by the ``hist_param`` field. The range of the Nth bucket (1 < N <
-> > +    ``size``) is [pow(``hist_param``, N-2), pow(``hist_param``, N-1)). The range
-> > +    of the first bucket is [0, 1), while the range of the last bucket is
-> > +    [pow(``hist_param``, ``size``-2), +INF). The bucket value indicates how many
-> > +    times the statistics data is in the bucket's range.
-> >
-> >  Bits 4-7 of ``flags`` encode the unit:
-> >    * ``KVM_STATS_UNIT_NONE``
-> > @@ -5246,9 +5267,10 @@ unsigned 64bit data.
-> >  The ``offset`` field is the offset from the start of Data Block to the start of
-> >  the corresponding statistics data.
-> >
-> > -The ``unused`` field is reserved for future support for other types of
-> > -statistics data, like log/linear histogram. Its value is always 0 for the types
-> > -defined above.
-> > +The ``hist_param`` field is used as a parameter for histogram statistics data.
-> > +For linear histogram statistics data, it indicates the size of a bucket. For
-> > +logarithmic histogram statistics data, it indicates the base of the logarithm.
-> > +Only base of 2 is supported fo logarithmic histogram.
-> >
-> >  The ``name`` field is the name string of the statistics data. The name string
-> >  starts at the end of ``struct kvm_stats_desc``.  The maximum length including
-> > @@ -7182,3 +7204,11 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
-> >  of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
-> >  the hypercalls whose corresponding bit is in the argument, and return
-> >  ENOSYS for the others.
-> > +
-> > +8.35 KVM_CAP_STATS_BINARY_FD
-> > +----------------------------
-> > +
-> > +:Architectures: all
-> > +
-> > +This capability indicates the feature that userspace can get a file descriptor
-> > +for every VM and VCPU to read statistics data in binary format.
+> This speeds up guest entry/exit by avoiding the register save/restore
+> when a guest is not frequently using them. When a guest does use them
+> often, there will be some additional demand fault overhead, but these
+> are not commonly used facilities.
 >
-> This should probably be in a separate patch with a Fixes tag.
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+
+> ---
+>  arch/powerpc/include/asm/kvm_host.h   |  1 +
+>  arch/powerpc/kvm/book3s_hv.c          | 11 +++++++++++
+>  arch/powerpc/kvm/book3s_hv_nested.c   |  3 ++-
+>  arch/powerpc/kvm/book3s_hv_p9_entry.c | 26 ++++++++++++++++++++------
+>  4 files changed, 34 insertions(+), 7 deletions(-)
 >
-> Fixes: fdc09ddd4064 ("KVM: stats: Add documentation for binary statistics interface")
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index 118b388ea887..bee95106c1f2 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -585,6 +585,7 @@ struct kvm_vcpu_arch {
+>  	ulong cfar;
+>  	ulong ppr;
+>  	u32 pspb;
+> +	u8 load_ebb;
+>  	ulong fscr;
+>  	ulong shadow_fscr;
+>  	ulong ebbhr;
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index ae528eb37792..99e9da078e7d 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -1366,6 +1366,13 @@ static int kvmppc_pmu_unavailable(struct kvm_vcpu *vcpu)
+>  	return RESUME_GUEST;
+>  }
 >
-> > --
-> > 2.32.0.93.g670b81a890-goog
-> >
-Thanks David.
-Jing
+> +static int kvmppc_ebb_unavailable(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hfscr |= HFSCR_EBB;
+> +
+> +	return RESUME_GUEST;
+> +}
+> +
+>  static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
+>  				 struct task_struct *tsk)
+>  {
+> @@ -1645,6 +1652,8 @@ XXX benchmark guest exits
+>  				r = kvmppc_emulate_doorbell_instr(vcpu);
+>  			if (cause == FSCR_PM_LG)
+>  				r = kvmppc_pmu_unavailable(vcpu);
+> +			if (cause == FSCR_EBB_LG)
+> +				r = kvmppc_ebb_unavailable(vcpu);
+>  		}
+>  		if (r == EMULATE_FAIL) {
+>  			kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
+> @@ -1764,6 +1773,8 @@ static int kvmppc_handle_nested_exit(struct kvm_vcpu *vcpu)
+>  		r = EMULATE_FAIL;
+>  		if (cause == FSCR_PM_LG && (vcpu->arch.nested_hfscr & HFSCR_PM))
+>  			r = kvmppc_pmu_unavailable(vcpu);
+> +		if (cause == FSCR_EBB_LG && (vcpu->arch.nested_hfscr & HFSCR_EBB))
+> +			r = kvmppc_ebb_unavailable(vcpu);
+>
+>  		if (r == EMULATE_FAIL)
+>  			r = RESUME_HOST;
+> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+> index 024b0ce5b702..ee8668f056f9 100644
+> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+> @@ -168,7 +168,8 @@ static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
+>  	 * but preserve the interrupt cause field and facilities that might
+>  	 * be disabled for demand faulting in the L1.
+>  	 */
+> -	hr->hfscr &= (HFSCR_INTR_CAUSE | HFSCR_PM | vcpu->arch.hfscr);
+> +	hr->hfscr &= (HFSCR_INTR_CAUSE | HFSCR_PM | HFSCR_EBB |
+> +			vcpu->arch.hfscr);
+>
+>  	/* Don't let data address watchpoint match in hypervisor state */
+>  	hr->dawrx0 &= ~DAWRX_HYP;
+> diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/book3s_hv_p9_entry.c
+> index 4d1a2d1ff4c1..cf41261daa97 100644
+> --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
+> +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
+> @@ -218,9 +218,12 @@ static void load_spr_state(struct kvm_vcpu *vcpu,
+>  				struct p9_host_os_sprs *host_os_sprs)
+>  {
+>  	mtspr(SPRN_TAR, vcpu->arch.tar);
+> -	mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
+> -	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
+> -	mtspr(SPRN_BESCR, vcpu->arch.bescr);
+> +
+> +	if (vcpu->arch.hfscr & HFSCR_EBB) {
+> +		mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
+> +		mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
+> +		mtspr(SPRN_BESCR, vcpu->arch.bescr);
+> +	}
+>
+>  	if (!cpu_has_feature(CPU_FTR_ARCH_31))
+>  		mtspr(SPRN_TIDR, vcpu->arch.tid);
+> @@ -251,9 +254,20 @@ static void load_spr_state(struct kvm_vcpu *vcpu,
+>  static void store_spr_state(struct kvm_vcpu *vcpu)
+>  {
+>  	vcpu->arch.tar = mfspr(SPRN_TAR);
+> -	vcpu->arch.ebbhr = mfspr(SPRN_EBBHR);
+> -	vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
+> -	vcpu->arch.bescr = mfspr(SPRN_BESCR);
+> +
+> +	if (vcpu->arch.hfscr & HFSCR_EBB) {
+> +		vcpu->arch.ebbhr = mfspr(SPRN_EBBHR);
+> +		vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
+> +		vcpu->arch.bescr = mfspr(SPRN_BESCR);
+> +		/*
+> +		 * This is like load_fp in context switching, turn off the
+> +		 * facility after it wraps the u8 to try avoiding saving
+> +		 * and restoring the registers each partition switch.
+> +		 */
+> +		vcpu->arch.load_ebb++;
+> +		if (!vcpu->arch.load_ebb)
+> +			vcpu->arch.hfscr &= ~HFSCR_EBB;
+> +	}
+>
+>  	if (!cpu_has_feature(CPU_FTR_ARCH_31))
+>  		vcpu->arch.tid = mfspr(SPRN_TIDR);
