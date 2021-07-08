@@ -2,141 +2,477 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0E793C18B9
-	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 19:56:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1679F3C1AC7
+	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 23:01:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229580AbhGHR7g (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 8 Jul 2021 13:59:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48380 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229469AbhGHR7g (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Jul 2021 13:59:36 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 168HYRTL071910;
-        Thu, 8 Jul 2021 13:56:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=IcXhJ2bC0L959rJe4wUD/jaNBEfSotz/cU6M37PLavA=;
- b=aZeQ0tiuiSCgaEZ25GHNUbhQ6X3luA5zDPtMO5h0vDQSswj/vh+E5D9MFd+LXtyooMRR
- i5bce2fICKQnzPy1UN348opMC4hjzNCzKVITa6/tzYI7SdZR8bd8+A/qItt+4w44crty
- SeLIuBrVx05mp5rKEveipaG8/bckEOfQ3O5/8nMRo4rIoK5XP65EUW52uyEnBovwCOex
- zGpQSO2PDLkTUBUk6EiQsuoFcdsj802WX5yeRM+LLn0bxjpH/dDYMlrE8CbHeYa6DtN7
- 7WJRZpWQ+QyFSoklrncn4clHoffbANTbJZ2JhdEeHxpX+BoTLz44MXA8mbLqGvPOkBbJ 6Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39n287mjxj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 13:56:51 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 168HYThX072054;
-        Thu, 8 Jul 2021 13:56:51 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39n287mjx8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 13:56:51 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 168HXrY0023374;
-        Thu, 8 Jul 2021 17:56:50 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma03dal.us.ibm.com with ESMTP id 39jhq1fehy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 17:56:50 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 168Hunb111731306
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 8 Jul 2021 17:56:49 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 639BFAE060;
-        Thu,  8 Jul 2021 17:56:49 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9981EAE01E;
-        Thu,  8 Jul 2021 17:56:48 +0000 (GMT)
-Received: from localhost (unknown [9.211.64.106])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Thu,  8 Jul 2021 17:56:48 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [RFC PATCH 12/43] KVM: PPC: Book3S HV P9: Factor out
- yield_count increment
-In-Reply-To: <20210622105736.633352-13-npiggin@gmail.com>
-References: <20210622105736.633352-1-npiggin@gmail.com>
- <20210622105736.633352-13-npiggin@gmail.com>
-Date:   Thu, 08 Jul 2021 14:56:45 -0300
-Message-ID: <87pmvsofj6.fsf@linux.ibm.com>
+        id S230425AbhGHVD7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 8 Jul 2021 17:03:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52230 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230238AbhGHVD7 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Jul 2021 17:03:59 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56C0BC061574
+        for <kvm-ppc@vger.kernel.org>; Thu,  8 Jul 2021 14:01:17 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id ie21so4521269pjb.0
+        for <kvm-ppc@vger.kernel.org>; Thu, 08 Jul 2021 14:01:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XnLVhnDqha4c59VyXUJUIVkNSVAAQY+VM5n1Wqckpa0=;
+        b=WTorCl1o635xlAu+NKkM9OWtM0K3nsO3XI4PbuomT5fDze7UeK1dlLDwqG78skJebh
+         vKyi4S9CnyhMzg/vWKJ6ur5mVmN41Lgru01VtBa65jhAUsSQv2gOb81pe8Cnv3YcyQnl
+         cTX9WTtDSQ8f8RmgRgEpzMA9Pg9StdBtOOOEo3t3QV1CPY2d+CHuZO8Wz/ZS+n6R566f
+         HO/Y12OfGuFzOSzyJy4Txw9lI2DqXL0sfii4u0camHTqCSmFS+4O8niydoE4VUYeXlV9
+         XKZB1nK02S9ou134oMR8g1fYFwcgqBWIsfxjwBqPvnHoSgfh6TtFykPX11OPgwoS57wQ
+         wKIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XnLVhnDqha4c59VyXUJUIVkNSVAAQY+VM5n1Wqckpa0=;
+        b=GgmrU5S8mObjujtZCdQkjTGYIF++BW9jesxsKCSFGylPz9KHRxLqbydvUXTq10kN7E
+         euSsi4gYfywgjnNso8mG/8i6J9S2VnTLihCtHu06FP4aeJQRringaXy5rDC+yNyDJUsA
+         McdV8Dq3cRU/OBCugeFPfHE7CiUjfH+GDoY4zVNv+O/t7IkIpedv+peHZIH5h31xepbD
+         7jVNSibWDVar2Q+NMEMBTa44MDNvb8Su7VGm/+EwyAMpkeIyBNN6sBOdpODVvNPQp0wX
+         T99jjHKVvuS9z+6mBLQPQwIIghtBPEYFTi4DA/RkdHdrYf1H6GDIb2q2Vg2J+R9AsOsK
+         lm+g==
+X-Gm-Message-State: AOAM532opZ1IcMTopzTqf9r8PNXPZQf93pH+Che3dKPw10aWly1yE+Bk
+        DQVHpeNLH6+awgfg3b/SAkF9lA==
+X-Google-Smtp-Source: ABdhPJxn4cJBOse66K7sy6jUSjOBf17B5E2LvnIIh8493ivqd0pnAisa4RHJrJUccnk6Cd/Jj5KA4w==
+X-Received: by 2002:a17:902:b94a:b029:10d:6f56:eeac with SMTP id h10-20020a170902b94ab029010d6f56eeacmr27835997pls.54.1625778076559;
+        Thu, 08 Jul 2021 14:01:16 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id z2sm3590995pfn.120.2021.07.08.14.01.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jul 2021 14:01:14 -0700 (PDT)
+Date:   Thu, 8 Jul 2021 21:01:11 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>
+Subject: Re: [PATCH v1 1/4] KVM: stats: Support linear and logarithmic
+ histogram statistics
+Message-ID: <YOdnl5nzCaPB5l2P@google.com>
+References: <20210706180350.2838127-1-jingzhangos@google.com>
+ <20210706180350.2838127-2-jingzhangos@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: weSfOTeI_pC2JJ_1f2pV_oyeNC14KiTl
-X-Proofpoint-ORIG-GUID: dpJyGwdN7RX28dciiyO4_n0gTKi1M_BJ
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-08_10:2021-07-08,2021-07-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- mlxscore=0 priorityscore=1501 malwarescore=0 suspectscore=0 spamscore=0
- phishscore=0 lowpriorityscore=0 mlxlogscore=999 adultscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2107080093
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210706180350.2838127-2-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
-
-> Factor duplicated code into a helper function.
->
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
-
+On Tue, Jul 06, 2021 at 06:03:47PM +0000, Jing Zhang wrote:
+> Add new types of KVM stats, linear and logarithmic histogram.
+> Histogram are very useful for observing the value distribution
+> of time or size related stats.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/powerpc/kvm/book3s_hv.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index b1b94b3563b7..38d8afa16839 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -3896,6 +3896,16 @@ static inline bool hcall_is_xics(unsigned long req)
->  		req == H_IPOLL || req == H_XIRR || req == H_XIRR_X;
+>  arch/arm64/kvm/guest.c    |  4 ---
+>  arch/mips/kvm/mips.c      |  4 ---
+>  arch/powerpc/kvm/book3s.c |  4 ---
+>  arch/powerpc/kvm/booke.c  |  4 ---
+>  arch/s390/kvm/kvm-s390.c  |  4 ---
+>  arch/x86/kvm/x86.c        |  4 ---
+>  include/linux/kvm_host.h  | 53 ++++++++++++++++++++++++++++-----------
+>  include/linux/kvm_types.h | 16 ++++++++++++
+>  include/uapi/linux/kvm.h  | 11 +++++---
+>  virt/kvm/binary_stats.c   | 36 ++++++++++++++++++++++++++
+>  10 files changed, 98 insertions(+), 42 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 1512a8007a78..cb44d8756fa7 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -31,8 +31,6 @@
+>  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	KVM_GENERIC_VM_STATS()
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -52,8 +50,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, mmio_exit_kernel),
+>  	STATS_DESC_COUNTER(VCPU, exits)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index af9dd029a4e1..75c6f264c626 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -41,8 +41,6 @@
+>  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	KVM_GENERIC_VM_STATS()
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -85,8 +83,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, vz_cpucfg_exits),
+>  #endif
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+> index 79833f78d1da..5cc6e90095b0 100644
+> --- a/arch/powerpc/kvm/book3s.c
+> +++ b/arch/powerpc/kvm/book3s.c
+> @@ -43,8 +43,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	STATS_DESC_ICOUNTER(VM, num_2M_pages),
+>  	STATS_DESC_ICOUNTER(VM, num_1G_pages)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -88,8 +86,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, pthru_host),
+>  	STATS_DESC_COUNTER(VCPU, pthru_bad_aff)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+> index 551b30d84aee..5ed6c235e059 100644
+> --- a/arch/powerpc/kvm/booke.c
+> +++ b/arch/powerpc/kvm/booke.c
+> @@ -41,8 +41,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	STATS_DESC_ICOUNTER(VM, num_2M_pages),
+>  	STATS_DESC_ICOUNTER(VM, num_1G_pages)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -79,8 +77,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, pthru_host),
+>  	STATS_DESC_COUNTER(VCPU, pthru_bad_aff)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 1695f0ced5ba..7610d33d319b 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -66,8 +66,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VM, inject_service_signal),
+>  	STATS_DESC_COUNTER(VM, inject_virtio)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -174,8 +172,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, diagnose_other),
+>  	STATS_DESC_COUNTER(VCPU, pfault_sync)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 8166ad113fb2..b94a80ad5b8d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -239,8 +239,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	STATS_DESC_ICOUNTER(VM, nx_lpage_splits),
+>  	STATS_DESC_PCOUNTER(VM, max_mmu_page_hash_collisions)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -280,8 +278,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, directed_yield_successful),
+>  	STATS_DESC_ICOUNTER(VCPU, guest_mode)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index ae7735b490b4..356af173114d 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1273,56 +1273,66 @@ struct _kvm_stats_desc {
+>  	char name[KVM_STATS_NAME_SIZE];
+>  };
+>  
+> -#define STATS_DESC_COMMON(type, unit, base, exp)			       \
+> +#define STATS_DESC_COMMON(type, unit, base, exp, sz, param)		       \
+>  	.flags = type | unit | base |					       \
+>  		 BUILD_BUG_ON_ZERO(type & ~KVM_STATS_TYPE_MASK) |	       \
+>  		 BUILD_BUG_ON_ZERO(unit & ~KVM_STATS_UNIT_MASK) |	       \
+>  		 BUILD_BUG_ON_ZERO(base & ~KVM_STATS_BASE_MASK),	       \
+>  	.exponent = exp,						       \
+> -	.size = 1
+> +	.size = sz,							       \
+> +	.hist_param = param
+>  
+> -#define VM_GENERIC_STATS_DESC(stat, type, unit, base, exp)		       \
+> +#define VM_GENERIC_STATS_DESC(stat, type, unit, base, exp, sz, param)	       \
+>  	{								       \
+>  		{							       \
+> -			STATS_DESC_COMMON(type, unit, base, exp),	       \
+> +			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
+>  			.offset = offsetof(struct kvm_vm_stat, generic.stat)   \
+>  		},							       \
+>  		.name = #stat,						       \
+>  	}
+> -#define VCPU_GENERIC_STATS_DESC(stat, type, unit, base, exp)		       \
+> +#define VCPU_GENERIC_STATS_DESC(stat, type, unit, base, exp, sz, param)	       \
+>  	{								       \
+>  		{							       \
+> -			STATS_DESC_COMMON(type, unit, base, exp),	       \
+> +			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
+>  			.offset = offsetof(struct kvm_vcpu_stat, generic.stat) \
+>  		},							       \
+>  		.name = #stat,						       \
+>  	}
+> -#define VM_STATS_DESC(stat, type, unit, base, exp)			       \
+> +#define VM_STATS_DESC(stat, type, unit, base, exp, sz, param)		       \
+>  	{								       \
+>  		{							       \
+> -			STATS_DESC_COMMON(type, unit, base, exp),	       \
+> +			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
+>  			.offset = offsetof(struct kvm_vm_stat, stat)	       \
+>  		},							       \
+>  		.name = #stat,						       \
+>  	}
+> -#define VCPU_STATS_DESC(stat, type, unit, base, exp)			       \
+> +#define VCPU_STATS_DESC(stat, type, unit, base, exp, sz, param)		       \
+>  	{								       \
+>  		{							       \
+> -			STATS_DESC_COMMON(type, unit, base, exp),	       \
+> +			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
+>  			.offset = offsetof(struct kvm_vcpu_stat, stat)	       \
+>  		},							       \
+>  		.name = #stat,						       \
+>  	}
+>  /* SCOPE: VM, VM_GENERIC, VCPU, VCPU_GENERIC */
+> -#define STATS_DESC(SCOPE, stat, type, unit, base, exp)			       \
+> -	SCOPE##_STATS_DESC(stat, type, unit, base, exp)
+> +#define STATS_DESC(SCOPE, stat, type, unit, base, exp, sz, param)	       \
+> +	SCOPE##_STATS_DESC(stat, type, unit, base, exp, sz, param)
+>  
+>  #define STATS_DESC_CUMULATIVE(SCOPE, name, unit, base, exponent)	       \
+> -	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_CUMULATIVE, unit, base, exponent)
+> +	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_CUMULATIVE,		       \
+> +		unit, base, exponent, 1, 0)
+>  #define STATS_DESC_INSTANT(SCOPE, name, unit, base, exponent)		       \
+> -	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_INSTANT, unit, base, exponent)
+> +	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_INSTANT,			       \
+> +		unit, base, exponent, 1, 0)
+>  #define STATS_DESC_PEAK(SCOPE, name, unit, base, exponent)		       \
+> -	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_PEAK, unit, base, exponent)
+> +	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_PEAK,			       \
+> +		unit, base, exponent, 1, 0)
+> +#define STATS_DESC_LINEAR_HIST(SCOPE, name, unit, base, exponent, sz, param)   \
+> +	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_LINEAR_HIST,		       \
+> +		unit, base, exponent, sz, param)
+> +#define STATS_DESC_LOG_HIST(SCOPE, name, unit, base, exponent, sz, param)      \
+> +	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_LOG_HIST,		       \
+> +		unit, base, exponent, sz, param)
+>  
+>  /* Cumulative counter, read/write */
+>  #define STATS_DESC_COUNTER(SCOPE, name)					       \
+> @@ -1341,6 +1351,14 @@ struct _kvm_stats_desc {
+>  #define STATS_DESC_TIME_NSEC(SCOPE, name)				       \
+>  	STATS_DESC_CUMULATIVE(SCOPE, name, KVM_STATS_UNIT_SECONDS,	       \
+>  		KVM_STATS_BASE_POW10, -9)
+> +/* Linear histogram for time in nanosecond */
+> +#define STATS_DESC_LINHIST_TIME_NSEC(SCOPE, name, sz, bucket_size)	       \
+> +	STATS_DESC_LINEAR_HIST(SCOPE, name, KVM_STATS_UNIT_SECONDS,	       \
+> +		KVM_STATS_BASE_POW10, -9, sz, bucket_size)
+> +/* Logarithmic histogram for time in nanosecond */
+> +#define STATS_DESC_LOGHIST_TIME_NSEC(SCOPE, name, sz)			       \
+> +	STATS_DESC_LOG_HIST(SCOPE, name, KVM_STATS_UNIT_SECONDS,	       \
+> +		KVM_STATS_BASE_POW10, -9, sz, LOGHIST_BASE_2)
+>  
+>  #define KVM_GENERIC_VM_STATS()						       \
+>  	STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush)
+> @@ -1354,10 +1372,15 @@ struct _kvm_stats_desc {
+>  	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_ns)
+>  
+>  extern struct dentry *kvm_debugfs_dir;
+> +
+>  ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
+>  		       const struct _kvm_stats_desc *desc,
+>  		       void *stats, size_t size_stats,
+>  		       char __user *user_buffer, size_t size, loff_t *offset);
+> +void kvm_stats_linear_hist_update(u64 *data, size_t size,
+> +				  u64 value, size_t bucket_size);
+> +void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value);
+> +
+>  extern const struct kvm_stats_header kvm_vm_stats_header;
+>  extern const struct _kvm_stats_desc kvm_vm_stats_desc[];
+>  extern const struct kvm_stats_header kvm_vcpu_stats_header;
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index ed6a985c5680..cc88cd676775 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -76,6 +76,22 @@ struct kvm_mmu_memory_cache {
+>  };
+>  #endif
+>  
+> +/* Constants used for histogram stats */
+> +#define LINHIST_SIZE_SMALL		10
+> +#define LINHIST_SIZE_MEDIUM		20
+> +#define LINHIST_SIZE_LARGE		50
+> +#define LINHIST_SIZE_XLARGE		100
+
+nit: s/SIZE/BUCKET_COUNT/
+
+> +#define LINHIST_BUCKET_SIZE_SMALL	10
+> +#define LINHIST_BUCKET_SIZE_MEDIUM	100
+> +#define LINHIST_BUCKET_SIZE_LARGE	1000
+> +#define LINHIST_BUCKET_SIZE_XLARGE	10000
+> +
+> +#define LOGHIST_SIZE_SMALL		8
+> +#define LOGHIST_SIZE_MEDIUM		16
+> +#define LOGHIST_SIZE_LARGE		32
+> +#define LOGHIST_SIZE_XLARGE		64
+
+Ditto here.
+
+> +#define LOGHIST_BASE_2			2
+> +
+>  struct kvm_vm_stat_generic {
+>  	u64 remote_tlb_flush;
+>  };
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 68c9e6d8bbda..ff34a471d9ef 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1963,7 +1963,9 @@ struct kvm_stats_header {
+>  #define KVM_STATS_TYPE_CUMULATIVE	(0x0 << KVM_STATS_TYPE_SHIFT)
+>  #define KVM_STATS_TYPE_INSTANT		(0x1 << KVM_STATS_TYPE_SHIFT)
+>  #define KVM_STATS_TYPE_PEAK		(0x2 << KVM_STATS_TYPE_SHIFT)
+> -#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_PEAK
+> +#define KVM_STATS_TYPE_LINEAR_HIST	(0x3 << KVM_STATS_TYPE_SHIFT)
+> +#define KVM_STATS_TYPE_LOG_HIST		(0x4 << KVM_STATS_TYPE_SHIFT)
+> +#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_LOG_HIST
+>  
+>  #define KVM_STATS_UNIT_SHIFT		4
+>  #define KVM_STATS_UNIT_MASK		(0xF << KVM_STATS_UNIT_SHIFT)
+> @@ -1987,7 +1989,10 @@ struct kvm_stats_header {
+>   *        Every data item is of type __u64.
+>   * @offset: The offset of the stats to the start of stat structure in
+>   *          struture kvm or kvm_vcpu.
+> - * @unused: Unused field for future usage. Always 0 for now.
+> + * @hist_param: A parameter value used for histogram stats. For linear
+> + *              histogram stats, it indicates the size of the bucket;
+> + *              For logarithmic histogram stats, it indicates the base
+> + *              of the logarithm. Only base of 2 is supported.
+>   * @name: The name string for the stats. Its size is indicated by the
+>   *        &kvm_stats_header->name_size.
+>   */
+> @@ -1996,7 +2001,7 @@ struct kvm_stats_desc {
+>  	__s16 exponent;
+>  	__u16 size;
+>  	__u32 offset;
+> -	__u32 unused;
+> +	__u32 hist_param;
+
+`hist_param` is vague. What about making this an anonymous union to make
+the dual meaning explicit?
+
+        union {
+                /* Only used for KVM_STATS_TYPE_LOG_HIST. */
+                __u32 base;
+                /* Only used for KVM_STATS_TYPE_LINEAR_HIST. */
+                __u32 bucket_size;
+        };
+
+It may make the STATS_DESC code a bit more complicated but the rest of
+the code that uses it will be much more clear.
+
+>  	char name[];
+>  };
+>  
+> diff --git a/virt/kvm/binary_stats.c b/virt/kvm/binary_stats.c
+> index e609d428811a..6eead6979a7f 100644
+> --- a/virt/kvm/binary_stats.c
+> +++ b/virt/kvm/binary_stats.c
+> @@ -144,3 +144,39 @@ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
+>  	*offset = pos;
+>  	return len;
 >  }
->
-> +static void vcpu_vpa_increment_dispatch(struct kvm_vcpu *vcpu)
+> +
+> +/**
+> + * kvm_stats_linear_hist_update() - Update bucket value for linear histogram
+> + * statistics data.
+> + *
+> + * @data: start address of the stats data
+> + * @size: the number of bucket of the stats data
+> + * @value: the new value used to update the linear histogram's bucket
+> + * @bucket_size: the size (width) of a bucket
+> + */
+> +void kvm_stats_linear_hist_update(u64 *data, size_t size,
+> +				  u64 value, size_t bucket_size)
 > +{
-> +	struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
-> +	if (lp) {
-> +		u32 yield_count = be32_to_cpu(lp->yield_count) + 1;
-> +		lp->yield_count = cpu_to_be32(yield_count);
-> +		vcpu->arch.vpa.dirty = 1;
-> +	}
+> +	size_t index = value / bucket_size;
+> +
+> +	if (index >= size)
+> +		index = size - 1;
+
+nit: It would be simpler to use max().
+
+        size_t index = max(value / bucket_size, size - 1);
+
+> +	++data[index];
 > +}
 > +
->  /*
->   * Guest entry for POWER9 and later CPUs.
->   */
-> @@ -3926,12 +3936,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
->  	vc->entry_exit_map = 1;
->  	vc->in_guest = 1;
->
-> -	if (vcpu->arch.vpa.pinned_addr) {
-> -		struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
-> -		u32 yield_count = be32_to_cpu(lp->yield_count) + 1;
-> -		lp->yield_count = cpu_to_be32(yield_count);
-> -		vcpu->arch.vpa.dirty = 1;
-> -	}
-> +	vcpu_vpa_increment_dispatch(vcpu);
->
->  	if (cpu_has_feature(CPU_FTR_TM) ||
->  	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
-> @@ -4069,12 +4074,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
->  	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
->  		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
->
-> -	if (vcpu->arch.vpa.pinned_addr) {
-> -		struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
-> -		u32 yield_count = be32_to_cpu(lp->yield_count) + 1;
-> -		lp->yield_count = cpu_to_be32(yield_count);
-> -		vcpu->arch.vpa.dirty = 1;
-> -	}
-> +	vcpu_vpa_increment_dispatch(vcpu);
->
->  	save_p9_guest_pmu(vcpu);
->  #ifdef CONFIG_PPC_PSERIES
+> +/**
+> + * kvm_stats_log_hist_update() - Update bucket value for logarithmic histogram
+> + * statistics data.
+> + *
+> + * @data: start address of the stats data
+> + * @size: the number of bucket of the stats data
+> + * @value: the new value used to update the logarithmic histogram's bucket
+> + */
+> +void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value)
+> +{
+> +	size_t index = fls64(value);
+> +
+> +	if (index >= size)
+> +		index = size - 1;
+
+Ditto here about using max().
+
+> +	++data[index];
+> +}
+> -- 
+> 2.32.0.93.g670b81a890-goog
+> 
