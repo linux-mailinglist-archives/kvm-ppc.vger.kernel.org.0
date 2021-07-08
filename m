@@ -2,169 +2,164 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D9A33BFA8B
-	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 14:45:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFDC33C152D
+	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 16:29:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231270AbhGHMsj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 8 Jul 2021 08:48:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54060 "EHLO
+        id S231785AbhGHOcV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 8 Jul 2021 10:32:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230433AbhGHMsj (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Jul 2021 08:48:39 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA42C061574
-        for <kvm-ppc@vger.kernel.org>; Thu,  8 Jul 2021 05:45:56 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id d12so5808383pgd.9
-        for <kvm-ppc@vger.kernel.org>; Thu, 08 Jul 2021 05:45:56 -0700 (PDT)
+        with ESMTP id S231779AbhGHOcV (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Jul 2021 10:32:21 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C361C061574
+        for <kvm-ppc@vger.kernel.org>; Thu,  8 Jul 2021 07:29:38 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id a18so16189588lfs.10
+        for <kvm-ppc@vger.kernel.org>; Thu, 08 Jul 2021 07:29:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=V9F9nU6MbirMGKo2lzCFkdt6YjO4+T9M0GAqL4st5Zw=;
-        b=YlSg5KTLns4/Qz5wajNfrxRNcTtoQ5Jl7jDZZ8dCrtRuMoAi+WhE9NMrncKXJtZU7U
-         MN3ekSTUvnqBT+gbt+YEWbvvO+XaytYyI9CruRDbPyACkiFatEFAQSsqXMj1WP8aI31K
-         EY6zjek/+/cHVdY+N6IetLxdW+WUTyvC6QxuuvHG+YaYX43i1IwXwlIJMI7RjLoyO0fR
-         Rxxb0RPJ76EwXRHGiNEgE1MChDTYw2mXVqZc1wbCMZI7inE2v9TXuUHzri1L7ktyn77g
-         1f3jA13z+V/BcjrMosHdmkfzmNqO8bfFYN7Q0hXjRdnkmxOf80840wjVraLeCQYMcBXi
-         5hjA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=KlZJUqaLgsBO7mX3KI8iI1wIxb+SgVZoM88aZKw+rzA=;
+        b=obWPsghibGoeU7rd3DensnAXBnHvwcxiIoKHrfURhiEUGBvfx5jrCXoh4K+JYC/OOz
+         7ZTtmjLST2bp4ANmZsR2f0WoB75kcsJ93MscKpT4kwOP80YTAcguMNu5sKnIiWprpcql
+         PNtHAJD+L7aKWTxcThzPzvOj26jSDSHcf5W/cCTgMsgBAG/4kLEd3h3+xtgm3y0wfjEe
+         G+Fz1MmJaiaJlPSpBQqZZfX6dPKZLVCBl3eH4QX9W9j3oDv6pEuY1J3Ihh/LapbI6wIp
+         8hnZyKa/5C+ded+7G8att1ZG++q/hdXFyOZpMxTnYasV5ka8Zgwh3M1TxoZS4umQOSTQ
+         Kdhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=V9F9nU6MbirMGKo2lzCFkdt6YjO4+T9M0GAqL4st5Zw=;
-        b=knQNiJ40nsLucx9kfj8UKHx8MCm5to/4iCVFzMBewLsUavVWvkQW+YUOIuryUeYRCO
-         xlpm7htYFIbSg/O9KSLOgObelWrwef0d9ctfarYdpUvtSUGRGg9lSLMiUuMEPwCucx/i
-         5uRtdVnOjbRmwbchi9bhSghHLlJ/qh5+QNJqKxuQhL9QtoI0+dmMIqW6prn0UpcOCenH
-         7n9U29DlK4vU7Bbw3R2MPC0g5RuCTZTMN+vHjKrEf8KNl/1X/jEItAOrupMtSlmTzHBM
-         NXZu0PiTGudwcnsTAiqZhXrgJhp9VL8T80iSHUvklJ+06l8awXKUVbb8UwYZ/ySHOvth
-         optQ==
-X-Gm-Message-State: AOAM5334odbqr0XfBD73IzJAyMvvu4BN5DlFi/+mHo7pZTiKsDpXtvC4
-        5AJP6lKywYeQyq0cvul3Z8BQAMJ7fts=
-X-Google-Smtp-Source: ABdhPJxzzRZ518bBwLsflS/TK5EJCPaRfOj6cR9e7GiPVRZuLq8P25e3BS1Wypre4supFoO/8GwObA==
-X-Received: by 2002:a05:6a00:1a0b:b029:31a:25cf:3dbd with SMTP id g11-20020a056a001a0bb029031a25cf3dbdmr28132323pfv.57.1625748355755;
-        Thu, 08 Jul 2021 05:45:55 -0700 (PDT)
-Received: from localhost (14-203-186-173.tpgi.com.au. [14.203.186.173])
-        by smtp.gmail.com with ESMTPSA id e4sm3519813pgi.94.2021.07.08.05.45.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jul 2021 05:45:55 -0700 (PDT)
-Date:   Thu, 08 Jul 2021 22:45:49 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [RFC PATCH 10/43] powerpc/64s: Always set PMU control registers
- to frozen/disabled when not in use
-To:     kvm-ppc@vger.kernel.org, Madhavan Srinivasan <maddy@linux.ibm.com>
-Cc:     linuxppc-dev@lists.ozlabs.org
-References: <20210622105736.633352-1-npiggin@gmail.com>
-        <20210622105736.633352-11-npiggin@gmail.com>
-        <c607e40c-5334-e8b1-11ac-c1464332e01a@linux.ibm.com>
-        <1625185125.n8jy7yqojr.astroid@bobo.none>
-In-Reply-To: <1625185125.n8jy7yqojr.astroid@bobo.none>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=KlZJUqaLgsBO7mX3KI8iI1wIxb+SgVZoM88aZKw+rzA=;
+        b=pK87hVd2ZqQ6SXS2hF93nKgdh1YMmE1EPWydJNLrnjT18D0gPCrq2xpQHFwTVO405c
+         MJzoi7HOcIGQqjTcRcdjAc3u7D8YMQOvos1fu9Ge24wM6Xd6H63dL/nWqQYlxAE0o7BM
+         trdjKcAQyem1T4ZTVDLj18guUIsXNXIamiQtPdb1isC2v2vKFY2Z1Ss7tK8wklROae0S
+         i1yynipRLTksMetwqj4kNtEzaZZtPnCSb6lO5y6DXkqEMu1HtAeyqJ6naac9siOM7f2e
+         NljcgvN1p/A5sYgkI9urWY3uB4UPLkYxFp1GBmH3IAobQNtZYzuxk+1onia2rZzTVJDQ
+         H87w==
+X-Gm-Message-State: AOAM533ISYI2LrBB5XVkQ3ayWGxrb7ewIbUVs+JKP5Wjx2mPUF/ucQ+I
+        /9S1gKpHVP4+HQrLMYHLaYadaBSqlovVk9oifaeRSw==
+X-Google-Smtp-Source: ABdhPJwJ/gHUqnQQLrEM6QdPY6amGL54L7H/DfwpiDkcpLDdlO7X6rs7//kecyIH8fJQDv9E7jx6T2rRQARezra5svE=
+X-Received: by 2002:a2e:3513:: with SMTP id z19mr15574170ljz.256.1625754576203;
+ Thu, 08 Jul 2021 07:29:36 -0700 (PDT)
 MIME-Version: 1.0
-Message-Id: <1625745913.qxusux97eo.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20210706180350.2838127-1-jingzhangos@google.com>
+ <20210706180350.2838127-3-jingzhangos@google.com> <YOY5QndV0O3giRJ2@google.com>
+In-Reply-To: <YOY5QndV0O3giRJ2@google.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Thu, 8 Jul 2021 09:29:24 -0500
+Message-ID: <CAAdAUtiA91MzByviP=0VEtiHi2dAp9PryKmgD1p+qE4Re9HCJg@mail.gmail.com>
+Subject: Re: [PATCH v1 2/4] KVM: stats: Update doc for histogram statistics
+To:     David Matlack <dmatlack@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Nicholas Piggin's message of July 2, 2021 10:27 am:
-> Excerpts from Madhavan Srinivasan's message of July 1, 2021 11:17 pm:
->>=20
->> On 6/22/21 4:27 PM, Nicholas Piggin wrote:
->>> KVM PMU management code looks for particular frozen/disabled bits in
->>> the PMU registers so it knows whether it must clear them when coming
->>> out of a guest or not. Setting this up helps KVM make these optimisatio=
-ns
->>> without getting confused. Longer term the better approach might be to
->>> move guest/host PMU switching to the perf subsystem.
->>>
->>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->>> ---
->>>   arch/powerpc/kernel/cpu_setup_power.c | 4 ++--
->>>   arch/powerpc/kernel/dt_cpu_ftrs.c     | 6 +++---
->>>   arch/powerpc/kvm/book3s_hv.c          | 5 +++++
->>>   arch/powerpc/perf/core-book3s.c       | 7 +++++++
->>>   4 files changed, 17 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/arch/powerpc/kernel/cpu_setup_power.c b/arch/powerpc/kerne=
-l/cpu_setup_power.c
->>> index a29dc8326622..3dc61e203f37 100644
->>> --- a/arch/powerpc/kernel/cpu_setup_power.c
->>> +++ b/arch/powerpc/kernel/cpu_setup_power.c
->>> @@ -109,7 +109,7 @@ static void init_PMU_HV_ISA207(void)
->>>   static void init_PMU(void)
->>>   {
->>>   	mtspr(SPRN_MMCRA, 0);
->>> -	mtspr(SPRN_MMCR0, 0);
->>> +	mtspr(SPRN_MMCR0, MMCR0_FC);
->>=20
->> Sticky point here is, currently if not frozen, pmc5/6 will
->> keep countering. And not freezing them at boot is quiet useful
->> sometime, like say when running in a simulation where we could calculate
->> approx CPIs for micro benchmarks without perf subsystem.
->=20
-> You even can't use the sysfs files in this sim environment? In that case
-> what if we added a boot option that could set some things up? In that=20
-> case possibly you could even gather some more types of events too.
-
-What if we added this to allow sim environments to run PMC5/6 and=20
-additionally specify MMCR1 without userspace involvement?
-
-Thanks,
-Nick
-
----
-diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-book3=
-s.c
-index af8a4981c6f6..454771243529 100644
---- a/arch/powerpc/perf/core-book3s.c
-+++ b/arch/powerpc/perf/core-book3s.c
-@@ -2425,8 +2425,24 @@ int register_power_pmu(struct power_pmu *pmu)
- }
-=20
- #ifdef CONFIG_PPC64
-+static bool pmu_override =3D false;
-+static unsigned long pmu_override_val;
-+static void do_pmu_override(void *data)
-+{
-+	ppc_set_pmu_inuse(1);
-+	if (pmu_override_val)
-+		mtspr(SPRN_MMCR1, pmu_override_val);
-+	mtspr(SPRN_MMCR0, mfspr(SPRN_MMCR0) & ~MMCR0_FC);
-+}
-+
- static int __init init_ppc64_pmu(void)
- {
-+	if (cpu_has_feature(CPU_FTR_HVMODE) && pmu_override) {
-+		printk(KERN_WARNING "perf: disabling perf due to pmu=3D command line opt=
-ion.\n");
-+		on_each_cpu(do_pmu_override, NULL, 1);
-+		return 0;
-+	}
-+
- 	/* run through all the pmu drivers one at a time */
- 	if (!init_power5_pmu())
- 		return 0;
-@@ -2448,4 +2464,23 @@ static int __init init_ppc64_pmu(void)
- 		return init_generic_compat_pmu();
- }
- early_initcall(init_ppc64_pmu);
-+
-+static int __init pmu_setup(char *str)
-+{
-+	unsigned long val;
-+
-+	if (!early_cpu_has_feature(CPU_FTR_HVMODE))
-+		return 0;
-+
-+	pmu_override =3D true;
-+
-+	if (kstrtoul(str, 0, &val))
-+		val =3D 0;
-+
-+	pmu_override_val =3D val;
-+
-+	return 1;
-+}
-+__setup("pmu=3D", pmu_setup);
-+
- #endif
+On Wed, Jul 7, 2021 at 6:31 PM David Matlack <dmatlack@google.com> wrote:
+>
+> On Tue, Jul 06, 2021 at 06:03:48PM +0000, Jing Zhang wrote:
+> > Add documentations for linear and logarithmic histogram statistics.
+> > Add binary stats capability text which is missing during merge of
+> > the binary stats patch.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  Documentation/virt/kvm/api.rst | 36 +++++++++++++++++++++++++++++++---
+> >  1 file changed, 33 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 3b6e3b1628b4..948d33c26704 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -5171,6 +5171,9 @@ by a string of size ``name_size``.
+> >       #define KVM_STATS_TYPE_CUMULATIVE       (0x0 << KVM_STATS_TYPE_SHIFT)
+> >       #define KVM_STATS_TYPE_INSTANT          (0x1 << KVM_STATS_TYPE_SHIFT)
+> >       #define KVM_STATS_TYPE_PEAK             (0x2 << KVM_STATS_TYPE_SHIFT)
+> > +     #define KVM_STATS_TYPE_LINEAR_HIST      (0x3 << KVM_STATS_TYPE_SHIFT)
+> > +     #define KVM_STATS_TYPE_LOG_HIST         (0x4 << KVM_STATS_TYPE_SHIFT)
+> > +     #define KVM_STATS_TYPE_MAX              KVM_STATS_TYPE_LOG_HIST
+> >
+> >       #define KVM_STATS_UNIT_SHIFT            4
+> >       #define KVM_STATS_UNIT_MASK             (0xF << KVM_STATS_UNIT_SHIFT)
+> > @@ -5178,11 +5181,13 @@ by a string of size ``name_size``.
+> >       #define KVM_STATS_UNIT_BYTES            (0x1 << KVM_STATS_UNIT_SHIFT)
+> >       #define KVM_STATS_UNIT_SECONDS          (0x2 << KVM_STATS_UNIT_SHIFT)
+> >       #define KVM_STATS_UNIT_CYCLES           (0x3 << KVM_STATS_UNIT_SHIFT)
+> > +     #define KVM_STATS_UNIT_MAX              KVM_STATS_UNIT_CYCLES
+> >
+> >       #define KVM_STATS_BASE_SHIFT            8
+> >       #define KVM_STATS_BASE_MASK             (0xF << KVM_STATS_BASE_SHIFT)
+> >       #define KVM_STATS_BASE_POW10            (0x0 << KVM_STATS_BASE_SHIFT)
+> >       #define KVM_STATS_BASE_POW2             (0x1 << KVM_STATS_BASE_SHIFT)
+> > +     #define KVM_STATS_BASE_MAX              KVM_STATS_BASE_POW2
+> >
+> >       struct kvm_stats_desc {
+> >               __u32 flags;
+> > @@ -5214,6 +5219,22 @@ Bits 0-3 of ``flags`` encode the type:
+> >      represents a peak value for a measurement, for example the maximum number
+> >      of items in a hash table bucket, the longest time waited and so on.
+> >      The corresponding ``size`` field for this type is always 1.
+> > +  * ``KVM_STATS_TYPE_LINEAR_HIST``
+> > +    The statistics data is in the form of linear histogram. The number of
+> > +    buckets is specified by the ``size`` field. The size of buckets is specified
+> > +    by the ``hist_param`` field. The range of the Nth bucket (1 <= N < ``size``)
+> > +    is [``hist_param``*(N-1), ``hist_param``*N), while the range of the last
+> > +    bucket is [``hist_param``*(``size``-1), +INF). (+INF means positive infinity
+> > +    value.) The bucket value indicates how many times the statistics data is in
+> > +    the bucket's range.
+> > +  * ``KVM_STATS_TYPE_LOG_HIST``
+> > +    The statistics data is in the form of logarithmic histogram. The number of
+> > +    buckets is specified by the ``size`` field. The base of logarithm is
+> > +    specified by the ``hist_param`` field. The range of the Nth bucket (1 < N <
+> > +    ``size``) is [pow(``hist_param``, N-2), pow(``hist_param``, N-1)). The range
+> > +    of the first bucket is [0, 1), while the range of the last bucket is
+> > +    [pow(``hist_param``, ``size``-2), +INF). The bucket value indicates how many
+> > +    times the statistics data is in the bucket's range.
+> >
+> >  Bits 4-7 of ``flags`` encode the unit:
+> >    * ``KVM_STATS_UNIT_NONE``
+> > @@ -5246,9 +5267,10 @@ unsigned 64bit data.
+> >  The ``offset`` field is the offset from the start of Data Block to the start of
+> >  the corresponding statistics data.
+> >
+> > -The ``unused`` field is reserved for future support for other types of
+> > -statistics data, like log/linear histogram. Its value is always 0 for the types
+> > -defined above.
+> > +The ``hist_param`` field is used as a parameter for histogram statistics data.
+> > +For linear histogram statistics data, it indicates the size of a bucket. For
+> > +logarithmic histogram statistics data, it indicates the base of the logarithm.
+> > +Only base of 2 is supported fo logarithmic histogram.
+> >
+> >  The ``name`` field is the name string of the statistics data. The name string
+> >  starts at the end of ``struct kvm_stats_desc``.  The maximum length including
+> > @@ -7182,3 +7204,11 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
+> >  of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
+> >  the hypercalls whose corresponding bit is in the argument, and return
+> >  ENOSYS for the others.
+> > +
+> > +8.35 KVM_CAP_STATS_BINARY_FD
+> > +----------------------------
+> > +
+> > +:Architectures: all
+> > +
+> > +This capability indicates the feature that userspace can get a file descriptor
+> > +for every VM and VCPU to read statistics data in binary format.
+>
+> This should probably be in a separate patch with a Fixes tag.
+>
+> Fixes: fdc09ddd4064 ("KVM: stats: Add documentation for binary statistics interface")
+>
+> > --
+> > 2.32.0.93.g670b81a890-goog
+> >
+Thanks David.
+Jing
