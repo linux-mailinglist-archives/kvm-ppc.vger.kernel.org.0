@@ -2,912 +2,526 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C42A83BF519
-	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 07:32:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29E663BF751
+	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 11:11:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229606AbhGHFfL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 8 Jul 2021 01:35:11 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61662 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229579AbhGHFfL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Jul 2021 01:35:11 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16852n8X019428;
-        Thu, 8 Jul 2021 01:32:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=pp1;
- bh=lJF63fnrYznQN45+XY156x2hPv3VI5FP2mw62FhgqTE=;
- b=DTFVQZjEZY972Na7YDZQ2VsEhOtGF+4Y1gB4SBInz+HQOzlUgt/hbOSl9D0DwYz9l08K
- v3p94NRJwq0otaGDH6d4Gkevay58jkLV8EiDGkWW/1T4A8beR+B0pkAIEC/daqxB48Eq
- 22HXmmkgR9G3z6B6xqIfyQ75V6JdXYQmGFMAEwgyARNIMIBKH/eEdyRLMzLrJMiF9KNg
- HhoHOKZDJiYuc5u8YmN+Q7aytxaHPqU2Tv5xWpDHQVzDbQsueQaG3ZWOesM8lTta7EEF
- wbA/ZpcVL3Ol67ifhP/LDiqxCbntMETwDs9fCxVu24AJlStDJXMrWyfvNCPeiLGEKV5s xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39mn8gbvu5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 01:32:26 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16853V2N021607;
-        Thu, 8 Jul 2021 01:32:26 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39mn8gbvtp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 01:32:26 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1685NUsb006215;
-        Thu, 8 Jul 2021 05:32:24 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 39jfh8t1ca-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 05:32:24 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1685USXj23200218
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 8 Jul 2021 05:30:28 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BD03DA405F;
-        Thu,  8 Jul 2021 05:32:21 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A236A4060;
-        Thu,  8 Jul 2021 05:32:20 +0000 (GMT)
-Received: from [9.79.181.201] (unknown [9.79.181.201])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu,  8 Jul 2021 05:32:20 +0000 (GMT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.6\))
-Subject: Re: [RFC PATCH 27/43] KVM: PPC: Book3S HV P9: Move host OS
- save/restore functions to built-in
-From:   Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-In-Reply-To: <20210622105736.633352-28-npiggin@gmail.com>
-Date:   Thu, 8 Jul 2021 11:02:17 +0530
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <983C1FE6-79CB-4DBD-BD00-8CFDA3685FEB@linux.vnet.ibm.com>
-References: <20210622105736.633352-1-npiggin@gmail.com>
- <20210622105736.633352-28-npiggin@gmail.com>
-To:     Nicholas Piggin <npiggin@gmail.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.6)
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: bHEPA96qsibRYVmP71CsTWvh46Z4kq0Y
-X-Proofpoint-GUID: kA6j3k1SptgpBCL0sqK1SvVnhTJ6gs-K
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-08_01:2021-07-06,2021-07-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- lowpriorityscore=0 spamscore=0 adultscore=0 suspectscore=0 mlxlogscore=999
- phishscore=0 clxscore=1011 impostorscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107080025
+        id S231190AbhGHJOU (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 8 Jul 2021 05:14:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34292 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231243AbhGHJOU (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Jul 2021 05:14:20 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0477C061574
+        for <kvm-ppc@vger.kernel.org>; Thu,  8 Jul 2021 02:11:38 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4GL9X775jHz9sX2; Thu,  8 Jul 2021 19:11:35 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1625735496;
+        bh=yqUKHfJL6cmSMFXUokqzI13g+wUoyr4KsWhtcvYLe4U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=T6pa0QhIk059/xv7FrBpKaHZ+sHuS2n6hTa7+s68Eii0DpvECXEkUr0///9jL8egF
+         61lCOrHQ9BEa2nI5Skijc5zeksYkkWLkwTOQ0WI59Se9yS5+7m96mcY0ldvXECyyOg
+         +XSUAFe/JYgzP8820C0xeqR1SttMRWR2u1yAPVqo=
+Date:   Thu, 8 Jul 2021 16:12:37 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Cc:     groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+        aneesh.kumar@linux.ibm.com, nvdimm@lists.linux.dev,
+        kvm-ppc@vger.kernel.org, bharata@linux.vnet.ibm.com
+Subject: Re: [PATCH REBASED v5 1/2] spapr: nvdimm: Implement H_SCM_FLUSH hcall
+Message-ID: <YOaXVZqXb631GoGR@yekko>
+References: <162571302321.1030381.15196355582642786915.stgit@lep8c.aus.stglabs.ibm.com>
+ <162571303048.1030381.13893352223345979621.stgit@lep8c.aus.stglabs.ibm.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="HJ/h8TT/zp4p/89v"
+Content-Disposition: inline
+In-Reply-To: <162571303048.1030381.13893352223345979621.stgit@lep8c.aus.stglabs.ibm.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
+--HJ/h8TT/zp4p/89v
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On 22-Jun-2021, at 4:27 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
+On Wed, Jul 07, 2021 at 09:57:21PM -0500, Shivaprasad G Bhat wrote:
+> The patch adds support for the SCM flush hcall for the nvdimm devices.
+> To be available for exploitation by guest through the next patch.
 >=20
-> Move the P9 guest/host register switching functions to the built-in
-> P9 entry code, and export it for nested to use as well.
+> The hcall expects the semantics such that the flush to return
+> with one of H_LONG_BUSY when the operation is expected to take longer
+> time along with a continue_token. The hcall to be called again providing
+> the continue_token to get the status. So, all fresh requests are put into
+> a 'pending' list and flush worker is submitted to the thread pool. The
+> thread pool completion callbacks move the requests to 'completed' list,
+> which are cleaned up after reporting to guest in subsequent hcalls to
+> get the status.
 >=20
-> This allows more flexibility in scheduling these supervisor privileged
-> SPR accesses with the HV privileged and PR SPR accesses in the low =
-level
-> entry code.
+> The semantics makes it necessary to preserve the continue_tokens and
+> their return status across migrations. So, the completed flush states
+> are forwarded to the destination and the pending ones are restarted
+> at the destination in post_load. The necessary nvdimm flush specific
+> vmstate structures are added to the spapr machine vmstate.
 >=20
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 > ---
-> arch/powerpc/kvm/book3s_hv.c          | 351 +-------------------------
-> arch/powerpc/kvm/book3s_hv.h          |  39 +++
-> arch/powerpc/kvm/book3s_hv_p9_entry.c | 332 ++++++++++++++++++++++++
-> 3 files changed, 372 insertions(+), 350 deletions(-)
-> create mode 100644 arch/powerpc/kvm/book3s_hv.h
+>  hw/ppc/spapr.c                |    6 +
+>  hw/ppc/spapr_nvdimm.c         |  240 +++++++++++++++++++++++++++++++++++=
+++++++
+>  include/hw/ppc/spapr.h        |   11 ++
+>  include/hw/ppc/spapr_nvdimm.h |   13 ++
+>  4 files changed, 269 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/arch/powerpc/kvm/book3s_hv.c =
-b/arch/powerpc/kvm/book3s_hv.c
-> index 35749b0b663f..a7660af22161 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -79,6 +79,7 @@
-> #include <asm/dtl.h>
->=20
-> #include "book3s.h"
-> +#include "book3s_hv.h"
->=20
-> #define CREATE_TRACE_POINTS
-> #include "trace_hv.h"
-> @@ -3675,356 +3676,6 @@ static noinline void kvmppc_run_core(struct =
-kvmppc_vcore *vc)
-> 	trace_kvmppc_run_core(vc, 1);
-> }
->=20
-> -/*
-> - * Privileged (non-hypervisor) host registers to save.
-> - */
-> -struct p9_host_os_sprs {
-> -	unsigned long dscr;
-> -	unsigned long tidr;
-> -	unsigned long iamr;
-> -	unsigned long amr;
-> -	unsigned long fscr;
-> -
-> -	unsigned int pmc1;
-> -	unsigned int pmc2;
-> -	unsigned int pmc3;
-> -	unsigned int pmc4;
-> -	unsigned int pmc5;
-> -	unsigned int pmc6;
-> -	unsigned long mmcr0;
-> -	unsigned long mmcr1;
-> -	unsigned long mmcr2;
-> -	unsigned long mmcr3;
-> -	unsigned long mmcra;
-> -	unsigned long siar;
-> -	unsigned long sier1;
-> -	unsigned long sier2;
-> -	unsigned long sier3;
-> -	unsigned long sdar;
-> -};
-> -
-> -static void freeze_pmu(unsigned long mmcr0, unsigned long mmcra)
-> -{
-> -	if (!(mmcr0 & MMCR0_FC))
-> -		goto do_freeze;
-> -	if (mmcra & MMCRA_SAMPLE_ENABLE)
-> -		goto do_freeze;
-> -	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> -		if (!(mmcr0 & MMCR0_PMCCEXT))
-> -			goto do_freeze;
-> -		if (!(mmcra & MMCRA_BHRB_DISABLE))
-> -			goto do_freeze;
-> -	}
-> -	return;
-> -
-> -do_freeze:
-> -	mmcr0 =3D MMCR0_FC;
-> -	mmcra =3D 0;
-> -	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> -		mmcr0 |=3D MMCR0_PMCCEXT;
-> -		mmcra =3D MMCRA_BHRB_DISABLE;
-> -	}
-> -
-> -	mtspr(SPRN_MMCR0, mmcr0);
-> -	mtspr(SPRN_MMCRA, mmcra);
-> -	isync();
-> -}
-> -
-> -static void switch_pmu_to_guest(struct kvm_vcpu *vcpu,
-> -				struct p9_host_os_sprs *host_os_sprs)
-> -{
-> -	struct lppaca *lp;
-> -	int load_pmu =3D 1;
-> -
-> -	lp =3D vcpu->arch.vpa.pinned_addr;
-> -	if (lp)
-> -		load_pmu =3D lp->pmcregs_in_use;
-> -
-> -	if (load_pmu)
-> -	      vcpu->arch.hfscr |=3D HFSCR_PM;
-> -
-> -	/* Save host */
-> -	if (ppc_get_pmu_inuse()) {
-> -		/*
-> -		 * It might be better to put PMU handling (at least for =
-the
-> -		 * host) in the perf subsystem because it knows more =
-about what
-> -		 * is being used.
-> -		 */
-> -
-> -		/* POWER9, POWER10 do not implement HPMC or SPMC */
-> -
-> -		host_os_sprs->mmcr0 =3D mfspr(SPRN_MMCR0);
-> -		host_os_sprs->mmcra =3D mfspr(SPRN_MMCRA);
-> -
-> -		freeze_pmu(host_os_sprs->mmcr0, host_os_sprs->mmcra);
-> -
-> -		host_os_sprs->pmc1 =3D mfspr(SPRN_PMC1);
-> -		host_os_sprs->pmc2 =3D mfspr(SPRN_PMC2);
-> -		host_os_sprs->pmc3 =3D mfspr(SPRN_PMC3);
-> -		host_os_sprs->pmc4 =3D mfspr(SPRN_PMC4);
-> -		host_os_sprs->pmc5 =3D mfspr(SPRN_PMC5);
-> -		host_os_sprs->pmc6 =3D mfspr(SPRN_PMC6);
-> -		host_os_sprs->mmcr1 =3D mfspr(SPRN_MMCR1);
-> -		host_os_sprs->mmcr2 =3D mfspr(SPRN_MMCR2);
-> -		host_os_sprs->sdar =3D mfspr(SPRN_SDAR);
-> -		host_os_sprs->siar =3D mfspr(SPRN_SIAR);
-> -		host_os_sprs->sier1 =3D mfspr(SPRN_SIER);
-> -
-> -		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> -			host_os_sprs->mmcr3 =3D mfspr(SPRN_MMCR3);
-> -			host_os_sprs->sier2 =3D mfspr(SPRN_SIER2);
-> -			host_os_sprs->sier3 =3D mfspr(SPRN_SIER3);
-> -		}
-> -	}
-> -
-> -#ifdef CONFIG_PPC_PSERIES
-> -	if (kvmhv_on_pseries()) {
-> -		if (vcpu->arch.vpa.pinned_addr) {
-> -			struct lppaca *lp =3D =
-vcpu->arch.vpa.pinned_addr;
-> -			get_lppaca()->pmcregs_in_use =3D =
-lp->pmcregs_in_use;
-> -		} else {
-> -			get_lppaca()->pmcregs_in_use =3D 1;
-> -		}
-> -	}
-> -#endif
-> -
-> -	/* Load guest */
-> -	if (vcpu->arch.hfscr & HFSCR_PM) {
-> -		mtspr(SPRN_PMC1, vcpu->arch.pmc[0]);
-> -		mtspr(SPRN_PMC2, vcpu->arch.pmc[1]);
-> -		mtspr(SPRN_PMC3, vcpu->arch.pmc[2]);
-> -		mtspr(SPRN_PMC4, vcpu->arch.pmc[3]);
-> -		mtspr(SPRN_PMC5, vcpu->arch.pmc[4]);
-> -		mtspr(SPRN_PMC6, vcpu->arch.pmc[5]);
-> -		mtspr(SPRN_MMCR1, vcpu->arch.mmcr[1]);
-> -		mtspr(SPRN_MMCR2, vcpu->arch.mmcr[2]);
-> -		mtspr(SPRN_SDAR, vcpu->arch.sdar);
-> -		mtspr(SPRN_SIAR, vcpu->arch.siar);
-> -		mtspr(SPRN_SIER, vcpu->arch.sier[0]);
-> -
-> -		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> -			mtspr(SPRN_MMCR3, vcpu->arch.mmcr[4]);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 4dd90b75cc..546d825dde 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1622,6 +1622,8 @@ static void spapr_machine_reset(MachineState *machi=
+ne)
+>          spapr->ov5_cas =3D spapr_ovec_clone(spapr->ov5);
+>      }
+> =20
+> +    spapr_nvdimm_finish_flushes(spapr);
+> +
+>      /* DRC reset may cause a device to be unplugged. This will cause tro=
+ubles
+>       * if this device is used by another device (eg, a running vhost bac=
+kend
+>       * will crash QEMU if the DIMM holding the vring goes away). To avoi=
+d such
+> @@ -2018,6 +2020,7 @@ static const VMStateDescription vmstate_spapr =3D {
+>          &vmstate_spapr_cap_ccf_assist,
+>          &vmstate_spapr_cap_fwnmi,
+>          &vmstate_spapr_fwnmi,
+> +        &vmstate_spapr_nvdimm_states,
+>          NULL
+>      }
+>  };
+> @@ -3014,6 +3017,9 @@ static void spapr_machine_init(MachineState *machin=
+e)
+>      }
+> =20
+>      qemu_cond_init(&spapr->fwnmi_machine_check_interlock_cond);
+> +
+> +    QLIST_INIT(&spapr->pending_flush_states);
+> +    QLIST_INIT(&spapr->completed_flush_states);
 
+These need nvdimm in the variable names.  There are any number of
+things in the machine that could be the subject of some sort of flush.
 
-Hi Nick,
-
-Have a doubt here..
-For MMCR3, it is  vcpu->arch.mmcr[3) ?
-
-Thanks
-Athira
-> -			mtspr(SPRN_SIER2, vcpu->arch.sier[1]);
-> -			mtspr(SPRN_SIER3, vcpu->arch.sier[2]);
-> -		}
-> -
-> -		/* Set MMCRA then MMCR0 last */
-> -		mtspr(SPRN_MMCRA, vcpu->arch.mmcra);
-> -		mtspr(SPRN_MMCR0, vcpu->arch.mmcr[0]);
-> -		/* No isync necessary because we're starting counters */
-> -	}
-> -}
-> -
-> -static void switch_pmu_to_host(struct kvm_vcpu *vcpu,
-> -				struct p9_host_os_sprs *host_os_sprs)
-> -{
-> -	struct lppaca *lp;
-> -	int save_pmu =3D 1;
-> -
-> -	lp =3D vcpu->arch.vpa.pinned_addr;
-> -	if (lp)
-> -		save_pmu =3D lp->pmcregs_in_use;
-> -
-> -	if (save_pmu) {
-> -		vcpu->arch.mmcr[0] =3D mfspr(SPRN_MMCR0);
-> -		vcpu->arch.mmcra =3D mfspr(SPRN_MMCRA);
-> -
-> -		freeze_pmu(vcpu->arch.mmcr[0], vcpu->arch.mmcra);
-> -
-> -		vcpu->arch.pmc[0] =3D mfspr(SPRN_PMC1);
-> -		vcpu->arch.pmc[1] =3D mfspr(SPRN_PMC2);
-> -		vcpu->arch.pmc[2] =3D mfspr(SPRN_PMC3);
-> -		vcpu->arch.pmc[3] =3D mfspr(SPRN_PMC4);
-> -		vcpu->arch.pmc[4] =3D mfspr(SPRN_PMC5);
-> -		vcpu->arch.pmc[5] =3D mfspr(SPRN_PMC6);
-> -		vcpu->arch.mmcr[1] =3D mfspr(SPRN_MMCR1);
-> -		vcpu->arch.mmcr[2] =3D mfspr(SPRN_MMCR2);
-> -		vcpu->arch.sdar =3D mfspr(SPRN_SDAR);
-> -		vcpu->arch.siar =3D mfspr(SPRN_SIAR);
-> -		vcpu->arch.sier[0] =3D mfspr(SPRN_SIER);
-> -
-> -		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> -			vcpu->arch.mmcr[3] =3D mfspr(SPRN_MMCR3);
-> -			vcpu->arch.sier[1] =3D mfspr(SPRN_SIER2);
-> -			vcpu->arch.sier[2] =3D mfspr(SPRN_SIER3);
-> -		}
-> -
-> -	} else if (vcpu->arch.hfscr & HFSCR_PM) {
-> -		/*
-> -		 * The guest accessed PMC SPRs without specifying they =
-should
-> -		 * be preserved. Stop them from counting if the guest =
-had
-> -		 * started anything.
-> -		 */
-> -		freeze_pmu(mfspr(SPRN_MMCR0), mfspr(SPRN_MMCRA));
-> -
-> -		/*
-> -		 * Demand-fault PMU register access in the guest.
-> -		 *
-> -		 * This is used to grab the guest's VPA pmcregs_in_use =
-value
-> -		 * and reflect it into the host's VPA in the case of a =
-nested
-> -		 * hypervisor.
-> -		 *
-> -		 * It also avoids having to zero-out SPRs after each =
-guest
-> -		 * exit to avoid side-channels when.
-> -		 *
-> -		 * This is cleared here when we exit the guest, so later =
-HFSCR
-> -		 * interrupt handling can add it back to run the guest =
-with
-> -		 * PM enabled next time.
-> -		 */
-> -		vcpu->arch.hfscr &=3D ~HFSCR_PM;
-> -	} /* otherwise the PMU should still be frozen from guest entry =
+>  }
+> =20
+>  #define DEFAULT_KVM_TYPE "auto"
+> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+> index 91de1052f2..4f8931ab15 100644
+> --- a/hw/ppc/spapr_nvdimm.c
+> +++ b/hw/ppc/spapr_nvdimm.c
+> @@ -22,6 +22,7 @@
+>   * THE SOFTWARE.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+>  #include "qapi/error.h"
+>  #include "hw/ppc/spapr_drc.h"
+>  #include "hw/ppc/spapr_nvdimm.h"
+> @@ -30,6 +31,7 @@
+>  #include "hw/ppc/fdt.h"
+>  #include "qemu/range.h"
+>  #include "hw/ppc/spapr_numa.h"
+> +#include "block/thread-pool.h"
+> =20
+>  /* DIMM health bitmap bitmap indicators. Taken from kernel's papr_scm.c =
 */
-> -
-> -#ifdef CONFIG_PPC_PSERIES
-> -	if (kvmhv_on_pseries())
-> -		get_lppaca()->pmcregs_in_use =3D ppc_get_pmu_inuse();
-> -#endif
-> -
-> -	if (ppc_get_pmu_inuse()) {
-> -		mtspr(SPRN_PMC1, host_os_sprs->pmc1);
-> -		mtspr(SPRN_PMC2, host_os_sprs->pmc2);
-> -		mtspr(SPRN_PMC3, host_os_sprs->pmc3);
-> -		mtspr(SPRN_PMC4, host_os_sprs->pmc4);
-> -		mtspr(SPRN_PMC5, host_os_sprs->pmc5);
-> -		mtspr(SPRN_PMC6, host_os_sprs->pmc6);
-> -		mtspr(SPRN_MMCR1, host_os_sprs->mmcr1);
-> -		mtspr(SPRN_MMCR2, host_os_sprs->mmcr2);
-> -		mtspr(SPRN_SDAR, host_os_sprs->sdar);
-> -		mtspr(SPRN_SIAR, host_os_sprs->siar);
-> -		mtspr(SPRN_SIER, host_os_sprs->sier1);
-> -
-> -		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> -			mtspr(SPRN_MMCR3, host_os_sprs->mmcr3);
-> -			mtspr(SPRN_SIER2, host_os_sprs->sier2);
-> -			mtspr(SPRN_SIER3, host_os_sprs->sier3);
-> -		}
-> -
-> -		/* Set MMCRA then MMCR0 last */
-> -		mtspr(SPRN_MMCRA, host_os_sprs->mmcra);
-> -		mtspr(SPRN_MMCR0, host_os_sprs->mmcr0);
-> -		isync();
-> -	}
-> -}
-> -
-> -static void load_spr_state(struct kvm_vcpu *vcpu,
-> -				struct p9_host_os_sprs *host_os_sprs)
-> -{
-> -	mtspr(SPRN_TAR, vcpu->arch.tar);
-> -	mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
-> -	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
-> -	mtspr(SPRN_BESCR, vcpu->arch.bescr);
-> -
-> -	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-> -		mtspr(SPRN_TIDR, vcpu->arch.tid);
-> -	if (host_os_sprs->iamr !=3D vcpu->arch.iamr)
-> -		mtspr(SPRN_IAMR, vcpu->arch.iamr);
-> -	if (host_os_sprs->amr !=3D vcpu->arch.amr)
-> -		mtspr(SPRN_AMR, vcpu->arch.amr);
-> -	if (vcpu->arch.uamor !=3D 0)
-> -		mtspr(SPRN_UAMOR, vcpu->arch.uamor);
-> -	if (host_os_sprs->fscr !=3D vcpu->arch.fscr)
-> -		mtspr(SPRN_FSCR, vcpu->arch.fscr);
-> -	if (host_os_sprs->dscr !=3D vcpu->arch.dscr)
-> -		mtspr(SPRN_DSCR, vcpu->arch.dscr);
-> -	if (vcpu->arch.pspb !=3D 0)
-> -		mtspr(SPRN_PSPB, vcpu->arch.pspb);
-> -
-> -	/*
-> -	 * DAR, DSISR, and for nested HV, SPRGs must be set with MSR[RI]
-> -	 * clear (or hstate set appropriately to catch those registers
-> -	 * being clobbered if we take a MCE or SRESET), so those are =
-done
-> -	 * later.
-> -	 */
-> -
-> -	if (!(vcpu->arch.ctrl & 1))
-> -		mtspr(SPRN_CTRLT, 0);
-> -}
-> -
-> -static void store_spr_state(struct kvm_vcpu *vcpu)
-> -{
-> -	vcpu->arch.tar =3D mfspr(SPRN_TAR);
-> -	vcpu->arch.ebbhr =3D mfspr(SPRN_EBBHR);
-> -	vcpu->arch.ebbrr =3D mfspr(SPRN_EBBRR);
-> -	vcpu->arch.bescr =3D mfspr(SPRN_BESCR);
-> -
-> -	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-> -		vcpu->arch.tid =3D mfspr(SPRN_TIDR);
-> -	vcpu->arch.iamr =3D mfspr(SPRN_IAMR);
-> -	vcpu->arch.amr =3D mfspr(SPRN_AMR);
-> -	vcpu->arch.uamor =3D mfspr(SPRN_UAMOR);
-> -	vcpu->arch.fscr =3D mfspr(SPRN_FSCR);
-> -	vcpu->arch.dscr =3D mfspr(SPRN_DSCR);
-> -	vcpu->arch.pspb =3D mfspr(SPRN_PSPB);
-> -
-> -	vcpu->arch.ctrl =3D mfspr(SPRN_CTRLF);
-> -}
-> -
-> -static void load_vcpu_state(struct kvm_vcpu *vcpu,
-> -			   struct p9_host_os_sprs *host_os_sprs)
-> -{
-> -	if (cpu_has_feature(CPU_FTR_TM) ||
-> -	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
-> -		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
-> -
-> -	load_spr_state(vcpu, host_os_sprs);
-> -
-> -	load_fp_state(&vcpu->arch.fp);
-> -#ifdef CONFIG_ALTIVEC
-> -	load_vr_state(&vcpu->arch.vr);
-> -#endif
-> -	mtspr(SPRN_VRSAVE, vcpu->arch.vrsave);
-> -}
-> -
-> -static void store_vcpu_state(struct kvm_vcpu *vcpu)
-> -{
-> -	store_spr_state(vcpu);
-> -
-> -	store_fp_state(&vcpu->arch.fp);
-> -#ifdef CONFIG_ALTIVEC
-> -	store_vr_state(&vcpu->arch.vr);
-> -#endif
-> -	vcpu->arch.vrsave =3D mfspr(SPRN_VRSAVE);
-> -
-> -	if (cpu_has_feature(CPU_FTR_TM) ||
-> -	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
-> -		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
-> -}
-> -
-> -static void save_p9_host_os_sprs(struct p9_host_os_sprs =
-*host_os_sprs)
-> -{
-> -	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-> -		host_os_sprs->tidr =3D mfspr(SPRN_TIDR);
-> -	host_os_sprs->iamr =3D mfspr(SPRN_IAMR);
-> -	host_os_sprs->amr =3D mfspr(SPRN_AMR);
-> -	host_os_sprs->fscr =3D mfspr(SPRN_FSCR);
-> -	host_os_sprs->dscr =3D mfspr(SPRN_DSCR);
-> -}
-> -
-> -/* vcpu guest regs must already be saved */
-> -static void restore_p9_host_os_sprs(struct kvm_vcpu *vcpu,
-> -				    struct p9_host_os_sprs =
-*host_os_sprs)
-> -{
-> -	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
-> -
-> -	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-> -		mtspr(SPRN_TIDR, host_os_sprs->tidr);
-> -	if (host_os_sprs->iamr !=3D vcpu->arch.iamr)
-> -		mtspr(SPRN_IAMR, host_os_sprs->iamr);
-> -	if (vcpu->arch.uamor !=3D 0)
-> -		mtspr(SPRN_UAMOR, 0);
-> -	if (host_os_sprs->amr !=3D vcpu->arch.amr)
-> -		mtspr(SPRN_AMR, host_os_sprs->amr);
-> -	if (host_os_sprs->fscr !=3D vcpu->arch.fscr)
-> -		mtspr(SPRN_FSCR, host_os_sprs->fscr);
-> -	if (host_os_sprs->dscr !=3D vcpu->arch.dscr)
-> -		mtspr(SPRN_DSCR, host_os_sprs->dscr);
-> -	if (vcpu->arch.pspb !=3D 0)
-> -		mtspr(SPRN_PSPB, 0);
-> -
-> -	/* Save guest CTRL register, set runlatch to 1 */
-> -	if (!(vcpu->arch.ctrl & 1))
-> -		mtspr(SPRN_CTRLT, 1);
-> -}
-> -
-> static inline bool hcall_is_xics(unsigned long req)
-> {
-> 	return req =3D=3D H_EOI || req =3D=3D H_CPPR || req =3D=3D H_IPI =
-||
-> diff --git a/arch/powerpc/kvm/book3s_hv.h =
-b/arch/powerpc/kvm/book3s_hv.h
-> new file mode 100644
-> index 000000000000..72e3a8f4c2cf
-> --- /dev/null
-> +++ b/arch/powerpc/kvm/book3s_hv.h
-> @@ -0,0 +1,39 @@
+>  /* SCM device is unable to persist memory contents */
+> @@ -375,6 +377,243 @@ static target_ulong h_scm_bind_mem(PowerPCCPU *cpu,=
+ SpaprMachineState *spapr,
+>      return H_SUCCESS;
+>  }
+> =20
+> +static uint64_t flush_token;
 > +
-> +/*
-> + * Privileged (non-hypervisor) host registers to save.
-> + */
-> +struct p9_host_os_sprs {
-> +	unsigned long dscr;
-> +	unsigned long tidr;
-> +	unsigned long iamr;
-> +	unsigned long amr;
-> +	unsigned long fscr;
+> +static int flush_worker_cb(void *opaque)
+> +{
+> +    int ret =3D H_SUCCESS;
+> +    SpaprNVDIMMDeviceFlushState *state =3D opaque;
 > +
-> +	unsigned int pmc1;
-> +	unsigned int pmc2;
-> +	unsigned int pmc3;
-> +	unsigned int pmc4;
-> +	unsigned int pmc5;
-> +	unsigned int pmc6;
-> +	unsigned long mmcr0;
-> +	unsigned long mmcr1;
-> +	unsigned long mmcr2;
-> +	unsigned long mmcr3;
-> +	unsigned long mmcra;
-> +	unsigned long siar;
-> +	unsigned long sier1;
-> +	unsigned long sier2;
-> +	unsigned long sier3;
-> +	unsigned long sdar;
+> +    /* flush raw backing image */
+> +    if (qemu_fdatasync(state->backend_fd) < 0) {
+> +        error_report("papr_scm: Could not sync nvdimm to backend file: %=
+s",
+> +                     strerror(errno));
+> +        ret =3D H_HARDWARE;
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void spapr_nvdimm_flush_completion_cb(void *opaque, int hcall_ret)
+> +{
+> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> +    SpaprNVDIMMDeviceFlushState *state =3D opaque;
+> +
+> +    state->hcall_ret =3D hcall_ret;
+> +    QLIST_REMOVE(state, node);
+> +    QLIST_INSERT_HEAD(&spapr->completed_flush_states, state, node);
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_nvdimm_flush_state =3D {
+> +     .name =3D "spapr_nvdimm_flush_state",
+> +     .version_id =3D 1,
+> +     .minimum_version_id =3D 1,
+> +     .fields =3D (VMStateField[]) {
+> +         VMSTATE_UINT64(continue_token, SpaprNVDIMMDeviceFlushState),
+> +         VMSTATE_INT64(hcall_ret, SpaprNVDIMMDeviceFlushState),
+> +         VMSTATE_UINT32(drcidx, SpaprNVDIMMDeviceFlushState),
+> +         VMSTATE_END_OF_LIST()
+> +     },
 > +};
 > +
-> +void load_vcpu_state(struct kvm_vcpu *vcpu,
-> +			   struct p9_host_os_sprs *host_os_sprs);
-> +void store_vcpu_state(struct kvm_vcpu *vcpu);
-> +void save_p9_host_os_sprs(struct p9_host_os_sprs *host_os_sprs);
-> +void restore_p9_host_os_sprs(struct kvm_vcpu *vcpu,
-> +				    struct p9_host_os_sprs =
-*host_os_sprs);
-> +void switch_pmu_to_guest(struct kvm_vcpu *vcpu,
-> +			    struct p9_host_os_sprs *host_os_sprs);
-> +void switch_pmu_to_host(struct kvm_vcpu *vcpu,
-> +			    struct p9_host_os_sprs *host_os_sprs);
-> diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c =
-b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-> index afdd7dfa1c08..cc74cd314fcf 100644
-> --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
-> +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-> @@ -4,8 +4,340 @@
-> #include <asm/asm-prototypes.h>
-> #include <asm/dbell.h>
-> #include <asm/kvm_ppc.h>
-> +#include <asm/pmc.h>
-> #include <asm/ppc-opcode.h>
+> +static bool spapr_nvdimm_states_needed(void *opaque)
+> +{
+> +     SpaprMachineState *spapr =3D (SpaprMachineState *)opaque;
+> +
+> +     return (!QLIST_EMPTY(&spapr->pending_flush_states) ||
+> +             !QLIST_EMPTY(&spapr->completed_flush_states));
+> +}
+> +
+> +static int spapr_nvdimm_post_load(void *opaque, int version_id)
+> +{
+> +    SpaprMachineState *spapr =3D (SpaprMachineState *)opaque;
+> +    SpaprNVDIMMDeviceFlushState *state, *next;
+> +    PCDIMMDevice *dimm;
+> +    HostMemoryBackend *backend =3D NULL;
+> +    ThreadPool *pool =3D aio_get_thread_pool(qemu_get_aio_context());
+> +    SpaprDrc *drc;
+> +
+> +    QLIST_FOREACH_SAFE(state, &spapr->completed_flush_states, node, next=
+) {
+> +        if (flush_token < state->continue_token) {
+> +            flush_token =3D state->continue_token;
+> +        }
+> +    }
+> +
+> +    QLIST_FOREACH_SAFE(state, &spapr->pending_flush_states, node, next) {
+> +        if (flush_token < state->continue_token) {
+> +            flush_token =3D state->continue_token;
+> +        }
+> +
+> +        drc =3D spapr_drc_by_index(state->drcidx);
+> +        dimm =3D PC_DIMM(drc->dev);
+> +        backend =3D MEMORY_BACKEND(dimm->hostmem);
+> +        state->backend_fd =3D memory_region_get_fd(&backend->mr);
+> +
+> +        thread_pool_submit_aio(pool, flush_worker_cb, state,
+> +                               spapr_nvdimm_flush_completion_cb, state);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +const VMStateDescription vmstate_spapr_nvdimm_states =3D {
+> +    .name =3D "spapr_nvdimm_states",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D spapr_nvdimm_states_needed,
+> +    .post_load =3D spapr_nvdimm_post_load,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_QLIST_V(completed_flush_states, SpaprMachineState, 1,
+> +                        vmstate_spapr_nvdimm_flush_state,
+> +                        SpaprNVDIMMDeviceFlushState, node),
+> +        VMSTATE_QLIST_V(pending_flush_states, SpaprMachineState, 1,
+> +                        vmstate_spapr_nvdimm_flush_state,
+> +                        SpaprNVDIMMDeviceFlushState, node),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+> +/*
+> + * Assign a token and reserve it for the new flush state.
+> + */
+> +static SpaprNVDIMMDeviceFlushState *spapr_nvdimm_init_new_flush_state(
+> +                                                      SpaprMachineState =
+*spapr)
+> +{
+> +    SpaprNVDIMMDeviceFlushState *state;
+> +
+> +    state =3D g_malloc0(sizeof(*state));
+> +
+> +    flush_token++;
+> +    /* Token zero is presumed as no job pending. Handle the overflow to =
+zero */
+> +    if (flush_token =3D=3D 0) {
+> +        flush_token++;
+> +    }
+> +    state->continue_token =3D flush_token;
+> +
+> +    QLIST_INSERT_HEAD(&spapr->pending_flush_states, state, node);
+> +
+> +    return state;
+> +}
+> +
+> +/*
+> + * spapr_nvdimm_finish_flushes
+> + *      Waits for all pending flush requests to complete
+> + *      their execution and free the states
+> + */
+> +void spapr_nvdimm_finish_flushes(SpaprMachineState *spapr)
+> +{
+> +    SpaprNVDIMMDeviceFlushState *state, *next;
+> +
+> +    /*
+> +     * Called on reset path, the main loop thread which calls
+> +     * the pending BHs has gotten out running in the reset path,
+> +     * finally reaching here. Other code path being guest
+> +     * h_client_architecture_support, thats early boot up.
+> +     */
+> +    while (!QLIST_EMPTY(&spapr->pending_flush_states)) {
+> +        aio_poll(qemu_get_aio_context(), true);
+> +    }
+> +
+> +    QLIST_FOREACH_SAFE(state, &spapr->completed_flush_states, node, next=
+) {
+> +        QLIST_REMOVE(state, node);
+> +        g_free(state);
+> +    }
+> +}
+> +
+> +/*
+> + * spapr_nvdimm_get_flush_status
+> + *      Fetches the status of the hcall worker and returns
+> + *      H_LONG_BUSY_XYZ if the worker is still running.
+> + */
+> +static int spapr_nvdimm_get_flush_status(SpaprMachineState *spapr,
+> +                                         uint64_t token)
+> +{
+> +    int ret =3D H_LONG_BUSY_ORDER_10_MSEC;
+> +    SpaprNVDIMMDeviceFlushState *state, *node;
+> +
+> +    QLIST_FOREACH_SAFE(state, &spapr->pending_flush_states, node, node) {
+> +        if (state->continue_token =3D=3D token) {
+> +            goto exit;
+
+There's no need for an ugly goto here.  Just return.
+
+> +        }
+> +    }
+> +    ret =3D H_P2; /* If not found in complete list too, invalid token */
+> +    QLIST_FOREACH_SAFE(state, &spapr->completed_flush_states, node, node=
+) {
+> +        if (state->continue_token =3D=3D token) {
+> +            ret =3D state->hcall_ret;
+> +            QLIST_REMOVE(state, node);
+> +            g_free(state);
+
+Likewise you can return here.
+
+> +            break;
+> +        }
+> +    }
+> +exit:
+> +    return ret;
+
+And here, and you won't need the 'ret' variable any more.
+
+> +}
+> +
+> +/*
+> + * H_SCM_FLUSH
+> + * Input: drc_index, continue-token
+> + * Out: continue-token
+> + * Return Value: H_SUCCESS, H_Parameter, H_P2, H_LONG_BUSY
+> + *
+> + * Given a DRC Index Flush the data to backend NVDIMM device.
+> + * The hcall returns H_LONG_BUSY_XX when the flush takes longer time and
+> + * the hcall needs to be issued multiple times in order to be completely
+> + * serviced. The continue-token from the output to be passed in the
+> + * argument list of subsequent hcalls until the hcall is completely serv=
+iced
+> + * at which point H_SUCCESS or other error is returned.
+> + */
+> +static target_ulong h_scm_flush(PowerPCCPU *cpu, SpaprMachineState *spap=
+r,
+> +                                target_ulong opcode, target_ulong *args)
+> +{
+> +    int ret;
+> +    uint32_t drc_index =3D args[0];
+> +    uint64_t continue_token =3D args[1];
+> +    SpaprDrc *drc =3D spapr_drc_by_index(drc_index);
+> +    PCDIMMDevice *dimm;
+> +    HostMemoryBackend *backend =3D NULL;
+> +    SpaprNVDIMMDeviceFlushState *state;
+> +    ThreadPool *pool =3D aio_get_thread_pool(qemu_get_aio_context());
+> +    int fd;
+> +
+> +    if (!drc || !drc->dev ||
+> +        spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PMEM) {
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    if (continue_token !=3D 0) {
+> +        goto get_status;
+
+Again, not really an idiomatically justified use of goto.  Just put
+the body in an if block - it's pretty simple so that's not excessively
+indented.
+
+> +    }
+> +
+> +    dimm =3D PC_DIMM(drc->dev);
+> +    backend =3D MEMORY_BACKEND(dimm->hostmem);
+> +    fd =3D memory_region_get_fd(&backend->mr);
+> +
+> +    if (fd < 0) {
+> +        return H_UNSUPPORTED;
+> +    }
+> +
+> +    state =3D spapr_nvdimm_init_new_flush_state(spapr);
+> +    if (!state) {
+> +        return H_HARDWARE;
+> +    }
+> +
+> +    state->drcidx =3D drc_index;
+> +    state->backend_fd =3D fd;
+> +
+> +    thread_pool_submit_aio(pool, flush_worker_cb, state,
+> +                           spapr_nvdimm_flush_completion_cb, state);
+> +
+> +    continue_token =3D state->continue_token;
+> +
+> +get_status:
+> +    ret =3D spapr_nvdimm_get_flush_status(spapr, continue_token);
+> +    if (H_IS_LONG_BUSY(ret)) {
+> +        args[0] =3D continue_token;
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+>  static target_ulong h_scm_unbind_mem(PowerPCCPU *cpu, SpaprMachineState =
+*spapr,
+>                                       target_ulong opcode, target_ulong *=
+args)
+>  {
+> @@ -523,6 +762,7 @@ static void spapr_scm_register_types(void)
+>      spapr_register_hypercall(H_SCM_UNBIND_MEM, h_scm_unbind_mem);
+>      spapr_register_hypercall(H_SCM_UNBIND_ALL, h_scm_unbind_all);
+>      spapr_register_hypercall(H_SCM_HEALTH, h_scm_health);
+> +    spapr_register_hypercall(H_SCM_FLUSH, h_scm_flush);
+>  }
+> =20
+>  type_init(spapr_scm_register_types)
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index f05219f75e..1684d72546 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -12,10 +12,12 @@
+>  #include "hw/ppc/spapr_xive.h"  /* For SpaprXive */
+>  #include "hw/ppc/xics.h"        /* For ICSState */
+>  #include "hw/ppc/spapr_tpm_proxy.h"
+> +#include "hw/ppc/spapr_nvdimm.h"
+> =20
+>  struct SpaprVioBus;
+>  struct SpaprPhbState;
+>  struct SpaprNvram;
+> +struct SpaprNVDIMMDeviceFlushState;
+> =20
+>  typedef struct SpaprEventLogEntry SpaprEventLogEntry;
+>  typedef struct SpaprEventSource SpaprEventSource;
+> @@ -248,6 +250,11 @@ struct SpaprMachineState {
+>      uint32_t numa_assoc_array[MAX_NODES + NVGPU_MAX_NUM][NUMA_ASSOC_SIZE=
+];
+> =20
+>      Error *fwnmi_migration_blocker;
+> +
+> +    /* nvdimm flush states */
+> +    QLIST_HEAD(, SpaprNVDIMMDeviceFlushState) pending_flush_states;
+> +    QLIST_HEAD(, SpaprNVDIMMDeviceFlushState) completed_flush_states;
+> +
+>  };
+> =20
+>  #define H_SUCCESS         0
+> @@ -328,6 +335,7 @@ struct SpaprMachineState {
+>  #define H_P7              -60
+>  #define H_P8              -61
+>  #define H_P9              -62
+> +#define H_UNSUPPORTED     -67
+>  #define H_OVERLAP         -68
+>  #define H_UNSUPPORTED_FLAG -256
+>  #define H_MULTI_THREADS_ACTIVE -9005
+> @@ -542,8 +550,9 @@ struct SpaprMachineState {
+>  #define H_SCM_UNBIND_MEM        0x3F0
+>  #define H_SCM_UNBIND_ALL        0x3FC
+>  #define H_SCM_HEALTH            0x400
+> +#define H_SCM_FLUSH             0x44C
+> =20
+> -#define MAX_HCALL_OPCODE        H_SCM_HEALTH
+> +#define MAX_HCALL_OPCODE        H_SCM_FLUSH
+> =20
+>  /* The hcalls above are standardized in PAPR and implemented by pHyp
+>   * as well.
+> diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvdimm.h
+> index 764f999f54..24d8e37b33 100644
+> --- a/include/hw/ppc/spapr_nvdimm.h
+> +++ b/include/hw/ppc/spapr_nvdimm.h
+> @@ -11,6 +11,7 @@
+>  #define HW_SPAPR_NVDIMM_H
+> =20
+>  #include "hw/mem/nvdimm.h"
+> +#include "migration/vmstate.h"
+> =20
+>  typedef struct SpaprDrc SpaprDrc;
+>  typedef struct SpaprMachineState SpaprMachineState;
+> @@ -21,5 +22,17 @@ void spapr_dt_persistent_memory(SpaprMachineState *spa=
+pr, void *fdt);
+>  bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nv=
+dimm,
+>                             uint64_t size, Error **errp);
+>  void spapr_add_nvdimm(DeviceState *dev, uint64_t slot);
+> +void spapr_nvdimm_finish_flushes(SpaprMachineState *spapr);
+> +
+> +typedef struct SpaprNVDIMMDeviceFlushState {
+> +    uint64_t continue_token;
+> +    int64_t hcall_ret;
+> +    int backend_fd;
+> +    uint32_t drcidx;
+> +
+> +    QLIST_ENTRY(SpaprNVDIMMDeviceFlushState) node;
+> +} SpaprNVDIMMDeviceFlushState;
+> +
+> +extern const VMStateDescription vmstate_spapr_nvdimm_states;
+> =20
+>  #endif
 >=20
-> +#include "book3s_hv.h"
-> +
-> +static void freeze_pmu(unsigned long mmcr0, unsigned long mmcra)
-> +{
-> +	if (!(mmcr0 & MMCR0_FC))
-> +		goto do_freeze;
-> +	if (mmcra & MMCRA_SAMPLE_ENABLE)
-> +		goto do_freeze;
-> +	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> +		if (!(mmcr0 & MMCR0_PMCCEXT))
-> +			goto do_freeze;
-> +		if (!(mmcra & MMCRA_BHRB_DISABLE))
-> +			goto do_freeze;
-> +	}
-> +	return;
-> +
-> +do_freeze:
-> +	mmcr0 =3D MMCR0_FC;
-> +	mmcra =3D 0;
-> +	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> +		mmcr0 |=3D MMCR0_PMCCEXT;
-> +		mmcra =3D MMCRA_BHRB_DISABLE;
-> +	}
-> +
-> +	mtspr(SPRN_MMCR0, mmcr0);
-> +	mtspr(SPRN_MMCRA, mmcra);
-> +	isync();
-> +}
-> +
-> +void switch_pmu_to_guest(struct kvm_vcpu *vcpu,
-> +				struct p9_host_os_sprs *host_os_sprs)
-> +{
-> +	struct lppaca *lp;
-> +	int load_pmu =3D 1;
-> +
-> +	lp =3D vcpu->arch.vpa.pinned_addr;
-> +	if (lp)
-> +		load_pmu =3D lp->pmcregs_in_use;
-> +
-> +	if (load_pmu)
-> +	      vcpu->arch.hfscr |=3D HFSCR_PM;
-> +
-> +	/* Save host */
-> +	if (ppc_get_pmu_inuse()) {
-> +		/*
-> +		 * It might be better to put PMU handling (at least for =
-the
-> +		 * host) in the perf subsystem because it knows more =
-about what
-> +		 * is being used.
-> +		 */
-> +
-> +		/* POWER9, POWER10 do not implement HPMC or SPMC */
-> +
-> +		host_os_sprs->mmcr0 =3D mfspr(SPRN_MMCR0);
-> +		host_os_sprs->mmcra =3D mfspr(SPRN_MMCRA);
-> +
-> +		freeze_pmu(host_os_sprs->mmcr0, host_os_sprs->mmcra);
-> +
-> +		host_os_sprs->pmc1 =3D mfspr(SPRN_PMC1);
-> +		host_os_sprs->pmc2 =3D mfspr(SPRN_PMC2);
-> +		host_os_sprs->pmc3 =3D mfspr(SPRN_PMC3);
-> +		host_os_sprs->pmc4 =3D mfspr(SPRN_PMC4);
-> +		host_os_sprs->pmc5 =3D mfspr(SPRN_PMC5);
-> +		host_os_sprs->pmc6 =3D mfspr(SPRN_PMC6);
-> +		host_os_sprs->mmcr1 =3D mfspr(SPRN_MMCR1);
-> +		host_os_sprs->mmcr2 =3D mfspr(SPRN_MMCR2);
-> +		host_os_sprs->sdar =3D mfspr(SPRN_SDAR);
-> +		host_os_sprs->siar =3D mfspr(SPRN_SIAR);
-> +		host_os_sprs->sier1 =3D mfspr(SPRN_SIER);
-> +
-> +		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> +			host_os_sprs->mmcr3 =3D mfspr(SPRN_MMCR3);
-> +			host_os_sprs->sier2 =3D mfspr(SPRN_SIER2);
-> +			host_os_sprs->sier3 =3D mfspr(SPRN_SIER3);
-> +		}
-> +	}
-> +
-> +#ifdef CONFIG_PPC_PSERIES
-> +	if (kvmhv_on_pseries()) {
-> +		if (vcpu->arch.vpa.pinned_addr) {
-> +			struct lppaca *lp =3D =
-vcpu->arch.vpa.pinned_addr;
-> +			get_lppaca()->pmcregs_in_use =3D =
-lp->pmcregs_in_use;
-> +		} else {
-> +			get_lppaca()->pmcregs_in_use =3D 1;
-> +		}
-> +	}
-> +#endif
-> +
-> +	/* Load guest */
-> +	if (vcpu->arch.hfscr & HFSCR_PM) {
-> +		mtspr(SPRN_PMC1, vcpu->arch.pmc[0]);
-> +		mtspr(SPRN_PMC2, vcpu->arch.pmc[1]);
-> +		mtspr(SPRN_PMC3, vcpu->arch.pmc[2]);
-> +		mtspr(SPRN_PMC4, vcpu->arch.pmc[3]);
-> +		mtspr(SPRN_PMC5, vcpu->arch.pmc[4]);
-> +		mtspr(SPRN_PMC6, vcpu->arch.pmc[5]);
-> +		mtspr(SPRN_MMCR1, vcpu->arch.mmcr[1]);
-> +		mtspr(SPRN_MMCR2, vcpu->arch.mmcr[2]);
-> +		mtspr(SPRN_SDAR, vcpu->arch.sdar);
-> +		mtspr(SPRN_SIAR, vcpu->arch.siar);
-> +		mtspr(SPRN_SIER, vcpu->arch.sier[0]);
-> +
-> +		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> +			mtspr(SPRN_MMCR3, vcpu->arch.mmcr[4]);
-> +			mtspr(SPRN_SIER2, vcpu->arch.sier[1]);
-> +			mtspr(SPRN_SIER3, vcpu->arch.sier[2]);
-> +		}
-> +
-> +		/* Set MMCRA then MMCR0 last */
-> +		mtspr(SPRN_MMCRA, vcpu->arch.mmcra);
-> +		mtspr(SPRN_MMCR0, vcpu->arch.mmcr[0]);
-> +		/* No isync necessary because we're starting counters */
-> +	}
-> +}
-> +EXPORT_SYMBOL_GPL(switch_pmu_to_guest);
-> +
-> +void switch_pmu_to_host(struct kvm_vcpu *vcpu,
-> +				struct p9_host_os_sprs *host_os_sprs)
-> +{
-> +	struct lppaca *lp;
-> +	int save_pmu =3D 1;
-> +
-> +	lp =3D vcpu->arch.vpa.pinned_addr;
-> +	if (lp)
-> +		save_pmu =3D lp->pmcregs_in_use;
-> +
-> +	if (save_pmu) {
-> +		vcpu->arch.mmcr[0] =3D mfspr(SPRN_MMCR0);
-> +		vcpu->arch.mmcra =3D mfspr(SPRN_MMCRA);
-> +
-> +		freeze_pmu(vcpu->arch.mmcr[0], vcpu->arch.mmcra);
-> +
-> +		vcpu->arch.pmc[0] =3D mfspr(SPRN_PMC1);
-> +		vcpu->arch.pmc[1] =3D mfspr(SPRN_PMC2);
-> +		vcpu->arch.pmc[2] =3D mfspr(SPRN_PMC3);
-> +		vcpu->arch.pmc[3] =3D mfspr(SPRN_PMC4);
-> +		vcpu->arch.pmc[4] =3D mfspr(SPRN_PMC5);
-> +		vcpu->arch.pmc[5] =3D mfspr(SPRN_PMC6);
-> +		vcpu->arch.mmcr[1] =3D mfspr(SPRN_MMCR1);
-> +		vcpu->arch.mmcr[2] =3D mfspr(SPRN_MMCR2);
-> +		vcpu->arch.sdar =3D mfspr(SPRN_SDAR);
-> +		vcpu->arch.siar =3D mfspr(SPRN_SIAR);
-> +		vcpu->arch.sier[0] =3D mfspr(SPRN_SIER);
-> +
-> +		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> +			vcpu->arch.mmcr[3] =3D mfspr(SPRN_MMCR3);
-> +			vcpu->arch.sier[1] =3D mfspr(SPRN_SIER2);
-> +			vcpu->arch.sier[2] =3D mfspr(SPRN_SIER3);
-> +		}
-> +
-> +	} else if (vcpu->arch.hfscr & HFSCR_PM) {
-> +		/*
-> +		 * The guest accessed PMC SPRs without specifying they =
-should
-> +		 * be preserved. Stop them from counting if the guest =
-had
-> +		 * started anything.
-> +		 */
-> +		freeze_pmu(mfspr(SPRN_MMCR0), mfspr(SPRN_MMCRA));
-> +
-> +		/*
-> +		 * Demand-fault PMU register access in the guest.
-> +		 *
-> +		 * This is used to grab the guest's VPA pmcregs_in_use =
-value
-> +		 * and reflect it into the host's VPA in the case of a =
-nested
-> +		 * hypervisor.
-> +		 *
-> +		 * It also avoids having to zero-out SPRs after each =
-guest
-> +		 * exit to avoid side-channels when.
-> +		 *
-> +		 * This is cleared here when we exit the guest, so later =
-HFSCR
-> +		 * interrupt handling can add it back to run the guest =
-with
-> +		 * PM enabled next time.
-> +		 */
-> +		vcpu->arch.hfscr &=3D ~HFSCR_PM;
-> +	} /* otherwise the PMU should still be frozen from guest entry =
-*/
-> +
-> +
-> +#ifdef CONFIG_PPC_PSERIES
-> +	if (kvmhv_on_pseries())
-> +		get_lppaca()->pmcregs_in_use =3D ppc_get_pmu_inuse();
-> +#endif
-> +
-> +	if (ppc_get_pmu_inuse()) {
-> +		mtspr(SPRN_PMC1, host_os_sprs->pmc1);
-> +		mtspr(SPRN_PMC2, host_os_sprs->pmc2);
-> +		mtspr(SPRN_PMC3, host_os_sprs->pmc3);
-> +		mtspr(SPRN_PMC4, host_os_sprs->pmc4);
-> +		mtspr(SPRN_PMC5, host_os_sprs->pmc5);
-> +		mtspr(SPRN_PMC6, host_os_sprs->pmc6);
-> +		mtspr(SPRN_MMCR1, host_os_sprs->mmcr1);
-> +		mtspr(SPRN_MMCR2, host_os_sprs->mmcr2);
-> +		mtspr(SPRN_SDAR, host_os_sprs->sdar);
-> +		mtspr(SPRN_SIAR, host_os_sprs->siar);
-> +		mtspr(SPRN_SIER, host_os_sprs->sier1);
-> +
-> +		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> +			mtspr(SPRN_MMCR3, host_os_sprs->mmcr3);
-> +			mtspr(SPRN_SIER2, host_os_sprs->sier2);
-> +			mtspr(SPRN_SIER3, host_os_sprs->sier3);
-> +		}
-> +
-> +		/* Set MMCRA then MMCR0 last */
-> +		mtspr(SPRN_MMCRA, host_os_sprs->mmcra);
-> +		mtspr(SPRN_MMCR0, host_os_sprs->mmcr0);
-> +		isync();
-> +	}
-> +}
-> +EXPORT_SYMBOL_GPL(switch_pmu_to_host);
-> +
-> +static void load_spr_state(struct kvm_vcpu *vcpu,
-> +				struct p9_host_os_sprs *host_os_sprs)
-> +{
-> +	mtspr(SPRN_TAR, vcpu->arch.tar);
-> +	mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
-> +	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
-> +	mtspr(SPRN_BESCR, vcpu->arch.bescr);
-> +
-> +	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-> +		mtspr(SPRN_TIDR, vcpu->arch.tid);
-> +	if (host_os_sprs->iamr !=3D vcpu->arch.iamr)
-> +		mtspr(SPRN_IAMR, vcpu->arch.iamr);
-> +	if (host_os_sprs->amr !=3D vcpu->arch.amr)
-> +		mtspr(SPRN_AMR, vcpu->arch.amr);
-> +	if (vcpu->arch.uamor !=3D 0)
-> +		mtspr(SPRN_UAMOR, vcpu->arch.uamor);
-> +	if (host_os_sprs->fscr !=3D vcpu->arch.fscr)
-> +		mtspr(SPRN_FSCR, vcpu->arch.fscr);
-> +	if (host_os_sprs->dscr !=3D vcpu->arch.dscr)
-> +		mtspr(SPRN_DSCR, vcpu->arch.dscr);
-> +	if (vcpu->arch.pspb !=3D 0)
-> +		mtspr(SPRN_PSPB, vcpu->arch.pspb);
-> +
-> +	/*
-> +	 * DAR, DSISR, and for nested HV, SPRGs must be set with MSR[RI]
-> +	 * clear (or hstate set appropriately to catch those registers
-> +	 * being clobbered if we take a MCE or SRESET), so those are =
-done
-> +	 * later.
-> +	 */
-> +
-> +	if (!(vcpu->arch.ctrl & 1))
-> +		mtspr(SPRN_CTRLT, 0);
-> +}
-> +
-> +static void store_spr_state(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->arch.tar =3D mfspr(SPRN_TAR);
-> +	vcpu->arch.ebbhr =3D mfspr(SPRN_EBBHR);
-> +	vcpu->arch.ebbrr =3D mfspr(SPRN_EBBRR);
-> +	vcpu->arch.bescr =3D mfspr(SPRN_BESCR);
-> +
-> +	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-> +		vcpu->arch.tid =3D mfspr(SPRN_TIDR);
-> +	vcpu->arch.iamr =3D mfspr(SPRN_IAMR);
-> +	vcpu->arch.amr =3D mfspr(SPRN_AMR);
-> +	vcpu->arch.uamor =3D mfspr(SPRN_UAMOR);
-> +	vcpu->arch.fscr =3D mfspr(SPRN_FSCR);
-> +	vcpu->arch.dscr =3D mfspr(SPRN_DSCR);
-> +	vcpu->arch.pspb =3D mfspr(SPRN_PSPB);
-> +
-> +	vcpu->arch.ctrl =3D mfspr(SPRN_CTRLF);
-> +}
-> +
-> +void load_vcpu_state(struct kvm_vcpu *vcpu,
-> +			   struct p9_host_os_sprs *host_os_sprs)
-> +{
-> +	if (cpu_has_feature(CPU_FTR_TM) ||
-> +	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
-> +		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
-> +
-> +	load_spr_state(vcpu, host_os_sprs);
-> +
-> +	load_fp_state(&vcpu->arch.fp);
-> +#ifdef CONFIG_ALTIVEC
-> +	load_vr_state(&vcpu->arch.vr);
-> +#endif
-> +	mtspr(SPRN_VRSAVE, vcpu->arch.vrsave);
-> +}
-> +EXPORT_SYMBOL_GPL(load_vcpu_state);
-> +
-> +void store_vcpu_state(struct kvm_vcpu *vcpu)
-> +{
-> +	store_spr_state(vcpu);
-> +
-> +	store_fp_state(&vcpu->arch.fp);
-> +#ifdef CONFIG_ALTIVEC
-> +	store_vr_state(&vcpu->arch.vr);
-> +#endif
-> +	vcpu->arch.vrsave =3D mfspr(SPRN_VRSAVE);
-> +
-> +	if (cpu_has_feature(CPU_FTR_TM) ||
-> +	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
-> +		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
-> +}
-> +EXPORT_SYMBOL_GPL(store_vcpu_state);
-> +
-> +void save_p9_host_os_sprs(struct p9_host_os_sprs *host_os_sprs)
-> +{
-> +	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-> +		host_os_sprs->tidr =3D mfspr(SPRN_TIDR);
-> +	host_os_sprs->iamr =3D mfspr(SPRN_IAMR);
-> +	host_os_sprs->amr =3D mfspr(SPRN_AMR);
-> +	host_os_sprs->fscr =3D mfspr(SPRN_FSCR);
-> +	host_os_sprs->dscr =3D mfspr(SPRN_DSCR);
-> +}
-> +EXPORT_SYMBOL_GPL(save_p9_host_os_sprs);
-> +
-> +/* vcpu guest regs must already be saved */
-> +void restore_p9_host_os_sprs(struct kvm_vcpu *vcpu,
-> +				    struct p9_host_os_sprs =
-*host_os_sprs)
-> +{
-> +	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
-> +
-> +	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-> +		mtspr(SPRN_TIDR, host_os_sprs->tidr);
-> +	if (host_os_sprs->iamr !=3D vcpu->arch.iamr)
-> +		mtspr(SPRN_IAMR, host_os_sprs->iamr);
-> +	if (vcpu->arch.uamor !=3D 0)
-> +		mtspr(SPRN_UAMOR, 0);
-> +	if (host_os_sprs->amr !=3D vcpu->arch.amr)
-> +		mtspr(SPRN_AMR, host_os_sprs->amr);
-> +	if (host_os_sprs->fscr !=3D vcpu->arch.fscr)
-> +		mtspr(SPRN_FSCR, host_os_sprs->fscr);
-> +	if (host_os_sprs->dscr !=3D vcpu->arch.dscr)
-> +		mtspr(SPRN_DSCR, host_os_sprs->dscr);
-> +	if (vcpu->arch.pspb !=3D 0)
-> +		mtspr(SPRN_PSPB, 0);
-> +
-> +	/* Save guest CTRL register, set runlatch to 1 */
-> +	if (!(vcpu->arch.ctrl & 1))
-> +		mtspr(SPRN_CTRLT, 1);
-> +}
-> +EXPORT_SYMBOL_GPL(restore_p9_host_os_sprs);
-> +
-> #ifdef CONFIG_KVM_BOOK3S_HV_EXIT_TIMING
-> static void __start_timing(struct kvm_vcpu *vcpu, struct =
-kvmhv_tb_accumulator *next)
-> {
-> --=20
-> 2.23.0
 >=20
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--HJ/h8TT/zp4p/89v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDml1IACgkQbDjKyiDZ
+s5Ji3Q//fx2Ptvjumxh3wo6Vz9N7y2xEi6di8mSwQNbRQMnAoAX4uydCPDEj2l7R
+DEGa6/lu46k0Zyv8Wp0GQGarzSqQu+p0McFRwyiVaL/9P3baTPejMHerhrYDW1eB
+aZ/fVLJiITv8R0vYcSnYIr70pKEyiw347k9qcZMmqY/xyln99FCyd8OfpYyHBLt/
+vf+99J4Yfez1XxDuNbgDsszDElKd8HoxT+pWFtGWr8W4wcDIigIo85BUa+rnByux
+0i4Iuj0Vk6DMwZ1f4T14AaX7noBYtbBD9bBAD0BxXD/dfAg4xpiKI7bUWfQZ0jC0
+ZPhKddhHufLhVTyewVIpC7atHrEEak5kjXtjJyku4u7XD9NgBpDtFNYYqKbr/hMz
+5yu1dh5ixTERPRSSSO5FQ4CmN+NJukD2ZVKLQpXY9w6bJFLPsmGXRVXlJxu61i3m
+RJ27ZznRp8odL+XhZKw0H5bYZzcdV6rbtZ6+7Txt7bZrGTyIkraFHPBf1S2+IahF
+UE7o90p4MSuNdnac5j2pGZej2TeBOG2OdLLrSRttHiQ8yFHJS965nOdty67o2aZ0
+TZqlQCTPNe9ixvC9j2i1j3YVuuGe7uNJQjdSdc0Wwo9IWo2vYoDc7XDQ71KIBMgP
+/+Rf8YqZwoDTVDsMjnZuxD4ihZfwRBeT15S7CnM6dRJai2iPNYg=
+=+q2B
+-----END PGP SIGNATURE-----
+
+--HJ/h8TT/zp4p/89v--
