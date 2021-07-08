@@ -2,196 +2,114 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF7F83BF41B
-	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 04:57:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E105F3BF464
+	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jul 2021 06:02:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230229AbhGHDAa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 7 Jul 2021 23:00:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33498 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230304AbhGHDA3 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 7 Jul 2021 23:00:29 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1682Yb3U047975;
-        Wed, 7 Jul 2021 22:57:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
- : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=YaAJbIOt4yyi4yrcpodi1H/EVgAmWLiCwFLM+ixUOfg=;
- b=c+eLSFi6lo3DRAjv/KQC5xokqBxf6eaIHOQxrDiMi532jfYOK393lwpLCmXGoBB+XEKi
- DxQYsxev4C1gua4++DRo/4LC0gjHfk3ODD7HkJYpsGJjfeCXR/LpjSYP3Js3KKDm8b1P
- ZYsRQ9RBIXa85Z2juJinbsCNsPrG0HIj+7qYpIrj7vGhddRsnp3QtO66qMjC++3gBtkA
- RhwbuihhiZ6YceChxDbhXGJd8jfPHDxoDWi/Lygj3M4D4I6j9ReVCUf0TdsOs6Jytq1Y
- oFJer435Im62rXS5Uqnj1fRWbfjlJns2rSrrk+agvsBwdMfMqXm6GGEwNcj5vb8KQZqe 7w== 
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39mkpwbg3a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Jul 2021 22:57:38 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1682sW9b019446;
-        Thu, 8 Jul 2021 02:57:36 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma02fra.de.ibm.com with ESMTP id 39jfh892fw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Jul 2021 02:57:36 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1682vY9M33095976
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 8 Jul 2021 02:57:34 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 114A711C052;
-        Thu,  8 Jul 2021 02:57:34 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C11A811C04A;
-        Thu,  8 Jul 2021 02:57:32 +0000 (GMT)
-Received: from lep8c.aus.stglabs.ibm.com (unknown [9.40.192.207])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  8 Jul 2021 02:57:32 +0000 (GMT)
-Subject: [PATCH REBASED v5 2/2] spapr: nvdimm: Introduce spapr-nvdimm device
-From:   Shivaprasad G Bhat <sbhat@linux.ibm.com>
-To:     david@gibson.dropbear.id.au, groug@kaod.org, qemu-ppc@nongnu.org
-Cc:     qemu-devel@nongnu.org, aneesh.kumar@linux.ibm.com,
-        nvdimm@lists.linux.dev, kvm-ppc@vger.kernel.org,
-        bharata@linux.vnet.ibm.com
-Date:   Wed, 07 Jul 2021 21:57:31 -0500
-Message-ID: <162571304881.1030381.2406869533148471546.stgit@lep8c.aus.stglabs.ibm.com>
-In-Reply-To: <162571302321.1030381.15196355582642786915.stgit@lep8c.aus.stglabs.ibm.com>
-References: <162571302321.1030381.15196355582642786915.stgit@lep8c.aus.stglabs.ibm.com>
-User-Agent: StGit/0.19
+        id S229482AbhGHEFZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 8 Jul 2021 00:05:25 -0400
+Received: from ozlabs.org ([203.11.71.1]:34443 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229468AbhGHEFY (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 8 Jul 2021 00:05:24 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4GL2gk55WWz9sj5; Thu,  8 Jul 2021 14:02:42 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1625716962;
+        bh=UkC2nyhdS7N7HxXoNBKQUIeav7GKLB8qfveETE0psBk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PRaB70iOHRh3n4Qux/vskCGMTOMkX4CAsoOyMCpqBPl91sWLzne0i/4D0mC+LeRpM
+         krJKcEGUndim/jFg7/DMf5HhY3VjXKcsW8iolUdFbku6fpRrUSvPvROXjqvmBjscmV
+         6mFQy25gSS2vQ/6dBi0yK1Ws6lPirEqBO9lP1UyM=
+Date:   Thu, 8 Jul 2021 13:58:04 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Bharata B Rao <bharata@linux.ibm.com>
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com, paulus@ozlabs.org,
+        mpe@ellerman.id.au, farosas@linux.ibm.com
+Subject: Re: [PATCH v8 3/6] KVM: PPC: Book3S HV: Add support for
+ H_RPT_INVALIDATE
+Message-ID: <YOZ3zNsGbSoymVKI@yekko>
+References: <20210621085003.904767-1-bharata@linux.ibm.com>
+ <20210621085003.904767-4-bharata@linux.ibm.com>
+ <YOKNub8mS4U4iox0@yekko>
+ <YOPpiLJlsEBtTmgt@in.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 9Ddrd10YOrg0phoz2b9wBB73ys7kppup
-X-Proofpoint-GUID: 9Ddrd10YOrg0phoz2b9wBB73ys7kppup
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-08_01:2021-07-06,2021-07-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- malwarescore=0 spamscore=0 suspectscore=0 impostorscore=0 phishscore=0
- mlxlogscore=856 lowpriorityscore=0 priorityscore=1501 clxscore=1015
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107080011
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="VI8dkJPIcBYLU6lP"
+Content-Disposition: inline
+In-Reply-To: <YOPpiLJlsEBtTmgt@in.ibm.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-If the device backend is not persistent memory for the nvdimm, there is
-need for explicit IO flushes on the backend to ensure persistence.
 
-On SPAPR, the issue is addressed by adding a new hcall to request for
-an explicit flush from the guest when the backend is not pmem. So, the
-approach here is to convey when the hcall flush is required in a device
-tree property. The guest once it knows the device backend is not pmem,
-makes the hcall whenever flush is required.
+--VI8dkJPIcBYLU6lP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-To set the device tree property, the patch introduces a new papr specific
-device type inheriting the nvdimm device. When the backend doesn't have
-pmem="yes", the device tree property "ibm,hcall-flush-required" is set,
-and the guest makes hcall H_SCM_FLUSH requesting for an explicit flush.
+On Tue, Jul 06, 2021 at 10:56:32AM +0530, Bharata B Rao wrote:
+> On Mon, Jul 05, 2021 at 02:42:33PM +1000, David Gibson wrote:
+> > On Mon, Jun 21, 2021 at 02:20:00PM +0530, Bharata B Rao wrote:
+> > > diff --git a/arch/powerpc/include/asm/mmu_context.h b/arch/powerpc/in=
+clude/asm/mmu_context.h
+> > > index 4bc45d3ed8b0..b44f291fc909 100644
+> > > --- a/arch/powerpc/include/asm/mmu_context.h
+> > > +++ b/arch/powerpc/include/asm/mmu_context.h
+> > > @@ -124,8 +124,17 @@ static inline bool need_extra_context(struct mm_=
+struct *mm, unsigned long ea)
+> > > =20
+> > >  #if defined(CONFIG_KVM_BOOK3S_HV_POSSIBLE) && defined(CONFIG_PPC_RAD=
+IX_MMU)
+> > >  extern void radix_kvm_prefetch_workaround(struct mm_struct *mm);
+> > > +void do_h_rpt_invalidate_prt(unsigned long pid, unsigned long lpid,
+> > > +			     unsigned long type, unsigned long pg_sizes,
+> > > +			     unsigned long start, unsigned long end);
+> > >  #else
+> > >  static inline void radix_kvm_prefetch_workaround(struct mm_struct *m=
+m) { }
+> > > +static inline void do_h_rpt_invalidate_prt(unsigned long pid,
+> > > +					   unsigned long lpid,
+> > > +					   unsigned long type,
+> > > +					   unsigned long pg_sizes,
+> > > +					   unsigned long start,
+> > > +					   unsigned long end) { }
+> >=20
+> > Since the only plausible caller is in KVM HV code, why do you need the
+> > #else clause.
+>=20
+> The call to the above routine is prevented for non-radix guests
+> in KVM HV code at runtime using kvm_is_radix() check and not by
+> CONFIG_PPC_RADIX_MMU. Hence the #else version would be needed.
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
----
- hw/ppc/spapr_nvdimm.c         |   46 +++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr_nvdimm.h |    4 ++++
- 2 files changed, 50 insertions(+)
+kvm_is_radix() should evaluate to false at compile time if
+!defined(CONFIG_PPC_RADIX_MMU), in which case, no you shouldn't need
+the else version.
 
-diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-index 4f8931ab15..4dc7c3f147 100644
---- a/hw/ppc/spapr_nvdimm.c
-+++ b/hw/ppc/spapr_nvdimm.c
-@@ -54,6 +54,8 @@ bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
- {
-     const MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
-     const MachineState *ms = MACHINE(hotplug_dev);
-+    PCDIMMDevice *dimm = PC_DIMM(nvdimm);
-+    MemoryRegion *mr = host_memory_backend_get_memory(dimm->hostmem);
-     g_autofree char *uuidstr = NULL;
-     QemuUUID uuid;
-     int ret;
-@@ -91,6 +93,14 @@ bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
-         return false;
-     }
- 
-+    if (object_dynamic_cast(OBJECT(nvdimm), TYPE_SPAPR_NVDIMM) &&
-+        (memory_region_get_fd(mr) < 0)) {
-+        error_setg(errp, "spapr-nvdimm device requires the "
-+                   "memdev %s to be of memory-backend-file type",
-+                   object_get_canonical_path_component(OBJECT(dimm->hostmem)));
-+        return false;
-+    }
-+
-     return true;
- }
- 
-@@ -162,6 +172,21 @@ static int spapr_dt_nvdimm(SpaprMachineState *spapr, void *fdt,
-                              "operating-system")));
-     _FDT(fdt_setprop(fdt, child_offset, "ibm,cache-flush-required", NULL, 0));
- 
-+    if (object_dynamic_cast(OBJECT(nvdimm), TYPE_SPAPR_NVDIMM)) {
-+        bool is_pmem = false;
-+#ifdef CONFIG_LIBPMEM
-+        PCDIMMDevice *dimm = PC_DIMM(nvdimm);
-+        HostMemoryBackend *hostmem = dimm->hostmem;
-+
-+        is_pmem = object_property_get_bool(OBJECT(hostmem), "pmem",
-+                                           &error_abort);
-+#endif
-+        if (!is_pmem) {
-+            _FDT(fdt_setprop(fdt, child_offset, "ibm,hcall-flush-required",
-+                             NULL, 0));
-+        }
-+    }
-+
-     return child_offset;
- }
- 
-@@ -585,7 +610,16 @@ static target_ulong h_scm_flush(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     }
- 
-     dimm = PC_DIMM(drc->dev);
-+    if (!object_dynamic_cast(OBJECT(dimm), TYPE_SPAPR_NVDIMM)) {
-+        return H_PARAMETER;
-+    }
-+
-     backend = MEMORY_BACKEND(dimm->hostmem);
-+#ifdef CONFIG_LIBPMEM
-+    if (object_property_get_bool(OBJECT(backend), "pmem", &error_abort)) {
-+        return H_UNSUPPORTED;
-+    }
-+#endif
-     fd = memory_region_get_fd(&backend->mr);
- 
-     if (fd < 0) {
-@@ -766,3 +800,15 @@ static void spapr_scm_register_types(void)
- }
- 
- type_init(spapr_scm_register_types)
-+
-+static TypeInfo spapr_nvdimm_info = {
-+    .name          = TYPE_SPAPR_NVDIMM,
-+    .parent        = TYPE_NVDIMM,
-+};
-+
-+static void spapr_nvdimm_register_types(void)
-+{
-+    type_register_static(&spapr_nvdimm_info);
-+}
-+
-+type_init(spapr_nvdimm_register_types)
-diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvdimm.h
-index 24d8e37b33..fb4e56418e 100644
---- a/include/hw/ppc/spapr_nvdimm.h
-+++ b/include/hw/ppc/spapr_nvdimm.h
-@@ -13,6 +13,10 @@
- #include "hw/mem/nvdimm.h"
- #include "migration/vmstate.h"
- 
-+#define TYPE_SPAPR_NVDIMM "spapr-nvdimm"
-+OBJECT_DECLARE_SIMPLE_TYPE(SpaprNVDIMMDevice, SPAPR_NVDIMM)
-+
-+typedef struct SpaprNVDIMMDevice  SpaprNVDIMMDevice;
- typedef struct SpaprDrc SpaprDrc;
- typedef struct SpaprMachineState SpaprMachineState;
- 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--VI8dkJPIcBYLU6lP
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDmd8wACgkQbDjKyiDZ
+s5LjjA//WzlijLo5jBiWB/psM4RoEjKOrdOxKxtjcQqniGik4SWpwqHq62iuVOhG
+XFDyl3QVzGnOByu23sjhdPm0hU6zSWnv/pDhEwoPT9kxpdmG2d9b/BLGzMoG0vXn
+gwMMNsHV4AbdnSf5mBWLBjL6g4sv7GZxOK64GLl9ejsumT82c6HLgUbFudUqoQxb
+kMTmGqkH1e2UR04e1QS8shzXFxkXBzYEdapzWF1HNp8g1GOqmkExhOhvrE5JwBgz
+WOHGnt2P479BAjcZcH7Eq8G1uYTiZGfKaEppMtTvBeiyeF6cn8Ue7y77SpdRBCAF
+E57eAIkws/a1o//AflxmxXz9AV8Yjiq35LZq4F1DJHZQgkThvTuvbN+7I4SMfRbh
+mcCwn6Ntq2WGnDOYBWmgZkyilECrydqr2Gue6pCGmYfftfDKMATuYB7kwVeQrul7
+3oEv8D/BMljW+ynORE5Mm75xl4bICQuUYby++Cc67ngbURr1pUqp0wptv6udEZtP
+SOTezV9hyT3qEhSyGJ9IZy3ZtTd2cKmLwUW83Xh0g/7kBMlpArMHHEJaWphNRnZG
+mH49EFjKHe7/P35tH7gMPl2iGymyKlsuhosZOJxfOssyuUAOcHaM2MnWcLjG/t/g
+/UfaNjbbDep8JtWrQLCZDpr4L6do/upPI3RRF88SCca4YzwvvQQ=
+=ThOq
+-----END PGP SIGNATURE-----
+
+--VI8dkJPIcBYLU6lP--
