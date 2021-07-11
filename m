@@ -2,211 +2,56 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56F5C3C3200
-	for <lists+kvm-ppc@lfdr.de>; Sat, 10 Jul 2021 04:51:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A93DB3C3C86
+	for <lists+kvm-ppc@lfdr.de>; Sun, 11 Jul 2021 14:44:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231205AbhGJCxu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 9 Jul 2021 22:53:50 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16096 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230317AbhGJCxu (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 9 Jul 2021 22:53:50 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16A2XoPh116577;
-        Fri, 9 Jul 2021 22:51:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=pp1;
- bh=A62f9LFYFNkcFG8XEGYH5zfzqtx8Y6q/wsLnyq2iL5c=;
- b=ESkWNBMnOZVA5G5qu1Ae8qTMFhq6XOQYDKXfqgKacoJvd2KEeN4YWP2aXMLvrG1be4t5
- bs1rEO0o8oowXy2poo/GqBJX/dbVVN3VN08TYJACszWQgTvU0KosIbQeSJm9e75Lsl17
- dXfRLsQmHwpLzl95OYTaQGJr2plFw0Po1QImceJZIvh7gtNSPFYSuhannXfP8RNr9bE7
- AazWnWytQa1eW+Jxfyf2gQBK/d8rNt9QOzInYagMnLSDj7HJo04IVAUQpCOzy8LZkBvx
- RDAhh+2piZ80JeC4apC1sBH78P1+HerCthS43AJf6/FZweCbzselewJHFM3EcoBq7lhe Gg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39nhccnx2h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Jul 2021 22:51:03 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16A2p2cA014977;
-        Fri, 9 Jul 2021 22:51:02 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39nhccnx21-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Jul 2021 22:51:02 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16A2lxuH027102;
-        Sat, 10 Jul 2021 02:51:00 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 39q2th8030-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 10 Jul 2021 02:51:00 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16A2ow1R28311862
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 10 Jul 2021 02:50:58 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 18883AE051;
-        Sat, 10 Jul 2021 02:50:58 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0AED2AE04D;
-        Sat, 10 Jul 2021 02:50:57 +0000 (GMT)
-Received: from [9.79.176.228] (unknown [9.79.176.228])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Sat, 10 Jul 2021 02:50:56 +0000 (GMT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.6\))
-Subject: Re: [RFC PATCH 10/43] powerpc/64s: Always set PMU control registers
- to frozen/disabled when not in use
-From:   Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-In-Reply-To: <20210622105736.633352-11-npiggin@gmail.com>
-Date:   Sat, 10 Jul 2021 08:20:54 +0530
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <C58A063A-3B5D-4188-80E2-4C19802785BF@linux.vnet.ibm.com>
-References: <20210622105736.633352-1-npiggin@gmail.com>
- <20210622105736.633352-11-npiggin@gmail.com>
-To:     Nicholas Piggin <npiggin@gmail.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.6)
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: o6RgV5VuVuOgehlUJdVPrBdu-XXRmFFs
-X-Proofpoint-GUID: FK4G-T8U__xOyiHE9quDJutl50Fu6q4K
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-10_02:2021-07-09,2021-07-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 mlxscore=0 spamscore=0
- clxscore=1015 impostorscore=0 priorityscore=1501 adultscore=0
- suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107100013
+        id S232554AbhGKMrd convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm-ppc@lfdr.de>); Sun, 11 Jul 2021 08:47:33 -0400
+Received: from mail.07d05.mspz7.gob.ec ([186.46.59.139]:50716 "EHLO
+        mail.07d05.mspz7.gob.ec" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229688AbhGKMrc (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 11 Jul 2021 08:47:32 -0400
+X-Greylist: delayed 1047 seconds by postgrey-1.27 at vger.kernel.org; Sun, 11 Jul 2021 08:47:32 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by mail.07d05.mspz7.gob.ec (Postfix) with ESMTP id 371151844829;
+        Sun, 11 Jul 2021 07:27:09 -0500 (-05)
+Received: from mail.07d05.mspz7.gob.ec ([127.0.0.1])
+        by localhost (mail.07d05.mspz7.gob.ec [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id hluvjtqJXifI; Sun, 11 Jul 2021 07:27:09 -0500 (-05)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.07d05.mspz7.gob.ec (Postfix) with ESMTP id E9169184489E;
+        Sun, 11 Jul 2021 07:23:50 -0500 (-05)
+X-Virus-Scanned: amavisd-new at 07d05.mspz7.gob.ec
+Received: from mail.07d05.mspz7.gob.ec ([127.0.0.1])
+        by localhost (mail.07d05.mspz7.gob.ec [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id XyoxMD1zWZ4s; Sun, 11 Jul 2021 07:19:01 -0500 (-05)
+Received: from cris-PC.wifi (unknown [105.9.79.139])
+        by mail.07d05.mspz7.gob.ec (Postfix) with ESMTPSA id A75BF1821B4A;
+        Sun, 11 Jul 2021 07:09:24 -0500 (-05)
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: spende von 2,000,000 euro
+To:     Recipients <maria.coronel@07d05.mspz7.gob.ec>
+From:   ''Tayeb souami'' <maria.coronel@07d05.mspz7.gob.ec>
+Date:   Sun, 11 Jul 2021 14:09:15 +0200
+Reply-To: Tayebsouam.spende@gmail.com
+Message-Id: <20210711120924.A75BF1821B4A@mail.07d05.mspz7.gob.ec>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Hallo mein lieber Freund
+Mein Name ist Tayeb Souami aus New Jersey in Amerika und ich habe den America Lottery Jackpot von 315 Millionen Euro gewonnen. Ich habe mich entschlossen, die Summe von 2.000.000 Euro an fünf glückliche Personen zu spenden, und Sie wurden als einer der Begünstigten ausgewählt. Bitte klicken Sie auf diesen Link, um mehr über meinen Gewinn zu erfahren.
 
 
-> On 22-Jun-2021, at 4:27 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
->=20
-> KVM PMU management code looks for particular frozen/disabled bits in
-> the PMU registers so it knows whether it must clear them when coming
-> out of a guest or not. Setting this up helps KVM make these =
-optimisations
-> without getting confused. Longer term the better approach might be to
-> move guest/host PMU switching to the perf subsystem.
->=20
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
-> arch/powerpc/kernel/cpu_setup_power.c | 4 ++--
-> arch/powerpc/kernel/dt_cpu_ftrs.c     | 6 +++---
-> arch/powerpc/kvm/book3s_hv.c          | 5 +++++
-> arch/powerpc/perf/core-book3s.c       | 7 +++++++
-> 4 files changed, 17 insertions(+), 5 deletions(-)
->=20
-> diff --git a/arch/powerpc/kernel/cpu_setup_power.c =
-b/arch/powerpc/kernel/cpu_setup_power.c
-> index a29dc8326622..3dc61e203f37 100644
-> --- a/arch/powerpc/kernel/cpu_setup_power.c
-> +++ b/arch/powerpc/kernel/cpu_setup_power.c
-> @@ -109,7 +109,7 @@ static void init_PMU_HV_ISA207(void)
-> static void init_PMU(void)
-> {
-> 	mtspr(SPRN_MMCRA, 0);
-> -	mtspr(SPRN_MMCR0, 0);
-> +	mtspr(SPRN_MMCR0, MMCR0_FC);
-> 	mtspr(SPRN_MMCR1, 0);
-> 	mtspr(SPRN_MMCR2, 0);
-> }
-> @@ -123,7 +123,7 @@ static void init_PMU_ISA31(void)
-> {
-> 	mtspr(SPRN_MMCR3, 0);
-> 	mtspr(SPRN_MMCRA, MMCRA_BHRB_DISABLE);
-> -	mtspr(SPRN_MMCR0, MMCR0_PMCCEXT);
-> +	mtspr(SPRN_MMCR0, MMCR0_FC | MMCR0_PMCCEXT);
-> }
->=20
-> /*
-> diff --git a/arch/powerpc/kernel/dt_cpu_ftrs.c =
-b/arch/powerpc/kernel/dt_cpu_ftrs.c
-> index 0a6b36b4bda8..06a089fbeaa7 100644
-> --- a/arch/powerpc/kernel/dt_cpu_ftrs.c
-> +++ b/arch/powerpc/kernel/dt_cpu_ftrs.c
-> @@ -353,7 +353,7 @@ static void init_pmu_power8(void)
-> 	}
->=20
-> 	mtspr(SPRN_MMCRA, 0);
-> -	mtspr(SPRN_MMCR0, 0);
-> +	mtspr(SPRN_MMCR0, MMCR0_FC);
-> 	mtspr(SPRN_MMCR1, 0);
-> 	mtspr(SPRN_MMCR2, 0);
-> 	mtspr(SPRN_MMCRS, 0);
-> @@ -392,7 +392,7 @@ static void init_pmu_power9(void)
-> 		mtspr(SPRN_MMCRC, 0);
->=20
-> 	mtspr(SPRN_MMCRA, 0);
-> -	mtspr(SPRN_MMCR0, 0);
-> +	mtspr(SPRN_MMCR0, MMCR0_FC);
-> 	mtspr(SPRN_MMCR1, 0);
-> 	mtspr(SPRN_MMCR2, 0);
-> }
-> @@ -428,7 +428,7 @@ static void init_pmu_power10(void)
->=20
-> 	mtspr(SPRN_MMCR3, 0);
-> 	mtspr(SPRN_MMCRA, MMCRA_BHRB_DISABLE);
-> -	mtspr(SPRN_MMCR0, MMCR0_PMCCEXT);
-> +	mtspr(SPRN_MMCR0, MMCR0_FC | MMCR0_PMCCEXT);
-> }
->=20
-> static int __init feat_enable_pmu_power10(struct dt_cpu_feature *f)
-> diff --git a/arch/powerpc/kvm/book3s_hv.c =
-b/arch/powerpc/kvm/book3s_hv.c
-> index 1f30f98b09d1..f7349d150828 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -2593,6 +2593,11 @@ static int kvmppc_core_vcpu_create_hv(struct =
-kvm_vcpu *vcpu)
-> #endif
-> #endif
-> 	vcpu->arch.mmcr[0] =3D MMCR0_FC;
-> +	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> +		vcpu->arch.mmcr[0] |=3D MMCR0_PMCCEXT;
-> +		vcpu->arch.mmcra =3D MMCRA_BHRB_DISABLE;
-> +	}
-> +
-> 	vcpu->arch.ctrl =3D CTRL_RUNLATCH;
-> 	/* default to host PVR, since we can't spoof it */
-> 	kvmppc_set_pvr_hv(vcpu, mfspr(SPRN_PVR));
-> diff --git a/arch/powerpc/perf/core-book3s.c =
-b/arch/powerpc/perf/core-book3s.c
-> index 51622411a7cc..e33b29ec1a65 100644
-> --- a/arch/powerpc/perf/core-book3s.c
-> +++ b/arch/powerpc/perf/core-book3s.c
-> @@ -1361,6 +1361,13 @@ static void power_pmu_enable(struct pmu *pmu)
-> 		goto out;
->=20
-> 	if (cpuhw->n_events =3D=3D 0) {
-> +		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
-> +			mtspr(SPRN_MMCRA, MMCRA_BHRB_DISABLE);
-> +			mtspr(SPRN_MMCR0, MMCR0_FC | MMCR0_PMCCEXT);
-> +		} else {
-> +			mtspr(SPRN_MMCRA, 0);
-> +			mtspr(SPRN_MMCR0, MMCR0_FC);
-> +		}
+UHR MICH HIER: https://www.youtube.com/watch?v=Z6ui8ZDQ6Ks
+
+Bitte kontaktieren Sie mich über diese E-Mail:Tayebsouam.spende@gmail.com
 
 
-Hi Nick,
+Ich hoffe, Sie und Ihre Familie glücklich zu machen.
 
-We are setting these bits in =E2=80=9Cpower_pmu_disable=E2=80=9D =
-function. And disable will be called before any event gets =
-deleted/stopped. Can you please help to understand why this is needed in =
-power_pmu_enable path also ?
-
-Thanks
-Athira
-
-> 		ppc_set_pmu_inuse(0);
-> 		goto out;
-> 	}
-> --=20
-> 2.23.0
->=20
-
+Grüße
+Herr Tayeb Souami
