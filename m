@@ -2,244 +2,136 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D8DB3C4154
-	for <lists+kvm-ppc@lfdr.de>; Mon, 12 Jul 2021 04:50:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F8F83C4222
+	for <lists+kvm-ppc@lfdr.de>; Mon, 12 Jul 2021 05:42:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229891AbhGLCxc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 11 Jul 2021 22:53:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34686 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229660AbhGLCxb (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 11 Jul 2021 22:53:31 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78BB5C0613DD
-        for <kvm-ppc@vger.kernel.org>; Sun, 11 Jul 2021 19:50:43 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id g24so9270201pji.4
-        for <kvm-ppc@vger.kernel.org>; Sun, 11 Jul 2021 19:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=w2r4qfv5vAYJ00NUqIGFvURWuXmn7VNm7e5xDqKTB40=;
-        b=peHg2NZYicXl7JUKveOTepsa2bfhyjmB2JQE0hW9wkOmsUl933a9C0q2v7O6jLtBbE
-         V/hTspmlE9CvELtFH2zhZPBQxafCjsu3yjh7G2YL/ikow9cuUl+NiwMjpdELfGhjb1Lt
-         1pvNKDa2evs8wYVWo+FA/4p7yLhI60nZjAcYf8G3MudWU4XciPBWUnV+EXC6eGg02f9p
-         NMM1eR4X7ihRox92tW8AveGdHUq5OPFaU+80UNZ32B65kysP3ANu600CtC2S7qY4aa3M
-         V2sDwWadsl6ORLOuDfKxdydFmKur6d3x8UWTCdVmGttwli3k55fo6PuiZ1Odq0Ci7kuI
-         1hwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=w2r4qfv5vAYJ00NUqIGFvURWuXmn7VNm7e5xDqKTB40=;
-        b=YXMKv7uy5+E/1ArRRIMJ7GmTXspXzOC/qnrSfV3o6QTR5tf9DULlrl/2rSbp4DW0Y/
-         OLc/D9WQ8kbAMIDD48DJu9UaU+RqqM5FyuyOe/n3wyfdUkp+JvCOJ1JBM0SUEglDDZOx
-         q+PJEeY2T9pmtqUP96vvXTvF64ZPI8LzCPMW/9tSyIQuyY8aa8pqjchr953/JGXtHtKS
-         akgpDG8H1KjZ6ha5V+9p+JoOwRbTuhgz9wZy2TM5k8U53R/KcDNgWG8XWp3ny098iPlT
-         yKGYeSHEoJStTNuNwiEQJx5KynjSONLBA+KcZqUlbS+vYxH69vFzsqYFijdpklAbpcFD
-         lL0g==
-X-Gm-Message-State: AOAM532THb4+/KOZdLweOFUauX0YGivsPRTgj1NVSQt/UV21lFK3AwMA
-        bic69NZfdpSps0NMXADqKys=
-X-Google-Smtp-Source: ABdhPJx8vYHuMpqABVE2A8PY2LXzGVCyvJikwfxTgN5gLhmU21scm0Rou6G7ltnJo7pMYtthEp3pXg==
-X-Received: by 2002:a17:90b:384f:: with SMTP id nl15mr51537121pjb.88.1626058243048;
-        Sun, 11 Jul 2021 19:50:43 -0700 (PDT)
-Received: from localhost (203-219-181-43.static.tpgi.com.au. [203.219.181.43])
-        by smtp.gmail.com with ESMTPSA id t1sm11565859pjo.33.2021.07.11.19.50.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Jul 2021 19:50:42 -0700 (PDT)
-Date:   Mon, 12 Jul 2021 12:50:37 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [RFC PATCH 27/43] KVM: PPC: Book3S HV P9: Move host OS
- save/restore functions to built-in
-To:     Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+        id S233178AbhGLDpI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 11 Jul 2021 23:45:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59116 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232643AbhGLDpI (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 11 Jul 2021 23:45:08 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16C3XpTO193291;
+        Sun, 11 Jul 2021 23:42:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=kHluxNBcjb4SxNSvJFBkNOcMcKkRn8PBcqRtneMkYuw=;
+ b=CDZD55B1YS6iFiivbps2MNhQpVxp9gZF4rHUV2qQUCZXNeaKmPpF5J8bkhk0sS0luS3d
+ QcjwJyTPa0/sOXs8z82pVBkhNPLswxBXuqMWZw1AX/eFlJerU4TDg7m+iq3uVSHpKbD+
+ 2+/7kbhcwQb80cZVQSFKJ8sBQKNBTsFTs+2ZRA+Axdh3yO5IAcpSR32ZAEyaHz59tXV6
+ kFYV/GxBcNGpNLkLfZWhun4xYR0AgoXAjx2qGbswRM/Q18GCB8NeqOVbRNReTEavbj8e
+ 8X4l+Db+E5p8vyXzNhzW/BhqYNdGMnGK8959LtRGe+fqnw/O6uCvxyRmkfXIznLr0XRY uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39qrkvc3nm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 11 Jul 2021 23:42:14 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16C3Ym4R195576;
+        Sun, 11 Jul 2021 23:42:14 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39qrkvc3nc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 11 Jul 2021 23:42:14 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16C3YY0i028523;
+        Mon, 12 Jul 2021 03:42:11 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 39q3688hhv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Jul 2021 03:42:11 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16C3g8QX18415992
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Jul 2021 03:42:09 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DC3A54C044;
+        Mon, 12 Jul 2021 03:42:08 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C328F4C046;
+        Mon, 12 Jul 2021 03:42:06 +0000 (GMT)
+Received: from Madhavan.PrimaryTP (unknown [9.102.2.250])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 12 Jul 2021 03:42:06 +0000 (GMT)
+Subject: Re: [RFC PATCH 10/43] powerpc/64s: Always set PMU control registers
+ to frozen/disabled when not in use
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org
 References: <20210622105736.633352-1-npiggin@gmail.com>
-        <20210622105736.633352-28-npiggin@gmail.com>
-        <983C1FE6-79CB-4DBD-BD00-8CFDA3685FEB@linux.vnet.ibm.com>
-In-Reply-To: <983C1FE6-79CB-4DBD-BD00-8CFDA3685FEB@linux.vnet.ibm.com>
+ <20210622105736.633352-11-npiggin@gmail.com>
+ <c607e40c-5334-e8b1-11ac-c1464332e01a@linux.ibm.com>
+ <1625185125.n8jy7yqojr.astroid@bobo.none>
+From:   Madhavan Srinivasan <maddy@linux.ibm.com>
+Message-ID: <0916fd08-f253-46ae-c4e9-8e910592e8b1@linux.ibm.com>
+Date:   Mon, 12 Jul 2021 09:12:04 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Message-Id: <1626058210.6twtrgfync.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1625185125.n8jy7yqojr.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3T1-1lhrJjU6YQI6slD0YQXIop2GnKq_
+X-Proofpoint-ORIG-GUID: Wq_f27AMCSGIosuVhC2R6IsFEktmn2d6
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-12_02:2021-07-09,2021-07-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 malwarescore=0 suspectscore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 spamscore=0
+ mlxlogscore=999 bulkscore=0 adultscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2107120027
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Athira Rajeev's message of July 8, 2021 3:32 pm:
->=20
->=20
->> On 22-Jun-2021, at 4:27 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
->>=20
->> Move the P9 guest/host register switching functions to the built-in
->> P9 entry code, and export it for nested to use as well.
->>=20
->> This allows more flexibility in scheduling these supervisor privileged
->> SPR accesses with the HV privileged and PR SPR accesses in the low level
->> entry code.
->>=20
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->> ---
->> arch/powerpc/kvm/book3s_hv.c          | 351 +-------------------------
->> arch/powerpc/kvm/book3s_hv.h          |  39 +++
->> arch/powerpc/kvm/book3s_hv_p9_entry.c | 332 ++++++++++++++++++++++++
->> 3 files changed, 372 insertions(+), 350 deletions(-)
->> create mode 100644 arch/powerpc/kvm/book3s_hv.h
->>=20
->> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
->> index 35749b0b663f..a7660af22161 100644
->> --- a/arch/powerpc/kvm/book3s_hv.c
->> +++ b/arch/powerpc/kvm/book3s_hv.c
->> @@ -79,6 +79,7 @@
->> #include <asm/dtl.h>
->>=20
->> #include "book3s.h"
->> +#include "book3s_hv.h"
->>=20
->> #define CREATE_TRACE_POINTS
->> #include "trace_hv.h"
->> @@ -3675,356 +3676,6 @@ static noinline void kvmppc_run_core(struct kvmp=
-pc_vcore *vc)
->> 	trace_kvmppc_run_core(vc, 1);
->> }
->>=20
->> -/*
->> - * Privileged (non-hypervisor) host registers to save.
->> - */
->> -struct p9_host_os_sprs {
->> -	unsigned long dscr;
->> -	unsigned long tidr;
->> -	unsigned long iamr;
->> -	unsigned long amr;
->> -	unsigned long fscr;
->> -
->> -	unsigned int pmc1;
->> -	unsigned int pmc2;
->> -	unsigned int pmc3;
->> -	unsigned int pmc4;
->> -	unsigned int pmc5;
->> -	unsigned int pmc6;
->> -	unsigned long mmcr0;
->> -	unsigned long mmcr1;
->> -	unsigned long mmcr2;
->> -	unsigned long mmcr3;
->> -	unsigned long mmcra;
->> -	unsigned long siar;
->> -	unsigned long sier1;
->> -	unsigned long sier2;
->> -	unsigned long sier3;
->> -	unsigned long sdar;
->> -};
->> -
->> -static void freeze_pmu(unsigned long mmcr0, unsigned long mmcra)
->> -{
->> -	if (!(mmcr0 & MMCR0_FC))
->> -		goto do_freeze;
->> -	if (mmcra & MMCRA_SAMPLE_ENABLE)
->> -		goto do_freeze;
->> -	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
->> -		if (!(mmcr0 & MMCR0_PMCCEXT))
->> -			goto do_freeze;
->> -		if (!(mmcra & MMCRA_BHRB_DISABLE))
->> -			goto do_freeze;
->> -	}
->> -	return;
->> -
->> -do_freeze:
->> -	mmcr0 =3D MMCR0_FC;
->> -	mmcra =3D 0;
->> -	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
->> -		mmcr0 |=3D MMCR0_PMCCEXT;
->> -		mmcra =3D MMCRA_BHRB_DISABLE;
->> -	}
->> -
->> -	mtspr(SPRN_MMCR0, mmcr0);
->> -	mtspr(SPRN_MMCRA, mmcra);
->> -	isync();
->> -}
->> -
->> -static void switch_pmu_to_guest(struct kvm_vcpu *vcpu,
->> -				struct p9_host_os_sprs *host_os_sprs)
->> -{
->> -	struct lppaca *lp;
->> -	int load_pmu =3D 1;
->> -
->> -	lp =3D vcpu->arch.vpa.pinned_addr;
->> -	if (lp)
->> -		load_pmu =3D lp->pmcregs_in_use;
->> -
->> -	if (load_pmu)
->> -	      vcpu->arch.hfscr |=3D HFSCR_PM;
->> -
->> -	/* Save host */
->> -	if (ppc_get_pmu_inuse()) {
->> -		/*
->> -		 * It might be better to put PMU handling (at least for the
->> -		 * host) in the perf subsystem because it knows more about what
->> -		 * is being used.
->> -		 */
->> -
->> -		/* POWER9, POWER10 do not implement HPMC or SPMC */
->> -
->> -		host_os_sprs->mmcr0 =3D mfspr(SPRN_MMCR0);
->> -		host_os_sprs->mmcra =3D mfspr(SPRN_MMCRA);
->> -
->> -		freeze_pmu(host_os_sprs->mmcr0, host_os_sprs->mmcra);
->> -
->> -		host_os_sprs->pmc1 =3D mfspr(SPRN_PMC1);
->> -		host_os_sprs->pmc2 =3D mfspr(SPRN_PMC2);
->> -		host_os_sprs->pmc3 =3D mfspr(SPRN_PMC3);
->> -		host_os_sprs->pmc4 =3D mfspr(SPRN_PMC4);
->> -		host_os_sprs->pmc5 =3D mfspr(SPRN_PMC5);
->> -		host_os_sprs->pmc6 =3D mfspr(SPRN_PMC6);
->> -		host_os_sprs->mmcr1 =3D mfspr(SPRN_MMCR1);
->> -		host_os_sprs->mmcr2 =3D mfspr(SPRN_MMCR2);
->> -		host_os_sprs->sdar =3D mfspr(SPRN_SDAR);
->> -		host_os_sprs->siar =3D mfspr(SPRN_SIAR);
->> -		host_os_sprs->sier1 =3D mfspr(SPRN_SIER);
->> -
->> -		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
->> -			host_os_sprs->mmcr3 =3D mfspr(SPRN_MMCR3);
->> -			host_os_sprs->sier2 =3D mfspr(SPRN_SIER2);
->> -			host_os_sprs->sier3 =3D mfspr(SPRN_SIER3);
->> -		}
->> -	}
->> -
->> -#ifdef CONFIG_PPC_PSERIES
->> -	if (kvmhv_on_pseries()) {
->> -		if (vcpu->arch.vpa.pinned_addr) {
->> -			struct lppaca *lp =3D vcpu->arch.vpa.pinned_addr;
->> -			get_lppaca()->pmcregs_in_use =3D lp->pmcregs_in_use;
->> -		} else {
->> -			get_lppaca()->pmcregs_in_use =3D 1;
->> -		}
->> -	}
->> -#endif
->> -
->> -	/* Load guest */
->> -	if (vcpu->arch.hfscr & HFSCR_PM) {
->> -		mtspr(SPRN_PMC1, vcpu->arch.pmc[0]);
->> -		mtspr(SPRN_PMC2, vcpu->arch.pmc[1]);
->> -		mtspr(SPRN_PMC3, vcpu->arch.pmc[2]);
->> -		mtspr(SPRN_PMC4, vcpu->arch.pmc[3]);
->> -		mtspr(SPRN_PMC5, vcpu->arch.pmc[4]);
->> -		mtspr(SPRN_PMC6, vcpu->arch.pmc[5]);
->> -		mtspr(SPRN_MMCR1, vcpu->arch.mmcr[1]);
->> -		mtspr(SPRN_MMCR2, vcpu->arch.mmcr[2]);
->> -		mtspr(SPRN_SDAR, vcpu->arch.sdar);
->> -		mtspr(SPRN_SIAR, vcpu->arch.siar);
->> -		mtspr(SPRN_SIER, vcpu->arch.sier[0]);
->> -
->> -		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
->> -			mtspr(SPRN_MMCR3, vcpu->arch.mmcr[4]);
->=20
->=20
-> Hi Nick,
->=20
-> Have a doubt here..
-> For MMCR3, it is  vcpu->arch.mmcr[3) ?
 
-Hey, yea it is you're right. Good catch.
+On 7/2/21 5:57 AM, Nicholas Piggin wrote:
+> Excerpts from Madhavan Srinivasan's message of July 1, 2021 11:17 pm:
+>> On 6/22/21 4:27 PM, Nicholas Piggin wrote:
+>>> KVM PMU management code looks for particular frozen/disabled bits in
+>>> the PMU registers so it knows whether it must clear them when coming
+>>> out of a guest or not. Setting this up helps KVM make these optimisations
+>>> without getting confused. Longer term the better approach might be to
+>>> move guest/host PMU switching to the perf subsystem.
+>>>
+>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>>> ---
+>>>    arch/powerpc/kernel/cpu_setup_power.c | 4 ++--
+>>>    arch/powerpc/kernel/dt_cpu_ftrs.c     | 6 +++---
+>>>    arch/powerpc/kvm/book3s_hv.c          | 5 +++++
+>>>    arch/powerpc/perf/core-book3s.c       | 7 +++++++
+>>>    4 files changed, 17 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/arch/powerpc/kernel/cpu_setup_power.c b/arch/powerpc/kernel/cpu_setup_power.c
+>>> index a29dc8326622..3dc61e203f37 100644
+>>> --- a/arch/powerpc/kernel/cpu_setup_power.c
+>>> +++ b/arch/powerpc/kernel/cpu_setup_power.c
+>>> @@ -109,7 +109,7 @@ static void init_PMU_HV_ISA207(void)
+>>>    static void init_PMU(void)
+>>>    {
+>>>    	mtspr(SPRN_MMCRA, 0);
+>>> -	mtspr(SPRN_MMCR0, 0);
+>>> +	mtspr(SPRN_MMCR0, MMCR0_FC);
+>> Sticky point here is, currently if not frozen, pmc5/6 will
+>> keep countering. And not freezing them at boot is quiet useful
+>> sometime, like say when running in a simulation where we could calculate
+>> approx CPIs for micro benchmarks without perf subsystem.
 
-Thanks,
-Nick
+Sorry for a delayed response
 
+> You even can't use the sysfs files in this sim environment? In that case
+
+Yes it is possible. Just that we need to have additional patch to maintain
+for the sim.
+> what if we added a boot option that could set some things up? In that
+> case possibly you could even gather some more types of events too.
+
+Having a boot option will be a over-kill :). I guess we could have
+this under config option?
+
+>
+> Thanks,
+> Nick
