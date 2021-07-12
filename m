@@ -2,101 +2,140 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 716B03C6047
-	for <lists+kvm-ppc@lfdr.de>; Mon, 12 Jul 2021 18:16:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECFFF3C60B1
+	for <lists+kvm-ppc@lfdr.de>; Mon, 12 Jul 2021 18:36:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230039AbhGLQTG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 12 Jul 2021 12:19:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52976 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229465AbhGLQTG (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 12 Jul 2021 12:19:06 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D34E3C0613DD
-        for <kvm-ppc@vger.kernel.org>; Mon, 12 Jul 2021 09:16:17 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id h9so9800604ljm.5
-        for <kvm-ppc@vger.kernel.org>; Mon, 12 Jul 2021 09:16:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6Lx92m3o1HyXPQthjv0NcXW5cxGIccq8kaKUriYiyX8=;
-        b=DuUJKfI40O4hv9E6w78z0AjBGVqYP5wd6acA8v1HwQkjx8eSmjaT9PhmnO6qlURV9X
-         J5iVjv+oqU5+pZqEEih9yPNSevbcTVRYzkueRyAO9vtu0em6gbu7UkcBkrIlcuMWuxef
-         nPvyd4y0VAOh5HOwD9JvkfSYVD2DDRRdM+RMkc07ct2i93+ZAt5NzK9S1D0zMjDU9PNp
-         lzXabQyqhT4kCCYyCrucDe5rOpCXEcomOQcY2lb6W0jfHm2fA4h95BXoynXWlcYuN6jY
-         YngwId+fcVp/OsnAUH9bMvSBqBAQGG4Rd883sj276xrJCJ9dnR9Jk7maVYeBwhhy5+Mw
-         qOiQ==
+        id S233620AbhGLQjl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 12 Jul 2021 12:39:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22616 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233073AbhGLQjl (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 12 Jul 2021 12:39:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626107812;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MtrPeL1MW5g9H7qmJOUpT+3Y4CWR41HGQODgw/zxeBs=;
+        b=gRVYqrRYr/O0Xs8gh7WUoBjPIfvrJs0fyabPdf3ks++Wj1nPANLMChPL0eQLhAdeHU/p10
+        o9qmLGAZ7xRxCPopJ5w+vk9E4gG4ZGU9LnWPoIVd2DyIF1r6SABVO7mMO5FH2k0nyfx3Hp
+        DFqvO9n0FGFo/dEunRiIGMEOcwHlKYc=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-lOHASAPTO8icZ-Od2qRb1g-1; Mon, 12 Jul 2021 12:36:50 -0400
+X-MC-Unique: lOHASAPTO8icZ-Od2qRb1g-1
+Received: by mail-io1-f69.google.com with SMTP id 18-20020a5d9c520000b029043af67da217so6504322iof.3
+        for <kvm-ppc@vger.kernel.org>; Mon, 12 Jul 2021 09:36:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6Lx92m3o1HyXPQthjv0NcXW5cxGIccq8kaKUriYiyX8=;
-        b=RGKq63Pmjo9UtO2lc8fsxRARIvi/GpzhNJ4W4It2QJeFwXMvu7v0x/UimKXpAYVx/F
-         kRmo3m/6sZs5AeaaiNpoESt2SS8PUJqlRDx/uBOI8JIokOpEG3xvJLNQ4QmIYw+pb7Lq
-         ixYXiTQFSzrJ7cqJcJYack9MsCmIQxlUgzCgVMn8w2M2nFZ5r9ivYrLFAVmofP6tY26Y
-         2wljwKJXend4owW0r2NXqtoISFDcXLuiPJg7w+iAdwlS5zy+wzJZFp8EFo1ol0KGK1D8
-         O6DhZIZmKq4kx21yCg6jOH/sJiNsId9ElNhihIHc4HjZmaUE9CrdgMPi5Py02xxadCZ5
-         OluA==
-X-Gm-Message-State: AOAM532JPHQzv8eEmUQpyW0JlXY7GgdOgN4ruGB8CB+xMIAMS8rxiqle
-        RZy1a0cFu2pA2+gHnrgp1Ee0RfzS8QrZkUerlUosWg==
-X-Google-Smtp-Source: ABdhPJw1ttH+evGMQKkgiiJMYtLqWyhKwcc+HdulMt5zTZ65fixW4bLUFKuYH1v1Qqvp3olXJ57gqTcJxah53OZjjtc=
-X-Received: by 2002:a05:651c:150a:: with SMTP id e10mr43771401ljf.215.1626106576004;
- Mon, 12 Jul 2021 09:16:16 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=MtrPeL1MW5g9H7qmJOUpT+3Y4CWR41HGQODgw/zxeBs=;
+        b=XhukrKevvNGoqNCtN937A/geNXeE5MtCro+9nzECVPT61UDIb+iVv1BrVEzvBpeawN
+         6wpYQMcldPkAD4TZnOCg0J7tz1zLdOvX9L+6p7I3k1hs1NRn0bHAwDiBYlZJcD8M29hk
+         mgVHKlPinKD57HwjWii9id7gHIxYOsR28EUAfq3XMXbHqHqqTwhyAlCvx165ytRnVVqw
+         piFpJm2Ty0KEGeIusQflnP4HM+D/rWMvumXRzXUjJiYvwWaK+tPOt0xTIyzfftGR6vd4
+         LLFaMS1F/pqjOFqErGT7/x+Do7sN3qoqIGORlkjOJjAlqXp+bKBB/AbOBAoK080Q3Bg+
+         3HDg==
+X-Gm-Message-State: AOAM530xj+xrQOR7yIzIbIhNgNggNtFTbla/p3mgs/X56+AH1xogwfAs
+        /PSOYM0QesOtCNuHorRJH8NbG9uRJjTCuia73CsY7p7T9oZsXbSoG7oRol7E4dYCTtpT5eR7MTK
+        mx3nzJZoNZXRtHwsqZw==
+X-Received: by 2002:a05:6638:3594:: with SMTP id v20mr44398390jal.25.1626107810375;
+        Mon, 12 Jul 2021 09:36:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwfZs7GgsE/lzYFDtyQMKvJJdBgqUsxHSeDXSOj4Dft5q8ck5jfD4jmnOq1o4WYVKlXhNT6cA==
+X-Received: by 2002:a05:6638:3594:: with SMTP id v20mr44398375jal.25.1626107810195;
+        Mon, 12 Jul 2021 09:36:50 -0700 (PDT)
+Received: from gator ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id m24sm8288360ion.3.2021.07.12.09.36.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jul 2021 09:36:49 -0700 (PDT)
+Date:   Mon, 12 Jul 2021 18:36:47 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
+        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
+        maz@kernel.org, vivek.gautam@arm.com
+Subject: Re: [kvm-unit-tests RFC PATCH 1/5] lib: arm: Print test exit status
+ on exit if chr-testdev is not available
+Message-ID: <20210712163647.oxntpjapur4z23sl@gator>
+References: <20210702163122.96110-1-alexandru.elisei@arm.com>
+ <20210702163122.96110-2-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-References: <20210706180350.2838127-2-jingzhangos@google.com> <202107122231.owPJye54-lkp@intel.com>
-In-Reply-To: <202107122231.owPJye54-lkp@intel.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Mon, 12 Jul 2021 11:16:03 -0500
-Message-ID: <CAAdAUth9Dx88+jyCxs-6paSPxf6h42rNEGG1xKowDm4k8h=2Ww@mail.gmail.com>
-Subject: Re: [PATCH v1 1/4] KVM: stats: Support linear and logarithmic
- histogram statistics
-To:     kernel test robot <lkp@intel.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        David Matlack <dmatlack@google.com>, kbuild-all@lists.01.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210702163122.96110-2-alexandru.elisei@arm.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Jul 12, 2021 at 9:10 AM kernel test robot <lkp@intel.com> wrote:
->
-> Hi Jing,
->
-> Thank you for the patch! Yet something to improve:
->
-> [auto build test ERROR on 7caa04b36f204a01dac65582b71d26d190a1e022]
->
-> url:    https://github.com/0day-ci/linux/commits/Jing-Zhang/Linear-and-Logarithmic-histogram-statistics/20210707-020549
-> base:   7caa04b36f204a01dac65582b71d26d190a1e022
-> config: i386-randconfig-a005-20210712 (attached as .config)
-> compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-> reproduce (this is a W=1 build):
->         # https://github.com/0day-ci/linux/commit/aba26c018828dadbff3f53e058c161fab2b09d35
->         git remote add linux-review https://github.com/0day-ci/linux
->         git fetch --no-tags linux-review Jing-Zhang/Linear-and-Logarithmic-histogram-statistics/20210707-020549
->         git checkout aba26c018828dadbff3f53e058c161fab2b09d35
->         # save the attached .config to linux build tree
->         mkdir build_dir
->         make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
->
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
->
-> All errors (new ones prefixed by >>):
->
->    ld: arch/x86/../../virt/kvm/binary_stats.o: in function `kvm_stats_linear_hist_update':
-> >> binary_stats.c:(.text+0x1ac): undefined reference to `__udivdi3'
-Will fix this.
->
+On Fri, Jul 02, 2021 at 05:31:18PM +0100, Alexandru Elisei wrote:
+> The arm64 tests can be run under kvmtool, which doesn't emulate a
+> chr-testdev device. In preparation for adding run script support for
+> kvmtool, print the test exit status so the scripts can pick it up and
+> correctly mark the test as pass or fail.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+>  lib/chr-testdev.h |  1 +
+>  lib/arm/io.c      | 10 +++++++++-
+>  lib/chr-testdev.c |  5 +++++
+>  3 files changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/chr-testdev.h b/lib/chr-testdev.h
+> index ffd9a851aa9b..09b4b424670e 100644
+> --- a/lib/chr-testdev.h
+> +++ b/lib/chr-testdev.h
+> @@ -11,4 +11,5 @@
+>   */
+>  extern void chr_testdev_init(void);
+>  extern void chr_testdev_exit(int code);
+> +extern bool chr_testdev_available(void);
+>  #endif
+> diff --git a/lib/arm/io.c b/lib/arm/io.c
+> index 343e10822263..9e62b571a91b 100644
+> --- a/lib/arm/io.c
+> +++ b/lib/arm/io.c
+> @@ -125,7 +125,15 @@ extern void halt(int code);
+>  
+>  void exit(int code)
+>  {
+> -	chr_testdev_exit(code);
+> +	if (chr_testdev_available()) {
+> +		chr_testdev_exit(code);
+
+chr_testdev_exit() already has a 'if !vcon goto out' in it, so you can
+just call it unconditionally. No need for chr_testdev_available().
+
+> +	} else {
+> +		/*
+> +		 * Print the test return code in the format used by chr-testdev
+> +		 * so the runner script can parse it.
+> +		 */
+> +		printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
+> +	}
+>  	psci_system_off();
+>  	halt(code);
+>  	__builtin_unreachable();
+> diff --git a/lib/chr-testdev.c b/lib/chr-testdev.c
+> index b3c641a833fe..301e73a6c064 100644
+> --- a/lib/chr-testdev.c
+> +++ b/lib/chr-testdev.c
+> @@ -68,3 +68,8 @@ void chr_testdev_init(void)
+>  	in_vq = vqs[0];
+>  	out_vq = vqs[1];
+>  }
+> +
+> +bool chr_testdev_available(void)
+> +{
+> +	return vcon != NULL;
+> +}
+> -- 
+> 2.32.0
+>
+
 Thanks,
-Jing
+drew 
+
