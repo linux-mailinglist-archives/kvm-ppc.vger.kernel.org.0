@@ -2,136 +2,234 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F8F83C4222
-	for <lists+kvm-ppc@lfdr.de>; Mon, 12 Jul 2021 05:42:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 762793C52A2
+	for <lists+kvm-ppc@lfdr.de>; Mon, 12 Jul 2021 12:50:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233178AbhGLDpI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 11 Jul 2021 23:45:08 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59116 "EHLO
+        id S1346091AbhGLHsC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 12 Jul 2021 03:48:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20360 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232643AbhGLDpI (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 11 Jul 2021 23:45:08 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16C3XpTO193291;
-        Sun, 11 Jul 2021 23:42:15 -0400
+        by vger.kernel.org with ESMTP id S1346245AbhGLHq0 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 12 Jul 2021 03:46:26 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16C7XKTF120244;
+        Mon, 12 Jul 2021 03:43:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=kHluxNBcjb4SxNSvJFBkNOcMcKkRn8PBcqRtneMkYuw=;
- b=CDZD55B1YS6iFiivbps2MNhQpVxp9gZF4rHUV2qQUCZXNeaKmPpF5J8bkhk0sS0luS3d
- QcjwJyTPa0/sOXs8z82pVBkhNPLswxBXuqMWZw1AX/eFlJerU4TDg7m+iq3uVSHpKbD+
- 2+/7kbhcwQb80cZVQSFKJ8sBQKNBTsFTs+2ZRA+Axdh3yO5IAcpSR32ZAEyaHz59tXV6
- kFYV/GxBcNGpNLkLfZWhun4xYR0AgoXAjx2qGbswRM/Q18GCB8NeqOVbRNReTEavbj8e
- 8X4l+Db+E5p8vyXzNhzW/BhqYNdGMnGK8959LtRGe+fqnw/O6uCvxyRmkfXIznLr0XRY uw== 
+ bh=vRruuTVTYuGPRDvelRjhh0we5OahUAhmoZY8I/d+IIc=;
+ b=mjjl8vvmtV2ASkSzOlVMabXitYsXtVahr/3DXvFyan8wzdQfuKloliyACWBHooXUuLiy
+ 6W7S129HT7hrNjfn1+ia0D9My23hWpdvx9m42FbryV7e33nHc23VAz45F/LLoapTf/15
+ 5anMMIyEcEuggJGpXtwWqQH/7InXnlUi02CQniWqrYF8vknsdU+67PLGZuuPd6aREiNd
+ LtjA4oQB0PHMRRZZZITKt0U/77w5xD+S+WgiLWu+oehg5vkbPNmtlVejwncB5fF5HvDR
+ fXqvOaXiNeIuMpkU+0lq3/uUnivbS5ytEsVkl3Wi7nx8MooyyvkfuvMlgTQfulg8P9FS DQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39qrkvc3nm-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39qrmbhbje-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 11 Jul 2021 23:42:14 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16C3Ym4R195576;
-        Sun, 11 Jul 2021 23:42:14 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39qrkvc3nc-1
+        Mon, 12 Jul 2021 03:43:10 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16C7aQro132417;
+        Mon, 12 Jul 2021 03:43:10 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39qrmbhbhh-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 11 Jul 2021 23:42:14 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16C3YY0i028523;
-        Mon, 12 Jul 2021 03:42:11 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 39q3688hhv-1
+        Mon, 12 Jul 2021 03:43:10 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16C7h7CR010058;
+        Mon, 12 Jul 2021 07:43:07 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 39q3688b2p-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Jul 2021 03:42:11 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16C3g8QX18415992
+        Mon, 12 Jul 2021 07:43:07 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16C7h5DB17236258
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Jul 2021 03:42:09 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC3A54C044;
-        Mon, 12 Jul 2021 03:42:08 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C328F4C046;
-        Mon, 12 Jul 2021 03:42:06 +0000 (GMT)
-Received: from Madhavan.PrimaryTP (unknown [9.102.2.250])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 12 Jul 2021 03:42:06 +0000 (GMT)
-Subject: Re: [RFC PATCH 10/43] powerpc/64s: Always set PMU control registers
- to frozen/disabled when not in use
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org
-References: <20210622105736.633352-1-npiggin@gmail.com>
- <20210622105736.633352-11-npiggin@gmail.com>
- <c607e40c-5334-e8b1-11ac-c1464332e01a@linux.ibm.com>
- <1625185125.n8jy7yqojr.astroid@bobo.none>
-From:   Madhavan Srinivasan <maddy@linux.ibm.com>
-Message-ID: <0916fd08-f253-46ae-c4e9-8e910592e8b1@linux.ibm.com>
-Date:   Mon, 12 Jul 2021 09:12:04 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        Mon, 12 Jul 2021 07:43:05 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E1CD011C04A;
+        Mon, 12 Jul 2021 07:43:04 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9441311C050;
+        Mon, 12 Jul 2021 07:43:03 +0000 (GMT)
+Received: from [9.102.2.188] (unknown [9.102.2.188])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 12 Jul 2021 07:43:03 +0000 (GMT)
+Subject: Re: [PATCH v2 1/1] powerpc/pseries: Interface to represent PAPR
+ firmware attributes
+To:     ego@linux.vnet.ibm.com
+Cc:     mpe@ellerman.id.au, benh@kernel.crashing.org, paulus@samba.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pratik.r.sampat@gmail.com
+References: <20210706082400.36996-1-psampat@linux.ibm.com>
+ <20210706082400.36996-2-psampat@linux.ibm.com>
+ <20210708103543.GA20804@in.ibm.com>
+From:   Pratik Sampat <psampat@linux.ibm.com>
+Message-ID: <7c360913-3215-e99b-0d58-adc604bb1d8f@linux.ibm.com>
+Date:   Mon, 12 Jul 2021 13:13:02 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <1625185125.n8jy7yqojr.astroid@bobo.none>
+In-Reply-To: <20210708103543.GA20804@in.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3T1-1lhrJjU6YQI6slD0YQXIop2GnKq_
-X-Proofpoint-ORIG-GUID: Wq_f27AMCSGIosuVhC2R6IsFEktmn2d6
+X-Proofpoint-ORIG-GUID: rR_yTr7oF4EYrtgH5GAeb49w1d1EUlzo
+X-Proofpoint-GUID: wgK3EzQJU447VIdAwaTq-tYQ6Hrj5vee
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-12_02:2021-07-09,2021-07-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 malwarescore=0 suspectscore=0
- impostorscore=0 phishscore=0 priorityscore=1501 spamscore=0
- mlxlogscore=999 bulkscore=0 adultscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2107120027
+ definitions=2021-07-12_04:2021-07-12,2021-07-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
+ phishscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0
+ suspectscore=0 impostorscore=0 mlxlogscore=999 priorityscore=1501
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107120059
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
-On 7/2/21 5:57 AM, Nicholas Piggin wrote:
-> Excerpts from Madhavan Srinivasan's message of July 1, 2021 11:17 pm:
->> On 6/22/21 4:27 PM, Nicholas Piggin wrote:
->>> KVM PMU management code looks for particular frozen/disabled bits in
->>> the PMU registers so it knows whether it must clear them when coming
->>> out of a guest or not. Setting this up helps KVM make these optimisations
->>> without getting confused. Longer term the better approach might be to
->>> move guest/host PMU switching to the perf subsystem.
->>>
->>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->>> ---
->>>    arch/powerpc/kernel/cpu_setup_power.c | 4 ++--
->>>    arch/powerpc/kernel/dt_cpu_ftrs.c     | 6 +++---
->>>    arch/powerpc/kvm/book3s_hv.c          | 5 +++++
->>>    arch/powerpc/perf/core-book3s.c       | 7 +++++++
->>>    4 files changed, 17 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/arch/powerpc/kernel/cpu_setup_power.c b/arch/powerpc/kernel/cpu_setup_power.c
->>> index a29dc8326622..3dc61e203f37 100644
->>> --- a/arch/powerpc/kernel/cpu_setup_power.c
->>> +++ b/arch/powerpc/kernel/cpu_setup_power.c
->>> @@ -109,7 +109,7 @@ static void init_PMU_HV_ISA207(void)
->>>    static void init_PMU(void)
->>>    {
->>>    	mtspr(SPRN_MMCRA, 0);
->>> -	mtspr(SPRN_MMCR0, 0);
->>> +	mtspr(SPRN_MMCR0, MMCR0_FC);
->> Sticky point here is, currently if not frozen, pmc5/6 will
->> keep countering. And not freezing them at boot is quiet useful
->> sometime, like say when running in a simulation where we could calculate
->> approx CPIs for micro benchmarks without perf subsystem.
 
-Sorry for a delayed response
-
-> You even can't use the sysfs files in this sim environment? In that case
-
-Yes it is possible. Just that we need to have additional patch to maintain
-for the sim.
-> what if we added a boot option that could set some things up? In that
-> case possibly you could even gather some more types of events too.
-
-Having a boot option will be a over-kill :). I guess we could have
-this under config option?
-
+On 08/07/21 4:05 pm, Gautham R Shenoy wrote:
+> Hello Pratik,
 >
-> Thanks,
-> Nick
+> On Tue, Jul 06, 2021 at 01:54:00PM +0530, Pratik R. Sampat wrote:
+>> Adds a generic interface to represent the energy and frequency related
+>> PAPR attributes on the system using the new H_CALL
+>> "H_GET_ENERGY_SCALE_INFO".
+>>
+>> H_GET_EM_PARMS H_CALL was previously responsible for exporting this
+>> information in the lparcfg, however the H_GET_EM_PARMS H_CALL
+>> will be deprecated P10 onwards.
+>>
+>> The H_GET_ENERGY_SCALE_INFO H_CALL is of the following call format:
+>> hcall(
+>>    uint64 H_GET_ENERGY_SCALE_INFO,  // Get energy scale info
+>>    uint64 flags,           // Per the flag request
+>>    uint64 firstAttributeId,// The attribute id
+>>    uint64 bufferAddress,   // Guest physical address of the output buffer
+>>    uint64 bufferSize       // The size in bytes of the output buffer
+>> );
+>>
+>> This H_CALL can query either all the attributes at once with
+>> firstAttributeId = 0, flags = 0 as well as query only one attribute
+>> at a time with firstAttributeId = id, flags = 1.
+>>
+>> The output buffer consists of the following
+>> 1. number of attributes              - 8 bytes
+>> 2. array offset to the data location - 8 bytes
+>> 3. version info                      - 1 byte
+>> 4. A data array of size num attributes, which contains the following:
+>>    a. attribute ID              - 8 bytes
+>>    b. attribute value in number - 8 bytes
+>>    c. attribute name in string  - 64 bytes
+>>    d. attribute value in string - 64 bytes
+>>
+>> The new H_CALL exports information in direct string value format, hence
+>> a new interface has been introduced in
+>> /sys/firmware/papr/energy_scale_info to export this information to
+>> userspace in an extensible pass-through format.
+>>
+>> The H_CALL returns the name, numeric value and string value (if exists)
+>>
+>> The format of exposing the sysfs information is as follows:
+>> /sys/firmware/papr/energy_scale_info/
+>>     |-- <id>/
+>>       |-- desc
+>>       |-- value
+>>       |-- value_desc (if exists)
+>>     |-- <id>/
+>>       |-- desc
+>>       |-- value
+>>       |-- value_desc (if exists)
+>> ...
+>
+> I like this implementation. Only one comment w.r.t versioning below:
+>
+> [..snip..]
+>
+>> @@ -631,6 +632,26 @@ struct hv_gpci_request_buffer {
+>>   	uint8_t bytes[HGPCI_MAX_DATA_BYTES];
+>>   } __packed;
+>>
+>> +#define MAX_ESI_ATTRS	10
+>> +#define MAX_BUF_SZ	(sizeof(struct h_energy_scale_info_hdr) + \
+>> +			(sizeof(struct energy_scale_attribute) * MAX_ESI_ATTRS))
+>> +
+>> +struct energy_scale_attribute {
+>> +	__be64 id;
+>> +	__be64 value;
+>> +	unsigned char desc[64];
+>> +	unsigned char value_desc[64];
+>> +} __packed;
+>> +
+>> +struct h_energy_scale_info_hdr {
+>> +	__be64 num_attrs;
+>> +	__be64 array_offset;
+>> +	__u8 data_header_version;
+>> +} __packed;
+>> +
+>
+> [..snip..]
+>
+>> +static int __init papr_init(void)
+>> +{
+>> +	uint64_t num_attrs;
+>> +	int ret, idx, i;
+>> +	char *esi_buf;
+>> +
+>> +	if (!firmware_has_feature(FW_FEATURE_LPAR))
+>> +		return -ENXIO;
+>> +
+>> +	esi_buf = kmalloc(MAX_BUF_SZ, GFP_KERNEL);
+>> +	if (esi_buf == NULL)
+>> +		return -ENOMEM;
+>> +	/*
+>> +	 * hcall(
+>> +	 * uint64 H_GET_ENERGY_SCALE_INFO,  // Get energy scale info
+>> +	 * uint64 flags,            // Per the flag request
+>> +	 * uint64 firstAttributeId, // The attribute id
+>> +	 * uint64 bufferAddress,    // Guest physical address of the output buffer
+>> +	 * uint64 bufferSize);      // The size in bytes of the output buffer
+>> +	 */
+>> +	ret = plpar_hcall_norets(H_GET_ENERGY_SCALE_INFO, ESI_FLAGS_ALL, 0,
+>> +				 virt_to_phys(esi_buf), MAX_BUF_SZ);
+>
+> It is good that you are passing a character buffer here and
+> interpreting it later. This helps in the cases where the header has
+> more fields than what we are aware of changed. I think even a future
+> platform adds newer fields to the header, those fields will be
+> appended after the existing fields, so we should still be able to
+> interpret the first three fields of the header that we are currently
+> aware of.
+>
+>
+>> +	if (ret != H_SUCCESS) {
+>> +		pr_warn("hcall failed: H_GET_ENERGY_SCALE_INFO");
+>> +		goto out;
+>> +	}
+>> +
+>> +	esi_hdr = (struct h_energy_scale_info_hdr *) esi_buf;
+>> +	num_attrs = be64_to_cpu(esi_hdr->num_attrs);
+>
+> Shouldn't we check for the esi_hdr->data_header_version here?
+> Currently we are only aware of the version 1. If we happen to run this
+> kernel code on a future platform which supports a different version,
+> wouldn't it be safer to bail out here ?
+>
+> Otherwise this patch looks good to me.
+>
+> Reviewed-by: Gautham R. Shenoy <ego@linux.vnet.ibm.com>
+
+Thanks for the review Gautham.
+Sure I'll make use of the header version to bail out.
+That just seems like the safest approach.
+
+I'll add that and spin a new version here
+
+Thanks
+Pratik
+
+> --
+> Thanks and Regards
+> gautham.
+
