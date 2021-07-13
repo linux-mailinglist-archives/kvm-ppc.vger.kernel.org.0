@@ -2,137 +2,124 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7114A3C6587
-	for <lists+kvm-ppc@lfdr.de>; Mon, 12 Jul 2021 23:38:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0482C3C6BA7
+	for <lists+kvm-ppc@lfdr.de>; Tue, 13 Jul 2021 09:45:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231878AbhGLVlJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 12 Jul 2021 17:41:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57196 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229842AbhGLVlJ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 12 Jul 2021 17:41:09 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16CLY69x162347;
-        Mon, 12 Jul 2021 17:35:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=7bzlV/hp3A1AiSAQdb8CLuXZtgsppLlM7yvqUjtaY9o=;
- b=nZTC3gmmdbFmW91xXslTiym6QurefilM+5YHmpBMsU75NcGmHBGtowuffdw6yvq4QXYt
- SuSuRgjYz+Cvwb5h1o8OZoNf9PmOJ/Mjbw72IEGll0DknKdA7WH9RBK7JEbspMmtBWi1
- cTUh6P7dhOUQ0xaxp1QHDdgQswNKoSXFjzTnmAJXxzkm+Hx1eRFgFWYDWBYZSLFHJ2dJ
- /1rns7UbtJmVYfBod/OqKNhIHRQYmkcvIBR0IWDlma9qeVD+ZZuftqCSnWrmuV0ow+7r
- feROOMnMp8tGVnqtTXOePpStKBndjZLlKCHsnZ+6qXyERjhYRBHoXi/xbRKQuIP896lB 6Q== 
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39qs2vff8k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Jul 2021 17:35:46 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16CLRFXb002891;
-        Mon, 12 Jul 2021 21:35:45 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma01dal.us.ibm.com with ESMTP id 39q36b6651-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Jul 2021 21:35:45 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16CLZi6m22217142
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Jul 2021 21:35:44 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 329AFAE066;
-        Mon, 12 Jul 2021 21:35:44 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 41C0AAE068;
-        Mon, 12 Jul 2021 21:35:41 +0000 (GMT)
-Received: from farosas.linux.ibm.com.com (unknown [9.211.32.192])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 12 Jul 2021 21:35:40 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
-        mpe@ellerman.id.au, mihai.caraman@freescale.com, mario@locati.it,
-        balaton@eik.bme.hu, christophe.leroy@csgroup.eu
-Subject: [RFC PATCH] KVM: PPC: BookE: Load FP and Altivec state before soft enabling IRQs
-Date:   Mon, 12 Jul 2021 18:35:37 -0300
-Message-Id: <20210712213537.2204009-1-farosas@linux.ibm.com>
-X-Mailer: git-send-email 2.29.2
+        id S234211AbhGMHsj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 13 Jul 2021 03:48:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47435 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234121AbhGMHsj (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 13 Jul 2021 03:48:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626162348;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NzhMW8UmyexogLd7WLsnQ7mohPd+vth26CSjnwu5sho=;
+        b=GLXQBXPmA3Bt6x73kDHcT4WtQhPX3IFqb5EouQoybixG+EZCa/FLb8Na3hqwGbX8rLqdY5
+        V3ygiVKyABr/vKI1cVbMaoj3yX/L1LheVP2lUOM4yBYjjRJV9hAhFd2jSUA3w80Vig4XWy
+        l+XGQQVb454e5ECjTDu8QxvqWf9VmOs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-DMiFHLOvMwOXYeQ-2nJe6A-1; Tue, 13 Jul 2021 03:45:47 -0400
+X-MC-Unique: DMiFHLOvMwOXYeQ-2nJe6A-1
+Received: by mail-wr1-f70.google.com with SMTP id r11-20020a5d52cb0000b02901309f5e7298so8379086wrv.0
+        for <kvm-ppc@vger.kernel.org>; Tue, 13 Jul 2021 00:45:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NzhMW8UmyexogLd7WLsnQ7mohPd+vth26CSjnwu5sho=;
+        b=Unz4fQ24r/kFnEsswfh92r3cA279TuPC8YGvD0rP+j5BXNkHrITX4hcmbNdZLCCZs3
+         dQDsm3wbDBuE43rWH+M6qwdnzaJa6MJahiYAWuwCjLo1k7fFWCkNoPT8YCP+JObkPLMW
+         tHW/wNuFtw4yVjAAbGnRsDgwVeF9kmkANHcq3eZDhR+MFQQBELVLlydolfdYJvoMIVkI
+         ixJGkQny9dWEIml1sjllX5Q7fZMXbNafZgm06ITm+9McS6D93oVLdWv3IvheRCLfa+vH
+         tZo7OmCGpTc8/+83Yji9lqTu/UoszlvUeIHI0BHogfNjvluD/P5EFP9iB28J4baPgioK
+         rdXg==
+X-Gm-Message-State: AOAM531DZOV9Oso7Yxo0YQw3t6SiQoMmFyliHM73gYaJF5iQFRo7jLSI
+        di80dUKi6P26F9i88mF5SNdnUBkBxu1f1t6Ah871Q3l5V4heQT+2ZA2mGCfErl2R5upcb+KngyA
+        uoPfh8PUWCcoZ4aWV9A==
+X-Received: by 2002:a5d:4f82:: with SMTP id d2mr3896510wru.345.1626162346314;
+        Tue, 13 Jul 2021 00:45:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzCWsmYfh0hjLY/M0FVKG9/E4Vh+zpZr2m1Ysr7LX2IDMssKj2c36kIzZD77QuB8ng/nRFXng==
+X-Received: by 2002:a5d:4f82:: with SMTP id d2mr3896486wru.345.1626162346098;
+        Tue, 13 Jul 2021 00:45:46 -0700 (PDT)
+Received: from thuth.remote.csb (pd9575fd2.dip0.t-ipconnect.de. [217.87.95.210])
+        by smtp.gmail.com with ESMTPSA id z17sm865725wrs.54.2021.07.13.00.45.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jul 2021 00:45:45 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RFC PATCH 2/5] scripts: Rename run_qemu_status ->
+ run_test_status
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
+        pbonzini@redhat.com, lvivier@redhat.com, kvm-ppc@vger.kernel.org,
+        david@redhat.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     andre.przywara@arm.com, maz@kernel.org, vivek.gautam@arm.com
+References: <20210702163122.96110-1-alexandru.elisei@arm.com>
+ <20210702163122.96110-3-alexandru.elisei@arm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <24f5629f-eff4-11b3-30a3-c6052f533ced@redhat.com>
+Date:   Tue, 13 Jul 2021 09:45:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: _n1yD522_VIXXL4NH187qiR5rhwLwcAE
-X-Proofpoint-GUID: _n1yD522_VIXXL4NH187qiR5rhwLwcAE
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-12_11:2021-07-12,2021-07-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- lowpriorityscore=0 malwarescore=0 impostorscore=0 bulkscore=0 phishscore=0
- suspectscore=0 mlxscore=0 adultscore=0 priorityscore=1501 spamscore=0
- mlxlogscore=700 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107120146
+In-Reply-To: <20210702163122.96110-3-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-The kvmppc_fix_ee_before_entry function sets the IRQ soft mask to
-IRQS_ENABLED. This function is called right before loading the guest
-FP and Altivec states at kvmppc_handle_exit. This triggers a
-WARN_ON(preemptible()) at enable_kernel_fp/altivec when running with
-CONFIG_PREEMPT_COUNT=y:
+On 02/07/2021 18.31, Alexandru Elisei wrote:
+> kvm-unit-tests will get support for running tests automatically under
+> kvmtool, rename the function to make it more generic.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>   scripts/arch-run.bash | 2 +-
+>   powerpc/run           | 2 +-
+>   s390x/run             | 2 +-
+>   3 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 5997e384019b..8ceed53ed7f8 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -69,7 +69,7 @@ run_qemu ()
+>   	return $ret
+>   }
+>   
+> -run_qemu_status ()
+> +run_test_status ()
+>   {
+>   	local stdout ret
+>   
+> diff --git a/powerpc/run b/powerpc/run
+> index 597ab96ed8a8..312576006504 100755
+> --- a/powerpc/run
+> +++ b/powerpc/run
+> @@ -31,4 +31,4 @@ command="$(migration_cmd) $(timeout_cmd) $command"
+>   # to fixup the fixup below by parsing the true exit code from the output.
+>   # The second fixup is also a FIXME, because once we add chr-testdev
+>   # support for powerpc, we won't need the second fixup.
+> -run_qemu_status $command "$@"
+> +run_test_status $command "$@"
+> diff --git a/s390x/run b/s390x/run
+> index c615caa1b772..5a4bb3bda805 100755
+> --- a/s390x/run
+> +++ b/s390x/run
+> @@ -28,4 +28,4 @@ command+=" -kernel"
+>   command="$(timeout_cmd) $command"
+>   
+>   # We return the exit code via stdout, not via the QEMU return code
+> -run_qemu_status $command "$@"
+> +run_test_status $command "$@"
+> 
 
-WARNING: CPU: 1 PID: 6585 at .enable_kernel_fp+0x30/0x78
-Modules linked in: r8153_ecm cdc_ether usbnet r8152 uio_pdrv_genirq uio
-CPU: 1 PID: 6585 Comm: qemu-system-ppc Tainted: G        W         5.12.10_e6500 #1
-NIP:  c000000000003ec0 LR: c00000000004fb00 CTR: 0000000000000004
-REGS: c0000000b38ab440 TRAP: 0700   Tainted: G        W          (5.12.10_e6500)
-MSR:  0000000082023002 <VEC,CE,FP,ME>  CR: 24000208  XER: 00000000
-IRQMASK: 0
-GPR00: c00000000004fb00 c0000000b38ab6e0 c000000001a4e300 c0000000b3878000
-GPR04: 0000000000000010 0000000080000003 0000000000000000 0000000000000000
-GPR08: 00000000fe662000 0000000000000001 0000000000000000 0000000000000001
-GPR12: 0000000024000208 c00000003ffff8c0 c0000000b3878000 c00000000183eb60
-GPR16: 0000000000000000 0000000000000000 c0000000020a8d80 0000000000000001
-GPR20: 0000000000000000 c000000001ab1a70 c0000000020a8d80 c0000000020a8d80
-GPR24: c00000000183ed48 c0000000017c8ec0 c00000000183eec0 c0000000000b80e0
-GPR28: 0000000000000000 00000000000b80e0 0000000000000000 c0000000b3878000
-NIP [c000000000003ec0] .enable_kernel_fp+0x30/0x78
-LR [c00000000004fb00] .kvmppc_load_guest_fp+0x2c/0x80
-Call Trace:
-[c0000000b38ab6e0] [c00000000183ed48] rcu_state+0x248/0x400 (unreliable)
-[c0000000b38ab750] [c00000000004fb00] .kvmppc_load_guest_fp+0x2c/0x80
-[c0000000b38ab7d0] [c000000000050f48] .kvmppc_handle_exit+0x5cc/0x5d8
-[c0000000b38ab870] [c000000000053e64] .kvmppc_resume_host+0xcc/0x120
-Instruction dump:
-7c0802a6 f8010010 f821ff91 e92d0658 81490000 39200000 2c0a0000 40c20014
-892d067a 552907fe 7d290034 5529d97e <0b090000> 38602000 4bfffe79 e86d0658
-
-I'm assuming this was an oversight while introducing the call to
-kvmppc_load_guest_fp and kvmppc_load_guest_altivec functions from
-kvmppc_handle_exit. So this patch moves kvmppc_fix_ee_before_entry to
-be again the last thing before exiting kvmppc_handle_exit.
-
-Compile tested only since I don't have a BookE machine.
-
-Fixes: 3efc7da61f6c ("KVM: PPC: Book3E: Increase FPU laziness")
-Fixes: 95d80a294b1e ("KVM: PPC: Book3e: Add AltiVec support")
-Reported-by: <mario@locati.it>
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- arch/powerpc/kvm/booke.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-index 551b30d84aee..38179c45eb90 100644
---- a/arch/powerpc/kvm/booke.c
-+++ b/arch/powerpc/kvm/booke.c
-@@ -1387,9 +1387,9 @@ int kvmppc_handle_exit(struct kvm_vcpu *vcpu, unsigned int exit_nr)
- 			r = (s << 2) | RESUME_HOST | (r & RESUME_FLAG_NV);
- 		else {
- 			/* interrupts now hard-disabled */
--			kvmppc_fix_ee_before_entry();
- 			kvmppc_load_guest_fp(vcpu);
- 			kvmppc_load_guest_altivec(vcpu);
-+			kvmppc_fix_ee_before_entry();
- 		}
- 	}
- 
--- 
-2.29.2
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
