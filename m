@@ -2,200 +2,206 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71F863C8490
-	for <lists+kvm-ppc@lfdr.de>; Wed, 14 Jul 2021 14:39:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D7DB3C93D6
+	for <lists+kvm-ppc@lfdr.de>; Thu, 15 Jul 2021 00:30:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231296AbhGNMmK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 14 Jul 2021 08:42:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35904 "EHLO
+        id S231452AbhGNWda (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 14 Jul 2021 18:33:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231260AbhGNMmK (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 14 Jul 2021 08:42:10 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32B68C06175F
-        for <kvm-ppc@vger.kernel.org>; Wed, 14 Jul 2021 05:39:18 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id 21so1928281pfp.3
-        for <kvm-ppc@vger.kernel.org>; Wed, 14 Jul 2021 05:39:18 -0700 (PDT)
+        with ESMTP id S229666AbhGNWda (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 14 Jul 2021 18:33:30 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 339E1C06175F
+        for <kvm-ppc@vger.kernel.org>; Wed, 14 Jul 2021 15:30:37 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id k9-20020a63d1090000b029021091ebb84cso2743517pgg.3
+        for <kvm-ppc@vger.kernel.org>; Wed, 14 Jul 2021 15:30:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=CcE+Luj/vv/V9B2PLHGUjgVkPHIzTSDrQQ8UogdtXTQ=;
-        b=p5dD5XXDZHRJk9wNY1G2FJHL1zK8j6XM9IyZklLNPZrOKmeVrSSwqHIffMU/yUYcFY
-         mPPlLuWRYiBQXQvI9VsB2yENJE2gyvccBNJVSkVa/EhYTtPbJU1RyqQwZkNQ2XIDvRbV
-         R4fq1hfz9MC1IGUNdABnQLdIPtfm/FURcVTyOXGcsCXAnSxC9LjfHunatiifHCKBL9hL
-         CD8NgQ3fLZWV/fw2WH898c9tmyZAo9ulyJ4KPoKUaaBhgdsMv8WJIBdS0lLQZl5dVzg5
-         95w2fWbxUfrjHg0pA17xuC2/RAQQ7Gy4Dt+kTP9D7GQf/rTCuY3yQVADK4ORkh65hOsx
-         ZD/w==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=jwZyKgEyFHw7odR1lKuyWoewoH8FOXUOrffsYnBC1i4=;
+        b=Xvm8fxL0GGwJBL20WyS485xoOB1+7c2NEjbq+Gwz923kTxe10cr1+JhexBR7DyYL0F
+         XeOuwIGFg1fHOq27J1mNFvpQv9qd1FdBHWQUWRSkz2qiJAWXWfSanW6bl2SROfDmmVv0
+         NzYYuBsQU1388A4z7U1jH9NVgOt+AxcsYkSkBkXHHc+27QNxzvc3gE6+ckJEXVrjPDbf
+         E3Gifq5Fo8EPTQNW+WZIPn/KvfYh2M48zORSvQXrhZxODY/VQNxkHDILe6KQrXMLbiuR
+         TG89yxaKNjnXerg3sdEzzhUOQsNRAYQlkhfdnGNN/QzcBraiwUo0v6MPMHKc6At3SZRO
+         XHXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=CcE+Luj/vv/V9B2PLHGUjgVkPHIzTSDrQQ8UogdtXTQ=;
-        b=b0oZ8MjjYEXSQIqCpUarPS7gqWgB1gXQbF7lUiLI6Vz1kMZMv7Ht6T0+Kg20HKGpZ+
-         iwh9u1yq0G8JGqNFi79xYWawXUr76sYVWN3fTgDFffyrC0CM8s8gI/zCSHGPCkB3L7rt
-         z97nZKEtzkWvZm64I0e1ZQYfPgPWrUbCV/53Ehy3BbsHdsDbatNMRdzE+KoUmv0QbHb6
-         0JiPWUrpJlctkBXz8RYrEwhU7qfWfWRX0TA1jWi4y1fDQWCtq25K1Y0g8Il3Uv7FPLUL
-         ogEbsX4zfuUs/Js+coKawL1Bav563VNuxJK8rCg9TGU6OrcJemwKK5AGpqhabZKGS7ig
-         vyfw==
-X-Gm-Message-State: AOAM530fyM2Jlh1u3x9HxSQ00kbYVjd+SuPwvQzcQzQ8FY06jB4EbEk9
-        2HB5aP5Nz74u/JzAdyQng+Y=
-X-Google-Smtp-Source: ABdhPJxv6MQHKHvwgfoIYB8aLfts4eY7yrOWP+bvZXtUWdqEnXg9lYfZUPgLWChgov+mcoBv7EeHvQ==
-X-Received: by 2002:a63:4415:: with SMTP id r21mr9475016pga.296.1626266357721;
-        Wed, 14 Jul 2021 05:39:17 -0700 (PDT)
-Received: from localhost (203-219-181-43.static.tpgi.com.au. [203.219.181.43])
-        by smtp.gmail.com with ESMTPSA id c11sm2932977pfp.0.2021.07.14.05.39.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jul 2021 05:39:17 -0700 (PDT)
-Date:   Wed, 14 Jul 2021 22:39:11 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [RFC PATCH 10/43] powerpc/64s: Always set PMU control registers
- to frozen/disabled when not in use
-To:     Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-References: <20210622105736.633352-1-npiggin@gmail.com>
-        <20210622105736.633352-11-npiggin@gmail.com>
-        <C58A063A-3B5D-4188-80E2-4C19802785BF@linux.vnet.ibm.com>
-        <1626057462.8m12ralsd6.astroid@bobo.none>
-In-Reply-To: <1626057462.8m12ralsd6.astroid@bobo.none>
-MIME-Version: 1.0
-Message-Id: <1626265929.asca0gyunh.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=jwZyKgEyFHw7odR1lKuyWoewoH8FOXUOrffsYnBC1i4=;
+        b=pDv4/dCijlbB8lRtZXen0yoYdgDE2JMV75hrXFzEHZO+DdGjsvn+dv1QrbfftylX8r
+         eriXTEkoix0dvZEKSML5Pcuku61O2vjokFg3IqCi1761zCwHi0FPc8ynk5/lGls2dSaY
+         w2MjaaKYfhV5u/NsQUOA5UpkfuB2B66sYxXMoRkZuB6aDS/grXxLI0N9QmxQLMGPaIHs
+         ZRovu2bhtc2rAj1tGXozbiJRJBW6kFEJHpAOyeq9xYQnlOKS+Atf937VQlcj/CACq+aX
+         oA9k9XtwtB5imCkS3L3rKAuh8wb568p2aU+CF6v9ysxF10CvRHObq9eN3J71qQ2uzwvs
+         V4jQ==
+X-Gm-Message-State: AOAM533QbMTGJCOTD1TXOH4L/vOu3n/alIiGhITrTQglFMScX2hsIN+8
+        QFYC2YP+HxIG78u+tilyW/P4pifKVC9N1J7qOg==
+X-Google-Smtp-Source: ABdhPJyFAIygTG5ek/sFodkqHxJtxKxSgddqqiVlm9ttbyBiM9KMTxUHVmWKjAj8j/CjmwG/X3kV089xb6Qz94ODbA==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:aa7:9ae4:0:b029:32e:b1:78e8 with SMTP
+ id y4-20020aa79ae40000b029032e00b178e8mr467432pfp.46.1626301836550; Wed, 14
+ Jul 2021 15:30:36 -0700 (PDT)
+Date:   Wed, 14 Jul 2021 22:30:27 +0000
+Message-Id: <20210714223033.742261-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
+Subject: [PATCH v2 0/6] Linear and Logarithmic histogram statistics
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        David Matlack <dmatlack@google.com>
+Cc:     Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Nicholas Piggin's message of July 12, 2021 12:41 pm:
-> Excerpts from Athira Rajeev's message of July 10, 2021 12:50 pm:
->>=20
->>=20
->>> On 22-Jun-2021, at 4:27 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
->>>=20
->>> KVM PMU management code looks for particular frozen/disabled bits in
->>> the PMU registers so it knows whether it must clear them when coming
->>> out of a guest or not. Setting this up helps KVM make these optimisatio=
-ns
->>> without getting confused. Longer term the better approach might be to
->>> move guest/host PMU switching to the perf subsystem.
->>>=20
->>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->>> ---
->>> arch/powerpc/kernel/cpu_setup_power.c | 4 ++--
->>> arch/powerpc/kernel/dt_cpu_ftrs.c     | 6 +++---
->>> arch/powerpc/kvm/book3s_hv.c          | 5 +++++
->>> arch/powerpc/perf/core-book3s.c       | 7 +++++++
->>> 4 files changed, 17 insertions(+), 5 deletions(-)
->>>=20
->>> diff --git a/arch/powerpc/kernel/cpu_setup_power.c b/arch/powerpc/kerne=
-l/cpu_setup_power.c
->>> index a29dc8326622..3dc61e203f37 100644
->>> --- a/arch/powerpc/kernel/cpu_setup_power.c
->>> +++ b/arch/powerpc/kernel/cpu_setup_power.c
->>> @@ -109,7 +109,7 @@ static void init_PMU_HV_ISA207(void)
->>> static void init_PMU(void)
->>> {
->>> 	mtspr(SPRN_MMCRA, 0);
->>> -	mtspr(SPRN_MMCR0, 0);
->>> +	mtspr(SPRN_MMCR0, MMCR0_FC);
->>> 	mtspr(SPRN_MMCR1, 0);
->>> 	mtspr(SPRN_MMCR2, 0);
->>> }
->>> @@ -123,7 +123,7 @@ static void init_PMU_ISA31(void)
->>> {
->>> 	mtspr(SPRN_MMCR3, 0);
->>> 	mtspr(SPRN_MMCRA, MMCRA_BHRB_DISABLE);
->>> -	mtspr(SPRN_MMCR0, MMCR0_PMCCEXT);
->>> +	mtspr(SPRN_MMCR0, MMCR0_FC | MMCR0_PMCCEXT);
->>> }
->>>=20
->>> /*
->>> diff --git a/arch/powerpc/kernel/dt_cpu_ftrs.c b/arch/powerpc/kernel/dt=
-_cpu_ftrs.c
->>> index 0a6b36b4bda8..06a089fbeaa7 100644
->>> --- a/arch/powerpc/kernel/dt_cpu_ftrs.c
->>> +++ b/arch/powerpc/kernel/dt_cpu_ftrs.c
->>> @@ -353,7 +353,7 @@ static void init_pmu_power8(void)
->>> 	}
->>>=20
->>> 	mtspr(SPRN_MMCRA, 0);
->>> -	mtspr(SPRN_MMCR0, 0);
->>> +	mtspr(SPRN_MMCR0, MMCR0_FC);
->>> 	mtspr(SPRN_MMCR1, 0);
->>> 	mtspr(SPRN_MMCR2, 0);
->>> 	mtspr(SPRN_MMCRS, 0);
->>> @@ -392,7 +392,7 @@ static void init_pmu_power9(void)
->>> 		mtspr(SPRN_MMCRC, 0);
->>>=20
->>> 	mtspr(SPRN_MMCRA, 0);
->>> -	mtspr(SPRN_MMCR0, 0);
->>> +	mtspr(SPRN_MMCR0, MMCR0_FC);
->>> 	mtspr(SPRN_MMCR1, 0);
->>> 	mtspr(SPRN_MMCR2, 0);
->>> }
->>> @@ -428,7 +428,7 @@ static void init_pmu_power10(void)
->>>=20
->>> 	mtspr(SPRN_MMCR3, 0);
->>> 	mtspr(SPRN_MMCRA, MMCRA_BHRB_DISABLE);
->>> -	mtspr(SPRN_MMCR0, MMCR0_PMCCEXT);
->>> +	mtspr(SPRN_MMCR0, MMCR0_FC | MMCR0_PMCCEXT);
->>> }
->>>=20
->>> static int __init feat_enable_pmu_power10(struct dt_cpu_feature *f)
->>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.=
-c
->>> index 1f30f98b09d1..f7349d150828 100644
->>> --- a/arch/powerpc/kvm/book3s_hv.c
->>> +++ b/arch/powerpc/kvm/book3s_hv.c
->>> @@ -2593,6 +2593,11 @@ static int kvmppc_core_vcpu_create_hv(struct kvm=
-_vcpu *vcpu)
->>> #endif
->>> #endif
->>> 	vcpu->arch.mmcr[0] =3D MMCR0_FC;
->>> +	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
->>> +		vcpu->arch.mmcr[0] |=3D MMCR0_PMCCEXT;
->>> +		vcpu->arch.mmcra =3D MMCRA_BHRB_DISABLE;
->>> +	}
->>> +
->>> 	vcpu->arch.ctrl =3D CTRL_RUNLATCH;
->>> 	/* default to host PVR, since we can't spoof it */
->>> 	kvmppc_set_pvr_hv(vcpu, mfspr(SPRN_PVR));
->>> diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-b=
-ook3s.c
->>> index 51622411a7cc..e33b29ec1a65 100644
->>> --- a/arch/powerpc/perf/core-book3s.c
->>> +++ b/arch/powerpc/perf/core-book3s.c
->>> @@ -1361,6 +1361,13 @@ static void power_pmu_enable(struct pmu *pmu)
->>> 		goto out;
->>>=20
->>> 	if (cpuhw->n_events =3D=3D 0) {
->>> +		if (cpu_has_feature(CPU_FTR_ARCH_31)) {
->>> +			mtspr(SPRN_MMCRA, MMCRA_BHRB_DISABLE);
->>> +			mtspr(SPRN_MMCR0, MMCR0_FC | MMCR0_PMCCEXT);
->>> +		} else {
->>> +			mtspr(SPRN_MMCRA, 0);
->>> +			mtspr(SPRN_MMCR0, MMCR0_FC);
->>> +		}
->>=20
->>=20
->> Hi Nick,
->>=20
->> We are setting these bits in =E2=80=9Cpower_pmu_disable=E2=80=9D functio=
-n. And disable will be called before any event gets deleted/stopped. Can yo=
-u please help to understand why this is needed in power_pmu_enable path als=
-o ?
->=20
-> I'll have to go back and check what I needed it for.
+This patchset adds linear and logarithmic histogram stats support and extend
+some halt polling stats with histogram.
+Histogram stats is very useful when we need to know the distribution of some
+latencies or any other stuff like used memory size, huge page size, etc.
+Below is a snapshot for three logarithmic histogram stats added in this
+patchset. halt_poll_success_hist shows the distribution of wait time before a
+success polling. halt_poll_fail_hist shows the distribution of wait time before
+a fail polling. halt_wait_hist shows the distribution of wait time of a VCPU
+spending on wait after it is halted. The halt polling parameters is halt_poll_ns
+= 500000, halt_poll_ns_grow = 2, halt_poll_ns_grow_start = 10000,
+halt_poll_ns_shrink = 2;
+From the snapshot, not only we can get an intuitive overview of those latencies,
+but also we can tune the polling parameters based on this; For example, it shows
+that about 80% of successful polling is less than 132000 nanoseconds from
+halt_poll_success_hist, then it might be a good option to set halt_poll_ns as
+132000 instead of 500000.
 
-Okay, MMCRA is getting MMCRA_SDAR_MODE_DCACHE set on POWER9, by the looks.
+halt_poll_success_hist:
+Range		Bucket Value	Percent     Cumulative Percent
+[0, 1)		 0		 0.000%      0.000%
+[1, 2)		 0		 0.000%      0.000%
+[2, 4)		 0		 0.000%      0.000%
+[4, 8)		 0		 0.000%      0.000%
+[8, 16)		 0		 0.000%      0.000%
+[16, 32)	 0		 0.000%      0.000%
+[32, 64)	 0		 0.000%      0.000%
+[64, 128)	 0		 0.000%      0.000%
+[128, 256)	 3		 0.093%      0.093%
+[256, 512)	 21		 0.650%      0.743%
+[512, 1024)	 43		 1.330%      2.073%
+[1024, 2048)	 279		 8.632%      10.705%
+[2048, 4096)	 253		 7.828%      18.533%
+[4096, 8192)	 595		 18.410%     36.943%
+[8192, 16384)	 274		 8.478%      45.421%
+[16384, 32768)	 351		 10.860%     56.281%
+[32768, 65536)	 343		 10.613%     66.894%
+[65536, 131072)  421		 13.026%     79.920%
+[131072, 262144) 459		 14.202%     94.121%
+[262144, 524288) 190		 5.879%      100.000%
 
-That's not necessarily a problem, but KVM sets MMCRA to 0 to disable
-SDAR updates. So KVM and perf don't agree on what the "correct" value
-for disabled is. Which could be a problem with POWER10 not setting BHRB
-disable before my series.
 
-I'll get rid of this hunk for now, I expect things won't be exactly clean
-or consistent until the KVM host PMU code is moved into perf/ though.
+halt_poll_fail_hist:
+Range		Bucket Value	Percent     Cumulative Percent
+[0, 1)		 0		 0.000%      0.000%
+[1, 2)		 0		 0.000%      0.000%
+[2, 4)		 0		 0.000%      0.000%
+[4, 8)		 0		 0.000%      0.000%
+[8, 16)		 0		 0.000%      0.000%
+[16, 32)	 0		 0.000%      0.000%
+[32, 64)	 0		 0.000%      0.000%
+[64, 128)	 21		 0.529%      0.529%
+[128, 256)	 398		 10.020%     10.549%
+[256, 512)	 613		 15.433%     25.982%
+[512, 1024)	 437		 11.002%     36.984%
+[1024, 2048)	 264		 6.647%      43.630%
+[2048, 4096)	 302		 7.603%      51.234%
+[4096, 8192)	 350		 8.812%      60.045%
+[8192, 16384)	 488		 12.286%     72.331%
+[16384, 32768)	 258		 6.495%      78.827%
+[32768, 65536)	 227		 5.715%      84.542%
+[65536, 131072)  232		 5.841%      90.383%
+[131072, 262144) 246		 6.193%      96.576%
+[262144, 524288) 136		 3.424%      100.000%
 
-Thanks,
-Nick
+
+halt_wait_hist:
+Range			    Bucket Value    Percent	Cumulative Percent
+[0, 1)			     0		     0.000%	 0.000%
+[1, 2)			     0		     0.000%	 0.000%
+[2, 4)			     0		     0.000%	 0.000%
+[4, 8)			     0		     0.000%	 0.000%
+[8, 16)			     0		     0.000%	 0.000%
+[16, 32)		     0		     0.000%	 0.000%
+[32, 64)		     0		     0.000%	 0.000%
+[64, 128)		     0		     0.000%	 0.000%
+[128, 256)		     0		     0.000%	 0.000%
+[256, 512)		     0		     0.000%	 0.000%
+[512, 1024)		     0		     0.000%	 0.000%
+[1024, 2048)		     0		     0.000%	 0.000%
+[2048, 4096)		     7		     0.127%	 0.127%
+[4096, 8192)		     37		     0.671%	 0.798%
+[8192, 16384)		     69		     1.251%	 2.049%
+[16384, 32768)		     94		     1.704%	 3.753%
+[32768, 65536)		     150	     2.719%	 6.472%
+[65536, 131072)		     233	     4.224%	 10.696%
+[131072, 262144)	     276	     5.004%	 15.700%
+[262144, 524288)	     236	     4.278%	 19.978%
+[524288, 1.04858e+06)	     176	     3.191%	 23.169%
+[1.04858e+06, 2.09715e+06)   94		     16.207%	 39.376%
+[2.09715e+06, 4.1943e+06)    1667	     30.221%	 69.598%
+[4.1943e+06, 8.38861e+06)    825	     14.956%	 84.554%
+[8.38861e+06, 1.67772e+07)   111	     2.012%	 86.566%
+[1.67772e+07, 3.35544e+07)   76		     1.378%	 87.944%
+[3.35544e+07, 6.71089e+07)   65		     1.178%	 89.123%
+[6.71089e+07, 1.34218e+08)   161	     2.919%	 92.041%
+[1.34218e+08, 2.68435e+08)   250	     4.532%	 96.574%
+[2.68435e+08, 5.36871e+08)   188	     3.408%	 99.982%
+[5.36871e+08, 1.07374e+09)   1		     0.018%	 100.000%
+
+---
+
+* v1 -> v2
+  - Rebase to kvm/queue, commit 1889228d80fe
+    (KVM: selftests: smm_test: Test SMM enter from L2)
+  - Break some changes to separate commits
+  - Fix u64 division issue Reported-by: kernel test robot <lkp@intel.com>
+  - Address a bunch of comments by David Matlack <dmatlack@google.com>
+
+[1] https://lore.kernel.org/kvm/20210706180350.2838127-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (6):
+  KVM: stats: Add capability description for KVM binary stats
+  KVM: stats: Support linear and logarithmic histogram statistics
+  KVM: stats: Update doc for histogram statistics
+  KVM: selftests: Add checks for histogram stats bucket_size field
+  KVM: stats: Add halt_wait_ns stats for all architectures
+  KVM: stats: Add halt polling related histogram stats
+
+ Documentation/virt/kvm/api.rst                | 36 ++++++++--
+ arch/arm64/kvm/guest.c                        |  4 --
+ arch/mips/kvm/mips.c                          |  4 --
+ arch/powerpc/include/asm/kvm_host.h           |  1 -
+ arch/powerpc/kvm/book3s.c                     |  5 --
+ arch/powerpc/kvm/book3s_hv.c                  | 18 ++++-
+ arch/powerpc/kvm/booke.c                      |  5 --
+ arch/s390/kvm/kvm-s390.c                      |  4 --
+ arch/x86/kvm/x86.c                            |  4 --
+ include/linux/kvm_host.h                      | 67 ++++++++++++++-----
+ include/linux/kvm_types.h                     | 21 ++++++
+ include/uapi/linux/kvm.h                      | 11 +--
+ .../selftests/kvm/kvm_binary_stats_test.c     | 12 ++++
+ virt/kvm/binary_stats.c                       | 32 +++++++++
+ virt/kvm/kvm_main.c                           | 16 +++++
+ 15 files changed, 186 insertions(+), 54 deletions(-)
+
+
+base-commit: 1889228d80fe3060d3b0bcb6d0f968ab33cce0df
+-- 
+2.32.0.402.g57bb445576-goog
+
