@@ -2,76 +2,264 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E96DA3CA404
-	for <lists+kvm-ppc@lfdr.de>; Thu, 15 Jul 2021 19:25:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C8C83CAD0E
+	for <lists+kvm-ppc@lfdr.de>; Thu, 15 Jul 2021 21:51:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234575AbhGOR1y (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 15 Jul 2021 13:27:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37158 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234635AbhGOR1x (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 15 Jul 2021 13:27:53 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F9DC0613E2
-        for <kvm-ppc@vger.kernel.org>; Thu, 15 Jul 2021 10:24:59 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id t2so8834155edd.13
-        for <kvm-ppc@vger.kernel.org>; Thu, 15 Jul 2021 10:24:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=Ibb5KNEw1DKqJEg9n4gJy5KnzVasBofn6QaWYsu9UCQ=;
-        b=t9W6ZUbHNRJ0qNSUPxxJ7rwyS6/T47LB8+GEvcGcZS2vgBILYApln75Pntcxn5fpNm
-         CtF83dHhK1sI0unp5//UIaTiWHKSRWhdzbLUXmwOWE0siga3uT7o6KbbqJLCuXISRJEQ
-         al8pRwAY03/IaxE3qXnt42v0CTRaHD2tppbU0LS/FZIzL8IxPeIaPJ1YZkyHqWZX3beM
-         4+xYQxqDDYwD9dyjX1Mc60oWXcAcZdalOCke9n3oDr1w+I8lJlufH05RbTPxRhFGiMAD
-         BpEH+2hcDtItf0cKj4UhyaFm0jsA0qnOxoGC5g15c9fNdeV0dFm2Efrq/yuK05wZR73f
-         O6jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=Ibb5KNEw1DKqJEg9n4gJy5KnzVasBofn6QaWYsu9UCQ=;
-        b=n2t+IVWgKm917wzP6RQ1gqNFRf5mII9LUT9rOiwzHO6FaY5s+Rwihjs70/9lkLdpnv
-         KWhBLUmxL5PTmleseC0S7sAbqOY2sCtXQVYuYgiiFbGzGBuP4mx+bF7/cZCsxI20rCdy
-         gU2/qluLZae/nsa/FzIsmchJwS8F05BqLakLZ6t7+G5KUaFvUht78YXUONT8XUAK1D0i
-         nVIziXHHniEvXW7eb1zktq6U0Xf+Ud/J57ZmIAlE8uiMGikn5QvK65vcpE4nJkQGWGdZ
-         WS1mmnwE5kuCMJk6lRqTZ+FXzj/0ir2xEHCJ8/M9gO7AevDPSNVv8k2Xzh78eknWZ40t
-         LzpQ==
-X-Gm-Message-State: AOAM530X/XX5nzaIW9KTwjNIXyfeNOxNxwv6uexDFBeIlKO/FEHjrqDC
-        ibpVa93kpu8G+nQyVxCktpNxOqxZmIBUBJMAarU=
-X-Google-Smtp-Source: ABdhPJyxueRlfHltyUCESR67vWAXcLtdouVP7pOna84WJs+57H00WkQ1yY0EfL0teWyNwd8lnwpCvuhD/ZS2cFmHFwA=
-X-Received: by 2002:a50:9faf:: with SMTP id c44mr8582001edf.197.1626369898073;
- Thu, 15 Jul 2021 10:24:58 -0700 (PDT)
+        id S1343507AbhGOTwp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 15 Jul 2021 15:52:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36318 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345045AbhGOTuB (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 15 Jul 2021 15:50:01 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16FJY0HO033239;
+        Thu, 15 Jul 2021 15:46:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : subject :
+ in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=DO+E8NiV2Y5oW7QZ1cVyK9xrKfnb/pFaXLa+lGNYbfI=;
+ b=ajQRYxjhOB1LyvJZeWZiSEkLSovy+jqpMmBVab/BTyyBjdyl1MK7geBqClS7RaCuZNaI
+ 4KU7SwjizXF0upIpMzwMPoGWwbMBVDTFk5lH5gvm1ocV5PJKVNVNum0U3bh1/xJmoVyi
+ 79oSy1uhemyJDuhCWcffT11m7FqLSvO/s7y1Kph1jMx/PHcNXwNGe5BgEinHk87P6I1q
+ etqArucujXwmtfLDLL+86AM3t7KL3+Ar/y6Jpz1NEdcwTf8XkxwiLxb82dAwwRNKS4XB
+ T3oyz5cJVjY6eA5XPI6gpbhKZ9wavkAdePlJLnF+aqXMORvo/lNbC9MGg1MKgKPrJp7F 7A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39sug0r03x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Jul 2021 15:46:44 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16FJYpir038850;
+        Thu, 15 Jul 2021 15:46:44 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39sug0r033-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Jul 2021 15:46:44 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16FJbgcA015476;
+        Thu, 15 Jul 2021 19:46:42 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma01wdc.us.ibm.com with ESMTP id 39q36dn2w9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Jul 2021 19:46:42 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16FJkgUR38863288
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Jul 2021 19:46:42 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2EDE2AE067;
+        Thu, 15 Jul 2021 19:46:42 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5306BAE06D;
+        Thu, 15 Jul 2021 19:46:41 +0000 (GMT)
+Received: from localhost (unknown [9.211.106.233])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Thu, 15 Jul 2021 19:46:40 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Pratik Sampat <psampat@linux.ibm.com>, mpe@ellerman.id.au,
+        benh@kernel.crashing.org, paulus@samba.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pratik.r.sampat@gmail.com
+Subject: Re: [PATCH v3 1/1] powerpc/pseries: Interface to represent PAPR
+ firmware attributes
+In-Reply-To: <60575876-b15d-6dee-dbb7-c68b9e304557@linux.ibm.com>
+References: <20210712105140.33388-1-psampat@linux.ibm.com>
+ <20210712105140.33388-2-psampat@linux.ibm.com>
+ <87lf6bo7v0.fsf@linux.ibm.com>
+ <60575876-b15d-6dee-dbb7-c68b9e304557@linux.ibm.com>
+Date:   Thu, 15 Jul 2021 16:46:38 -0300
+Message-ID: <87lf672wdd.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Received: by 2002:a54:2dcd:0:0:0:0:0 with HTTP; Thu, 15 Jul 2021 10:24:57
- -0700 (PDT)
-Reply-To: faty.muhamad@gmail.com
-From:   Fatima Muhammad <matinscott.chambers@gmail.com>
-Date:   Thu, 15 Jul 2021 17:24:57 +0000
-Message-ID: <CAG26VvVWiHB2u8iO1e8bETcuSekW3UnVoiXKLwNZ2yh0MOiBWw@mail.gmail.com>
-Subject: Hello Dear
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: a0bNXcy2J-n-XNiwByW7QrGsv_iNqiU_
+X-Proofpoint-ORIG-GUID: mrYjsOkyQ-E4RBvzf5ieZGQ7m4OaIkVv
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-15_14:2021-07-14,2021-07-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ adultscore=0 phishscore=0 priorityscore=1501 impostorscore=0
+ suspectscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107150132
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hello Dear,
+Pratik Sampat <psampat@linux.ibm.com> writes:
 
-My name is Ms.Fatima Muhammad., Please forgive me for stressing you
-with my predicaments and I sorry to approach you through this media
-because is serves the fastest means of  my communication right now,
+> Hello,
+>
+> On 12/07/21 9:13 pm, Fabiano Rosas wrote:
+>> "Pratik R. Sampat" <psampat@linux.ibm.com> writes:
+>>
+>> Hi, have you seen Documentation/core-api/kobject.rst, particularly the
+>> part that says:
+>>
+>> "When you see a sysfs directory full of other directories, generally each
+>>     of those directories corresponds to a kobject in the same kset."
+>>
+>> Taking a look at samples/kobject/kset-example.c, it seems to provide an
+>> overall structure that is closer to what other modules do when creating
+>> sysfs entries. It uses less dynamic allocations and deals a bit better
+>> with cleaning up the state afterwards.
+>>
+> Thank you for pointing me towards this example, the kset approach is
+> interesting and the example indeed does handle cleanups better.
+>
+> Currently, we use "machine_device_initcall()" to register this
+> functionality, do you suggest I convert this into a tristate module
+> instead where I can include a "module_exit" for cleanups?
 
-I came across your Email from my personal search and I decided to
-contact you believing you will be honest to fulfill my business
-proposal which I believe that will be a very good opportunity for both
-of us. Please it is my pleasure to contact you today for a business
-partnership investments projects worth $4.6 million USD which I intend
-to establish in your country..
+Ugh.. I was hoping we could get away with having all cleanups done at
+kobject release time. But now I see that it is not called unless we
+decrement the reference count. Nevermind then.
 
-Pls If this business proposal offends your moral and ethic values do
-accept my apology. therefore kindly contact me immediately if you are
-interested for more details.
+>>> +	ret = plpar_hcall_norets(H_GET_ENERGY_SCALE_INFO, ESI_FLAGS_ALL, 0,
+>>> +				 virt_to_phys(esi_buf), MAX_BUF_SZ);
+>>> +	esi_hdr = (struct h_energy_scale_info_hdr *) esi_buf;
+>>> +	if (ret != H_SUCCESS || esi_hdr->data_header_version != ESI_VERSION) {
+>> I really dislike this. If you want to bail due to version change, then
+>> at least include in the ABI document that we might not give the
+>> userspace any data at all.
+>
+> My only concern for having a version check is that, the attribute list
+> can change as well as the attributes itself may change.
+> If that is the case, then in a newer version if we do not bail out we
+> may parse data into our structs incorrectly.
 
-Thank you for your wiliness to help me
-Yours Sincerely Fatima Muhammad
+Sure, that is a valid concern. But the documentation for the header
+version field says:
+
+  "Version of the Header. The header will be always backward compatible,
+  and changes will not impact the Array of attributes. Current version =
+  0x01"
+
+I guess this is a bit vague still, but I understood that:
+
+1- header elements continue to exist at the same position;
+2- the format of the array of attributes will not change.
+
+Are you saying that my interpretation above is not correct or that you
+don't trust the HV to enforce it?
+
+> My argument only hinges on that we should likely give no data at all
+> instead of junk or incorrect data.
+
+I agree. I just don't think it would be possible to end up with
+incorrect data, unless the HV has a bug.
+
+> Maybe I could make this check after the return check and give out a
+> version mismatch message like the following?
+> pr_warn("hcall failed: H_GET_ENERGY_SCALE_INFO VER MISMATCH - EXP: 0x%x, REC: 0x%x",
+>          ESI_VERSION, esi_hdr->data_header_version);
+
+Yes, this will help with debug if we ever end up in this situation.
+
+>>> +		pr_warn("hcall failed: H_GET_ENERGY_SCALE_INFO");
+>>> +		goto out;
+>>> +	}
+>>> +
+>>> +	num_attrs = be64_to_cpu(esi_hdr->num_attrs);
+>>> +	/*
+>>> +	 * Typecast the energy buffer to the attribute structure at the offset
+>>> +	 * specified in the buffer
+>>> +	 */
+>> I think the code is now simple enough that this comment could be
+>> removed.
+>
+> ack
+>
+>>> +	esi_attrs = (struct energy_scale_attribute *)
+>>> +		    (esi_buf + be64_to_cpu(esi_hdr->array_offset));
+>>> +
+>>> +	pgs = kcalloc(num_attrs, sizeof(*pgs), GFP_KERNEL);
+>> This is never freed.
+>>
+>>> +	if (!pgs)
+>>> +		goto out_pgs;
+>>> +
+>>> +	papr_kobj = kobject_create_and_add("papr", firmware_kobj);
+>>> +	if (!papr_kobj) {
+>>> +		pr_warn("kobject_create_and_add papr failed\n");
+>>> +		goto out_kobj;
+>>> +	}
+>>> +
+>>> +	esi_kobj = kobject_create_and_add("energy_scale_info", papr_kobj);
+>>> +	if (!esi_kobj) {
+>>> +		pr_warn("kobject_create_and_add energy_scale_info failed\n");
+>>> +		goto out_ekobj;
+>>> +	}
+>>> +
+>>> +	for (idx = 0; idx < num_attrs; idx++) {
+>>> +		char buf[4];
+>>> +		bool show_val_desc = true;
+>>> +
+>>> +		pgs[idx].pgattrs = kcalloc(MAX_ATTRS,
+>>> +					   sizeof(*pgs[idx].pgattrs),
+>>> +					   GFP_KERNEL);
+>>> +		if (!pgs[idx].pgattrs)
+>>> +			goto out_kobj;
+>>> +
+>>> +		pgs[idx].pg.attrs = kcalloc(MAX_ATTRS + 1,
+>>> +					    sizeof(*pgs[idx].pg.attrs),
+>>> +					    GFP_KERNEL);
+>> I think the kobject code expects this to be statically allocated, so
+>> you'd need to override the release function in some way to be able to
+>> free this.
+>
+> Right this and pgs both are never free'd because my understanding was
+> that as this functionality is invoked from machine_init, I'd expect it
+> to stay until shutdown.
+
+Yep, I thought the kset code would improve this, but I misread it. So
+I'm fine with keeping it like this.
+
+> However, if you believe that a module approach is cleaner, I can change
+> my implementation to accommodate for that and also include a
+> module_exit for cleanup of the above allocations
+>>> +		if (!pgs[idx].pg.attrs) {
+>>> +			kfree(pgs[idx].pgattrs);
+>>> +			goto out_kobj;
+>>> +		}
+>>> +
+>>> +		sprintf(buf, "%lld", be64_to_cpu(esi_attrs[idx].id));
+>> Do you mean pgs[idx].name instead of buf? Otherwise you're passing this
+>> stack allocated 'buf' to another function.
+>>
+> Yes you're right I should have either passed the pg struct or I should
+> have used strcpy, here the stack allocated buffer is being taken out of
+> scope which is incorrect.
+> Thanks for pointing this out!
+>
+>>> +		pgs[idx].pg.name = buf;
+>>> +
+>>> +		/* Do not add the value description if it does not exist */
+>>> +		if (strlen(esi_attrs[idx].value_desc) == 0)
+>>> +			show_val_desc = false;
+>>> +
+>>> +		if (add_attr_group(be64_to_cpu(esi_attrs[idx].id),
+>>> +				   MAX_ATTRS, &pgs[idx], show_val_desc)) {
+>>> +			pr_warn("Failed to create papr attribute group %s\n",
+>>> +				pgs[idx].pg.name);
+>>> +			goto out_pgattrs;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +
+>>> +out_pgattrs:
+>>> +	for (i = 0; i < MAX_ATTRS; i++) {
+>>> +		kfree(pgs[i].pgattrs);
+>>> +		kfree(pgs[i].pg.attrs);
+>>> +	}
+>>> +out_ekobj:
+>>> +	kobject_put(esi_kobj);
+>>> +out_kobj:
+>>> +	kobject_put(papr_kobj);
+>>> +out_pgs:
+>>> +	kfree(pgs);
+>>> +out:
+>>> +	kfree(esi_buf);
+>>> +
+>>> +	return -ENOMEM;
+>>> +}
+>>> +
+>>> +machine_device_initcall(pseries, papr_init);
