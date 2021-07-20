@@ -2,162 +2,172 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 111673CEF6A
-	for <lists+kvm-ppc@lfdr.de>; Tue, 20 Jul 2021 00:55:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63E513CF3D5
+	for <lists+kvm-ppc@lfdr.de>; Tue, 20 Jul 2021 07:08:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359796AbhGSVwv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 19 Jul 2021 17:52:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6102 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1384463AbhGSS3g (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 19 Jul 2021 14:29:36 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16JJ3bEa085866;
-        Mon, 19 Jul 2021 15:09:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : subject :
- in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=yffuskbZjbkCSggQOcBqBaCblBD0NP0nsAkyxMQzvig=;
- b=hQktzIsOhHBCzqFmjJRXb6M536SgGU9nDRbEaolPfyfRgMxNtEdLZ7XkSP7/eFSTjIpv
- 73Eoza389D6D/YF7sfxmtNSMUOpcv209lWEubSTiFj+sENAz8gM5LBia2fyeIiLZAmuQ
- Jnbn8RFpkJtGiPMBal4hZKsF1ErgrrYq6cUUB4jHfrQV9uZLAnPM+4wPFLQsrFktC95u
- z+3p9Typ5i/IeJ4bAolAo5JCpZbWmZ9+QkoWPdW7vfbeMm53BxylHn8VjRtGb+W7BtD4
- RIZmRx8aC0Xu3EGQsXdqltHcp5oDp0zfpKvSVbI/HnEa3/Nnrr9n6SxUM547F4tfE4bw fw== 
+        id S1347100AbhGTEY2 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 20 Jul 2021 00:24:28 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37160 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1346226AbhGTEYW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 20 Jul 2021 00:24:22 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16K53NJ9019968;
+        Tue, 20 Jul 2021 01:04:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=YIlbonzyYfr48j+9mltYbtpEvxW+h5RKDMRsYj4+yp8=;
+ b=bD8fD32/SMHgXFWkCZxZCzTI5HHc1jN9Lu64hUj1qXnSp2JdP2nHKV/mR7gmu2yQUhqC
+ C8Ls0kvfnjPB60HM2uSmfmFmWsNhBZLskfteK/ntAIRIaF/kZFIieLI28D4TJ/wCsOCX
+ WPBsSRbYF/QvNj2wPZj7XMMHEpsNSKmNhCdNF4lDffvWU9nrH52heYs/B6/4yX2oJ/lm
+ GzNSVy5LOxBuVEq/foMNwavbZZWu1jFV6/VKDwk3IezmyKtcaaqcYKUFjYyAzLQJWXuJ
+ PGIWziQTkB0/0dieRZqILEkEOhZGBye1BzJpjEkuVz41jfsINQ5FrKQ4aUf66tqP4xsw nQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39wf6c07sh-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39wny8jj8p-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Jul 2021 15:09:50 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16JJ5uHH101007;
-        Mon, 19 Jul 2021 15:09:49 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39wf6c07s4-1
+        Tue, 20 Jul 2021 01:04:29 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16K53O8T020069;
+        Tue, 20 Jul 2021 01:04:29 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39wny8jj81-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Jul 2021 15:09:49 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16JJ8TfE005124;
-        Mon, 19 Jul 2021 19:09:49 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma04dal.us.ibm.com with ESMTP id 39upub7uf8-1
+        Tue, 20 Jul 2021 01:04:29 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16K52cfK014061;
+        Tue, 20 Jul 2021 05:04:27 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 39vng70p9y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Jul 2021 19:09:48 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16JJ9lTb15204744
+        Tue, 20 Jul 2021 05:04:27 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16K54PQH26673532
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 19 Jul 2021 19:09:47 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7F1D978064;
-        Mon, 19 Jul 2021 19:09:47 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CC2BE78063;
-        Mon, 19 Jul 2021 19:09:46 +0000 (GMT)
-Received: from localhost (unknown [9.211.80.96])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Mon, 19 Jul 2021 19:09:46 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     "Pratik R. Sampat" <psampat@linux.ibm.com>, mpe@ellerman.id.au,
-        benh@kernel.crashing.org, paulus@samba.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, psampat@linux.ibm.com,
-        pratik.r.sampat@gmail.com
+        Tue, 20 Jul 2021 05:04:25 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6348FAE059;
+        Tue, 20 Jul 2021 05:04:25 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F874AE051;
+        Tue, 20 Jul 2021 05:04:23 +0000 (GMT)
+Received: from [9.199.45.122] (unknown [9.199.45.122])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 20 Jul 2021 05:04:23 +0000 (GMT)
 Subject: Re: [PATCH v5 1/1] powerpc/pseries: Interface to represent PAPR
  firmware attributes
-In-Reply-To: <20210719093250.41405-2-psampat@linux.ibm.com>
+To:     Fabiano Rosas <farosas@linux.ibm.com>, mpe@ellerman.id.au,
+        benh@kernel.crashing.org, paulus@samba.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pratik.r.sampat@gmail.com
 References: <20210719093250.41405-1-psampat@linux.ibm.com>
- <20210719093250.41405-2-psampat@linux.ibm.com>
-Date:   Mon, 19 Jul 2021 16:09:44 -0300
-Message-ID: <87fswa2k93.fsf@linux.ibm.com>
+ <20210719093250.41405-2-psampat@linux.ibm.com> <87fswa2k93.fsf@linux.ibm.com>
+From:   Pratik Sampat <psampat@linux.ibm.com>
+Message-ID: <de3c5540-2a07-8373-57a2-a89e3d304413@linux.ibm.com>
+Date:   Tue, 20 Jul 2021 10:34:22 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <87fswa2k93.fsf@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ngeXdlbW3EHNZBl-0ru8DfbP6dw6U89I
-X-Proofpoint-GUID: bmPnIy4xdc9Mc2NPjWUlKfU9gmKnt_7H
+X-Proofpoint-ORIG-GUID: ssVwGSroUKkgqBVXNDRQTUb2Yw54hczw
+X-Proofpoint-GUID: 4u1S___xB0Dar2DtbsH4-eXC1GRUkLB7
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-19_09:2021-07-19,2021-07-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- mlxlogscore=999 spamscore=0 malwarescore=0 clxscore=1015 phishscore=0
- priorityscore=1501 bulkscore=0 lowpriorityscore=0 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107190109
+ definitions=2021-07-20_01:2021-07-19,2021-07-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
+ impostorscore=0 mlxscore=0 lowpriorityscore=0 spamscore=0 adultscore=0
+ malwarescore=0 mlxlogscore=999 bulkscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107200028
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-"Pratik R. Sampat" <psampat@linux.ibm.com> writes:
 
-> +	pgs = kcalloc(num_attrs, sizeof(*pgs), GFP_KERNEL);
-> +	if (!pgs)
-> +		goto out;
-> +
-> +	papr_kobj = kobject_create_and_add("papr", firmware_kobj);
-> +	if (!papr_kobj) {
-> +		pr_warn("kobject_create_and_add papr failed\n");
-> +		goto out_pgs;
-> +	}
-> +
-> +	esi_kobj = kobject_create_and_add("energy_scale_info", papr_kobj);
-> +	if (!esi_kobj) {
-> +		pr_warn("kobject_create_and_add energy_scale_info failed\n");
-> +		goto out_kobj;
-> +	}
-> +
-> +	for (idx = 0; idx < num_attrs; idx++) {
-> +		bool show_val_desc = true;
-> +
-> +		pgs[idx].pg.attrs = kcalloc(MAX_ATTRS + 1,
-> +					    sizeof(*pgs[idx].pg.attrs),
-> +					    GFP_KERNEL);
-> +		if (!pgs[idx].pg.attrs) {
-> +			for (i = idx - 1; i >= 0; i--)
-> +				kfree(pgs[i].pg.attrs);
 
-What about the pg.name from the previous iterations?
+On 20/07/21 12:39 am, Fabiano Rosas wrote:
+> "Pratik R. Sampat" <psampat@linux.ibm.com> writes:
+>
+>> +	pgs = kcalloc(num_attrs, sizeof(*pgs), GFP_KERNEL);
+>> +	if (!pgs)
+>> +		goto out;
+>> +
+>> +	papr_kobj = kobject_create_and_add("papr", firmware_kobj);
+>> +	if (!papr_kobj) {
+>> +		pr_warn("kobject_create_and_add papr failed\n");
+>> +		goto out_pgs;
+>> +	}
+>> +
+>> +	esi_kobj = kobject_create_and_add("energy_scale_info", papr_kobj);
+>> +	if (!esi_kobj) {
+>> +		pr_warn("kobject_create_and_add energy_scale_info failed\n");
+>> +		goto out_kobj;
+>> +	}
+>> +
+>> +	for (idx = 0; idx < num_attrs; idx++) {
+>> +		bool show_val_desc = true;
+>> +
+>> +		pgs[idx].pg.attrs = kcalloc(MAX_ATTRS + 1,
+>> +					    sizeof(*pgs[idx].pg.attrs),
+>> +					    GFP_KERNEL);
+>> +		if (!pgs[idx].pg.attrs) {
+>> +			for (i = idx - 1; i >= 0; i--)
+>> +				kfree(pgs[i].pg.attrs);
+> What about the pg.name from the previous iterations?
+>
+>> +			goto out_ekobj;
+>> +		}
+>> +
+>> +		pgs[idx].pg.name = kasprintf(GFP_KERNEL, "%lld",
+>> +					     be64_to_cpu(esi_attrs[idx].id));
+>> +		if (pgs[idx].pg.name == NULL) {
+>> +			for (i = idx; i >= 0; i--)
+>> +				kfree(pgs[i].pg.attrs);
+> Here too.
+>
+> You could just 'goto out_pgattrs' in both cases.
 
-> +			goto out_ekobj;
-> +		}
-> +
-> +		pgs[idx].pg.name = kasprintf(GFP_KERNEL, "%lld",
-> +					     be64_to_cpu(esi_attrs[idx].id));
-> +		if (pgs[idx].pg.name == NULL) {
-> +			for (i = idx; i >= 0; i--)
-> +				kfree(pgs[i].pg.attrs);
+Yeah, you're right. I may have over-complicated the free, in case of
+failure in both the cases above I could just free from "out_pgattrs"
+with no issues
 
-Here too.
+>> +			goto out_ekobj;
+>> +		}
+>> +		/* Do not add the value description if it does not exist */
+>> +		if (strnlen(esi_attrs[idx].value_desc,
+>> +			    sizeof(esi_attrs[idx].value_desc)) == 0)
+>> +			show_val_desc = false;
+>> +
+>> +		if (add_attr_group(be64_to_cpu(esi_attrs[idx].id), &pgs[idx],
+>> +				   show_val_desc)) {
+>> +			pr_warn("Failed to create papr attribute group %s\n",
+>> +				pgs[idx].pg.name);
+>> +			goto out_pgattrs;
+>> +		}
+>> +	}
+>> +
+>> +	kfree(esi_buf);
+>> +	return 0;
+>> +
+>> +out_pgattrs:
+>> +	for (i = 0; i < num_attrs ; i++) {
+>> +		kfree(pgs[i].pg.attrs);
+>> +		kfree(pgs[i].pg.name);
+>> +	}
+>> +out_ekobj:
+>> +	kobject_put(esi_kobj);
+>> +out_kobj:
+>> +	kobject_put(papr_kobj);
+>> +out_pgs:
+>> +	kfree(pgs);
+>> +out:
+>> +	kfree(esi_buf);
+>> +
+>> +	return -ENOMEM;
+>> +}
+>> +
+>> +machine_device_initcall(pseries, papr_init);
 
-You could just 'goto out_pgattrs' in both cases.
-
-> +			goto out_ekobj;
-> +		}
-> +		/* Do not add the value description if it does not exist */
-> +		if (strnlen(esi_attrs[idx].value_desc,
-> +			    sizeof(esi_attrs[idx].value_desc)) == 0)
-> +			show_val_desc = false;
-> +
-> +		if (add_attr_group(be64_to_cpu(esi_attrs[idx].id), &pgs[idx],
-> +				   show_val_desc)) {
-> +			pr_warn("Failed to create papr attribute group %s\n",
-> +				pgs[idx].pg.name);
-> +			goto out_pgattrs;
-> +		}
-> +	}
-> +
-> +	kfree(esi_buf);
-> +	return 0;
-> +
-> +out_pgattrs:
-> +	for (i = 0; i < num_attrs ; i++) {
-> +		kfree(pgs[i].pg.attrs);
-> +		kfree(pgs[i].pg.name);
-> +	}
-> +out_ekobj:
-> +	kobject_put(esi_kobj);
-> +out_kobj:
-> +	kobject_put(papr_kobj);
-> +out_pgs:
-> +	kfree(pgs);
-> +out:
-> +	kfree(esi_buf);
-> +
-> +	return -ENOMEM;
-> +}
-> +
-> +machine_device_initcall(pseries, papr_init);
