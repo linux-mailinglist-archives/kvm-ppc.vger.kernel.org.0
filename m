@@ -2,57 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCE133D51D4
-	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Jul 2021 05:52:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 459523D51D5
+	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Jul 2021 05:52:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231674AbhGZDLr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 25 Jul 2021 23:11:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53372 "EHLO
+        id S231727AbhGZDLt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 25 Jul 2021 23:11:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231759AbhGZDLr (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 23:11:47 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58F0C061757
-        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:15 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id o44-20020a17090a0a2fb0290176ca3e5a2fso5068888pjo.1
-        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:15 -0700 (PDT)
+        with ESMTP id S231597AbhGZDLs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 23:11:48 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 291F7C061757
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:18 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id a20so10255392plm.0
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=86e4Ir+GEs/5DHLdJaHdInDBlUze8Yk+Kpd4tTCHNYc=;
-        b=C7TZA/rAlCWxwMf2EMMbByyBRWsKpwk2yPXEv1z4YRMODsMclb3dwX3IL7zMpV2ckg
-         w7AKpzx+a4H6Ryom1TPUc1UTI5xS2V52JjPz09kI9HfXf/8nYQWmmTq3D0OM3Y61lDq7
-         P3T8NlyxnawOjX4r51u0M5DUD/hhO0WpAteCg/nVlgVY3I9O4LsBzobFx5/yqsdFL215
-         BojwqjFjwio3tvdfPU//KRAhXCnVMr2VLQ+tjI7fxLPbahNw78eL86/JlecTdecd/C3f
-         7lh8pfxS7Oa8pv4MEcSJ+wnHnn9HnrZZhF2F48iaP0JmIuwd0f4nTu24HNon/IDxkoRu
-         XDCQ==
+        bh=1/EeEmpkENbYKzjTPkVIqeul9e2Dav0nMW6DA1lL2A8=;
+        b=hHFz8NRyDXUDvGn4D0+zMSOjsQnKYUxL7wMs8t5FwC24qWwgMoJjDbNqjOWSMAyobH
+         dfQgLAxBPWqLtTOciszdMRBzjDndhoNZP4DUxriVnPVLMdCle0VesG8VhHQ9aRFqhq+M
+         4ovAJm8VM90NigxCwN+ggFUnkW5mdNkSGtDd+n9OBZ+W1KH1p5m8q1K6w9lUWcBagaPD
+         3KC5+XvlmBmTXlsV4EFeuzvC6nS4j7Yp/bPaWcj5frLvFhki5r95RNV3NxlOBxkyQcPe
+         RUI+zPlMUAYYjjD82UM9zN9nxzEIFQaOpASZprpWBHfv3fnXpKc7rxwP60Kb2cY6o3OX
+         448A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=86e4Ir+GEs/5DHLdJaHdInDBlUze8Yk+Kpd4tTCHNYc=;
-        b=i58z/UsEGDPouJMm3OzRAIpKUv/dwMwBziIWKFoqaUC5bs8Up8ptNiafQ7aY0srwWQ
-         eF5p7BDbLEvdpX4DPbyJNS9f2Ts9qAx2h+EteLeRrxParmjKck47AK8sOKLde9Etbrel
-         Fbxrv2bNA6Bjc5WGWjH9CQthLZYwHqj8VFfQfjFn3f1+UVfktOj+6B3H5O+/+WktG/2K
-         2f+fCTO7GiqnR/7Firp5VdqbTMvwlf9CXlu92QCZ/EeuKJizULuf5w/JUivIsNFPmlhN
-         cq/R3nAMMtd8t7dyUL3NaV8zIlsP87NKp9zWQyXJKd3T8uNenmikVAM3d/vI+1E6lbGT
-         FCkQ==
-X-Gm-Message-State: AOAM531/3oFkJzzo5oax3Uxi5wHCyOpNSIhwXO9nPbm/BuQc9Fekv6j5
-        EZwhNwxWNrStvLTVCJ2+6+eC/++2D94=
-X-Google-Smtp-Source: ABdhPJyvbE/mgqiqH4BsDllLyRe4rI83EOMWmvwbKGvzlbeAozLtB/VuSyR7CWJxYbpK+s7rHaKmxQ==
-X-Received: by 2002:a63:34a:: with SMTP id 71mr16330513pgd.289.1627271535149;
-        Sun, 25 Jul 2021 20:52:15 -0700 (PDT)
+        bh=1/EeEmpkENbYKzjTPkVIqeul9e2Dav0nMW6DA1lL2A8=;
+        b=Tej1909KeyfY3mKc2yfpD0HnU/cNiJ56NJrY+vajumQJjgTKhV08pbHlcBDKepxrGK
+         avJa1ECl2EGKaLY8/AqG0mT3nHHHtgmuSK/rB7ooEttBaN07dGOcpCiG1mmbOOsiDFfO
+         iEkYqwzS1rLo/dk9U6eKLzji9yXNidpje7UI+AVJ+Ll+XPRX/5apP97bj+a+VrjwaliU
+         D7AR83JoxdYzr7mwbEMZ6R617nS2bKN/WO92+T74ccsk4vc2HPOn9hH/XVgT8uedyq/D
+         lWZJTH3dlUAg62pjBGR5sncCl5e++U/NgUrMAgPckFKtNxT/s9fL5sw5rZB8yTr/rkaw
+         WbKA==
+X-Gm-Message-State: AOAM531SYmJb1DvA1nDvuR7bkKJ/V0aV7RareHIE+B96zy5rHoH5I6r6
+        Y/L5v7jNwczTeEQ5kDb3w1DC+TgIdfw=
+X-Google-Smtp-Source: ABdhPJzPAa3Mr9lYPTKBxMrg3VVIeodf6rRE6BYENfYH0dIjf8/Zl93BHlns1HIHPh/+48B+tXCK6w==
+X-Received: by 2002:a17:902:ed95:b029:ee:aa46:547a with SMTP id e21-20020a170902ed95b02900eeaa46547amr12818233plj.27.1627271537659;
+        Sun, 25 Jul 2021 20:52:17 -0700 (PDT)
 Received: from bobo.ibm.com (220-244-190-123.tpgi.com.au. [220.244.190.123])
-        by smtp.gmail.com with ESMTPSA id p33sm41140341pfw.40.2021.07.25.20.52.13
+        by smtp.gmail.com with ESMTPSA id p33sm41140341pfw.40.2021.07.25.20.52.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jul 2021 20:52:14 -0700 (PDT)
+        Sun, 25 Jul 2021 20:52:17 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v1 39/55] KVM: PPC: Book3S HV P9: More SPR speed improvements
-Date:   Mon, 26 Jul 2021 13:50:20 +1000
-Message-Id: <20210726035036.739609-40-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+        Fabiano Rosas <farosas@linux.ibm.com>
+Subject: [PATCH v1 40/55] KVM: PPC: Book3S HV P9: Demand fault EBB facility registers
+Date:   Mon, 26 Jul 2021 13:50:21 +1000
+Message-Id: <20210726035036.739609-41-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210726035036.739609-1-npiggin@gmail.com>
 References: <20210726035036.739609-1-npiggin@gmail.com>
@@ -62,131 +63,124 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This avoids more scoreboard stalls and reduces mtSPRs.
+Use HFSCR facility disabling to implement demand faulting for EBB, with
+a hysteresis counter similar to the load_fp etc counters in context
+switching that implement the equivalent demand faulting for userspace
+facilities.
 
--193 cycles (6985) POWER9 virt-mode NULL hcall
+This speeds up guest entry/exit by avoiding the register save/restore
+when a guest is not frequently using them. When a guest does use them
+often, there will be some additional demand fault overhead, but these
+are not commonly used facilities.
 
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv_p9_entry.c | 73 ++++++++++++++++-----------
- 1 file changed, 43 insertions(+), 30 deletions(-)
+ arch/powerpc/include/asm/kvm_host.h   |  1 +
+ arch/powerpc/kvm/book3s_hv.c          | 16 +++++++++++++--
+ arch/powerpc/kvm/book3s_hv_p9_entry.c | 28 +++++++++++++++++++++------
+ 3 files changed, 37 insertions(+), 8 deletions(-)
 
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index f105eaeb4521..1c00c4a565f5 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -580,6 +580,7 @@ struct kvm_vcpu_arch {
+ 	ulong cfar;
+ 	ulong ppr;
+ 	u32 pspb;
++	u8 load_ebb;
+ 	ulong fscr;
+ 	ulong shadow_fscr;
+ 	ulong ebbhr;
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 47ccea5ffba2..dd8199a423cf 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -1441,6 +1441,16 @@ static int kvmppc_pmu_unavailable(struct kvm_vcpu *vcpu)
+ 	return RESUME_GUEST;
+ }
+ 
++static int kvmppc_ebb_unavailable(struct kvm_vcpu *vcpu)
++{
++	if (!(vcpu->arch.hfscr_permitted & HFSCR_EBB))
++		return EMULATE_FAIL;
++
++	vcpu->arch.hfscr |= HFSCR_EBB;
++
++	return RESUME_GUEST;
++}
++
+ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
+ 				 struct task_struct *tsk)
+ {
+@@ -1735,6 +1745,8 @@ XXX benchmark guest exits
+ 				r = kvmppc_emulate_doorbell_instr(vcpu);
+ 			if (cause == FSCR_PM_LG)
+ 				r = kvmppc_pmu_unavailable(vcpu);
++			if (cause == FSCR_EBB_LG)
++				r = kvmppc_ebb_unavailable(vcpu);
+ 		}
+ 		if (r == EMULATE_FAIL) {
+ 			kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
+@@ -2751,9 +2763,9 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.hfscr_permitted = vcpu->arch.hfscr;
+ 
+ 	/*
+-	 * PM is demand-faulted so start with it clear.
++	 * PM, EBB is demand-faulted so start with it clear.
+ 	 */
+-	vcpu->arch.hfscr &= ~HFSCR_PM;
++	vcpu->arch.hfscr &= ~(HFSCR_PM | HFSCR_EBB);
+ 
+ 	kvmppc_mmu_book3s_hv_init(vcpu);
+ 
 diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-index d83b5d4d02c1..c4e93167d120 100644
+index c4e93167d120..f68a3d107d04 100644
 --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
 +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-@@ -633,24 +633,29 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 		vc->tb_offset_applied = vc->tb_offset;
- 	}
- 
--	if (vc->pcr)
--		mtspr(SPRN_PCR, vc->pcr | PCR_MASK);
--	mtspr(SPRN_DPDES, vc->dpdes);
- 	mtspr(SPRN_VTB, vc->vtb);
--
- 	mtspr(SPRN_PURR, vcpu->arch.purr);
- 	mtspr(SPRN_SPURR, vcpu->arch.spurr);
- 
-+	if (vc->pcr)
-+		mtspr(SPRN_PCR, vc->pcr | PCR_MASK);
-+	if (vc->dpdes)
-+		mtspr(SPRN_DPDES, vc->dpdes);
+@@ -224,9 +224,12 @@ static void load_spr_state(struct kvm_vcpu *vcpu,
+ 				struct p9_host_os_sprs *host_os_sprs)
+ {
+ 	mtspr(SPRN_TAR, vcpu->arch.tar);
+-	mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
+-	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
+-	mtspr(SPRN_BESCR, vcpu->arch.bescr);
 +
- 	if (dawr_enabled()) {
--		mtspr(SPRN_DAWR0, vcpu->arch.dawr0);
--		mtspr(SPRN_DAWRX0, vcpu->arch.dawrx0);
-+		if (vcpu->arch.dawr0 != host_dawr0)
-+			mtspr(SPRN_DAWR0, vcpu->arch.dawr0);
-+		if (vcpu->arch.dawrx0 != host_dawrx0)
-+			mtspr(SPRN_DAWRX0, vcpu->arch.dawrx0);
- 		if (cpu_has_feature(CPU_FTR_DAWR1)) {
--			mtspr(SPRN_DAWR1, vcpu->arch.dawr1);
--			mtspr(SPRN_DAWRX1, vcpu->arch.dawrx1);
-+			if (vcpu->arch.dawr1 != host_dawr1)
-+				mtspr(SPRN_DAWR1, vcpu->arch.dawr1);
-+			if (vcpu->arch.dawrx1 != host_dawrx1)
-+				mtspr(SPRN_DAWRX1, vcpu->arch.dawrx1);
- 		}
- 	}
--	mtspr(SPRN_CIABR, vcpu->arch.ciabr);
--	mtspr(SPRN_IC, vcpu->arch.ic);
-+	if (vcpu->arch.ciabr != host_ciabr)
-+		mtspr(SPRN_CIABR, vcpu->arch.ciabr);
++	if (vcpu->arch.hfscr & HFSCR_EBB) {
++		mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
++		mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
++		mtspr(SPRN_BESCR, vcpu->arch.bescr);
++	}
  
- 	mtspr(SPRN_PSSCR, vcpu->arch.psscr | PSSCR_EC |
- 	      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
-@@ -869,20 +874,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	vc->dpdes = mfspr(SPRN_DPDES);
- 	vc->vtb = mfspr(SPRN_VTB);
- 
--	save_clear_guest_mmu(kvm, vcpu);
--	switch_mmu_to_host(kvm, host_pidr);
--
--	/*
--	 * If we are in real mode, only switch MMU on after the MMU is
--	 * switched to host, to avoid the P9_RADIX_PREFETCH_BUG.
--	 */
--	if (IS_ENABLED(CONFIG_PPC_TRANSACTIONAL_MEM) &&
--			vcpu->arch.shregs.msr & MSR_TS_MASK)
--		msr |= MSR_TS_S;
--	__mtmsrd(msr, 0);
--
--	store_vcpu_state(vcpu);
--
- 	dec = mfspr(SPRN_DEC);
- 	if (!(lpcr & LPCR_LD)) /* Sign extend if not using large decrementer */
- 		dec = (s32) dec;
-@@ -900,6 +891,22 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 		vc->tb_offset_applied = 0;
- 	}
- 
-+	save_clear_guest_mmu(kvm, vcpu);
-+	switch_mmu_to_host(kvm, host_pidr);
+ 	if (!cpu_has_feature(CPU_FTR_ARCH_31))
+ 		mtspr(SPRN_TIDR, vcpu->arch.tid);
+@@ -257,9 +260,22 @@ static void load_spr_state(struct kvm_vcpu *vcpu,
+ static void store_spr_state(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.tar = mfspr(SPRN_TAR);
+-	vcpu->arch.ebbhr = mfspr(SPRN_EBBHR);
+-	vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
+-	vcpu->arch.bescr = mfspr(SPRN_BESCR);
 +
-+	/*
-+	 * Enable MSR here in order to have facilities enabled to save
-+	 * guest registers. This enables MMU (if we were in realmode), so
-+	 * only switch MMU on after the MMU is switched to host, to avoid
-+	 * the P9_RADIX_PREFETCH_BUG or hash guest context.
-+	 */
-+	if (IS_ENABLED(CONFIG_PPC_TRANSACTIONAL_MEM) &&
-+			vcpu->arch.shregs.msr & MSR_TS_MASK)
-+		msr |= MSR_TS_S;
-+	__mtmsrd(msr, 0);
-+
-+	store_vcpu_state(vcpu);
-+
- 	mtspr(SPRN_PURR, local_paca->kvm_hstate.host_purr);
- 	mtspr(SPRN_SPURR, local_paca->kvm_hstate.host_spurr);
++	if (vcpu->arch.hfscr & HFSCR_EBB) {
++		vcpu->arch.ebbhr = mfspr(SPRN_EBBHR);
++		vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
++		vcpu->arch.bescr = mfspr(SPRN_BESCR);
++		/*
++		 * This is like load_fp in context switching, turn off the
++		 * facility after it wraps the u8 to try avoiding saving
++		 * and restoring the registers each partition switch.
++		 */
++		if (!vcpu->arch.nested) {
++			vcpu->arch.load_ebb++;
++			if (!vcpu->arch.load_ebb)
++				vcpu->arch.hfscr &= ~HFSCR_EBB;
++		}
++	}
  
-@@ -907,15 +914,21 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	mtspr(SPRN_PSSCR, host_psscr |
- 	      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
- 	mtspr(SPRN_HFSCR, host_hfscr);
--	mtspr(SPRN_CIABR, host_ciabr);
--	mtspr(SPRN_DAWR0, host_dawr0);
--	mtspr(SPRN_DAWRX0, host_dawrx0);
-+	if (vcpu->arch.ciabr != host_ciabr)
-+		mtspr(SPRN_CIABR, host_ciabr);
-+	if (vcpu->arch.dawr0 != host_dawr0)
-+		mtspr(SPRN_DAWR0, host_dawr0);
-+	if (vcpu->arch.dawrx0 != host_dawrx0)
-+		mtspr(SPRN_DAWRX0, host_dawrx0);
- 	if (cpu_has_feature(CPU_FTR_DAWR1)) {
--		mtspr(SPRN_DAWR1, host_dawr1);
--		mtspr(SPRN_DAWRX1, host_dawrx1);
-+		if (vcpu->arch.dawr1 != host_dawr1)
-+			mtspr(SPRN_DAWR1, host_dawr1);
-+		if (vcpu->arch.dawrx1 != host_dawrx1)
-+			mtspr(SPRN_DAWRX1, host_dawrx1);
- 	}
- 
--	mtspr(SPRN_DPDES, 0);
-+	if (vc->dpdes)
-+		mtspr(SPRN_DPDES, 0);
- 	if (vc->pcr)
- 		mtspr(SPRN_PCR, PCR_MASK);
- 
+ 	if (!cpu_has_feature(CPU_FTR_ARCH_31))
+ 		vcpu->arch.tid = mfspr(SPRN_TIDR);
 -- 
 2.23.0
 
