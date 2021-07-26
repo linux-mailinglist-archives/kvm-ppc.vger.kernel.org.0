@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 330B63D51DA
+	by mail.lfdr.de (Postfix) with ESMTP id 591613D51DB
 	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Jul 2021 05:52:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231717AbhGZDMA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 25 Jul 2021 23:12:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53482 "EHLO
+        id S231723AbhGZDMD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 25 Jul 2021 23:12:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231219AbhGZDMA (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 23:12:00 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AB26C061757
-        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:29 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id m1so11126158pjv.2
-        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:29 -0700 (PDT)
+        with ESMTP id S231219AbhGZDMC (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 23:12:02 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91A7CC061757
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:31 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id n10so10142241plf.4
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=i9H2zE5BQgIqgQefqlymemI2qVOIx89ENHZOOC1fDxM=;
-        b=Aqa31gWsRY2Tv2rhn5S8YAx+p89ZkAuMaDh3Ve6ZIrO2lz+niaGWpPFS+jrmCymdKh
-         K086RDyrCHiUfqd3Bu7dEhJofHkRF2eW0bdf/BGGncM6RjlxFI+DT6IFLrXvN+6UokMx
-         EJ4W44e85CU/CjRHWQ7Wx3LwOeMnBzvpxaCeRLtdUHTtky2wuCam9NLbtgwWtLNuvO/A
-         okx6Hllf1KbnypVjz4z3+1FocjEE1CVCYSYKP9dTUcWdcqf60F4tWdTK7xA2Pbql/Sjr
-         Vc1/3CAQls/vudjKGqBWVky9kbZn4J+8OGPmwSXrJROhNGQ3nggZOo/S9ZichhWEB4yd
-         GM4Q==
+        bh=lXIv8+mtVkMgsv+PEpjVCTZ/uwGBbTyFBO8PdcIpTk0=;
+        b=EMPYL54EwTFULzHCsxaN9dj8RhCUGi3pxeswB+2CG7oKsXJ+7ZZn7y5YXq3ufooioL
+         lGc/lgHe9jEaR4BmzjL9dgtpTe3S8YX/+LjVGy3onWxV47BYuBQ0Yaz9Q+b+Od60QBwA
+         axWvrEHWh4R4q1w5tMi8nLSX5hyVUnkhbpSLNhWa4AU1lg/OZfNm6f+NgoctHmKjkv9J
+         tfXyZ7NffhixUJqTWo4uDMtUdkrqYUJSxerikMnzVuqknbNTteKvYYJ02TB6WLqsr45l
+         cCcjyF96u/7PTfeVfsT0VA3xRUoHchhx6dBTUivhCRvsmxTT9g3RthfzuP4wgDJO2Xny
+         +opA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=i9H2zE5BQgIqgQefqlymemI2qVOIx89ENHZOOC1fDxM=;
-        b=S6lg1lDc7uFZHveWzKwMPSMrINq5NfdEr2Gt998rpE2OYCoSlxxrLJwkzZq6iZXeR6
-         MYrQro1MnX5i0817SkcamPXVWQPwYfW+qIt4crs/sydrWMpsehlLtfMFN6K/B+U3++Ga
-         XByHSDq/NHFY3V6/fL2qHlHCxGnNNYnx0rwNBPXbngRuQKon93lKaAWxRqQMfQQguuN1
-         Spj4EkMdJZdw2r91+hWPzABSSssGG7rMgkjUegeUVbTgNDTGZspw2rO4hn/BwgzkOuE5
-         D+jdWqILFiSkoKfAOebmmi9KOU710Qxx2NK8i9Qi1L7P6dZYd7Dk35Y/LRhzejAxxtHw
-         vURQ==
-X-Gm-Message-State: AOAM531xjXbexxYgZ3WLTuynP6qUgdyQxukMqQt5xlI43Ao0IOHeitnR
-        9b6KO/tDokAOSwDv06PVmvXdDV3ecAg=
-X-Google-Smtp-Source: ABdhPJyqTWQXw0SLueB8qxriflkAzv8/ErHOIbGjBB7w86lwMqlhPg+N0AQKEv5gjyqZyNMnPWfqjg==
-X-Received: by 2002:a62:3852:0:b029:32e:50d4:6ee5 with SMTP id f79-20020a6238520000b029032e50d46ee5mr15751754pfa.3.1627271548855;
-        Sun, 25 Jul 2021 20:52:28 -0700 (PDT)
+        bh=lXIv8+mtVkMgsv+PEpjVCTZ/uwGBbTyFBO8PdcIpTk0=;
+        b=m2aiqcE2o+ptsTBgh6b5StmOvYXS0XWMsd4mH7fHPWHIQJhQ96z7T1MmcmuMVhqf8N
+         8eZgTnToGkfxd4ToZc3Qimy9PrgNzT2/fHRMU6MhjIlb2CLgQ8ph9JNc5q01PK6dzEdt
+         ctXiMDOfg43oVBWCbxiH0h851b7+fGc60wZbUsKU/QXkPtOtdMrbz/wi8HkbgwuqFpVA
+         kKWRf01DJZIm4KztLUo0mnnCCJ+ld8YJJAlfn6xoe70wvvm1rCrRzD/6HvdOGSWpo4ey
+         QzIvC9KP5Yv343OcuGoecdOuopaPMOXEj68aEwoY4m5GyHMInR/Cao+ntv80NX1mOhJR
+         9IJw==
+X-Gm-Message-State: AOAM530cJscu0/UsHFqQ3+xcjHEDulMD8PUcyMtFOApkuMbfu5Vj5d05
+        hTgTI3hcqFFQr/wVNdHhNWdfqpFFIJU=
+X-Google-Smtp-Source: ABdhPJwqtCO47R6gTVGnL6uw3vwhx0CNGShT1EDzg4B1ve2x0F307g9FK9O8aY1/rNRYsxXpHeYiFw==
+X-Received: by 2002:aa7:874c:0:b029:39a:56d1:6d42 with SMTP id g12-20020aa7874c0000b029039a56d16d42mr2015069pfo.58.1627271551083;
+        Sun, 25 Jul 2021 20:52:31 -0700 (PDT)
 Received: from bobo.ibm.com (220-244-190-123.tpgi.com.au. [220.244.190.123])
-        by smtp.gmail.com with ESMTPSA id p33sm41140341pfw.40.2021.07.25.20.52.27
+        by smtp.gmail.com with ESMTPSA id p33sm41140341pfw.40.2021.07.25.20.52.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jul 2021 20:52:28 -0700 (PDT)
+        Sun, 25 Jul 2021 20:52:30 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v1 45/55] KVM: PPC: Book3S HV P9: Don't restore PSSCR if not needed
-Date:   Mon, 26 Jul 2021 13:50:26 +1000
-Message-Id: <20210726035036.739609-46-npiggin@gmail.com>
+Subject: [PATCH v1 46/55] KVM: PPC: Book3S HV P9: Avoid tlbsync sequence on radix guest exit
+Date:   Mon, 26 Jul 2021 13:50:27 +1000
+Message-Id: <20210726035036.739609-47-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210726035036.739609-1-npiggin@gmail.com>
 References: <20210726035036.739609-1-npiggin@gmail.com>
@@ -62,114 +62,92 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This also moves the PSSCR update in nested entry to avoid a SPR
-scoreboard stall.
+Use the existing TLB flushing logic to IPI the previous CPU and run the
+necessary barriers before running a guest vCPU on a new physical CPU,
+to do the necessary radix GTSE barriers for handling the case of an
+interrupted guest tlbie sequence.
 
--45 cycles (6276) POWER9 virt-mode NULL hcall
+This results in more IPIs than the TLB flush logic requires, but it's
+a significant win for common case scheduling when the vCPU remains on
+the same physical CPU.
+
+-522 cycles (5754) POWER9 virt-mode NULL hcall
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c          |  7 +++++--
- arch/powerpc/kvm/book3s_hv_p9_entry.c | 26 +++++++++++++++++++-------
- 2 files changed, 24 insertions(+), 9 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c          | 31 +++++++++++++++++++++++----
+ arch/powerpc/kvm/book3s_hv_p9_entry.c |  9 --------
+ 2 files changed, 27 insertions(+), 13 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index c0a04ce39e00..a37ab798eb7c 100644
+index a37ab798eb7c..3e5c6b745394 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3856,7 +3856,9 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
- 	if (unlikely(load_vcpu_state(vcpu, &host_os_sprs)))
- 		msr = mfmsr(); /* TM restore can update msr */
- 
--	mtspr(SPRN_PSSCR_PR, vcpu->arch.psscr);
-+	if (vcpu->arch.psscr != host_psscr)
-+		mtspr(SPRN_PSSCR_PR, vcpu->arch.psscr);
-+
- 	kvmhv_save_hv_regs(vcpu, &hvregs);
- 	hvregs.lpcr = lpcr;
- 	vcpu->arch.regs.msr = vcpu->arch.shregs.msr;
-@@ -3897,7 +3899,6 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
- 	vcpu->arch.shregs.dar = mfspr(SPRN_DAR);
- 	vcpu->arch.shregs.dsisr = mfspr(SPRN_DSISR);
- 	vcpu->arch.psscr = mfspr(SPRN_PSSCR_PR);
--	mtspr(SPRN_PSSCR_PR, host_psscr);
- 
- 	store_vcpu_state(vcpu);
- 
-@@ -3910,6 +3911,8 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
- 	timer_rearm_host_dec(*tb);
- 
- 	restore_p9_host_os_sprs(vcpu, &host_os_sprs);
-+	if (vcpu->arch.psscr != host_psscr)
-+		mtspr(SPRN_PSSCR_PR, host_psscr);
- 
- 	return trap;
+@@ -3005,6 +3005,25 @@ static void radix_flush_cpu(struct kvm *kvm, int cpu, struct kvm_vcpu *vcpu)
+ 			smp_call_function_single(i, do_nothing, NULL, 1);
  }
+ 
++static void do_migrate_away_vcpu(void *arg)
++{
++	struct kvm_vcpu *vcpu = arg;
++	struct kvm *kvm = vcpu->kvm;
++
++	/*
++	 * If the guest has GTSE, it may execute tlbie, so do a eieio; tlbsync;
++	 * ptesync sequence on the old CPU before migrating to a new one, in
++	 * case we interrupted the guest between a tlbie ; eieio ;
++	 * tlbsync; ptesync sequence.
++	 *
++	 * Otherwise, ptesync is sufficient.
++	 */
++	if (kvm->arch.lpcr & LPCR_GTSE)
++		asm volatile("eieio; tlbsync; ptesync");
++	else
++		asm volatile("ptesync");
++}
++
+ static void kvmppc_prepare_radix_vcpu(struct kvm_vcpu *vcpu, int pcpu)
+ {
+ 	struct kvm_nested_guest *nested = vcpu->arch.nested;
+@@ -3032,10 +3051,14 @@ static void kvmppc_prepare_radix_vcpu(struct kvm_vcpu *vcpu, int pcpu)
+ 	 * so we use a single bit in .need_tlb_flush for all 4 threads.
+ 	 */
+ 	if (prev_cpu != pcpu) {
+-		if (prev_cpu >= 0 &&
+-		    cpu_first_tlb_thread_sibling(prev_cpu) !=
+-		    cpu_first_tlb_thread_sibling(pcpu))
+-			radix_flush_cpu(kvm, prev_cpu, vcpu);
++		if (prev_cpu >= 0) {
++			if (cpu_first_tlb_thread_sibling(prev_cpu) !=
++			    cpu_first_tlb_thread_sibling(pcpu))
++				radix_flush_cpu(kvm, prev_cpu, vcpu);
++
++			smp_call_function_single(prev_cpu,
++					do_migrate_away_vcpu, vcpu, 1);
++		}
+ 		if (nested)
+ 			nested->prev_cpu[vcpu->arch.nested_vcpu_id] = pcpu;
+ 		else
 diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-index 976687c3709a..52690af66ca9 100644
+index 52690af66ca9..1bb81be09d4f 100644
 --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
 +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-@@ -639,6 +639,7 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	unsigned long host_dawr0;
- 	unsigned long host_dawrx0;
- 	unsigned long host_psscr;
-+	unsigned long host_hpsscr;
- 	unsigned long host_pidr;
- 	unsigned long host_dawr1;
- 	unsigned long host_dawrx1;
-@@ -656,7 +657,9 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+@@ -1039,15 +1039,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
  
- 	host_hfscr = mfspr(SPRN_HFSCR);
- 	host_ciabr = mfspr(SPRN_CIABR);
--	host_psscr = mfspr(SPRN_PSSCR);
-+	host_psscr = mfspr(SPRN_PSSCR_PR);
-+	if (cpu_has_feature(CPU_FTRS_POWER9_DD2_2))
-+		host_hpsscr = mfspr(SPRN_PSSCR);
- 	host_pidr = mfspr(SPRN_PID);
+ 	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_NONE;
  
- 	if (dawr_enabled()) {
-@@ -740,8 +743,14 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	if (vcpu->arch.ciabr != host_ciabr)
- 		mtspr(SPRN_CIABR, vcpu->arch.ciabr);
- 
--	mtspr(SPRN_PSSCR, vcpu->arch.psscr | PSSCR_EC |
--	      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
-+
-+	if (cpu_has_feature(CPU_FTRS_POWER9_DD2_2)) {
-+		mtspr(SPRN_PSSCR, vcpu->arch.psscr | PSSCR_EC |
-+		      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
-+	} else {
-+		if (vcpu->arch.psscr != host_psscr)
-+			mtspr(SPRN_PSSCR_PR, vcpu->arch.psscr);
-+	}
- 
- 	mtspr(SPRN_HFSCR, vcpu->arch.hfscr);
- 
-@@ -947,7 +956,7 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 
- 	vcpu->arch.ic = mfspr(SPRN_IC);
- 	vcpu->arch.pid = mfspr(SPRN_PID);
--	vcpu->arch.psscr = mfspr(SPRN_PSSCR) & PSSCR_GUEST_VIS;
-+	vcpu->arch.psscr = mfspr(SPRN_PSSCR_PR);
- 
- 	vcpu->arch.shregs.sprg0 = mfspr(SPRN_SPRG0);
- 	vcpu->arch.shregs.sprg1 = mfspr(SPRN_SPRG1);
-@@ -993,9 +1002,12 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	mtspr(SPRN_PURR, local_paca->kvm_hstate.host_purr);
- 	mtspr(SPRN_SPURR, local_paca->kvm_hstate.host_spurr);
- 
--	/* Preserve PSSCR[FAKE_SUSPEND] until we've called kvmppc_save_tm_hv */
--	mtspr(SPRN_PSSCR, host_psscr |
--	      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
-+	if (cpu_has_feature(CPU_FTRS_POWER9_DD2_2)) {
-+		/* Preserve PSSCR[FAKE_SUSPEND] until we've called kvmppc_save_tm_hv */
-+		mtspr(SPRN_PSSCR, host_hpsscr |
-+		      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
-+	}
-+
- 	mtspr(SPRN_HFSCR, host_hfscr);
- 	if (vcpu->arch.ciabr != host_ciabr)
- 		mtspr(SPRN_CIABR, host_ciabr);
+-	if (kvm_is_radix(kvm)) {
+-		/*
+-		 * Since this is radix, do a eieio; tlbsync; ptesync sequence
+-		 * in case we interrupted the guest between a tlbie and a
+-		 * ptesync.
+-		 */
+-		asm volatile("eieio; tlbsync; ptesync");
+-	}
+-
+ 	/*
+ 	 * cp_abort is required if the processor supports local copy-paste
+ 	 * to clear the copy buffer that was under control of the guest.
 -- 
 2.23.0
 
