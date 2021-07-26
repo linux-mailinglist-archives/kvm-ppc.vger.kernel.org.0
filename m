@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 507F13D51CF
+	by mail.lfdr.de (Postfix) with ESMTP id E2A8E3D51D1
 	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Jul 2021 05:52:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231684AbhGZDLl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 25 Jul 2021 23:11:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
+        id S231731AbhGZDLp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 25 Jul 2021 23:11:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231721AbhGZDLi (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 23:11:38 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0636C061757
-        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:06 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id k4-20020a17090a5144b02901731c776526so17813324pjm.4
-        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:06 -0700 (PDT)
+        with ESMTP id S231759AbhGZDLk (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 23:11:40 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10FC1C061757
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:09 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id n10so10141462plf.4
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=+MWm14uY7P1fSf/YhIqEtrAZmMe0JMxZyWqzL2Rlp0w=;
-        b=gHYbre+zoSHTn/bjhWokit9lnR7JT8muvJl+YYCdx5Cos5LSAStwhkNyIAzohFOUmE
-         C8hUF6M130O6Vucz17nLFzuzw64xFw/eqvmT7Ob1f6ccXJNH/yH4SsHCbbn0d/zDhLsO
-         FFXN8shSrxQQnFXwUxbnbt4wGopxzcc8weRMvAFJ9tTutK9hvZKamFKlK3r+66P3kRcP
-         WbRJPJqznSD5BqjQe+CL/kliDpl9p9yG2Yj3ooaFVGGrK3bHxWwJtSEHauC925FIgBzO
-         0HT6F5R22F2eaqk3XSa9dtTa7bvcmp1qPPI0n+wKYWKdUuGQQpsV7GDTP8JBtPI0Rfx+
-         ReAg==
+        bh=I/TJyOnmABEE9AkNTcVjeb806PCZeTTaeMWQWBzIZXw=;
+        b=SX6rBbXmeohLYDiGBmdYikgQxBkPOKkSixP00Rb1Nm7DLPofm/Hn7FVKh7zTRTvoug
+         gJiw4ubHPfOde/XFILOW6YdWCSjHCoeh4IjxHnyqoRan0zxBrNnTB7aZN/mNw0EkLBph
+         M3x4gSvR6KGwLwgPnzioW3xibNHcBnzsXAm73pJmANcQBwlbOx/YgACZGm32NkMrYxkk
+         L2ghSu4xOzJ1W0h5SYnPIuToFvt4MTf56IJXxbLHDcDKSr5S0n4N+OOtjVEdohQY0FCm
+         W5t7YlpWo/QZpadXlWIb0dBsLmB2IPBYNwl4CeXOEeVz2AlNGSHZNQbKbYHQYOTlb6+a
+         RNoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=+MWm14uY7P1fSf/YhIqEtrAZmMe0JMxZyWqzL2Rlp0w=;
-        b=Qpl48HQmkkIzSD4n30NngYbOHrCFWIWPSoLAbfaeJWZKmBw8e+VgmtcMd4Bend83Vl
-         evLhxhIZ/axlJZOrIZnWZoiyuMb6LN7J+4rgmMUO5T7srXee6ck6TMjdVZN0PQg1VOCn
-         50kU34m0UzNpoqmhLle+fr4H9cbknvpTOlTv5VcvQAET6WhA6qoOUOiU/WNyrYgYmasV
-         wCMurKRyxtIfpNHFa+QAj6okEe/PsFNZkla5ZnvFmxOZWGEW4/1ZFpfqExE6pHXNGYwZ
-         5AY9oQCzsMfIjzMSdgFTTVmQKqZKs4R4E5MXSN3fMKsJPOD7PO6Nv/VbV8UD7zY/wRkw
-         E3cA==
-X-Gm-Message-State: AOAM530EJrmrYR5Z1NQM6fOGeZuJ1xOd8z29tiqy5BQXNa2iLkO3XNGd
-        9kOkXAWtW0RCqodqZuhJclDvh5ajH+4=
-X-Google-Smtp-Source: ABdhPJxhXQUApJnv5htINwSDdCfylRkOyd7ywK9QL5xMbUpxqB8lvuBxIbI3nmkF5q93a1gRzyooqA==
-X-Received: by 2002:a62:6103:0:b029:396:f515:94bf with SMTP id v3-20020a6261030000b0290396f51594bfmr4151205pfb.4.1627271526346;
-        Sun, 25 Jul 2021 20:52:06 -0700 (PDT)
+        bh=I/TJyOnmABEE9AkNTcVjeb806PCZeTTaeMWQWBzIZXw=;
+        b=TKFN8hK5H6O7WL6Yzf2BXU3pUj5EUOEU2+8Ezqp9xOhiYnNnhUeVJi+VKtB19NHypR
+         iNcdgKGbjEYPpD3Vu3CbQw5nItdkmvMiutyzq0JN9iM99W5p7Zk/WVhSk/gwWZWPJMVt
+         9Tm34s6jeO4bE+7+gGdov8nwTYY30B54p1Q3zQ5fU4GjsCwBv4gmzqEXEsNcoHcQFNz8
+         YzqZL+SFs7BGSZrZApWQU0TKNcXrp3gSZ67sK7cpNDH6aZjZqyuaqyIbyJmh0e7PXKxc
+         tBQkGz7jpMUkmkVhX6TCw9JqjjMAAshoKSTUcSTh7y/qMkOqYjhubKKJaVOFrAiswC+D
+         9jSw==
+X-Gm-Message-State: AOAM532UYBG1T3s3gmj8fQInURuJjDju5zowG0W2DZxIUjtd+66F7J/+
+        7yDi2ZjgyrkbV5eYMfWKp5ne1Y18I70=
+X-Google-Smtp-Source: ABdhPJwbjlo5VbE7IwK1qAiTSiFySOjd7sqAjrEDnb5ZUOg4q6E0ClnLPxIIyKgTP3ns+CZ23MwUqA==
+X-Received: by 2002:a62:cfc4:0:b029:2fe:eaf8:8012 with SMTP id b187-20020a62cfc40000b02902feeaf88012mr15654662pfg.45.1627271528553;
+        Sun, 25 Jul 2021 20:52:08 -0700 (PDT)
 Received: from bobo.ibm.com (220-244-190-123.tpgi.com.au. [220.244.190.123])
-        by smtp.gmail.com with ESMTPSA id p33sm41140341pfw.40.2021.07.25.20.52.04
+        by smtp.gmail.com with ESMTPSA id p33sm41140341pfw.40.2021.07.25.20.52.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jul 2021 20:52:06 -0700 (PDT)
+        Sun, 25 Jul 2021 20:52:08 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v1 35/55] KVM: PPC: Book3S HV P9: Move remaining SPR and MSR access into low level entry
-Date:   Mon, 26 Jul 2021 13:50:16 +1000
-Message-Id: <20210726035036.739609-36-npiggin@gmail.com>
+Subject: [PATCH v1 36/55] KVM: PPC: Book3S HV P9: Implement TM fastpath for guest entry/exit
+Date:   Mon, 26 Jul 2021 13:50:17 +1000
+Message-Id: <20210726035036.739609-37-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210726035036.739609-1-npiggin@gmail.com>
 References: <20210726035036.739609-1-npiggin@gmail.com>
@@ -62,311 +62,55 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Move register saving and loading from kvmhv_p9_guest_entry() into the HV
-and nested entry handlers.
+If TM is not active, only TM register state needs to be saved.
 
-Accesses are scheduled to reduce mtSPR / mfSPR interleaving which
-reduces SPR scoreboard stalls.
-
-XXX +212 cycles here somewhere (7566), investigate  POWER9 virt-mode NULL hcall
+-348 cycles (7218) POWER9 virt-mode NULL hcall
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c          | 79 ++++++++++------------
- arch/powerpc/kvm/book3s_hv_p9_entry.c | 96 ++++++++++++++++++++-------
- 2 files changed, 109 insertions(+), 66 deletions(-)
+ arch/powerpc/kvm/book3s_hv_p9_entry.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index cb66c9534dbf..8c1c93ebd669 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3794,9 +3794,15 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
- {
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
- 	unsigned long host_psscr;
-+	unsigned long msr;
- 	struct hv_guest_state hvregs;
--	int trap;
-+	struct p9_host_os_sprs host_os_sprs;
- 	s64 dec;
-+	int trap;
-+
-+	switch_pmu_to_guest(vcpu, &host_os_sprs);
-+
-+	save_p9_host_os_sprs(&host_os_sprs);
- 
- 	/*
- 	 * We need to save and restore the guest visible part of the
-@@ -3805,6 +3811,27 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
- 	 * this is done in kvmhv_vcpu_entry_p9() below otherwise.
- 	 */
- 	host_psscr = mfspr(SPRN_PSSCR_PR);
-+
-+	hard_irq_disable();
-+	if (lazy_irq_pending())
-+		return 0;
-+
-+	/* MSR bits may have been cleared by context switch */
-+	msr = 0;
-+	if (IS_ENABLED(CONFIG_PPC_FPU))
-+		msr |= MSR_FP;
-+	if (cpu_has_feature(CPU_FTR_ALTIVEC))
-+		msr |= MSR_VEC;
-+	if (cpu_has_feature(CPU_FTR_VSX))
-+		msr |= MSR_VSX;
-+	if (cpu_has_feature(CPU_FTR_TM) ||
-+	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
-+		msr |= MSR_TM;
-+	msr = msr_check_and_set(msr);
-+
-+	if (unlikely(load_vcpu_state(vcpu, &host_os_sprs)))
-+		msr = mfmsr(); /* TM restore can update msr */
-+
- 	mtspr(SPRN_PSSCR_PR, vcpu->arch.psscr);
- 	kvmhv_save_hv_regs(vcpu, &hvregs);
- 	hvregs.lpcr = lpcr;
-@@ -3846,12 +3873,20 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
- 	vcpu->arch.psscr = mfspr(SPRN_PSSCR_PR);
- 	mtspr(SPRN_PSSCR_PR, host_psscr);
- 
-+	store_vcpu_state(vcpu);
-+
- 	dec = mfspr(SPRN_DEC);
- 	if (!(lpcr & LPCR_LD)) /* Sign extend if not using large decrementer */
- 		dec = (s32) dec;
- 	*tb = mftb();
- 	vcpu->arch.dec_expires = dec + (*tb + vc->tb_offset);
- 
-+	timer_rearm_host_dec(*tb);
-+
-+	restore_p9_host_os_sprs(vcpu, &host_os_sprs);
-+
-+	switch_pmu_to_host(vcpu, &host_os_sprs);
-+
- 	return trap;
- }
- 
-@@ -3862,9 +3897,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 			 unsigned long lpcr, u64 *tb)
- {
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
--	struct p9_host_os_sprs host_os_sprs;
- 	u64 next_timer;
--	unsigned long msr;
- 	int trap;
- 
- 	next_timer = timer_get_next_tb();
-@@ -3875,33 +3908,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 
- 	vcpu->arch.ceded = 0;
- 
--	save_p9_host_os_sprs(&host_os_sprs);
--
--	/*
--	 * This could be combined with MSR[RI] clearing, but that expands
--	 * the unrecoverable window. It would be better to cover unrecoverable
--	 * with KVM bad interrupt handling rather than use MSR[RI] at all.
--	 *
--	 * Much more difficult and less worthwhile to combine with IR/DR
--	 * disable.
--	 */
--	hard_irq_disable();
--	if (lazy_irq_pending())
--		return 0;
--
--	/* MSR bits may have been cleared by context switch */
--	msr = 0;
--	if (IS_ENABLED(CONFIG_PPC_FPU))
--		msr |= MSR_FP;
--	if (cpu_has_feature(CPU_FTR_ALTIVEC))
--		msr |= MSR_VEC;
--	if (cpu_has_feature(CPU_FTR_VSX))
--		msr |= MSR_VSX;
--	if (cpu_has_feature(CPU_FTR_TM) ||
--	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
--		msr |= MSR_TM;
--	msr = msr_check_and_set(msr);
--
- 	kvmppc_subcore_enter_guest();
- 
- 	vc->entry_exit_map = 1;
-@@ -3909,11 +3915,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 
- 	vcpu_vpa_increment_dispatch(vcpu);
- 
--	if (unlikely(load_vcpu_state(vcpu, &host_os_sprs)))
--		msr = mfmsr(); /* MSR may have been updated */
--
--	switch_pmu_to_guest(vcpu, &host_os_sprs);
--
- 	if (kvmhv_on_pseries()) {
- 		trap = kvmhv_vcpu_entry_p9_nested(vcpu, time_limit, lpcr, tb);
- 
-@@ -3956,16 +3957,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 			vcpu->arch.slb_max = 0;
- 	}
- 
--	switch_pmu_to_host(vcpu, &host_os_sprs);
--
--	store_vcpu_state(vcpu);
--
- 	vcpu_vpa_increment_dispatch(vcpu);
- 
--	timer_rearm_host_dec(*tb);
--
--	restore_p9_host_os_sprs(vcpu, &host_os_sprs);
--
- 	vc->entry_exit_map = 0x101;
- 	vc->in_guest = 0;
- 
 diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-index 5a34f0199bfe..ea531f76f116 100644
+index ea531f76f116..2e7498817b2e 100644
 --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
 +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-@@ -530,6 +530,7 @@ static void save_clear_guest_mmu(struct kvm *kvm, struct kvm_vcpu *vcpu)
+@@ -281,8 +281,15 @@ bool load_vcpu_state(struct kvm_vcpu *vcpu,
  
- int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpcr, u64 *tb)
- {
-+	struct p9_host_os_sprs host_os_sprs;
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_nested_guest *nested = vcpu->arch.nested;
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
-@@ -559,9 +560,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 
- 	vcpu->arch.ceded = 0;
- 
--	/* Could avoid mfmsr by passing around, but probably no big deal */
--	msr = mfmsr();
--
- 	host_hfscr = mfspr(SPRN_HFSCR);
- 	host_ciabr = mfspr(SPRN_CIABR);
- 	host_dawr0 = mfspr(SPRN_DAWR0);
-@@ -576,6 +574,41 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	local_paca->kvm_hstate.host_purr = mfspr(SPRN_PURR);
- 	local_paca->kvm_hstate.host_spurr = mfspr(SPRN_SPURR);
- 
-+	switch_pmu_to_guest(vcpu, &host_os_sprs);
-+
-+	save_p9_host_os_sprs(&host_os_sprs);
-+
-+	/*
-+	 * This could be combined with MSR[RI] clearing, but that expands
-+	 * the unrecoverable window. It would be better to cover unrecoverable
-+	 * with KVM bad interrupt handling rather than use MSR[RI] at all.
-+	 *
-+	 * Much more difficult and less worthwhile to combine with IR/DR
-+	 * disable.
-+	 */
-+	hard_irq_disable();
-+	if (lazy_irq_pending()) {
-+		trap = 0;
-+		goto out;
-+	}
-+
-+	/* MSR bits may have been cleared by context switch */
-+	msr = 0;
-+	if (IS_ENABLED(CONFIG_PPC_FPU))
-+		msr |= MSR_FP;
-+	if (cpu_has_feature(CPU_FTR_ALTIVEC))
-+		msr |= MSR_VEC;
-+	if (cpu_has_feature(CPU_FTR_VSX))
-+		msr |= MSR_VSX;
-+	if (cpu_has_feature(CPU_FTR_TM) ||
-+	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
-+		msr |= MSR_TM;
-+	msr = msr_check_and_set(msr);
-+	/* Save MSR for restore. This is after hard disable, so EE is clear. */
-+
-+	if (unlikely(load_vcpu_state(vcpu, &host_os_sprs)))
-+		msr = mfmsr(); /* MSR may have been updated */
-+
- 	if (vc->tb_offset) {
- 		u64 new_tb = *tb + vc->tb_offset;
- 		mtspr(SPRN_TBU40, new_tb);
-@@ -634,6 +667,14 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	mtspr(SPRN_SPRG2, vcpu->arch.shregs.sprg2);
- 	mtspr(SPRN_SPRG3, vcpu->arch.shregs.sprg3);
- 
-+	/*
-+	 * It might be preferable to load_vcpu_state here, in order to get the
-+	 * GPR/FP register loads executing in parallel with the previous mtSPR
-+	 * instructions, but for now that can't be done because the TM handling
-+	 * in load_vcpu_state can change some SPRs and vcpu state (nip, msr).
-+	 * But TM could be split out if this would be a significant benefit.
-+	 */
-+
- 	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_HV_P9;
- 
- 	/*
-@@ -811,6 +852,20 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	vc->dpdes = mfspr(SPRN_DPDES);
- 	vc->vtb = mfspr(SPRN_VTB);
- 
-+	save_clear_guest_mmu(kvm, vcpu);
-+	switch_mmu_to_host(kvm, host_pidr);
-+
-+	/*
-+	 * If we are in real mode, only switch MMU on after the MMU is
-+	 * switched to host, to avoid the P9_RADIX_PREFETCH_BUG.
-+	 */
-+	if (IS_ENABLED(CONFIG_PPC_TRANSACTIONAL_MEM) &&
-+			vcpu->arch.shregs.msr & MSR_TS_MASK)
-+		msr |= MSR_TS_S;
-+	__mtmsrd(msr, 0);
-+
-+	store_vcpu_state(vcpu);
-+
- 	dec = mfspr(SPRN_DEC);
- 	if (!(lpcr & LPCR_LD)) /* Sign extend if not using large decrementer */
- 		dec = (s32) dec;
-@@ -843,6 +898,19 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 		mtspr(SPRN_DAWRX1, host_dawrx1);
+ 	if (cpu_has_feature(CPU_FTR_TM) ||
+ 	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST)) {
+-		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
+-		ret = true;
++		unsigned long guest_msr = vcpu->arch.shregs.msr;
++		if (MSR_TM_ACTIVE(guest_msr)) {
++			kvmppc_restore_tm_hv(vcpu, guest_msr, true);
++			ret = true;
++		} else {
++			mtspr(SPRN_TEXASR, vcpu->arch.texasr);
++			mtspr(SPRN_TFHAR, vcpu->arch.tfhar);
++			mtspr(SPRN_TFIAR, vcpu->arch.tfiar);
++		}
  	}
  
-+	mtspr(SPRN_DPDES, 0);
-+	if (vc->pcr)
-+		mtspr(SPRN_PCR, PCR_MASK);
-+
-+	/* HDEC must be at least as large as DEC, so decrementer_max fits */
-+	mtspr(SPRN_HDEC, decrementer_max);
-+
-+	timer_rearm_host_dec(*tb);
-+
-+	restore_p9_host_os_sprs(vcpu, &host_os_sprs);
-+
-+	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_NONE;
-+
- 	if (kvm_is_radix(kvm)) {
- 		/*
- 		 * Since this is radix, do a eieio; tlbsync; ptesync sequence
-@@ -859,26 +927,8 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	if (cpu_has_feature(CPU_FTR_ARCH_31))
- 		asm volatile(PPC_CP_ABORT);
+ 	load_spr_state(vcpu, host_os_sprs);
+@@ -308,8 +315,16 @@ void store_vcpu_state(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.vrsave = mfspr(SPRN_VRSAVE);
  
--	mtspr(SPRN_DPDES, 0);
--	if (vc->pcr)
--		mtspr(SPRN_PCR, PCR_MASK);
--
--	/* HDEC must be at least as large as DEC, so decrementer_max fits */
--	mtspr(SPRN_HDEC, decrementer_max);
--
--	save_clear_guest_mmu(kvm, vcpu);
--	switch_mmu_to_host(kvm, host_pidr);
--	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_NONE;
--
--	/*
--	 * If we are in real mode, only switch MMU on after the MMU is
--	 * switched to host, to avoid the P9_RADIX_PREFETCH_BUG.
--	 */
--	if (IS_ENABLED(CONFIG_PPC_TRANSACTIONAL_MEM) &&
--	    vcpu->arch.shregs.msr & MSR_TS_MASK)
--		msr |= MSR_TS_S;
--
--	__mtmsrd(msr, 0);
-+out:
-+	switch_pmu_to_host(vcpu, &host_os_sprs);
- 
- 	end_timing(vcpu);
+ 	if (cpu_has_feature(CPU_FTR_TM) ||
+-	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
+-		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
++	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST)) {
++		unsigned long guest_msr = vcpu->arch.shregs.msr;
++		if (MSR_TM_ACTIVE(guest_msr)) {
++			kvmppc_save_tm_hv(vcpu, guest_msr, true);
++		} else {
++			vcpu->arch.texasr = mfspr(SPRN_TEXASR);
++			vcpu->arch.tfhar = mfspr(SPRN_TFHAR);
++			vcpu->arch.tfiar = mfspr(SPRN_TFIAR);
++		}
++	}
+ }
+ EXPORT_SYMBOL_GPL(store_vcpu_state);
  
 -- 
 2.23.0
