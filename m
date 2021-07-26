@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8C1A3D51E0
-	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Jul 2021 05:52:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D5BD3D51E1
+	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Jul 2021 05:52:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbhGZDMO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 25 Jul 2021 23:12:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53544 "EHLO
+        id S231754AbhGZDMR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 25 Jul 2021 23:12:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231738AbhGZDMO (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 23:12:14 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A42D9C061757
-        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:42 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id j1so11102004pjv.3
-        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:42 -0700 (PDT)
+        with ESMTP id S231738AbhGZDMQ (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 23:12:16 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 018DEC061760
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:45 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id ch6so2118701pjb.5
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=3Od0aBmiRV7nfGJrUiIs+liiazjhz4hDN8E8M4lUNSM=;
-        b=dGnLADup8PXhp2alX1zwmgnoMeROJhet7wzxDOBYK9Wqrp9siBgyNrnayez9DVnqvA
-         RqM267IWKQjI2WRgpbFc5Hy1acxtprxWFsTLxlR310gwLCMBUw81WaMQt5bATflqCb/V
-         hgjcp35AVGcfqYOxsQnUpHADABCVRCkIPpFO+bXwveW1qS7cAyKM99vJ+1M4dJfr0FvD
-         5XoCrZmeahmwyITZOHgN6tKdH7uTSPRFIzwPVmvYNqFe9Z5qQ6Kb/M4WGO6KpLdsAawe
-         +Htg08f85C/Ceuarq2Vn+Fbx/96twDLQxn/5cXUah2zOVYg+CZorZadaiYVPKuiE2rP5
-         bIug==
+        bh=iUws3UTIX1TvCQYo2LYjoB9sUWO54hgibFdVZfokms4=;
+        b=fYWRJi9Qmh8c7vxOZ2Mj0IA9wn7JYkndfcdC/tjT9rAPlpL6LepCTX8YBvyC52DyZf
+         3YB/i+T6HF3yfMG6udn04kDM90XRB0lu3HGzl4fk0lr42wvKDBTCi6pYqtqN132Epdcv
+         x4DykmcWnI/Ja6m0fQHNpzX+0vWlvPUVAU0Jjtv+mLpEq8MkHSG2+QEZjbfjJ33XKLXo
+         u5kH5hrUXuXiDyNZ1z3O0APfNyu8nS9adxrk07t3OyW0sB9vFjMXkmHLaoMJoStt4xwD
+         WtVVAOEPypmxuL4zLDrl7JUJSzrPAVWfBBi3AF2OUQAGx2LkFfLNoJdZu4DeIR2l52t7
+         s/Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=3Od0aBmiRV7nfGJrUiIs+liiazjhz4hDN8E8M4lUNSM=;
-        b=GE9jYdLB5g7hwhaG4nNSfx/pyczVMbTy+Hf9VSjo87zHy/talb7umQJafA29PapwOD
-         hKsPlJbM9QuqE6EJwED+j5WGeWJIUKrI6wwYJWHGU5mX2E+Hs1eSHsTJW/VGwYX1AL9s
-         PLNU3xHKSpm5nV0qjjkiIyawja/Bi3YKDxT/q4lwMtxjPhj9h7TrpRmOL4El8Wxmrxd2
-         ZEFu3p8X8PgRHX8zdWa0es2qc9VzcfHVyjELEv5w6qovV3mOAtls1gk5IbKYbNNL+nAA
-         ZvA30lRkKnY0NTu5gRPaN18EJ3dNIvsnF94RwHEAoPjpdlY9pVijqgnhc19g5O51VyRX
-         Z+Gw==
-X-Gm-Message-State: AOAM533YzXpp3OyhuZLS4dC4h+FZekJ+4VeSG4914j45fBjXrHrVvA1v
-        6m7DScNj9Z839ruNEexanwShg94gwsk=
-X-Google-Smtp-Source: ABdhPJx8uSuk+e8Tl7n9R3pE4gRvBsOOzry52L9kpOAZzitiY675t4Edy5Ljuh0bb+zMDA/7gDzhag==
-X-Received: by 2002:a63:fc02:: with SMTP id j2mr16507162pgi.235.1627271562183;
-        Sun, 25 Jul 2021 20:52:42 -0700 (PDT)
+        bh=iUws3UTIX1TvCQYo2LYjoB9sUWO54hgibFdVZfokms4=;
+        b=D8jjWU5p3GA2i+ps3P3emt15gadEEH9Q0N31rl3Sgj06sMKt8Qn6Rvl8NWpHeSTmEe
+         eQLuKH1X1VmOLmXVTYLOvZDiJwpQRbvxRe+ldz3X/5Zbv1DASf19t2MICuuZ6wXsGdua
+         YOTNq1Md8FO3sKOh6XFkTH+9jcWdb43QcUqYe6VwOjxEb2deZqnB3YuP77vyvbSGPfuD
+         xufnYdqJ7ADiZvquxbWlm73n1AcCgS2DntchZjkJD6ffrpBxN8x7X5KWUZng2Kc23yLu
+         68cCquB0nhLf+Z+NA/xt9DN2bOFna+OQn57xlP/Emy/miaplDCJOfz3z49o4r/8a0aEL
+         5vvg==
+X-Gm-Message-State: AOAM53174wlBFd0Lj28aKRCeJIS7ShjMSLXvnZx9IdG0r4ti0KmlI+Iw
+        Kvcrxp07b0wcz2qzAriDkk05QtbY+PI=
+X-Google-Smtp-Source: ABdhPJw/wTtyRvCoMNn5B6X6n/f2xubB+bOFBGnWOyLXRjHnaW4xpkEWJCf3Uhss5JITW177qQYxMg==
+X-Received: by 2002:a65:62da:: with SMTP id m26mr16257272pgv.370.1627271564384;
+        Sun, 25 Jul 2021 20:52:44 -0700 (PDT)
 Received: from bobo.ibm.com (220-244-190-123.tpgi.com.au. [220.244.190.123])
-        by smtp.gmail.com with ESMTPSA id p33sm41140341pfw.40.2021.07.25.20.52.40
+        by smtp.gmail.com with ESMTPSA id p33sm41140341pfw.40.2021.07.25.20.52.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jul 2021 20:52:42 -0700 (PDT)
+        Sun, 25 Jul 2021 20:52:44 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v1 51/55] KVM: PPC: Book3S HV P9: Avoid cpu_in_guest atomics on entry and exit
-Date:   Mon, 26 Jul 2021 13:50:32 +1000
-Message-Id: <20210726035036.739609-52-npiggin@gmail.com>
+Subject: [PATCH v1 52/55] KVM: PPC: Book3S HV P9: Remove most of the vcore logic
+Date:   Mon, 26 Jul 2021 13:50:33 +1000
+Message-Id: <20210726035036.739609-53-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210726035036.739609-1-npiggin@gmail.com>
 References: <20210726035036.739609-1-npiggin@gmail.com>
@@ -62,151 +62,350 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-cpu_in_guest is set to determine if a CPU needs to be IPI'ed to exit
-the guest and notice the need_tlb_flush bit.
+The P9 path always uses one vcpu per vcore, so none of the the vcore,
+locks, stolen time, blocking logic, shared waitq, etc., is required.
 
-This can be implemented as a global per-CPU pointer to the currently
-running guest instead of per-guest cpumasks, saving 2 atomics per
-entry/exit. P7/8 doesn't require cpu_in_guest, nor does a nested HV
-(only the L0 does), so move it to the P9 HV path.
+Remove most of it.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/include/asm/kvm_book3s_64.h |  1 -
- arch/powerpc/include/asm/kvm_host.h      |  1 -
- arch/powerpc/kvm/book3s_hv.c             | 38 +++++++++++++-----------
- 3 files changed, 21 insertions(+), 19 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 147 ++++++++++++++++++++---------------
+ 1 file changed, 85 insertions(+), 62 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/kvm_book3s_64.h b/arch/powerpc/include/asm/kvm_book3s_64.h
-index 4b0753e03731..793aa2868c3f 100644
---- a/arch/powerpc/include/asm/kvm_book3s_64.h
-+++ b/arch/powerpc/include/asm/kvm_book3s_64.h
-@@ -44,7 +44,6 @@ struct kvm_nested_guest {
- 	struct mutex tlb_lock;		/* serialize page faults and tlbies */
- 	struct kvm_nested_guest *next;
- 	cpumask_t need_tlb_flush;
--	cpumask_t cpu_in_guest;
- 	short prev_cpu[NR_CPUS];
- 	u8 radix;			/* is this nested guest radix */
- };
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 74ee3a5b110e..650e1c0d118c 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -288,7 +288,6 @@ struct kvm_arch {
- 	u32 online_vcores;
- 	atomic_t hpte_mod_interest;
- 	cpumask_t need_tlb_flush;
--	cpumask_t cpu_in_guest;
- 	u8 radix;
- 	u8 fwnmi_enabled;
- 	u8 secure_guest;
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 2bd000e2c269..6f29fa7d77cc 100644
+index 6f29fa7d77cc..f83ae33e875c 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -2989,30 +2989,33 @@ static void kvmppc_release_hwthread(int cpu)
- 	tpaca->kvm_hstate.kvm_split_mode = NULL;
+@@ -281,6 +281,8 @@ static void kvmppc_core_start_stolen(struct kvmppc_vcore *vc, u64 tb)
+ {
+ 	unsigned long flags;
+ 
++	WARN_ON_ONCE(cpu_has_feature(CPU_FTR_ARCH_300));
++
+ 	spin_lock_irqsave(&vc->stoltb_lock, flags);
+ 	vc->preempt_tb = tb;
+ 	spin_unlock_irqrestore(&vc->stoltb_lock, flags);
+@@ -290,6 +292,8 @@ static void kvmppc_core_end_stolen(struct kvmppc_vcore *vc, u64 tb)
+ {
+ 	unsigned long flags;
+ 
++	WARN_ON_ONCE(cpu_has_feature(CPU_FTR_ARCH_300));
++
+ 	spin_lock_irqsave(&vc->stoltb_lock, flags);
+ 	if (vc->preempt_tb != TB_NIL) {
+ 		vc->stolen_tb += tb - vc->preempt_tb;
+@@ -302,7 +306,12 @@ static void kvmppc_core_vcpu_load_hv(struct kvm_vcpu *vcpu, int cpu)
+ {
+ 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
+ 	unsigned long flags;
+-	u64 now = mftb();
++	u64 now;
++
++	if (cpu_has_feature(CPU_FTR_ARCH_300))
++		return;
++
++	now = mftb();
+ 
+ 	/*
+ 	 * We can test vc->runner without taking the vcore lock,
+@@ -326,7 +335,12 @@ static void kvmppc_core_vcpu_put_hv(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
+ 	unsigned long flags;
+-	u64 now = mftb();
++	u64 now;
++
++	if (cpu_has_feature(CPU_FTR_ARCH_300))
++		return;
++
++	now = mftb();
+ 
+ 	if (vc->runner == vcpu && vc->vcore_state >= VCORE_SLEEPING)
+ 		kvmppc_core_start_stolen(vc, now);
+@@ -678,6 +692,8 @@ static u64 vcore_stolen_time(struct kvmppc_vcore *vc, u64 now)
+ 	u64 p;
+ 	unsigned long flags;
+ 
++	WARN_ON_ONCE(cpu_has_feature(CPU_FTR_ARCH_300));
++
+ 	spin_lock_irqsave(&vc->stoltb_lock, flags);
+ 	p = vc->stolen_tb;
+ 	if (vc->vcore_state != VCORE_INACTIVE &&
+@@ -700,13 +716,19 @@ static void kvmppc_create_dtl_entry(struct kvm_vcpu *vcpu,
+ 	dt = vcpu->arch.dtl_ptr;
+ 	vpa = vcpu->arch.vpa.pinned_addr;
+ 	now = tb;
+-	core_stolen = vcore_stolen_time(vc, now);
+-	stolen = core_stolen - vcpu->arch.stolen_logged;
+-	vcpu->arch.stolen_logged = core_stolen;
+-	spin_lock_irqsave(&vcpu->arch.tbacct_lock, flags);
+-	stolen += vcpu->arch.busy_stolen;
+-	vcpu->arch.busy_stolen = 0;
+-	spin_unlock_irqrestore(&vcpu->arch.tbacct_lock, flags);
++
++	if (cpu_has_feature(CPU_FTR_ARCH_300)) {
++		stolen = 0;
++	} else {
++		core_stolen = vcore_stolen_time(vc, now);
++		stolen = core_stolen - vcpu->arch.stolen_logged;
++		vcpu->arch.stolen_logged = core_stolen;
++		spin_lock_irqsave(&vcpu->arch.tbacct_lock, flags);
++		stolen += vcpu->arch.busy_stolen;
++		vcpu->arch.busy_stolen = 0;
++		spin_unlock_irqrestore(&vcpu->arch.tbacct_lock, flags);
++	}
++
+ 	if (!dt || !vpa)
+ 		return;
+ 	memset(dt, 0, sizeof(struct dtl_entry));
+@@ -903,13 +925,14 @@ static int kvm_arch_vcpu_yield_to(struct kvm_vcpu *target)
+ 	 * mode handler is not called but no other threads are in the
+ 	 * source vcore.
+ 	 */
+-
+-	spin_lock(&vcore->lock);
+-	if (target->arch.state == KVMPPC_VCPU_RUNNABLE &&
+-	    vcore->vcore_state != VCORE_INACTIVE &&
+-	    vcore->runner)
+-		target = vcore->runner;
+-	spin_unlock(&vcore->lock);
++	if (!cpu_has_feature(CPU_FTR_ARCH_300)) {
++		spin_lock(&vcore->lock);
++		if (target->arch.state == KVMPPC_VCPU_RUNNABLE &&
++		    vcore->vcore_state != VCORE_INACTIVE &&
++		    vcore->runner)
++			target = vcore->runner;
++		spin_unlock(&vcore->lock);
++	}
+ 
+ 	return kvm_vcpu_yield_to(target);
+ }
+@@ -3105,13 +3128,6 @@ static void kvmppc_start_thread(struct kvm_vcpu *vcpu, struct kvmppc_vcore *vc)
+ 		kvmppc_ipi_thread(cpu);
  }
  
-+static DEFINE_PER_CPU(struct kvm *, cpu_in_guest);
-+
- static void radix_flush_cpu(struct kvm *kvm, int cpu, struct kvm_vcpu *vcpu)
+-/* Old path does this in asm */
+-static void kvmppc_stop_thread(struct kvm_vcpu *vcpu)
+-{
+-	vcpu->cpu = -1;
+-	vcpu->arch.thread_cpu = -1;
+-}
+-
+ static void kvmppc_wait_for_nap(int n_threads)
  {
- 	struct kvm_nested_guest *nested = vcpu->arch.nested;
--	cpumask_t *cpu_in_guest;
+ 	int cpu = smp_processor_id();
+@@ -3200,6 +3216,8 @@ static void kvmppc_vcore_preempt(struct kvmppc_vcore *vc)
+ {
+ 	struct preempted_vcore_list *lp = this_cpu_ptr(&preempted_vcores);
+ 
++	WARN_ON_ONCE(cpu_has_feature(CPU_FTR_ARCH_300));
++
+ 	vc->vcore_state = VCORE_PREEMPT;
+ 	vc->pcpu = smp_processor_id();
+ 	if (vc->num_threads < threads_per_vcore(vc->kvm)) {
+@@ -3216,6 +3234,8 @@ static void kvmppc_vcore_end_preempt(struct kvmppc_vcore *vc)
+ {
+ 	struct preempted_vcore_list *lp;
+ 
++	WARN_ON_ONCE(cpu_has_feature(CPU_FTR_ARCH_300));
++
+ 	kvmppc_core_end_stolen(vc, mftb());
+ 	if (!list_empty(&vc->preempt_list)) {
+ 		lp = &per_cpu(preempted_vcores, vc->pcpu);
+@@ -3944,7 +3964,6 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
+ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 			 unsigned long lpcr, u64 *tb)
+ {
+-	struct kvmppc_vcore *vc = vcpu->arch.vcore;
+ 	u64 next_timer;
+ 	int trap;
+ 
+@@ -3960,9 +3979,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 
+ 	kvmppc_subcore_enter_guest();
+ 
+-	vc->entry_exit_map = 1;
+-	vc->in_guest = 1;
+-
+ 	vcpu_vpa_increment_dispatch(vcpu);
+ 
+ 	if (kvmhv_on_pseries()) {
+@@ -4015,9 +4031,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 
+ 	vcpu_vpa_increment_dispatch(vcpu);
+ 
+-	vc->entry_exit_map = 0x101;
+-	vc->in_guest = 0;
+-
+ 	kvmppc_subcore_exit_guest();
+ 
+ 	return trap;
+@@ -4083,6 +4096,13 @@ static bool kvmppc_vcpu_woken(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
++static bool kvmppc_vcpu_check_block(struct kvm_vcpu *vcpu)
++{
++	if (!vcpu->arch.ceded || kvmppc_vcpu_woken(vcpu))
++		return true;
++	return false;
++}
++
+ /*
+  * Check to see if any of the runnable vcpus on the vcore have pending
+  * exceptions or are no longer ceded
+@@ -4093,7 +4113,7 @@ static int kvmppc_vcore_check_block(struct kvmppc_vcore *vc)
  	int i;
  
- 	cpu = cpu_first_tlb_thread_sibling(cpu);
--	if (nested) {
-+	if (nested)
- 		cpumask_set_cpu(cpu, &nested->need_tlb_flush);
--		cpu_in_guest = &nested->cpu_in_guest;
--	} else {
-+	else
- 		cpumask_set_cpu(cpu, &kvm->arch.need_tlb_flush);
--		cpu_in_guest = &kvm->arch.cpu_in_guest;
--	}
- 	/*
--	 * Make sure setting of bit in need_tlb_flush precedes
--	 * testing of cpu_in_guest bits.  The matching barrier on
--	 * the other side is the first smp_mb() in kvmppc_run_core().
-+	 * Make sure setting of bit in need_tlb_flush precedes testing of
-+	 * cpu_in_guest. The matching barrier on the other side is hwsync
-+	 * when switching to guest MMU mode, which happens between
-+	 * cpu_in_guest being set to the guest kvm, and need_tlb_flush bit
-+	 * being tested.
- 	 */
- 	smp_mb();
- 	for (i = cpu; i <= cpu_last_tlb_thread_sibling(cpu);
--					i += cpu_tlb_thread_sibling_step())
--		if (cpumask_test_cpu(i, cpu_in_guest))
-+					i += cpu_tlb_thread_sibling_step()) {
-+		struct kvm *running = *per_cpu_ptr(&cpu_in_guest, i);
+ 	for_each_runnable_thread(i, vcpu, vc) {
+-		if (!vcpu->arch.ceded || kvmppc_vcpu_woken(vcpu))
++		if (kvmppc_vcpu_check_block(vcpu))
+ 			return 1;
+ 	}
+ 
+@@ -4110,6 +4130,8 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
+ 	int do_sleep = 1;
+ 	u64 block_ns;
+ 
++	WARN_ON_ONCE(cpu_has_feature(CPU_FTR_ARCH_300));
 +
-+		if (running == kvm)
- 			smp_call_function_single(i, do_nothing, NULL, 1);
+ 	/* Poll for pending exceptions and ceded state */
+ 	cur = start_poll = ktime_get();
+ 	if (vc->halt_poll_ns) {
+@@ -4375,11 +4397,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	vcpu->arch.ceded = 0;
+ 	vcpu->arch.run_task = current;
+ 	vcpu->arch.state = KVMPPC_VCPU_RUNNABLE;
+-	vcpu->arch.busy_preempt = TB_NIL;
+ 	vcpu->arch.last_inst = KVM_INST_FETCH_FAILED;
+-	vc->runnable_threads[0] = vcpu;
+-	vc->n_runnable = 1;
+-	vc->runner = vcpu;
+ 
+ 	/* See if the MMU is ready to go */
+ 	if (unlikely(!kvm->arch.mmu_ready)) {
+@@ -4397,11 +4415,8 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
+ 
+ 	kvmppc_update_vpas(vcpu);
+ 
+-	init_vcore_to_run(vc);
+-
+ 	preempt_disable();
+ 	pcpu = smp_processor_id();
+-	vc->pcpu = pcpu;
+ 	if (kvm_is_radix(kvm))
+ 		kvmppc_prepare_radix_vcpu(vcpu, pcpu);
+ 
+@@ -4430,21 +4445,23 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
+ 		goto out;
+ 	}
+ 
+-	tb = mftb();
++	if (vcpu->arch.timer_running) {
++		hrtimer_try_to_cancel(&vcpu->arch.dec_timer);
++		vcpu->arch.timer_running = 0;
 +	}
- }
  
- static void do_migrate_away_vcpu(void *arg)
-@@ -3080,7 +3083,6 @@ static void kvmppc_start_thread(struct kvm_vcpu *vcpu, struct kvmppc_vcore *vc)
- {
- 	int cpu;
- 	struct paca_struct *tpaca;
--	struct kvm *kvm = vc->kvm;
+-	vcpu->arch.stolen_logged = vcore_stolen_time(vc, tb);
+-	vc->preempt_tb = TB_NIL;
++	tb = mftb();
  
- 	cpu = vc->pcpu;
- 	if (vcpu) {
-@@ -3091,7 +3093,6 @@ static void kvmppc_start_thread(struct kvm_vcpu *vcpu, struct kvmppc_vcore *vc)
- 		cpu += vcpu->arch.ptid;
- 		vcpu->cpu = vc->pcpu;
- 		vcpu->arch.thread_cpu = cpu;
--		cpumask_set_cpu(cpu, &kvm->arch.cpu_in_guest);
- 	}
- 	tpaca = paca_ptrs[cpu];
- 	tpaca->kvm_hstate.kvm_vcpu = vcpu;
-@@ -3809,7 +3810,6 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
- 		kvmppc_release_hwthread(pcpu + i);
- 		if (sip && sip->napped[i])
- 			kvmppc_ipi_thread(pcpu + i);
--		cpumask_clear_cpu(pcpu + i, &vc->kvm->arch.cpu_in_guest);
- 	}
+-	kvmppc_clear_host_core(pcpu);
++	vcpu->cpu = pcpu;
++	vcpu->arch.thread_cpu = pcpu;
++	local_paca->kvm_hstate.kvm_vcpu = vcpu;
++	local_paca->kvm_hstate.ptid = 0;
++	local_paca->kvm_hstate.fake_suspend = 0;
  
- 	spin_unlock(&vc->lock);
-@@ -3977,8 +3977,14 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 		}
+-	local_paca->kvm_hstate.napping = 0;
+-	local_paca->kvm_hstate.kvm_split_mode = NULL;
+-	kvmppc_start_thread(vcpu, vc);
++	vc->pcpu = pcpu; // for kvmppc_create_dtl_entry
+ 	kvmppc_create_dtl_entry(vcpu, vc, tb);
+-	trace_kvm_guest_enter(vcpu);
  
- 	} else {
-+		struct kvm *kvm = vcpu->kvm;
-+
- 		kvmppc_xive_push_vcpu(vcpu);
-+
-+		__this_cpu_write(cpu_in_guest, kvm);
- 		trap = kvmhv_vcpu_entry_p9(vcpu, time_limit, lpcr, tb);
-+		__this_cpu_write(cpu_in_guest, NULL);
-+
- 		if (trap == BOOK3S_INTERRUPT_SYSCALL && !vcpu->arch.nested &&
- 		    !(vcpu->arch.shregs.msr & MSR_PR)) {
- 			unsigned long req = kvmppc_get_gpr(vcpu, 3);
-@@ -4003,7 +4009,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 		}
- 		kvmppc_xive_pull_vcpu(vcpu);
+-	vc->vcore_state = VCORE_RUNNING;
+-	trace_kvmppc_run_core(vc, 0);
++	trace_kvm_guest_enter(vcpu);
  
--		if (kvm_is_radix(vcpu->kvm))
-+		if (kvm_is_radix(kvm))
- 			vcpu->arch.slb_max = 0;
- 	}
+ 	guest_enter_irqoff();
  
-@@ -4468,8 +4474,6 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
+@@ -4466,11 +4483,10 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
+ 
+ 	set_irq_happened(trap);
+ 
+-	kvmppc_set_host_core(pcpu);
+-
+ 	guest_exit_irqoff();
+ 
+-	kvmppc_stop_thread(vcpu);
++	vcpu->cpu = -1;
++	vcpu->arch.thread_cpu = -1;
  
  	powerpc_local_irq_pmu_restore(flags);
  
--	cpumask_clear_cpu(pcpu, &kvm->arch.cpu_in_guest);
--
- 	preempt_enable();
+@@ -4497,28 +4513,31 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	}
+ 	vcpu->arch.ret = r;
  
- 	/*
+-	if (is_kvmppc_resume_guest(r) && vcpu->arch.ceded &&
+-	    !kvmppc_vcpu_woken(vcpu)) {
++	if (is_kvmppc_resume_guest(r) && !kvmppc_vcpu_check_block(vcpu)) {
+ 		kvmppc_set_timer(vcpu);
+-		while (vcpu->arch.ceded && !kvmppc_vcpu_woken(vcpu)) {
++
++		prepare_to_rcuwait(&vcpu->wait);
++		for (;;) {
++			set_current_state(TASK_INTERRUPTIBLE);
+ 			if (signal_pending(current)) {
+ 				vcpu->stat.signal_exits++;
+ 				run->exit_reason = KVM_EXIT_INTR;
+ 				vcpu->arch.ret = -EINTR;
+ 				break;
+ 			}
+-			spin_lock(&vc->lock);
+-			kvmppc_vcore_blocked(vc);
+-			spin_unlock(&vc->lock);
++
++			if (kvmppc_vcpu_check_block(vcpu))
++				break;
++
++			trace_kvmppc_vcore_blocked(vc, 0);
++			schedule();
++			trace_kvmppc_vcore_blocked(vc, 1);
+ 		}
++		finish_rcuwait(&vcpu->wait);
+ 	}
+ 	vcpu->arch.ceded = 0;
+ 
+-	vc->vcore_state = VCORE_INACTIVE;
+-	trace_kvmppc_run_core(vc, 1);
+-
+  done:
+-	kvmppc_remove_runnable(vc, vcpu, tb);
+ 	trace_kvmppc_run_vcpu_exit(vcpu);
+ 
+ 	return vcpu->arch.ret;
+@@ -4602,7 +4621,8 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
+ 
+ 	kvmppc_save_current_sprs();
+ 
+-	vcpu->arch.waitp = &vcpu->arch.vcore->wait;
++	if (!cpu_has_feature(CPU_FTR_ARCH_300))
++		vcpu->arch.waitp = &vcpu->arch.vcore->wait;
+ 	vcpu->arch.pgdir = kvm->mm->pgd;
+ 	vcpu->arch.state = KVMPPC_VCPU_BUSY_IN_HOST;
+ 
+@@ -5064,6 +5084,9 @@ void kvmppc_alloc_host_rm_ops(void)
+ 	int cpu, core;
+ 	int size;
+ 
++	if (cpu_has_feature(CPU_FTR_ARCH_300))
++		return;
++
+ 	/* Not the first time here ? */
+ 	if (kvmppc_host_rm_ops_hv != NULL)
+ 		return;
 -- 
 2.23.0
 
