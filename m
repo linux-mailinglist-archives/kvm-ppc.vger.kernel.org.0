@@ -2,149 +2,269 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A67523D3AF6
-	for <lists+kvm-ppc@lfdr.de>; Fri, 23 Jul 2021 15:17:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C3BE3D5125
+	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Jul 2021 03:50:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234972AbhGWMg3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 23 Jul 2021 08:36:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56714 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234988AbhGWMg2 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 23 Jul 2021 08:36:28 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16ND3eFX049686;
-        Fri, 23 Jul 2021 09:16:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : subject :
- in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=UVQt0GuOeKk36RlYZ2dAkgT4CoJbUq2B09fX4wSvrCo=;
- b=EHW0RAUX7yvLTLkInVn0AP/U+4lP4bnMv879AooV+2s5vI/ZzONJRT9ufOQUAX6fCAeI
- MZzG5PgIJLBVfpVDVRDcJcr1wbG6KqDoSzoW39BcT9bVX7Il/6o3wARB8SUdV0GpSplq
- GeMLtqWmLKHM+Ib9OoCSBM+tdKGxiT6qVmVZs4GvD3SRsroe58VOd6OtBR7tIoMqSRay
- 9bIhMWRpc2qLudtrDuLNcgr7V+c/fCJ9hZddt4vj3hkutXZCwZqlT5/QDQ+wIEVqNPMd
- 64rBs1OeHCQsOMh5ZfO7bru9sUbe6JgVwy9pT1ozXfSwvwj8VOHnCj4Abgv6c9cH42Gp Nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39yvxwbdj0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jul 2021 09:16:38 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16ND4Sf3053233;
-        Fri, 23 Jul 2021 09:16:38 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39yvxwbdhm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jul 2021 09:16:37 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16ND74Oa018506;
-        Fri, 23 Jul 2021 13:16:37 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma04dal.us.ibm.com with ESMTP id 39upufy0a7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jul 2021 13:16:37 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16NDGaEY24051970
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 23 Jul 2021 13:16:36 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 25914112070;
-        Fri, 23 Jul 2021 13:16:36 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5824F112065;
-        Fri, 23 Jul 2021 13:16:35 +0000 (GMT)
-Received: from localhost (unknown [9.211.138.163])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Fri, 23 Jul 2021 13:16:34 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     "Pratik R. Sampat" <psampat@linux.ibm.com>, mpe@ellerman.id.au,
-        benh@kernel.crashing.org, paulus@samba.org, kjain@linux.ibm.com,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, psampat@linux.ibm.com,
-        pratik.r.sampat@gmail.com
-Subject: Re: [PATCH v7 1/1] powerpc/pseries: Interface to represent PAPR
- firmware attributes
-In-Reply-To: <20210723054609.15033-2-psampat@linux.ibm.com>
-References: <20210723054609.15033-1-psampat@linux.ibm.com>
- <20210723054609.15033-2-psampat@linux.ibm.com>
-Date:   Fri, 23 Jul 2021 10:16:32 -0300
-Message-ID: <87r1fpcgr3.fsf@linux.ibm.com>
+        id S230321AbhGZBK1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 25 Jul 2021 21:10:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55068 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230272AbhGZBK1 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 21:10:27 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 202ACC061757
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 18:50:56 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id pf12-20020a17090b1d8cb0290175c085e7a5so17563897pjb.0
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 18:50:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=TfsUknjrJxS3/K50NAkYQdZi/fyngt6PnwTm6MfOOQw=;
+        b=tWW5oM8FgRxlkQ+Qoz4bkxNVkBpxJaUnYVHkWsKfwA4bTHMQ+P+8q8khbYpyt0G/Op
+         97SxiG/GF+TQWD3n8z/NVkY9htHqFV3ufCaEqyoWwwJIcYxwqW0ENM01PWQhRGKMHR7+
+         glW1SfuAId3JmpR5HLlil73+fE1xUBGpNME0JUamcvxrfs7EPkOeg1IciffyQ8wcGCoV
+         XpFH2MLHtF45nbl6T1K9XsdJ7fxT8rE3uy2MhqAKcdmxkxM9gYxDOd5uJfPWSV9KXimR
+         JuyVHNocdxgajXtSFafczVXcgCimFVVwJFtJptZN9ayn7bc1mf8eEOC5ckHHcFXpAhSe
+         xlfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=TfsUknjrJxS3/K50NAkYQdZi/fyngt6PnwTm6MfOOQw=;
+        b=W6zt/w3zjG/riJND6/1vJaid7nnnCWlE3FozdEaOY9dq8KS3Ymv1tfzs4nBPOVCeM3
+         rt0A6Jut/UEmd/dulimL9Y39JKwnSCa6dWzoMtjdkamg61Cadi468FcKXL3w7pmYA5eo
+         DmIz3trBMS+d74BFQVXihZRodCv0V1xxDD2bMqtdkMMjKiUdne59vybLh+wwjxLlrWg5
+         /opzveS7Z4QJXEp9HPNzuRQjk7c4mASgHeik3HY+/jl6gVw0RRslhCVv4hQBvNQd/2oT
+         TqkmBpxInsyg2GG3TaKj/xWSrKwQTovdk4fRDvGTzRoZBdAqjhZK4W6PQ+Lq5qOyCM08
+         TihQ==
+X-Gm-Message-State: AOAM531MKCK2eFhFFYFodve99WxDAqXR4/KEwokG3Y0RAjtr4W1di88U
+        a8SlS34rLDDVY36SrCv8R+E=
+X-Google-Smtp-Source: ABdhPJzbbjXo/sTEbHh6B9PN3y2Hx3DeAF1uurvBqKACVg6CKfVPOHw6Khdj0tVfLVxGA1u7haliyw==
+X-Received: by 2002:a17:90a:6097:: with SMTP id z23mr14672145pji.172.1627264255561;
+        Sun, 25 Jul 2021 18:50:55 -0700 (PDT)
+Received: from localhost (220-244-190-123.tpgi.com.au. [220.244.190.123])
+        by smtp.gmail.com with ESMTPSA id a21sm11868557pjq.2.2021.07.25.18.50.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jul 2021 18:50:55 -0700 (PDT)
+Date:   Mon, 26 Jul 2021 11:50:50 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v4 1/2] KVM: PPC: Book3S HV: Sanitise vcpu registers in
+ nested path
+To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
+        paulus@ozlabs.org
+References: <20210722221240.2384655-1-farosas@linux.ibm.com>
+        <20210722221240.2384655-2-farosas@linux.ibm.com>
+In-Reply-To: <20210722221240.2384655-2-farosas@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: t4BzyVrfvVSyoZVsVv1DINHFabc5o9M_
-X-Proofpoint-GUID: y1d1d4t_xEJ3rGTmbqYl9y8h4rjJ3Z2X
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-23_05:2021-07-23,2021-07-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 phishscore=0 mlxlogscore=999 suspectscore=0
- bulkscore=0 priorityscore=1501 impostorscore=0 adultscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2107230078
+Message-Id: <1627263995.i8pr0asy10.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-"Pratik R. Sampat" <psampat@linux.ibm.com> writes:
+Excerpts from Fabiano Rosas's message of July 23, 2021 8:12 am:
+> As one of the arguments of the H_ENTER_NESTED hypercall, the nested
+> hypervisor (L1) prepares a structure containing the values of various
+> hypervisor-privileged registers with which it wants the nested guest
+> (L2) to run. Since the nested HV runs in supervisor mode it needs the
+> host to write to these registers.
+>=20
+> To stop a nested HV manipulating this mechanism and using a nested
+> guest as a proxy to access a facility that has been made unavailable
+> to it, we have a routine that sanitises the values of the HV registers
+> before copying them into the nested guest's vcpu struct.
+>=20
+> However, when coming out of the guest the values are copied as they
+> were back into L1 memory, which means that any sanitisation we did
+> during guest entry will be exposed to L1 after H_ENTER_NESTED returns.
+>=20
+> This patch alters this sanitisation to have effect on the vcpu->arch
+> registers directly before entering and after exiting the guest,
+> leaving the structure that is copied back into L1 unchanged (except
+> when we really want L1 to access the value, e.g the Cause bits of
+> HFSCR).
 
-> Adds a generic interface to represent the energy and frequency related
-> PAPR attributes on the system using the new H_CALL
-> "H_GET_ENERGY_SCALE_INFO".
->
-> H_GET_EM_PARMS H_CALL was previously responsible for exporting this
-> information in the lparcfg, however the H_GET_EM_PARMS H_CALL
-> will be deprecated P10 onwards.
->
-> The H_GET_ENERGY_SCALE_INFO H_CALL is of the following call format:
-> hcall(
->   uint64 H_GET_ENERGY_SCALE_INFO,  // Get energy scale info
->   uint64 flags,           // Per the flag request
->   uint64 firstAttributeId,// The attribute id
->   uint64 bufferAddress,   // Guest physical address of the output buffer
->   uint64 bufferSize       // The size in bytes of the output buffer
-> );
->
-> This H_CALL can query either all the attributes at once with
-> firstAttributeId = 0, flags = 0 as well as query only one attribute
-> at a time with firstAttributeId = id, flags = 1.
->
-> The output buffer consists of the following
-> 1. number of attributes              - 8 bytes
-> 2. array offset to the data location - 8 bytes
-> 3. version info                      - 1 byte
-> 4. A data array of size num attributes, which contains the following:
->   a. attribute ID              - 8 bytes
->   b. attribute value in number - 8 bytes
->   c. attribute name in string  - 64 bytes
->   d. attribute value in string - 64 bytes
->
-> The new H_CALL exports information in direct string value format, hence
-> a new interface has been introduced in
-> /sys/firmware/papr/energy_scale_info to export this information to
-> userspace in an extensible pass-through format.
->
-> The H_CALL returns the name, numeric value and string value (if exists)
->
-> The format of exposing the sysfs information is as follows:
-> /sys/firmware/papr/energy_scale_info/
->    |-- <id>/
->      |-- desc
->      |-- value
->      |-- value_desc (if exists)
->    |-- <id>/
->      |-- desc
->      |-- value
->      |-- value_desc (if exists)
-> ...
->
-> The energy information that is exported is useful for userspace tools
-> such as powerpc-utils. Currently these tools infer the
-> "power_mode_data" value in the lparcfg, which in turn is obtained from
-> the to be deprecated H_GET_EM_PARMS H_CALL.
-> On future platforms, such userspace utilities will have to look at the
-> data returned from the new H_CALL being populated in this new sysfs
-> interface and report this information directly without the need of
-> interpretation.
->
-> Signed-off-by: Pratik R. Sampat <psampat@linux.ibm.com>
-> Reviewed-by: Gautham R. Shenoy <ego@linux.vnet.ibm.com>
+These patches look good to me. I ported my demand-faulting patches on=20
+top of them and things seem to work okay.
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
 
+Just one minor nit:
+
+>=20
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> ---
+>  arch/powerpc/kvm/book3s_hv_nested.c | 100 +++++++++++++++-------------
+>  1 file changed, 52 insertions(+), 48 deletions(-)
+>=20
+> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3=
+s_hv_nested.c
+> index 8543ad538b0c..3804dc50ebe8 100644
+> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+> @@ -104,8 +104,17 @@ static void save_hv_return_state(struct kvm_vcpu *vc=
+pu, int trap,
+>  {
+>  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
+> =20
+> +	/*
+> +	 * When loading the hypervisor-privileged registers to run L2,
+> +	 * we might have used bits from L1 state to restrict what the
+> +	 * L2 state is allowed to be. Since L1 is not allowed to read
+> +	 * the HV registers, do not include these modifications in the
+> +	 * return state.
+> +	 */
+> +	hr->hfscr =3D ((~HFSCR_INTR_CAUSE & hr->hfscr) |
+> +		     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
+
+Can you change this to only update HFSCR intr cause field when we take a=20
+hfac interrupt? It's possible the L0 can cause other kinds of hfacs=20
+behind the back of the L1 with demand faulting, so it would be unusual
+for L1 to see the register change if it didn't take an hfac interrupt.
+
+Thanks,
+Nick
+
+> +
+>  	hr->dpdes =3D vc->dpdes;
+> -	hr->hfscr =3D vcpu->arch.hfscr;
+>  	hr->purr =3D vcpu->arch.purr;
+>  	hr->spurr =3D vcpu->arch.spurr;
+>  	hr->ic =3D vcpu->arch.ic;
+> @@ -134,49 +143,7 @@ static void save_hv_return_state(struct kvm_vcpu *vc=
+pu, int trap,
+>  	}
+>  }
+> =20
+> -/*
+> - * This can result in some L0 HV register state being leaked to an L1
+> - * hypervisor when the hv_guest_state is copied back to the guest after
+> - * being modified here.
+> - *
+> - * There is no known problem with such a leak, and in many cases these
+> - * register settings could be derived by the guest by observing behaviou=
+r
+> - * and timing, interrupts, etc., but it is an issue to consider.
+> - */
+> -static void sanitise_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_stat=
+e *hr)
+> -{
+> -	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
+> -	u64 mask;
+> -
+> -	/*
+> -	 * Don't let L1 change LPCR bits for the L2 except these:
+> -	 */
+> -	mask =3D LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
+> -		LPCR_LPES | LPCR_MER;
+> -
+> -	/*
+> -	 * Additional filtering is required depending on hardware
+> -	 * and configuration.
+> -	 */
+> -	hr->lpcr =3D kvmppc_filter_lpcr_hv(vcpu->kvm,
+> -			(vc->lpcr & ~mask) | (hr->lpcr & mask));
+> -
+> -	/*
+> -	 * Don't let L1 enable features for L2 which we've disabled for L1,
+> -	 * but preserve the interrupt cause field.
+> -	 */
+> -	hr->hfscr &=3D (HFSCR_INTR_CAUSE | vcpu->arch.hfscr);
+> -
+> -	/* Don't let data address watchpoint match in hypervisor state */
+> -	hr->dawrx0 &=3D ~DAWRX_HYP;
+> -	hr->dawrx1 &=3D ~DAWRX_HYP;
+> -
+> -	/* Don't let completed instruction address breakpt match in HV state */
+> -	if ((hr->ciabr & CIABR_PRIV) =3D=3D CIABR_PRIV_HYPER)
+> -		hr->ciabr &=3D ~CIABR_PRIV;
+> -}
+> -
+> -static void restore_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state=
+ *hr)
+> +static void restore_hv_regs(struct kvm_vcpu *vcpu, const struct hv_guest=
+_state *hr)
+>  {
+>  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
+> =20
+> @@ -288,6 +255,43 @@ static int kvmhv_write_guest_state_and_regs(struct k=
+vm_vcpu *vcpu,
+>  				     sizeof(struct pt_regs));
+>  }
+> =20
+> +static void load_l2_hv_regs(struct kvm_vcpu *vcpu,
+> +			    const struct hv_guest_state *l2_hv,
+> +			    const struct hv_guest_state *l1_hv, u64 *lpcr)
+> +{
+> +	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
+> +	u64 mask;
+> +
+> +	restore_hv_regs(vcpu, l2_hv);
+> +
+> +	/*
+> +	 * Don't let L1 change LPCR bits for the L2 except these:
+> +	 */
+> +	mask =3D LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD |
+> +		LPCR_LPES | LPCR_MER;
+> +
+> +	/*
+> +	 * Additional filtering is required depending on hardware
+> +	 * and configuration.
+> +	 */
+> +	*lpcr =3D kvmppc_filter_lpcr_hv(vcpu->kvm,
+> +				      (vc->lpcr & ~mask) | (*lpcr & mask));
+> +
+> +	/*
+> +	 * Don't let L1 enable features for L2 which we've disabled for L1,
+> +	 * but preserve the interrupt cause field.
+> +	 */
+> +	vcpu->arch.hfscr =3D l2_hv->hfscr & (HFSCR_INTR_CAUSE | l1_hv->hfscr);
+> +
+> +	/* Don't let data address watchpoint match in hypervisor state */
+> +	vcpu->arch.dawrx0 =3D l2_hv->dawrx0 & ~DAWRX_HYP;
+> +	vcpu->arch.dawrx1 =3D l2_hv->dawrx1 & ~DAWRX_HYP;
+> +
+> +	/* Don't let completed instruction address breakpt match in HV state */
+> +	if ((l2_hv->ciabr & CIABR_PRIV) =3D=3D CIABR_PRIV_HYPER)
+> +		vcpu->arch.ciabr =3D l2_hv->ciabr & ~CIABR_PRIV;
+> +}
+> +
+>  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>  {
+>  	long int err, r;
+> @@ -296,7 +300,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>  	struct hv_guest_state l2_hv =3D {0}, saved_l1_hv;
+>  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
+>  	u64 hv_ptr, regs_ptr;
+> -	u64 hdec_exp;
+> +	u64 hdec_exp, lpcr;
+>  	s64 delta_purr, delta_spurr, delta_ic, delta_vtb;
+> =20
+>  	if (vcpu->kvm->arch.l1_ptcr =3D=3D 0)
+> @@ -349,8 +353,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>  	/* Guest must always run with ME enabled, HV disabled. */
+>  	vcpu->arch.shregs.msr =3D (vcpu->arch.regs.msr | MSR_ME) & ~MSR_HV;
+> =20
+> -	sanitise_hv_regs(vcpu, &l2_hv);
+> -	restore_hv_regs(vcpu, &l2_hv);
+> +	lpcr =3D l2_hv.lpcr;
+> +	load_l2_hv_regs(vcpu, &l2_hv, &saved_l1_hv, &lpcr);
+> =20
+>  	vcpu->arch.ret =3D RESUME_GUEST;
+>  	vcpu->arch.trap =3D 0;
+> @@ -360,7 +364,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+>  			r =3D RESUME_HOST;
+>  			break;
+>  		}
+> -		r =3D kvmhv_run_single_vcpu(vcpu, hdec_exp, l2_hv.lpcr);
+> +		r =3D kvmhv_run_single_vcpu(vcpu, hdec_exp, lpcr);
+>  	} while (is_kvmppc_resume_guest(r));
+> =20
+>  	/* save L2 state for return */
+> --=20
+> 2.29.2
+>=20
+>=20
