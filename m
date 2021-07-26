@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CEE523D51C9
-	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Jul 2021 05:52:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 238483D51CA
+	for <lists+kvm-ppc@lfdr.de>; Mon, 26 Jul 2021 05:52:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231695AbhGZDLh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 25 Jul 2021 23:11:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53316 "EHLO
+        id S231718AbhGZDLi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 25 Jul 2021 23:11:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231674AbhGZDL3 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 23:11:29 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0092C061757
-        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:51:57 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id p5-20020a17090a8685b029015d1a9a6f1aso11972650pjn.1
-        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:51:57 -0700 (PDT)
+        with ESMTP id S231679AbhGZDLb (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 25 Jul 2021 23:11:31 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 187EAC061757
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:00 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id ch6so2116887pjb.5
+        for <kvm-ppc@vger.kernel.org>; Sun, 25 Jul 2021 20:52:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=4FMW47dARaup+eOqBMjIjGjKfF+ltOIcNH9DSadt5C4=;
-        b=HOKqpTPk5lE5fjYw+uVPSwYFwNbq92SAWi8giqUyT9LLGQSBP9CPlEVg6B7jxa2QME
-         4ckogK4xix6yhsQzIiFvajyHAdKGK/bUONAXdvqZofKGGA+6Q6gVNhUbILRxNDAp0Yyc
-         aLkU/JwQLSk/9UUhwEm4zn5/45TuDir4OKZiu96YnarcMYYnxATog9gQaQpoS2ak8I6L
-         CNJ78E0Yd3SlYBtmEj4ebqdL71AZhG9ZQ5pcV92xuBnDi5FSdZ0pNs729k2e7UIeIjg+
-         IhwmNIUlXyJtdz9obRQI0HzLLLNjfLpUDqgZ/vnuhcSGHCzFJlAFmTUvnpB8P+7KKgXQ
-         UV8A==
+        bh=YoEeMmSqnvFKWKfBwYyk8RCXQVi3ja3orrar8JiO4tk=;
+        b=O6Rb7Rmt6QCh6w+Klwzr9LN7o5OZd3TtSkNXnW95T7qkdMdW6Ny2eOcF+g1iEWzILD
+         EdorcqXgUXUTkU4Z2eeju2pE6H5dEIHosih3PpWVofy3X/vBcIiNnVHg3W7cqXOZHxEi
+         XgWTlO+ChfhYwKT4M04Wjpt3xR3fxAZmaBqMyzTfp4KLJqv8lOGUCKAs67ngQptsl6QD
+         TXpAdFUEQLbTgzALNLgeBjw9fXlzVES0bmM08X6h4kLclEucyivaH35zJwYKFVbMmbOR
+         bZGHGDCzn5KDskbyM+qpMxBfIZOfTRzFGZ0poZdEIFulGY47CvLQZ44KogrspdfP2sZ9
+         9bQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=4FMW47dARaup+eOqBMjIjGjKfF+ltOIcNH9DSadt5C4=;
-        b=OZ/FlsdbBnrIamwUvLNUwLEaLpkMFvNwrjUq5l+n5vJ10gs44SfaM0Hno/K4bmEDUo
-         9QZ99pRM64jQ47rGpIaLtJgYxcXP/p7GMgHnYsaHGKg9CUvi9lddsH0aOdR2fptnZYrr
-         v/JgOTgeIkArEA0zRWhBpo9R7ueKffYyWx8DOmV+e56FTwNc9wuYdcsd80IlAwZasFpi
-         ak5or/dnIHLIKf1IUY3shnKsFO4TOuYTm4qkXCxiuGoipQjChldSHuMYx5ifwbSRu1EG
-         wKEr5Z+sGV5NiQJvZXUjO4E5DfZWS0wPbd/IZ0tnmGzIIjEgQnL+/g0VlpbaPduHk3g2
-         4sew==
-X-Gm-Message-State: AOAM532ImHAEiNIHHjjOK1wLwftH1DuSzEupjWdtfVEk5j5naSFgmH7V
-        c0ZaFyFkECfZSlnjbqLGZ7U/V+nKWcM=
-X-Google-Smtp-Source: ABdhPJwHn4E6yTCWXtErPNc+BeOQyynG2dD/DRZCLKaW97xyd4T92AoQfu8XAB7VKDUHnQbRlMCpQw==
-X-Received: by 2002:a63:1f24:: with SMTP id f36mr16264020pgf.151.1627271517416;
-        Sun, 25 Jul 2021 20:51:57 -0700 (PDT)
+        bh=YoEeMmSqnvFKWKfBwYyk8RCXQVi3ja3orrar8JiO4tk=;
+        b=MDSlcQJRsgeafuG0QvlH7iUFLzEFAVgGOu+wp9zD9Bbw5EpTNw2V10d9OCnAALENuZ
+         be1QDrFD05+/MEllKwaYCkYnyJKLvPN39/BpxJUs95wqOcp9eG4iLP7R9gYDRrHIDpcI
+         /S47XNC5+oiInmuBEMiLgOQ5eQXGY7M2oPIA783PYio4RpYl/aB0OtNqtk0xNdlw+/wf
+         vwRdrJLNA2SyodQ5HHTYhkeCXzdhtOHJeQPxUxRqkopOHxGaGi/RJnejC+EBo0Ey9+Yd
+         ma09SZsArYP/ozBcg+q3SnjBpNsEbwaJOvueRs3DfuswomANy34NnXl6Gti6orWRxZOU
+         MCzA==
+X-Gm-Message-State: AOAM531wUcfmzso6zHzGOQ0RW+PUjf7CkoHu7x31spfLJwOfm1n40DSE
+        gYTftuq1hJm/5wDYszGlWFg9oc61psI=
+X-Google-Smtp-Source: ABdhPJzr0hLlHf/k25iTZeVNCkWOSf/iquwxNFX4+rD1Ug8qEvheoO7fpDgRunhFC/hjz4E6grSyqw==
+X-Received: by 2002:a65:61ab:: with SMTP id i11mr16393083pgv.168.1627271519612;
+        Sun, 25 Jul 2021 20:51:59 -0700 (PDT)
 Received: from bobo.ibm.com (220-244-190-123.tpgi.com.au. [220.244.190.123])
-        by smtp.gmail.com with ESMTPSA id p33sm41140341pfw.40.2021.07.25.20.51.55
+        by smtp.gmail.com with ESMTPSA id p33sm41140341pfw.40.2021.07.25.20.51.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jul 2021 20:51:57 -0700 (PDT)
+        Sun, 25 Jul 2021 20:51:59 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v1 31/55] KVM: PPC: Book3S HV P9: Juggle SPR switching around
-Date:   Mon, 26 Jul 2021 13:50:12 +1000
-Message-Id: <20210726035036.739609-32-npiggin@gmail.com>
+Subject: [PATCH v1 32/55] KVM: PPC: Book3S HV P9: Move vcpu register save/restore into functions
+Date:   Mon, 26 Jul 2021 13:50:13 +1000
+Message-Id: <20210726035036.739609-33-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210726035036.739609-1-npiggin@gmail.com>
 References: <20210726035036.739609-1-npiggin@gmail.com>
@@ -62,55 +62,104 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This juggles SPR switching on the entry and exit sides to be more
-symmetric, which makes the next refactoring patch possible with no
-functional change.
+This should be no functional difference but makes the caller easier
+to read.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 65 +++++++++++++++++++++++-------------
+ 1 file changed, 41 insertions(+), 24 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 56429b53f4dc..c2c72875fca9 100644
+index c2c72875fca9..45211458ac05 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4175,7 +4175,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 		msr = mfmsr(); /* TM restore can update msr */
- 	}
+@@ -4062,6 +4062,44 @@ static void store_spr_state(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.ctrl = mfspr(SPRN_CTRLF);
+ }
  
--	switch_pmu_to_guest(vcpu, &host_os_sprs);
-+	load_spr_state(vcpu, &host_os_sprs);
- 
- 	load_fp_state(&vcpu->arch.fp);
- #ifdef CONFIG_ALTIVEC
-@@ -4183,7 +4183,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- #endif
- 	mtspr(SPRN_VRSAVE, vcpu->arch.vrsave);
- 
--	load_spr_state(vcpu, &host_os_sprs);
-+	switch_pmu_to_guest(vcpu, &host_os_sprs);
- 
- 	if (kvmhv_on_pseries()) {
- 		/*
-@@ -4283,6 +4283,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 			vcpu->arch.slb_max = 0;
- 	}
- 
-+	switch_pmu_to_host(vcpu, &host_os_sprs);
++/* Returns true if current MSR and/or guest MSR may have changed */
++static bool load_vcpu_state(struct kvm_vcpu *vcpu,
++			   struct p9_host_os_sprs *host_os_sprs)
++{
++	bool ret = false;
 +
- 	store_spr_state(vcpu);
- 
- 	store_fp_state(&vcpu->arch.fp);
-@@ -4297,8 +4299,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
++	if (cpu_has_feature(CPU_FTR_TM) ||
++	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST)) {
++		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
++		ret = true;
++	}
++
++	load_spr_state(vcpu, host_os_sprs);
++
++	load_fp_state(&vcpu->arch.fp);
++#ifdef CONFIG_ALTIVEC
++	load_vr_state(&vcpu->arch.vr);
++#endif
++	mtspr(SPRN_VRSAVE, vcpu->arch.vrsave);
++
++	return ret;
++}
++
++static void store_vcpu_state(struct kvm_vcpu *vcpu)
++{
++	store_spr_state(vcpu);
++
++	store_fp_state(&vcpu->arch.fp);
++#ifdef CONFIG_ALTIVEC
++	store_vr_state(&vcpu->arch.vr);
++#endif
++	vcpu->arch.vrsave = mfspr(SPRN_VRSAVE);
++
++	if (cpu_has_feature(CPU_FTR_TM) ||
++	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
++		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
++}
++
+ static void save_p9_host_os_sprs(struct p9_host_os_sprs *host_os_sprs)
+ {
+ 	if (!cpu_has_feature(CPU_FTR_ARCH_31))
+@@ -4169,19 +4207,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
  
  	vcpu_vpa_increment_dispatch(vcpu);
  
--	switch_pmu_to_host(vcpu, &host_os_sprs);
+-	if (cpu_has_feature(CPU_FTR_TM) ||
+-	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST)) {
+-		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
+-		msr = mfmsr(); /* TM restore can update msr */
+-	}
 -
- 	timer_rearm_host_dec(*tb);
+-	load_spr_state(vcpu, &host_os_sprs);
+-
+-	load_fp_state(&vcpu->arch.fp);
+-#ifdef CONFIG_ALTIVEC
+-	load_vr_state(&vcpu->arch.vr);
+-#endif
+-	mtspr(SPRN_VRSAVE, vcpu->arch.vrsave);
++	if (unlikely(load_vcpu_state(vcpu, &host_os_sprs)))
++		msr = mfmsr(); /* MSR may have been updated */
  
- 	restore_p9_host_os_sprs(vcpu, &host_os_sprs);
+ 	switch_pmu_to_guest(vcpu, &host_os_sprs);
+ 
+@@ -4285,17 +4312,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 
+ 	switch_pmu_to_host(vcpu, &host_os_sprs);
+ 
+-	store_spr_state(vcpu);
+-
+-	store_fp_state(&vcpu->arch.fp);
+-#ifdef CONFIG_ALTIVEC
+-	store_vr_state(&vcpu->arch.vr);
+-#endif
+-	vcpu->arch.vrsave = mfspr(SPRN_VRSAVE);
+-
+-	if (cpu_has_feature(CPU_FTR_TM) ||
+-	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
+-		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
++	store_vcpu_state(vcpu);
+ 
+ 	vcpu_vpa_increment_dispatch(vcpu);
+ 
 -- 
 2.23.0
 
