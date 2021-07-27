@@ -2,148 +2,179 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 895A03D6C5C
-	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Jul 2021 05:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A27FB3D7898
+	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Jul 2021 16:37:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234749AbhG0C3T (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 26 Jul 2021 22:29:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34176 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234736AbhG0C3T (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 26 Jul 2021 22:29:19 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66FDFC061757
-        for <kvm-ppc@vger.kernel.org>; Mon, 26 Jul 2021 20:09:47 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id k4-20020a17090a5144b02901731c776526so2062167pjm.4
-        for <kvm-ppc@vger.kernel.org>; Mon, 26 Jul 2021 20:09:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=RfMfAd8vk9ucuSiYD8/T4BjZj1PqGA8EST1H4ubJKo4=;
-        b=nZh2s2qBDDJVUSzO7FUUhXtI0fm3DMB8U1Y3b+zPd/wgmfpcMSoeLArFGe53TJVuq2
-         o6o2bcQJ6guK2/gC6hFtKksdgfyvO2QaI/68wWIm93IG2RnlEpnLACgppm1Lj6nkYo4a
-         xy6N+Md+kjcb1/iTWRkn6aC91ab8diPhox4gMUXyZRMyYKb2ZlTYiBKqaNTdWQzdTx0K
-         SxNXhahAEfyKz2XQuEhT2ieitI0yWVGUpIw8v9Bro6pxoW6bBW0g64vBHy0Efbxbx5Ep
-         lAbXCfUNWZL6Xq5oGN8fxsaTF95Xkmw41mORHRIAqgqhFIHosCU6tVe07JYpcR/iCA8s
-         9/ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=RfMfAd8vk9ucuSiYD8/T4BjZj1PqGA8EST1H4ubJKo4=;
-        b=OLT5jVks75ldQQD9HamskoUTTPv+E4QjXojIEDc2VvlNpW7IXoKVi4Ii2V1rBzQj6a
-         L4WezaWh+gXHOHNPSC/PWOnujSu744HXTlfciNsxBSq9sTLc8AHiQP9M7lqCXZs1HJYS
-         J97Bi46zqLRJMF5mvlyEY1XKWZCMrYcPXKTu5o+0VUHxqofMy41NZiyNIQleyZ/9wVa5
-         OofAVBTbVs2U0dLlHy76f7fByqhKLM9rp41xzAPvZ+Y+Y8ZPXxP+O5/5lKrvn/WTNuj+
-         9C1j307H9FSV77m735cdshM1/YsQ+1UcVgo/DDAqUc9idt1JCCKv1442fzOUOxskZci4
-         1w0w==
-X-Gm-Message-State: AOAM5329j4V5cJnzrMm4zWCWmzFwKC/173RYTLKQViEM9Uw+jy77Yf+n
-        pPio0t/WMiUJEGs0uI7DFjnYm1YW7MeEwg==
-X-Google-Smtp-Source: ABdhPJytOkj/2jmDWUsqrHMD2un4k3BwnFkqgL8PEGXMVaiDTL9d5pdtiF9a2xEmAOfEak/MsjDeQQ==
-X-Received: by 2002:a63:34a:: with SMTP id 71mr21297103pgd.289.1627355386968;
-        Mon, 26 Jul 2021 20:09:46 -0700 (PDT)
-Received: from localhost (60-242-181-102.static.tpgi.com.au. [60.242.181.102])
-        by smtp.gmail.com with ESMTPSA id f3sm1508261pfk.206.2021.07.26.20.09.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jul 2021 20:09:46 -0700 (PDT)
-Date:   Tue, 27 Jul 2021 13:09:40 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v5 2/2] KVM: PPC: Book3S HV: Stop forwarding all HFUs to
- L1
-To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
+        id S231466AbhG0OhI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 27 Jul 2021 10:37:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37006 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231948AbhG0OhH (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 27 Jul 2021 10:37:07 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16REXgq9178457;
+        Tue, 27 Jul 2021 10:36:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=MQ4ux33af7VadX0imatqcwUcNfNmUpD8TX9W/+DBEt0=;
+ b=MZeR0fkgwbSXvS6OMfEquZ7bn2+U6rdOBFFkrIHMqlDFkL7CcTLDaAe7+IIlL1WFqsgx
+ 5L8s2ATFs1qiKzISu8Su1a4b6Jmh7wQY67m0+3LG2IxyPBhmA2JKoShx9VNqw+t68OMi
+ nK1XnwQbuVbnu0JFkFxxbiO/lR3cZ7M23yls8elHNoJ7lVP1rA7crVGnuJNKhxsnPC8E
+ vLYUB+GhWeD7R3bwpqGkLhm7rXMBpImSRxfbsxlCSzepCFwdGPByxsYT9hqhq3fzTUSu
+ Vt7Renq85HDAku5KmS3gUoOuCy2wqf4SoGbOwdI6vzXR7g0+BPRCXeQoR0UuxprpcJNa BQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a2g7bj8gk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jul 2021 10:36:56 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16REXtMi179616;
+        Tue, 27 Jul 2021 10:36:39 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a2g7bj7ey-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jul 2021 10:36:38 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16REM61O003606;
+        Tue, 27 Jul 2021 14:36:24 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma02dal.us.ibm.com with ESMTP id 3a2362dpuc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jul 2021 14:36:24 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16REaNAQ50397554
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Jul 2021 14:36:23 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3CF8D112066;
+        Tue, 27 Jul 2021 14:36:23 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 837F6112070;
+        Tue, 27 Jul 2021 14:36:22 +0000 (GMT)
+Received: from localhost (unknown [9.211.99.174])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Tue, 27 Jul 2021 14:36:22 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
 Cc:     linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
         paulus@ozlabs.org
+Subject: Re: [PATCH v5 2/2] KVM: PPC: Book3S HV: Stop forwarding all HFUs to L1
+In-Reply-To: <1627355201.gqa4czyyxy.astroid@bobo.none>
 References: <20210726201710.2432874-1-farosas@linux.ibm.com>
-        <20210726201710.2432874-3-farosas@linux.ibm.com>
-In-Reply-To: <20210726201710.2432874-3-farosas@linux.ibm.com>
+ <20210726201710.2432874-3-farosas@linux.ibm.com>
+ <1627355201.gqa4czyyxy.astroid@bobo.none>
+Date:   Tue, 27 Jul 2021 11:36:20 -0300
+Message-ID: <87o8anddsr.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Message-Id: <1627355201.gqa4czyyxy.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 46Un7Zj04E9iCj213-wdxD8JkNpIXPK9
+X-Proofpoint-ORIG-GUID: vqsRGzEaj4gq5C088sZ7HWVto0aY2lNW
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-27_10:2021-07-27,2021-07-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 adultscore=0 spamscore=0 impostorscore=0 suspectscore=0
+ phishscore=0 bulkscore=0 clxscore=1015 mlxlogscore=999 priorityscore=1501
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2107270086
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Fabiano Rosas's message of July 27, 2021 6:17 am:
-> If the nested hypervisor has no access to a facility because it has
-> been disabled by the host, it should also not be able to see the
-> Hypervisor Facility Unavailable that arises from one of its guests
-> trying to access the facility.
->=20
-> This patch turns a HFU that happened in L2 into a Hypervisor Emulation
-> Assistance interrupt and forwards it to L1 for handling. The ones that
-> happened because L1 explicitly disabled the facility for L2 are still
-> let through, along with the corresponding Cause bits in the HFSCR.
->=20
-> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
-> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arch/powerpc/kvm/book3s_hv_nested.c | 32 +++++++++++++++++++++++------
->  1 file changed, 26 insertions(+), 6 deletions(-)
->=20
-> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3=
-s_hv_nested.c
-> index 8215dbd4be9a..d544b092b49a 100644
-> --- a/arch/powerpc/kvm/book3s_hv_nested.c
-> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
-> @@ -99,7 +99,7 @@ static void byteswap_hv_regs(struct hv_guest_state *hr)
->  	hr->dawrx1 =3D swab64(hr->dawrx1);
->  }
-> =20
-> -static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
-> +static void save_hv_return_state(struct kvm_vcpu *vcpu,
->  				 struct hv_guest_state *hr)
->  {
->  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
-> @@ -118,7 +118,7 @@ static void save_hv_return_state(struct kvm_vcpu *vcp=
-u, int trap,
->  	hr->pidr =3D vcpu->arch.pid;
->  	hr->cfar =3D vcpu->arch.cfar;
->  	hr->ppr =3D vcpu->arch.ppr;
-> -	switch (trap) {
-> +	switch (vcpu->arch.trap) {
->  	case BOOK3S_INTERRUPT_H_DATA_STORAGE:
->  		hr->hdar =3D vcpu->arch.fault_dar;
->  		hr->hdsisr =3D vcpu->arch.fault_dsisr;
-> @@ -128,9 +128,29 @@ static void save_hv_return_state(struct kvm_vcpu *vc=
-pu, int trap,
->  		hr->asdr =3D vcpu->arch.fault_gpa;
->  		break;
->  	case BOOK3S_INTERRUPT_H_FAC_UNAVAIL:
-> -		hr->hfscr =3D ((~HFSCR_INTR_CAUSE & hr->hfscr) |
-> -			     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
-> -		break;
-> +	{
-> +		u8 cause =3D vcpu->arch.hfscr >> 56;
+Nicholas Piggin <npiggin@gmail.com> writes:
 
-Can this be u64 just to help gcc?
+> Excerpts from Fabiano Rosas's message of July 27, 2021 6:17 am:
+>> If the nested hypervisor has no access to a facility because it has
+>> been disabled by the host, it should also not be able to see the
+>> Hypervisor Facility Unavailable that arises from one of its guests
+>> trying to access the facility.
+>> 
+>> This patch turns a HFU that happened in L2 into a Hypervisor Emulation
+>> Assistance interrupt and forwards it to L1 for handling. The ones that
+>> happened because L1 explicitly disabled the facility for L2 are still
+>> let through, along with the corresponding Cause bits in the HFSCR.
+>> 
+>> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+>> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+>> ---
+>>  arch/powerpc/kvm/book3s_hv_nested.c | 32 +++++++++++++++++++++++------
+>>  1 file changed, 26 insertions(+), 6 deletions(-)
+>> 
+>> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+>> index 8215dbd4be9a..d544b092b49a 100644
+>> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+>> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+>> @@ -99,7 +99,7 @@ static void byteswap_hv_regs(struct hv_guest_state *hr)
+>>  	hr->dawrx1 = swab64(hr->dawrx1);
+>>  }
+>>  
+>> -static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
+>> +static void save_hv_return_state(struct kvm_vcpu *vcpu,
+>>  				 struct hv_guest_state *hr)
+>>  {
+>>  	struct kvmppc_vcore *vc = vcpu->arch.vcore;
+>> @@ -118,7 +118,7 @@ static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
+>>  	hr->pidr = vcpu->arch.pid;
+>>  	hr->cfar = vcpu->arch.cfar;
+>>  	hr->ppr = vcpu->arch.ppr;
+>> -	switch (trap) {
+>> +	switch (vcpu->arch.trap) {
+>>  	case BOOK3S_INTERRUPT_H_DATA_STORAGE:
+>>  		hr->hdar = vcpu->arch.fault_dar;
+>>  		hr->hdsisr = vcpu->arch.fault_dsisr;
+>> @@ -128,9 +128,29 @@ static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
+>>  		hr->asdr = vcpu->arch.fault_gpa;
+>>  		break;
+>>  	case BOOK3S_INTERRUPT_H_FAC_UNAVAIL:
+>> -		hr->hfscr = ((~HFSCR_INTR_CAUSE & hr->hfscr) |
+>> -			     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
+>> -		break;
+>> +	{
+>> +		u8 cause = vcpu->arch.hfscr >> 56;
+>
+> Can this be u64 just to help gcc?
+>
 
-> +
-> +		WARN_ON_ONCE(cause >=3D BITS_PER_LONG);
-> +
-> +		if (!(hr->hfscr & (1UL << cause))) {
-> +			hr->hfscr =3D ((~HFSCR_INTR_CAUSE & hr->hfscr) |
-> +				     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
-> +			break;
-> +		}
-> +
-> +		/*
-> +		 * We have disabled this facility, so it does not
-> +		 * exist from L1's perspective. Turn it into a HEAI.
-> +		 */
-> +		vcpu->arch.trap =3D BOOK3S_INTERRUPT_H_EMUL_ASSIST;
-> +		kvmppc_load_last_inst(vcpu, INST_GENERIC, &vcpu->arch.emul_inst);
+Yes.
 
-Hmm, this doesn't handle kvmpc_load_last_inst failure. Other code tends=20
-to just resume guest and retry in this case. Can we do that here?
+>> +
+>> +		WARN_ON_ONCE(cause >= BITS_PER_LONG);
+>> +
+>> +		if (!(hr->hfscr & (1UL << cause))) {
+>> +			hr->hfscr = ((~HFSCR_INTR_CAUSE & hr->hfscr) |
+>> +				     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
+>> +			break;
+>> +		}
+>> +
+>> +		/*
+>> +		 * We have disabled this facility, so it does not
+>> +		 * exist from L1's perspective. Turn it into a HEAI.
+>> +		 */
+>> +		vcpu->arch.trap = BOOK3S_INTERRUPT_H_EMUL_ASSIST;
+>> +		kvmppc_load_last_inst(vcpu, INST_GENERIC, &vcpu->arch.emul_inst);
+>
+> Hmm, this doesn't handle kvmpc_load_last_inst failure. Other code tends 
+> to just resume guest and retry in this case. Can we do that here?
+>
 
-> +
-> +		/* Don't leak the cause field */
-> +		hr->hfscr &=3D ~HFSCR_INTR_CAUSE;
+Not at this point. The other code does that inside
+kvmppc_handle_exit_hv, which is called from kvmhv_run_single_vcpu. And
+since we're changing the interrupt, I cannot load the last instruction
+at kvmppc_handle_nested_exit because at that point this is still an HFU.
 
-This hunk also remains -- shouldn't change HFSCR for HEA, only HFAC.
+Unless I do it anyway at the HFU handler and put a comment explaining
+the situation.
 
-Thanks,
-Nick
+Or I could check for failure and clear vcpu->arch.emul_inst and
+therefore also hr->heir if we couldn't load the instruction.
 
+>> +
+>> +		/* Don't leak the cause field */
+>> +		hr->hfscr &= ~HFSCR_INTR_CAUSE;
+>
+> This hunk also remains -- shouldn't change HFSCR for HEA, only HFAC.
+
+Ah of course, thanks.
+
+>
+> Thanks,
+> Nick
