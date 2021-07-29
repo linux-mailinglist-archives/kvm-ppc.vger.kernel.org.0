@@ -2,92 +2,161 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC3CA3D8E1D
-	for <lists+kvm-ppc@lfdr.de>; Wed, 28 Jul 2021 14:45:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B78B3D9C66
+	for <lists+kvm-ppc@lfdr.de>; Thu, 29 Jul 2021 05:52:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235009AbhG1MpR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 28 Jul 2021 08:45:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46586 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234771AbhG1MpQ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 28 Jul 2021 08:45:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627476314;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YGi9CBVNLAaz99KYoBpbnkJ8wllA/JPj30f2JKISKfA=;
-        b=g/+n/g2hYYAt5pdt6Fjawc85wD02UondZGymRS+8XtBiSDqDsDnyt1ZNJxXjXAmziUTYeC
-        RQyJv2TgfduBdbCXv/YgqWk1MoLXT4O8gfRcInc2uaC3RoBth7k01af/WLk610hxnTtRc6
-        24zXfq8/EewPKxeMFdqw55MioAuK5L0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-z2V6K9cOPymsIIHdYlHwig-1; Wed, 28 Jul 2021 08:45:12 -0400
-X-MC-Unique: z2V6K9cOPymsIIHdYlHwig-1
-Received: by mail-wm1-f71.google.com with SMTP id r125-20020a1c2b830000b0290197a4be97b7so892478wmr.9
-        for <kvm-ppc@vger.kernel.org>; Wed, 28 Jul 2021 05:45:12 -0700 (PDT)
+        id S233488AbhG2Dw7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 28 Jul 2021 23:52:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52162 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233485AbhG2Dw7 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 28 Jul 2021 23:52:59 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFDF9C061757
+        for <kvm-ppc@vger.kernel.org>; Wed, 28 Jul 2021 20:52:55 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d1so5358115pll.1
+        for <kvm-ppc@vger.kernel.org>; Wed, 28 Jul 2021 20:52:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=raQOQdpU8K2UcVzsPkwxSrz9lH1X2bF4EYfiRD2nT6s=;
+        b=Cx8+UoRrPb/UJrxJCmiaervR89VoYhb4pKbdaDCzptlzQsuXGXkWA7jLxsvjRZGGje
+         UYhR4hEUGsRc2/QK0LjZnTMlHyMnE/pJ+kC8u6N/4qbZ6f4cA78SnjZM4aQacipq3x1x
+         u9foYMtYwoR7d3eBHRo7pRRqQGTPOaa1MSansAJiL1r2bddS2JzCxsxUoBxJvfIcJUNL
+         Fp7fVpTVxUL/Ut/oNUXWf3aIhyINM0Ey2Qw1SyYgbW/GbcKh3WggEzXDzRlhvNwifFfC
+         7OjkYUwsBWqRRahPzv8zMtG2cBD3gjEwVHU9QuJ8UDjmaUSav5srdXfOAmYJp/UFIaqz
+         3MnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=YGi9CBVNLAaz99KYoBpbnkJ8wllA/JPj30f2JKISKfA=;
-        b=J5XEO+VNay1BIvIOAHB7bPoul8bD6MQqqaLc18bQmgVRFoVm8Z6lskAjkqq01ta0Ri
-         bgKZFJqdk+hWB937B1uViDwZ9WYyr/OJdjDi6sdRN8+crhWKHpie4260+ehZ+mY634Na
-         +S8OHa68ykd/4hPBpLkGhR657vJx7EJX8SomeUfIJBC7z6LJRu4VgzJsLbPZ14hk/1nB
-         nf43CRdFISL7Hm/Privdi3eFzU+uVitiifE+hFxnosG4UeVHPrwc9w4iaGsQj0UMjM1r
-         DXIieXc8h/80lEcyWoxwNBty/Py6WBlVtlUONC8sTYzB2ipGwC9qWfSKG94beDo+Gljf
-         8uDw==
-X-Gm-Message-State: AOAM5308D/h6jCx6DuRJyo8Xa34jHyV7g/AiHsSlImkRSjgxPjxH+5gW
-        kIHT5S4hpIitXwyb1QGQP85z0K+nP/RdARYlV9i2HaVGPLJoeGPaN7R5/IHUGIj1iHHgDWCUUu/
-        H6qRNEkXboYHjIQUB+g==
-X-Received: by 2002:a05:600c:4108:: with SMTP id j8mr8951332wmi.67.1627476311725;
-        Wed, 28 Jul 2021 05:45:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyB4+vpCIDwC4RTUR6fM2EjrBVgNWRiaPrkQPVWgoV2R0S/+hHfBAHdBCDBCRvnQET/39AbhQ==
-X-Received: by 2002:a05:600c:4108:: with SMTP id j8mr8951306wmi.67.1627476311554;
-        Wed, 28 Jul 2021 05:45:11 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id u15sm5974689wmn.6.2021.07.28.05.45.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jul 2021 05:45:11 -0700 (PDT)
-Subject: Re: [PATCH v1 4/4] KVM: stats: Add halt polling related histogram
- stats
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        David Matlack <dmatlack@google.com>
-References: <20210706180350.2838127-1-jingzhangos@google.com>
- <20210706180350.2838127-5-jingzhangos@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8a6f9314-7329-54d1-63b4-dc7ba6b4ea1d@redhat.com>
-Date:   Wed, 28 Jul 2021 14:45:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=raQOQdpU8K2UcVzsPkwxSrz9lH1X2bF4EYfiRD2nT6s=;
+        b=avrNsoujDRT3Yuluv2UWQYU030Towa7iM6OU+rSKC1q/N+9ZskK743ODA6+KZtdEBr
+         PGoIzAjnwVnd1tsm4cWshV/9nB2oks/7c0tFdJkQ0uvF+MJ1BfoKMlvJQpJwLdBx9BV3
+         oQ/xK3toNnKE+/gy3i87HRDe5xYWku2oNHcDRwTuYbBapJQhCGVY3ja1l+K3oa09Rbv0
+         NPjwKRCVY7yE3r63Qdl/NGD9qgLYXemnSa2ce8USc37haPkxh1xq1LSO8PgYyKOERtb+
+         jFzjKokL08myqbDIgFYEW2lL+KkGrjow+0TSDwk/lKSkFiMyc5uCc/LdAT+3f7tyBJy6
+         FILg==
+X-Gm-Message-State: AOAM533MZzxDs9xpV2/IypIYCd9vmvmQRmpAWMYoG/EfmHrurKaDxIa4
+        Psp5DQLc7lLigt93QImVr3fPuZalcHU=
+X-Google-Smtp-Source: ABdhPJxDweUZAz5Tfmv1Rf7bAzdB4obsZEjB0XbY1Qi5y8V6zbn6f2uuSW2cEv0m7m4f6U9rM4CFig==
+X-Received: by 2002:a17:902:8c83:b029:129:17e5:a1cc with SMTP id t3-20020a1709028c83b029012917e5a1ccmr2696576plo.49.1627530775419;
+        Wed, 28 Jul 2021 20:52:55 -0700 (PDT)
+Received: from localhost (60-242-181-102.static.tpgi.com.au. [60.242.181.102])
+        by smtp.gmail.com with ESMTPSA id a23sm1525283pff.43.2021.07.28.20.52.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jul 2021 20:52:54 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 13:52:49 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v5 2/2] KVM: PPC: Book3S HV: Stop forwarding all HFUs to
+ L1
+To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
+        paulus@ozlabs.org
+References: <20210726201710.2432874-1-farosas@linux.ibm.com>
+        <20210726201710.2432874-3-farosas@linux.ibm.com>
+        <1627355201.gqa4czyyxy.astroid@bobo.none> <87o8anddsr.fsf@linux.ibm.com>
+In-Reply-To: <87o8anddsr.fsf@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210706180350.2838127-5-jingzhangos@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Message-Id: <1627530625.zza0qspyp2.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 06/07/21 20:03, Jing Zhang wrote:
-> +		kvm_stats_log_hist_update(
-> +				vc->runner->stat.generic.halt_wait_hist,
-> +				LOGHIST_SIZE_LARGE,
-> +				ktime_to_ns(cur) - ktime_to_ns(start_wait));
+Excerpts from Fabiano Rosas's message of July 28, 2021 12:36 am:
+> Nicholas Piggin <npiggin@gmail.com> writes:
+>=20
+>> Excerpts from Fabiano Rosas's message of July 27, 2021 6:17 am:
+>>> If the nested hypervisor has no access to a facility because it has
+>>> been disabled by the host, it should also not be able to see the
+>>> Hypervisor Facility Unavailable that arises from one of its guests
+>>> trying to access the facility.
+>>>=20
+>>> This patch turns a HFU that happened in L2 into a Hypervisor Emulation
+>>> Assistance interrupt and forwards it to L1 for handling. The ones that
+>>> happened because L1 explicitly disabled the facility for L2 are still
+>>> let through, along with the corresponding Cause bits in the HFSCR.
+>>>=20
+>>> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+>>> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+>>> ---
+>>>  arch/powerpc/kvm/book3s_hv_nested.c | 32 +++++++++++++++++++++++------
+>>>  1 file changed, 26 insertions(+), 6 deletions(-)
+>>>=20
+>>> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/boo=
+k3s_hv_nested.c
+>>> index 8215dbd4be9a..d544b092b49a 100644
+>>> --- a/arch/powerpc/kvm/book3s_hv_nested.c
+>>> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
+>>> @@ -99,7 +99,7 @@ static void byteswap_hv_regs(struct hv_guest_state *h=
+r)
+>>>  	hr->dawrx1 =3D swab64(hr->dawrx1);
+>>>  }
+>>> =20
+>>> -static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
+>>> +static void save_hv_return_state(struct kvm_vcpu *vcpu,
+>>>  				 struct hv_guest_state *hr)
+>>>  {
+>>>  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
+>>> @@ -118,7 +118,7 @@ static void save_hv_return_state(struct kvm_vcpu *v=
+cpu, int trap,
+>>>  	hr->pidr =3D vcpu->arch.pid;
+>>>  	hr->cfar =3D vcpu->arch.cfar;
+>>>  	hr->ppr =3D vcpu->arch.ppr;
+>>> -	switch (trap) {
+>>> +	switch (vcpu->arch.trap) {
+>>>  	case BOOK3S_INTERRUPT_H_DATA_STORAGE:
+>>>  		hr->hdar =3D vcpu->arch.fault_dar;
+>>>  		hr->hdsisr =3D vcpu->arch.fault_dsisr;
+>>> @@ -128,9 +128,29 @@ static void save_hv_return_state(struct kvm_vcpu *=
+vcpu, int trap,
+>>>  		hr->asdr =3D vcpu->arch.fault_gpa;
+>>>  		break;
+>>>  	case BOOK3S_INTERRUPT_H_FAC_UNAVAIL:
+>>> -		hr->hfscr =3D ((~HFSCR_INTR_CAUSE & hr->hfscr) |
+>>> -			     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
+>>> -		break;
+>>> +	{
+>>> +		u8 cause =3D vcpu->arch.hfscr >> 56;
+>>
+>> Can this be u64 just to help gcc?
+>>
+>=20
+> Yes.
+>=20
+>>> +
+>>> +		WARN_ON_ONCE(cause >=3D BITS_PER_LONG);
+>>> +
+>>> +		if (!(hr->hfscr & (1UL << cause))) {
+>>> +			hr->hfscr =3D ((~HFSCR_INTR_CAUSE & hr->hfscr) |
+>>> +				     (HFSCR_INTR_CAUSE & vcpu->arch.hfscr));
+>>> +			break;
+>>> +		}
+>>> +
+>>> +		/*
+>>> +		 * We have disabled this facility, so it does not
+>>> +		 * exist from L1's perspective. Turn it into a HEAI.
+>>> +		 */
+>>> +		vcpu->arch.trap =3D BOOK3S_INTERRUPT_H_EMUL_ASSIST;
+>>> +		kvmppc_load_last_inst(vcpu, INST_GENERIC, &vcpu->arch.emul_inst);
+>>
+>> Hmm, this doesn't handle kvmpc_load_last_inst failure. Other code tends=20
+>> to just resume guest and retry in this case. Can we do that here?
+>>
+>=20
+> Not at this point. The other code does that inside
+> kvmppc_handle_exit_hv, which is called from kvmhv_run_single_vcpu. And
+> since we're changing the interrupt, I cannot load the last instruction
+> at kvmppc_handle_nested_exit because at that point this is still an HFU.
+>=20
+> Unless I do it anyway at the HFU handler and put a comment explaining
+> the situation.
 
-Instead of passing the size to the function, perhaps you can wrap it 
-with a macro
+Yeah I think it would be better to move this logic to the nested exit=20
+handler.
 
-#define KVM_STATS_LOG_HIST_UPDATE(array, value) \
-     kvm_stats_log_hist_update(array, ARRAY_SIZE(array), value)
-
-Paolo
-
+Thanks,
+Nick
