@@ -2,101 +2,213 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9EDE3DD039
-	for <lists+kvm-ppc@lfdr.de>; Mon,  2 Aug 2021 08:02:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D92AE3DDE13
+	for <lists+kvm-ppc@lfdr.de>; Mon,  2 Aug 2021 18:56:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231148AbhHBGDD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 2 Aug 2021 02:03:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37884 "EHLO
+        id S229681AbhHBQ4s (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 2 Aug 2021 12:56:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbhHBGDD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 2 Aug 2021 02:03:03 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49204C06175F;
-        Sun,  1 Aug 2021 23:02:54 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GdS8p4BsNz9sRK;
-        Mon,  2 Aug 2021 16:02:48 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1627884171;
-        bh=n8jZx6w5lsO8h4k9sHk6uNDWOQkmiMu8W8QtD1+2nO8=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=KhE/7yngTkzWfiGcIos1FbWPLpdyYidIZkO96Xmei+xSuXi1IHpFADnnXA8lTi0MH
-         8rXdS5lr94S+ItUlrRMXhROjhnXJMA37UrMObAbcX8Q+i9hF8253qAxVhVjQjuKhQI
-         PvbBC/XyMMPYxr6hx19BDj5H73ioBoa5cm499JaPS3/gJ6oNLVXdNndj18KA6ZP7zM
-         +0aCqQs7N8eHzd+lRqMP7OcsLf65/FC2gwY9aSeroiw2cwPAWtH6/VaGL0TNg3Amsh
-         uQZEZUitD1aOINQJieswBnfY5NUtPNl4aXBg6c9C+xIFrt+eHyeWBUx89pkyP+I1IA
-         m4/iHahE0wTcA==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, linux-kernel@vger.kernel.org,
-        Paul Mackerras <paulus@samba.org>, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH kernel] powerpc/powernv: Check if powernv_rng is
- initialized
-In-Reply-To: <20210730044315.956125-1-aik@ozlabs.ru>
-References: <20210730044315.956125-1-aik@ozlabs.ru>
-Date:   Mon, 02 Aug 2021 16:02:48 +1000
-Message-ID: <87im0ol6yf.fsf@mpe.ellerman.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain
+        with ESMTP id S229593AbhHBQ4r (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 2 Aug 2021 12:56:47 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C01A7C06175F
+        for <kvm-ppc@vger.kernel.org>; Mon,  2 Aug 2021 09:56:37 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id s12-20020a0cdc0c0000b0290341c280725dso4164608qvk.6
+        for <kvm-ppc@vger.kernel.org>; Mon, 02 Aug 2021 09:56:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=5Z4bZj5paPSkp4gwqawduLyKtqagQ8T50jVQFMFNZX4=;
+        b=FVjE3L7/+lsSi2HksgsyNy/qi/XvmL/1Vw4CYJ7OUMcqHgF96eJ86XSCD4YTx9KohZ
+         LfnZfm9zuI3XIyNUa/kXCPlw/HjWl6f0/89d1IMqwaZFFrysyBmXxO8WwkAbh+CUbjl/
+         37dMGZlUMcd58E1gxUkSJItGsXruWlairgc9eLnnGKp9rxu5BSxzE1DkVoikvAGibtpM
+         UqSdID9vvnVpZ/s3aOdjsnq9ChBughMPv5yMYr/cS56W0OMulqhqoOPG99KrNmQiXwRz
+         F6rvvXDtn3U4D7NLnnXboT6U6fswCbN7NtGfwF2MzWizoobQ4PW+o/sd8wGO/U0JpMx/
+         6HLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=5Z4bZj5paPSkp4gwqawduLyKtqagQ8T50jVQFMFNZX4=;
+        b=JrRBlPGUp2fn8OXnVCd9n1I5moqxaPBWPhn7Plzw6w//Dfh5JfQBpwbAqtZ+Kp0GTk
+         p/NAI6KxpQsIKLaqY4ZmbPSqzATklW7bF7O90+WZmIGF1pY7pGBkPap8s0mdR+D0kbnX
+         yS32r/3qQTknEdVJFsAiWw08kNIYS9Oakk4+M/YY4shp9Gv9p4xeT2LSMHmICkt7uWDr
+         uJBlSV8GDNUAEpM3yFSiHMws7lIu/SbzCN06jlKvHzEtyrQ6jxQkXThOMBUPhrTPhDKf
+         deoMGVFGfBGCqXj2p9sdkvsPYp1rAEMiDK9fw6Yqp+HiiYSfynsjMpX6e8SjsRHhhDGC
+         BG3A==
+X-Gm-Message-State: AOAM53095a7LpCfoVAKf3GVf/ZTfpoP904P+VZsICWANd6KTh/3BONBj
+        r0F5D9IXRp5Cvby5FzPNSTXc3vEHNRXpHXd19w==
+X-Google-Smtp-Source: ABdhPJwcHMYUcemzn9GJzKi/qJ6Q3lCevKa09kbHridtMOa3iYdchTcbci5ukgq4UGPoxL4REkMH0g6IYFU4z5gY8g==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a05:6214:8c6:: with SMTP id
+ da6mr9705685qvb.18.1627923396953; Mon, 02 Aug 2021 09:56:36 -0700 (PDT)
+Date:   Mon,  2 Aug 2021 16:56:28 +0000
+Message-Id: <20210802165633.1866976-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
+Subject: [PATCH v3 0/5] Linear and Logarithmic histogram statistics
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        David Matlack <dmatlack@google.com>
+Cc:     Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Alexey Kardashevskiy <aik@ozlabs.ru> writes:
-> The powernv-rng driver has 2 users - the bare metal powernv platform and
-> the KVM's H_RANDOM hcall. The hcall handler works fine when it is L0 KVM
-> but fails in L1 KVM as there is no support for the HW registers in L1 VMs
-> and such support is not advertised either (== no "ibm,power-rng" in
-> the FDT). So when a nested VM tries H_RANDOM, the L1 KVM crashes on
-> in_be64(rng->regs).
->
-> This checks the pointers and returns an error if the feature is not
-> set up.
->
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->
->
-> Randomly randomized H_RANDOM:
->
-> 00:00:45 executing program 10:
-> r0 = openat$kvm(0xffffffffffffff9c, &(0x7f0000000000), 0x0, 0x0)
-> r1 = ioctl$KVM_CREATE_VM(r0, 0x2000ae01, 0x0)
-> r2 = ioctl$KVM_CREATE_VCPU(r1, 0x2000ae41, 0x0)
-> ioctl$KVM_SET_REGS(r2, 0x8188ae82, &(0x7f00000001c0)={[0x0, 0x0, 0xffffffffffffffe1, 0x0, 0x0, 0x200000953, 0x0, 0xfffffffffffffffe, 0x0, 0x0, 0x2], 0x2000})
-> syz_kvm_setup_cpu$ppc64(0xffffffffffffffff, r2, &(0x7f0000e80000/0x180000)=nil, 0x0, 0x0, 0x0, 0x0, 0x0)
-> r3 = openat$kvm(0xffffffffffffff9c, &(0x7f0000000100), 0x0, 0x0)
-> syz_kvm_setup_cpu$ppc64(r1, r2, &(0x7f0000e70000/0x180000)=nil, &(0x7f0000000080)=[{0x0, &(0x7f0000000280)="0000e03d0080ef61e403ef790000ef650900ef61647b007c0000e03f0000ff63e403ff7b0000ff679952ff6370e63f7e0000603c00006360e4036378000063640003636018a8803c28bf8460e4038478ef97846436888460b6f6a03c88d6a560e403a5781beda564d879a5602665c03cb08dc660e403c67806b3c664966fc660d53fe03cddf1e760e403e7785c41e7646623e76022000044463fb1f20000803e00809462e403947a0000946604009462a6a6607f4abb4c130000603f00007b63e4037b7b00007b679a367b6332d9c17c201c994f7201004cbb7a603f72047b63e4037b7b955f7b6799947b636401607f", 0xf0}], 0x1, 0x0, &(0x7f00000000c0)=[@featur2={0x1, 0x1000}], 0x1)
->
->
-> cpu 0xd: Vector: 300 (Data Access) at [c00000001599f590]
->     pc: c00000000011d2bc: powernv_get_random_long+0x4c/0xc0
->     lr: c00000000011d298: powernv_get_random_long+0x28/0xc0
->     sp: c00000001599f830
->    msr: 800000000280b033
->    dar: 0
->  dsisr: 40000000
->   current = 0xc0000000614c7f80
->   paca    = 0xc0000000fff81700	 irqmask: 0x03	 irq_happened: 0x01
->     pid   = 31576, comm = syz-executor.10
->
-> Linux version 5.14.0-rc2-le_f29cf1ff9a23_a+fstn1 (aik@fstn1-p1) (gcc (Ubuntu 10.3.0-1ubuntu1) 10.3.0, GNU ld (GNU Binutils for Ubuntu) 2.36.1) #263 SMP Thu Jul 29 17:56:12 AEST 2021
-> enter ? for help
-> [c00000001599f860] c0000000001e45f8 kvmppc_pseries_do_hcall+0x5d8/0x2190
-> [c00000001599f8f0] c0000000001ea2dc kvmppc_vcpu_run_hv+0x31c/0x14d0
-> [c00000001599f9c0] c0000000001bd518 kvmppc_vcpu_run+0x48/0x60
-> [c00000001599f9f0] c0000000001b74b0 kvm_arch_vcpu_ioctl_run+0x580/0x7d0
-> [c00000001599fa90] c00000000019e6f8 kvm_vcpu_ioctl+0x418/0xd00
-> [c00000001599fc70] c00000000079d8c4 sys_ioctl+0xb44/0x2100
-> [c00000001599fd90] c00000000003b704 system_call_exception+0x224/0x410
-> [c00000001599fe10] c00000000000c0e8 system_call_vectored_common+0xe8/0x278
+This patchset adds linear and logarithmic histogram stats support and extend
+some halt polling stats with histogram.
+Histogram stats is very useful when we need to know the distribution of some
+latencies or any other stuff like used memory size, huge page size, etc.
+Below is a snapshot for three logarithmic histogram stats added in this
+patchset. halt_poll_success_hist shows the distribution of wait time before a
+success polling. halt_poll_fail_hist shows the distribution of wait time before
+a fail polling. halt_wait_hist shows the distribution of wait time of a VCPU
+spending on wait after it is halted. The halt polling parameters is halt_poll_ns
+= 500000, halt_poll_ns_grow = 2, halt_poll_ns_grow_start = 10000,
+halt_poll_ns_shrink = 2;
+From the snapshot, not only we can get an intuitive overview of those latencies,
+but also we can tune the polling parameters based on this; For example, it shows
+that about 80% of successful polling is less than 132000 nanoseconds from
+halt_poll_success_hist, then it might be a good option to set halt_poll_ns as
+132000 instead of 500000.
 
-There would be no bug if KVM was using arch_get_random_seed_long(),
-because that defers to ppc_md, which is only populated when the RNG is
-setup correctly. That seems like a better fix?
+halt_poll_success_hist:
+Range		Bucket Value	Percent     Cumulative Percent
+[0, 1)		 0		 0.000%      0.000%
+[1, 2)		 0		 0.000%      0.000%
+[2, 4)		 0		 0.000%      0.000%
+[4, 8)		 0		 0.000%      0.000%
+[8, 16)		 0		 0.000%      0.000%
+[16, 32)	 0		 0.000%      0.000%
+[32, 64)	 0		 0.000%      0.000%
+[64, 128)	 0		 0.000%      0.000%
+[128, 256)	 3		 0.093%      0.093%
+[256, 512)	 21		 0.650%      0.743%
+[512, 1024)	 43		 1.330%      2.073%
+[1024, 2048)	 279		 8.632%      10.705%
+[2048, 4096)	 253		 7.828%      18.533%
+[4096, 8192)	 595		 18.410%     36.943%
+[8192, 16384)	 274		 8.478%      45.421%
+[16384, 32768)	 351		 10.860%     56.281%
+[32768, 65536)	 343		 10.613%     66.894%
+[65536, 131072)  421		 13.026%     79.920%
+[131072, 262144) 459		 14.202%     94.121%
+[262144, 524288) 190		 5.879%      100.000%
 
-cheers
+
+halt_poll_fail_hist:
+Range		Bucket Value	Percent     Cumulative Percent
+[0, 1)		 0		 0.000%      0.000%
+[1, 2)		 0		 0.000%      0.000%
+[2, 4)		 0		 0.000%      0.000%
+[4, 8)		 0		 0.000%      0.000%
+[8, 16)		 0		 0.000%      0.000%
+[16, 32)	 0		 0.000%      0.000%
+[32, 64)	 0		 0.000%      0.000%
+[64, 128)	 21		 0.529%      0.529%
+[128, 256)	 398		 10.020%     10.549%
+[256, 512)	 613		 15.433%     25.982%
+[512, 1024)	 437		 11.002%     36.984%
+[1024, 2048)	 264		 6.647%      43.630%
+[2048, 4096)	 302		 7.603%      51.234%
+[4096, 8192)	 350		 8.812%      60.045%
+[8192, 16384)	 488		 12.286%     72.331%
+[16384, 32768)	 258		 6.495%      78.827%
+[32768, 65536)	 227		 5.715%      84.542%
+[65536, 131072)  232		 5.841%      90.383%
+[131072, 262144) 246		 6.193%      96.576%
+[262144, 524288) 136		 3.424%      100.000%
+
+
+halt_wait_hist:
+Range			    Bucket Value    Percent	Cumulative Percent
+[0, 1)			     0		     0.000%	 0.000%
+[1, 2)			     0		     0.000%	 0.000%
+[2, 4)			     0		     0.000%	 0.000%
+[4, 8)			     0		     0.000%	 0.000%
+[8, 16)			     0		     0.000%	 0.000%
+[16, 32)		     0		     0.000%	 0.000%
+[32, 64)		     0		     0.000%	 0.000%
+[64, 128)		     0		     0.000%	 0.000%
+[128, 256)		     0		     0.000%	 0.000%
+[256, 512)		     0		     0.000%	 0.000%
+[512, 1024)		     0		     0.000%	 0.000%
+[1024, 2048)		     0		     0.000%	 0.000%
+[2048, 4096)		     7		     0.127%	 0.127%
+[4096, 8192)		     37		     0.671%	 0.798%
+[8192, 16384)		     69		     1.251%	 2.049%
+[16384, 32768)		     94		     1.704%	 3.753%
+[32768, 65536)		     150	     2.719%	 6.472%
+[65536, 131072)		     233	     4.224%	 10.696%
+[131072, 262144)	     276	     5.004%	 15.700%
+[262144, 524288)	     236	     4.278%	 19.978%
+[524288, 1.04858e+06)	     176	     3.191%	 23.169%
+[1.04858e+06, 2.09715e+06)   94		     16.207%	 39.376%
+[2.09715e+06, 4.1943e+06)    1667	     30.221%	 69.598%
+[4.1943e+06, 8.38861e+06)    825	     14.956%	 84.554%
+[8.38861e+06, 1.67772e+07)   111	     2.012%	 86.566%
+[1.67772e+07, 3.35544e+07)   76		     1.378%	 87.944%
+[3.35544e+07, 6.71089e+07)   65		     1.178%	 89.123%
+[6.71089e+07, 1.34218e+08)   161	     2.919%	 92.041%
+[1.34218e+08, 2.68435e+08)   250	     4.532%	 96.574%
+[2.68435e+08, 5.36871e+08)   188	     3.408%	 99.982%
+[5.36871e+08, 1.07374e+09)   1		     0.018%	 100.000%
+
+---
+
+* v2 -> v3
+  - Rebase to kvm/queue, commit 8ad5e63649ff
+    (KVM: Don't take mmu_lock for range invalidation unless necessary)
+  - Specify inline explicitly for histogram stats update functions
+  - Use array_index_nospec to clamp the index to histogram array size
+  - Remove constant macros for histogram array size and bucket size
+  - Addressed other comments from Paolo.
+
+* v1 -> v2
+  - Rebase to kvm/queue, commit 1889228d80fe
+    (KVM: selftests: smm_test: Test SMM enter from L2)
+  - Break some changes to separate commits
+  - Fix u64 division issue Reported-by: kernel test robot <lkp@intel.com>
+  - Address a bunch of comments by David Matlack <dmatlack@google.com>
+
+[1] https://lore.kernel.org/kvm/20210706180350.2838127-1-jingzhangos@google.com
+[2] https://lore.kernel.org/kvm/20210714223033.742261-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (5):
+  KVM: stats: Support linear and logarithmic histogram statistics
+  KVM: stats: Update doc for histogram statistics
+  KVM: selftests: Add checks for histogram stats bucket_size field
+  KVM: stats: Add halt_wait_ns stats for all architectures
+  KVM: stats: Add halt polling related histogram stats
+
+ Documentation/virt/kvm/api.rst                | 28 ++++++--
+ arch/arm64/kvm/guest.c                        |  4 --
+ arch/mips/kvm/mips.c                          |  4 --
+ arch/powerpc/include/asm/kvm_host.h           |  1 -
+ arch/powerpc/kvm/book3s.c                     |  5 --
+ arch/powerpc/kvm/book3s_hv.c                  | 18 ++++-
+ arch/powerpc/kvm/booke.c                      |  5 --
+ arch/s390/kvm/kvm-s390.c                      |  4 --
+ arch/x86/kvm/x86.c                            |  4 --
+ include/linux/kvm_host.h                      | 67 ++++++++++++++-----
+ include/linux/kvm_types.h                     |  6 ++
+ include/uapi/linux/kvm.h                      | 11 +--
+ .../selftests/kvm/kvm_binary_stats_test.c     | 12 ++++
+ virt/kvm/binary_stats.c                       | 34 ++++++++++
+ virt/kvm/kvm_main.c                           | 16 +++++
+ 15 files changed, 165 insertions(+), 54 deletions(-)
+
+
+base-commit: 8ad5e63649ffaa9207b8fde932f3bd59a72c4c94
+-- 
+2.32.0.554.ge1b32706d8-goog
+
