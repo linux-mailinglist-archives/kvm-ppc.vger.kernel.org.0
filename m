@@ -2,199 +2,229 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9380E3DDE1E
-	for <lists+kvm-ppc@lfdr.de>; Mon,  2 Aug 2021 18:56:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB1C53DE342
+	for <lists+kvm-ppc@lfdr.de>; Tue,  3 Aug 2021 01:51:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232426AbhHBQ44 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 2 Aug 2021 12:56:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58192 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232029AbhHBQ4z (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 2 Aug 2021 12:56:55 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1122CC06175F
-        for <kvm-ppc@vger.kernel.org>; Mon,  2 Aug 2021 09:56:45 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id e16-20020ac867100000b0290257b7db4a28so10232909qtp.9
-        for <kvm-ppc@vger.kernel.org>; Mon, 02 Aug 2021 09:56:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=VXgwAAaOZDdhQJAmcCsgajsK7P41PLb/M4QBrHtckB4=;
-        b=uu/yX7pHqaAAnRRi8Htyf6pBMrBCqXOibwZDpnbIu0BeYMF59NqPMgSBMpU4+v9cmo
-         pzfccr0SY9o8sv+uWxPFw5U3G2F2rnUNUipaPp2r9c9lZMtfY14HP523uBYyLzZX+074
-         7tZuGo35ZQ3xKrRBjrFpOTrYXWHH/nNKIbtBtpz3UZHRCXpZjvX5qifXY+0w9wBXPvvV
-         A6rqQ+qiHWwY2mTuvIFXdWuCB5WlJ1mX344tPjuvkC2z6cgzjvsZyPwDz36qI5ZzwZhy
-         GcasoGIZffjX8DnjayYwCwOh85VrVBKxIzY5m1MhZKi1ka4lOhKhU0T2nOEKtB5mmD9s
-         vS3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=VXgwAAaOZDdhQJAmcCsgajsK7P41PLb/M4QBrHtckB4=;
-        b=KNdmh4ki5GLN91RoldPDaPtBDueCdjHuyYdDNsdKPMIXtGspAbMK2Q3/M3DlYZu762
-         PwRkui6j5OoTSNRRiXmbX2Gnq5ng1xRzVdwjEZnBdZRPUBiEJQ0CtqEBQ70f6Fy6WP6b
-         gJnwFe8+U9K/gjPIZHWjiS/I7bQn3R+tGwCvqGelJ7kJ5fq1Mo50I0xmdmnVJnaMo9MV
-         xujysURxUF4XLNpDGCJLmiHPsXimccSLdE/tiuQ7XVqIrT83ZYYxRX2FFOrk21n+Gkr5
-         SeEWaRPZSEWc7pOt/HBXLlnx2h1zYw8cOeRUAvyCjFaGM0y0k/wBmweJ6dhngkRdW6gP
-         ykAw==
-X-Gm-Message-State: AOAM531uJojpyTFXeZ6FeW8EVrCqcxMqell7ftfCOEqdgq1Dsm2eyQF0
-        mLDlyeBLUpM939Txuh0JeDHdjnl0X9z5TFG2rA==
-X-Google-Smtp-Source: ABdhPJzSVgOt+I8hE7F+dMFTwoIwceAnL+TZyLr2Lod8tHBnGw0g7rMKXyKpoSWaKDECLgbhxIltoepmGIpkqP7osA==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:ad4:4972:: with SMTP id
- p18mr5954084qvy.26.1627923404246; Mon, 02 Aug 2021 09:56:44 -0700 (PDT)
-Date:   Mon,  2 Aug 2021 16:56:33 +0000
-In-Reply-To: <20210802165633.1866976-1-jingzhangos@google.com>
-Message-Id: <20210802165633.1866976-6-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20210802165633.1866976-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v3 5/5] KVM: stats: Add halt polling related histogram stats
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        David Matlack <dmatlack@google.com>
-Cc:     Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S232540AbhHBXvo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 2 Aug 2021 19:51:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51596 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232208AbhHBXvn (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 2 Aug 2021 19:51:43 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 172NYWhq191770;
+        Mon, 2 Aug 2021 19:51:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=Zy8u+iZjJF5rgUIWtPjs5w51IfL+CHjjbvIEPBpoG5k=;
+ b=tB94p91kxMeukDC0RwIMEkW4ZxiHMfwvun4CSxfNXOEjpRg+oup2W7VuEkRTZESjFKEg
+ okRXIGuAHBrh0qjJa1CMuBEBj9inOmLZGCCwsoFJw77a+NfV6wG9QOqkVfCnIb8XKUPE
+ zOCV8wWmD6m883dQknDizD05aXG7QztE5Razfi8ak9ZtQV011B84Gh94qWcKV1zYvd70
+ ucQj+rKSP2NnXwoG3Gm2zECOd/hWDwk1OK+KwHcVChEJs0lR1ScWRwTBtuYVCobO6ibi
+ csFhs+eVePl4o9XO/LH4abgPx2umrQ+0lrAIwgCwYQdHRg5ly+1r3xSD4kRF3ALYp8YC rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3a5m024cky-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 Aug 2021 19:51:19 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 172NZrxL194627;
+        Mon, 2 Aug 2021 19:51:18 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3a5m024cks-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 Aug 2021 19:51:18 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 172NhOYk018035;
+        Mon, 2 Aug 2021 23:51:17 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma01dal.us.ibm.com with ESMTP id 3a4x5c282v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 Aug 2021 23:51:15 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 172Nnm7G28115318
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 2 Aug 2021 23:49:48 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4D81D112089;
+        Mon,  2 Aug 2021 23:49:48 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D8DC1112080;
+        Mon,  2 Aug 2021 23:49:45 +0000 (GMT)
+Received: from farosas.linux.ibm.com.com (unknown [9.211.147.189])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  2 Aug 2021 23:49:45 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
+        mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@c-s.fr
+Subject: [PATCH] KVM: PPC: Book3S HV: Fix kvmhv_copy_tofrom_guest_radix
+Date:   Mon,  2 Aug 2021 20:49:41 -0300
+Message-Id: <20210802234941.2568493-1-farosas@linux.ibm.com>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: XDu1sdXcRYa4geea3LgkH1NIsLRHQtNl
+X-Proofpoint-GUID: 66lDNQhNt0HxsFdf703KzyF9NmB-7PQo
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-02_07:2021-08-02,2021-08-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ mlxlogscore=999 lowpriorityscore=0 clxscore=1011 priorityscore=1501
+ mlxscore=0 malwarescore=0 phishscore=0 bulkscore=0 impostorscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108020149
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Add three log histogram stats to record the distribution of time spent
-on successful polling, failed polling and VCPU wait.
-halt_poll_success_hist: Distribution of spent time for a successful poll.
-halt_poll_fail_hist: Distribution of spent time for a failed poll.
-halt_wait_hist: Distribution of time a VCPU has spent on waiting.
+This function was introduced along with nested HV guest support. It
+uses the platform's Radix MMU quadrants[1] to provide a nested
+hypervisor with fast access to its nested guests memory
+(H_COPY_TOFROM_GUEST hypercall). It has also since been added as a
+fast path for the kvmppc_ld/st routines which are used during
+instruction emulation.
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
+The commit def0bfdbd603 ("powerpc: use probe_user_read() and
+probe_user_write()") changed the low level copy function from
+raw_copy_from_user to probe_user_read, which adds a check to
+access_ok. In powerpc that is:
+
+ static inline bool __access_ok(unsigned long addr, unsigned long size)
+ {
+        return addr < TASK_SIZE_MAX && size <= TASK_SIZE_MAX - addr;
+ }
+
+and TASK_SIZE_MAX is 0x0010000000000000UL for 64-bit, which means that
+setting the two MSBs of the effective address (which correspond to the
+quadrant) now cause access_ok to reject the access.
+
+This was not caught earlier because the most common code path via
+kvmppc_ld/st contains a fallback (kvm_read_guest) that is likely to
+succeed for L1 guests. For nested guests there is no fallback.
+
+Another issue is that probe_user_read (now __copy_from_user_nofault)
+does not return the number of not copied bytes in case of failure, so
+the destination memory is not being cleared anymore in
+kvmhv_copy_from_guest_radix:
+
+ ret = kvmhv_copy_tofrom_guest_radix(vcpu, eaddr, to, NULL, n);
+ if (ret > 0)                            <-- always false!
+        memset(to + (n - ret), 0, ret);
+
+This patch fixes both issues by introducing two new functions that set
+the quadrant bit of the effective address only after checking
+access_ok and moving the memset closer to __copy_to_user_inatomic.
+
+1 - for more on quadrants see commit d7b456152230 ("KVM: PPC: Book3S
+HV: Implement functions to access quadrants 1 & 2")
+
+Fixes: def0bfdbd603 ("powerpc: use probe_user_read() and probe_user_write()")
+Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 16 ++++++++++++++--
- include/linux/kvm_host.h     |  8 +++++++-
- include/linux/kvm_types.h    |  5 +++++
- virt/kvm/kvm_main.c          | 12 ++++++++++++
- 4 files changed, 38 insertions(+), 3 deletions(-)
+ arch/powerpc/kvm/book3s_64_mmu_radix.c | 63 ++++++++++++++++++++------
+ 1 file changed, 49 insertions(+), 14 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 813ca155561b..6d63c8e6d4f0 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4146,17 +4146,29 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- 	if (do_sleep) {
- 		vc->runner->stat.generic.halt_wait_ns +=
- 			ktime_to_ns(cur) - ktime_to_ns(start_wait);
-+		KVM_STATS_LOG_HIST_UPDATE(
-+				vc->runner->stat.generic.halt_wait_hist,
-+				ktime_to_ns(cur) - ktime_to_ns(start_wait));
- 		/* Attribute failed poll time */
--		if (vc->halt_poll_ns)
-+		if (vc->halt_poll_ns) {
- 			vc->runner->stat.generic.halt_poll_fail_ns +=
- 				ktime_to_ns(start_wait) -
- 				ktime_to_ns(start_poll);
-+			KVM_STATS_LOG_HIST_UPDATE(
-+				vc->runner->stat.generic.halt_poll_fail_hist,
-+				ktime_to_ns(start_wait) -
-+				ktime_to_ns(start_poll));
-+		}
- 	} else {
- 		/* Attribute successful poll time */
--		if (vc->halt_poll_ns)
-+		if (vc->halt_poll_ns) {
- 			vc->runner->stat.generic.halt_poll_success_ns +=
- 				ktime_to_ns(cur) -
- 				ktime_to_ns(start_poll);
-+			KVM_STATS_LOG_HIST_UPDATE(
-+				vc->runner->stat.generic.halt_poll_success_hist,
-+				ktime_to_ns(cur) - ktime_to_ns(start_poll));
-+		}
- 	}
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index b5905ae4377c..076a8e4a9135 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -30,12 +30,57 @@
+  */
+ static int p9_supported_radix_bits[4] = { 5, 9, 9, 13 };
  
- 	/* Adjust poll time */
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9b773fef7bba..b67f01f61840 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1403,7 +1403,13 @@ struct _kvm_stats_desc {
- 	STATS_DESC_COUNTER(VCPU_GENERIC, halt_wakeup),			       \
- 	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_success_ns),	       \
- 	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_ns),		       \
--	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_wait_ns)
-+	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_wait_ns),		       \
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_success_hist,     \
-+			HALT_POLL_HIST_COUNT),				       \
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_hist,	       \
-+			HALT_POLL_HIST_COUNT),				       \
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_wait_hist,	       \
-+			HALT_POLL_HIST_COUNT)
- 
- extern struct dentry *kvm_debugfs_dir;
- 
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index 291ef55125b2..de7fb5f364d8 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -76,6 +76,8 @@ struct kvm_mmu_memory_cache {
- };
- #endif
- 
-+#define HALT_POLL_HIST_COUNT			32
++/* LPIDR and PIDR must have already been set */
++static long __copy_from_guest_quadrant(void *dst, void __user *src, size_t size,
++				       unsigned long quadrant)
++{
++	long ret = size;
++	mm_segment_t old_fs = force_uaccess_begin();
 +
- struct kvm_vm_stat_generic {
- 	u64 remote_tlb_flush;
- };
-@@ -88,6 +90,9 @@ struct kvm_vcpu_stat_generic {
- 	u64 halt_poll_success_ns;
- 	u64 halt_poll_fail_ns;
- 	u64 halt_wait_ns;
-+	u64 halt_poll_success_hist[HALT_POLL_HIST_COUNT];
-+	u64 halt_poll_fail_hist[HALT_POLL_HIST_COUNT];
-+	u64 halt_wait_hist[HALT_POLL_HIST_COUNT];
- };
++	if (access_ok(src, size)) {
++		src += (quadrant << 62);
++
++		pagefault_disable();
++		ret = __copy_from_user_inatomic((void __user *)dst, src, size);
++		pagefault_enable();
++	}
++	force_uaccess_end(old_fs);
++
++	if (!ret)
++		return ret;
++
++	memset(dst + (size - ret), 0, ret);
++
++	return -EFAULT;
++}
++
++/* LPIDR and PIDR must have already been set */
++static long __copy_to_guest_quadrant(void __user *dst, void *src, size_t size,
++				     unsigned long quadrant)
++{
++	long ret = -EFAULT;
++	mm_segment_t old_fs = force_uaccess_begin();
++
++	if (access_ok(dst, size)) {
++		dst += (quadrant << 62);
++
++		pagefault_disable();
++		ret = __copy_to_user_inatomic(dst, (void __user *)src, size);
++		pagefault_enable();
++	}
++	force_uaccess_end(old_fs);
++
++	if (ret)
++		return -EFAULT;
++	return 0;
++}
++
+ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
+ 					      gva_t eaddr, void *to, void *from,
+ 					      unsigned long n)
+ {
+ 	int old_pid, old_lpid;
+-	unsigned long quadrant, ret = n;
++	unsigned long quadrant, ret;
+ 	bool is_load = !!to;
  
- #define KVM_STATS_NAME_SIZE	48
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index af9bcb50fdd4..717006de17e7 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3166,13 +3166,23 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 				++vcpu->stat.generic.halt_successful_poll;
- 				if (!vcpu_valid_wakeup(vcpu))
- 					++vcpu->stat.generic.halt_poll_invalid;
-+
-+				KVM_STATS_LOG_HIST_UPDATE(
-+				      vcpu->stat.generic.halt_poll_success_hist,
-+				      ktime_to_ns(ktime_get()) -
-+				      ktime_to_ns(start));
- 				goto out;
- 			}
- 			cpu_relax();
- 			poll_end = cur = ktime_get();
- 		} while (kvm_vcpu_can_poll(cur, stop));
-+
-+		KVM_STATS_LOG_HIST_UPDATE(
-+				vcpu->stat.generic.halt_poll_fail_hist,
-+				ktime_to_ns(ktime_get()) - ktime_to_ns(start));
- 	}
+ 	/* Can't access quadrants 1 or 2 in non-HV mode, call the HV to do it */
+@@ -47,10 +92,6 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
+ 	quadrant = 1;
+ 	if (!pid)
+ 		quadrant = 2;
+-	if (is_load)
+-		from = (void *) (eaddr | (quadrant << 62));
+-	else
+-		to = (void *) (eaddr | (quadrant << 62));
  
-+
- 	prepare_to_rcuwait(&vcpu->wait);
- 	for (;;) {
- 		set_current_state(TASK_INTERRUPTIBLE);
-@@ -3188,6 +3198,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 	if (waited) {
- 		vcpu->stat.generic.halt_wait_ns +=
- 			ktime_to_ns(cur) - ktime_to_ns(poll_end);
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.generic.halt_wait_hist,
-+				ktime_to_ns(cur) - ktime_to_ns(poll_end));
- 	}
- out:
- 	kvm_arch_vcpu_unblocking(vcpu);
+ 	preempt_disable();
+ 
+@@ -66,9 +107,9 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
+ 	isync();
+ 
+ 	if (is_load)
+-		ret = copy_from_user_nofault(to, (const void __user *)from, n);
++		ret = __copy_from_guest_quadrant(to, (void __user *)eaddr, n, quadrant);
+ 	else
+-		ret = copy_to_user_nofault((void __user *)to, from, n);
++		ret = __copy_to_guest_quadrant((void __user *)eaddr, from, n, quadrant);
+ 
+ 	/* switch the pid first to avoid running host with unallocated pid */
+ 	if (quadrant == 1 && pid != old_pid)
+@@ -109,13 +150,7 @@ static long kvmhv_copy_tofrom_guest_radix(struct kvm_vcpu *vcpu, gva_t eaddr,
+ long kvmhv_copy_from_guest_radix(struct kvm_vcpu *vcpu, gva_t eaddr, void *to,
+ 				 unsigned long n)
+ {
+-	long ret;
+-
+-	ret = kvmhv_copy_tofrom_guest_radix(vcpu, eaddr, to, NULL, n);
+-	if (ret > 0)
+-		memset(to + (n - ret), 0, ret);
+-
+-	return ret;
++	return kvmhv_copy_tofrom_guest_radix(vcpu, eaddr, to, NULL, n);
+ }
+ EXPORT_SYMBOL_GPL(kvmhv_copy_from_guest_radix);
+ 
 -- 
-2.32.0.554.ge1b32706d8-goog
+2.29.2
 
