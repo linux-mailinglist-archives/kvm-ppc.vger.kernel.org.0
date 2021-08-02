@@ -2,84 +2,101 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ACF973DBDCC
-	for <lists+kvm-ppc@lfdr.de>; Fri, 30 Jul 2021 19:34:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9EDE3DD039
+	for <lists+kvm-ppc@lfdr.de>; Mon,  2 Aug 2021 08:02:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229970AbhG3ReS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 30 Jul 2021 13:34:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33832 "EHLO
+        id S231148AbhHBGDD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 2 Aug 2021 02:03:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbhG3ReS (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 30 Jul 2021 13:34:18 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256D0C061765
-        for <kvm-ppc@vger.kernel.org>; Fri, 30 Jul 2021 10:34:13 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id l4so13436253ljq.4
-        for <kvm-ppc@vger.kernel.org>; Fri, 30 Jul 2021 10:34:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mlX1nCiNDRiVrVxlVDHszrB0v/ewjTsjg4ostQyNPUg=;
-        b=bynegcZxgDCEpUi8d2HuAzcpZ1tEmeaASJMHmkOYZc3mvMjCLUDIbTm+O1VuoWz91H
-         9R28kLzaqtrtHbh9yTEfJSESk7sV+cF8+oLbjR9RXqSJqaX0bVci5a3SnRsowoV+yED6
-         qZ1TK7yxLK6D7Dwz70IPalyohCTfsZ0VxZdPgPixwDQdgqQw/m4dO7i2KIOJ2e+w+ygF
-         e9QCCHbYO5VNcNwQ9EfUkoqJQg+ZrK8WL7ZrKiM7muXUNXPn/a3WuhkqK+lk8Fc+TMQZ
-         ia21dWwC18DDnXBaP3W4XQnWopcwzowFvE3wYZ8lhNd61SbFTMvyTL7EpbyJclo+l3xb
-         +6yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mlX1nCiNDRiVrVxlVDHszrB0v/ewjTsjg4ostQyNPUg=;
-        b=cKlKNp/U6F3zZgowcQPMnPlYGixPalh6kfTHpl6jPh/dPjaTHvFxwxZjmCxsFVcxHl
-         2isbdfkK3lmZLlN9T0i3++jPwx0PuJ87+8hQX8sVPB8NpQemkDgavHYf7eO8yCipN51z
-         Bmy83iqJsFFr36nDACdzGoXwWXe/nmYWWDH/koqcr3TZNxMe38dUI8cVJ1ej8rygaVx6
-         RBvSAMVvDUlcoFPXWVxF9VFpnSyW0ZWPlTRM8pSi2og2ZYRJqiyfeW+aABmzr3C5ijqZ
-         7KFQwSSzuCTa8a1Wi9Q1BnsLfKCXj61FPJk3HCLQHz99dL2Z3WujYz5bWrkMw32yDq0k
-         +5kA==
-X-Gm-Message-State: AOAM530boRK3Nh55ReJAzPng2+Ap+Uk0ktumehCE/XYbXOOSJh0hKMeH
-        Qg66CX5JL6kggaLDG6CsZdKf/GkmmC6tLNOIuJJrGA==
-X-Google-Smtp-Source: ABdhPJwQm7osgysjal7b4gFKQif1+BNO+0WNNDORDMRHHkvDuxmU8Mm408VnxrPPcR+CR90UPsnKxeheV7HfFlQNNJA=
-X-Received: by 2002:a2e:90c4:: with SMTP id o4mr2361162ljg.28.1627666451240;
- Fri, 30 Jul 2021 10:34:11 -0700 (PDT)
+        with ESMTP id S229792AbhHBGDD (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 2 Aug 2021 02:03:03 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49204C06175F;
+        Sun,  1 Aug 2021 23:02:54 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GdS8p4BsNz9sRK;
+        Mon,  2 Aug 2021 16:02:48 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1627884171;
+        bh=n8jZx6w5lsO8h4k9sHk6uNDWOQkmiMu8W8QtD1+2nO8=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=KhE/7yngTkzWfiGcIos1FbWPLpdyYidIZkO96Xmei+xSuXi1IHpFADnnXA8lTi0MH
+         8rXdS5lr94S+ItUlrRMXhROjhnXJMA37UrMObAbcX8Q+i9hF8253qAxVhVjQjuKhQI
+         PvbBC/XyMMPYxr6hx19BDj5H73ioBoa5cm499JaPS3/gJ6oNLVXdNndj18KA6ZP7zM
+         +0aCqQs7N8eHzd+lRqMP7OcsLf65/FC2gwY9aSeroiw2cwPAWtH6/VaGL0TNg3Amsh
+         uQZEZUitD1aOINQJieswBnfY5NUtPNl4aXBg6c9C+xIFrt+eHyeWBUx89pkyP+I1IA
+         m4/iHahE0wTcA==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, linux-kernel@vger.kernel.org,
+        Paul Mackerras <paulus@samba.org>, kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH kernel] powerpc/powernv: Check if powernv_rng is
+ initialized
+In-Reply-To: <20210730044315.956125-1-aik@ozlabs.ru>
+References: <20210730044315.956125-1-aik@ozlabs.ru>
+Date:   Mon, 02 Aug 2021 16:02:48 +1000
+Message-ID: <87im0ol6yf.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-References: <20210706180350.2838127-1-jingzhangos@google.com>
- <20210706180350.2838127-5-jingzhangos@google.com> <8a6f9314-7329-54d1-63b4-dc7ba6b4ea1d@redhat.com>
-In-Reply-To: <8a6f9314-7329-54d1-63b4-dc7ba6b4ea1d@redhat.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Fri, 30 Jul 2021 10:34:00 -0700
-Message-ID: <CAAdAUtg6TNQ=_UrMe_mZ8Hv_u98i7gMybMUPKsnCXZkjivDRiQ@mail.gmail.com>
-Subject: Re: [PATCH v1 4/4] KVM: stats: Add halt polling related histogram stats
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 5:45 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+> The powernv-rng driver has 2 users - the bare metal powernv platform and
+> the KVM's H_RANDOM hcall. The hcall handler works fine when it is L0 KVM
+> but fails in L1 KVM as there is no support for the HW registers in L1 VMs
+> and such support is not advertised either (== no "ibm,power-rng" in
+> the FDT). So when a nested VM tries H_RANDOM, the L1 KVM crashes on
+> in_be64(rng->regs).
 >
-> On 06/07/21 20:03, Jing Zhang wrote:
-> > +             kvm_stats_log_hist_update(
-> > +                             vc->runner->stat.generic.halt_wait_hist,
-> > +                             LOGHIST_SIZE_LARGE,
-> > +                             ktime_to_ns(cur) - ktime_to_ns(start_wait));
+> This checks the pointers and returns an error if the feature is not
+> set up.
 >
-> Instead of passing the size to the function, perhaps you can wrap it
-> with a macro
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
 >
-> #define KVM_STATS_LOG_HIST_UPDATE(array, value) \
->      kvm_stats_log_hist_update(array, ARRAY_SIZE(array), value)
-That's nice! Will do that.
 >
-> Paolo
+> Randomly randomized H_RANDOM:
 >
-Thanks,
-Jing
+> 00:00:45 executing program 10:
+> r0 = openat$kvm(0xffffffffffffff9c, &(0x7f0000000000), 0x0, 0x0)
+> r1 = ioctl$KVM_CREATE_VM(r0, 0x2000ae01, 0x0)
+> r2 = ioctl$KVM_CREATE_VCPU(r1, 0x2000ae41, 0x0)
+> ioctl$KVM_SET_REGS(r2, 0x8188ae82, &(0x7f00000001c0)={[0x0, 0x0, 0xffffffffffffffe1, 0x0, 0x0, 0x200000953, 0x0, 0xfffffffffffffffe, 0x0, 0x0, 0x2], 0x2000})
+> syz_kvm_setup_cpu$ppc64(0xffffffffffffffff, r2, &(0x7f0000e80000/0x180000)=nil, 0x0, 0x0, 0x0, 0x0, 0x0)
+> r3 = openat$kvm(0xffffffffffffff9c, &(0x7f0000000100), 0x0, 0x0)
+> syz_kvm_setup_cpu$ppc64(r1, r2, &(0x7f0000e70000/0x180000)=nil, &(0x7f0000000080)=[{0x0, &(0x7f0000000280)="0000e03d0080ef61e403ef790000ef650900ef61647b007c0000e03f0000ff63e403ff7b0000ff679952ff6370e63f7e0000603c00006360e4036378000063640003636018a8803c28bf8460e4038478ef97846436888460b6f6a03c88d6a560e403a5781beda564d879a5602665c03cb08dc660e403c67806b3c664966fc660d53fe03cddf1e760e403e7785c41e7646623e76022000044463fb1f20000803e00809462e403947a0000946604009462a6a6607f4abb4c130000603f00007b63e4037b7b00007b679a367b6332d9c17c201c994f7201004cbb7a603f72047b63e4037b7b955f7b6799947b636401607f", 0xf0}], 0x1, 0x0, &(0x7f00000000c0)=[@featur2={0x1, 0x1000}], 0x1)
+>
+>
+> cpu 0xd: Vector: 300 (Data Access) at [c00000001599f590]
+>     pc: c00000000011d2bc: powernv_get_random_long+0x4c/0xc0
+>     lr: c00000000011d298: powernv_get_random_long+0x28/0xc0
+>     sp: c00000001599f830
+>    msr: 800000000280b033
+>    dar: 0
+>  dsisr: 40000000
+>   current = 0xc0000000614c7f80
+>   paca    = 0xc0000000fff81700	 irqmask: 0x03	 irq_happened: 0x01
+>     pid   = 31576, comm = syz-executor.10
+>
+> Linux version 5.14.0-rc2-le_f29cf1ff9a23_a+fstn1 (aik@fstn1-p1) (gcc (Ubuntu 10.3.0-1ubuntu1) 10.3.0, GNU ld (GNU Binutils for Ubuntu) 2.36.1) #263 SMP Thu Jul 29 17:56:12 AEST 2021
+> enter ? for help
+> [c00000001599f860] c0000000001e45f8 kvmppc_pseries_do_hcall+0x5d8/0x2190
+> [c00000001599f8f0] c0000000001ea2dc kvmppc_vcpu_run_hv+0x31c/0x14d0
+> [c00000001599f9c0] c0000000001bd518 kvmppc_vcpu_run+0x48/0x60
+> [c00000001599f9f0] c0000000001b74b0 kvm_arch_vcpu_ioctl_run+0x580/0x7d0
+> [c00000001599fa90] c00000000019e6f8 kvm_vcpu_ioctl+0x418/0xd00
+> [c00000001599fc70] c00000000079d8c4 sys_ioctl+0xb44/0x2100
+> [c00000001599fd90] c00000000003b704 system_call_exception+0x224/0x410
+> [c00000001599fe10] c00000000000c0e8 system_call_vectored_common+0xe8/0x278
+
+There would be no bug if KVM was using arch_get_random_seed_long(),
+because that defers to ppc_md, which is only populated when the RNG is
+setup correctly. That seems like a better fix?
+
+cheers
