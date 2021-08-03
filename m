@@ -2,229 +2,244 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB1C53DE342
-	for <lists+kvm-ppc@lfdr.de>; Tue,  3 Aug 2021 01:51:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2952B3DEFD1
+	for <lists+kvm-ppc@lfdr.de>; Tue,  3 Aug 2021 16:16:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232540AbhHBXvo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 2 Aug 2021 19:51:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51596 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232208AbhHBXvn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 2 Aug 2021 19:51:43 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 172NYWhq191770;
-        Mon, 2 Aug 2021 19:51:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=Zy8u+iZjJF5rgUIWtPjs5w51IfL+CHjjbvIEPBpoG5k=;
- b=tB94p91kxMeukDC0RwIMEkW4ZxiHMfwvun4CSxfNXOEjpRg+oup2W7VuEkRTZESjFKEg
- okRXIGuAHBrh0qjJa1CMuBEBj9inOmLZGCCwsoFJw77a+NfV6wG9QOqkVfCnIb8XKUPE
- zOCV8wWmD6m883dQknDizD05aXG7QztE5Razfi8ak9ZtQV011B84Gh94qWcKV1zYvd70
- ucQj+rKSP2NnXwoG3Gm2zECOd/hWDwk1OK+KwHcVChEJs0lR1ScWRwTBtuYVCobO6ibi
- csFhs+eVePl4o9XO/LH4abgPx2umrQ+0lrAIwgCwYQdHRg5ly+1r3xSD4kRF3ALYp8YC rw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3a5m024cky-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 Aug 2021 19:51:19 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 172NZrxL194627;
-        Mon, 2 Aug 2021 19:51:18 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3a5m024cks-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 Aug 2021 19:51:18 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 172NhOYk018035;
-        Mon, 2 Aug 2021 23:51:17 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma01dal.us.ibm.com with ESMTP id 3a4x5c282v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 Aug 2021 23:51:15 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 172Nnm7G28115318
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 2 Aug 2021 23:49:48 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4D81D112089;
-        Mon,  2 Aug 2021 23:49:48 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D8DC1112080;
-        Mon,  2 Aug 2021 23:49:45 +0000 (GMT)
-Received: from farosas.linux.ibm.com.com (unknown [9.211.147.189])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  2 Aug 2021 23:49:45 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
-        mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@c-s.fr
-Subject: [PATCH] KVM: PPC: Book3S HV: Fix kvmhv_copy_tofrom_guest_radix
-Date:   Mon,  2 Aug 2021 20:49:41 -0300
-Message-Id: <20210802234941.2568493-1-farosas@linux.ibm.com>
-X-Mailer: git-send-email 2.29.2
+        id S236253AbhHCOQt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 3 Aug 2021 10:16:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54814 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236205AbhHCOQs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 3 Aug 2021 10:16:48 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3671AC061757;
+        Tue,  3 Aug 2021 07:16:37 -0700 (PDT)
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1628000193;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Qkfc7lxCqn4p3B20wjfjiLsyLpuZIa2kIlbDitBY8sw=;
+        b=fStBYY9cDOofnMkMc6JUcZVYcNWx/eg2N05Pb/o7ef6JJTcTG48t+GioJgBl+eXKMJGEgi
+        TVCeDR+EwHJjgdulnpLwVy12sseYnaixefw5o14vk+2PAOm/LUlJHLssIOZ+nJyuRxaM3r
+        fCCG5ZeBAdz/Q3kIzOJQstWW7ST+mFehWQwEJk+hKZizcoepZD/zOgz+f7GO7oZ2MtK2DY
+        wm7slubFVtLqvtY6o7cEl9ZIw3mvJ35go7HuaiPxyi+ESejsT+e0qaP6D0Fis4EUqsKcRu
+        JGNGT0BYA9PAUGHVfsb3cVOtZwFCr59O6V6ObVy+T4OF395mknhLgwpLJFiGUg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1628000193;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Qkfc7lxCqn4p3B20wjfjiLsyLpuZIa2kIlbDitBY8sw=;
+        b=pGmFmcj1u+vX59p9gWCClfCslb9a1WxY2Pwa8q+HwkfzdAY6X/r9JgYaxIXaCJOpPNDW2W
+        rceMZSe2cSwuwVDA==
+To:     linux-kernel@vger.kernel.org
+Cc:     tglx@linutronix.de, Peter Zijlstra <peterz@infradead.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Amit Kucheria <amitk@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Ben Segall <bsegall@google.com>,
+        Borislav Petkov <bp@alien8.de>, cgroups@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        coresight@lists.linaro.org,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Gonglei <arei.gonglei@huawei.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean Delvare <jdelvare@suse.com>,
+        Jiri Kosina <jikos@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Julian Wiedmann <jwi@linux.ibm.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Karsten Graul <kgraul@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Len Brown <lenb@kernel.org>, Len Brown <len.brown@intel.com>,
+        Leo Yan <leo.yan@linaro.org>, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-edac@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-mm@kvack.org, linux-pm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, live-patching@vger.kernel.org,
+        Mark Gross <mgross@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Mel Gorman <mgorman@suse.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Mike Leach <mike.leach@linaro.org>,
+        Mike Travis <mike.travis@hpe.com>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Namhyung Kim <namhyung@kernel.org>, netdev@vger.kernel.org,
+        nouveau@lists.freedesktop.org,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Paul Mackerras <paulus@samba.org>, Pavel Machek <pavel@ucw.cz>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Petr Mladek <pmladek@suse.com>,
+        platform-driver-x86@vger.kernel.org,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>, rcu@vger.kernel.org,
+        Robin Holt <robinmholt@gmail.com>, Song Liu <song@kernel.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Steve Wahl <steve.wahl@hpe.com>,
+        Stuart Hayes <stuart.w.hayes@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Tony Luck <tony.luck@intel.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        virtualization@lists.linux-foundation.org, x86@kernel.org,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Zhang Rui <rui.zhang@intel.com>
+Subject: [PATCH 00/38] Replace deprecated CPU-hotplug
+Date:   Tue,  3 Aug 2021 16:15:43 +0200
+Message-Id: <20210803141621.780504-1-bigeasy@linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: XDu1sdXcRYa4geea3LgkH1NIsLRHQtNl
-X-Proofpoint-GUID: 66lDNQhNt0HxsFdf703KzyF9NmB-7PQo
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-02_07:2021-08-02,2021-08-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
- mlxlogscore=999 lowpriorityscore=0 clxscore=1011 priorityscore=1501
- mlxscore=0 malwarescore=0 phishscore=0 bulkscore=0 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108020149
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This function was introduced along with nested HV guest support. It
-uses the platform's Radix MMU quadrants[1] to provide a nested
-hypervisor with fast access to its nested guests memory
-(H_COPY_TOFROM_GUEST hypercall). It has also since been added as a
-fast path for the kvmppc_ld/st routines which are used during
-instruction emulation.
+This is a tree wide replacement of the deprecated CPU hotplug functions
+which are only wrappers around the actual functions.
 
-The commit def0bfdbd603 ("powerpc: use probe_user_read() and
-probe_user_write()") changed the low level copy function from
-raw_copy_from_user to probe_user_read, which adds a check to
-access_ok. In powerpc that is:
+Each patch is independent and can be picked up by the relevant maintainer.
 
- static inline bool __access_ok(unsigned long addr, unsigned long size)
- {
-        return addr < TASK_SIZE_MAX && size <= TASK_SIZE_MAX - addr;
- }
+Cc: Alexander Shishkin <alexander.shishkin@linux.intel.com>
+Cc: Amit Kucheria <amitk@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Ben Segall <bsegall@google.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: cgroups@vger.kernel.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: coresight@lists.linaro.org
+Cc: Daniel Bristot de Oliveira <bristot@redhat.com>
+Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Davidlohr Bueso <dave@stgolabs.net>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Dietmar Eggemann <dietmar.eggemann@arm.com>
+Cc: Gonglei <arei.gonglei@huawei.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: Hans de Goede <hdegoede@redhat.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Jean Delvare <jdelvare@suse.com>
+Cc: Jiri Kosina <jikos@kernel.org>
+Cc: Jiri Olsa <jolsa@redhat.com>
+Cc: Joe Lawrence <joe.lawrence@redhat.com>
+Cc: Joel Fernandes <joel@joelfernandes.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>
+Cc: John Stultz <john.stultz@linaro.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+Cc: Josh Triplett <josh@joshtriplett.org>
+Cc: Julian Wiedmann <jwi@linux.ibm.com>
+Cc: Juri Lelli <juri.lelli@redhat.com>
+Cc: Karol Herbst <karolherbst@gmail.com>
+Cc: Karsten Graul <kgraul@linux.ibm.com>
+Cc: kvm-ppc@vger.kernel.org
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>
+Cc: Len Brown <lenb@kernel.org>
+Cc: Len Brown <len.brown@intel.com>
+Cc: Leo Yan <leo.yan@linaro.org>
+Cc: linux-acpi@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-edac@vger.kernel.org
+Cc: linux-hwmon@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-mips@vger.kernel.org
+Cc: linux-mm@kvack.org
+Cc: linux-pm@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-raid@vger.kernel.org
+Cc: linux-s390@vger.kernel.org
+Cc: live-patching@vger.kernel.org
+Cc: Mark Gross <mgross@linux.intel.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc: Mel Gorman <mgorman@suse.de>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Mike Leach <mike.leach@linaro.org>
+Cc: Mike Travis <mike.travis@hpe.com>
+Cc: Miroslav Benes <mbenes@suse.cz>
+Cc: Namhyung Kim <namhyung@kernel.org>
+Cc: netdev@vger.kernel.org
+Cc: nouveau@lists.freedesktop.org
+Cc: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Pavel Machek <pavel@ucw.cz>
+Cc: Pekka Paalanen <ppaalanen@gmail.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Petr Mladek <pmladek@suse.com>
+Cc: platform-driver-x86@vger.kernel.org
+Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Cc: rcu@vger.kernel.org
+Cc: Robin Holt <robinmholt@gmail.com>
+Cc: Song Liu <song@kernel.org>
+Cc: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Stephen Boyd <sboyd@kernel.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Steve Wahl <steve.wahl@hpe.com>
+Cc: Stuart Hayes <stuart.w.hayes@gmail.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Tony Luck <tony.luck@intel.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Vincent Guittot <vincent.guittot@linaro.org>
+Cc: Viresh Kumar <viresh.kumar@linaro.org>
+Cc: virtualization@lists.linux-foundation.org
+Cc: x86@kernel.org
+Cc: Zefan Li <lizefan.x@bytedance.com>
+Cc: Zhang Rui <rui.zhang@intel.com>
 
-and TASK_SIZE_MAX is 0x0010000000000000UL for 64-bit, which means that
-setting the two MSBs of the effective address (which correspond to the
-quadrant) now cause access_ok to reject the access.
-
-This was not caught earlier because the most common code path via
-kvmppc_ld/st contains a fallback (kvm_read_guest) that is likely to
-succeed for L1 guests. For nested guests there is no fallback.
-
-Another issue is that probe_user_read (now __copy_from_user_nofault)
-does not return the number of not copied bytes in case of failure, so
-the destination memory is not being cleared anymore in
-kvmhv_copy_from_guest_radix:
-
- ret = kvmhv_copy_tofrom_guest_radix(vcpu, eaddr, to, NULL, n);
- if (ret > 0)                            <-- always false!
-        memset(to + (n - ret), 0, ret);
-
-This patch fixes both issues by introducing two new functions that set
-the quadrant bit of the effective address only after checking
-access_ok and moving the memset closer to __copy_to_user_inatomic.
-
-1 - for more on quadrants see commit d7b456152230 ("KVM: PPC: Book3S
-HV: Implement functions to access quadrants 1 & 2")
-
-Fixes: def0bfdbd603 ("powerpc: use probe_user_read() and probe_user_write()")
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_64_mmu_radix.c | 63 ++++++++++++++++++++------
- 1 file changed, 49 insertions(+), 14 deletions(-)
-
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index b5905ae4377c..076a8e4a9135 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -30,12 +30,57 @@
-  */
- static int p9_supported_radix_bits[4] = { 5, 9, 9, 13 };
- 
-+/* LPIDR and PIDR must have already been set */
-+static long __copy_from_guest_quadrant(void *dst, void __user *src, size_t size,
-+				       unsigned long quadrant)
-+{
-+	long ret = size;
-+	mm_segment_t old_fs = force_uaccess_begin();
-+
-+	if (access_ok(src, size)) {
-+		src += (quadrant << 62);
-+
-+		pagefault_disable();
-+		ret = __copy_from_user_inatomic((void __user *)dst, src, size);
-+		pagefault_enable();
-+	}
-+	force_uaccess_end(old_fs);
-+
-+	if (!ret)
-+		return ret;
-+
-+	memset(dst + (size - ret), 0, ret);
-+
-+	return -EFAULT;
-+}
-+
-+/* LPIDR and PIDR must have already been set */
-+static long __copy_to_guest_quadrant(void __user *dst, void *src, size_t size,
-+				     unsigned long quadrant)
-+{
-+	long ret = -EFAULT;
-+	mm_segment_t old_fs = force_uaccess_begin();
-+
-+	if (access_ok(dst, size)) {
-+		dst += (quadrant << 62);
-+
-+		pagefault_disable();
-+		ret = __copy_to_user_inatomic(dst, (void __user *)src, size);
-+		pagefault_enable();
-+	}
-+	force_uaccess_end(old_fs);
-+
-+	if (ret)
-+		return -EFAULT;
-+	return 0;
-+}
-+
- unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
- 					      gva_t eaddr, void *to, void *from,
- 					      unsigned long n)
- {
- 	int old_pid, old_lpid;
--	unsigned long quadrant, ret = n;
-+	unsigned long quadrant, ret;
- 	bool is_load = !!to;
- 
- 	/* Can't access quadrants 1 or 2 in non-HV mode, call the HV to do it */
-@@ -47,10 +92,6 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
- 	quadrant = 1;
- 	if (!pid)
- 		quadrant = 2;
--	if (is_load)
--		from = (void *) (eaddr | (quadrant << 62));
--	else
--		to = (void *) (eaddr | (quadrant << 62));
- 
- 	preempt_disable();
- 
-@@ -66,9 +107,9 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
- 	isync();
- 
- 	if (is_load)
--		ret = copy_from_user_nofault(to, (const void __user *)from, n);
-+		ret = __copy_from_guest_quadrant(to, (void __user *)eaddr, n, quadrant);
- 	else
--		ret = copy_to_user_nofault((void __user *)to, from, n);
-+		ret = __copy_to_guest_quadrant((void __user *)eaddr, from, n, quadrant);
- 
- 	/* switch the pid first to avoid running host with unallocated pid */
- 	if (quadrant == 1 && pid != old_pid)
-@@ -109,13 +150,7 @@ static long kvmhv_copy_tofrom_guest_radix(struct kvm_vcpu *vcpu, gva_t eaddr,
- long kvmhv_copy_from_guest_radix(struct kvm_vcpu *vcpu, gva_t eaddr, void *to,
- 				 unsigned long n)
- {
--	long ret;
--
--	ret = kvmhv_copy_tofrom_guest_radix(vcpu, eaddr, to, NULL, n);
--	if (ret > 0)
--		memset(to + (n - ret), 0, ret);
--
--	return ret;
-+	return kvmhv_copy_tofrom_guest_radix(vcpu, eaddr, to, NULL, n);
- }
- EXPORT_SYMBOL_GPL(kvmhv_copy_from_guest_radix);
- 
--- 
-2.29.2
+Sebastian
 
