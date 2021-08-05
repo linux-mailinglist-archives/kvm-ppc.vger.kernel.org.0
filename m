@@ -2,353 +2,222 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D58BC3E0A65
-	for <lists+kvm-ppc@lfdr.de>; Thu,  5 Aug 2021 00:29:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 660483E0F96
+	for <lists+kvm-ppc@lfdr.de>; Thu,  5 Aug 2021 09:50:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234169AbhHDW3Z (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 4 Aug 2021 18:29:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51692 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234569AbhHDW3Y (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 4 Aug 2021 18:29:24 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BBC5C061799
-        for <kvm-ppc@vger.kernel.org>; Wed,  4 Aug 2021 15:29:11 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id g11-20020a25ae4b0000b02905792fb55b0bso4417802ybe.9
-        for <kvm-ppc@vger.kernel.org>; Wed, 04 Aug 2021 15:29:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=2aoVz7znREQKWV9lVbXQeoyZokiTowDuQPpHDCPdpA4=;
-        b=rYiRhy7HvFPxCdOakFjV3jqekFuudX4ODhN8X0kHmu3m4k3KwHDKhpDiF0ogKjNu/1
-         FDXoXN53HPJ8x37IKRYnAOr4dk4lTYcvGr0/RBkr8Cx0t50/Gcw22k1oGYvvZZCTZK4L
-         VUUtcwKbOZMpcGprsUnexWxDgXxELHlSBaVRKbQ8OCu5X9Oje6mlOl12pw+dTIOqzW1c
-         4ZPGdt6nuOnhK39hYCjOeFRx/e+CQ1JAz2OANTNgsaf8g2/fR1AD7TrFoyS4KlaoYKJF
-         FqX2A3Gfi8WxxJgBK0zH8tIZsB+88Dqo6k2VHDz/FF1QotP+N4J2bH8GZj2hM3ruE2ae
-         72sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=2aoVz7znREQKWV9lVbXQeoyZokiTowDuQPpHDCPdpA4=;
-        b=tEZLwCUF/eiVqAPfJmXqqFPY5mKHB1rpu1nj24tm3SbP1xv5QOLzbVr5AgC9MSMz8L
-         YSb3eqamKRANtxByZnHQK4GxuQqw4LF/GfHUGcf69Or49L5wXkol1YakSzCR8JkZAgjF
-         /C+Dcy2KiqCco///zSVZZt7soPJZhcTzUBXaIhoresLSmwU6sjThqZs49ycX74NlWqbt
-         5UC3I8QNSmt/h4pwdE5StKtlI/jE7ewyMe9syil6LIvvdz+TW1ggz7xDLsoHyRGctL57
-         2uL2Kf1AuYGS88dPjJykur/GHxpzOATOhnumWXlRJic8Q4IL4JNaXUD2sEtZ6kQPjG2Z
-         ivmg==
-X-Gm-Message-State: AOAM530oO925KWZZ5jTdjeUkYnVkTJsKiFY8ZfppEptwo3N1SaLA3ib/
-        Zj8UfDPH6Hy7aJdjeWsv7g4mccaflhk0Uw==
-X-Google-Smtp-Source: ABdhPJxHy/N/MgRfyUrBXbX9FZJvm9llKjCkEjmHsfPAEaL1deE3Bv5j6BwtBqXGQyLIN4Z4k9/iOQMHETSvSw==
-X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a25:ac5f:: with SMTP id
- r31mr2079354ybd.384.1628116150789; Wed, 04 Aug 2021 15:29:10 -0700 (PDT)
-Date:   Wed,  4 Aug 2021 22:28:44 +0000
-In-Reply-To: <20210804222844.1419481-1-dmatlack@google.com>
-Message-Id: <20210804222844.1419481-8-dmatlack@google.com>
-Mime-Version: 1.0
-References: <20210804222844.1419481-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v2 7/7] KVM: selftests: Support multiple slots in dirty_log_perf_test
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S232535AbhHEHuc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 5 Aug 2021 03:50:32 -0400
+Received: from pegase2.c-s.fr ([93.17.235.10]:56019 "EHLO pegase2.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229674AbhHEHuc (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 5 Aug 2021 03:50:32 -0400
+X-Greylist: delayed 1690 seconds by postgrey-1.27 at vger.kernel.org; Thu, 05 Aug 2021 03:50:32 EDT
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+        by localhost (Postfix) with ESMTP id 4GgKmv1Qd7z9sTQ;
+        Thu,  5 Aug 2021 09:22:07 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+        by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id vVLALSTpUWcO; Thu,  5 Aug 2021 09:22:07 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase2.c-s.fr (Postfix) with ESMTP id 4GgKmv0RKCz9sVh;
+        Thu,  5 Aug 2021 09:22:07 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id E87E88B7B9;
+        Thu,  5 Aug 2021 09:22:06 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id LT6tMK24Gv07; Thu,  5 Aug 2021 09:22:06 +0200 (CEST)
+Received: from [192.168.4.90] (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 90DBE8B7BB;
+        Thu,  5 Aug 2021 09:22:06 +0200 (CEST)
+Subject: Re: [PATCH v1 11/55] powerpc/time: add API for KVM to re-arm the host
+ timer/decrementer
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org
+References: <20210726035036.739609-1-npiggin@gmail.com>
+ <20210726035036.739609-12-npiggin@gmail.com>
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+Message-ID: <370398a9-4429-285e-4a0f-33759f39b2fc@csgroup.eu>
+Date:   Thu, 5 Aug 2021 09:22:05 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
+MIME-Version: 1.0
+In-Reply-To: <20210726035036.739609-12-npiggin@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Introduce a new option to dirty_log_perf_test: -x number_of_slots. This
-causes the test to attempt to split the region of memory into the given
-number of slots. If the region cannot be evenly divided, the test will
-fail.
 
-This allows testing with more than one slot and therefore measure how
-performance scales with the number of memslots.
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- .../selftests/kvm/access_tracking_perf_test.c |  2 +-
- .../selftests/kvm/demand_paging_test.c        |  2 +-
- .../selftests/kvm/dirty_log_perf_test.c       | 76 ++++++++++++++++---
- .../selftests/kvm/include/perf_test_util.h    |  2 +-
- .../selftests/kvm/lib/perf_test_util.c        | 20 +++--
- .../kvm/memslot_modification_stress_test.c    |  2 +-
- 6 files changed, 84 insertions(+), 20 deletions(-)
+Le 26/07/2021 à 05:49, Nicholas Piggin a écrit :
+> Rather than have KVM look up the host timer and fiddle with the
+> irq-work internal details, have the powerpc/time.c code provide a
+> function for KVM to re-arm the Linux timer code when exiting a
+> guest.
+> 
+> This is implementation has an improvement over existing code of
+> marking a decrementer interrupt as soft-pending if a timer has
+> expired, rather than setting DEC to a -ve value, which tended to
+> cause host timers to take two interrupts (first hdec to exit the
+> guest, then the immediate dec).
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   arch/powerpc/include/asm/time.h | 16 +++-------
+>   arch/powerpc/kernel/time.c      | 52 +++++++++++++++++++++++++++------
+>   arch/powerpc/kvm/book3s_hv.c    |  7 ++---
+>   3 files changed, 49 insertions(+), 26 deletions(-)
+> 
+> diff --git a/arch/powerpc/include/asm/time.h b/arch/powerpc/include/asm/time.h
+> index 69b6be617772..924b2157882f 100644
+> --- a/arch/powerpc/include/asm/time.h
+> +++ b/arch/powerpc/include/asm/time.h
+> @@ -99,18 +99,6 @@ extern void div128_by_32(u64 dividend_high, u64 dividend_low,
+>   extern void secondary_cpu_time_init(void);
+>   extern void __init time_init(void);
+>   
+> -#ifdef CONFIG_PPC64
+> -static inline unsigned long test_irq_work_pending(void)
+> -{
+> -	unsigned long x;
+> -
+> -	asm volatile("lbz %0,%1(13)"
+> -		: "=r" (x)
+> -		: "i" (offsetof(struct paca_struct, irq_work_pending)));
+> -	return x;
+> -}
+> -#endif
+> -
+>   DECLARE_PER_CPU(u64, decrementers_next_tb);
+>   
+>   static inline u64 timer_get_next_tb(void)
+> @@ -118,6 +106,10 @@ static inline u64 timer_get_next_tb(void)
+>   	return __this_cpu_read(decrementers_next_tb);
+>   }
+>   
+> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+> +void timer_rearm_host_dec(u64 now);
+> +#endif
+> +
+>   /* Convert timebase ticks to nanoseconds */
+>   unsigned long long tb_to_ns(unsigned long long tb_ticks);
+>   
+> diff --git a/arch/powerpc/kernel/time.c b/arch/powerpc/kernel/time.c
+> index 72d872b49167..016828b7401b 100644
+> --- a/arch/powerpc/kernel/time.c
+> +++ b/arch/powerpc/kernel/time.c
+> @@ -499,6 +499,16 @@ EXPORT_SYMBOL(profile_pc);
+>    * 64-bit uses a byte in the PACA, 32-bit uses a per-cpu variable...
+>    */
+>   #ifdef CONFIG_PPC64
+> +static inline unsigned long test_irq_work_pending(void)
+> +{
+> +	unsigned long x;
+> +
+> +	asm volatile("lbz %0,%1(13)"
+> +		: "=r" (x)
+> +		: "i" (offsetof(struct paca_struct, irq_work_pending)));
 
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index e2baa187a21e..3e23b2105f4b 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -333,7 +333,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	pthread_t *vcpu_threads;
- 	int vcpus = params->vcpus;
- 
--	vm = perf_test_create_vm(mode, vcpus, params->vcpu_memory_bytes,
-+	vm = perf_test_create_vm(mode, vcpus, params->vcpu_memory_bytes, 1,
- 				 params->backing_src);
- 
- 	perf_test_setup_vcpus(vm, vcpus, params->vcpu_memory_bytes,
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index b74704305835..61266a729d88 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -293,7 +293,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	int vcpu_id;
- 	int r;
- 
--	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
-+	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
- 				 p->src_type);
- 
- 	perf_test_args.wr_fract = 1;
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 80cbd3a748c0..034458dd89a2 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -94,8 +94,59 @@ struct test_params {
- 	int wr_fract;
- 	bool partition_vcpu_memory_access;
- 	enum vm_mem_backing_src_type backing_src;
-+	int slots;
- };
- 
-+static void toggle_dirty_logging(struct kvm_vm *vm, int slots, bool enable)
-+{
-+	int i;
-+
-+	for (i = 0; i < slots; i++) {
-+		int slot = PERF_TEST_MEM_SLOT_INDEX + i;
-+		int flags = enable ? KVM_MEM_LOG_DIRTY_PAGES : 0;
-+
-+		vm_mem_region_set_flags(vm, slot, flags);
-+	}
-+}
-+
-+static inline void enable_dirty_logging(struct kvm_vm *vm, int slots)
-+{
-+	toggle_dirty_logging(vm, slots, true);
-+}
-+
-+static inline void disable_dirty_logging(struct kvm_vm *vm, int slots)
-+{
-+	toggle_dirty_logging(vm, slots, false);
-+}
-+
-+static void get_dirty_log(struct kvm_vm *vm, int slots, unsigned long *bitmap,
-+			  uint64_t nr_pages)
-+{
-+	uint64_t slot_pages = nr_pages / slots;
-+	int i;
-+
-+	for (i = 0; i < slots; i++) {
-+		int slot = PERF_TEST_MEM_SLOT_INDEX + i;
-+		unsigned long *slot_bitmap = bitmap + i * slot_pages;
-+
-+		kvm_vm_get_dirty_log(vm, slot, slot_bitmap);
-+	}
-+}
-+
-+static void clear_dirty_log(struct kvm_vm *vm, int slots, unsigned long *bitmap,
-+			    uint64_t nr_pages)
-+{
-+	uint64_t slot_pages = nr_pages / slots;
-+	int i;
-+
-+	for (i = 0; i < slots; i++) {
-+		int slot = PERF_TEST_MEM_SLOT_INDEX + i;
-+		unsigned long *slot_bitmap = bitmap + i * slot_pages;
-+
-+		kvm_vm_clear_dirty_log(vm, slot, slot_bitmap, 0, slot_pages);
-+	}
-+}
-+
- static void run_test(enum vm_guest_mode mode, void *arg)
- {
- 	struct test_params *p = arg;
-@@ -114,7 +165,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	struct timespec clear_dirty_log_total = (struct timespec){0};
- 
- 	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
--				 p->backing_src);
-+				 p->slots, p->backing_src);
- 
- 	perf_test_args.wr_fract = p->wr_fract;
- 
-@@ -163,8 +214,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 
- 	/* Enable dirty logging */
- 	clock_gettime(CLOCK_MONOTONIC, &start);
--	vm_mem_region_set_flags(vm, PERF_TEST_MEM_SLOT_INDEX,
--				KVM_MEM_LOG_DIRTY_PAGES);
-+	enable_dirty_logging(vm, p->slots);
- 	ts_diff = timespec_elapsed(start);
- 	pr_info("Enabling dirty logging time: %ld.%.9lds\n\n",
- 		ts_diff.tv_sec, ts_diff.tv_nsec);
-@@ -190,8 +240,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
- 
- 		clock_gettime(CLOCK_MONOTONIC, &start);
--		kvm_vm_get_dirty_log(vm, PERF_TEST_MEM_SLOT_INDEX, bmap);
--
-+		get_dirty_log(vm, p->slots, bmap, host_num_pages);
- 		ts_diff = timespec_elapsed(start);
- 		get_dirty_log_total = timespec_add(get_dirty_log_total,
- 						   ts_diff);
-@@ -200,9 +249,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 
- 		if (dirty_log_manual_caps) {
- 			clock_gettime(CLOCK_MONOTONIC, &start);
--			kvm_vm_clear_dirty_log(vm, PERF_TEST_MEM_SLOT_INDEX, bmap, 0,
--					       host_num_pages);
--
-+			clear_dirty_log(vm, p->slots, bmap, host_num_pages);
- 			ts_diff = timespec_elapsed(start);
- 			clear_dirty_log_total = timespec_add(clear_dirty_log_total,
- 							     ts_diff);
-@@ -213,7 +260,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 
- 	/* Disable dirty logging */
- 	clock_gettime(CLOCK_MONOTONIC, &start);
--	vm_mem_region_set_flags(vm, PERF_TEST_MEM_SLOT_INDEX, 0);
-+	disable_dirty_logging(vm, p->slots);
- 	ts_diff = timespec_elapsed(start);
- 	pr_info("Disabling dirty logging time: %ld.%.9lds\n",
- 		ts_diff.tv_sec, ts_diff.tv_nsec);
-@@ -244,7 +291,8 @@ static void help(char *name)
- {
- 	puts("");
- 	printf("usage: %s [-h] [-i iterations] [-p offset] "
--	       "[-m mode] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]\n", name);
-+	       "[-m mode] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
-+	       "[-x memslots]\n", name);
- 	puts("");
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
- 	       TEST_HOST_LOOP_N);
-@@ -263,6 +311,8 @@ static void help(char *name)
- 	       "     them into a separate region of memory for each vCPU.\n");
- 	printf(" -s: specify the type of memory that should be used to\n"
- 	       "     back the guest data region.\n\n");
-+	printf(" -x: Split the memory region into this number of memslots.\n"
-+	       "     (default: 1)");
- 	backing_src_help();
- 	puts("");
- 	exit(0);
-@@ -276,6 +326,7 @@ int main(int argc, char *argv[])
- 		.wr_fract = 1,
- 		.partition_vcpu_memory_access = true,
- 		.backing_src = VM_MEM_SRC_ANONYMOUS,
-+		.slots = 1,
- 	};
- 	int opt;
- 
-@@ -286,7 +337,7 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "hi:p:m:b:f:v:os:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hi:p:m:b:f:v:os:x:")) != -1) {
- 		switch (opt) {
- 		case 'i':
- 			p.iterations = atoi(optarg);
-@@ -316,6 +367,9 @@ int main(int argc, char *argv[])
- 		case 's':
- 			p.backing_src = parse_backing_src_type(optarg);
- 			break;
-+		case 'x':
-+			p.slots = atoi(optarg);
-+			break;
- 		case 'h':
- 		default:
- 			help(argv[0]);
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index 005f2143adeb..df9f1a3a3ffb 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -44,7 +44,7 @@ extern struct perf_test_args perf_test_args;
- extern uint64_t guest_test_phys_mem;
- 
- struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
--				   uint64_t vcpu_memory_bytes,
-+				   uint64_t vcpu_memory_bytes, int slots,
- 				   enum vm_mem_backing_src_type backing_src);
- void perf_test_destroy_vm(struct kvm_vm *vm);
- void perf_test_setup_vcpus(struct kvm_vm *vm, int vcpus,
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index b488f4aefea8..aebb223d34a7 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -50,11 +50,12 @@ static void guest_code(uint32_t vcpu_id)
- }
- 
- struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
--				   uint64_t vcpu_memory_bytes,
-+				   uint64_t vcpu_memory_bytes, int slots,
- 				   enum vm_mem_backing_src_type backing_src)
- {
- 	struct kvm_vm *vm;
- 	uint64_t guest_num_pages;
-+	int i;
- 
- 	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
- 
-@@ -68,6 +69,9 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
- 		    "Guest memory size is not host page size aligned.");
- 	TEST_ASSERT(vcpu_memory_bytes % perf_test_args.guest_page_size == 0,
- 		    "Guest memory size is not guest page size aligned.");
-+	TEST_ASSERT(guest_num_pages % slots == 0,
-+		    "Guest memory cannot be evenly divided into %d slots.",
-+		    slots);
- 
- 	vm = vm_create_with_vcpus(mode, vcpus, DEFAULT_GUEST_PHY_PAGES,
- 				  (vcpus * vcpu_memory_bytes) / perf_test_args.guest_page_size,
-@@ -95,10 +99,16 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
- #endif
- 	pr_info("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
- 
--	/* Add an extra memory slot for testing */
--	vm_userspace_mem_region_add(vm, backing_src, guest_test_phys_mem,
--				    PERF_TEST_MEM_SLOT_INDEX,
--				    guest_num_pages, 0);
-+	/* Add extra memory slots for testing */
-+	for (i = 0; i < slots; i++) {
-+		uint64_t region_pages = guest_num_pages / slots;
-+		vm_paddr_t region_start = guest_test_phys_mem +
-+			region_pages * perf_test_args.guest_page_size * i;
-+
-+		vm_userspace_mem_region_add(vm, backing_src, region_start,
-+					    PERF_TEST_MEM_SLOT_INDEX + i,
-+					    region_pages, 0);
-+	}
- 
- 	/* Do mapping for the demand paging memory slot */
- 	virt_map(vm, guest_test_virt_mem, guest_test_phys_mem, guest_num_pages);
-diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-index 98351ba0933c..8a9c6ccce3ca 100644
---- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-+++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-@@ -105,7 +105,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	struct kvm_vm *vm;
- 	int vcpu_id;
- 
--	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
-+	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
- 				 VM_MEM_SRC_ANONYMOUS);
- 
- 	perf_test_args.wr_fract = 1;
--- 
-2.32.0.554.ge1b32706d8-goog
+Can we just use READ_ONCE() instead of hard coding the read ?
 
+
+> +	return x;
+> +}
+> +
+>   static inline void set_irq_work_pending_flag(void)
+>   {
+>   	asm volatile("stb %0,%1(13)" : :
+> @@ -542,13 +552,44 @@ void arch_irq_work_raise(void)
+>   	preempt_enable();
+>   }
+>   
+> +static void set_dec_or_work(u64 val)
+> +{
+> +	set_dec(val);
+> +	/* We may have raced with new irq work */
+> +	if (unlikely(test_irq_work_pending()))
+> +		set_dec(1);
+> +}
+> +
+>   #else  /* CONFIG_IRQ_WORK */
+>   
+>   #define test_irq_work_pending()	0
+>   #define clear_irq_work_pending()
+>   
+> +static void set_dec_or_work(u64 val)
+> +{
+> +	set_dec(val);
+> +}
+>   #endif /* CONFIG_IRQ_WORK */
+>   
+> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+> +void timer_rearm_host_dec(u64 now)
+> +{
+> +	u64 *next_tb = this_cpu_ptr(&decrementers_next_tb);
+> +
+> +	WARN_ON_ONCE(!arch_irqs_disabled());
+> +	WARN_ON_ONCE(mfmsr() & MSR_EE);
+> +
+> +	if (now >= *next_tb) {
+> +		local_paca->irq_happened |= PACA_IRQ_DEC;
+> +	} else {
+> +		now = *next_tb - now;
+> +		if (now <= decrementer_max)
+> +			set_dec_or_work(now);
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(timer_rearm_host_dec);
+> +#endif
+> +
+>   /*
+>    * timer_interrupt - gets called when the decrementer overflows,
+>    * with interrupts disabled.
+> @@ -609,10 +650,7 @@ DEFINE_INTERRUPT_HANDLER_ASYNC(timer_interrupt)
+>   	} else {
+>   		now = *next_tb - now;
+>   		if (now <= decrementer_max)
+> -			set_dec(now);
+> -		/* We may have raced with new irq work */
+> -		if (test_irq_work_pending())
+> -			set_dec(1);
+> +			set_dec_or_work(now);
+>   		__this_cpu_inc(irq_stat.timer_irqs_others);
+>   	}
+>   
+> @@ -854,11 +892,7 @@ static int decrementer_set_next_event(unsigned long evt,
+>   				      struct clock_event_device *dev)
+>   {
+>   	__this_cpu_write(decrementers_next_tb, get_tb() + evt);
+> -	set_dec(evt);
+> -
+> -	/* We may have raced with new irq work */
+> -	if (test_irq_work_pending())
+> -		set_dec(1);
+> +	set_dec_or_work(evt);
+>   
+>   	return 0;
+>   }
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 6e6cfb10e9bb..0cef578930f9 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -4018,11 +4018,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+>   	vc->entry_exit_map = 0x101;
+>   	vc->in_guest = 0;
+>   
+> -	next_timer = timer_get_next_tb();
+> -	set_dec(next_timer - tb);
+> -	/* We may have raced with new irq work */
+> -	if (test_irq_work_pending())
+> -		set_dec(1);
+> +	timer_rearm_host_dec(tb);
+> +
+>   	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
+>   
+>   	kvmhv_load_host_pmu();
+> 
