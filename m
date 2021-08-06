@@ -2,95 +2,181 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEED13E2081
-	for <lists+kvm-ppc@lfdr.de>; Fri,  6 Aug 2021 03:16:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF6BB3E242D
+	for <lists+kvm-ppc@lfdr.de>; Fri,  6 Aug 2021 09:33:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236561AbhHFBQw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 5 Aug 2021 21:16:52 -0400
-Received: from ozlabs.org ([203.11.71.1]:55083 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233016AbhHFBQw (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 5 Aug 2021 21:16:52 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Ggnch3SS2z9sT6;
-        Fri,  6 Aug 2021 11:16:36 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1628212596;
-        bh=qzBSBCGCdmBE2RDHJZuwYJaVGQV98VMQ96dVPfIdCe0=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=j9ZGvITulsrwtJeTKf99DnnkxENKha2tUy+dsuXTw0jODq+1EUMo/CDvzWMTqQGaj
-         oIldu4hZ5bdRyNAfEyjwlc0CfHl3e9iFN9eldZtiKxOAV3bxqKqCM60JCLw43Roi67
-         8y0Taxy5opecPURcEemWgQ9J+xu+RBVmAxpQuTegqQ87agLPjWqKptlAjNqgH/9/nJ
-         FABwqD90N2VDbuDdkkp73PNE1EoeDC4cHCryrdV7EBpy3BZXBEmSbFOLZhgFwfZkcx
-         P7uYaeUisY+dUfbmMSuIDuxvgX9w0vWqe+9Glv6u3ope2NW1eiFUVTJiwbnPgLLl+7
-         6mGZeFI2kzcFg==
-From:   Michael Ellerman <mpe@ellerman.id.au>
+        id S229604AbhHFHdg (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 6 Aug 2021 03:33:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34822 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229987AbhHFHdf (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 6 Aug 2021 03:33:35 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1767ObsM054933;
+        Fri, 6 Aug 2021 03:33:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Gp2q4WHoNMzOUwiwaKLPIij34wEo3uVZvMp56XdSJdM=;
+ b=nmAN6QK6eIimJ774dKvmmPc0+j8dz9BHhScPLzop37w7CTSqJZF2CUCrZQ+XadB7kYw+
+ XNQUb/XPxRisAZIn0j2ImXyIc68qB/EPm6ex/Hdq+Mev0IEfp8HzU8DqPPbOmyAt8qce
+ WetV2WSfzbDCJovc8WyISHhhuzfobxWCybjLfRWIAdMGMxVCGwFT7Xj5OZwpMleYj4p4
+ E71O60eHpKvU7UkyN5ZLv6uWVZzGByR5P5kjy1EnVPldOPQA6dmo9H4HFRilw4+sZ/N2
+ PYuj22AhFEcdaXI2hxI82k5NJfO/nGMQo/KvQGpDChqk65Z9ijHNOjob9TkmmmAxn+rR uQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3a89prj4g0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 03:33:14 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1767UHNP069460;
+        Fri, 6 Aug 2021 03:33:13 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3a89prj4fg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 03:33:13 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1767ViHT032008;
+        Fri, 6 Aug 2021 07:33:12 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 3a4x594ry2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 07:33:11 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1767UApl56623582
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 6 Aug 2021 07:30:10 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 95DABA4065;
+        Fri,  6 Aug 2021 07:33:09 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7DE43A4059;
+        Fri,  6 Aug 2021 07:33:08 +0000 (GMT)
+Received: from Madhavan.PrimaryTP (unknown [9.85.73.2])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  6 Aug 2021 07:33:08 +0000 (GMT)
+Subject: Re: [PATCH v1 16/55] powerpc/64s: Implement PMU override command line
+ option
 To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v1 02/55] KVM: PPC: Book3S HV P9: Fixes for TM softpatch
- interrupt
-In-Reply-To: <20210726035036.739609-3-npiggin@gmail.com>
+Cc:     linuxppc-dev@lists.ozlabs.org
 References: <20210726035036.739609-1-npiggin@gmail.com>
- <20210726035036.739609-3-npiggin@gmail.com>
-Date:   Fri, 06 Aug 2021 11:16:32 +1000
-Message-ID: <87a6lvnzin.fsf@mpe.ellerman.id.au>
+ <20210726035036.739609-17-npiggin@gmail.com>
+From:   Madhavan Srinivasan <maddy@linux.ibm.com>
+Message-ID: <e7bb1311-3b50-dcc2-7fb0-1773558e9abc@linux.ibm.com>
+Date:   Fri, 6 Aug 2021 13:03:06 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20210726035036.739609-17-npiggin@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _ri4bES6uZ-tSNt0mJkOyA4N1b72bMrw
+X-Proofpoint-ORIG-GUID: mXlU7quKVHSUp6ADn5cYniSzEiFX0gp5
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-06_02:2021-08-05,2021-08-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ adultscore=0 mlxlogscore=999 impostorscore=0 lowpriorityscore=0
+ clxscore=1015 mlxscore=0 spamscore=0 malwarescore=0 bulkscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108060048
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
-> The softpatch interrupt sets HSRR0 to the faulting instruction +4, so
-> it should subtract 4 for the faulting instruction address. Also have it
-> emulate and deliver HFAC interrupts correctly, which is important for
-> nested HV and facility demand-faulting in future.
 
-The nip being off by 4 sounds bad. But I guess it's not that big a deal
-because it's only used for reporting the instruction address?
-
-Would also be good to have some more explanation of why it's OK to
-change from illegal to HFAC, which is a guest visible change.
-
-> diff --git a/arch/powerpc/kvm/book3s_hv_tm.c b/arch/powerpc/kvm/book3s_hv_tm.c
-> index cc90b8b82329..e4fd4a9dee08 100644
-> --- a/arch/powerpc/kvm/book3s_hv_tm.c
-> +++ b/arch/powerpc/kvm/book3s_hv_tm.c
-> @@ -74,19 +74,23 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
->  	case PPC_INST_RFEBB:
->  		if ((msr & MSR_PR) && (vcpu->arch.vcore->pcr & PCR_ARCH_206)) {
->  			/* generate an illegal instruction interrupt */
-> +			vcpu->arch.regs.nip -= 4;
->  			kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
->  			return RESUME_GUEST;
->  		}
->  		/* check EBB facility is available */
->  		if (!(vcpu->arch.hfscr & HFSCR_EBB)) {
-> -			/* generate an illegal instruction interrupt */
-> -			kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
-> -			return RESUME_GUEST;
-> +			vcpu->arch.regs.nip -= 4;
-> +			vcpu->arch.hfscr &= ~HFSCR_INTR_CAUSE;
-> +			vcpu->arch.hfscr |= (u64)FSCR_EBB_LG << 56;
-> +			vcpu->arch.trap = BOOK3S_INTERRUPT_H_FAC_UNAVAIL;
-> +			return -1; /* rerun host interrupt handler */
-
-This is EBB not TM. Probably OK to leave it in this patch as long as
-it's mentioned in the change log?
-
->  		}
->  		if ((msr & MSR_PR) && !(vcpu->arch.fscr & FSCR_EBB)) {
->  			/* generate a facility unavailable interrupt */
-> -			vcpu->arch.fscr = (vcpu->arch.fscr & ~(0xffull << 56)) |
-> -				((u64)FSCR_EBB_LG << 56);
-> +			vcpu->arch.regs.nip -= 4;
-> +			vcpu->arch.fscr &= ~FSCR_INTR_CAUSE;
-> +			vcpu->arch.fscr |= (u64)FSCR_EBB_LG << 56;
-
-Same.
+On 7/26/21 9:19 AM, Nicholas Piggin wrote:
+> It can be useful in simulators (with very constrained environments)
+> to allow some PMCs to run from boot so they can be sampled directly
+> by a test harness, rather than having to run perf.
+>
+> A previous change freezes counters at boot by default, so provide
+> a boot time option to un-freeze (plus a bit more flexibility).
+>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   .../admin-guide/kernel-parameters.txt         |  7 ++++
+>   arch/powerpc/perf/core-book3s.c               | 35 +++++++++++++++++++
+>   2 files changed, 42 insertions(+)
+>
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index bdb22006f713..96b7d0ebaa40 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -4089,6 +4089,13 @@
+>   			Override pmtimer IOPort with a hex value.
+>   			e.g. pmtmr=0x508
+>
+> +	pmu=		[PPC] Manually enable the PMU.
 
 
-cheers
+This is bit confusing, IIUC, we are manually disabling the perf 
+registration
+with this option and not pmu. If this option is used, we will unfreeze the
+MMCR0_FC (only in the HV_mode) and not register perf subsystem.
+Since this option is valid only for HV_mode, canwe call it
+kvm_disable_perf or kvm_dis_perf.
+
+
+> +			Enable the PMU by setting MMCR0 to 0 (clear FC bit).
+> +			This option is implemented for Book3S processors.
+> +			If a number is given, then MMCR1 is set to that number,
+> +			otherwise (e.g., 'pmu=on'), it is left 0. The perf
+> +			subsystem is disabled if this option is used.
+> +
+>   	pm_debug_messages	[SUSPEND,KNL]
+>   			Enable suspend/resume debug messages during boot up.
+>
+> diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-book3s.c
+> index 65795cadb475..e7cef4fe17d7 100644
+> --- a/arch/powerpc/perf/core-book3s.c
+> +++ b/arch/powerpc/perf/core-book3s.c
+> @@ -2428,8 +2428,24 @@ int register_power_pmu(struct power_pmu *pmu)
+>   }
+>
+>   #ifdef CONFIG_PPC64
+> +static bool pmu_override = false;
+> +static unsigned long pmu_override_val;
+> +static void do_pmu_override(void *data)
+> +{
+> +	ppc_set_pmu_inuse(1);
+> +	if (pmu_override_val)
+> +		mtspr(SPRN_MMCR1, pmu_override_val);
+> +	mtspr(SPRN_MMCR0, mfspr(SPRN_MMCR0) & ~MMCR0_FC);
+> +}
+> +
+>   static int __init init_ppc64_pmu(void)
+>   {
+> +	if (cpu_has_feature(CPU_FTR_HVMODE) && pmu_override) {
+> +		printk(KERN_WARNING "perf: disabling perf due to pmu= command line option.\n");
+> +		on_each_cpu(do_pmu_override, NULL, 1);
+> +		return 0;
+> +	}
+> +
+>   	/* run through all the pmu drivers one at a time */
+>   	if (!init_power5_pmu())
+>   		return 0;
+> @@ -2451,4 +2467,23 @@ static int __init init_ppc64_pmu(void)
+>   		return init_generic_compat_pmu();
+>   }
+>   early_initcall(init_ppc64_pmu);
+> +
+> +static int __init pmu_setup(char *str)
+> +{
+> +	unsigned long val;
+> +
+> +	if (!early_cpu_has_feature(CPU_FTR_HVMODE))
+> +		return 0;
+> +
+> +	pmu_override = true;
+> +
+> +	if (kstrtoul(str, 0, &val))
+> +		val = 0;
+> +
+> +	pmu_override_val = val;
+> +
+> +	return 1;
+> +}
+> +__setup("pmu=", pmu_setup);
+> +
+>   #endif
