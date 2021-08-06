@@ -2,89 +2,197 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57F8C3E2431
-	for <lists+kvm-ppc@lfdr.de>; Fri,  6 Aug 2021 09:34:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41BE23E2747
+	for <lists+kvm-ppc@lfdr.de>; Fri,  6 Aug 2021 11:31:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229987AbhHFHeY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 6 Aug 2021 03:34:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47166 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234568AbhHFHeX (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 6 Aug 2021 03:34:23 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63EF8C061798
-        for <kvm-ppc@vger.kernel.org>; Fri,  6 Aug 2021 00:34:08 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Ggy0G11Pcz9sCD;
-        Fri,  6 Aug 2021 17:34:06 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1628235246;
-        bh=6aJ5cEo3MkqnUspd6fLCdrsVKPeYDkl7qVBbV+RvnsE=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=l+H5H3B5SGOe99aqxzr2NN2vMV0dtzKh1f0bHEECKTP/orEzVDDshHXPN3uGw5ZPn
-         91AIDK364G9Yt/NTvPED+QLsO6gUXBxL+yjiHwIWGiKeaVuYMFfTBQESxwyugHq4/p
-         eUD+ioFXeDMAK8r/6qtHPn6XmKptmU/6lRD7ZA+VKw4uPXcz5HkvePm1Wh1cNWkYcW
-         0XKKMtTNmnzRZm5NUgzJiWeL/nALfd3Rs+sEL5YZL3/gFzdbgi9v44MrMVIwQjveuv
-         upCxoPJDv6+0tIIxYhGGvGjVJb5PbcM1ZAw2WhJ6DdUF7auJOpeOMnwSHa7jbBtF06
-         lo3ukLhS4DV8A==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v1 14/55] KVM: PPC: Book3S HV: Don't always save PMU for
- guest capable of nesting
-In-Reply-To: <20210726035036.739609-15-npiggin@gmail.com>
+        id S244527AbhHFJbR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 6 Aug 2021 05:31:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16776 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S244430AbhHFJbR (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 6 Aug 2021 05:31:17 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17692oiH015442;
+        Fri, 6 Aug 2021 05:30:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=pp1;
+ bh=4s7oqlwn9w3rtTW7J2kUZb7HP6PQ79F4aMAitgNN7O0=;
+ b=ObmAuoNAM7LfSdSeK34gTf2y9rzRDm+SrQZaSWdUxQn39+Bz10Ywfb0N5rogImvEKs7R
+ AavWHBufBVSSTCepuXXpiHNkFMjwGm/N1YrzWItk/8o162hyleYQRJqh5WTV2agX7m6W
+ hCfyIINdVUEPeaaMfJAIYhD1hW4/IBU6BSueKTsUbYMDewwTuM8fTUzJstJWYvM89feb
+ 9TYgObY2HJC5xSLgo67jxQbDw+l9LDZjJEtKmuR6oRAgitSG7DNlEMmUMmeoPcpEj9oq
+ Z65GLqoBaV44AL8ICvbnyF3PnXUBjhe45eMbVeyJ8aQsv5s7Z3sY2iJwELvMktKjVA9A Ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3a859dww78-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 05:30:57 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17692vBI015892;
+        Fri, 6 Aug 2021 05:30:57 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3a859dww6m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 05:30:56 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1769Mhpc010160;
+        Fri, 6 Aug 2021 09:30:55 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma02fra.de.ibm.com with ESMTP id 3a4x58ukx0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 09:30:55 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1769UqTa52494652
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 6 Aug 2021 09:30:52 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C26FFA406A;
+        Fri,  6 Aug 2021 09:30:52 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DC4A6A4068;
+        Fri,  6 Aug 2021 09:30:51 +0000 (GMT)
+Received: from [9.195.43.159] (unknown [9.195.43.159])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri,  6 Aug 2021 09:30:51 +0000 (GMT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.6\))
+Subject: Re: [PATCH v1 16/55] powerpc/64s: Implement PMU override command line
+ option
+From:   Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+In-Reply-To: <20210726035036.739609-17-npiggin@gmail.com>
+Date:   Fri, 6 Aug 2021 14:58:36 +0530
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4600EC62-5505-4856-AE23-939ED62287B3@linux.vnet.ibm.com>
 References: <20210726035036.739609-1-npiggin@gmail.com>
- <20210726035036.739609-15-npiggin@gmail.com>
-Date:   Fri, 06 Aug 2021 17:34:03 +1000
-Message-ID: <871r77ni1g.fsf@mpe.ellerman.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain
+ <20210726035036.739609-17-npiggin@gmail.com>
+To:     Nicholas Piggin <npiggin@gmail.com>
+X-Mailer: Apple Mail (2.3608.120.23.2.6)
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Cssd7fdc2k171g_7OndDAy1JWYpQ-1QM
+X-Proofpoint-ORIG-GUID: 7UJt4491db0EiiISZk6mPa2oF_53EwLA
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-06_02:2021-08-05,2021-08-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ clxscore=1011 suspectscore=0 malwarescore=0 bulkscore=0 impostorscore=0
+ mlxscore=0 adultscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108060063
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
-> Revert the workaround added by commit 63279eeb7f93a ("KVM: PPC: Book3S
-> HV: Always save guest pmu for guest capable of nesting").
->
-> Nested capable guests running with the earlier commit ("KVM: PPC: Book3S
-> HV Nested: Indicate guest PMU in-use in VPA") will now indicate the PMU
-> in-use status of their guests, which means the parent does not need to
-> unconditionally save the PMU for nested capable guests.
->
-> This will cause the PMU to break for nested guests when running older
-> nested hypervisor guests under a kernel with this change. It's unclear
-> there's an easy way to avoid that, so this could wait for a release or
-> so for the fix to filter into stable kernels.
 
-I'm not sure PMU inside nested guests is getting much use, but I don't
-think we can break this quite so casually :)
 
-Especially as the failure mode will be PMU counts that don't match
-reality, which is hard to diagnose. It took nearly a year for us to find
-the original bug.
+> On 26-Jul-2021, at 9:19 AM, Nicholas Piggin <npiggin@gmail.com> wrote:
+>=20
+> It can be useful in simulators (with very constrained environments)
+> to allow some PMCs to run from boot so they can be sampled directly
+> by a test harness, rather than having to run perf.
+>=20
+> A previous change freezes counters at boot by default, so provide
+> a boot time option to un-freeze (plus a bit more flexibility).
+>=20
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+> .../admin-guide/kernel-parameters.txt         |  7 ++++
+> arch/powerpc/perf/core-book3s.c               | 35 +++++++++++++++++++
+> 2 files changed, 42 insertions(+)
+>=20
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt =
+b/Documentation/admin-guide/kernel-parameters.txt
+> index bdb22006f713..96b7d0ebaa40 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -4089,6 +4089,13 @@
+> 			Override pmtimer IOPort with a hex value.
+> 			e.g. pmtmr=3D0x508
+>=20
+> +	pmu=3D		[PPC] Manually enable the PMU.
+> +			Enable the PMU by setting MMCR0 to 0 (clear FC =
+bit).
+> +			This option is implemented for Book3S =
+processors.
+> +			If a number is given, then MMCR1 is set to that =
+number,
+> +			otherwise (e.g., 'pmu=3Don'), it is left 0. The =
+perf
+> +			subsystem is disabled if this option is used.
+> +
+> 	pm_debug_messages	[SUSPEND,KNL]
+> 			Enable suspend/resume debug messages during boot =
+up.
+>=20
+> diff --git a/arch/powerpc/perf/core-book3s.c =
+b/arch/powerpc/perf/core-book3s.c
+> index 65795cadb475..e7cef4fe17d7 100644
+> --- a/arch/powerpc/perf/core-book3s.c
+> +++ b/arch/powerpc/perf/core-book3s.c
+> @@ -2428,8 +2428,24 @@ int register_power_pmu(struct power_pmu *pmu)
+> }
+>=20
+> #ifdef CONFIG_PPC64
+> +static bool pmu_override =3D false;
+> +static unsigned long pmu_override_val;
+> +static void do_pmu_override(void *data)
+> +{
+> +	ppc_set_pmu_inuse(1);
+> +	if (pmu_override_val)
+> +		mtspr(SPRN_MMCR1, pmu_override_val);
+> +	mtspr(SPRN_MMCR0, mfspr(SPRN_MMCR0) & ~MMCR0_FC);
 
-I think we need to hold this back for a while.
+Hi Nick
 
-We could put it under a CONFIG option, and then flip that option to off
-at some point in the future.
+Here, we are not doing any validity check for the value used to set =
+MMCR1.=20
+For advanced users, the option to pass value for MMCR1 is fine. But =
+other cases, it could result in
+invalid event getting used. Do we need to restrict this boot time option =
+for only PMC5/6 ?
+=20
+Thanks
+Athira
 
-cheers
-
-> index e7f8cc04944b..ab89db561c85 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -4003,8 +4003,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
->  		vcpu->arch.vpa.dirty = 1;
->  		save_pmu = lp->pmcregs_in_use;
->  	}
-> -	/* Must save pmu if this guest is capable of running nested guests */
-> -	save_pmu |= nesting_enabled(vcpu->kvm);
->  
->  	kvmhv_save_guest_pmu(vcpu, save_pmu);
->  #ifdef CONFIG_PPC_PSERIES
-> -- 
+> +}
+> +
+> static int __init init_ppc64_pmu(void)
+> {
+> +	if (cpu_has_feature(CPU_FTR_HVMODE) && pmu_override) {
+> +		printk(KERN_WARNING "perf: disabling perf due to pmu=3D =
+command line option.\n");
+> +		on_each_cpu(do_pmu_override, NULL, 1);
+> +		return 0;
+> +	}
+> +
+> 	/* run through all the pmu drivers one at a time */
+> 	if (!init_power5_pmu())
+> 		return 0;
+> @@ -2451,4 +2467,23 @@ static int __init init_ppc64_pmu(void)
+> 		return init_generic_compat_pmu();
+> }
+> early_initcall(init_ppc64_pmu);
+> +
+> +static int __init pmu_setup(char *str)
+> +{
+> +	unsigned long val;
+> +
+> +	if (!early_cpu_has_feature(CPU_FTR_HVMODE))
+> +		return 0;
+> +
+> +	pmu_override =3D true;
+> +
+> +	if (kstrtoul(str, 0, &val))
+> +		val =3D 0;
+> +
+> +	pmu_override_val =3D val;
+> +
+> +	return 1;
+> +}
+> +__setup("pmu=3D", pmu_setup);
+> +
+> #endif
+> --=20
 > 2.23.0
+>=20
+
