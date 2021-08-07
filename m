@@ -2,182 +2,122 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2D213E308E
-	for <lists+kvm-ppc@lfdr.de>; Fri,  6 Aug 2021 22:49:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 715593E378C
+	for <lists+kvm-ppc@lfdr.de>; Sun,  8 Aug 2021 01:17:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232932AbhHFUts (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 6 Aug 2021 16:49:48 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62498 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231472AbhHFUtr (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 6 Aug 2021 16:49:47 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 176KXGRa038671;
-        Fri, 6 Aug 2021 16:49:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=pChskJh1JyiI6S3y9CdGw15j4LoDb1x5XA7EDg7Vorc=;
- b=VMYXyJN6kzmZeT8PBnprn9qW00NhOgL3e47XWPnIOYyR4pU4nlcdSdfUOY908mg6lV5f
- stRtp+TZU/8nclAIbJqdZWYsuJc2LRhpLvs1OJjcSM7IVJ1gBNqwJcyj+zoQGTnI/EgO
- gZbP81oUwImDXfx/Ra1psms5hE0BZeDlMlibKnFP2MrCGj9fnA1wwqacUrjEZSz2evFm
- +hzyu5bBWyn/atZL1nUH8a+yT7mv3QTI9qixuMJb7oV0OX6+3g2kcuZEWKla4+UtMkHs
- 4i6hDafmihbp22oGT2IfMGfuacoQjj3xjmLRS9LayYS8sks1kc1Xn78Kx+bGfDWO1vOS EQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a9bxdgt42-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Aug 2021 16:49:28 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 176KXPCH039742;
-        Fri, 6 Aug 2021 16:49:28 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a9bxdgt3w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Aug 2021 16:49:28 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 176KlsSh001628;
-        Fri, 6 Aug 2021 20:49:27 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma01dal.us.ibm.com with ESMTP id 3a4x5j4hy9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Aug 2021 20:49:27 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 176KnP6p47645178
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 6 Aug 2021 20:49:26 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C4B6778064;
-        Fri,  6 Aug 2021 20:49:25 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 062E27805E;
-        Fri,  6 Aug 2021 20:49:25 +0000 (GMT)
-Received: from localhost (unknown [9.211.46.8])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Fri,  6 Aug 2021 20:49:24 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
+        id S229797AbhHGXR5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 7 Aug 2021 19:17:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37272 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229578AbhHGXR5 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 7 Aug 2021 19:17:57 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 875C8C061760
+        for <kvm-ppc@vger.kernel.org>; Sat,  7 Aug 2021 16:17:39 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GhytS1fFCz9sWX;
+        Sun,  8 Aug 2021 09:17:36 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1628378256;
+        bh=PWOzXFIKeUu2qxb6O/vuk6Ol6fUDMqUIaa+119yejJI=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=e1H+Gg/3r/Vew3wnVvXF/EHFO7NVnk/MLYSWGJaGoGoB1R5WLGyp6wdNlxqRFUXwQ
+         eMmn+80K80kJO3F4LMUZ+tF7/hwO2CGoBpLTn725GYXlC5qcGgkkcZVvPZn3IRFNHS
+         nwRdZfiE+X9gzZNnxPIMPpOoM5jEu1T8m3ndBWG8JPwM0hsuN/btzmL84Zf3wR2zir
+         eSNNfy44R2eEzQQhD8E/mak4UcYD4VkytAFwmMjvydsWOVHzZt/cLIMdacbQ1X8zA8
+         08qv8siZo/Lg1gBTQ4KYQ1SavgWSb90QmPddyHlGIlPsy0UsXRAIFZOGcYxS1PeEEe
+         akq5aO6s24pDw==
+From:   Michael Ellerman <mpe@ellerman.id.au>
 To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v1 32/55] KVM: PPC: Book3S HV P9: Move vcpu register
- save/restore into functions
-In-Reply-To: <20210726035036.739609-33-npiggin@gmail.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v1 26/55] KVM: PPC: Book3S HV: Change dec_expires to be
+ relative to guest timebase
+In-Reply-To: <20210726035036.739609-27-npiggin@gmail.com>
 References: <20210726035036.739609-1-npiggin@gmail.com>
- <20210726035036.739609-33-npiggin@gmail.com>
-Date:   Fri, 06 Aug 2021 17:49:22 -0300
-Message-ID: <87zgtus3hp.fsf@linux.ibm.com>
+ <20210726035036.739609-27-npiggin@gmail.com>
+Date:   Sun, 08 Aug 2021 09:17:34 +1000
+Message-ID: <87y29cn8tt.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: B6pf_4g4yjBUjD2uAOkSm_kAZkNnPFom
-X-Proofpoint-ORIG-GUID: KrU2nqxCVU-5pesZjvuYvvFwggxamz9k
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-06_06:2021-08-06,2021-08-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- impostorscore=0 suspectscore=0 phishscore=0 clxscore=1015 bulkscore=0
- adultscore=0 mlxlogscore=999 lowpriorityscore=0 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108060136
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 Nicholas Piggin <npiggin@gmail.com> writes:
-
-> This should be no functional difference but makes the caller easier
-> to read.
+> Change dec_expires to be relative to the guest timebase, and allow
+> it to be moved into low level P9 guest entry functions, to improve
+> SPR access scheduling.
 >
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
-
 > ---
->  arch/powerpc/kvm/book3s_hv.c | 65 +++++++++++++++++++++++-------------
->  1 file changed, 41 insertions(+), 24 deletions(-)
->
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index c2c72875fca9..45211458ac05 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -4062,6 +4062,44 @@ static void store_spr_state(struct kvm_vcpu *vcpu)
->  	vcpu->arch.ctrl = mfspr(SPRN_CTRLF);
->  }
->
-> +/* Returns true if current MSR and/or guest MSR may have changed */
-> +static bool load_vcpu_state(struct kvm_vcpu *vcpu,
-> +			   struct p9_host_os_sprs *host_os_sprs)
-> +{
-> +	bool ret = false;
-> +
-> +	if (cpu_has_feature(CPU_FTR_TM) ||
-> +	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST)) {
-> +		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
-> +		ret = true;
-> +	}
-> +
-> +	load_spr_state(vcpu, host_os_sprs);
-> +
-> +	load_fp_state(&vcpu->arch.fp);
-> +#ifdef CONFIG_ALTIVEC
-> +	load_vr_state(&vcpu->arch.vr);
-> +#endif
-> +	mtspr(SPRN_VRSAVE, vcpu->arch.vrsave);
-> +
-> +	return ret;
-> +}
-> +
-> +static void store_vcpu_state(struct kvm_vcpu *vcpu)
-> +{
-> +	store_spr_state(vcpu);
-> +
-> +	store_fp_state(&vcpu->arch.fp);
-> +#ifdef CONFIG_ALTIVEC
-> +	store_vr_state(&vcpu->arch.vr);
-> +#endif
-> +	vcpu->arch.vrsave = mfspr(SPRN_VRSAVE);
-> +
-> +	if (cpu_has_feature(CPU_FTR_TM) ||
-> +	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
-> +		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
-> +}
-> +
->  static void save_p9_host_os_sprs(struct p9_host_os_sprs *host_os_sprs)
->  {
->  	if (!cpu_has_feature(CPU_FTR_ARCH_31))
-> @@ -4169,19 +4207,8 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
->
->  	vcpu_vpa_increment_dispatch(vcpu);
->
-> -	if (cpu_has_feature(CPU_FTR_TM) ||
-> -	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST)) {
-> -		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
-> -		msr = mfmsr(); /* TM restore can update msr */
-> -	}
-> -
-> -	load_spr_state(vcpu, &host_os_sprs);
-> -
-> -	load_fp_state(&vcpu->arch.fp);
-> -#ifdef CONFIG_ALTIVEC
-> -	load_vr_state(&vcpu->arch.vr);
-> -#endif
-> -	mtspr(SPRN_VRSAVE, vcpu->arch.vrsave);
-> +	if (unlikely(load_vcpu_state(vcpu, &host_os_sprs)))
-> +		msr = mfmsr(); /* MSR may have been updated */
->
->  	switch_pmu_to_guest(vcpu, &host_os_sprs);
->
-> @@ -4285,17 +4312,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
->
->  	switch_pmu_to_host(vcpu, &host_os_sprs);
->
-> -	store_spr_state(vcpu);
-> -
-> -	store_fp_state(&vcpu->arch.fp);
-> -#ifdef CONFIG_ALTIVEC
-> -	store_vr_state(&vcpu->arch.vr);
-> -#endif
-> -	vcpu->arch.vrsave = mfspr(SPRN_VRSAVE);
-> -
-> -	if (cpu_has_feature(CPU_FTR_TM) ||
-> -	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
-> -		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
-> +	store_vcpu_state(vcpu);
->
->  	vcpu_vpa_increment_dispatch(vcpu);
+>  arch/powerpc/include/asm/kvm_book3s.h   |  6 +++
+>  arch/powerpc/include/asm/kvm_host.h     |  2 +-
+>  arch/powerpc/kvm/book3s_hv.c            | 58 +++++++++++++------------
+>  arch/powerpc/kvm/book3s_hv_nested.c     |  3 ++
+>  arch/powerpc/kvm/book3s_hv_p9_entry.c   | 10 ++++-
+>  arch/powerpc/kvm/book3s_hv_rmhandlers.S | 14 ------
+>  6 files changed, 49 insertions(+), 44 deletions(-)
+
+My p8 is hitting an oops running guests, and bisect points to this. Not
+obvious how the change relates to the oops, but maybe you can see it.
+
+cheers
+
+
+[  716.042962][T16989] Kernel attempted to read user page (0) - exploit attempt? (uid: 0)
+[  716.043020][T16989] BUG: Kernel NULL pointer dereference on read at 0x00000000
+[  716.043028][T16989] Faulting instruction address: 0xc00000000001e1a8
+[  716.043037][T16989] Oops: Kernel access of bad area, sig: 11 [#1]
+[  716.043043][T16989] LE PAGE_SIZE=64K MMU=Hash SMP NR_CPUS=2048 NUMA PowerNV
+[  716.043052][T16989] Modules linked in: xt_MASQUERADE xt_conntrack ipt_REJECT nf_reject_ipv4 xt_tcpudp iptable_mangle iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nfnetlink ip6table_filter ip6_tables iptable_filter tun bridge stp llc fuse kvm_hv kvm binfmt_misc squashfs mlx4_ib ib_uverbs dm_multipath scsi_dh_rdac ib_core scsi_dh_alua mlx4_en sr_mod cdrom lpfc sg mlx4_core bnx2x crc_t10dif crct10dif_generic scsi_transport_fc mdio vmx_crypto gf128mul crct10dif_vpmsum crct10dif_common leds_powernv powernv_rng led_class crc32c_vpmsum rng_core powernv_op_panel sunrpc ip_tables x_tables autofs4
+[  716.043128][T16989] CPU: 56 PID: 16989 Comm: qemu-system-ppc Not tainted 5.14.0-rc4-02329-g9bdd37071243 #1
+[  716.043137][T16989] NIP:  c00000000001e1a8 LR: c00000000001e154 CTR: c00000000016ebb0
+[  716.043144][T16989] REGS: c0000009f1a93480 TRAP: 0300   Not tainted  (5.14.0-rc4-02329-g9bdd37071243)
+[  716.043150][T16989] MSR:  9000000002803033 <SF,HV,VEC,VSX,FP,ME,IR,DR,RI,LE>  CR: 42442444  XER: 20000000
+[  716.043167][T16989] CFAR: c00000000000cd0c DAR: 0000000000000000 DSISR: 40000000 IRQMASK: 3
+[  716.043167][T16989] GPR00: c00000000001eab8 c0000009f1a93720 c000000002459f00 c0000009c0730270
+[  716.043167][T16989] GPR04: 00000000000001f0 0000000000000000 0000000022442448 c0000009c072ec80
+[  716.043167][T16989] GPR08: 00000000000000c2 0000000044000000 9000000002803033 0000000000000001
+[  716.043167][T16989] GPR12: 0000000000002200 c000000ffffec600 00007fff955f4410 0000000000000000
+[  716.043167][T16989] GPR16: 00007fff96280000 00007fff955f0320 00007fff8ee8ebe0 00007fff8e660028
+[  716.043167][T16989] GPR20: c000000803807400 c000000858b243bc 000000000000000a c000000002496eb8
+[  716.043167][T16989] GPR24: c000000801123650 c0000009c0730250 c0000009c072ec80 0000000002802000
+[  716.043167][T16989] GPR28: 0000000000800000 0000000002802000 0000000000800000 c0000009f1a93e80
+[  716.043236][T16989] NIP [c00000000001e1a8] restore_math+0x208/0x310
+[  716.043247][T16989] LR [c00000000001e154] restore_math+0x1b4/0x310
+[  716.043254][T16989] Call Trace:
+[  716.043257][T16989] [c0000009f1a93720] [0000000022442448] 0x22442448 (unreliable)
+[  716.043267][T16989] [c0000009f1a93780] [c00000000001eab8] __switch_to+0x228/0x2f0
+[  716.043274][T16989] [c0000009f1a937e0] [c000000000f7949c] __schedule+0x40c/0xf10
+[  716.043283][T16989] [c0000009f1a938b0] [c000000000f7a034] schedule+0x94/0x170
+[  716.043291][T16989] [c0000009f1a938e0] [c00800000b8e4474] kvmppc_wait_for_exec+0xdc/0xf8 [kvm_hv]
+[  716.043307][T16989] [c0000009f1a93960] [c00800000b8eeb18] kvmppc_vcpu_run_hv+0x900/0x10f0 [kvm_hv]
+[  716.043319][T16989] [c0000009f1a93a10] [c00800000b76355c] kvmppc_vcpu_run+0x34/0x48 [kvm]
+[  716.043340][T16989] [c0000009f1a93a30] [c00800000b75f188] kvm_arch_vcpu_ioctl_run+0x340/0x450 [kvm]
+[  716.043359][T16989] [c0000009f1a93ac0] [c00800000b74d470] kvm_vcpu_ioctl+0x328/0x8f8 [kvm]
+[  716.043378][T16989] [c0000009f1a93ca0] [c0000000004fe9d4] sys_ioctl+0x6b4/0x13b0
+[  716.043386][T16989] [c0000009f1a93db0] [c00000000002f918] system_call_exception+0x168/0x290
+[  716.043394][T16989] [c0000009f1a93e10] [c00000000000c864] system_call_common+0xf4/0x258
+[  716.043402][T16989] --- interrupt: c00 at 0x7fff954af010
+[  716.043407][T16989] NIP:  00007fff954af010 LR: 0000000116243430 CTR: 0000000000000000
+[  716.043413][T16989] REGS: c0000009f1a93e80 TRAP: 0c00   Not tainted  (5.14.0-rc4-02329-g9bdd37071243)
+[  716.043419][T16989] MSR:  900000000000d033 <SF,HV,EE,PR,ME,IR,DR,RI,LE>  CR: 22444442  XER: 00000000
+[  716.043434][T16989] IRQMASK: 0
+[  716.043434][T16989] GPR00: 0000000000000036 00007fff8ee8dc30 00007fff955a7100 000000000000000f
+[  716.043434][T16989] GPR04: 000000002000ae80 0000000000000000 00000000000004fb 0000000000000000
+[  716.043434][T16989] GPR08: 000000000000000f 0000000000000000 0000000000000000 0000000000000000
+[  716.043434][T16989] GPR12: 0000000000000000 00007fff8ee96290 00007fff955f4410 0000000000000000
+[  716.043434][T16989] GPR16: 00007fff96280000 00007fff955f0320 00007fff8ee8ebe0 00007fff8e660028
+[  716.043434][T16989] GPR20: 0000000000000000 0000000000000000 000000011689b0d0 000000002000ae80
+[  716.043434][T16989] GPR24: 00007fff8ffa00ae 0000000000000000 00007fff8ee8f290 00007fff8ffb0010
+[  716.043434][T16989] GPR28: 0000000116e010e0 00007fff8ffb0010 0000000000000000 000000002000ae80
+[  716.043498][T16989] NIP [00007fff954af010] 0x7fff954af010
+[  716.043503][T16989] LR [0000000116243430] 0x116243430
+[  716.043507][T16989] --- interrupt: c00
+[  716.043511][T16989] Instruction dump:
+[  716.043517][T16989] fb610038 67db0200 9907185a 4182005c 7c0802a6 7f63db78 f8010070 4bffeeed
+[  716.043529][T16989] 2c3e0000 408200d4 547ddb78 0082812b <eb000000> 387a1860 7fdcf378 7f7edb78
+[  716.043543][T16989] ---[ end trace b02ece1d913ff866 ]---
