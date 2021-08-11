@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE6753E9574
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:04:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5A2A3E9575
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:04:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233682AbhHKQE0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 12:04:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52272 "EHLO
+        id S233591AbhHKQE3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Aug 2021 12:04:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233589AbhHKQE0 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:04:26 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D89C061765
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:04:02 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id oa17so4230230pjb.1
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:04:02 -0700 (PDT)
+        with ESMTP id S233589AbhHKQE3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:04:29 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6033AC061765
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:04:05 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id u13-20020a17090abb0db0290177e1d9b3f7so10374860pjr.1
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:04:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=tuny/0eGXiUI7uo2gVucclOBaSeF7WVbv1eeHSQKFaE=;
-        b=OZaXx3cUvijxkwm0x1eN2JTWJWgtsEwynt9e6yW/0x1n+/J7npACl0cjOAhtGMMY2D
-         jO9aVROyUQIK/xurGp7CDQ6HuaFzIw3qKn0DjI+5a2psfC3kMCAmLfPKcXe4xcUb89sP
-         iE/rLcnZvQ6w+Gs9xFOCZGDGGHfXHVIML9eZMJi2NcoR+yQuk9WX4548JZ+nl3FyKRuB
-         J+G1e01iLqS6USBfWB1F2064lPFWqClXm27wtp8UD6xkUf4TnTAv6tQQJygSlgYvBm6H
-         cR6DQCr2Z+/m1KvxbroiBxKJaPTZ9pxDsEbNWJrHZSSBm3e3a91giiW15vW+VflDndfa
-         U1tA==
+        bh=lGFwm9eLMc818K8Y7HbXY46Jvms/PHQTfB9Xnbg0In4=;
+        b=UKOkMobR524dzmwACOuDHce1apQN8B3xOUPuWeZ+dEAbTPZ7xWGBwUrDeOFqQwhIKf
+         vu90SPr2ao5wIranB8XSk/XoEbm9hR7SXqSZtmKj3m/W/w/kdrvnnvGY8/5YtC8mz1sN
+         LHWh0E7qj9ZGIoCEYJlg3UHkPpblLCp9wPtW/nygqC5qqdxVWOoP1q0ty94crB2uVxwk
+         qZPVCbo7M3ZWNftVYOMOTIzOXZ2KXsIUPtbk3C5AWDwCRVIuBCBkq1rZKVqz+6aH6VMr
+         6P8lde9ikwC3rG6R5vECx2XzO3oAAZS9ytowh3BfTBDik3PixzZPIhO14DtYMY0P1tDY
+         M8Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=tuny/0eGXiUI7uo2gVucclOBaSeF7WVbv1eeHSQKFaE=;
-        b=g02LGl217lDy1sgMjxqHTJPTCPacfxqpRXiQJR1K2QUDCCF/oPDzkkuLNIIgQ4YYBJ
-         KUS6hyZGbsK64bVYUdd1mRpb/m/HMMQ0kNYwjGxvAHvqE0Z/lgfNNtiLRwTuGaF4KG9g
-         YJzal+22dW9YBkDEjbPryixvE0qnLAFdoskx5rCBbbd9An56dhUNcAjACvxLWHIHaFya
-         XynxWY1y6T9xwzIvRTuAmFbHc/QqIzIiQYeNeSQ5SyVcAO9YUIclC1utryshUyg2Pj61
-         iut0ns5t6py8e5b+EA0jNZdcdc0rmWGqvcC7/YhnG+B8mDcY1fxYKtYNn2Uu6pg1YGTK
-         HGcA==
-X-Gm-Message-State: AOAM5314kYIXrv7sq0k76AeFsc1mQdnP+qCSaosj9qqJux/hYqE5zvjc
-        TGJHZgnpm5awubViHT0QgpB0hzWegeA=
-X-Google-Smtp-Source: ABdhPJy2Iq6P+yIa9UFj5axzhHa+x+EubqFC3tvbbYbE9FTipuyNemwAnPdcJOW0VYk4zQFHOfAaTA==
-X-Received: by 2002:a17:90a:7185:: with SMTP id i5mr37588461pjk.236.1628697842379;
-        Wed, 11 Aug 2021 09:04:02 -0700 (PDT)
+        bh=lGFwm9eLMc818K8Y7HbXY46Jvms/PHQTfB9Xnbg0In4=;
+        b=I6rcn5wOLrpH3q+qHJXOeeANtMHQKePSjHaF2oGSTjZDKMVzCyxf6tBmmSe6Wcg5C3
+         SVU4Gxj2MDdW1QrkEp7jSE6gAu1VOySKL70EUPQ1nl5sKmRVADMGstWW0MDh+SzIoLLf
+         +yKTk1JqJgk8HDS/xyJ/PaXIJnNlfwyopcxCVayC4oape7icqLO/dnfuH/7w026PANV5
+         Tw7yg7BwUyD4+j+zc6E6keHkal6/1IweT0kCjWY4xR6YmLqRaiyj1C4YwMck7mmES+7L
+         cZmYzQ90IUX7o7UsIsJpLbxtXJ7f6QNVZniSK7R5KNitDdEs8eyPjUk80y4kjfB6H0+j
+         n7gA==
+X-Gm-Message-State: AOAM531MEaN+JhKFtWQ9j93TamsaYtadRJvHf/YbuITNaC2CwOgYDM3V
+        78RmwZ/44TR6CKN0lBaIkI/urD0PwCc=
+X-Google-Smtp-Source: ABdhPJz0cgfxKnR+wqNYHrawFiUMpNNJFs8wHnfFYJOWIj1C27SkzJRTWtm2J0AqLhTROVRE3ixSKw==
+X-Received: by 2002:a17:90a:1d44:: with SMTP id u4mr11329555pju.119.1628697844869;
+        Wed, 11 Aug 2021 09:04:04 -0700 (PDT)
 Received: from bobo.ibm.com ([118.210.97.79])
-        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.04.00
+        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.04.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 09:04:02 -0700 (PDT)
+        Wed, 11 Aug 2021 09:04:04 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2 53/60] KVM: PPC: Book3S HV P9: Optimise hash guest SLB saving
-Date:   Thu, 12 Aug 2021 02:01:27 +1000
-Message-Id: <20210811160134.904987-54-npiggin@gmail.com>
+Subject: [PATCH v2 54/60] KVM: PPC: Book3S HV P9: Avoid changing MSR[RI] in entry and exit
+Date:   Thu, 12 Aug 2021 02:01:28 +1000
+Message-Id: <20210811160134.904987-55-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210811160134.904987-1-npiggin@gmail.com>
 References: <20210811160134.904987-1-npiggin@gmail.com>
@@ -62,58 +62,116 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-slbmfee/slbmfev instructions are very expensive, moreso than a regular
-mfspr instruction, so minimising them significantly improves hash guest
-exit performance. The slbmfev is only required if slbmfee found a valid
-SLB entry.
+kvm_hstate.in_guest provides the equivalent of MSR[RI]=0 protection,
+and it covers the existing MSR[RI]=0 section in late entry and early
+exit, so clearing and setting MSR[RI] in those cases does not
+actually do anything useful.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Remove the RI manipulation and replace it with comments. Make the
+in_guest memory accesses a bit closer to a proper critical section
+pattern. This speeds up guest entry/exit performance.
+
+This also removes the MSR[RI] warnings which aren't very interesting
+and would cause crashes if they hit due to causing an interrupt in
+non-recoverable code.
+
+From: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv_p9_entry.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ arch/powerpc/kvm/book3s_hv_p9_entry.c | 50 ++++++++++++---------------
+ 1 file changed, 23 insertions(+), 27 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-index fa6ac153c0f9..cb865fe2580d 100644
+index cb865fe2580d..5745a49021c3 100644
 --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
 +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-@@ -483,10 +483,22 @@ static void __accumulate_time(struct kvm_vcpu *vcpu, struct kvmhv_tb_accumulator
- #define accumulate_time(vcpu, next) do {} while (0)
- #endif
+@@ -825,7 +825,15 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	 * But TM could be split out if this would be a significant benefit.
+ 	 */
  
--static inline void mfslb(unsigned int idx, u64 *slbee, u64 *slbev)
-+static inline u64 mfslbv(unsigned int idx)
- {
--	asm volatile("slbmfev  %0,%1" : "=r" (*slbev) : "r" (idx));
--	asm volatile("slbmfee  %0,%1" : "=r" (*slbee) : "r" (idx));
-+	u64 slbev;
-+
-+	asm volatile("slbmfev  %0,%1" : "=r" (slbev) : "r" (idx));
-+
-+	return slbev;
-+}
-+
-+static inline u64 mfslbe(unsigned int idx)
-+{
-+	u64 slbee;
-+
-+	asm volatile("slbmfee  %0,%1" : "=r" (slbee) : "r" (idx));
-+
-+	return slbee;
- }
+-	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_HV_P9;
++	/*
++	 * MSR[RI] does not need to be cleared (and is not, for radix guests
++	 * with no prefetch bug), because in_guest is set. If we take a SRESET
++	 * or MCE with in_guest set but still in HV mode, then
++	 * kvmppc_p9_bad_interrupt handles the interrupt, which effectively
++	 * clears MSR[RI] and doesn't return.
++	 */
++	WRITE_ONCE(local_paca->kvm_hstate.in_guest, KVM_GUEST_MODE_HV_P9);
++	barrier(); /* Open in_guest critical section */
  
- static inline void mtslb(u64 slbee, u64 slbev)
-@@ -616,8 +628,10 @@ static void save_clear_guest_mmu(struct kvm *kvm, struct kvm_vcpu *vcpu)
- 		 */
- 		for (i = 0; i < vcpu->arch.slb_nr; i++) {
- 			u64 slbee, slbev;
--			mfslb(i, &slbee, &slbev);
-+
-+			slbee = mfslbe(i);
- 			if (slbee & SLB_ESID_V) {
-+				slbev = mfslbv(i);
- 				vcpu->arch.slb[nr].orige = slbee | i;
- 				vcpu->arch.slb[nr].origv = slbev;
- 				nr++;
+ 	/*
+ 	 * Hash host, hash guest, or radix guest with prefetch bug, all have
+@@ -837,14 +845,10 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 
+ 	save_clear_host_mmu(kvm);
+ 
+-	if (kvm_is_radix(kvm)) {
++	if (kvm_is_radix(kvm))
+ 		switch_mmu_to_guest_radix(kvm, vcpu, lpcr);
+-		if (!cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG))
+-			__mtmsrd(0, 1); /* clear RI */
+-
+-	} else {
++	else
+ 		switch_mmu_to_guest_hpt(kvm, vcpu, lpcr);
+-	}
+ 
+ 	/* TLBIEL uses LPID=LPIDR, so run this after setting guest LPID */
+ 	kvmppc_check_need_tlb_flush(kvm, vc->pcpu, nested);
+@@ -899,19 +903,16 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	vcpu->arch.regs.gpr[3] = local_paca->kvm_hstate.scratch2;
+ 
+ 	/*
+-	 * Only set RI after reading machine check regs (DAR, DSISR, SRR0/1)
+-	 * and hstate scratch (which we need to move into exsave to make
+-	 * re-entrant vs SRESET/MCE)
++	 * After reading machine check regs (DAR, DSISR, SRR0/1) and hstate
++	 * scratch (which we need to move into exsave to make re-entrant vs
++	 * SRESET/MCE), register state is protected from reentrancy. However
++	 * timebase, MMU, among other state is still set to guest, so don't
++	 * enable MSR[RI] here. It gets enabled at the end, after in_guest
++	 * is cleared.
++	 *
++	 * It is possible an NMI could come in here, which is why it is
++	 * important to save the above state early so it can be debugged.
+ 	 */
+-	if (ri_set) {
+-		if (unlikely(!(mfmsr() & MSR_RI))) {
+-			__mtmsrd(MSR_RI, 1);
+-			WARN_ON_ONCE(1);
+-		}
+-	} else {
+-		WARN_ON_ONCE(mfmsr() & MSR_RI);
+-		__mtmsrd(MSR_RI, 1);
+-	}
+ 
+ 	vcpu->arch.regs.gpr[9] = exsave[EX_R9/sizeof(u64)];
+ 	vcpu->arch.regs.gpr[10] = exsave[EX_R10/sizeof(u64)];
+@@ -969,13 +970,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 				 */
+ 				mtspr(SPRN_HSRR0, vcpu->arch.regs.nip);
+ 				mtspr(SPRN_HSRR1, vcpu->arch.shregs.msr);
+-
+-				/*
+-				 * tm_return_to_guest re-loads SRR0/1, DAR,
+-				 * DSISR after RI is cleared, in case they had
+-				 * been clobbered by a MCE.
+-				 */
+-				__mtmsrd(0, 1); /* clear RI */
+ 				goto tm_return_to_guest;
+ 			}
+ 		}
+@@ -1075,7 +1069,9 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 
+ 	restore_p9_host_os_sprs(vcpu, &host_os_sprs);
+ 
+-	local_paca->kvm_hstate.in_guest = KVM_GUEST_MODE_NONE;
++	barrier(); /* Close in_guest critical section */
++	WRITE_ONCE(local_paca->kvm_hstate.in_guest, KVM_GUEST_MODE_NONE);
++	/* Interrupts are recoverable at this point */
+ 
+ 	/*
+ 	 * cp_abort is required if the processor supports local copy-paste
 -- 
 2.23.0
 
