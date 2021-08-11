@@ -2,147 +2,167 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DF503E8F18
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 12:54:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDB883E91CE
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 14:46:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231857AbhHKKy4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 06:54:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40338 "EHLO
+        id S229593AbhHKMrP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Aug 2021 08:47:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44040 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231143AbhHKKyz (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 06:54:55 -0400
+        by vger.kernel.org with ESMTP id S229576AbhHKMrP (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 08:47:15 -0400
 Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17BAo4T2013162;
-        Wed, 11 Aug 2021 06:54:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=pp1;
- bh=sP32XbgQ5CzhWUiPsAQPXt4hxK55ieZaoOqPmBgd5MA=;
- b=JgrYeYc4pktKOkOylJfmQM4pkn17+Xlhbw0e1dKyJrT2zFQoe1/VuPE1uTWI6/2Gslxr
- MAxUke+v8IYhIVzv01h2ZVYtgq1mBUpuet+Aft5dW/dfW33MsDj8BeiBt31ZYngyW/XI
- 7Ya5PbnWkjsC66hI3awviLs9YP0c0NtyHAw/Q6bCXjFK9NG+wrHzm5BGiRvPi6aZnltw
- cBmyad9l5bLC/k4z9OmLyz7Io9TSw846ijm9IpzuM9PhgmgdT7dWRpVsn7ocQLb8CkrQ
- EDRGMOfu5S8iKK7EeaWh6MUA6yt+r/svBoLc3bXplXW0t6okdA7/G+Nmh/HWl5UTfF18 jw== 
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17BCXveI020593;
+        Wed, 11 Aug 2021 08:46:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Y4hZ51Uv+Q9tIIeG033/i31F6ICBSLny+IRgHDDF4Ik=;
+ b=pv79AOHOJTEDbhf58haV2G7BZi0/zQMMDB+f4BZxtIb68H1KKqKhYUrkNiYHn8wisfl7
+ +ER44jBQCPEZE6g84e1NFiWBomrexDV0dQLlv1yodLljxrYNARyPK5EMzrYs3w0i1fCF
+ uEMIBHo+Ns0Shjk80NPwwpNX1IMvdbLlvTWWTGQw9roDiDDXjb8XHwn+jVF3nMSxL/sH
+ C199U1iZ16E8xg/qbcnjC0l0BTkZI1eyOm15TK6Vqgl+zowJwTmlH4SFDwoAhZjt7+wj
+ TikWbtglEPnhAFiw+6WGt1K9wDvB6uIBfguSry357zXXAovwzb2yaoLgsKPseWEtYdpq hA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3abt14cekx-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3abt14f94n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Aug 2021 06:54:26 -0400
+        Wed, 11 Aug 2021 08:46:47 -0400
 Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17BArBKZ023058;
-        Wed, 11 Aug 2021 06:54:25 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3abt14cekb-1
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17BCXw2l020720;
+        Wed, 11 Aug 2021 08:46:47 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3abt14f940-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Aug 2021 06:54:25 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17BAr4sp028293;
-        Wed, 11 Aug 2021 10:54:24 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3abtdnhpv3-1
+        Wed, 11 Aug 2021 08:46:46 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17BChR9C005980;
+        Wed, 11 Aug 2021 12:46:45 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3a9ht9020v-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Aug 2021 10:54:24 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17BApAwW34210182
+        Wed, 11 Aug 2021 12:46:45 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17BCkgD243974992
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 Aug 2021 10:51:10 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7759D42081;
-        Wed, 11 Aug 2021 10:54:21 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 95E6C42067;
-        Wed, 11 Aug 2021 10:54:20 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.79.182.59])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 11 Aug 2021 10:54:20 +0000 (GMT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+        Wed, 11 Aug 2021 12:46:42 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A61594C06E;
+        Wed, 11 Aug 2021 12:46:42 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 871254C066;
+        Wed, 11 Aug 2021 12:46:41 +0000 (GMT)
+Received: from Madhavan.PrimaryTP (unknown [9.85.71.29])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 11 Aug 2021 12:46:41 +0000 (GMT)
 Subject: Re: [PATCH v1 16/55] powerpc/64s: Implement PMU override command line
  option
-From:   Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-In-Reply-To: <1628246339.762vtrxskz.astroid@bobo.none>
-Date:   Wed, 11 Aug 2021 16:24:16 +0530
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <5C3CA279-F9C6-463A-BE1E-8FC6BB5BDA21@linux.vnet.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org
 References: <20210726035036.739609-1-npiggin@gmail.com>
  <20210726035036.739609-17-npiggin@gmail.com>
- <4600EC62-5505-4856-AE23-939ED62287B3@linux.vnet.ibm.com>
- <1628246339.762vtrxskz.astroid@bobo.none>
-To:     Nicholas Piggin <npiggin@gmail.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+ <e7bb1311-3b50-dcc2-7fb0-1773558e9abc@linux.ibm.com>
+ <1628245966.h9u2e2m21l.astroid@bobo.none>
+From:   Madhavan Srinivasan <maddy@linux.ibm.com>
+Message-ID: <c38c0802-1e59-f5bf-6d24-169db49f4427@linux.ibm.com>
+Date:   Wed, 11 Aug 2021 18:16:40 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <1628245966.h9u2e2m21l.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: izhRoOFnlzz4boZxfT_GGZvAxv1oN5N8
-X-Proofpoint-GUID: S8ncV2I4xh-wkazU7b9daDzKZcqKM3H2
+X-Proofpoint-ORIG-GUID: 17IApHHt5G8d-4OWExycSnxWezf1NBgC
+X-Proofpoint-GUID: N2t1KoQBOenPW2JtSo2g0cCf4ptimMH3
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-11_03:2021-08-11,2021-08-11 signatures=0
+ definitions=2021-08-11_04:2021-08-11,2021-08-11 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
  phishscore=0 malwarescore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
  spamscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0 priorityscore=1501
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108110069
+ definitions=main-2108110085
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
-
-> On 06-Aug-2021, at 4:12 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
->=20
-> Excerpts from Athira Rajeev's message of August 6, 2021 7:28 pm:
->>=20
->>=20
->>> On 26-Jul-2021, at 9:19 AM, Nicholas Piggin <npiggin@gmail.com> =
-wrote:
->>>=20
+On 8/6/21 4:08 PM, Nicholas Piggin wrote:
+> Excerpts from Madhavan Srinivasan's message of August 6, 2021 5:33 pm:
+>> On 7/26/21 9:19 AM, Nicholas Piggin wrote:
 >>> It can be useful in simulators (with very constrained environments)
 >>> to allow some PMCs to run from boot so they can be sampled directly
 >>> by a test harness, rather than having to run perf.
->>>=20
+>>>
 >>> A previous change freezes counters at boot by default, so provide
 >>> a boot time option to un-freeze (plus a bit more flexibility).
->>>=20
+>>>
 >>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 >>> ---
->>> .../admin-guide/kernel-parameters.txt         |  7 ++++
->>> arch/powerpc/perf/core-book3s.c               | 35 =
-+++++++++++++++++++
->>> 2 files changed, 42 insertions(+)
->>>=20
->>> diff --git a/Documentation/admin-guide/kernel-parameters.txt =
-b/Documentation/admin-guide/kernel-parameters.txt
+>>>    .../admin-guide/kernel-parameters.txt         |  7 ++++
+>>>    arch/powerpc/perf/core-book3s.c               | 35 +++++++++++++++++++
+>>>    2 files changed, 42 insertions(+)
+>>>
+>>> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
 >>> index bdb22006f713..96b7d0ebaa40 100644
 >>> --- a/Documentation/admin-guide/kernel-parameters.txt
 >>> +++ b/Documentation/admin-guide/kernel-parameters.txt
 >>> @@ -4089,6 +4089,13 @@
->>> 			Override pmtimer IOPort with a hex value.
->>> 			e.g. pmtmr=3D0x508
->>>=20
->>> +	pmu=3D		[PPC] Manually enable the PMU.
->>> +			Enable the PMU by setting MMCR0 to 0 (clear FC =
-bit).
->>> +			This option is implemented for Book3S =
-processors.
->>> +			If a number is given, then MMCR1 is set to that =
-number,
->>> +			otherwise (e.g., 'pmu=3Don'), it is left 0. The =
-perf
+>>>    			Override pmtimer IOPort with a hex value.
+>>>    			e.g. pmtmr=0x508
+>>>
+>>> +	pmu=		[PPC] Manually enable the PMU.
+>>
+>> This is bit confusing, IIUC, we are manually disabling the perf
+>> registration
+>> with this option and not pmu.
+>> If this option is used, we will unfreeze the
+>> MMCR0_FC (only in the HV_mode) and not register perf subsystem.
+> With the previous patch, this option un-freezes the PMU
+> (and disables perf).
+>
+>> Since this option is valid only for HV_mode, canwe call it
+>> kvm_disable_perf or kvm_dis_perf.
+> It's only disabled for guests because it would require a bit
+> of logic to set pmcregs_in_use when we register our lppaca. We could
+> add that if needed, but the intention is for use on BML, not exactly
+> KVM specific.
+>
+> I can add HV restriction to the help text. And we could rename the
+> option. free_run_pmu= or something?
+
+
+yeah having it a different name will be better. I am not sure
+whether we should say "[PPC] Manually enable the PMU",
+because IIUC, if we dont provide this option PMU and perf is
+anyway enabled, but rest looks good to me.
+
+Maddy
+
+
+>
+> Thanks,
+> Nick
+>
+>>
+>>> +			Enable the PMU by setting MMCR0 to 0 (clear FC bit).
+>>> +			This option is implemented for Book3S processors.
+>>> +			If a number is given, then MMCR1 is set to that number,
+>>> +			otherwise (e.g., 'pmu=on'), it is left 0. The perf
 >>> +			subsystem is disabled if this option is used.
 >>> +
->>> 	pm_debug_messages	[SUSPEND,KNL]
->>> 			Enable suspend/resume debug messages during boot =
-up.
->>>=20
->>> diff --git a/arch/powerpc/perf/core-book3s.c =
-b/arch/powerpc/perf/core-book3s.c
+>>>    	pm_debug_messages	[SUSPEND,KNL]
+>>>    			Enable suspend/resume debug messages during boot up.
+>>>
+>>> diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-book3s.c
 >>> index 65795cadb475..e7cef4fe17d7 100644
 >>> --- a/arch/powerpc/perf/core-book3s.c
 >>> +++ b/arch/powerpc/perf/core-book3s.c
 >>> @@ -2428,8 +2428,24 @@ int register_power_pmu(struct power_pmu *pmu)
->>> }
->>>=20
->>> #ifdef CONFIG_PPC64
->>> +static bool pmu_override =3D false;
+>>>    }
+>>>
+>>>    #ifdef CONFIG_PPC64
+>>> +static bool pmu_override = false;
 >>> +static unsigned long pmu_override_val;
 >>> +static void do_pmu_override(void *data)
 >>> +{
@@ -150,32 +170,40 @@ b/arch/powerpc/perf/core-book3s.c
 >>> +	if (pmu_override_val)
 >>> +		mtspr(SPRN_MMCR1, pmu_override_val);
 >>> +	mtspr(SPRN_MMCR0, mfspr(SPRN_MMCR0) & ~MMCR0_FC);
->>=20
->> Hi Nick
->>=20
->> Here, we are not doing any validity check for the value used to set =
-MMCR1.=20
->> For advanced users, the option to pass value for MMCR1 is fine. But =
-other cases, it could result in
->> invalid event getting used. Do we need to restrict this boot time =
-option for only PMC5/6 ?
->=20
-> Depends what would be useful. We don't have to prevent the admin =
-shooting=20
-> themselves in the foot with options like this, but if we can make it=20=
-
-> safer without making it less useful then that's always a good option.
-
-Hi Nick
-
-I checked back on my comment and it will be difficult to add/maintain =
-validity check for MMCR1 considering different platforms that we have.
-We can go ahead with present approach you have in this patch. Changes =
-looks good to me.
-
-Reviewed-by: Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-
->=20
-> Thanks,
-> Nick
-
+>>> +}
+>>> +
+>>>    static int __init init_ppc64_pmu(void)
+>>>    {
+>>> +	if (cpu_has_feature(CPU_FTR_HVMODE) && pmu_override) {
+>>> +		printk(KERN_WARNING "perf: disabling perf due to pmu= command line option.\n");
+>>> +		on_each_cpu(do_pmu_override, NULL, 1);
+>>> +		return 0;
+>>> +	}
+>>> +
+>>>    	/* run through all the pmu drivers one at a time */
+>>>    	if (!init_power5_pmu())
+>>>    		return 0;
+>>> @@ -2451,4 +2467,23 @@ static int __init init_ppc64_pmu(void)
+>>>    		return init_generic_compat_pmu();
+>>>    }
+>>>    early_initcall(init_ppc64_pmu);
+>>> +
+>>> +static int __init pmu_setup(char *str)
+>>> +{
+>>> +	unsigned long val;
+>>> +
+>>> +	if (!early_cpu_has_feature(CPU_FTR_HVMODE))
+>>> +		return 0;
+>>> +
+>>> +	pmu_override = true;
+>>> +
+>>> +	if (kstrtoul(str, 0, &val))
+>>> +		val = 0;
+>>> +
+>>> +	pmu_override_val = val;
+>>> +
+>>> +	return 1;
+>>> +}
+>>> +__setup("pmu=", pmu_setup);
+>>> +
+>>>    #endif
