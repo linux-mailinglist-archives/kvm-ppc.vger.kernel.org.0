@@ -2,58 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42B313E9554
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BB483E9555
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:02:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233622AbhHKQDN (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 12:03:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51948 "EHLO
+        id S233628AbhHKQDP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Aug 2021 12:03:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229634AbhHKQDM (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:03:12 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1951C061765
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:48 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id b7so3282505plh.7
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:48 -0700 (PDT)
+        with ESMTP id S229634AbhHKQDP (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:03:15 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A72EC061765
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:51 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id 28-20020a17090a031cb0290178dcd8a4d1so5350257pje.0
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=QqPmgr/sGr5j1zDNMnH53gsmq1i0Fa0vOmXvGCg74L4=;
-        b=Oga2Xv/cYKmKt+7qubqKM3fMNcJU24OXsL9KjiqLqi0tF9gDQJqkR5UCarU6Ys2Asl
-         Yd+RkuDpGdHGrj4WtMGCQ1UjNAeb9KvlFQYybusL0jtuDX1pY+/0Kfp9FOpFV8OjuEjH
-         g4njjLDRuvVhPEHu+K/8DqgAze4cTvbZKJ2yYutvIce3+hKlJpCa7SugTq0fGHqUtRHf
-         9qU8ypjya/shZM3RMKgwDiLzCKgl98gH/CNd9Qj1O1xYW29Gg06AvCoS9Bghksz7bfHI
-         TWA9e9Jn0UOpasAlC530YmDUgNDxxYMDtgThop6GLcy1TUzLoso1yKZD23MijgLiQcwu
-         SjJQ==
+        bh=Q0d0iaopUkL57P/YF2EiZzRzVhFFGYIegIp/ZQI3dO8=;
+        b=tEdIQaqs2HRZCjge8fh1ibXHwlZC+5KChx8ndqotUyE69jWlERwDq7ecjhtfEBxaBq
+         K9O8G/N6GpS9Yc6P16JFFjYuO0HTfWNOe1PWBe3+7Wt1nfPFR+K5M80NCIAqLtz979kP
+         /i2b+qbrFPNc0NgluKbYwJG5PHIAVKQxwOMgPepDqWo/STuhyDM0vLLizY6OeqTClPMU
+         ugyDxaqDn6bYXm6dmnwEeGyNRKePgbpwtSSQ0Tyb07jyo0k7OWn/BDhKBjSks58uB/8n
+         G6ToDuGVYYcnT2gswCIC9QbM/wYQYvg6b3ReZxeJ2xkpjY4E3zLaoqH8tt5iAdXL4liF
+         GlOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=QqPmgr/sGr5j1zDNMnH53gsmq1i0Fa0vOmXvGCg74L4=;
-        b=L/pX0A4iNoEbf5e/aQPiOWDOrGPiIndDzxEO42HT1V4kYtk5Jw4w812YRUjrqTjVAt
-         zAbzZK5/vs1ZEimLfqZEfcsTzXNlnNbdwiZe/Ez2qGwSBTyeDlZGCvBzei9BN9ngjspU
-         qRx8SROs+E1e2MRgmnMjllYYU7c3O8+78jLjvnu1R4OzLaUw10SIMQcI1bdcOv0aGDQv
-         rSDnJNbpLuDc1jN6NmLmOBuOwqY3d1SV1XwqvbpNVe0uy1a4guwq9xDPyyH93RUx4Oky
-         n7Fw+9bTuJmZjVqpfj0R2IWYBWX3BGvRtdwFmJL6k7sNAlWkkphuehzMPF3IAEy8Z8X9
-         98rA==
-X-Gm-Message-State: AOAM533h0eh9xECI3PJYpkEQDDAZSRrMJoGRMr7pQWUhTDwt6LWy8zw2
-        n6tU9mY3u5yYL7DETAvM90vwmITe8FA=
-X-Google-Smtp-Source: ABdhPJyEilrPW7asJOvFeaFex2/BT3EDl9ATGVLj6BS67i90hGQjqkAIxNbcmDCowWQj7LwcesqaMg==
-X-Received: by 2002:a17:90a:db44:: with SMTP id u4mr11278276pjx.180.1628697768491;
-        Wed, 11 Aug 2021 09:02:48 -0700 (PDT)
+        bh=Q0d0iaopUkL57P/YF2EiZzRzVhFFGYIegIp/ZQI3dO8=;
+        b=cOaXIGNpakDHbiDkeqEJjC/71ry/XLZCUBtWzgQX33KDhEZwSV7EHpBox26g4lbSjH
+         tXwEHgrwAtRZvsdghxP5SjrdbQVKXwne5W9PSyiccn3UuvQ0aaCDF73A+OsnITdx5GCh
+         a6szu6m1oNIV3buJkCHeMHIzPam/B+u9N/myGIBxFe6i27mApQ+x8svU2IYXSGux26kB
+         7/fN6qIa0Meor8dBgqWpI3D2Z7zBQPjpDMXmdc3ENMj37HCnBwCjn481Lfv4SFKRXD6r
+         lXmiLOj9pPg50F4LbXP46Yo8d2qD6LbmjAYkYHipx29spMAf7CeytAOJk1QN0IEJXftX
+         wqBg==
+X-Gm-Message-State: AOAM530yLAXNjVEnk5qaK0S4HQspURPuP3jn0PXMYs7TzBTdnyhJhPMO
+        WQ7yKTz5KbHmMD/OkXCwiTaQ0fbu5KY=
+X-Google-Smtp-Source: ABdhPJzd+cZm7lc8lSMZdvmG9Mg0irEwwXBZrOzKs7aJnrs7cThmGx00AGnzug/cEOiJRet08RQRpQ==
+X-Received: by 2002:a17:90a:a091:: with SMTP id r17mr4239723pjp.56.1628697770805;
+        Wed, 11 Aug 2021 09:02:50 -0700 (PDT)
 Received: from bobo.ibm.com ([118.210.97.79])
-        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.02.46
+        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.02.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 09:02:48 -0700 (PDT)
+        Wed, 11 Aug 2021 09:02:50 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
-        Fabiano Rosas <farosas@linux.ibm.com>
-Subject: [PATCH v2 24/60] KVM: PPC: Book3S HV P9: Factor out yield_count increment
-Date:   Thu, 12 Aug 2021 02:00:58 +1000
-Message-Id: <20210811160134.904987-25-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v2 25/60] KVM: PPC: Book3S HV: CTRL SPR does not require read-modify-write
+Date:   Thu, 12 Aug 2021 02:00:59 +1000
+Message-Id: <20210811160134.904987-26-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210811160134.904987-1-npiggin@gmail.com>
 References: <20210811160134.904987-1-npiggin@gmail.com>
@@ -63,63 +62,83 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Factor duplicated code into a helper function.
+Processors that support KVM HV do not require read-modify-write of
+the CTRL SPR to set/clear their thread's runlatch. Just write 1 or 0
+to it.
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c            |  2 +-
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 15 ++++++---------
+ 2 files changed, 7 insertions(+), 10 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 9ff7e3ea70f9..fa12a3efeeb2 100644
+index fa12a3efeeb2..f9942eeaefd3 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4117,6 +4117,16 @@ static inline bool hcall_is_xics(unsigned long req)
- 		req == H_IPOLL || req == H_XIRR || req == H_XIRR_X;
+@@ -4060,7 +4060,7 @@ static void load_spr_state(struct kvm_vcpu *vcpu)
+ 	 */
+ 
+ 	if (!(vcpu->arch.ctrl & 1))
+-		mtspr(SPRN_CTRLT, mfspr(SPRN_CTRLF) & ~1);
++		mtspr(SPRN_CTRLT, 0);
  }
  
-+static void vcpu_vpa_increment_dispatch(struct kvm_vcpu *vcpu)
-+{
-+	struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
-+	if (lp) {
-+		u32 yield_count = be32_to_cpu(lp->yield_count) + 1;
-+		lp->yield_count = cpu_to_be32(yield_count);
-+		vcpu->arch.vpa.dirty = 1;
-+	}
-+}
-+
- /*
-  * Guest entry for POWER9 and later CPUs.
-  */
-@@ -4145,12 +4155,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	vc->entry_exit_map = 1;
- 	vc->in_guest = 1;
+ static void store_spr_state(struct kvm_vcpu *vcpu)
+diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+index 551ce223b40c..05be8648937d 100644
+--- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
++++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+@@ -775,12 +775,11 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
+ 	mtspr	SPRN_AMR,r5
+ 	mtspr	SPRN_UAMOR,r6
  
--	if (vcpu->arch.vpa.pinned_addr) {
--		struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
--		u32 yield_count = be32_to_cpu(lp->yield_count) + 1;
--		lp->yield_count = cpu_to_be32(yield_count);
--		vcpu->arch.vpa.dirty = 1;
--	}
-+	vcpu_vpa_increment_dispatch(vcpu);
+-	/* Restore state of CTRL run bit; assume 1 on entry */
++	/* Restore state of CTRL run bit; the host currently has it set to 1 */
+ 	lwz	r5,VCPU_CTRL(r4)
+ 	andi.	r5,r5,1
+ 	bne	4f
+-	mfspr	r6,SPRN_CTRLF
+-	clrrdi	r6,r6,1
++	li	r6,0
+ 	mtspr	SPRN_CTRLT,r6
+ 4:
+ 	/* Secondary threads wait for primary to have done partition switch */
+@@ -1203,12 +1202,12 @@ guest_bypass:
+ 	stw	r0, VCPU_CPU(r9)
+ 	stw	r0, VCPU_THREAD_CPU(r9)
  
- 	if (cpu_has_feature(CPU_FTR_TM) ||
- 	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
-@@ -4278,12 +4283,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
- 		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
+-	/* Save guest CTRL register, set runlatch to 1 */
++	/* Save guest CTRL register, set runlatch to 1 if it was clear */
+ 	mfspr	r6,SPRN_CTRLF
+ 	stw	r6,VCPU_CTRL(r9)
+ 	andi.	r0,r6,1
+ 	bne	4f
+-	ori	r6,r6,1
++	li	r6,1
+ 	mtspr	SPRN_CTRLT,r6
+ 4:
+ 	/*
+@@ -2178,8 +2177,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_TM)
+ 	 * Also clear the runlatch bit before napping.
+ 	 */
+ kvm_do_nap:
+-	mfspr	r0, SPRN_CTRLF
+-	clrrdi	r0, r0, 1
++	li	r0,0
+ 	mtspr	SPRN_CTRLT, r0
  
--	if (vcpu->arch.vpa.pinned_addr) {
--		struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
--		u32 yield_count = be32_to_cpu(lp->yield_count) + 1;
--		lp->yield_count = cpu_to_be32(yield_count);
--		vcpu->arch.vpa.dirty = 1;
--	}
-+	vcpu_vpa_increment_dispatch(vcpu);
+ 	li	r0,1
+@@ -2198,8 +2196,7 @@ kvm_nap_sequence:		/* desired LPCR value in r5 */
  
- 	switch_pmu_to_host(vcpu, &host_os_sprs);
+ 	bl	isa206_idle_insn_mayloss
  
+-	mfspr	r0, SPRN_CTRLF
+-	ori	r0, r0, 1
++	li	r0,1
+ 	mtspr	SPRN_CTRLT, r0
+ 
+ 	mtspr	SPRN_SRR1, r3
 -- 
 2.23.0
 
