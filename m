@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB6263E9565
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:03:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE14A3E9566
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:03:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233508AbhHKQDy (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 12:03:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52126 "EHLO
+        id S233523AbhHKQD4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Aug 2021 12:03:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233442AbhHKQDx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:03:53 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C43C061765
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:03:30 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id s22-20020a17090a1c16b0290177caeba067so10433805pjs.0
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:03:30 -0700 (PDT)
+        with ESMTP id S233442AbhHKQD4 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:03:56 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88CE3C061765
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:03:32 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id l11so3290785plk.6
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:03:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=h9r7slMa/wxjs1UUTM7giJfy6Yufgbe7vAh2oRXYxVo=;
-        b=Lx3QQ9odZsPvd10rGGcBQyoWkVluSa+FHJrDKFAxKHsXzb/31cevkrNjpB2+FNLTbD
-         0+BPI5fyC+4RtfBNRR3tPVsYKszXK3Lo4KbVgbw25t6Gt7Y/0xattrtkGC59RMX3CgLk
-         cIKEW+xpgmh8M3zKsv3bMXjgSnx05gESe1MRf6dIaXSzCpmm5V6uYBgEhhhNK+dTn7bd
-         ORZrs3BfxsWP8dgqCDX/mV/tZzdmLdaQ6ihx1pOa4yjkzVBSjZI8UC3g88RnGfTob37K
-         289TuT+csRAzuLYZL1XCbLpUnE/2od0cm4cF7sozCCEkQsG2MVvNVAToSuwNp/juA2mW
-         zDCg==
+        bh=seBS1CKh1tdJivnx8ndo4Zu4wItjYVzMJJMUXfTGVvE=;
+        b=PSPAlFatBQ+1B6aLgAp2LKgkYDsDtU4inSnxdbXA2HlkzIVoFdMX5D8W31vAUax/JF
+         /Ug2/aKUrWfP73U3nHdIfG3gD0JmH/L3dumzXvTfmWBfEp9saVhls/jeTWpjsqLm957R
+         Z2T+MF8CCzsmWlBltQZYZTPQ1W3QUuNSMEU1rPIBUohx2bWWzO1PPCmeODkH4VMMLu59
+         f2FZ6T38BEcFSIgcWAS3vPQ/Qp6JugGi703Wb5sSGDArUZisE8ZRH/4nLwT3JATwWbv+
+         I918hmOvE/IIEvoGSn2kCJLfqhPmtw+itIfAB9y8/J46CPudz2HcZht+ycAQlEm1NZ4m
+         STuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=h9r7slMa/wxjs1UUTM7giJfy6Yufgbe7vAh2oRXYxVo=;
-        b=YfkpFIYqeOPVSsjl6eznbs9TkeHr0YigBP8zYG+hHKLh8xJenVGSg9rymxv+HZtiAT
-         YzJLam3zOlB4coYpx1FKOQWAjjpia24aN6sAYKeAyBFRNrNe39D4cyl/qPdmPG4i7u6l
-         I7C1v6DrmxuvppiCEuVWCsjSBDi3GMB3KGmpuIymBXo2Okv50GOOOVYd3V1kMVr9N8fY
-         u3Wzc1clZwHOtzbchH47iSSr0j42DIBWpZbPvJISeMInkMN01sR41jMO9fIcIcmMVO8u
-         n0uAX/VKSZzn1DQrfkEe5eIwY9pVmG1ZCzn98cVfws1kNPR3B7M2eNG4yMzFzupxVpzG
-         od5g==
-X-Gm-Message-State: AOAM532ijSUYNBtGprKKqo1s72lUiiDZPVl6P6ozxaKNxH229AIWqUsh
-        mAT3JU482I5oznsBI0I5A+kIWZEcDgM=
-X-Google-Smtp-Source: ABdhPJyKtVY7gsWVHDzOWE5GYD38Ht12rDXBJOgWTbTjSbWADtCV64mrIDjuE+J2LKGlgHw27HiF+w==
-X-Received: by 2002:a05:6a00:ccb:b029:3c6:803d:8e3 with SMTP id b11-20020a056a000ccbb02903c6803d08e3mr35308617pfv.0.1628697809419;
-        Wed, 11 Aug 2021 09:03:29 -0700 (PDT)
+        bh=seBS1CKh1tdJivnx8ndo4Zu4wItjYVzMJJMUXfTGVvE=;
+        b=A685q4JpJtM77hRMKR5jOShIJZBK5WuM0iY+bOL8sUiMevTjrxW8rsHTVaOztS6AGh
+         y/CKKGHs5LLVtUDpH0rWT0arTImZpZ3bJvnU+SP+e3U2EjGWrjDulKeD7lygtBIbn8EH
+         evb0ez8AW4WjytheD6E/uimEk6rWkBMwKHCS3axdirW5QkHG8VPBGZj8SA4KO3uyxaXk
+         IaKgoHTqKa/KcNlnVWkHw8lLory+/NfLAKQzrYYKWh9a5HUHOGLvgIBzgJMdqefvtkkN
+         J0Kmdsj3sRgFGgSbLdNdNyyxw9zZpOs5rdKGs/XCr9IQdjkHUJXyMJ0JBC5rwmGb+nE0
+         a8dg==
+X-Gm-Message-State: AOAM531lggg1oaSVQYkKKeoat0oqBJWOSh7pu5dBXDD+YBRPlYWCXxSg
+        QsBX6IKyIWcpWHCex8BtS7oq4VnQtY4=
+X-Google-Smtp-Source: ABdhPJzQiy935f6UIsCwZfdi6QtVSrEE6j6Mo3zLJYxYjBVNd49DHIHZaKJEgWaBGYnctR3+MEXiyg==
+X-Received: by 2002:a17:90a:648b:: with SMTP id h11mr10767670pjj.141.1628697812062;
+        Wed, 11 Aug 2021 09:03:32 -0700 (PDT)
 Received: from bobo.ibm.com ([118.210.97.79])
-        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.03.27
+        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.03.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 09:03:29 -0700 (PDT)
+        Wed, 11 Aug 2021 09:03:31 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2 40/60] KVM: PPC: Book3S HV P9: Implement TM fastpath for guest entry/exit
-Date:   Thu, 12 Aug 2021 02:01:14 +1000
-Message-Id: <20210811160134.904987-41-npiggin@gmail.com>
+Subject: [PATCH v2 41/60] KVM: PPC: Book3S HV P9: Switch PMU to guest as late as possible
+Date:   Thu, 12 Aug 2021 02:01:15 +1000
+Message-Id: <20210811160134.904987-42-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210811160134.904987-1-npiggin@gmail.com>
 References: <20210811160134.904987-1-npiggin@gmail.com>
@@ -62,56 +62,85 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-If TM is not active, only TM register state needs to be saved and
-restored, avoiding several mfmsr/mtmsrd instructions and improving
-performance.
+This moves PMU switch to guest as late as possible in entry, and switch
+back to host as early as possible at exit. This helps the host get the
+most perf coverage of KVM entry/exit code as possible.
+
+This is slightly suboptimal for SPR scheduling point of view when the
+PMU is enabled, but when perf is disabled there is no real difference.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv_p9_entry.c | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c          | 6 ++----
+ arch/powerpc/kvm/book3s_hv_p9_entry.c | 6 ++----
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 26872a4993fd..c76deb3de3e9 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -3823,8 +3823,6 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
+ 	s64 dec;
+ 	int trap;
+ 
+-	switch_pmu_to_guest(vcpu, &host_os_sprs);
+-
+ 	save_p9_host_os_sprs(&host_os_sprs);
+ 
+ 	/*
+@@ -3887,9 +3885,11 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
+ 
+ 	mtspr(SPRN_DAR, vcpu->arch.shregs.dar);
+ 	mtspr(SPRN_DSISR, vcpu->arch.shregs.dsisr);
++	switch_pmu_to_guest(vcpu, &host_os_sprs);
+ 	trap = plpar_hcall_norets(H_ENTER_NESTED, __pa(&hvregs),
+ 				  __pa(&vcpu->arch.regs));
+ 	kvmhv_restore_hv_return_state(vcpu, &hvregs);
++	switch_pmu_to_host(vcpu, &host_os_sprs);
+ 	vcpu->arch.shregs.msr = vcpu->arch.regs.msr;
+ 	vcpu->arch.shregs.dar = mfspr(SPRN_DAR);
+ 	vcpu->arch.shregs.dsisr = mfspr(SPRN_DSISR);
+@@ -3908,8 +3908,6 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
+ 
+ 	restore_p9_host_os_sprs(vcpu, &host_os_sprs);
+ 
+-	switch_pmu_to_host(vcpu, &host_os_sprs);
+-
+ 	return trap;
+ }
+ 
 diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-index 9ea70736f3d7..e52d8b040970 100644
+index e52d8b040970..48cc94f3d642 100644
 --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
 +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-@@ -289,8 +289,15 @@ bool load_vcpu_state(struct kvm_vcpu *vcpu,
+@@ -597,8 +597,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	local_paca->kvm_hstate.host_purr = mfspr(SPRN_PURR);
+ 	local_paca->kvm_hstate.host_spurr = mfspr(SPRN_SPURR);
  
- 	if (cpu_has_feature(CPU_FTR_TM) ||
- 	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST)) {
--		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
--		ret = true;
-+		unsigned long guest_msr = vcpu->arch.shregs.msr;
-+		if (MSR_TM_ACTIVE(guest_msr)) {
-+			kvmppc_restore_tm_hv(vcpu, guest_msr, true);
-+			ret = true;
-+		} else {
-+			mtspr(SPRN_TEXASR, vcpu->arch.texasr);
-+			mtspr(SPRN_TFHAR, vcpu->arch.tfhar);
-+			mtspr(SPRN_TFIAR, vcpu->arch.tfiar);
-+		}
- 	}
+-	switch_pmu_to_guest(vcpu, &host_os_sprs);
+-
+ 	save_p9_host_os_sprs(&host_os_sprs);
  
- 	load_spr_state(vcpu, host_os_sprs);
-@@ -316,8 +323,16 @@ void store_vcpu_state(struct kvm_vcpu *vcpu)
- 	vcpu->arch.vrsave = mfspr(SPRN_VRSAVE);
+ 	/*
+@@ -740,7 +738,9 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
  
- 	if (cpu_has_feature(CPU_FTR_TM) ||
--	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
--		kvmppc_save_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
-+	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST)) {
-+		unsigned long guest_msr = vcpu->arch.shregs.msr;
-+		if (MSR_TM_ACTIVE(guest_msr)) {
-+			kvmppc_save_tm_hv(vcpu, guest_msr, true);
-+		} else {
-+			vcpu->arch.texasr = mfspr(SPRN_TEXASR);
-+			vcpu->arch.tfhar = mfspr(SPRN_TFHAR);
-+			vcpu->arch.tfiar = mfspr(SPRN_TFIAR);
-+		}
-+	}
- }
- EXPORT_SYMBOL_GPL(store_vcpu_state);
+ 	accumulate_time(vcpu, &vcpu->arch.guest_time);
  
++	switch_pmu_to_guest(vcpu, &host_os_sprs);
+ 	kvmppc_p9_enter_guest(vcpu);
++	switch_pmu_to_host(vcpu, &host_os_sprs);
+ 
+ 	accumulate_time(vcpu, &vcpu->arch.rm_intr);
+ 
+@@ -951,8 +951,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 		asm volatile(PPC_CP_ABORT);
+ 
+ out:
+-	switch_pmu_to_host(vcpu, &host_os_sprs);
+-
+ 	end_timing(vcpu);
+ 
+ 	return trap;
 -- 
 2.23.0
 
