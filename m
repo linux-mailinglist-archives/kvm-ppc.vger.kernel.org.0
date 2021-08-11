@@ -2,58 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AE013E953F
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:02:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 919F63E9540
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:02:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233542AbhHKQCc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 12:02:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51756 "EHLO
+        id S233227AbhHKQCf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Aug 2021 12:02:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233385AbhHKQCb (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:02:31 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3678EC061765
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:08 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id n12so2617146plf.4
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:08 -0700 (PDT)
+        with ESMTP id S232847AbhHKQCe (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:02:34 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C8DC061765
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:10 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id w14so4172234pjh.5
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=eZIRwNA4o4bMaBzjGFVMA8AYhuzRrj44ddH2iqzIflE=;
-        b=NAkhG87wcUA8ta7y0aFfdVUVX3SdYhHQr9/iNt3ExP81clRIWk8oPiBlBdzYCFt4nT
-         IBwuXy66zdIxNboGkVy5XRpeE7SPgqDGW1W89yYBVdmItBW0ULOPx/g4VH6Rd5LGF5t+
-         tr7l7J68qitSQMKXDuTART27BOA4wt1ChwU7ZRGPPgfqCbmh1Kci+7V/OQtUUbQ4COil
-         dOfEZS9YU1tF1CuHDRxRxSsbPVUiR/1uLyznZ80q+9lguMRtZQK2hG8Pgu5Wd71vBwPy
-         IghH+UoB/XTimidGlsDntDp09uQnYEXVThXq1JpM9QoqOk9KGPaI0Ch43hc11T+tNDSS
-         +xaw==
+        bh=jCxdivQtSElLr5d9idnYO7f6LUBSBDiT6V+2D6aLUKg=;
+        b=aDlRdsD4I51ZZcZxRl0CmF1zHn4RYxWsHJ4/iLOfOd8NbRtE2QUQg60i0d0dn6IaSf
+         OHfNgTaHEh1+Zwo1ZuhciLciJua9HiZI+t7dR3KthS+vpzKhjvDV3V+j6iO11KMniFWO
+         y95cThRmDMfOwBvQkTzrbjQBxBPBwBe2YckNxbDGA2ypVJO61Bcg9OE9MkLoDt8vB6jM
+         9vxgiCduW63oudsTcY9h4a/lZwv/HWqdxfSNIYUsgTYksCvhch9IcYH1y8qPW/Yd0HhC
+         C3qTG2E1WYWgayKHvqimfxuU00dNXFCe3QG2Nnz3quJpubM7fQ5Nt0U77ieT1iHsxe/h
+         wJqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=eZIRwNA4o4bMaBzjGFVMA8AYhuzRrj44ddH2iqzIflE=;
-        b=NkzKCOa2/g7njR/854/LozI8hYEDne9bxvpflf/4EYP0D0gkdCS3EqkvXnCRQc1XRG
-         9e5EJMXMtYDGmnwBWAfXVmRql4E9IXBpEK9DJAEHouRYYJpiJY0mL8TnbsCdTVSnCK1a
-         SmT/gL0Bx5rB/h6NGUV+1nJdW3SzA9UEqnncIuokRneUOH6WGukPhVbX+l+ymaTIXTaH
-         ErgcmWqdB9JvM+DOKewF6Lk7HepcrRB7H+0iYPvw6UKCm1ypJTDuRTanJYHyc14v1rXu
-         0USXV72Hgmb2o4GaK42PMw/7h7uVbmjzPTnmBfk8vLpQdEjxfa6GyOgpAl770rvNIlWg
-         RC9g==
-X-Gm-Message-State: AOAM532cRCfsAGdb311elyGJLAXAOUQJFj2gMBPwA8sWcice7o9wCeBT
-        94pKWCf9sEBeR5MvDTHFbFWzwdaJEH0=
-X-Google-Smtp-Source: ABdhPJxXfhjv6ppy9tJgNemJJcDdIqbOkE6ioo6BrgS0G55roCMvlVPTGWcmDTp2qJtr0cKvG+vy/A==
-X-Received: by 2002:a17:90a:de8b:: with SMTP id n11mr11380877pjv.31.1628697727552;
-        Wed, 11 Aug 2021 09:02:07 -0700 (PDT)
+        bh=jCxdivQtSElLr5d9idnYO7f6LUBSBDiT6V+2D6aLUKg=;
+        b=hEywnByEVoGWRZYOQmu6eO5m3JbTH8p5zxr/DCI9ILDraCZLfb3LM9DaFV08REFu2/
+         DnR6BleVXLyCXH13/eF2o5l1QkJVtp5o0AX9eZyBePCkUJO5+q/CdEEE+IiSwA0juyrG
+         VYD2zy9049UEzhc6ZUluDCb/+2SsOV+4v1UStLHDzKwKyIhsWHAuj9s9jErN09KSbhaa
+         oxSSaZoLVRgO8HEQEpTDI2V9rx9MqqgmjM8B25b0a9OfOtulDHD78S+SZ343QJO3vm96
+         rA/gkjPqb56s9oxgPEozbX5sNHA5eKlAqpi5g0zNdfQj4evGIz9w2hHQ5BigYSSsfrrF
+         HVNg==
+X-Gm-Message-State: AOAM533oK71vyukkIAR/EkbrGh1wm6obX2ssyXBX1Ef82CeB5PLOechV
+        zZ5wzescOXqFEymJZUypy2Llb+xGYpw=
+X-Google-Smtp-Source: ABdhPJwOe47kCVYD2CjJf/UNfti3v0EKt3Z98V8sfY0s93Cmt6jR9l3cIXm7nAZJRd6rLoInIll1YQ==
+X-Received: by 2002:a17:902:c711:b029:12c:9b3c:9986 with SMTP id p17-20020a170902c711b029012c9b3c9986mr19502076plp.44.1628697730313;
+        Wed, 11 Aug 2021 09:02:10 -0700 (PDT)
 Received: from bobo.ibm.com ([118.210.97.79])
-        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.02.05
+        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.02.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 09:02:07 -0700 (PDT)
+        Wed, 11 Aug 2021 09:02:10 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
         Fabiano Rosas <farosas@linux.ibm.com>
-Subject: [PATCH v2 09/60] KVM: PPC: Book3S HV Nested: Reflect guest PMU in-use to L0 when guest SPRs are live
-Date:   Thu, 12 Aug 2021 02:00:43 +1000
-Message-Id: <20210811160134.904987-10-npiggin@gmail.com>
+Subject: [PATCH v2 10/60] powerpc/64s: Remove WORT SPR from POWER9/10
+Date:   Thu, 12 Aug 2021 02:00:44 +1000
+Message-Id: <20210811160134.904987-11-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210811160134.904987-1-npiggin@gmail.com>
 References: <20210811160134.904987-1-npiggin@gmail.com>
@@ -63,91 +63,64 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-After the L1 saves its PMU SPRs but before loading the L2's PMU SPRs,
-switch the pmcregs_in_use field in the L1 lppaca to the value advertised
-by the L2 in its VPA. On the way out of the L2, set it back after saving
-the L2 PMU registers (if they were in-use).
+This register is not architected and not implemented in POWER9 or 10,
+it just reads back zeroes for compatibility.
 
-This transfers the PMU liveness indication between the L1 and L2 at the
-points where the registers are not live.
-
-This fixes the nested HV bug for which a workaround was added to the L0
-HV by commit 63279eeb7f93a ("KVM: PPC: Book3S HV: Always save guest pmu
-for guest capable of nesting"), which explains the problem in detail.
-That workaround is no longer required for guests that include this bug
-fix.
-
-Fixes: 360cae313702 ("KVM: PPC: Book3S HV: Nested guest entry via hypercall")
 Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/include/asm/pmc.h |  7 +++++++
- arch/powerpc/kvm/book3s_hv.c   | 20 ++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ arch/powerpc/kvm/book3s_hv.c          | 3 ---
+ arch/powerpc/platforms/powernv/idle.c | 2 --
+ 2 files changed, 5 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/pmc.h b/arch/powerpc/include/asm/pmc.h
-index c6bbe9778d3c..3c09109e708e 100644
---- a/arch/powerpc/include/asm/pmc.h
-+++ b/arch/powerpc/include/asm/pmc.h
-@@ -34,6 +34,13 @@ static inline void ppc_set_pmu_inuse(int inuse)
- #endif
- }
- 
-+#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-+static inline int ppc_get_pmu_inuse(void)
-+{
-+	return get_paca()->pmcregs_in_use;
-+}
-+#endif
-+
- extern void power4_enable_pmcs(void);
- 
- #else /* CONFIG_PPC64 */
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 7bc9d487bc1a..1a3ea0ea7514 100644
+index 1a3ea0ea7514..3198f79572d8 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -59,6 +59,7 @@
- #include <asm/kvm_book3s.h>
- #include <asm/mmu_context.h>
- #include <asm/lppaca.h>
-+#include <asm/pmc.h>
- #include <asm/processor.h>
- #include <asm/cputhreads.h>
- #include <asm/page.h>
-@@ -3894,6 +3895,18 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
- 		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
+@@ -3770,7 +3770,6 @@ static void load_spr_state(struct kvm_vcpu *vcpu)
+ 	mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
+ 	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
+ 	mtspr(SPRN_BESCR, vcpu->arch.bescr);
+-	mtspr(SPRN_WORT, vcpu->arch.wort);
+ 	mtspr(SPRN_TIDR, vcpu->arch.tid);
+ 	mtspr(SPRN_AMR, vcpu->arch.amr);
+ 	mtspr(SPRN_UAMOR, vcpu->arch.uamor);
+@@ -3797,7 +3796,6 @@ static void store_spr_state(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.ebbhr = mfspr(SPRN_EBBHR);
+ 	vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
+ 	vcpu->arch.bescr = mfspr(SPRN_BESCR);
+-	vcpu->arch.wort = mfspr(SPRN_WORT);
+ 	vcpu->arch.tid = mfspr(SPRN_TIDR);
+ 	vcpu->arch.amr = mfspr(SPRN_AMR);
+ 	vcpu->arch.uamor = mfspr(SPRN_UAMOR);
+@@ -3829,7 +3827,6 @@ static void restore_p9_host_os_sprs(struct kvm_vcpu *vcpu,
+ 				    struct p9_host_os_sprs *host_os_sprs)
+ {
+ 	mtspr(SPRN_PSPB, 0);
+-	mtspr(SPRN_WORT, 0);
+ 	mtspr(SPRN_UAMOR, 0);
  
-+#ifdef CONFIG_PPC_PSERIES
-+	if (kvmhv_on_pseries()) {
-+		barrier();
-+		if (vcpu->arch.vpa.pinned_addr) {
-+			struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
-+			get_lppaca()->pmcregs_in_use = lp->pmcregs_in_use;
-+		} else {
-+			get_lppaca()->pmcregs_in_use = 1;
-+		}
-+		barrier();
-+	}
-+#endif
- 	kvmhv_load_guest_pmu(vcpu);
+ 	mtspr(SPRN_DSCR, host_os_sprs->dscr);
+diff --git a/arch/powerpc/platforms/powernv/idle.c b/arch/powerpc/platforms/powernv/idle.c
+index 1e908536890b..df19e2ff9d3c 100644
+--- a/arch/powerpc/platforms/powernv/idle.c
++++ b/arch/powerpc/platforms/powernv/idle.c
+@@ -667,7 +667,6 @@ static unsigned long power9_idle_stop(unsigned long psscr)
+ 		sprs.purr	= mfspr(SPRN_PURR);
+ 		sprs.spurr	= mfspr(SPRN_SPURR);
+ 		sprs.dscr	= mfspr(SPRN_DSCR);
+-		sprs.wort	= mfspr(SPRN_WORT);
+ 		sprs.ciabr	= mfspr(SPRN_CIABR);
  
- 	msr_check_and_set(MSR_FP | MSR_VEC | MSR_VSX);
-@@ -4028,6 +4041,13 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	save_pmu |= nesting_enabled(vcpu->kvm);
+ 		sprs.mmcra	= mfspr(SPRN_MMCRA);
+@@ -785,7 +784,6 @@ static unsigned long power9_idle_stop(unsigned long psscr)
+ 	mtspr(SPRN_PURR,	sprs.purr);
+ 	mtspr(SPRN_SPURR,	sprs.spurr);
+ 	mtspr(SPRN_DSCR,	sprs.dscr);
+-	mtspr(SPRN_WORT,	sprs.wort);
+ 	mtspr(SPRN_CIABR,	sprs.ciabr);
  
- 	kvmhv_save_guest_pmu(vcpu, save_pmu);
-+#ifdef CONFIG_PPC_PSERIES
-+	if (kvmhv_on_pseries()) {
-+		barrier();
-+		get_lppaca()->pmcregs_in_use = ppc_get_pmu_inuse();
-+		barrier();
-+	}
-+#endif
- 
- 	vc->entry_exit_map = 0x101;
- 	vc->in_guest = 0;
+ 	mtspr(SPRN_MMCRA,	sprs.mmcra);
 -- 
 2.23.0
 
