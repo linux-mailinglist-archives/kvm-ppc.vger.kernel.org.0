@@ -2,58 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A30B13E953E
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:02:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AE013E953F
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:02:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233434AbhHKQC3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 12:02:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51744 "EHLO
+        id S233542AbhHKQCc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Aug 2021 12:02:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233385AbhHKQC2 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:02:28 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E74BC061765
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:05 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id m24-20020a17090a7f98b0290178b1a81700so5725085pjl.4
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:05 -0700 (PDT)
+        with ESMTP id S233385AbhHKQCb (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:02:31 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3678EC061765
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:08 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id n12so2617146plf.4
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=FIn8UyB5857Vdy2BoINpCb9wuJq8s9gPoZz4Xu4yDfU=;
-        b=sSj9xBVDl75/eJWzEvk+K430dQ484klUIfLlSJKCUM1/+lrQKcMJPCTQTFxMuqCrqf
-         0tAmVtq9PfSgsGNX6X3ijzEQ7OI47EQqkDf85Fncb3jV4M+bOskM8vE6x1iKCdEn9qCB
-         pHQICgZZO+usoUGkpxXcBhUzBaMgemEjTzLFm7j8b2EDCEmEe+gHXGXbXhQSObpxKrHS
-         HdWd3Mr+X8+izi79Q/uPgfOvN4U9nIM/9D6YQHXvkwoUiwCGNJZpISRDszeUhZBm90I+
-         Jhr5kMApD/D9VgdDPI5IGxTQTiAEa7FvTH+0W/ErEB/pgNCODbZ8+ebCb3GYcz6Tbv9s
-         Zo5w==
+        bh=eZIRwNA4o4bMaBzjGFVMA8AYhuzRrj44ddH2iqzIflE=;
+        b=NAkhG87wcUA8ta7y0aFfdVUVX3SdYhHQr9/iNt3ExP81clRIWk8oPiBlBdzYCFt4nT
+         IBwuXy66zdIxNboGkVy5XRpeE7SPgqDGW1W89yYBVdmItBW0ULOPx/g4VH6Rd5LGF5t+
+         tr7l7J68qitSQMKXDuTART27BOA4wt1ChwU7ZRGPPgfqCbmh1Kci+7V/OQtUUbQ4COil
+         dOfEZS9YU1tF1CuHDRxRxSsbPVUiR/1uLyznZ80q+9lguMRtZQK2hG8Pgu5Wd71vBwPy
+         IghH+UoB/XTimidGlsDntDp09uQnYEXVThXq1JpM9QoqOk9KGPaI0Ch43hc11T+tNDSS
+         +xaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FIn8UyB5857Vdy2BoINpCb9wuJq8s9gPoZz4Xu4yDfU=;
-        b=aYCGA5xcO5+G3L9ijC0CNz4NW3e9QispFSGZ7pIFlrR8MeUtJuLFqED1ZWNPKePBrf
-         tKh4tVXC6941wVo+HH6YCgky9Wsw7w1qVfrgk2Yxg9INJG9OgLohi+DDy1/nfh5QOllF
-         mOIWCMHd+QG/qzunP2Ob5NUfwUSftMleK8H5BOqIeuN/5ZsG3RGqTwpq8doIvqRiKeCS
-         mLCqMv74FSOSc4LHaqmVWctzr1fo/Ij50YywzDZbqInDVp2knGKhAIPhpXYIhxXcxZj2
-         YrwY/Ml91NXyUcAiJxzrDxleEizGMTBfsV9C0rT9gWgn3vJCmpAXcfR7RKABilnnECRA
-         ibaw==
-X-Gm-Message-State: AOAM530yXLwxLkPPa7CCgMFmMrbJ0W9EUpLh8yfqp8q8LyGo5CtI0j6v
-        BHCU6vcJX/aGSXJSi/RoOZeDXpK+kTg=
-X-Google-Smtp-Source: ABdhPJyR4mhpDw1Ja1VVLy+V8qMCP6gtA2e92qPYuBlNIGCJ5bpg8E8h/gEebz/mYvoPFSpW5/uZYw==
-X-Received: by 2002:a63:788e:: with SMTP id t136mr1275639pgc.374.1628697724765;
-        Wed, 11 Aug 2021 09:02:04 -0700 (PDT)
+        bh=eZIRwNA4o4bMaBzjGFVMA8AYhuzRrj44ddH2iqzIflE=;
+        b=NkzKCOa2/g7njR/854/LozI8hYEDne9bxvpflf/4EYP0D0gkdCS3EqkvXnCRQc1XRG
+         9e5EJMXMtYDGmnwBWAfXVmRql4E9IXBpEK9DJAEHouRYYJpiJY0mL8TnbsCdTVSnCK1a
+         SmT/gL0Bx5rB/h6NGUV+1nJdW3SzA9UEqnncIuokRneUOH6WGukPhVbX+l+ymaTIXTaH
+         ErgcmWqdB9JvM+DOKewF6Lk7HepcrRB7H+0iYPvw6UKCm1ypJTDuRTanJYHyc14v1rXu
+         0USXV72Hgmb2o4GaK42PMw/7h7uVbmjzPTnmBfk8vLpQdEjxfa6GyOgpAl770rvNIlWg
+         RC9g==
+X-Gm-Message-State: AOAM532cRCfsAGdb311elyGJLAXAOUQJFj2gMBPwA8sWcice7o9wCeBT
+        94pKWCf9sEBeR5MvDTHFbFWzwdaJEH0=
+X-Google-Smtp-Source: ABdhPJxXfhjv6ppy9tJgNemJJcDdIqbOkE6ioo6BrgS0G55roCMvlVPTGWcmDTp2qJtr0cKvG+vy/A==
+X-Received: by 2002:a17:90a:de8b:: with SMTP id n11mr11380877pjv.31.1628697727552;
+        Wed, 11 Aug 2021 09:02:07 -0700 (PDT)
 Received: from bobo.ibm.com ([118.210.97.79])
-        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.02.02
+        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.02.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 09:02:04 -0700 (PDT)
+        Wed, 11 Aug 2021 09:02:07 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
         Fabiano Rosas <farosas@linux.ibm.com>
-Subject: [PATCH v2 08/60] KVM: PPC: Book3S HV Nested: save_hv_return_state does not require trap argument
-Date:   Thu, 12 Aug 2021 02:00:42 +1000
-Message-Id: <20210811160134.904987-9-npiggin@gmail.com>
+Subject: [PATCH v2 09/60] KVM: PPC: Book3S HV Nested: Reflect guest PMU in-use to L0 when guest SPRs are live
+Date:   Thu, 12 Aug 2021 02:00:43 +1000
+Message-Id: <20210811160134.904987-10-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210811160134.904987-1-npiggin@gmail.com>
 References: <20210811160134.904987-1-npiggin@gmail.com>
@@ -63,47 +63,91 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Fabiano Rosas <farosas@linux.ibm.com>
+After the L1 saves its PMU SPRs but before loading the L2's PMU SPRs,
+switch the pmcregs_in_use field in the L1 lppaca to the value advertised
+by the L2 in its VPA. On the way out of the L2, set it back after saving
+the L2 PMU registers (if they were in-use).
 
-vcpu is already anargument so vcpu->arch.trap can be used directly.
+This transfers the PMU liveness indication between the L1 and L2 at the
+points where the registers are not live.
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+This fixes the nested HV bug for which a workaround was added to the L0
+HV by commit 63279eeb7f93a ("KVM: PPC: Book3S HV: Always save guest pmu
+for guest capable of nesting"), which explains the problem in detail.
+That workaround is no longer required for guests that include this bug
+fix.
+
+Fixes: 360cae313702 ("KVM: PPC: Book3S HV: Nested guest entry via hypercall")
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv_nested.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/powerpc/include/asm/pmc.h |  7 +++++++
+ arch/powerpc/kvm/book3s_hv.c   | 20 ++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-index 5ad5014c6f68..ed8a2c9f5629 100644
---- a/arch/powerpc/kvm/book3s_hv_nested.c
-+++ b/arch/powerpc/kvm/book3s_hv_nested.c
-@@ -99,7 +99,7 @@ static void byteswap_hv_regs(struct hv_guest_state *hr)
- 	hr->dawrx1 = swab64(hr->dawrx1);
+diff --git a/arch/powerpc/include/asm/pmc.h b/arch/powerpc/include/asm/pmc.h
+index c6bbe9778d3c..3c09109e708e 100644
+--- a/arch/powerpc/include/asm/pmc.h
++++ b/arch/powerpc/include/asm/pmc.h
+@@ -34,6 +34,13 @@ static inline void ppc_set_pmu_inuse(int inuse)
+ #endif
  }
  
--static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
-+static void save_hv_return_state(struct kvm_vcpu *vcpu,
- 				 struct hv_guest_state *hr)
- {
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
-@@ -118,7 +118,7 @@ static void save_hv_return_state(struct kvm_vcpu *vcpu, int trap,
- 	hr->pidr = vcpu->arch.pid;
- 	hr->cfar = vcpu->arch.cfar;
- 	hr->ppr = vcpu->arch.ppr;
--	switch (trap) {
-+	switch (vcpu->arch.trap) {
- 	case BOOK3S_INTERRUPT_H_DATA_STORAGE:
- 		hr->hdar = vcpu->arch.fault_dar;
- 		hr->hdsisr = vcpu->arch.fault_dsisr;
-@@ -389,7 +389,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
- 	delta_spurr = vcpu->arch.spurr - l2_hv.spurr;
- 	delta_ic = vcpu->arch.ic - l2_hv.ic;
- 	delta_vtb = vc->vtb - l2_hv.vtb;
--	save_hv_return_state(vcpu, vcpu->arch.trap, &l2_hv);
-+	save_hv_return_state(vcpu, &l2_hv);
++#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
++static inline int ppc_get_pmu_inuse(void)
++{
++	return get_paca()->pmcregs_in_use;
++}
++#endif
++
+ extern void power4_enable_pmcs(void);
  
- 	/* restore L1 state */
- 	vcpu->arch.nested = NULL;
+ #else /* CONFIG_PPC64 */
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 7bc9d487bc1a..1a3ea0ea7514 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -59,6 +59,7 @@
+ #include <asm/kvm_book3s.h>
+ #include <asm/mmu_context.h>
+ #include <asm/lppaca.h>
++#include <asm/pmc.h>
+ #include <asm/processor.h>
+ #include <asm/cputhreads.h>
+ #include <asm/page.h>
+@@ -3894,6 +3895,18 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	    cpu_has_feature(CPU_FTR_P9_TM_HV_ASSIST))
+ 		kvmppc_restore_tm_hv(vcpu, vcpu->arch.shregs.msr, true);
+ 
++#ifdef CONFIG_PPC_PSERIES
++	if (kvmhv_on_pseries()) {
++		barrier();
++		if (vcpu->arch.vpa.pinned_addr) {
++			struct lppaca *lp = vcpu->arch.vpa.pinned_addr;
++			get_lppaca()->pmcregs_in_use = lp->pmcregs_in_use;
++		} else {
++			get_lppaca()->pmcregs_in_use = 1;
++		}
++		barrier();
++	}
++#endif
+ 	kvmhv_load_guest_pmu(vcpu);
+ 
+ 	msr_check_and_set(MSR_FP | MSR_VEC | MSR_VSX);
+@@ -4028,6 +4041,13 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	save_pmu |= nesting_enabled(vcpu->kvm);
+ 
+ 	kvmhv_save_guest_pmu(vcpu, save_pmu);
++#ifdef CONFIG_PPC_PSERIES
++	if (kvmhv_on_pseries()) {
++		barrier();
++		get_lppaca()->pmcregs_in_use = ppc_get_pmu_inuse();
++		barrier();
++	}
++#endif
+ 
+ 	vc->entry_exit_map = 0x101;
+ 	vc->in_guest = 0;
 -- 
 2.23.0
 
