@@ -2,58 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 919F63E9540
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 697FB3E9541
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:02:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233227AbhHKQCf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 12:02:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51768 "EHLO
+        id S232847AbhHKQCh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Aug 2021 12:02:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232847AbhHKQCe (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:02:34 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C8DC061765
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:10 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id w14so4172234pjh.5
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:10 -0700 (PDT)
+        with ESMTP id S229634AbhHKQCh (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:02:37 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94C81C061765
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:13 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d1so3307518pll.1
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=jCxdivQtSElLr5d9idnYO7f6LUBSBDiT6V+2D6aLUKg=;
-        b=aDlRdsD4I51ZZcZxRl0CmF1zHn4RYxWsHJ4/iLOfOd8NbRtE2QUQg60i0d0dn6IaSf
-         OHfNgTaHEh1+Zwo1ZuhciLciJua9HiZI+t7dR3KthS+vpzKhjvDV3V+j6iO11KMniFWO
-         y95cThRmDMfOwBvQkTzrbjQBxBPBwBe2YckNxbDGA2ypVJO61Bcg9OE9MkLoDt8vB6jM
-         9vxgiCduW63oudsTcY9h4a/lZwv/HWqdxfSNIYUsgTYksCvhch9IcYH1y8qPW/Yd0HhC
-         C3qTG2E1WYWgayKHvqimfxuU00dNXFCe3QG2Nnz3quJpubM7fQ5Nt0U77ieT1iHsxe/h
-         wJqA==
+        bh=DKq8DJSxGhBXzYj1xzUohFIXvPf01oJFRn8nuM9P7p4=;
+        b=lma6aBQNpLAl+jS3h8+vESjIcKgyn9gViolaxPgZ+neVXaOq/Tm52zDzZq2zQCKK/M
+         BhFYNFSZppyaXcvmgmr8ema84WlMud1Vmhua00bA+/tZDu+Sccfo+I/wzv/QbI9O1ZhG
+         uLvg+uV77Ye4vtGFz21ji5RuAdM+bglisqYk7Ndft/EpNpdDbxZ87iDt0QIpsHZ/1qyM
+         ggfbWhnyzedtE98zjQbOLYm1NvPmL2NP5IhAukaI3lF5ZCJufSSjfAGro6K05SXERAFy
+         jaQvB3AhF11YfpFMuFhI6O/ngMhXqzkQpI+Gx/dTWYNWW0iwudusnbIUCCShxzY3YncM
+         WfIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jCxdivQtSElLr5d9idnYO7f6LUBSBDiT6V+2D6aLUKg=;
-        b=hEywnByEVoGWRZYOQmu6eO5m3JbTH8p5zxr/DCI9ILDraCZLfb3LM9DaFV08REFu2/
-         DnR6BleVXLyCXH13/eF2o5l1QkJVtp5o0AX9eZyBePCkUJO5+q/CdEEE+IiSwA0juyrG
-         VYD2zy9049UEzhc6ZUluDCb/+2SsOV+4v1UStLHDzKwKyIhsWHAuj9s9jErN09KSbhaa
-         oxSSaZoLVRgO8HEQEpTDI2V9rx9MqqgmjM8B25b0a9OfOtulDHD78S+SZ343QJO3vm96
-         rA/gkjPqb56s9oxgPEozbX5sNHA5eKlAqpi5g0zNdfQj4evGIz9w2hHQ5BigYSSsfrrF
-         HVNg==
-X-Gm-Message-State: AOAM533oK71vyukkIAR/EkbrGh1wm6obX2ssyXBX1Ef82CeB5PLOechV
-        zZ5wzescOXqFEymJZUypy2Llb+xGYpw=
-X-Google-Smtp-Source: ABdhPJwOe47kCVYD2CjJf/UNfti3v0EKt3Z98V8sfY0s93Cmt6jR9l3cIXm7nAZJRd6rLoInIll1YQ==
-X-Received: by 2002:a17:902:c711:b029:12c:9b3c:9986 with SMTP id p17-20020a170902c711b029012c9b3c9986mr19502076plp.44.1628697730313;
-        Wed, 11 Aug 2021 09:02:10 -0700 (PDT)
+        bh=DKq8DJSxGhBXzYj1xzUohFIXvPf01oJFRn8nuM9P7p4=;
+        b=GDKc5iX4GM9tFT48/ZMYMjj2Twe+JIg4P7rqNd55zjI3fQwju+qctsLWZk+vMIeFL7
+         ou2qLXwKwDR9R1/HqwsO40ZmQSAFf7KzyZVSvwR7xNWtLQXURJaL5gINGEo7YC7O2XYF
+         ndGvk8s7nTXv8JxqcaclSyWTAxNKeCDNVAWyPtweaq2pppxBzTjhA0fbhqM0G1ixXJbi
+         2JUR2gRfmTIpVxuLrXMSueVhEeDomgiJ7SvpoDZdE3w1tloPOR7rZrsgSKcrUbrOZr6t
+         u6BuIvtPg6f6zigeVFv5+MguEjE0CWbxb/vdFm4AGNLoeWJamRWq0vuB4xUqAubvrGoJ
+         oUzQ==
+X-Gm-Message-State: AOAM532rnViisJjKwY8NP7NQPN1cdom+QYNJCVEP7p9yvuUvl7SPVmy5
+        99ca1cF7b0fWHX8pMtnGjNAbjiogW7k=
+X-Google-Smtp-Source: ABdhPJycpQsCjxqz5RVJTlxfpp/h1mcxCPlbQ4A5gGw9kh5PMpEuxbaTy7hWJkJJGorXl329MBvphw==
+X-Received: by 2002:a17:90a:1a51:: with SMTP id 17mr10940798pjl.59.1628697733000;
+        Wed, 11 Aug 2021 09:02:13 -0700 (PDT)
 Received: from bobo.ibm.com ([118.210.97.79])
-        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.02.08
+        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.02.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 09:02:10 -0700 (PDT)
+        Wed, 11 Aug 2021 09:02:12 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
-        Fabiano Rosas <farosas@linux.ibm.com>
-Subject: [PATCH v2 10/60] powerpc/64s: Remove WORT SPR from POWER9/10
-Date:   Thu, 12 Aug 2021 02:00:44 +1000
-Message-Id: <20210811160134.904987-11-npiggin@gmail.com>
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: [PATCH v2 11/60] KMV: PPC: Book3S HV P9: Use set_dec to set decrementer to host
+Date:   Thu, 12 Aug 2021 02:00:45 +1000
+Message-Id: <20210811160134.904987-12-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210811160134.904987-1-npiggin@gmail.com>
 References: <20210811160134.904987-1-npiggin@gmail.com>
@@ -63,64 +63,33 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-This register is not architected and not implemented in POWER9 or 10,
-it just reads back zeroes for compatibility.
+The host Linux timer code arms the decrementer with the value
+'decrementers_next_tb - current_tb' using set_dec(), which stores
+val - 1 on Book3S-64, which is not quite the same as what KVM does
+to re-arm the host decrementer when exiting the guest.
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+This shouldn't be a significant change, but it makes the logic match
+and avoids this small extra change being brought into the next patch.
+
+Suggested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/book3s_hv.c          | 3 ---
- arch/powerpc/platforms/powernv/idle.c | 2 --
- 2 files changed, 5 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 1a3ea0ea7514..3198f79572d8 100644
+index 3198f79572d8..b60a70177507 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3770,7 +3770,6 @@ static void load_spr_state(struct kvm_vcpu *vcpu)
- 	mtspr(SPRN_EBBHR, vcpu->arch.ebbhr);
- 	mtspr(SPRN_EBBRR, vcpu->arch.ebbrr);
- 	mtspr(SPRN_BESCR, vcpu->arch.bescr);
--	mtspr(SPRN_WORT, vcpu->arch.wort);
- 	mtspr(SPRN_TIDR, vcpu->arch.tid);
- 	mtspr(SPRN_AMR, vcpu->arch.amr);
- 	mtspr(SPRN_UAMOR, vcpu->arch.uamor);
-@@ -3797,7 +3796,6 @@ static void store_spr_state(struct kvm_vcpu *vcpu)
- 	vcpu->arch.ebbhr = mfspr(SPRN_EBBHR);
- 	vcpu->arch.ebbrr = mfspr(SPRN_EBBRR);
- 	vcpu->arch.bescr = mfspr(SPRN_BESCR);
--	vcpu->arch.wort = mfspr(SPRN_WORT);
- 	vcpu->arch.tid = mfspr(SPRN_TIDR);
- 	vcpu->arch.amr = mfspr(SPRN_AMR);
- 	vcpu->arch.uamor = mfspr(SPRN_UAMOR);
-@@ -3829,7 +3827,6 @@ static void restore_p9_host_os_sprs(struct kvm_vcpu *vcpu,
- 				    struct p9_host_os_sprs *host_os_sprs)
- {
- 	mtspr(SPRN_PSPB, 0);
--	mtspr(SPRN_WORT, 0);
- 	mtspr(SPRN_UAMOR, 0);
+@@ -4049,7 +4049,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
+ 	vc->entry_exit_map = 0x101;
+ 	vc->in_guest = 0;
  
- 	mtspr(SPRN_DSCR, host_os_sprs->dscr);
-diff --git a/arch/powerpc/platforms/powernv/idle.c b/arch/powerpc/platforms/powernv/idle.c
-index 1e908536890b..df19e2ff9d3c 100644
---- a/arch/powerpc/platforms/powernv/idle.c
-+++ b/arch/powerpc/platforms/powernv/idle.c
-@@ -667,7 +667,6 @@ static unsigned long power9_idle_stop(unsigned long psscr)
- 		sprs.purr	= mfspr(SPRN_PURR);
- 		sprs.spurr	= mfspr(SPRN_SPURR);
- 		sprs.dscr	= mfspr(SPRN_DSCR);
--		sprs.wort	= mfspr(SPRN_WORT);
- 		sprs.ciabr	= mfspr(SPRN_CIABR);
- 
- 		sprs.mmcra	= mfspr(SPRN_MMCRA);
-@@ -785,7 +784,6 @@ static unsigned long power9_idle_stop(unsigned long psscr)
- 	mtspr(SPRN_PURR,	sprs.purr);
- 	mtspr(SPRN_SPURR,	sprs.spurr);
- 	mtspr(SPRN_DSCR,	sprs.dscr);
--	mtspr(SPRN_WORT,	sprs.wort);
- 	mtspr(SPRN_CIABR,	sprs.ciabr);
- 
- 	mtspr(SPRN_MMCRA,	sprs.mmcra);
+-	mtspr(SPRN_DEC, local_paca->kvm_hstate.dec_expires - mftb());
++	set_dec(local_paca->kvm_hstate.dec_expires - mftb());
+ 	/* We may have raced with new irq work */
+ 	if (test_irq_work_pending())
+ 		set_dec(1);
 -- 
 2.23.0
 
