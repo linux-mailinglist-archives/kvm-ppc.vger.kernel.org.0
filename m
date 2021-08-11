@@ -2,230 +2,180 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 624FA3E8F11
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 12:53:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DF503E8F18
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 12:54:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236433AbhHKKxx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 06:53:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25059 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232196AbhHKKxx (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 06:53:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628679209;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VNUeFA/VGbCjn6UGdXkeMajDHrCe7/a+UXRYkfFt3ME=;
-        b=Yq9gYayLfUnWLrmfLY0uRbRJRvbJJzXnLvB43eRUJ94kBcVvwr15zfq62PVyR1WWGldjJi
-        4JQh4+m8nArMxy9QHzl/RQsUfXwnc9wJFVOve/IB3+iSXONDm/uBvPwjsJ0F5lER1rhARr
-        wuPPuqwM9SkKi+hZc4+ZBNFP2kLk1EQ=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-596-yGD8xQ_PN_OIHwhuQXNyvA-1; Wed, 11 Aug 2021 06:53:28 -0400
-X-MC-Unique: yGD8xQ_PN_OIHwhuQXNyvA-1
-Received: by mail-ej1-f70.google.com with SMTP id h17-20020a1709070b11b02905b5ced62193so533271ejl.1
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 03:53:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VNUeFA/VGbCjn6UGdXkeMajDHrCe7/a+UXRYkfFt3ME=;
-        b=bmuLnQ+KNSsDI3s52R9udfj7tYcGlgCjvFzXfFs4YakzxiF1MLiYGMC0gY4jB9A55C
-         jCK3jGixPsrxlDEkH99BWs+4eMmkfvRLHlXZRP1d0SXQnKmeSBiDAR7tt3CnkMCIORzH
-         DZuS2uwjPjUj296PV2Sjs7kg84SMU0pihV2QSfqFmSGtdq+t1wcEYMi0Qr796l7tzbia
-         W5AIdSrc2WJl0UaAxlqWYOzx6aMftXrcYyoQkIj+2O0c+AIec3TSOk2Ja6Qi12Nm31aC
-         qn8BqJxL+iylGKar4C2XNe0Z47rDUAPTD0vGLq2/Q/SPUH58ncSBRUnpVzu7WoLBnvyk
-         tHEA==
-X-Gm-Message-State: AOAM530wfr1JhcQ/m2NHNBTNYdaPu1u59RgMclvnxH89kQaVZPu49KZS
-        FevdHEamPvxtu4KDYHpd1x2PN+F1QMB8Rl73Phv8uU0zhjd4liaCJzZHWihH0Q6sZ0fLtGO0U8K
-        H/hB8S/ERN2OV3/JeoQ==
-X-Received: by 2002:a17:906:1ec9:: with SMTP id m9mr3096289ejj.115.1628679206654;
-        Wed, 11 Aug 2021 03:53:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz9VOGfu/HBIG5glyW6XLRjV3vpSIcPk0H1oaLr2fsEabGlkR15ocEUv8UxqOv91kvO44EqXg==
-X-Received: by 2002:a17:906:1ec9:: with SMTP id m9mr3096263ejj.115.1628679206471;
-        Wed, 11 Aug 2021 03:53:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id j13sm2839038edr.89.2021.08.11.03.53.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Aug 2021 03:53:25 -0700 (PDT)
-Subject: Re: [PATCH v3 0/5] Linear and Logarithmic histogram statistics
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        David Matlack <dmatlack@google.com>
-References: <20210802165633.1866976-1-jingzhangos@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6865c425-30d2-9db6-7b6b-9ab665ddc352@redhat.com>
-Date:   Wed, 11 Aug 2021 12:53:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210802165633.1866976-1-jingzhangos@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S231857AbhHKKy4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Aug 2021 06:54:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40338 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231143AbhHKKyz (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 06:54:55 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17BAo4T2013162;
+        Wed, 11 Aug 2021 06:54:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=pp1;
+ bh=sP32XbgQ5CzhWUiPsAQPXt4hxK55ieZaoOqPmBgd5MA=;
+ b=JgrYeYc4pktKOkOylJfmQM4pkn17+Xlhbw0e1dKyJrT2zFQoe1/VuPE1uTWI6/2Gslxr
+ MAxUke+v8IYhIVzv01h2ZVYtgq1mBUpuet+Aft5dW/dfW33MsDj8BeiBt31ZYngyW/XI
+ 7Ya5PbnWkjsC66hI3awviLs9YP0c0NtyHAw/Q6bCXjFK9NG+wrHzm5BGiRvPi6aZnltw
+ cBmyad9l5bLC/k4z9OmLyz7Io9TSw846ijm9IpzuM9PhgmgdT7dWRpVsn7ocQLb8CkrQ
+ EDRGMOfu5S8iKK7EeaWh6MUA6yt+r/svBoLc3bXplXW0t6okdA7/G+Nmh/HWl5UTfF18 jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3abt14cekx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Aug 2021 06:54:26 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17BArBKZ023058;
+        Wed, 11 Aug 2021 06:54:25 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3abt14cekb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Aug 2021 06:54:25 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17BAr4sp028293;
+        Wed, 11 Aug 2021 10:54:24 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06ams.nl.ibm.com with ESMTP id 3abtdnhpv3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Aug 2021 10:54:24 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17BApAwW34210182
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Aug 2021 10:51:10 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7759D42081;
+        Wed, 11 Aug 2021 10:54:21 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 95E6C42067;
+        Wed, 11 Aug 2021 10:54:20 +0000 (GMT)
+Received: from smtpclient.apple (unknown [9.79.182.59])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 11 Aug 2021 10:54:20 +0000 (GMT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [PATCH v1 16/55] powerpc/64s: Implement PMU override command line
+ option
+From:   Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+In-Reply-To: <1628246339.762vtrxskz.astroid@bobo.none>
+Date:   Wed, 11 Aug 2021 16:24:16 +0530
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5C3CA279-F9C6-463A-BE1E-8FC6BB5BDA21@linux.vnet.ibm.com>
+References: <20210726035036.739609-1-npiggin@gmail.com>
+ <20210726035036.739609-17-npiggin@gmail.com>
+ <4600EC62-5505-4856-AE23-939ED62287B3@linux.vnet.ibm.com>
+ <1628246339.762vtrxskz.astroid@bobo.none>
+To:     Nicholas Piggin <npiggin@gmail.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: izhRoOFnlzz4boZxfT_GGZvAxv1oN5N8
+X-Proofpoint-GUID: S8ncV2I4xh-wkazU7b9daDzKZcqKM3H2
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-11_03:2021-08-11,2021-08-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
+ phishscore=0 malwarescore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ spamscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108110069
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 02/08/21 18:56, Jing Zhang wrote:
-> This patchset adds linear and logarithmic histogram stats support and extend
-> some halt polling stats with histogram.
-> Histogram stats is very useful when we need to know the distribution of some
-> latencies or any other stuff like used memory size, huge page size, etc.
-> Below is a snapshot for three logarithmic histogram stats added in this
-> patchset. halt_poll_success_hist shows the distribution of wait time before a
-> success polling. halt_poll_fail_hist shows the distribution of wait time before
-> a fail polling. halt_wait_hist shows the distribution of wait time of a VCPU
-> spending on wait after it is halted. The halt polling parameters is halt_poll_ns
-> = 500000, halt_poll_ns_grow = 2, halt_poll_ns_grow_start = 10000,
-> halt_poll_ns_shrink = 2;
->  From the snapshot, not only we can get an intuitive overview of those latencies,
-> but also we can tune the polling parameters based on this; For example, it shows
-> that about 80% of successful polling is less than 132000 nanoseconds from
-> halt_poll_success_hist, then it might be a good option to set halt_poll_ns as
-> 132000 instead of 500000.
-> 
-> halt_poll_success_hist:
-> Range		Bucket Value	Percent     Cumulative Percent
-> [0, 1)		 0		 0.000%      0.000%
-> [1, 2)		 0		 0.000%      0.000%
-> [2, 4)		 0		 0.000%      0.000%
-> [4, 8)		 0		 0.000%      0.000%
-> [8, 16)		 0		 0.000%      0.000%
-> [16, 32)	 0		 0.000%      0.000%
-> [32, 64)	 0		 0.000%      0.000%
-> [64, 128)	 0		 0.000%      0.000%
-> [128, 256)	 3		 0.093%      0.093%
-> [256, 512)	 21		 0.650%      0.743%
-> [512, 1024)	 43		 1.330%      2.073%
-> [1024, 2048)	 279		 8.632%      10.705%
-> [2048, 4096)	 253		 7.828%      18.533%
-> [4096, 8192)	 595		 18.410%     36.943%
-> [8192, 16384)	 274		 8.478%      45.421%
-> [16384, 32768)	 351		 10.860%     56.281%
-> [32768, 65536)	 343		 10.613%     66.894%
-> [65536, 131072)  421		 13.026%     79.920%
-> [131072, 262144) 459		 14.202%     94.121%
-> [262144, 524288) 190		 5.879%      100.000%
-> 
-> 
-> halt_poll_fail_hist:
-> Range		Bucket Value	Percent     Cumulative Percent
-> [0, 1)		 0		 0.000%      0.000%
-> [1, 2)		 0		 0.000%      0.000%
-> [2, 4)		 0		 0.000%      0.000%
-> [4, 8)		 0		 0.000%      0.000%
-> [8, 16)		 0		 0.000%      0.000%
-> [16, 32)	 0		 0.000%      0.000%
-> [32, 64)	 0		 0.000%      0.000%
-> [64, 128)	 21		 0.529%      0.529%
-> [128, 256)	 398		 10.020%     10.549%
-> [256, 512)	 613		 15.433%     25.982%
-> [512, 1024)	 437		 11.002%     36.984%
-> [1024, 2048)	 264		 6.647%      43.630%
-> [2048, 4096)	 302		 7.603%      51.234%
-> [4096, 8192)	 350		 8.812%      60.045%
-> [8192, 16384)	 488		 12.286%     72.331%
-> [16384, 32768)	 258		 6.495%      78.827%
-> [32768, 65536)	 227		 5.715%      84.542%
-> [65536, 131072)  232		 5.841%      90.383%
-> [131072, 262144) 246		 6.193%      96.576%
-> [262144, 524288) 136		 3.424%      100.000%
-> 
-> 
-> halt_wait_hist:
-> Range			    Bucket Value    Percent	Cumulative Percent
-> [0, 1)			     0		     0.000%	 0.000%
-> [1, 2)			     0		     0.000%	 0.000%
-> [2, 4)			     0		     0.000%	 0.000%
-> [4, 8)			     0		     0.000%	 0.000%
-> [8, 16)			     0		     0.000%	 0.000%
-> [16, 32)		     0		     0.000%	 0.000%
-> [32, 64)		     0		     0.000%	 0.000%
-> [64, 128)		     0		     0.000%	 0.000%
-> [128, 256)		     0		     0.000%	 0.000%
-> [256, 512)		     0		     0.000%	 0.000%
-> [512, 1024)		     0		     0.000%	 0.000%
-> [1024, 2048)		     0		     0.000%	 0.000%
-> [2048, 4096)		     7		     0.127%	 0.127%
-> [4096, 8192)		     37		     0.671%	 0.798%
-> [8192, 16384)		     69		     1.251%	 2.049%
-> [16384, 32768)		     94		     1.704%	 3.753%
-> [32768, 65536)		     150	     2.719%	 6.472%
-> [65536, 131072)		     233	     4.224%	 10.696%
-> [131072, 262144)	     276	     5.004%	 15.700%
-> [262144, 524288)	     236	     4.278%	 19.978%
-> [524288, 1.04858e+06)	     176	     3.191%	 23.169%
-> [1.04858e+06, 2.09715e+06)   94		     16.207%	 39.376%
-> [2.09715e+06, 4.1943e+06)    1667	     30.221%	 69.598%
-> [4.1943e+06, 8.38861e+06)    825	     14.956%	 84.554%
-> [8.38861e+06, 1.67772e+07)   111	     2.012%	 86.566%
-> [1.67772e+07, 3.35544e+07)   76		     1.378%	 87.944%
-> [3.35544e+07, 6.71089e+07)   65		     1.178%	 89.123%
-> [6.71089e+07, 1.34218e+08)   161	     2.919%	 92.041%
-> [1.34218e+08, 2.68435e+08)   250	     4.532%	 96.574%
-> [2.68435e+08, 5.36871e+08)   188	     3.408%	 99.982%
-> [5.36871e+08, 1.07374e+09)   1		     0.018%	 100.000%
-> 
-> ---
-> 
-> * v2 -> v3
->    - Rebase to kvm/queue, commit 8ad5e63649ff
->      (KVM: Don't take mmu_lock for range invalidation unless necessary)
->    - Specify inline explicitly for histogram stats update functions
->    - Use array_index_nospec to clamp the index to histogram array size
->    - Remove constant macros for histogram array size and bucket size
->    - Addressed other comments from Paolo.
-> 
-> * v1 -> v2
->    - Rebase to kvm/queue, commit 1889228d80fe
->      (KVM: selftests: smm_test: Test SMM enter from L2)
->    - Break some changes to separate commits
->    - Fix u64 division issue Reported-by: kernel test robot <lkp@intel.com>
->    - Address a bunch of comments by David Matlack <dmatlack@google.com>
-> 
-> [1] https://lore.kernel.org/kvm/20210706180350.2838127-1-jingzhangos@google.com
-> [2] https://lore.kernel.org/kvm/20210714223033.742261-1-jingzhangos@google.com
-> 
-> ---
-> 
-> Jing Zhang (5):
->    KVM: stats: Support linear and logarithmic histogram statistics
->    KVM: stats: Update doc for histogram statistics
->    KVM: selftests: Add checks for histogram stats bucket_size field
->    KVM: stats: Add halt_wait_ns stats for all architectures
->    KVM: stats: Add halt polling related histogram stats
-> 
->   Documentation/virt/kvm/api.rst                | 28 ++++++--
->   arch/arm64/kvm/guest.c                        |  4 --
->   arch/mips/kvm/mips.c                          |  4 --
->   arch/powerpc/include/asm/kvm_host.h           |  1 -
->   arch/powerpc/kvm/book3s.c                     |  5 --
->   arch/powerpc/kvm/book3s_hv.c                  | 18 ++++-
->   arch/powerpc/kvm/booke.c                      |  5 --
->   arch/s390/kvm/kvm-s390.c                      |  4 --
->   arch/x86/kvm/x86.c                            |  4 --
->   include/linux/kvm_host.h                      | 67 ++++++++++++++-----
->   include/linux/kvm_types.h                     |  6 ++
->   include/uapi/linux/kvm.h                      | 11 +--
->   .../selftests/kvm/kvm_binary_stats_test.c     | 12 ++++
->   virt/kvm/binary_stats.c                       | 34 ++++++++++
->   virt/kvm/kvm_main.c                           | 16 +++++
->   15 files changed, 165 insertions(+), 54 deletions(-)
-> 
-> 
-> base-commit: 8ad5e63649ffaa9207b8fde932f3bd59a72c4c94
-> 
 
-Queued, thanks.
 
-Paolo
+> On 06-Aug-2021, at 4:12 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
+>=20
+> Excerpts from Athira Rajeev's message of August 6, 2021 7:28 pm:
+>>=20
+>>=20
+>>> On 26-Jul-2021, at 9:19 AM, Nicholas Piggin <npiggin@gmail.com> =
+wrote:
+>>>=20
+>>> It can be useful in simulators (with very constrained environments)
+>>> to allow some PMCs to run from boot so they can be sampled directly
+>>> by a test harness, rather than having to run perf.
+>>>=20
+>>> A previous change freezes counters at boot by default, so provide
+>>> a boot time option to un-freeze (plus a bit more flexibility).
+>>>=20
+>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>>> ---
+>>> .../admin-guide/kernel-parameters.txt         |  7 ++++
+>>> arch/powerpc/perf/core-book3s.c               | 35 =
++++++++++++++++++++
+>>> 2 files changed, 42 insertions(+)
+>>>=20
+>>> diff --git a/Documentation/admin-guide/kernel-parameters.txt =
+b/Documentation/admin-guide/kernel-parameters.txt
+>>> index bdb22006f713..96b7d0ebaa40 100644
+>>> --- a/Documentation/admin-guide/kernel-parameters.txt
+>>> +++ b/Documentation/admin-guide/kernel-parameters.txt
+>>> @@ -4089,6 +4089,13 @@
+>>> 			Override pmtimer IOPort with a hex value.
+>>> 			e.g. pmtmr=3D0x508
+>>>=20
+>>> +	pmu=3D		[PPC] Manually enable the PMU.
+>>> +			Enable the PMU by setting MMCR0 to 0 (clear FC =
+bit).
+>>> +			This option is implemented for Book3S =
+processors.
+>>> +			If a number is given, then MMCR1 is set to that =
+number,
+>>> +			otherwise (e.g., 'pmu=3Don'), it is left 0. The =
+perf
+>>> +			subsystem is disabled if this option is used.
+>>> +
+>>> 	pm_debug_messages	[SUSPEND,KNL]
+>>> 			Enable suspend/resume debug messages during boot =
+up.
+>>>=20
+>>> diff --git a/arch/powerpc/perf/core-book3s.c =
+b/arch/powerpc/perf/core-book3s.c
+>>> index 65795cadb475..e7cef4fe17d7 100644
+>>> --- a/arch/powerpc/perf/core-book3s.c
+>>> +++ b/arch/powerpc/perf/core-book3s.c
+>>> @@ -2428,8 +2428,24 @@ int register_power_pmu(struct power_pmu *pmu)
+>>> }
+>>>=20
+>>> #ifdef CONFIG_PPC64
+>>> +static bool pmu_override =3D false;
+>>> +static unsigned long pmu_override_val;
+>>> +static void do_pmu_override(void *data)
+>>> +{
+>>> +	ppc_set_pmu_inuse(1);
+>>> +	if (pmu_override_val)
+>>> +		mtspr(SPRN_MMCR1, pmu_override_val);
+>>> +	mtspr(SPRN_MMCR0, mfspr(SPRN_MMCR0) & ~MMCR0_FC);
+>>=20
+>> Hi Nick
+>>=20
+>> Here, we are not doing any validity check for the value used to set =
+MMCR1.=20
+>> For advanced users, the option to pass value for MMCR1 is fine. But =
+other cases, it could result in
+>> invalid event getting used. Do we need to restrict this boot time =
+option for only PMC5/6 ?
+>=20
+> Depends what would be useful. We don't have to prevent the admin =
+shooting=20
+> themselves in the foot with options like this, but if we can make it=20=
+
+> safer without making it less useful then that's always a good option.
+
+Hi Nick
+
+I checked back on my comment and it will be difficult to add/maintain =
+validity check for MMCR1 considering different platforms that we have.
+We can go ahead with present approach you have in this patch. Changes =
+looks good to me.
+
+Reviewed-by: Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+
+>=20
+> Thanks,
+> Nick
 
