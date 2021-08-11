@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CD4A3E955A
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:03:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58DDB3E955B
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:03:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233640AbhHKQD2 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 12:03:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52012 "EHLO
+        id S233641AbhHKQDb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Aug 2021 12:03:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233639AbhHKQD2 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:03:28 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887D5C061765
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:03:04 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id f3so3298831plg.3
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:03:04 -0700 (PDT)
+        with ESMTP id S233639AbhHKQDa (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:03:30 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF6CAC061765
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:03:06 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id fa24-20020a17090af0d8b0290178bfa69d97so5813166pjb.0
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:03:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Tqi0zbyzPJ0VguohP2pBEXBrA7DtvBIu6X3xbhJzi5U=;
-        b=vYQtGputncVGoyWp5VcnypAufbYXhjOZh6luw4kRw7mQtcHeB5Pn1HoRuy84UCXKRM
-         jUwwd0KaSTmVRKq6W9p383y2TBfDS1VQA4NAioJsFLNsOgXoe7J2t9n1qXJhFw0E1F/o
-         DCvYgatqznb2DBalJIwcOB/7Q3aybO8CzktVoyAcQ0udaFMT15P7tLDuQeupQoBDV7L+
-         kD01SVXOygGc8NuFMDU6bQwS0JDvgnSem2nNCJVoeVeHLCLCt+MqkraMT6h7eX8bL1N8
-         jXkkKYFjjfxn8pBG0wWipj+I5v+Z0PvyU2SkvqVsrQDsuD31JGvWV/jDa+yYayv6Il/7
-         QQQQ==
+        bh=InnIngdCZKWqNjgAIB+VqHmGiblNFRvsyL7J2HN5wII=;
+        b=SLs5Sp2KGYzaSjW8FHaSs2/pqJVjreblwmivnXGPwMI10Y4p95FmUWnDySm/Xf69mH
+         /KoL/C6fVQ5bSIKms4NGM1g9dJVY0Rw+8c/LzS5JsceonBefq6sGfn8larYR+Hee6ugs
+         u9TBS3pUCwTxG4Iw7GbN00blokO9E0VXBw2QMn6ExtGj0sY+vEUaUDixf17jzQojQIMK
+         VTDy4kau7brqPDmmjlg+SIvewMkmL8VjQikT+T16tzphnhLUv3W5xx7GJVpbHIwYP2qR
+         aphBom2Fwy3spcSlUA+EfTmY+N3+RyX6cB3qdteLZtvU4wM1E/3SGD5kRskB7uxp4Gra
+         AcVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Tqi0zbyzPJ0VguohP2pBEXBrA7DtvBIu6X3xbhJzi5U=;
-        b=CasZCcYAnVoS5dVN4UeS7EXZLFKyHIaoY71t/laDX+LnmBZNrYUoKnQIY5MPjg+bSH
-         JCKfV80CVNePssVogpoUDABH7qHNwxzv2XVx7gjxs1bxgpn5Iri8H/RxvJs2/rBrCb5j
-         btUENYaT521u+R1su7ZtR7l6mwPfByVOeIaXeprMQ9+UDRe8cePBL2NZihuRrKB1HIbQ
-         t5dM42/RUQtiSeuXiI4Ohrn0M0vaz7Z4xfM2rnPV1yrti6SeX9/CRZrasx7HoOnYJxSf
-         Qe8AiMsnEO8YzMCPBL13AiDCRiSIRt+y7wERJtbL1Ncav7uXFMJ8K+Ew4NbcwKW2f8gE
-         JFog==
-X-Gm-Message-State: AOAM532XJKTNy1yEMidWTGGV3Wj4UMbQ8Ro3uEJGdS6qaBqxjZ2Tg8Z3
-        HKEQCdjo4boi/hhu4tLvZCGFtV7+Db8=
-X-Google-Smtp-Source: ABdhPJzgAHWg7lvxv0R57aySk5+nId2yCBSPQK7MLLJtnGvVA34I0/EeRyf3+AZxL+bxu/799XeoMA==
-X-Received: by 2002:a65:438c:: with SMTP id m12mr1017106pgp.163.1628697783847;
-        Wed, 11 Aug 2021 09:03:03 -0700 (PDT)
+        bh=InnIngdCZKWqNjgAIB+VqHmGiblNFRvsyL7J2HN5wII=;
+        b=kZjjplSwDnEB0o1ARZcBon+SjHLMf1jI5RVCakcVOvN2Nm9SzHG4ewRPvkIMpWPOFV
+         qE1JCXyZJVOnwO6CTPHY4a9zhL6cMY+XqR6Lxy87Fz1AXi3NwTvRFTFJaYVDoqWRkx7W
+         trjN/r/8tvCl3fvwfxHmYAL9seZcpbqHT2D+o4OjLX6smW2d4eBg2FK9EaPurkNglaIb
+         1jM2MmJgyCEBjtOhelC/IC8gQF68ZIe9zsT+gPIhjGoGd8W/QOsRgbbjGY6WB6BKk4tb
+         YrQ8+6jGk6jXM2QEoSl4Gqi9smDIiCCFmgqDx+ISsEujefikDW2FA5Dixao2S4sUhkpD
+         eDaQ==
+X-Gm-Message-State: AOAM5328w/q6+uJPCW8sMpPCHdN2FcKxUv9WgQvzxtsrVChleT/NiZCG
+        ITx0k5FGdtEFRE+IF1chicDlQNMfswA=
+X-Google-Smtp-Source: ABdhPJz4HafK0CG2RxLwDc1U5+eNUabmA0f5ORXEhQfO5vZsMmODLog8hZ8tYln9uMIWG01fQP9joQ==
+X-Received: by 2002:a63:214b:: with SMTP id s11mr401813pgm.87.1628697786435;
+        Wed, 11 Aug 2021 09:03:06 -0700 (PDT)
 Received: from bobo.ibm.com ([118.210.97.79])
-        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.03.01
+        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.03.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 09:03:03 -0700 (PDT)
+        Wed, 11 Aug 2021 09:03:06 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2 30/60] KVM: PPC: Book3S HV: Change dec_expires to be relative to guest timebase
-Date:   Thu, 12 Aug 2021 02:01:04 +1000
-Message-Id: <20210811160134.904987-31-npiggin@gmail.com>
+Subject: [PATCH v2 31/60] KVM: PPC: Book3S HV P9: Move TB updates
+Date:   Thu, 12 Aug 2021 02:01:05 +1000
+Message-Id: <20210811160134.904987-32-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210811160134.904987-1-npiggin@gmail.com>
 References: <20210811160134.904987-1-npiggin@gmail.com>
@@ -62,288 +62,83 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Change dec_expires to be relative to the guest timebase, and allow
-it to be moved into low level P9 guest entry functions, to improve
-SPR access scheduling.
+Move the TB updates between saving and loading guest and host SPRs,
+to improve scheduling by keeping issue-NTC operations together as
+much as possible.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/include/asm/kvm_book3s.h   |  6 +++
- arch/powerpc/include/asm/kvm_host.h     |  2 +-
- arch/powerpc/kvm/book3s_hv.c            | 58 +++++++++++++------------
- arch/powerpc/kvm/book3s_hv_nested.c     |  3 ++
- arch/powerpc/kvm/book3s_hv_p9_entry.c   | 10 ++++-
- arch/powerpc/kvm/book3s_hv_rmhandlers.S | 13 ------
- 6 files changed, 49 insertions(+), 43 deletions(-)
+ arch/powerpc/kvm/book3s_hv_p9_entry.c | 36 +++++++++++++--------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-index caaa0f592d8e..15b573671f99 100644
---- a/arch/powerpc/include/asm/kvm_book3s.h
-+++ b/arch/powerpc/include/asm/kvm_book3s.h
-@@ -406,6 +406,12 @@ static inline ulong kvmppc_get_fault_dar(struct kvm_vcpu *vcpu)
- 	return vcpu->arch.fault_dar;
- }
- 
-+/* Expiry time of vcpu DEC relative to host TB */
-+static inline u64 kvmppc_dec_expires_host_tb(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.dec_expires - vcpu->arch.vcore->tb_offset;
-+}
-+
- static inline bool is_kvmppc_resume_guest(int r)
- {
- 	return (r == RESUME_GUEST || r == RESUME_GUEST_NV);
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index a779f7849cfb..89216e247e8b 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -742,7 +742,7 @@ struct kvm_vcpu_arch {
- 
- 	struct hrtimer dec_timer;
- 	u64 dec_jiffies;
--	u64 dec_expires;
-+	u64 dec_expires;	/* Relative to guest timebase. */
- 	unsigned long pending_exceptions;
- 	u8 ceded;
- 	u8 prodded;
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index e25eccfe1501..967fa81063aa 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -2264,8 +2264,7 @@ static int kvmppc_get_one_reg_hv(struct kvm_vcpu *vcpu, u64 id,
- 		*val = get_reg_val(id, vcpu->arch.vcore->arch_compat);
- 		break;
- 	case KVM_REG_PPC_DEC_EXPIRY:
--		*val = get_reg_val(id, vcpu->arch.dec_expires +
--				   vcpu->arch.vcore->tb_offset);
-+		*val = get_reg_val(id, vcpu->arch.dec_expires);
- 		break;
- 	case KVM_REG_PPC_ONLINE:
- 		*val = get_reg_val(id, vcpu->arch.online);
-@@ -2517,8 +2516,7 @@ static int kvmppc_set_one_reg_hv(struct kvm_vcpu *vcpu, u64 id,
- 		r = kvmppc_set_arch_compat(vcpu, set_reg_val(id, *val));
- 		break;
- 	case KVM_REG_PPC_DEC_EXPIRY:
--		vcpu->arch.dec_expires = set_reg_val(id, *val) -
--			vcpu->arch.vcore->tb_offset;
-+		vcpu->arch.dec_expires = set_reg_val(id, *val);
- 		break;
- 	case KVM_REG_PPC_ONLINE:
- 		i = set_reg_val(id, *val);
-@@ -2905,13 +2903,13 @@ static void kvmppc_set_timer(struct kvm_vcpu *vcpu)
- 	unsigned long dec_nsec, now;
- 
- 	now = get_tb();
--	if (now > vcpu->arch.dec_expires) {
-+	if (now > kvmppc_dec_expires_host_tb(vcpu)) {
- 		/* decrementer has already gone negative */
- 		kvmppc_core_queue_dec(vcpu);
- 		kvmppc_core_prepare_to_enter(vcpu);
- 		return;
- 	}
--	dec_nsec = tb_to_ns(vcpu->arch.dec_expires - now);
-+	dec_nsec = tb_to_ns(kvmppc_dec_expires_host_tb(vcpu) - now);
- 	hrtimer_start(&vcpu->arch.dec_timer, dec_nsec, HRTIMER_MODE_REL);
- 	vcpu->arch.timer_running = 1;
- }
-@@ -3383,7 +3381,7 @@ static void post_guest_process(struct kvmppc_vcore *vc, bool is_master)
- 		 */
- 		spin_unlock(&vc->lock);
- 		/* cancel pending dec exception if dec is positive */
--		if (now < vcpu->arch.dec_expires &&
-+		if (now < kvmppc_dec_expires_host_tb(vcpu) &&
- 		    kvmppc_core_pending_dec(vcpu))
- 			kvmppc_core_dequeue_dec(vcpu);
- 
-@@ -4210,20 +4208,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 
- 	load_spr_state(vcpu);
- 
--	/*
--	 * When setting DEC, we must always deal with irq_work_raise via NMI vs
--	 * setting DEC. The problem occurs right as we switch into guest mode
--	 * if a NMI hits and sets pending work and sets DEC, then that will
--	 * apply to the guest and not bring us back to the host.
--	 *
--	 * irq_work_raise could check a flag (or possibly LPCR[HDICE] for
--	 * example) and set HDEC to 1? That wouldn't solve the nested hv
--	 * case which needs to abort the hcall or zero the time limit.
--	 *
--	 * XXX: Another day's problem.
--	 */
--	mtspr(SPRN_DEC, vcpu->arch.dec_expires - tb);
--
- 	if (kvmhv_on_pseries()) {
- 		/*
- 		 * We need to save and restore the guest visible part of the
-@@ -4249,6 +4233,23 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 			hvregs.vcpu_token = vcpu->vcpu_id;
- 		}
- 		hvregs.hdec_expiry = time_limit;
-+
-+		/*
-+		 * When setting DEC, we must always deal with irq_work_raise
-+		 * via NMI vs setting DEC. The problem occurs right as we
-+		 * switch into guest mode if a NMI hits and sets pending work
-+		 * and sets DEC, then that will apply to the guest and not
-+		 * bring us back to the host.
-+		 *
-+		 * irq_work_raise could check a flag (or possibly LPCR[HDICE]
-+		 * for example) and set HDEC to 1? That wouldn't solve the
-+		 * nested hv case which needs to abort the hcall or zero the
-+		 * time limit.
-+		 *
-+		 * XXX: Another day's problem.
-+		 */
-+		mtspr(SPRN_DEC, kvmppc_dec_expires_host_tb(vcpu) - tb);
-+
- 		mtspr(SPRN_DAR, vcpu->arch.shregs.dar);
- 		mtspr(SPRN_DSISR, vcpu->arch.shregs.dsisr);
- 		trap = plpar_hcall_norets(H_ENTER_NESTED, __pa(&hvregs),
-@@ -4260,6 +4261,12 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 		vcpu->arch.psscr = mfspr(SPRN_PSSCR_PR);
- 		mtspr(SPRN_PSSCR_PR, host_psscr);
- 
-+		dec = mfspr(SPRN_DEC);
-+		if (!(lpcr & LPCR_LD)) /* Sign extend if not using large decrementer */
-+			dec = (s32) dec;
-+		tb = mftb();
-+		vcpu->arch.dec_expires = dec + (tb + vc->tb_offset);
-+
- 		/* H_CEDE has to be handled now, not later */
- 		if (trap == BOOK3S_INTERRUPT_SYSCALL && !vcpu->arch.nested &&
- 		    kvmppc_get_gpr(vcpu, 3) == H_CEDE) {
-@@ -4267,6 +4274,7 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 			kvmppc_set_gpr(vcpu, 3, 0);
- 			trap = 0;
- 		}
-+
- 	} else {
- 		kvmppc_xive_push_vcpu(vcpu);
- 		trap = kvmhv_vcpu_entry_p9(vcpu, time_limit, lpcr);
-@@ -4298,12 +4306,6 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 			vcpu->arch.slb_max = 0;
- 	}
- 
--	dec = mfspr(SPRN_DEC);
--	if (!(lpcr & LPCR_LD)) /* Sign extend if not using large decrementer */
--		dec = (s32) dec;
--	tb = mftb();
--	vcpu->arch.dec_expires = dec + tb;
--
- 	store_spr_state(vcpu);
- 
- 	restore_p9_host_os_sprs(vcpu, &host_os_sprs);
-@@ -4788,7 +4790,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 	 * by L2 and the L1 decrementer is provided in hdec_expires
- 	 */
- 	if (kvmppc_core_pending_dec(vcpu) &&
--			((get_tb() < vcpu->arch.dec_expires) ||
-+			((get_tb() < kvmppc_dec_expires_host_tb(vcpu)) ||
- 			 (trap == BOOK3S_INTERRUPT_SYSCALL &&
- 			  kvmppc_get_gpr(vcpu, 3) == H_ENTER_NESTED)))
- 		kvmppc_core_dequeue_dec(vcpu);
-diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-index ed8a2c9f5629..7bed0b91245e 100644
---- a/arch/powerpc/kvm/book3s_hv_nested.c
-+++ b/arch/powerpc/kvm/book3s_hv_nested.c
-@@ -358,6 +358,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
- 	/* convert TB values/offsets to host (L0) values */
- 	hdec_exp = l2_hv.hdec_expiry - vc->tb_offset;
- 	vc->tb_offset += l2_hv.tb_offset;
-+	vcpu->arch.dec_expires += l2_hv.tb_offset;
- 
- 	/* set L1 state to L2 state */
- 	vcpu->arch.nested = l2;
-@@ -399,6 +400,8 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
- 	if (l2_regs.msr & MSR_TS_MASK)
- 		vcpu->arch.shregs.msr |= MSR_TS_S;
- 	vc->tb_offset = saved_l1_hv.tb_offset;
-+	/* XXX: is this always the same delta as saved_l1_hv.tb_offset? */
-+	vcpu->arch.dec_expires -= l2_hv.tb_offset;
- 	restore_hv_regs(vcpu, &saved_l1_hv);
- 	vcpu->arch.purr += delta_purr;
- 	vcpu->arch.spurr += delta_spurr;
 diff --git a/arch/powerpc/kvm/book3s_hv_p9_entry.c b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-index fb9cb34445ea..814b0dfd590f 100644
+index 814b0dfd590f..e7793bb806eb 100644
 --- a/arch/powerpc/kvm/book3s_hv_p9_entry.c
 +++ b/arch/powerpc/kvm/book3s_hv_p9_entry.c
-@@ -188,7 +188,7 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_nested_guest *nested = vcpu->arch.nested;
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
--	s64 hdec;
-+	s64 hdec, dec;
- 	u64 tb, purr, spurr;
- 	u64 *exsave;
- 	bool ri_set;
-@@ -317,6 +317,8 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	 */
- 	mtspr(SPRN_HDEC, hdec);
+@@ -215,15 +215,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
  
-+	mtspr(SPRN_DEC, vcpu->arch.dec_expires - tb);
+ 	vcpu->arch.ceded = 0;
+ 
+-	if (vc->tb_offset) {
+-		u64 new_tb = tb + vc->tb_offset;
+-		mtspr(SPRN_TBU40, new_tb);
+-		tb = mftb();
+-		if ((tb & 0xffffff) < (new_tb & 0xffffff))
+-			mtspr(SPRN_TBU40, new_tb + 0x1000000);
+-		vc->tb_offset_applied = vc->tb_offset;
+-	}
+-
+ 	/* Could avoid mfmsr by passing around, but probably no big deal */
+ 	msr = mfmsr();
+ 
+@@ -238,6 +229,15 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 		host_dawrx1 = mfspr(SPRN_DAWRX1);
+ 	}
+ 
++	if (vc->tb_offset) {
++		u64 new_tb = tb + vc->tb_offset;
++		mtspr(SPRN_TBU40, new_tb);
++		tb = mftb();
++		if ((tb & 0xffffff) < (new_tb & 0xffffff))
++			mtspr(SPRN_TBU40, new_tb + 0x1000000);
++		vc->tb_offset_applied = vc->tb_offset;
++	}
 +
- #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
- tm_return_to_guest:
- #endif
-@@ -461,6 +463,12 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
- 	vcpu->arch.shregs.sprg2 = mfspr(SPRN_SPRG2);
- 	vcpu->arch.shregs.sprg3 = mfspr(SPRN_SPRG3);
+ 	if (vc->pcr)
+ 		mtspr(SPRN_PCR, vc->pcr | PCR_MASK);
+ 	mtspr(SPRN_DPDES, vc->dpdes);
+@@ -469,6 +469,15 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	tb = mftb();
+ 	vcpu->arch.dec_expires = dec + tb;
  
-+	dec = mfspr(SPRN_DEC);
-+	if (!(lpcr & LPCR_LD)) /* Sign extend if not using large decrementer */
-+		dec = (s32) dec;
-+	tb = mftb();
-+	vcpu->arch.dec_expires = dec + tb;
++	if (vc->tb_offset_applied) {
++		u64 new_tb = tb - vc->tb_offset_applied;
++		mtspr(SPRN_TBU40, new_tb);
++		tb = mftb();
++		if ((tb & 0xffffff) < (new_tb & 0xffffff))
++			mtspr(SPRN_TBU40, new_tb + 0x1000000);
++		vc->tb_offset_applied = 0;
++	}
 +
  	/* Preserve PSSCR[FAKE_SUSPEND] until we've called kvmppc_save_tm_hv */
  	mtspr(SPRN_PSSCR, host_psscr |
  	      (local_paca->kvm_hstate.fake_suspend << PSSCR_FAKE_SUSPEND_LG));
-diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index 05be8648937d..f3489584bcfc 100644
---- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-+++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -808,10 +808,6 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_207S)
- 	 * Set the decrementer to the guest decrementer.
- 	 */
- 	ld	r8,VCPU_DEC_EXPIRES(r4)
--	/* r8 is a host timebase value here, convert to guest TB */
--	ld	r5,HSTATE_KVM_VCORE(r13)
--	ld	r6,VCORE_TB_OFFSET_APPL(r5)
--	add	r8,r8,r6
- 	mftb	r7
- 	subf	r3,r7,r8
- 	mtspr	SPRN_DEC,r3
-@@ -1186,9 +1182,6 @@ guest_bypass:
- 	mftb	r6
- 	extsw	r5,r5
- 16:	add	r5,r5,r6
--	/* r5 is a guest timebase value here, convert to host TB */
--	ld	r4,VCORE_TB_OFFSET_APPL(r3)
--	subf	r5,r4,r5
- 	std	r5,VCPU_DEC_EXPIRES(r9)
+@@ -503,15 +512,6 @@ int kvmhv_vcpu_entry_p9(struct kvm_vcpu *vcpu, u64 time_limit, unsigned long lpc
+ 	if (vc->pcr)
+ 		mtspr(SPRN_PCR, PCR_MASK);
  
- 	/* Increment exit count, poke other threads to exit */
-@@ -2154,9 +2147,6 @@ END_FTR_SECTION_IFCLR(CPU_FTR_TM)
- 	/* save expiry time of guest decrementer */
- 	add	r3, r3, r5
- 	ld	r4, HSTATE_KVM_VCPU(r13)
--	ld	r5, HSTATE_KVM_VCORE(r13)
--	ld	r6, VCORE_TB_OFFSET_APPL(r5)
--	subf	r3, r6, r3	/* convert to host TB value */
- 	std	r3, VCPU_DEC_EXPIRES(r4)
+-	if (vc->tb_offset_applied) {
+-		u64 new_tb = mftb() - vc->tb_offset_applied;
+-		mtspr(SPRN_TBU40, new_tb);
+-		tb = mftb();
+-		if ((tb & 0xffffff) < (new_tb & 0xffffff))
+-			mtspr(SPRN_TBU40, new_tb + 0x1000000);
+-		vc->tb_offset_applied = 0;
+-	}
+-
+ 	/* HDEC must be at least as large as DEC, so decrementer_max fits */
+ 	mtspr(SPRN_HDEC, decrementer_max);
  
- #ifdef CONFIG_KVM_BOOK3S_HV_EXIT_TIMING
-@@ -2253,9 +2243,6 @@ END_FTR_SECTION_IFCLR(CPU_FTR_TM)
- 
- 	/* Restore guest decrementer */
- 	ld	r3, VCPU_DEC_EXPIRES(r4)
--	ld	r5, HSTATE_KVM_VCORE(r13)
--	ld	r6, VCORE_TB_OFFSET_APPL(r5)
--	add	r3, r3, r6	/* convert host TB to guest TB value */
- 	mftb	r7
- 	subf	r3, r7, r3
- 	mtspr	SPRN_DEC, r3
 -- 
 2.23.0
 
