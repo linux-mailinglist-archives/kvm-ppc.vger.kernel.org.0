@@ -2,57 +2,59 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 208A03E954D
-	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:02:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E4723E954E
+	for <lists+kvm-ppc@lfdr.de>; Wed, 11 Aug 2021 18:02:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233609AbhHKQCz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 12:02:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51866 "EHLO
+        id S233613AbhHKQC7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 11 Aug 2021 12:02:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229634AbhHKQCz (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:02:55 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD195C061765
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:31 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d1so3308564pll.1
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:31 -0700 (PDT)
+        with ESMTP id S229634AbhHKQC6 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 12:02:58 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73409C061765
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:34 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id lw7-20020a17090b1807b029017881cc80b7so10333942pjb.3
+        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 09:02:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=cKT4fTx7oGwRWzvpaHxdjqzbrtTqZjyygbqKOYWpOIc=;
-        b=Qe0/FtQKhVwQV1cLcmplgCvwntQW+FjPNErVOqKGPL31gn6QeXoMl/3bNoON4C0gUH
-         lv9QcHtJJ3G2J+FqJa/m5968lJbIzxGJpv7evVhhQxlXwCLdWs7AvWmbPtMCskfBnl7N
-         gRkSo158HYGVTJmIYk3Ncr7DXnyIGqgVJrqgkJJBORe+PSItVe2DXoFTLqNje9qfV6Qs
-         iiKuF5Q/24Pz19o+Ce0yqfyRbDGNL4PZ6fzEGoTkBe/6ueiAJfwGJUj5uEcKKAFBkOwR
-         fd6+FgVRk74o3w7HRbJNBjkquh7y3Cev1tdKMFzEaASR9YqCj9u9Oyj8oVqIyx3J8POs
-         7Law==
+        bh=yZjufjuNadV1tghNNfY89lJSLDdECYjetCLWMrMMZtk=;
+        b=m38fx7MjF9GLTn7G7CX6ptbf2MEFMOR2BN6eFsf1rwSxK69YYE8lrvFFLtplE02onm
+         IPjG29oDa7wt9QpiY+qKMVdGYBFLR33agxko6jN0LnT89z/ofi/Akpm0GYxsBJxddWZB
+         9XcrTmgU8kHiX5r5UgqmGo2MqPqGm5Dzv5RtKBuI8A8L7HLn6/4P2QrkZfNjZXpBLBmW
+         FNDy6iwz5wi4ffmJOLWTn6T0preI7q7ajs6L0/JGSxZnp8hXzElv4pY0pWqqfz7MglDS
+         I95hg+me3j2HIJR1mANo0yWA5ubJK+euNanTae/bhAWSmz23hhBmncuTNlQepPY56PlJ
+         H/Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=cKT4fTx7oGwRWzvpaHxdjqzbrtTqZjyygbqKOYWpOIc=;
-        b=QgBJTfXRJIDBSBGR1S4MwAhDvB4/D1CGF/bcvZw9dg/dZDq6ofBUSYq51UeXCML85L
-         EmujTGPn9afun7tbpRCTcH42ekYkJk0vhbOu1QGsa3Q0CMIbiZFeIXDR0zP1NOPzyeUL
-         jvRzmTk1mFuuuk7HNvWoiXubkNAXODn79R3Frj4P+o44Sjiq/asPNUjQzn1/cPM8uecx
-         kClAezbfIPSiQU3oex5rQow19V1qyQIaNavePQY/qQ2uhNo1Jt4zbh4X8XFBe6BFL3/n
-         oinaQYgXqI0/x+DgIOhSN1IRR8IGoAt9CKVJ0Uqummqi/N1fL57F1eTfAa+P1dsPnF2c
-         H6rw==
-X-Gm-Message-State: AOAM532hlLvtErS+zQDhpIvucpZwpLrKlF9bxt1YHRokJqU1Y5d/zscr
-        HgGfTNMwKOQAy10xlJX43EkZet+QEe0=
-X-Google-Smtp-Source: ABdhPJwQ5ivMxxa21BFrRKDX9Rhm0Iomm4tEiMybappdPSnvp0DlNEF3LTosHm27OJKOt4BGfREdVQ==
-X-Received: by 2002:a17:902:ecc6:b029:12c:44b:40bd with SMTP id a6-20020a170902ecc6b029012c044b40bdmr7605549plh.33.1628697751009;
-        Wed, 11 Aug 2021 09:02:31 -0700 (PDT)
+        bh=yZjufjuNadV1tghNNfY89lJSLDdECYjetCLWMrMMZtk=;
+        b=De6vAu1RfTqcQ/CtCV0fJKGwsopl+Y5jonGudBEbcIUeWgEIbsuedbDKHzXNA+3KIg
+         6MzCEdNgjMEieZou6P2AnKM9u/C9fUyaeQqsns9ZNPynj5OPVyLGHDutmNhWn9xmZ1b7
+         XmMLmBovGo1GBLLIe6qI+nBDctUNN9ToSiotWqt04T27KZCBRLMBHTC3jn+NNw8NqgMa
+         jyB5f00spcA9TGnja4f6Xalkxo3khvd61zAyptKv1W+8ZKOGw4tw8qKmqGseZ3CylkTH
+         74hHavRy3Fod5IPyPO4R9mKNTVTqg366k452yy7IVersoXiI71H9pXUw+7Khr6fkrOAl
+         r8zg==
+X-Gm-Message-State: AOAM533ZqXs8yvMsj0wEPYHmXjgrZtyZNYXXI4E5bIgpikcpTv8VitNh
+        sjF6BLngTgU+pCGA5TiXBEGmzDOlbyU=
+X-Google-Smtp-Source: ABdhPJwHhdLxVG/f4hmuVWZtbivuXl7M2kIpPYqbLjFGsM/0UhkIb8Xix9zFZbjXXh0r4cI7gBnAkQ==
+X-Received: by 2002:a17:902:d2c8:b029:12b:84f8:d916 with SMTP id n8-20020a170902d2c8b029012b84f8d916mr1293181plc.75.1628697753915;
+        Wed, 11 Aug 2021 09:02:33 -0700 (PDT)
 Received: from bobo.ibm.com ([118.210.97.79])
-        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.02.29
+        by smtp.gmail.com with ESMTPSA id k19sm6596494pff.28.2021.08.11.09.02.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 09:02:30 -0700 (PDT)
+        Wed, 11 Aug 2021 09:02:33 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm-ppc@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2 18/60] KVM: PPC: Book3S HV: Don't always save PMU for guest capable of nesting
-Date:   Thu, 12 Aug 2021 02:00:52 +1000
-Message-Id: <20210811160134.904987-19-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+        Athira Jajeev <atrajeev@linux.vnet.ibm.com>,
+        Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
+Subject: [PATCH v2 19/60] powerpc/64s: Always set PMU control registers to frozen/disabled when not in use
+Date:   Thu, 12 Aug 2021 02:00:53 +1000
+Message-Id: <20210811160134.904987-20-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20210811160134.904987-1-npiggin@gmail.com>
 References: <20210811160134.904987-1-npiggin@gmail.com>
@@ -62,73 +64,90 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Provide a config option that controls the the workaround added by commit
-63279eeb7f93a ("KVM: PPC: Book3S HV: Always save guest pmu for guest
-capable of nesting"). The option defaults to y for now, but is expected
-to go away within a few releases.
+KVM PMU management code looks for particular frozen/disabled bits in
+the PMU registers so it knows whether it must clear them when coming
+out of a guest or not. Setting this up helps KVM make these optimisations
+without getting confused. Longer term the better approach might be to
+move guest/host PMU switching to the perf subsystem.
 
-Nested capable guests running with the earlier commit ("KVM: PPC: Book3S
-HV Nested: Indicate guest PMU in-use in VPA") will now indicate the PMU
-in-use status of their guests, which means the parent does not need to
-unconditionally save the PMU for nested capable guests.
-
-After this latest round of performance optimisations, this option costs
-about 540 cycles or 10% entry/exit performance on a POWER9 nested-capable
-guest.
-
+Cc: Athira Jajeev <atrajeev@linux.vnet.ibm.com>
+Cc: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/powerpc/kvm/Kconfig     | 15 +++++++++++++++
- arch/powerpc/kvm/book3s_hv.c | 10 ++++++++--
- 2 files changed, 23 insertions(+), 2 deletions(-)
+ arch/powerpc/kernel/cpu_setup_power.c | 4 ++--
+ arch/powerpc/kernel/dt_cpu_ftrs.c     | 6 +++---
+ arch/powerpc/kvm/book3s_hv.c          | 5 +++++
+ 3 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
-index e45644657d49..d57dcbc4eb0f 100644
---- a/arch/powerpc/kvm/Kconfig
-+++ b/arch/powerpc/kvm/Kconfig
-@@ -131,6 +131,21 @@ config KVM_BOOK3S_HV_EXIT_TIMING
+diff --git a/arch/powerpc/kernel/cpu_setup_power.c b/arch/powerpc/kernel/cpu_setup_power.c
+index a29dc8326622..3dc61e203f37 100644
+--- a/arch/powerpc/kernel/cpu_setup_power.c
++++ b/arch/powerpc/kernel/cpu_setup_power.c
+@@ -109,7 +109,7 @@ static void init_PMU_HV_ISA207(void)
+ static void init_PMU(void)
+ {
+ 	mtspr(SPRN_MMCRA, 0);
+-	mtspr(SPRN_MMCR0, 0);
++	mtspr(SPRN_MMCR0, MMCR0_FC);
+ 	mtspr(SPRN_MMCR1, 0);
+ 	mtspr(SPRN_MMCR2, 0);
+ }
+@@ -123,7 +123,7 @@ static void init_PMU_ISA31(void)
+ {
+ 	mtspr(SPRN_MMCR3, 0);
+ 	mtspr(SPRN_MMCRA, MMCRA_BHRB_DISABLE);
+-	mtspr(SPRN_MMCR0, MMCR0_PMCCEXT);
++	mtspr(SPRN_MMCR0, MMCR0_FC | MMCR0_PMCCEXT);
+ }
  
- 	  If unsure, say N.
+ /*
+diff --git a/arch/powerpc/kernel/dt_cpu_ftrs.c b/arch/powerpc/kernel/dt_cpu_ftrs.c
+index 38ea20fadc4a..a6bb0ee179cd 100644
+--- a/arch/powerpc/kernel/dt_cpu_ftrs.c
++++ b/arch/powerpc/kernel/dt_cpu_ftrs.c
+@@ -353,7 +353,7 @@ static void init_pmu_power8(void)
+ 	}
  
-+config KVM_BOOK3S_HV_NESTED_PMU_WORKAROUND
-+	bool "Nested L0 host workaround for L1 KVM host PMU handling bug" if EXPERT
-+	depends on KVM_BOOK3S_HV_POSSIBLE
-+	default !EXPERT
-+	help
-+	  Old nested HV capable Linux guests have a bug where the don't
-+	  reflect the PMU in-use status of their L2 guest to the L0 host
-+	  while the L2 PMU registers are live. This can result in loss
-+          of L2 PMU register state, causing perf to not work correctly in
-+	  L2 guests.
-+
-+	  Selecting this option for the L0 host implements a workaround for
-+	  those buggy L1s which saves the L2 state, at the cost of performance
-+	  in all nested-capable guest entry/exit.
-+
- config KVM_BOOKE_HV
- 	bool
+ 	mtspr(SPRN_MMCRA, 0);
+-	mtspr(SPRN_MMCR0, 0);
++	mtspr(SPRN_MMCR0, MMCR0_FC);
+ 	mtspr(SPRN_MMCR1, 0);
+ 	mtspr(SPRN_MMCR2, 0);
+ 	mtspr(SPRN_MMCRS, 0);
+@@ -392,7 +392,7 @@ static void init_pmu_power9(void)
+ 		mtspr(SPRN_MMCRC, 0);
  
+ 	mtspr(SPRN_MMCRA, 0);
+-	mtspr(SPRN_MMCR0, 0);
++	mtspr(SPRN_MMCR0, MMCR0_FC);
+ 	mtspr(SPRN_MMCR1, 0);
+ 	mtspr(SPRN_MMCR2, 0);
+ }
+@@ -428,7 +428,7 @@ static void init_pmu_power10(void)
+ 
+ 	mtspr(SPRN_MMCR3, 0);
+ 	mtspr(SPRN_MMCRA, MMCRA_BHRB_DISABLE);
+-	mtspr(SPRN_MMCR0, MMCR0_PMCCEXT);
++	mtspr(SPRN_MMCR0, MMCR0_FC | MMCR0_PMCCEXT);
+ }
+ 
+ static int __init feat_enable_pmu_power10(struct dt_cpu_feature *f)
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 2fe01dc2062f..197665c1a1cd 100644
+index 197665c1a1cd..e6cb923f91ff 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4033,8 +4033,14 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 		vcpu->arch.vpa.dirty = 1;
- 		save_pmu = lp->pmcregs_in_use;
- 	}
--	/* Must save pmu if this guest is capable of running nested guests */
--	save_pmu |= nesting_enabled(vcpu->kvm);
-+	if (IS_ENABLED(CONFIG_KVM_BOOK3S_HV_NESTED_PMU_WORKAROUND)) {
-+		/*
-+		 * Save pmu if this guest is capable of running nested guests.
-+		 * This is option is for old L1s that do not set their
-+		 * lppaca->pmcregs_in_use properly when entering their L2.
-+		 */
-+		save_pmu |= nesting_enabled(vcpu->kvm);
+@@ -2718,6 +2718,11 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_vcpu *vcpu)
+ #endif
+ #endif
+ 	vcpu->arch.mmcr[0] = MMCR0_FC;
++	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
++		vcpu->arch.mmcr[0] |= MMCR0_PMCCEXT;
++		vcpu->arch.mmcra = MMCRA_BHRB_DISABLE;
 +	}
- 
- 	kvmhv_save_guest_pmu(vcpu, save_pmu);
- #ifdef CONFIG_PPC_PSERIES
++
+ 	vcpu->arch.ctrl = CTRL_RUNLATCH;
+ 	/* default to host PVR, since we can't spoof it */
+ 	kvmppc_set_pvr_hv(vcpu, mfspr(SPRN_PVR));
 -- 
 2.23.0
 
