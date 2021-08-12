@@ -2,286 +2,206 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 278E83E9B68
-	for <lists+kvm-ppc@lfdr.de>; Thu, 12 Aug 2021 01:53:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F6F73E9D21
+	for <lists+kvm-ppc@lfdr.de>; Thu, 12 Aug 2021 06:02:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232932AbhHKXyA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 11 Aug 2021 19:54:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46828 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232902AbhHKXyA (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 11 Aug 2021 19:54:00 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F97C061765
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 16:53:35 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id t9so9591557lfc.6
-        for <kvm-ppc@vger.kernel.org>; Wed, 11 Aug 2021 16:53:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AbQjAn349c58heNeQvXLftlqX+mBO23yPtJbR/y1YOo=;
-        b=KeBoDO9Na4EACU6wkLem0guDaGbvDYMWLEe/zcALhJyz1OYA10g3g9BcrE5Agq1CfT
-         mIsjd8D6UxQJS1ZnY0yNTjmKgtsP9Y7IT7azfRZeAua187kYzOzC80qfzKEgSz0Shbe0
-         jLCEy4aqrFThGAi3zlq9t+Z/QTHl/SKJxi3aSFVtEwNy8zUo4/EYmlF9B7+eLdDFHP0e
-         Z37YDAB4fSIPtUW2lDzxnx2jkpJPN4/mJc0urHGDcY2V58xb0hmZafV1Kq6OM/i/O8F+
-         NQKe2xXvGnj4oqTBzACsvTP4RbT3d184XyzKKzneyQj21G/RqZBoBnLbRhPhJLoGLObb
-         C3iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AbQjAn349c58heNeQvXLftlqX+mBO23yPtJbR/y1YOo=;
-        b=hnxIVtZl8lSQksZ45uTVGhnZm+UGhKu9IqAk5CK+2TEU69oLGlVBFwC9gRCJXSto17
-         GJedOYzoRwCkzFp287AlxOrlY1pNTahMtXrcTAAstXdTuO2W3+TzS9RKRbNtzDiJtMv3
-         dS7J+kGWGQ//AbwIUYO9zoYtSvcdJi4cXTBKtILBQlJPfb/rgsQOdonZB8gqyJDQ3Zvy
-         bf3BFR2Shuod1fschtra6OEfo4bChTH8FG96mcEe1/dmB/pkaofVzkPy3Nsab6/9YKrH
-         WTg48OH2nOH/8HShDXcnx8Lea8iPBJR6AOZ2KqiMP78XguPHXilkWBEt5TX0ayeklWtr
-         sE5w==
-X-Gm-Message-State: AOAM530mGvKT2rsI76DR8Cw9svRpOwb8CILQAzBseUi5JFXDE3G5uAFT
-        572bK9j/PU/rW0n3yQ51SwOQlwUH503AGbQTOdyPcQ==
-X-Google-Smtp-Source: ABdhPJwBMBWRwcn5JdbVFJQNzEdQrKD33a+A0bNFJNU43qp1FelMgBm/o/csgEgRUnpAcJ5jtzDujkiG3Q75jVhSEVI=
-X-Received: by 2002:ac2:57cd:: with SMTP id k13mr474337lfo.117.1628726013497;
- Wed, 11 Aug 2021 16:53:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210811233744.1450962-1-jingzhangos@google.com>
-In-Reply-To: <20210811233744.1450962-1-jingzhangos@google.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Wed, 11 Aug 2021 16:53:22 -0700
-Message-ID: <CAOQ_Qsh4i8YBpZGq1XUeyGK-o3p0ZKAOHdWeJi_QhZPVesLP0g@mail.gmail.com>
-Subject: Re: [PATCH v1] KVM: stats: Add VM stat for the cumulative number of
- dirtied pages
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+        id S229825AbhHLECv (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 12 Aug 2021 00:02:51 -0400
+Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:39336 "EHLO
+        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229518AbhHLECu (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 12 Aug 2021 00:02:50 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=38;SR=0;TI=SMTPD_---0UikIOfn_1628740941;
+Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0UikIOfn_1628740941)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 12 Aug 2021 12:02:21 +0800
+From:   Hou Wenlong <houwenlong93@linux.alibaba.com>
+To:     kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Peter Feiner <pfeiner@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org
+Subject: [PATCH v2 1/2] KVM: Refactor kvm_arch_vcpu_fault() to return a struct page pointer
+Date:   Thu, 12 Aug 2021 12:02:19 +0800
+Message-Id: <1c510b24fc1d7cbae8aa4b69c0799ebd32e65b82.1628739116.git.houwenlong93@linux.alibaba.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <YRQcZqCWwVH8bCGc@google.com>
+References: <YRQcZqCWwVH8bCGc@google.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi Jing,
+From: Sean Christopherson <seanjc@google.com>
 
-Tiny nit (doesn't need to be addressed for this patch): when
-respinning a patch, start from 'v2'. The original patch (without
-versioning) is v1.
+Refactor kvm_arch_vcpu_fault() to return 'struct page *' instead of
+'vm_fault_t' to simplify architecture specific implementations that do
+more than return SIGBUS.  Currently this only applies to s390, but a
+future patch will move x86's pio_data handling into x86 where it belongs.
 
-On Wed, Aug 11, 2021 at 4:37 PM Jing Zhang <jingzhangos@google.com> wrote:
->
-> A per VM stat dirty_pages is added to record the number of dirtied pages
-> in the life cycle of a VM.
-> The growth rate of this stat is a good indicator during the process of
-> live migrations. The exact number of dirty pages at the moment doesn't
-> matter. That's why we define dirty_pages as a cumulative counter instead
-> of an instantaneous one.
->
-> Original-by: Peter Feiner <pfeiner@google.com>
-> Suggested-by: Oliver Upton <oupton@google.com>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+No functional changed intended.
 
-Besides the comment below:
+Cc: Hou Wenlong <houwenlong93@linux.alibaba.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
+---
+ arch/arm64/kvm/arm.c       |  4 ++--
+ arch/mips/kvm/mips.c       |  4 ++--
+ arch/powerpc/kvm/powerpc.c |  4 ++--
+ arch/s390/kvm/kvm-s390.c   | 12 ++++--------
+ arch/x86/kvm/x86.c         |  4 ++--
+ include/linux/kvm_host.h   |  2 +-
+ virt/kvm/kvm_main.c        |  5 ++++-
+ 7 files changed, 17 insertions(+), 18 deletions(-)
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e9a2b8f27792..83f4ffe3e4f2 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -161,9 +161,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	return ret;
+ }
+ 
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+-	return VM_FAULT_SIGBUS;
++	return NULL;
+ }
+ 
+ 
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index af9dd029a4e1..ae79874e6fd2 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -1053,9 +1053,9 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+ 	return -ENOIOCTLCMD;
+ }
+ 
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+-	return VM_FAULT_SIGBUS;
++	return NULL;
+ }
+ 
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index be33b5321a76..b9c21f9ab784 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -2090,9 +2090,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
+ }
+ 
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+-	return VM_FAULT_SIGBUS;
++	return NULL;
+ }
+ 
+ static int kvm_vm_ioctl_get_pvinfo(struct kvm_ppc_pvinfo *pvinfo)
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 02574d7b3612..e1b69833e228 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4979,17 +4979,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
+ }
+ 
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+ #ifdef CONFIG_KVM_S390_UCONTROL
+-	if ((vmf->pgoff == KVM_S390_SIE_PAGE_OFFSET)
+-		 && (kvm_is_ucontrol(vcpu->kvm))) {
+-		vmf->page = virt_to_page(vcpu->arch.sie_block);
+-		get_page(vmf->page);
+-		return 0;
+-	}
++	if (vmf->pgoff == KVM_S390_SIE_PAGE_OFFSET && kvm_is_ucontrol(vcpu->kvm))
++		return virt_to_page(vcpu->arch.sie_block);
+ #endif
+-	return VM_FAULT_SIGBUS;
++	return NULL;
+ }
+ 
+ /* Section: memory related */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3cedc7cc132a..1e3bbe5cd33a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5347,9 +5347,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
+ }
+ 
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+-	return VM_FAULT_SIGBUS;
++	return NULL;
+ }
+ 
+ static int kvm_vm_ioctl_set_tss_addr(struct kvm *kvm, unsigned long addr)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 492d183dd7d0..a949de534722 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -995,7 +995,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
+ 			unsigned int ioctl, unsigned long arg);
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg);
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf);
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf);
+ 
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext);
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 30d322519253..f7d21418971b 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3448,7 +3448,10 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
+ 		    &vcpu->dirty_ring,
+ 		    vmf->pgoff - KVM_DIRTY_LOG_PAGE_OFFSET);
+ 	else
+-		return kvm_arch_vcpu_fault(vcpu, vmf);
++		page = kvm_arch_vcpu_fault(vcpu, vmf);
++	if (!page)
++		return VM_FAULT_SIGBUS;
++
+ 	get_page(page);
+ 	vmf->page = page;
+ 	return 0;
+-- 
+2.31.1
 
-Also make sure this builds on PPC (follow up offline if you need to
-know how to do it with our tools), as I believe testing automation
-flagged your last spin.
-
-Thanks!
-
---
-Oliver
-
-> ---
->  arch/powerpc/include/asm/kvm_book3s.h  |  3 ++-
->  arch/powerpc/kvm/book3s_64_mmu_hv.c    | 10 +++++++---
->  arch/powerpc/kvm/book3s_64_mmu_radix.c |  3 ++-
->  arch/powerpc/kvm/book3s_hv_rm_mmu.c    | 13 ++++++++-----
->  include/linux/kvm_host.h               |  3 ++-
->  include/linux/kvm_types.h              |  1 +
->  virt/kvm/kvm_main.c                    |  2 ++
->  7 files changed, 24 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-> index caaa0f592d8e..cee4c7f23c8d 100644
-> --- a/arch/powerpc/include/asm/kvm_book3s.h
-> +++ b/arch/powerpc/include/asm/kvm_book3s.h
-> @@ -237,7 +237,8 @@ extern kvm_pfn_t kvmppc_gpa_to_pfn(struct kvm_vcpu *vcpu, gpa_t gpa,
->                         bool writing, bool *writable);
->  extern void kvmppc_add_revmap_chain(struct kvm *kvm, struct revmap_entry *rev,
->                         unsigned long *rmap, long pte_index, int realmode);
-> -extern void kvmppc_update_dirty_map(const struct kvm_memory_slot *memslot,
-> +extern void kvmppc_update_dirty_map(struct kvm *kvm,
-> +                       const struct kvm_memory_slot *memslot,
->                         unsigned long gfn, unsigned long psize);
->  extern void kvmppc_invalidate_hpte(struct kvm *kvm, __be64 *hptep,
->                         unsigned long pte_index);
-> diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> index c63e263312a4..08194aacd2a6 100644
-> --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> @@ -787,7 +787,7 @@ static void kvmppc_unmap_hpte(struct kvm *kvm, unsigned long i,
->                 rcbits = be64_to_cpu(hptep[1]) & (HPTE_R_R | HPTE_R_C);
->                 *rmapp |= rcbits << KVMPPC_RMAP_RC_SHIFT;
->                 if ((rcbits & HPTE_R_C) && memslot->dirty_bitmap)
-> -                       kvmppc_update_dirty_map(memslot, gfn, psize);
-> +                       kvmppc_update_dirty_map(kvm, memslot, gfn, psize);
->                 if (rcbits & ~rev[i].guest_rpte) {
->                         rev[i].guest_rpte = ptel | rcbits;
->                         note_hpte_modification(kvm, &rev[i]);
-> @@ -1122,8 +1122,10 @@ long kvmppc_hv_get_dirty_log_hpt(struct kvm *kvm,
->                  * since we always put huge-page HPTEs in the rmap chain
->                  * corresponding to their page base address.
->                  */
-> -               if (npages)
-> +               if (npages) {
->                         set_dirty_bits(map, i, npages);
-> +                       kvm->stat.generic.dirty_pages += npages;
-> +               }
->                 ++rmapp;
->         }
->         preempt_enable();
-> @@ -1178,8 +1180,10 @@ void kvmppc_unpin_guest_page(struct kvm *kvm, void *va, unsigned long gpa,
->         gfn = gpa >> PAGE_SHIFT;
->         srcu_idx = srcu_read_lock(&kvm->srcu);
->         memslot = gfn_to_memslot(kvm, gfn);
-> -       if (memslot && memslot->dirty_bitmap)
-> +       if (memslot && memslot->dirty_bitmap) {
->                 set_bit_le(gfn - memslot->base_gfn, memslot->dirty_bitmap);
-> +               ++kvm->stat.generic.dirty_pages;
-> +       }
->         srcu_read_unlock(&kvm->srcu, srcu_idx);
->  }
->
-> diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-> index b5905ae4377c..dc3fb027020a 100644
-> --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-> +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-> @@ -442,7 +442,7 @@ void kvmppc_unmap_pte(struct kvm *kvm, pte_t *pte, unsigned long gpa,
->         kvmhv_remove_nest_rmap_range(kvm, memslot, gpa, hpa, page_size);
->
->         if ((old & _PAGE_DIRTY) && memslot->dirty_bitmap)
-> -               kvmppc_update_dirty_map(memslot, gfn, page_size);
-> +               kvmppc_update_dirty_map(kvm, memslot, gfn, page_size);
->  }
->
->  /*
-> @@ -1150,6 +1150,7 @@ long kvmppc_hv_get_dirty_log_radix(struct kvm *kvm,
->                 j = i + 1;
->                 if (npages) {
->                         set_dirty_bits(map, i, npages);
-> +                       kvm->stat.generic.dirty_pages += npages;
->                         j = i + npages;
->                 }
->         }
-> diff --git a/arch/powerpc/kvm/book3s_hv_rm_mmu.c b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-> index 632b2545072b..f168ffb0a32b 100644
-> --- a/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-> +++ b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-> @@ -99,7 +99,8 @@ void kvmppc_add_revmap_chain(struct kvm *kvm, struct revmap_entry *rev,
->  EXPORT_SYMBOL_GPL(kvmppc_add_revmap_chain);
->
->  /* Update the dirty bitmap of a memslot */
-> -void kvmppc_update_dirty_map(const struct kvm_memory_slot *memslot,
-> +void kvmppc_update_dirty_map(struct kvm *kvm,
-> +                            const struct kvm_memory_slot *memslot,
->                              unsigned long gfn, unsigned long psize)
->  {
->         unsigned long npages;
-> @@ -109,6 +110,7 @@ void kvmppc_update_dirty_map(const struct kvm_memory_slot *memslot,
->         npages = (psize + PAGE_SIZE - 1) / PAGE_SIZE;
->         gfn -= memslot->base_gfn;
->         set_dirty_bits_atomic(memslot->dirty_bitmap, gfn, npages);
-> +       kvm->stat.generic.dirty_pages += npages;
->  }
->  EXPORT_SYMBOL_GPL(kvmppc_update_dirty_map);
->
-> @@ -123,7 +125,7 @@ static void kvmppc_set_dirty_from_hpte(struct kvm *kvm,
->         gfn = hpte_rpn(hpte_gr, psize);
->         memslot = __gfn_to_memslot(kvm_memslots_raw(kvm), gfn);
->         if (memslot && memslot->dirty_bitmap)
-> -               kvmppc_update_dirty_map(memslot, gfn, psize);
-> +               kvmppc_update_dirty_map(kvm, memslot, gfn, psize);
->  }
->
->  /* Returns a pointer to the revmap entry for the page mapped by a HPTE */
-> @@ -182,7 +184,7 @@ static void remove_revmap_chain(struct kvm *kvm, long pte_index,
->         }
->         *rmap |= rcbits << KVMPPC_RMAP_RC_SHIFT;
->         if (rcbits & HPTE_R_C)
-> -               kvmppc_update_dirty_map(memslot, gfn,
-> +               kvmppc_update_dirty_map(kvm, memslot, gfn,
->                                         kvmppc_actual_pgsz(hpte_v, hpte_r));
->         unlock_rmap(rmap);
->  }
-> @@ -941,7 +943,7 @@ static long kvmppc_do_h_page_init_zero(struct kvm_vcpu *vcpu,
->         /* Zero the page */
->         for (i = 0; i < SZ_4K; i += L1_CACHE_BYTES, pa += L1_CACHE_BYTES)
->                 dcbz((void *)pa);
-> -       kvmppc_update_dirty_map(memslot, dest >> PAGE_SHIFT, PAGE_SIZE);
-> +       kvmppc_update_dirty_map(kvm, memslot, dest >> PAGE_SHIFT, PAGE_SIZE);
->
->  out_unlock:
->         arch_spin_unlock(&kvm->mmu_lock.rlock.raw_lock);
-> @@ -972,7 +974,8 @@ static long kvmppc_do_h_page_init_copy(struct kvm_vcpu *vcpu,
->         /* Copy the page */
->         memcpy((void *)dest_pa, (void *)src_pa, SZ_4K);
->
-> -       kvmppc_update_dirty_map(dest_memslot, dest >> PAGE_SHIFT, PAGE_SIZE);
-> +       kvmppc_update_dirty_map(kvm, dest_memslot,
-> +                               dest >> PAGE_SHIFT, PAGE_SIZE);
->
->  out_unlock:
->         arch_spin_unlock(&kvm->mmu_lock.rlock.raw_lock);
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index d447b21cdd73..1229a7dd83e3 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1444,7 +1444,8 @@ struct _kvm_stats_desc {
->                 KVM_STATS_BASE_POW10, -9, sz)
->
->  #define KVM_GENERIC_VM_STATS()                                                \
-> -       STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush)
-> +       STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush),                      \
-> +       STATS_DESC_COUNTER(VM_GENERIC, dirty_pages)
->
->  #define KVM_GENERIC_VCPU_STATS()                                              \
->         STATS_DESC_COUNTER(VCPU_GENERIC, halt_successful_poll),                \
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index de7fb5f364d8..ff811bac851a 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -80,6 +80,7 @@ struct kvm_mmu_memory_cache {
->
->  struct kvm_vm_stat_generic {
->         u64 remote_tlb_flush;
-> +       u64 dirty_pages;
-
-This should read "dirtied_pages", to imply it is the number of pages
-dirtied since start, not the number of pages dirty at a given moment.
-
-
->  };
->
->  struct kvm_vcpu_stat_generic {
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 3e67c93ca403..b99ade3fd2b4 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3084,6 +3084,8 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->                                             slot, rel_gfn);
->                 else
->                         set_bit_le(rel_gfn, memslot->dirty_bitmap);
-> +
-> +               ++kvm->stat.generic.dirty_pages;
->         }
->  }
->  EXPORT_SYMBOL_GPL(mark_page_dirty_in_slot);
->
-> base-commit: a3e0b8bd99ab098514bde2434301fa6fde040da2
-> --
-> 2.32.0.605.g8dce9f2422-goog
->
