@@ -2,173 +2,111 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 484DE3EAF6D
-	for <lists+kvm-ppc@lfdr.de>; Fri, 13 Aug 2021 06:54:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2053D3EB387
+	for <lists+kvm-ppc@lfdr.de>; Fri, 13 Aug 2021 11:50:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229524AbhHMEzU (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 13 Aug 2021 00:55:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7368 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229468AbhHMEzU (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 13 Aug 2021 00:55:20 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17D4bXUO019616;
-        Fri, 13 Aug 2021 00:54:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : reply-to : references : mime-version : content-type
- : in-reply-to; s=pp1; bh=X2H3cSxTkK96kB6K5c2zXcyJlMFtpj/jSNRl5K8+vr0=;
- b=UBurvOKKO2B6jucTPAB3U/TU0iqSSL7UjrfOgR5e5ZdS+8HHExUvT4ZbPgLhRO+MhjJf
- ICNOEJRj7BIxLn1lVFrLHQ02+JgIpPHazPg9AQrBr9ScEZ74Jzih4NbQUrcflh+4YLtB
- lkWsngBY77pDPZTXh8yDIwK7/lqzA8UE4UZAGnBzSW7qQQtdNnYADOs8XZ3sK46Gho6b
- dbFIlneR6BhMDanbd1lAX5Jgq8B0N3cRAX7Grfz2o1n7JcURgE7ydZA2HrRHcQtsIo8F
- 3D5Kgh5RbOEjpvUU9eKEF8lRplzK+3RAvhzli49CQH27FMg5xGcS/SPb77VB18S+6oHg pQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ad4hy44du-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 00:54:48 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17D4bq7c021646;
-        Fri, 13 Aug 2021 00:54:47 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ad4hy44de-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 00:54:47 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17D4skZe023085;
-        Fri, 13 Aug 2021 04:54:46 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3acfpgaqu6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 04:54:46 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17D4pPSa56295880
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Aug 2021 04:51:25 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C676642047;
-        Fri, 13 Aug 2021 04:54:43 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4E0BA42041;
-        Fri, 13 Aug 2021 04:54:42 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.102.2.89])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 13 Aug 2021 04:54:42 +0000 (GMT)
-Date:   Fri, 13 Aug 2021 10:24:39 +0530
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        aneesh.kumar@linux.ibm.com, bharata.rao@gmail.com,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v0 5/5] pseries: Asynchronous page fault support
-Message-ID: <YRX7DyCz1xp34xfK@in.ibm.com>
-Reply-To: bharata@linux.ibm.com
-References: <20210805072439.501481-1-bharata@linux.ibm.com>
- <20210805072439.501481-6-bharata@linux.ibm.com>
- <1628825941.uhcogyrzjc.astroid@bobo.none>
+        id S239493AbhHMJug (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 13 Aug 2021 05:50:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57542 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239290AbhHMJug (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 13 Aug 2021 05:50:36 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57BBC061756
+        for <kvm-ppc@vger.kernel.org>; Fri, 13 Aug 2021 02:50:09 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d1so11215602pll.1
+        for <kvm-ppc@vger.kernel.org>; Fri, 13 Aug 2021 02:50:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=RAz/Im2O2D0PVJYzLw0GvtWHajffI0uko6BVtdR8kig=;
+        b=W2rEqQW+usxN+AbT4yJeR+eFoGAbEaXrBkpYVDbqByhFW+KdAjLYQgy7xM7c80wIGk
+         NZ9sJVV9LDiAfhMhjLdbLNr4zJLFAZaGsm3Ah/0xO+Zu+Km8F+F8ZXtgslo2Z6BIS2D7
+         bRXHOFiqHcjNwt76sWp2Z3gRNI9VgIJOR009bPZzC3iYOue2oBzqiBpMS7n6C3XZWLTE
+         SnaWg+S5WnJUxxG5z2fOjE/iLs2336z1pyrMucIE+jHhYfEg/hLPv7SSDYj2ZLEqmQRP
+         7pdLpeP4oSHq75iirkmw4SQFJPRd4+HIJmQpqsMmo39vUMaXj+u6ZEYG8P+rdUN8k9T+
+         /fVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=RAz/Im2O2D0PVJYzLw0GvtWHajffI0uko6BVtdR8kig=;
+        b=miTRnG5vi5cpFsjLxm2AV7podiI8zQ7S/c1Hh+FVlKVbtyBr87MxT2nN0jb3AAlm7x
+         SoNsDDTLZNFi5NJbYyHip0HZnGjDbwVUOHDjCwtoNpLW9XR4UgoEF7rdekI5BPbTJGTm
+         fsKD6d64MmuGTxMGtzq3/sqHCpl1Q/JxrpSv+5aJCKhdahTOL6om95mjAyY4TmDJpjdk
+         CxFIQrp4MFHZo1sLlRbzCVvQXPTEIIXTP+3ha1a6X157bOcJPOp5wNIT648PHgSje9Ql
+         TMmMg3PxZFkyKvmjmyfTonqU3WqyqKrkpv22+qC5nyp6w+1kNzYdRM3hEAvTQxofgYc0
+         vxzg==
+X-Gm-Message-State: AOAM531MdkFU/kz0Gz0uj93LiC4gGmU9KdQxXQpNzQgHw/vBMQQiNxJv
+        FLfta/RwBnmKcJB4i9adAVTV4Q==
+X-Google-Smtp-Source: ABdhPJw5cyWuImWVnIxRZJhPAyC9HkG/H/PERXnp/EEW2ZTkpCJE1GhFPgK7fxh0A1Xld0XtU3NVjg==
+X-Received: by 2002:a63:ed47:: with SMTP id m7mr1640554pgk.194.1628848209313;
+        Fri, 13 Aug 2021 02:50:09 -0700 (PDT)
+Received: from [192.168.10.23] (219-90-184-65.ip.adam.com.au. [219.90.184.65])
+        by smtp.gmail.com with UTF8SMTPSA id j6sm1937877pgq.0.2021.08.13.02.50.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Aug 2021 02:50:08 -0700 (PDT)
+Message-ID: <be02290c-60a0-48af-0491-61e8a6d5b7b7@ozlabs.ru>
+Date:   Fri, 13 Aug 2021 19:50:04 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1628825941.uhcogyrzjc.astroid@bobo.none>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: HKKLaq-gc61MbdtQx-nckLCMc1Cv0I-w
-X-Proofpoint-GUID: 9ljl69I8TDnMIS-D8d9ZVZ6KuIXEIH7I
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-13_01:2021-08-12,2021-08-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 bulkscore=0 mlxlogscore=999 spamscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 phishscore=0 clxscore=1015 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108130027
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.0
+Subject: Re: [PATCH kernel] KVM: PPC: Book3S HV: Make unique debugfs nodename
+Content-Language: en-US
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+References: <20210707041344.3803554-1-aik@ozlabs.ru>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <20210707041344.3803554-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Aug 13, 2021 at 02:06:40PM +1000, Nicholas Piggin wrote:
-> Excerpts from Bharata B Rao's message of August 5, 2021 5:24 pm:
-> > Add asynchronous page fault support for pseries guests.
-> > 
-> > 1. Setup the guest to handle async-pf
-> >    - Issue H_REG_SNS hcall to register the SNS region.
-> >    - Setup the subvention interrupt irq.
-> >    - Enable async-pf by updating the byte_b9 of VPA for each
-> >      CPU.
-> > 2. Check if the page fault is an expropriation notification
-> >    (SRR1_PROGTRAP set in SRR1) and if so put the task on
-> >    wait queue based on the expropriation correlation number
-> >    read from the VPA.
-> > 3. Handle subvention interrupt to wake any waiting tasks.
-> >    The wait and wakeup mechanism from x86 async-pf implementation
-> >    is being reused here.
+
+
+On 07/07/2021 14:13, Alexey Kardashevskiy wrote:
+> Currently it is vm-$currentpid which works as long as there is just one
+> VM per the userspace (99.99% cases) but produces a bunch
+> of "debugfs: Directory 'vm16679' with parent 'kvm' already present!"
+> when syzkaller (syscall fuzzer) is running so only one VM is present in
+> the debugfs for a given process.
 > 
-> I don't know too much about the background of this.
+> This changes the debugfs node to include the LPID which alone should be
+> system wide unique. This leaves the existing pid for the convenience of
+> matching the VM's debugfs with the running userspace process (QEMU).
 > 
-> How much benefit does this give? What situations?
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-I haven't yet gotten into measuring the benefit of this. Once
-the patches are bit more stable than what they are currently,
-we need to measure and evaluate the benefits.
+Looks like this is not enough as syzkaller still manages to cause the 
+error message, I need more robust approach as in 
+https://lore.kernel.org/patchwork/patch/1472025/  or   alternatively 
+move this debugfs stuff under the platform-independent directory, how 
+about that?
 
-> Does PowerVM implement it?
 
-I suppose so, need to check though.
-
-> Do other architectures KVM have something similar?
-
-Yes, x86 and s390 KVM have had this feature for a while now
-and generic KVM interfaces exist to support it.
-
+> ---
+>   arch/powerpc/kvm/book3s_hv.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> The SRR1 setting for the DSI is in PAPR? In that case it should be okay,
-> it might be good to add a small comment in exceptions-64s.S.
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 1d1fcc290fca..0223ddc0eed0 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -5227,7 +5227,7 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+>   	/*
+>   	 * Create a debugfs directory for the VM
+>   	 */
+> -	snprintf(buf, sizeof(buf), "vm%d", current->pid);
+> +	snprintf(buf, sizeof(buf), "vm%d-lp%ld", current->pid, lpid);
+>   	kvm->arch.debugfs_dir = debugfs_create_dir(buf, kvm_debugfs_dir);
+>   	kvmppc_mmu_debugfs_init(kvm);
+>   	if (radix_enabled())
+> 
 
-Yes, SRR1 setting is part of PAPR.
-
-> 
-> [...]
-> 
-> > @@ -395,6 +395,11 @@ static int ___do_page_fault(struct pt_regs *regs, unsigned long address,
-> >  	vm_fault_t fault, major = 0;
-> >  	bool kprobe_fault = kprobe_page_fault(regs, 11);
-> >  
-> > +#ifdef CONFIG_PPC_PSERIES
-> > +	if (handle_async_page_fault(regs, address))
-> > +		return 0;
-> > +#endif
-> > +
-> >  	if (unlikely(debugger_fault_handler(regs) || kprobe_fault))
-> >  		return 0;
-> 
-> [...]
-> 
-> > +int handle_async_page_fault(struct pt_regs *regs, unsigned long addr)
-> > +{
-> > +	struct async_pf_sleep_node n;
-> > +	DECLARE_SWAITQUEUE(wait);
-> > +	unsigned long exp_corr_nr;
-> > +
-> > +	/* Is this Expropriation notification? */
-> > +	if (!(mfspr(SPRN_SRR1) & SRR1_PROGTRAP))
-> > +		return 0;
-> 
-> Yep this should be an inline that is guarded by a static key, and then 
-> probably have an inline check for SRR1_PROGTRAP. You shouldn't need to
-> mfspr here, but just use regs->msr.
-
-Right.
-
-> 
-> > +
-> > +	if (unlikely(!user_mode(regs)))
-> > +		panic("Host injected async PF in kernel mode\n");
-> 
-> Hmm. Is there anything in the PAPR interface that specifies that the
-> OS can only deal with problem state access faults here? Or is that
-> inherent in the expropriation feature?
-
-Didn't see anything specific to that effect in PAPR. However since
-this puts the faulting guest process to sleep until the page
-becomes ready in the host, I have limited it to guest user space
-faults.
-
-Regards,
-Bharata.
+-- 
+Alexey
