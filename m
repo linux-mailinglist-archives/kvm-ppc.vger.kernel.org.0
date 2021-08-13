@@ -2,111 +2,271 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2053D3EB387
-	for <lists+kvm-ppc@lfdr.de>; Fri, 13 Aug 2021 11:50:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A4A13EBCD9
+	for <lists+kvm-ppc@lfdr.de>; Fri, 13 Aug 2021 21:54:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239493AbhHMJug (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 13 Aug 2021 05:50:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57542 "EHLO
+        id S233862AbhHMTzG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 13 Aug 2021 15:55:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239290AbhHMJug (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 13 Aug 2021 05:50:36 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57BBC061756
-        for <kvm-ppc@vger.kernel.org>; Fri, 13 Aug 2021 02:50:09 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d1so11215602pll.1
-        for <kvm-ppc@vger.kernel.org>; Fri, 13 Aug 2021 02:50:09 -0700 (PDT)
+        with ESMTP id S230440AbhHMTzF (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 13 Aug 2021 15:55:05 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A777EC061756
+        for <kvm-ppc@vger.kernel.org>; Fri, 13 Aug 2021 12:54:38 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id co4-20020a17090afe8400b00179436a9ecbso1851743pjb.3
+        for <kvm-ppc@vger.kernel.org>; Fri, 13 Aug 2021 12:54:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=RAz/Im2O2D0PVJYzLw0GvtWHajffI0uko6BVtdR8kig=;
-        b=W2rEqQW+usxN+AbT4yJeR+eFoGAbEaXrBkpYVDbqByhFW+KdAjLYQgy7xM7c80wIGk
-         NZ9sJVV9LDiAfhMhjLdbLNr4zJLFAZaGsm3Ah/0xO+Zu+Km8F+F8ZXtgslo2Z6BIS2D7
-         bRXHOFiqHcjNwt76sWp2Z3gRNI9VgIJOR009bPZzC3iYOue2oBzqiBpMS7n6C3XZWLTE
-         SnaWg+S5WnJUxxG5z2fOjE/iLs2336z1pyrMucIE+jHhYfEg/hLPv7SSDYj2ZLEqmQRP
-         7pdLpeP4oSHq75iirkmw4SQFJPRd4+HIJmQpqsMmo39vUMaXj+u6ZEYG8P+rdUN8k9T+
-         /fVA==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=jGdqH7teKJ4mZM017dJsQ8DXbufWMqis8KtdPBn4mCA=;
+        b=F9p4yWSJkf87aCLhH+oo7krZZ+f38oss3VXzkoX+SACRVCO1FWa/Gs1kNYK8Ywhdiu
+         3B3NG/ghOERM8pN4rEPVbGPZj3WKiMnftYn25EbcVEFy4JJZdbRpkPfjjdB3ElQ7v0P+
+         t603+l6oliTEcb8+ydFYju8uopcSmFW996I7sODVj3V99+Sm+tyaugyCjaIyivGty0G+
+         GIkvU84w6mAHvAEt0RlhetLIQrvDQDsC38pYL95uV/9Swu2/5/fCAyCwj6r7EhuGtnuF
+         eFkJS+b6C3wOdTaST0KoNiiUjz9W8Sc327CTpMEsxtMOkDJUXoMcX1vIamLV8dqiJpQ1
+         UAfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=RAz/Im2O2D0PVJYzLw0GvtWHajffI0uko6BVtdR8kig=;
-        b=miTRnG5vi5cpFsjLxm2AV7podiI8zQ7S/c1Hh+FVlKVbtyBr87MxT2nN0jb3AAlm7x
-         SoNsDDTLZNFi5NJbYyHip0HZnGjDbwVUOHDjCwtoNpLW9XR4UgoEF7rdekI5BPbTJGTm
-         fsKD6d64MmuGTxMGtzq3/sqHCpl1Q/JxrpSv+5aJCKhdahTOL6om95mjAyY4TmDJpjdk
-         CxFIQrp4MFHZo1sLlRbzCVvQXPTEIIXTP+3ha1a6X157bOcJPOp5wNIT648PHgSje9Ql
-         TMmMg3PxZFkyKvmjmyfTonqU3WqyqKrkpv22+qC5nyp6w+1kNzYdRM3hEAvTQxofgYc0
-         vxzg==
-X-Gm-Message-State: AOAM531MdkFU/kz0Gz0uj93LiC4gGmU9KdQxXQpNzQgHw/vBMQQiNxJv
-        FLfta/RwBnmKcJB4i9adAVTV4Q==
-X-Google-Smtp-Source: ABdhPJw5cyWuImWVnIxRZJhPAyC9HkG/H/PERXnp/EEW2ZTkpCJE1GhFPgK7fxh0A1Xld0XtU3NVjg==
-X-Received: by 2002:a63:ed47:: with SMTP id m7mr1640554pgk.194.1628848209313;
-        Fri, 13 Aug 2021 02:50:09 -0700 (PDT)
-Received: from [192.168.10.23] (219-90-184-65.ip.adam.com.au. [219.90.184.65])
-        by smtp.gmail.com with UTF8SMTPSA id j6sm1937877pgq.0.2021.08.13.02.50.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Aug 2021 02:50:08 -0700 (PDT)
-Message-ID: <be02290c-60a0-48af-0491-61e8a6d5b7b7@ozlabs.ru>
-Date:   Fri, 13 Aug 2021 19:50:04 +1000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.0
-Subject: Re: [PATCH kernel] KVM: PPC: Book3S HV: Make unique debugfs nodename
-Content-Language: en-US
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-References: <20210707041344.3803554-1-aik@ozlabs.ru>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <20210707041344.3803554-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=jGdqH7teKJ4mZM017dJsQ8DXbufWMqis8KtdPBn4mCA=;
+        b=tIHeq5SdtOLGpCDsro+JPciV0pGpNcMbK2rC45EIBoSIh1ULXfLJcWC5altBmH6HpL
+         myCKfIbv43eEJlVZvPMjA9zqAIw3s94NHxTeDK/g6jf0VjkGNz1bsqCmFgoK1b27cXrZ
+         EByW4edcdKxhjWmSBYGFORjT61OMepfEju8NtKrqPczugevH8SEIsjaMuu2JWiw6kVh1
+         Qj3mNFrllcy0t0MuHFCZPtOeAB4gdUYGC5zZ01PDeALWnFbi0hlMG0JZSey8AqGFwUib
+         RHjZrJJXlAyngAezYCoNQ9NcRW4LhwLN5e4U7wT8+/kBRGd8wSFHR1AUEGy6cvgwHduw
+         dp+Q==
+X-Gm-Message-State: AOAM530qG6AoxZan3puXrgI+T6a9cNV0UEFi2VpLE+yGOi1Niw2MQ5Ol
+        GzWIJ+f1qaOLVQfkqVNfdQFNVZq+WBxz3vgdZg==
+X-Google-Smtp-Source: ABdhPJw6fOPR+CX9bCm0Ns9AALocYSNGiDKEtptkFfcuABrYWtIofRT/VtqdeNILbBkjcOAmzSWllFtTQqkwkIFaEQ==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:902:ecca:b029:12d:1a3b:571f with
+ SMTP id a10-20020a170902eccab029012d1a3b571fmr3265550plh.37.1628884478139;
+ Fri, 13 Aug 2021 12:54:38 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 19:54:33 +0000
+Message-Id: <20210813195433.2555924-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
+Subject: [PATCH v3] KVM: stats: Add VM stat for the cumulative number of
+ dirtied pages
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Peter Feiner <pfeiner@google.com>
+Cc:     Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+A per VCPU stat dirtied_pages is added to record the number of dirtied
+pages in the life cycle of a VM.
+The growth rate of this stat is a good indicator during the process of
+live migrations. The exact number of dirty pages at the moment doesn't
+matter. That's why we define dirtied_pages as a cumulative counter instead
+of an instantaneous one.
 
+Original-by: Peter Feiner <pfeiner@google.com>
+Suggested-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
+---
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    | 12 ++++++++++--
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  3 +++
+ include/linux/kvm_host.h               |  3 ++-
+ include/linux/kvm_types.h              |  1 +
+ virt/kvm/kvm_main.c                    |  5 +++++
+ 5 files changed, 21 insertions(+), 3 deletions(-)
 
-On 07/07/2021 14:13, Alexey Kardashevskiy wrote:
-> Currently it is vm-$currentpid which works as long as there is just one
-> VM per the userspace (99.99% cases) but produces a bunch
-> of "debugfs: Directory 'vm16679' with parent 'kvm' already present!"
-> when syzkaller (syscall fuzzer) is running so only one VM is present in
-> the debugfs for a given process.
-> 
-> This changes the debugfs node to include the LPID which alone should be
-> system wide unique. This leaves the existing pid for the convenience of
-> matching the VM's debugfs with the running userspace process (QEMU).
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index c63e263312a4..e06cd9c9a278 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -1112,6 +1112,7 @@ long kvmppc_hv_get_dirty_log_hpt(struct kvm *kvm,
+ {
+ 	unsigned long i;
+ 	unsigned long *rmapp;
++	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+ 
+ 	preempt_disable();
+ 	rmapp = memslot->arch.rmap;
+@@ -1122,8 +1123,11 @@ long kvmppc_hv_get_dirty_log_hpt(struct kvm *kvm,
+ 		 * since we always put huge-page HPTEs in the rmap chain
+ 		 * corresponding to their page base address.
+ 		 */
+-		if (npages)
++		if (npages) {
+ 			set_dirty_bits(map, i, npages);
++			if (vcpu)
++				vcpu->stat.generic.dirtied_pages += npages;
++		}
+ 		++rmapp;
+ 	}
+ 	preempt_enable();
+@@ -1164,6 +1168,7 @@ void *kvmppc_pin_guest_page(struct kvm *kvm, unsigned long gpa,
+ void kvmppc_unpin_guest_page(struct kvm *kvm, void *va, unsigned long gpa,
+ 			     bool dirty)
+ {
++	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+ 	struct page *page = virt_to_page(va);
+ 	struct kvm_memory_slot *memslot;
+ 	unsigned long gfn;
+@@ -1178,8 +1183,11 @@ void kvmppc_unpin_guest_page(struct kvm *kvm, void *va, unsigned long gpa,
+ 	gfn = gpa >> PAGE_SHIFT;
+ 	srcu_idx = srcu_read_lock(&kvm->srcu);
+ 	memslot = gfn_to_memslot(kvm, gfn);
+-	if (memslot && memslot->dirty_bitmap)
++	if (memslot && memslot->dirty_bitmap) {
+ 		set_bit_le(gfn - memslot->base_gfn, memslot->dirty_bitmap);
++		if (vcpu)
++			++vcpu->stat.generic.dirtied_pages;
++	}
+ 	srcu_read_unlock(&kvm->srcu, srcu_idx);
+ }
+ 
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index b5905ae4377c..a07f143ff5ee 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -1134,6 +1134,7 @@ static int kvm_radix_test_clear_dirty(struct kvm *kvm,
+ long kvmppc_hv_get_dirty_log_radix(struct kvm *kvm,
+ 			struct kvm_memory_slot *memslot, unsigned long *map)
+ {
++	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+ 	unsigned long i, j;
+ 	int npages;
+ 
+@@ -1150,6 +1151,8 @@ long kvmppc_hv_get_dirty_log_radix(struct kvm *kvm,
+ 		j = i + 1;
+ 		if (npages) {
+ 			set_dirty_bits(map, i, npages);
++			if (vcpu)
++				vcpu->stat.generic.dirtied_pages += npages;
+ 			j = i + npages;
+ 		}
+ 	}
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index d447b21cdd73..c73d8bf74f9f 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1459,7 +1459,8 @@ struct _kvm_stats_desc {
+ 	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_hist,	       \
+ 			HALT_POLL_HIST_COUNT),				       \
+ 	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_wait_hist,	       \
+-			HALT_POLL_HIST_COUNT)
++			HALT_POLL_HIST_COUNT),				       \
++	STATS_DESC_COUNTER(VCPU_GENERIC, dirtied_pages)
+ 
+ extern struct dentry *kvm_debugfs_dir;
+ 
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index de7fb5f364d8..949549f55187 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -93,6 +93,7 @@ struct kvm_vcpu_stat_generic {
+ 	u64 halt_poll_success_hist[HALT_POLL_HIST_COUNT];
+ 	u64 halt_poll_fail_hist[HALT_POLL_HIST_COUNT];
+ 	u64 halt_wait_hist[HALT_POLL_HIST_COUNT];
++	u64 dirtied_pages;
+ };
+ 
+ #define KVM_STATS_NAME_SIZE	48
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3e67c93ca403..8c673198cc83 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3075,6 +3075,8 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+ 			     struct kvm_memory_slot *memslot,
+ 		 	     gfn_t gfn)
+ {
++	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
++
+ 	if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
+ 		unsigned long rel_gfn = gfn - memslot->base_gfn;
+ 		u32 slot = (memslot->as_id << 16) | memslot->id;
+@@ -3084,6 +3086,9 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+ 					    slot, rel_gfn);
+ 		else
+ 			set_bit_le(rel_gfn, memslot->dirty_bitmap);
++
++		if (vcpu)
++			++vcpu->stat.generic.dirtied_pages;
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(mark_page_dirty_in_slot);
 
-Looks like this is not enough as syzkaller still manages to cause the 
-error message, I need more robust approach as in 
-https://lore.kernel.org/patchwork/patch/1472025/  or   alternatively 
-move this debugfs stuff under the platform-independent directory, how 
-about that?
-
-
-> ---
->   arch/powerpc/kvm/book3s_hv.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 1d1fcc290fca..0223ddc0eed0 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -5227,7 +5227,7 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
->   	/*
->   	 * Create a debugfs directory for the VM
->   	 */
-> -	snprintf(buf, sizeof(buf), "vm%d", current->pid);
-> +	snprintf(buf, sizeof(buf), "vm%d-lp%ld", current->pid, lpid);
->   	kvm->arch.debugfs_dir = debugfs_create_dir(buf, kvm_debugfs_dir);
->   	kvmppc_mmu_debugfs_init(kvm);
->   	if (radix_enabled())
-> 
-
+base-commit: 32bdc01988413031c6e743714c2b40bdd773e5db
+prerequisite-patch-id: 7f9928f8f0eefbaa3a583f2938fe702bf082832d
+prerequisite-patch-id: c02ba4a19976d9404f0b74e9a004b94c32250e23
+prerequisite-patch-id: 628acee8421e7a79a8c88457a3c7cfc62eb60df6
+prerequisite-patch-id: 38a6ba1e5f31ec6527aa9834be8c24bdcc10daf8
+prerequisite-patch-id: 1dad2c942cdaf9085f3ca0d7e075bf412f063690
+prerequisite-patch-id: 733eec6f0411d168d8be7e84123c2701d650c9b1
+prerequisite-patch-id: e01d06225202e7e71948649e6f17d131c514eed0
+prerequisite-patch-id: cc1b3818a85e8d9caea4804f89adeb58771bbf1e
+prerequisite-patch-id: 81ef42f04afa63ac0b3016c27835e3b5968d202a
+prerequisite-patch-id: 7f279f4a51f46f2108e4854fb9558df4c6a94f29
+prerequisite-patch-id: f2defc4b5b2be4a8533bc404018c2dff84804e1c
+prerequisite-patch-id: 71a90f368e66bdefff7c9e61aeadf3b8d0ddde82
+prerequisite-patch-id: 8f2100ccb62bee15548d7cb95290aaeb0f8e2b5c
+prerequisite-patch-id: dc293f3133694e90a2ebf0ae144f43fffb906f85
+prerequisite-patch-id: 5d69ad7077a762025172f5fd2574d08fea7dc268
+prerequisite-patch-id: 48505db61f795aa630346ecc7ac6356edcca06a3
+prerequisite-patch-id: d3bf8234d2c9ad9232cb555c36dee748b0c80718
+prerequisite-patch-id: 26c42b588f3b5e69221c3e306ec3e1b4790bee8c
+prerequisite-patch-id: 602dc8d069bebe908605c8a215dc43a884735ead
+prerequisite-patch-id: e280224c3d0a3b4f4655b8ff72bd94b35b1f43e7
+prerequisite-patch-id: d1b1fef9e46f933a7966f696bb524701173e5204
+prerequisite-patch-id: 291fdde808d05f601930d010fdac5f8338189ff0
+prerequisite-patch-id: b5fcfb1ce91b4a18f4e2b13b4768956c4b58f244
+prerequisite-patch-id: 4374b5db583ecd2fc7b9dd09d5798e39dcfd8133
+prerequisite-patch-id: c48a5c9e213598815d7d421ea37a7c1ffadd5c5f
+prerequisite-patch-id: d2eb17f39a5c0b79f4572e61865bf0780a701150
+prerequisite-patch-id: b307b25a22b7323d381172d0567e9d605a4a81d6
+prerequisite-patch-id: e029e05c967a87ae93a825c554295278cc2992bc
+prerequisite-patch-id: 82839126bac4f409eeba502c3b9c42cdb94d6755
+prerequisite-patch-id: 74133700ce1b993ab21f856460fb376118afc03b
+prerequisite-patch-id: d2103c1a2efd0c8827a2755a1900cd9882e24d69
+prerequisite-patch-id: e23c3a8fef94984b2646749af6f5039951db0078
+prerequisite-patch-id: 79d10df1e51206f1b5ab817cb0a4fe0e5deb3714
+prerequisite-patch-id: 1e9b9d657710420f725a5ca7a907af4f1c490cf7
+prerequisite-patch-id: a23e193be8d45015fc97b5c050b95c1d993c4071
+prerequisite-patch-id: 635e397140a5ee693b57107349a0361a3bdfdaad
+prerequisite-patch-id: ee2ba6ddbda9caeff25fe806fb7b90f6bc8d738f
+prerequisite-patch-id: 170ca5c3ff1b233471a18cfd2c8a784da4ccd992
+prerequisite-patch-id: a1097b6a0e20c4e90836c91c76706fffc729764b
+prerequisite-patch-id: e8f1fb7ab8f65141e31779ee07727dff47ac0098
+prerequisite-patch-id: b6312876622aca5d7c9e75f30dc3fd8a03ac26a0
+prerequisite-patch-id: ca943c3b8b8b92890be1460b1ea35700f334660a
+prerequisite-patch-id: e7f18191c3eab5e9d00835427b24e5c4cb71e816
+prerequisite-patch-id: 35d6e3afb732b90645dbe616b09ac3804d0c382c
+prerequisite-patch-id: 44e001ebb2ca30fc9961d05318b255b5cd613373
+prerequisite-patch-id: 191134641b9ac4388a673cd1be8990c055e7a7e0
+prerequisite-patch-id: 381ad781082b71336c68dc34b5f25d5b77ba414a
+prerequisite-patch-id: adc5e83bd8bb078c8ea18e7967c50f1129bf6b32
+prerequisite-patch-id: 08acb2d3d0570fa274f37f6962d77717ba1dc81e
+prerequisite-patch-id: e208ed736197056053c4f31831f6d8778255142e
+prerequisite-patch-id: 36c72d212fbe1dd0f90eb2767a9537931836dd1d
+prerequisite-patch-id: d9267363edcdfe283817db7a8d4bccf3e51e497d
+prerequisite-patch-id: 9cc7ff89a0b76cbad8e3ef90c7cb2677874e055a
+prerequisite-patch-id: a86657c13e42746d2bc1dd9a97cd0c69873b405a
+prerequisite-patch-id: 52bbc868d38a1e9747af2339769cc5fef37ee5e8
+prerequisite-patch-id: af33089f214ac7a4018dfb5f1d2eaba8fe0da914
+prerequisite-patch-id: 83783ad0d671bf57882cb508ce210aa997e40f55
+prerequisite-patch-id: fbf0c1e61a19ca0c2ba30fc25e00aec74b77caeb
+prerequisite-patch-id: 2475fd8e98d99b813fc1975bb74ec313944b91eb
+prerequisite-patch-id: 30c2fe721d08d0355358f14065339164fd2fc05e
+prerequisite-patch-id: 7aea11540a6b79b9490a71291ad8f55dac766333
+prerequisite-patch-id: 2172f5ec654e6dbeb853234e49debf02002e0c1e
+prerequisite-patch-id: b5615f710c650f11dc792b1ed41b1f6e0466b5b4
+prerequisite-patch-id: e7081362d2b5f7f6c47004216a06491c88219438
+prerequisite-patch-id: d5a02470af471474c86fe98e744d6765c7bb0568
+prerequisite-patch-id: 875404b5ca431d51ed44ef1bac7314263378c21c
+prerequisite-patch-id: bd76891bbc89690d44048c4bcdeceea803b8c329
 -- 
-Alexey
+2.33.0.rc1.237.g0d66db33f3-goog
+
