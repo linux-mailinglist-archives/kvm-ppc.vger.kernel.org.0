@@ -2,243 +2,117 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34D8F3EBE6C
-	for <lists+kvm-ppc@lfdr.de>; Sat, 14 Aug 2021 00:59:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 548BA3EBEF1
+	for <lists+kvm-ppc@lfdr.de>; Sat, 14 Aug 2021 02:19:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235156AbhHMXAB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 13 Aug 2021 19:00:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60850 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235029AbhHMXAA (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 13 Aug 2021 19:00:00 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17DMZHTJ022255;
-        Fri, 13 Aug 2021 18:59:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=+LU0JC0OH8wdlQAidWtisOjSGsT8zxXXZZjrK/lu1qs=;
- b=Kx1SokruvHO+kZsDNYmNiUxYr3JLJEar/1/uokNwlfSYRTR8URjlFJCrY+isSAEJ5iGw
- RBXGf2Mt1zmOGL4cPWdB2vH/oupXdWO/ZJ35ob5DtZ5E6Ebdomr38z1GKPOY/Gw4t+lL
- AVGR53sCSVuSvNl+DEmIOlEo0oUjYnRyVW7j7QQ4C0cgnKzxMGwc3x7BsWDBRkmIK9xK
- FoJSZSs2nc9Zf7tyv9vBUDRb0OHoEVXKm8l9sdbK8o0N56VW60hEC+twbKOz7DrzGNiy
- rRJ9a+iP5vmPUjDJbVWGaqWOGUaAR+RW1xstK9McE84jWK5ZfHStjsb9pPDxvylyO879 lg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3adsf45hab-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 18:59:05 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17DMaJ7h027454;
-        Fri, 13 Aug 2021 18:59:05 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3adsf45ha2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 18:59:04 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17DMvZMK028019;
-        Fri, 13 Aug 2021 22:59:04 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma02dal.us.ibm.com with ESMTP id 3a9htjf6hq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 22:59:04 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17DMx2fm48300442
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Aug 2021 22:59:02 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 75EF6BE04F;
-        Fri, 13 Aug 2021 22:59:02 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5B1FBE053;
-        Fri, 13 Aug 2021 22:59:01 +0000 (GMT)
-Received: from localhost (unknown [9.211.46.37])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Fri, 13 Aug 2021 22:59:01 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Laurent Vivier <lvivier@redhat.com>,
-        Jordan Niethe <jniethe5@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     ajd@linux.ibm.com, cmr@codefail.de, npiggin@gmail.com,
-        aneesh.kumar@linux.ibm.com, naveen.n.rao@linux.ibm.com,
-        dja@axtens.net, David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>, kvm-ppc@vger.kernel.org,
-        Russell Currey <ruscur@russell.cc>, muriloo@linux.ibm.com
-Subject: Re: [PATCH v15 7/9] powerpc: Set ARCH_HAS_STRICT_MODULE_RWX
-In-Reply-To: <f7624d58-80e1-6912-1867-7874f1a569f5@redhat.com>
-References: <20210609013431.9805-1-jniethe5@gmail.com>
- <20210609013431.9805-8-jniethe5@gmail.com>
- <f7624d58-80e1-6912-1867-7874f1a569f5@redhat.com>
-Date:   Fri, 13 Aug 2021 19:58:59 -0300
-Message-ID: <8735rdt0i4.fsf@linux.ibm.com>
+        id S235850AbhHNATr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 13 Aug 2021 20:19:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59140 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235816AbhHNATr (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 13 Aug 2021 20:19:47 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD84DC061756
+        for <kvm-ppc@vger.kernel.org>; Fri, 13 Aug 2021 17:19:19 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id c17so8792142plz.2
+        for <kvm-ppc@vger.kernel.org>; Fri, 13 Aug 2021 17:19:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=4aBLFRrRApNXp2Xx8CYTjlo6hcEG/5cBNaMQeAv3eCY=;
+        b=SEJbD4XN/1eQZ5Jj0HJyzgo2fsUcU26+Ccw7JSV6bCE7DZ5cSMQxngtYapC3m7Olit
+         Fc9imgTAb8TIzNxAAUbKhfpt3mTYeDTbaT263DqflC/72BZDoYoWLcW0x8VBWzI8YBsK
+         mp+N1zOLKyqPvAhvfDYzivb00mh4mJB1qYmDhINxV7ho32JZfnsjHwx7s9awLlsFllQP
+         CfiTO/0qmMbsMF901gjSlq0zpovFHuqmCJ8/UnBKqL0ret1zrGRYCkmYjrMnUAhySBjf
+         HxMoXqunFbCff5tPU1EbMkgoMER/nZxk56zQwn+8jUXGQo5NKGZlrB3MMJHTxxfxX+PM
+         1Vcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4aBLFRrRApNXp2Xx8CYTjlo6hcEG/5cBNaMQeAv3eCY=;
+        b=ZyEr1B4ld/ZTnYDWlA4/00xuQjpG7W4aR2a59O1EGTnLbJrnjlj9w5HTPjd6UrZ5Ls
+         Aqs4MNh72sh/R7eOZohRzrYGVXiG5xp5uJgqFDHxJj9uXegvVXlCDXxdGTUWTE047R2X
+         h8O1FEiLrqQsdOn9gversRhuGmv4YVCz0iDl7V5hVmTAuMxOirkAPCsHu1qt7iPPD3h2
+         mWnnA1nrveVLQEgDC8zOaDS5pQxYQGQbgy/JtIBX6xkzJ3F83FSVtGBIellWnXqePZZK
+         7x2Lk7aLcyzOz3tQl7B+GSwfcptg6mwQvFE/LNjHp03WD7NeAHIdUMOIvzFPJ2rYtAqY
+         e0ZQ==
+X-Gm-Message-State: AOAM5309VgFsau/2WspMpObzDgO/w24HS5SAoGnWMXwxqlgNLaMVE47g
+        z6Zi9J+LLUfQC28EVwZ4uh+edg==
+X-Google-Smtp-Source: ABdhPJx+qtJhG7LoXzOWAi6WKgmKRuA4EACWIk6g64RLWo4z+EcrKBh2wjC7PNGmLx3GcPANgXIwSw==
+X-Received: by 2002:a17:90a:8801:: with SMTP id s1mr4948837pjn.166.1628900359318;
+        Fri, 13 Aug 2021 17:19:19 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id o14sm696044pgl.85.2021.08.13.17.19.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Aug 2021 17:19:18 -0700 (PDT)
+Date:   Sat, 14 Aug 2021 00:19:13 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Peter Feiner <pfeiner@google.com>
+Subject: Re: [PATCH v3] KVM: stats: Add VM stat for the cumulative number of
+ dirtied pages
+Message-ID: <YRcMAXvvI/Kphb5R@google.com>
+References: <20210813195433.2555924-1-jingzhangos@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kqC0rpjbEdUQY3HwpruQNEnbaw08Udj5
-X-Proofpoint-GUID: Vizkp80HeT6cjZOwO8LqTonAMeJPSraA
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-13_09:2021-08-13,2021-08-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- mlxlogscore=999 adultscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- priorityscore=1501 phishscore=0 spamscore=0 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108130132
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210813195433.2555924-1-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Laurent Vivier <lvivier@redhat.com> writes:
+On Fri, Aug 13, 2021, Jing Zhang wrote:
+> A per VCPU stat dirtied_pages is added to record the number of dirtied
+> pages in the life cycle of a VM.
+> The growth rate of this stat is a good indicator during the process of
+> live migrations. The exact number of dirty pages at the moment doesn't
+> matter. That's why we define dirtied_pages as a cumulative counter instead
+> of an instantaneous one.
+> 
+> Original-by: Peter Feiner <pfeiner@google.com>
+> Suggested-by: Oliver Upton <oupton@google.com>
+> Reviewed-by: Oliver Upton <oupton@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 3e67c93ca403..8c673198cc83 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3075,6 +3075,8 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>  			     struct kvm_memory_slot *memslot,
+>  		 	     gfn_t gfn)
+>  {
+> +	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+> +
+>  	if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
+>  		unsigned long rel_gfn = gfn - memslot->base_gfn;
+>  		u32 slot = (memslot->as_id << 16) | memslot->id;
+> @@ -3084,6 +3086,9 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>  					    slot, rel_gfn);
+>  		else
+>  			set_bit_le(rel_gfn, memslot->dirty_bitmap);
+> +
+> +		if (vcpu)
+> +			++vcpu->stat.generic.dirtied_pages;
 
->
-> since this patch is merged my VM is experiencing a crash at boot (20% of the time):
->
-> [    8.496850] kernel tried to execute exec-protected page (c008000004073278) - exploit
-> attempt? (uid: 0)
-> [    8.496921] BUG: Unable to handle kernel instruction fetch
-> [    8.496954] Faulting instruction address: 0xc008000004073278
-> [    8.496994] Oops: Kernel access of bad area, sig: 11 [#1]
-> [    8.497028] LE PAGE_SIZE=64K MMU=Radix SMP NR_CPUS=2048 NUMA pSeries
-> [    8.497071] Modules linked in: drm virtio_console fuse drm_panel_orientation_quirks xfs
-> libcrc32c virtio_net net_failover virtio_blk vmx_crypto failover dm_mirror dm_region_hash
-> dm_log dm_mod
-> [    8.497186] CPU: 3 PID: 44 Comm: kworker/3:1 Not tainted 5.14.0-rc4+ #12
-> [    8.497228] Workqueue: events control_work_handler [virtio_console]
-> [    8.497272] NIP:  c008000004073278 LR: c008000004073278 CTR: c0000000001e9de0
-> [    8.497320] REGS: c00000002e4ef7e0 TRAP: 0400   Not tainted  (5.14.0-rc4+)
-> [    8.497361] MSR:  800000004280b033 <SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 24002822
-> XER: 200400cf
-> [    8.497426] CFAR: c0000000001e9e44 IRQMASK: 1
-> [    8.497426] GPR00: c008000004073278 c00000002e4efa80 c000000002a26b00 c000000042c39520
-> [    8.497426] GPR04: 0000000000000001 0000000000000000 0000000000000000 00000000000000ff
-> [    8.497426] GPR08: 0000000000000001 c000000042c39520 0000000000000001 c008000004076008
-> [    8.497426] GPR12: c0000000001e9de0 c0000001fffccb00 c00000000018ba88 c00000002c91d400
-> [    8.497426] GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> [    8.497426] GPR20: 0000000000000000 0000000000000000 0000000000000000 c008000004080340
-> [    8.497426] GPR24: c0080000040a01e8 0000000000000000 0000000000000000 c00000002e0975c0
-> [    8.497426] GPR28: c00000002ce72940 c000000042c39520 0000000000000048 0000000000000038
-> [    8.497891] NIP [c008000004073278] fill_queue+0xf0/0x210 [virtio_console]
-> [    8.497934] LR [c008000004073278] fill_queue+0xf0/0x210 [virtio_console]
-> [    8.497976] Call Trace:
-> [    8.497993] [c00000002e4efa80] [c00800000407323c] fill_queue+0xb4/0x210
-> [virtio_console] (unreliable)
-> [    8.498052] [c00000002e4efae0] [c008000004073a90] add_port+0x1a8/0x470 [virtio_console]
-> [    8.498102] [c00000002e4efbb0] [c0080000040750f4] control_work_handler+0xbc/0x1e8
-> [virtio_console]
-> [    8.498160] [c00000002e4efc60] [c00000000017f4f0] process_one_work+0x290/0x590
-> [    8.498212] [c00000002e4efd00] [c00000000017f878] worker_thread+0x88/0x620
-> [    8.498256] [c00000002e4efda0] [c00000000018bc14] kthread+0x194/0x1a0
-> [    8.498299] [c00000002e4efe10] [c00000000000cf54] ret_from_kernel_thread+0x5c/0x64
-> [    8.498349] Instruction dump:
-> [    8.498374] 7da96b78 a14d0c8a 419c00b0 2f8a0000 419eff88 b32d0c8a 7c0004ac 4bffff7c
-> [    8.498430] 60000000 60000000 7fa3eb78 48002d95 <e8410018> 38600000 480025e1 e8410018
-> [    8.498485] ---[ end trace 16ee10903290b647 ]---
-> [    8.501433]
-> [    9.502601] Kernel panic - not syncing: Fatal exception
->
-> add_port+0x1a8/0x470 :
->
->   1420	
->   1421		/* We can safely ignore ENOSPC because it means
->   1422		 * the queue already has buffers. Buffers are removed
->   1423		 * only by virtcons_remove(), not by unplug_port()
->   1424		 */
-> ->1425		err = fill_queue(port->in_vq, &port->inbuf_lock);
->   1426		if (err < 0 && err != -ENOSPC) {
->   1427			dev_err(port->dev, "Error allocating inbufs\n");
->   1428			goto free_device;
->   1429		}
->
-> fill_queue+0x90/0x210 :
->
->   1326	static int fill_queue(struct virtqueue *vq, spinlock_t *lock)
->   1327	{
->   1328		struct port_buffer *buf;
->   1329		int nr_added_bufs;
->   1330		int ret;
->   1331	
->   1332		nr_added_bufs = 0;
->   1333		do {
->   1334			buf = alloc_buf(vq->vdev, PAGE_SIZE, 0);
->   1335			if (!buf)
->   1336				return -ENOMEM;
->   1337	
-> ->1338			spin_lock_irq(lock);
->
-> I'm using an upstream kernel (5.14-rc4, 251a1524293d) in the VM.
->
-> My host is a RHEL 8.5/POWER9: qemu-kvm-6.0.0-21 and kernel-4.18.0-325
->
-> My qemu command line is:
->
-> /usr/libexec/qemu-kvm \
-> -M pseries,accel=kvm \
-> -nographic -nodefaults \
-> -device virtio-serial-pci \
-> -device virtconsole \
-> -device virtio-net-pci,mac=9a:2b:2c:2d:2e:2f,netdev=hostnet0  \
-> -blockdev
-> node-name=disk1,file.driver=file,driver=qcow2,file.driver=file,file.filename=disk.qcow2 \
-> -netdev bridge,id=hostnet0,br=virbr0,helper=/usr/libexec/qemu-bridge-helper \
-> -device virtio-blk-pci,id=image1,drive=disk1 \
-> -m 8192  \
-> -smp 4 \
-> -serial mon:stdio
->
->
-> Do we need something in qemu/kvm to support STRICT_MODULE_RWX ?
->
-> Thanks,
-> Laurent
+I agree with Peter that this is a solution looking for a problem, and the stat is
+going to be confusing because it's only active if dirty logging is enabled.
 
-This patch survived 300 consecutive runs without the issue:
+For Oliver's debug use case, it will require userspace to coordinate reaping the
+dirty bitmap/ring with the stats, otherwise there's no baseline, e.g. the number
+of dirtied pages will scale with how frequently userspace is clearing dirty bits.
 
-diff --git a/arch/powerpc/mm/pageattr.c b/arch/powerpc/mm/pageattr.c
-index 0876216ceee6..7aeb2b62e5dc 100644
---- a/arch/powerpc/mm/pageattr.c
-+++ b/arch/powerpc/mm/pageattr.c
-@@ -35,10 +35,7 @@ static int change_page_attr(pte_t *ptep, unsigned long addr, void *data)
-        pte_t pte;
- 
-        spin_lock(&init_mm.page_table_lock);
--
--       /* invalidate the PTE so it's safe to modify */
--       pte = ptep_get_and_clear(&init_mm, addr, ptep);
--       flush_tlb_kernel_range(addr, addr + PAGE_SIZE);
-+       pte = *ptep;
- 
-        /* modify the PTE bits as desired, then apply */
-        switch (action) {
-@@ -60,10 +57,7 @@ static int change_page_attr(pte_t *ptep, unsigned long addr, void *data)
-        }
- 
-        set_pte_at(&init_mm, addr, ptep, pte);
--
--       /* See ptesync comment in radix__set_pte_at() */
--       if (radix_enabled())
--               asm volatile("ptesync": : :"memory");
-+       flush_tlb_kernel_range(addr, addr + PAGE_SIZE);
-        spin_unlock(&init_mm.page_table_lock);
- 
-        return 0;
----
-
-What I think is happening is that the virtio_console code is running
-at the same time we are doing the `module_enable_ro` at the end of
-`do_init_module` due to the async nature of the work handler. There is
-a window after the TLB flush when the PTE has its permission bits
-cleared, so any translations of the module code page attempted during
-that window will fault.
-
-I'm ignorant of strict rwx in general so I don't see why we need to
-clear the bits before setting them to their final value, but as I
-understand it, the set_pte_at + flush_tlb_kernel_range satisfy the ISA
-requirement of [ptesync; tlbie; eieio; tlbsync; ptesync;] so it seems
-like the patch should work.
-
-Now, I cannot explain why the crash always happens around the code
-that does the module's symbols relocation (the NIP in Laurent's trace
-is the TOC reload from module_64.c:restore_r2). Maybe because
-instructions are already in icache until the first branch into the
-stub?
-
-Anyway, this is what Murilo and I found out over our debugging session
-in the past couple of days. I hope it helps. =)
-
+At that point, userspace can do the whole thing itself, e.g. with a dirty ring
+it's trivial to do "dirtied_pages += ring->dirty_index - ring->reset_index".
+The traditional bitmap will be slower, but without additional userspace enabling
+the dirty logging dependency means this is mostly limited to live migration being
+in-progress.  In that case, something in userspace needs to actually be processing
+the dirty pages, it should be easy for that something to keep a running count.
