@@ -2,263 +2,117 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD0F53ED074
-	for <lists+kvm-ppc@lfdr.de>; Mon, 16 Aug 2021 10:42:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BB943EDC19
+	for <lists+kvm-ppc@lfdr.de>; Mon, 16 Aug 2021 19:11:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234704AbhHPImf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 16 Aug 2021 04:42:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45878 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234645AbhHPImf (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 16 Aug 2021 04:42:35 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17G8YSMH066124;
-        Mon, 16 Aug 2021 04:42:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=pp1;
- bh=496GxUYXXrdMWsxa5chADq56D/jc92bevVrZUqoa8W8=;
- b=SpOe/sdzOW7iDnKxAKxdgbZbzy8oAZxHUyZFRwrfovCant26mxVyw54Qs0eRE2EXPmym
- hU7RMJfXNHJIy0nBTMj20+BZaDhZhH9atum2xV+Ptl6kR6jdzvNGsQFY6oWPFsefa9mK
- Rs+TkNfFMywNj9ysKxCD51ynMJI/VYfCEzJg5B+DmcpxNqLfZ7AsbqiYxIM8KFhyStMf
- N7saTg6S8k6FqZCSrWCLrr7u5z8NvkBch+lFCWFFs/Q6E6OjmqQC30ByOYXmvjWXyLMY
- 8qtvNH/PsrFLnrQA8WZz7+X2b9a6Bm/1Oi+CzJX1YqJjrBbpU0IirIOy8yeFvZ6KhxHp uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3aetwb8drp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Aug 2021 04:42:00 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17G8YW3R066504;
-        Mon, 16 Aug 2021 04:42:00 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3aetwb8dq8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Aug 2021 04:42:00 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17G8auoC006592;
-        Mon, 16 Aug 2021 08:41:58 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3ae5f8tdxs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Aug 2021 08:41:57 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17G8cUuV55509254
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Aug 2021 08:38:30 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0F1C552120;
-        Mon, 16 Aug 2021 08:41:55 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.79.177.240])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 0873552128;
-        Mon, 16 Aug 2021 08:41:53 +0000 (GMT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v2 00/60] KVM: PPC: Book3S HV P9: entry/exit optimisations
-From:   Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-In-Reply-To: <20210811160134.904987-1-npiggin@gmail.com>
-Date:   Mon, 16 Aug 2021 14:11:51 +0530
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <0A4942B1-94BE-4FF1-B434-05C8159966B0@linux.vnet.ibm.com>
-References: <20210811160134.904987-1-npiggin@gmail.com>
-To:     Nicholas Piggin <npiggin@gmail.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UAhAo1bg0cAEPlYuDDM5Jw1BHfNWYkrx
-X-Proofpoint-ORIG-GUID: 1Rs8_hLabV9fqdkwbHWgissQjwP-ZmOH
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-16_02:2021-08-13,2021-08-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- impostorscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
- clxscore=1015 spamscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108160054
+        id S230332AbhHPRLi (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 16 Aug 2021 13:11:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46562 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230294AbhHPRLh (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 16 Aug 2021 13:11:37 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E450DC0613C1
+        for <kvm-ppc@vger.kernel.org>; Mon, 16 Aug 2021 10:11:04 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id u22so4721737lfq.13
+        for <kvm-ppc@vger.kernel.org>; Mon, 16 Aug 2021 10:11:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vMMb4LU8I/SSdOh5kDDQxYQsVy+zic4iTvxGmme0W+w=;
+        b=DQ1YzDDCUc0s4buLxDE7pPgWrS7zvaM2Ye5O1kmIi3i4IWcnpDBNQS1aZqq9UAS83i
+         S+aV5Q+r5TuiraFtlZ/+2JRbnUwXmhFnEPHsZG4ZClcpH0hNPFjBY/t4ep59b6gg4sGN
+         6VONK496qhLfXdCtcHDodq6IlCfwMZ82i3AixZD+6GGUspwYfdU9s2ipfm5TZgCmapjA
+         jaj4WtPOFWng9pKK3oSkK05qg0PNl37wSxLmnyZk1ubWvd+OzwH/4oDtOhuHR9PB8Jem
+         V+y7D75Q4XP1GQQc9vMBY6lBYXm3dN1nldZoopg/BV4KHHViMkhjSmJ40CFZ9Qjagihg
+         lzbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vMMb4LU8I/SSdOh5kDDQxYQsVy+zic4iTvxGmme0W+w=;
+        b=Gbh9ZSrHnPf9EpWa4XxKcgH+HZbPdNtz6aV3avCe0wLVk5x1FztUxXFMBSJeMcg2hp
+         BZzqKWRWwr/w9yWd0twWBOgon8nsMTRUlMRP5ZhPLKQ0jxiuKVEvrVpsbH2oV+6wPZB4
+         S8wIwNK0BZzwTPKCVavvWbUWtsD2cJjBbfZCTxyEXWNjL6jsZ18yMpHf7oC5zvufQtkl
+         SmUYU+BSkWXFLA2lpC2yoWqKP9jT/r0bD5FpcL7qBoY1pVvPsDv6Ebk2c2GEIIsEkZXt
+         U++7ZyaTbaZXi57R3zgLek9nruTHjAwEckdRlu0SS7LAQyNdb9lHLL6FLbGyG8e7jiW9
+         LmCw==
+X-Gm-Message-State: AOAM533Hogy1AocbIzBX4GXyU59CpaUzaeJ4yUmKn2Ie8khvaLrf9joh
+        i10r+KOWT8ToKwk7G0Y1DHfNdIl28UuzZh/V0QRLAw==
+X-Google-Smtp-Source: ABdhPJy/VGzQ64TxuWTYy+SEVYAKoflKNBVWguzBknLH1QYeedLemTQ9SQGd3PAOsKKvj1ELKUmrZPXAYZwFwKpVPPs=
+X-Received: by 2002:a05:6512:3f5:: with SMTP id n21mr7838880lfq.359.1629133862948;
+ Mon, 16 Aug 2021 10:11:02 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210813195433.2555924-1-jingzhangos@google.com> <YRcMAXvvI/Kphb5R@google.com>
+In-Reply-To: <YRcMAXvvI/Kphb5R@google.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Mon, 16 Aug 2021 10:10:52 -0700
+Message-ID: <CAAdAUtgo883HWgxQDgD-wofd=bW4HqozvCRhh8nEEbU-c0nbQQ@mail.gmail.com>
+Subject: Re: [PATCH v3] KVM: stats: Add VM stat for the cumulative number of
+ dirtied pages
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Peter Feiner <pfeiner@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Fri, Aug 13, 2021 at 5:19 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Aug 13, 2021, Jing Zhang wrote:
+> > A per VCPU stat dirtied_pages is added to record the number of dirtied
+> > pages in the life cycle of a VM.
+> > The growth rate of this stat is a good indicator during the process of
+> > live migrations. The exact number of dirty pages at the moment doesn't
+> > matter. That's why we define dirtied_pages as a cumulative counter instead
+> > of an instantaneous one.
+> >
+> > Original-by: Peter Feiner <pfeiner@google.com>
+> > Suggested-by: Oliver Upton <oupton@google.com>
+> > Reviewed-by: Oliver Upton <oupton@google.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 3e67c93ca403..8c673198cc83 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -3075,6 +3075,8 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+> >                            struct kvm_memory_slot *memslot,
+> >                            gfn_t gfn)
+> >  {
+> > +     struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+> > +
+> >       if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
+> >               unsigned long rel_gfn = gfn - memslot->base_gfn;
+> >               u32 slot = (memslot->as_id << 16) | memslot->id;
+> > @@ -3084,6 +3086,9 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+> >                                           slot, rel_gfn);
+> >               else
+> >                       set_bit_le(rel_gfn, memslot->dirty_bitmap);
+> > +
+> > +             if (vcpu)
+> > +                     ++vcpu->stat.generic.dirtied_pages;
+>
+> I agree with Peter that this is a solution looking for a problem, and the stat is
+> going to be confusing because it's only active if dirty logging is enabled.
+>
+> For Oliver's debug use case, it will require userspace to coordinate reaping the
+> dirty bitmap/ring with the stats, otherwise there's no baseline, e.g. the number
+> of dirtied pages will scale with how frequently userspace is clearing dirty bits.
+>
+> At that point, userspace can do the whole thing itself, e.g. with a dirty ring
+> it's trivial to do "dirtied_pages += ring->dirty_index - ring->reset_index".
+> The traditional bitmap will be slower, but without additional userspace enabling
+> the dirty logging dependency means this is mostly limited to live migration being
+> in-progress.  In that case, something in userspace needs to actually be processing
+> the dirty pages, it should be easy for that something to keep a running count.
+Thanks Sean. Looks like it is not a bad idea to drop this change. Will do that.
 
-
-> On 11-Aug-2021, at 9:30 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
-> 
-> This reduces radix guest full entry/exit latency on POWER9 and POWER10
-> by 2x.
-> 
-> Nested HV guests should see smaller improvements in their L1 entry/exit,
-> but this is also combined with most L0 speedups also applying to nested
-> entry. nginx localhost throughput test in a SMP nested guest is improved
-> about 10% (in a direct guest it doesn't change much because it uses XIVE
-> for IPIs) when L0 and L1 are patched.
-> 
-> It does this in several main ways:
-> 
-> - Rearrange code to optimise SPR accesses. Mainly, avoid scoreboard
->  stalls.
-> 
-> - Test SPR values to avoid mtSPRs where possible. mtSPRs are expensive.
-> 
-> - Reduce mftb. mftb is expensive.
-> 
-> - Demand fault certain facilities to avoid saving and/or restoring them
->  (at the cost of fault when they are used, but this is mitigated over
->  a number of entries, like the facilities when context switching 
->  processes). PM, TM, and EBB so far.
-> 
-> - Defer some sequences that are made just in case a guest is interrupted
->  in the middle of a critical section to the case where the guest is
->  scheduled on a different CPU, rather than every time (at the cost of
->  an extra IPI in this case). Namely the tlbsync sequence for radix with
->  GTSE, which is very expensive.
-> 
-> - Reduce locking, barriers, atomics related to the vcpus-per-vcore > 1
->  handling that the P9 path does not require.
-> 
-> Changes since v1:
-> - Verified DPDES changes still work with msgsndp SMT emulation.
-> - Fixed HMI handling bug.
-> - Split softpatch handling fixes into smaller pieces.
-> - Rebased with Fabiano's latest HV sanitising patches.
-> - Fix TM demand faulting bug causing nested guest TM tests to TM Bad
->  Thing the host in rare cases.
-> - Re-name new "pmu=" command line option to "pmu_override=" and update
->  documentation wording.
-
-Hi Nick,
-
-For the PMU related changes,
-
-Reviewed-by: Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-
-Thanks
-Athira
-> - Add default=y config option rather than unconditionally removing the
->  L0 nested PMU workaround.
-> - Remove unnecessary MSR[RI] updates in entry/exit. Down to about 4700
->  cycles now.
-> - Another bugfix from Alexey's testing.
-> 
-> Changes since RFC:
-> - Rebased with Fabiano's HV sanitising patches at the front.
-> - Several demand faulting bug fixes mostly relating to nested guests.
-> - Removed facility demand-faulting from L0 nested entry/exit handler.
->  Demand faulting is still done in the L1, but not the L0. The reason
->  is to reduce complexity (although it's only a small amount of
->  complexity), reduce demand faulting overhead that may require several
-> 
-> Fabiano Rosas (3):
->  KVM: PPC: Book3S HV Nested: Sanitise vcpu registers
->  KVM: PPC: Book3S HV Nested: Stop forwarding all HFUs to L1
->  KVM: PPC: Book3S HV Nested: save_hv_return_state does not require trap
->    argument
-> 
-> Nicholas Piggin (57):
->  KVM: PPC: Book3S HV: Initialise vcpu MSR with MSR_ME
->  KVM: PPC: Book3S HV: Remove TM emulation from POWER7/8 path
->  KVM: PPC: Book3S HV P9: Fixes for TM softpatch interrupt NIP
->  KVM: PPC: Book3S HV Nested: Fix TM softpatch HFAC interrupt emulation
->  KVM: PPC: Book3S HV Nested: Make nested HFSCR state accessible
->  KVM: PPC: Book3S HV Nested: Reflect guest PMU in-use to L0 when guest
->    SPRs are live
->  powerpc/64s: Remove WORT SPR from POWER9/10
->  KMV: PPC: Book3S HV P9: Use set_dec to set decrementer to host
->  KVM: PPC: Book3S HV P9: Use host timer accounting to avoid decrementer
->    read
->  KVM: PPC: Book3S HV P9: Use large decrementer for HDEC
->  KVM: PPC: Book3S HV P9: Reduce mftb per guest entry/exit
->  powerpc/time: add API for KVM to re-arm the host timer/decrementer
->  KVM: PPC: Book3S HV: POWER10 enable HAIL when running radix guests
->  powerpc/64s: Keep AMOR SPR a constant ~0 at runtime
->  KVM: PPC: Book3S HV: Don't always save PMU for guest capable of
->    nesting
->  powerpc/64s: Always set PMU control registers to frozen/disabled when
->    not in use
->  powerpc/64s: Implement PMU override command line option
->  KVM: PPC: Book3S HV P9: Implement PMU save/restore in C
->  KVM: PPC: Book3S HV P9: Factor PMU save/load into context switch
->    functions
->  KVM: PPC: Book3S HV P9: Demand fault PMU SPRs when marked not inuse
->  KVM: PPC: Book3S HV P9: Factor out yield_count increment
->  KVM: PPC: Book3S HV: CTRL SPR does not require read-modify-write
->  KVM: PPC: Book3S HV P9: Move SPRG restore to restore_p9_host_os_sprs
->  KVM: PPC: Book3S HV P9: Reduce mtmsrd instructions required to save
->    host SPRs
->  KVM: PPC: Book3S HV P9: Improve mtmsrd scheduling by delaying MSR[EE]
->    disable
->  KVM: PPC: Book3S HV P9: Add kvmppc_stop_thread to match
->    kvmppc_start_thread
->  KVM: PPC: Book3S HV: Change dec_expires to be relative to guest
->    timebase
->  KVM: PPC: Book3S HV P9: Move TB updates
->  KVM: PPC: Book3S HV P9: Optimise timebase reads
->  KVM: PPC: Book3S HV P9: Avoid SPR scoreboard stalls
->  KVM: PPC: Book3S HV P9: Only execute mtSPR if the value changed
->  KVM: PPC: Book3S HV P9: Juggle SPR switching around
->  KVM: PPC: Book3S HV P9: Move vcpu register save/restore into functions
->  KVM: PPC: Book3S HV P9: Move host OS save/restore functions to
->    built-in
->  KVM: PPC: Book3S HV P9: Move nested guest entry into its own function
->  KVM: PPC: Book3S HV P9: Move remaining SPR and MSR access into low
->    level entry
->  KVM: PPC: Book3S HV P9: Implement TM fastpath for guest entry/exit
->  KVM: PPC: Book3S HV P9: Switch PMU to guest as late as possible
->  KVM: PPC: Book3S HV P9: Restrict DSISR canary workaround to processors
->    that require it
->  KVM: PPC: Book3S HV P9: More SPR speed improvements
->  KVM: PPC: Book3S HV P9: Demand fault EBB facility registers
->  KVM: PPC: Book3S HV P9: Demand fault TM facility registers
->  KVM: PPC: Book3S HV P9: Use Linux SPR save/restore to manage some host
->    SPRs
->  KVM: PPC: Book3S HV P9: Comment and fix MMU context switching code
->  KVM: PPC: Book3S HV P9: Test dawr_enabled() before saving host DAWR
->    SPRs
->  KVM: PPC: Book3S HV P9: Don't restore PSSCR if not needed
->  KVM: PPC: Book3S HV P9: Avoid tlbsync sequence on radix guest exit
->  KVM: PPC: Book3S HV Nested: Avoid extra mftb() in nested entry
->  KVM: PPC: Book3S HV P9: Improve mfmsr performance on entry
->  KVM: PPC: Book3S HV P9: Optimise hash guest SLB saving
->  KVM: PPC: Book3S HV P9: Avoid changing MSR[RI] in entry and exit
->  KVM: PPC: Book3S HV P9: Add unlikely annotation for !mmu_ready
->  KVM: PPC: Book3S HV P9: Avoid cpu_in_guest atomics on entry and exit
->  KVM: PPC: Book3S HV P9: Remove most of the vcore logic
->  KVM: PPC: Book3S HV P9: Tidy kvmppc_create_dtl_entry
->  KVM: PPC: Book3S HV P9: Stop using vc->dpdes
->  KVM: PPC: Book3S HV P9: Remove subcore HMI handling
-> 
-> .../admin-guide/kernel-parameters.txt         |   8 +
-> arch/powerpc/include/asm/asm-prototypes.h     |   5 -
-> arch/powerpc/include/asm/kvm_asm.h            |   1 +
-> arch/powerpc/include/asm/kvm_book3s.h         |   6 +
-> arch/powerpc/include/asm/kvm_book3s_64.h      |   6 +-
-> arch/powerpc/include/asm/kvm_host.h           |   7 +-
-> arch/powerpc/include/asm/kvm_ppc.h            |   1 +
-> arch/powerpc/include/asm/pmc.h                |   7 +
-> arch/powerpc/include/asm/reg.h                |   3 +-
-> arch/powerpc/include/asm/switch_to.h          |   2 +
-> arch/powerpc/include/asm/time.h               |  19 +-
-> arch/powerpc/kernel/cpu_setup_power.c         |  12 +-
-> arch/powerpc/kernel/dt_cpu_ftrs.c             |   8 +-
-> arch/powerpc/kernel/process.c                 |  32 +
-> arch/powerpc/kernel/time.c                    |  54 +-
-> arch/powerpc/kvm/Kconfig                      |  15 +
-> arch/powerpc/kvm/book3s_64_mmu_radix.c        |   4 +
-> arch/powerpc/kvm/book3s_hv.c                  | 890 ++++++++++--------
-> arch/powerpc/kvm/book3s_hv.h                  |  41 +
-> arch/powerpc/kvm/book3s_hv_builtin.c          |   2 +
-> arch/powerpc/kvm/book3s_hv_hmi.c              |   7 +-
-> arch/powerpc/kvm/book3s_hv_interrupts.S       |  13 +-
-> arch/powerpc/kvm/book3s_hv_nested.c           | 109 ++-
-> arch/powerpc/kvm/book3s_hv_p9_entry.c         | 817 +++++++++++++---
-> arch/powerpc/kvm/book3s_hv_ras.c              |  54 ++
-> arch/powerpc/kvm/book3s_hv_rmhandlers.S       | 115 +--
-> arch/powerpc/kvm/book3s_hv_tm.c               |  61 +-
-> arch/powerpc/mm/book3s64/radix_pgtable.c      |  15 -
-> arch/powerpc/perf/core-book3s.c               |  35 +
-> arch/powerpc/platforms/powernv/idle.c         |  10 +-
-> 30 files changed, 1589 insertions(+), 770 deletions(-)
-> create mode 100644 arch/powerpc/kvm/book3s_hv.h
-> 
-> -- 
-> 2.23.0
-> 
-
+Jing
