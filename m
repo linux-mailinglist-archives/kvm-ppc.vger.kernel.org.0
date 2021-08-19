@@ -2,80 +2,106 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE2153F16CA
-	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Aug 2021 11:56:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCA093F1858
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Aug 2021 13:40:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237662AbhHSJ4m (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 19 Aug 2021 05:56:42 -0400
-Received: from foss.arm.com ([217.140.110.172]:34300 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232750AbhHSJ4l (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 19 Aug 2021 05:56:41 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2EDE1FB;
-        Thu, 19 Aug 2021 02:56:05 -0700 (PDT)
-Received: from [10.163.69.73] (unknown [10.163.69.73])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 947EA3F70D;
-        Thu, 19 Aug 2021 02:55:59 -0700 (PDT)
-Subject: Re: [PATCH 2/2] powerpc: rectify selection to
- ARCH_ENABLE_SPLIT_PMD_PTLOCK
-To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
+        id S238611AbhHSLkm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 19 Aug 2021 07:40:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60096 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238208AbhHSLkl (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 19 Aug 2021 07:40:41 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95554C061575;
+        Thu, 19 Aug 2021 04:40:05 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id g138so3644056wmg.4;
+        Thu, 19 Aug 2021 04:40:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=EtgvXhAGt19qhroUE6m6P7pb+TNdJ1fCcsUGPxSLauI=;
+        b=qgdelYbbaIFqrbFwfaA5EXeG+i70bRf7BubylNOL2c8rnvz4kBrWAJX2G7Fnb1u2OQ
+         lO9a6X6BJ1gV/GGO+OZU5bA/vpXb9fC3c0o7WhIKJrLDmSXJ8cjyLHcsqChCEx9BrIY4
+         LiupfmrUAVFAfTpZyO/g4+tJUg9AmPU2f3gvxZU4vGjgDOq9SJbrQ+qkJAq0D2ryAzzC
+         UtQR5u+oINJ0DfoyRdke5/USJTG8egMCz5D4Oa8U9H6n66YLjSPR5o6cc4kfkbVW8UP6
+         3M+0DxeXQVYPHyykhXqn+w+Cf89SXMzTSWtmwkd0Y3yAQWtYn4F6cQusgXDLJoFYCO2/
+         nlfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=EtgvXhAGt19qhroUE6m6P7pb+TNdJ1fCcsUGPxSLauI=;
+        b=cu+Qwo4XVw5LEL+3XjWEiCs9AENMXSzBD30vC3za7aPZFSuz9vQN4Fjbi435gc+V7m
+         I4N6gwcuAAcTdpJfXqhO24xJz25ONPEjH15ubeoqGHHScx/Txa63A+52e/T1lWOz7PpS
+         WC+qUiHcyaKGR/KrO8Xb8d2HlNwktPeOkxGCZAsk+6emfBUbWZrjotrxaFOpRlxqjUGR
+         Aziog/UKJTF8+V5l2XMZYiYlFmnkC/24vcZwcsO02PdWz8fMzYVPcOCjNTiG+TZqBGnP
+         FpnhOkhDX9ez8Jgwmj5utkk2/muyMBUsnko3zaRmOnacWAC5PECIZO6AUO5bS/lYIfNk
+         Y/nw==
+X-Gm-Message-State: AOAM532FhVQdNDQebffdvVasT6ahT2pJmKa+9MELC+iVd369S2eXglvo
+        7V7EQKbZdaeLTJ9RV4jr7Hk=
+X-Google-Smtp-Source: ABdhPJysGEtO7h5HDEHbCC6sb2xHTov/gXqitGsEWyloYIsqxzFsQa4iMVyAfZ4X38bnwpxBw9mMMQ==
+X-Received: by 2002:a05:600c:3554:: with SMTP id i20mr2089272wmq.70.1629373204136;
+        Thu, 19 Aug 2021 04:40:04 -0700 (PDT)
+Received: from localhost.localdomain (arl-84-90-178-246.netvisao.pt. [84.90.178.246])
+        by smtp.gmail.com with ESMTPSA id b13sm2650891wrf.86.2021.08.19.04.40.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Aug 2021 04:40:03 -0700 (PDT)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Paul Mackerras <paulus@ozlabs.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Neuling <mikey@neuling.org>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     stable@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210819093226.13955-1-lukas.bulwahn@gmail.com>
- <20210819093226.13955-3-lukas.bulwahn@gmail.com>
-From:   Anshuman Khandual <anshuman.khandual@arm.com>
-Message-ID: <12a996cb-5c54-afab-f095-708a08931cad@arm.com>
-Date:   Thu, 19 Aug 2021 15:26:44 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Michael Neuling <mikey@neuling.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     Christophe Leroy <christophe.leroy@csgroup.eu>,
+        stable@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH v2 0/2] Kconfig symbol fixes on powerpc
+Date:   Thu, 19 Aug 2021 13:39:52 +0200
+Message-Id: <20210819113954.17515-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20210819093226.13955-3-lukas.bulwahn@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Dear powerpc maintainers,
+
+The script ./scripts/checkkconfigsymbols.py warns on invalid references to
+Kconfig symbols (often, minor typos, name confusions or outdated references).
+
+This patch series addresses all issues reported by
+./scripts/checkkconfigsymbols.py in ./drivers/usb/ for Kconfig and Makefile
+files. Issues in the Kconfig and Makefile files indicate some shortcomings in
+the overall build definitions, and often are true actionable issues to address.
+
+These issues can be identified and filtered by:
+
+  ./scripts/checkkconfigsymbols.py | grep -E "arch/powerpc/.*(Kconfig|Makefile)" -B 1 -A 1
+
+After applying this patch series on linux-next (next-20210817), the command
+above yields just two false positives (SHELL, r13) due to tool shortcomings.
+
+As these two patches are fixes, please consider if they are suitable for
+backporting to stable.
+
+v1 -> v2:
+  Followed Christophe Leroy's comment and drop the obsolete select.
 
 
-On 8/19/21 3:02 PM, Lukas Bulwahn wrote:
-> Commit 66f24fa766e3 ("mm: drop redundant ARCH_ENABLE_SPLIT_PMD_PTLOCK")
-> selects the non-existing config ARCH_ENABLE_PMD_SPLIT_PTLOCK in
-> ./arch/powerpc/platforms/Kconfig.cputype, but clearly it intends to select
-> ARCH_ENABLE_SPLIT_PMD_PTLOCK here (notice the word swapping!), as this
-> commit does select that for all other architectures.
+Lukas
 
-Right, indeed the words here got swapped. They look very similar and also
-a cross compile would not even detect the problem because the non-existent
-config option would simply evaluate to 0. Thanks for catching this.
+Lukas Bulwahn (2):
+  powerpc: kvm: remove obsolete and unneeded select
+  powerpc: rectify selection to ARCH_ENABLE_SPLIT_PMD_PTLOCK
 
-> 
-> Rectify selection to ARCH_ENABLE_SPLIT_PMD_PTLOCK instead.
-> 
-> Fixes: 66f24fa766e3 ("mm: drop redundant ARCH_ENABLE_SPLIT_PMD_PTLOCK")
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-> ---
->  arch/powerpc/platforms/Kconfig.cputype | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/powerpc/platforms/Kconfig.cputype b/arch/powerpc/platforms/Kconfig.cputype
-> index 6794145603de..a208997ade88 100644
-> --- a/arch/powerpc/platforms/Kconfig.cputype
-> +++ b/arch/powerpc/platforms/Kconfig.cputype
-> @@ -98,7 +98,7 @@ config PPC_BOOK3S_64
->  	select PPC_HAVE_PMU_SUPPORT
->  	select HAVE_ARCH_TRANSPARENT_HUGEPAGE
->  	select ARCH_ENABLE_HUGEPAGE_MIGRATION if HUGETLB_PAGE && MIGRATION
-> -	select ARCH_ENABLE_PMD_SPLIT_PTLOCK
-> +	select ARCH_ENABLE_SPLIT_PMD_PTLOCK
->  	select ARCH_ENABLE_THP_MIGRATION if TRANSPARENT_HUGEPAGE
->  	select ARCH_SUPPORTS_HUGETLBFS
->  	select ARCH_SUPPORTS_NUMA_BALANCING
-> 
+ arch/powerpc/kvm/Kconfig               | 1 -
+ arch/powerpc/platforms/Kconfig.cputype | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+-- 
+2.26.2
+
