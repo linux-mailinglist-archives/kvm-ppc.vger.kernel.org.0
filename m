@@ -2,129 +2,102 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DF0D3F0DAC
-	for <lists+kvm-ppc@lfdr.de>; Wed, 18 Aug 2021 23:49:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7ED03F163C
+	for <lists+kvm-ppc@lfdr.de>; Thu, 19 Aug 2021 11:32:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234106AbhHRVuX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 18 Aug 2021 17:50:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40136 "EHLO
+        id S236292AbhHSJdG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 19 Aug 2021 05:33:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234083AbhHRVuW (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 18 Aug 2021 17:50:22 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB7CC061764
-        for <kvm-ppc@vger.kernel.org>; Wed, 18 Aug 2021 14:49:47 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id i28so7835584lfl.2
-        for <kvm-ppc@vger.kernel.org>; Wed, 18 Aug 2021 14:49:47 -0700 (PDT)
+        with ESMTP id S229745AbhHSJdG (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 19 Aug 2021 05:33:06 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDE78C061575;
+        Thu, 19 Aug 2021 02:32:29 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id h13so8093073wrp.1;
+        Thu, 19 Aug 2021 02:32:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iJVkGRZsMGQxCh04dQEEetPATyoitTCuRRt3dR/OwaQ=;
-        b=MBJrjaGztFAJR0qOLiTWThRt9z10srm4PeJK99NfdPS1VdWHes04bGEuCMJ3+81yKG
-         xMmt1W/5VFXH3Y/rlf6JGj6KPQ5aqt6Bo2HysLVRmrbi/u8P9ZK6QtkU0Zxnv02rxAmg
-         ETOd9msrKzgzXYudP8auMlhAHgLqL7dhfq+1A=
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jmf3umRfv4KMZ4uQ33/nDRLk5ExaW9fT/xorODYlDPc=;
+        b=enn9Mp7+BHj8C9UfShybnnOLllZFUZKmPD3lFyG54k9reTcqpk5AkxO9UJohwcucyj
+         iwQTIO2npa3wA1k0iA2wE7V6z7SL4ojVklZY5i3FEqRvn4HUvKcbQ+iVNkQcHlP7P8nr
+         dXs64snQ0/F7klMWbgLLpuhDGlDvVjRT9uF99TOej9/zM8aB3aYGTX9Hk99Aq3NgP67C
+         pvBBzhwuDuAw+apun2yEkKhFWNpwf6PX6pShYpQQ3XwfqIQk6/Ctee1Vw+Ufu54fgaqN
+         D2xY7doZWziyJqOA9Jdc0P2uVWDFEqq5lt2ctpWfR9hckwMDAbkGL8XMJ/LOJGqy4Wui
+         AlYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iJVkGRZsMGQxCh04dQEEetPATyoitTCuRRt3dR/OwaQ=;
-        b=iGpoo28sw9hKj07RDXiICThURt9BRb2Kd9KRmb0nsdynze5tUTzgaTaJvB41aZKBLn
-         LxH5vnUZ4xlrJ9HFFf5BUdjrxdMS0Z7gusMJshJTAz4jEbVrGhYCjPym81WOCgbKF/w5
-         ebD1ZHddqOIKuXoc6RU4G2TLOH6RSVapnVUghU04TfwUo5YCozb1ryPKiKd6Kayt6+NU
-         dsun6uuJWFxXmgDWxOoizrmaR3P81nRzy5BPalQ8g7YUdP5ATen1fVxp03JsiYUChZC4
-         Btgg8aMYdi9O0M4nqZqFx0Rk/SXCtxvZNZJ12WYSWrVHU78EOFCAp+holxsylK6FeNDg
-         GJrw==
-X-Gm-Message-State: AOAM531yYf4GeYEzh+cgCWiGdo6KI2O22dp9iQrvXCvs5ltRwbPn15zu
-        5cHjE6oOrAJHPmsT7hnM5HxAAhgc6FtAfhoQ
-X-Google-Smtp-Source: ABdhPJylGrL6E/yy9Ghjy21k+ZAZdAqZxAk9KDJ9XzZL/9PvTcLv5dVGVhenLacSYkngIVQrYvG5tA==
-X-Received: by 2002:a05:6512:23a2:: with SMTP id c34mr8232714lfv.342.1629323385574;
-        Wed, 18 Aug 2021 14:49:45 -0700 (PDT)
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com. [209.85.167.49])
-        by smtp.gmail.com with ESMTPSA id m15sm88487lfl.14.2021.08.18.14.49.44
-        for <kvm-ppc@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Aug 2021 14:49:44 -0700 (PDT)
-Received: by mail-lf1-f49.google.com with SMTP id d4so7754950lfk.9
-        for <kvm-ppc@vger.kernel.org>; Wed, 18 Aug 2021 14:49:44 -0700 (PDT)
-X-Received: by 2002:ac2:5a1a:: with SMTP id q26mr7636192lfn.41.1629323384436;
- Wed, 18 Aug 2021 14:49:44 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jmf3umRfv4KMZ4uQ33/nDRLk5ExaW9fT/xorODYlDPc=;
+        b=ZBROK+rI2aIW4X1H5M0xDyck1VXOIEQfGWbFZTokqutDoZ5g3reP/lzq0zUEy1dC1S
+         gplRn+AXQCipKw2ansqISGmtDuMMBQtR37aO98exobECzXcqNfFJnpmKqtWLeKvdFlFX
+         q7uYqr5AxMrsjD2woFUP6Dz8Dqx3ppafj9dU/YiOLC122GSxfB6x20nRERhCCd7IT+CA
+         cid5EIbZHMiX9uJ5wAOF1vCm5AxzlhOkFEKdIcUWQiks85TwuzXSiqqx0ltaqdTDvnOy
+         OFCVUwWp/pLUM4rs33FAypUk0H4brH+rjrLEjPrbDdOWzGhs09qNeUiJj3YUOyJEucZ0
+         TrNw==
+X-Gm-Message-State: AOAM531AZKqioJNkjxFBUWrKIBUV2MfEh5LJbo9qLJfBI1z2xjv/9prj
+        Tw/Xf3aGPhOm05TZjBWuv9Y=
+X-Google-Smtp-Source: ABdhPJyWWlLboikpd2then9nHSZfdRg9YfDbpOedyAGwGxARsjMptNU5YHc3mcTz52AsxgCxk/sorw==
+X-Received: by 2002:adf:fa11:: with SMTP id m17mr2592459wrr.323.1629365548547;
+        Thu, 19 Aug 2021 02:32:28 -0700 (PDT)
+Received: from localhost.localdomain (arl-84-90-178-246.netvisao.pt. [84.90.178.246])
+        by smtp.gmail.com with ESMTPSA id h11sm8485061wmc.23.2021.08.19.02.32.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Aug 2021 02:32:28 -0700 (PDT)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Neuling <mikey@neuling.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     stable@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH 0/2] Kconfig symbol fixes on powerpc
+Date:   Thu, 19 Aug 2021 11:32:24 +0200
+Message-Id: <20210819093226.13955-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20210803191818.993968-1-agruenba@redhat.com> <CAHk-=wj+_Y7NQ-NhhE0jk52c9ZB0VJbO1AjtMJFB8wP=PO+bdw@mail.gmail.com>
- <CAHc6FU6H5q20qiQ5FX1726i0FJHyh=Y46huWkCBZTR3sk+3Dhg@mail.gmail.com>
-In-Reply-To: <CAHc6FU6H5q20qiQ5FX1726i0FJHyh=Y46huWkCBZTR3sk+3Dhg@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 18 Aug 2021 14:49:28 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whBCm3G5yibbvQsTn00fA16a688NTU_geQV158DnRy+bQ@mail.gmail.com>
-Message-ID: <CAHk-=whBCm3G5yibbvQsTn00fA16a688NTU_geQV158DnRy+bQ@mail.gmail.com>
-Subject: Re: [PATCH v5 00/12] gfs2: Fix mmap + page fault deadlocks
-To:     Andreas Gruenbacher <agruenba@redhat.com>
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>, Jan Kara <jack@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        cluster-devel <cluster-devel@redhat.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-[ Sorry for the delay, I was on the road and this fell through the cracks ]
+Dear powerpc maintainers,
 
-On Mon, Aug 16, 2021 at 12:14 PM Andreas Gruenbacher
-<agruenba@redhat.com> wrote:
->
-> On Tue, Aug 3, 2021 at 9:45 PM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> > Hmm. Have you tried to figure out why that "still returns 0" happens?
->
-> The call stack is:
->
-> gup_pte_range
-> gup_pmd_range
-> gup_pud_range
-> gup_p4d_range
-> gup_pgd_range
-> lockless_pages_from_mm
-> internal_get_user_pages_fast
-> get_user_pages_fast
-> iov_iter_get_pages
-> __bio_iov_iter_get_pages
-> bio_iov_iter_get_pages
-> iomap_dio_bio_actor
-> iomap_dio_actor
-> iomap_apply
-> iomap_dio_rw
-> gfs2_file_direct_write
->
-> In gup_pte_range, pte_special(pte) is true and so we return 0.
+The script ./scripts/checkkconfigsymbols.py warns on invalid references to
+Kconfig symbols (often, minor typos, name confusions or outdated references).
 
-Ok, so that is indeed something that the fast-case can't handle,
-because some of the special code wants to have the mm_lock so that it
-can look at the vma flags (eg "vm_normal_page()" and friends.
+This patch series addresses all issues reported by
+./scripts/checkkconfigsymbols.py in ./drivers/usb/ for Kconfig and Makefile
+files. Issues in the Kconfig and Makefile files indicate some shortcomings in
+the overall build definitions, and often are true actionable issues to address.
 
-That said, some of these cases even the full GUP won't ever handle,
-simply because a mapping doesn't necessarily even _have_ a 'struct
-page' associated with it if it's a VM_IO mapping.
+These issues can be identified and filtered by:
 
-So it turns out that you can't just always do
-fault_in_iov_iter_readable() and then assume that you can do
-iov_iter_get_pages() and repeat until successful.
+  ./scripts/checkkconfigsymbols.py | grep -E "arch/powerpc/.*(Kconfig|Makefile)" -B 1 -A 1
 
-We could certainly make get_user_pages_fast() handle a few more cases,
-but I get the feeling that we need to have separate error cases for
-EFAULT - no page exists - and the "page exists, but cannot be mapped
-as a 'struct page'" case.
+After applying this patch series on linux-next (next-20210817), the command
+above yields just two false positives (SHELL, r13) due to tool shortcomings.
 
-I also do still think that even regardless of that, we want to just
-add a FOLL_NOFAULT flag that just disables calling handle_mm_fault(),
-and then you can use the regular get_user_pages().
+As these two patches are fixes, please consider if they are suitable for
+backporting to stable.
 
-That at least gives us the full _normal_ page handling stuff.
 
-                   Linus
+Lukas
+
+Lukas Bulwahn (2):
+  powerpc: kvm: rectify selection to PPC_DAWR
+  powerpc: rectify selection to ARCH_ENABLE_SPLIT_PMD_PTLOCK
+
+ arch/powerpc/kvm/Kconfig               | 2 +-
+ arch/powerpc/platforms/Kconfig.cputype | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+-- 
+2.26.2
+
