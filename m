@@ -2,121 +2,91 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA6893F59E8
-	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Aug 2021 10:37:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B0AF3F9366
+	for <lists+kvm-ppc@lfdr.de>; Fri, 27 Aug 2021 06:10:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235353AbhHXIiP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 24 Aug 2021 04:38:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51406 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232714AbhHXIiO (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 24 Aug 2021 04:38:14 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F746C061757
-        for <kvm-ppc@vger.kernel.org>; Tue, 24 Aug 2021 01:37:31 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id s11so19120974pgr.11
-        for <kvm-ppc@vger.kernel.org>; Tue, 24 Aug 2021 01:37:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=B2gKm6chBsv5r3i/L80Y3/d7t6I2kPU5f7xacAN/16I=;
-        b=UN1hqkTUde+ZVmSeDs02KLaAqXx+Udsm8mkh6v/GeeQMKx9dUk3As7xnfnzTCdVvIT
-         8GAdUxoIa2yNJ1CT23mGdkZgZoRYCn396OF0ASku2oEgxzklDtMa3azVrL+49MbiuVHe
-         Ys8qNpa5mE9KrEsMezYUpgiC64AkYaXleghP6Semde5mheftJcQQrlAR4pC+Nx9xyKXf
-         FzwkfCFrBnkSP0X2SY4coE8htycrioioGpxj5zPfjnEGzdH+4UoCrU7FL6CH7N/yFTgC
-         ZtsmHIBe/Qx4Sbwxq0IRDLLHF0Rdh+F4nMlSZdlz2ZyMiYY54IiujG06xWqKWly7QcUT
-         4Jsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=B2gKm6chBsv5r3i/L80Y3/d7t6I2kPU5f7xacAN/16I=;
-        b=iUC/dF5ha+XvShHE4C1JsQDf1qSBkUz/ZMhtQybiGJENxzwSYR+fyZH9+gTUGY1ItI
-         cwR97iTpd9u9KKPMijxm5Jzu91euXearLEO+gViehQOAsrKZah6Bj7LOkp/+ZOXLFRvi
-         jdIctnKWytlgRr3dRUQN2HgNDitIBhKWQM6FU9TtktFWMf1xSH7D9a4ojhtBkTxELiRy
-         WIlCk5Hb4/w5fCXDomAPNxZzfQ5LQ9KYreg+GyJqie4nc99Y31QmiAoZalzmwHoFWTsP
-         WVXHkcRPkVir3lfbLsXDI0/+qtWgfZD+TyQNYM4OZyrjzfVNgrXNdzD2Sexp+nj3dfUM
-         qN0g==
-X-Gm-Message-State: AOAM532IoZG0TS5pseQqt2FywJjYeCw8IpX6JsumO7pA52gzzrXsyKa3
-        CVtJv101CadmBT3l9BGg5PBB8Q==
-X-Google-Smtp-Source: ABdhPJwm8/hDWjBO4m0jD9d+GUvfnpaDVbH4ZheRLKmoA8ju9VtsRmFdyxMMuVmlFA/NmuXdBO1Ygw==
-X-Received: by 2002:a62:9712:0:b029:3be:3408:65a9 with SMTP id n18-20020a6297120000b02903be340865a9mr38537843pfe.63.1629794250637;
-        Tue, 24 Aug 2021 01:37:30 -0700 (PDT)
-Received: from [192.168.10.23] (124-171-108-209.dyn.iinet.net.au. [124.171.108.209])
-        by smtp.gmail.com with UTF8SMTPSA id ds6sm1700529pjb.32.2021.08.24.01.37.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Aug 2021 01:37:30 -0700 (PDT)
-Message-ID: <a1be1913-f564-924b-1750-03efa859a0b1@ozlabs.ru>
-Date:   Tue, 24 Aug 2021 18:37:25 +1000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.0
-Subject: Re: [PATCH kernel] KVM: PPC: Book3S HV: Make unique debugfs nodename
-Content-Language: en-US
-To:     Fabiano Rosas <farosas@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@ozlabs.org>
-References: <20210707041344.3803554-1-aik@ozlabs.ru>
- <be02290c-60a0-48af-0491-61e8a6d5b7b7@ozlabs.ru>
- <87pmubu306.fsf@linux.ibm.com>
+        id S229731AbhH0EIC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 27 Aug 2021 00:08:02 -0400
+Received: from ozlabs.ru ([107.174.27.60]:58306 "EHLO ozlabs.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229645AbhH0EIB (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Fri, 27 Aug 2021 00:08:01 -0400
+Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 4666FAE80030;
+        Fri, 27 Aug 2021 00:07:09 -0400 (EDT)
 From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <87pmubu306.fsf@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, kvm-ppc@vger.kernel.org,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Leonardo Bras <leobras.c@gmail.com>
+Subject: [PATCH kernel] KVM: PPC: Fix clearing never mapped TCEs in realmode
+Date:   Fri, 27 Aug 2021 14:07:06 +1000
+Message-Id: <20210827040706.517652-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Since e1a1ef84cd07, pages for TCE tables for KVM guests are allocated
+only when needed. This allows skipping any update when clearing TCEs.
+This works mostly fine as TCE updates are handled when MMU is enabled.
+The realmode handlers fail with H_TOO_HARD when pages are not yet
+allocated except when clearing a TCE in which case KVM prints a warning
+but proceeds to dereference a NULL pointer which crashes the host OS.
 
+This has not been caught so far as the change is reasonably new,
+POWER9 runs mostly radix which does not use realmode handlers.
+With hash, the default TCE table is memset() by QEMU the machine reset
+which triggers page faults and the KVM TCE device's kvm_spapr_tce_fault()
+handles those with MMU on. And the huge DMA windows are not cleared
+by VMs whicn instead successfully create a DMA window big enough to map
+the VM memory 1:1 and then VMs just map everything without clearing.
 
-On 18/08/2021 08:20, Fabiano Rosas wrote:
-> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
-> 
->> On 07/07/2021 14:13, Alexey Kardashevskiy wrote:
-> 
->> alternatively move this debugfs stuff under the platform-independent
->> directory, how about that?
-> 
-> That's a good idea. I only now realized we have two separate directories
-> for the same guest:
-> 
-> $ ls /sys/kernel/debug/kvm/ | grep $pid
-> 19062-11
-> vm19062
-> 
-> Looks like we would have to implement kvm_arch_create_vcpu_debugfs for
-> the vcpu information and add a similar hook for the vm.
+This started crashing now as upcoming sriov-under-powervm support added
+a mode when a dymanic DMA window not big enough to map the VM memory 1:1
+but it is used anyway, and the VM now is the first (i.e. not QEMU) to
+clear a just created table. Note that the upstream QEMU needs to be
+modified to trigger the VM to trigger the host OS crash.
 
-Something like that. From the git history, it looks like the ppc folder 
-was added first and then the generic kvm folder was added but apparently 
-they did not notice the ppc one due to natural reasons :)
+This replaces WARN_ON_ONCE_RM() with a check and return.
+This adds another warning if TCE is not being cleared.
 
-If you are not too busy, can you please merge the ppc one into the 
-generic one and post the patch, so we won't need to fix these 
-duplication warnings again? Thanks,
+Cc: Leonardo Bras <leobras.c@gmail.com>
+Fixes: e1a1ef84cd07 ("KVM: PPC: Book3S: Allocate guest TCEs on demand too")
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
 
+With recent changes in the printk() department, calling pr_err() when MMU
+off causes lockdep lockups which I did not dig any further so we should
+start getting rid of the realmode's WARN_ON_ONCE_RM().
+---
+ arch/powerpc/kvm/book3s_64_vio_hv.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-
->>> ---
->>>    arch/powerpc/kvm/book3s_hv.c | 2 +-
->>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
->>> index 1d1fcc290fca..0223ddc0eed0 100644
->>> --- a/arch/powerpc/kvm/book3s_hv.c
->>> +++ b/arch/powerpc/kvm/book3s_hv.c
->>> @@ -5227,7 +5227,7 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
->>>    	/*
->>>    	 * Create a debugfs directory for the VM
->>>    	 */
->>> -	snprintf(buf, sizeof(buf), "vm%d", current->pid);
->>> +	snprintf(buf, sizeof(buf), "vm%d-lp%ld", current->pid, lpid);
->>>    	kvm->arch.debugfs_dir = debugfs_create_dir(buf, kvm_debugfs_dir);
->>>    	kvmppc_mmu_debugfs_init(kvm);
->>>    	if (radix_enabled())
->>>
-
+diff --git a/arch/powerpc/kvm/book3s_64_vio_hv.c b/arch/powerpc/kvm/book3s_64_vio_hv.c
+index 083a4e037718..e5ba96c41f3f 100644
+--- a/arch/powerpc/kvm/book3s_64_vio_hv.c
++++ b/arch/powerpc/kvm/book3s_64_vio_hv.c
+@@ -173,10 +173,13 @@ static void kvmppc_rm_tce_put(struct kvmppc_spapr_tce_table *stt,
+ 	idx -= stt->offset;
+ 	page = stt->pages[idx / TCES_PER_PAGE];
+ 	/*
+-	 * page must not be NULL in real mode,
+-	 * kvmppc_rm_ioba_validate() must have taken care of this.
++	 * kvmppc_rm_ioba_validate() allows pages not be allocated if TCE is
++	 * being cleared, otherwise it returns H_TOO_HARD and we skip this.
+ 	 */
+-	WARN_ON_ONCE_RM(!page);
++	if (!page) {
++		WARN_ON_ONCE_RM(tce != 0);
++		return;
++	}
+ 	tbl = kvmppc_page_address(page);
+ 
+ 	tbl[idx % TCES_PER_PAGE] = tce;
 -- 
-Alexey
+2.30.2
+
