@@ -2,84 +2,89 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFA1F3F9CCA
-	for <lists+kvm-ppc@lfdr.de>; Fri, 27 Aug 2021 18:49:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C2173F9D7F
+	for <lists+kvm-ppc@lfdr.de>; Fri, 27 Aug 2021 19:17:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230021AbhH0Qum (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 27 Aug 2021 12:50:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60923 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233485AbhH0Qul (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 27 Aug 2021 12:50:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630082992;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WhkHch2a2Nq/MBCYyoOXfRTqLt9ghm/Gbw3AzjsmZeo=;
-        b=J88Uilm7CEpdHa+6vHruAJssNvTGA/lHjrVnFAIc3yoxzJqfLQKBj4tKWA/RY3KEEWJRSu
-        uYfRDuCv5IFOFeIpCOxB05nVz4Qs0cGvpctJGouHBxL+5ONFAm8mIfqYpX+Hkhejm/BX3/
-        dTTeVpeYITT68G/rsvTqYolO6+XZK70=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-522-XxWSGH8tPiqOPk8jiMg5QQ-1; Fri, 27 Aug 2021 12:49:50 -0400
-X-MC-Unique: XxWSGH8tPiqOPk8jiMg5QQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14857190A7A6;
-        Fri, 27 Aug 2021 16:49:49 +0000 (UTC)
-Received: from max.com (unknown [10.40.194.206])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 74B3B60C04;
-        Fri, 27 Aug 2021 16:49:42 +0000 (UTC)
-From:   Andreas Gruenbacher <agruenba@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
+        id S239817AbhH0RRr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 27 Aug 2021 13:17:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59606 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239707AbhH0RRq (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 27 Aug 2021 13:17:46 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35255C0613CF
+        for <kvm-ppc@vger.kernel.org>; Fri, 27 Aug 2021 10:16:57 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id p38so15962669lfa.0
+        for <kvm-ppc@vger.kernel.org>; Fri, 27 Aug 2021 10:16:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=j79aTkkV7QWLMRm7gv45CG9ALkTrZZR1j0Lx/8G3d6o=;
+        b=fj/ZxCs8ur2rBha43Ay0HYB7+91H8QbKZzf8dL12yK9YzzNVZrCZbQRf5t7oQpJsoI
+         Wgz8k7xy+geN1KnmohU7DOJais9Vhl6IrRuWDBIc20zyIyuMKAlU0hx94AqlBsRcWyd+
+         95xQ+kewg4rcEfCorLbNVHCfZaK90xSHRzBSg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=j79aTkkV7QWLMRm7gv45CG9ALkTrZZR1j0Lx/8G3d6o=;
+        b=F9WnC0w26djqB1aDbe8HW5QEFfOAwC6AECdhGyghE1Wdqguj5PoAJJhTpETcIM/c+A
+         1kDzeUELp1KWfYCd65tOfusXwI+QThPe+8CDffWGaRw+GPKklU5/K2Yk9c9VUdiWNlpQ
+         LKqz+NffY7dEqjnadi0qman+lT5Uh5nRiODNDQuwvsDrGCahK7BFlpo9UdfzqHw6FSFK
+         i1S1zPi1t3XczzkQqzTTxbHwHLiWcIRx9Oc8j9ZjPJw9sRd0i4AgjqokXwbXbkClSWKd
+         XXqhS7xDCfy10u1flDhSqbxA9XQR1AbiNhUWlWsyKfJ9PlqYT4mtT54P28zwnvhQRvSq
+         UeJg==
+X-Gm-Message-State: AOAM531KFPpmDyVus5U2j4a6D7EMIsUW4NtIqEfvITslI1PNsatlacDJ
+        MEG0WVBOY7tqgIswMSWLndq581g2teXWtIgI
+X-Google-Smtp-Source: ABdhPJzacHk3afIvWF8cuBujg12XBH3v7mGHP4JMZaF1R2YSLOKgcyAW5CWO7Fq9WVG/EmBuoFCH5w==
+X-Received: by 2002:a05:6512:c24:: with SMTP id z36mr7685083lfu.194.1630084615329;
+        Fri, 27 Aug 2021 10:16:55 -0700 (PDT)
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com. [209.85.208.178])
+        by smtp.gmail.com with ESMTPSA id d9sm646105lfn.147.2021.08.27.10.16.53
+        for <kvm-ppc@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Aug 2021 10:16:54 -0700 (PDT)
+Received: by mail-lj1-f178.google.com with SMTP id w4so12589768ljh.13
+        for <kvm-ppc@vger.kernel.org>; Fri, 27 Aug 2021 10:16:53 -0700 (PDT)
+X-Received: by 2002:a2e:3004:: with SMTP id w4mr8318181ljw.465.1630084613565;
+ Fri, 27 Aug 2021 10:16:53 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210827164926.1726765-1-agruenba@redhat.com>
+In-Reply-To: <20210827164926.1726765-1-agruenba@redhat.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 27 Aug 2021 10:16:37 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wiUtyoTWuzroNJQwQDM9GHRXvq4974VL=y8T_3tUxDbkA@mail.gmail.com>
+Message-ID: <CAHk-=wiUtyoTWuzroNJQwQDM9GHRXvq4974VL=y8T_3tUxDbkA@mail.gmail.com>
+Subject: Re: [PATCH v7 00/19] gfs2: Fix mmap + page fault deadlocks
+To:     Andreas Gruenbacher <agruenba@redhat.com>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>,
         "Darrick J. Wong" <djwong@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>
-Cc:     Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
-        cluster-devel@redhat.com, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        kvm-ppc@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH v7 02/19] powerpc/kvm: Fix kvm_use_magic_page
-Date:   Fri, 27 Aug 2021 18:49:09 +0200
-Message-Id: <20210827164926.1726765-3-agruenba@redhat.com>
-In-Reply-To: <20210827164926.1726765-1-agruenba@redhat.com>
-References: <20210827164926.1726765-1-agruenba@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+        Paul Mackerras <paulus@ozlabs.org>, Jan Kara <jack@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        cluster-devel <cluster-devel@redhat.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-When switching from __get_user to fault_in_pages_readable, commit
-9f9eae5ce717 broke kvm_use_magic_page: fault_in_pages_readable returns 0
-on success.  Fix that.
+On Fri, Aug 27, 2021 at 9:49 AM Andreas Gruenbacher <agruenba@redhat.com> wrote:
+>
+> here's another update on top of v5.14-rc7.  Changes:
+>
+>  * Some of the patch descriptions have been improved.
+>
+>  * Patch "gfs2: Eliminate ip->i_gh" has been moved further to the front.
+>
+> At this point, I'm not aware of anything that still needs fixing,
 
-Fixes: 9f9eae5ce717 ("powerpc/kvm: Prefer fault_in_pages_readable function")
-Cc: stable@vger.kernel.org # v4.18+
-Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
----
- arch/powerpc/kernel/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From a quick scan, I didn't see anything that raised my hackles.
 
-diff --git a/arch/powerpc/kernel/kvm.c b/arch/powerpc/kernel/kvm.c
-index 617eba82531c..d89cf802d9aa 100644
---- a/arch/powerpc/kernel/kvm.c
-+++ b/arch/powerpc/kernel/kvm.c
-@@ -669,7 +669,7 @@ static void __init kvm_use_magic_page(void)
- 	on_each_cpu(kvm_map_magic_page, &features, 1);
- 
- 	/* Quick self-test to see if the mapping works */
--	if (!fault_in_pages_readable((const char *)KVM_MAGIC_PAGE, sizeof(u32))) {
-+	if (fault_in_pages_readable((const char *)KVM_MAGIC_PAGE, sizeof(u32))) {
- 		kvm_patching_worked = false;
- 		return;
- 	}
--- 
-2.26.3
+But I skipped all the gfs2-specific changes in the series, since
+that's all above my paygrade.
 
+                 Linus
