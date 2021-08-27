@@ -2,86 +2,148 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 324AB3F9AEA
-	for <lists+kvm-ppc@lfdr.de>; Fri, 27 Aug 2021 16:35:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86C393F9CC3
+	for <lists+kvm-ppc@lfdr.de>; Fri, 27 Aug 2021 18:49:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233079AbhH0Ogb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 27 Aug 2021 10:36:31 -0400
-Received: from mail-0301.mail-europe.com ([188.165.51.139]:39910 "EHLO
-        mail-0301.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232477AbhH0Ogb (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 27 Aug 2021 10:36:31 -0400
-Date:   Fri, 27 Aug 2021 14:35:39 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail; t=1630074939;
-        bh=OJRN8Z54/IeUVqiL5Gc5qsF5PbVHWHsn8rcOB/97h00=;
-        h=Date:To:From:Cc:Reply-To:Subject:In-Reply-To:References:From;
-        b=tCKcQJUlCySO5tBvfh3FJ3rdGB0Eswx7TFsl8/jcJQZ4JyWvgauQddhdZxRth6804
-         9KsJ+3k8bbEK/UPo7tG+v2gzWwdWLqeXQKbdqDiYJtH+swNEwEcU/ks6we0DEEFdBL
-         oi718XqPSY4Cg+b/BL5kkaD75OqxXhCtdnp85Jcs=
-To:     "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>
-From:   Joseph <joseph.mayer@protonmail.com>
-Cc:     David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>, Karel Gardas <gardask@gmail.com>,
-        "Peter J. Philipp" <pjp@centroid.eu>,
-        Mark Kettenis <mark.kettenis@xs4all.nl>,
-        "kite@centroid.eu" <kite@centroid.eu>, rgc <rgcinjp@disroot.org>,
-        Alan Gifford <siliconbadger@protonmail.com>,
-        Daniel Pocock <daniel@pocock.pro>
-Reply-To: Joseph <joseph.mayer@protonmail.com>
-Subject: QEMU-KVM offers OPAL firmware interface? OpenBSD guest support?
-Message-ID: <i9sauevIbXa6g3UvMfA7JQxafMUIrM0KiRmkCWoHi2wVjB0uIAYIXB1fBlxmFOPmocUhwHGbJBkBcBvrTEok-kToxrn8lq_35TgGIEOh5lc=@protonmail.com>
-In-Reply-To: <7r8MLHEKQicVkfT4tQLsiRXQmt_800XbV1s0mM_QJTgOY7XadpiRcD4HizmXByPaZRsMQV2WbNKDfKU-PdVo3ZO9JC6fJ0MF5LM_j5a2fgA=@protonmail.com>
-References: <7r8MLHEKQicVkfT4tQLsiRXQmt_800XbV1s0mM_QJTgOY7XadpiRcD4HizmXByPaZRsMQV2WbNKDfKU-PdVo3ZO9JC6fJ0MF5LM_j5a2fgA=@protonmail.com>
+        id S230007AbhH0Qub (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 27 Aug 2021 12:50:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48707 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229562AbhH0Qub (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 27 Aug 2021 12:50:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630082981;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=qzk7xHxXOvrpJjyOc9WnxUmMVaQgghawUTASMZZwVjA=;
+        b=N01xHh5BPZ1iriao2xD1QLi1bPwUgSpQbPWf8Ui/i+0zqPSQTaPAHkxoveH8Go4pwPO/+t
+        YvGQlQVRqRELTKVdGUWq9EBXSh+CYTKiJFPALRrF0RGFNPioa/DpuSn8BJHoUBv+4b7dZs
+        OcYyEnEt2m3OPZUlrJtnS/g9yPBe8Mo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-3bkppAoeN961tOw7yiok3A-1; Fri, 27 Aug 2021 12:49:40 -0400
+X-MC-Unique: 3bkppAoeN961tOw7yiok3A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F093190A7A3;
+        Fri, 27 Aug 2021 16:49:38 +0000 (UTC)
+Received: from max.com (unknown [10.40.194.206])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 285BF60C81;
+        Fri, 27 Aug 2021 16:49:27 +0000 (UTC)
+From:   Andreas Gruenbacher <agruenba@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>
+Cc:     Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
+        cluster-devel@redhat.com, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        kvm-ppc@vger.kernel.org
+Subject: [PATCH v7 00/19] gfs2: Fix mmap + page fault deadlocks
+Date:   Fri, 27 Aug 2021 18:49:07 +0200
+Message-Id: <20210827164926.1726765-1-agruenba@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.2 required=10.0 tests=ALL_TRUSTED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM shortcircuit=no
-        autolearn=disabled version=3.4.4
-X-Spam-Checker-Version: SpamAssassin 3.4.4 (2020-01-24) on
-        mailout.protonmail.ch
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi KVM-PPC emailing list,
+Hi all,
 
-I just emailed this to QEMU-PPC, and then realized it should probably
-go here too. Any cues much appreciated.
+here's another update on top of v5.14-rc7.  Changes:
 
- --
+ * Some of the patch descriptions have been improved.
 
-Hi QEMU PPC emailing list!
+ * Patch "gfs2: Eliminate ip->i_gh" has been moved further to the front.
 
-(And maintainers https://wiki.qemu.org/Documentation/Platforms/POWER )
+At this point, I'm not aware of anything that still needs fixing, 
 
-https://www.openbsd.org/powerpc64.html says "OpenBSD/powerpc64 does
-not run under a hypervisor such as PowerVM or PowerKVM".
 
-QEMU-KVM is not listed here but I have heard no success report
-anywhere, so I presume it doesn't work.
+The first two patches are independent of the core of this patch queue
+and I've asked the respective maintainers to have a look, but I've not
+heard back from them.  The first patch should just go into Al's tree;
+it's a relatively straight-forward fix.  The second patch really needs
+to be looked at; it might break things:
 
-From talking to people, I gather that the limit to running OpenBSD
-as VM guest on POWER, is that it operates based on the OPAL firmware
-interface, and for some reason previous VM:s did not export it. But
-also, I may have gotten this detail wrong.
-(https://www.talospace.com/2020/07/when-will-openpower-openbsd-be-now-now.h=
-tml)
+  iov_iter: Fix iov_iter_get_pages{,_alloc} page fault return value
+  powerpc/kvm: Fix kvm_use_magic_page
 
-Watching the POWER QEMU Wiki page https://wiki.qemu.org/Documentation/Platf=
-orms/POWER
-I don't see any mentioning of any of this .
 
-Can you who work with QEMU POWER support help clarify, can OpenBSD
-run as a QEMU-KVM guest - if so what are the steps to get it going -
-and or are any updates to QEMU coming that will enable it?
+Al and Linus seem to have a disagreement about the error reporting
+semantics that functions fault_in_{readable,writeable} and
+fault_in_iov_iter_{readable,writeable} should have.  I've implemented
+Linus's suggestion of returning the number of bytes not faulted in and I
+think that being able to tell if "nothing", "something" or "everything"
+could be faulted in does help, but I'll live with anything that allows
+us to make progress.
 
-Any cues much appreciated.
 
-I brought up this same question on the OpenBSD PPC emailing list,
-https://marc.info/?l=3Dopenbsd-ppc&m=3D163006851125546&w=3D2 , waiting for
-response.
+The iomap changes should ideally be reviewed by Christoph; I've not
+heard from him about those.
 
-Thanks!
-Joseph
+
+Thanks,
+Andreas
+
+Andreas Gruenbacher (16):
+  iov_iter: Fix iov_iter_get_pages{,_alloc} page fault return value
+  powerpc/kvm: Fix kvm_use_magic_page
+  gup: Turn fault_in_pages_{readable,writeable} into
+    fault_in_{readable,writeable}
+  iov_iter: Turn iov_iter_fault_in_readable into
+    fault_in_iov_iter_readable
+  iov_iter: Introduce fault_in_iov_iter_writeable
+  gfs2: Add wrapper for iomap_file_buffered_write
+  gfs2: Clean up function may_grant
+  gfs2: Move the inode glock locking to gfs2_file_buffered_write
+  gfs2: Eliminate ip->i_gh
+  gfs2: Fix mmap + page fault deadlocks for buffered I/O
+  iomap: Fix iomap_dio_rw return value for user copies
+  iomap: Support partial direct I/O on user copy failures
+  iomap: Add done_before argument to iomap_dio_rw
+  gup: Introduce FOLL_NOFAULT flag to disable page faults
+  iov_iter: Introduce nofault flag to disable page faults
+  gfs2: Fix mmap + page fault deadlocks for direct I/O
+
+Bob Peterson (3):
+  gfs2: Eliminate vestigial HIF_FIRST
+  gfs2: Remove redundant check from gfs2_glock_dq
+  gfs2: Introduce flag for glock holder auto-demotion
+
+ arch/powerpc/kernel/kvm.c           |   3 +-
+ arch/powerpc/kernel/signal_32.c     |   4 +-
+ arch/powerpc/kernel/signal_64.c     |   2 +-
+ arch/x86/kernel/fpu/signal.c        |   7 +-
+ drivers/gpu/drm/armada/armada_gem.c |   7 +-
+ fs/btrfs/file.c                     |   7 +-
+ fs/btrfs/ioctl.c                    |   5 +-
+ fs/ext4/file.c                      |   5 +-
+ fs/f2fs/file.c                      |   2 +-
+ fs/fuse/file.c                      |   2 +-
+ fs/gfs2/bmap.c                      |  60 +----
+ fs/gfs2/file.c                      | 245 ++++++++++++++++++--
+ fs/gfs2/glock.c                     | 340 +++++++++++++++++++++-------
+ fs/gfs2/glock.h                     |  20 ++
+ fs/gfs2/incore.h                    |   5 +-
+ fs/iomap/buffered-io.c              |   2 +-
+ fs/iomap/direct-io.c                |  21 +-
+ fs/ntfs/file.c                      |   2 +-
+ fs/xfs/xfs_file.c                   |   6 +-
+ fs/zonefs/super.c                   |   4 +-
+ include/linux/iomap.h               |  11 +-
+ include/linux/mm.h                  |   3 +-
+ include/linux/pagemap.h             |  58 +----
+ include/linux/uio.h                 |   4 +-
+ lib/iov_iter.c                      | 103 +++++++--
+ mm/filemap.c                        |   4 +-
+ mm/gup.c                            | 139 +++++++++++-
+ 27 files changed, 785 insertions(+), 286 deletions(-)
+
+-- 
+2.26.3
+
