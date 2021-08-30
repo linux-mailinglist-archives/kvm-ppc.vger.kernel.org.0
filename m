@@ -2,89 +2,82 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C2173F9D7F
-	for <lists+kvm-ppc@lfdr.de>; Fri, 27 Aug 2021 19:17:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 998883FBDCF
+	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Aug 2021 23:01:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239817AbhH0RRr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 27 Aug 2021 13:17:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59606 "EHLO
+        id S234509AbhH3VCF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 30 Aug 2021 17:02:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239707AbhH0RRq (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 27 Aug 2021 13:17:46 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35255C0613CF
-        for <kvm-ppc@vger.kernel.org>; Fri, 27 Aug 2021 10:16:57 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id p38so15962669lfa.0
-        for <kvm-ppc@vger.kernel.org>; Fri, 27 Aug 2021 10:16:57 -0700 (PDT)
+        with ESMTP id S229923AbhH3VCF (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Aug 2021 17:02:05 -0400
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4FEEC061575
+        for <kvm-ppc@vger.kernel.org>; Mon, 30 Aug 2021 14:01:10 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id f15so30768546ybg.3
+        for <kvm-ppc@vger.kernel.org>; Mon, 30 Aug 2021 14:01:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=j79aTkkV7QWLMRm7gv45CG9ALkTrZZR1j0Lx/8G3d6o=;
-        b=fj/ZxCs8ur2rBha43Ay0HYB7+91H8QbKZzf8dL12yK9YzzNVZrCZbQRf5t7oQpJsoI
-         Wgz8k7xy+geN1KnmohU7DOJais9Vhl6IrRuWDBIc20zyIyuMKAlU0hx94AqlBsRcWyd+
-         95xQ+kewg4rcEfCorLbNVHCfZaK90xSHRzBSg=
+        d=gmail.com; s=20161025;
+        h=mime-version:sender:from:date:message-id:subject:to;
+        bh=51TFbS3el96AOEcoR4VTaIsbOVwTN+nkp29IOWiWLFc=;
+        b=Aof81KsXQAKw0+W3iolZLzUaMUR3Gl5wCZ9ZxrZMxuPxYlzPMo6SELnxqB+5pk6LHd
+         dI0dyVtTZQxF9FLe1/EbJDG7K3IsO/BWx/s3S2u0TIGZj6R+efrQdtRjJhHvElhO35Zz
+         WhfjQjB8mrQeVjsQUIGBc5acEwxPUBSFN6AYpTzRO6TE8QwWrqbOCndSs3gsSG576jgg
+         1e4ZQI8Ix4x8iYgNLpRx3F/6EL7ugQW1KdswfwcCLUOvSsul+wuU7e3jfqrOpyEqab/4
+         8VMu79fhKVoTrFOelv49/BGvb/S8E2KHLY3SW+JBy9bz5IslCQSq1W4btmZgUjtBMMl5
+         4Anw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=j79aTkkV7QWLMRm7gv45CG9ALkTrZZR1j0Lx/8G3d6o=;
-        b=F9WnC0w26djqB1aDbe8HW5QEFfOAwC6AECdhGyghE1Wdqguj5PoAJJhTpETcIM/c+A
-         1kDzeUELp1KWfYCd65tOfusXwI+QThPe+8CDffWGaRw+GPKklU5/K2Yk9c9VUdiWNlpQ
-         LKqz+NffY7dEqjnadi0qman+lT5Uh5nRiODNDQuwvsDrGCahK7BFlpo9UdfzqHw6FSFK
-         i1S1zPi1t3XczzkQqzTTxbHwHLiWcIRx9Oc8j9ZjPJw9sRd0i4AgjqokXwbXbkClSWKd
-         XXqhS7xDCfy10u1flDhSqbxA9XQR1AbiNhUWlWsyKfJ9PlqYT4mtT54P28zwnvhQRvSq
-         UeJg==
-X-Gm-Message-State: AOAM531KFPpmDyVus5U2j4a6D7EMIsUW4NtIqEfvITslI1PNsatlacDJ
-        MEG0WVBOY7tqgIswMSWLndq581g2teXWtIgI
-X-Google-Smtp-Source: ABdhPJzacHk3afIvWF8cuBujg12XBH3v7mGHP4JMZaF1R2YSLOKgcyAW5CWO7Fq9WVG/EmBuoFCH5w==
-X-Received: by 2002:a05:6512:c24:: with SMTP id z36mr7685083lfu.194.1630084615329;
-        Fri, 27 Aug 2021 10:16:55 -0700 (PDT)
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com. [209.85.208.178])
-        by smtp.gmail.com with ESMTPSA id d9sm646105lfn.147.2021.08.27.10.16.53
-        for <kvm-ppc@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Aug 2021 10:16:54 -0700 (PDT)
-Received: by mail-lj1-f178.google.com with SMTP id w4so12589768ljh.13
-        for <kvm-ppc@vger.kernel.org>; Fri, 27 Aug 2021 10:16:53 -0700 (PDT)
-X-Received: by 2002:a2e:3004:: with SMTP id w4mr8318181ljw.465.1630084613565;
- Fri, 27 Aug 2021 10:16:53 -0700 (PDT)
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to;
+        bh=51TFbS3el96AOEcoR4VTaIsbOVwTN+nkp29IOWiWLFc=;
+        b=OqXXcDTOBtayBsXa9zTbF8bthk7zd/XY9yMTP96UlrF1wWGJd3lxT7ZfQFgYM48068
+         EJlkVL35sote53JwXScogv3uO3eUo3EJKo7YvT7MeTZsu2WtU/2CNwx9bPJNCsdwriEU
+         cWavo9LwRn47veq+ih9s+FNoyM9q+yqz0986kCWK/XXarnyhilLZ01Ay3PH+kOKKBXwz
+         Uz3L2YUi6jCuHl+A+w3MCSZ4XFOt9A/R+a3nhc3v/m7dI1oCHUs4UaBXj8Jbkxh2ab5B
+         4uSX2BmRJ7+tJ455bgJqDvPARaSMSvPWonrct9JiD6unTbsAfORTCyzVTYEILCWjMx/D
+         4B1Q==
+X-Gm-Message-State: AOAM533YD5G4XGJ1umVdtEtie8iAYPWkt+88MZzgYpfJjywLxl4KjHVz
+        AAhBNNwxkbv+YxNmDuDJiMWGWaFEnNvFisj9IA==
+X-Google-Smtp-Source: ABdhPJwEI7UlKKUYYI1RzqdWOwoivV7FQPgEiRtEZKu/1hTONhXJC1FYFe01uycmEFxoMHf6i2MaQnv9NcrCO43ws+Q=
+X-Received: by 2002:a25:3046:: with SMTP id w67mr26326842ybw.134.1630357270087;
+ Mon, 30 Aug 2021 14:01:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210827164926.1726765-1-agruenba@redhat.com>
-In-Reply-To: <20210827164926.1726765-1-agruenba@redhat.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 27 Aug 2021 10:16:37 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiUtyoTWuzroNJQwQDM9GHRXvq4974VL=y8T_3tUxDbkA@mail.gmail.com>
-Message-ID: <CAHk-=wiUtyoTWuzroNJQwQDM9GHRXvq4974VL=y8T_3tUxDbkA@mail.gmail.com>
-Subject: Re: [PATCH v7 00/19] gfs2: Fix mmap + page fault deadlocks
-To:     Andreas Gruenbacher <agruenba@redhat.com>
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>, Jan Kara <jack@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        cluster-devel <cluster-devel@redhat.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org
+Sender: hussainazizali@gmail.com
+Received: by 2002:a05:7110:57a7:b0:f4:7bd5:1ae0 with HTTP; Mon, 30 Aug 2021
+ 14:01:09 -0700 (PDT)
+From:   umaru zongo <umaruzongo266@gmail.com>
+Date:   Mon, 30 Aug 2021 14:01:09 -0700
+X-Google-Sender-Auth: fG94ayNDtszuqzDZsF0mbVI9JGA
+Message-ID: <CAEROipN2xVg74Cm33PmwJdC-1qja73bfO+ryRq5VMDk=kWES-A@mail.gmail.com>
+Subject: From Mr.Umaru Zongo.
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 9:49 AM Andreas Gruenbacher <agruenba@redhat.com> wrote:
->
-> here's another update on top of v5.14-rc7.  Changes:
->
->  * Some of the patch descriptions have been improved.
->
->  * Patch "gfs2: Eliminate ip->i_gh" has been moved further to the front.
->
-> At this point, I'm not aware of anything that still needs fixing,
+Dear Friend,
 
-From a quick scan, I didn't see anything that raised my hackles.
+I have a business proposal in the tune of $10.2 Million USD for you to
+handle with me. I have opportunity to transfer this abandon fund to
+your bank account in your country which belongs to our client.
 
-But I skipped all the gfs2-specific changes in the series, since
-that's all above my paygrade.
+ I am inviting you in this transaction where this money can be shared
+between us at ratio of 60/40% and help the needy around us don't be
+afraid of anything I am with you I will instruct you what you will do
+to maintain this fund.
 
-                 Linus
+
+Please kindly contact me with your information's if you are interested
+in this transaction for more details.
+
+Your Name.....................
+Your Bank Name:...............
+Your Account Number:..........
+Your Telephone Number:........
+Your Country and Address:.....
+Your Age and Sex:.............
+
+ Thanks
+Mr.Umaru Zongo
