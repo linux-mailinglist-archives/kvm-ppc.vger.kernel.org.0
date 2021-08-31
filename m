@@ -2,82 +2,140 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 998883FBDCF
-	for <lists+kvm-ppc@lfdr.de>; Mon, 30 Aug 2021 23:01:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23D003FCE93
+	for <lists+kvm-ppc@lfdr.de>; Tue, 31 Aug 2021 22:29:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234509AbhH3VCF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 30 Aug 2021 17:02:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55528 "EHLO
+        id S229887AbhHaUaj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 31 Aug 2021 16:30:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229923AbhH3VCF (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 30 Aug 2021 17:02:05 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4FEEC061575
-        for <kvm-ppc@vger.kernel.org>; Mon, 30 Aug 2021 14:01:10 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id f15so30768546ybg.3
-        for <kvm-ppc@vger.kernel.org>; Mon, 30 Aug 2021 14:01:10 -0700 (PDT)
+        with ESMTP id S240899AbhHaUaj (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 31 Aug 2021 16:30:39 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88253C061764
+        for <kvm-ppc@vger.kernel.org>; Tue, 31 Aug 2021 13:29:43 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id d11so715221qtw.3
+        for <kvm-ppc@vger.kernel.org>; Tue, 31 Aug 2021 13:29:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:sender:from:date:message-id:subject:to;
-        bh=51TFbS3el96AOEcoR4VTaIsbOVwTN+nkp29IOWiWLFc=;
-        b=Aof81KsXQAKw0+W3iolZLzUaMUR3Gl5wCZ9ZxrZMxuPxYlzPMo6SELnxqB+5pk6LHd
-         dI0dyVtTZQxF9FLe1/EbJDG7K3IsO/BWx/s3S2u0TIGZj6R+efrQdtRjJhHvElhO35Zz
-         WhfjQjB8mrQeVjsQUIGBc5acEwxPUBSFN6AYpTzRO6TE8QwWrqbOCndSs3gsSG576jgg
-         1e4ZQI8Ix4x8iYgNLpRx3F/6EL7ugQW1KdswfwcCLUOvSsul+wuU7e3jfqrOpyEqab/4
-         8VMu79fhKVoTrFOelv49/BGvb/S8E2KHLY3SW+JBy9bz5IslCQSq1W4btmZgUjtBMMl5
-         4Anw==
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=HZ3pj56mGoBpB6xSaPok/o43VKjWK5QuZ3X0xEylQ7A=;
+        b=BBMK7o+guuqTDQOFARaHRkaRTvS1c+yc3Lo6N9osZWow/fEaRX9vXQgPfVvLCKRAbS
+         rYlEleVtV+xAkrL2t7kEDkfu3RJhBeKrF8Ppb4CY1l8nOaQXdasY360nDcjaxmC6ToCf
+         jt4m8ipskpVtAun9oah/uZ/AwkHPPLsh1vSzqO2y5d8ULYYFgIpist2HBCDD7P9fCrBb
+         kNz7cThumSgAxwRXvgSewucHuF6ZBg4cU7Sl6PbCzL2pmDu/yAms01vQ184aJzkHQjxt
+         80t919GkhucHsuQ8jSHAgwMq6sgEZxzz9bjWrnCkrVL5UumlNy/Uh1yCZyszkTgix4o1
+         N9Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to;
-        bh=51TFbS3el96AOEcoR4VTaIsbOVwTN+nkp29IOWiWLFc=;
-        b=OqXXcDTOBtayBsXa9zTbF8bthk7zd/XY9yMTP96UlrF1wWGJd3lxT7ZfQFgYM48068
-         EJlkVL35sote53JwXScogv3uO3eUo3EJKo7YvT7MeTZsu2WtU/2CNwx9bPJNCsdwriEU
-         cWavo9LwRn47veq+ih9s+FNoyM9q+yqz0986kCWK/XXarnyhilLZ01Ay3PH+kOKKBXwz
-         Uz3L2YUi6jCuHl+A+w3MCSZ4XFOt9A/R+a3nhc3v/m7dI1oCHUs4UaBXj8Jbkxh2ab5B
-         4uSX2BmRJ7+tJ455bgJqDvPARaSMSvPWonrct9JiD6unTbsAfORTCyzVTYEILCWjMx/D
-         4B1Q==
-X-Gm-Message-State: AOAM533YD5G4XGJ1umVdtEtie8iAYPWkt+88MZzgYpfJjywLxl4KjHVz
-        AAhBNNwxkbv+YxNmDuDJiMWGWaFEnNvFisj9IA==
-X-Google-Smtp-Source: ABdhPJwEI7UlKKUYYI1RzqdWOwoivV7FQPgEiRtEZKu/1hTONhXJC1FYFe01uycmEFxoMHf6i2MaQnv9NcrCO43ws+Q=
-X-Received: by 2002:a25:3046:: with SMTP id w67mr26326842ybw.134.1630357270087;
- Mon, 30 Aug 2021 14:01:10 -0700 (PDT)
-MIME-Version: 1.0
-Sender: hussainazizali@gmail.com
-Received: by 2002:a05:7110:57a7:b0:f4:7bd5:1ae0 with HTTP; Mon, 30 Aug 2021
- 14:01:09 -0700 (PDT)
-From:   umaru zongo <umaruzongo266@gmail.com>
-Date:   Mon, 30 Aug 2021 14:01:09 -0700
-X-Google-Sender-Auth: fG94ayNDtszuqzDZsF0mbVI9JGA
-Message-ID: <CAEROipN2xVg74Cm33PmwJdC-1qja73bfO+ryRq5VMDk=kWES-A@mail.gmail.com>
-Subject: From Mr.Umaru Zongo.
-To:     undisclosed-recipients:;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=HZ3pj56mGoBpB6xSaPok/o43VKjWK5QuZ3X0xEylQ7A=;
+        b=iL5b2TiDWBztVIFFw/1LsUNEuh/y3fjjsuUHkJtXp/AuzGpaaaRuc0nLqONQGITSS9
+         Bvi0PmYTOZ4wwTtoDiQFdPIBIw5/oBd72QsdZQ0EcT2QJyvX8Z2xGNDjDjvirkzINQLe
+         bYLbx2XXtbeZLHPzYVT9cH5vp0YeRfgHX/+XOH41YkB2h2hdOrhJiFgirGanVELiDZ0u
+         9gyv4xjacz2Ywi4/3Wqvaq2JgD5xgNNJN+bp3PyVrXrYO7CUi/mMoUHbgoOFINfX+qVu
+         yfjuAsMVXEf9r9s6SsxFQ1VmOPWzWQuVPfhrCqmMrcPoM/FYhnEgadj/FsiLhhNtkvWq
+         gbfg==
+X-Gm-Message-State: AOAM530i0qYRGXnmGnr2182if5tFv6kmm7LiHuVmito5tzx646J4lQA/
+        W/16faf3ix4xcW2SxucD8OoYFo9tCLc=
+X-Google-Smtp-Source: ABdhPJyX0j27HVECx4O2VgHX34zIa84/GutgBUzDHsVpXWO1ZkIzLYiQS+eWA1ICVuFpC2q7PBh7Hw==
+X-Received: by 2002:ac8:4891:: with SMTP id i17mr4525321qtq.321.1630441782665;
+        Tue, 31 Aug 2021 13:29:42 -0700 (PDT)
+Received: from ?IPv6:2804:431:c7f1:e948:8e69:9cd6:5512:12f4? ([2804:431:c7f1:e948:8e69:9cd6:5512:12f4])
+        by smtp.gmail.com with ESMTPSA id t8sm11433605qtn.37.2021.08.31.13.29.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Aug 2021 13:29:42 -0700 (PDT)
+Message-ID: <12346f49d2f9962d654efe4466754c519a98c236.camel@gmail.com>
+Subject: Re: [PATCH kernel] KVM: PPC: Fix clearing never mapped TCEs in
+ realmode
+From:   Leonardo =?ISO-8859-1?Q?Br=E1s?= <leobras.c@gmail.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Date:   Tue, 31 Aug 2021 17:30:00 -0300
+In-Reply-To: <20210827040706.517652-1-aik@ozlabs.ru>
+References: <20210827040706.517652-1-aik@ozlabs.ru>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Dear Friend,
+Hello Alexey,
 
-I have a business proposal in the tune of $10.2 Million USD for you to
-handle with me. I have opportunity to transfer this abandon fund to
-your bank account in your country which belongs to our client.
+On Fri, 2021-08-27 at 14:07 +1000, Alexey Kardashevskiy wrote:
+> Since e1a1ef84cd07, pages for TCE tables for KVM guests are allocated
+> only when needed. This allows skipping any update when clearing TCEs.
+> This works mostly fine as TCE updates are handled when MMU is enabled.
+> The realmode handlers fail with H_TOO_HARD when pages are not yet
+> allocated except when clearing a TCE in which case KVM prints a warning
+> but proceeds to dereference a NULL pointer which crashes the host OS.
+> 
+> This has not been caught so far as the change is reasonably new,
+> POWER9 runs mostly radix which does not use realmode handlers.
+> With hash, the default TCE table is memset() by QEMU the machine reset
+> which triggers page faults and the KVM TCE device's
+> kvm_spapr_tce_fault()
+> handles those with MMU on. And the huge DMA windows are not cleared
+> by VMs whicn instead successfully create a DMA window big enough to map
+> the VM memory 1:1 and then VMs just map everything without clearing.
+> 
+> This started crashing now as upcoming sriov-under-powervm support added
+> a mode when a dymanic DMA window not big enough to map the VM memory
+> 1:1
+> but it is used anyway, and the VM now is the first (i.e. not QEMU) to
+> clear a just created table. Note that the upstream QEMU needs to be
+> modified to trigger the VM to trigger the host OS crash.
+> 
+> This replaces WARN_ON_ONCE_RM() with a check and return.
+> This adds another warning if TCE is not being cleared.
+> 
+> Cc: Leonardo Bras <leobras.c@gmail.com>
+> Fixes: e1a1ef84cd07 ("KVM: PPC: Book3S: Allocate guest TCEs on demand
+> too")
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> 
+> With recent changes in the printk() department, calling pr_err() when
+> MMU
+> off causes lockdep lockups which I did not dig any further so we should
+> start getting rid of the realmode's WARN_ON_ONCE_RM().
+> ---
+>  arch/powerpc/kvm/book3s_64_vio_hv.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_64_vio_hv.c
+> b/arch/powerpc/kvm/book3s_64_vio_hv.c
+> index 083a4e037718..e5ba96c41f3f 100644
+> --- a/arch/powerpc/kvm/book3s_64_vio_hv.c
+> +++ b/arch/powerpc/kvm/book3s_64_vio_hv.c
+> @@ -173,10 +173,13 @@ static void kvmppc_rm_tce_put(struct
+> kvmppc_spapr_tce_table *stt,
+>         idx -= stt->offset;
+>         page = stt->pages[idx / TCES_PER_PAGE];
+>         /*
+> -        * page must not be NULL in real mode,
+> -        * kvmppc_rm_ioba_validate() must have taken care of this.
+> +        * kvmppc_rm_ioba_validate() allows pages not be allocated if
+> TCE is
+> +        * being cleared, otherwise it returns H_TOO_HARD and we skip
+> this.
+>          */
+> -       WARN_ON_ONCE_RM(!page);
+> +       if (!page) {
+> +               WARN_ON_ONCE_RM(tce != 0);
+> +               return;
+> +       }
+>         tbl = kvmppc_page_address(page);
+>  
+>         tbl[idx % TCES_PER_PAGE] = tce;
 
- I am inviting you in this transaction where this money can be shared
-between us at ratio of 60/40% and help the needy around us don't be
-afraid of anything I am with you I will instruct you what you will do
-to maintain this fund.
+That looks reasonable IMHO.
 
+FWIW:
+Reviewed-by: Leonardo Bras <leobras.c@gmail.com>
 
-Please kindly contact me with your information's if you are interested
-in this transaction for more details.
-
-Your Name.....................
-Your Bank Name:...............
-Your Account Number:..........
-Your Telephone Number:........
-Your Country and Address:.....
-Your Age and Sex:.............
-
- Thanks
-Mr.Umaru Zongo
