@@ -2,86 +2,135 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B3CA3FDE9D
-	for <lists+kvm-ppc@lfdr.de>; Wed,  1 Sep 2021 17:26:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96DE43FE12B
+	for <lists+kvm-ppc@lfdr.de>; Wed,  1 Sep 2021 19:34:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244039AbhIAP1V (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 1 Sep 2021 11:27:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47394 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343713AbhIAP1U (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 1 Sep 2021 11:27:20 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 181F36v7108365;
-        Wed, 1 Sep 2021 11:26:08 -0400
+        id S231225AbhIARfN (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 1 Sep 2021 13:35:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11858 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S236419AbhIARfN (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 1 Sep 2021 13:35:13 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 181HXcdV105955;
+        Wed, 1 Sep 2021 13:34:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=o9gDLNcRFjSNsFzIPCKeyxaw9Ra4/1Hcw6ozwNSHkVo=;
- b=YM83bdR7jkhS2OhLgSu5xrtbvMtvyagp+ZfS89aru7FOJ30IlU4u87L4QDJHKT6npVWU
- 0LW3ADqVcsKc/mB1uCYkVj7VwLMF7DnDz1mj2UBSRJxfuGmicygWmdtbXZ87KOYiXz2H
- DyKamxAswX6HGidoCmRpZFWRe3uRrpla+jXPSQMXmi+qOKTwvcXrwRegyT8FGS/3Fwqc
- XE2yHa8gg6Dhy6390x/mCgoF7S0lWde2I2+3FmMhFxpxJzBmnLeWY7bRrfteT7c0U9c/
- KTCvgg0K/ozlM9BhQ9Lu4I9b1r8ebx5F5K1AnS/SnhKkt6K+a/94Z6SZF/gw60k9Yt6/ pQ== 
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3atafabhp4-1
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=CKNJFRwzN2ZBjkZlU88ostb4VI9CQSiBae6qBuRCY8Y=;
+ b=PEZkqU4ljD0toBsfAzweTXDwVvsovy5ZXfQdLp60LNS+91vgD4Hi4+chkfr6ONAvYGfp
+ 3z2pLkwSLgMReTFQczr3GQl9cDo5p46M5pR0yGiPaMD27nV4cHAJGd85nousm8SMv2YU
+ WFO9r7ZZuxr8u8mmDTEkUgkKn6BGGJAA31fif2YtOYPHuL2AXZDMp5P78rNQD9tufweL
+ g84/kKl0cuHK/16L5T6Iqc0jCIjDin7SotER0LQxy5KXVl2ro+QratBPX3LALKDW/wXX
+ p5Yz1jOipcPgDccZF9lX0uFmn7DDo5i6Rd8WtdiiM99NmKI+Dljc8q9eXzrHElvvPjIo DA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3ate1br0j1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 01 Sep 2021 11:26:08 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 181FIfGA031727;
-        Wed, 1 Sep 2021 15:26:06 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma04dal.us.ibm.com with ESMTP id 3aqcse7g7f-1
+        Wed, 01 Sep 2021 13:34:05 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 181HXcwm105959;
+        Wed, 1 Sep 2021 13:34:04 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3ate1br0hd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 01 Sep 2021 15:26:06 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 181FQ5up43581950
+        Wed, 01 Sep 2021 13:34:04 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 181HWujq027895;
+        Wed, 1 Sep 2021 17:34:04 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma05wdc.us.ibm.com with ESMTP id 3atdxd03t7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Sep 2021 17:34:03 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 181HY2wH16712148
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 1 Sep 2021 15:26:05 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E991311207D;
-        Wed,  1 Sep 2021 15:26:04 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E149A112072;
-        Wed,  1 Sep 2021 15:26:03 +0000 (GMT)
-Received: from localhost (unknown [9.211.58.54])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Wed,  1 Sep 2021 15:26:03 +0000 (GMT)
+        Wed, 1 Sep 2021 17:34:03 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D1C3378074;
+        Wed,  1 Sep 2021 17:34:02 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 565F67805F;
+        Wed,  1 Sep 2021 17:34:01 +0000 (GMT)
+Received: from farosas.linux.ibm.com.com (unknown [9.211.58.54])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  1 Sep 2021 17:34:01 +0000 (GMT)
 From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Cc:     linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@ozlabs.org>
-Subject: Re: [PATCH kernel] KVM: PPC: Book3S HV: Make unique debugfs nodename
-In-Reply-To: <87lf4gv0hf.fsf@linux.ibm.com>
-References: <20210707041344.3803554-1-aik@ozlabs.ru>
- <be02290c-60a0-48af-0491-61e8a6d5b7b7@ozlabs.ru>
- <87pmubu306.fsf@linux.ibm.com>
- <a1be1913-f564-924b-1750-03efa859a0b1@ozlabs.ru>
- <2fe01488-5a9b-785e-7c05-1d527dead18d@ozlabs.ru>
- <87lf4gv0hf.fsf@linux.ibm.com>
-Date:   Wed, 01 Sep 2021 12:26:00 -0300
-Message-ID: <87czpsuxkn.fsf@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
+        mpe@ellerman.id.au, npiggin@gmail.com, david@gibson.dropbear.id.au
+Subject: [PATCH 0/5] KVM: PPC: Book3S: Modules cleanup and unification
+Date:   Wed,  1 Sep 2021 14:33:52 -0300
+Message-Id: <20210901173357.3183658-1-farosas@linux.ibm.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: CFkKSQvx1QVx1ajLDPnoLgxB4hboUs5Y
-X-Proofpoint-GUID: CFkKSQvx1QVx1ajLDPnoLgxB4hboUs5Y
+X-Proofpoint-GUID: cPBbFxdKJ9HjNQfaLWRmECOZ-2qi-Ndr
+X-Proofpoint-ORIG-GUID: drMB0p7m-JNVvQfCO8ac41lXJvchRbRO
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
  definitions=2021-09-01_05:2021-09-01,2021-09-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 bulkscore=0 adultscore=0 impostorscore=0 spamscore=0
- suspectscore=0 lowpriorityscore=0 mlxlogscore=795 mlxscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2109010087
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ malwarescore=0 lowpriorityscore=0 mlxscore=0 adultscore=0 bulkscore=0
+ spamscore=0 mlxlogscore=714 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2108310000 definitions=main-2109010100
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Fabiano Rosas <farosas@linux.ibm.com> writes:
+This series merges our three kvm modules kvm.ko, kvm-hv.ko and
+kvm-pr.ko into one kvm.ko module.
 
-> That is why I mentioned creating a hook similar to
-> kvm_create_vcpu_debugfs in the common KVM code. kvm_create_vm_debugfs or
-> something.
+The main reason for this is to deal with the issue that kvm.ko can be
+loaded on its own without any of the other modules present. This can
+happen if one or both of the modules fail to init or if the user loads
+kvm.ko only.
 
-s/kvm/kvm_arch/
+With only kvm.ko loaded, the userspace can call any of the KVM ioctls
+which will fail more or less gracefully depending on what kind of
+verification we do in powerpc.c.
+
+Instead of adding a check to every entry point or finding a hack to
+link the modules so that when one fails (hv/pr), the other (kvm)
+exits, I think it is cleaner to just make them all a single module.
+
+The two KVM implementations are already selected by Kconfig options,
+so the only thing that changes is that they are now in the same
+module. I also kept kvm-hv and kvm-pr as aliases to kvm, so that
+people don't get too surprised with the change.
+
+There is a possible issue with the larger module size for kernel
+builds that should support both HV-only and PR-only environments, but
+PR is usually not used in production so I'm not sure if that is a real
+issue.
+
+Patches 1,2,3 are standalone cleanups.
+Patches 4,5 are the unification work.
+
+Fabiano Rosas (5):
+  KVM: PPC: Book3S HV: Check return value of kvmppc_radix_init
+  KVM: PPC: Book3S HV: Delay setting of kvm ops
+  KVM: PPC: Book3S HV: Free allocated memory if module init fails
+  KVM: PPC: Book3S: Unify kvm-hv and kvm-pr modules
+  KVM: PPC: Book3S: Stop exporting non-builtin symbols
+
+ arch/powerpc/configs/powernv_defconfig |  2 +-
+ arch/powerpc/configs/ppc64_defconfig   |  2 +-
+ arch/powerpc/configs/pseries_defconfig |  2 +-
+ arch/powerpc/kvm/Kconfig               | 72 ++++++++++++--------------
+ arch/powerpc/kvm/Makefile              | 11 ++--
+ arch/powerpc/kvm/book3s.c              | 61 ++++++++++++++--------
+ arch/powerpc/kvm/book3s.h              | 19 +++++++
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  3 --
+ arch/powerpc/kvm/book3s_64_vio.c       |  3 --
+ arch/powerpc/kvm/book3s_hv.c           | 38 ++++++++------
+ arch/powerpc/kvm/book3s_pr.c           | 13 -----
+ arch/powerpc/kvm/book3s_rtas.c         |  1 -
+ arch/powerpc/kvm/book3s_xics.c         |  4 --
+ arch/powerpc/kvm/book3s_xive.c         |  6 ---
+ arch/powerpc/kvm/emulate.c             |  1 -
+ arch/powerpc/kvm/powerpc.c             | 14 -----
+ kernel/irq/irqdesc.c                   |  2 +-
+ 17 files changed, 125 insertions(+), 129 deletions(-)
+
+-- 
+2.29.2
 
