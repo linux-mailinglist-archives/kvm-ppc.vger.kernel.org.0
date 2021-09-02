@@ -2,125 +2,129 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EA103FE86B
-	for <lists+kvm-ppc@lfdr.de>; Thu,  2 Sep 2021 06:25:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98E9A3FEE60
+	for <lists+kvm-ppc@lfdr.de>; Thu,  2 Sep 2021 15:08:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229546AbhIBE0G (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 2 Sep 2021 00:26:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51948 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbhIBE0G (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 2 Sep 2021 00:26:06 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C66A4C061575
-        for <kvm-ppc@vger.kernel.org>; Wed,  1 Sep 2021 21:25:08 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id n13-20020a17090a4e0d00b0017946980d8dso540978pjh.5
-        for <kvm-ppc@vger.kernel.org>; Wed, 01 Sep 2021 21:25:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=o/fdA9EiQAmnjCZwLE6dEup3eAwqC+a9XVZ0mxlaGiM=;
-        b=RxbL8dN2qZkf2mEv2PmrK4gxrU8XmkYq8nc1/8Kvb3SVXXcPYRbTkkjcWCWqR/Qm14
-         Vt7XAcc/y1RrzND0fZwF69pUbP8yZJNc2m9/gt2NIs2xkhABxvVTEf2P7Pbmsd2O2Egv
-         AQi9sZvGKgshwe4seCdOJ1iqigt1AWzyVCkC1mROqMj/ybHleMbZ6980qm7GxGHaSOA+
-         MWtbpQ6674CECRxd1L/dDDV+U+l7Je8cmA1hGHrvYrry5j60pZfkTKlOJNAW0qrbNgRY
-         d3solZPvG6Wl6nVj+9e/qY48RraFq/mojIED4S7Dw9JRHLaw7vL6rz9FVL2iDs8QXDlr
-         GApw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=o/fdA9EiQAmnjCZwLE6dEup3eAwqC+a9XVZ0mxlaGiM=;
-        b=NxAGdkxEo2vR9kPeKEZMrV8JSaQOeDj6E2mUX6HnmXgv/QG/7wT5lW+OZ8y//oW8Hu
-         0D8GOTvyTvvzPgGsT1cgs+TAARE85AXITNkfNvJF5qZ1EsWaTv5ED1QHjtIuEdW457Vy
-         qfy/FkzinembLyAS03pY2EShyiIb2cE8j1Qa3vHXQXuwzWnwpm5VYwyYiVJftr7kERTR
-         xrxQP4RiBLg921OkxrTMzZVzE4ehFG0EK94AhsKKQjqX8FH6qx1heoLpdcgdaHI8Zm1i
-         hR2IBVnKZkezzayAC+2tH37iOmtrSCW8znYJRorBEkOlfoQS/hcQaY+bnN/DoE/1ihh7
-         iznA==
-X-Gm-Message-State: AOAM531vEf5eDgnqINL/+wS0N7EmUkq+QCd6m5srLDeRJGBWfJ/QlW1r
-        bHGlLQ1BFoJqv9kK+8NDikJSStME5BnPEQ==
-X-Google-Smtp-Source: ABdhPJwcbWkTnTvfgneRQA2NLuCqjbeOV7NKEUCvFLXhAVerLpVk540v9Y8BlwnhrT4TAhyL2WUeYQ==
-X-Received: by 2002:a17:90a:b795:: with SMTP id m21mr1483001pjr.143.1630556708274;
-        Wed, 01 Sep 2021 21:25:08 -0700 (PDT)
-Received: from [192.168.10.23] (124-171-108-209.dyn.iinet.net.au. [124.171.108.209])
-        by smtp.gmail.com with ESMTPSA id c123sm526061pfc.50.2021.09.01.21.25.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Sep 2021 21:25:07 -0700 (PDT)
-Message-ID: <a72edcd2-a990-a549-2f31-dab134bef6a6@ozlabs.ru>
-Date:   Thu, 2 Sep 2021 14:25:03 +1000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:92.0) Gecko/20100101
- Thunderbird/92.0
+        id S234054AbhIBNJY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 2 Sep 2021 09:09:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44778 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1344993AbhIBNJV (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 2 Sep 2021 09:09:21 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 182D3heT017467;
+        Thu, 2 Sep 2021 09:08:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : content-type :
+ mime-version; s=pp1; bh=eThGAUXXmw+IkLaHbn+zHjlR21pCpK6b0ul2tukVdFQ=;
+ b=dFPgt341xOyElVA88qiOCzyU+5AY2F7+CcodH+C/JgjxXW/9AG6k8ivaOJe1b153Cp1g
+ uoz4geM+3KmUbiZ7XuU4wpEPSYp9gR1F+iJkRaPsvLwjp0kCgc8ttarHfz0oIOhMT58c
+ DX+s6C9SIxu+yKuSW7CtnIUbARifH7QpvlUFZCw1tLEepChVr6PLRvCc0EGG36W1hp0u
+ perv7raDXZzR6X0QFxJYyEURZ5+HKXvypY6d/eXO9L6YQ/15+Q/L6rDYN/MQ0NN9DlXn
+ RsQe1AHj/7lm9RuA/q5VBgZ19qT+aQq13UcVVynjUN24e2+GntWcGwv0o+uD2z5AUbq0 Fw== 
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3atx7thv44-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Sep 2021 09:08:12 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 182CuoGv029968;
+        Thu, 2 Sep 2021 13:08:11 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma04dal.us.ibm.com with ESMTP id 3atdxbqhtn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Sep 2021 13:08:11 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 182D897644499304
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Sep 2021 13:08:10 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CF865AE066;
+        Thu,  2 Sep 2021 13:08:09 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E7E28AE064;
+        Thu,  2 Sep 2021 13:08:08 +0000 (GMT)
+Received: from localhost (unknown [9.211.46.111])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Thu,  2 Sep 2021 13:08:08 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org
 Subject: Re: [PATCH kernel] KVM: PPC: Book3S: Suppress warnings when
  allocating too big memory slots
-Content-Language: en-US
-To:     Fabiano Rosas <farosas@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org
+In-Reply-To: <a72edcd2-a990-a549-2f31-dab134bef6a6@ozlabs.ru>
 References: <20210901084512.1658628-1-aik@ozlabs.ru>
  <87fsuouysc.fsf@linux.ibm.com>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <87fsuouysc.fsf@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <a72edcd2-a990-a549-2f31-dab134bef6a6@ozlabs.ru>
+Date:   Thu, 02 Sep 2021 10:08:05 -0300
+Message-ID: <878s0funuy.fsf@linux.ibm.com>
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: TCkyYlb5QNUlbed3M7FdwT0Ke8NBK1N7
+X-Proofpoint-GUID: TCkyYlb5QNUlbed3M7FdwT0Ke8NBK1N7
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-09-02_04:2021-09-02,2021-09-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 bulkscore=0 priorityscore=1501 impostorscore=0
+ lowpriorityscore=0 phishscore=0 spamscore=0 mlxscore=0 adultscore=0
+ clxscore=1015 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2108310000 definitions=main-2109020080
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Alexey Kardashevskiy <aik@ozlabs.ru> writes:
 
+> On 02/09/2021 00:59, Fabiano Rosas wrote:
+>> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+>> 
+>>> The userspace can trigger "vmalloc size %lu allocation failure: exceeds
+>>> total pages" via the KVM_SET_USER_MEMORY_REGION ioctl.
+>>>
+>>> This silences the warning by checking the limit before calling vzalloc()
+>>> and returns ENOMEM if failed.
+>>>
+>>> This does not call underlying valloc helpers as __vmalloc_node() is only
+>>> exported when CONFIG_TEST_VMALLOC_MODULE and __vmalloc_node_range() is not
+>>> exported at all.
+>>>
+>>> Spotted by syzkaller.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>> ---
+>>>   arch/powerpc/kvm/book3s_hv.c | 8 ++++++--
+>>>   1 file changed, 6 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+>>> index 474c0cfde384..a59f1cccbcf9 100644
+>>> --- a/arch/powerpc/kvm/book3s_hv.c
+>>> +++ b/arch/powerpc/kvm/book3s_hv.c
+>>> @@ -4830,8 +4830,12 @@ static int kvmppc_core_prepare_memory_region_hv(struct kvm *kvm,
+>>>   	unsigned long npages = mem->memory_size >> PAGE_SHIFT;
+>>>
+>>>   	if (change == KVM_MR_CREATE) {
+>>> -		slot->arch.rmap = vzalloc(array_size(npages,
+>>> -					  sizeof(*slot->arch.rmap)));
+>>> +		unsigned long cb = array_size(npages, sizeof(*slot->arch.rmap));
+>> 
+>> What does cb mean?
+>
+> "count of bytes"
+>
+> This is from my deep Windows past :)
+>
+> https://docs.microsoft.com/en-us/windows/win32/stg/coding-style-conventions
 
-On 02/09/2021 00:59, Fabiano Rosas wrote:
-> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
-> 
->> The userspace can trigger "vmalloc size %lu allocation failure: exceeds
->> total pages" via the KVM_SET_USER_MEMORY_REGION ioctl.
->>
->> This silences the warning by checking the limit before calling vzalloc()
->> and returns ENOMEM if failed.
->>
->> This does not call underlying valloc helpers as __vmalloc_node() is only
->> exported when CONFIG_TEST_VMALLOC_MODULE and __vmalloc_node_range() is not
->> exported at all.
->>
->> Spotted by syzkaller.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> ---
->>   arch/powerpc/kvm/book3s_hv.c | 8 ++++++--
->>   1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
->> index 474c0cfde384..a59f1cccbcf9 100644
->> --- a/arch/powerpc/kvm/book3s_hv.c
->> +++ b/arch/powerpc/kvm/book3s_hv.c
->> @@ -4830,8 +4830,12 @@ static int kvmppc_core_prepare_memory_region_hv(struct kvm *kvm,
->>   	unsigned long npages = mem->memory_size >> PAGE_SHIFT;
->>
->>   	if (change == KVM_MR_CREATE) {
->> -		slot->arch.rmap = vzalloc(array_size(npages,
->> -					  sizeof(*slot->arch.rmap)));
->> +		unsigned long cb = array_size(npages, sizeof(*slot->arch.rmap));
-> 
-> What does cb mean?
+=D How interesting! And according to that link 'sz' means "Zero terminated
+String". Imagine the confusion.. haha
 
-"count of bytes"
-
-This is from my deep Windows past :)
-
-https://docs.microsoft.com/en-us/windows/win32/stg/coding-style-conventions
-
-
-> 
->> +
->> +		if ((cb >> PAGE_SHIFT) > totalram_pages())
->> +			return -ENOMEM;
->> +
->> +		slot->arch.rmap = vzalloc(cb);
->>   		if (!slot->arch.rmap)
->>   			return -ENOMEM;
->>   	}
-
--- 
-Alexey
+>> 
+>>> +
+>>> +		if ((cb >> PAGE_SHIFT) > totalram_pages())
+>>> +			return -ENOMEM;
+>>> +
+>>> +		slot->arch.rmap = vzalloc(cb);
+>>>   		if (!slot->arch.rmap)
+>>>   			return -ENOMEM;
+>>>   	}
