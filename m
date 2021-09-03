@@ -2,148 +2,200 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29EAF40013C
-	for <lists+kvm-ppc@lfdr.de>; Fri,  3 Sep 2021 16:28:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F01FC4001BF
+	for <lists+kvm-ppc@lfdr.de>; Fri,  3 Sep 2021 17:08:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235668AbhICO35 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 3 Sep 2021 10:29:57 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33076 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232812AbhICO34 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 3 Sep 2021 10:29:56 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 183E3i5U088954;
-        Fri, 3 Sep 2021 10:28:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=4Oxv1YL44c0LlpLj7WGBe+IWuuPb9AUMeaMAL8IRp5w=;
- b=nL7zq4gP1kFbnp7fu5XFWMpF/p4gRLR/FfIC+qrniY7f/zwrG0FcIbYnrYoWn1TR0V4s
- JhDjbRnmiURQDDCxLB4Yu0NDTmyE3K5PiGQEGmnq2/vqyFkkcHIFjXYnAUembYCABduw
- xyR3OCc0hyElmZjqXzYaeZAIcdwSIBbKA2RAfSkQ8DqLLiUP8FE3ZmSyMQ1nx6mURo3Z
- TftdKZ8N78eFuLH0YaL2qRlhnGukmZqCG7mipLIC/ilpwxfif9GIjp5ke5tNGXmmawHn
- 69osPhAV8iLTkM+M9Ju6qPctGt3g9vBgfNf+PxfkoKX/4Ah+KX11/SqbTeZbAiaOIT+v 2A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3audm441cp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Sep 2021 10:28:46 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 183E3qT6089720;
-        Fri, 3 Sep 2021 10:28:45 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3audm441c8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Sep 2021 10:28:45 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 183ECpld029274;
-        Fri, 3 Sep 2021 14:28:45 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma01wdc.us.ibm.com with ESMTP id 3au6pjqsuh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Sep 2021 14:28:45 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 183ESi4J18612948
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Sep 2021 14:28:44 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 10218C6062;
-        Fri,  3 Sep 2021 14:28:44 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FC8CC605F;
-        Fri,  3 Sep 2021 14:28:43 +0000 (GMT)
-Received: from localhost (unknown [9.211.32.78])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Fri,  3 Sep 2021 14:28:42 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH kernel] KVM: PPC: Book3S: Merge powerpc's debugfs entry
- content into generic entry
-In-Reply-To: <20210903052257.2348036-1-aik@ozlabs.ru>
-References: <20210903052257.2348036-1-aik@ozlabs.ru>
-Date:   Fri, 03 Sep 2021 11:28:41 -0300
-Message-ID: <87v93hens6.fsf@linux.ibm.com>
+        id S239585AbhICPJ2 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 3 Sep 2021 11:09:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47222 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239566AbhICPJ2 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 3 Sep 2021 11:09:28 -0400
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34734C061575;
+        Fri,  3 Sep 2021 08:08:28 -0700 (PDT)
+Received: by mail-qk1-x730.google.com with SMTP id b64so6127130qkg.0;
+        Fri, 03 Sep 2021 08:08:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc:content-transfer-encoding;
+        bh=dfVAyRi3egcPmrpkkX6mL213sIGpEaRWvxdiTkq+xW8=;
+        b=EWcq229FL/ntUEq82qpPUWBWKHdqlgiM75aaopWI0EXKXMdaGvWC9k5+Djmpf9cuh4
+         b8Px+qCiOFbdSlTTv3bCUWjo/NV+fV2FfDhtVBTe+11Hyzzc0GtfIzt9fM6pWJdOsQTo
+         Hw091772P+VcEN0wpXd2QJDN5P2CBMbRXMqIqUPHoTTS4oCbdr33nxJebB3k0cLE1JVx
+         35kVoZO3fqZcIp7tDFWrd/ielCIlkFmjs/qNYQvB0vIZOGZG2GKfB2JH//Zfs1FulZVX
+         gOTOWaFGN1mnjDgUBankLRTMLHBaoKykGiP6F5yFw7iKyEEFMRF86tzacUtCHWKO2oZM
+         RWbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc:content-transfer-encoding;
+        bh=dfVAyRi3egcPmrpkkX6mL213sIGpEaRWvxdiTkq+xW8=;
+        b=sn4I3exGBD8q3ec6r19GyxvO/DYghe4OBEERsdUgPGoZbcQjCSnZoPH0W8ElPrWPUN
+         SwNZlBRv22SrdqangNRNmk7vvOa0LCVWYThNyStC0wCFR+DxO7UgW7iahvnuyX6s1iTw
+         2ciMdRDN59Ux7sT2RYYJXDEDY7mmUfNosKrLUczPQZTG9iz/6GdFadhZWA6ONa7SJdoY
+         jkKoG3z90NvIFV+vWkKTMBf7njkLli+9Rv5Gucy2iQx7xdCqPPLSLQcsWlZIdk0gD6SB
+         O1Vq+L4if7upBjk7PAm4P87M5r8pDovMCpy/ZEPR7NUGsqNsKVd3JjpjZigMwfTlJ/Ov
+         898A==
+X-Gm-Message-State: AOAM532cDxzb+6noWwUqtI1AwOMnLgJhio91jNhBcxSFEDqpWDJhdrAp
+        dai/eoe+hnfRZfnYqxj814bKbbpC0+eFN4dm1gM=
+X-Google-Smtp-Source: ABdhPJxOxNoEKZDrnzr5I27hdDLrYAI3fzlDltFTJm77mMKSv9gWkp9I05ZDbo+9/cQzt6JSbVvTx3kldRbLUD+SG7w=
+X-Received: by 2002:a05:620a:2844:: with SMTP id h4mr3924402qkp.388.1630681707290;
+ Fri, 03 Sep 2021 08:08:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2VXsMFf1U_aBGmOz8Tmuq8PRhImPoOOr
-X-Proofpoint-GUID: ufHLN5Lu48IB9JtOWR1HPAJ4cmH5x0x4
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-09-03_05:2021-09-03,2021-09-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- adultscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0
- priorityscore=1501 suspectscore=0 lowpriorityscore=0 mlxscore=0
- spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2108310000 definitions=main-2109030088
+References: <20210827164926.1726765-1-agruenba@redhat.com>
+In-Reply-To: <20210827164926.1726765-1-agruenba@redhat.com>
+Reply-To: fdmanana@gmail.com
+From:   Filipe Manana <fdmanana@gmail.com>
+Date:   Fri, 3 Sep 2021 16:07:51 +0100
+Message-ID: <CAL3q7H709FSbHtinPRqe6XtZEvhmkSVBhFHUGMiVDW7Ngb3wrQ@mail.gmail.com>
+Subject: Re: [PATCH v7 00/19] gfs2: Fix mmap + page fault deadlocks
+To:     Andreas Gruenbacher <agruenba@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>, Jan Kara <jack@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>, cluster-devel@redhat.com,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org,
+        linux-btrfs <linux-btrfs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Alexey Kardashevskiy <aik@ozlabs.ru> writes:
-
-> At the moment the generic KVM code creates an "%pid-%fd" entry per a KVM
-> instance; and the PPC HV KVM creates its own at "vm%pid".
+On Fri, Aug 27, 2021 at 5:51 PM Andreas Gruenbacher <agruenba@redhat.com> w=
+rote:
 >
-> The rproblems with the PPC entries are:
-> 1. they do not allow multiple VMs in the same process (which is extremely
-> rare case mostly used by syzkaller fuzzer);
-> 2. prone to race bugs like the generic KVM code had fixed in
-> commit 85cd39af14f4 ("KVM: Do not leak memory for duplicate debugfs
-> directories").
+> Hi all,
 >
-> This defines kvm_arch_create_kvm_debugfs() similar to one for vcpus.
-
-I think kvm_arch_create_vm_debugfs is a bit mode accurate?
-                        ^
-> This defines 2 hooks in kvmppc_ops for allowing specific KVM
-> implementations to add necessary entries.
+> here's another update on top of v5.14-rc7.  Changes:
 >
-> This makes use of already existing kvm_arch_create_vcpu_debugfs.
+>  * Some of the patch descriptions have been improved.
 >
-> This removes no more used debugfs_dir pointers from PPC kvm_arch structs.
+>  * Patch "gfs2: Eliminate ip->i_gh" has been moved further to the front.
 >
-> Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> At this point, I'm not aware of anything that still needs fixing,
 
-...
+Hi, thanks for doing this.
 
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index c8f12b056968..325b388c725a 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -2771,19 +2771,14 @@ static const struct file_operations debugfs_timings_ops = {
->  };
->  
->  /* Create a debugfs directory for the vcpu */
-> -static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
-> +static void kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
+In btrfs we also have a deadlock (after the conversion to use iomap
+for direct IO) triggered by your recent test case for fstests,
+generic/647 [1].
+Even though we can fix it in btrfs without touching iomap, iov_iter,
+etc, it would be too complex for such a rare and exotic case (a user
+passing a buffer for a direct IO read/write that is memory mapped to
+the same file range of the operation is very uncommon at least). But
+this patchset would make the fix much simpler and cleaner.
 
-This could lose the 'arch' since it is already inside our code and
-accessed only via ops. I see that we already have a
-kvmppc_create_vcpu_debugfs that's used for some BookE processor, this
-would make:
+One thing I noticed is that, for direct IO reads, despite setting the
+->nofault attribute of the iov_iter to true, we can still get page
+faults while in the iomap code.
+This happens when reading from holes and unwritten/prealloc extents,
+because iomap calls iov_iter_zero() and this seems to ignore the value
+of ->nofault.
+Is that intentional? I can get around it by surrounding the iomap call
+with pagefault_disable() / pagefault_enable(), but it seems odd to do
+so, given that iov_iter->nofault was set to true.
 
-kvmppc_create_vcpu_debugfs
-kvmppc_create_vcpu_debugfs_hv
-kvmppc_create_vcpu_debugfs_pr (possibly)
+[1] https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git/commit/?id=3Dd3c=
+bdabffc4cb28850e97bc7bd8a7a1460db94e5
 
-which perhaps is more consistent.
+Thanks.
 
->  {
-> -	char buf[16];
-> -	struct kvm *kvm = vcpu->kvm;
-> -
-> -	snprintf(buf, sizeof(buf), "vcpu%u", id);
-> -	vcpu->arch.debugfs_dir = debugfs_create_dir(buf, kvm->arch.debugfs_dir);
-> -	debugfs_create_file("timings", 0444, vcpu->arch.debugfs_dir, vcpu,
-> +	debugfs_create_file("timings", 0444, debugfs_dentry, vcpu,
->  			    &debugfs_timings_ops);
->  }
->  
->  #else /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
-> -static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
-> +static void kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
->  {
->  }
->  #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+>
+>
+> The first two patches are independent of the core of this patch queue
+> and I've asked the respective maintainers to have a look, but I've not
+> heard back from them.  The first patch should just go into Al's tree;
+> it's a relatively straight-forward fix.  The second patch really needs
+> to be looked at; it might break things:
+>
+>   iov_iter: Fix iov_iter_get_pages{,_alloc} page fault return value
+>   powerpc/kvm: Fix kvm_use_magic_page
+>
+>
+> Al and Linus seem to have a disagreement about the error reporting
+> semantics that functions fault_in_{readable,writeable} and
+> fault_in_iov_iter_{readable,writeable} should have.  I've implemented
+> Linus's suggestion of returning the number of bytes not faulted in and I
+> think that being able to tell if "nothing", "something" or "everything"
+> could be faulted in does help, but I'll live with anything that allows
+> us to make progress.
+>
+>
+> The iomap changes should ideally be reviewed by Christoph; I've not
+> heard from him about those.
+>
+>
+> Thanks,
+> Andreas
+>
+> Andreas Gruenbacher (16):
+>   iov_iter: Fix iov_iter_get_pages{,_alloc} page fault return value
+>   powerpc/kvm: Fix kvm_use_magic_page
+>   gup: Turn fault_in_pages_{readable,writeable} into
+>     fault_in_{readable,writeable}
+>   iov_iter: Turn iov_iter_fault_in_readable into
+>     fault_in_iov_iter_readable
+>   iov_iter: Introduce fault_in_iov_iter_writeable
+>   gfs2: Add wrapper for iomap_file_buffered_write
+>   gfs2: Clean up function may_grant
+>   gfs2: Move the inode glock locking to gfs2_file_buffered_write
+>   gfs2: Eliminate ip->i_gh
+>   gfs2: Fix mmap + page fault deadlocks for buffered I/O
+>   iomap: Fix iomap_dio_rw return value for user copies
+>   iomap: Support partial direct I/O on user copy failures
+>   iomap: Add done_before argument to iomap_dio_rw
+>   gup: Introduce FOLL_NOFAULT flag to disable page faults
+>   iov_iter: Introduce nofault flag to disable page faults
+>   gfs2: Fix mmap + page fault deadlocks for direct I/O
+>
+> Bob Peterson (3):
+>   gfs2: Eliminate vestigial HIF_FIRST
+>   gfs2: Remove redundant check from gfs2_glock_dq
+>   gfs2: Introduce flag for glock holder auto-demotion
+>
+>  arch/powerpc/kernel/kvm.c           |   3 +-
+>  arch/powerpc/kernel/signal_32.c     |   4 +-
+>  arch/powerpc/kernel/signal_64.c     |   2 +-
+>  arch/x86/kernel/fpu/signal.c        |   7 +-
+>  drivers/gpu/drm/armada/armada_gem.c |   7 +-
+>  fs/btrfs/file.c                     |   7 +-
+>  fs/btrfs/ioctl.c                    |   5 +-
+>  fs/ext4/file.c                      |   5 +-
+>  fs/f2fs/file.c                      |   2 +-
+>  fs/fuse/file.c                      |   2 +-
+>  fs/gfs2/bmap.c                      |  60 +----
+>  fs/gfs2/file.c                      | 245 ++++++++++++++++++--
+>  fs/gfs2/glock.c                     | 340 +++++++++++++++++++++-------
+>  fs/gfs2/glock.h                     |  20 ++
+>  fs/gfs2/incore.h                    |   5 +-
+>  fs/iomap/buffered-io.c              |   2 +-
+>  fs/iomap/direct-io.c                |  21 +-
+>  fs/ntfs/file.c                      |   2 +-
+>  fs/xfs/xfs_file.c                   |   6 +-
+>  fs/zonefs/super.c                   |   4 +-
+>  include/linux/iomap.h               |  11 +-
+>  include/linux/mm.h                  |   3 +-
+>  include/linux/pagemap.h             |  58 +----
+>  include/linux/uio.h                 |   4 +-
+>  lib/iov_iter.c                      | 103 +++++++--
+>  mm/filemap.c                        |   4 +-
+>  mm/gup.c                            | 139 +++++++++++-
+>  27 files changed, 785 insertions(+), 286 deletions(-)
+>
+> --
+> 2.26.3
+>
+
+
+--=20
+Filipe David Manana,
+
+=E2=80=9CWhether you think you can, or you think you can't =E2=80=94 you're=
+ right.=E2=80=9D
