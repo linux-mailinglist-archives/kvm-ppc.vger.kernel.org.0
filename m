@@ -2,431 +2,126 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CBA8400DCA
-	for <lists+kvm-ppc@lfdr.de>; Sun,  5 Sep 2021 04:27:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0D354019A6
+	for <lists+kvm-ppc@lfdr.de>; Mon,  6 Sep 2021 12:19:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231989AbhIEC2O (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 4 Sep 2021 22:28:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35762 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231908AbhIEC2N (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 4 Sep 2021 22:28:13 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60FA3C061757
-        for <kvm-ppc@vger.kernel.org>; Sat,  4 Sep 2021 19:27:11 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id gp20-20020a17090adf1400b00196b761920aso2270907pjb.3
-        for <kvm-ppc@vger.kernel.org>; Sat, 04 Sep 2021 19:27:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=sTx/blmdXkyFW4cdD5Xgc1D3BKuYTREessMByUS2XKI=;
-        b=X4CxIdEJgBYOz6QRbrYpIyQHqzTCL9s7+Fv44VFnh/ayKPzqDNuEJD3PAU+sfIjYUC
-         yjdCwAji2c1Urqmd0fqWzjgvVMJ2KPtitB6JMwHjulqgv4i/H5LJXx/PUTsC0xZu/jXI
-         mc2ev7w8Bw+wFdWtq7v7LKcicV+r+D7gUTWjJpFm19PxFC5euqEXOc6FD+t//YYHso7d
-         uZC4s49OozynBMcDaFQlrkGzf2WhHJ2arinnecbn3RBgESo2Xk5lcBIzSKFpdetK0aI+
-         KFgxtYnvWlDNk1u1y5AlXypjqWi4vNAUD9xpUXch15vVcwinRspiz1V1vG8ThHeA6Zv3
-         UpqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=sTx/blmdXkyFW4cdD5Xgc1D3BKuYTREessMByUS2XKI=;
-        b=HgOakolWYuFvWbLE+YomXX+9oUbVcrlqT9lsTFQy1+XRGvURUjrf1aA5+fZhiUqN/y
-         CXauILVSpRrHjzs5CJ1t6Ma6Gz24mve/o1KT7DtHEak8wKJbjykukHSYM++MLsBM4nzp
-         1/V+n7ONzs1zQlMXHHw2qT7pQPXrLAjp9VWt1zfiCeRzGVtnIJBmhPOsQtLoY0I7uDB+
-         4lCq6VrUmMtdeWC/XG9tRItO9uESG1XseMhdpv+/wEhkA3yhGzp7bn7nAoV6sW1gBKwf
-         jpGNr0mFP/iEsoILqCdqQfZzlsmQKX6I1QQEAJ2ONTQBWQ6srbQkfSU3HDvVE9Q9KgxU
-         GkUA==
-X-Gm-Message-State: AOAM5326AOEr5wa+euA0398ZB8EHu9xx44VDmB0pvmVd4QTFV9yQLEmS
-        Twhlxjg8ZXSSt0YXLFna6trUlQ==
-X-Google-Smtp-Source: ABdhPJy1kvbAYTOLHfMLvNJIxAhvFuLg+EimjTIgcaZeONjvLC8epxaTAJyrEtdehEhk0wIZ4/IgsQ==
-X-Received: by 2002:a17:90b:250e:: with SMTP id ns14mr6869743pjb.84.1630808830462;
-        Sat, 04 Sep 2021 19:27:10 -0700 (PDT)
-Received: from [192.168.10.23] (124-171-108-209.dyn.iinet.net.au. [124.171.108.209])
-        by smtp.gmail.com with ESMTPSA id q21sm3966525pgk.71.2021.09.04.19.27.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Sep 2021 19:27:09 -0700 (PDT)
-Message-ID: <872d75a4-08e2-f597-0bee-6be9fdce0ac1@ozlabs.ru>
-Date:   Sun, 5 Sep 2021 12:27:04 +1000
+        id S241860AbhIFKUP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 6 Sep 2021 06:20:15 -0400
+Received: from foss.arm.com ([217.140.110.172]:54492 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232032AbhIFKUP (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Mon, 6 Sep 2021 06:20:15 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 39725D6E;
+        Mon,  6 Sep 2021 03:19:10 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C89813F73D;
+        Mon,  6 Sep 2021 03:19:07 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RFC PATCH 1/5] lib: arm: Print test exit status
+ on exit if chr-testdev is not available
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
+        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
+        maz@kernel.org, vivek.gautam@arm.com
+References: <20210702163122.96110-1-alexandru.elisei@arm.com>
+ <20210702163122.96110-2-alexandru.elisei@arm.com>
+ <20210712163647.oxntpjapur4z23sl@gator>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <7814beab-547e-98d9-9aa0-3b7e5afd803b@arm.com>
+Date:   Mon, 6 Sep 2021 11:20:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:92.0) Gecko/20100101
- Thunderbird/92.0
-Subject: Re: [PATCH kernel v2] KVM: PPC: Merge powerpc's debugfs entry content
- into generic entry
-Content-Language: en-US
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Fabiano Rosas <farosas@linux.ibm.com>
-References: <20210904133532.2871562-1-aik@ozlabs.ru>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <20210904133532.2871562-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20210712163647.oxntpjapur4z23sl@gator>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Please ignore this one, v3 is coming.
+Hi Drew,
 
-After I posted this, I suddenly realized that the vcpu debugfs entry 
-remain until the VM exists and this does not handle vcpu 
-hotunplug+hotplug (the ppc book3e did handle this). Thanks,
+Sorry for taking so long to reply, been busy with other things.
 
+On 7/12/21 5:36 PM, Andrew Jones wrote:
+> On Fri, Jul 02, 2021 at 05:31:18PM +0100, Alexandru Elisei wrote:
+>> The arm64 tests can be run under kvmtool, which doesn't emulate a
+>> chr-testdev device. In preparation for adding run script support for
+>> kvmtool, print the test exit status so the scripts can pick it up and
+>> correctly mark the test as pass or fail.
+>>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  lib/chr-testdev.h |  1 +
+>>  lib/arm/io.c      | 10 +++++++++-
+>>  lib/chr-testdev.c |  5 +++++
+>>  3 files changed, 15 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/lib/chr-testdev.h b/lib/chr-testdev.h
+>> index ffd9a851aa9b..09b4b424670e 100644
+>> --- a/lib/chr-testdev.h
+>> +++ b/lib/chr-testdev.h
+>> @@ -11,4 +11,5 @@
+>>   */
+>>  extern void chr_testdev_init(void);
+>>  extern void chr_testdev_exit(int code);
+>> +extern bool chr_testdev_available(void);
+>>  #endif
+>> diff --git a/lib/arm/io.c b/lib/arm/io.c
+>> index 343e10822263..9e62b571a91b 100644
+>> --- a/lib/arm/io.c
+>> +++ b/lib/arm/io.c
+>> @@ -125,7 +125,15 @@ extern void halt(int code);
+>>  
+>>  void exit(int code)
+>>  {
+>> -	chr_testdev_exit(code);
+>> +	if (chr_testdev_available()) {
+>> +		chr_testdev_exit(code);
+> chr_testdev_exit() already has a 'if !vcon goto out' in it, so you can
+> just call it unconditionally. No need for chr_testdev_available().
 
-On 04/09/2021 23:35, Alexey Kardashevskiy wrote:
-> At the moment the generic KVM code creates an "%pid-%fd" entry per a KVM
-> instance; and the PPC HV KVM creates its own at "vm%pid". The Book3E KVM
-> creates its own entry for timings.
-> 
-> The problems with the PPC entries are:
-> 1. they do not allow multiple VMs in the same process (which is extremely
-> rare case mostly used by syzkaller fuzzer);
-> 2. prone to race bugs like the generic KVM code had fixed in
-> commit 85cd39af14f4 ("KVM: Do not leak memory for duplicate debugfs
-> directories").
-> 
-> This defines kvm_arch_create_kvm_debugfs() similar to one for vcpus.
-> 
-> This defines 2 hooks in kvmppc_ops for allowing specific KVM
-> implementations to add necessary entries. This defines handlers
-> for HV KVM and defines the Book3E debugfs vcpu helper as a handler.
-> 
-> This makes use of already existing kvm_arch_create_vcpu_debugfs
-> on PPC.
-> 
-> This removes no more used debugfs_dir pointers from PPC kvm_arch structs.
-> 
-> Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> Changes:
-> v2:
-> * handled powerpc-booke
-> * s/kvm/vm/ in arch hooks
-> ---
->   arch/powerpc/include/asm/kvm_host.h    |  7 +++---
->   arch/powerpc/include/asm/kvm_ppc.h     |  2 ++
->   arch/powerpc/kvm/timing.h              |  7 +++---
->   include/linux/kvm_host.h               |  3 +++
->   arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
->   arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
->   arch/powerpc/kvm/book3s_hv.c           | 30 +++++++++-----------------
->   arch/powerpc/kvm/e500.c                |  1 +
->   arch/powerpc/kvm/e500mc.c              |  1 +
->   arch/powerpc/kvm/powerpc.c             | 15 ++++++++++---
->   arch/powerpc/kvm/timing.c              | 20 ++++-------------
->   virt/kvm/kvm_main.c                    |  3 +++
->   12 files changed, 44 insertions(+), 49 deletions(-)
-> 
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-> index 2bcac6da0a4b..f29b66cc2163 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -296,7 +296,6 @@ struct kvm_arch {
->   	bool dawr1_enabled;
->   	pgd_t *pgtable;
->   	u64 process_table;
-> -	struct dentry *debugfs_dir;
->   	struct kvm_resize_hpt *resize_hpt; /* protected by kvm->lock */
->   #endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
->   #ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
-> @@ -672,7 +671,6 @@ struct kvm_vcpu_arch {
->   	u64 timing_min_duration[__NUMBER_OF_KVM_EXIT_TYPES];
->   	u64 timing_max_duration[__NUMBER_OF_KVM_EXIT_TYPES];
->   	u64 timing_last_exit;
-> -	struct dentry *debugfs_exit_timing;
->   #endif
->   
->   #ifdef CONFIG_PPC_BOOK3S
-> @@ -828,8 +826,6 @@ struct kvm_vcpu_arch {
->   	struct kvmhv_tb_accumulator rm_exit;	/* real-mode exit code */
->   	struct kvmhv_tb_accumulator guest_time;	/* guest execution */
->   	struct kvmhv_tb_accumulator cede_time;	/* time napping inside guest */
-> -
-> -	struct dentry *debugfs_dir;
->   #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
->   };
->   
-> @@ -868,4 +864,7 @@ static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
->   static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
->   static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
->   
-> +#define __KVM_HAVE_ARCH_VCPU_DEBUGFS
-> +#define __KVM_HAVE_ARCH_KVM_DEBUGFS
-> +
->   #endif /* __POWERPC_KVM_HOST_H__ */
-> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-> index 6355a6980ccf..fd841e844b90 100644
-> --- a/arch/powerpc/include/asm/kvm_ppc.h
-> +++ b/arch/powerpc/include/asm/kvm_ppc.h
-> @@ -316,6 +316,8 @@ struct kvmppc_ops {
->   	int (*svm_off)(struct kvm *kvm);
->   	int (*enable_dawr1)(struct kvm *kvm);
->   	bool (*hash_v3_possible)(void);
-> +	void (*create_vm_debugfs)(struct kvm *kvm);
-> +	void (*create_vcpu_debugfs)(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry);
->   };
->   
->   extern struct kvmppc_ops *kvmppc_hv_ops;
-> diff --git a/arch/powerpc/kvm/timing.h b/arch/powerpc/kvm/timing.h
-> index feef7885ba82..36f7c201c6f1 100644
-> --- a/arch/powerpc/kvm/timing.h
-> +++ b/arch/powerpc/kvm/timing.h
-> @@ -14,8 +14,8 @@
->   #ifdef CONFIG_KVM_EXIT_TIMING
->   void kvmppc_init_timing_stats(struct kvm_vcpu *vcpu);
->   void kvmppc_update_timing_stats(struct kvm_vcpu *vcpu);
-> -void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu, unsigned int id);
-> -void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu);
-> +void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu,
-> +				struct dentry *debugfs_dentry);
->   
->   static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type)
->   {
-> @@ -27,8 +27,7 @@ static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type)
->   static inline void kvmppc_init_timing_stats(struct kvm_vcpu *vcpu) {}
->   static inline void kvmppc_update_timing_stats(struct kvm_vcpu *vcpu) {}
->   static inline void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu,
-> -						unsigned int id) {}
-> -static inline void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
-> +					      struct dentry *debugfs_dentry) {}
->   static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type) {}
->   #endif /* CONFIG_KVM_EXIT_TIMING */
->   
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index ae7735b490b4..4f22b1201a0d 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1021,6 +1021,9 @@ int kvm_arch_pm_notifier(struct kvm *kvm, unsigned long state);
->   #ifdef __KVM_HAVE_ARCH_VCPU_DEBUGFS
->   void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry);
->   #endif
-> +#ifdef __KVM_HAVE_ARCH_KVM_DEBUGFS
-> +void kvm_arch_create_vm_debugfs(struct kvm *kvm);
-> +#endif
->   
->   int kvm_arch_hardware_enable(void);
->   void kvm_arch_hardware_disable(void);
-> diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> index c63e263312a4..33dae253a0ac 100644
-> --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> @@ -2112,7 +2112,7 @@ static const struct file_operations debugfs_htab_fops = {
->   
->   void kvmppc_mmu_debugfs_init(struct kvm *kvm)
->   {
-> -	debugfs_create_file("htab", 0400, kvm->arch.debugfs_dir, kvm,
-> +	debugfs_create_file("htab", 0400, kvm->debugfs_dentry, kvm,
->   			    &debugfs_htab_fops);
->   }
->   
-> diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-> index c5508744e14c..f4e083c20872 100644
-> --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-> +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-> @@ -1452,7 +1452,7 @@ static const struct file_operations debugfs_radix_fops = {
->   
->   void kvmhv_radix_debugfs_init(struct kvm *kvm)
->   {
-> -	debugfs_create_file("radix", 0400, kvm->arch.debugfs_dir, kvm,
-> +	debugfs_create_file("radix", 0400, kvm->debugfs_dentry, kvm,
->   			    &debugfs_radix_fops);
->   }
->   
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index c8f12b056968..046df9e0d462 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -2771,19 +2771,14 @@ static const struct file_operations debugfs_timings_ops = {
->   };
->   
->   /* Create a debugfs directory for the vcpu */
-> -static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
-> +static void kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
->   {
-> -	char buf[16];
-> -	struct kvm *kvm = vcpu->kvm;
-> -
-> -	snprintf(buf, sizeof(buf), "vcpu%u", id);
-> -	vcpu->arch.debugfs_dir = debugfs_create_dir(buf, kvm->arch.debugfs_dir);
-> -	debugfs_create_file("timings", 0444, vcpu->arch.debugfs_dir, vcpu,
-> +	debugfs_create_file("timings", 0444, debugfs_dentry, vcpu,
->   			    &debugfs_timings_ops);
->   }
->   
->   #else /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
-> -static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
-> +static void kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
->   {
->   }
->   #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
-> @@ -2907,8 +2902,6 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_vcpu *vcpu)
->   	vcpu->arch.cpu_type = KVM_CPU_3S_64;
->   	kvmppc_sanity_check(vcpu);
->   
-> -	debugfs_vcpu_init(vcpu, id);
-> -
->   	return 0;
->   }
->   
-> @@ -5186,7 +5179,6 @@ void kvmppc_free_host_rm_ops(void)
->   static int kvmppc_core_init_vm_hv(struct kvm *kvm)
->   {
->   	unsigned long lpcr, lpid;
-> -	char buf[32];
->   	int ret;
->   
->   	mutex_init(&kvm->arch.uvmem_lock);
-> @@ -5319,16 +5311,14 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
->   		kvm->arch.smt_mode = 1;
->   	kvm->arch.emul_smt_mode = 1;
->   
-> -	/*
-> -	 * Create a debugfs directory for the VM
-> -	 */
-> -	snprintf(buf, sizeof(buf), "vm%d", current->pid);
-> -	kvm->arch.debugfs_dir = debugfs_create_dir(buf, kvm_debugfs_dir);
-> +	return 0;
-> +}
-> +
-> +static void kvmppc_arch_create_vm_debugfs_hv(struct kvm *kvm)
-> +{
->   	kvmppc_mmu_debugfs_init(kvm);
->   	if (radix_enabled())
->   		kvmhv_radix_debugfs_init(kvm);
-> -
-> -	return 0;
->   }
->   
->   static void kvmppc_free_vcores(struct kvm *kvm)
-> @@ -5342,8 +5332,6 @@ static void kvmppc_free_vcores(struct kvm *kvm)
->   
->   static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
->   {
-> -	debugfs_remove_recursive(kvm->arch.debugfs_dir);
-> -
->   	if (!cpu_has_feature(CPU_FTR_ARCH_300))
->   		kvm_hv_vm_deactivated();
->   
-> @@ -5996,6 +5984,8 @@ static struct kvmppc_ops kvm_ops_hv = {
->   	.svm_off = kvmhv_svm_off,
->   	.enable_dawr1 = kvmhv_enable_dawr1,
->   	.hash_v3_possible = kvmppc_hash_v3_possible,
-> +	.create_vcpu_debugfs = kvmppc_arch_create_vcpu_debugfs_hv,
-> +	.create_vm_debugfs = kvmppc_arch_create_vm_debugfs_hv,
->   };
->   
->   static int kvm_init_subcore_bitmap(void)
-> diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
-> index 7e8b69015d20..d82e70c3e0a9 100644
-> --- a/arch/powerpc/kvm/e500.c
-> +++ b/arch/powerpc/kvm/e500.c
-> @@ -495,6 +495,7 @@ static struct kvmppc_ops kvm_ops_e500 = {
->   	.emulate_op = kvmppc_core_emulate_op_e500,
->   	.emulate_mtspr = kvmppc_core_emulate_mtspr_e500,
->   	.emulate_mfspr = kvmppc_core_emulate_mfspr_e500,
-> +	.create_vcpu_debugfs = kvmppc_create_vcpu_debugfs,
->   };
->   
->   static int __init kvmppc_e500_init(void)
-> diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-> index 1c189b5aadcc..45eacd949f4b 100644
-> --- a/arch/powerpc/kvm/e500mc.c
-> +++ b/arch/powerpc/kvm/e500mc.c
-> @@ -381,6 +381,7 @@ static struct kvmppc_ops kvm_ops_e500mc = {
->   	.emulate_op = kvmppc_core_emulate_op_e500,
->   	.emulate_mtspr = kvmppc_core_emulate_mtspr_e500,
->   	.emulate_mfspr = kvmppc_core_emulate_mfspr_e500,
-> +	.create_vcpu_debugfs = kvmppc_create_vcpu_debugfs,
->   };
->   
->   static int __init kvmppc_e500mc_init(void)
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index c248d6d8b9e3..c895521ac6e9 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -763,7 +763,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->   		goto out_vcpu_uninit;
->   
->   	vcpu->arch.waitp = &vcpu->wait;
-> -	kvmppc_create_vcpu_debugfs(vcpu, vcpu->vcpu_id);
->   	return 0;
->   
->   out_vcpu_uninit:
-> @@ -780,8 +779,6 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->   	/* Make sure we're not using the vcpu anymore */
->   	hrtimer_cancel(&vcpu->arch.dec_timer);
->   
-> -	kvmppc_remove_vcpu_debugfs(vcpu);
-> -
->   	switch (vcpu->arch.irq_type) {
->   	case KVMPPC_IRQ_MPIC:
->   		kvmppc_mpic_disconnect_vcpu(vcpu->arch.mpic, vcpu);
-> @@ -2505,3 +2502,15 @@ int kvm_arch_init(void *opaque)
->   }
->   
->   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_ppc_instr);
-> +
-> +void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
-> +{
-> +	if (vcpu->kvm->arch.kvm_ops->create_vcpu_debugfs)
-> +		vcpu->kvm->arch.kvm_ops->create_vcpu_debugfs(vcpu, debugfs_dentry);
-> +}
-> +
-> +void kvm_arch_create_vm_debugfs(struct kvm *kvm)
-> +{
-> +	if (kvm->arch.kvm_ops->create_vm_debugfs)
-> +		kvm->arch.kvm_ops->create_vm_debugfs(kvm);
-> +}
-> diff --git a/arch/powerpc/kvm/timing.c b/arch/powerpc/kvm/timing.c
-> index ba56a5cbba97..e1c17afc714d 100644
-> --- a/arch/powerpc/kvm/timing.c
-> +++ b/arch/powerpc/kvm/timing.c
-> @@ -204,21 +204,9 @@ static const struct file_operations kvmppc_exit_timing_fops = {
->   	.release = single_release,
->   };
->   
-> -void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu, unsigned int id)
-> +void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu,
-> +				struct dentry *debugfs_dentry)
->   {
-> -	static char dbg_fname[50];
-> -	struct dentry *debugfs_file;
-> -
-> -	snprintf(dbg_fname, sizeof(dbg_fname), "vm%u_vcpu%u_timing",
-> -		 current->pid, id);
-> -	debugfs_file = debugfs_create_file(dbg_fname, 0666, kvm_debugfs_dir,
-> -						vcpu, &kvmppc_exit_timing_fops);
-> -
-> -	vcpu->arch.debugfs_exit_timing = debugfs_file;
-> -}
-> -
-> -void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu)
-> -{
-> -	debugfs_remove(vcpu->arch.debugfs_exit_timing);
-> -	vcpu->arch.debugfs_exit_timing = NULL;
-> +	debugfs_create_file("timing", 0666, debugfs_dentry,
-> +			    vcpu, &kvmppc_exit_timing_fops);
->   }
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index b50dbe269f4b..85b2550e18e7 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -954,6 +954,9 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
->   				    kvm->debugfs_dentry, stat_data,
->   				    &stat_fops_per_vm);
->   	}
-> +#ifdef __KVM_HAVE_ARCH_KVM_DEBUGFS
-> +	kvm_arch_create_vm_debugfs(kvm);
-> +#endif
->   	return 0;
->   }
->   
-> 
+I'm not sure what you mean. There has to be a way to check if chr-testdev is
+available, and if it's not present on the system, to print the EXIT: STATUS
+message, and vcon is static in chr-testdev.c.
 
--- 
-Alexey
+Are you suggesting that we move the message to chr_testdev_exit(code)?
+
+Thanks,
+
+Alex
+
+>
+>> +	} else {
+>> +		/*
+>> +		 * Print the test return code in the format used by chr-testdev
+>> +		 * so the runner script can parse it.
+>> +		 */
+>> +		printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
+>> +	}
+>>  	psci_system_off();
+>>  	halt(code);
+>>  	__builtin_unreachable();
+>> diff --git a/lib/chr-testdev.c b/lib/chr-testdev.c
+>> index b3c641a833fe..301e73a6c064 100644
+>> --- a/lib/chr-testdev.c
+>> +++ b/lib/chr-testdev.c
+>> @@ -68,3 +68,8 @@ void chr_testdev_init(void)
+>>  	in_vq = vqs[0];
+>>  	out_vq = vqs[1];
+>>  }
+>> +
+>> +bool chr_testdev_available(void)
+>> +{
+>> +	return vcon != NULL;
+>> +}
+>> -- 
+>> 2.32.0
+>>
+> Thanks,
+> drew 
+>
