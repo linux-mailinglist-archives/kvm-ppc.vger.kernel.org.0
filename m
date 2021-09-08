@@ -2,54 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5727C403CD1
-	for <lists+kvm-ppc@lfdr.de>; Wed,  8 Sep 2021 17:49:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABEE6403D53
+	for <lists+kvm-ppc@lfdr.de>; Wed,  8 Sep 2021 18:07:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349653AbhIHPu6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 8 Sep 2021 11:50:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37197 "EHLO
+        id S1347166AbhIHQI5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 8 Sep 2021 12:08:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57586 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348440AbhIHPu5 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 8 Sep 2021 11:50:57 -0400
+        by vger.kernel.org with ESMTP id S235639AbhIHQI4 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 8 Sep 2021 12:08:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631116189;
+        s=mimecast20190719; t=1631117268;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=40UFBHRGhw7kqtdgKZE841ipL5pc0UoJdYE+Qv6yqos=;
-        b=h820ZvBQ1iARuwOK50tEmfUsB/2ll/X2P7mAltw2xnYuO1rt8+NKLfkGi/hg1R8oB/a70O
-        3U0NK6ndQpNh314Q8hmgDXX6i6kkWEhy1joOOwOYXuHS3+560gvdMYyjyDW9fBW6jL29bO
-        S8iT0id4o/1WLPbXvKeQYmMjb4ARjoA=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-vxBt2uT6O2qcCpgj7cPXiA-1; Wed, 08 Sep 2021 11:49:48 -0400
-X-MC-Unique: vxBt2uT6O2qcCpgj7cPXiA-1
-Received: by mail-ej1-f69.google.com with SMTP id o7-20020a170906288700b005bb05cb6e25so1192017ejd.23
-        for <kvm-ppc@vger.kernel.org>; Wed, 08 Sep 2021 08:49:48 -0700 (PDT)
+        bh=bgAixjfqxK+KySv0KLIPFQXXlPfwGRV/dBCLSa1qrTs=;
+        b=aUw0wiLpDa+JObqaDmcQp0On/HCXQwVbL0k6oHuq2QmocCj8vkp8PyiqSLAUVe23XIOTiV
+        qDeaFa8HOG3C6PS1+VjJc1fncajvRi9cNW5/bPpHy754PZ44RdoNiB+4EGOmShsGfIlNMf
+        8tE+s70nkui5YvL6OZ/ZFi839o55Ygo=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-6-wCazdvpNMzOggoRMfDcQmg-1; Wed, 08 Sep 2021 12:07:47 -0400
+X-MC-Unique: wCazdvpNMzOggoRMfDcQmg-1
+Received: by mail-ej1-f72.google.com with SMTP id x21-20020a170906135500b005d8d4900c5eso1248912ejb.4
+        for <kvm-ppc@vger.kernel.org>; Wed, 08 Sep 2021 09:07:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=40UFBHRGhw7kqtdgKZE841ipL5pc0UoJdYE+Qv6yqos=;
-        b=WBIk/EluPEz+MyVLxBAAWK1iWIddWLUYE0k4TtkXEMI/8poBiV57yZNXA8VMT2y/Fb
-         EBDwar8gFOeKePplgctYyf4OBzgMzTZ3Q9l182f8+E1rwJMDH1qTK3h455Xaw9lauhHT
-         d1k/l7bpP8TRAvLbus5UBTOraw789w0xO5NDazG55EfBUyf30zjOhHlSKestAqtWFQxj
-         yi82jllnIAvW5w/tra4/QQLHvgi0UH+JXqQcInScA+mKSN2zOHoVgdvsAUiF9HUhcqgT
-         HGiBYX/SKHHLMkFpamYN0Fomo0DbsleWDPT3H8ga8lPfujAL8fbyhaM0g3UJkQE6KW6W
-         eMUw==
-X-Gm-Message-State: AOAM533kzDYJ8YB7p3qIjrac1LA2d0kxKd7GFGBR7NncKCVw2+Vn2Z1C
-        rXFHPd3uycenU6ZTnO0gN8TtqMc8O5lAGWuFNEArdj+S/RiTFDd3dpK/F7k6GUVfpSq1HslLI0N
-        nMkJ15I+GwUvS816p0w==
-X-Received: by 2002:a17:906:b052:: with SMTP id bj18mr546486ejb.55.1631116187168;
-        Wed, 08 Sep 2021 08:49:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwXu4ZttkpvQjuCVBMIYjCKsZn9H35dFZn58PHwzeCurWJGXZpuFqkrf66aLT/CwHYOOp5Rdw==
-X-Received: by 2002:a17:906:b052:: with SMTP id bj18mr546467ejb.55.1631116186921;
-        Wed, 08 Sep 2021 08:49:46 -0700 (PDT)
+        bh=bgAixjfqxK+KySv0KLIPFQXXlPfwGRV/dBCLSa1qrTs=;
+        b=cmL127xPvPdJh/PF0tkhFOPdGkCQmPIfjz4Rz1Wa7tXpbhcns7ATKDDbbVid8O2ZTg
+         Q2M3N43OwpXNLlvxOX+He0Zc/2EZOle+7h1IWpiXqvchrkBRSQmzuplgCriOlTvnTYVl
+         5HyMDJ5hoBTlGvcQRoVy/Y34lFrsfePlMQPZr9rMbcehnT/nw9N8dVOrM8hmDS4Pz0+A
+         3PdfWqevgHDpA2WJcNIGoCf0ZLTmeSNJ3JztG7R1rQuf7iv5W5ffEXJUgwrsaoTHUd2g
+         hDUQp7daSEMH7XdUKLp905noKcgtuOVCtwW6KaqLWeS4u0cg5HilZxY04osS6f1gSzgI
+         C5dw==
+X-Gm-Message-State: AOAM531jVwSqkhQA35h64ruL8gEx+JNpiuk8TVmjxpOEVnEELtuN96ll
+        xPHAC7upNEbbxk3dAAX0AS29PoqtNMaTXJ8rDt0A7S2sOqnpNrwkB/eji8evWJgYNbpoRRdLeBk
+        +1tjXXXguGb3XbAnQhA==
+X-Received: by 2002:aa7:c04e:: with SMTP id k14mr4597900edo.101.1631117265775;
+        Wed, 08 Sep 2021 09:07:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx/Z+CwRUwOjBWCCIIw4LzHo1BJr62ATb5mUiTSp/JNWar8qE3J6IMmTqOXtmUN6Dl6kWTUDw==
+X-Received: by 2002:aa7:c04e:: with SMTP id k14mr4597875edo.101.1631117265580;
+        Wed, 08 Sep 2021 09:07:45 -0700 (PDT)
 Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id t16sm1226386ejj.54.2021.09.08.08.49.44
+        by smtp.gmail.com with ESMTPSA id l8sm1080254ejn.103.2021.09.08.09.07.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Sep 2021 08:49:45 -0700 (PDT)
-Date:   Wed, 8 Sep 2021 17:49:43 +0200
+        Wed, 08 Sep 2021 09:07:45 -0700 (PDT)
+Date:   Wed, 8 Sep 2021 18:07:43 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
@@ -58,125 +58,107 @@ Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
         linux-s390@vger.kernel.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
         maz@kernel.org, vivek.gautam@arm.com
-Subject: Re: [kvm-unit-tests RFC PATCH 3/5] run_tests.sh: Add kvmtool support
-Message-ID: <20210908154943.z7d6bhww3pnbaftd@gator>
+Subject: Re: [kvm-unit-tests RFC PATCH 4/5] scripts: Generate kvmtool
+ standalone tests
+Message-ID: <20210908160743.l4hrl4de7wkxwuda@gator>
 References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-4-alexandru.elisei@arm.com>
- <20210907101730.trnsig2j4jmhinyu@gator>
- <587a5f8c-cf04-59ec-7e35-4ca6adf87862@arm.com>
- <20210908150912.3d57akqkfux4fahj@gator>
- <56289c06-04ec-1772-6e15-98d02780876d@arm.com>
+ <20210702163122.96110-5-alexandru.elisei@arm.com>
+ <20210907102135.i2w3r7j4zyj736b5@gator>
+ <ee11a10a-c3e6-b9ce-81e1-147025a9b5bd@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <56289c06-04ec-1772-6e15-98d02780876d@arm.com>
+In-Reply-To: <ee11a10a-c3e6-b9ce-81e1-147025a9b5bd@arm.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Sep 08, 2021 at 04:46:19PM +0100, Alexandru Elisei wrote:
+On Wed, Sep 08, 2021 at 04:37:39PM +0100, Alexandru Elisei wrote:
 > Hi Drew,
 > 
-> On 9/8/21 4:09 PM, Andrew Jones wrote:
-> > On Wed, Sep 08, 2021 at 03:33:19PM +0100, Alexandru Elisei wrote:
-> > ...
-> >>>> +fixup_kvmtool_opts()
-> >>>> +{
-> >>>> +    local opts=$1
-> >>>> +    local groups=$2
-> >>>> +    local gic
-> >>>> +    local gic_version
-> >>>> +
-> >>>> +    if find_word "pmu" $groups; then
-> >>>> +        opts+=" --pmu"
-> >>>> +    fi
-> >>>> +
-> >>>> +    if find_word "its" $groups; then
-> >>>> +        gic_version=3
-> >>>> +        gic="gicv3-its"
-> >>>> +    elif [[ "$opts" =~ -machine\ *gic-version=(2|3) ]]; then
-> >>>> +        gic_version="${BASH_REMATCH[1]}"
-> >>>> +        gic="gicv$gic_version"
-> >>>> +    fi
-> >>>> +
-> >>>> +    if [ -n "$gic" ]; then
-> >>>> +        opts=${opts/-machine gic-version=$gic_version/}
-> >>>> +        opts+=" --irqchip=$gic"
-> >>>> +    fi
-> >>>> +
-> >>>> +    opts=${opts/-append/--params}
-> >>>> +
-> >>>> +    echo "$opts"
-> >>>> +}
-> >>> Hmm, I don't think we want to write a QEMU parameter translator for
-> >>> all other VMMs, and all other VMM architectures, that we want to
-> >>> support. I think we should add new "extra_params" variables to the
-> >>> unittest configuration instead, e.g. "kvmtool_params", where the
-> >>> extra parameters can be listed correctly and explicitly. While at
-> >>> it, I would create an alias for "extra_params", which would be
-> >>> "qemu_params" allowing unittests that support more than one VMM
-> >>> to clearly show what's what.
-> >> I agree, this is a much better idea than a parameter translator. Using a dedicated
-> >> variable in unittests.cfg will make it easier for new tests to get support for all
-> >> VMMs (for example, writing a list of parameters in unittests.cfg should be easier
-> >> than digging through the scripts to figure exactly how and where to add a
-> >> translation for a new parameter), and it allow us to express parameters for other
-> >> VMMs which don't have a direct correspondent in qemu.
+> On 9/7/21 11:21 AM, Andrew Jones wrote:
+> > On Fri, Jul 02, 2021 at 05:31:21PM +0100, Alexandru Elisei wrote:
+> >> Add support for the standalone target when running kvm-unit-tests under
+> >> kvmtool.
 > >>
-> >> By creating an alias, do you mean replacing extra_params with qemu_params in
-> >> arm/unittests.cfg? Or something else?
-> > Probably something like this
-> >
-> > diff --git a/scripts/common.bash b/scripts/common.bash
-> > index 7b983f7d6dd6..e5119ff216e5 100644
-> > --- a/scripts/common.bash
-> > +++ b/scripts/common.bash
-> > @@ -37,7 +37,12 @@ function for_each_unittest()
-> >                 elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
-> >                         smp=${BASH_REMATCH[1]}
-> >                 elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
-> > -                       opts=${BASH_REMATCH[1]}
-> > +               elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
-> > +                       qemu_opts=${BASH_REMATCH[1]}
-> > +               elif [[ $line =~ ^qemu_params\ *=\ *(.*)$ ]]; then
-> > +                       qemu_opts=${BASH_REMATCH[1]}
-> > +               elif [[ $line =~ ^kvmtool_params\ *=\ *(.*)$ ]]; then
-> > +                       kvmtool_opts=${BASH_REMATCH[1]}
-> >                 elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
-> >                         groups=${BASH_REMATCH[1]}
-> >                 elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
-> >
-> > and all other changes needed to support the s/opts/qemu_opts/ change
-> > should work. Also, an addition to the unittests.cfg documentation.
+> >> Example command line invocation:
+> >>
+> >> $ ./configure --target=kvmtool
+> >> $ make clean && make standalone
+> >>
+> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >> ---
+> >>  scripts/mkstandalone.sh | 14 +++++++-------
+> >>  1 file changed, 7 insertions(+), 7 deletions(-)
+> >>
+> >> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+> >> index 16f461c06842..d84bdb7e278c 100755
+> >> --- a/scripts/mkstandalone.sh
+> >> +++ b/scripts/mkstandalone.sh
+> >> @@ -44,6 +44,10 @@ generate_test ()
+> >>  	config_export ARCH_NAME
+> >>  	config_export PROCESSOR
+> >>  
+> >> +	if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "arm" ]; then
+> >> +		config_export TARGET
+> >> +	fi
+> > Should export unconditionally, since we'll want TARGET set
+> > unconditionally.
 > 
-> Got it, replace extra_opts with qemu_opts in the scripts.
-> 
-> Yes, the documentation for unittests.cfg (at the top of the file) should
-> definitely be updated to document the new configuration option, kvmtool_params.
+> Yes, will do.
 > 
 > >
-> > The above diff doesn't consider that a unittests.cfg file could have
-> > both an 'extra_params' and a 'qemu_params' field, but I'm not sure
-> > we care about that. Users should read the documentation and we
-> > should review changes to the committed unittests.cfg files to avoid
-> > that.
+> >> +
+> >>  	echo "echo BUILD_HEAD=$(cat build-head)"
+> >>  
+> >>  	if [ ! -f $kernel ]; then
+> >> @@ -59,7 +63,7 @@ generate_test ()
+> >>  		echo 'export FIRMWARE'
+> >>  	fi
+> >>  
+> >> -	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+> >> +	if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+> > I think it would be better to ensure that ENVIRON_DEFAULT is "no" for
+> > TARGET=kvmtool in configure.
 > 
-> What do you feel about renaming extra_params -> qemu_params in unittests.cfg?
+> From looking at the code, it is my understanding that with ENVIRON_DEFAULT=yes, an
+> initrd file is generated with the contents of erratatxt and other information, in
+> a key=value pair format. This initrd is then passed on to the test (please correct
+> me if I'm wrong). With ENVIRON_DEFAULT=no (set via ./configure
+> --disable-default-environ), this initrd is not generated.
+> 
+> kvmtool doesn't have support for passing an initrd when loading firmware, so yes,
+> I believe the default should be no.
+> 
+> However, I have two questions:
+> 
+> 1. What happens when the user specifically enables the default environ via
+> ./configure --enable-default-environ --target=kvmtool? In my opinion, that should
+> be an error because the user wants something that is not possible with kvmtool
+> (loading an image with --firmware in kvmtool means that the initrd image it not
+> loaded into the guest memory and no node is generated for it in the dtb), but I
+> would like to hear your thoughts about it.
 
-Yes, that's what I would expect the patch to do.
+As part of the forcing ENVIRON_DEFAULT to "no" for kvmtool in configure an
+error should be generated if a user tries to explicitly enable it.
 
-> I'm
-> thinking it would make the usage clearer, improve consistency (we would have
-> qemu_params and kvmtool_params, instead of extra_params and kvmtool_params), and
-> remove any confusions regarding when they are used (I can see someone thinking
-> that extra_params are used all the time, and are appended to kvmtool_params when
-> --target=kvmtool). On the other hand, this could be problematic for people using
-> out-of-tree scripts that parse the unittest.cfg file for whatever reason (are
-> there people that do that?).
+> 
+> 2. If the default environment is disabled, is it still possible for an user to
+> pass an initrd via other means? I couldn't find where that is implemented, so I'm
+> guessing it's not possible.
 
-I'm not as worried about that as about people using out-of-tree
-unittests.cfg files that will break when the 'extra_params' field
-disappears. That's why I suggested to make 'extra_params' an alias.
+Yes, a user could have a KVM_UNIT_TESTS_ENV environment variable set when
+they launch the tests. If that variable points to a file then it will get
+passed as an initrd. I guess you should also report a warning in arm/run
+if KVM_UNIT_TESTS_ENV is set which states that the environment file will
+be ignored when running with kvmtool.
+
+There aren't currently any other ways to invoke the addition of the
+-initrd command line option, because so far we only support passing a
+single file to test (the environment "file"). If we ever want to pass
+more files, then we'd need to create a simple file system on the initrd
+and make it possible to add -initrd even when no environment is desired.
+But, that may never happen.
 
 Thanks,
 drew
@@ -187,8 +169,30 @@ drew
 > Alex
 > 
 > >
+> >
+> >>  		temp_file ERRATATXT "$ERRATATXT"
+> >>  		echo 'export ERRATATXT'
+> >>  	fi
+> >> @@ -95,12 +99,8 @@ function mkstandalone()
+> >>  	echo Written $standalone.
+> >>  }
+> >>  
+> >> -if [ "$TARGET" = "kvmtool" ]; then
+> >> -	echo "Standalone tests not supported with kvmtool"
+> >> -	exit 2
+> >> -fi
+> >> -
+> >> -if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+> >> +if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && \
+> >> +		[ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+> >>  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
+> >>  	exit 2
+> >>  fi
+> >> -- 
+> >> 2.32.0
+> >>
 > > Thanks,
-> > drew
+> > drew 
 > >
 > 
 
