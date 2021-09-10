@@ -2,80 +2,122 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6016740626A
-	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Sep 2021 02:44:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20AA940670E
+	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Sep 2021 08:05:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241891AbhIJAps (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 9 Sep 2021 20:45:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50342 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234943AbhIJAZ1 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 9 Sep 2021 20:25:27 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 791D1610A3;
-        Fri, 10 Sep 2021 00:24:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631233457;
-        bh=/3PyN0Qj3YLPH/F6yY8D0aSJtt251I6XUp7vJyGCqWU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hoxot8uU4jWmv+pDQ0AqzcnSRAdV//lNfZ0UKDhyUhsVmL144cnlyMO0QMuYCXGvS
-         Bjh5m5zIDzQ9oWnczW/EtkDguPuC9kxQ14pOn4MiC+CWrDEuftvCK4b9P10tbFaG6P
-         CxLXD5L81BYf02ijW5eqGUoI5GEODlYAOOooTuZAjh0iB0MutOz618xRqMn7ZefMpR
-         CySAXtWo6braHY8u6uTHkv48FPPPxQveNPRJehQ3l7ezfvYpAHWope3FKd9O10GPuj
-         OxRoHXG457RXAaEkJnzcOouyekOouQdjLOCymhYKinQWXBI9yjnSytxpF91DmLw/L8
-         T/VyDymuEkbXg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 4.4 10/14] KVM: PPC: Book3S HV: Initialise vcpu MSR with MSR_ME
-Date:   Thu,  9 Sep 2021 20:23:59 -0400
-Message-Id: <20210910002403.176887-10-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210910002403.176887-1-sashal@kernel.org>
-References: <20210910002403.176887-1-sashal@kernel.org>
+        id S230442AbhIJGGh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 10 Sep 2021 02:06:37 -0400
+Received: from smtpout1.mo3005.mail-out.ovh.net ([79.137.123.220]:48425 "EHLO
+        smtpout1.3005.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230429AbhIJGGg (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 10 Sep 2021 02:06:36 -0400
+X-Greylist: delayed 600 seconds by postgrey-1.27 at vger.kernel.org; Fri, 10 Sep 2021 02:06:35 EDT
+Received: from mxplan5.mail.ovh.net (unknown [10.109.146.51])
+        by mo3005.mail-out.ovh.net (Postfix) with ESMTPS id ECA4513EFE4;
+        Fri, 10 Sep 2021 05:48:19 +0000 (UTC)
+Received: from kaod.org (37.59.142.100) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.14; Fri, 10 Sep
+ 2021 07:48:19 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-100R003b2afc9eb-92ed-4917-a57a-8775a7168fc9,
+                    7E3151BA03BDFE499776E315E3312AC0A00E288C) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 82.64.250.170
+Subject: Re: [PATCH AUTOSEL 5.14 38/99] KVM: PPC: Book3S HV: XICS: Fix mapping
+ of passthrough interrupts
+To:     Sasha Levin <sashal@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>
+CC:     Michael Ellerman <mpe@ellerman.id.au>, <kvm-ppc@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>
+References: <20210910001558.173296-1-sashal@kernel.org>
+ <20210910001558.173296-38-sashal@kernel.org>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <27739836-bad2-6b3f-7f40-e84663fbbf24@kaod.org>
+Date:   Fri, 10 Sep 2021 07:48:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+In-Reply-To: <20210910001558.173296-38-sashal@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.100]
+X-ClientProxiedBy: DAG1EX1.mxp5.local (172.16.2.1) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: c650a476-78a5-43c6-9aa9-2b943421663f
+X-Ovh-Tracer-Id: 17411760584997833510
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvtddrudegtddgleekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepjeetfeejteefhfeuveethfduffeftdelvdeghfelhfeljeehheeuieevudeggefhnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddttdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepshgrshhhrghlsehkvghrnhgvlhdrohhrgh
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Nicholas Piggin <npiggin@gmail.com>
+On 9/10/21 2:14 AM, Sasha Levin wrote:
+> From: Cédric Le Goater <clg@kaod.org>
+> 
+> [ Upstream commit 1753081f2d445f9157550692fcc4221cd3ff0958 ]
+> 
+> PCI MSIs now live in an MSI domain but the underlying calls, which
+> will EOI the interrupt in real mode, need an HW IRQ number mapped in
+> the XICS IRQ domain. Grab it there.
+> 
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> Link: https://lore.kernel.org/r/20210701132750.1475580-31-clg@kaod.org
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
 
-[ Upstream commit fd42b7b09c602c904452c0c3e5955ca21d8e387a ]
 
-It is possible to create a VCPU without setting the MSR before running
-it, which results in a warning in kvmhv_vcpu_entry_p9() that MSR_ME is
-not set. This is pretty harmless because the MSR_ME bit is added to
-HSRR1 before HRFID to guest, and a normal qemu guest doesn't hit it.
+Why are we backporting this patch in stable trees ?
 
-Initialise the vcpu MSR with MSR_ME set.
+It should be fine but to compile, we need a partial backport of commit
+51be9e51a800 ("KVM: PPC: Book3S HV: XIVE: Fix mapping of passthrough 
+interrupts") which exports irq_get_default_host().
 
-Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-Link: https://lore.kernel.org/r/20210811160134.904987-2-npiggin@gmail.com
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/powerpc/kvm/book3s_hv.c | 1 +
- 1 file changed, 1 insertion(+)
+Thanks,
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 54c6ba87a25a..ba72bf95c80e 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -1651,6 +1651,7 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_hv(struct kvm *kvm,
- 	spin_lock_init(&vcpu->arch.vpa_update_lock);
- 	spin_lock_init(&vcpu->arch.tbacct_lock);
- 	vcpu->arch.busy_preempt = TB_NIL;
-+	vcpu->arch.shregs.msr = MSR_ME;
- 	vcpu->arch.intr_msr = MSR_SF | MSR_ME;
- 
- 	kvmppc_mmu_book3s_hv_init(vcpu);
--- 
-2.30.2
+C.
+
+
+> ---
+>  arch/powerpc/kvm/book3s_hv.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 085fb8ecbf68..1ca0a4f760bc 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -5328,6 +5328,7 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
+>  	struct kvmppc_passthru_irqmap *pimap;
+>  	struct irq_chip *chip;
+>  	int i, rc = 0;
+> +	struct irq_data *host_data;
+>  
+>  	if (!kvm_irq_bypass)
+>  		return 1;
+> @@ -5392,7 +5393,14 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
+>  	 * the KVM real mode handler.
+>  	 */
+>  	smp_wmb();
+> -	irq_map->r_hwirq = desc->irq_data.hwirq;
+> +
+> +	/*
+> +	 * The 'host_irq' number is mapped in the PCI-MSI domain but
+> +	 * the underlying calls, which will EOI the interrupt in real
+> +	 * mode, need an HW IRQ number mapped in the XICS IRQ domain.
+> +	 */
+> +	host_data = irq_domain_get_irq_data(irq_get_default_host(), host_irq);
+> +	irq_map->r_hwirq = (unsigned int)irqd_to_hwirq(host_data);
+>  
+>  	if (i == pimap->n_mapped)
+>  		pimap->n_mapped++;
+> @@ -5400,7 +5408,7 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
+>  	if (xics_on_xive())
+>  		rc = kvmppc_xive_set_mapped(kvm, guest_gsi, desc);
+>  	else
+> -		kvmppc_xics_set_mapped(kvm, guest_gsi, desc->irq_data.hwirq);
+> +		kvmppc_xics_set_mapped(kvm, guest_gsi, irq_map->r_hwirq);
+>  	if (rc)
+>  		irq_map->r_hwirq = 0;
+>  
+> 
 
