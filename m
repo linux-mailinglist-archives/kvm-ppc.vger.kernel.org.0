@@ -2,236 +2,101 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4719B405957
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Sep 2021 16:42:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 777DD406260
+	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Sep 2021 02:44:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244589AbhIIOm4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 9 Sep 2021 10:42:56 -0400
-Received: from foss.arm.com ([217.140.110.172]:36598 "EHLO foss.arm.com"
+        id S241696AbhIJAp0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 9 Sep 2021 20:45:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43538 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1350908AbhIIOml (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 9 Sep 2021 10:42:41 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC8DF6D;
-        Thu,  9 Sep 2021 07:41:31 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 78A7F3F59C;
-        Thu,  9 Sep 2021 07:41:29 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH 4/5] scripts: Generate kvmtool
- standalone tests
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
-        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
-        maz@kernel.org, vivek.gautam@arm.com
-References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-5-alexandru.elisei@arm.com>
- <20210907102135.i2w3r7j4zyj736b5@gator>
- <ee11a10a-c3e6-b9ce-81e1-147025a9b5bd@arm.com>
- <20210908160743.l4hrl4de7wkxwuda@gator>
- <9d5da497-7070-31ef-282a-a11a86e0102e@arm.com>
- <20210909130553.gnzce7cs7d5stvjd@gator>
- <7313396e-de46-8a3b-902d-5a59b2089c79@arm.com>
- <20210909135429.dqreodxr7elpvmfm@gator>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <e8560cdb-532c-0320-420d-c57d14cdae18@arm.com>
-Date:   Thu, 9 Sep 2021 15:42:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S231691AbhIJAST (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 9 Sep 2021 20:18:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3217961207;
+        Fri, 10 Sep 2021 00:16:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631233012;
+        bh=5QHMzjuKFZj8EELoxq77L9sxWasggjwmQgGgG+hbvEg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=oFfPqXH96IeJlDskuSn3iIA7g0CQoMgaqUizcCCZZGDOnW5REBqxCBvJC8PjGub6K
+         7KA2MPAq4izMlhw4BL0Fy61hIcIqb7bStSZNZGenTQdyWHCAJxoXCjC+uBTzhjciOs
+         B9tZmYD+HRV/haiotUr/+PHQojFYM2CV6CaotcKSGo82FM/S2PAMXcG5GKHdhWM+xS
+         Bbm/LpJawPr/iivNBW03+tWSsm2OUNb3EPanSiKmdEJZPyv7JFezGaNrR7JgtWHqrX
+         mHHBfgMA55eQmPxgkuZHjz62ubQsSM/LBJCD5qBMThcESw+DM1zgRIrLA3OMDZrNni
+         qetwFMUuu9SuA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH AUTOSEL 5.14 38/99] KVM: PPC: Book3S HV: XICS: Fix mapping of passthrough interrupts
+Date:   Thu,  9 Sep 2021 20:14:57 -0400
+Message-Id: <20210910001558.173296-38-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210910001558.173296-1-sashal@kernel.org>
+References: <20210910001558.173296-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210909135429.dqreodxr7elpvmfm@gator>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi Drew,
+From: Cédric Le Goater <clg@kaod.org>
 
-On 9/9/21 2:54 PM, Andrew Jones wrote:
-> On Thu, Sep 09, 2021 at 02:47:57PM +0100, Alexandru Elisei wrote:
->> Hi Drew,
->>
->> On 9/9/21 2:05 PM, Andrew Jones wrote:
->>> On Thu, Sep 09, 2021 at 12:11:52PM +0100, Alexandru Elisei wrote:
->>>> Hi Drew,
->>>>
->>>> On 9/8/21 5:07 PM, Andrew Jones wrote:
->>>>> On Wed, Sep 08, 2021 at 04:37:39PM +0100, Alexandru Elisei wrote:
->>>>>> Hi Drew,
->>>>>>
->>>>>> On 9/7/21 11:21 AM, Andrew Jones wrote:
->>>>>>> On Fri, Jul 02, 2021 at 05:31:21PM +0100, Alexandru Elisei wrote:
->>>>>>>> Add support for the standalone target when running kvm-unit-tests under
->>>>>>>> kvmtool.
->>>>>>>>
->>>>>>>> Example command line invocation:
->>>>>>>>
->>>>>>>> $ ./configure --target=kvmtool
->>>>>>>> $ make clean && make standalone
->>>>>>>>
->>>>>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>>>>>>> ---
->>>>>>>>  scripts/mkstandalone.sh | 14 +++++++-------
->>>>>>>>  1 file changed, 7 insertions(+), 7 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
->>>>>>>> index 16f461c06842..d84bdb7e278c 100755
->>>>>>>> --- a/scripts/mkstandalone.sh
->>>>>>>> +++ b/scripts/mkstandalone.sh
->>>>>>>> @@ -44,6 +44,10 @@ generate_test ()
->>>>>>>>  	config_export ARCH_NAME
->>>>>>>>  	config_export PROCESSOR
->>>>>>>>  
->>>>>>>> +	if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "arm" ]; then
->>>>>>>> +		config_export TARGET
->>>>>>>> +	fi
->>>>>>> Should export unconditionally, since we'll want TARGET set
->>>>>>> unconditionally.
->>>>>> Yes, will do.
->>>>>>
->>>>>>>> +
->>>>>>>>  	echo "echo BUILD_HEAD=$(cat build-head)"
->>>>>>>>  
->>>>>>>>  	if [ ! -f $kernel ]; then
->>>>>>>> @@ -59,7 +63,7 @@ generate_test ()
->>>>>>>>  		echo 'export FIRMWARE'
->>>>>>>>  	fi
->>>>>>>>  
->>>>>>>> -	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
->>>>>>>> +	if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
->>>>>>> I think it would be better to ensure that ENVIRON_DEFAULT is "no" for
->>>>>>> TARGET=kvmtool in configure.
->>>>>> From looking at the code, it is my understanding that with ENVIRON_DEFAULT=yes, an
->>>>>> initrd file is generated with the contents of erratatxt and other information, in
->>>>>> a key=value pair format. This initrd is then passed on to the test (please correct
->>>>>> me if I'm wrong). With ENVIRON_DEFAULT=no (set via ./configure
->>>>>> --disable-default-environ), this initrd is not generated.
->>>>>>
->>>>>> kvmtool doesn't have support for passing an initrd when loading firmware, so yes,
->>>>>> I believe the default should be no.
->>>>>>
->>>>>> However, I have two questions:
->>>>>>
->>>>>> 1. What happens when the user specifically enables the default environ via
->>>>>> ./configure --enable-default-environ --target=kvmtool? In my opinion, that should
->>>>>> be an error because the user wants something that is not possible with kvmtool
->>>>>> (loading an image with --firmware in kvmtool means that the initrd image it not
->>>>>> loaded into the guest memory and no node is generated for it in the dtb), but I
->>>>>> would like to hear your thoughts about it.
->>>>> As part of the forcing ENVIRON_DEFAULT to "no" for kvmtool in configure an
->>>>> error should be generated if a user tries to explicitly enable it.
->>>>>
->>>>>> 2. If the default environment is disabled, is it still possible for an user to
->>>>>> pass an initrd via other means? I couldn't find where that is implemented, so I'm
->>>>>> guessing it's not possible.
->>>>> Yes, a user could have a KVM_UNIT_TESTS_ENV environment variable set when
->>>>> they launch the tests. If that variable points to a file then it will get
->>>>> passed as an initrd. I guess you should also report a warning in arm/run
->>>>> if KVM_UNIT_TESTS_ENV is set which states that the environment file will
->>>>> be ignored when running with kvmtool.
->>>> Thank you for explaining it, I had looked at
->>>> scripts/arch-run.bash::initrd_create(), but it didn't click that setting the
->>>> KVM_UNIT_TESTS_ENV environment variable is enough to generate and use the initrd.
->>>>
->>>> After looking at the code some more, in the logs the -initrd argument is shown as
->>>> a comment, instead of an actual argument that is passed to qemu:
->>>>
->>>> timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64 -nodefaults -machine
->>>> virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device
->>>> virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none
->>>> -serial stdio -kernel arm/cache.flat -smp 1 # -initrd /tmp/tmp.rUIZ3h9KLJ
->>>> QEMU_ACCEL = kvm
->>>> INFO: IDC-DIC: dcache clean to PoU required
->>>> INFO: IDC-DIC: icache invalidation to PoU required
->>>> PASS: IDC-DIC: code generation
->>>> SUMMARY: 1 tests
->>>>
->>>> This is done intentionally in scripts/arch-run.bash::run_qemu(). I don't
->>>> understand the reason for that. When I first looked at the logs, I was sure that
->>>> no initrd is passed to the test. I had to go dig through the scripts to figure out
->>>> that the "#" sign (which marks the beginning of a comment) is not present in the
->>>> qemu invocation.
->>> It's commented out because if you want to copy+paste the command line to
->>> use it again it'll fail to run because the temp file will be gone. Of
->>> course somebody depending on the environment for their test run will have
->>> other problems when it's gone, but those people can use the
->>> KVM_UNIT_TESTS_ENV variable to specify a non-temp file which includes the
->>> default environment and then configure without the default environment.
->>> The command line won't get the # in that case.
->> Hmm... wouldn't it make more sense then to generate the initrd in the logs
->> directory, and keep it there? To ensure the test runs can be reproduced manually,
->> if needed?
-> Well, there's no logs directory for standalone tests, but I do like the
-> idea of capturing the environment when possible. Possibly the best thing
-> to do is to provide an option that, when enabled, says to dump the
-> environment into the log before executing the test. That would be similar
-> to how BUILD_HEAD is output first when running the tests standalone.
-> Anyway, this is a good idea, but probably outside the scope of your
-> kvmtool work unless the initrd thing is blocking you and you need to
-> rework it anyway.
+[ Upstream commit 1753081f2d445f9157550692fcc4221cd3ff0958 ]
 
-I don't need to change anything about how initrd works in kvm-unit-tests for my
-kvmtool series, I was just curious to understand more about it. Thank you for the
-explanations!
+PCI MSIs now live in an MSI domain but the underlying calls, which
+will EOI the interrupt in real mode, need an HW IRQ number mapped in
+the XICS IRQ domain. Grab it there.
 
-Thanks,
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+Link: https://lore.kernel.org/r/20210701132750.1475580-31-clg@kaod.org
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/powerpc/kvm/book3s_hv.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-Alex
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 085fb8ecbf68..1ca0a4f760bc 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -5328,6 +5328,7 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
+ 	struct kvmppc_passthru_irqmap *pimap;
+ 	struct irq_chip *chip;
+ 	int i, rc = 0;
++	struct irq_data *host_data;
+ 
+ 	if (!kvm_irq_bypass)
+ 		return 1;
+@@ -5392,7 +5393,14 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
+ 	 * the KVM real mode handler.
+ 	 */
+ 	smp_wmb();
+-	irq_map->r_hwirq = desc->irq_data.hwirq;
++
++	/*
++	 * The 'host_irq' number is mapped in the PCI-MSI domain but
++	 * the underlying calls, which will EOI the interrupt in real
++	 * mode, need an HW IRQ number mapped in the XICS IRQ domain.
++	 */
++	host_data = irq_domain_get_irq_data(irq_get_default_host(), host_irq);
++	irq_map->r_hwirq = (unsigned int)irqd_to_hwirq(host_data);
+ 
+ 	if (i == pimap->n_mapped)
+ 		pimap->n_mapped++;
+@@ -5400,7 +5408,7 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
+ 	if (xics_on_xive())
+ 		rc = kvmppc_xive_set_mapped(kvm, guest_gsi, desc);
+ 	else
+-		kvmppc_xics_set_mapped(kvm, guest_gsi, desc->irq_data.hwirq);
++		kvmppc_xics_set_mapped(kvm, guest_gsi, irq_map->r_hwirq);
+ 	if (rc)
+ 		irq_map->r_hwirq = 0;
+ 
+-- 
+2.30.2
 
->
-> Thanks,
-> drew
->
->> Thanks,
->>
->> Alex
->>
->>> Thanks,
->>> drew
->>>
->>>> Thanks,
->>>>
->>>> Alex
->>>>
->>>>> There aren't currently any other ways to invoke the addition of the
->>>>> -initrd command line option, because so far we only support passing a
->>>>> single file to test (the environment "file"). If we ever want to pass
->>>>> more files, then we'd need to create a simple file system on the initrd
->>>>> and make it possible to add -initrd even when no environment is desired.
->>>>> But, that may never happen.
->>>>>
->>>>> Thanks,
->>>>> drew
->>>>>
->>>>>> Thanks,
->>>>>>
->>>>>> Alex
->>>>>>
->>>>>>>>  		temp_file ERRATATXT "$ERRATATXT"
->>>>>>>>  		echo 'export ERRATATXT'
->>>>>>>>  	fi
->>>>>>>> @@ -95,12 +99,8 @@ function mkstandalone()
->>>>>>>>  	echo Written $standalone.
->>>>>>>>  }
->>>>>>>>  
->>>>>>>> -if [ "$TARGET" = "kvmtool" ]; then
->>>>>>>> -	echo "Standalone tests not supported with kvmtool"
->>>>>>>> -	exit 2
->>>>>>>> -fi
->>>>>>>> -
->>>>>>>> -if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
->>>>>>>> +if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && \
->>>>>>>> +		[ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
->>>>>>>>  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
->>>>>>>>  	exit 2
->>>>>>>>  fi
->>>>>>>> -- 
->>>>>>>> 2.32.0
->>>>>>>>
->>>>>>> Thanks,
->>>>>>> drew 
->>>>>>>
