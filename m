@@ -2,40 +2,41 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 395BD406290
-	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Sep 2021 02:45:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EB01406296
+	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Sep 2021 02:45:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232334AbhIJApf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 9 Sep 2021 20:45:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48152 "EHLO mail.kernel.org"
+        id S241793AbhIJApg (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 9 Sep 2021 20:45:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48734 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234066AbhIJAWd (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 9 Sep 2021 20:22:33 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E03D6610E9;
-        Fri, 10 Sep 2021 00:21:22 +0000 (UTC)
+        id S234333AbhIJAXM (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 9 Sep 2021 20:23:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C694B604DC;
+        Fri, 10 Sep 2021 00:22:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631233283;
-        bh=NtulRjOrV87nM8Gavo+JAQMb/AvJx1jcJ3G41Z36vIM=;
+        s=k20201202; t=1631233321;
+        bh=clTN2ElM5rZvt7kmmgVJXHpVifOKOUFmA0jDeON8ICQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AMqalXUcy8ZwtOJw1Nd+Z/Pf1xDnGeZAlM4yA5nPx73ASQolX1F0wOJIiFuorBp+s
-         PLsriQlrZtA1SGkcYsJ6jHjeGohxLhk1wRjxjVNaZoFGosEzpM7ZfjdUX89EWox91T
-         SnNfzR6SsZsr3r2sP2u86R1XRmhSSxPR7NJyZnqZCt7elQPhgYk+Zh470rKwQTJc5r
-         uRY9CG9vdjCfBw6F6HQji3P4uLswXl1PXpjl/XnvKNcqPc3dBQ8jjPgtCBYzMToSJ9
-         0odKxradVA1nsSOvLrZh05860//WeHbXWb4fZgU/ykro8OHKZfurYItA9ceyoie7z/
-         QqRV8uRbuWKKw==
+        b=P+M8TYrLQE9ri8z+3sUcfGaxkkUHJMn/xxxuiaeaMc3FRXPBloMUnyhfNexbhHG4w
+         kRIzlR00mtOU+j+IXGeUoSbHRXLlUqTjCcYp/ocRjqcc73PUL6Z+nOAt5SyUdVuZ51
+         4D31HjwagEKHUuKV6apV1LsI7K9Hjj7QCewxIcJ0IC2WqNzTaWbaflo35cMXvW6uYS
+         GLh0MP+oQtPp/o0w/YYOHqICrPFysLZuI/IO1+6+NbI0hQaYzWMUSfj/acVvRGqx+T
+         t4rYcueFhyTM0er3iKPjIQV3zpMLURQhKXz2wVzbCfhmtiT9U5gRDw6BLLudVHQtsz
+         H3L8JCsPS5GjA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>,
+Cc:     =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
-        Sasha Levin <sashal@kernel.org>, linuxppc-dev@lists.ozlabs.org,
-        kvm-ppc@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 40/53] KVM: PPC: Book3S HV Nested: Fix TM softpatch HFAC interrupt emulation
-Date:   Thu,  9 Sep 2021 20:20:15 -0400
-Message-Id: <20210910002028.175174-40-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH AUTOSEL 5.4 13/37] KVM: PPC: Book3S HV: XICS: Fix mapping of passthrough interrupts
+Date:   Thu,  9 Sep 2021 20:21:18 -0400
+Message-Id: <20210910002143.175731-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210910002028.175174-1-sashal@kernel.org>
-References: <20210910002028.175174-1-sashal@kernel.org>
+In-Reply-To: <20210910002143.175731-1-sashal@kernel.org>
+References: <20210910002143.175731-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -43,204 +44,59 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Nicholas Piggin <npiggin@gmail.com>
+From: Cédric Le Goater <clg@kaod.org>
 
-[ Upstream commit d82b392d9b3556b63e3f9916cf057ea847e173a9 ]
+[ Upstream commit 1753081f2d445f9157550692fcc4221cd3ff0958 ]
 
-Have the TM softpatch emulation code set up the HFAC interrupt and
-return -1 in case an instruction was executed with HFSCR bits clear,
-and have the interrupt exit handler fall through to the HFAC handler.
-When the L0 is running a nested guest, this ensures the HFAC interrupt
-is correctly passed up to the L1.
+PCI MSIs now live in an MSI domain but the underlying calls, which
+will EOI the interrupt in real mode, need an HW IRQ number mapped in
+the XICS IRQ domain. Grab it there.
 
-The "direct guest" exit handler will turn these into PROGILL program
-interrupts so functionality in practice will be unchanged. But it's
-possible an L1 would want to handle these in a different way.
-
-Also rearrange the FAC interrupt emulation code to match the HFAC format
-while here (mainly, adding the FSCR_INTR_CAUSE mask).
-
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-Link: https://lore.kernel.org/r/20210811160134.904987-5-npiggin@gmail.com
+Link: https://lore.kernel.org/r/20210701132750.1475580-31-clg@kaod.org
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/powerpc/include/asm/reg.h  |  3 ++-
- arch/powerpc/kvm/book3s_hv.c    | 35 ++++++++++++++++----------
- arch/powerpc/kvm/book3s_hv_tm.c | 44 ++++++++++++++++++---------------
- 3 files changed, 48 insertions(+), 34 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/reg.h
-index f4b98903064f..af07347ac61a 100644
---- a/arch/powerpc/include/asm/reg.h
-+++ b/arch/powerpc/include/asm/reg.h
-@@ -417,6 +417,7 @@
- #define   FSCR_TAR	__MASK(FSCR_TAR_LG)
- #define   FSCR_EBB	__MASK(FSCR_EBB_LG)
- #define   FSCR_DSCR	__MASK(FSCR_DSCR_LG)
-+#define   FSCR_INTR_CAUSE (ASM_CONST(0xFF) << 56)	/* interrupt cause */
- #define SPRN_HFSCR	0xbe	/* HV=1 Facility Status & Control Register */
- #define   HFSCR_PREFIX	__MASK(FSCR_PREFIX_LG)
- #define   HFSCR_MSGP	__MASK(FSCR_MSGP_LG)
-@@ -428,7 +429,7 @@
- #define   HFSCR_DSCR	__MASK(FSCR_DSCR_LG)
- #define   HFSCR_VECVSX	__MASK(FSCR_VECVSX_LG)
- #define   HFSCR_FP	__MASK(FSCR_FP_LG)
--#define   HFSCR_INTR_CAUSE (ASM_CONST(0xFF) << 56)	/* interrupt cause */
-+#define   HFSCR_INTR_CAUSE FSCR_INTR_CAUSE
- #define SPRN_TAR	0x32f	/* Target Address Register */
- #define SPRN_LPCR	0x13E	/* LPAR Control Register */
- #define   LPCR_VPM0		ASM_CONST(0x8000000000000000)
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 8e16dfecbe36..c63fb61de62a 100644
+index bba358f13471..dc897dff8eb9 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -1425,6 +1425,21 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
- 			r = RESUME_GUEST;
- 		}
- 		break;
-+
-+#ifdef CONFIG_PPC_TRANSACTIONAL_MEM
-+	case BOOK3S_INTERRUPT_HV_SOFTPATCH:
-+		/*
-+		 * This occurs for various TM-related instructions that
-+		 * we need to emulate on POWER9 DD2.2.  We have already
-+		 * handled the cases where the guest was in real-suspend
-+		 * mode and was transitioning to transactional state.
-+		 */
-+		r = kvmhv_p9_tm_emulation(vcpu);
-+		if (r != -1)
-+			break;
-+		fallthrough; /* go to facility unavailable handler */
-+#endif
-+
- 	/*
- 	 * This occurs if the guest (kernel or userspace), does something that
- 	 * is prohibited by HFSCR.
-@@ -1443,18 +1458,6 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
- 		}
- 		break;
+@@ -5020,6 +5020,7 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
+ 	struct kvmppc_passthru_irqmap *pimap;
+ 	struct irq_chip *chip;
+ 	int i, rc = 0;
++	struct irq_data *host_data;
  
--#ifdef CONFIG_PPC_TRANSACTIONAL_MEM
--	case BOOK3S_INTERRUPT_HV_SOFTPATCH:
--		/*
--		 * This occurs for various TM-related instructions that
--		 * we need to emulate on POWER9 DD2.2.  We have already
--		 * handled the cases where the guest was in real-suspend
--		 * mode and was transitioning to transactional state.
--		 */
--		r = kvmhv_p9_tm_emulation(vcpu);
--		break;
--#endif
--
- 	case BOOK3S_INTERRUPT_HV_RM_HARD:
- 		r = RESUME_PASSTHROUGH;
- 		break;
-@@ -1552,9 +1555,15 @@ static int kvmppc_handle_nested_exit(struct kvm_vcpu *vcpu)
- 		 * mode and was transitioning to transactional state.
- 		 */
- 		r = kvmhv_p9_tm_emulation(vcpu);
--		break;
-+		if (r != -1)
-+			break;
-+		fallthrough; /* go to facility unavailable handler */
- #endif
- 
-+	case BOOK3S_INTERRUPT_H_FAC_UNAVAIL:
-+		r = RESUME_HOST;
-+		break;
+ 	if (!kvm_irq_bypass)
+ 		return 1;
+@@ -5084,7 +5085,14 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
+ 	 * the KVM real mode handler.
+ 	 */
+ 	smp_wmb();
+-	irq_map->r_hwirq = desc->irq_data.hwirq;
 +
- 	case BOOK3S_INTERRUPT_HV_RM_HARD:
- 		vcpu->arch.trap = 0;
- 		r = RESUME_GUEST;
-diff --git a/arch/powerpc/kvm/book3s_hv_tm.c b/arch/powerpc/kvm/book3s_hv_tm.c
-index e7c36f8bf205..866cadd70094 100644
---- a/arch/powerpc/kvm/book3s_hv_tm.c
-+++ b/arch/powerpc/kvm/book3s_hv_tm.c
-@@ -88,14 +88,15 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
- 		}
- 		/* check EBB facility is available */
- 		if (!(vcpu->arch.hfscr & HFSCR_EBB)) {
--			/* generate an illegal instruction interrupt */
--			kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
--			return RESUME_GUEST;
-+			vcpu->arch.hfscr &= ~HFSCR_INTR_CAUSE;
-+			vcpu->arch.hfscr |= (u64)FSCR_EBB_LG << 56;
-+			vcpu->arch.trap = BOOK3S_INTERRUPT_H_FAC_UNAVAIL;
-+			return -1; /* rerun host interrupt handler */
- 		}
- 		if ((msr & MSR_PR) && !(vcpu->arch.fscr & FSCR_EBB)) {
- 			/* generate a facility unavailable interrupt */
--			vcpu->arch.fscr = (vcpu->arch.fscr & ~(0xffull << 56)) |
--				((u64)FSCR_EBB_LG << 56);
-+			vcpu->arch.fscr &= ~FSCR_INTR_CAUSE;
-+			vcpu->arch.fscr |= (u64)FSCR_EBB_LG << 56;
- 			kvmppc_book3s_queue_irqprio(vcpu, BOOK3S_INTERRUPT_FAC_UNAVAIL);
- 			return RESUME_GUEST;
- 		}
-@@ -138,14 +139,15 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
- 		}
- 		/* check for TM disabled in the HFSCR or MSR */
- 		if (!(vcpu->arch.hfscr & HFSCR_TM)) {
--			/* generate an illegal instruction interrupt */
--			kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
--			return RESUME_GUEST;
-+			vcpu->arch.hfscr &= ~HFSCR_INTR_CAUSE;
-+			vcpu->arch.hfscr |= (u64)FSCR_TM_LG << 56;
-+			vcpu->arch.trap = BOOK3S_INTERRUPT_H_FAC_UNAVAIL;
-+			return -1; /* rerun host interrupt handler */
- 		}
- 		if (!(msr & MSR_TM)) {
- 			/* generate a facility unavailable interrupt */
--			vcpu->arch.fscr = (vcpu->arch.fscr & ~(0xffull << 56)) |
--				((u64)FSCR_TM_LG << 56);
-+			vcpu->arch.fscr &= ~FSCR_INTR_CAUSE;
-+			vcpu->arch.fscr |= (u64)FSCR_TM_LG << 56;
- 			kvmppc_book3s_queue_irqprio(vcpu,
- 						BOOK3S_INTERRUPT_FAC_UNAVAIL);
- 			return RESUME_GUEST;
-@@ -169,14 +171,15 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
- 	case (PPC_INST_TRECLAIM & PO_XOP_OPCODE_MASK):
- 		/* check for TM disabled in the HFSCR or MSR */
- 		if (!(vcpu->arch.hfscr & HFSCR_TM)) {
--			/* generate an illegal instruction interrupt */
--			kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
--			return RESUME_GUEST;
-+			vcpu->arch.hfscr &= ~HFSCR_INTR_CAUSE;
-+			vcpu->arch.hfscr |= (u64)FSCR_TM_LG << 56;
-+			vcpu->arch.trap = BOOK3S_INTERRUPT_H_FAC_UNAVAIL;
-+			return -1; /* rerun host interrupt handler */
- 		}
- 		if (!(msr & MSR_TM)) {
- 			/* generate a facility unavailable interrupt */
--			vcpu->arch.fscr = (vcpu->arch.fscr & ~(0xffull << 56)) |
--				((u64)FSCR_TM_LG << 56);
-+			vcpu->arch.fscr &= ~FSCR_INTR_CAUSE;
-+			vcpu->arch.fscr |= (u64)FSCR_TM_LG << 56;
- 			kvmppc_book3s_queue_irqprio(vcpu,
- 						BOOK3S_INTERRUPT_FAC_UNAVAIL);
- 			return RESUME_GUEST;
-@@ -208,14 +211,15 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
- 		/* XXX do we need to check for PR=0 here? */
- 		/* check for TM disabled in the HFSCR or MSR */
- 		if (!(vcpu->arch.hfscr & HFSCR_TM)) {
--			/* generate an illegal instruction interrupt */
--			kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
--			return RESUME_GUEST;
-+			vcpu->arch.hfscr &= ~HFSCR_INTR_CAUSE;
-+			vcpu->arch.hfscr |= (u64)FSCR_TM_LG << 56;
-+			vcpu->arch.trap = BOOK3S_INTERRUPT_H_FAC_UNAVAIL;
-+			return -1; /* rerun host interrupt handler */
- 		}
- 		if (!(msr & MSR_TM)) {
- 			/* generate a facility unavailable interrupt */
--			vcpu->arch.fscr = (vcpu->arch.fscr & ~(0xffull << 56)) |
--				((u64)FSCR_TM_LG << 56);
-+			vcpu->arch.fscr &= ~FSCR_INTR_CAUSE;
-+			vcpu->arch.fscr |= (u64)FSCR_TM_LG << 56;
- 			kvmppc_book3s_queue_irqprio(vcpu,
- 						BOOK3S_INTERRUPT_FAC_UNAVAIL);
- 			return RESUME_GUEST;
++	/*
++	 * The 'host_irq' number is mapped in the PCI-MSI domain but
++	 * the underlying calls, which will EOI the interrupt in real
++	 * mode, need an HW IRQ number mapped in the XICS IRQ domain.
++	 */
++	host_data = irq_domain_get_irq_data(irq_get_default_host(), host_irq);
++	irq_map->r_hwirq = (unsigned int)irqd_to_hwirq(host_data);
+ 
+ 	if (i == pimap->n_mapped)
+ 		pimap->n_mapped++;
+@@ -5092,7 +5100,7 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
+ 	if (xics_on_xive())
+ 		rc = kvmppc_xive_set_mapped(kvm, guest_gsi, desc);
+ 	else
+-		kvmppc_xics_set_mapped(kvm, guest_gsi, desc->irq_data.hwirq);
++		kvmppc_xics_set_mapped(kvm, guest_gsi, irq_map->r_hwirq);
+ 	if (rc)
+ 		irq_map->r_hwirq = 0;
+ 
 -- 
 2.30.2
 
