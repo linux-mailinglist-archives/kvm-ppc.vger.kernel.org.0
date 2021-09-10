@@ -2,41 +2,41 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F67F406275
-	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Sep 2021 02:44:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3E27406279
+	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Sep 2021 02:44:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230218AbhIJApb (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 9 Sep 2021 20:45:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46516 "EHLO mail.kernel.org"
+        id S231811AbhIJApc (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 9 Sep 2021 20:45:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46976 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233553AbhIJAUT (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Thu, 9 Sep 2021 20:20:19 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A92D4611C2;
-        Fri, 10 Sep 2021 00:19:06 +0000 (UTC)
+        id S231646AbhIJAU7 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 9 Sep 2021 20:20:59 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DE7A96023D;
+        Fri, 10 Sep 2021 00:19:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631233147;
-        bh=EzVc4+9z8jJm3006a4PiHOFkM6wMDw2uoZJqKWC7Rz8=;
+        s=k20201202; t=1631233189;
+        bh=Y3/js3fqBvwtcn9MbY6awCZpDmfBWh1okOFkiaTE7BM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JjK8XoY61T71LIr3dIYYdc01p6UJMuamzPA6uha8dgRoRgcp3vanJrY3HKnegvV/C
-         ngLva2mWvFNYmfuuL8PIcgCVgIywlocDI0a8Lt1ihT+UU/9wyeY57e4iMNuPnuwP3d
-         oqToHElSyqnHkmajCHnDDybvP1QuI+aDRRM26urT8yClQEuloNwnrAaOOxxdC+ZAGs
-         EZFr4WkFB+OYYk7xhX4CLKJbNyJq7eK3TQ/uxhPNB314Yhz9FLdcvVbToSx+R0abn2
-         EEYcqGKGDuCKOXA/WZuyDsBzZpmYt1agm4qruW1BusJRbU8RyI+lrYTD8ZQ8hrK03Z
-         F/JAQ0y6JkKQA==
+        b=A8vylV/hK+o4oY3BnoHcmGBp+pyjmayx7zh093Y+CWmAVbj9153UPioiQotQLoj+A
+         ovW1V7875e4tbZklcR7S1lOsRXEDg/KHrnk+TlhMZx+dhi/UQ7qfTj9JJbqxkmTzcI
+         jJloe+CPsvtkF3CgXqJslKYXzz1N0LA8nxgx4BbpX9uX7QR7Oosk4wsr7h+OxOorUr
+         CyePpt/wx4PCQdioSsDl57iastjaj6IGvhqKdX2Tq744CLrx8PjRX+phM3jB2o/zOa
+         59asswRbQI4xMdeL2rvYa9Vi+PoXy+z7lLx8HeMxfc+XjjCbtXncGYPFoFrDvqFIZo
+         F1Soo6+rD9iXw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Sasha Levin <sashal@kernel.org>, kvm-ppc@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 5.13 32/88] KVM: PPC: Book3S HV: XICS: Fix mapping of passthrough interrupts
-Date:   Thu,  9 Sep 2021 20:17:24 -0400
-Message-Id: <20210910001820.174272-32-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.13 63/88] KVM: PPC: Book3S HV: Initialise vcpu MSR with MSR_ME
+Date:   Thu,  9 Sep 2021 20:17:55 -0400
+Message-Id: <20210910001820.174272-63-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210910001820.174272-1-sashal@kernel.org>
 References: <20210910001820.174272-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -44,59 +44,38 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Nicholas Piggin <npiggin@gmail.com>
 
-[ Upstream commit 1753081f2d445f9157550692fcc4221cd3ff0958 ]
+[ Upstream commit fd42b7b09c602c904452c0c3e5955ca21d8e387a ]
 
-PCI MSIs now live in an MSI domain but the underlying calls, which
-will EOI the interrupt in real mode, need an HW IRQ number mapped in
-the XICS IRQ domain. Grab it there.
+It is possible to create a VCPU without setting the MSR before running
+it, which results in a warning in kvmhv_vcpu_entry_p9() that MSR_ME is
+not set. This is pretty harmless because the MSR_ME bit is added to
+HSRR1 before HRFID to guest, and a normal qemu guest doesn't hit it.
 
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Initialise the vcpu MSR with MSR_ME set.
+
+Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-Link: https://lore.kernel.org/r/20210701132750.1475580-31-clg@kaod.org
+Link: https://lore.kernel.org/r/20210811160134.904987-2-npiggin@gmail.com
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/powerpc/kvm/book3s_hv.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 395f98158e81..a284999a3171 100644
+index a284999a3171..14c6b8392021 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -5170,6 +5170,7 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
- 	struct kvmppc_passthru_irqmap *pimap;
- 	struct irq_chip *chip;
- 	int i, rc = 0;
-+	struct irq_data *host_data;
+@@ -2432,6 +2432,7 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_vcpu *vcpu)
+ 	spin_lock_init(&vcpu->arch.vpa_update_lock);
+ 	spin_lock_init(&vcpu->arch.tbacct_lock);
+ 	vcpu->arch.busy_preempt = TB_NIL;
++	vcpu->arch.shregs.msr = MSR_ME;
+ 	vcpu->arch.intr_msr = MSR_SF | MSR_ME;
  
- 	if (!kvm_irq_bypass)
- 		return 1;
-@@ -5234,7 +5235,14 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
- 	 * the KVM real mode handler.
- 	 */
- 	smp_wmb();
--	irq_map->r_hwirq = desc->irq_data.hwirq;
-+
-+	/*
-+	 * The 'host_irq' number is mapped in the PCI-MSI domain but
-+	 * the underlying calls, which will EOI the interrupt in real
-+	 * mode, need an HW IRQ number mapped in the XICS IRQ domain.
-+	 */
-+	host_data = irq_domain_get_irq_data(irq_get_default_host(), host_irq);
-+	irq_map->r_hwirq = (unsigned int)irqd_to_hwirq(host_data);
- 
- 	if (i == pimap->n_mapped)
- 		pimap->n_mapped++;
-@@ -5242,7 +5250,7 @@ static int kvmppc_set_passthru_irq(struct kvm *kvm, int host_irq, int guest_gsi)
- 	if (xics_on_xive())
- 		rc = kvmppc_xive_set_mapped(kvm, guest_gsi, desc);
- 	else
--		kvmppc_xics_set_mapped(kvm, guest_gsi, desc->irq_data.hwirq);
-+		kvmppc_xics_set_mapped(kvm, guest_gsi, irq_map->r_hwirq);
- 	if (rc)
- 		irq_map->r_hwirq = 0;
- 
+ 	/*
 -- 
 2.30.2
 
