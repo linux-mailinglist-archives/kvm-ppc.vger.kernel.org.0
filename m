@@ -2,87 +2,95 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69723409900
-	for <lists+kvm-ppc@lfdr.de>; Mon, 13 Sep 2021 18:25:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 126E64098F0
+	for <lists+kvm-ppc@lfdr.de>; Mon, 13 Sep 2021 18:24:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237030AbhIMQ1A (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 13 Sep 2021 12:27:00 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:44051 "EHLO
-        smtpout1.mo529.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229795AbhIMQ1A (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 Sep 2021 12:27:00 -0400
-X-Greylist: delayed 368 seconds by postgrey-1.27 at vger.kernel.org; Mon, 13 Sep 2021 12:26:59 EDT
-Received: from mxplan5.mail.ovh.net (unknown [10.109.146.44])
-        by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 26866BDC1B10;
-        Mon, 13 Sep 2021 18:19:33 +0200 (CEST)
-Received: from kaod.org (37.59.142.103) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.14; Mon, 13 Sep
- 2021 18:19:33 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-103G005f9cd1f28-1563-4076-a263-cc79d3707ab1,
-                    B58C78742DCB5DC23679A7A9E2785397667D7E18) smtp.auth=clg@kaod.org
-X-OVh-ClientIp: 82.64.250.170
-Subject: Re: [PATCH AUTOSEL 5.14 38/99] KVM: PPC: Book3S HV: XICS: Fix mapping
- of passthrough interrupts
-To:     Sasha Levin <sashal@kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
+        id S234182AbhIMQZd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 13 Sep 2021 12:25:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43662 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229535AbhIMQZc (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 Sep 2021 12:25:32 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B286C061762
+        for <kvm-ppc@vger.kernel.org>; Mon, 13 Sep 2021 09:24:16 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id mi6-20020a17090b4b4600b00199280a31cbso295646pjb.0
+        for <kvm-ppc@vger.kernel.org>; Mon, 13 Sep 2021 09:24:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Q0CGByNGBLX5VAdHy/UUqDDhbh6zFNghWMoOnFHZGGw=;
+        b=RKVTfzY0+sEOlHZwMw4vPz+GvPXyX750p2mC7wWOXKxWfCoapA8MjCsz6G9dj02/wG
+         B3XA0COQxzdKlQnGZdkEIklM+WI1cCOz+NXBUmQAkuk6QYoRk2zuC5o5qdb+Waer+AG6
+         OJfpQmWIx+uSLeokuBis+oQjVfX0ehooADGOWTQJL7kvEiY2whnhENiIBsCY1yS7miFs
+         eIwDCSG3arqEXzSdyaQ8k4NCpo1gSL9V/1EeiI4I0/s0VJZhs1z0e/EcQVIbBvac32A4
+         s/tiDk2BF9PVxJ1n8cTLxrdDzppZo/ZkmBIG/TmGcUI4PbafbQvkNhTqwB0iH4JdKWBE
+         B1fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Q0CGByNGBLX5VAdHy/UUqDDhbh6zFNghWMoOnFHZGGw=;
+        b=u4hSjyWZq77W9R8c1JYhQ6zqS+rPNiILke6FEnZOuybMfCmdaZgRS9fbb7VBUkNbwW
+         M3wYEr4i9Wbf5fAyC3mwsKHpj+HtCLqSZFBAnJlVcL/+HfZPqBz/+lLnkC/GVvQ19M0z
+         yPTP0LevMdHPzFxLwMENpYvQqjUbAT2sythjg5pH+N5+qYPnhqZHY20rKKuih7PybIxf
+         gRmUMu/10AF0WUOjnOSavxBbErnXaVB3GU5QAVvwRRXk1g07LzSCATlAZJRopSIKhdrR
+         b5DdupszokWKTJ5vb3Qzuw6YE62pkweYDPMUD5m3+6Uq7WxDdpBhkuOA2fSgB+vN3k3o
+         ArGg==
+X-Gm-Message-State: AOAM5338Mbm+1jTmnVsMmfCT8dJCJNcEKIiuFtYaGLX3liU9YWehIjFh
+        8FS3WioN3Lc6u02L0K7CdKk5xQ==
+X-Google-Smtp-Source: ABdhPJxf1CW8M7Ti4tr+U9bXba0ZjdRcakxdnIlaD1AcyqYZi788mkJc1rFObUJoedvExK8OgSG5Tw==
+X-Received: by 2002:a17:902:c94f:b0:13b:8359:9506 with SMTP id i15-20020a170902c94f00b0013b83599506mr9519028pla.33.1631550255767;
+        Mon, 13 Sep 2021 09:24:15 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b16sm7768188pfr.138.2021.09.13.09.24.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Sep 2021 09:24:15 -0700 (PDT)
+Date:   Mon, 13 Sep 2021 16:24:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Juergen Gross <jgross@suse.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
-        <kvm-ppc@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>
-References: <20210910001558.173296-1-sashal@kernel.org>
- <20210910001558.173296-38-sashal@kernel.org>
- <27739836-bad2-6b3f-7f40-e84663fbbf24@kaod.org> <YTy+xUtEEpln2Sq4@sashalap>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <90cd638d-62d2-8c98-cce0-4c71feee8671@kaod.org>
-Date:   Mon, 13 Sep 2021 18:19:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH 2/2] kvm: rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS
+Message-ID: <YT97K7yXyCrphyCt@google.com>
+References: <20210913135745.13944-1-jgross@suse.com>
+ <20210913135745.13944-3-jgross@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <YTy+xUtEEpln2Sq4@sashalap>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.103]
-X-ClientProxiedBy: DAG2EX2.mxp5.local (172.16.2.12) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: c78f8b93-1b94-4716-88b6-cfd8e4a89938
-X-Ovh-Tracer-Id: 8796937449597471526
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvtddrudegjedgleeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepjeetfeejteefhfeuveethfduffeftdelvdeghfelhfeljeehheeuieevudeggefhnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepshgrshhhrghlsehkvghrnhgvlhdrohhrgh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210913135745.13944-3-jgross@suse.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 9/11/21 4:35 PM, Sasha Levin wrote:
-> On Fri, Sep 10, 2021 at 07:48:18AM +0200, Cédric Le Goater wrote:
->> On 9/10/21 2:14 AM, Sasha Levin wrote:
->>> From: Cédric Le Goater <clg@kaod.org>
->>>
->>> [ Upstream commit 1753081f2d445f9157550692fcc4221cd3ff0958 ]
->>>
->>> PCI MSIs now live in an MSI domain but the underlying calls, which
->>> will EOI the interrupt in real mode, need an HW IRQ number mapped in
->>> the XICS IRQ domain. Grab it there.
->>>
->>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->>> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
->>> Link: https://lore.kernel.org/r/20210701132750.1475580-31-clg@kaod.org
->>> Signed-off-by: Sasha Levin <sashal@kernel.org>
->>
->>
->> Why are we backporting this patch in stable trees ?
->>
->> It should be fine but to compile, we need a partial backport of commit
->> 51be9e51a800 ("KVM: PPC: Book3S HV: XIVE: Fix mapping of passthrough
->> interrupts") which exports irq_get_default_host().
-> 
-> Or, I can drop it if it makes no sense?
+On Mon, Sep 13, 2021, Juergen Gross wrote:
+> KVM_MAX_VCPU_ID is not specifying the highest allowed vcpu-id, but the
+> number of allowed vcpu-ids. This has already led to confusion, so
+> rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS to make its semantics more
+> clear
 
-Yes I would. 
-
-It makes sense only with the full patchset, the one reworking PCI MSI 
-support in the PPC pSeries and PowerNV platforms.
-
-Thanks,
-
-C.
+My hesitation with this rename is that the max _number_ of IDs is not the same
+thing as the max allowed ID.  E.g. on x86, given a capability that enumerates the
+max number of IDs, I would expect to be able to create vCPUs with arbitrary 32-bit
+x2APIC IDs so long as the total number of IDs is below the max.
