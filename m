@@ -2,72 +2,96 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0E3F4078D1
-	for <lists+kvm-ppc@lfdr.de>; Sat, 11 Sep 2021 16:35:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BBE4409161
+	for <lists+kvm-ppc@lfdr.de>; Mon, 13 Sep 2021 16:00:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbhIKOhE (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 11 Sep 2021 10:37:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41562 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229452AbhIKOhD (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sat, 11 Sep 2021 10:37:03 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C6D3A6109F;
-        Sat, 11 Sep 2021 14:35:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631370951;
-        bh=LW2199kttJtBTwAhoKWy75wM87SVN6+UIBjbbND4LYA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uMcyHemGp+1THisLwBmc8sth9JoOxiEj44S11tY69ywFVKEmUkfe7yZcIUVhkAgpG
-         rF7SMCIGr8F7KU+zyBAEw5DGe70MThctGMSeBNG1bYBnj7ATTZYmKwiOBY5v+bXz0D
-         HaVo6f8Q/G2SQguHdFB9ezWbBjiTMJ8ShDVx7bX6JRauvCYBq+32RXRraq7m10BbQQ
-         xHcV9prI5MtKamXcOmLEfBiJ3YaocRFbZLE4OROn4UruO+vlbFtm56dF3QNmbqqFbJ
-         4Dq/gnCSnNHLaUzhYV6H/VWfrSEFnD06ye93bUIDVsdoxjtxU5lCYj+k3r5YVbAcEQ
-         4uEgyAuabiDrw==
-Date:   Sat, 11 Sep 2021 10:35:49 -0400
-From:   Sasha Levin <sashal@kernel.org>
-To:     =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH AUTOSEL 5.14 38/99] KVM: PPC: Book3S HV: XICS: Fix
- mapping of passthrough interrupts
-Message-ID: <YTy+xUtEEpln2Sq4@sashalap>
-References: <20210910001558.173296-1-sashal@kernel.org>
- <20210910001558.173296-38-sashal@kernel.org>
- <27739836-bad2-6b3f-7f40-e84663fbbf24@kaod.org>
+        id S1343696AbhIMOBJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 13 Sep 2021 10:01:09 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:58060 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245106AbhIMN7I (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 13 Sep 2021 09:59:08 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id EC9A61FD84;
+        Mon, 13 Sep 2021 13:57:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1631541468; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=hH7Iy2pE2qXXycVl+pdgp/YjaWw0chbvKCaG1nR6wMw=;
+        b=rskVLjWzWO+SQgKM7whOVKZMJUU4eAWiaaJMkUHgZ4o7XtDWNqJkR0Wr4hdo3PNSaEbKzB
+        Exa6amYfD+QDBiQhuM+DEZysqjzQngjO3Q3MK8s9iFamZnSgC1AeJZJ+unDND6ZpNFUZSC
+        o24T08ZH8M+lcBm0flqCa3TxOm58Cks=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0B52D13AB2;
+        Mon, 13 Sep 2021 13:57:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id ucX7ANxYP2FMUwAAMHmgww
+        (envelope-from <jgross@suse.com>); Mon, 13 Sep 2021 13:57:48 +0000
+From:   Juergen Gross <jgross@suse.com>
+To:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kselftest@vger.kernel.org
+Cc:     Juergen Gross <jgross@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>
+Subject: [PATCH 0/2] kvm: fix KVM_MAX_VCPU_ID handling
+Date:   Mon, 13 Sep 2021 15:57:42 +0200
+Message-Id: <20210913135745.13944-1-jgross@suse.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <27739836-bad2-6b3f-7f40-e84663fbbf24@kaod.org>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Sep 10, 2021 at 07:48:18AM +0200, Cédric Le Goater wrote:
->On 9/10/21 2:14 AM, Sasha Levin wrote:
->> From: Cédric Le Goater <clg@kaod.org>
->>
->> [ Upstream commit 1753081f2d445f9157550692fcc4221cd3ff0958 ]
->>
->> PCI MSIs now live in an MSI domain but the underlying calls, which
->> will EOI the interrupt in real mode, need an HW IRQ number mapped in
->> the XICS IRQ domain. Grab it there.
->>
->> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
->> Link: https://lore.kernel.org/r/20210701132750.1475580-31-clg@kaod.org
->> Signed-off-by: Sasha Levin <sashal@kernel.org>
->
->
->Why are we backporting this patch in stable trees ?
->
->It should be fine but to compile, we need a partial backport of commit
->51be9e51a800 ("KVM: PPC: Book3S HV: XIVE: Fix mapping of passthrough
->interrupts") which exports irq_get_default_host().
+Revert commit 76b4f357d0e7d8f6f00 which was based on wrong reasoning
+and rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS in order to avoid the
+same issue in future.
 
-Or, I can drop it if it makes no sense?
+Juergen Gross (2):
+  x86/kvm: revert commit 76b4f357d0e7d8f6f00
+  kvm: rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS
+
+ Documentation/virt/kvm/devices/xics.rst            | 2 +-
+ Documentation/virt/kvm/devices/xive.rst            | 2 +-
+ arch/mips/kvm/mips.c                               | 2 +-
+ arch/powerpc/include/asm/kvm_book3s.h              | 2 +-
+ arch/powerpc/include/asm/kvm_host.h                | 4 ++--
+ arch/powerpc/kvm/book3s_xive.c                     | 2 +-
+ arch/powerpc/kvm/powerpc.c                         | 2 +-
+ arch/x86/include/asm/kvm_host.h                    | 2 +-
+ arch/x86/kvm/ioapic.c                              | 2 +-
+ arch/x86/kvm/ioapic.h                              | 4 ++--
+ arch/x86/kvm/x86.c                                 | 2 +-
+ include/linux/kvm_host.h                           | 4 ++--
+ tools/testing/selftests/kvm/kvm_create_max_vcpus.c | 2 +-
+ virt/kvm/kvm_main.c                                | 2 +-
+ 14 files changed, 17 insertions(+), 17 deletions(-)
 
 -- 
-Thanks,
-Sasha
+2.26.2
+
