@@ -2,201 +2,140 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8A4B40B50D
-	for <lists+kvm-ppc@lfdr.de>; Tue, 14 Sep 2021 18:38:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 272BD40F3B6
+	for <lists+kvm-ppc@lfdr.de>; Fri, 17 Sep 2021 10:08:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229483AbhINQkO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 14 Sep 2021 12:40:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43902 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229492AbhINQkN (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Tue, 14 Sep 2021 12:40:13 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4F970610A6;
-        Tue, 14 Sep 2021 16:38:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631637536;
-        bh=uvMVvjps/EzMsz0e/xHGQpDS9hZhJdVg3N7lAeNdyBs=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=WXC4s1Flpimwz39El5q5+N6oUFi6W3Ber0xZF7Sd1TJdvRVCyFdn+oXvHkpQM8W05
-         Z77ubk8ByH+yjXJvcmOLTpUrbCKbs2PtX7amk8zOruo8S3wvWdfVZLeikZx6uNyWt+
-         T8UVGprTDms1n4hm8DUmA2t9kV/42PB9z6/lFkrX4DjGymOqJAy/5VhXEYFXdtbePU
-         Q/BjDlnHLEaruapz9+cE6MbLdnopRIt3ueUJsHGktUKjN/obnEdxb1uPDnrIjupO3c
-         nhii9mfPUHZzjwaP0zSI7vJRsWrucLwlth8VRfo6QLd1Cl20XK/5eRGlBHZct6nUhV
-         PHKrmshoxVvUQ==
-Subject: Re: [PATCH] powerpc: clean up UPD_CONSTR
-To:     Nick Desaulniers <ndesaulniers@google.com>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Will Deacon <will@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Segher Boessenkool <segher@kernel.crashing.org>,
-        David Hildenbrand <david@redhat.com>,
-        Michal Hocko <mhocko@suse.com>, Daniel Axtens <dja@axtens.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        "Christopher M. Riedl" <cmr@codefail.de>,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-References: <20210914161712.2463458-1-ndesaulniers@google.com>
-From:   Nathan Chancellor <nathan@kernel.org>
-Message-ID: <c2ebc59f-c14e-d78f-78f0-2204d09cf81c@kernel.org>
-Date:   Tue, 14 Sep 2021 09:38:53 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S231996AbhIQII4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 17 Sep 2021 04:08:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60612 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230421AbhIQIFD (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 17 Sep 2021 04:05:03 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B923AC061764
+        for <kvm-ppc@vger.kernel.org>; Fri, 17 Sep 2021 01:03:01 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id x7so8403346pfa.8
+        for <kvm-ppc@vger.kernel.org>; Fri, 17 Sep 2021 01:03:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=axtens.net; s=google;
+        h=from:to:cc:subject:in-reply-to:references:date:message-id
+         :mime-version;
+        bh=F5LdGTojih2Mc9qSmXv5ONSympP9xKi3sLGrLFi+yzk=;
+        b=gOgFekj2lvWmEwLRxLyVCPqRF9r1OQF6l575N3C9OXIFLvIZaAMiV0aNpRE7b+41mi
+         sJoDmghGgPqLFIt3NibqOoxb+zL0KBbAj6lumtqMTUMD1d/PyRCD27ui0SNlw430v94h
+         AXprAqATqRevW7DgHSZ9jc/RmOihB+bwBbyr4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=F5LdGTojih2Mc9qSmXv5ONSympP9xKi3sLGrLFi+yzk=;
+        b=j9RAH2qCkFbhvphbYeW95/UccN3s4InWzD8rMfeiNT1SGf1gnlF/Q5yVSDj/1Ro1GD
+         9eajUSyTpnouSEtXYfc6lU+Eho5cZhXcnCGCMGqgS2t1gV7L9upZXqS+kX3ByKv6xZr+
+         FNOFMB+S5CKBGR33qOtp6YXKJsMiLToOXUvSwCVGWfKrTauAqonpq6D9BrnXXwg/w4Tw
+         H5EcphQ7/8nw/VvVXcRA9ZoZMJwb4bJCLEwjvHFDz2uI1OBL7a5dihJygXC+kFVnzOqd
+         hosP3U5K01agAV0uNm9ntVk1I0+zOzK3Ijjc5n+mg8htaJylNdzSa0EIHoZdktlh1pjn
+         t+7Q==
+X-Gm-Message-State: AOAM532lTW/bA64JUlHuRuXrRx9vT/t5+1mCkHHosV7cgOB++z9wtT9t
+        IwdK3ZCEvdsKrXyXJNydTio6ZnVPmPx6hw==
+X-Google-Smtp-Source: ABdhPJzOkw+0F7WSnznscTnJ/cH5+aC6jY0pVEvMB51WiRscz24cZIrYjX6+6+kBATbnK/yq6NE54A==
+X-Received: by 2002:a63:5d5f:: with SMTP id o31mr8769726pgm.56.1631865781230;
+        Fri, 17 Sep 2021 01:03:01 -0700 (PDT)
+Received: from localhost ([2001:4479:e200:df00:f1a1:4b0:6139:723d])
+        by smtp.gmail.com with ESMTPSA id 126sm6213924pgi.86.2021.09.17.01.03.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Sep 2021 01:03:00 -0700 (PDT)
+From:   Daniel Axtens <dja@axtens.net>
+To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Cc:     Eirik Fuller <efuller@redhat.com>, kvm-ppc@vger.kernel.org,
+        Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v1 1/2] powerpc/64s: system call rfscv workaround for TM bugs
+In-Reply-To: <20210908101718.118522-1-npiggin@gmail.com>
+References: <20210908101718.118522-1-npiggin@gmail.com>
+Date:   Fri, 17 Sep 2021 18:02:57 +1000
+Message-ID: <87ilyz8w9a.fsf@linkitivity.dja.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20210914161712.2463458-1-ndesaulniers@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 9/14/2021 9:17 AM, Nick Desaulniers wrote:
-> UPD_CONSTR was previously a preprocessor define for an old GCC 4.9 inline
-> asm bug with m<> constraints.
-> 
-> Fixes: 6563139d90ad ("powerpc: remove GCC version check for UPD_CONSTR")
-> Suggested-by: Nathan Chancellor <nathan@kernel.org>
-> Suggested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Suggested-by: Michael Ellerman <mpe@ellerman.id.au>
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+Nicholas Piggin <npiggin@gmail.com> writes:
 
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+> The rfscv instruction does not work correctly with the fake-suspend mode
+> in POWER9, which can end up with the hypervisor restoring an incorrect
+> checkpoint.
 
+If I understand correctly from commit 4bb3c7a0208f ("KVM: PPC: Book3S
+HV: Work around transactional memory bugs in POWER9"), this is because
+rfscv does not cause a soft-patch interrupt in the way that rfid etc do.
+So we need to avoid calling rfscv if we are in fake-suspend state -
+instead we must call something that does indeed get soft-patched - like
+rfid.
+
+> Work around this by setting the _TIF_RESTOREALL flag if a system call
+> returns to a transaction active state, causing rfid to be used instead
+> of rfscv to return, which will do the right thing. The contents of the
+> registers are irrelevant because they will be overwritten in this case
+> anyway.
+
+I can follow that this will indeed cause syscall_exit_prepare to return
+non-zero and therefore we should take the
+syscall_vectored_*_restore_regs path which does an RFID_TO_USER rather
+than a RFSCV_TO_USER. My only question/concern is:
+
+.Lsyscall_vectored_\name\()_exit:
+	addi	r4,r1,STACK_FRAME_OVERHEAD
+	li	r5,1 /* scv */
+	bl	syscall_exit_prepare            <-------- we get r3 != 0  here
+	std	r1,PACA_EXIT_SAVE_R1(r13) /* save r1 for restart */
+.Lsyscall_vectored_\name\()_rst_start:
+	lbz	r11,PACAIRQHAPPENED(r13)
+	andi.	r11,r11,(~PACA_IRQ_HARD_DIS)@l
+	bne-	syscall_vectored_\name\()_restart <-- can we end up taking
+	                                              this branch?
+
+Are there any circumstances that would take us down the _restart path,
+and if so, will we still go through the correct RFID_TO_USER branch
+rather than the RFSCV_TO_USER branch?
+
+Apart from that this looks good to me, although with the heavy
+disclaimer that I only learned about fake suspend for the first time
+while reviewing the patch.
+
+Kind regards,
+Daniel
+
+>
+> Reported-by: Eirik Fuller <efuller@redhat.com>
+> Fixes: 7fa95f9adaee7 ("powerpc/64s: system call support for scv/rfscv instructions")
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   arch/powerpc/include/asm/asm-const.h | 2 --
->   arch/powerpc/include/asm/atomic.h    | 8 ++++----
->   arch/powerpc/include/asm/io.h        | 4 ++--
->   arch/powerpc/include/asm/uaccess.h   | 6 +++---
->   arch/powerpc/kvm/powerpc.c           | 4 ++--
->   5 files changed, 11 insertions(+), 13 deletions(-)
-> 
-> diff --git a/arch/powerpc/include/asm/asm-const.h b/arch/powerpc/include/asm/asm-const.h
-> index dbfa5e1e3198..bfb3c3534877 100644
-> --- a/arch/powerpc/include/asm/asm-const.h
-> +++ b/arch/powerpc/include/asm/asm-const.h
-> @@ -12,6 +12,4 @@
->   #  define ASM_CONST(x)		__ASM_CONST(x)
->   #endif
->   
-> -#define UPD_CONSTR "<>"
-> -
->   #endif /* _ASM_POWERPC_ASM_CONST_H */
-> diff --git a/arch/powerpc/include/asm/atomic.h b/arch/powerpc/include/asm/atomic.h
-> index 6a53ef178bfd..fd594fdbd84d 100644
-> --- a/arch/powerpc/include/asm/atomic.h
-> +++ b/arch/powerpc/include/asm/atomic.h
-> @@ -27,14 +27,14 @@ static __inline__ int arch_atomic_read(const atomic_t *v)
->   {
->   	int t;
->   
-> -	__asm__ __volatile__("lwz%U1%X1 %0,%1" : "=r"(t) : "m"UPD_CONSTR(v->counter));
-> +	__asm__ __volatile__("lwz%U1%X1 %0,%1" : "=r"(t) : "m<>"(v->counter));
->   
->   	return t;
->   }
->   
->   static __inline__ void arch_atomic_set(atomic_t *v, int i)
->   {
-> -	__asm__ __volatile__("stw%U0%X0 %1,%0" : "=m"UPD_CONSTR(v->counter) : "r"(i));
-> +	__asm__ __volatile__("stw%U0%X0 %1,%0" : "=m<>"(v->counter) : "r"(i));
->   }
->   
->   #define ATOMIC_OP(op, asm_op)						\
-> @@ -320,14 +320,14 @@ static __inline__ s64 arch_atomic64_read(const atomic64_t *v)
->   {
->   	s64 t;
->   
-> -	__asm__ __volatile__("ld%U1%X1 %0,%1" : "=r"(t) : "m"UPD_CONSTR(v->counter));
-> +	__asm__ __volatile__("ld%U1%X1 %0,%1" : "=r"(t) : "m<>"(v->counter));
->   
->   	return t;
->   }
->   
->   static __inline__ void arch_atomic64_set(atomic64_t *v, s64 i)
->   {
-> -	__asm__ __volatile__("std%U0%X0 %1,%0" : "=m"UPD_CONSTR(v->counter) : "r"(i));
-> +	__asm__ __volatile__("std%U0%X0 %1,%0" : "=m<>"(v->counter) : "r"(i));
->   }
->   
->   #define ATOMIC64_OP(op, asm_op)						\
-> diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
-> index f130783c8301..beba4979bff9 100644
-> --- a/arch/powerpc/include/asm/io.h
-> +++ b/arch/powerpc/include/asm/io.h
-> @@ -122,7 +122,7 @@ static inline u##size name(const volatile u##size __iomem *addr)	\
->   {									\
->   	u##size ret;							\
->   	__asm__ __volatile__("sync;"#insn"%U1%X1 %0,%1;twi 0,%0,0;isync"\
-> -		: "=r" (ret) : "m"UPD_CONSTR (*addr) : "memory");	\
-> +		: "=r" (ret) : "m<>" (*addr) : "memory");	\
->   	return ret;							\
->   }
->   
-> @@ -130,7 +130,7 @@ static inline u##size name(const volatile u##size __iomem *addr)	\
->   static inline void name(volatile u##size __iomem *addr, u##size val)	\
->   {									\
->   	__asm__ __volatile__("sync;"#insn"%U0%X0 %1,%0"			\
-> -		: "=m"UPD_CONSTR (*addr) : "r" (val) : "memory");	\
-> +		: "=m<>" (*addr) : "r" (val) : "memory");	\
->   	mmiowb_set_pending();						\
->   }
->   
-> diff --git a/arch/powerpc/include/asm/uaccess.h b/arch/powerpc/include/asm/uaccess.h
-> index 22c79ab40006..63316100080c 100644
-> --- a/arch/powerpc/include/asm/uaccess.h
-> +++ b/arch/powerpc/include/asm/uaccess.h
-> @@ -86,7 +86,7 @@ __pu_failed:							\
->   		"1:	" op "%U1%X1 %0,%1	# put_user\n"	\
->   		EX_TABLE(1b, %l2)				\
->   		:						\
-> -		: "r" (x), "m"UPD_CONSTR (*addr)		\
-> +		: "r" (x), "m<>" (*addr)		\
->   		:						\
->   		: label)
->   
-> @@ -143,7 +143,7 @@ do {								\
->   		"1:	"op"%U1%X1 %0, %1	# get_user\n"	\
->   		EX_TABLE(1b, %l2)				\
->   		: "=r" (x)					\
-> -		: "m"UPD_CONSTR (*addr)				\
-> +		: "m<>" (*addr)				\
->   		:						\
->   		: label)
->   
-> @@ -200,7 +200,7 @@ __gus_failed:								\
->   		".previous\n"				\
->   		EX_TABLE(1b, 3b)			\
->   		: "=r" (err), "=r" (x)			\
-> -		: "m"UPD_CONSTR (*addr), "i" (-EFAULT), "0" (err))
-> +		: "m<>" (*addr), "i" (-EFAULT), "0" (err))
->   
->   #ifdef __powerpc64__
->   #define __get_user_asm2(x, addr, err)			\
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index b4e6f70b97b9..3fd037d36afb 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -1094,7 +1094,7 @@ static inline u64 sp_to_dp(u32 fprs)
->   
->   	preempt_disable();
->   	enable_kernel_fp();
-> -	asm ("lfs%U1%X1 0,%1; stfd%U0%X0 0,%0" : "=m"UPD_CONSTR (fprd) : "m"UPD_CONSTR (fprs)
-> +	asm ("lfs%U1%X1 0,%1; stfd%U0%X0 0,%0" : "=m<>" (fprd) : "m<>" (fprs)
->   	     : "fr0");
->   	preempt_enable();
->   	return fprd;
-> @@ -1106,7 +1106,7 @@ static inline u32 dp_to_sp(u64 fprd)
->   
->   	preempt_disable();
->   	enable_kernel_fp();
-> -	asm ("lfd%U1%X1 0,%1; stfs%U0%X0 0,%0" : "=m"UPD_CONSTR (fprs) : "m"UPD_CONSTR (fprd)
-> +	asm ("lfd%U1%X1 0,%1; stfs%U0%X0 0,%0" : "=m<>" (fprs) : "m<>" (fprd)
->   	     : "fr0");
->   	preempt_enable();
->   	return fprs;
-> 
-
+>  arch/powerpc/kernel/interrupt.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>
+> diff --git a/arch/powerpc/kernel/interrupt.c b/arch/powerpc/kernel/interrupt.c
+> index c77c80214ad3..917a2ac4def6 100644
+> --- a/arch/powerpc/kernel/interrupt.c
+> +++ b/arch/powerpc/kernel/interrupt.c
+> @@ -139,6 +139,19 @@ notrace long system_call_exception(long r3, long r4, long r5,
+>  	 */
+>  	irq_soft_mask_regs_set_state(regs, IRQS_ENABLED);
+>  
+> +	/*
+> +	 * If system call is called with TM active, set _TIF_RESTOREALL to
+> +	 * prevent RFSCV being used to return to userspace, because POWER9
+> +	 * TM implementation has problems with this instruction returning to
+> +	 * transactional state. Final register values are not relevant because
+> +	 * the transaction will be aborted upon return anyway. Or in the case
+> +	 * of unsupported_scv SIGILL fault, the return state does not much
+> +	 * matter because it's an edge case.
+> +	 */
+> +	if (IS_ENABLED(CONFIG_PPC_TRANSACTIONAL_MEM) &&
+> +			unlikely(MSR_TM_TRANSACTIONAL(regs->msr)))
+> +		current_thread_info()->flags |= _TIF_RESTOREALL;
+> +
+>  	/*
+>  	 * If the system call was made with a transaction active, doom it and
+>  	 * return without performing the system call. Unless it was an
+> -- 
+> 2.23.0
