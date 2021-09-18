@@ -2,140 +2,114 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 272BD40F3B6
-	for <lists+kvm-ppc@lfdr.de>; Fri, 17 Sep 2021 10:08:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE85F410702
+	for <lists+kvm-ppc@lfdr.de>; Sat, 18 Sep 2021 16:22:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231996AbhIQII4 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 17 Sep 2021 04:08:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60612 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230421AbhIQIFD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 17 Sep 2021 04:05:03 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B923AC061764
-        for <kvm-ppc@vger.kernel.org>; Fri, 17 Sep 2021 01:03:01 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id x7so8403346pfa.8
-        for <kvm-ppc@vger.kernel.org>; Fri, 17 Sep 2021 01:03:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=axtens.net; s=google;
-        h=from:to:cc:subject:in-reply-to:references:date:message-id
-         :mime-version;
-        bh=F5LdGTojih2Mc9qSmXv5ONSympP9xKi3sLGrLFi+yzk=;
-        b=gOgFekj2lvWmEwLRxLyVCPqRF9r1OQF6l575N3C9OXIFLvIZaAMiV0aNpRE7b+41mi
-         sJoDmghGgPqLFIt3NibqOoxb+zL0KBbAj6lumtqMTUMD1d/PyRCD27ui0SNlw430v94h
-         AXprAqATqRevW7DgHSZ9jc/RmOihB+bwBbyr4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=F5LdGTojih2Mc9qSmXv5ONSympP9xKi3sLGrLFi+yzk=;
-        b=j9RAH2qCkFbhvphbYeW95/UccN3s4InWzD8rMfeiNT1SGf1gnlF/Q5yVSDj/1Ro1GD
-         9eajUSyTpnouSEtXYfc6lU+Eho5cZhXcnCGCMGqgS2t1gV7L9upZXqS+kX3ByKv6xZr+
-         FNOFMB+S5CKBGR33qOtp6YXKJsMiLToOXUvSwCVGWfKrTauAqonpq6D9BrnXXwg/w4Tw
-         H5EcphQ7/8nw/VvVXcRA9ZoZMJwb4bJCLEwjvHFDz2uI1OBL7a5dihJygXC+kFVnzOqd
-         hosP3U5K01agAV0uNm9ntVk1I0+zOzK3Ijjc5n+mg8htaJylNdzSa0EIHoZdktlh1pjn
-         t+7Q==
-X-Gm-Message-State: AOAM532lTW/bA64JUlHuRuXrRx9vT/t5+1mCkHHosV7cgOB++z9wtT9t
-        IwdK3ZCEvdsKrXyXJNydTio6ZnVPmPx6hw==
-X-Google-Smtp-Source: ABdhPJzOkw+0F7WSnznscTnJ/cH5+aC6jY0pVEvMB51WiRscz24cZIrYjX6+6+kBATbnK/yq6NE54A==
-X-Received: by 2002:a63:5d5f:: with SMTP id o31mr8769726pgm.56.1631865781230;
-        Fri, 17 Sep 2021 01:03:01 -0700 (PDT)
-Received: from localhost ([2001:4479:e200:df00:f1a1:4b0:6139:723d])
-        by smtp.gmail.com with ESMTPSA id 126sm6213924pgi.86.2021.09.17.01.03.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Sep 2021 01:03:00 -0700 (PDT)
-From:   Daniel Axtens <dja@axtens.net>
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     Eirik Fuller <efuller@redhat.com>, kvm-ppc@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v1 1/2] powerpc/64s: system call rfscv workaround for TM bugs
-In-Reply-To: <20210908101718.118522-1-npiggin@gmail.com>
-References: <20210908101718.118522-1-npiggin@gmail.com>
-Date:   Fri, 17 Sep 2021 18:02:57 +1000
-Message-ID: <87ilyz8w9a.fsf@linkitivity.dja.id.au>
+        id S237779AbhIROXZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 18 Sep 2021 10:23:25 -0400
+Received: from mout.gmx.net ([212.227.17.22]:59955 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237771AbhIROXY (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Sat, 18 Sep 2021 10:23:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1631974912;
+        bh=UmWycZcizNYid4Z+392DMeF7EKIyi4qx+X3CFcO1uDE=;
+        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+        b=OHL5tT3y1TiXx0wkB4k4slkZMZI8KDCqbWKc5Q/EfYtvF6NluuoyY9yoJP4YD9gPc
+         kOiKCdeyfrg9M6eb9R1PUYhsu/qy6vcNmHvC2Wa4VzgxCcC+a7IG1JciPyJ+vYHapK
+         AR+DjUc4Kjgwl5XEUFwoiAawV1qbTBW0/nG7t5pM=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from localhost.localdomain ([79.150.72.99]) by mail.gmx.net
+ (mrgmx105 [212.227.17.174]) with ESMTPSA (Nemesis) id
+ 1MdebB-1n0O0n1DxB-00ZjGv; Sat, 18 Sep 2021 16:21:52 +0200
+From:   Len Baker <len.baker@gmx.com>
+To:     Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc:     Len Baker <len.baker@gmx.com>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Kees Cook <keescook@chromium.org>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-hardening@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: PPC: Replace zero-length array with flexible array member
+Date:   Sat, 18 Sep 2021 16:21:38 +0200
+Message-Id: <20210918142138.17709-1-len.baker@gmx.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:nUjxkWAcJOBgMwjffXAt1QuuDOCIXUU/JKmzX9iUDs9pGqz2aHN
+ 98GDDCSWE9bq+l3Sk5BPYQ5vXYhDBd6i6m9oBE/LNW0YxvO/oLjzioqf/Ji0uzBVOm9chr0
+ LL9bRwvN7Fce6JyKqT87QUtYysU10VZEQcZZKM2WuxjcBrS1kJvveJZIa+QYFSTgKVzdzcF
+ 5QICgt5PO1IAWzYmd7a8Q==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:RM7jumJIPRc=:iV3Dwa2P7AD02q/3KO68IT
+ BDzSVfG1ioBkwhrb+6qgNASCHxUj9Q/aArb1XlOug0eTZo7EX0tS/9NcbcL0gFVq7ZiK7juec
+ aw+TghlsV9LQa5Ab4H5yeHGk0H6nj6B8NbQ2TstFwNlbxh2MqxJjrfMPNXTad7dxB8cZJPdN1
+ igLcjxvmZjs/JmZxWWMzf2z2WY87Q9L4+b5ssB9aMIqj8TcNWZfHTpL1O9y5XmxwGfqPMMtdV
+ lTxgVnjIhym06uO7OUfYZWIJVHEU7sFRH0yYPBLA6XJzmLPbq+LXlw0eQ9P1Ho6ogRHG2DS3c
+ 0JZKvyMZ7Gi9aqlxb8hQj5WyfDWAMTjYXCR8j3YFRAJ1WRJ0UyRKctaAwZSYEnmjYVGJDhQ19
+ dPPt152wY9NjQBc3Hn7UgUhXHcSb70hIxNxQHRB+foCmSGwCQwsiGfJ9aZi+PSspzri3kEJW8
+ i1thsYq8MTvOW3OLDv1iqHVDMni5wJIwKZqqWDhIWovfesZZ5k4DIF9QWkvW7z6P+ovABo5Wd
+ j5HiWNZxxqdBZA1mBxyxe5hglT1H15Z+9v2JuWw7Yd/ATfvksdQjMZ/7HpsJ2TrNxF2twTMay
+ s4yaFIj6/SBsngxuQ52uPAbxM9hCp3Il0g+9wBzE0HX3QAw+fNosh/2fM9N9D07T79yQMevCv
+ QRWygqOq+PS7QU3vcJE+9PD2DpIMC8jr5n6pVK80AxxV2yK1lbLmV4MLFhwYn63Wo7REVNSTX
+ g0NCghfK9b8jA0runYKHxOf4whbKHtsPf4lFYYNSDjdIfnkJuAsPu55RB4gB6evPW7rgxE6os
+ uka2MC208rgCXyYKnQeWPakWWEC1WXveod36ovFxvraYU4GEK1dRFAKK5wPIruIwJQBptcCVj
+ 0Zf7vmXOTwGKA9T5AxPsMfaP5V1XR95fvMV73zHAwfuW+8LSgIfCepvfXh+GMYPoOQ683DsxF
+ 4PmOqPwM8OS038ga1mnPs/aQhfat5tzpxxDHsjplerHiZ9I51+aXdsjmGza1VVjut2rFfV2Fu
+ KxL08FdYrJDx/nxab6C/N+Ux0B18NAs1Z60J9YoO7dRbx1vMlqSwskF4hBxXACceg/mH/t7yq
+ o/7JJ0W4gKEMJg=
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Nicholas Piggin <npiggin@gmail.com> writes:
+There is a regular need in the kernel to provide a way to declare having
+a dynamically sized set of trailing elements in a structure. Kernel code
+should always use "flexible array members" [1] for these cases. The
+older style of one-element or zero-length arrays should no longer be
+used[2].
 
-> The rfscv instruction does not work correctly with the fake-suspend mode
-> in POWER9, which can end up with the hypervisor restoring an incorrect
-> checkpoint.
+Also, make use of the struct_size() helper in kzalloc().
 
-If I understand correctly from commit 4bb3c7a0208f ("KVM: PPC: Book3S
-HV: Work around transactional memory bugs in POWER9"), this is because
-rfscv does not cause a soft-patch interrupt in the way that rfid etc do.
-So we need to avoid calling rfscv if we are in fake-suspend state -
-instead we must call something that does indeed get soft-patched - like
-rfid.
+[1] https://en.wikipedia.org/wiki/Flexible_array_member
+[2] https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-le=
+ngth-and-one-element-arrays
 
-> Work around this by setting the _TIF_RESTOREALL flag if a system call
-> returns to a transaction active state, causing rfid to be used instead
-> of rfscv to return, which will do the right thing. The contents of the
-> registers are irrelevant because they will be overwritten in this case
-> anyway.
+Signed-off-by: Len Baker <len.baker@gmx.com>
+=2D--
+ arch/powerpc/include/asm/kvm_host.h | 2 +-
+ arch/powerpc/kvm/book3s_64_vio.c    | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-I can follow that this will indeed cause syscall_exit_prepare to return
-non-zero and therefore we should take the
-syscall_vectored_*_restore_regs path which does an RFID_TO_USER rather
-than a RFSCV_TO_USER. My only question/concern is:
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/as=
+m/kvm_host.h
+index 080a7feb7731..3aed653373a5 100644
+=2D-- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -190,7 +190,7 @@ struct kvmppc_spapr_tce_table {
+ 	u64 size;		/* window size in pages */
+ 	struct list_head iommu_tables;
+ 	struct mutex alloc_lock;
+-	struct page *pages[0];
++	struct page *pages[];
+ };
 
-.Lsyscall_vectored_\name\()_exit:
-	addi	r4,r1,STACK_FRAME_OVERHEAD
-	li	r5,1 /* scv */
-	bl	syscall_exit_prepare            <-------- we get r3 != 0  here
-	std	r1,PACA_EXIT_SAVE_R1(r13) /* save r1 for restart */
-.Lsyscall_vectored_\name\()_rst_start:
-	lbz	r11,PACAIRQHAPPENED(r13)
-	andi.	r11,r11,(~PACA_IRQ_HARD_DIS)@l
-	bne-	syscall_vectored_\name\()_restart <-- can we end up taking
-	                                              this branch?
+ /* XICS components, defined in book3s_xics.c */
+diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64=
+_vio.c
+index 6365087f3160..d42b4b6d4a79 100644
+=2D-- a/arch/powerpc/kvm/book3s_64_vio.c
++++ b/arch/powerpc/kvm/book3s_64_vio.c
+@@ -295,8 +295,7 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
+ 		return ret;
 
-Are there any circumstances that would take us down the _restart path,
-and if so, will we still go through the correct RFID_TO_USER branch
-rather than the RFSCV_TO_USER branch?
+ 	ret =3D -ENOMEM;
+-	stt =3D kzalloc(sizeof(*stt) + npages * sizeof(struct page *),
+-		      GFP_KERNEL);
++	stt =3D kzalloc(struct_size(stt, pages, npages), GFP_KERNEL);
+ 	if (!stt)
+ 		goto fail_acct;
 
-Apart from that this looks good to me, although with the heavy
-disclaimer that I only learned about fake suspend for the first time
-while reviewing the patch.
+=2D-
+2.25.1
 
-Kind regards,
-Daniel
-
->
-> Reported-by: Eirik Fuller <efuller@redhat.com>
-> Fixes: 7fa95f9adaee7 ("powerpc/64s: system call support for scv/rfscv instructions")
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arch/powerpc/kernel/interrupt.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/arch/powerpc/kernel/interrupt.c b/arch/powerpc/kernel/interrupt.c
-> index c77c80214ad3..917a2ac4def6 100644
-> --- a/arch/powerpc/kernel/interrupt.c
-> +++ b/arch/powerpc/kernel/interrupt.c
-> @@ -139,6 +139,19 @@ notrace long system_call_exception(long r3, long r4, long r5,
->  	 */
->  	irq_soft_mask_regs_set_state(regs, IRQS_ENABLED);
->  
-> +	/*
-> +	 * If system call is called with TM active, set _TIF_RESTOREALL to
-> +	 * prevent RFSCV being used to return to userspace, because POWER9
-> +	 * TM implementation has problems with this instruction returning to
-> +	 * transactional state. Final register values are not relevant because
-> +	 * the transaction will be aborted upon return anyway. Or in the case
-> +	 * of unsupported_scv SIGILL fault, the return state does not much
-> +	 * matter because it's an edge case.
-> +	 */
-> +	if (IS_ENABLED(CONFIG_PPC_TRANSACTIONAL_MEM) &&
-> +			unlikely(MSR_TM_TRANSACTIONAL(regs->msr)))
-> +		current_thread_info()->flags |= _TIF_RESTOREALL;
-> +
->  	/*
->  	 * If the system call was made with a transaction active, doom it and
->  	 * return without performing the system call. Unless it was an
-> -- 
-> 2.23.0
