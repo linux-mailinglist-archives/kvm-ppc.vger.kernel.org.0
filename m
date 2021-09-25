@@ -2,120 +2,175 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB21B4162E5
-	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Sep 2021 18:21:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2BF4417EB4
+	for <lists+kvm-ppc@lfdr.de>; Sat, 25 Sep 2021 02:55:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235928AbhIWQXW (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 23 Sep 2021 12:23:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49693 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232675AbhIWQXV (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Sep 2021 12:23:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1632414109;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=u6pqfNeOt8tL2GBP0sFXaQoAOnZO3+YJ2VkaCjJ0uXk=;
-        b=N/RhTH0OCitRwuXDjP7hNUoX2ZovnAJcbaN6RE0JmyWatBQZ4MgMtPpGDldkdN/lI9k+IA
-        gCEWnIyx0SzTD7KdhwBgA4GfmShwrsBrqD1qxJZ5C8QnGY1KkK6u8/mpXtyhy9i31V7xiU
-        4ZxUGHwcLLd0GJBe0EP/l48sJLbnt9w=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-zKUNsTffOdizvcl7RbTmuw-1; Thu, 23 Sep 2021 12:21:47 -0400
-X-MC-Unique: zKUNsTffOdizvcl7RbTmuw-1
-Received: by mail-ed1-f71.google.com with SMTP id r11-20020aa7cfcb000000b003d4fbd652b9so7268825edy.14
-        for <kvm-ppc@vger.kernel.org>; Thu, 23 Sep 2021 09:21:47 -0700 (PDT)
+        id S1345831AbhIYA5G (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 24 Sep 2021 20:57:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40240 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231514AbhIYA5F (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 24 Sep 2021 20:57:05 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3A98C061571
+        for <kvm-ppc@vger.kernel.org>; Fri, 24 Sep 2021 17:55:31 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id v16-20020a256110000000b005b23a793d77so5834333ybb.15
+        for <kvm-ppc@vger.kernel.org>; Fri, 24 Sep 2021 17:55:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=7raooij+tUym7W5s5WPrsLkrWPVticCVkKY3RWsiNDM=;
+        b=DXmlShHbjvZa1JvxxvOqKfYKe30mtQRur87j+123oY2dFsBNlIAv8O9qEBNpSOGVM0
+         b5Sl+lbCoTOZX+zxJ51FQGhzcy9kOU+kuN3HT7C+f5nB6pN5R9AkQ8rfnjTjbSc6y1L3
+         1xXBLePNa9IJaU5EZa6ilhTbqnfNBkXudDaPUTNvEb8RjoCOqehEtkbp9fcq+twCr1dj
+         7pQFp14KUjSeBu0Lomx7YgO5vlp+0uTYliIei7NH6p2gACqnEuNLOy869NtJ5XSjME8N
+         QoN0wBA2Bv2bcnfhLjSPkQbfYQGKsKIy45up5bnYKrvy1J3XDWY6xOjC4rNSR6s7vMuY
+         cddw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=u6pqfNeOt8tL2GBP0sFXaQoAOnZO3+YJ2VkaCjJ0uXk=;
-        b=FbDUV5E33ZZ0nEonvkA6lWH9+F85vDJefInR5OZfmirgHsRFvxkmcQ2dEeA4CKTvfp
-         Ef+W5TJFL1wLyS9iJNkAEKSmDCWF/LkMCPXA+2Vnolz4qA0xdD9lFdau22ao+roNqETK
-         OJNUYnGYMrdukGgjjJqJhHjDvWThhOQRs2XSIqsl90blvhD5pDy8vfNovhh0zAqVWO6B
-         Kay4A8nuFteQhQiSOcOF9jMgLBaYGOjoISTZP1UUQ51Gk0uW8vcOumfGDguwkf72/Zn5
-         W84kMepdKfUc5OGAEHGBfT7Elo4Jt8mJa5JwkgGCrAkV2ehUCdiBRSqQztlWLTTgSxTH
-         Sokw==
-X-Gm-Message-State: AOAM532KYeQS7kMj7iw0SZxYUrlifN4nXKSSflYP6pCk3UC2oVbIPTRj
-        DiMiQQfpnCmfpK3MdpnTMLuGxk8RRVOGa/MokXNTjWsjBSa8Vn3q+Z+u0qCylOTmbPXNmH/iHVT
-        2uV7fC8u+VjsRWuPLYw==
-X-Received: by 2002:a50:fb06:: with SMTP id d6mr6462182edq.31.1632414106418;
-        Thu, 23 Sep 2021 09:21:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzrEzjHXWR+VYrKJT7i95j45MgVWMJnN/dFXr62alQzAy8bfphi2nG6GFcipGwzTPlE6aJKZg==
-X-Received: by 2002:a50:fb06:: with SMTP id d6mr6462153edq.31.1632414106210;
-        Thu, 23 Sep 2021 09:21:46 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id e13sm3352440eje.95.2021.09.23.09.21.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Sep 2021 09:21:45 -0700 (PDT)
-Subject: Re: [PATCH 0/2] kvm: fix KVM_MAX_VCPU_ID handling
-To:     Juergen Gross <jgross@suse.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=7raooij+tUym7W5s5WPrsLkrWPVticCVkKY3RWsiNDM=;
+        b=lRa+QKfzhMWn2jumzG255hMRRa/VnyUfpiCmcktRqQulooLg7CRbcOP2xobf6gPWiV
+         TOxdQbOrPbOKKmNvirXo0RSpx6G5rH9o0u7DEVq2QfqcURy3uiFKZR3Ut9s3VZb8aR0y
+         2Mp4Ejdfo4EzKXRy4sOPSC6HIjnnzAxB7/a92I8TPOjotF5xI8TB+T5iYIsGrIT4afJB
+         iDjHG0bl45AIfQlhUedhQxoY6biNFk9kGQVVSU5MMUBnj++xq17EkljFrnFQS5ZKcgww
+         ERrUwYW/lweg0jE11h26akN23103miwec2v+MsrW8Z6/0U5gAKNJabd68TSQwtlmql0X
+         DdCQ==
+X-Gm-Message-State: AOAM530L8I8WNEOlA66Aa26rFgWain6EXA17Ih5UeZ7yC+aM17dMo3Cp
+        qiwaZOathrg4xLZuiLnkgSzRqXwaUSM=
+X-Google-Smtp-Source: ABdhPJz8Y4bPpJ9bNnOFRpqK33tyNqeaLzwcsIjpAg9bIC4dVS+lANHryvRV962R2bWiwjuBZB41gPX4lxc=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:4c72:89be:dba3:2bcb])
+ (user=seanjc job=sendgmr) by 2002:a25:d482:: with SMTP id m124mr15615049ybf.73.1632531330879;
+ Fri, 24 Sep 2021 17:55:30 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 24 Sep 2021 17:55:14 -0700
+Message-Id: <20210925005528.1145584-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
+Subject: [PATCH 00/14] KVM: Halt-polling fixes, cleanups and a new stat
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>
-References: <20210913135745.13944-1-jgross@suse.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <75959861-6644-aa9a-5e81-a25f864d74ab@redhat.com>
-Date:   Thu, 23 Sep 2021 18:21:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210913135745.13944-1-jgross@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 13/09/21 15:57, Juergen Gross wrote:
-> Revert commit 76b4f357d0e7d8f6f00 which was based on wrong reasoning
-> and rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS in order to avoid the
-> same issue in future.
-> 
-> Juergen Gross (2):
->    x86/kvm: revert commit 76b4f357d0e7d8f6f00
->    kvm: rename KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS
-> 
->   Documentation/virt/kvm/devices/xics.rst            | 2 +-
->   Documentation/virt/kvm/devices/xive.rst            | 2 +-
->   arch/mips/kvm/mips.c                               | 2 +-
->   arch/powerpc/include/asm/kvm_book3s.h              | 2 +-
->   arch/powerpc/include/asm/kvm_host.h                | 4 ++--
->   arch/powerpc/kvm/book3s_xive.c                     | 2 +-
->   arch/powerpc/kvm/powerpc.c                         | 2 +-
->   arch/x86/include/asm/kvm_host.h                    | 2 +-
->   arch/x86/kvm/ioapic.c                              | 2 +-
->   arch/x86/kvm/ioapic.h                              | 4 ++--
->   arch/x86/kvm/x86.c                                 | 2 +-
->   include/linux/kvm_host.h                           | 4 ++--
->   tools/testing/selftests/kvm/kvm_create_max_vcpus.c | 2 +-
->   virt/kvm/kvm_main.c                                | 2 +-
->   14 files changed, 17 insertions(+), 17 deletions(-)
-> 
+The main purpose of this series is differentiate between "halt" and a more
+generic "block", where "halt" aligns with x86's HLT instruction, the
+halt-polling mechanisms, and associated stats, and "block" means any guest
+action that causes the vCPU to block/wait.
 
-Queued, thanks.
+This series arose out of a discussion over adding a stat to track if a
+vCPU is blocked/halted[*].  The TL;DR of the discussion is that x86 has
+several non-halt "wait" states, and arguably those states should not
+participate in halt-polling.  In practice, it really doesn't matter from
+a functionality perspective because there are typically so few occurences
+of the non-halt waits that they're in the noise compared to the number of
+actual HLTs, especially for a long-running VM.  So, my justification for
+the rename is that because it doesn't truly affect functionality, KVM
+might as well be technically correct and only use halt-polling for HLT.
 
-Paolo
+The other annoyance this series addresses is that KVM mixes "halt" and
+"block", e.g. the existing function is kvm_vcpu_block(), but all the stats
+and the tracepoint use "halt".  Ideally, KVM would probably avoid "block"
+altogether as people often think of "blocked" as meaning the vCPU is
+blocked due to _host_ activity.  But I don't have a better alternative,
+e.g. "halt" is obviously taken, "wait" is equivalent to "halt" on arm64,
+"stop" has specific meaning on s390, etc...  I tried to address the host
+vs. guest issue by naming the new stat "blocking" instead of "blocked",
+e.g. to convey that the vCPU is "actively blocking" instead of "being
+blocked".
+
+Patch 01 fixes a theoretical, benign s390 bug, and sets the stage for
+additional cleanups.
+
+Patches 02-04 reconcile discrepancies in when KVM considers halt-polling
+to be "successful".  Some stats consider it a success so long as KVM
+doesn't schedule() away, others consider it a success if and only if a
+wake event is detected in the halt-polling loop.
+
+Patches 05-06 are prep cleanup to split out the core "block" routine.
+
+Patch 07 is more prep, and should also be a small perf optimization for
+halt-polling on arm64.
+
+Patch 08 is x86 cleanup to free up the name kvm_vcpu_halt().
+
+Patches 09-10 rename the existing kvm_vcpu_block() to kvm_vcpu_halt(), and
+split out the core "block" routine to a new helper.
+
+Patches 11-12 are minor cleanups to avoid unnecessary ktime_get().
+
+Patches 13-14 convert non-HLT x86 flows to use kvm_vcpu_block().
+
+[*] https://lkml.kernel.org/r/20210817230508.142907-1-jingzhangos@google.com
+
+Jing Zhang (1):
+  KVM: stats: Add stat to detect if vcpu is currently blocking
+
+Sean Christopherson (13):
+  KVM: s390: Ensure kvm_arch_no_poll() is read once when blocking vCPU
+  KVM: Update halt-polling stats if and only if halt-polling was
+    attempted
+  KVM: Refactor and document halt-polling stats update helper
+  KVM: Reconcile discrepancies in halt-polling stats
+  KVM: s390: Clear valid_wakeup in kvm_s390_handle_wait(), not in arch
+    hook
+  KVM: Drop obsolete kvm_arch_vcpu_block_finish()
+  KVM: Don't block+unblock when halt-polling is successful
+  KVM: x86: Tweak halt emulation helper names to free up kvm_vcpu_halt()
+  KVM: Rename kvm_vcpu_block() => kvm_vcpu_halt()
+  KVM: Split out a kvm_vcpu_block() helper from kvm_vcpu_halt()
+  KVM: Don't redo ktime_get() when calculating halt-polling
+    stop/deadline
+  KVM: x86: Directly block (instead of "halting") UNINITIALIZED vCPUs
+  KVM: x86: Invoke kvm_vcpu_block() directly for non-HALTED wait states
+
+ arch/arm64/include/asm/kvm_host.h   |   1 -
+ arch/arm64/kvm/arch_timer.c         |   2 +-
+ arch/arm64/kvm/handle_exit.c        |   4 +-
+ arch/arm64/kvm/psci.c               |   2 +-
+ arch/mips/include/asm/kvm_host.h    |   1 -
+ arch/mips/kvm/emulate.c             |   2 +-
+ arch/powerpc/include/asm/kvm_host.h |   1 -
+ arch/powerpc/kvm/book3s_pr.c        |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c   |   2 +-
+ arch/powerpc/kvm/booke.c            |   2 +-
+ arch/powerpc/kvm/powerpc.c          |   2 +-
+ arch/s390/include/asm/kvm_host.h    |   2 -
+ arch/s390/kvm/interrupt.c           |   3 +-
+ arch/s390/kvm/kvm-s390.c            |   7 +-
+ arch/x86/include/asm/kvm_host.h     |   4 +-
+ arch/x86/kvm/vmx/nested.c           |   2 +-
+ arch/x86/kvm/vmx/vmx.c              |   4 +-
+ arch/x86/kvm/x86.c                  |  25 ++++--
+ include/linux/kvm_host.h            |   6 +-
+ include/linux/kvm_types.h           |   1 +
+ virt/kvm/kvm_main.c                 | 131 +++++++++++++++++-----------
+ 21 files changed, 118 insertions(+), 88 deletions(-)
+
+-- 
+2.33.0.685.g46640cef36-goog
 
