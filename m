@@ -2,35 +2,70 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75F2F4180DF
-	for <lists+kvm-ppc@lfdr.de>; Sat, 25 Sep 2021 11:50:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 025564186B1
+	for <lists+kvm-ppc@lfdr.de>; Sun, 26 Sep 2021 08:27:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237469AbhIYJwG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 25 Sep 2021 05:52:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58102 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240182AbhIYJv5 (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sat, 25 Sep 2021 05:51:57 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 441BD61279;
-        Sat, 25 Sep 2021 09:50:08 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mU4Jq-00Cuoe-EB; Sat, 25 Sep 2021 10:50:06 +0100
-Date:   Sat, 25 Sep 2021 10:50:05 +0100
-Message-ID: <878rzlass2.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
+        id S229754AbhIZG3M (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sun, 26 Sep 2021 02:29:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33535 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229592AbhIZG3L (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 26 Sep 2021 02:29:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632637655;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1TiBTpYstMaABQ/rAwh18m9vsSq3OqvaFEu629LcCL8=;
+        b=AT5/PG0z3EzdeorlWOjcalMkMIuqdx/kSJlyedxA9a0Z5HaOAWh19SuOyQfVfP1hscnXDo
+        ndrzwXzzRB5LVNi85EvMVI55Hx7Hnns/fgrq4gRTKomf4x5KJinVbPpTd/gfSLSyo8Vl98
+        RL+yotYrs93Q304RJn+4O16zB8UkSk4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-YJDSeRklOnivKAK4Si2c5A-1; Sun, 26 Sep 2021 02:27:33 -0400
+X-MC-Unique: YJDSeRklOnivKAK4Si2c5A-1
+Received: by mail-ed1-f69.google.com with SMTP id l29-20020a50d6dd000000b003d80214566cso14468447edj.21
+        for <kvm-ppc@vger.kernel.org>; Sat, 25 Sep 2021 23:27:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=1TiBTpYstMaABQ/rAwh18m9vsSq3OqvaFEu629LcCL8=;
+        b=GWtnJRA9x9m3SeSqLUi4flHMssgi+wtrfN7HLBHiNpJw9U0fxXdu38KltIurgEOP5M
+         qRWwNywQ3QstWB0HZQEWxuNq7ofa2KtNq59JU3JMDCvujiVBJTeifXbs/XUf7Pi6EA82
+         yJvAp0Fcysx76qMXfgHZlG2Bkgq/Un1nd+Ce7N8DGaif1WHHq6+5BEIJBdpjq2pmn2VG
+         FF+FJTuKY+Oat6sRN4UW4hn35TvsA1Qs3SLExgNHNSYcTg9PIbcKIfmFSVtvIwHunPnN
+         AqbtP9pHcU83UMzEpLmAsjozZEJ/xfnuZfbVwjRG7P+n+o6a4fk36bs/rRRkazBPvOxM
+         QtoQ==
+X-Gm-Message-State: AOAM531q4A9yUN1+9CyhOm1vYeuWbiNY9RVsVzmfdnH7sr8m0sP1gFho
+        i9glJZO+sqi6uc7MyzuPenkBN9LZCuw9PstQEG1L2K3cL1rZCToQHUe2mddabXB6lp2orzqanBa
+        Y6ekLsp1Mo2eIaKfx7w==
+X-Received: by 2002:a17:906:bcf5:: with SMTP id op21mr21248203ejb.114.1632637652476;
+        Sat, 25 Sep 2021 23:27:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxKIxMWhBoRL018xLqTu0jQnou9ZPZ7BoXp91FbgfoN587mWDIRzysD7Ruz1/cm6u5Gy8RhTw==
+X-Received: by 2002:a17:906:bcf5:: with SMTP id op21mr21248168ejb.114.1632637652217;
+        Sat, 25 Sep 2021 23:27:32 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id dk27sm8333826edb.19.2021.09.25.23.27.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 25 Sep 2021 23:27:31 -0700 (PDT)
+Message-ID: <80d90ee6-0d43-3735-5c26-be8c3d72d493@redhat.com>
+Date:   Sun, 26 Sep 2021 08:27:28 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH 07/14] KVM: Don't block+unblock when halt-polling is
+ successful
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>,
+        Sean Christopherson <seanjc@google.com>
 Cc:     Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -46,66 +81,36 @@ Cc:     Huacai Chen <chenhuacai@kernel.org>,
         kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
         David Matlack <dmatlack@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 07/14] KVM: Don't block+unblock when halt-polling is successful
-In-Reply-To: <20210925005528.1145584-8-seanjc@google.com>
 References: <20210925005528.1145584-1-seanjc@google.com>
-        <20210925005528.1145584-8-seanjc@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, dmatlack@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+ <20210925005528.1145584-8-seanjc@google.com> <878rzlass2.wl-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <878rzlass2.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Sat, 25 Sep 2021 01:55:21 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
+On 25/09/21 11:50, Marc Zyngier wrote:
+>> there is no need for arm64 to put/load
+>> the vGIC as KVM hasn't relinquished control of the vCPU in any way.
 > 
-> Invoke the arch hooks for block+unblock if and only if KVM actually
-> attempts to block the vCPU.  The only non-nop implementation is on arm64,
-> and if halt-polling is successful, there is no need for arm64 to put/load
-> the vGIC as KVM hasn't relinquished control of the vCPU in any way.
+> This doesn't mean that there is no requirement for any state
+> change. The put/load on GICv4 is crucial for performance, and the VMCR
+> resync is a correctness requirement.
 
-This doesn't mean that there is no requirement for any state
-change. The put/load on GICv4 is crucial for performance, and the VMCR
-resync is a correctness requirement.
+I wouldn't even say it's crucial for performance: halt polling cannot 
+work and is a waste of time without (the current implementation of) 
+put/load.
 
-> 
-> The primary motivation is to allow future cleanup to split out "block"
-> from "halt", but this is also likely a small performance boost on arm64
-> when halt-polling is successful.
-> 
-> Adjust the post-block path to update "cur" after unblocking, i.e. include
-> vGIC load time in halt_wait_ns and halt_wait_hist, so that the behavior
-> is consistent.  Moving just the pre-block arch hook would result in only
-> the vGIC put latency being included in the halt_wait stats.  There is no
-> obvious evidence that one way or the other is correct, so just ensure KVM
-> is consistent.
+However, is activating the doorbell necessary?  If possible, polling the 
+VGIC directly for pending VLPIs without touching the ITS (for example by 
+emulating IAR reads) may make sense.  IIUC that must be done at EL2 
+though, so maybe it would even make sense to move all of halt polling to 
+EL2 for the nVHE case.  It all depends on benchmark results, of course.
 
-This effectively reverts 07ab0f8d9a12 ("KVM: Call
-kvm_arch_vcpu_blocking early into the blocking sequence"), which was a
-huge gain on arm64, not to mention a correctness fix.
+Sorry for the many stupid questions I'm asking lately, but I'm trying to 
+pay more attention to ARM and understand the VGIC and EL1/EL2 split better.
 
-Without this, a GICv4 machine will always pay for the full poll
-penalty, going into schedule(), and only then get a doorbell interrupt
-signalling telling the kernel that there was an interrupt.
+Paolo
 
-On a non-GICv4 machine, it means that interrupts injected by another
-thread during the pooling will be evaluated with an outdated priority
-mask, which can result in either a spurious wake-up or a missed
-wake-up.
-
-If it means introducing a new set of {pre,post}-poll arch-specific
-hooks, so be it. But I don't think this change is acceptable as is.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
