@@ -2,36 +2,65 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D977841879D
-	for <lists+kvm-ppc@lfdr.de>; Sun, 26 Sep 2021 11:02:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3C31418F82
+	for <lists+kvm-ppc@lfdr.de>; Mon, 27 Sep 2021 08:55:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229584AbhIZJEH (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 26 Sep 2021 05:04:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39872 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229551AbhIZJEH (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Sun, 26 Sep 2021 05:04:07 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6F4DC60FC1;
-        Sun, 26 Sep 2021 09:02:31 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mUQ3J-00D1iV-6U; Sun, 26 Sep 2021 10:02:29 +0100
-Date:   Sun, 26 Sep 2021 10:02:28 +0100
-Message-ID: <877df3btgb.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S233174AbhI0G5H (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 27 Sep 2021 02:57:07 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10380 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233067AbhI0G5G (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 27 Sep 2021 02:57:06 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18R2iku9027135;
+        Mon, 27 Sep 2021 02:54:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Jiq7gvoz3pplZUufR4kw3kQJZqSIDso0Eiiy9V37bEM=;
+ b=VkEysG81hdqNPtmizeFNiqRMUtPhpslhfpZ7XwSUR8TlVvZjPFw874jOUgvVqAYlwML5
+ Mh7/4PtNOTYIQKIA8kffQU9p/V0+uh+5TVPm9vXf0HDixLV9M6pu/OYQ7j3oCwwbpxj+
+ gwORYMdTe9bIkRKFPZ6iLlFxilDinOZ5xwWQPgGN7P0cOExfLptyyURr6ECjcHhf11XD
+ i8bBDFJZfWoEKg2yZ1Ib7b/PNfBkxUYItXG8QZa0yAFH2xLMFEiHmoj/UeIYRr3v/jXb
+ InNrJk+G4WUP879bfIvCaL6Vlr/NBz9+lbY10Ec7osQxukaZzImGV1JXdjWKFAweRfv1 pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bagv7v60d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 02:54:43 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18R60135023974;
+        Mon, 27 Sep 2021 02:54:42 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bagv7v5yq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 02:54:42 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18R6l9YC022190;
+        Mon, 27 Sep 2021 06:54:39 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma05fra.de.ibm.com with ESMTP id 3b9ud8rnj5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 27 Sep 2021 06:54:39 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18R6sZUt52101612
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Sep 2021 06:54:35 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 648AD52050;
+        Mon, 27 Sep 2021 06:54:35 +0000 (GMT)
+Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.4.236])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id CF8525205F;
+        Mon, 27 Sep 2021 06:54:33 +0000 (GMT)
+Subject: Re: [PATCH 01/14] KVM: s390: Ensure kvm_arch_no_poll() is read once
+ when blocking vCPU
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         David Hildenbrand <david@redhat.com>,
@@ -46,87 +75,100 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
         David Matlack <dmatlack@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 07/14] KVM: Don't block+unblock when halt-polling is successful
-In-Reply-To: <80d90ee6-0d43-3735-5c26-be8c3d72d493@redhat.com>
 References: <20210925005528.1145584-1-seanjc@google.com>
-        <20210925005528.1145584-8-seanjc@google.com>
-        <878rzlass2.wl-maz@kernel.org>
-        <80d90ee6-0d43-3735-5c26-be8c3d72d493@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, dmatlack@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+ <20210925005528.1145584-2-seanjc@google.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <01fa2462-6652-7206-5ef3-bacb3452b4c8@de.ibm.com>
+Date:   Mon, 27 Sep 2021 08:54:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+MIME-Version: 1.0
+In-Reply-To: <20210925005528.1145584-2-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: LRqB5f6S9hbk17-RqSL7Lr4MRuKyWqHw
+X-Proofpoint-ORIG-GUID: EuLGaHU57XrzZa8qPJevhWzEyIkwBjOa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
+ definitions=2021-09-27_01,2021-09-24_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 mlxlogscore=999 malwarescore=0 phishscore=0 adultscore=0
+ spamscore=0 impostorscore=0 priorityscore=1501 mlxscore=0 bulkscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2109270042
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Sun, 26 Sep 2021 07:27:28 +0100,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+
+Am 25.09.21 um 02:55 schrieb Sean Christopherson:
+> Wrap s390's halt_poll_max_steal with READ_ONCE and snapshot the result of
+> kvm_arch_no_poll() in kvm_vcpu_block() to avoid a mostly-theoretical,
+> largely benign bug on s390 where the result of kvm_arch_no_poll() could
+> change due to userspace modifying halt_poll_max_steal while the vCPU is
+> blocking.  The bug is largely benign as it will either cause KVM to skip
+> updating halt-polling times (no_poll toggles false=>true) or to update
+> halt-polling times with a slightly flawed block_ns.
 > 
-> On 25/09/21 11:50, Marc Zyngier wrote:
-> >> there is no need for arm64 to put/load
-> >> the vGIC as KVM hasn't relinquished control of the vCPU in any way.
-> > 
-> > This doesn't mean that there is no requirement for any state
-> > change. The put/load on GICv4 is crucial for performance, and the VMCR
-> > resync is a correctness requirement.
+> Note, READ_ONCE is unnecessary in the current code, add it in case the
+> arch hook is ever inlined, and to provide a hint that userspace can
+> change the param at will.
 > 
-> I wouldn't even say it's crucial for performance: halt polling cannot
-> work and is a waste of time without (the current implementation of)
-> put/load.
+> Fixes: 8b905d28ee17 ("KVM: s390: provide kvm_arch_no_poll function")
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Not quite. A non-V{LPI,SGI} could still be used as the a wake-up from
-WFI (which is the only reason we end-up on this path). Only LPIs (and
-SGIs on GICv4.1) can be directly injected, meaning that SPIs and PPIs
-still follow the standard SW injection model.
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-However, there is still the ICH_VMCR_EL2 requirement (to get the
-up-to-date priority mask and group enable bits) for SW-injected
-interrupt wake-up to work correctly, and I really don't want to save
-that one eagerly on each shallow exit.
-
-> However, is activating the doorbell necessary?  If possible, polling
-> the VGIC directly for pending VLPIs without touching the ITS (for
-> example by emulating IAR reads) may make sense.  IIUC that must be
-> done at EL2 though, so maybe it would even make sense to move all of
-> halt polling to EL2 for the nVHE case.  It all depends on benchmark
-> results, of course.
-
-No, there is no architectural way to observe the VLPI state. EL2
-cannot impersonate the guest an read ICV_IAR1_EL1 (because it
-conveniently has the same encoding as ICC_IAR1_EL1), and if it could,
-it would be *destructive* (not what you want). The equivalent of the
-LR that is used to hold the highest priority VLPI presented to the
-virtual CPU interface is not visible to SW at all.
-
-There are exactly two ways for the hypervisor to get a hint about the
-VLPI state (and that's only a hint, as everything can be spurious):
-
-- Make the vPE non resident and use GICR_VPENDBASER.PendingLast bit to
-  find out whether there are pending VLPIs
-
-- Make the vPE non resident and get a doorbell interrupt
-
-See the common pattern?
-
-There is no polling mechanism, and the only way to flush the VLPI
-state to memory is to destroy the GIC view of the vPE, which is a bit
-counter-productive. It also only work on GICv4.1, and not GICv4 (which
-is why we don't support live migration on GICv4).
-
-> Sorry for the many stupid questions I'm asking lately, but I'm trying
-> to pay more attention to ARM and understand the VGIC and EL1/EL2 split
-> better.
-
-Feel free to ask any question. The more people understand how the
-architecture works, the better.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> ---
+>   arch/s390/kvm/kvm-s390.c | 2 +-
+>   virt/kvm/kvm_main.c      | 5 +++--
+>   2 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 6a6dd5e1daf6..7cabe6778b1b 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3446,7 +3446,7 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
+>   {
+>   	/* do not poll with more than halt_poll_max_steal percent of steal time */
+>   	if (S390_lowcore.avg_steal_timer * 100 / (TICK_USEC << 12) >=
+> -	    halt_poll_max_steal) {
+> +	    READ_ONCE(halt_poll_max_steal)) {
+>   		vcpu->stat.halt_no_poll_steal++;
+>   		return true;
+>   	}
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 191dac6b1bed..768a4cbb26a6 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3213,6 +3213,7 @@ update_halt_poll_stats(struct kvm_vcpu *vcpu, u64 poll_ns, bool waited)
+>    */
+>   void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>   {
+> +	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
+>   	ktime_t start, cur, poll_end;
+>   	bool waited = false;
+>   	u64 block_ns;
+> @@ -3220,7 +3221,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>   	kvm_arch_vcpu_blocking(vcpu);
+>   
+>   	start = cur = poll_end = ktime_get();
+> -	if (vcpu->halt_poll_ns && !kvm_arch_no_poll(vcpu)) {
+> +	if (vcpu->halt_poll_ns && halt_poll_allowed) {
+>   		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
+>   
+>   		++vcpu->stat.generic.halt_attempted_poll;
+> @@ -3275,7 +3276,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>   	update_halt_poll_stats(
+>   		vcpu, ktime_to_ns(ktime_sub(poll_end, start)), waited);
+>   
+> -	if (!kvm_arch_no_poll(vcpu)) {
+> +	if (halt_poll_allowed) {
+>   		if (!vcpu_valid_wakeup(vcpu)) {
+>   			shrink_halt_poll_ns(vcpu);
+>   		} else if (vcpu->kvm->max_halt_poll_ns) {
+> 
