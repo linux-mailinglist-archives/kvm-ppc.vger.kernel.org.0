@@ -2,304 +2,320 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C99E341B1C8
-	for <lists+kvm-ppc@lfdr.de>; Tue, 28 Sep 2021 16:12:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E60A41B3AE
+	for <lists+kvm-ppc@lfdr.de>; Tue, 28 Sep 2021 18:21:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240917AbhI1OOC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 28 Sep 2021 10:14:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3172 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240908AbhI1OOC (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 28 Sep 2021 10:14:02 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 18SC8E2m006152;
-        Tue, 28 Sep 2021 10:12:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=3wsbUkqmrx13+n8Rxa7S2JfyWOpm1Ji/LvMcjMremB0=;
- b=AuEchPTcsc87wIF6Opmsi0DaJE6HqQXQ8QmUmYDcZGW/ekMhfwQWs75njIoHisdC7S1I
- TaHse76i1WXW6Lim9ZGOTU1PBean8EzluHshrmpwERZ/V/b4IotzeapcCnmqwBFntXAB
- /ptuAtCveC/BTjGlVftIAgLmZLvIam0hycJpS1OtfMOox1I5knUnuXdLrSeS+ijFSJns
- aWbRmymRHCgy50KHEEGySnHQzDYOc6P2w0LK/1+eQHp9t32/pAFKJ4hmJ61avOvMQBi3
- 0OLV1yPaa2sWWHfq6RzWijnNML/J1fg+kQmq8+g2hMGacF9c+JEc3dgIIANmao897Dl8 zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bc092ebnn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Sep 2021 10:12:04 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 18SDe4bA003559;
-        Tue, 28 Sep 2021 10:12:03 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bc092ebkf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Sep 2021 10:12:03 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 18SE3Gta021696;
-        Tue, 28 Sep 2021 14:12:00 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3b9u1jeunq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Sep 2021 14:12:00 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 18SEBqWF46137710
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Sep 2021 14:11:52 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC83E52065;
-        Tue, 28 Sep 2021 14:11:52 +0000 (GMT)
-Received: from [9.43.58.127] (unknown [9.43.58.127])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3872352054;
-        Tue, 28 Sep 2021 14:11:45 +0000 (GMT)
-Subject: Re: [PATCH v8 1/2] powerpc/pseries: Interface to represent PAPR
- firmware attributes
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     mpe@ellerman.id.au, benh@kernel.crashing.org, paulus@samba.org,
-        shuah@kernel.org, farosas@linux.ibm.com, kjain@linux.ibm.com,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pratik.r.sampat@gmail.com
-References: <20210928115102.57117-1-psampat@linux.ibm.com>
- <20210928115102.57117-2-psampat@linux.ibm.com> <YVMFvyGwfH+rxYPz@kroah.com>
- <289d2081-7ae8-f76a-5180-49bc6061a05c@linux.ibm.com>
- <YVMfonwjmbgL/ZCX@kroah.com>
-From:   Pratik Sampat <psampat@linux.ibm.com>
-Message-ID: <1d8e82ab-fab7-d014-c812-2c086dd7a63f@linux.ibm.com>
-Date:   Tue, 28 Sep 2021 19:41:44 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S241759AbhI1QW5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 28 Sep 2021 12:22:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50432 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241523AbhI1QW5 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 28 Sep 2021 12:22:57 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C54BC061745
+        for <kvm-ppc@vger.kernel.org>; Tue, 28 Sep 2021 09:21:17 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id e7so21760800pgk.2
+        for <kvm-ppc@vger.kernel.org>; Tue, 28 Sep 2021 09:21:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=4W1FddI98pFlnr+A0lvtfqj/bE0RlEbF+OZi5QyXfNQ=;
+        b=rRG5+ibV0VfTSTicp1bhIGdnPJs2eKiLq2XzebWggCrmgs3veBEvfmHcXBiVrkvlhr
+         pasvKyJuVD/tCR/gXD4BcHA9nsxqDt4qCNpCzJiytnVVYjPlnxLaPBgP5mSWdyI9kW+J
+         i4LEEcGYlnHMbwfaCAnCjMwTclB4O68YC5H5sFscTb65HQuzCWDCisyhMm5ffdKTn7Ay
+         lNZC2KYMygu6dBZSzwm9+EdohM3Suyj+qhy/hk/Z14ubImxH8k78+tqDOqBOz7l+yJ6f
+         Txn/VQ5RX8HjLrgWFg6NC/blpkElmvDMFM+9G7EoTZP0AkKUWZyACsImEB5K+QlbXbhB
+         mH+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4W1FddI98pFlnr+A0lvtfqj/bE0RlEbF+OZi5QyXfNQ=;
+        b=HRIDpzKB+XzevOtyO4hODA8dgULiGLtx7MIemiYvVDqy4f8fQ7KTsx5dWTUQ8UxXbT
+         kbWiRkeremRaE+DOdO39ThY8Rwsrj3uJwbzSMPLIoEEhFAEr33g1tMjOLEFAUwZj/Dt6
+         /XXH/xv/4hJDXt5t20+EEZPeE4B7aQ2sFvrXXM4JAoMUg+H/ENSEhGi9hqm1c/Uys8Qt
+         iPwm0srWKpf5tVqGrCLAyRM9Z11eLbADOsFO6k2FhzCYUidW2QYcZIrsScQw7VXn4oMa
+         k0fOO0ay43VbatkRTaFbqMhEVWNcBpZzHNcw+4CRncd8OK+7Lywrmxc16e4tl3eGOx4/
+         S+jQ==
+X-Gm-Message-State: AOAM533GIX5fyPimkGRY6J5EgtM+QycL4gPIACRb9awIs5SXdLuoqZXi
+        fAQN1/PyIUezewDO/dhtnsJiqg==
+X-Google-Smtp-Source: ABdhPJwvRKMgNcMAnByHEA4jwqcNi7NdpV8g3FIwIP1nCr7TIZIvl4OYYda797EjrwyZo4NDgJC3GA==
+X-Received: by 2002:a63:2d02:: with SMTP id t2mr5392663pgt.1.1632846076184;
+        Tue, 28 Sep 2021 09:21:16 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p9sm3038231pfo.153.2021.09.28.09.21.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Sep 2021 09:21:15 -0700 (PDT)
+Date:   Tue, 28 Sep 2021 16:21:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 07/14] KVM: Don't block+unblock when halt-polling is
+ successful
+Message-ID: <YVNA+KTbLrxGQ6ML@google.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+ <20210925005528.1145584-8-seanjc@google.com>
+ <878rzlass2.wl-maz@kernel.org>
+ <80d90ee6-0d43-3735-5c26-be8c3d72d493@redhat.com>
+ <877df3btgb.wl-maz@kernel.org>
+ <YVH/LjCqk/9PfDHn@google.com>
+ <87o88dt5m5.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <YVMfonwjmbgL/ZCX@kroah.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: apBFcd0aGB2zWRr9xoHDNOJkogDDUscS
-X-Proofpoint-GUID: 7ThZpnyAIZBb16ZL2TgNz6ueBR9BpeJe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.391,FMLib:17.0.607.475
- definitions=2021-09-28_05,2021-09-28_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
- mlxlogscore=999 spamscore=0 bulkscore=0 adultscore=0 mlxscore=0
- lowpriorityscore=0 suspectscore=0 malwarescore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2109280081
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87o88dt5m5.wl-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Tue, Sep 28, 2021, Marc Zyngier wrote:
+> On Mon, 27 Sep 2021 18:28:14 +0100,
+> Sean Christopherson <seanjc@google.com> wrote:
+> > 
+> > On Sun, Sep 26, 2021, Marc Zyngier wrote:
+> > > On Sun, 26 Sep 2021 07:27:28 +0100,
+> > > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > > > 
+> > > > On 25/09/21 11:50, Marc Zyngier wrote:
+> > > > >> there is no need for arm64 to put/load
+> > > > >> the vGIC as KVM hasn't relinquished control of the vCPU in any way.
+> > > > > 
+> > > > > This doesn't mean that there is no requirement for any state
+> > > > > change. The put/load on GICv4 is crucial for performance, and the VMCR
+> > > > > resync is a correctness requirement.
+> > 
+> > Ah crud, I didn't blame that code beforehand, I simply assumed
+> > kvm_arch_vcpu_blocking() was purely for the blocking/schedule()
+> > sequence.  The comment in arm64's kvm_arch_vcpu_blocking() about
+> > kvm_arch_vcpu_runnable() makes more sense now too.
+> > 
+> > > > I wouldn't even say it's crucial for performance: halt polling cannot
+> > > > work and is a waste of time without (the current implementation of)
+> > > > put/load.
+> > > 
+> > > Not quite. A non-V{LPI,SGI} could still be used as the a wake-up from
+> > > WFI (which is the only reason we end-up on this path). Only LPIs (and
+> > > SGIs on GICv4.1) can be directly injected, meaning that SPIs and PPIs
+> > > still follow the standard SW injection model.
+> > > 
+> > > However, there is still the ICH_VMCR_EL2 requirement (to get the
+> > > up-to-date priority mask and group enable bits) for SW-injected
+> > > interrupt wake-up to work correctly, and I really don't want to save
+> > > that one eagerly on each shallow exit.
+> > 
+> > IIUC, VMCR is resident in hardware while the guest is running, and
+> > KVM needs to retrieve the VMCR when processing interrupts to
+> > determine if a interrupt is above the priority threshold.  If that's
+> > the case, then IMO handling the VMCR via an arch hook is
+> > unnecessarily fragile, e.g. any generic call that leads to
+> > kvm_arch_vcpu_runnable() needs to know that arm64 lazily retrieves a
+> > guest register.
+> 
+> Not quite. We only need to retrieve the VMCR if we are in a situation
+> where we need to trigger a wake-up from WFI at the point where we have
+> not done a vcpu_put() yet. All the other cases where the interrupt is
+> injected are managed by the HW. And the only case where
+> kvm_arch_vcpu_runnable() gets called is when blocking.
+> 
+> I also don't get why a hook would be fragile, as long as it has well
+> defined semantics.
+
+Generic KVM should not have to know that a seemingly benign arch hook,
+kvm_arch_vcpu_runnable(), cannot be safely called without first calling another
+arch hook.  E.g. I suspect there's a (benign?) race in kvm_vcpu_on_spin().  If
+the loop is delayed between checking rcuwait_active() and vcpu_dy_runnable(),
+and the target vCPU is awakened during that period, KVM can call
+kvm_arch_vcpu_runnable() while the vCPU is running.
+
+It's kind of a counter-example to my below suggestion as putting the vGIC would
+indeed lead to state corruption if the vCPU is running, but I would argue that
+arm64 should override kvm_arch_dy_runnable() so that its correctness is guaranteed,
+e.g. by not calling kvm_arch_vcpu_runnable() if the vCPU is already running.
+
+> > A better approach for VMCR would be to retrieve the value from
+> > hardware on-demand, e.g. via a hook in vgic_get_vmcr(), so that it's all but
+> > impossible to have bugs where KVM is working with a stale VMCR, e.g.
+> > 
+> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+> > index 48c6067fc5ec..0784de0c4080 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-mmio.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+> > @@ -828,6 +828,13 @@ void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+> >  
+> >  void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+> >  {
+> > +       if (!vcpu->...->vmcr_available) {
+> > +               preempt_disable();
+> > +               kvm_vgic_vmcr_sync(vcpu);
+> > +               preempt_enable();
+> > +               vcpu->...->vmcr_available = true;
+> > +       }
+> > +
+> 
+> But most of the uses of vgic_get_vmcr() are in contexts where the vcpu
+> isn't running at all (such as save/restore). It really only operates
+> on the shadow state, and what you have above will only lead to state
+> corruption.
+
+Ignoring the kvm_arch_dy_runnable() case for the moment, how would it lead to
+corruption?  The idea is that the 'vmcr_available' flag would be cleared when the
+vCPU is run, i.e. it tracks whether or not the shadow state may be stale.
+
+> >         if (kvm_vgic_global_state.type == VGIC_V2)
+> >                 vgic_v2_get_vmcr(vcpu, vmcr);
+> >         else
+> > 
+> > 
+> > Regarding vGIC v4, does KVM require it to be resident in hardware
+> > while the vCPU is loaded?
+> 
+> It is a requirement. Otherwise, we end-up with an inconsistent state
+> between the delivery of doorbells and the state of the vgic.
+
+For my own understanding, does KVM require it to be resident in hardware while
+the vCPU is loaded but _not_ running?  What I don't fully understand is how KVM
+can safely load/put the vCPU if that true, i.e. wouldn't there always be a window
+for badness?
+
+> Also, reloading the GICv4 state can be pretty expensive (multiple MMIO
+> accesses), which is why we really don't want to do that on the hot path
+> (kvm_arch_vcpu_ioctl_run() *is* a hot path).
+
+I wasn't suggesting to reload GICv4 on every entry, it would only be reloaded
+if it was put between vcpu_load() and entry to the guest.
+
+> > If not, then we could do something like
+> > this, which would eliminate the arch hooks entirely if the VMCR is
+> > handled as above.
+
+...
+
+> > @@ -813,6 +787,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >                  */
+> >                 preempt_disable();
+> > 
+> > +               /*
+> > +                * Reload vGIC v4 if necessary, as it may be put on-demand so
+> > +                * that KVM can detect directly injected interrupts, e.g. when
+> > +                * determining if the vCPU is runnable due to a pending event.
+> > +                */
+> > +               vgic_v4_load(vcpu);
+> 
+> You'd need to detect that a previous put has been done.
+
+Not that it will likely matter, but doesn't the its_vpe.resident check automatically
+handle this?
+
+> But overall, it puts the complexity at the wrong place. WFI (aka
+> kvm_vcpu_block) is the place where we want to handle this synchronisation,
+> and not the run loop.
+> 
+> Instead of having a well defined interface with the blocking code
+> where we implement the required synchronisation, you spray the vgic
+> crap all over, and it becomes much harder to reason about it. Guess
+> what, I'm not keen on it.
+
+My objection to the arch hooks is that, from generic KVM's perspective, the
+direct dependency is not on blocking, it's on calling kvm_arch_vcpu_runnable().
+That's why I suggested handling this by tracking whether or not the VMCR is
+up-to-date/stale, as it allows generic KVM to safely call kvm_arch_vcpu_runnable()
+whenever the vCPU is loaded.
+
+I don't have a strong opinion on arm64 preferring the sync to be specific to
+WFI, but if that's the case then IMO this should be handled fully in arm64, e.g.
+a patch like so (or with a wrapper around the call to kvm_vcpu_block() if we
+want to guard against future calls into generic KVM)
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index fe102cd2e518..312f3acd3ca3 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -367,27 +367,12 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+
+ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ {
+-       /*
+-        * If we're about to block (most likely because we've just hit a
+-        * WFI), we need to sync back the state of the GIC CPU interface
+-        * so that we have the latest PMR and group enables. This ensures
+-        * that kvm_arch_vcpu_runnable has up-to-date data to decide
+-        * whether we have pending interrupts.
+-        *
+-        * For the same reason, we want to tell GICv4 that we need
+-        * doorbells to be signalled, should an interrupt become pending.
+-        */
+-       preempt_disable();
+-       kvm_vgic_vmcr_sync(vcpu);
+-       vgic_v4_put(vcpu, true);
+-       preempt_enable();
++
+ }
+
+ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+ {
+-       preempt_disable();
+-       vgic_v4_load(vcpu);
+-       preempt_enable();
++
+ }
+
+ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 275a27368a04..9870e824a27e 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -95,8 +95,28 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+        } else {
+                trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
+                vcpu->stat.wfi_exit_stat++;
++
++               /*
++                * Sync back the state of the GIC CPU interface so that we have
++                * the latest PMR and group enables. This ensures that
++                * kvm_arch_vcpu_runnable has up-to-date data to decide whether
++                * we have pending interrupts, e.g. when determining if the
++                * vCPU should block.
++                *
++                * For the same reason, we want to tell GICv4 that we need
++                * doorbells to be signalled, should an interrupt become pending.
++                */
++               preempt_disable();
++               kvm_vgic_vmcr_sync(vcpu);
++               vgic_v4_put(vcpu, true);
++               preempt_enable();
++
+                kvm_vcpu_block(vcpu);
+                kvm_clear_request(KVM_REQ_UNHALT, vcpu);
++
++               preempt_disable();
++               vgic_v4_load(vcpu);
++               preempt_enable();
+        }
+
+        kvm_incr_pc(vcpu);
 
 
-On 28/09/21 7:28 pm, Greg KH wrote:
-> On Tue, Sep 28, 2021 at 06:13:18PM +0530, Pratik Sampat wrote:
->> Hello Greg,
->>
->> Thank you for your review.
->>
->> On 28/09/21 5:38 pm, Greg KH wrote:
->>> On Tue, Sep 28, 2021 at 05:21:01PM +0530, Pratik R. Sampat wrote:
->>>> Adds a generic interface to represent the energy and frequency related
->>>> PAPR attributes on the system using the new H_CALL
->>>> "H_GET_ENERGY_SCALE_INFO".
->>>>
->>>> H_GET_EM_PARMS H_CALL was previously responsible for exporting this
->>>> information in the lparcfg, however the H_GET_EM_PARMS H_CALL
->>>> will be deprecated P10 onwards.
->>>>
->>>> The H_GET_ENERGY_SCALE_INFO H_CALL is of the following call format:
->>>> hcall(
->>>>     uint64 H_GET_ENERGY_SCALE_INFO,  // Get energy scale info
->>>>     uint64 flags,           // Per the flag request
->>>>     uint64 firstAttributeId,// The attribute id
->>>>     uint64 bufferAddress,   // Guest physical address of the output buffer
->>>>     uint64 bufferSize       // The size in bytes of the output buffer
->>>> );
->>>>
->>>> This H_CALL can query either all the attributes at once with
->>>> firstAttributeId = 0, flags = 0 as well as query only one attribute
->>>> at a time with firstAttributeId = id, flags = 1.
->>>>
->>>> The output buffer consists of the following
->>>> 1. number of attributes              - 8 bytes
->>>> 2. array offset to the data location - 8 bytes
->>>> 3. version info                      - 1 byte
->>>> 4. A data array of size num attributes, which contains the following:
->>>>     a. attribute ID              - 8 bytes
->>>>     b. attribute value in number - 8 bytes
->>>>     c. attribute name in string  - 64 bytes
->>>>     d. attribute value in string - 64 bytes
->>>>
->>>> The new H_CALL exports information in direct string value format, hence
->>>> a new interface has been introduced in
->>>> /sys/firmware/papr/energy_scale_info to export this information to
->>>> userspace in an extensible pass-through format.
->>>>
->>>> The H_CALL returns the name, numeric value and string value (if exists)
->>>>
->>>> The format of exposing the sysfs information is as follows:
->>>> /sys/firmware/papr/energy_scale_info/
->>>>      |-- <id>/
->>>>        |-- desc
->>>>        |-- value
->>>>        |-- value_desc (if exists)
->>>>      |-- <id>/
->>>>        |-- desc
->>>>        |-- value
->>>>        |-- value_desc (if exists)
->>>> ...
->>>>
->>>> The energy information that is exported is useful for userspace tools
->>>> such as powerpc-utils. Currently these tools infer the
->>>> "power_mode_data" value in the lparcfg, which in turn is obtained from
->>>> the to be deprecated H_GET_EM_PARMS H_CALL.
->>>> On future platforms, such userspace utilities will have to look at the
->>>> data returned from the new H_CALL being populated in this new sysfs
->>>> interface and report this information directly without the need of
->>>> interpretation.
->>>>
->>>> Signed-off-by: Pratik R. Sampat <psampat@linux.ibm.com>
->>>> Reviewed-by: Gautham R. Shenoy <ego@linux.vnet.ibm.com>
->>>> Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
->>>> Reviewed-by: Kajol Jain <kjain@linux.ibm.com>
->>>> ---
->>>>    .../sysfs-firmware-papr-energy-scale-info     |  26 ++
->>>>    arch/powerpc/include/asm/hvcall.h             |  24 +-
->>>>    arch/powerpc/kvm/trace_hv.h                   |   1 +
->>>>    arch/powerpc/platforms/pseries/Makefile       |   3 +-
->>>>    .../pseries/papr_platform_attributes.c        | 312 ++++++++++++++++++
->>>>    5 files changed, 364 insertions(+), 2 deletions(-)
->>>>    create mode 100644 Documentation/ABI/testing/sysfs-firmware-papr-energy-scale-info
->>>>    create mode 100644 arch/powerpc/platforms/pseries/papr_platform_attributes.c
->>>>
->>>> diff --git a/Documentation/ABI/testing/sysfs-firmware-papr-energy-scale-info b/Documentation/ABI/testing/sysfs-firmware-papr-energy-scale-info
->>>> new file mode 100644
->>>> index 000000000000..139a576c7c9d
->>>> --- /dev/null
->>>> +++ b/Documentation/ABI/testing/sysfs-firmware-papr-energy-scale-info
->>>> @@ -0,0 +1,26 @@
->>>> +What:		/sys/firmware/papr/energy_scale_info
->>>> +Date:		June 2021
->>>> +Contact:	Linux for PowerPC mailing list <linuxppc-dev@ozlabs.org>
->>>> +Description:	Directory hosting a set of platform attributes like
->>>> +		energy/frequency on Linux running as a PAPR guest.
->>>> +
->>>> +		Each file in a directory contains a platform
->>>> +		attribute hierarchy pertaining to performance/
->>>> +		energy-savings mode and processor frequency.
->>>> +
->>>> +What:		/sys/firmware/papr/energy_scale_info/<id>
->>>> +		/sys/firmware/papr/energy_scale_info/<id>/desc
->>>> +		/sys/firmware/papr/energy_scale_info/<id>/value
->>>> +		/sys/firmware/papr/energy_scale_info/<id>/value_desc
->>>> +Date:		June 2021
->>>> +Contact:	Linux for PowerPC mailing list <linuxppc-dev@ozlabs.org>
->>>> +Description:	Energy, frequency attributes directory for POWERVM servers
->>>> +
->>>> +		This directory provides energy, frequency, folding information. It
->>>> +		contains below sysfs attributes:
->>>> +
->>>> +		- desc: String description of the attribute <id>
->>>> +
->>>> +		- value: Numeric value of attribute <id>
->>>> +
->>>> +		- value_desc: String value of attribute <id>
->>> Can you just make 4 different entries in this file, making it easier to
->>> parse and extend over time?
->> Do you mean I only create one file per attribute and populate it with 4
->> different entries as follows?
->>
->> # cat /sys/firmware/papr/energy_scale_info/<id>
->> id:
->> desc:
->> value:
->> value_desc:
-> No, I mean in this documentation file, have 4 different "What:" entries,
-> don't lump 4 of them together into one larger Description for no reason
-> like you did here.
->
-> The sysfs files themselves are fine.
 
-Ah okay, I understand what you're saying. I just need to make 4 different
-entries in the documentation.
-Thanks for that clarification.
 
->>>> +struct papr_attr {
->>>> +	u64 id;
->>>> +	struct kobj_attribute kobj_attr;
->>> Why does an attribute have to be part of this structure?
->> I bundled both an attribute as well as its ID in a structure because each
->> attributes value could only be queried from the firmware with the corresponding
->> ID.
->> It seemed to be logically connected and that's why I had them in the structure.
->> Are you suggesting we maintain them separately and don't need the coupling?
-> The id is connected to the kobject, not the attribute, right?
-> Attributes do not have uniqueness like this normally.
->
->
->>>> +static struct papr_ops_info {
->>>> +	const char *attr_name;
->>>> +	ssize_t (*show)(struct kobject *kobj, struct kobj_attribute *kobj_attr,
->>>> +			char *buf);
->>>> +} ops_info[MAX_ATTRS] = {
->>>> +	{ "desc", papr_show_desc },
->>>> +	{ "value", papr_show_value },
->>>> +	{ "value_desc", papr_show_value_desc },
->>> What is wrong with just using the __ATTR_RO() macro and then having an
->>> array of attributes in a single group?  That should be a lot simpler
->>> overall, right?
->> If I understand this correctly, you mean I can have a array of attributes in a
->> flat single group?
-> Yes.
->
->> I suppose that would be a simpler, given your earlier suggestion to wrap
->> attribute values up in a single file per attribute.
->>
->> However, the intent of grouping and keeping files separate was that each sysfs
->> file has only one value to display.
-> That is correct, and not a problem here at all.
->
->> I can change it to using an array of attributes in a single group too if you
->> believe that is right way to go instead.
-> You have 3 variables for your attributes:
->
-> static struct kobj_attribute papr_desc = __ATTR_RO(desc);
-> static struct kobj_attribute papr_value = __ATTR_RO(value);
-> static struct kobj_attribute papr_value_desc = __ATTR_RO(value_desc);
->
-> and then your attribute group:
-> static struct attribute papr_attrs[] = {
-> 	&papr_desc.attr,
-> 	&papr_value.attr,
-> 	&papr_value_desc.attr,
-> 	NULL,
-> };
->
-> ATTRIBUTE_GROUPS(papr);
->
-> Then take that papr_groups and register that with the kobject when
-> needed.
->
-> But, you seem to only be having a whole kobject for a subdirectory,
-> right?  No need for that, just name your attribute group, so instead of
->
-> ATTRIBUTE_GROUPS(papr);
->
-> do:
-> static const struct attribute_group papr_group = {
-> 	.name = "Your Subdirectory Name here",
-> 	.attrs = papr_attrs,
-> };
->
-> Hope this helps,
-
-Yes, this does!
-I understand now that a whole kobject for a sub-directory is futile.
-The approach you suggested for having papr_groups register with the kobject
-whenever needed is more cleaner.
-
-Thanks for the help, I'll rework my current logic according to that.
-
-Pratik
-
-> greg k-h
 
