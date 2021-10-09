@@ -2,57 +2,56 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 461734275B0
-	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Oct 2021 04:13:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 302834275B3
+	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Oct 2021 04:13:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244161AbhJICOr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 8 Oct 2021 22:14:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38180 "EHLO
+        id S244181AbhJICOu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 8 Oct 2021 22:14:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244182AbhJICOq (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Oct 2021 22:14:46 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF60C061755
-        for <kvm-ppc@vger.kernel.org>; Fri,  8 Oct 2021 19:12:49 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id x15-20020a056902102f00b005ba71cd7dbfso4952541ybt.8
-        for <kvm-ppc@vger.kernel.org>; Fri, 08 Oct 2021 19:12:49 -0700 (PDT)
+        with ESMTP id S244194AbhJICOt (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Oct 2021 22:14:49 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A26CC061764
+        for <kvm-ppc@vger.kernel.org>; Fri,  8 Oct 2021 19:12:52 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id b9-20020a5b07890000b0290558245b7eabso15002941ybq.10
+        for <kvm-ppc@vger.kernel.org>; Fri, 08 Oct 2021 19:12:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=VOf0o+drOoyjtnZHAjwPMyY2QgjmuejeI8ZGvk5qQh8=;
-        b=c594JBXBzlzJm/B4MJiuak37F10cOGqzZRDRYYkHvGtg+tYhi9bkpT7HAvzA4a7CrO
-         wY9eJk+8SXC6VXSYxm/HtIH7HCqw4WmraTlKbDvDXkb0ieGHnQEdhLp9SHTOoF1D+ihb
-         l0NC5UfvB9mBvn0GShFPrhMJGBfjxpiBY5BrX5s0xEdDxmIpWuxZBBx29TlMmh0JGg0R
-         lof8oMgaYbwVizPYN+9qQPXHfvL56RO9ccLyp7IYNiT8OQ7d02343dCZy83nOSQGhHOM
-         xfDcm3J7v9Zaqb3Cv7KhQ0mVfu7vqET/6w/svCdKYDLPxqzAsRNGhLifWQMr9xoyFcPL
-         LUIA==
+        bh=cmY3ciYgK0Pw7Nc3yQ2tKxt4RfIVgRouhF9jfsbApsU=;
+        b=QbQVaw+LEXAnvKqqBqFc88s4xq502vqu1GE3XpXsagKgQF+sSH5oy9ZN3Riurg0uam
+         NboPaoBoD+NTvzrr76ut0oSCAr/dobocjfxXDCgfKREM1WgGlcHv/XKBbx+8XlSywjl9
+         v6gbyQ/DSMA6ibdL//jX5ac88VgPO68Yar5tSoyOjvQU7DWuLyOGlTMs1EcHp6GBd7t8
+         zDaqFcWWP1eS2XcbCz8YiWyZQMO7D8kVYM83EyYLTsNWw/FWNJEOnWDm+n66w3yiKT4b
+         k4mJC2lWsO+wgHdIF9UIkXA7mXBDmZvdXGiRS4k0umncgko4hmVixQMSV1g0v0Xm3Xav
+         bXww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=VOf0o+drOoyjtnZHAjwPMyY2QgjmuejeI8ZGvk5qQh8=;
-        b=zpwzpxJ6v1Nvg3+mCldKcjkEqMJPNUvqS9oOpprq8iU+XAuClud+9CH3GKkekUiHlK
-         CQXSi/Gs2EakmWp5m1AjoDMxPe8J6dRRiou1Hm7hVqFjh4nDxu4OJOyWCdUssQ2jJLqH
-         Bk9F/RDqJ6ewkGKm1L1u4oE3xR4T0EhTjfzHpzGQIjuFE16c0pyFcj29zhi3mBGhjkiO
-         Ja93bq/54ZVU1m9pe4Xr4Vz0AmDGjCCDnVdBgf70MRi6M+3ozj/h6xL+7Bf9/pnSllgD
-         vZ2bV2uwxuVbA05cty/Q9qXrGa7DUTFyV5lJusIbNlbExMV2XecarqnjlG0MI/X2XA2L
-         4soQ==
-X-Gm-Message-State: AOAM533//bhvHivpUJKJvlDFYzofsH2ZCneAI84XYQYofReDIzeMZ4QD
-        KyP3EAaBPkczx3v1i36vqMY4JYaWgo8=
-X-Google-Smtp-Source: ABdhPJzvUj+lYxE1uvv63+XvvDPeheCH+oyqg89jaLQyiP8PVpc/MK53zetbWHLCR1OXSf8DRfROgUDiyR0=
+        bh=cmY3ciYgK0Pw7Nc3yQ2tKxt4RfIVgRouhF9jfsbApsU=;
+        b=nWviHR3Q7TkzUP42wO8+FQfRp/uDilEb0b5OhYkr/gSchNeD0fJCU4On5DY2bbTaQ3
+         Ny81FCa6z8JaxtV9B/pafSeUBFa+0TrpN7S6gigcRNMVyZbSms9D6jtDvUI69yzFqv0o
+         e7ruwSoqBpuSQ48FKdoPyZVfLmYsN4Ccn5r/JvbHO8es/H+GyJO/Wa/fdoVolgl4Gg/g
+         ul7vqVRylw3Db04W819qi1OwtGxr1eNYUoiJbp/2QHVW5VTQA6RT8Wg6vuYSrJTJjgg1
+         4eiF+/7nbTo/IfqUviHpxq35fPHP3GxZ65f858xIUVLcQZYJXVewW82xGIQQdobNReF6
+         xuZw==
+X-Gm-Message-State: AOAM53254qJQhSEbwYaAA6SCLoF9n3sy90DPGLIa6LYGJQNzIXHdQ023
+        amACJ+x8Kn+9iz2pdpHoxQGYV9eh0DI=
+X-Google-Smtp-Source: ABdhPJxDfkHFA9j3YHwNecv1+8g7k+RRNV2EAtanrld0mWMeRHqp+zJFBO4S5rRqjxsoT4caGrG4+Mlfzmc=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:a25:d915:: with SMTP id q21mr7203996ybg.17.1633745569082;
- Fri, 08 Oct 2021 19:12:49 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:bc0e:: with SMTP id i14mr6935877ybh.324.1633745571812;
+ Fri, 08 Oct 2021 19:12:51 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Oct 2021 19:11:56 -0700
+Date:   Fri,  8 Oct 2021 19:11:57 -0700
 In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-4-seanjc@google.com>
+Message-Id: <20211009021236.4122790-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009021236.4122790-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 03/43] KVM: s390: Ensure kvm_arch_no_poll() is read once
- when blocking vCPU
+Subject: [PATCH v2 04/43] KVM: Force PPC to define its own rcuwait object
 From:   Sean Christopherson <seanjc@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -88,69 +87,129 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Wrap s390's halt_poll_max_steal with READ_ONCE and snapshot the result of
-kvm_arch_no_poll() in kvm_vcpu_block() to avoid a mostly-theoretical,
-largely benign bug on s390 where the result of kvm_arch_no_poll() could
-change due to userspace modifying halt_poll_max_steal while the vCPU is
-blocking.  The bug is largely benign as it will either cause KVM to skip
-updating halt-polling times (no_poll toggles false=>true) or to update
-halt-polling times with a slightly flawed block_ns.
+Do not define/reference kvm_vcpu.wait if __KVM_HAVE_ARCH_WQP is true, and
+instead force the architecture (PPC) to define its own rcuwait object.
+Allowing common KVM to directly access vcpu->wait without a guard makes
+it all too easy to introduce potential bugs, e.g. kvm_vcpu_block(),
+kvm_vcpu_on_spin(), and async_pf_execute() all operate on vcpu->wait, not
+the result of kvm_arch_vcpu_get_wait(), and so may do the wrong thing for
+PPC.
 
-Note, READ_ONCE is unnecessary in the current code, add it in case the
-arch hook is ever inlined, and to provide a hint that userspace can
-change the param at will.
+Due to PPC's shenanigans with respect to callbacks and waits (it switches
+to the virtual core's wait object at KVM_RUN!?!?), it's not clear whether
+or not this fixes any bugs.
 
-Fixes: 8b905d28ee17 ("KVM: s390: provide kvm_arch_no_poll function")
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/s390/kvm/kvm-s390.c | 2 +-
- virt/kvm/kvm_main.c      | 5 +++--
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ arch/powerpc/include/asm/kvm_host.h | 1 +
+ arch/powerpc/kvm/powerpc.c          | 3 ++-
+ include/linux/kvm_host.h            | 2 ++
+ virt/kvm/async_pf.c                 | 2 +-
+ virt/kvm/kvm_main.c                 | 9 ++++++---
+ 5 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 6a6dd5e1daf6..7cabe6778b1b 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -3446,7 +3446,7 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
- {
- 	/* do not poll with more than halt_poll_max_steal percent of steal time */
- 	if (S390_lowcore.avg_steal_timer * 100 / (TICK_USEC << 12) >=
--	    halt_poll_max_steal) {
-+	    READ_ONCE(halt_poll_max_steal)) {
- 		vcpu->stat.halt_no_poll_steal++;
- 		return true;
- 	}
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 59cb38b04ede..876c10803cda 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -749,6 +749,7 @@ struct kvm_vcpu_arch {
+ 	u8 irq_pending; /* Used by XIVE to signal pending guest irqs */
+ 	u32 last_inst;
+ 
++	struct rcuwait wait;
+ 	struct rcuwait *waitp;
+ 	struct kvmppc_vcore *vcore;
+ 	int ret;
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 8ab90ce8738f..be22da157569 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -762,7 +762,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	if (err)
+ 		goto out_vcpu_uninit;
+ 
+-	vcpu->arch.waitp = &vcpu->wait;
++	rcuwait_init(&vcpu->arch.wait);
++	vcpu->arch.waitp = &vcpu->arch.wait;
+ 	kvmppc_create_vcpu_debugfs(vcpu, vcpu->vcpu_id);
+ 	return 0;
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 60a35d9fe259..1ced2914d9ca 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -310,7 +310,9 @@ struct kvm_vcpu {
+ 	struct mutex mutex;
+ 	struct kvm_run *run;
+ 
++#ifndef __KVM_HAVE_ARCH_WQP
+ 	struct rcuwait wait;
++#endif
+ 	struct pid __rcu *pid;
+ 	int sigset_active;
+ 	sigset_t sigset;
+diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+index dd777688d14a..ccb35c22785e 100644
+--- a/virt/kvm/async_pf.c
++++ b/virt/kvm/async_pf.c
+@@ -85,7 +85,7 @@ static void async_pf_execute(struct work_struct *work)
+ 
+ 	trace_kvm_async_pf_completed(addr, cr2_or_gpa);
+ 
+-	rcuwait_wake_up(&vcpu->wait);
++	rcuwait_wake_up(kvm_arch_vcpu_get_wait(vcpu));
+ 
+ 	mmput(mm);
+ 	kvm_put_kvm(vcpu->kvm);
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3f6d450355f0..7bc38549487e 100644
+index 7bc38549487e..5d4a90032277 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -3213,6 +3213,7 @@ update_halt_poll_stats(struct kvm_vcpu *vcpu, u64 poll_ns, bool waited)
+@@ -421,7 +421,9 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
+ 	vcpu->kvm = kvm;
+ 	vcpu->vcpu_id = id;
+ 	vcpu->pid = NULL;
++#ifndef __KVM_HAVE_ARCH_WQP
+ 	rcuwait_init(&vcpu->wait);
++#endif
+ 	kvm_async_pf_vcpu_init(vcpu);
+ 
+ 	vcpu->pre_pcpu = -1;
+@@ -3213,6 +3215,7 @@ update_halt_poll_stats(struct kvm_vcpu *vcpu, u64 poll_ns, bool waited)
   */
  void kvm_vcpu_block(struct kvm_vcpu *vcpu)
  {
-+	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
++	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
+ 	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
  	ktime_t start, cur, poll_end;
  	bool waited = false;
- 	u64 block_ns;
-@@ -3220,7 +3221,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 	kvm_arch_vcpu_blocking(vcpu);
+@@ -3251,7 +3254,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ 	}
  
- 	start = cur = poll_end = ktime_get();
--	if (vcpu->halt_poll_ns && !kvm_arch_no_poll(vcpu)) {
-+	if (vcpu->halt_poll_ns && halt_poll_allowed) {
- 		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
  
- 		++vcpu->stat.generic.halt_attempted_poll;
-@@ -3275,7 +3276,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 	update_halt_poll_stats(
- 		vcpu, ktime_to_ns(ktime_sub(poll_end, start)), waited);
+-	prepare_to_rcuwait(&vcpu->wait);
++	prepare_to_rcuwait(wait);
+ 	for (;;) {
+ 		set_current_state(TASK_INTERRUPTIBLE);
  
--	if (!kvm_arch_no_poll(vcpu)) {
-+	if (halt_poll_allowed) {
- 		if (!vcpu_valid_wakeup(vcpu)) {
- 			shrink_halt_poll_ns(vcpu);
- 		} else if (vcpu->kvm->max_halt_poll_ns) {
+@@ -3261,7 +3264,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ 		waited = true;
+ 		schedule();
+ 	}
+-	finish_rcuwait(&vcpu->wait);
++	finish_rcuwait(wait);
+ 	cur = ktime_get();
+ 	if (waited) {
+ 		vcpu->stat.generic.halt_wait_ns +=
+@@ -3460,7 +3463,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ 				continue;
+ 			if (vcpu == me)
+ 				continue;
+-			if (rcuwait_active(&vcpu->wait) &&
++			if (rcuwait_active(kvm_arch_vcpu_get_wait(vcpu)) &&
+ 			    !vcpu_dy_runnable(vcpu))
+ 				continue;
+ 			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
 -- 
 2.33.0.882.g93a45727a2-goog
 
