@@ -2,142 +2,212 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A20C426449
-	for <lists+kvm-ppc@lfdr.de>; Fri,  8 Oct 2021 07:53:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1B0742759D
+	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Oct 2021 04:12:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229693AbhJHFzq convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm-ppc@lfdr.de>); Fri, 8 Oct 2021 01:55:46 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:21604 "EHLO
-        us-smtp-delivery-44.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229721AbhJHFzq (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Oct 2021 01:55:46 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-Z3P4acovOzaCeubDXSg87A-1; Fri, 08 Oct 2021 01:53:49 -0400
-X-MC-Unique: Z3P4acovOzaCeubDXSg87A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 545D083DBC0;
-        Fri,  8 Oct 2021 05:53:47 +0000 (UTC)
-Received: from bahia.huguette (unknown [10.39.192.158])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 81691196E2;
-        Fri,  8 Oct 2021 05:53:42 +0000 (UTC)
-Date:   Fri, 8 Oct 2021 07:53:41 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     Laurent Vivier <lvivier@redhat.com>
-Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: PPC: Defer vtime accounting 'til after IRQ
- handling
-Message-ID: <20211008074438.49fc577a@bahia.huguette>
-In-Reply-To: <20211007142856.41205-1-lvivier@redhat.com>
-References: <20211007142856.41205-1-lvivier@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: 8BIT
+        id S244133AbhJICOj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 8 Oct 2021 22:14:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38130 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232210AbhJICOi (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Oct 2021 22:14:38 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81CC0C061755
+        for <kvm-ppc@vger.kernel.org>; Fri,  8 Oct 2021 19:12:42 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id y16-20020a2586d0000000b005b752db8f97so14924019ybm.18
+        for <kvm-ppc@vger.kernel.org>; Fri, 08 Oct 2021 19:12:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=cS1lb71+JIYOSor7OwJgk2gnjH1VOs8uFvRzBEpw+bQ=;
+        b=EYM8SrcNO1Csv5h/cAGhb86L7GGVUu/ZmEz7+V+AGrx+oVzewDqxj0wLNTU/xH6TNY
+         N+FoJL8OJNuYof1Wa+yyqbM3Az9BEVljXvmvjmheCO9+baWSytH2Od7jpLSRuGkenjFq
+         SWm+dSeSY1sryFqxTXdHds/BNzcbaZQxJWKJakz5ZC1hzhOUvNqg2MVhVJFcJ+pDmMyn
+         Z0JnLSQRsdLSZgotZ2BYpbu02wXl1yrgFTIEju5mQmsle7w1VnuD8Dj1V67lIQ1QfN5I
+         48JtSMNIe7dXvP0dpfRomToMbuDi+IDLjLvZ3UscgjGgeWh4dpuSDl952WD6dDs/gFZG
+         0IwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=cS1lb71+JIYOSor7OwJgk2gnjH1VOs8uFvRzBEpw+bQ=;
+        b=Lcguqsgb4Nf7p6vl5YY2oYql5M/Qj05z3x4KWKNWx5cjtv3RwTbtag53EaoP+d0iXI
+         f2Z0MpjvYgDMq7akFfiJ/fPMjXLTrLFQsXM4QKjbyGkGbqTDMdZ+PZzfAAinZ1ydTV0i
+         Mi3Bcw+N+wMOfQk3g4ZJfxL2EK02qOu/ixAAaqlRRWeCsclOPHQVxNjtHLCLaSzg2vth
+         7dWBEWyehZuZA+8kbForYLM8SPs1H9+nBNujGYqFB9qlwONFEDg3GmpzpiuVM3KaNuTD
+         tWRHrHOyLJsIAO4AK3ZRl/OQqnspj+su05wqXhTBEs4ZeairKP5UzPuOADegUMUmkcUy
+         oysg==
+X-Gm-Message-State: AOAM533S4hxLrpDcWl5xjSGkN4pzM6dyUKsd0F1aiO/E933ziyYYOOng
+        CJawYl6y5xOon7RbA8A2NHMjtBnI69Q=
+X-Google-Smtp-Source: ABdhPJzl93S733o8ZxchIrko0AydsKa+w/gF7Yyof3UCHWikEoxKTRDZmabSLPZBYZUolde90hyK7YjFH8Q=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e39b:6333:b001:cb])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:114a:: with SMTP id
+ p10mr7381719ybu.91.1633745561743; Fri, 08 Oct 2021 19:12:41 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri,  8 Oct 2021 19:11:53 -0700
+Message-Id: <20211009021236.4122790-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu,  7 Oct 2021 16:28:56 +0200
-Laurent Vivier <lvivier@redhat.com> wrote:
+This is basically two series smushed into one.  The first "half" aims
+to differentiate between "halt" and a more generic "block", where "halt"
+aligns with x86's HLT instruction, the halt-polling mechanisms, and
+associated stats, and "block" means any guest action that causes the vCPU
+to block/wait.
 
-> Commit 112665286d08 moved guest_exit() in the interrupt protected
-> area to avoid wrong context warning (or worse), but the tick counter
-> cannot be updated and the guest time is accounted to the system time.
-> 
-> To fix the problem port to POWER the x86 fix
-> 160457140187 ("Defer vtime accounting 'til after IRQ handling"):
-> 
-> "Defer the call to account guest time until after servicing any IRQ(s)
->  that happened in the guest or immediately after VM-Exit.  Tick-based
->  accounting of vCPU time relies on PF_VCPU being set when the tick IRQ
->  handler runs, and IRQs are blocked throughout the main sequence of
->  vcpu_enter_guest(), including the call into vendor code to actually
->  enter and exit the guest."
-> 
-> Fixes: 112665286d08 ("KVM: PPC: Book3S HV: Context tracking exit guest context before enabling irqs")
-> Cc: npiggin@gmail.com
-> Cc: <stable@vger.kernel.org> # 5.12
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
-> 
-> Notes:
->     v2: remove reference to commit 61bd0f66ff92
->         cc stable 5.12
->         add the same comment in the code as for x86
-> 
+The second "half" overhauls x86's APIC virtualization code (Posted
+Interrupts on Intel VMX, AVIC on AMD SVM) to do their updates in response
+to vCPU (un)blocking in the vcpu_load/put() paths, keying off of the
+vCPU's rcuwait status to determine when a blocking vCPU is being put and
+reloaded.  This idea comes from arm64's kvm_timer_vcpu_put(), which I
+stumbled across when diving into the history of arm64's (un)blocking hooks.
 
-Works for me. As you stated in your answer, someone can polish the
-code later on.
+The x86 APICv overhaul allows for killing off several sets of hooks in
+common KVM and in x86 KVM (to the vendor code).  Moving everything to
+vcpu_put/load() also realizes nice cleanups, especially for the Posted
+Interrupt code, which required some impressive mental gymnastics to
+understand how vCPU task migration interacted with vCPU blocking.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Non-x86 folks, sorry for the noise.  I'm hoping the common parts can get
+applied without much fuss so that future versions can be x86-only.
 
->  arch/powerpc/kvm/book3s_hv.c | 24 ++++++++++++++++++++----
->  1 file changed, 20 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 2acb1c96cfaf..a694d1a8f6ce 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -3695,6 +3695,8 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
->  
->  	srcu_read_unlock(&vc->kvm->srcu, srcu_idx);
->  
-> +	context_tracking_guest_exit();
-> +
->  	set_irq_happened(trap);
->  
->  	spin_lock(&vc->lock);
-> @@ -3726,9 +3728,15 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
->  
->  	kvmppc_set_host_core(pcpu);
->  
-> -	guest_exit_irqoff();
-> -
->  	local_irq_enable();
-> +	/*
-> +	 * Wait until after servicing IRQs to account guest time so that any
-> +	 * ticks that occurred while running the guest are properly accounted
-> +	 * to the guest.  Waiting until IRQs are enabled degrades the accuracy
-> +	 * of accounting via context tracking, but the loss of accuracy is
-> +	 * acceptable for all known use cases.
-> +	 */
-> +	vtime_account_guest_exit();
->  
->  	/* Let secondaries go back to the offline loop */
->  	for (i = 0; i < controlled_threads; ++i) {
-> @@ -4506,13 +4514,21 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
->  
->  	srcu_read_unlock(&kvm->srcu, srcu_idx);
->  
-> +	context_tracking_guest_exit();
-> +
->  	set_irq_happened(trap);
->  
->  	kvmppc_set_host_core(pcpu);
->  
-> -	guest_exit_irqoff();
-> -
->  	local_irq_enable();
-> +	/*
-> +	 * Wait until after servicing IRQs to account guest time so that any
-> +	 * ticks that occurred while running the guest are properly accounted
-> +	 * to the guest.  Waiting until IRQs are enabled degrades the accuracy
-> +	 * of accounting via context tracking, but the loss of accuracy is
-> +	 * acceptable for all known use cases.
-> +	 */
-> +	vtime_account_guest_exit();
->  
->  	cpumask_clear_cpu(pcpu, &kvm->arch.cpu_in_guest);
->  
+v2:
+ - Collect reviews. [Christian, David]
+ - Add patch to move arm64 WFI functionality out of hooks. [Marc]
+ - Add RISC-V to the fun.
+ - Add all the APICv fun.
+
+v1: https://lkml.kernel.org/r/20210925005528.1145584-1-seanjc@google.com
+
+Jing Zhang (1):
+  KVM: stats: Add stat to detect if vcpu is currently blocking
+
+Sean Christopherson (42):
+  KVM: VMX: Don't unblock vCPU w/ Posted IRQ if IRQs are disabled in
+    guest
+  KVM: SVM: Ensure target pCPU is read once when signalling AVIC
+    doorbell
+  KVM: s390: Ensure kvm_arch_no_poll() is read once when blocking vCPU
+  KVM: Force PPC to define its own rcuwait object
+  KVM: Update halt-polling stats if and only if halt-polling was
+    attempted
+  KVM: Refactor and document halt-polling stats update helper
+  KVM: Reconcile discrepancies in halt-polling stats
+  KVM: s390: Clear valid_wakeup in kvm_s390_handle_wait(), not in arch
+    hook
+  KVM: Drop obsolete kvm_arch_vcpu_block_finish()
+  KVM: arm64: Move vGIC v4 handling for WFI out arch callback hook
+  KVM: Don't block+unblock when halt-polling is successful
+  KVM: x86: Tweak halt emulation helper names to free up kvm_vcpu_halt()
+  KVM: Rename kvm_vcpu_block() => kvm_vcpu_halt()
+  KVM: Split out a kvm_vcpu_block() helper from kvm_vcpu_halt()
+  KVM: Don't redo ktime_get() when calculating halt-polling
+    stop/deadline
+  KVM: x86: Directly block (instead of "halting") UNINITIALIZED vCPUs
+  KVM: x86: Invoke kvm_vcpu_block() directly for non-HALTED wait states
+  KVM: Add helpers to wake/query blocking vCPU
+  KVM: VMX: Skip Posted Interrupt updates if APICv is hard disabled
+  KVM: VMX: Clean up PI pre/post-block WARNs
+  KVM: VMX: Drop unnecessary PI logic to handle impossible conditions
+  KVM: VMX: Use boolean returns for Posted Interrupt "test" helpers
+  KVM: VMX: Drop pointless PI.NDST update when blocking
+  KVM: VMX: Save/restore IRQs (instead of CLI/STI) during PI pre/post
+    block
+  KVM: VMX: Read Posted Interrupt "control" exactly once per loop
+    iteration
+  KVM: VMX: Move Posted Interrupt ndst computation out of write loop
+  KVM: VMX: Remove vCPU from PI wakeup list before updating PID.NV
+  KVM: VMX: Handle PI wakeup shenanigans during vcpu_put/load
+  KVM: Drop unused kvm_vcpu.pre_pcpu field
+  KVM: Move x86 VMX's posted interrupt list_head to vcpu_vmx
+  KVM: VMX: Move preemption timer <=> hrtimer dance to common x86
+  KVM: x86: Unexport LAPIC's switch_to_{hv,sw}_timer() helpers
+  KVM: x86: Remove defunct pre_block/post_block kvm_x86_ops hooks
+  KVM: SVM: Signal AVIC doorbell iff vCPU is in guest mode
+  KVM: SVM: Don't bother checking for "running" AVIC when kicking for
+    IPIs
+  KVM: SVM: Unconditionally mark AVIC as running on vCPU load (with
+    APICv)
+  KVM: Drop defunct kvm_arch_vcpu_(un)blocking() hooks
+  KVM: VMX: Don't do full kick when triggering posted interrupt "fails"
+  KVM: VMX: Wake vCPU when delivering posted IRQ even if vCPU == this
+    vCPU
+  KVM: VMX: Pass desired vector instead of bool for triggering posted
+    IRQ
+  KVM: VMX: Fold fallback path into triggering posted IRQ helper
+  KVM: VMX: Don't do full kick when handling posted interrupt wakeup
+
+ arch/arm64/include/asm/kvm_emulate.h |   2 +
+ arch/arm64/include/asm/kvm_host.h    |   1 -
+ arch/arm64/kvm/arch_timer.c          |   5 +-
+ arch/arm64/kvm/arm.c                 |  60 +++---
+ arch/arm64/kvm/handle_exit.c         |   5 +-
+ arch/arm64/kvm/psci.c                |   2 +-
+ arch/mips/include/asm/kvm_host.h     |   3 -
+ arch/mips/kvm/emulate.c              |   2 +-
+ arch/powerpc/include/asm/kvm_host.h  |   4 +-
+ arch/powerpc/kvm/book3s_pr.c         |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c    |   2 +-
+ arch/powerpc/kvm/booke.c             |   2 +-
+ arch/powerpc/kvm/powerpc.c           |   5 +-
+ arch/riscv/include/asm/kvm_host.h    |   1 -
+ arch/riscv/kvm/vcpu_exit.c           |   2 +-
+ arch/s390/include/asm/kvm_host.h     |   4 -
+ arch/s390/kvm/interrupt.c            |   3 +-
+ arch/s390/kvm/kvm-s390.c             |   7 +-
+ arch/x86/include/asm/kvm-x86-ops.h   |   4 -
+ arch/x86/include/asm/kvm_host.h      |  29 +--
+ arch/x86/kvm/lapic.c                 |   4 +-
+ arch/x86/kvm/svm/avic.c              |  95 ++++-----
+ arch/x86/kvm/svm/svm.c               |   8 -
+ arch/x86/kvm/svm/svm.h               |  14 --
+ arch/x86/kvm/vmx/nested.c            |   2 +-
+ arch/x86/kvm/vmx/posted_intr.c       | 279 ++++++++++++---------------
+ arch/x86/kvm/vmx/posted_intr.h       |  14 +-
+ arch/x86/kvm/vmx/vmx.c               |  63 +++---
+ arch/x86/kvm/vmx/vmx.h               |   3 +
+ arch/x86/kvm/x86.c                   |  55 ++++--
+ include/linux/kvm_host.h             |  27 ++-
+ include/linux/kvm_types.h            |   1 +
+ virt/kvm/async_pf.c                  |   2 +-
+ virt/kvm/kvm_main.c                  | 138 +++++++------
+ 34 files changed, 413 insertions(+), 437 deletions(-)
+
+-- 
+2.33.0.882.g93a45727a2-goog
 
