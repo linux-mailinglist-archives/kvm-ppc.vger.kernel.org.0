@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07F984275AC
-	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Oct 2021 04:13:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 461734275B0
+	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Oct 2021 04:13:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244171AbhJICOo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 8 Oct 2021 22:14:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38170 "EHLO
+        id S244161AbhJICOr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 8 Oct 2021 22:14:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244164AbhJICOn (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Oct 2021 22:14:43 -0400
+        with ESMTP id S244182AbhJICOq (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Oct 2021 22:14:46 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AAEBC061764
-        for <kvm-ppc@vger.kernel.org>; Fri,  8 Oct 2021 19:12:47 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id b5-20020a251b05000000b005b575f23711so15168475ybb.4
-        for <kvm-ppc@vger.kernel.org>; Fri, 08 Oct 2021 19:12:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF60C061755
+        for <kvm-ppc@vger.kernel.org>; Fri,  8 Oct 2021 19:12:49 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id x15-20020a056902102f00b005ba71cd7dbfso4952541ybt.8
+        for <kvm-ppc@vger.kernel.org>; Fri, 08 Oct 2021 19:12:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=79LIBqpnbdhRmfT7kSoV1WyIctghtEtxlcdZEfLixOI=;
-        b=td6Jp/Qoz+WOt+cvb/jSNSqRd38PBqxXjUOlkCeRRmF+Xq32DT9663UFIERzbBP+7k
-         sIaPHTm4Vgj+KHKuAZRxJtlQiFNwnW7Gr6Np/g8/gHiZEP/vq1b8eXJehgPH0k67g74g
-         Eejc31bexmjXOP0iVOhiJxMHqh3sykybQ5VDUN0mBT1X+xmhe4U8/hRuzrlGW28cUSb9
-         g22fsln1P8HNH27yLN8eZT01CH6+UAgE5LZNQQheC1aFigNp8cVDpq7HbECp3WAvt9tG
-         GqRirzTAEB5G45ET1seL/TOuwe+ZOUYFxzi+NEQTSlGInnVjBGl4BhooEPA1Uoist32O
-         48qw==
+        bh=VOf0o+drOoyjtnZHAjwPMyY2QgjmuejeI8ZGvk5qQh8=;
+        b=c594JBXBzlzJm/B4MJiuak37F10cOGqzZRDRYYkHvGtg+tYhi9bkpT7HAvzA4a7CrO
+         wY9eJk+8SXC6VXSYxm/HtIH7HCqw4WmraTlKbDvDXkb0ieGHnQEdhLp9SHTOoF1D+ihb
+         l0NC5UfvB9mBvn0GShFPrhMJGBfjxpiBY5BrX5s0xEdDxmIpWuxZBBx29TlMmh0JGg0R
+         lof8oMgaYbwVizPYN+9qQPXHfvL56RO9ccLyp7IYNiT8OQ7d02343dCZy83nOSQGhHOM
+         xfDcm3J7v9Zaqb3Cv7KhQ0mVfu7vqET/6w/svCdKYDLPxqzAsRNGhLifWQMr9xoyFcPL
+         LUIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=79LIBqpnbdhRmfT7kSoV1WyIctghtEtxlcdZEfLixOI=;
-        b=MqIsvO6LL4Ymdcz9/9F9W0vfPauI1zNJho6kSygTrL8yRYhl8pUTIEfHWjDHVXGI8z
-         hEGFx8iP+ZqEKonO1Ho+q+6VUrxUROfHHNQGj2316WjkaHm6y8RRjicEtZEo+t1so1vu
-         fOsonD4WZQI46fJquqaL/im8LR2QH/Eq4MXz0Zk49iqw8Km3SaHVd019oTTMNRF65VNU
-         V3gElY67oTFlZebL4DzCz1DwdHuj2kohD2o/kX2+XPwFqtbu20aISqKLLuouBVphZuXp
-         cO2N2/zsnizrmxjmHmYFI+1iy6tPYvAvij/7DgqcRz/Z3JNF/UdusHoLDXucKoq6pVKe
-         dOvA==
-X-Gm-Message-State: AOAM533oPQ5fy4ZkybhwzNl3cjAIT3RH2OczjDiByTyi6zjS1pNmLB6T
-        X3EjeQwjpP5wb7Zdbrbr5a4Aq9qvXrg=
-X-Google-Smtp-Source: ABdhPJzWtheYwqmb2qGHXjL3MjJXvhFbgclB9eUF2EsS3ZM9JxohPV47rYshPv06U56fIG/ADzd4Ho8ZjF4=
+        bh=VOf0o+drOoyjtnZHAjwPMyY2QgjmuejeI8ZGvk5qQh8=;
+        b=zpwzpxJ6v1Nvg3+mCldKcjkEqMJPNUvqS9oOpprq8iU+XAuClud+9CH3GKkekUiHlK
+         CQXSi/Gs2EakmWp5m1AjoDMxPe8J6dRRiou1Hm7hVqFjh4nDxu4OJOyWCdUssQ2jJLqH
+         Bk9F/RDqJ6ewkGKm1L1u4oE3xR4T0EhTjfzHpzGQIjuFE16c0pyFcj29zhi3mBGhjkiO
+         Ja93bq/54ZVU1m9pe4Xr4Vz0AmDGjCCDnVdBgf70MRi6M+3ozj/h6xL+7Bf9/pnSllgD
+         vZ2bV2uwxuVbA05cty/Q9qXrGa7DUTFyV5lJusIbNlbExMV2XecarqnjlG0MI/X2XA2L
+         4soQ==
+X-Gm-Message-State: AOAM533//bhvHivpUJKJvlDFYzofsH2ZCneAI84XYQYofReDIzeMZ4QD
+        KyP3EAaBPkczx3v1i36vqMY4JYaWgo8=
+X-Google-Smtp-Source: ABdhPJzvUj+lYxE1uvv63+XvvDPeheCH+oyqg89jaLQyiP8PVpc/MK53zetbWHLCR1OXSf8DRfROgUDiyR0=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:a25:bd03:: with SMTP id f3mr6935305ybk.412.1633745566669;
- Fri, 08 Oct 2021 19:12:46 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:d915:: with SMTP id q21mr7203996ybg.17.1633745569082;
+ Fri, 08 Oct 2021 19:12:49 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Oct 2021 19:11:55 -0700
+Date:   Fri,  8 Oct 2021 19:11:56 -0700
 In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-3-seanjc@google.com>
+Message-Id: <20211009021236.4122790-4-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009021236.4122790-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 02/43] KVM: SVM: Ensure target pCPU is read once when
- signalling AVIC doorbell
+Subject: [PATCH v2 03/43] KVM: s390: Ensure kvm_arch_no_poll() is read once
+ when blocking vCPU
 From:   Sean Christopherson <seanjc@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -88,49 +88,69 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Ensure vcpu->cpu is read once when signalling the AVIC doorbell.  If the
-compiler rereads the field and the vCPU is migrated between the check and
-writing the doorbell, KVM would signal the wrong physical CPU.
+Wrap s390's halt_poll_max_steal with READ_ONCE and snapshot the result of
+kvm_arch_no_poll() in kvm_vcpu_block() to avoid a mostly-theoretical,
+largely benign bug on s390 where the result of kvm_arch_no_poll() could
+change due to userspace modifying halt_poll_max_steal while the vCPU is
+blocking.  The bug is largely benign as it will either cause KVM to skip
+updating halt-polling times (no_poll toggles false=>true) or to update
+halt-polling times with a slightly flawed block_ns.
 
-Functionally, signalling the wrong CPU in this case is not an issue as
-task migration means the vCPU has exited and will pick up any pending
-interrupts on the next VMRUN.  Add the READ_ONCE() purely to clean up the
-code.
+Note, READ_ONCE is unnecessary in the current code, add it in case the
+arch hook is ever inlined, and to provide a hint that userspace can
+change the param at will.
 
-Opportunistically add a comment explaining the task migration behavior,
-and rename cpuid=>cpu to avoid conflating the CPU number with KVM's more
-common usage of CPUID.
-
+Fixes: 8b905d28ee17 ("KVM: s390: provide kvm_arch_no_poll function")
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/avic.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ arch/s390/kvm/kvm-s390.c | 2 +-
+ virt/kvm/kvm_main.c      | 5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 8052d92069e0..208c5c71e827 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -675,10 +675,17 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
- 	smp_mb__after_atomic();
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 6a6dd5e1daf6..7cabe6778b1b 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -3446,7 +3446,7 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
+ {
+ 	/* do not poll with more than halt_poll_max_steal percent of steal time */
+ 	if (S390_lowcore.avg_steal_timer * 100 / (TICK_USEC << 12) >=
+-	    halt_poll_max_steal) {
++	    READ_ONCE(halt_poll_max_steal)) {
+ 		vcpu->stat.halt_no_poll_steal++;
+ 		return true;
+ 	}
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3f6d450355f0..7bc38549487e 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3213,6 +3213,7 @@ update_halt_poll_stats(struct kvm_vcpu *vcpu, u64 poll_ns, bool waited)
+  */
+ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ {
++	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
+ 	ktime_t start, cur, poll_end;
+ 	bool waited = false;
+ 	u64 block_ns;
+@@ -3220,7 +3221,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ 	kvm_arch_vcpu_blocking(vcpu);
  
- 	if (avic_vcpu_is_running(vcpu)) {
--		int cpuid = vcpu->cpu;
-+		int cpu = READ_ONCE(vcpu->cpu);
+ 	start = cur = poll_end = ktime_get();
+-	if (vcpu->halt_poll_ns && !kvm_arch_no_poll(vcpu)) {
++	if (vcpu->halt_poll_ns && halt_poll_allowed) {
+ 		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
  
--		if (cpuid != get_cpu())
--			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpuid));
-+		/*
-+		 * Note, the vCPU could get migrated to a different pCPU at any
-+		 * point, which could result in signalling the wrong/previous
-+		 * pCPU.  But if that happens the vCPU is guaranteed to do a
-+		 * VMRUN (after being migrated) and thus will process pending
-+		 * interrupts, i.e. a doorbell is not needed (and the spurious)
-+		 */
-+		if (cpu != get_cpu())
-+			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpu));
- 		put_cpu();
- 	} else
- 		kvm_vcpu_wake_up(vcpu);
+ 		++vcpu->stat.generic.halt_attempted_poll;
+@@ -3275,7 +3276,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ 	update_halt_poll_stats(
+ 		vcpu, ktime_to_ns(ktime_sub(poll_end, start)), waited);
+ 
+-	if (!kvm_arch_no_poll(vcpu)) {
++	if (halt_poll_allowed) {
+ 		if (!vcpu_valid_wakeup(vcpu)) {
+ 			shrink_halt_poll_ns(vcpu);
+ 		} else if (vcpu->kvm->max_halt_poll_ns) {
 -- 
 2.33.0.882.g93a45727a2-goog
 
