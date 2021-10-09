@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 155AD427631
-	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Oct 2021 04:16:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2027C427634
+	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Oct 2021 04:16:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244450AbhJICRX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 8 Oct 2021 22:17:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38368 "EHLO
+        id S244587AbhJICR3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 8 Oct 2021 22:17:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244593AbhJICQp (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Oct 2021 22:16:45 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB8E6C0617BF
-        for <kvm-ppc@vger.kernel.org>; Fri,  8 Oct 2021 19:13:46 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id q17-20020a25b591000000b005a07d27bbdaso15038550ybj.3
-        for <kvm-ppc@vger.kernel.org>; Fri, 08 Oct 2021 19:13:46 -0700 (PDT)
+        with ESMTP id S244690AbhJICQz (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Oct 2021 22:16:55 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E21DC0613A2
+        for <kvm-ppc@vger.kernel.org>; Fri,  8 Oct 2021 19:13:49 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id bm12-20020a05620a198c00b00432e14ddb99so9747299qkb.21
+        for <kvm-ppc@vger.kernel.org>; Fri, 08 Oct 2021 19:13:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=va765MwNV8lkPK+fPa+/nQPV7Q6ICFe76wXLuhKBR7k=;
-        b=B5oLyIOK5DCmxdgNe+Nl5/eUZ+1dZvr28zFbfb0yUmRDrQAn6gFu0meDWGbooWcwf+
-         l+waGmWoLOHDfWujUlJgTIfXQBGxvJYpWrTevNrJNk5M8uz1livq3G0CbLqGnwGl0JPm
-         sNTwBIZ8vWCCI3dUoTv7AkcFha93KYIamIUHSTRqHBmzceqRPtYmNYOCGYVyZvVn3Np/
-         TL6ymtR5bZm6u0h37kbtwh2/3um/F6VSleLNBRjXkJxQwQ6Tl5usknG2mBtpFmrzjKYA
-         RfxJYCWymoaofgRtrejK3tfUhsfLqLitFSkmp9z1zLeMTRzswrj10R8lRDFv/A07PTzr
-         ihYQ==
+        bh=wjQtX4Ec6wZvrLi6PMkrNqIQ2oyMcPdDf1m/MoA8d+0=;
+        b=Lnm/cjPXbd272GpMZC0UeDF+UHTqiJU1haGCknMr5AmNFQOxgzVQrkCrFXx8cCosZZ
+         vhad/H/bU6EtWHdiaGljqq6NEDe4jYwnagw1hmypkZVWw7KopTXWbIioXhrKeB9WZIoL
+         ReDT+1R5eLOhM0x5my19UH6pmlRFdnAMJjCjW90ue2a+3KqjCQ5KVltKsfzvFJct3Or4
+         f9Oft1KiecdRxszaICFl0MAY6x3TalLjCr4OG45jGmzTw8bdrlGkucMOEXd/i271jan6
+         0hz+LH0reRdSJS/sNXpSqjCOVK3W+uTEL9F4YDHRKI7A05LpPRMlHE+Kaw+W+rV3UGa5
+         UrVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=va765MwNV8lkPK+fPa+/nQPV7Q6ICFe76wXLuhKBR7k=;
-        b=u1J0Ny/MlataEDz5FqO+3vpzVYihoNHO3lIcyQGAsFbby9YgdK3myJ7yXaeHpfrzne
-         E3Kj+wvqfiq7HXA8fN8aHfJMSJR73H9KkWfay0GQwMwoqzEYDLnecjT9EREQ8mOBsDM8
-         tVCS+6PXkG/hfMkepjcT7lMmQ5XtYWVw2/4DPh0pbZ6X0DoKOKKnxNyfa7BkfD3lPyoS
-         C0QKLIRDkilphzLAjCIAi8HZDIkp6kkK+wK0U/Ko61weZhfb+XTMOv22Aee+NjgAwsc+
-         V/pSlfd5GdCF0XMV6c/3nq1A9U1vUvt1hg/qvM2K/LATC6M7GYv3pKnSeWhNfI8zoqVV
-         L5Zw==
-X-Gm-Message-State: AOAM532bVyvw8y3eujsqQNRt5jtVm97vRMzHZjE181I3fL2hZ7tUpdD0
-        l8/BYsA8fmS5zWoTlQR4lIqCghDIWEY=
-X-Google-Smtp-Source: ABdhPJxNwqY1vJaMvOgnvL3+QcSM5HrN4+PYEJxKTsdN858kzlppD8XZ0WLvzzYX6ErETJg0fQvQs2GFQ5w=
+        bh=wjQtX4Ec6wZvrLi6PMkrNqIQ2oyMcPdDf1m/MoA8d+0=;
+        b=kyZw3BcoZF/3EmszUkjZ+7Uo11GJAP9cM7+42p8SmdniiYW0gnz4c2F0siTAmhqzwt
+         RYWTtXCcH218DeWNHn7Zn/3ekngZ6HPoM0SK5YpUyqv1RokiHpFNcHRJjswLEl9DnDxC
+         25ruOVjSAU5O3eIfJoiY/j05L7rAkhsr35Z6rMelh/XZ2Gi4zH0rN0DGIhbruAognQBm
+         NxyjrpkVVh5KHw08QqBbBSvzhPPuxYUxwW3fg41QrUlKYehO/zyNHyTEGBWXioBE0sK6
+         w7DHaP5zeDk9N+uTi75VTnQX8DvCl6qLD3O1H1X08IGjr0E6IoWPfwu0w2gHnGt21FMq
+         sGJg==
+X-Gm-Message-State: AOAM530PdVgOJYVWeHk4BUTb8knwPUy3LkijywuRuD78VIeXGIpqsZu1
+        8HzTayAeEZf3XKb96mj7dNfqSjG7cQU=
+X-Google-Smtp-Source: ABdhPJzf4lH44KnogukwF+1XfgXVpbO4vnuwdh3pwX1cj7Z8+jmbGSLZhM6YPlZ7b6MhcrCUeQd2OdsxOQw=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:a25:69c7:: with SMTP id e190mr6678164ybc.334.1633745625928;
- Fri, 08 Oct 2021 19:13:45 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:ac8:6113:: with SMTP id a19mr1849269qtm.307.1633745628357;
+ Fri, 08 Oct 2021 19:13:48 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Oct 2021 19:12:19 -0700
+Date:   Fri,  8 Oct 2021 19:12:20 -0700
 In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-27-seanjc@google.com>
+Message-Id: <20211009021236.4122790-28-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009021236.4122790-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 26/43] KVM: VMX: Read Posted Interrupt "control" exactly
- once per loop iteration
+Subject: [PATCH v2 27/43] KVM: VMX: Move Posted Interrupt ndst computation out
+ of write loop
 From:   Sean Christopherson <seanjc@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -88,48 +88,66 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Use READ_ONCE() when loading the posted interrupt descriptor control
-field to ensure "old" and "new" have the same base value.  If the
-compiler emits separate loads, and loads into "new" before "old", KVM
-could theoretically drop the ON bit if it were set between the loads.
+Hoist the CPU => APIC ID conversion for the Posted Interrupt descriptor
+out of the loop to write the descriptor, preemption is disabled so the
+CPU won't change, and if the APIC ID changes KVM has bigger problems.
 
-Fixes: 28b835d60fcc ("KVM: Update Posted-Interrupts Descriptor when vCPU is preempted")
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/posted_intr.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/kvm/vmx/posted_intr.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 414ea6972b5c..fea343dcc011 100644
+index fea343dcc011..2b2206339174 100644
 --- a/arch/x86/kvm/vmx/posted_intr.c
 +++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -53,7 +53,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+@@ -51,17 +51,15 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+ 		goto after_clear_sn;
+ 	}
  
- 	/* The full case.  */
+-	/* The full case.  */
++	/* The full case.  Set the new destination and clear SN. */
++	dest = cpu_physical_id(cpu);
++	if (!x2apic_mode)
++		dest = (dest << 8) & 0xFF00;
++
  	do {
--		old.control = new.control = pi_desc->control;
-+		old.control = new.control = READ_ONCE(pi_desc->control);
+ 		old.control = new.control = READ_ONCE(pi_desc->control);
  
- 		dest = cpu_physical_id(cpu);
- 
-@@ -104,7 +104,7 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
+-		dest = cpu_physical_id(cpu);
+-
+-		if (x2apic_mode)
+-			new.ndst = dest;
+-		else
+-			new.ndst = (dest << 8) & 0xFF00;
+-
++		new.ndst = dest;
+ 		new.sn = 0;
+ 	} while (cmpxchg64(&pi_desc->control, old.control,
+ 			   new.control) != old.control);
+@@ -103,15 +101,14 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
+ 	WARN(pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR,
  	     "Wakeup handler not enabled while the vCPU was blocking");
  
++	dest = cpu_physical_id(vcpu->cpu);
++	if (!x2apic_mode)
++		dest = (dest << 8) & 0xFF00;
++
  	do {
--		old.control = new.control = pi_desc->control;
-+		old.control = new.control = READ_ONCE(pi_desc->control);
+ 		old.control = new.control = READ_ONCE(pi_desc->control);
  
- 		dest = cpu_physical_id(vcpu->cpu);
+-		dest = cpu_physical_id(vcpu->cpu);
+-
+-		if (x2apic_mode)
+-			new.ndst = dest;
+-		else
+-			new.ndst = (dest << 8) & 0xFF00;
++		new.ndst = dest;
  
-@@ -160,7 +160,7 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
- 	     "Posted Interrupt Suppress Notification set before blocking");
- 
- 	do {
--		old.control = new.control = pi_desc->control;
-+		old.control = new.control = READ_ONCE(pi_desc->control);
- 
- 		/* set 'NV' to 'wakeup vector' */
- 		new.nv = POSTED_INTR_WAKEUP_VECTOR;
+ 		/* set 'NV' to 'notification vector' */
+ 		new.nv = POSTED_INTR_VECTOR;
 -- 
 2.33.0.882.g93a45727a2-goog
 
