@@ -2,56 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF94A42764F
-	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Oct 2021 04:16:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A7A5427653
+	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Oct 2021 04:16:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244705AbhJICSI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 8 Oct 2021 22:18:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38376 "EHLO
+        id S244555AbhJICSS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 8 Oct 2021 22:18:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244540AbhJICRr (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Oct 2021 22:17:47 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03BE7C0613B4
-        for <kvm-ppc@vger.kernel.org>; Fri,  8 Oct 2021 19:14:04 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id z130-20020a256588000000b005b6b4594129so15100830ybb.15
-        for <kvm-ppc@vger.kernel.org>; Fri, 08 Oct 2021 19:14:03 -0700 (PDT)
+        with ESMTP id S244636AbhJICSA (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Oct 2021 22:18:00 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 703B7C0613BA
+        for <kvm-ppc@vger.kernel.org>; Fri,  8 Oct 2021 19:14:06 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id s10-20020ac80d8a000000b002a753776238so8836442qti.15
+        for <kvm-ppc@vger.kernel.org>; Fri, 08 Oct 2021 19:14:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=C2PBzYfpswTkvsOYeskWQEML51RRougebHfj0Alyx5A=;
-        b=WYMPTsMzDt+AsjiCyZJ1B4+ZpYxh2OtDt82Ju6kAg5cXo6tqXm1ZgRYGEPixBeGSUX
-         csu0nnUcxqKDiQ1eAmAeGes+LUQg2mXWzAyCEZN0ncq8JRJRFlJFF87rnbemqyBf6tBd
-         V9ViKRAH1hB1quUnaDowk1/9kTi2JyNnkHWTKfzzmhY7AxslA7BLbxo1ZA8eLcYWLnjz
-         YbQ0w447PhslHJ3ZxBNJRnTcGLYtNfmZQAOeWXXJuualGN4NlLQe9GK7rEtrWgH0mtsp
-         VqsmagApekmgICqy79O2umIOGpnKlEqjA71PkSs0Bk91M4cBLEAn1bGCQe9gx+1d5Zvx
-         1xGg==
+        bh=vAfx5V7oXhMQdNK6n8fKDF9GGCBj6ltSzPsyuPD42Bs=;
+        b=HyCTY7JAidC//XRRYdKJX4UqDMF+OOF3bUAiJb+P7QyZ+wCs6Z/juMFKBQx23iMMVN
+         cqVP/RAmIlHJJh/IhCDJgzpkP3/4PSr5HvmGU1YPAIdroNNdN/LgWT1sdedqNCFyThVJ
+         OB3PsHG+5QPOxxfyOCjKqjYqJ4/3yZaYt4IJa7HdBQLnErOW6mzpDjvlQYRWWwwhfSDr
+         es8zEbyw0sk5VgOb2rS8SbWA9aRFUd6GPvV5QVuzDE3suPpPWMfVuh4VMHrQBClBm931
+         uNAJ7v8jb3UYDmZvbfs/UX4HaL+qaNp7Uu3y1027BulayBFMmGfZVNaeWs+z9FeE6i1a
+         QWaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=C2PBzYfpswTkvsOYeskWQEML51RRougebHfj0Alyx5A=;
-        b=7xyUzf4znAN8kO/UPuaDC8HcGP/D7YN9lLBwbmjQAntXlAkqZ/yh0lb4+EWWVJu+Wu
-         z0shpdQVrWG5jhQx0mQYua0Nk54WmpdBTv7ByUNSuhSDvZtbfObCX8YDY3sMeF3eCXJK
-         soEOcHjHtHGJO0OLe8yZ4saCYUPLFiwcTaXi9KlEfAP0oe5gNCYWX6Ov7L4QwqEfeS3j
-         XHxOMSMv2X3p22k3XMVSENy0Sc1S0aVLA67+9PKQgtuYut41sjr+ug86OzIqxlwFYw1u
-         Wj8S6S9miriZ7buM4nVNXFwPaynGGNu9ve69Re0tHX45BmCio0BI8cuJ2A+Oal9Krpkl
-         LoXQ==
-X-Gm-Message-State: AOAM532yiOmosPOdeAaBDQ99igL2/qJehC8CJqIlZYVmuxNbp8xQjiZu
-        Cc/BQlicf67NHc9lyj5b2D6wZf4MQCc=
-X-Google-Smtp-Source: ABdhPJzcpn5DTPQuPSfZUPDLuPAfkBrPTcc8cEPmAKwjDwkk0IcaBIdBFMmznx5JjVGnWgQQ1Ay+qs9Sp8s=
+        bh=vAfx5V7oXhMQdNK6n8fKDF9GGCBj6ltSzPsyuPD42Bs=;
+        b=I5T6BJS66KbY7JfaYeC6U1bU65+bbuYM9qkUZWWpEZT2HUibEm69eeaf5rKQMNCMux
+         HTbCF2VTdTopTM/pi21Qpi5G8smj7SI2sREP+Bvm/TFuF40n+EKyhG0X+IuD6g8TOUME
+         SFeYK8DpbdugzHQms1QYYH5SGAxHzqPjt0PLVfa9guEmX59UnQVPjFjKDuZ45vhmwQLd
+         m2H7CldGihKoyJAywrsi7fZco6Mv+s7TIw8KC3loazfzdO99X03bxaYg7RxsBJsWPhIA
+         b+NMZkVy9d6ad6kzAbwNOAy7eOg0y8IMBSxCpTHzCtRGLwvFO5Tch8kNk2KGVeD9EUx8
+         h8gg==
+X-Gm-Message-State: AOAM533082h8McteZkI3hAXxRdU0V6KK+zoEcQe0J68t7fxW8dLO1lKM
+        KGHp1xc9BneOEEFDvr8Was9nMCTa4d4=
+X-Google-Smtp-Source: ABdhPJx91iwUKT3XNp8Nkk81qQnI7CC/+A7yDe4tFSaroMx6ORDJ7jKPf6Pp/KOtyNzdi03H7gazxyAr7d8=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:a25:5954:: with SMTP id n81mr7136674ybb.435.1633745643213;
- Fri, 08 Oct 2021 19:14:03 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:ac8:5c0a:: with SMTP id i10mr1952886qti.23.1633745645576;
+ Fri, 08 Oct 2021 19:14:05 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Oct 2021 19:12:26 -0700
+Date:   Fri,  8 Oct 2021 19:12:27 -0700
 In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-34-seanjc@google.com>
+Message-Id: <20211009021236.4122790-35-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009021236.4122790-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 33/43] KVM: x86: Unexport LAPIC's switch_to_{hv,sw}_timer() helpers
+Subject: [PATCH v2 34/43] KVM: x86: Remove defunct pre_block/post_block
+ kvm_x86_ops hooks
 From:   Sean Christopherson <seanjc@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -87,36 +88,109 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Unexport switch_to_{hv,sw}_timer() now that common x86 handles the
-transitions.
+Drop kvm_x86_ops' pre/post_block() now that all implementations are nops.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/lapic.c | 2 --
- 1 file changed, 2 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  2 --
+ arch/x86/include/asm/kvm_host.h    | 12 ------------
+ arch/x86/kvm/vmx/vmx.c             | 13 -------------
+ arch/x86/kvm/x86.c                 |  6 +-----
+ 4 files changed, 1 insertion(+), 32 deletions(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 0cd7ed21b205..cfb64bd4a1c1 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1948,7 +1948,6 @@ void kvm_lapic_switch_to_hv_timer(struct kvm_vcpu *vcpu)
- {
- 	restart_apic_timer(vcpu->arch.apic);
- }
--EXPORT_SYMBOL_GPL(kvm_lapic_switch_to_hv_timer);
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index cefe1d81e2e8..c2b007171abd 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -96,8 +96,6 @@ KVM_X86_OP(handle_exit_irqoff)
+ KVM_X86_OP_NULL(request_immediate_exit)
+ KVM_X86_OP(sched_in)
+ KVM_X86_OP_NULL(update_cpu_dirty_logging)
+-KVM_X86_OP_NULL(pre_block)
+-KVM_X86_OP_NULL(post_block)
+ KVM_X86_OP_NULL(vcpu_blocking)
+ KVM_X86_OP_NULL(vcpu_unblocking)
+ KVM_X86_OP_NULL(update_pi_irte)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 328103a520d3..76a8dddc1a48 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1445,18 +1445,6 @@ struct kvm_x86_ops {
+ 	const struct kvm_pmu_ops *pmu_ops;
+ 	const struct kvm_x86_nested_ops *nested_ops;
  
- void kvm_lapic_switch_to_sw_timer(struct kvm_vcpu *vcpu)
- {
-@@ -1960,7 +1959,6 @@ void kvm_lapic_switch_to_sw_timer(struct kvm_vcpu *vcpu)
- 		start_sw_timer(apic);
- 	preempt_enable();
- }
--EXPORT_SYMBOL_GPL(kvm_lapic_switch_to_sw_timer);
+-	/*
+-	 * Architecture specific hooks for vCPU blocking due to
+-	 * HLT instruction.
+-	 * Returns for .pre_block():
+-	 *    - 0 means continue to block the vCPU.
+-	 *    - 1 means we cannot block the vCPU since some event
+-	 *        happens during this period, such as, 'ON' bit in
+-	 *        posted-interrupts descriptor is set.
+-	 */
+-	int (*pre_block)(struct kvm_vcpu *vcpu);
+-	void (*post_block)(struct kvm_vcpu *vcpu);
+-
+ 	void (*vcpu_blocking)(struct kvm_vcpu *vcpu);
+ 	void (*vcpu_unblocking)(struct kvm_vcpu *vcpu);
  
- void kvm_lapic_restart_hv_timer(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index a24f19874716..13e732a818f3 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7462,16 +7462,6 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
+ 		secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_ENABLE_PML);
+ }
+ 
+-static int vmx_pre_block(struct kvm_vcpu *vcpu)
+-{
+-	return 0;
+-}
+-
+-static void vmx_post_block(struct kvm_vcpu *vcpu)
+-{
+-
+-}
+-
+ static void vmx_setup_mce(struct kvm_vcpu *vcpu)
  {
+ 	if (vcpu->arch.mcg_cap & MCG_LMCE_P)
+@@ -7665,9 +7655,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.cpu_dirty_log_size = PML_ENTITY_NUM,
+ 	.update_cpu_dirty_logging = vmx_update_cpu_dirty_logging,
+ 
+-	.pre_block = vmx_pre_block,
+-	.post_block = vmx_post_block,
+-
+ 	.pmu_ops = &intel_pmu_ops,
+ 	.nested_ops = &vmx_nested_ops,
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 909e932a7ae7..9643f23c28c7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9898,8 +9898,7 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+ {
+ 	bool hv_timer;
+ 
+-	if (!kvm_arch_vcpu_runnable(vcpu) &&
+-	    (!kvm_x86_ops.pre_block || static_call(kvm_x86_pre_block)(vcpu) == 0)) {
++	if (!kvm_arch_vcpu_runnable(vcpu)) {
+ 		/*
+ 		 * Switch to the software timer before halt-polling/blocking as
+ 		 * the guest's timer may be a break event for the vCPU, and the
+@@ -9921,9 +9920,6 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+ 		if (hv_timer)
+ 			kvm_lapic_switch_to_hv_timer(vcpu);
+ 
+-		if (kvm_x86_ops.post_block)
+-			static_call(kvm_x86_post_block)(vcpu);
+-
+ 		if (!kvm_check_request(KVM_REQ_UNHALT, vcpu))
+ 			return 1;
+ 	}
 -- 
 2.33.0.882.g93a45727a2-goog
 
