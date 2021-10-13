@@ -2,159 +2,105 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29B2D42BB90
-	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Oct 2021 11:30:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2163342C364
+	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Oct 2021 16:34:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237603AbhJMJcJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 13 Oct 2021 05:32:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22053 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235811AbhJMJcI (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 13 Oct 2021 05:32:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634117405;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZjFKZdAkzPM6kA0DElv7KLx9JGj1opCMkKpXv5IVjds=;
-        b=ZqW9NrFQghVJeNH0zq9KHWNnOemc2LB5GrnD3ffmnldo+cwoic+noviB9a3/vQ76iHC1Ib
-        LUQ8Y7RIQE0WAkksN+92NpOLLdvtMAflZ+EeJvbgzECm3puAtWjaWe4aBmLGKHscSUipio
-        H+hPwUICQoojaok0waIdxyU6VO02OkI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-aQI2aEs6MMqpU0zEl8z3Eg-1; Wed, 13 Oct 2021 05:30:03 -0400
-X-MC-Unique: aQI2aEs6MMqpU0zEl8z3Eg-1
-Received: by mail-wr1-f72.google.com with SMTP id c4-20020a5d6cc4000000b00160edc8bb28so1490118wrc.9
-        for <kvm-ppc@vger.kernel.org>; Wed, 13 Oct 2021 02:30:03 -0700 (PDT)
+        id S233901AbhJMOgz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 13 Oct 2021 10:36:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51058 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236847AbhJMOgp (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 13 Oct 2021 10:36:45 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E47DBC06174E
+        for <kvm-ppc@vger.kernel.org>; Wed, 13 Oct 2021 07:34:37 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id e7so2515244pgk.2
+        for <kvm-ppc@vger.kernel.org>; Wed, 13 Oct 2021 07:34:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=u3UVtloaaMqDkztEGASyWNnbDwu0ymuLbk5cZTT/COQ=;
+        b=k1zoprz2Levvmr5oO6egQ6fGzjqjpTizM/l53ysB9U3y5Aknk8M0hPgwZh7KrfAnra
+         DpfCtsJTVhztiUCRlJr464Xw/Himf8NS7/htKyXXVR+VUOso3o127nFf1aX9PumBZkWC
+         ZbPha25f+61tFsWCwMmKJm7mKvCOEumoFp73/bIuGOBIaN9xOjD+pEhs/zvUj44TsMfm
+         8QS7V8ViDd0VL3LhWmUJOOpIbARfI/FjorakVtV0WWtg/WRLX5RpAC316mxfw3BW3jl8
+         pspP8ADKzAwZ7Uo6RLVmjm3zQZzqoiLjHWIHndHWhl5HZqlvJWrq6+cJJ0mqy0HrQ9B6
+         Dl0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ZjFKZdAkzPM6kA0DElv7KLx9JGj1opCMkKpXv5IVjds=;
-        b=yAKNH5uqvPVEQos3RHtcGsN+ubr4AnmcLA8exPEmAUkbaJ1VZP8BQHiiDK8AbXKtPp
-         ubArPp9dkDogGwO/F91ok9pyoY2rv5lF4Nlky9DX6+Dw+nO3yKps6RtE6KqPHHDPJdU6
-         MynnEPgdzbFjqcyiZw5omz9vBRWSRkowxvHff+YyXgM6+hJ7Qg+5q96ZWbFO/8keJIY5
-         g2xqzJJORVLYgy56aV0oNUAtIXbFVcwcHX8C1oxKZOvrerJUDdBiwCs/hGu/iBTjk6t+
-         +WfMqXb8T5Yj+lgPZqg0IaeDGA6DNE40IZkPd3AogImoB/J7qSrj8Zy3VgfEF9O3/KOz
-         BCZg==
-X-Gm-Message-State: AOAM5308r+29SaW/ebwlrKPt6A/MlucQ6XUuXO5pveiu2cyYdSBNq//b
-        0cQukxtfBJqxg2FBAzMe48WuWSbmlcSMgctGC3sRSQGvljS5XcZ4JiuCqJ8OK9DYk72eKqsyUFy
-        bpEWWRjSQD6DSkQvHbw==
-X-Received: by 2002:a1c:c906:: with SMTP id f6mr11752838wmb.136.1634117402777;
-        Wed, 13 Oct 2021 02:30:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw9gTLzJcIp/yrU6EoIVb6qauYFuyxecxt8Qxs8z4PtL5mkOqc+Jp//TvYKtW53QKGayzslJQ==
-X-Received: by 2002:a1c:c906:: with SMTP id f6mr11752794wmb.136.1634117402420;
-        Wed, 13 Oct 2021 02:30:02 -0700 (PDT)
-Received: from [192.168.100.42] ([82.142.24.54])
-        by smtp.gmail.com with ESMTPSA id e16sm11103886wrw.17.2021.10.13.02.30.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Oct 2021 02:30:02 -0700 (PDT)
-Message-ID: <d7f59d0e-eac2-7978-4067-9258c8b1aefe@redhat.com>
-Date:   Wed, 13 Oct 2021 11:30:00 +0200
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=u3UVtloaaMqDkztEGASyWNnbDwu0ymuLbk5cZTT/COQ=;
+        b=M914TYZkkFv120edckjC6IKhYHhdcKK3PmuYQIt2tcu8Y28kX85Lr0kqAER6+RSwRB
+         N1X2CU4mowSNeSLs+amPX1MkJRqMKG8p8AGzElrnNCb+qj0TLLqGI5mkWOXG6Sffz0tL
+         vyOw6OOS/Yd7Zz9KQeAcF6v3yZub7AfxYDM3BcsBQ+JddEOIXl0jhAWlMVk5GPm/6Dei
+         GbdaaEeu+rXxL4WuT+B+fjoEUsRm+yj6gi09tA5aTD/JJtGs03EhkUW8r7eGvk5ngpyE
+         fVbn0URte6JmCZf2Xb+XqfGuEUWjpTDdXb8CD6AjulsE7q6tIh4H943zmF8Qq/FiWimP
+         MvQg==
+X-Gm-Message-State: AOAM5336TlzxHpdIWAwiDj1Oqoj3iT8QxepujUS2rIlZyJZP2l/D53ti
+        eB2aRc8MKwN5fKkAJObWcU9d890hMKqbSkpm9Qs=
+X-Google-Smtp-Source: ABdhPJwWQ8Mk1yZ+223iierbd8XYtBZkdQgRdhMMXg/LB0jVDK4zYk9mpMA7XzlmFd2CaZCjQUJXzG8iDv7fDkFdqsM=
+X-Received: by 2002:a63:7405:: with SMTP id p5mr27814692pgc.426.1634135677037;
+ Wed, 13 Oct 2021 07:34:37 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2] KVM: PPC: Defer vtime accounting 'til after IRQ
- handling
-Content-Language: en-US
-To:     Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org
-Cc:     Paul Mackerras <paulus@ozlabs.org>, Greg Kurz <groug@kaod.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
-References: <20211007142856.41205-1-lvivier@redhat.com>
- <875yu17rxk.fsf@mpe.ellerman.id.au>
-From:   Laurent Vivier <lvivier@redhat.com>
-In-Reply-To: <875yu17rxk.fsf@mpe.ellerman.id.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a05:6a10:8a56:0:0:0:0 with HTTP; Wed, 13 Oct 2021 07:34:36
+ -0700 (PDT)
+Reply-To: jesspayne72@gmail.com
+From:   Jess Payne <joeladamu2@gmail.com>
+Date:   Wed, 13 Oct 2021 07:34:36 -0700
+Message-ID: <CAO_K9djNYSVL_62rDXSPrBVjKygbt3BgVKiOX5dLHp6C7hschw@mail.gmail.com>
+Subject: =?UTF-8?B?5oiR6ZyA6KaB5L2g55qE5biu5YqpIC8gSSBuZWVkIHlvdXIgYXNzaXN0YW5jZQ==?=
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 13/10/2021 01:18, Michael Ellerman wrote:
-> Laurent Vivier <lvivier@redhat.com> writes:
->> Commit 112665286d08 moved guest_exit() in the interrupt protected
->> area to avoid wrong context warning (or worse), but the tick counter
->> cannot be updated and the guest time is accounted to the system time.
->>
->> To fix the problem port to POWER the x86 fix
->> 160457140187 ("Defer vtime accounting 'til after IRQ handling"):
->>
->> "Defer the call to account guest time until after servicing any IRQ(s)
->>   that happened in the guest or immediately after VM-Exit.  Tick-based
->>   accounting of vCPU time relies on PF_VCPU being set when the tick IRQ
->>   handler runs, and IRQs are blocked throughout the main sequence of
->>   vcpu_enter_guest(), including the call into vendor code to actually
->>   enter and exit the guest."
->>
->> Fixes: 112665286d08 ("KVM: PPC: Book3S HV: Context tracking exit guest context before enabling irqs")
->> Cc: npiggin@gmail.com
->> Cc: <stable@vger.kernel.org> # 5.12
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->> ---
->>
->> Notes:
->>      v2: remove reference to commit 61bd0f66ff92
->>          cc stable 5.12
->>          add the same comment in the code as for x86
->>
->>   arch/powerpc/kvm/book3s_hv.c | 24 ++++++++++++++++++++----
->>   1 file changed, 20 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
->> index 2acb1c96cfaf..a694d1a8f6ce 100644
->> --- a/arch/powerpc/kvm/book3s_hv.c
->> +++ b/arch/powerpc/kvm/book3s_hv.c
-> ...
->> @@ -4506,13 +4514,21 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
->>   
->>   	srcu_read_unlock(&kvm->srcu, srcu_idx);
->>   
->> +	context_tracking_guest_exit();
->> +
->>   	set_irq_happened(trap);
->>   
->>   	kvmppc_set_host_core(pcpu);
->>   
->> -	guest_exit_irqoff();
->> -
->>   	local_irq_enable();
->> +	/*
->> +	 * Wait until after servicing IRQs to account guest time so that any
->> +	 * ticks that occurred while running the guest are properly accounted
->> +	 * to the guest.  Waiting until IRQs are enabled degrades the accuracy
->> +	 * of accounting via context tracking, but the loss of accuracy is
->> +	 * acceptable for all known use cases.
->> +	 */
->> +	vtime_account_guest_exit();
-> 
-> This pops a warning for me, running guest(s) on Power8:
->   
->    [  270.745303][T16661] ------------[ cut here ]------------
->    [  270.745374][T16661] WARNING: CPU: 72 PID: 16661 at arch/powerpc/kernel/time.c:311 vtime_account_kernel+0xe0/0xf0
-
-Thank you, I missed that...
-
-My patch is wrong, I have to add vtime_account_guest_exit() before the local_irq_enable().
-
-arch/powerpc/kernel/time.c
-
-  305 static unsigned long vtime_delta(struct cpu_accounting_data *acct,
-  306                                  unsigned long *stime_scaled,
-  307                                  unsigned long *steal_time)
-  308 {
-  309         unsigned long now, stime;
-  310
-  311         WARN_ON_ONCE(!irqs_disabled());
-...
-
-But I don't understand how ticks can be accounted now if irqs are still disabled.
-
-Not sure it is as simple as expected...
-
-Thanks,
-Laurent
-
+5oiR5piv5p2w6KW/5L2p5oGp5Lit5aOr5aSr5Lq644CCDQoNCuWcqOe+juWbvemZhuWGm+eahOWG
+m+S6i+mDqOmXqOOAgue+juWbve+8jOS4gOWQjeS4reWjq++8jDMyIOWyge+8jOaIkeWNlei6q++8
+jOadpeiHque+juWbveeUsOe6s+ilv+W3nuWFi+WIqeWkq+WFsO+8jOebruWJjempu+aJjuWcqOWI
+qeavlOS6muePreWKoOilv++8jOS4juaBkOaAluS4u+S5ieS9nOaImOOAguaIkeeahOWNleS9jeaY
+r+esrDTmiqTnkIbpmJ/nrKw3ODLml4XmlK/mj7TokKXjgIINCg0K5oiR5piv5LiA5Liq5YWF5ruh
+54ix5b+D44CB6K+a5a6e5ZKM5rex5oOF55qE5Lq677yM5YW35pyJ6Imv5aW955qE5bm96buY5oSf
+77yM5oiR5Zac5qyi57uT6K+G5paw5pyL5Y+L5bm25LqG6Kej5LuW5Lus55qE55Sf5rS75pa55byP
+77yM5oiR5Zac5qyi55yL5Yiw5aSn5rW355qE5rOi5rWq5ZKM5bGx6ISJ55qE576O5Li95Lul5Y+K
+5aSn6Ieq54S25omA5oul5pyJ55qE5LiA5YiH5o+Q5L6b44CC5b6I6auY5YW06IO95pu05aSa5Zyw
+5LqG6Kej5oKo77yM5oiR6K6k5Li65oiR5Lus5Y+v5Lul5bu656uL6Imv5aW955qE5ZWG5Lia5Y+L
+6LCK44CCDQoNCuaIkeS4gOebtOW+iOS4jeW8gOW/g++8jOWboOS4uui/meS6m+W5tOadpeeUn+a0
+u+WvueaIkeS4jeWFrOW5s++8m+aIkeWkseWOu+S6hueItuavje+8jOmCo+W5tOaIkSAyMQ0K5bKB
+44CC5oiR54i25Lqy55qE5ZCN5a2X5piv5biV54m56YeM5pav5L2p5oGp77yM5oiR55qE5q+N5Lqy
+5piv546b5Li95L2p5oGp44CC5rKh5pyJ5Lq65biu5Yqp5oiR77yM5L2G5b6I6auY5YW05oiR57uI
+5LqO5Zyo576O5Yab5Lit5om+5Yiw5LqG6Ieq5bex44CCDQoNCuaIkee7k+WpmueUn+S6huWtqeWt
+kO+8jOS9huS7luatu+S6hu+8jOS4jeS5heaIkeS4iOWkq+W8gOWni+asuumql+aIke+8jOaJgOS7
+peaIkeS4jeW+l+S4jeaUvuW8g+WpmuWnu+OAgg0KDQrmiJHkuZ/lvojlubjov5DvvIzlnKjmiJHn
+moTlm73lrrbnvo7lm73lkozliKnmr5Tkuprnj63liqDopb/ov5nph4zmi6XmnInmiJHnlJ/mtLvk
+uK3miYDpnIDnmoTkuIDliIfvvIzkvYbmsqHmnInkurrkuLrmiJHmj5Dkvpvlu7rorq7jgILmiJHp
+nIDopoHkuIDkuKror5rlrp7nmoTkurrmnaXkv6Hku7vvvIzku5bkuZ/kvJrlsLHlpoLkvZXmipXo
+tYTmiJHnmoTpkrHmj5Dkvpvlu7rorq7jgILlm6DkuLrmiJHmmK/miJHniLbmr43lnKjku5bku6zl
+jrvkuJbliY3nlJ/kuIvnmoTllK/kuIDkuIDkuKrlpbPlranjgIINCg0K5oiR5LiN6K6k6K+G5L2g
+5pys5Lq677yM5L2G5oiR6K6k5Li65pyJ5LiA5Liq5YC85b6X5L+h6LWW55qE5aW95Lq677yM5LuW
+5Y+v5Lul5bu656uL55yf5q2j55qE5L+h5Lu75ZKM6Imv5aW955qE5ZWG5Lia5Y+L6LCK77yM5aaC
+5p6c5L2g55yf55qE5pyJ5LiA5Liq6K+a5a6e55qE5ZCN5a2X77yM5oiR5Lmf5pyJ5LiA5Lqb5Lic
+6KW/6KaB5ZKM5L2g5YiG5Lqr55u45L+h44CC5Zyo5L2g6Lqr5LiK77yM5Zug5Li65oiR6ZyA6KaB
+5L2g55qE5biu5Yqp44CC5oiR5oul5pyJ5oiR5Zyo5Yip5q+U5Lqa54+t5Yqg6KW/6L+Z6YeM6LWa
+5Yiw55qE5oC76aKd77yIMjUwDQrkuIfnvo7lhYPvvInjgILmiJHkvJrlnKjkuIvkuIDlsIHnlLXl
+rZDpgq7ku7bkuK3lkYror4nkvaDmiJHmmK/lpoLkvZXlgZrliLDnmoTvvIzkuI3opoHmg4rmhYzv
+vIzku5bku6zmsqHmnInpo47pmanvvIzogIzkuJTmiJHov5jlnKjkuI4gUmVkDQrmnInogZTns7vn
+moTkurrpgZPkuLvkuYnljLvnlJ/nmoTluK7liqnkuIvlsIbov5nnrJTpkrHlrZjlhaXkuobpk7bo
+oYzjgILmiJHluIzmnJvmgqjlsIboh6rlt7HkvZzkuLrmiJHnmoTlj5fnm4rkurrmnaXmjqXmlLbl
+n7rph5HlubblnKjmiJHlnKjov5nph4zlrozmiJDlkI7noa7kv53lroPnmoTlronlhajlubbojrfl
+vpfmiJHnmoTlhpvkuovpgJrooYzor4Hku6XlnKjmgqjnmoTlm73lrrbkuI7mgqjkvJrpnaLvvJvk
+uI3opoHlrrPmgJXpk7booYzkvJrlsIbotYTph5HlrZjlgqjlnKgNCkFUTSBWSVNBIOWNoeS4re+8
+jOi/meWvueaIkeS7rOadpeivtOaYr+WuieWFqOS4lOW/q+aNt+eahOOAgg0KDQrnrJTorrA75oiR
+5LiN55+l6YGT5oiR5Lus6KaB5Zyo6L+Z6YeM5ZGG5aSa5LmF77yM5oiR55qE5ZG96L+Q77yM5Zug
+5Li65oiR5Zyo6L+Z6YeM5Lik5qyh54K45by56KKt5Ye75Lit5bm45a2Y5LiL5p2l77yM6L+Z5L+D
+5L2/5oiR5a+75om+5LiA5Liq5YC85b6X5L+h6LWW55qE5Lq65p2l5biu5Yqp5oiR5o6l5pS25ZKM
+5oqV6LWE5Z+66YeR77yM5Zug5Li65oiR5bCG5p2l5Yiw5L2g5Lus55qE5Zu95a625Ye66Lqr5oqV
+6LWE77yM5byA5aeL5paw55Sf5rS777yM5LiN5YaN5b2T5YW144CCDQoNCuWmguaenOaCqOaEv+aE
+j+iwqOaFjuWkhOeQhu+8jOivt+WbnuWkjeaIkeOAguaIkeS8muWRiuivieS9oOS4i+S4gOatpeea
+hOa1geeoi++8jOW5tue7meS9oOWPkemAgeabtOWkmuWFs+S6juWfuumHkeWtmOWFpemTtuihjOea
+hOS/oeaBr+OAguS7peWPiumTtuihjOWwhuWmguS9leW4ruWKqeaIkeS7rOmAmui/hyBBVE0gVklT
+QQ0KQ0FSRCDlsIbotYTph5Hovaznp7vliLDmgqjnmoTlm73lrrYv5Zyw5Yy644CC5aaC5p6c5L2g
+5pyJ5YW06Laj77yM6K+35LiO5oiR6IGU57O744CCDQo=
