@@ -2,105 +2,139 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2163342C364
-	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Oct 2021 16:34:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4DB942C6C9
+	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Oct 2021 18:52:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233901AbhJMOgz (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 13 Oct 2021 10:36:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51058 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236847AbhJMOgp (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 13 Oct 2021 10:36:45 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E47DBC06174E
-        for <kvm-ppc@vger.kernel.org>; Wed, 13 Oct 2021 07:34:37 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id e7so2515244pgk.2
-        for <kvm-ppc@vger.kernel.org>; Wed, 13 Oct 2021 07:34:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=u3UVtloaaMqDkztEGASyWNnbDwu0ymuLbk5cZTT/COQ=;
-        b=k1zoprz2Levvmr5oO6egQ6fGzjqjpTizM/l53ysB9U3y5Aknk8M0hPgwZh7KrfAnra
-         DpfCtsJTVhztiUCRlJr464Xw/Himf8NS7/htKyXXVR+VUOso3o127nFf1aX9PumBZkWC
-         ZbPha25f+61tFsWCwMmKJm7mKvCOEumoFp73/bIuGOBIaN9xOjD+pEhs/zvUj44TsMfm
-         8QS7V8ViDd0VL3LhWmUJOOpIbARfI/FjorakVtV0WWtg/WRLX5RpAC316mxfw3BW3jl8
-         pspP8ADKzAwZ7Uo6RLVmjm3zQZzqoiLjHWIHndHWhl5HZqlvJWrq6+cJJ0mqy0HrQ9B6
-         Dl0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=u3UVtloaaMqDkztEGASyWNnbDwu0ymuLbk5cZTT/COQ=;
-        b=M914TYZkkFv120edckjC6IKhYHhdcKK3PmuYQIt2tcu8Y28kX85Lr0kqAER6+RSwRB
-         N1X2CU4mowSNeSLs+amPX1MkJRqMKG8p8AGzElrnNCb+qj0TLLqGI5mkWOXG6Sffz0tL
-         vyOw6OOS/Yd7Zz9KQeAcF6v3yZub7AfxYDM3BcsBQ+JddEOIXl0jhAWlMVk5GPm/6Dei
-         GbdaaEeu+rXxL4WuT+B+fjoEUsRm+yj6gi09tA5aTD/JJtGs03EhkUW8r7eGvk5ngpyE
-         fVbn0URte6JmCZf2Xb+XqfGuEUWjpTDdXb8CD6AjulsE7q6tIh4H943zmF8Qq/FiWimP
-         MvQg==
-X-Gm-Message-State: AOAM5336TlzxHpdIWAwiDj1Oqoj3iT8QxepujUS2rIlZyJZP2l/D53ti
-        eB2aRc8MKwN5fKkAJObWcU9d890hMKqbSkpm9Qs=
-X-Google-Smtp-Source: ABdhPJwWQ8Mk1yZ+223iierbd8XYtBZkdQgRdhMMXg/LB0jVDK4zYk9mpMA7XzlmFd2CaZCjQUJXzG8iDv7fDkFdqsM=
-X-Received: by 2002:a63:7405:: with SMTP id p5mr27814692pgc.426.1634135677037;
- Wed, 13 Oct 2021 07:34:37 -0700 (PDT)
+        id S237763AbhJMQyR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 13 Oct 2021 12:54:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59478 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231213AbhJMQyQ (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 13 Oct 2021 12:54:16 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19DGHkHc010095;
+        Wed, 13 Oct 2021 12:52:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=5sACMFfzDtAUFaTMRsmigYNf2FvC/e0YhjfueZQDcDY=;
+ b=Duzb+slnotpEJ3phN+qwXsiXIe42q1Naroo9HU1eqqItJCRS1qV9I/jFpkPpOv4D58qV
+ XE/z4wYJ+x4b/1PPGPrmeSThrHGw6epsvOWeLxAd/A65KCr8vEXaNpKrgg+GZzHAXUVw
+ 1vpdIkogxtenlX/JUDlmalOfVgsH2ruaBaqgBamOkpScBeIv5DfNPcBeJBCtds8cuJ/1
+ XN07h5QPqfU6B1jMUNrLPkKDobe1yhtWta8fGh8HHqvuGMFY4rrS8skBZXntgn8hMkQ+
+ fxWfPtNZ2JacIKPu1D1VYc6qZUwNN+PtfgLd+BO3OvAbCNvCDrh1M3eOALWSThQEA/Gn gg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnwb5gmgt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 12:52:03 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19DGT3iL020520;
+        Wed, 13 Oct 2021 12:52:03 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnwb5gmgc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 12:52:03 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19DGpck6023935;
+        Wed, 13 Oct 2021 16:52:01 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma02wdc.us.ibm.com with ESMTP id 3bnm397qr3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Oct 2021 16:52:01 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19DGq03736635090
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Oct 2021 16:52:00 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 92D727806B;
+        Wed, 13 Oct 2021 16:52:00 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFC687805F;
+        Wed, 13 Oct 2021 16:51:59 +0000 (GMT)
+Received: from localhost (unknown [9.211.73.118])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Wed, 13 Oct 2021 16:51:59 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v3 02/52] powerpc/64s: guard optional TIDR SPR with CPU
+ ftr test
+In-Reply-To: <87k0ijm1ty.fsf@mpe.ellerman.id.au>
+References: <20211004160049.1338837-1-npiggin@gmail.com>
+ <20211004160049.1338837-3-npiggin@gmail.com>
+ <87v9235rl2.fsf@linux.ibm.com> <87k0ijm1ty.fsf@mpe.ellerman.id.au>
+Date:   Wed, 13 Oct 2021 13:51:57 -0300
+Message-ID: <87zgrckguq.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Received: by 2002:a05:6a10:8a56:0:0:0:0 with HTTP; Wed, 13 Oct 2021 07:34:36
- -0700 (PDT)
-Reply-To: jesspayne72@gmail.com
-From:   Jess Payne <joeladamu2@gmail.com>
-Date:   Wed, 13 Oct 2021 07:34:36 -0700
-Message-ID: <CAO_K9djNYSVL_62rDXSPrBVjKygbt3BgVKiOX5dLHp6C7hschw@mail.gmail.com>
-Subject: =?UTF-8?B?5oiR6ZyA6KaB5L2g55qE5biu5YqpIC8gSSBuZWVkIHlvdXIgYXNzaXN0YW5jZQ==?=
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: nVEXXV6283GjZCd5cWN6RoZ7IhhktV8H
+X-Proofpoint-ORIG-GUID: ziC5t9dymdhUy6p_aRc2LKu1e9Zx0vJS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-13_06,2021-10-13_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ impostorscore=0 spamscore=0 suspectscore=0 mlxscore=0 malwarescore=0
+ bulkscore=0 lowpriorityscore=0 priorityscore=1501 clxscore=1011
+ adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110130104
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-5oiR5piv5p2w6KW/5L2p5oGp5Lit5aOr5aSr5Lq644CCDQoNCuWcqOe+juWbvemZhuWGm+eahOWG
-m+S6i+mDqOmXqOOAgue+juWbve+8jOS4gOWQjeS4reWjq++8jDMyIOWyge+8jOaIkeWNlei6q++8
-jOadpeiHque+juWbveeUsOe6s+ilv+W3nuWFi+WIqeWkq+WFsO+8jOebruWJjempu+aJjuWcqOWI
-qeavlOS6muePreWKoOilv++8jOS4juaBkOaAluS4u+S5ieS9nOaImOOAguaIkeeahOWNleS9jeaY
-r+esrDTmiqTnkIbpmJ/nrKw3ODLml4XmlK/mj7TokKXjgIINCg0K5oiR5piv5LiA5Liq5YWF5ruh
-54ix5b+D44CB6K+a5a6e5ZKM5rex5oOF55qE5Lq677yM5YW35pyJ6Imv5aW955qE5bm96buY5oSf
-77yM5oiR5Zac5qyi57uT6K+G5paw5pyL5Y+L5bm25LqG6Kej5LuW5Lus55qE55Sf5rS75pa55byP
-77yM5oiR5Zac5qyi55yL5Yiw5aSn5rW355qE5rOi5rWq5ZKM5bGx6ISJ55qE576O5Li95Lul5Y+K
-5aSn6Ieq54S25omA5oul5pyJ55qE5LiA5YiH5o+Q5L6b44CC5b6I6auY5YW06IO95pu05aSa5Zyw
-5LqG6Kej5oKo77yM5oiR6K6k5Li65oiR5Lus5Y+v5Lul5bu656uL6Imv5aW955qE5ZWG5Lia5Y+L
-6LCK44CCDQoNCuaIkeS4gOebtOW+iOS4jeW8gOW/g++8jOWboOS4uui/meS6m+W5tOadpeeUn+a0
-u+WvueaIkeS4jeWFrOW5s++8m+aIkeWkseWOu+S6hueItuavje+8jOmCo+W5tOaIkSAyMQ0K5bKB
-44CC5oiR54i25Lqy55qE5ZCN5a2X5piv5biV54m56YeM5pav5L2p5oGp77yM5oiR55qE5q+N5Lqy
-5piv546b5Li95L2p5oGp44CC5rKh5pyJ5Lq65biu5Yqp5oiR77yM5L2G5b6I6auY5YW05oiR57uI
-5LqO5Zyo576O5Yab5Lit5om+5Yiw5LqG6Ieq5bex44CCDQoNCuaIkee7k+WpmueUn+S6huWtqeWt
-kO+8jOS9huS7luatu+S6hu+8jOS4jeS5heaIkeS4iOWkq+W8gOWni+asuumql+aIke+8jOaJgOS7
-peaIkeS4jeW+l+S4jeaUvuW8g+WpmuWnu+OAgg0KDQrmiJHkuZ/lvojlubjov5DvvIzlnKjmiJHn
-moTlm73lrrbnvo7lm73lkozliKnmr5Tkuprnj63liqDopb/ov5nph4zmi6XmnInmiJHnlJ/mtLvk
-uK3miYDpnIDnmoTkuIDliIfvvIzkvYbmsqHmnInkurrkuLrmiJHmj5Dkvpvlu7rorq7jgILmiJHp
-nIDopoHkuIDkuKror5rlrp7nmoTkurrmnaXkv6Hku7vvvIzku5bkuZ/kvJrlsLHlpoLkvZXmipXo
-tYTmiJHnmoTpkrHmj5Dkvpvlu7rorq7jgILlm6DkuLrmiJHmmK/miJHniLbmr43lnKjku5bku6zl
-jrvkuJbliY3nlJ/kuIvnmoTllK/kuIDkuIDkuKrlpbPlranjgIINCg0K5oiR5LiN6K6k6K+G5L2g
-5pys5Lq677yM5L2G5oiR6K6k5Li65pyJ5LiA5Liq5YC85b6X5L+h6LWW55qE5aW95Lq677yM5LuW
-5Y+v5Lul5bu656uL55yf5q2j55qE5L+h5Lu75ZKM6Imv5aW955qE5ZWG5Lia5Y+L6LCK77yM5aaC
-5p6c5L2g55yf55qE5pyJ5LiA5Liq6K+a5a6e55qE5ZCN5a2X77yM5oiR5Lmf5pyJ5LiA5Lqb5Lic
-6KW/6KaB5ZKM5L2g5YiG5Lqr55u45L+h44CC5Zyo5L2g6Lqr5LiK77yM5Zug5Li65oiR6ZyA6KaB
-5L2g55qE5biu5Yqp44CC5oiR5oul5pyJ5oiR5Zyo5Yip5q+U5Lqa54+t5Yqg6KW/6L+Z6YeM6LWa
-5Yiw55qE5oC76aKd77yIMjUwDQrkuIfnvo7lhYPvvInjgILmiJHkvJrlnKjkuIvkuIDlsIHnlLXl
-rZDpgq7ku7bkuK3lkYror4nkvaDmiJHmmK/lpoLkvZXlgZrliLDnmoTvvIzkuI3opoHmg4rmhYzv
-vIzku5bku6zmsqHmnInpo47pmanvvIzogIzkuJTmiJHov5jlnKjkuI4gUmVkDQrmnInogZTns7vn
-moTkurrpgZPkuLvkuYnljLvnlJ/nmoTluK7liqnkuIvlsIbov5nnrJTpkrHlrZjlhaXkuobpk7bo
-oYzjgILmiJHluIzmnJvmgqjlsIboh6rlt7HkvZzkuLrmiJHnmoTlj5fnm4rkurrmnaXmjqXmlLbl
-n7rph5HlubblnKjmiJHlnKjov5nph4zlrozmiJDlkI7noa7kv53lroPnmoTlronlhajlubbojrfl
-vpfmiJHnmoTlhpvkuovpgJrooYzor4Hku6XlnKjmgqjnmoTlm73lrrbkuI7mgqjkvJrpnaLvvJvk
-uI3opoHlrrPmgJXpk7booYzkvJrlsIbotYTph5HlrZjlgqjlnKgNCkFUTSBWSVNBIOWNoeS4re+8
-jOi/meWvueaIkeS7rOadpeivtOaYr+WuieWFqOS4lOW/q+aNt+eahOOAgg0KDQrnrJTorrA75oiR
-5LiN55+l6YGT5oiR5Lus6KaB5Zyo6L+Z6YeM5ZGG5aSa5LmF77yM5oiR55qE5ZG96L+Q77yM5Zug
-5Li65oiR5Zyo6L+Z6YeM5Lik5qyh54K45by56KKt5Ye75Lit5bm45a2Y5LiL5p2l77yM6L+Z5L+D
-5L2/5oiR5a+75om+5LiA5Liq5YC85b6X5L+h6LWW55qE5Lq65p2l5biu5Yqp5oiR5o6l5pS25ZKM
-5oqV6LWE5Z+66YeR77yM5Zug5Li65oiR5bCG5p2l5Yiw5L2g5Lus55qE5Zu95a625Ye66Lqr5oqV
-6LWE77yM5byA5aeL5paw55Sf5rS777yM5LiN5YaN5b2T5YW144CCDQoNCuWmguaenOaCqOaEv+aE
-j+iwqOaFjuWkhOeQhu+8jOivt+WbnuWkjeaIkeOAguaIkeS8muWRiuivieS9oOS4i+S4gOatpeea
-hOa1geeoi++8jOW5tue7meS9oOWPkemAgeabtOWkmuWFs+S6juWfuumHkeWtmOWFpemTtuihjOea
-hOS/oeaBr+OAguS7peWPiumTtuihjOWwhuWmguS9leW4ruWKqeaIkeS7rOmAmui/hyBBVE0gVklT
-QQ0KQ0FSRCDlsIbotYTph5Hovaznp7vliLDmgqjnmoTlm73lrrYv5Zyw5Yy644CC5aaC5p6c5L2g
-5pyJ5YW06Laj77yM6K+35LiO5oiR6IGU57O744CCDQo=
+Michael Ellerman <mpe@ellerman.id.au> writes:
+
+> Fabiano Rosas <farosas@linux.ibm.com> writes:
+>> Nicholas Piggin <npiggin@gmail.com> writes:
+>>
+>>> The TIDR SPR only exists on POWER9. Avoid accessing it when the
+>>> feature bit for it is not set.
+>>
+>> Not related to this patch, but how does this work with compat mode? A P9
+>> compat mode guest would get an invalid instruction when trying to access
+>> this SPR?
+>
+> Good question.
+>
+> I assume you're talking about P9 compat mode on P10.
+>
+> In general compat mode only applies to userspace, because it's
+> implemented by setting the PCR which only (mostly?) applies to PR=3D1.
+>
+> I don't think there's any special casing in the ISA for the TIDR, so I
+> think it just falls into the unimplemented SPR case for mt/fspr.
+>
+> That's documented in Book III section 5.4.4, in particular on page 1171
+> it says:
+>
+>   Execution of this instruction specifying an SPR number
+>   that is undefined for the implementation causes one of
+>   the following.
+>   =E2=80=A2 if spr[0]=3D0:
+>     - if MSR[PR]=3D1: Hypervisor Emulation Assistance interrupt
+>     - if MSR[PR]=3D0: Hypervisor Emulation Assistance interrupt for SPR
+>       0,4,5, and 6, and no operation (i.e., the instruction is treated
+>       as a no-op) when LPCR[EVIRT]=3D0 and Hypervisor Emulation Assistance
+>       interrupt when LPCR[EVIRT]=3D1 for all other SPRs
+
+I knew this must have been somewhere in there but had no idea how to
+find it. Thanks.
+
+> Linux doesn't set EVIRT, and I assume neither does phyp, so it behaves
+> like a nop.
+>
+> We actually use that behaviour in xmon to detect that an SPR is not
+> implemented, by noticing that the mfspr has no effect on the target
+> register, see dump_one_spr().
+>
+> We should really write some docs on compat mode in the linuxppc wiki
+> and/or Documentation ;)
+
+Hmm I was not aware we had a wiki. I'll see if I can contribute
+something. I need to go learn all this stuff first, though =3DD.
+
+>
+> cheers
