@@ -2,139 +2,178 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4DB942C6C9
-	for <lists+kvm-ppc@lfdr.de>; Wed, 13 Oct 2021 18:52:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7570342E67B
+	for <lists+kvm-ppc@lfdr.de>; Fri, 15 Oct 2021 04:23:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237763AbhJMQyR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 13 Oct 2021 12:54:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59478 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231213AbhJMQyQ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 13 Oct 2021 12:54:16 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19DGHkHc010095;
-        Wed, 13 Oct 2021 12:52:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=5sACMFfzDtAUFaTMRsmigYNf2FvC/e0YhjfueZQDcDY=;
- b=Duzb+slnotpEJ3phN+qwXsiXIe42q1Naroo9HU1eqqItJCRS1qV9I/jFpkPpOv4D58qV
- XE/z4wYJ+x4b/1PPGPrmeSThrHGw6epsvOWeLxAd/A65KCr8vEXaNpKrgg+GZzHAXUVw
- 1vpdIkogxtenlX/JUDlmalOfVgsH2ruaBaqgBamOkpScBeIv5DfNPcBeJBCtds8cuJ/1
- XN07h5QPqfU6B1jMUNrLPkKDobe1yhtWta8fGh8HHqvuGMFY4rrS8skBZXntgn8hMkQ+
- fxWfPtNZ2JacIKPu1D1VYc6qZUwNN+PtfgLd+BO3OvAbCNvCDrh1M3eOALWSThQEA/Gn gg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnwb5gmgt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 12:52:03 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19DGT3iL020520;
-        Wed, 13 Oct 2021 12:52:03 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bnwb5gmgc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 12:52:03 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19DGpck6023935;
-        Wed, 13 Oct 2021 16:52:01 GMT
-Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
-        by ppma02wdc.us.ibm.com with ESMTP id 3bnm397qr3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Oct 2021 16:52:01 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19DGq03736635090
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Oct 2021 16:52:00 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 92D727806B;
-        Wed, 13 Oct 2021 16:52:00 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EFC687805F;
-        Wed, 13 Oct 2021 16:51:59 +0000 (GMT)
-Received: from localhost (unknown [9.211.73.118])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Wed, 13 Oct 2021 16:51:59 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v3 02/52] powerpc/64s: guard optional TIDR SPR with CPU
- ftr test
-In-Reply-To: <87k0ijm1ty.fsf@mpe.ellerman.id.au>
-References: <20211004160049.1338837-1-npiggin@gmail.com>
- <20211004160049.1338837-3-npiggin@gmail.com>
- <87v9235rl2.fsf@linux.ibm.com> <87k0ijm1ty.fsf@mpe.ellerman.id.au>
-Date:   Wed, 13 Oct 2021 13:51:57 -0300
-Message-ID: <87zgrckguq.fsf@linux.ibm.com>
+        id S232566AbhJOCZT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 14 Oct 2021 22:25:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60006 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231372AbhJOCZP (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 14 Oct 2021 22:25:15 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71421C061570;
+        Thu, 14 Oct 2021 19:23:10 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id i76so4965538pfe.13;
+        Thu, 14 Oct 2021 19:23:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=3M9O7XSoph4svAH5nZJ04xH/DP3a3sIU5ihXxGXcasc=;
+        b=ZHoEbIOM2bEgMVGUhbJNjUZ4YyZUu6Pgt80iFL6xmp3QDTrCxz27ls16kQ8qhlA45j
+         l/e3vYKK6iLLoz246LoePo9U9SLtgtMqW70HTuQV37COmDhfGk3CHLp15tzK/koSJFIF
+         tBdf9bj3Qmqb/zV9crdL/9tLrlZKrDouDRgr9Y6ooCd0B6Tmzmo/C9R6wNJKVGcVLs7n
+         fCcE0gXpiagWOJU3O0lz6w7aTdkw5VPxXtlfWVaGH/QYDq7pr4/TKzi4TIDjd+Z7FzYB
+         uFrzFJdnVQTg15ddft0Dq+DkAK579EUHM9Fl6Ws1m2RVzSGd6m6Gf/9hTx1n+qYWt8Go
+         Bncg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=3M9O7XSoph4svAH5nZJ04xH/DP3a3sIU5ihXxGXcasc=;
+        b=VxTC/e09aQdBorVnS/1F0igSUW1VeBRJZmc6rvxOCB4Hcgx7cVMJk2wf15M5TcffEz
+         JbzKS0qEq0Es4hB2pXK4pPrrgBThvPjb1Fl73aBIyq8C1bjQEyN4xhdsxQWbN1Hq8u34
+         mhsETzOyXhiH8NOpPD8k/2tjmFvN+eTHZF9kSkTUgigPgZtwiM8wZMARdnwuz7W4a1CE
+         Kt97JMvYaRMcyuovHWTq6K5j1rRYB9lyghE/Jrl84BWMdz9YxSFOG7AuolqjdU75QwpN
+         LtlVyNIEgiF1KuvkSgW1oRLvqz1QGqyiwrINTQIZwcse9GX2Y9AQgnHyu+cmQgbucqp3
+         JU5Q==
+X-Gm-Message-State: AOAM533w+mN/LL10Von+ucGB0b8s6Hc2l6tS+T2SwH7O41sAGgumSMrk
+        PW7oDvM6gsSLiL0snxKEg6W2u1vsToM=
+X-Google-Smtp-Source: ABdhPJxOlWOOgYYmyYuVxUvgD8RqatJ6qu59HWcI+qiH2UryvxaZcqbC9wQO6rsGR9v+SIc92Y5Yhw==
+X-Received: by 2002:a05:6a00:856:b0:44c:f184:9320 with SMTP id q22-20020a056a00085600b0044cf1849320mr8671829pfk.81.1634264589786;
+        Thu, 14 Oct 2021 19:23:09 -0700 (PDT)
+Received: from localhost (14-203-144-177.static.tpgi.com.au. [14.203.144.177])
+        by smtp.gmail.com with ESMTPSA id oc8sm3843637pjb.15.2021.10.14.19.23.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Oct 2021 19:23:09 -0700 (PDT)
+Date:   Fri, 15 Oct 2021 12:23:04 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2] KVM: PPC: Defer vtime accounting 'til after IRQ
+ handling
+To:     kvm-ppc@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Greg Kurz <groug@kaod.org>, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@ozlabs.org>,
+        stable@vger.kernel.org
+References: <20211007142856.41205-1-lvivier@redhat.com>
+        <875yu17rxk.fsf@mpe.ellerman.id.au>
+        <d7f59d0e-eac2-7978-4067-9258c8b1aefe@redhat.com>
+In-Reply-To: <d7f59d0e-eac2-7978-4067-9258c8b1aefe@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Message-Id: <1634263564.zfj0ajf8eh.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: nVEXXV6283GjZCd5cWN6RoZ7IhhktV8H
-X-Proofpoint-ORIG-GUID: ziC5t9dymdhUy6p_aRc2LKu1e9Zx0vJS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-13_06,2021-10-13_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- impostorscore=0 spamscore=0 suspectscore=0 mlxscore=0 malwarescore=0
- bulkscore=0 lowpriorityscore=0 priorityscore=1501 clxscore=1011
- adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2109230001 definitions=main-2110130104
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Michael Ellerman <mpe@ellerman.id.au> writes:
+Excerpts from Laurent Vivier's message of October 13, 2021 7:30 pm:
+> On 13/10/2021 01:18, Michael Ellerman wrote:
+>> Laurent Vivier <lvivier@redhat.com> writes:
+>>> Commit 112665286d08 moved guest_exit() in the interrupt protected
+>>> area to avoid wrong context warning (or worse), but the tick counter
+>>> cannot be updated and the guest time is accounted to the system time.
+>>>
+>>> To fix the problem port to POWER the x86 fix
+>>> 160457140187 ("Defer vtime accounting 'til after IRQ handling"):
+>>>
+>>> "Defer the call to account guest time until after servicing any IRQ(s)
+>>>   that happened in the guest or immediately after VM-Exit.  Tick-based
+>>>   accounting of vCPU time relies on PF_VCPU being set when the tick IRQ
+>>>   handler runs, and IRQs are blocked throughout the main sequence of
+>>>   vcpu_enter_guest(), including the call into vendor code to actually
+>>>   enter and exit the guest."
+>>>
+>>> Fixes: 112665286d08 ("KVM: PPC: Book3S HV: Context tracking exit guest =
+context before enabling irqs")
+>>> Cc: npiggin@gmail.com
+>>> Cc: <stable@vger.kernel.org> # 5.12
+>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>>> ---
+>>>
+>>> Notes:
+>>>      v2: remove reference to commit 61bd0f66ff92
+>>>          cc stable 5.12
+>>>          add the same comment in the code as for x86
+>>>
+>>>   arch/powerpc/kvm/book3s_hv.c | 24 ++++++++++++++++++++----
+>>>   1 file changed, 20 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.=
+c
+>>> index 2acb1c96cfaf..a694d1a8f6ce 100644
+>>> --- a/arch/powerpc/kvm/book3s_hv.c
+>>> +++ b/arch/powerpc/kvm/book3s_hv.c
+>> ...
+>>> @@ -4506,13 +4514,21 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu=
+, u64 time_limit,
+>>>  =20
+>>>   	srcu_read_unlock(&kvm->srcu, srcu_idx);
+>>>  =20
+>>> +	context_tracking_guest_exit();
+>>> +
+>>>   	set_irq_happened(trap);
+>>>  =20
+>>>   	kvmppc_set_host_core(pcpu);
+>>>  =20
+>>> -	guest_exit_irqoff();
+>>> -
+>>>   	local_irq_enable();
+>>> +	/*
+>>> +	 * Wait until after servicing IRQs to account guest time so that any
+>>> +	 * ticks that occurred while running the guest are properly accounted
+>>> +	 * to the guest.  Waiting until IRQs are enabled degrades the accurac=
+y
+>>> +	 * of accounting via context tracking, but the loss of accuracy is
+>>> +	 * acceptable for all known use cases.
+>>> +	 */
+>>> +	vtime_account_guest_exit();
+>>=20
+>> This pops a warning for me, running guest(s) on Power8:
+>>  =20
+>>    [  270.745303][T16661] ------------[ cut here ]------------
+>>    [  270.745374][T16661] WARNING: CPU: 72 PID: 16661 at arch/powerpc/ke=
+rnel/time.c:311 vtime_account_kernel+0xe0/0xf0
+>=20
+> Thank you, I missed that...
+>=20
+> My patch is wrong, I have to add vtime_account_guest_exit() before the lo=
+cal_irq_enable().
 
-> Fabiano Rosas <farosas@linux.ibm.com> writes:
->> Nicholas Piggin <npiggin@gmail.com> writes:
->>
->>> The TIDR SPR only exists on POWER9. Avoid accessing it when the
->>> feature bit for it is not set.
->>
->> Not related to this patch, but how does this work with compat mode? A P9
->> compat mode guest would get an invalid instruction when trying to access
->> this SPR?
->
-> Good question.
->
-> I assume you're talking about P9 compat mode on P10.
->
-> In general compat mode only applies to userspace, because it's
-> implemented by setting the PCR which only (mostly?) applies to PR=3D1.
->
-> I don't think there's any special casing in the ISA for the TIDR, so I
-> think it just falls into the unimplemented SPR case for mt/fspr.
->
-> That's documented in Book III section 5.4.4, in particular on page 1171
-> it says:
->
->   Execution of this instruction specifying an SPR number
->   that is undefined for the implementation causes one of
->   the following.
->   =E2=80=A2 if spr[0]=3D0:
->     - if MSR[PR]=3D1: Hypervisor Emulation Assistance interrupt
->     - if MSR[PR]=3D0: Hypervisor Emulation Assistance interrupt for SPR
->       0,4,5, and 6, and no operation (i.e., the instruction is treated
->       as a no-op) when LPCR[EVIRT]=3D0 and Hypervisor Emulation Assistance
->       interrupt when LPCR[EVIRT]=3D1 for all other SPRs
+I thought so because if we take an interrupt after exiting the guest that=20
+should be accounted to kernel not guest.
 
-I knew this must have been somewhere in there but had no idea how to
-find it. Thanks.
+>=20
+> arch/powerpc/kernel/time.c
+>=20
+>   305 static unsigned long vtime_delta(struct cpu_accounting_data *acct,
+>   306                                  unsigned long *stime_scaled,
+>   307                                  unsigned long *steal_time)
+>   308 {
+>   309         unsigned long now, stime;
+>   310
+>   311         WARN_ON_ONCE(!irqs_disabled());
+> ...
+>=20
+> But I don't understand how ticks can be accounted now if irqs are still d=
+isabled.
+>=20
+> Not sure it is as simple as expected...
 
-> Linux doesn't set EVIRT, and I assume neither does phyp, so it behaves
-> like a nop.
->
-> We actually use that behaviour in xmon to detect that an SPR is not
-> implemented, by noticing that the mfspr has no effect on the target
-> register, see dump_one_spr().
->
-> We should really write some docs on compat mode in the linuxppc wiki
-> and/or Documentation ;)
+I don't know all the timer stuff too well. The=20
+!CONFIG_VIRT_CPU_ACCOUNTING case is relying on PF_VCPU to be set when=20
+the host timer interrupt runs irqtime_account_process_tick runs so it
+can accumulate that tick to the guest?
 
-Hmm I was not aware we had a wiki. I'll see if I can contribute
-something. I need to go learn all this stuff first, though =3DD.
+That probably makes sense then, but it seems like we need that in a
+different place. Timer interrupts are not guaranteed to be the first one
+to occur when interrupts are enabled.
 
->
-> cheers
+Maybe a new tick_account_guest_exit() and move PF_VCPU clearing to that
+for tick based accounting. Call it after local_irq_enable and call the
+vtime accounting before it. Would that work?
+
+Thanks,
+Nick
