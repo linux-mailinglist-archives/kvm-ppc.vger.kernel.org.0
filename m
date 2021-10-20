@@ -2,198 +2,105 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4463F4347FE
-	for <lists+kvm-ppc@lfdr.de>; Wed, 20 Oct 2021 11:35:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59C73434849
+	for <lists+kvm-ppc@lfdr.de>; Wed, 20 Oct 2021 11:48:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbhJTJhU (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 20 Oct 2021 05:37:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40056 "EHLO
+        id S229943AbhJTJvG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 20 Oct 2021 05:51:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbhJTJhT (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 20 Oct 2021 05:37:19 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA92DC06161C;
-        Wed, 20 Oct 2021 02:35:05 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id m14so2424185pfc.9;
-        Wed, 20 Oct 2021 02:35:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=I0ZEoxf+qBRrE4EbV2DUTK2XydFaBZKQRHBZdtXWdAI=;
-        b=ZuTXYVNiTIfLkbMl6G+ZXFJwDD8iEeOO9ZL4ZcQyMqRWdw3D7oXfxTqhZu/j2em3IB
-         8XMj9jq6yg0zME0rR8hUAhM3GVP6qjMkBR/U0bWPyFxHPi4Bl3LjCwENvAE4tSlun/7s
-         wAswkg2Fb758WbOyD/QGu+6mmtOMB0rUYBQrIchpHr/xBPfFtW+cgFCNpVlNDm0Pc0/D
-         647q2HD2sssL8dBVZrR8mSrz7Ppp1aE2hvbseyVM1/CHzkcKI58Q+9MYdVfCXxlJF7tA
-         YcWLsyttuR6cOiJNaBX/B9Y5SMfzDcRSs6QnscagOXbbCHGHR/zmQZbaf2E8wrlJy6ep
-         jTGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=I0ZEoxf+qBRrE4EbV2DUTK2XydFaBZKQRHBZdtXWdAI=;
-        b=GnrpCVQ3Siw5AGiEhG9IKp7/BAf/d2+hf0B9ogyofRNRRhYBjUHr0MCXpalqqz7tqn
-         oodQW5Y2v5qwPyM9MDTogKqY0KJA/z65aBD5l47kNrSBNF9dx5yE8cl2OZVtwjT06kkR
-         ooOGKvuSelurBAdurLfWYQXNLghkeMuUiRGfP8T8cTD8Pp4K5HwNbMbomJBQJ6H51jWR
-         75t9Oqy4mD0+dj/GMjXpbKijb+z1HxWXzu8k1qRXS/IGyWqLSu1xxDatS08DpRJxMG5L
-         rExNDKf8FlhKY3bGFo3LHMZVDY9XD8umubybgr7/x92ZTr6jRR/UxDcsaaTCxVlY88bs
-         0qWA==
-X-Gm-Message-State: AOAM532mVY3Fta73LtLhGh40d1BpM5J+w6GNj1DxBt6x+wJDth24swHS
-        mLEVErC5rqNY+Eu7pcAhVuFd0iyc8HI=
-X-Google-Smtp-Source: ABdhPJxNP0G5kSvi88Ytp53fs3hL1SswaI+tfU2GpY8sqcprGF19p7VNXQeDBZIyuq+qhdAciF8y4Q==
-X-Received: by 2002:a05:6a00:9a2:b0:44c:b979:afe3 with SMTP id u34-20020a056a0009a200b0044cb979afe3mr5194704pfg.61.1634722505179;
-        Wed, 20 Oct 2021 02:35:05 -0700 (PDT)
-Received: from localhost (14-203-144-177.static.tpgi.com.au. [14.203.144.177])
-        by smtp.gmail.com with ESMTPSA id oc8sm1978993pjb.15.2021.10.20.02.35.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Oct 2021 02:35:04 -0700 (PDT)
-Date:   Wed, 20 Oct 2021 19:35:00 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2] KVM: PPC: Defer vtime accounting 'til after IRQ
- handling
-To:     kvm-ppc@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Greg Kurz <groug@kaod.org>, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@ozlabs.org>,
-        stable@vger.kernel.org
-References: <20211007142856.41205-1-lvivier@redhat.com>
-        <875yu17rxk.fsf@mpe.ellerman.id.au>
-        <d7f59d0e-eac2-7978-4067-9258c8b1aefe@redhat.com>
-        <1634263564.zfj0ajf8eh.astroid@bobo.none>
-        <2a13119c-ccec-1dd5-8cf6-da07a9d8fe6f@redhat.com>
-In-Reply-To: <2a13119c-ccec-1dd5-8cf6-da07a9d8fe6f@redhat.com>
+        with ESMTP id S230213AbhJTJuy (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 20 Oct 2021 05:50:54 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D17B5C06174E
+        for <kvm-ppc@vger.kernel.org>; Wed, 20 Oct 2021 02:48:40 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HZ5Qv0WT6z4xb9;
+        Wed, 20 Oct 2021 20:48:39 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1634723319;
+        bh=yrsVAUODqbT1Kig4Jeti7vBlyyWb8oQHopqazA+I77I=;
+        h=From:To:Cc:Subject:Date:From;
+        b=qoyHM4r647UOikwesgO+kqUgGdJc3w4qo0hmA0y0w2DCtLomkbVU/zbMGZgbOk1cy
+         hGtfz+I84en9ldjO51my5vQyhYv3F7Ct3ZkmZPYeboPjJe31XzCxFOzUuPLfUzoCZJ
+         M8wczt7XOhL5l+X10QFsHbKZWjjsfFGsJ+s22X4mzeNxfgpAKJmYV+QEUUNIpokIP9
+         7pEz2uLKDu2hGcOP9eJI8QVDQTIK44TuAYQC7u7C1mZ/lvJdeiqkXo+L+TgKFloAax
+         M0pMpUgzXV63rf+4JnGWa3UmWDo+w50GEcgip51W1iV5G753Cs9X8QprBiDNykXXLz
+         ZtYlUPqWcGTzg==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     <linuxppc-dev@lists.ozlabs.org>
+Cc:     <npiggin@gmail.com>, <kvm-ppc@vger.kernel.org>
+Subject: [PATCH] powerpc/idle: Don't corrupt back chain when going idle
+Date:   Wed, 20 Oct 2021 20:48:26 +1100
+Message-Id: <20211020094826.3222052-1-mpe@ellerman.id.au>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Message-Id: <1634722472.k7vwa86otu.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Laurent Vivier's message of October 20, 2021 4:29 pm:
-> On 15/10/2021 04:23, Nicholas Piggin wrote:
->> Excerpts from Laurent Vivier's message of October 13, 2021 7:30 pm:
->>> On 13/10/2021 01:18, Michael Ellerman wrote:
->>>> Laurent Vivier <lvivier@redhat.com> writes:
->>>>> Commit 112665286d08 moved guest_exit() in the interrupt protected
->>>>> area to avoid wrong context warning (or worse), but the tick counter
->>>>> cannot be updated and the guest time is accounted to the system time.
->>>>>
->>>>> To fix the problem port to POWER the x86 fix
->>>>> 160457140187 ("Defer vtime accounting 'til after IRQ handling"):
->>>>>
->>>>> "Defer the call to account guest time until after servicing any IRQ(s=
-)
->>>>>    that happened in the guest or immediately after VM-Exit.  Tick-bas=
-ed
->>>>>    accounting of vCPU time relies on PF_VCPU being set when the tick =
-IRQ
->>>>>    handler runs, and IRQs are blocked throughout the main sequence of
->>>>>    vcpu_enter_guest(), including the call into vendor code to actuall=
-y
->>>>>    enter and exit the guest."
->>>>>
->>>>> Fixes: 112665286d08 ("KVM: PPC: Book3S HV: Context tracking exit gues=
-t context before enabling irqs")
->>>>> Cc: npiggin@gmail.com
->>>>> Cc: <stable@vger.kernel.org> # 5.12
->>>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>>>> ---
->>>>>
->>>>> Notes:
->>>>>       v2: remove reference to commit 61bd0f66ff92
->>>>>           cc stable 5.12
->>>>>           add the same comment in the code as for x86
->>>>>
->>>>>    arch/powerpc/kvm/book3s_hv.c | 24 ++++++++++++++++++++----
->>>>>    1 file changed, 20 insertions(+), 4 deletions(-)
->>>>>
->>>>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_h=
-v.c
->>>>> index 2acb1c96cfaf..a694d1a8f6ce 100644
->>>>> --- a/arch/powerpc/kvm/book3s_hv.c
->>>>> +++ b/arch/powerpc/kvm/book3s_hv.c
->>>> ...
->>>>> @@ -4506,13 +4514,21 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vc=
-pu, u64 time_limit,
->>>>>   =20
->>>>>    	srcu_read_unlock(&kvm->srcu, srcu_idx);
->>>>>   =20
->>>>> +	context_tracking_guest_exit();
->>>>> +
->>>>>    	set_irq_happened(trap);
->>>>>   =20
->>>>>    	kvmppc_set_host_core(pcpu);
->>>>>   =20
->>>>> -	guest_exit_irqoff();
->>>>> -
->>>>>    	local_irq_enable();
->>>>> +	/*
->>>>> +	 * Wait until after servicing IRQs to account guest time so that an=
-y
->>>>> +	 * ticks that occurred while running the guest are properly account=
-ed
->>>>> +	 * to the guest.  Waiting until IRQs are enabled degrades the accur=
-acy
->>>>> +	 * of accounting via context tracking, but the loss of accuracy is
->>>>> +	 * acceptable for all known use cases.
->>>>> +	 */
->>>>> +	vtime_account_guest_exit();
->>>>
->>>> This pops a warning for me, running guest(s) on Power8:
->>>>   =20
->>>>     [  270.745303][T16661] ------------[ cut here ]------------
->>>>     [  270.745374][T16661] WARNING: CPU: 72 PID: 16661 at arch/powerpc=
-/kernel/time.c:311 vtime_account_kernel+0xe0/0xf0
->>>
->>> Thank you, I missed that...
->>>
->>> My patch is wrong, I have to add vtime_account_guest_exit() before the =
-local_irq_enable().
->>=20
->> I thought so because if we take an interrupt after exiting the guest tha=
-t
->> should be accounted to kernel not guest.
->>=20
->>>
->>> arch/powerpc/kernel/time.c
->>>
->>>    305 static unsigned long vtime_delta(struct cpu_accounting_data *acc=
-t,
->>>    306                                  unsigned long *stime_scaled,
->>>    307                                  unsigned long *steal_time)
->>>    308 {
->>>    309         unsigned long now, stime;
->>>    310
->>>    311         WARN_ON_ONCE(!irqs_disabled());
->>> ...
->>>
->>> But I don't understand how ticks can be accounted now if irqs are still=
- disabled.
->>>
->>> Not sure it is as simple as expected...
->>=20
->> I don't know all the timer stuff too well. The
->> !CONFIG_VIRT_CPU_ACCOUNTING case is relying on PF_VCPU to be set when
->> the host timer interrupt runs irqtime_account_process_tick runs so it
->> can accumulate that tick to the guest?
->>=20
->> That probably makes sense then, but it seems like we need that in a
->> different place. Timer interrupts are not guaranteed to be the first one
->> to occur when interrupts are enabled.
->>=20
->> Maybe a new tick_account_guest_exit() and move PF_VCPU clearing to that
->> for tick based accounting. Call it after local_irq_enable and call the
->> vtime accounting before it. Would that work?
->=20
-> Hi Nick,
->=20
-> I think I will not have the time to have a look to fix that?
->=20
-> Could you try?
+In isa206_idle_insn_mayloss() we store various registers into the stack
+red zone, which is allowed.
 
-Hey Laurent, sure I can take a look at it.
+However inside the IDLE_STATE_ENTER_SEQ_NORET macro we save r2 again,
+to 0(r1), which corrupts the stack back chain.
 
-Thanks,
-Nick
+We used to do the same in isa206_idle_insn_mayloss() itself, but we
+fixed that in 73287caa9210 ("powerpc64/idle: Fix SP offsets when saving
+GPRs"), however we missed that the macro also corrupts the back chain.
+
+Corrupting the back chain is bad for debuggability but doesn't
+necessarily cause a bug.
+
+However we recently changed the stack handling in some KVM code, and it
+now relies on the stack back chain being valid when it returns. The
+corruption causes that code to return with r1 pointing somewhere in
+kernel data, at some point LR is restored from the stack and we branch
+to NULL or somewhere else invalid.
+
+Only affects Power8 hosts running KVM guests, with dynamic_mt_modes
+enabled (which it is by default).
+
+The fixes tag below points to the commit that changed the KVM stack
+handling, exposing this bug. The actual corruption of the back chain has
+always existed since 948cf67c4726 ("powerpc: Add NAP mode support on
+Power7 in HV mode").
+
+Fixes: 9b4416c5095c ("KVM: PPC: Book3S HV: Fix stack handling in idle_kvm_start_guest()")
+Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+---
+ arch/powerpc/kernel/idle_book3s.S | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/arch/powerpc/kernel/idle_book3s.S b/arch/powerpc/kernel/idle_book3s.S
+index abb719b21cae..3d97fb833834 100644
+--- a/arch/powerpc/kernel/idle_book3s.S
++++ b/arch/powerpc/kernel/idle_book3s.S
+@@ -126,14 +126,16 @@ _GLOBAL(idle_return_gpr_loss)
+ /*
+  * This is the sequence required to execute idle instructions, as
+  * specified in ISA v2.07 (and earlier). MSR[IR] and MSR[DR] must be 0.
+- *
+- * The 0(r1) slot is used to save r2 in isa206, so use that here.
++ * We have to store a GPR somewhere, ptesync, then reload it, and create
++ * a false dependency on the result of the load. It doesn't matter which
++ * GPR we store, or where we store it. We have already stored r2 to the
++ * stack at -8(r1) in isa206_idle_insn_mayloss, so use that.
+  */
+ #define IDLE_STATE_ENTER_SEQ_NORET(IDLE_INST)			\
+ 	/* Magic NAP/SLEEP/WINKLE mode enter sequence */	\
+-	std	r2,0(r1);					\
++	std	r2,-8(r1);					\
+ 	ptesync;						\
+-	ld	r2,0(r1);					\
++	ld	r2,-8(r1);					\
+ 236:	cmpd	cr0,r2,r2;					\
+ 	bne	236b;						\
+ 	IDLE_INST;						\
+-- 
+2.31.1
+
