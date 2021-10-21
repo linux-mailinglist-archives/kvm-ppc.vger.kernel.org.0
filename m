@@ -2,53 +2,65 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25DD1435FF7
-	for <lists+kvm-ppc@lfdr.de>; Thu, 21 Oct 2021 13:08:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AC31436172
+	for <lists+kvm-ppc@lfdr.de>; Thu, 21 Oct 2021 14:19:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230190AbhJULKs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 21 Oct 2021 07:10:48 -0400
-Received: from gandalf.ozlabs.org ([150.107.74.76]:33565 "EHLO
-        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230105AbhJULKo (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 21 Oct 2021 07:10:44 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HZl8W4ks0z4xbL;
-        Thu, 21 Oct 2021 22:08:27 +1100 (AEDT)
-From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-To:     Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, npiggin@gmail.com
-In-Reply-To: <20211020094826.3222052-1-mpe@ellerman.id.au>
-References: <20211020094826.3222052-1-mpe@ellerman.id.au>
-Subject: Re: [PATCH] powerpc/idle: Don't corrupt back chain when going idle
-Message-Id: <163481446090.3437586.5094721778895983974.b4-ty@ellerman.id.au>
-Date:   Thu, 21 Oct 2021 22:07:40 +1100
+        id S231593AbhJUMWF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 21 Oct 2021 08:22:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36996 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231622AbhJUMWD (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 21 Oct 2021 08:22:03 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE674C061769
+        for <kvm-ppc@vger.kernel.org>; Thu, 21 Oct 2021 05:19:47 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id y17so312238ilb.9
+        for <kvm-ppc@vger.kernel.org>; Thu, 21 Oct 2021 05:19:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=G2Jq8ABcZaKAiy06d3oRm5z7XXaT0OFvg3EWPt/6AmM=;
+        b=F1jMFWa3tcrf6C/q10jKM2KHE+3YUSGVvIR6OAK0HmxUbnqdLb697/8MbvJYm/Zv2j
+         hOdIDWtDq9eKS6DYl5aBeEJV06nEuV6Tpmd+KIJvU2tWgw6XN4fEAKXNbftvQsQsYZ+Z
+         FofRpROvB4fsoVF1OY/H42ntC4aKtdV1mbs2NuW4+lOfF+q88iyax2G/FJvgUUe9L9f+
+         oksNKi6CJ9Vhe/SFWlCUzhq48RRSNZ01IPiJ3wyMZ7HJfTlOhQAtLIHu4mBgG7CT0WpQ
+         XhuIjDaivbFll6AcGXzmi/34hO4BMv6n/DdHRtR+BvHZmkUFE/eag8cnyR6q1NNc+c1b
+         GpvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=G2Jq8ABcZaKAiy06d3oRm5z7XXaT0OFvg3EWPt/6AmM=;
+        b=ihMrJtNpAQw1XxW3kJiaQojgWftm+XlRvTypKp/pulMldMuheWgKXxoYSYOM8pRENf
+         00t2Eyx0Wes24I+UrvvZI6ez+ADMQw6i5EHykXsVmYlDYH4B/pIvKykALvpdAn9v1RbW
+         QaQMsofXAS6CM1k0LcD/qW1xgdJhYLAR8hYJBCqQqM4METTXAn9HmmvlvlxriW9vTMy3
+         VcSaMLm5sJEcSX5vJVxnzAURKbCYdSpi6A9YU2lDBXFtS2Y5cMu3/aTYH7Mqgs5RlvE1
+         /PsmLC2TdMLxQVZm3sbIaMoziqE16rnWZsnhrLzEs7KPZNHOQMD72UPBWiahtt37YfVX
+         pCXw==
+X-Gm-Message-State: AOAM533gJSxcnuiSw3WCtvhIbVD0tTmZIGIgw26O9e9yH2m5NZJpGWBM
+        mnfNe4rjAlyYfHYAp4LlPDPxK3Uty/hC+3GjHoE=
+X-Google-Smtp-Source: ABdhPJx7pj0M+cQ0AHi6lCbgCpKulVRUXY7U66KdcH22YrWFVe/Yy9CZ/xIvBhCDxkUezv4+TH1X7IPH1Sd+tOfwhHg=
+X-Received: by 2002:a92:c206:: with SMTP id j6mr3370839ilo.71.1634818787157;
+ Thu, 21 Oct 2021 05:19:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a05:6638:1924:0:0:0:0 with HTTP; Thu, 21 Oct 2021 05:19:46
+ -0700 (PDT)
+Reply-To: ooisangkuang63@gmail.com
+From:   Mr Ooi Sang Kuang <mrsshirleyperezfosgate7@gmail.com>
+Date:   Thu, 21 Oct 2021 05:19:46 -0700
+Message-ID: <CA+ynneAvQZSQVfF33SxyGk281-1Gx_d3FMuBrk1N2PF-sHgqzw@mail.gmail.com>
+Subject: Hello
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, 20 Oct 2021 20:48:26 +1100, Michael Ellerman wrote:
-> In isa206_idle_insn_mayloss() we store various registers into the stack
-> red zone, which is allowed.
-> 
-> However inside the IDLE_STATE_ENTER_SEQ_NORET macro we save r2 again,
-> to 0(r1), which corrupts the stack back chain.
-> 
-> We used to do the same in isa206_idle_insn_mayloss() itself, but we
-> fixed that in 73287caa9210 ("powerpc64/idle: Fix SP offsets when saving
-> GPRs"), however we missed that the macro also corrupts the back chain.
-> 
-> [...]
+-- 
+Hello,
 
-Applied to powerpc/fixes.
+I want to discuss an important project issue with you.
+Please, let me know if this email is valid. Reply me at ooisangkuang63@gmail.com
 
-[1/1] powerpc/idle: Don't corrupt back chain when going idle
-      https://git.kernel.org/powerpc/c/496c5fe25c377ddb7815c4ce8ecfb676f051e9b6
-
-cheers
+Thank you,
+Mr Ooi Sang Kuang
