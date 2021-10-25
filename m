@@ -2,116 +2,140 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB96F439B0E
-	for <lists+kvm-ppc@lfdr.de>; Mon, 25 Oct 2021 18:01:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BC93439E68
+	for <lists+kvm-ppc@lfdr.de>; Mon, 25 Oct 2021 20:24:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233827AbhJYQDY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 25 Oct 2021 12:03:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33482 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233713AbhJYQDX (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 25 Oct 2021 12:03:23 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C93AC061767
-        for <kvm-ppc@vger.kernel.org>; Mon, 25 Oct 2021 09:01:01 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id 83so5143819pgc.8
-        for <kvm-ppc@vger.kernel.org>; Mon, 25 Oct 2021 09:01:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=x6eNl6O1fSvFYqdMcRuePT95mvtM6NDjKvqXNkc5pYY=;
-        b=W66VdzQAiFa1xER7EM1CT10+Eh4wcd9TMpOSeNztU9mQ/b+ICWh6L1ynZPC3b8cWCA
-         wuqZ3JuK0JGehSxVwtqEbTHwrBlvK53p1U6E/+mtZAETvvOLRtbYFjLFwI5UloPxv8BN
-         XlYir//YmeaaWdnkVyW1uxNuSu55EoKM4Sw+NhmN68wnM6lSDD7jC6Cq+yKsA+BDT9S7
-         LYFfhy6YQg08/t+jqQY9xY27FLq7qZME+IYTw4bo6b7p4vRP0wxorg/00RAZqr4kWqI+
-         VviR3lssvu74tKK3FhhWMgst1k6Zz5l/r1ahbN8uJfV8tyf6Q1Oq93E9u1/e6tuuAmnW
-         0NsA==
+        id S232819AbhJYS1E (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 25 Oct 2021 14:27:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28014 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232870AbhJYS1D (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 25 Oct 2021 14:27:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635186280;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=F3SLaknlCrgsyNEFXulutuLS6zkvJHd+fv8cS/rpPqI=;
+        b=UrCbbeo37FFAA5hy86HB+nhRyZZezns6zs7souS+/3D9VqGNo0OFKRuTRie7LoXwScCtXw
+        kI8+6BOVJH9R1gsJxYUPHwET26cq3J4CKt+s+Pdr5sHKnBn6+pN9A/6fYF/2bcVnVaoF0h
+        2vRhPltp6uVkXh01qqSomsXXhubMsCY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-546-a0DwFylLPqGej0l-74al8A-1; Mon, 25 Oct 2021 14:24:38 -0400
+X-MC-Unique: a0DwFylLPqGej0l-74al8A-1
+Received: by mail-wm1-f72.google.com with SMTP id 5-20020a05600c024500b0032cbaa29765so312249wmj.7
+        for <kvm-ppc@vger.kernel.org>; Mon, 25 Oct 2021 11:24:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=x6eNl6O1fSvFYqdMcRuePT95mvtM6NDjKvqXNkc5pYY=;
-        b=gCLh01Pvp6PFeo/ghwddpT4rNONBCry2XfBORMrxvQbbWhba+96xBVStYJoEfjOeVF
-         Nfokwo/GLtQfkB7WsKl7NuFpI2I46cgv+8FPK3ufqLk45seyfab/7UCzb/rJgIeNu07x
-         qE9pKAlJceUsgiPv4K0plC3jL1mDGFdJ77bNUGm6s87F+w7Hs3LldIPMKdkgGl1iBnP3
-         DWgCgR5tP1Ctr9ZgruqF55QOVJIbk7MADTyRidLJReyjOt3EdXZAH+BIg+SSC1dI2vST
-         XzZolDoRZH58L8JCizCBWmaqhKncIC7C50D/qhjRo5XVJHzSj1m5SOrfHUdb5Z42eYBP
-         6r2g==
-X-Gm-Message-State: AOAM533tn7JVzyIUR7wPdk/AwMkXbWxW7W9OMtBN9xqe4NCpnlwBA5vq
-        tyxQdHCKNRbaJSCGLaLZl8XpJg==
-X-Google-Smtp-Source: ABdhPJxfd0U6TdkD95vRyewvEnv+pkmAbt8gRM1KdKD5w9N0+9AMKZEnnSCWoZvj6xIN71v2dvngIg==
-X-Received: by 2002:a63:e613:: with SMTP id g19mr14679139pgh.12.1635177660627;
-        Mon, 25 Oct 2021 09:01:00 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a124sm2589630pgc.15.2021.10.25.09.00.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Oct 2021 09:01:00 -0700 (PDT)
-Date:   Mon, 25 Oct 2021 16:00:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v2 37/43] KVM: SVM: Unconditionally mark AVIC as running
- on vCPU load (with APICv)
-Message-ID: <YXbUuLD4yAoNxCH4@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-38-seanjc@google.com>
- <acea3c6d-49f4-ab5e-d9fe-6c6a8a665a46@redhat.com>
- <YXbRyMQgMpHVQa3G@google.com>
- <e9509fb0-54f3-ca86-57b7-8b6d5de240b7@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=F3SLaknlCrgsyNEFXulutuLS6zkvJHd+fv8cS/rpPqI=;
+        b=ewTfZs0O4ElZouCNXLNC30t72d0IqVtaq2rYctQ2Y4iaGrs5KrvEn+GKdrI05WPFl1
+         oV50SOMTk71JVMB2h41ORjYpzo9BCacI1q4hms6j3SAaF5NFwmzIs6E2IrrwhrWSbFNQ
+         9tFxHtM3rdHHAm4XS5rjLV5JSob7WHTzOqjT+4I5msd/spx3VEnPCV5m1rBO3o8kuiN8
+         UiNi5ZChqL2GAfr2aZFWd82hd6kNbDh5TPq1E7dgo0FJqHMlOQoL/mguTEbtgR8UxSlb
+         ufpRwJSQjnu52sP5x0dL7vMhCAqtyGj90txu5LBIrejkCP2iD3TyFBEXJJF8mUCEKqys
+         5KJw==
+X-Gm-Message-State: AOAM530t+JGWML1DaOMnLAC0TIO2CBiXVyCuKE3Z3GhjrGL+pcBVFNbw
+        ptKvZLC7PLYYRhZLsBsEyLk8ED+iP+KwuMk4M/fgagbVFADcNRS9OmX5ljEIBMTbxWxD9B0eF2U
+        hJeJDKYxqazvR0Yq28kIoxnsBUwrtjB3MHg==
+X-Received: by 2002:a5d:4bc2:: with SMTP id l2mr24538458wrt.81.1635186277660;
+        Mon, 25 Oct 2021 11:24:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxFzXJ9qteuovw6CsfxV07yOsXNr94Jrc52XFmj3IWaW0sfPtl2ViNad/7UKAIgfk9H2m/v1wcPdQgWW5/Viog=
+X-Received: by 2002:a5d:4bc2:: with SMTP id l2mr24538418wrt.81.1635186277388;
+ Mon, 25 Oct 2021 11:24:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e9509fb0-54f3-ca86-57b7-8b6d5de240b7@redhat.com>
+References: <20211019134204.3382645-1-agruenba@redhat.com> <CAHk-=wh0_3y5s7-G74U0Pcjm7Y_yHB608NYrQSvgogVNBxsWSQ@mail.gmail.com>
+ <YXBFqD9WVuU8awIv@arm.com> <CAHk-=wgv=KPZBJGnx_O5-7hhST8CL9BN4wJwtVuycjhv_1MmvQ@mail.gmail.com>
+ <YXCbv5gdfEEtAYo8@arm.com> <CAHk-=wgP058PNY8eoWW=5uRMox-PuesDMrLsrCWPS+xXhzbQxQ@mail.gmail.com>
+ <YXL9tRher7QVmq6N@arm.com>
+In-Reply-To: <YXL9tRher7QVmq6N@arm.com>
+From:   Andreas Gruenbacher <agruenba@redhat.com>
+Date:   Mon, 25 Oct 2021 20:24:26 +0200
+Message-ID: <CAHc6FU6JC4ZOwA8t854WbNdmuiNL9DPq0FPga8guATaoCtvsaw@mail.gmail.com>
+Subject: Re: [PATCH v8 00/17] gfs2: Fix mmap + page fault deadlocks
+To:     Catalin Marinas <catalin.marinas@arm.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Ted Ts'o" <tytso@mit.edu>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        cluster-devel <cluster-devel@redhat.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org,
+        linux-btrfs <linux-btrfs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Oct 25, 2021, Paolo Bonzini wrote:
-> On 25/10/21 17:48, Sean Christopherson wrote:
-> > On Mon, Oct 25, 2021, Paolo Bonzini wrote:
-> > > On 09/10/21 04:12, Sean Christopherson wrote:
-> > > > +	/* TODO: Document why the unblocking path checks for updates. */
-> > > 
-> > > Is that a riddle or what? :)
-> > 
-> > Yes?  I haven't been able to figure out why the unblocking path explicitly
-> > checks and handles an APICv update.
-> > 
-> 
-> Challenge accepted.  In the original code, it was because without it
-> avic_vcpu_load would do nothing, and nothing would update the IS_RUNNING
-> flag.
-> 
-> It shouldn't be necessary anymore since commit df7e4827c549 ("KVM: SVM: call
-> avic_vcpu_load/avic_vcpu_put when enabling/disabling AVIC", 2021-08-20),
-> where svm_refresh_apicv_exec_ctrl takes care of the avic_vcpu_load on the
-> next VMRUN.
+commit
+On Fri, Oct 22, 2021 at 8:07 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
+> On Wed, Oct 20, 2021 at 08:19:40PM -1000, Linus Torvalds wrote:
+> > On Wed, Oct 20, 2021 at 12:44 PM Catalin Marinas
+> > <catalin.marinas@arm.com> wrote:
+> > >
+> > > However, with MTE doing both get_user() every 16 bytes and
+> > > gup can get pretty expensive.
+> >
+> > So I really think that anything that is performance-critical had
+> > better only do the "fault_in_write()" code path in the cold error path
+> > where you took a page fault.
+> [...]
+> > So I wouldn't worry too much about the performance concerns. It simply
+> > shouldn't be a common or hot path.
+> >
+> > And yes, I've seen code that does that "fault_in_xyz()" before the
+> > critical operation that cannot take page faults, and does it
+> > unconditionally.
+> >
+> > But then it isn't the "fault_in_xyz()" that should be blamed if it is
+> > slow, but the caller that does things the wrong way around.
+>
+> Some more thinking out loud. I did some unscientific benchmarks on a
+> Raspberry Pi 4 with the filesystem in a RAM block device and a
+> "dd if=/dev/zero of=/mnt/test" writing 512MB in 1MB blocks. I changed
+> fault_in_readable() in linux-next to probe every 16 bytes:
+>
+> - ext4 drops from around 261MB/s to 246MB/s: 5.7% penalty
+>
+> - btrfs drops from around 360MB/s to 337MB/s: 6.4% penalty
+>
+> For generic_perform_write() Dave Hansen attempted to move the fault-in
+> after the uaccess in commit 998ef75ddb57 ("fs: do not prefault
+> sys_write() user buffer pages"). This was reverted as it was exposing an
+> ext4 bug. I don't [know] whether it was fixed but re-applying Dave's commit
+> avoids the performance drop.
 
-Aha!  Thanks, I'll work in a removal for the next version.
+Interesting. The revert of commit 998ef75ddb57 is in commit
+00a3d660cbac. Maybe Dave and Ted can tell us more about what went
+wrong in ext4 and whether it's still an issue.
+
+Commit 998ef75ddb57 looks mostly good except that it should loop
+around whenever the fault-in succeeds even partially, so it needs the
+semantic change of patch 4 [*] of this series. A copy of the same code
+now lives in iomap_write_iter, so the same fix needs to be applied
+there. Finally, it may be worthwhile to check for pagefault_disabled()
+in generic_perform_write and iomap_write_iter before trying the
+fault-in; this would help gfs2 which will always call into
+iomap_write_iter with page faults disabled, and additional callers
+like that could emerge relatively soon.
+
+[*] https://lore.kernel.org/lkml/20211019134204.3382645-5-agruenba@redhat.com/
+
+> btrfs_buffered_write() has a comment about faulting pages in before
+> locking them in prepare_pages(). I suspect it's a similar problem and
+> the fault_in() could be moved, though I can't say I understand this code
+> well enough.
+>
+> Probing only the first byte(s) in fault_in() would be ideal, no need to
+> go through all filesystems and try to change the uaccess/probing order.
+
+Thanks,
+Andreas
+
