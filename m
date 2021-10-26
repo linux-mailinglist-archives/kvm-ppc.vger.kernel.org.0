@@ -2,157 +2,125 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B11B143B99B
-	for <lists+kvm-ppc@lfdr.de>; Tue, 26 Oct 2021 20:30:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A979443B9F4
+	for <lists+kvm-ppc@lfdr.de>; Tue, 26 Oct 2021 20:50:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238370AbhJZSdV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 26 Oct 2021 14:33:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38966 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231232AbhJZSdL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 Oct 2021 14:33:11 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19QG1oc7035894;
-        Tue, 26 Oct 2021 18:30:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=kHQsUpw1VFu+TXvR3qH68hSJpP0tEJmquXEf/hWANuE=;
- b=CPpIaKBG5Tl8Nl3RLSocczn2e8RIBD3cyDKfpQKhgmH3lYN567yvuqbL3znAzcpdm4ti
- +sI2leQ/S1XFZfyR+1sYEKoec8tqsk19fXLH6BPQXoH+ldOrcrHkmaAZnr+JApFBwYRp
- 4sjv/kz5ZsR18O/340unhMQKEZN4OkrBfeJPG5JSs5pALT1+muGdPkwwMcdDY6E4SGPm
- YLpI7hwmH2WU7b1/5zY9Qeou3Mq+oGfct+1/1hv6Bsw7L8lO4x4xDZikTzHTcabU31Cx
- SC4DHiMuIgtNdCgOl3wDEHJykcXDGttiQ8w+GW1b+HFudewIMM29Nhg9Qke/YVSLCgj3 xA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bx4kbhr58-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Oct 2021 18:30:05 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19QIBbd0034899;
-        Tue, 26 Oct 2021 18:30:05 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bx4kbhr3x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Oct 2021 18:30:04 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19QIHPAD028495;
-        Tue, 26 Oct 2021 18:30:02 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04fra.de.ibm.com with ESMTP id 3bx4f7fm39-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Oct 2021 18:30:02 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19QITxnK51249440
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Oct 2021 18:29:59 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 360B811C052;
-        Tue, 26 Oct 2021 18:29:59 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC53C11C050;
-        Tue, 26 Oct 2021 18:29:57 +0000 (GMT)
-Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.78.157])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 26 Oct 2021 18:29:57 +0000 (GMT)
-Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <04b1a72e-47b4-4bde-eb9e-ba36c156ff0d@de.ibm.com>
- <YXgVIvYhABnrP2Jo@google.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <a9c1e6ca-0257-4b69-84dd-49d3485f9565@de.ibm.com>
-Date:   Tue, 26 Oct 2021 20:29:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S236718AbhJZSww (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 26 Oct 2021 14:52:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236762AbhJZSwu (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 Oct 2021 14:52:50 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A275C061348
+        for <kvm-ppc@vger.kernel.org>; Tue, 26 Oct 2021 11:50:25 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id y26so781328lfa.11
+        for <kvm-ppc@vger.kernel.org>; Tue, 26 Oct 2021 11:50:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=r5Cx2RnmHPH+SxoKka0sJEz3NkssP3YCqbiSsqzadkQ=;
+        b=XWmvXqx6E/lnwqgDlacsJYsSx9OK8zrlmcuZe075Kg2Q7afYrlM28LUphtMnNWBBss
+         19rtrgtkK+y60H9M3H213OTzx4KlKQs5vTnOVoJ7FFgOi4799TI0MlAwQR64ujeGGpUF
+         Ec975XRObLADp1do89z7xhEJGw/WNDenswDZ0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=r5Cx2RnmHPH+SxoKka0sJEz3NkssP3YCqbiSsqzadkQ=;
+        b=rdPXqZGg67KLou8Ld16S0zDrEeoviDZ2+ADN47ejGHxxIWLLqTVHq9y0Up4t0sJMra
+         jmOUUg9gahaZgpTdiZpSXbGqnNfWXZr6SFpD48D2G5dqWLjfHonq+Af3e6BerETgWqbq
+         QzSV5kVn+/SLoqRpbkBIhnQM28+oUpOI6mFLHLfmZ/H58fMuugRQNJ6ZcWybbzKTGUCy
+         vYNZm0u2EtwKPeADCLM4dY6zoiXD6t1Y9fLJZW23I6WTgkf0H9ueazuZ655WX4Vrf8XA
+         85VDaABwdtubTjYybJ+wSSPKiFWhZYs5X8dXzsMRu94zAmxfnN0Hi8ZcHRmSlk/knYyD
+         4UWg==
+X-Gm-Message-State: AOAM532BzOkRRTvSBBLK3983fqi3bXQs2djXsFPLx1ejhQ3zCqPdH1C7
+        wk7RelpFOq65z6Lh5AODc49r2bMvZ3hmV//x
+X-Google-Smtp-Source: ABdhPJwMWXFcO5pXUt8PlH+9xmUKLnKdASGujD3RQX8EXNwvAl2+AR/VyM5HX/0oF4Y0FXasxAnL1Q==
+X-Received: by 2002:a05:6512:3d24:: with SMTP id d36mr24335089lfv.78.1635274223131;
+        Tue, 26 Oct 2021 11:50:23 -0700 (PDT)
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com. [209.85.208.180])
+        by smtp.gmail.com with ESMTPSA id g15sm834961lfr.223.2021.10.26.11.50.21
+        for <kvm-ppc@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Oct 2021 11:50:21 -0700 (PDT)
+Received: by mail-lj1-f180.google.com with SMTP id s19so415009ljj.11
+        for <kvm-ppc@vger.kernel.org>; Tue, 26 Oct 2021 11:50:21 -0700 (PDT)
+X-Received: by 2002:a2e:9e13:: with SMTP id e19mr4519488ljk.494.1635274221013;
+ Tue, 26 Oct 2021 11:50:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YXgVIvYhABnrP2Jo@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: JmDEkCgcD3-ZRJi2Qd_r_hCC449htTWY
-X-Proofpoint-GUID: 02zJ-KDhJ3N2JI7UDwO_ZOcNKnXzVG1F
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-26_05,2021-10-26_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
- spamscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0 mlxscore=0
- clxscore=1015 suspectscore=0 priorityscore=1501 bulkscore=0
- mlxlogscore=966 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2110260100
+References: <20211019134204.3382645-1-agruenba@redhat.com> <CAHk-=wh0_3y5s7-G74U0Pcjm7Y_yHB608NYrQSvgogVNBxsWSQ@mail.gmail.com>
+ <YXBFqD9WVuU8awIv@arm.com> <CAHk-=wgv=KPZBJGnx_O5-7hhST8CL9BN4wJwtVuycjhv_1MmvQ@mail.gmail.com>
+ <YXCbv5gdfEEtAYo8@arm.com> <CAHk-=wgP058PNY8eoWW=5uRMox-PuesDMrLsrCWPS+xXhzbQxQ@mail.gmail.com>
+ <YXL9tRher7QVmq6N@arm.com> <CAHk-=wg4t2t1AaBDyMfOVhCCOiLLjCB5TFVgZcV4Pr8X2qptJw@mail.gmail.com>
+ <CAHc6FU7BEfBJCpm8wC3P+8GTBcXxzDWcp6wAcgzQtuaJLHrqZA@mail.gmail.com> <YXhH0sBSyTyz5Eh2@arm.com>
+In-Reply-To: <YXhH0sBSyTyz5Eh2@arm.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 26 Oct 2021 11:50:04 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjWDsB-dDj+x4yr8h8f_VSkyB7MbgGqBzDRMNz125sZxw@mail.gmail.com>
+Message-ID: <CAHk-=wjWDsB-dDj+x4yr8h8f_VSkyB7MbgGqBzDRMNz125sZxw@mail.gmail.com>
+Subject: Re: [PATCH v8 00/17] gfs2: Fix mmap + page fault deadlocks
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Andreas Gruenbacher <agruenba@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        cluster-devel <cluster-devel@redhat.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org,
+        linux-btrfs <linux-btrfs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+On Tue, Oct 26, 2021 at 11:24 AM Catalin Marinas
+<catalin.marinas@arm.com> wrote:
+>
+> While more intrusive, I'd rather change copy_page_from_iter_atomic()
+> etc. to take a pointer where to write back an error code.
 
+I absolutely hate this model.
 
-Am 26.10.21 um 16:48 schrieb Sean Christopherson:
-> On Tue, Oct 26, 2021, Christian Borntraeger wrote:
->> Am 09.10.21 um 04:11 schrieb Sean Christopherson:
->>> This is basically two series smushed into one.  The first "half" aims
->>> to differentiate between "halt" and a more generic "block", where "halt"
->>> aligns with x86's HLT instruction, the halt-polling mechanisms, and
->>> associated stats, and "block" means any guest action that causes the vCPU
->>> to block/wait.
->>>
->>> The second "half" overhauls x86's APIC virtualization code (Posted
->>> Interrupts on Intel VMX, AVIC on AMD SVM) to do their updates in response
->>> to vCPU (un)blocking in the vcpu_load/put() paths, keying off of the
->>> vCPU's rcuwait status to determine when a blocking vCPU is being put and
->>> reloaded.  This idea comes from arm64's kvm_timer_vcpu_put(), which I
->>> stumbled across when diving into the history of arm64's (un)blocking hooks.
->>>
->>> The x86 APICv overhaul allows for killing off several sets of hooks in
->>> common KVM and in x86 KVM (to the vendor code).  Moving everything to
->>> vcpu_put/load() also realizes nice cleanups, especially for the Posted
->>> Interrupt code, which required some impressive mental gymnastics to
->>> understand how vCPU task migration interacted with vCPU blocking.
->>>
->>> Non-x86 folks, sorry for the noise.  I'm hoping the common parts can get
->>> applied without much fuss so that future versions can be x86-only.
->>>
->>> v2:
->>>    - Collect reviews. [Christian, David]
->>>    - Add patch to move arm64 WFI functionality out of hooks. [Marc]
->>>    - Add RISC-V to the fun.
->>>    - Add all the APICv fun.
->>
->> Have we actually followed up on the regression regarding halt_poll_ns=0 no longer disabling
->> polling for running systems?
-> 
-> No, I have that conversation flagged but haven't gotten back to it.  I still like
-> the idea of special casing halt_poll_ns=0 to override the capability.  I can send
-> a proper patch for that unless there's a different/better idea?
+The thing is, going down that rat-hole, you'll find that you'll need
+to add it to *all* the "copy_to/from_user()" cases, which isn't
+acceptable. So then you start doing some duplicate versions with
+different calling conventions, just because of things like this.
 
-I think I would prefer a variant that uses the halt_poll_ns value AS IS for all
-guests that have not opted in the per guest feature.
-And then MAYBE have 0 as a special case to disable that also for the opted in
-VMs.
+So no, I really don't want a "pass down a reference to an extra error
+code" kind of horror.
 
+That said, the fact that these sub-page faults are always
+non-recoverable might be a hint to a solution to the problem: maybe we
+could extend the existing return code with actual negative error
+numbers.
+
+Because for _most_ cases of "copy_to/from_user()" and friends by far,
+the only thing we look for is "zero for success".
+
+We could extend the "number of bytes _not_ copied" semantics to say
+"negative means fatal", and because there are fairly few places that
+actually look at non-zero values, we could have a coccinelle script
+that actually marks those places.
+
+End result: no change in calling conventions, no change to most users,
+and the (relatively few) cases where we look at the "what about
+partial results", we just add a
+
+         .. existing code ..
+         ret = copy_from_user(..);
++        if (ret < 0)
++                break;  // or whatever "fatal error" situation
+         .. existing  code ..
+
+kind of thing that just stops the re-try.
+
+(The coccinelle script couldn't actually do that, but it could add
+some comment marker or something so that it's easy to find and then
+manually fix up the places it finds).
+
+             Linus
