@@ -2,91 +2,184 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA2ED43AB96
-	for <lists+kvm-ppc@lfdr.de>; Tue, 26 Oct 2021 07:13:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0579243AC21
+	for <lists+kvm-ppc@lfdr.de>; Tue, 26 Oct 2021 08:15:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234690AbhJZFQL (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 26 Oct 2021 01:16:11 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:54457 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S234445AbhJZFQK (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 Oct 2021 01:16:10 -0400
-Received: from cwcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 19Q5Crw3021006
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Oct 2021 01:12:54 -0400
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id C967515C3F84; Tue, 26 Oct 2021 01:12:53 -0400 (EDT)
-Date:   Tue, 26 Oct 2021 01:12:53 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Andreas Gruenbacher <agruenba@redhat.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        cluster-devel <cluster-devel@redhat.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org,
-        linux-btrfs <linux-btrfs@vger.kernel.org>
-Subject: Re: [PATCH v8 00/17] gfs2: Fix mmap + page fault deadlocks
-Message-ID: <YXeOVZqer+GFBkXO@mit.edu>
-References: <20211019134204.3382645-1-agruenba@redhat.com>
- <CAHk-=wh0_3y5s7-G74U0Pcjm7Y_yHB608NYrQSvgogVNBxsWSQ@mail.gmail.com>
- <YXBFqD9WVuU8awIv@arm.com>
- <CAHk-=wgv=KPZBJGnx_O5-7hhST8CL9BN4wJwtVuycjhv_1MmvQ@mail.gmail.com>
- <YXCbv5gdfEEtAYo8@arm.com>
- <CAHk-=wgP058PNY8eoWW=5uRMox-PuesDMrLsrCWPS+xXhzbQxQ@mail.gmail.com>
- <YXL9tRher7QVmq6N@arm.com>
- <CAHc6FU6JC4ZOwA8t854WbNdmuiNL9DPq0FPga8guATaoCtvsaw@mail.gmail.com>
+        id S235220AbhJZGSF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 26 Oct 2021 02:18:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26004 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232553AbhJZGSE (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 Oct 2021 02:18:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635228941;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=mJsqqM2/684FT0TwstqLEKbletkgBGtXBJVjOMHdqD4=;
+        b=LF5/Sx4HoNNYB1U+KgHslDzD4Coh89UndCd8L8QOuUdEf02z2RanmPQ6+8dH5c46XW1sWR
+        QOpVQjet1+3n5pC75oPZ4EDeKITCDaqGt1vZiZi/y0tjrXnvI7RaI4RmcqDxXWhCEzbWk0
+        y4Jc5jtk9CCnExgqdwlJSAGoGKi7gY4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-579-1VFxE8J9Ovyip5b-RoQx2g-1; Tue, 26 Oct 2021 02:15:37 -0400
+X-MC-Unique: 1VFxE8J9Ovyip5b-RoQx2g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FC5F10A8E00;
+        Tue, 26 Oct 2021 06:15:36 +0000 (UTC)
+Received: from thuth.com (dhcp-192-183.str.redhat.com [10.33.192.183])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ADC945C1A3;
+        Tue, 26 Oct 2021 06:15:33 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>
+Cc:     kvm-ppc@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] powerpc/emulator: Fix compilation with recent versions of GCC
+Date:   Tue, 26 Oct 2021 08:15:32 +0200
+Message-Id: <20211026061532.117368-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHc6FU6JC4ZOwA8t854WbNdmuiNL9DPq0FPga8guATaoCtvsaw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, Oct 25, 2021 at 08:24:26PM +0200, Andreas Gruenbacher wrote:
-> > For generic_perform_write() Dave Hansen attempted to move the fault-in
-> > after the uaccess in commit 998ef75ddb57 ("fs: do not prefault
-> > sys_write() user buffer pages"). This was reverted as it was exposing an
-> > ext4 bug. I don't [know] whether it was fixed but re-applying Dave's commit
-> > avoids the performance drop.
-> 
-> Interesting. The revert of commit 998ef75ddb57 is in commit
-> 00a3d660cbac. Maybe Dave and Ted can tell us more about what went
-> wrong in ext4 and whether it's still an issue.
+New versions of GCC (e.g. version 11.2 from Fedora 34) refuse to compile
+assembly with the lswx and lswi mnemonics in little endian mode since the
+instruction is only allowed in big endian mode, thus emulator.c cannot be
+compiled anymore. Re-arrange the tests a little bit to use hand-crafted
+instructions in little endian mode to fix this issue. Additionally, the lswx
+and lswi instructions generate an alignment exception with recent versions
+of QEMU, too (see https://gitlab.com/qemu-project/qemu/-/commit/5817355ed0),
+so we can turn the report_xfail() into proper report() statements now.
 
-The context for the revert can be found here[1].
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ powerpc/emulator.c | 69 +++++++++++++++++++++++++++-------------------
+ 1 file changed, 40 insertions(+), 29 deletions(-)
 
-[1] https://lore.kernel.org/lkml/20151005152236.GA8140@thunk.org/
+diff --git a/powerpc/emulator.c b/powerpc/emulator.c
+index 147878e..65ae4b6 100644
+--- a/powerpc/emulator.c
++++ b/powerpc/emulator.c
+@@ -86,8 +86,25 @@ static void test_lswi(void)
+ 	for (i = 0; i < 128; i++)
+ 		addr[i] = 1 + i;
+ 
+-	/* check incomplete register filling */
++#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++
++	/*
++	 * lswi is supposed to cause an alignment exception in little endian
++	 * mode, but to be able to check this, we also have to specify the
++	 * opcode without mnemonic here since newer versions of GCC refuse
++	 * "lswi" when compiling in little endian mode.
++	 */
+ 	alignment = 0;
++	asm volatile ("mr r12,%[addr];"
++		      ".long 0x7d6c24aa;"       /* lswi r11,r12,4 */
++		      "std r11,0(%[regs]);"
++		       :: [addr] "r" (addr), [regs] "r" (regs)
++		       : "r11", "r12", "memory");
++	report(alignment, "alignment");
++
++#else
++
++	/* check incomplete register filling */
+ 	asm volatile ("li r12,-1;"
+ 		      "mr r11, r12;"
+ 		      "lswi r11, %[addr], %[len];"
+@@ -99,19 +116,6 @@ static void test_lswi(void)
+ 		      [regs] "r" (regs)
+ 		      :
+ 		      "r11", "r12", "memory");
+-
+-#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+-	/*
+-	 * lswi is supposed to cause an alignment exception in little endian
+-	 * mode, but QEMU does not support it. So in case we do not get an
+-	 * exception, this is an expected failure and we run the other tests
+-	 */
+-	report_xfail(!alignment, alignment, "alignment");
+-	if (alignment) {
+-		report_prefix_pop();
+-		return;
+-	}
+-#endif
+ 	report(regs[0] == 0x01020300 && regs[1] == (uint64_t)-1, "partial");
+ 
+ 	/* check NB = 0 ==> 32 bytes. */
+@@ -191,6 +195,8 @@ static void test_lswi(void)
+ 	 */
+ 	report(regs[2] == (uint64_t)addr, "Don't overwrite Ra");
+ 
++#endif
++
+ 	report_prefix_pop();
+ }
+ 
+@@ -224,13 +230,29 @@ static void test_lswx(void)
+ 	report_prefix_push("lswx");
+ 
+ 	/* fill memory with sequence */
+-
+ 	for (i = 0; i < 128; i++)
+ 		addr[i] = 1 + i;
+ 
+-	/* check incomplete register filling */
++#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+ 
++	/*
++	 * lswx is supposed to cause an alignment exception in little endian
++	 * mode, but to be able to check this, we also have to specify the
++	 * opcode without mnemonic here since newer versions of GCC refuse
++	 * "lswx" when compiling in little endian mode.
++	 */
+ 	alignment = 0;
++	asm volatile ("mtxer %[len];"
++		      "mr r11,%[addr];"
++		      ".long 0x7d805c2a;"       /* lswx r12,0,r11 */
++		      "std r12,0(%[regs]);"
++		      :: [len]"r"(4), [addr]"r"(addr), [regs]"r"(regs)
++		      : "r11", "r12", "memory");
++	report(alignment, "alignment");
++
++#else
++
++	/* check incomplete register filling */
+ 	asm volatile ("mtxer %[len];"
+ 		      "li r12,-1;"
+ 		      "mr r11, r12;"
+@@ -243,19 +265,6 @@ static void test_lswx(void)
+ 		      [regs] "r" (regs)
+ 		      :
+ 		      "xer", "r11", "r12", "memory");
+-
+-#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+-	/*
+-	 * lswx is supposed to cause an alignment exception in little endian
+-	 * mode, but QEMU does not support it. So in case we do not get an
+-	 * exception, this is an expected failure and we run the other tests
+-	 */
+-	report_xfail(!alignment, alignment, "alignment");
+-	if (alignment) {
+-		report_prefix_pop();
+-		return;
+-	}
+-#endif
+ 	report(regs[0] == 0x01020300 && regs[1] == (uint64_t)-1, "partial");
+ 
+ 	/* check an old know bug: the number of bytes is used as
+@@ -344,6 +353,8 @@ static void test_lswx(void)
+ 	 */
+ 	report(regs[1] == (uint64_t)addr, "Don't overwrite Rb");
+ 
++#endif
++
+ 	report_prefix_pop();
+ }
+ 
+-- 
+2.27.0
 
-And "what went wrong in ext4" was fixed here[2].
-
-[2] https://lore.kernel.org/lkml/20151005152236.GA8140@thunk.org/
-
-which landed upstream as commit b90197b65518 ("ext4: use private
-version of page_zero_new_buffers() for data=journal mode").
-
-So it looks like the original issue which triggered the revert in 2015
-should be addressed, and we can easily test it by using generic/208
-with data=journal mode.
-
-There also seems to be a related discussion about whether we should
-unrevert 998ef75ddb57 here[3].  Hmm. there is a mention on that thread
-in [3], "Side note: search for "iov_iter_fault_in_writeable()" on lkml
-for a gfs2 patch-series that is buggy, exactly because it does *not*
-use the atomic user space accesses, and just tries to do the fault-in
-to hide the real bug."  I assume that's related to the discussion on
-this thread?
-
-[3] https://lore.kernel.org/all/3221175.1624375240@warthog.procyon.org.uk/T/#u
-
-						- Ted
