@@ -2,177 +2,126 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A13B43AF5B
-	for <lists+kvm-ppc@lfdr.de>; Tue, 26 Oct 2021 11:45:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD6C143B4BB
+	for <lists+kvm-ppc@lfdr.de>; Tue, 26 Oct 2021 16:48:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230160AbhJZJr1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 26 Oct 2021 05:47:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:37159 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235083AbhJZJrM (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 Oct 2021 05:47:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635241487;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xaM9TTYxS+zHZ2czT8usDFfzNg+0Vbk9+uFHYAEJF0k=;
-        b=Ra8V2KMmXNyd9mftpWomaME+CPKyMH0vOkiYNM+dF1/MJpcu047QqL4ihdhmn0HFwGxi2y
-        PNA+MharYLS7WYfj8eGC8kISmwIil0jCxgHp2nyXYimFv48sFqxtExtMNG3ZwmfCFr1Jwe
-        ubtoIYM9eERmZkizNhlATtAZnUZs41k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-saoAI_GvNBugHIjyLU4dsQ-1; Tue, 26 Oct 2021 05:44:42 -0400
-X-MC-Unique: saoAI_GvNBugHIjyLU4dsQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0955887950D;
-        Tue, 26 Oct 2021 09:44:40 +0000 (UTC)
-Received: from max.com (unknown [10.40.193.143])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D9B8419C79;
-        Tue, 26 Oct 2021 09:44:31 +0000 (UTC)
-From:   Andreas Gruenbacher <agruenba@redhat.com>
-To:     "Theodore Ts'o" <tytso@mit.edu>
-Cc:     Andreas Gruenbacher <agruenba@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
+        id S236943AbhJZOud (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 26 Oct 2021 10:50:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60200 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236953AbhJZOub (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 26 Oct 2021 10:50:31 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01B12C061220
+        for <kvm-ppc@vger.kernel.org>; Tue, 26 Oct 2021 07:48:08 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id k2-20020a17090ac50200b001a218b956aaso1895047pjt.2
+        for <kvm-ppc@vger.kernel.org>; Tue, 26 Oct 2021 07:48:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=t+GavL7jaDIOLO9+HWOF0JpCL4n+9982OXgOJJO3B68=;
+        b=mMtlNqAGEx5moOXiuoulPA91tzGA7QXfJoC+FMrgS7kXKDaeQEPhlrtU0/6hIAVeF6
+         4XgOag3S8f64bxtieFkoj/CBTBoyg71uy6bYxr2fBQK7J8y0qvj3yp4nxsZiGo0ugwoy
+         chqWhQbdF2M/ss8dRD5cMeGRjF2i7TFbnWAE4XD/Gn+/ew4eCp8tBNWFi6mKqTjGiuSB
+         4K+eMtDT8TA09mAfuKwzPO/bGE/KLqBK8ggRwFAk21MDpCSdzSupIOVWDECUMDk9Gucp
+         WDZDdD8wswuh2DToiC42rEb1Gvw+Zc82wwd7L/2Pn0t+7EwhXqTAcJo8pcrg6fGfmqKg
+         9NUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=t+GavL7jaDIOLO9+HWOF0JpCL4n+9982OXgOJJO3B68=;
+        b=0s3Lbe/Dz0k4MAsGvrbjgn5U2aZFnrmZIhHyFCVdhnRD0HfIP4bOaeSSaS2WwPAuzF
+         DV3Q53OmKYZtQfaiWypaLT69qz4mnJTqgdHK6VSB4oA02SkHokhMCwEcJ64+Ni7KPQc7
+         8JFna8c9SYwzZgaMLGgdV67b8uvMm0TLAoGuLt2AgIuAugcUgIj8xU7DtztV8PcdGRF+
+         BqM6Q5wSJcN1CE2kJIuwnEYfMkAjeqmZZqvGfcP9ZgeNSl8R6tbzKvBDu/MQYdFNrYso
+         p82n0oHZpOCU0UnDdocInN9866WNuDNpZoRNU1oM93ZBfwi+cznE/jsdtGD9albtAUd5
+         KXaA==
+X-Gm-Message-State: AOAM533pywa7qYYMiBplc05EPgz/oVQpQwzpU3NF7jaTB3xoE5uAm1Sk
+        aOiVAs5/FD9EVEbqZgSGw9P/bA==
+X-Google-Smtp-Source: ABdhPJwehmwFySoaS1hi2p+T+LiAO8upF6izWYrpOOMtkZkPW5L2hiCqpK0gC/Rhqd0TA7qN0BGQqw==
+X-Received: by 2002:a17:902:e88a:b0:140:25a7:4a1b with SMTP id w10-20020a170902e88a00b0014025a74a1bmr22402882plg.67.1635259687236;
+        Tue, 26 Oct 2021 07:48:07 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id fy8sm186294pjb.47.2021.10.26.07.48.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Oct 2021 07:48:06 -0700 (PDT)
+Date:   Tue, 26 Oct 2021 14:48:02 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        cluster-devel <cluster-devel@redhat.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org,
-        linux-btrfs <linux-btrfs@vger.kernel.org>
-Subject: Re: [PATCH v8 00/17] gfs2: Fix mmap + page fault deadlocks
-Date:   Tue, 26 Oct 2021 11:44:30 +0200
-Message-Id: <20211026094430.3669156-1-agruenba@redhat.com>
-In-Reply-To: <YXeOVZqer+GFBkXO@mit.edu>
-References: <YXeOVZqer+GFBkXO@mit.edu> <20211019134204.3382645-1-agruenba@redhat.com> <CAHk-=wh0_3y5s7-G74U0Pcjm7Y_yHB608NYrQSvgogVNBxsWSQ@mail.gmail.com> <YXBFqD9WVuU8awIv@arm.com> <CAHk-=wgv=KPZBJGnx_O5-7hhST8CL9BN4wJwtVuycjhv_1MmvQ@mail.gmail.com> <YXCbv5gdfEEtAYo8@arm.com> <CAHk-=wgP058PNY8eoWW=5uRMox-PuesDMrLsrCWPS+xXhzbQxQ@mail.gmail.com> <YXL9tRher7QVmq6N@arm.com> <CAHc6FU6JC4ZOwA8t854WbNdmuiNL9DPq0FPga8guATaoCtvsaw@mail.gmail.com>
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
+Message-ID: <YXgVIvYhABnrP2Jo@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <04b1a72e-47b4-4bde-eb9e-ba36c156ff0d@de.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <04b1a72e-47b4-4bde-eb9e-ba36c156ff0d@de.ibm.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Ted,
+On Tue, Oct 26, 2021, Christian Borntraeger wrote:
+> Am 09.10.21 um 04:11 schrieb Sean Christopherson:
+> > This is basically two series smushed into one.  The first "half" aims
+> > to differentiate between "halt" and a more generic "block", where "halt"
+> > aligns with x86's HLT instruction, the halt-polling mechanisms, and
+> > associated stats, and "block" means any guest action that causes the vCPU
+> > to block/wait.
+> > 
+> > The second "half" overhauls x86's APIC virtualization code (Posted
+> > Interrupts on Intel VMX, AVIC on AMD SVM) to do their updates in response
+> > to vCPU (un)blocking in the vcpu_load/put() paths, keying off of the
+> > vCPU's rcuwait status to determine when a blocking vCPU is being put and
+> > reloaded.  This idea comes from arm64's kvm_timer_vcpu_put(), which I
+> > stumbled across when diving into the history of arm64's (un)blocking hooks.
+> > 
+> > The x86 APICv overhaul allows for killing off several sets of hooks in
+> > common KVM and in x86 KVM (to the vendor code).  Moving everything to
+> > vcpu_put/load() also realizes nice cleanups, especially for the Posted
+> > Interrupt code, which required some impressive mental gymnastics to
+> > understand how vCPU task migration interacted with vCPU blocking.
+> > 
+> > Non-x86 folks, sorry for the noise.  I'm hoping the common parts can get
+> > applied without much fuss so that future versions can be x86-only.
+> > 
+> > v2:
+> >   - Collect reviews. [Christian, David]
+> >   - Add patch to move arm64 WFI functionality out of hooks. [Marc]
+> >   - Add RISC-V to the fun.
+> >   - Add all the APICv fun.
+> 
+> Have we actually followed up on the regression regarding halt_poll_ns=0 no longer disabling
+> polling for running systems?
 
-here's an updated version of Dave Hansen's original commit, but note
-that generic/208 won't run on ext4 with data journaling enabled:
-
-  $ MOUNT_OPTIONS='-o data=journal' TEST_DIR=/mnt/test TEST_DEV=/dev/vdb ./tests/generic/208
-  QA output created by 208
-  208 not run: ext4 data journaling doesn't support O_DIRECT
-
-Thanks,
-Andreas
-
---
-
-Based on commit 998ef75ddb57 ("fs: do not prefault sys_write() user
-buffer pages") by Dave Hansen <dave.hansen@linux.intel.com>, but:
-
-* Fix generic_perform_write as well as iomap_write_iter.
-
-* copy_page_from_iter_atomic() doesn't trigger page faults, so there's no need
-  to disable page faults around it [see commit 9e8c2af96e0d ("callers of
-  iov_copy_from_user_atomic() don't need pagecache_disable()")].
-
-* If fault_in_iov_iter_readable() fails to fault in the entire buffer,
-  we still want to read everything up to the fault position.  This depends on
-  commit a6294593e8a1 ("iov_iter: Turn iov_iter_fault_in_readable into
-  fault_in_iov_iter_readable").
-
-Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
----
- fs/iomap/buffered-io.c | 20 +++++++-------------
- mm/filemap.c           | 20 +++++++-------------
- 2 files changed, 14 insertions(+), 26 deletions(-)
-
-diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-index 1753c26c8e76..d8809cd9ab31 100644
---- a/fs/iomap/buffered-io.c
-+++ b/fs/iomap/buffered-io.c
-@@ -744,17 +744,6 @@ static loff_t iomap_write_iter(struct iomap_iter *iter, struct iov_iter *i)
- 		if (bytes > length)
- 			bytes = length;
- 
--		/*
--		 * Bring in the user page that we'll copy from _first_.
--		 * Otherwise there's a nasty deadlock on copying from the
--		 * same page as we're writing to, without it being marked
--		 * up-to-date.
--		 */
--		if (unlikely(fault_in_iov_iter_readable(i, bytes))) {
--			status = -EFAULT;
--			break;
--		}
--
- 		status = iomap_write_begin(iter, pos, bytes, &page);
- 		if (unlikely(status))
- 			break;
-@@ -777,9 +766,14 @@ static loff_t iomap_write_iter(struct iomap_iter *iter, struct iov_iter *i)
- 			 * halfway through, might be a race with munmap,
- 			 * might be severe memory pressure.
- 			 */
--			if (copied)
-+			if (copied) {
- 				bytes = copied;
--			goto again;
-+				goto again;
-+			}
-+			if (fault_in_iov_iter_readable(i, bytes) != bytes)
-+				goto again;
-+			status = -EFAULT;
-+			break;
- 		}
- 		pos += status;
- 		written += status;
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 4dd5edcd39fd..467cdb7d086d 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -3751,17 +3751,6 @@ ssize_t generic_perform_write(struct file *file,
- 						iov_iter_count(i));
- 
- again:
--		/*
--		 * Bring in the user page that we will copy from _first_.
--		 * Otherwise there's a nasty deadlock on copying from the
--		 * same page as we're writing to, without it being marked
--		 * up-to-date.
--		 */
--		if (unlikely(fault_in_iov_iter_readable(i, bytes))) {
--			status = -EFAULT;
--			break;
--		}
--
- 		if (fatal_signal_pending(current)) {
- 			status = -EINTR;
- 			break;
-@@ -3794,9 +3783,14 @@ ssize_t generic_perform_write(struct file *file,
- 			 * halfway through, might be a race with munmap,
- 			 * might be severe memory pressure.
- 			 */
--			if (copied)
-+			if (copied) {
- 				bytes = copied;
--			goto again;
-+				goto again;
-+			}
-+			if (fault_in_iov_iter_readable(i, bytes) != bytes)
-+				goto again;
-+			status = -EFAULT;
-+			break;
- 		}
- 		pos += status;
- 		written += status;
--- 
-2.26.3
-
+No, I have that conversation flagged but haven't gotten back to it.  I still like
+the idea of special casing halt_poll_ns=0 to override the capability.  I can send
+a proper patch for that unless there's a different/better idea?
