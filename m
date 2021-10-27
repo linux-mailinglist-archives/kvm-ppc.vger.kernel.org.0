@@ -2,63 +2,54 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 523EC43CDC1
-	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 17:38:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEEDE43CE3A
+	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 18:04:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242803AbhJ0Pk0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 27 Oct 2021 11:40:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50654 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238780AbhJ0PkZ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 11:40:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635349080;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bSqxXsSY7PzPPy6E5Cy05Nx/OdmHcN1STcnBEYyHdIs=;
-        b=MbMxbXAupMhsOj7n1ORnzGUbt2FJk9mfhs1WY97br91xQhy2gI1grOuvQnxEp6LE0pzRZZ
-        1ueNqOMlSarkjIx3XpEKw+UEb5n1ek2asuexqFwukbmOUCbHmkd+mobwHsmwa1bWXKCwn1
-        2CRz2Zv9n8TOyxe7u0sslDWf0CgTm/E=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-lPNnvxmsOMWnJr-FYq0MCg-1; Wed, 27 Oct 2021 11:37:58 -0400
-X-MC-Unique: lPNnvxmsOMWnJr-FYq0MCg-1
-Received: by mail-ed1-f72.google.com with SMTP id u10-20020a50d94a000000b003dc51565894so2656304edj.21
-        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 08:37:58 -0700 (PDT)
+        id S242862AbhJ0QHP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 27 Oct 2021 12:07:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38044 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237245AbhJ0QHK (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 12:07:10 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F1EC061745
+        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 09:04:45 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id b4so128712plg.13
+        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 09:04:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dcpH/p742iSNJ4bZTW0zt1TGCcBsOCFOjXwA1nHOArQ=;
+        b=Tm86IoMHOyj+zpaOtCSE4VFzqAdP+9ruKNcRadlOsFvChh7ill13kZR5jWD9NHE65h
+         64jvZDMu9kIVfatwV9NqtMoLtCasfA5hteZXUvebb1KfemQP+3PqYeGQAgGx9M3p7bU8
+         qNPAFnYhitn+E30o4EXNDe5pTB+zWAuxmiSCE4KEPuXZlCuroSJybkJylXO0PsvVFrn8
+         WHatzxWVbSvDonjRBU4GlRNXf74WN3TzY8Vqi6OJ+Ctj4jxWd/Ui1c+kFiATf0mtE0jn
+         ZZyVyj8OcnNeewioZwWE0jsQa9pZSUdW+6oR7be9c4lXCDaENvCYDfdnIza70+cJL6Io
+         dmAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=bSqxXsSY7PzPPy6E5Cy05Nx/OdmHcN1STcnBEYyHdIs=;
-        b=adNsGdoqhZRTrz5XbphZiqOXOJFEXSXpMAhCkDb08jIzOtenoAT/Va2eKoWnENTIS/
-         tuwTEPM0mlSgH/YF8dcRj2DZsQS7gZxtfzWotxivCZPK6kb+gH4upcVRNTgs1/IFWX5k
-         16Yl4vphT9vpnLVCayaJQMuU4z6+qniQXtxGaYPmLdjPKgoTaFt0HavaIeDzi3ng1Ob7
-         r2YF+gKwmL1QzDaVY4ZdgPP3bWnR+ZjmecCqahKt3HS5Wuxila4RL/N122HXb3oCBBsC
-         h0TwUgYp/FXebsc1PzLgawTz5cg3ngUFoLk8+WJUalSEHQGbshGWMKLu9GavfNSOq9wQ
-         5Prg==
-X-Gm-Message-State: AOAM5313VDG0lSS7noHIqrclmbCKDjjm0anVlLHaKu3c2vDxQUtoc2nd
-        qQPGp4MRBkeZPBOAii/7kQ4TkWQ4Sz9BHfsyTCs5/LiX68+wyplXgWfXhpg9EbuPHo0ITbWL3RJ
-        MQVG2eIoSqrslu2h4BA==
-X-Received: by 2002:a05:6402:520f:: with SMTP id s15mr19650581edd.376.1635349077543;
-        Wed, 27 Oct 2021 08:37:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxcV3ajcrSuCCBMr6jO83QbO8KNKYMvLx5Z90JLfoEGGYsQl7acheIlREFbLHWM9uSofWHX3A==
-X-Received: by 2002:a05:6402:520f:: with SMTP id s15mr19650552edd.376.1635349077353;
-        Wed, 27 Oct 2021 08:37:57 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id h7sm218074edt.37.2021.10.27.08.37.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Oct 2021 08:37:56 -0700 (PDT)
-Message-ID: <5b8f554b-5bbc-e257-12d0-800ec82489d0@redhat.com>
-Date:   Wed, 27 Oct 2021 17:37:47 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dcpH/p742iSNJ4bZTW0zt1TGCcBsOCFOjXwA1nHOArQ=;
+        b=23p/Ctr95lt0Rb8ldZowyG13Q/nNAAq75b2fraLfVrqz69Ey8VDZshHwP+7At8+KVw
+         QvOelxJrBwrRKv8PjS8gq8WpV3QaMdVr5gIOYl4AV/F+03jWjGnvMHAne6gzPyZHgs51
+         8IXdlv1SPOHO1K0AUgivQvMYXuEmhWgK+d5SHRfTIMNxGehIsZ1MkgKnKVXyeMIBbDVe
+         xLAGHUZ0sF+zkAnBxAw3P8HgjRnyHx9u1kJFjX+KybfmXVMFmEmHmsh6JBbd+9FIyrIO
+         PaFA9S1OHLnoqXjbbUz3jKG+S8St4hGmv5vHjdt7+pbVrrAE8y/GP8U+zh7kgDveeHVl
+         vcdA==
+X-Gm-Message-State: AOAM532HWH2CRz9r/cQfeXWaYOHG7L01pVsRxoxvvjTvSCzjY5lF9cpa
+        YgK8OGxbAtu+nLi3x0e1KZvZbw==
+X-Google-Smtp-Source: ABdhPJywTswkNFY7FXvXu6HG//R1t5yx+yTwPulg5ieqikJtUBQKOiC63rBPbvuvCOKHk/yZoLtKWg==
+X-Received: by 2002:a17:90b:1b46:: with SMTP id nv6mr6766883pjb.162.1635350684192;
+        Wed, 27 Oct 2021 09:04:44 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z15sm242123pga.16.2021.10.27.09.04.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Oct 2021 09:04:43 -0700 (PDT)
+Date:   Wed, 27 Oct 2021 16:04:40 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>,
@@ -86,43 +77,92 @@ Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oupton@google.com>,
         Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v2 39/43] KVM: VMX: Don't do full kick when triggering
+ posted interrupt "fails"
+Message-ID: <YXl4mK7CyUBnPaQV@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <614858dd-106c-64cc-04bc-f1887b2054d1@redhat.com>
- <YXllGfrjPX1pVUx6@google.com>
- <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
- <YXlwH2vWILFS9QOG@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YXlwH2vWILFS9QOG@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <20211009021236.4122790-40-seanjc@google.com>
+ <335822ac-b98b-1eec-4911-34e4d0e99907@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <335822ac-b98b-1eec-4911-34e4d0e99907@redhat.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 27/10/21 17:28, Sean Christopherson wrote:
-> On Wed, Oct 27, 2021, Paolo Bonzini wrote:
->> On 27/10/21 16:41, Sean Christopherson wrote:
->>> The other thing I don't like about having the WARN in the loop is that it suggests
->>> that something other than the vCPU can modify the NDST and SN fields, which is
->>> wrong and confusing (for me).
->>
->> Yeah, I can agree with that.  Can you add it in a comment above the cmpxchg
->> loop, it can be as simple as
->>
->> 	/* The processor can set ON concurrently.  */
->>
->> when you respin patch 21 and the rest of the series?
+On Mon, Oct 25, 2021, Paolo Bonzini wrote:
+> On 09/10/21 04:12, Sean Christopherson wrote:
+> > +		/*
+> > +		 * The smp_wmb() in kvm_make_request() pairs with the smp_mb_*()
+> > +		 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU
+> > +		 * is guaranteed to see the event request if triggering a posted
+> > +		 * interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
 > 
-> I can definitely add a comment, but I think that comment is incorrect.
-
-It's completely backwards indeed.  I first had "the hardware" and then 
-shut down my brain for a second to replace it.
-
-> So something like this?
+> This explanation doesn't make much sense to me.  This is just the usual
+> request/kick pattern explained in Documentation/virt/kvm/vcpu-requests.rst;
+> except that we don't bother with a "kick" out of guest mode because the
+> entry always goes through kvm_check_request (in the nVMX case) or
+> sync_pir_to_irr (if non-nested) and completes the delivery itself.
 > 
-> 	/* ON can be set concurrently by a different vCPU or by hardware. */
+> In other word, it is a similar idea as patch 43/43.
+> 
+> What this smp_wmb() pair with, is the smp_mb__after_atomic in
+> kvm_check_request(KVM_REQ_EVENT, vcpu).
 
-Yes, of course.
+I don't think that's correct.  There is no kvm_check_request() in the relevant path.
+kvm_vcpu_exit_request() uses kvm_request_pending(), which is just a READ_ONCE()
+without a barrier.  The smp_mb__after_atomic ensures that any assets that were
+modified prior to making the request are seen by the vCPU handling the request.
+It does not provide any guarantees for a different vCPU/task making a request
+and checking vcpu->mode versus the target vCPU setting vcpu->mode and checking
+for a pending request.
 
-Paolo
+> Setting the interrupt in the PIR orders before kvm_make_request in this
+> thread, and orders after kvm_make_request in the vCPU thread.
+>
+> Here, instead:
+> 
+> > +	/*
+> > +	 * The implied barrier in pi_test_and_set_on() pairs with the smp_mb_*()
+> > +	 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU is
+> > +	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
+> > +	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
+> > +	 */
+> >  	if (vcpu != kvm_get_running_vcpu() &&
+> >  	    !kvm_vcpu_trigger_posted_interrupt(vcpu, false))
+> > -		kvm_vcpu_kick(vcpu);
+> > +		kvm_vcpu_wake_up(vcpu);
+> 
+> it pairs with the smp_mb__after_atomic in vmx_sync_pir_to_irr().  As
+> explained again in vcpu-requests.rst, the ON bit has the same function as
+> vcpu->request in the previous case.
 
+Same as above, I don't think that's correct.  The smp_mb__after_atomic() ensures
+that there's no race between the IOMMU writing vIRR and setting ON, and KVM
+clearing ON and processing the vIRR.
+
+pi_test_on() is not an atomic operation, and there's no memory barrier if ON=0.
+It's the same behavior as kvm_check_request(), but again the ordering with respect
+to vcpu->mode isn't being handled by PID.ON/kvm_check_request().
+
+AIUI, this is the barrier that's paired with the PI barriers.  This is even called
+out in (2).
+
+	vcpu->mode = IN_GUEST_MODE;
+
+	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+
+	/*
+	 * 1) We should set ->mode before checking ->requests.  Please see
+	 * the comment in kvm_vcpu_exiting_guest_mode().
+	 *
+	 * 2) For APICv, we should set ->mode before checking PID.ON. This
+	 * pairs with the memory barrier implicit in pi_test_and_set_on
+	 * (see vmx_deliver_posted_interrupt).
+	 *
+	 * 3) This also orders the write to mode from any reads to the page
+	 * tables done while the VCPU is running.  Please see the comment
+	 * in kvm_flush_remote_tlbs.
+	 */
+	smp_mb__after_srcu_read_unlock();
