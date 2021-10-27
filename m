@@ -2,44 +2,55 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FBEF43CD60
-	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 17:18:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7994C43CD76
+	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 17:28:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242693AbhJ0PVI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 27 Oct 2021 11:21:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:50081 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237954AbhJ0PVC (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 11:21:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635347917;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Mqfkyc1h1IacAYuqVX+51EaEIUB4H7XAD3a00wXW0uo=;
-        b=eir2d4PSGJ/MTPo0r1eSoM9O6N4VFKXDD1hvvAQaq/OmUvOjfL3JgzcKWqZpSR40TQT7/V
-        5yppdYlpv3eWQut0pgSUS19+d0zlLgr/xWEgnJWSREeoteqae9wbhQj0tjb/w/S8kP75vM
-        bMwmT0WYEdaqlxMXrFzgYjfbt2Mq/fw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-129-NivpEGWfOKW2rqXDN2Iarw-1; Wed, 27 Oct 2021 11:18:33 -0400
-X-MC-Unique: NivpEGWfOKW2rqXDN2Iarw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 090521023F57;
-        Wed, 27 Oct 2021 15:18:26 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 37C0260C48;
-        Wed, 27 Oct 2021 15:18:14 +0000 (UTC)
-Message-ID: <796f9a7d553a0e13da5c44597666962620c64303.camel@redhat.com>
-Subject: Re: [PATCH v2 18/43] KVM: x86: Invoke kvm_vcpu_block() directly for
- non-HALTED wait states
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
+        id S242717AbhJ0PbB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 27 Oct 2021 11:31:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57926 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237611AbhJ0PbB (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 11:31:01 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1864C061570
+        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 08:28:35 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 83so3248300pgc.8
+        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 08:28:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jluBW5yA9LvugmQi8oyfDy8/cabbakiUXPqo4utsaB8=;
+        b=IXIkAF60iwH8Ca28unKtkkjCxMxH4jsRE7rdlyRpHRKxqRH5DKvzKzXeE1xZpeP67E
+         xwOJxCxtNAW/vuRZ9/cA++xLC0bu82EJesdjjIouYVg3x2VESqFJeksK7bKKBVif038n
+         GNlri9Hc+F1u7CW4lPLn9JPRn52da4aBC4xsr93HTbSLq1yGzKbznkaiM+WfpWPTb1nX
+         8Hjyo7QQx66GQF0REMEMDncs7WF5cqEgNENljeKIdAyawTn2njGp/q6Q7uPOzyYDFpEX
+         mqf5isD4pvLAp694w88H9zUwbgY74QXFwiejeE2dZlhZt757K0HlOnfUIVAivKet6eGr
+         4Dpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jluBW5yA9LvugmQi8oyfDy8/cabbakiUXPqo4utsaB8=;
+        b=trmT5vZ3FyISOgXL7unflQigbMYHg3R8WBJ+j9U4NUsY6wj9zhJLBgyTwzS++HWd52
+         zKEeNb0UGPuzonBHfG/l25hDI/hJNw16+3+5NrNmXeItRvn6S64KkiQjRcdlliAVn1js
+         OuWGKaodfMZ6yryyBCRqSt+YVSkmQbbq1Ti39jvkYfAV4FysyPBjMKlSKwBD1Pe4YJq1
+         mRz2cgDdx3WqPJ0hIkRukpsGyrAhEWydRWdf5ESHWErJeXl6EvWcMBJo48ht4+dhiKfL
+         Ab+ptm1u23JP3Ud5OeO1b0e7xtHcpFpm5HvqE6S5ifyp/6GE2UT1Drrk4+rpeVLZ3B4o
+         VsCA==
+X-Gm-Message-State: AOAM531cQzxdYLbhfAZo2ZJE/KspzbBiYa1qMiwySAhPx9F3NROJOv1q
+        VVpZbeS5tsp6T17itgKAxEbu7Q==
+X-Google-Smtp-Source: ABdhPJxibfpJFn220g32tVsxXXYwD2JThHpi8b5HJLrZMbbjn5Hu0UDQk4ZV4kEcRQbC7q9gao3DeQ==
+X-Received: by 2002:a05:6a00:2405:b0:44c:1ec3:8dbe with SMTP id z5-20020a056a00240500b0044c1ec38dbemr33619608pfh.33.1635348515143;
+        Wed, 27 Oct 2021 08:28:35 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id y19sm340714pfn.23.2021.10.27.08.28.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Oct 2021 08:28:34 -0700 (PDT)
+Date:   Wed, 27 Oct 2021 15:28:31 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Anup Patel <anup.patel@wdc.com>,
@@ -48,8 +59,7 @@ To:     Sean Christopherson <seanjc@google.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
+        James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Atish Patra <atish.patra@wdc.com>,
@@ -67,59 +77,40 @@ Cc:     James Morse <james.morse@arm.com>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oupton@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Date:   Wed, 27 Oct 2021 18:18:13 +0300
-In-Reply-To: <20211009021236.4122790-19-seanjc@google.com>
+Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
+Message-ID: <YXlwH2vWILFS9QOG@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-19-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ <614858dd-106c-64cc-04bc-f1887b2054d1@redhat.com>
+ <YXllGfrjPX1pVUx6@google.com>
+ <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Call kvm_vcpu_block() directly for all wait states except HALTED so that
-> kvm_vcpu_halt() is no longer a misnomer on x86.
+On Wed, Oct 27, 2021, Paolo Bonzini wrote:
+> On 27/10/21 16:41, Sean Christopherson wrote:
+> > The other thing I don't like about having the WARN in the loop is that it suggests
+> > that something other than the vCPU can modify the NDST and SN fields, which is
+> > wrong and confusing (for me).
 > 
-> Functionally, this means KVM will never attempt halt-polling or adjust
-> vcpu->halt_poll_ns for INIT_RECEIVED (a.k.a. Wait-For-SIPI (WFS)) or
-> AP_RESET_HOLD; UNINITIALIZED is handled in kvm_arch_vcpu_ioctl_run(),
-> and x86 doesn't use any other "wait" states.
+> Yeah, I can agree with that.  Can you add it in a comment above the cmpxchg
+> loop, it can be as simple as
 > 
-> As mentioned above, the motivation of this is purely so that "halt" isn't
-> overloaded on x86, e.g. in KVM's stats.  Skipping halt-polling for WFS
-> (and RESET_HOLD) has no meaningful effect on guest performance as there
-> are typically single-digit numbers of INIT-SIPI sequences per AP vCPU,
-> per boot, versus thousands of HLTs just to boot to console.
+> 	/* The processor can set ON concurrently.  */
 > 
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/x86.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index cd51f100e906..e0219acfd9cf 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9899,7 +9899,10 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
->  	if (!kvm_arch_vcpu_runnable(vcpu) &&
->  	    (!kvm_x86_ops.pre_block || static_call(kvm_x86_pre_block)(vcpu) == 0)) {
->  		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
-> -		kvm_vcpu_halt(vcpu);
-> +		if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED)
-> +			kvm_vcpu_halt(vcpu);
-> +		else
-> +			kvm_vcpu_block(vcpu);
->  		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
->  
->  		if (kvm_x86_ops.post_block)
+> when you respin patch 21 and the rest of the series?
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+I can definitely add a comment, but I think that comment is incorrect.  AIUI,
+the CPU is the one thing in the system that _doesn't_ set ON, at least not without
+IPI virtualization (haven't read that spec yet).  KVM (software) sets it when
+emulating IPIs, and the IOMMU (hardware) sets it for "real" posted interrupts,
+but the CPU (sans IPI virtualization) only clears ON when processing an IRQ on
+the notification vector.
 
-Best regards,
-	Maxim Levitsky
+So something like this?
 
+	/* ON can be set concurrently by a different vCPU or by hardware. */
