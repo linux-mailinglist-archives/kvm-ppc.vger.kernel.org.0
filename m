@@ -2,52 +2,52 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7994C43CD76
-	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 17:28:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A02143CD8B
+	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 17:30:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242717AbhJ0PbB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 27 Oct 2021 11:31:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57926 "EHLO
+        id S237741AbhJ0PdG (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 27 Oct 2021 11:33:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237611AbhJ0PbB (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 11:31:01 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1864C061570
-        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 08:28:35 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 83so3248300pgc.8
-        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 08:28:35 -0700 (PDT)
+        with ESMTP id S242771AbhJ0PdF (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 11:33:05 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF858C061767
+        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 08:30:39 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id r2so3236234pgl.10
+        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 08:30:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=jluBW5yA9LvugmQi8oyfDy8/cabbakiUXPqo4utsaB8=;
-        b=IXIkAF60iwH8Ca28unKtkkjCxMxH4jsRE7rdlyRpHRKxqRH5DKvzKzXeE1xZpeP67E
-         xwOJxCxtNAW/vuRZ9/cA++xLC0bu82EJesdjjIouYVg3x2VESqFJeksK7bKKBVif038n
-         GNlri9Hc+F1u7CW4lPLn9JPRn52da4aBC4xsr93HTbSLq1yGzKbznkaiM+WfpWPTb1nX
-         8Hjyo7QQx66GQF0REMEMDncs7WF5cqEgNENljeKIdAyawTn2njGp/q6Q7uPOzyYDFpEX
-         mqf5isD4pvLAp694w88H9zUwbgY74QXFwiejeE2dZlhZt757K0HlOnfUIVAivKet6eGr
-         4Dpg==
+        bh=8HVWDdXXt0AD/xSFizk+AYjOVZmIDbS9XwzvKXYRSt8=;
+        b=OEfG9fsgSPXFsuD00eYA/4hb/4nOJhqt3Fa3DsCVNZsfitbSN/e7Fn81m4qSyNF6U/
+         mhh/R9TUBiF7pjmngLNdEADzgfxtm/aVHY0H9J+z6ozxZ49ZZu8j36ZA8vNS+jc3P4K8
+         39l9ZJZa9RV8xzTd4Pq6XBto9wKnNJruu9xTNPgxAnhf+lq+LyLyNX9Nl8mvXteW2N67
+         +TcMWmCTLvtk136TTAc8/TraiE87+QKjoC7eTJ2OAuWqRKMp2hqkYHzHc/UrtgHJUjNB
+         S90jgPj6NxctTlEeFg16F+/ojMD4VkEXJciV+yM/BHrhD9Juzesc0Jpe/IsL5krJCSuw
+         Hz+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=jluBW5yA9LvugmQi8oyfDy8/cabbakiUXPqo4utsaB8=;
-        b=trmT5vZ3FyISOgXL7unflQigbMYHg3R8WBJ+j9U4NUsY6wj9zhJLBgyTwzS++HWd52
-         zKEeNb0UGPuzonBHfG/l25hDI/hJNw16+3+5NrNmXeItRvn6S64KkiQjRcdlliAVn1js
-         OuWGKaodfMZ6yryyBCRqSt+YVSkmQbbq1Ti39jvkYfAV4FysyPBjMKlSKwBD1Pe4YJq1
-         mRz2cgDdx3WqPJ0hIkRukpsGyrAhEWydRWdf5ESHWErJeXl6EvWcMBJo48ht4+dhiKfL
-         Ab+ptm1u23JP3Ud5OeO1b0e7xtHcpFpm5HvqE6S5ifyp/6GE2UT1Drrk4+rpeVLZ3B4o
-         VsCA==
-X-Gm-Message-State: AOAM531cQzxdYLbhfAZo2ZJE/KspzbBiYa1qMiwySAhPx9F3NROJOv1q
-        VVpZbeS5tsp6T17itgKAxEbu7Q==
-X-Google-Smtp-Source: ABdhPJxibfpJFn220g32tVsxXXYwD2JThHpi8b5HJLrZMbbjn5Hu0UDQk4ZV4kEcRQbC7q9gao3DeQ==
-X-Received: by 2002:a05:6a00:2405:b0:44c:1ec3:8dbe with SMTP id z5-20020a056a00240500b0044c1ec38dbemr33619608pfh.33.1635348515143;
-        Wed, 27 Oct 2021 08:28:35 -0700 (PDT)
+        bh=8HVWDdXXt0AD/xSFizk+AYjOVZmIDbS9XwzvKXYRSt8=;
+        b=eRH+/E4QxPHX2wC47c/YJjCQvieT9+MXTsNssT0d2jjIAtesHM4IZm5kfQUWc37nGS
+         jWpJclicqpy/sBzGu5lH3gz0OzbLzbKaSnaMRmpEYnUv5VF3f67YqrTkW+E9qdxqFKdS
+         wTLIeVIPKGiVmdRjs4Q0IEcm+HIud3Ec7gIDSQK17Ma578DSvqIs3eqsdK7y1Mk6QYLZ
+         XrjylVG9eLfB+qiyA8YSV3/tKdBXAOtz0lDa9qKXyplIamzNdiSymsUS/ICdTnEjcwbz
+         kyMwh+o583Ble9q7UtNLakEJy/DXTkGFVuKxwZMN092xsb1dR1fsUmOCx4QfuiycrLF8
+         otgw==
+X-Gm-Message-State: AOAM532RVXMpBKzkio6ji3wmqDhS9Akd+WQa1zioVM0uYTkSM6etCTpC
+        85THgToHvCq9jAokJabXkRG4wg==
+X-Google-Smtp-Source: ABdhPJxZ0e6i7j4AtLY0aYMSXG5aUrKCFCUTxCqVHzekft57NleHTTPCd6QukrG2yYLrBLX5jK+rLA==
+X-Received: by 2002:a63:698a:: with SMTP id e132mr24303698pgc.434.1635348638933;
+        Wed, 27 Oct 2021 08:30:38 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y19sm340714pfn.23.2021.10.27.08.28.34
+        by smtp.gmail.com with ESMTPSA id w11sm180048pge.48.2021.10.27.08.30.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 08:28:34 -0700 (PDT)
-Date:   Wed, 27 Oct 2021 15:28:31 +0000
+        Wed, 27 Oct 2021 08:30:38 -0700 (PDT)
+Date:   Wed, 27 Oct 2021 15:30:34 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -77,40 +77,28 @@ Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oupton@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
-Message-ID: <YXlwH2vWILFS9QOG@google.com>
+Subject: Re: [PATCH v2 40/43] KVM: VMX: Wake vCPU when delivering posted IRQ
+ even if vCPU == this vCPU
+Message-ID: <YXlwmrrRVIoaU2kG@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <614858dd-106c-64cc-04bc-f1887b2054d1@redhat.com>
- <YXllGfrjPX1pVUx6@google.com>
- <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
+ <20211009021236.4122790-41-seanjc@google.com>
+ <a2a4e076-edb8-2cb5-5cb2-6825a1a4559a@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
+In-Reply-To: <a2a4e076-edb8-2cb5-5cb2-6825a1a4559a@redhat.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Wed, Oct 27, 2021, Paolo Bonzini wrote:
-> On 27/10/21 16:41, Sean Christopherson wrote:
-> > The other thing I don't like about having the WARN in the loop is that it suggests
-> > that something other than the vCPU can modify the NDST and SN fields, which is
-> > wrong and confusing (for me).
+On Mon, Oct 25, 2021, Paolo Bonzini wrote:
+> On 09/10/21 04:12, Sean Christopherson wrote:
+> > 
+> > Lastly, this aligns the non-nested and nested usage of triggering posted
+> > interrupts, and will allow for additional cleanups.
 > 
-> Yeah, I can agree with that.  Can you add it in a comment above the cmpxchg
-> loop, it can be as simple as
-> 
-> 	/* The processor can set ON concurrently.  */
-> 
-> when you respin patch 21 and the rest of the series?
+> It also aligns with SVM a little bit more (especially given patch 35),
+> doesn't it?
 
-I can definitely add a comment, but I think that comment is incorrect.  AIUI,
-the CPU is the one thing in the system that _doesn't_ set ON, at least not without
-IPI virtualization (haven't read that spec yet).  KVM (software) sets it when
-emulating IPIs, and the IOMMU (hardware) sets it for "real" posted interrupts,
-but the CPU (sans IPI virtualization) only clears ON when processing an IRQ on
-the notification vector.
-
-So something like this?
-
-	/* ON can be set concurrently by a different vCPU or by hardware. */
+Yes, aligning VMX and SVM APICv behavior as much as possible is definitely a goal
+of this series, though I suspect I failed to state that anywhere.
