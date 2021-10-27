@@ -2,40 +2,40 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E4C4F43C899
-	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 13:30:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8391543CAD8
+	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 15:41:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241641AbhJ0Lci (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 27 Oct 2021 07:32:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26003 "EHLO
+        id S242156AbhJ0Nn1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 27 Oct 2021 09:43:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44077 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237421AbhJ0Lch (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 07:32:37 -0400
+        by vger.kernel.org with ESMTP id S242192AbhJ0Nn1 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 09:43:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635334212;
+        s=mimecast20190719; t=1635342061;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6755i8Ev1p/V649+fKWbCguz7hafsCtx6KF7gf1uorY=;
-        b=TX/V5o7c9HZn0ZYo1Stbn5UuRW1GQ4TLUWo1UuB7pNERiGnFNu87TCgocVolnSwZws3Ly0
-        McB8kWSV8zufJ0S2j5l9cGSYABg9A2udHCTxhp7HgKb+bsB9vhLVkYGONA5Vah5BRrPu9j
-        lvJFsPddbHDevsHwOr3pgLk5y/5Y4Gk=
+        bh=/no10Aa/zZ1ucVFb2s+gZiK3uB9pJ6W+0T89aCEE3wg=;
+        b=RNzq9IYdV4VMTBm8nPZjhJqZkJEifW4zngBPKy3tqVxbb0gocrFdj3CenZy3rh08FxyFZt
+        /h+tde7vyYdZeW2jb2l94kxMUrDsitUnZsdVLP9qmdo6GcS32Jj6R+6kPLtYqrTjN/qpVB
+        KrdHQ4sEt+KL2rNuM2Z14w60vJ96Elc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-SCV0Ypy_PSae9_O3yFoh6Q-1; Wed, 27 Oct 2021 07:30:07 -0400
-X-MC-Unique: SCV0Ypy_PSae9_O3yFoh6Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-309-SCIw7oS_OWK-BwM7oLJx0w-1; Wed, 27 Oct 2021 09:40:58 -0400
+X-MC-Unique: SCIw7oS_OWK-BwM7oLJx0w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B14A3100C66D;
-        Wed, 27 Oct 2021 11:30:03 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F7711966320;
+        Wed, 27 Oct 2021 13:40:54 +0000 (UTC)
 Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A291C101E591;
-        Wed, 27 Oct 2021 11:29:47 +0000 (UTC)
-Message-ID: <62231cec8a62db6bf2baba24cc55e0ec2515d0b1.camel@redhat.com>
-Subject: Re: [PATCH v2 07/43] KVM: Reconcile discrepancies in halt-polling
- stats
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4809F5DF35;
+        Wed, 27 Oct 2021 13:40:41 +0000 (UTC)
+Message-ID: <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
+Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
+ successful
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Marc Zyngier <maz@kernel.org>,
@@ -67,111 +67,93 @@ Cc:     James Morse <james.morse@arm.com>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oupton@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Date:   Wed, 27 Oct 2021 14:29:46 +0300
-In-Reply-To: <20211009021236.4122790-8-seanjc@google.com>
+Date:   Wed, 27 Oct 2021 16:40:40 +0300
+In-Reply-To: <20211009021236.4122790-12-seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-8-seanjc@google.com>
+         <20211009021236.4122790-12-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Move the halt-polling "success" and histogram stats update into the
-> dedicated helper to fix a discrepancy where the success/fail "time" stats
-> consider polling successful so long as the wait is avoided, but the main
-> "success" and histogram stats consider polling successful if and only if
-> a wake event was detected by the halt-polling loop.
+> Invoke the arch hooks for block+unblock if and only if KVM actually
+> attempts to block the vCPU.  The only non-nop implementation is on x86,
+> specifically SVM's AVIC, and there is no need to put the AVIC prior to
+> halt-polling as KVM x86's kvm_vcpu_has_events() will scour the full vIRR
+> to find pending IRQs regardless of whether the AVIC is loaded/"running".
 > 
-> Move halt_attempted_poll to the helper as well so that all the stats are
-> updated in a single location.  While it's a bit odd to update the stat
-> well after the fact, practically speaking there's no meaningful advantage
-> to updating before polling.
+> The primary motivation is to allow future cleanup to split out "block"
+> from "halt", but this is also likely a small performance boost on x86 SVM
+> when halt-polling is successful.
 > 
-> Note, there is a functional change in addition to the success vs. fail
-> change.  The histogram updates previously called ktime_get() instead of
-> using "cur".  But that change is desirable as it means all the stats are
-> now updated with the same polling time, and avoids the extra ktime_get(),
-> which isn't expensive but isn't free either.
+> Adjust the post-block path to update "cur" after unblocking, i.e. include
+> AVIC load time in halt_wait_ns and halt_wait_hist, so that the behavior
+> is consistent.  Moving just the pre-block arch hook would result in only
+> the AVIC put latency being included in the halt_wait stats.  There is no
+> obvious evidence that one way or the other is correct, so just ensure KVM
+> is consistent.
 > 
-> Reviewed-by: David Matlack <dmatlack@google.com>
+> Note, x86 has two separate paths for handling APICv with respect to vCPU
+> blocking.  VMX uses hooks in x86's vcpu_block(), while SVM uses the arch
+> hooks in kvm_vcpu_block().  Prior to this path, the two paths were more
+> or less functionally identical.  That is very much not the case after
+> this patch, as the hooks used by VMX _must_ fire before halt-polling.
+> x86's entire mess will be cleaned up in future patches.
+> 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  virt/kvm/kvm_main.c | 35 ++++++++++++++++-------------------
->  1 file changed, 16 insertions(+), 19 deletions(-)
+>  virt/kvm/kvm_main.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
 > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 4dfcd736b274..1292c7876d3f 100644
+> index f90b3ed05628..227f6bbe0716 100644
 > --- a/virt/kvm/kvm_main.c
 > +++ b/virt/kvm/kvm_main.c
-> @@ -3204,12 +3204,23 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
->  static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
->  					  ktime_t end, bool success)
->  {
-> +	struct kvm_vcpu_stat_generic *stats = &vcpu->stat.generic;
->  	u64 poll_ns = ktime_to_ns(ktime_sub(end, start));
+> @@ -3235,8 +3235,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  	bool waited = false;
+>  	u64 block_ns;
 >  
-> -	if (success)
-> -		vcpu->stat.generic.halt_poll_success_ns += poll_ns;
-> -	else
-> -		vcpu->stat.generic.halt_poll_fail_ns += poll_ns;
-> +	++vcpu->stat.generic.halt_attempted_poll;
-> +
-> +	if (success) {
-> +		++vcpu->stat.generic.halt_successful_poll;
-> +
-> +		if (!vcpu_valid_wakeup(vcpu))
-> +			++vcpu->stat.generic.halt_poll_invalid;
-> +
-> +		stats->halt_poll_success_ns += poll_ns;
-> +		KVM_STATS_LOG_HIST_UPDATE(stats->halt_poll_success_hist, poll_ns);
-> +	} else {
-> +		stats->halt_poll_fail_ns += poll_ns;
-> +		KVM_STATS_LOG_HIST_UPDATE(stats->halt_poll_fail_hist, poll_ns);
-> +	}
->  }
->  
->  /*
-> @@ -3230,30 +3241,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+> -	kvm_arch_vcpu_blocking(vcpu);
+> -
+>  	start = cur = poll_end = ktime_get();
 >  	if (do_halt_poll) {
 >  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
->  
-> -		++vcpu->stat.generic.halt_attempted_poll;
->  		do {
->  			/*
->  			 * This sets KVM_REQ_UNHALT if an interrupt
->  			 * arrives.
->  			 */
-> -			if (kvm_vcpu_check_block(vcpu) < 0) {
-> -				++vcpu->stat.generic.halt_successful_poll;
-> -				if (!vcpu_valid_wakeup(vcpu))
-> -					++vcpu->stat.generic.halt_poll_invalid;
-> -
-> -				KVM_STATS_LOG_HIST_UPDATE(
-> -				      vcpu->stat.generic.halt_poll_success_hist,
-> -				      ktime_to_ns(ktime_get()) -
-> -				      ktime_to_ns(start));
-> +			if (kvm_vcpu_check_block(vcpu) < 0)
->  				goto out;
-> -			}
->  			cpu_relax();
->  			poll_end = cur = ktime_get();
+> @@ -3253,6 +3251,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
 >  		} while (kvm_vcpu_can_poll(cur, stop));
-> -
-> -		KVM_STATS_LOG_HIST_UPDATE(
-> -				vcpu->stat.generic.halt_poll_fail_hist,
-> -				ktime_to_ns(ktime_get()) - ktime_to_ns(start));
 >  	}
 >  
+> +	kvm_arch_vcpu_blocking(vcpu);
 >  
+>  	prepare_to_rcuwait(wait);
+>  	for (;;) {
+> @@ -3265,6 +3264,9 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  		schedule();
+>  	}
+>  	finish_rcuwait(wait);
+> +
+> +	kvm_arch_vcpu_unblocking(vcpu);
+> +
+>  	cur = ktime_get();
+>  	if (waited) {
+>  		vcpu->stat.generic.halt_wait_ns +=
+> @@ -3273,7 +3275,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  				ktime_to_ns(cur) - ktime_to_ns(poll_end));
+>  	}
+>  out:
+> -	kvm_arch_vcpu_unblocking(vcpu);
+>  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+>  
+>  	/*
+
+Makes sense.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
-
 
