@@ -2,123 +2,93 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2087743CE77
-	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 18:14:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F99943D178
+	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 21:13:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237923AbhJ0QRQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 27 Oct 2021 12:17:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37205 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232590AbhJ0QRP (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 12:17:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635351289;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YJ1AvjILyDHE6A0xH65m+vjqkknvkqBvDuAHk95niU8=;
-        b=NNZezK5I92wtIcPstDA/xymm972gQZ9WtIC5LNxfA9/cKxuo+jbIJpAKxG+WhoLmdVV01i
-        NfPQgaZ9mJOfSB0HBcNLWZgEKlOhbZu9FMixihVNRp0ciu5gnbRZwRTQfUaUFD0slfDuBp
-        DgWNhhGjuOT8NzyXPJVCkv+W8CekUrs=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408--wgaOJwdMsuwtWWEJpQkZQ-1; Wed, 27 Oct 2021 12:14:48 -0400
-X-MC-Unique: -wgaOJwdMsuwtWWEJpQkZQ-1
-Received: by mail-ed1-f71.google.com with SMTP id r25-20020a05640216d900b003dca3501ab4so2775923edx.15
-        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 09:14:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=YJ1AvjILyDHE6A0xH65m+vjqkknvkqBvDuAHk95niU8=;
-        b=l5QY/h/YpMsJp4Fc2vSAVgQZkgSYVBILpYaTMkR11AbYlU0ulAKaqmObEPo76ktYFd
-         F8s7QOGz7kddjlgIVE6KAJf/Ib+95b7QZ9aEsM7WGQJleXMO/Jvm6gHzPIdKGCacsEHR
-         voc0pTe7kAWKjYwp1QGFFQegdc2Ajwj2ky3zptjuD1TXAPbQS73DhEowP30alhie26AU
-         r8yF0EnMRHOApIrbJvyWfihdBUWPJK9bOHzfRsTHurqxEYRXoZ/OHQ/4drATyjofDg+h
-         vSns3V9+8+qJlndRly1mqe2/ym3iPjfq5ba1XiT29of51OVY1SBZhVSev8q2mD5j0wT6
-         J58Q==
-X-Gm-Message-State: AOAM531frGpCXbD805po4GFpw3yR93ySVsVlK8mW29Nbm7OIHS7vG6to
-        ceixLkC909dXoM424vyUWsb/DBDKgDjU5n20CiEnq4/aVU3sVZrL3KJuHnbWRPc+oT7bUYAzdOX
-        nzC44Ybg9tyAzKgUj/w==
-X-Received: by 2002:a17:907:16a7:: with SMTP id hc39mr22891320ejc.214.1635351287173;
-        Wed, 27 Oct 2021 09:14:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzO/QgQ5GMyh0vFS/oBYQIX6qwD3vL9k6RGrSUIXFucShmCvNWLSsmfmRBNY3o+Ac+4bg3ipQ==
-X-Received: by 2002:a17:907:16a7:: with SMTP id hc39mr22891269ejc.214.1635351286915;
-        Wed, 27 Oct 2021 09:14:46 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id sb30sm195562ejc.45.2021.10.27.09.14.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Oct 2021 09:14:46 -0700 (PDT)
-Message-ID: <d0746ea4-06e9-f65d-6e45-72b1b0dea29b@redhat.com>
-Date:   Wed, 27 Oct 2021 18:14:44 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2 35/43] KVM: SVM: Signal AVIC doorbell iff vCPU is in
- guest mode
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        id S240599AbhJ0TPd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 27 Oct 2021 15:15:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40882 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240552AbhJ0TPc (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Wed, 27 Oct 2021 15:15:32 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8EAE960EB4;
+        Wed, 27 Oct 2021 19:13:04 +0000 (UTC)
+Date:   Wed, 27 Oct 2021 20:13:01 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Andreas Gruenbacher <agruenba@redhat.com>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-36-seanjc@google.com>
- <0333be2a-76d8-657a-6c82-3bb5c9ff2e3b@redhat.com>
- <YXlrEWmBohaDXmqL@google.com>
- <185502d7-861e-fa5c-b225-419710fe77ed@redhat.com>
- <YXl5anv0Lyjx1cws@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YXl5anv0Lyjx1cws@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        cluster-devel <cluster-devel@redhat.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org,
+        linux-btrfs <linux-btrfs@vger.kernel.org>
+Subject: Re: [PATCH v8 00/17] gfs2: Fix mmap + page fault deadlocks
+Message-ID: <YXmkvfL9B+4mQAIo@arm.com>
+References: <CAHk-=wh0_3y5s7-G74U0Pcjm7Y_yHB608NYrQSvgogVNBxsWSQ@mail.gmail.com>
+ <YXBFqD9WVuU8awIv@arm.com>
+ <CAHk-=wgv=KPZBJGnx_O5-7hhST8CL9BN4wJwtVuycjhv_1MmvQ@mail.gmail.com>
+ <YXCbv5gdfEEtAYo8@arm.com>
+ <CAHk-=wgP058PNY8eoWW=5uRMox-PuesDMrLsrCWPS+xXhzbQxQ@mail.gmail.com>
+ <YXL9tRher7QVmq6N@arm.com>
+ <CAHk-=wg4t2t1AaBDyMfOVhCCOiLLjCB5TFVgZcV4Pr8X2qptJw@mail.gmail.com>
+ <CAHc6FU7BEfBJCpm8wC3P+8GTBcXxzDWcp6wAcgzQtuaJLHrqZA@mail.gmail.com>
+ <YXhH0sBSyTyz5Eh2@arm.com>
+ <CAHk-=wjWDsB-dDj+x4yr8h8f_VSkyB7MbgGqBzDRMNz125sZxw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wjWDsB-dDj+x4yr8h8f_VSkyB7MbgGqBzDRMNz125sZxw@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 27/10/21 18:08, Sean Christopherson wrote:
->> Right, so should we drop the "if (running)" check in this patch, at the same
->> time as it's adding the IN_GUEST_MODE check?
-> LOL, I think we have a Three^WTwo Stooges routine going on.  This patch does
-> remove avic_vcpu_is_running() and replaces it with the vcpu->mode check.  Or am
-> I completely misunderstanding what your referring to?
+On Tue, Oct 26, 2021 at 11:50:04AM -0700, Linus Torvalds wrote:
+> On Tue, Oct 26, 2021 at 11:24 AM Catalin Marinas
+> <catalin.marinas@arm.com> wrote:
+> > While more intrusive, I'd rather change copy_page_from_iter_atomic()
+> > etc. to take a pointer where to write back an error code.
+[...]
+> That said, the fact that these sub-page faults are always
+> non-recoverable might be a hint to a solution to the problem: maybe we
+> could extend the existing return code with actual negative error
+> numbers.
 > 
-> -       if (avic_vcpu_is_running(vcpu)) {
-> +       /*
-> +        * Signal the doorbell to tell hardware to inject the IRQ if the vCPU
-> +        * is in the guest.  If the vCPU is not in the guest, hardware will
-> +        * automatically process AVIC interrupts at VMRUN.
-> +        */
-> +       if (vcpu->mode == IN_GUEST_MODE) {
->                  int cpu = READ_ONCE(vcpu->cpu);
+> Because for _most_ cases of "copy_to/from_user()" and friends by far,
+> the only thing we look for is "zero for success".
+> 
+> We could extend the "number of bytes _not_ copied" semantics to say
+> "negative means fatal", and because there are fairly few places that
+> actually look at non-zero values, we could have a coccinelle script
+> that actually marks those places.
 
-Nevermind, I confused svm_deliver_avic_intr with avic_kick_target_vcpus, 
-which anyway you are handling in patch 36.
+As you already replied, there are some odd places where the returned
+uncopied of bytes is used. Also for some valid cases like
+copy_mount_options(), it's likely that it will fall back to
+byte-at-a-time with MTE since it's a good chance it would hit a fault in
+a 4K page (not a fast path though). I'd have to go through all the cases
+and check whether the return value is meaningful. The iter_iov.c
+functions and their callers also seem to make use of the bytes copied in
+case they need to call iov_iter_revert() (though I suppose the
+iov_iter_iovec_advance() would skip the update in case of an error).
 
-Paolo
+As an alternative, you mentioned earlier that a per-thread fault status
+was not feasible on x86 due to races. Was this only for the hw poison
+case? I think the uaccess is slightly different.
 
+We can add a current->non_recoverable_uaccess variable cleared on
+pagefault_disable(), only set by uaccess faults and checked by the fs
+code before re-attempting the fault_in(). An interrupt shouldn't do a
+uaccess (well, if it does a _nofault one, we can detect in_interrupt()
+in the MTE exception handler). Last time I looked at io_uring it was
+running in a separate kernel thread, not sure whether this was changed.
+I don't see what else would be racing with such
+current->non_recoverable_uaccess variable. If that's doable, I think
+it's the least intrusive approach.
+
+-- 
+Catalin
