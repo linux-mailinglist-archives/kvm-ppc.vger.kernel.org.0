@@ -2,77 +2,135 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D13F743C2C5
-	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 08:16:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9287743C6D9
+	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 11:51:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238459AbhJ0GTS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 27 Oct 2021 02:19:18 -0400
-Received: from gandalf.ozlabs.org ([150.107.74.76]:50319 "EHLO
-        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229887AbhJ0GTS (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 02:19:18 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S238891AbhJ0Jxt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 27 Oct 2021 05:53:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28244 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233612AbhJ0Jxs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 05:53:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635328282;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OLKZI82hmPisWACp/QMd/03BQs+RHKrDBliqptWWYzE=;
+        b=JlGCLXib6mP67nqrMVKEdro08E7es/nLdFS9D05/GNFiNHY9ph7aXU44AK/fU+Dc/IGRMP
+        s1/6NQ0khHHN6yWVIGN7Mar4ykVEAYFpyoZICsyvfOTvkwAwHCz3AOpA2RuUuWUi00+Ck7
+        WdpGR1IytQ8EAYqoQ3leHhSI7Y9SORs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-4gOjCQ60OwesHHSXcF-XSQ-1; Wed, 27 Oct 2021 05:51:19 -0400
+X-MC-Unique: 4gOjCQ60OwesHHSXcF-XSQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HfJPH59GYz4xbC;
-        Wed, 27 Oct 2021 17:16:51 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1635315411;
-        bh=mwm4J8jrzKugb5lA+yxnuCYG70ULHBCpxrPxQS0JCHM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=YF9f95hwNKpwFqoyV0xqLfnItvZdM5KkMVTwB9YLeKMka7WUaHUTGZQ4wfNO2vBQO
-         EVcgXIvSIu+E8YhNR1v8Ql1CgD+srnAfamNkh+PNVQzvRTtk5rnnNuCqHHxsM58zJH
-         zhh+LbFQy/6yEJT9qvi7vAD6/tel0RvOLU1P3tQ2/U8bIpnq86I3+HADuaGv1T+YNK
-         6aVxIFZswJhxcukszR6hOvch51kO+qxzUsCKh1Sv3KYC2JXku7dlxn4W7S5wqAZ1tT
-         5RQN66g/AgtIM+bHu0WNifKmgKbXgcWCUnj1cEvpwMbUo05r9zpz8tSOuY6+IKnEv8
-         vBicmdMMv/a9w==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     <linuxppc-dev@lists.ozlabs.org>, <paulus@samba.org>
-Cc:     <npiggin@gmail.com>, <kvm-ppc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <pbonzini@redhat.com>
-Subject: [PATCH] MAINTAINERS: Update powerpc KVM entry
-Date:   Wed, 27 Oct 2021 17:16:46 +1100
-Message-Id: <20211027061646.540708-1-mpe@ellerman.id.au>
-X-Mailer: git-send-email 2.31.1
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD15980A5C0;
+        Wed, 27 Oct 2021 09:51:15 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 401B019D9F;
+        Wed, 27 Oct 2021 09:50:31 +0000 (UTC)
+Message-ID: <aa1656c01ea5d46dd22c66da4a5eaa27f58810a2.camel@redhat.com>
+Subject: Re: [PATCH v2 02/43] KVM: SVM: Ensure target pCPU is read once when
+ signalling AVIC doorbell
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Date:   Wed, 27 Oct 2021 12:50:30 +0300
+In-Reply-To: <20211009021236.4122790-3-seanjc@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+         <20211009021236.4122790-3-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paul is no longer handling patches for kvmppc.
+On Fri, 2021-10-08 at 19:11 -0700, Sean Christopherson wrote:
+> Ensure vcpu->cpu is read once when signalling the AVIC doorbell.  If the
+> compiler rereads the field and the vCPU is migrated between the check and
+> writing the doorbell, KVM would signal the wrong physical CPU.
 
-Instead we'll treat them as regular powerpc patches, taking them via the
-powerpc tree, using the topic/ppc-kvm branch when necessary.
+Since vcpu->cpu can change any moment anyway, adding READ_ONCE I think can't really fix anything
+but I do agree that it makes this more readable.
 
-Also drop the web reference, it doesn't have any information
-specifically relevant to powerpc KVM.
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
----
- MAINTAINERS | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ca6d6fde85cf..fbfd3345c40d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10260,11 +10260,8 @@ F:	arch/mips/include/uapi/asm/kvm*
- F:	arch/mips/kvm/
- 
- KERNEL VIRTUAL MACHINE FOR POWERPC (KVM/powerpc)
--M:	Paul Mackerras <paulus@ozlabs.org>
--L:	kvm-ppc@vger.kernel.org
--S:	Supported
--W:	http://www.linux-kvm.org/
--T:	git git://github.com/agraf/linux-2.6.git
-+L:	linuxppc-dev@lists.ozlabs.org
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git topic/ppc-kvm
- F:	arch/powerpc/include/asm/kvm*
- F:	arch/powerpc/include/uapi/asm/kvm*
- F:	arch/powerpc/kernel/kvm*
--- 
-2.31.1
+
+> 
+> Functionally, signalling the wrong CPU in this case is not an issue as
+> task migration means the vCPU has exited and will pick up any pending
+> interrupts on the next VMRUN.  Add the READ_ONCE() purely to clean up the
+> code.
+> 
+> Opportunistically add a comment explaining the task migration behavior,
+> and rename cpuid=>cpu to avoid conflating the CPU number with KVM's more
+> common usage of CPUID.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 8052d92069e0..208c5c71e827 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -675,10 +675,17 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+>  	smp_mb__after_atomic();
+>  
+>  	if (avic_vcpu_is_running(vcpu)) {
+> -		int cpuid = vcpu->cpu;
+> +		int cpu = READ_ONCE(vcpu->cpu);
+>  
+> -		if (cpuid != get_cpu())
+> -			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpuid));
+> +		/*
+> +		 * Note, the vCPU could get migrated to a different pCPU at any
+> +		 * point, which could result in signalling the wrong/previous
+> +		 * pCPU.  But if that happens the vCPU is guaranteed to do a
+> +		 * VMRUN (after being migrated) and thus will process pending
+> +		 * interrupts, i.e. a doorbell is not needed (and the spurious)
+> +		 */
+> +		if (cpu != get_cpu())
+> +			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpu));
+>  		put_cpu();
+>  	} else
+>  		kvm_vcpu_wake_up(vcpu);
+
 
