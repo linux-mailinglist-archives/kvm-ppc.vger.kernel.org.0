@@ -2,258 +2,139 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2220443D538
-	for <lists+kvm-ppc@lfdr.de>; Wed, 27 Oct 2021 23:23:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E220443D64E
+	for <lists+kvm-ppc@lfdr.de>; Thu, 28 Oct 2021 00:09:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241186AbhJ0VZo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 27 Oct 2021 17:25:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43186 "EHLO
+        id S229441AbhJ0WMR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 27 Oct 2021 18:12:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23220 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241244AbhJ0VYV (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 17:24:21 -0400
+        by vger.kernel.org with ESMTP id S229885AbhJ0WMN (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 27 Oct 2021 18:12:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635369714;
+        s=mimecast20190719; t=1635372587;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nwLHJ12ZKjT6leEJ6WYOkEZZGnrS+h6tW+Et+6r7vhY=;
-        b=ErynskCFZQbgjf4bAqihkJRdlb36ZxlI3gF6rpsUjO3yedMiWh+QK+ZX859IH4NZv1KnNM
-        TozaDQ8Tp6javiwS+ZoDcVYSwC+1Yz61lQWbnO3vSgNmL5v12yTlHb3KuL6WIq6VKhguo3
-        iufLnRngqxa0OrguNshS2TPJQiKdz/8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-P4M58sfBMS2OucCtV0CJRQ-1; Wed, 27 Oct 2021 17:21:51 -0400
-X-MC-Unique: P4M58sfBMS2OucCtV0CJRQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E25E0100D029;
-        Wed, 27 Oct 2021 21:21:44 +0000 (UTC)
-Received: from max.com (unknown [10.40.193.143])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C17C8472FC;
-        Wed, 27 Oct 2021 21:21:40 +0000 (UTC)
-From:   Andreas Gruenbacher <agruenba@redhat.com>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     Andreas Gruenbacher <agruenba@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>, cluster-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org,
-        linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v8 00/17] gfs2: Fix mmap + page fault deadlocks
-Date:   Wed, 27 Oct 2021 23:21:38 +0200
-Message-Id: <20211027212138.3722977-1-agruenba@redhat.com>
-In-Reply-To: <20211026094430.3669156-1-agruenba@redhat.com>
-References: <20211026094430.3669156-1-agruenba@redhat.com> <YXeOVZqer+GFBkXO@mit.edu> <20211019134204.3382645-1-agruenba@redhat.com> <CAHk-=wh0_3y5s7-G74U0Pcjm7Y_yHB608NYrQSvgogVNBxsWSQ@mail.gmail.com> <YXBFqD9WVuU8awIv@arm.com> <CAHk-=wgv=KPZBJGnx_O5-7hhST8CL9BN4wJwtVuycjhv_1MmvQ@mail.gmail.com> <YXCbv5gdfEEtAYo8@arm.com> <CAHk-=wgP058PNY8eoWW=5uRMox-PuesDMrLsrCWPS+xXhzbQxQ@mail.gmail.com> <YXL9tRher7QVmq6N@arm.com> <CAHc6FU6JC4ZOwA8t854WbNdmuiNL9DPq0FPga8guATaoCtvsaw@mail.gmail.com>
+        bh=vPTDsq9RY16fTCCoMhEcqKhkYxR/hT5AGgzHMhJ6ojY=;
+        b=GW84Vw7pza+og6AlQkSStDCr+1P5nspQ7TtvSEueKXYKAkG62c75otaTSgTDcHmZeCWVfT
+        uwTNQTOGQCU7TvhtCZdIIeGUW18IXf5YInxnS1/X/q/y1v6tUSxRouck3/RjgSajycTUij
+        gK+XzfOD7Ppyo2nzL6zjKY+Izr8o0ZI=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-1M5eDWr-OWytkafSZPmYUw-1; Wed, 27 Oct 2021 18:09:45 -0400
+X-MC-Unique: 1M5eDWr-OWytkafSZPmYUw-1
+Received: by mail-ed1-f71.google.com with SMTP id u17-20020a50d511000000b003daa3828c13so3645137edi.12
+        for <kvm-ppc@vger.kernel.org>; Wed, 27 Oct 2021 15:09:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=vPTDsq9RY16fTCCoMhEcqKhkYxR/hT5AGgzHMhJ6ojY=;
+        b=hp7tE7bH7vwazPk2yw7wACct9ss/aORUQjbHReDhpL43sC1ehYe/COtdgzwTAGPwlS
+         1V7gJnmb14eaaZ2MmQrjvgJwLW5abATdyLPkNJP+lmq7GI6ETeYrsLNDJgXK0fPRl72r
+         7weychC5yETc7cn7APCwn7iEbRujSMdA0mBVjklOc6TRCPh/1aSijLvJuCs27mbmMHX5
+         qHUMKeectakdcTl2thd7lIzIJeldoWuEHDOGHmzJ+9n9YeLudacnMeNXdwPLqrUwcGbk
+         eKnim4xTLjgWtSjdKdp1Ix0+09CdrA386D6UO5dl05sM643oxOLRs1aHJffpw0giruqW
+         yJkA==
+X-Gm-Message-State: AOAM532+d0qJbZJCqnVFAS6LwSFUaOnTkxl8sSoF9lrme3eu5S0DNZ7G
+        atsN6IuMmN31dL3ZAqITVlQg69DT7GlonMjSx5sMr5vMxs3BNlIG41T2VXGJnQ+l+AU1Xtt9PEA
+        CwQsxqNj6SY97AO5W6w==
+X-Received: by 2002:a17:906:3f95:: with SMTP id b21mr341851ejj.368.1635372584297;
+        Wed, 27 Oct 2021 15:09:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxoBx4vKjR30o+Kgjfdb4KsDUE6yjTUINxxdU8F5+6sRGk01DyvRy4bEl13EnJPgWSCV29mNQ==
+X-Received: by 2002:a17:906:3f95:: with SMTP id b21mr341810ejj.368.1635372584078;
+        Wed, 27 Oct 2021 15:09:44 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id a9sm675279edm.31.2021.10.27.15.09.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Oct 2021 15:09:43 -0700 (PDT)
+Message-ID: <fdf90c2f-81c8-513b-2e06-a90959f4cd89@redhat.com>
+Date:   Thu, 28 Oct 2021 00:09:25 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v2 39/43] KVM: VMX: Don't do full kick when triggering
+ posted interrupt "fails"
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <20211009021236.4122790-40-seanjc@google.com>
+ <335822ac-b98b-1eec-4911-34e4d0e99907@redhat.com>
+ <YXl4mK7CyUBnPaQV@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YXl4mK7CyUBnPaQV@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-One of the arguments against Dave Hansen's patch that eliminates the
-pre-faulting was that it doubles the number of page faults in the slow
-case.  This can be avoided by using get_user_pages() to do the
-"post-faulting", though.  For what it's worth, here's a patch for that
-(on top of this series).
+On 27/10/21 18:04, Sean Christopherson wrote:
+>>> +		/*
+>>> +		 * The smp_wmb() in kvm_make_request() pairs with the smp_mb_*()
+>>> +		 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU
+>>> +		 * is guaranteed to see the event request if triggering a posted
+>>> +		 * interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
+>>
+>> What this smp_wmb() pair with, is the smp_mb__after_atomic in
+>> kvm_check_request(KVM_REQ_EVENT, vcpu).
+>
+> I don't think that's correct.  There is no kvm_check_request() in the relevant path.
+> kvm_vcpu_exit_request() uses kvm_request_pending(), which is just a READ_ONCE()
+> without a barrier.
 
-Andreas
+Ok, we are talking about two different set of barriers.  This is mine:
 
---
+- smp_wmb() in kvm_make_request() pairs with the smp_mb__after_atomic() in
+kvm_check_request(); it ensures that everything before the request
+(in this case, pi_pending = true) is seen by inject_pending_event.
 
-fs: Avoid predictable page faults for sys_write() user buffer pages
+- pi_test_and_set_on() orders the write to ON after the write to PIR,
+pairing with vmx_sync_pir_to_irr and ensuring that the bit in the PIR is
+seen.
 
-Introduce a new fault_in_iov_iter_slow_readable() helper for faulting in
-an iterator via get_user_pages() instead of triggering page faults.
-This is slower than a simple memory read when the underlying pages are
-resident, but avoids the page fault overhead when the underlying pages
-need to be faulted in.
+And this is yours:
 
-Use fault_in_iov_iter_slow_readable() in generic_perform_write and
-iomap_write_iter when reading from the user buffer fails.
+- pi_test_and_set_on() _also_ orders the write to ON before the read of
+vcpu->mode, pairing with vcpu_enter_guest()
 
-Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
----
- fs/iomap/buffered-io.c  |  2 +-
- include/linux/pagemap.h |  3 ++-
- include/linux/uio.h     | 17 ++++++++++++++++-
- lib/iov_iter.c          | 10 ++++++----
- mm/filemap.c            |  2 +-
- mm/gup.c                | 10 ++++++----
- 6 files changed, 32 insertions(+), 12 deletions(-)
+- kvm_make_request() however does _not_ order the write to
+vcpu->requests before the read of vcpu->mode, even though it's needed.
+Usually that's handled by kvm_vcpu_exiting_guest_mode(), but in this case
+vcpu->mode is read in kvm_vcpu_trigger_posted_interrupt.
 
-diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-index d8809cd9ab31..15a0b4bb9528 100644
---- a/fs/iomap/buffered-io.c
-+++ b/fs/iomap/buffered-io.c
-@@ -770,7 +770,7 @@ static loff_t iomap_write_iter(struct iomap_iter *iter, struct iov_iter *i)
- 				bytes = copied;
- 				goto again;
- 			}
--			if (fault_in_iov_iter_readable(i, bytes) != bytes)
-+			if (fault_in_iov_iter_slow_readable(i, bytes) != bytes)
- 				goto again;
- 			status = -EFAULT;
- 			break;
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 2f7dd14083d9..43844ed5675f 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -736,8 +736,9 @@ extern void add_page_wait_queue(struct page *page, wait_queue_entry_t *waiter);
-  * Fault in userspace address range.
-  */
- size_t fault_in_writeable(char __user *uaddr, size_t size);
--size_t fault_in_safe_writeable(const char __user *uaddr, size_t size);
- size_t fault_in_readable(const char __user *uaddr, size_t size);
-+size_t __fault_in_slow(const char __user *uaddr, size_t size,
-+		       unsigned int flags);
- 
- int add_to_page_cache_locked(struct page *page, struct address_space *mapping,
- 				pgoff_t index, gfp_t gfp_mask);
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 6350354f97e9..b071f4445059 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -8,6 +8,7 @@
- #include <linux/kernel.h>
- #include <linux/thread_info.h>
- #include <uapi/linux/uio.h>
-+#include <linux/mm.h>
- 
- struct page;
- struct pipe_inode_info;
-@@ -135,7 +136,21 @@ size_t copy_page_from_iter_atomic(struct page *page, unsigned offset,
- void iov_iter_advance(struct iov_iter *i, size_t bytes);
- void iov_iter_revert(struct iov_iter *i, size_t bytes);
- size_t fault_in_iov_iter_readable(const struct iov_iter *i, size_t bytes);
--size_t fault_in_iov_iter_writeable(const struct iov_iter *i, size_t bytes);
-+size_t __fault_in_iov_iter_slow(const struct iov_iter *i, size_t bytes,
-+				unsigned int flags);
-+
-+static inline size_t fault_in_iov_iter_slow_readable(const struct iov_iter *i,
-+						     size_t bytes)
-+{
-+	return __fault_in_iov_iter_slow(i, bytes, 0);
-+}
-+
-+static inline size_t fault_in_iov_iter_writeable(const struct iov_iter *i,
-+						 size_t bytes)
-+{
-+	return __fault_in_iov_iter_slow(i, bytes, FOLL_WRITE);
-+}
-+
- size_t iov_iter_single_seg_count(const struct iov_iter *i);
- size_t copy_page_to_iter(struct page *page, size_t offset, size_t bytes,
- 			 struct iov_iter *i);
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 66a740e6e153..73789a5409f6 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -468,9 +468,10 @@ size_t fault_in_iov_iter_readable(const struct iov_iter *i, size_t size)
- EXPORT_SYMBOL(fault_in_iov_iter_readable);
- 
- /*
-- * fault_in_iov_iter_writeable - fault in iov iterator for writing
-+ * __fault_in_iov_iter_slow - fault in iov iterator for reading/writing
-  * @i: iterator
-  * @size: maximum length
-+ * @flags: FOLL_* flags (FOLL_WRITE for writing)
-  *
-  * Faults in the iterator using get_user_pages(), i.e., without triggering
-  * hardware page faults.  This is primarily useful when we already know that
-@@ -481,7 +482,8 @@ EXPORT_SYMBOL(fault_in_iov_iter_readable);
-  *
-  * Always returns 0 for non-user-space iterators.
-  */
--size_t fault_in_iov_iter_writeable(const struct iov_iter *i, size_t size)
-+size_t __fault_in_iov_iter_slow(const struct iov_iter *i, size_t size,
-+				unsigned int flags)
- {
- 	if (iter_is_iovec(i)) {
- 		size_t count = min(size, iov_iter_count(i));
-@@ -495,7 +497,7 @@ size_t fault_in_iov_iter_writeable(const struct iov_iter *i, size_t size)
- 
- 			if (unlikely(!len))
- 				continue;
--			ret = fault_in_safe_writeable(p->iov_base + skip, len);
-+			ret = __fault_in_slow(p->iov_base + skip, len, flags);
- 			count -= len - ret;
- 			if (ret)
- 				break;
-@@ -504,7 +506,7 @@ size_t fault_in_iov_iter_writeable(const struct iov_iter *i, size_t size)
- 	}
- 	return 0;
- }
--EXPORT_SYMBOL(fault_in_iov_iter_writeable);
-+EXPORT_SYMBOL(__fault_in_iov_iter_slow);
- 
- void iov_iter_init(struct iov_iter *i, unsigned int direction,
- 			const struct iovec *iov, unsigned long nr_segs,
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 467cdb7d086d..7ca76f4aa974 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -3787,7 +3787,7 @@ ssize_t generic_perform_write(struct file *file,
- 				bytes = copied;
- 				goto again;
- 			}
--			if (fault_in_iov_iter_readable(i, bytes) != bytes)
-+			if (fault_in_iov_iter_slow_readable(i, bytes) != bytes)
- 				goto again;
- 			status = -EFAULT;
- 			break;
-diff --git a/mm/gup.c b/mm/gup.c
-index e1c7e4bde11f..def9f478a621 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -1694,9 +1694,10 @@ size_t fault_in_writeable(char __user *uaddr, size_t size)
- EXPORT_SYMBOL(fault_in_writeable);
- 
- /*
-- * fault_in_safe_writeable - fault in an address range for writing
-+ * __fault_in_slow - fault in an address range for reading/writing
-  * @uaddr: start of address range
-  * @size: length of address range
-+ * @flags: FOLL_* flags (FOLL_WRITE for writing)
-  *
-  * Faults in an address range using get_user_pages, i.e., without triggering
-  * hardware page faults.  This is primarily useful when we already know that
-@@ -1711,7 +1712,8 @@ EXPORT_SYMBOL(fault_in_writeable);
-  * Returns the number of bytes not faulted in, like copy_to_user() and
-  * copy_from_user().
-  */
--size_t fault_in_safe_writeable(const char __user *uaddr, size_t size)
-+size_t __fault_in_slow(const char __user *uaddr, size_t size,
-+		       unsigned int flags)
- {
- 	unsigned long start = (unsigned long)untagged_addr(uaddr);
- 	unsigned long end, nstart, nend;
-@@ -1743,7 +1745,7 @@ size_t fault_in_safe_writeable(const char __user *uaddr, size_t size)
- 		nr_pages = (nend - nstart) / PAGE_SIZE;
- 		ret = __get_user_pages_locked(mm, nstart, nr_pages,
- 					      NULL, NULL, &locked,
--					      FOLL_TOUCH | FOLL_WRITE);
-+					      FOLL_TOUCH | flags);
- 		if (ret <= 0)
- 			break;
- 		nend = nstart + ret * PAGE_SIZE;
-@@ -1754,7 +1756,7 @@ size_t fault_in_safe_writeable(const char __user *uaddr, size_t size)
- 		return 0;
- 	return size - min_t(size_t, nstart - start, size);
- }
--EXPORT_SYMBOL(fault_in_safe_writeable);
-+EXPORT_SYMBOL(__fault_in_slow);
- 
- /**
-  * fault_in_readable - fault in userspace address range for reading
--- 
-2.26.3
+So vmx_deliver_nested_posted_interrupt() is missing a smp_mb__after_atomic().
+It's documentation only for x86, but still easily done in v3.
+
+Paolo
 
