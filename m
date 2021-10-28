@@ -2,207 +2,106 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66C2643E70A
-	for <lists+kvm-ppc@lfdr.de>; Thu, 28 Oct 2021 19:19:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7226C43F184
+	for <lists+kvm-ppc@lfdr.de>; Thu, 28 Oct 2021 23:21:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230410AbhJ1RWI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 28 Oct 2021 13:22:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42976 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230437AbhJ1RWH (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 28 Oct 2021 13:22:07 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40E2EC061745
-        for <kvm-ppc@vger.kernel.org>; Thu, 28 Oct 2021 10:19:40 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id n11-20020a17090a2bcb00b001a1e7a0a6a6so8499439pje.0
-        for <kvm-ppc@vger.kernel.org>; Thu, 28 Oct 2021 10:19:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=q4iJG3ZW7obL4DMmrtDt5ktj041PvD+dEvmTQN+uKyY=;
-        b=mnkWkJlsD3Efv+dhabg9XRW3VcAMBFLrAWU0a5kq4aSl4p3OkuIs64Ri3PE1R6G45W
-         WWX1srIjeyGp7bl0JwXP4EsqbWo0C7Rq7LlpprSwJJDhP6Z9C4BlGZ6pF0W6uFPVwJd6
-         newuZGIp7fi3S1LWbDnukcAYyKzMEUnwUDvBD8yhO2TaY/ppfXW+LzQN7N/3ahTyR+Xa
-         EoqLzmvlkN3t1dBGcUsabuqlQMThWwYqrYkPzmYbFq4TCGSH1FBWF6bLFrKhvfl+wIkg
-         myDgbOosQ39NTrE5GkyLOk3F2ofMqkvjX3mEfa4Ds01sxY6mlbwLLtW+SYgm0DJ0rLj4
-         pK7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=q4iJG3ZW7obL4DMmrtDt5ktj041PvD+dEvmTQN+uKyY=;
-        b=j9XZ4U5jCgHdiJPTz3nq9At6I0c5CHuY1NTJ8WQlRetWgSVK+yTkqdrgCDDXBrxLvu
-         Cc7a4US+VkmK/IwTDaSORcSqYBQqxvAXtLtNvV8Mx5U/BN/PtwVupc6/XT9wFKv8tXZI
-         jsY0NXTaBylwY5SzqUARAy4/NgL98MC0F8XvCnt5iPN6Fhfby0/p8iljgUSmfvbRwlk6
-         uiu1fTi/Q7ijFjbyb/g0FYwwn7SZgxyFwpE8+mkQD9pUuu7X0zO/ZbmxuKrsNN16NyOB
-         tPBDLVCkXLnufq8AACAD7JWKztmyTPSZFPCsHW5q7CBQfDpFyX/Wz9o8LDb9tVO2SS6Z
-         1qQg==
-X-Gm-Message-State: AOAM530dyPKIASmrvUHfnngh1c+82SS7fPMsdZRASPfT5YHKjWOdM1Iu
-        EiCSkCRHWz1/yWeYSco5+EppPg==
-X-Google-Smtp-Source: ABdhPJybd062Z7dZdlv5Ua0y9WgXsZDlcpD/ngOKZtR+XtlO0zPIxbocuXwUccJIVKZ7ltOnF8e4MQ==
-X-Received: by 2002:a17:90a:b105:: with SMTP id z5mr5854314pjq.181.1635441579540;
-        Thu, 28 Oct 2021 10:19:39 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d24sm3945465pfn.62.2021.10.28.10.19.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Oct 2021 10:19:38 -0700 (PDT)
-Date:   Thu, 28 Oct 2021 17:19:34 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        id S230522AbhJ1VX0 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 28 Oct 2021 17:23:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47886 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230404AbhJ1VXZ (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
+        Thu, 28 Oct 2021 17:23:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id EBF7A6023E;
+        Thu, 28 Oct 2021 21:20:55 +0000 (UTC)
+Date:   Thu, 28 Oct 2021 22:20:52 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Andreas Gruenbacher <agruenba@redhat.com>,
         Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v2 28/43] KVM: VMX: Remove vCPU from PI wakeup list
- before updating PID.NV
-Message-ID: <YXrbpvHG7YD0MNO2@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-29-seanjc@google.com>
- <558e7e4c36e649709837079a25c2f56fc5609fbe.camel@redhat.com>
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
+        Matthew Wilcox <willy@infradead.org>,
+        cluster-devel <cluster-devel@redhat.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org,
+        linux-btrfs <linux-btrfs@vger.kernel.org>
+Subject: Re: [PATCH v8 00/17] gfs2: Fix mmap + page fault deadlocks
+Message-ID: <YXsUNMWFpmT1eQcX@arm.com>
+References: <CAHk-=wgv=KPZBJGnx_O5-7hhST8CL9BN4wJwtVuycjhv_1MmvQ@mail.gmail.com>
+ <YXCbv5gdfEEtAYo8@arm.com>
+ <CAHk-=wgP058PNY8eoWW=5uRMox-PuesDMrLsrCWPS+xXhzbQxQ@mail.gmail.com>
+ <YXL9tRher7QVmq6N@arm.com>
+ <CAHk-=wg4t2t1AaBDyMfOVhCCOiLLjCB5TFVgZcV4Pr8X2qptJw@mail.gmail.com>
+ <CAHc6FU7BEfBJCpm8wC3P+8GTBcXxzDWcp6wAcgzQtuaJLHrqZA@mail.gmail.com>
+ <YXhH0sBSyTyz5Eh2@arm.com>
+ <CAHk-=wjWDsB-dDj+x4yr8h8f_VSkyB7MbgGqBzDRMNz125sZxw@mail.gmail.com>
+ <YXmkvfL9B+4mQAIo@arm.com>
+ <CAHk-=wjQqi9cw1Guz6a8oBB0xiQNF_jtFzs3gW0k7+fKN-mB1g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <558e7e4c36e649709837079a25c2f56fc5609fbe.camel@redhat.com>
+In-Reply-To: <CAHk-=wjQqi9cw1Guz6a8oBB0xiQNF_jtFzs3gW0k7+fKN-mB1g@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Oct 28, 2021, Maxim Levitsky wrote:
-> On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> > Remove the vCPU from the wakeup list before updating the notification
-> > vector in the posted interrupt post-block helper.  There is no need to
-> > wake the current vCPU as it is by definition not blocking.  Practically
-> > speaking this is a nop as it only shaves a few meager cycles in the
-> > unlikely case that the vCPU was migrated and the previous pCPU gets a
-> > wakeup IRQ right before PID.NV is updated.  The real motivation is to
-> > allow for more readable code in the future, when post-block is merged
-> > with vmx_vcpu_pi_load(), at which point removal from the list will be
-> > conditional on the old notification vector.
-> > 
-> > Opportunistically add comments to document why KVM has a per-CPU spinlock
-> > that, at first glance, appears to be taken only on the owning CPU.
-> > Explicitly call out that the spinlock must be taken with IRQs disabled, a
-> > detail that was "lost" when KVM switched from spin_lock_irqsave() to
-> > spin_lock(), with IRQs disabled for the entirety of the relevant path.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/posted_intr.c | 49 +++++++++++++++++++++++-----------
-> >  1 file changed, 33 insertions(+), 16 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> > index 2b2206339174..901b7a5f7777 100644
-> > --- a/arch/x86/kvm/vmx/posted_intr.c
-> > +++ b/arch/x86/kvm/vmx/posted_intr.c
-> > @@ -10,10 +10,22 @@
-> >  #include "vmx.h"
-> >  
-> >  /*
-> > - * We maintain a per-CPU linked-list of vCPU, so in wakeup_handler() we
-> > - * can find which vCPU should be waken up.
-> > + * Maintain a per-CPU list of vCPUs that need to be awakened by wakeup_handler()
-> Nit: While at it, it would be nice to rename this to pi_wakeup_hanlder() so
-> that it can be more easilly found.
+One last try on this path before I switch to the other options.
 
-Ah, good catch.
-
-> > + * when a WAKEUP_VECTOR interrupted is posted.  vCPUs are added to the list when
-> > + * the vCPU is scheduled out and is blocking (e.g. in HLT) with IRQs enabled.
-> s/interrupted/interrupt ?
+On Wed, Oct 27, 2021 at 02:14:48PM -0700, Linus Torvalds wrote:
+> On Wed, Oct 27, 2021 at 12:13 PM Catalin Marinas
+> <catalin.marinas@arm.com> wrote:
+> > As an alternative, you mentioned earlier that a per-thread fault status
+> > was not feasible on x86 due to races. Was this only for the hw poison
+> > case? I think the uaccess is slightly different.
 > 
-> Isn't that comment incorrect? As I see, the PI hardware is setup to use the WAKEUP_VECTOR
-> when vcpu blocks (in pi_pre_block) and then that vcpu is added to the list.
-> The pi_wakeup_hanlder just goes over the list and wakes up all vcpus on the lsit.
+> It's not x86-specific, it's very generic.
+> 
+> If we set some flag in the per-thread status, we'll need to be careful
+> about not overwriting it if we then have a subsequent NMI that _also_
+> takes a (completely unrelated) page fault - before we then read the
+> per-thread flag.
+> 
+> Think 'perf' and fetching backtraces etc.
+> 
+> Note that the NMI page fault can easily also be a pointer coloring
+> fault on arm64, for exactly the same reason that whatever original
+> copy_from_user() code was. So this is not a "oh, pointer coloring
+> faults are different". They have the same re-entrancy issue.
+> 
+> And both the "pagefault_disable" and "fault happens in interrupt
+> context" cases are also the exact same 'faulthandler_disabled()'
+> thing. So even at fault time they look very similar.
 
-Doh, yes.  This patch is predicting the future.  The comment becomes correct as of 
+They do look fairly similar but we should have the information in the
+fault handler to distinguish: not a page fault (pte permission or p*d
+translation), in_task(), user address, fixup handler. But I agree the
+logic looks fragile.
 
-  KVM: VMX: Handle PI wakeup shenanigans during vcpu_put/load
+I think for nested contexts we can save the uaccess fault state on
+exception entry, restore it on return. Or (needs some thinking on
+atomicity) save it in a local variable. The high-level API would look
+something like:
 
-but as of this patch the "scheduled out" piece doesn't hold true.
- 
-> > + * The vCPUs posted interrupt descriptor is updated at the same time to set its
-> > + * notification vector to WAKEUP_VECTOR, so that posted interrupt from devices
-> > + * wake the target vCPUs.  vCPUs are removed from the list and the notification
-> > + * vector is reset when the vCPU is scheduled in.
-> >   */
-> >  static DEFINE_PER_CPU(struct list_head, blocked_vcpu_on_cpu);
-> Also while at it, why not to rename this to 'blocked_vcpu_list'?
-> to explain that this is list of blocked vcpus. Its a per-cpu variable
-> so 'on_cpu' suffix isn't needed IMHO.
+	unsigned long uaccess_flags;	/* we could use TIF_ flags */
 
-As you noted, addressed in a future patch.
+	uaccess_flags = begin_retriable_uaccess();
+	copied = copy_page_from_iter_atomic(...);
+	retry = end_retriable_uaccess(uaccess_flags);
+	...
 
-> > +/*
-> > + * Protect the per-CPU list with a per-CPU spinlock to handle task migration.
-> > + * When a blocking vCPU is awakened _and_ migrated to a different pCPU, the
-> > + * ->sched_in() path will need to take the vCPU off the list of the _previous_
-> > + * CPU.  IRQs must be disabled when taking this lock, otherwise deadlock will
-> > + * occur if a wakeup IRQ arrives and attempts to acquire the lock.
-> > + */
-> >  static DEFINE_PER_CPU(spinlock_t, blocked_vcpu_on_cpu_lock);
-> >  
-> >  static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
-> > @@ -101,23 +113,28 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
-> >  	WARN(pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR,
-> >  	     "Wakeup handler not enabled while the vCPU was blocking");
-> >  
-> > -	dest = cpu_physical_id(vcpu->cpu);
-> > -	if (!x2apic_mode)
-> > -		dest = (dest << 8) & 0xFF00;
-> > -
-> > -	do {
-> > -		old.control = new.control = READ_ONCE(pi_desc->control);
-> > -
-> > -		new.ndst = dest;
-> > -
-> > -		/* set 'NV' to 'notification vector' */
-> > -		new.nv = POSTED_INTR_VECTOR;
-> > -	} while (cmpxchg64(&pi_desc->control, old.control,
-> > -			   new.control) != old.control);
-> > -
-> > +	/*
-> > +	 * Remove the vCPU from the wakeup list of the _previous_ pCPU, which
-> > +	 * will not be the same as the current pCPU if the task was migrated.
-> > +	 */
-> >  	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> >  	list_del(&vcpu->blocked_vcpu_list);
-> >  	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> > +
-> > +	dest = cpu_physical_id(vcpu->cpu);
-> > +	if (!x2apic_mode)
-> > +		dest = (dest << 8) & 0xFF00;
-> It would be nice to have a function for this, this appears in this file twice.
-> Maybe there is a function already somewhere?
+	if (!retry)
+		break;
 
-The second instance does go away by the aforementioned:
+I think we'd need a TIF flag to mark the retriable region and another to
+track whether a non-recoverable fault occurred. It needs prototyping.
 
-  KVM: VMX: Handle PI wakeup shenanigans during vcpu_put/load
+Anyway, if you don't like this approach, I'll look at error codes being
+returned but rather than changing all copy_from_user() etc., introduce a
+new API that returns different error codes depending on the fault
+(e.g -EFAULT vs -EACCES). We already have copy_from_user_nofault(), we'd
+need something for the iov_iter stuff to use in the fs code.
 
-I'm inclined to say we don't want a helper because there should only ever be one
-path that changes PI.ndst.  But a comment would definitely help to explain the
-difference between xAPIC and x2APIC IDs.
+-- 
+Catalin
