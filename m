@@ -2,40 +2,40 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5DEA43E5C7
-	for <lists+kvm-ppc@lfdr.de>; Thu, 28 Oct 2021 18:10:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F08B43E5DD
+	for <lists+kvm-ppc@lfdr.de>; Thu, 28 Oct 2021 18:13:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230242AbhJ1QM2 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 28 Oct 2021 12:12:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20887 "EHLO
+        id S229755AbhJ1QPa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 28 Oct 2021 12:15:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21241 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229723AbhJ1QM1 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 28 Oct 2021 12:12:27 -0400
+        by vger.kernel.org with ESMTP id S229764AbhJ1QP3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 28 Oct 2021 12:15:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635437400;
+        s=mimecast20190719; t=1635437582;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RPIozLU8n1iGsiSzHPyPa84e4ejX/UYwSJJGhpw0Bzs=;
-        b=EN22D5+rckM0+dVsDEOd5Um7waQihRqPh6Q4A52PQWPPu9B2miQoDBM3ruy/ofFKtnNF9z
-        yzDMab8E6co1fGe7aWPQ5+CCtCouJ9EwcsJ60U65VIEWhBffXlWMULKuYLdKg6GoPyrhGf
-        EzqV6Hax5Zc2nbL9RtMSLqbY7Or8wcQ=
+        bh=MqVw0Z8vi7JjvCVtjxAexVsSznKzCGLBzzaPnc6KX/k=;
+        b=P2sEdLOrWuN2FEwx4PnSv0muStl+J7q1l3FhF61G7kPdPN7uu3C7HtZuAOT0nDuHDuquGg
+        dBO1rcXU6zKAy7RzE6kS8AaJ9lfcvDTCBIBCHQidH/7wv0rWPR9fyGMxxY/EapQcPL5yKy
+        8BvRbv7uzVq7Uz0pYvAg/+tgIZoK8GE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-PimS6ymnOV-UnZZtG5v5zw-1; Thu, 28 Oct 2021 12:09:56 -0400
-X-MC-Unique: PimS6ymnOV-UnZZtG5v5zw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-238-R1OcEdtCNRy5fjOQqmfJWg-1; Thu, 28 Oct 2021 12:13:00 -0400
+X-MC-Unique: R1OcEdtCNRy5fjOQqmfJWg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E21580A5C0;
-        Thu, 28 Oct 2021 16:09:52 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 594BC112A0A3;
+        Thu, 28 Oct 2021 16:12:14 +0000 (UTC)
 Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 79BD660843;
-        Thu, 28 Oct 2021 16:09:42 +0000 (UTC)
-Message-ID: <5769bb700d94c3828bdef57963a3fe9422e801e7.camel@redhat.com>
-Subject: Re: [PATCH v2 27/43] KVM: VMX: Move Posted Interrupt ndst
- computation out of write loop
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BBDF84180;
+        Thu, 28 Oct 2021 16:12:05 +0000 (UTC)
+Message-ID: <b2ba4c4e6a9083f3fa0b9af4504f9f54e72ca24c.camel@redhat.com>
+Subject: Re: [PATCH v2 35/43] KVM: SVM: Signal AVIC doorbell iff vCPU is in
+ guest mode
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Marc Zyngier <maz@kernel.org>,
@@ -67,99 +67,74 @@ Cc:     James Morse <james.morse@arm.com>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oupton@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 28 Oct 2021 19:09:41 +0300
-In-Reply-To: <643d9c249b5863f04290a6f047ea1a2d98bd75f9.camel@redhat.com>
+Date:   Thu, 28 Oct 2021 19:12:04 +0300
+In-Reply-To: <20211009021236.4122790-36-seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-28-seanjc@google.com>
-         <643d9c249b5863f04290a6f047ea1a2d98bd75f9.camel@redhat.com>
+         <20211009021236.4122790-36-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, 2021-10-28 at 14:28 +0300, Maxim Levitsky wrote:
-> On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> > Hoist the CPU => APIC ID conversion for the Posted Interrupt descriptor
-> > out of the loop to write the descriptor, preemption is disabled so the
-> > CPU won't change, and if the APIC ID changes KVM has bigger problems.
-> > 
-> > No functional change intended.
+On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> Signal the AVIC doorbell iff the vCPU is running in the guest.  If the vCPU
+> is not IN_GUEST_MODE, it's guaranteed to pick up any pending IRQs on the
+> next VMRUN, which unconditionally processes the vIRR.
 > 
-> Is preemption always disabled in vmx_vcpu_pi_load? vmx_vcpu_pi_load is called from vmx_vcpu_load,
-> which is called indirectly from vcpu_load which is called from many ioctls,
-> which userspace does. In these places I don't think that preemption is disabled.
+> Add comments to document the logic.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 208c5c71e827..cbf02e7e20d0 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -674,7 +674,12 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+>  	kvm_lapic_set_irr(vec, vcpu->arch.apic);
+>  	smp_mb__after_atomic();
+>  
+> -	if (avic_vcpu_is_running(vcpu)) {
+> +	/*
+> +	 * Signal the doorbell to tell hardware to inject the IRQ if the vCPU
+> +	 * is in the guest.  If the vCPU is not in the guest, hardware will
+> +	 * automatically process AVIC interrupts at VMRUN.
+> +	 */
+> +	if (vcpu->mode == IN_GUEST_MODE) {
+>  		int cpu = READ_ONCE(vcpu->cpu);
+>  
+>  		/*
+> @@ -687,8 +692,13 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+>  		if (cpu != get_cpu())
+>  			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpu));
+>  		put_cpu();
+> -	} else
+> +	} else {
+> +		/*
+> +		 * Wake the vCPU if it was blocking.  KVM will then detect the
+> +		 * pending IRQ when checking if the vCPU has a wake event.
+> +		 */
+>  		kvm_vcpu_wake_up(vcpu);
+> +	}
+>  
+>  	return 0;
+>  }
 
-You can disregard this, I missed the fact that we have 'int cpu = get_cpu();'
-which disables preemption in 'vcpu_load'
+It makes sense indeed to avoid ringing the doorbell when the vCPU is not in the guest mode.
 
-Thus,
+I do wonder if we want to call kvm_vcpu_wake_up always otherwise, as the vCPU might
+be just outside of the guest mode and not scheduled out. I don't know how expensive
+is kvm_vcpu_wake_up in this case.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
+Before this patch, the avic_vcpu_is_running would only be false when the vCPU is scheduled out
+(e.g when vcpu_put was done on it)
 
 Best regards,
 	Maxim Levitsky
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/posted_intr.c | 25 +++++++++++--------------
-> >  1 file changed, 11 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> > index fea343dcc011..2b2206339174 100644
-> > --- a/arch/x86/kvm/vmx/posted_intr.c
-> > +++ b/arch/x86/kvm/vmx/posted_intr.c
-> > @@ -51,17 +51,15 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
-> >  		goto after_clear_sn;
-> >  	}
-> >  
-> > -	/* The full case.  */
-> > +	/* The full case.  Set the new destination and clear SN. */
-> > +	dest = cpu_physical_id(cpu);
-> > +	if (!x2apic_mode)
-> > +		dest = (dest << 8) & 0xFF00;
-> > +
-> >  	do {
-> >  		old.control = new.control = READ_ONCE(pi_desc->control);
-> >  
-> > -		dest = cpu_physical_id(cpu);
-> > -
-> > -		if (x2apic_mode)
-> > -			new.ndst = dest;
-> > -		else
-> > -			new.ndst = (dest << 8) & 0xFF00;
-> > -
-> > +		new.ndst = dest;
-> >  		new.sn = 0;
-> >  	} while (cmpxchg64(&pi_desc->control, old.control,
-> >  			   new.control) != old.control);
-> > @@ -103,15 +101,14 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
-> >  	WARN(pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR,
-> >  	     "Wakeup handler not enabled while the vCPU was blocking");
-> >  
-> > +	dest = cpu_physical_id(vcpu->cpu);
-> > +	if (!x2apic_mode)
-> > +		dest = (dest << 8) & 0xFF00;
-> > +
-> >  	do {
-> >  		old.control = new.control = READ_ONCE(pi_desc->control);
-> >  
-> > -		dest = cpu_physical_id(vcpu->cpu);
-> > -
-> > -		if (x2apic_mode)
-> > -			new.ndst = dest;
-> > -		else
-> > -			new.ndst = (dest << 8) & 0xFF00;
-> > +		new.ndst = dest;
-> >  
-> >  		/* set 'NV' to 'notification vector' */
-> >  		new.nv = POSTED_INTR_VECTOR;
-
 
