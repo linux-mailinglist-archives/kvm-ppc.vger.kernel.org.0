@@ -2,20 +2,68 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4285C440173
-	for <lists+kvm-ppc@lfdr.de>; Fri, 29 Oct 2021 19:50:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8E4344026B
+	for <lists+kvm-ppc@lfdr.de>; Fri, 29 Oct 2021 20:47:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229940AbhJ2RxK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 29 Oct 2021 13:53:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58554 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229489AbhJ2RxK (ORCPT <rfc822;kvm-ppc@vger.kernel.org>);
-        Fri, 29 Oct 2021 13:53:10 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C7CA9610C7;
-        Fri, 29 Oct 2021 17:50:38 +0000 (UTC)
-Date:   Fri, 29 Oct 2021 18:50:35 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
+        id S230126AbhJ2SuX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 29 Oct 2021 14:50:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47938 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229755AbhJ2SuW (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 29 Oct 2021 14:50:22 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE70FC061714
+        for <kvm-ppc@vger.kernel.org>; Fri, 29 Oct 2021 11:47:53 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id bu18so5621900lfb.0
+        for <kvm-ppc@vger.kernel.org>; Fri, 29 Oct 2021 11:47:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=uGPiPKSphOUEs2fEDAQ1oyHUSr8W7H4wPzT5A6mID2k=;
+        b=PwcTyiA+l0irgoS20hv3ruCOgqQ9pk+pMaL//cWuIfytOjzpNyUjD0wheL47Rw4p5e
+         XrhsN1D22td0eNyy9FTurkcJuSyIf4PSSbRhWBWg03sYd3a5zne0nY8hIhl5wl5Iiq0/
+         rwXzrUhn5/fXzh2aHHrpyapZm5QCvdomJAv4A=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=uGPiPKSphOUEs2fEDAQ1oyHUSr8W7H4wPzT5A6mID2k=;
+        b=G1BTZXmkslD1YV/oGmDppMUWx9upy61CIjWidPRVEXQn49jUQmwcuq20z0kN/1K5FS
+         HyBhmQDQHTiRh7SYpt/VgS427MXTarrI35EiRR36EnHogZ/x1kcu8wK5amaCquKlfeCC
+         gf1VuuT7HFRdPCcQX/8l878/WqdJGYkk0dHZ7fZO4hicFFogH2ocAF96oXM5rPIBvXVr
+         VMJDiFPko7O7SsrmdUI9Oz3SmmiAbY1/9LwRs1cQtE6OT05bmrcOrrBO6RL5RVEi7X9I
+         nxsk+wJpebNwHrPZs/v11aAZP1mfTa/J3YEzlTA7Gus+jilWRWPi4j9doblzAKLR65zB
+         anyw==
+X-Gm-Message-State: AOAM531xcgTz2lCujlryOgu40++tJBL0aaPRPzoud9BmLhNFBtSDxyYx
+        EdJOg+YfSZr+wg8HarXXa6qjrZ4tifdlZTMXF3A=
+X-Google-Smtp-Source: ABdhPJyS6Qpi5tMvHIKbocpqUDebi1V/94gevNIH5HlZT4oPKCkf43pTGvnRwPugjiLgeZ0LRWja2A==
+X-Received: by 2002:a05:6512:2399:: with SMTP id c25mr9255425lfv.454.1635533270807;
+        Fri, 29 Oct 2021 11:47:50 -0700 (PDT)
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com. [209.85.208.177])
+        by smtp.gmail.com with ESMTPSA id z3sm181837ljm.113.2021.10.29.11.47.49
+        for <kvm-ppc@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Oct 2021 11:47:49 -0700 (PDT)
+Received: by mail-lj1-f177.google.com with SMTP id i26so16410759ljg.7
+        for <kvm-ppc@vger.kernel.org>; Fri, 29 Oct 2021 11:47:49 -0700 (PDT)
+X-Received: by 2002:a05:651c:17a6:: with SMTP id bn38mr13088470ljb.56.1635533269069;
+ Fri, 29 Oct 2021 11:47:49 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAHk-=wgP058PNY8eoWW=5uRMox-PuesDMrLsrCWPS+xXhzbQxQ@mail.gmail.com>
+ <YXL9tRher7QVmq6N@arm.com> <CAHk-=wg4t2t1AaBDyMfOVhCCOiLLjCB5TFVgZcV4Pr8X2qptJw@mail.gmail.com>
+ <CAHc6FU7BEfBJCpm8wC3P+8GTBcXxzDWcp6wAcgzQtuaJLHrqZA@mail.gmail.com>
+ <YXhH0sBSyTyz5Eh2@arm.com> <CAHk-=wjWDsB-dDj+x4yr8h8f_VSkyB7MbgGqBzDRMNz125sZxw@mail.gmail.com>
+ <YXmkvfL9B+4mQAIo@arm.com> <CAHk-=wjQqi9cw1Guz6a8oBB0xiQNF_jtFzs3gW0k7+fKN-mB1g@mail.gmail.com>
+ <YXsUNMWFpmT1eQcX@arm.com> <CAHk-=wgzEKEYKRoR_abQRDO=R8xJX_FK+XC3gNhKfu=KLdxt3g@mail.gmail.com>
+ <YXw0a9n+/PLAcObB@arm.com>
+In-Reply-To: <YXw0a9n+/PLAcObB@arm.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 29 Oct 2021 11:47:33 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgNV5Ka0yTssic0JbZEcO3wvoTC65budK88k4D-34v0xA@mail.gmail.com>
+Message-ID: <CAHk-=wgNV5Ka0yTssic0JbZEcO3wvoTC65budK88k4D-34v0xA@mail.gmail.com>
+Subject: Re: [PATCH v8 00/17] gfs2: Fix mmap + page fault deadlocks
+To:     Catalin Marinas <catalin.marinas@arm.com>
 Cc:     Andreas Gruenbacher <agruenba@redhat.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
@@ -29,101 +77,78 @@ Cc:     Andreas Gruenbacher <agruenba@redhat.com>,
         linux-btrfs <linux-btrfs@vger.kernel.org>,
         Tony Luck <tony.luck@intel.com>,
         Andy Lutomirski <luto@kernel.org>
-Subject: Re: [PATCH v8 00/17] gfs2: Fix mmap + page fault deadlocks
-Message-ID: <YXw0a9n+/PLAcObB@arm.com>
-References: <CAHk-=wgP058PNY8eoWW=5uRMox-PuesDMrLsrCWPS+xXhzbQxQ@mail.gmail.com>
- <YXL9tRher7QVmq6N@arm.com>
- <CAHk-=wg4t2t1AaBDyMfOVhCCOiLLjCB5TFVgZcV4Pr8X2qptJw@mail.gmail.com>
- <CAHc6FU7BEfBJCpm8wC3P+8GTBcXxzDWcp6wAcgzQtuaJLHrqZA@mail.gmail.com>
- <YXhH0sBSyTyz5Eh2@arm.com>
- <CAHk-=wjWDsB-dDj+x4yr8h8f_VSkyB7MbgGqBzDRMNz125sZxw@mail.gmail.com>
- <YXmkvfL9B+4mQAIo@arm.com>
- <CAHk-=wjQqi9cw1Guz6a8oBB0xiQNF_jtFzs3gW0k7+fKN-mB1g@mail.gmail.com>
- <YXsUNMWFpmT1eQcX@arm.com>
- <CAHk-=wgzEKEYKRoR_abQRDO=R8xJX_FK+XC3gNhKfu=KLdxt3g@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wgzEKEYKRoR_abQRDO=R8xJX_FK+XC3gNhKfu=KLdxt3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Oct 28, 2021 at 03:32:23PM -0700, Linus Torvalds wrote:
-> The pointer color fault (or whatever some other architecture may do to
-> generate sub-page faults) is not only not recoverable in the sense
-> that we can't fix it up, it also ends up being a forced SIGSEGV (ie it
-> can't be blocked - it has to either be caught or cause the process to
-> be killed).
-> 
-> And the thing is, I think we could just make the rule be that kernel
-> code that has this kind of retry loop with fault_in_pages() would
-> force an EFAULT on a pending SIGSEGV.
-> 
-> IOW, the pending SIGSEGV could effectively be exactly that "thread flag".
-> 
-> And that means that fault_in_xyz() wouldn't need to worry about this
-> situation at all: the regular copy_from_user() (or whatever flavor it
-> is - to/from/iter/whatever) would take the fault. And if it's a
-> regular page fault,. it would act exactly like it does now, so no
-> changes.
-> 
-> If it's a sub-page fault, we'd just make the rule be that we send a
-> SIGSEGV even if the instruction in question has a user exception
-> fixup.
-> 
-> Then we just need to add the logic somewhere that does "if active
-> pending SIGSEGV, return -EFAULT".
-> 
-> Of course, that logic might be in fault_in_xyz(), but it migth also be
-> a separate function entirely.
-> 
-> So this does effectively end up being a thread flag, but it's also
-> slightly more than that - it's that a sub-page fault from kernel mode
-> has semantics that a regular page fault does not.
-> 
-> The whole "kernel access doesn't cause SIGSEGV, but returns -EFAULT
-> instead" has always been an odd and somewhat wrong-headed thing. Of
-> course it should cause a SIGSEGV, but that's not how Unix traditionall
-> worked. We would just say "color faults always raise a signal, even if
-> the color fault was triggered in a system call".
+On Fri, Oct 29, 2021 at 10:50 AM Catalin Marinas
+<catalin.marinas@arm.com> wrote:
+>
+> First of all, a uaccess in interrupt should not force such signal as it
+> had nothing to do with the interrupted context. I guess we can do an
+> in_task() check in the fault handler.
 
-It's doable and, at least for MTE, people have asked for a signal even
-when the fault was caused by a kernel uaccess. But there are some
-potentially confusing aspects to sort out:
+Yeah. It ends up being similar to the thread flag in that you still
+end up having to protect against NMI and other users of asynchronous
+page faults.
 
-First of all, a uaccess in interrupt should not force such signal as it
-had nothing to do with the interrupted context. I guess we can do an
-in_task() check in the fault handler.
+So the suggestion was more of a "mindset" difference and modified
+version of the task flag rather than anything fundamentally different.
 
-Second, is there a chance that we enter the fault-in loop with a SIGSEGV
-already pending? Maybe it's not a problem, we just bail out of the loop
-early and deliver the signal, though unrelated to the actual uaccess in
-the loop.
+> Second, is there a chance that we enter the fault-in loop with a SIGSEGV
+> already pending? Maybe it's not a problem, we just bail out of the loop
+> early and deliver the signal, though unrelated to the actual uaccess in
+> the loop.
 
-Third is the sigcontext.pc presented to the signal handler. Normally for
-SIGSEGV it points to the address of a load/store instruction and a
-handler could disable MTE and restart from that point. With a syscall we
-don't want it to point to the syscall place as it shouldn't be restarted
-in case it copied something. Pointing it to the next instruction after
-syscall is backwards-compatible but it may confuse the handler (if it
-does some reporting). I think we need add a new si_code that describes a
-fault in kernel mode to differentiate from the genuine user access.
+If we ever run in user space with a pending per-thread SIGSEGV, that
+would already be a fairly bad bug. The intent of "force_sig()" is not
+only to make sure you can't block the signal, but also that it targets
+the particular thread that caused the problem: unlike other random
+"send signal to process", a SIGSEGV caused by a bad memory access is
+really local to that _thread_, not the signal thread group.
 
-There was a discussion back in August on infinite loops with hwpoison
-and Tony said that Andy convinced him that the kernel should not send a
-SIGBUS for uaccess:
+So somebody else sending a SIGSEGV asynchronsly is actually very
+different - it goes to the thread group (although you can specify
+individual threads too - but once you do that you're already outside
+of POSIX).
 
-https://lore.kernel.org/linux-edac/20210823152437.GA1637466@agluck-desk2.amr.corp.intel.com/
+That said, the more I look at it, the more I think I was wrong. I
+think the "we have a SIGSEGV pending" could act as the per-thread
+flag, but the complexity of the signal handling is probably an
+argument against it.
 
-I personally like the approach of a SIG{SEGV,BUS} on uaccess and I don't
-think the ABI change is significant but ideally we should have a unified
-approach that's not just for MTE.
+Not because a SIGSEGV could already be pending, but because so many
+other situations could be pending.
 
-Adding Andy and Tony (the background is potentially infinite loops with
-faults at sub-page granularity: arm64 MTE, hwpoison, sparc ADI).
+In particular, the signal code won't send new signals to a thread if
+that thread group is already exiting. So another thread may have
+already started the exit and core dump sequence, and is in the process
+of killing the shared signal threads, and if one of those threads is
+now in the kernel and goes through the copy_from_user() dance, that
+whole "thread group is exiting" will mean that the signal code won't
+add a new SIGSEGV to the queue.
 
-Thanks.
+So the signal could conceptually be used as the flag to stop looping,
+but it ends up being such a complicated flag that I think it's
+probably not worth it after all. Even if it semantically would be
+fairly nice to use pre-existing machinery.
 
--- 
-Catalin
+Could it be worked around? Sure. That kernel loop probably has to
+check for fatal_signal_pending() anyway, so it would all work even in
+the presense of the above kinds of issues. But just the fact that I
+went and looked at just how exciting the signal code is made me think
+"ok, conceptually nice, but we take a lot of locks and we do a lot of
+special things even in the 'simple' force_sig() case".
+
+> Third is the sigcontext.pc presented to the signal handler. Normally for
+> SIGSEGV it points to the address of a load/store instruction and a
+> handler could disable MTE and restart from that point. With a syscall we
+> don't want it to point to the syscall place as it shouldn't be restarted
+> in case it copied something.
+
+I think this is actually independent of the whole "how to return
+errors". We'll still need to return an error from the system call,
+even if we also have a signal pending.
+
+                  Linus
