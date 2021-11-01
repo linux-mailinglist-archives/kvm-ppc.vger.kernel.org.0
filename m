@@ -2,80 +2,147 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B115A4414A0
-	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Nov 2021 09:03:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E046441F73
+	for <lists+kvm-ppc@lfdr.de>; Mon,  1 Nov 2021 18:41:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231475AbhKAIFn (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 1 Nov 2021 04:05:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53308 "EHLO
+        id S230329AbhKARoJ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 1 Nov 2021 13:44:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231384AbhKAIFm (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Nov 2021 04:05:42 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71627C061714
-        for <kvm-ppc@vger.kernel.org>; Mon,  1 Nov 2021 01:03:09 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id p16so34822657lfa.2
-        for <kvm-ppc@vger.kernel.org>; Mon, 01 Nov 2021 01:03:09 -0700 (PDT)
+        with ESMTP id S230206AbhKARoH (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 1 Nov 2021 13:44:07 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A528C061767
+        for <kvm-ppc@vger.kernel.org>; Mon,  1 Nov 2021 10:41:34 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id gn3so12623542pjb.0
+        for <kvm-ppc@vger.kernel.org>; Mon, 01 Nov 2021 10:41:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=kTlPYaJ3qmdiuwil3bN4/5BGELxQxYaH2mDV2D/+NOc=;
-        b=noIunhl9PvoPcUkMO1aIA1oVXnNEN4KUMnLzX81u41bUYmm654/d+8Zmtlo6rVUfiP
-         URKnr6K8ehg0Wh7FRqSI9k6fPv2DsXoeQF5RyVvvBWL5iE17ii0Hwy7DEGCxBrabSyNn
-         EOknVx9TADL+GR6CwdZv5iwiQkA+SgU+2TIIuYRY7UtEIvS3tf+3AOfWSGAHDegfCUDW
-         KFTXPeEWCeZvS9OsO77XW5FzLhbHNg24miTgIfpxgxdtWSxpsMgcVp1ovVt1nV8bPABY
-         Nt9t0GENejSl8bnKdYk9qzpsZJoEh4QUKHq3To1LyThtQ/UNoUZiShWGV9dnp4emntud
-         6TAQ==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=rtTqRA7823rLhhDHR/FeABtCXlD+vQwUZXFhSKbl7nw=;
+        b=otcBvN/3IcuDrr15J0K5CvKDj9ic0jccTokbwB/sVPFst2f0LLD/XC7PPmPO9eJXRu
+         P2OBNUe1RlpO0zOo26l/3DPAdKxfcfvQY3tyTT+VRt2u50F02VgF8OTA49ToznF2ILGt
+         Yy6m85iKMGx1XCrOjugojlIHRrq3kXSGg8wFybO1VALqYGLus50IE17TDpBh8OqfqKK1
+         AAKVEsJcdEBK8202Jfb1yydMhJbNy9mJ8dChJ1pRBEEAKk0vwWevUCT/VxYAjLKOhhmx
+         ip94OeR4ZQJbCq2qfgBZUaSsgLQoBT6PDF+7fUOqfu8QIWy5qh2RFzJV0Hmhvl6+AMgp
+         M0Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=kTlPYaJ3qmdiuwil3bN4/5BGELxQxYaH2mDV2D/+NOc=;
-        b=No/JHUv7rkbJa13/i9BLhcbxFkgf+GJzjTUTwPVOBLtjMYB1l5hCMq4hFqntfhQ0T+
-         +PXC5qkf9SMm5HynI1g6wwQ6ECqL57jXEk7eRFSLkRZTfoBlQAB8WjzwsP++Qvn2Ozk1
-         77J5uEpmgd6iEVuoP3u4M5dxkQ41eFZQQwXtxmZ5AHvvwwoyoPr5d91j0BV3Hhx6Frsi
-         p9bhokbc+iXWCKLALLHmtJbiMs7M0TFqHtklsCw6D+39S+DLfaMgFLs4cG7FOFBvNk0y
-         TwDFBoo+F9Vr4BMyvTaquf1TUEtIzm6szTQGphI9bU+sIuD7cQoAjRFy8gWJSY78wvyD
-         0KlA==
-X-Gm-Message-State: AOAM530jgC3iV8O5TkYlel5reyEgn1JdQBkmoJP/HbfmjxmRTKxzCwwW
-        HYETW3VYOvn1g8vnkptJz0YLTSe5udyxD+AArZg=
-X-Google-Smtp-Source: ABdhPJxXtE0G1whIGXe2hxI/YsBwuQCFdtv4O25KgKEw0cNYTytiUo7Vy8b5pLqj8uf6S/Zvq7lb35uF1vpbXYsY0v0=
-X-Received: by 2002:a05:6512:a8e:: with SMTP id m14mr26458494lfu.575.1635753787779;
- Mon, 01 Nov 2021 01:03:07 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=rtTqRA7823rLhhDHR/FeABtCXlD+vQwUZXFhSKbl7nw=;
+        b=SVK1GX5KM0otDeqk8wKCtpqiVIOJdv3wGaxWBY35YzmI2tz0T8kUdX7Gs3fmnRnxwd
+         et6HB8pERQXQ1T+ZadN+HsN1sZYqfj7asM1LDpgCTwJBPZWmPOkMwazoL3p1RVFLLPrP
+         zwWmP2GjaXZFkEMLN8JlY6MV/6Q3JRBrs82hsUJFtogTQ+EkVybe8ziOEHvRMU6wA8ca
+         lAxSTZEERZnkUixA2H9j7UBPcO5CZ2Gfczq8Z/4CzkaymG62fMiFaquiRVu0Qm3JMKkM
+         juJCy7WCP/VHeVHb1Tq1COtSub8nIXplxp95ZTjkvhB3otZZ8O4lgasgp0C8U8UFYu9+
+         3ddA==
+X-Gm-Message-State: AOAM531ESKTqBq6RaWWeVa9Oy3ejfHiS27bYRWr4Jmp06J9Xy+QPw2gH
+        I9869YHxOuctg0QoQPhAkgQr6g==
+X-Google-Smtp-Source: ABdhPJyQ2rd8AtzfLKSk7pcRIWMkAF0QH30KhY5NHLgIkgccLRDTnxh33KsvfNWVKvhaR3vGZrvloQ==
+X-Received: by 2002:a17:90b:3ec6:: with SMTP id rm6mr365778pjb.27.1635788493615;
+        Mon, 01 Nov 2021 10:41:33 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id cv1sm86275pjb.48.2021.11.01.10.41.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Nov 2021 10:41:33 -0700 (PDT)
+Date:   Mon, 1 Nov 2021 17:41:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v2 26/43] KVM: VMX: Read Posted Interrupt "control"
+ exactly once per loop iteration
+Message-ID: <YYAmyUZhmcSntUza@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <20211009021236.4122790-27-seanjc@google.com>
+ <b078cce30f86672d7d8f8eaa0adc47d24def24e2.camel@redhat.com>
+ <YXrH/ZZBOHrWHz4j@google.com>
+ <20a17d75855dfb9bd496466fcd9f14baab0b2bda.camel@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a05:6512:304b:0:0:0:0 with HTTP; Mon, 1 Nov 2021 01:03:07
- -0700 (PDT)
-Reply-To: aisha.7d@yahoo.com
-From:   Aisha AG <rbx17058@gmail.com>
-Date:   Mon, 1 Nov 2021 00:03:07 -0800
-Message-ID: <CA+KbyyeEn+hP9T75RRy6+snGWxpAx+xn43MKdB30KYFYZNAV2Q@mail.gmail.com>
-Subject: Hello Dear,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20a17d75855dfb9bd496466fcd9f14baab0b2bda.camel@redhat.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
--- 
-Hello Dear,
+On Mon, Nov 01, 2021, Maxim Levitsky wrote:
+> On Thu, 2021-10-28 at 15:55 +0000, Sean Christopherson wrote:
+> > On Thu, Oct 28, 2021, Maxim Levitsky wrote:
+> > > On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> > > I wish there was a way to mark fields in a struct, as requiring 'READ_ONCE' on them
+> > > so that compiler would complain if this isn't done, or automatically use 'READ_ONCE'
+> > > logic.
+> > 
+> > Hmm, I think you could make an argument that ON and thus the whole "control"
+> > word should be volatile.  AFAICT, tagging just "on" as volatile actually works.
+> > There's even in a clause in Documentation/process/volatile-considered-harmful.rst
+> > that calls this out as a (potentially) legitimate use case.
+> > 
+> >   - Pointers to data structures in coherent memory which might be modified
+> >     by I/O devices can, sometimes, legitimately be volatile.
+> > 
+> > That said, I think I actually prefer forcing the use of READ_ONCE.  The descriptor
+> > requires more protections than what volatile provides, namely that all writes need
+> > to be atomic.  So given that volatile alone isn't sufficient, I'd prefer to have
+> > the code itself be more self-documenting.
+> 
+> I took a look at how READ_ONCE/WRITE_ONCE is implemented and indeed they use volatile
+> (the comment above __READ_ONCE is worth gold...), so there is a bit of contradiction:
+> 
+> volatile-considered-harmful.rst states not to mark struct members volatile since
+> you usually need more that than (very true often) and yet, I also heard that
+> READ_ONCE/WRITE_ONCE is very encouraged to be used to fields that are used in lockless
+> algorithms, even when not strictly needed,
+> so why not to just mark the field and then use it normally? I guess that
+> explicit READ_ONCE/WRITE_ONCE is much more readable/visible that a volatile
+> in some header file.
 
-I came across your e-mail contact prior to a private search while in
-need of your assistance. I am Aisha Al-Qaddafi, the only biological
-Daughter of Former President of Libya Col.Muammar Al-Qaddafi.
-Am a Widow and a single Mother with three Children.
+Are you asking about this PI field in particular, or for any field in general?
 
-I have investment funds worth Twenty Seven Million Five Hundred
-Thousand United State Dollar $27.500.000.00, and i need a trusted
-investment Manager/Partner because of my current refugee status,
-however, I am interested in you for investment project assistance in
-your country, may be from there, we can build business relationship
-in the nearest future.
+In this particular case, visibility and documentation is really the only difference,
+functionally the result is the same.  But that's also very much related to why this
+case gets the exception listed above.  The "use it normally" part is also why I
+don't want to tag the field volatile since writing the field absolutely cannot be
+done "normally", it must be done atomically, and volatile doesn't capture that
+detail.
 
-I am willing to negotiate an investment/business profit sharing ratio
-with you based on the future investment earning profits.
+If you're asking about fields in general, the "volatile is harmful" guideline is
+to deter usage of volatile for cases where the field/variable in question is not
+intrinsically volatile.  As the docs call out, using volatile in those cases often
+leads to worse code generation because the compiler is disallowed from optimizing
+accesses that are protected through other mechanisms.
 
-If you are willing to handle this project on my behalf kindly reply
-urgently to enable me to provide you more information about the
-investment funds.
-Best Regards
-Mrs Aisha Al-Qaddafi.
+A good example in x86 KVM is the READ_ONCE(sp->unsync) in mmu_try_to_unsync_pages() to
+force the compiler to emit a load of sp->unsync after acquiring mmu_unsync_pages_lock.
+Tagging "unsync" as volatile is unnecessary since the vast majority of its usage is
+protected by holding a spinlock for write, and would prevent optimizing references in
+kvm_mmu_get_page() and other flows that are protected by mmu_lock in the legacy MMU.
