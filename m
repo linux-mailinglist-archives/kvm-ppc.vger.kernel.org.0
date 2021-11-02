@@ -2,161 +2,183 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDF8F442F7E
-	for <lists+kvm-ppc@lfdr.de>; Tue,  2 Nov 2021 14:54:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C824B443203
+	for <lists+kvm-ppc@lfdr.de>; Tue,  2 Nov 2021 16:48:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231251AbhKBN5R (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 2 Nov 2021 09:57:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57946 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229712AbhKBN5R (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 2 Nov 2021 09:57:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635861281;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ZIml53bo0PEw+1GPldGqxvXRU9sgyca3MuCiU7dOmOM=;
-        b=Ib+QstJ3Oc7eezAQvEX/9m8FjvoCVGiEXPh4kywf/VaH8c0XBjrd+bg5gCc0nNgn04PA9f
-        1mhxacom+yad6inwzi3UBf3Q7ifOUgPoikx6ew7f0F82WaN5/JPu4ykrmmDcinOVZZDfz+
-        hG7D6WRfoIgqFYNRwVjtyj7mfgGcU88=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-MREFlxGwObSgtBCBzsMCpg-1; Tue, 02 Nov 2021 09:54:38 -0400
-X-MC-Unique: MREFlxGwObSgtBCBzsMCpg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S234608AbhKBPvS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 2 Nov 2021 11:51:18 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:57664 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234309AbhKBPvM (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 2 Nov 2021 11:51:12 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 08C8221639;
+        Tue,  2 Nov 2021 15:48:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1635868117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oei/Vl5aP6rLS5lpkscnCj7v3fQPmBAplgA77ous6I0=;
+        b=fG+fkNhe+opTnWtTwExBlRfQQ5FwT4IL1gPoGT003O+Znid881GXyGqNs5Cb/ragtUjOTi
+        i5h6K7N2uD5ltOsceWk0PNAQEEWpk8WwA2aR/GN5VNEhVSqVo4DZqbxmB1/wiXPnD2Ln4m
+        01YVaHoZz75c7R7AqFSWuqhnZbOsgrU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1635868117;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oei/Vl5aP6rLS5lpkscnCj7v3fQPmBAplgA77ous6I0=;
+        b=4YYLRJWXJ2hzMXIMmn16h4unrWb0o+SGJ4x9td4PVUBwPshf1IevATEyDey2PO9rT736kj
+        oF0RmhpOBpaBasCA==
+Received: from kunlun.suse.cz (unknown [10.100.128.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AD4E100C665;
-        Tue,  2 Nov 2021 13:54:36 +0000 (UTC)
-Received: from max.localdomain (unknown [10.40.195.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BBD771017CF5;
-        Tue,  2 Nov 2021 13:54:23 +0000 (UTC)
-From:   Andreas Gruenbacher <agruenba@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Andreas Gruenbacher <agruenba@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>, Jan Kara <jack@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>, cluster-devel@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ocfs2-devel@oss.oracle.com, kvm-ppc@vger.kernel.org,
-        linux-btrfs@vger.kernel.org
-Subject: [GIT PULL] gfs2: Fix mmap + page fault deadlocks
-Date:   Tue,  2 Nov 2021 14:54:22 +0100
-Message-Id: <20211102135422.121093-1-agruenba@redhat.com>
+        by relay2.suse.de (Postfix) with ESMTPS id DED99A3B8D;
+        Tue,  2 Nov 2021 15:48:36 +0000 (UTC)
+Date:   Tue, 2 Nov 2021 16:48:35 +0100
+From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     Hari Bathini <hbathini@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        Michael Ellerman <mpe@ellerman.id.au>, ro@suse.de,
+        kvm-ppc@vger.kernel.org
+Subject: Re: KVM on POWER8 host lock up since 10d91611f426 ("powerpc/64s:
+ Reimplement book3s idle code in C")
+Message-ID: <20211102154835.GQ11195@kunlun.suse.cz>
+References: <20200830201145.GA29521@kitsune.suse.cz>
+ <1598835313.5688ngko4f.astroid@bobo.none>
+ <20200831091523.GC29521@kitsune.suse.cz>
+ <87y2lv1430.fsf@mpe.ellerman.id.au>
+ <1599484062.vgmycu6q5i.astroid@bobo.none>
+ <20201016201410.GH29778@kitsune.suse.cz>
+ <1603066878.gtbyofrzyo.astroid@bobo.none>
+ <1603082970.5545yt7raj.astroid@bobo.none>
+ <20210114124023.GL6564@kitsune.suse.cz>
+ <1610628922.o1ihbt98xg.astroid@bobo.none>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <1610628922.o1ihbt98xg.astroid@bobo.none>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hi Linus,
+On Thu, Jan 14, 2021 at 11:08:03PM +1000, Nicholas Piggin wrote:
+> Excerpts from Michal Suchánek's message of January 14, 2021 10:40 pm:
+> > On Mon, Oct 19, 2020 at 02:50:51PM +1000, Nicholas Piggin wrote:
+> >> Excerpts from Nicholas Piggin's message of October 19, 2020 11:00 am:
+> >> > Excerpts from Michal Suchánek's message of October 17, 2020 6:14 am:
+> >> >> On Mon, Sep 07, 2020 at 11:13:47PM +1000, Nicholas Piggin wrote:
+> >> >>> Excerpts from Michael Ellerman's message of August 31, 2020 8:50 pm:
+> >> >>> > Michal Suchánek <msuchanek@suse.de> writes:
+> >> >>> >> On Mon, Aug 31, 2020 at 11:14:18AM +1000, Nicholas Piggin wrote:
+> >> >>> >>> Excerpts from Michal Suchánek's message of August 31, 2020 6:11 am:
+> >> >>> >>> > Hello,
+> >> >>> >>> > 
+> >> >>> >>> > on POWER8 KVM hosts lock up since commit 10d91611f426 ("powerpc/64s:
+> >> >>> >>> > Reimplement book3s idle code in C").
+> >> >>> >>> > 
+> >> >>> >>> > The symptom is host locking up completely after some hours of KVM
+> >> >>> >>> > workload with messages like
+> >> >>> >>> > 
+> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn't grab cpu 47
+> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn't grab cpu 71
+> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn't grab cpu 47
+> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn't grab cpu 71
+> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn't grab cpu 47
+> >> >>> >>> > 
+> >> >>> >>> > printed before the host locks up.
+> >> >>> >>> > 
+> >> >>> >>> > The machines run sandboxed builds which is a mixed workload resulting in
+> >> >>> >>> > IO/single core/mutiple core load over time and there are periods of no
+> >> >>> >>> > activity and no VMS runnig as well. The VMs are shortlived so VM
+> >> >>> >>> > setup/terdown is somewhat excercised as well.
+> >> >>> >>> > 
+> >> >>> >>> > POWER9 with the new guest entry fast path does not seem to be affected.
+> >> >>> >>> > 
+> >> >>> >>> > Reverted the patch and the followup idle fixes on top of 5.2.14 and
+> >> >>> >>> > re-applied commit a3f3072db6ca ("powerpc/powernv/idle: Restore IAMR
+> >> >>> >>> > after idle") which gives same idle code as 5.1.16 and the kernel seems
+> >> >>> >>> > stable.
+> >> >>> >>> > 
+> >> >>> >>> > Config is attached.
+> >> >>> >>> > 
+> >> >>> >>> > I cannot easily revert this commit, especially if I want to use the same
+> >> >>> >>> > kernel on POWER8 and POWER9 - many of the POWER9 fixes are applicable
+> >> >>> >>> > only to the new idle code.
+> >> >>> >>> > 
+> >> >>> >>> > Any idea what can be the problem?
+> >> >>> >>> 
+> >> >>> >>> So hwthread_state is never getting back to to HWTHREAD_IN_IDLE on
+> >> >>> >>> those threads. I wonder what they are doing. POWER8 doesn't have a good
+> >> >>> >>> NMI IPI and I don't know if it supports pdbg dumping registers from the
+> >> >>> >>> BMC unfortunately.
+> >> >>> >>
+> >> >>> >> It may be possible to set up fadump with a later kernel version that
+> >> >>> >> supports it on powernv and dump the whole kernel.
+> >> >>> > 
+> >> >>> > Your firmware won't support it AFAIK.
+> >> >>> > 
+> >> >>> > You could try kdump, but if we have CPUs stuck in KVM then there's a
+> >> >>> > good chance it won't work :/
+> >> >>> 
+> >> >>> I haven't had any luck yet reproducing this still. Testing with sub 
+> >> >>> cores of various different combinations, etc. I'll keep trying though.
+> >> >> 
+> >> >> Hello,
+> >> >> 
+> >> >> I tried running some KVM guests to simulate the workload and what I get
+> >> >> is guests failing to start with a rcu stall. Tried both 5.3 and 5.9
+> >> >> kernel and qemu 4.2.1 and 5.1.0
+> >> >> 
+> >> >> To start some guests I run
+> >> >> 
+> >> >> for i in $(seq 0 9) ; do /opt/qemu/bin/qemu-system-ppc64 -m 2048 -accel kvm -smp 8 -kernel /boot/vmlinux -initrd /boot/initrd -nodefaults -nographic -serial mon:telnet::444$i,server,wait & done
+> >> >> 
+> >> >> To simulate some workload I run
+> >> >> 
+> >> >> xz -zc9T0 < /dev/zero > /dev/null &
+> >> >> while true; do
+> >> >>     killall -STOP xz; sleep 1; killall -CONT xz; sleep 1;
+> >> >> done &
+> >> >> 
+> >> >> on the host and add a job that executes this to the ramdisk. However, most
+> >> >> guests never get to the point where the job is executed.
+> >> >> 
+> >> >> Any idea what might be the problem?
+> >> > 
+> >> > I would say try without pv queued spin locks (but if the same thing is 
+> >> > happening with 5.3 then it must be something else I guess). 
+> >> > 
+> >> > I'll try to test a similar setup on a POWER8 here.
+> >> 
+> >> Couldn't reproduce the guest hang, they seem to run fine even with 
+> >> queued spinlocks. Might have a different .config.
+> >> 
+> >> I might have got a lockup in the host (although different symptoms than 
+> >> the original report). I'll look into that a bit further.
+> > 
+> > Hello,
+> > 
+> > any progress on this?
+> 
+> No progress, I still wasn't able to reproduce, and it fell off the 
+> radar sorry.
+> 
+> I expect hwthred_state must be getting corrupted somewhere or a
+> secondary thread getting stuck but I couldn't see where. I try pick
+> it up again thanks for the reminder.
 
-please consider pulling these fixes for the gfs2 memory map + page fault
-deadlocks.
+Hello,
 
-Stephen Rothwell has pointed out the following merge conflict between
-commit:
+the fixes pointed out in
+https://lore.kernel.org/linuxppc-dev/87pmrtbbdt.fsf@mpe.ellerman.id.au/T/#u
+resolve the problem.
 
-  bb523b406c84 ("gup: Turn fault_in_pages_{readable,writeable} into fault_in_{readable,writeable}")
+Thanks
 
-from this patch set and the following two commits in your tree:
-
-  fcfb7163329c ("x86/fpu/signal: Move xstate clearing out of copy_fpregs_to_sigframe()")
-  a2a8fd9a3efd ("x86/fpu/signal: Change return code of restore_fpregs_from_user() to boolean")
-
-This is due to the fault_in_{pages_ =>}readable rename, and commit
-fcfb7163329c eliminating the call to fault_in_pages_writeable() from
-copy_fpstate_to_sigframe().  Stephen's conflict notification can be
-found here:
-
-https://lore.kernel.org/linux-next/20211015150420.617125bd@canb.auug.org.au/
-
-Thanks,
-Andreas
-
-
-The following changes since commit 64570fbc14f8d7cb3fe3995f20e26bc25ce4b2cc:
-
-  Linux 5.15-rc5 (2021-10-10 17:01:59 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/gfs2/linux-gfs2.git tags/gfs2-v5.15-rc5-mmap-fault
-
-for you to fetch changes up to b01b2d72da25c000aeb124bc78daf3fb998be2b6:
-
-  gfs2: Fix mmap + page fault deadlocks for direct I/O (2021-10-25 08:42:14 +0200)
-
-----------------------------------------------------------------
-gfs2: Fix mmap + page fault deadlocks
-
-Functions gfs2_file_read_iter and gfs2_file_write_iter are both
-accessing the user buffer to write to or read from while holding the
-inode glock.  In the most basic scenario, that buffer will not be
-resident and it will be mapped to the same file.  Accessing the buffer
-will trigger a page fault, and gfs2 will deadlock trying to take the
-same inode glock again while trying to handle that fault.
-
-Fix that and similar, more complex scenarios by disabling page faults
-while accessing user buffers.  To make this work, introduce a small
-amount of new infrastructure and fix some bugs that didn't trigger so
-far, with page faults enabled.
-
-----------------------------------------------------------------
-Andreas Gruenbacher (16):
-      iov_iter: Fix iov_iter_get_pages{,_alloc} page fault return value
-      powerpc/kvm: Fix kvm_use_magic_page
-      gup: Turn fault_in_pages_{readable,writeable} into fault_in_{readable,writeable}
-      iov_iter: Turn iov_iter_fault_in_readable into fault_in_iov_iter_readable
-      iov_iter: Introduce fault_in_iov_iter_writeable
-      gfs2: Add wrapper for iomap_file_buffered_write
-      gfs2: Clean up function may_grant
-      gfs2: Move the inode glock locking to gfs2_file_buffered_write
-      gfs2: Eliminate ip->i_gh
-      gfs2: Fix mmap + page fault deadlocks for buffered I/O
-      iomap: Fix iomap_dio_rw return value for user copies
-      iomap: Support partial direct I/O on user copy failures
-      iomap: Add done_before argument to iomap_dio_rw
-      gup: Introduce FOLL_NOFAULT flag to disable page faults
-      iov_iter: Introduce nofault flag to disable page faults
-      gfs2: Fix mmap + page fault deadlocks for direct I/O
-
-Bob Peterson (1):
-      gfs2: Introduce flag for glock holder auto-demotion
-
- arch/powerpc/kernel/kvm.c           |   3 +-
- arch/powerpc/kernel/signal_32.c     |   4 +-
- arch/powerpc/kernel/signal_64.c     |   2 +-
- arch/x86/kernel/fpu/signal.c        |   7 +-
- drivers/gpu/drm/armada/armada_gem.c |   7 +-
- fs/btrfs/file.c                     |   7 +-
- fs/btrfs/ioctl.c                    |   5 +-
- fs/erofs/data.c                     |   2 +-
- fs/ext4/file.c                      |   5 +-
- fs/f2fs/file.c                      |   2 +-
- fs/fuse/file.c                      |   2 +-
- fs/gfs2/bmap.c                      |  60 +------
- fs/gfs2/file.c                      | 252 ++++++++++++++++++++++++---
- fs/gfs2/glock.c                     | 330 +++++++++++++++++++++++++++---------
- fs/gfs2/glock.h                     |  20 +++
- fs/gfs2/incore.h                    |   4 +-
- fs/iomap/buffered-io.c              |   2 +-
- fs/iomap/direct-io.c                |  29 +++-
- fs/ntfs/file.c                      |   2 +-
- fs/ntfs3/file.c                     |   2 +-
- fs/xfs/xfs_file.c                   |   6 +-
- fs/zonefs/super.c                   |   4 +-
- include/linux/iomap.h               |  11 +-
- include/linux/mm.h                  |   3 +-
- include/linux/pagemap.h             |  58 +------
- include/linux/uio.h                 |   4 +-
- lib/iov_iter.c                      | 103 ++++++++---
- mm/filemap.c                        |   4 +-
- mm/gup.c                            | 139 ++++++++++++++-
- 29 files changed, 793 insertions(+), 286 deletions(-)
-
+Michal
