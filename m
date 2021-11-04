@@ -2,58 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AE848444C5E
-	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Nov 2021 01:29:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6778444C39
+	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Nov 2021 01:27:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232948AbhKDAaC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        id S233151AbhKDAaC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
         Wed, 3 Nov 2021 20:30:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52642 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233281AbhKDA24 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 3 Nov 2021 20:28:56 -0400
+        with ESMTP id S233287AbhKDA26 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 3 Nov 2021 20:28:58 -0400
 Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 501EBC061203
-        for <kvm-ppc@vger.kernel.org>; Wed,  3 Nov 2021 17:26:19 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id s4-20020a627704000000b00481101730b1so2338963pfc.11
-        for <kvm-ppc@vger.kernel.org>; Wed, 03 Nov 2021 17:26:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A434C06120B
+        for <kvm-ppc@vger.kernel.org>; Wed,  3 Nov 2021 17:26:21 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id x34-20020a056a0018a200b004945bce89bdso524220pfh.17
+        for <kvm-ppc@vger.kernel.org>; Wed, 03 Nov 2021 17:26:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=A6RNuBqUgsG4d2AkEOuVD6njvyuDvF4HW/gggxH+5XA=;
-        b=OEQtzcgzg8iUsXNKyYwVPMo1zK+4Kr5qoKxGqBuItQV2mlefdBnexzTvsQV8x7tFLB
-         DJ7N1H9zaKUjIJM9lgUrmNBtCvPaEhJRmE75YYyGNfGHftU+r7zpZ5tAJxYDGkRZ5UaN
-         eCFKKjVPfyvAv1MPQ+W3cG8F1U785VZ2TB/bCNeburay+vZTg802nta3hX92M+l5e/kY
-         v9PkejhG6TTnKgDhaZRjUpks89CX+RjAuwRAYXLN4sVhejbhHruqwLuHdy9a63l08zeG
-         UQHlhHNETrOYUd9aJ76VJnvg16EQRO47SPl2LKCIPj/pp3bTuMRIyoksJkM8yu5B2mRm
-         sSDg==
+        bh=Knv6NX4aNDEtvlXPSeSH4G0VJXSoyW8J2lqqVusFeB0=;
+        b=WAj+5pKSlToue5x/Xjp3tHAY8zkyEMkATjMwSDKkSLNc+c15nQO/y3IMeoonW+8TGW
+         IJ//NVTbf9iDd83CZGqogcbVBJFAwkAWutEaX8OHtmK98GraXTwQmiojDJlfjgAF0LlZ
+         VKLj3H4JJK4O+dXU8VVJcJqNhuhyRpmQ/xKaWsc+4pgLXjw9U6El3bcpe+Md5lqvOckG
+         VcaHEmfZpm2lQzXxITOF5vpCwMpKOib5Ate7AUJbu3BfwOJ4sMpJbFl+NTQugIzCKWHz
+         Bu63CaoNp5DbWRkc48ITeWB0/vQjNJnW0r5KU3r+tAHLd4I7Sk2VhJyHE/A1d5epjjc8
+         jySg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=A6RNuBqUgsG4d2AkEOuVD6njvyuDvF4HW/gggxH+5XA=;
-        b=5KgpSTzgjFrPz10wRuqF4x+eKW/wfjesEYCbfP0yD8wBbPpPNsGi5Ra5WVZG1VOWYZ
-         S1Q9c71CvI/ldC8tShcUOPNVBh+7aFPPBz87PPEanA8GaaCIVbClljweLq8J2m7uak6P
-         722VBqBJzLQFlTJeYsZE+XLtU8TKc7ipUprRrLVoEx8m+KV9TunSz5mt+kz6Nun/PqZV
-         8E6MD3OVof8P9xN51uhr1kScQj0/iyVVTkjOZRFO/E/WlYELlh4mgcAJdwYfwMvP3uOr
-         UqAfHadHcJI7BhVtGSGGOQckW6P6tD2u5gzyJ/U9hzngIZUJDoMWTSVYN5cai7P2ycpz
-         /OiQ==
-X-Gm-Message-State: AOAM5301HHtaBAqxl/deNBHtBFyINT1tnJEQDCLa+ApBq1s98s8Pjby7
-        RpezikhpPPDMGQuP5nlKQsFIP1YeJOA=
-X-Google-Smtp-Source: ABdhPJwlGR9LbkwslcTVo23oQzDGM/4MShAybN51snLAMyuOhBW32wf0LbVvAKT8z91bQYBzxg51jn3JWKY=
+        bh=Knv6NX4aNDEtvlXPSeSH4G0VJXSoyW8J2lqqVusFeB0=;
+        b=AkLfGl4gLsAWzsYiFT0F27EUcW67nu8lm85aO3DpZMCBfk67O6GRnKo9CFRfrKEDXe
+         gMhXwKIc6cLfPXw2xTVqhz/Nk2+fmmuY0DSeM+vRNFnQFtzw3/6gwnYbcWVb3jUo3TAP
+         PAcxuAXnv4aux8tnxYubHhZFEQndQah44KCiAu/PSg/gQG+y9tjRu3yfEo2GXdYagWaN
+         Bwj4vRVrz8FMT/4dIvLkK3J5tnE4deV/1lcwEvsiF4VEedM4/yw7aqKxWhU1s5/rMrGE
+         GKR3w4XpD5f5I4G9gUtP2jLjfl10jiwKv1fDy18Q8MryJECQUFBj/tR3y17QmgzhlGRv
+         mfvw==
+X-Gm-Message-State: AOAM532nxBeii2ACOYiBDQhGa9JGPHz0NilEzP77kZnODZVeuww4g2Eq
+        kHFaq0mYwDtcLyA3MARuolSgPdfEZzk=
+X-Google-Smtp-Source: ABdhPJycWJt6vZswesjO49ykEcHeMjmquF3AfKfwc6UF1QVg1hQjUz6uw6WOUx1iNerGeq81ot/R29ZJDgQ=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2181:b0:44c:f4bc:2f74 with SMTP id
- h1-20020a056a00218100b0044cf4bc2f74mr47624205pfi.68.1635985578784; Wed, 03
- Nov 2021 17:26:18 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:c3:: with SMTP id
+ v3mr252380pjd.0.1635985580217; Wed, 03 Nov 2021 17:26:20 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu,  4 Nov 2021 00:25:13 +0000
+Date:   Thu,  4 Nov 2021 00:25:14 +0000
 In-Reply-To: <20211104002531.1176691-1-seanjc@google.com>
-Message-Id: <20211104002531.1176691-13-seanjc@google.com>
+Message-Id: <20211104002531.1176691-14-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211104002531.1176691-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH v5.5 12/30] KVM: x86: Use "new" memslot instead of userspace
- memory region
+Subject: [PATCH v5.5 13/30] KVM: RISC-V: Use "new" memslot instead of
+ userspace memory region
 From:   Sean Christopherson <seanjc@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -88,43 +87,98 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Get the number of pages directly from the new memslot instead of
-computing the same from the userspace memory region when allocating
-memslot metadata.  This will allow a future patch to drop @mem.
+Get the slot ID, hva, etc... from the "new" memslot instead of the
+userspace memory region when preparing/committing a memory region.  This
+will allow a future commit to drop @mem from the prepare/commit hooks
+once all architectures convert to using "new".
 
-No functional change intended.
+Opportunistically wait to get the various "new" values until after
+filtering out the DELETE case in anticipation of a future commit passing
+NULL for @new when deleting a memslot.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ arch/riscv/kvm/mmu.c | 34 +++++++++++++++++++---------------
+ 1 file changed, 19 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index aa2abca47af0..c68e7de9f116 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11646,9 +11646,9 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages)
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 3a00c2df7640..db5230ec6951 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -466,18 +466,19 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 	 * allocated dirty_bitmap[], dirty pages will be tracked while
+ 	 * the memory slot is write protected.
+ 	 */
+-	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES)
+-		stage2_wp_memory_region(kvm, mem->slot);
++	if (change != KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_PAGES)
++		stage2_wp_memory_region(kvm, new->id);
  }
  
- static int kvm_alloc_memslot_metadata(struct kvm *kvm,
--				      struct kvm_memory_slot *slot,
--				      unsigned long npages)
-+				      struct kvm_memory_slot *slot)
+ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+-				struct kvm_memory_slot *memslot,
+-				const struct kvm_userspace_memory_region *mem,
+-				enum kvm_mr_change change)
++				   const struct kvm_userspace_memory_region *mem,
++				   const struct kvm_memory_slot *old,
++				   struct kvm_memory_slot *new,
++				   enum kvm_mr_change change)
  {
-+	unsigned long npages = slot->npages;
- 	int i, r;
+-	hva_t hva = mem->userspace_addr;
+-	hva_t reg_end = hva + mem->memory_size;
+-	bool writable = !(mem->flags & KVM_MEM_READONLY);
++	hva_t hva, reg_end, size;
++	gpa_t base_gpa;
++	bool writable;
+ 	int ret = 0;
+ 
+ 	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
+@@ -488,10 +489,15 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	 * Prevent userspace from creating a memory region outside of the GPA
+ 	 * space addressable by the KVM guest GPA space.
+ 	 */
+-	if ((memslot->base_gfn + memslot->npages) >=
+-	    (stage2_gpa_size >> PAGE_SHIFT))
++	if ((new->base_gfn + new->npages) >= (stage2_gpa_size >> PAGE_SHIFT))
+ 		return -EFAULT;
+ 
++	hva = new->userspace_addr;
++	size = new->npages << PAGE_SHIFT;
++	reg_end = hva + size;
++	base_gpa = new->base_gfn << PAGE_SHIFT;
++	writable = !(new->flags & KVM_MEM_READONLY);
++
+ 	mmap_read_lock(current->mm);
  
  	/*
-@@ -11733,8 +11733,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				   enum kvm_mr_change change)
- {
- 	if (change == KVM_MR_CREATE || change == KVM_MR_MOVE)
--		return kvm_alloc_memslot_metadata(kvm, new,
--						  mem->memory_size >> PAGE_SHIFT);
-+		return kvm_alloc_memslot_metadata(kvm, new);
+@@ -527,15 +533,14 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 		vm_end = min(reg_end, vma->vm_end);
  
- 	if (change == KVM_MR_FLAGS_ONLY)
- 		memcpy(&new->arch, &old->arch, sizeof(old->arch));
+ 		if (vma->vm_flags & VM_PFNMAP) {
+-			gpa_t gpa = mem->guest_phys_addr +
+-				    (vm_start - mem->userspace_addr);
++			gpa_t gpa = base_gpa + (vm_start - hva);
+ 			phys_addr_t pa;
+ 
+ 			pa = (phys_addr_t)vma->vm_pgoff << PAGE_SHIFT;
+ 			pa += vm_start - vma->vm_start;
+ 
+ 			/* IO region dirty page logging not allowed */
+-			if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES) {
++			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+ 				ret = -EINVAL;
+ 				goto out;
+ 			}
+@@ -553,8 +558,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 
+ 	spin_lock(&kvm->mmu_lock);
+ 	if (ret)
+-		stage2_unmap_range(kvm, mem->guest_phys_addr,
+-				   mem->memory_size, false);
++		stage2_unmap_range(kvm, base_gpa, size, false);
+ 	spin_unlock(&kvm->mmu_lock);
+ 
+ out:
 -- 
 2.33.1.1089.g2158813163f-goog
 
