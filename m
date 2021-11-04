@@ -2,57 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56645444C22
-	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Nov 2021 01:27:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01395444C27
+	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Nov 2021 01:27:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232888AbhKDA3y (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        id S232915AbhKDA3y (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
         Wed, 3 Nov 2021 20:29:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52532 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233159AbhKDA2m (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 3 Nov 2021 20:28:42 -0400
+        with ESMTP id S233178AbhKDA2o (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 3 Nov 2021 20:28:44 -0400
 Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CE26C061205
-        for <kvm-ppc@vger.kernel.org>; Wed,  3 Nov 2021 17:26:05 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id i25-20020a631319000000b002cce0a43e94so2443820pgl.0
-        for <kvm-ppc@vger.kernel.org>; Wed, 03 Nov 2021 17:26:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCA7AC061203
+        for <kvm-ppc@vger.kernel.org>; Wed,  3 Nov 2021 17:26:07 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id p20-20020a63fe14000000b002cc2a31eaf6so2402457pgh.6
+        for <kvm-ppc@vger.kernel.org>; Wed, 03 Nov 2021 17:26:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=E63+zcqes7aObPmDEJrvowSyb7WASC2+JFrjiGuoOMk=;
-        b=G1EofX3RvsgDocbJ2WdlZIxLPrRqCOY3yk9dCpHXn3BrotBTcINoCOIdoZtnGuqNkz
-         XjduJywdhEpzM76x4KoUTmOMqDWGTwqBcR9WlCLJ/Ixo7OZNiFzolIn6uGeuv97Lynv7
-         ddl94QsCyWYRP1cDpWTxGlOfLjkpa9JMyPhL71/QGQqzOCEiWBc8/ntYod6VDaOBqRIS
-         X353qmmShX/kJORUwjw2weuKuQNgd6XS84Jwff3SPGUNlABXgf8tKjegkYwWGGN3YZ/S
-         LGQAetSmsnJyG5LH2Wdt7/WsV81v8KEKNpq61Fts5PSRMZc9eqQNsC0W+vLYcBCTaqSh
-         tOqg==
+        bh=d5eBGhjOdraOb8ROBhsskw4veY1ejlVUg/ty/xkC83c=;
+        b=L0C1v+L5WkKOg/1UpzG68qTukZN83qwmMd/ueUN7ewuot9u43aTlXxZMHBpBnaC7/S
+         e6lXD4GKbCtYx2tBTmg/D1dxn24ATg3EXOzk/ufgGhsCdxjkWD3S/Oet9+81xR7BjiXX
+         KsSER1qqH3/ReOXKXEOMxEw+ZWZNMNrHAG+1wsXmgAmQGJdPsauAqWgxGa2bXM3eqrsd
+         MHAblvb9KsqWTWqMYMO09zCzubyhjCK3PZcX9W1VDJfzaXxKjt1+UDPCWwyzZTqBxXQG
+         LYMbx+aWi+q//Eh8G56e8rXxUsD7RwW0EkMLPRzsJeTaMSzf+hbvycjlYJ8jReWzoeCU
+         NYQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=E63+zcqes7aObPmDEJrvowSyb7WASC2+JFrjiGuoOMk=;
-        b=325Znu0W3LyiC22GsggSn96L90tQYIWIi1aycb8k/iowqmpHCGWB05DEyE13Ggv5eg
-         UVzishMOJQcuCHwFGD+p7DqgkrfiTyQWKbxOj1Cf4aJLG3LIsCnJ7lqfnJlBrcXMZduR
-         +MdHY3joGx6ITi7N7LbDZ4nNtEnOcXJnYI3CisHxeRX4meU/eVx8mjIjWlQUfWDKH7uJ
-         YNt8y9poVOPsnA3wrr4D2XnzH+0NJifDocbqL0Qv7dSFa7QntFbkIKcmpZbKzuQXQrOh
-         +8N2oNdwus5E6MXU8OmiknBWEGOt14amXe9XBBdCwnJaG0KwG4dJ+IU31YjtEYZDU5DG
-         6KJQ==
-X-Gm-Message-State: AOAM533WMqDczTTwFTw55l/51q2j7rqtohE7T9FYKiuFcx+TvCdH3pou
-        9VIsvRECLMmR66rqlYz9SGHVQ4iIw6A=
-X-Google-Smtp-Source: ABdhPJyxb/nQ01mzKYX4m8bfp03Ule2nAlwfJSHz9a05yqoefRBI+SnT6XPXcdLf6g/xUstLGwYZnueYC+Q=
+        bh=d5eBGhjOdraOb8ROBhsskw4veY1ejlVUg/ty/xkC83c=;
+        b=biOrlhjJBp+6LI/pspOTrOMU3KC21ItJ6Cmm3MkxT+rp9C4d5xzJIV9kY1sN64yVpP
+         K7pSFLemO+0gE4gxBcdH1q4M4tIT96qqZrV2/6dYZlNLraNRQMPxXVtN6OossU06iLd7
+         7FtKD0ezWa7pIQ0QSwk9Hahdujyv6hht9OjjSEQVztp6sMj9k/M/hKEdCPhHeiRys1Vq
+         F6q1kzUvf0PfScnCcih16G8+CKDFfP5AXEQyBEoKR97HrzfuzkcUtB1EUb2SSMJAkEFV
+         V5x5AoExYf0nBWgef00E8In3ZOcB21pgFrEdEt8NEBjVzkNHyWE7QDWYjceuebbHi6RH
+         yyRQ==
+X-Gm-Message-State: AOAM531RPBzkZONJ0WnhNUsmM+fDpxkfCZsO64HGxYN9sYikD63Szj7L
+        ukcup2Ep4Vat57e7ihFUupDHiqQt6gI=
+X-Google-Smtp-Source: ABdhPJwR/8S2bf9OYImnNTGTvQtJKx+tPqKxegkkAxc8UN7P/Djj1xJRY5WUZbtpalPRRv4cuF26HKA4p5A=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a62:1b8e:0:b0:44c:9318:f6e1 with SMTP id
- b136-20020a621b8e000000b0044c9318f6e1mr48578653pfb.84.1635985564791; Wed, 03
- Nov 2021 17:26:04 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:5285:: with SMTP id
+ w5mr261267pjh.1.1635985566550; Wed, 03 Nov 2021 17:26:06 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu,  4 Nov 2021 00:25:05 +0000
+Date:   Thu,  4 Nov 2021 00:25:06 +0000
 In-Reply-To: <20211104002531.1176691-1-seanjc@google.com>
-Message-Id: <20211104002531.1176691-5-seanjc@google.com>
+Message-Id: <20211104002531.1176691-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211104002531.1176691-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH v5.5 04/30] KVM: Open code kvm_delete_memslot() into its only caller
+Subject: [PATCH v5.5 05/30] KVM: Resync only arch fields when slots_arch_lock
+ gets reacquired
 From:   Sean Christopherson <seanjc@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -87,78 +87,117 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Fold kvm_delete_memslot() into __kvm_set_memory_region() to free up the
-"kvm_delete_memslot()" name for use in a future helper.  The delete logic
-isn't so complex/long that it truly needs a helper, and it will be
-simplified a wee bit further in upcoming commits.
+From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 
-No functional change intended.
+There is no need to copy the whole memslot data after releasing
+slots_arch_lock for a moment to install temporary memslots copy in
+kvm_set_memslot() since this lock only protects the arch field of each
+memslot.
 
+Just resync this particular field after reacquiring slots_arch_lock.
+
+Note, this also eliminates the need to manually clear the INVALID flag
+when restoring memslots; the "setting" of the INVALID flag was an
+unwanted side effect of copying the entire memslots.
+
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+[sean: tweak shortlog, note INVALID flag in changelog, revert comment]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/kvm_main.c | 42 +++++++++++++++++-------------------------
- 1 file changed, 17 insertions(+), 25 deletions(-)
+ virt/kvm/kvm_main.c | 45 +++++++++++++++++++++++++--------------------
+ 1 file changed, 25 insertions(+), 20 deletions(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 264c4b16520b..6171ddb3e31c 100644
+index 6171ddb3e31c..e5c2d10f6111 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1653,29 +1653,6 @@ static int kvm_set_memslot(struct kvm *kvm,
- 	return r;
+@@ -1500,12 +1500,6 @@ static size_t kvm_memslots_size(int slots)
+ 	       (sizeof(struct kvm_memory_slot) * slots);
  }
  
--static int kvm_delete_memslot(struct kvm *kvm,
--			      const struct kvm_userspace_memory_region *mem,
--			      struct kvm_memory_slot *old, int as_id)
+-static void kvm_copy_memslots(struct kvm_memslots *to,
+-			      struct kvm_memslots *from)
 -{
--	struct kvm_memory_slot new;
--
--	if (!old->npages)
--		return -EINVAL;
--
--	if (WARN_ON_ONCE(kvm->nr_memslot_pages < old->npages))
--		return -EIO;
--
--	memset(&new, 0, sizeof(new));
--	new.id = old->id;
--	/*
--	 * This is only for debugging purpose; it should never be referenced
--	 * for a removed memslot.
--	 */
--	new.as_id = as_id;
--
--	return kvm_set_memslot(kvm, mem, &new, as_id, KVM_MR_DELETE);
+-	memcpy(to, from, kvm_memslots_size(from->used_slots));
 -}
 -
  /*
-  * Allocate some memory and give it an address in the guest physical address
-  * space.
-@@ -1732,8 +1709,23 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 		old.id = id;
+  * Note, at a minimum, the current number of used slots must be allocated, even
+  * when deleting a memslot, as we need a complete duplicate of the memslots for
+@@ -1524,11 +1518,22 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
+ 
+ 	slots = kvzalloc(new_size, GFP_KERNEL_ACCOUNT);
+ 	if (likely(slots))
+-		kvm_copy_memslots(slots, old);
++		memcpy(slots, old, kvm_memslots_size(old->used_slots));
+ 
+ 	return slots;
+ }
+ 
++static void kvm_copy_memslots_arch(struct kvm_memslots *to,
++				   struct kvm_memslots *from)
++{
++	int i;
++
++	WARN_ON_ONCE(to->used_slots != from->used_slots);
++
++	for (i = 0; i < from->used_slots; i++)
++		to->memslots[i].arch = from->memslots[i].arch;
++}
++
+ static int kvm_set_memslot(struct kvm *kvm,
+ 			   const struct kvm_userspace_memory_region *mem,
+ 			   struct kvm_memory_slot *new, int as_id,
+@@ -1569,9 +1574,10 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 		slot->flags |= KVM_MEMSLOT_INVALID;
+ 
+ 		/*
+-		 * We can re-use the memory from the old memslots.
+-		 * It will be overwritten with a copy of the new memslots
+-		 * after reacquiring the slots_arch_lock below.
++		 * We can re-use the old memslots, the only difference from the
++		 * newly installed memslots is the invalid flag, which will get
++		 * dropped by update_memslots anyway.  We'll also revert to the
++		 * old memslots if preparing the new memory region fails.
+ 		 */
+ 		slots = install_new_memslots(kvm, as_id, slots);
+ 
+@@ -1588,12 +1594,14 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 		mutex_lock(&kvm->slots_arch_lock);
+ 
+ 		/*
+-		 * The arch-specific fields of the memslots could have changed
+-		 * between releasing the slots_arch_lock in
+-		 * install_new_memslots and here, so get a fresh copy of the
+-		 * slots.
++		 * The arch-specific fields of the now-active memslots could
++		 * have been modified between releasing slots_arch_lock in
++		 * install_new_memslots and re-acquiring slots_arch_lock above.
++		 * Copy them to the inactive memslots.  Arch code is required
++		 * to retrieve memslots *after* acquiring slots_arch_lock, thus
++		 * the active memslots are guaranteed to be fresh.
+ 		 */
+-		kvm_copy_memslots(slots, __kvm_memslots(kvm, as_id));
++		kvm_copy_memslots_arch(slots, __kvm_memslots(kvm, as_id));
  	}
  
--	if (!mem->memory_size)
--		return kvm_delete_memslot(kvm, mem, &old, as_id);
-+	if (!mem->memory_size) {
-+		if (!old.npages)
-+			return -EINVAL;
-+
-+		if (WARN_ON_ONCE(kvm->nr_memslot_pages < old.npages))
-+			return -EIO;
-+
-+		memset(&new, 0, sizeof(new));
-+		new.id = id;
-+		/*
-+		 * This is only for debugging purpose; it should never be
-+		 * referenced for a removed memslot.
-+		 */
-+		new.as_id = as_id;
-+
-+		return kvm_set_memslot(kvm, mem, &new, as_id, KVM_MR_DELETE);
-+	}
+ 	/*
+@@ -1642,13 +1650,10 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 	return 0;
  
- 	new.as_id = as_id;
- 	new.id = id;
+ out_slots:
+-	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
+-		slot = id_to_memslot(slots, new->id);
+-		slot->flags &= ~KVM_MEMSLOT_INVALID;
++	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
+ 		slots = install_new_memslots(kvm, as_id, slots);
+-	} else {
++	else
+ 		mutex_unlock(&kvm->slots_arch_lock);
+-	}
+ 	kvfree(slots);
+ 	return r;
+ }
 -- 
 2.33.1.1089.g2158813163f-goog
 
