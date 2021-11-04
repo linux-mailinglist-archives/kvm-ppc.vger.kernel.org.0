@@ -2,132 +2,242 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF537445B1C
-	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Nov 2021 21:31:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49D41445BA1
+	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Nov 2021 22:28:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232161AbhKDUeA (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 4 Nov 2021 16:34:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28696 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231867AbhKDUd7 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Nov 2021 16:33:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636057880;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HlUyb94lQB0YUSrmRZ31/WYJ0OQFpRSOr5iyyx2CB+I=;
-        b=iZbh4uDLSP6kT7knLw1eAIfBEVznYQ+opQcOSyUDBkZ9FShhYRFB1bBd+Eqr+iUpM6c1Nz
-        w2g66LNA7mUQTV++sdSNdLD/FbzjJdfh4N3E3lGk5qvqQy3A8jGgCfZH+u4MSRTRE1fH9S
-        GI9TeD/uXnHLI7OrozjVp7RjdEUAJZE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-r1WBkXRvPVmS989H1G-icw-1; Thu, 04 Nov 2021 16:31:19 -0400
-X-MC-Unique: r1WBkXRvPVmS989H1G-icw-1
-Received: by mail-wr1-f72.google.com with SMTP id y4-20020adfd084000000b00186b16950f3so1434241wrh.14
-        for <kvm-ppc@vger.kernel.org>; Thu, 04 Nov 2021 13:31:19 -0700 (PDT)
+        id S232144AbhKDVau (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 4 Nov 2021 17:30:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54354 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231450AbhKDVau (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Nov 2021 17:30:50 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7CC6C061203
+        for <kvm-ppc@vger.kernel.org>; Thu,  4 Nov 2021 14:28:11 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id y73so8550793iof.4
+        for <kvm-ppc@vger.kernel.org>; Thu, 04 Nov 2021 14:28:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kT59fOFXGdqG57cxSFiBCbx9dcYetqnRywW1gdZNmeY=;
+        b=gT4nzQq0x89i6Vp5dNWtSZrRbMe0W3qbbXwW9NXWgaRs8fYbXvHzdlEGUK48g0ajas
+         uHVv10bVNkjhWr3B3MYTi44+qGBwBfoBwhj+2jrlWAsr2slc13bc4BseaXy2AoLJs6t8
+         xRBsjkLiRiH+rEZC9bjYDRvB0cKfRmGxlddQQ74lKlIH3DSIbhZURrg/4JSes8eUaatv
+         4YcLz57IesgJy0I2f7nby9V0UuPZTikaQqcNEzddlw13/ibFXy00E0dEkzMok1oNoZqt
+         ZDIYGh1maMM5k3AvqVuUpAr6S+JkIrJwFta52d8TDhA2FBg5X1Xits9o/XjdmWUTRl4X
+         pAhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=HlUyb94lQB0YUSrmRZ31/WYJ0OQFpRSOr5iyyx2CB+I=;
-        b=QBVF03JdvS8XGEMJY7KlVHKfjWJDPhYDicFB/SfbdzOLR2uXT3VNHUYyA4WRQpGTBE
-         XbwBUpaOLWQuU+3lBhkbrabcOTyVsaUHNQtZxrfNfMUdzzc9IdWBXFf6/pMKHqpQb6pW
-         8rbxd6D9CZ18oGw6mf3jnBqMQLy9eikQwVMZuGogbd+w6CvL7Qf16PHMjz6rrrWCGrEo
-         hjUy5r7ug+WW5yO1JwJptFTK+l2B36hNW14t1mVNfX+Nz+7dSrSUGTDFoqpiFN4nxAgo
-         upRyZZ6dEKT+zRuw2sbjUkVzKwu/VWvqnLD3DRNQ6Zo8dqepBBAgUcrlyQRgHzBNoowE
-         OWsg==
-X-Gm-Message-State: AOAM532RW5RIltp4ZqmC0tTyGVZ3vIEnZK+JU4EoorsJAXz7LDSV91HM
-        P8WpeLpSySHk3MHmQmM9MfbA8obuEBNT3VhkAgL0k4obYwz1Y3tlxOc9hJ63z6iihRiG4pvyjc+
-        94mkEBGpacw1Mwwc3Mr8F3usjQ77kR7erYQ==
-X-Received: by 2002:a5d:628f:: with SMTP id k15mr55558394wru.363.1636057878501;
-        Thu, 04 Nov 2021 13:31:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzy1DT2zp9sqf5BtrQx4eQL+9Qk0WkCFqWYvRSY0pAibZ7MAIDeuCyzWc0voG6eZ/QZ2qH8hnGM3VUV2a9qxnY=
-X-Received: by 2002:a5d:628f:: with SMTP id k15mr55558351wru.363.1636057878260;
- Thu, 04 Nov 2021 13:31:18 -0700 (PDT)
+        bh=kT59fOFXGdqG57cxSFiBCbx9dcYetqnRywW1gdZNmeY=;
+        b=259pkj2UQuz4Bifas2gUfwaGyvr/b+RVYOdAXwO9b+qe2ZlZCrTDKWbgQQbX6ZD48E
+         Jb0SfZjlF2LdbJSNEbBGIoEiwIhi9kjFh2RsmIjOSWvYuiNm/gU7nfQkeesLwxRHPP28
+         oCPUX83BSfwU/YP7F/63vFctV+lKYINuyx30OGfYS28l7P4not4/u4RlGdXY133X6dTH
+         qPancmrDCLlZN1z8K1j2ZTD4ygfHnt2ymnJ8NhzX2ao51zj51g6dnVRZxDmbVYtFPUPn
+         4LFdy1Pg9kuscR5QvLPYnpQwA9jYTjIacklj6oEDtl5ORDJYrZVhBQC69QdTQ5wXGuSY
+         eXJA==
+X-Gm-Message-State: AOAM530edf45FduxDKzZa2ej9s4uaIyhJUmFEvg1WIe+1z/poGxgDpvu
+        XLUkzQ9STaeMWVGkzwIepHhIXrLvEYZEbWJdwLJtjg==
+X-Google-Smtp-Source: ABdhPJyMIoxuukzQc6rukS1CsN0VzOsX5g2manzJn1KGK69DmvdVJ1f5vqR2wNyFb/XiaX/LmgNI1ppfR5uwGseVoTo=
+X-Received: by 2002:a05:6602:1612:: with SMTP id x18mr282554iow.37.1636061290880;
+ Thu, 04 Nov 2021 14:28:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211102122945.117744-1-agruenba@redhat.com> <20211102122945.117744-5-agruenba@redhat.com>
- <YYQk9L0D57QHc0gE@arm.com>
-In-Reply-To: <YYQk9L0D57QHc0gE@arm.com>
-From:   Andreas Gruenbacher <agruenba@redhat.com>
-Date:   Thu, 4 Nov 2021 21:31:07 +0100
-Message-ID: <CAHc6FU5DsC5C+aOTPX+MV+_49-V_RvyOWKNzcjoVfY=OzEVuAw@mail.gmail.com>
-Subject: Re: [PATCH v9 04/17] iov_iter: Turn iov_iter_fault_in_readable into fault_in_iov_iter_readable
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     cluster-devel <cluster-devel@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>, Jan Kara <jack@suse.cz>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, ocfs2-devel@oss.oracle.com,
-        kvm-ppc@vger.kernel.org, linux-btrfs <linux-btrfs@vger.kernel.org>,
-        joey.gouly@arm.com
+References: <20211104002531.1176691-1-seanjc@google.com> <20211104002531.1176691-2-seanjc@google.com>
+In-Reply-To: <20211104002531.1176691-2-seanjc@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 4 Nov 2021 14:27:59 -0700
+Message-ID: <CANgfPd-uuPFjAHk5kVNom2Qs=UU_GX6CQ0xDLg1h_iL8t8S2aQ@mail.gmail.com>
+Subject: Re: [PATCH v5.5 01/30] KVM: Ensure local memslot copies operate on
+ up-to-date arch-specific data
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Nov 4, 2021 at 7:22 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> On Tue, Nov 02, 2021 at 01:29:32PM +0100, Andreas Gruenbacher wrote:
-> > Turn iov_iter_fault_in_readable into a function that returns the number
-> > of bytes not faulted in, similar to copy_to_user, instead of returning a
-> > non-zero value when any of the requested pages couldn't be faulted in.
-> > This supports the existing users that require all pages to be faulted in
-> > as well as new users that are happy if any pages can be faulted in.
-> >
-> > Rename iov_iter_fault_in_readable to fault_in_iov_iter_readable to make
-> > sure this change doesn't silently break things.
-> >
-> > Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
-> [...]
-> > diff --git a/mm/filemap.c b/mm/filemap.c
-> > index ff34f4087f87..4dd5edcd39fd 100644
-> > --- a/mm/filemap.c
-> > +++ b/mm/filemap.c
-> > @@ -3757,7 +3757,7 @@ ssize_t generic_perform_write(struct file *file,
-> >                * same page as we're writing to, without it being marked
-> >                * up-to-date.
-> >                */
-> > -             if (unlikely(iov_iter_fault_in_readable(i, bytes))) {
-> > +             if (unlikely(fault_in_iov_iter_readable(i, bytes))) {
-> >                       status = -EFAULT;
-> >                       break;
-> >               }
+On Wed, Nov 3, 2021 at 5:26 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Now that fault_in_iov_iter_readable() returns the number of bytes, we
-> could change the above test to:
+> When modifying memslots, snapshot the "old" memslot and copy it to the
+> "new" memslot's arch data after (re)acquiring slots_arch_lock.  x86 can
+> change a memslot's arch data while memslot updates are in-progress so
+> long as it holds slots_arch_lock, thus snapshotting a memslot without
+> holding the lock can result in the consumption of stale data.
 >
->                 if (unlikely(fault_in_iov_iter_readable(i, bytes) == bytes)) {
+> Fixes: b10a038e84d1 ("KVM: mmu: Add slots_arch_lock for memslot arch fields")
+> Cc: stable@vger.kernel.org
+> Cc: Ben Gardon <bgardon@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 47 ++++++++++++++++++++++++++++++---------------
+>  1 file changed, 31 insertions(+), 16 deletions(-)
 >
-> Assuming we have a pointer 'a', accessible, and 'a + PAGE_SIZE' unmapped:
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 3f6d450355f0..99e69375c4c9 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1531,11 +1531,10 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
 >
->         write(fd, a + PAGE_SIZE - 1, 2);
+>  static int kvm_set_memslot(struct kvm *kvm,
+>                            const struct kvm_userspace_memory_region *mem,
+> -                          struct kvm_memory_slot *old,
+>                            struct kvm_memory_slot *new, int as_id,
+>                            enum kvm_mr_change change)
+>  {
+> -       struct kvm_memory_slot *slot;
+> +       struct kvm_memory_slot *slot, old;
+>         struct kvm_memslots *slots;
+>         int r;
 >
-> can still copy one byte but it returns -EFAULT instead since the second
-> page is not accessible.
->
-> While writing some test-cases for MTE (sub-page faults, 16-byte
-> granularity), we noticed that reading 2 bytes from 'a + 15' with
-> 'a + 16' tagged for faulting:
->
->         write(fd, a + 15, 2);
->
-> succeeds as long as 'a + 16' is not at a page boundary. Checking against
-> 'bytes' above makes this consistent.
->
-> The downside is that it's an ABI change though not sure anyone is
-> relying on it.
+> @@ -1566,7 +1565,7 @@ static int kvm_set_memslot(struct kvm *kvm,
+>                  * Note, the INVALID flag needs to be in the appropriate entry
+>                  * in the freshly allocated memslots, not in @old or @new.
+>                  */
+> -               slot = id_to_memslot(slots, old->id);
+> +               slot = id_to_memslot(slots, new->id);
 
-The same pattern exists in iomap_write_iter too, of course. In the
-very light testing I did for eliminating the pre-faulting, this kind
-of change was working fine. I have no performance numbers though.
+Since new is guaranteed to have the same id as old (at least prior to
+this change) this is a no-op change, so no problem here.
+This could be a separate commit which would have no functional change
+but only worth extracting if you send a v2.
 
-  https://lore.kernel.org/linux-fsdevel/20211026094430.3669156-1-agruenba@redhat.com/
-  https://lore.kernel.org/linux-fsdevel/20211027212138.3722977-1-agruenba@redhat.com/
+>                 slot->flags |= KVM_MEMSLOT_INVALID;
+>
+>                 /*
+> @@ -1597,6 +1596,26 @@ static int kvm_set_memslot(struct kvm *kvm,
+>                 kvm_copy_memslots(slots, __kvm_memslots(kvm, as_id));
+>         }
+>
+> +       /*
+> +        * Make a full copy of the old memslot, the pointer will become stale
+> +        * when the memslots are re-sorted by update_memslots(), and the old
+> +        * memslot needs to be referenced after calling update_memslots(), e.g.
+> +        * to free its resources and for arch specific behavior.  This needs to
+> +        * happen *after* (re)acquiring slots_arch_lock.
+> +        */
+> +       slot = id_to_memslot(slots, new->id);
+> +       if (slot) {
+> +               old = *slot;
+> +       } else {
+> +               WARN_ON_ONCE(change != KVM_MR_CREATE);
+> +               memset(&old, 0, sizeof(old));
+> +               old.id = new->id;
+> +               old.as_id = as_id;
+> +       }
+> +
+> +       /* Copy the arch-specific data, again after (re)acquiring slots_arch_lock. */
+> +       memcpy(&new->arch, &old.arch, sizeof(old.arch));
+> +
 
-Thanks,
-Andreas
+Is new->arch not initialized before this function is called? Does this
+need to be here, or could it be moved above into the first branch of
+the if statement?
+Oh I see you removed the memset below and replaced it with this. I
+think this is fine, but it might be easier to reason about if we left
+the memset and moved the memcopy into the if.
+No point in doing a memcpy of zeros here.
 
+>         r = kvm_arch_prepare_memory_region(kvm, new, mem, change);
+>         if (r)
+>                 goto out_slots;
+> @@ -1604,14 +1623,18 @@ static int kvm_set_memslot(struct kvm *kvm,
+>         update_memslots(slots, new, change);
+>         slots = install_new_memslots(kvm, as_id, slots);
+>
+> -       kvm_arch_commit_memory_region(kvm, mem, old, new, change);
+> +       kvm_arch_commit_memory_region(kvm, mem, &old, new, change);
+> +
+> +       /* Free the old memslot's metadata.  Note, this is the full copy!!! */
+> +       if (change == KVM_MR_DELETE)
+> +               kvm_free_memslot(kvm, &old);
+>
+>         kvfree(slots);
+>         return 0;
+>
+>  out_slots:
+>         if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
+> -               slot = id_to_memslot(slots, old->id);
+> +               slot = id_to_memslot(slots, new->id);
+>                 slot->flags &= ~KVM_MEMSLOT_INVALID;
+>                 slots = install_new_memslots(kvm, as_id, slots);
+>         } else {
+> @@ -1626,7 +1649,6 @@ static int kvm_delete_memslot(struct kvm *kvm,
+>                               struct kvm_memory_slot *old, int as_id)
+>  {
+>         struct kvm_memory_slot new;
+> -       int r;
+>
+>         if (!old->npages)
+>                 return -EINVAL;
+> @@ -1639,12 +1661,7 @@ static int kvm_delete_memslot(struct kvm *kvm,
+>          */
+>         new.as_id = as_id;
+>
+> -       r = kvm_set_memslot(kvm, mem, old, &new, as_id, KVM_MR_DELETE);
+> -       if (r)
+> -               return r;
+> -
+> -       kvm_free_memslot(kvm, old);
+> -       return 0;
+> +       return kvm_set_memslot(kvm, mem, &new, as_id, KVM_MR_DELETE);
+>  }
+>
+>  /*
+> @@ -1718,7 +1735,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>         if (!old.npages) {
+>                 change = KVM_MR_CREATE;
+>                 new.dirty_bitmap = NULL;
+> -               memset(&new.arch, 0, sizeof(new.arch));
+>         } else { /* Modify an existing slot. */
+>                 if ((new.userspace_addr != old.userspace_addr) ||
+>                     (new.npages != old.npages) ||
+> @@ -1732,9 +1748,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>                 else /* Nothing to change. */
+>                         return 0;
+>
+> -               /* Copy dirty_bitmap and arch from the current memslot. */
+> +               /* Copy dirty_bitmap from the current memslot. */
+>                 new.dirty_bitmap = old.dirty_bitmap;
+> -               memcpy(&new.arch, &old.arch, sizeof(new.arch));
+>         }
+>
+>         if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
+> @@ -1760,7 +1775,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>                         bitmap_set(new.dirty_bitmap, 0, new.npages);
+>         }
+>
+> -       r = kvm_set_memslot(kvm, mem, &old, &new, as_id, change);
+> +       r = kvm_set_memslot(kvm, mem, &new, as_id, change);
+>         if (r)
+>                 goto out_bitmap;
+>
+> --
+> 2.33.1.1089.g2158813163f-goog
+>
