@@ -2,128 +2,233 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3E5E445C54
-	for <lists+kvm-ppc@lfdr.de>; Thu,  4 Nov 2021 23:42:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0481D445D82
+	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Nov 2021 02:47:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232251AbhKDWoh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 4 Nov 2021 18:44:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42576 "EHLO
+        id S230333AbhKEBuM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 4 Nov 2021 21:50:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232231AbhKDWoh (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Nov 2021 18:44:37 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 917B6C061203
-        for <kvm-ppc@vger.kernel.org>; Thu,  4 Nov 2021 15:41:58 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id e65so6696530pgc.5
-        for <kvm-ppc@vger.kernel.org>; Thu, 04 Nov 2021 15:41:58 -0700 (PDT)
+        with ESMTP id S229647AbhKEBuL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Nov 2021 21:50:11 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BBF7C061714
+        for <kvm-ppc@vger.kernel.org>; Thu,  4 Nov 2021 18:47:32 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id p17so7049748pgj.2
+        for <kvm-ppc@vger.kernel.org>; Thu, 04 Nov 2021 18:47:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2cM+pc7RJOlLXf/kESM57DsH9Y+7ss4v2ISlVrw0au4=;
-        b=ooE6FbC1dphlseVcXYf6E54FhDQXALDT9cp9rkFbPJ4y3391PeZbY42Xq5zYAiM2X0
-         NdOPtJ6lkjBowxQXuPPYzsk/ImWUzRx84xa98kqJsQVBicjU2eDc5DVULiWpqnCKqxed
-         Ey2Ctp6iCrEN8zCtRphZ24isIw03JAvk0SfSWM0DA/73Pbf0h/QRbrwYHZfhgAzS25J9
-         xoJiSowrT7yhbflDyi/bGTCX/rlcA7okzQ8gpsTNHWowkIpirAi9P+owp8DITCHO+0RI
-         qztHqyk6DNOgAHnulQogAsMkvqtleYWLZNf20k/P+g9/YJ3n7yTI2IPueMQnaW5/KaTr
-         oILQ==
+        d=gmail.com; s=20210112;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=RYQvW3gYgNWZLXwXv6LJCFArVSQe9BKw3ODOnU+eVTA=;
+        b=YG8/+XaVLw3Zk8a10TbDgqc/6xZyU/v16HuLL1Q0ISzN5D43c4ckOzoSOycGfw9lLL
+         uCp6qVFuyYwCQJI1VAjfFiGDoiuolUtRFWcflIFeif0iXCQIOz0wyTq6IZsuxExh6zUt
+         tJ0bw1N7uZkkH+y3x31xsueM4cMlJB0BBSoBI1aAnPREHUvCnsrJfEiQzgOaAd0TieQw
+         xHPlHik9jdLXdWr8E5rX+rlu2xQrzdzoJJwyY3/eLcAxuUqASqdyv86qsw2LJF8HVVt2
+         wH/4N6EDE+IO+n5LhbR0hnC/UTV97jAtBjUPxNYBSkqQ0vkHpsDvHdYhO88HyU2KE3KH
+         59tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2cM+pc7RJOlLXf/kESM57DsH9Y+7ss4v2ISlVrw0au4=;
-        b=0kqxqLQjK3rMgrpnvYpPA7542TxdpDR5NXeLU2v7JcWhFaAs3sg8udxt02JjgKoLAb
-         9YTnr88r+g2/Zt2MiLm/h/xmFQlSFi+PSqfCdWAasUoUFBbowvlRjIPbjz9dV45S9YTJ
-         8p+Jhvk4FWqJXwcHBrjasYnwYs5Eib1/Oqpkf/vD5BGxfGJt9IHe26XURFUY5yENJbVi
-         3ltRV+IAe1rjMtPThEQyx/2Q0K8Urg+l4ZKf+ict7Ayv05IH5q8PDW2Bj6z5C9DFC3hw
-         g6/pGjJkjvX1kHN3yPx8Tk1f55J8ClLnZtWzsqyXYIeo7ngu8XYAEQOzW/HAL4KiE1M5
-         7bsA==
-X-Gm-Message-State: AOAM532uHzVuERxWlli0Ig9NJEeXFVU0KMuQ1FZ65BC1FW3iJuao4uoA
-        NQ4+8bn4uUJGcxxj/vtcBMZfOw==
-X-Google-Smtp-Source: ABdhPJxxNMKGv/NhLtIdMl/BRJOCT+zMUUqyt4AWTJHdlm9O9AHyBiNnpE4YQWobAiLulE4sZ0UvKQ==
-X-Received: by 2002:a05:6a00:21c2:b0:44c:fa0b:f72 with SMTP id t2-20020a056a0021c200b0044cfa0b0f72mr54948884pfj.13.1636065717795;
-        Thu, 04 Nov 2021 15:41:57 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h2sm4707798pjk.44.2021.11.04.15.41.56
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=RYQvW3gYgNWZLXwXv6LJCFArVSQe9BKw3ODOnU+eVTA=;
+        b=YKGLFSp1L/nX3XwO9Kj+p7UPsoDw4tlYHMyb3m6Hx5UyQwUL0Ju6NzYcGX79/eX/9D
+         OrXcVqOTadbg60utZbhQWCqYLousDN+L6FkQ4ubERfmGWlza5t8y83cA4sof2kdLFQjd
+         MkLo25v4YznFneZEwlAY4gDxS3QbB6iScU1/QyhpV1W+IruUT4pKZ514HMY9lMxZUcdS
+         rxOJLiCXfhRkqowV9mnvZ0FjbWOG2qu2lWbtUaQvHg6gVmvPHDA15yHFYG2hhBQ7tYWE
+         UsHoO3QUjZpFo6WF+pbhVjaI/HEJibcil7bNSaf47hyLGkfHueV7aOHy6hXjx3tI6p2x
+         ganw==
+X-Gm-Message-State: AOAM532w+2r3y5qp4M7a6t2cnCKdc+1akHUkoHXcuPIJ12Ox0rWhvCWo
+        7jBJBB7lQ+Jpaj1FIsn+UBs=
+X-Google-Smtp-Source: ABdhPJytuFT8ksE98hkXQDdKSkJq/n00qK8+qkf7Me1/Ho9Pkj0Sv4VcSk0BY5NyYB28K24l2JTAJw==
+X-Received: by 2002:a05:6a00:1593:b0:492:67eb:355f with SMTP id u19-20020a056a00159300b0049267eb355fmr15414673pfk.32.1636076851947;
+        Thu, 04 Nov 2021 18:47:31 -0700 (PDT)
+Received: from localhost (60-241-46-56.tpgi.com.au. [60.241.46.56])
+        by smtp.gmail.com with ESMTPSA id i68sm5716293pfc.158.2021.11.04.18.47.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Nov 2021 15:41:57 -0700 (PDT)
-Date:   Thu, 4 Nov 2021 22:41:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
-Subject: Re: [PATCH v5.5 01/30] KVM: Ensure local memslot copies operate on
- up-to-date arch-specific data
-Message-ID: <YYRhsclZpZwilkE5@google.com>
-References: <20211104002531.1176691-1-seanjc@google.com>
- <20211104002531.1176691-2-seanjc@google.com>
- <CANgfPd-uuPFjAHk5kVNom2Qs=UU_GX6CQ0xDLg1h_iL8t8S2aQ@mail.gmail.com>
+        Thu, 04 Nov 2021 18:47:31 -0700 (PDT)
+Date:   Fri, 05 Nov 2021 11:47:26 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: KVM on POWER8 host lock up since 10d91611f426 ("powerpc/64s:
+ Reimplement book3s idle code in C")
+To:     Michal =?iso-8859-1?q?Such=E1nek?= <msuchanek@suse.de>
+Cc:     Hari Bathini <hbathini@linux.ibm.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org,
+        Michael Ellerman <mpe@ellerman.id.au>, ro@suse.de
+References: <20200830201145.GA29521@kitsune.suse.cz>
+        <1598835313.5688ngko4f.astroid@bobo.none>
+        <20200831091523.GC29521@kitsune.suse.cz> <87y2lv1430.fsf@mpe.ellerman.id.au>
+        <1599484062.vgmycu6q5i.astroid@bobo.none>
+        <20201016201410.GH29778@kitsune.suse.cz>
+        <1603066878.gtbyofrzyo.astroid@bobo.none>
+        <1603082970.5545yt7raj.astroid@bobo.none>
+        <20210114124023.GL6564@kitsune.suse.cz>
+        <1610628922.o1ihbt98xg.astroid@bobo.none>
+        <20211102154835.GQ11195@kunlun.suse.cz>
+In-Reply-To: <20211102154835.GQ11195@kunlun.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd-uuPFjAHk5kVNom2Qs=UU_GX6CQ0xDLg1h_iL8t8S2aQ@mail.gmail.com>
+Message-Id: <1636076786.9byigbkr8k.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, Nov 04, 2021, Ben Gardon wrote:
-> > @@ -1597,6 +1596,26 @@ static int kvm_set_memslot(struct kvm *kvm,
-> >                 kvm_copy_memslots(slots, __kvm_memslots(kvm, as_id));
-> >         }
-> >
-> > +       /*
-> > +        * Make a full copy of the old memslot, the pointer will become stale
-> > +        * when the memslots are re-sorted by update_memslots(), and the old
-> > +        * memslot needs to be referenced after calling update_memslots(), e.g.
-> > +        * to free its resources and for arch specific behavior.  This needs to
-> > +        * happen *after* (re)acquiring slots_arch_lock.
-> > +        */
-> > +       slot = id_to_memslot(slots, new->id);
-> > +       if (slot) {
-> > +               old = *slot;
-> > +       } else {
-> > +               WARN_ON_ONCE(change != KVM_MR_CREATE);
-> > +               memset(&old, 0, sizeof(old));
-> > +               old.id = new->id;
-> > +               old.as_id = as_id;
-> > +       }
-> > +
-> > +       /* Copy the arch-specific data, again after (re)acquiring slots_arch_lock. */
-> > +       memcpy(&new->arch, &old.arch, sizeof(old.arch));
-> > +
-> 
-> Is new->arch not initialized before this function is called? Does this
-> need to be here, or could it be moved above into the first branch of
-> the if statement?
-> Oh I see you removed the memset below and replaced it with this. I
-> think this is fine, but it might be easier to reason about if we left
-> the memset and moved the memcopy into the if.
-> No point in doing a memcpy of zeros here.
+Excerpts from Michal Such=C3=A1nek's message of November 3, 2021 1:48 am:
+> On Thu, Jan 14, 2021 at 11:08:03PM +1000, Nicholas Piggin wrote:
+>> Excerpts from Michal Such=C3=A1nek's message of January 14, 2021 10:40 p=
+m:
+>> > On Mon, Oct 19, 2020 at 02:50:51PM +1000, Nicholas Piggin wrote:
+>> >> Excerpts from Nicholas Piggin's message of October 19, 2020 11:00 am:
+>> >> > Excerpts from Michal Such=C3=A1nek's message of October 17, 2020 6:=
+14 am:
+>> >> >> On Mon, Sep 07, 2020 at 11:13:47PM +1000, Nicholas Piggin wrote:
+>> >> >>> Excerpts from Michael Ellerman's message of August 31, 2020 8:50 =
+pm:
+>> >> >>> > Michal Such=C3=A1nek <msuchanek@suse.de> writes:
+>> >> >>> >> On Mon, Aug 31, 2020 at 11:14:18AM +1000, Nicholas Piggin wrot=
+e:
+>> >> >>> >>> Excerpts from Michal Such=C3=A1nek's message of August 31, 20=
+20 6:11 am:
+>> >> >>> >>> > Hello,
+>> >> >>> >>> >=20
+>> >> >>> >>> > on POWER8 KVM hosts lock up since commit 10d91611f426 ("pow=
+erpc/64s:
+>> >> >>> >>> > Reimplement book3s idle code in C").
+>> >> >>> >>> >=20
+>> >> >>> >>> > The symptom is host locking up completely after some hours =
+of KVM
+>> >> >>> >>> > workload with messages like
+>> >> >>> >>> >=20
+>> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn=
+'t grab cpu 47
+>> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn=
+'t grab cpu 71
+>> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn=
+'t grab cpu 47
+>> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn=
+'t grab cpu 71
+>> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn=
+'t grab cpu 47
+>> >> >>> >>> >=20
+>> >> >>> >>> > printed before the host locks up.
+>> >> >>> >>> >=20
+>> >> >>> >>> > The machines run sandboxed builds which is a mixed workload=
+ resulting in
+>> >> >>> >>> > IO/single core/mutiple core load over time and there are pe=
+riods of no
+>> >> >>> >>> > activity and no VMS runnig as well. The VMs are shortlived =
+so VM
+>> >> >>> >>> > setup/terdown is somewhat excercised as well.
+>> >> >>> >>> >=20
+>> >> >>> >>> > POWER9 with the new guest entry fast path does not seem to =
+be affected.
+>> >> >>> >>> >=20
+>> >> >>> >>> > Reverted the patch and the followup idle fixes on top of 5.=
+2.14 and
+>> >> >>> >>> > re-applied commit a3f3072db6ca ("powerpc/powernv/idle: Rest=
+ore IAMR
+>> >> >>> >>> > after idle") which gives same idle code as 5.1.16 and the k=
+ernel seems
+>> >> >>> >>> > stable.
+>> >> >>> >>> >=20
+>> >> >>> >>> > Config is attached.
+>> >> >>> >>> >=20
+>> >> >>> >>> > I cannot easily revert this commit, especially if I want to=
+ use the same
+>> >> >>> >>> > kernel on POWER8 and POWER9 - many of the POWER9 fixes are =
+applicable
+>> >> >>> >>> > only to the new idle code.
+>> >> >>> >>> >=20
+>> >> >>> >>> > Any idea what can be the problem?
+>> >> >>> >>>=20
+>> >> >>> >>> So hwthread_state is never getting back to to HWTHREAD_IN_IDL=
+E on
+>> >> >>> >>> those threads. I wonder what they are doing. POWER8 doesn't h=
+ave a good
+>> >> >>> >>> NMI IPI and I don't know if it supports pdbg dumping register=
+s from the
+>> >> >>> >>> BMC unfortunately.
+>> >> >>> >>
+>> >> >>> >> It may be possible to set up fadump with a later kernel versio=
+n that
+>> >> >>> >> supports it on powernv and dump the whole kernel.
+>> >> >>> >=20
+>> >> >>> > Your firmware won't support it AFAIK.
+>> >> >>> >=20
+>> >> >>> > You could try kdump, but if we have CPUs stuck in KVM then ther=
+e's a
+>> >> >>> > good chance it won't work :/
+>> >> >>>=20
+>> >> >>> I haven't had any luck yet reproducing this still. Testing with s=
+ub=20
+>> >> >>> cores of various different combinations, etc. I'll keep trying th=
+ough.
+>> >> >>=20
+>> >> >> Hello,
+>> >> >>=20
+>> >> >> I tried running some KVM guests to simulate the workload and what =
+I get
+>> >> >> is guests failing to start with a rcu stall. Tried both 5.3 and 5.=
+9
+>> >> >> kernel and qemu 4.2.1 and 5.1.0
+>> >> >>=20
+>> >> >> To start some guests I run
+>> >> >>=20
+>> >> >> for i in $(seq 0 9) ; do /opt/qemu/bin/qemu-system-ppc64 -m 2048 -=
+accel kvm -smp 8 -kernel /boot/vmlinux -initrd /boot/initrd -nodefaults -no=
+graphic -serial mon:telnet::444$i,server,wait & done
+>> >> >>=20
+>> >> >> To simulate some workload I run
+>> >> >>=20
+>> >> >> xz -zc9T0 < /dev/zero > /dev/null &
+>> >> >> while true; do
+>> >> >>     killall -STOP xz; sleep 1; killall -CONT xz; sleep 1;
+>> >> >> done &
+>> >> >>=20
+>> >> >> on the host and add a job that executes this to the ramdisk. Howev=
+er, most
+>> >> >> guests never get to the point where the job is executed.
+>> >> >>=20
+>> >> >> Any idea what might be the problem?
+>> >> >=20
+>> >> > I would say try without pv queued spin locks (but if the same thing=
+ is=20
+>> >> > happening with 5.3 then it must be something else I guess).=20
+>> >> >=20
+>> >> > I'll try to test a similar setup on a POWER8 here.
+>> >>=20
+>> >> Couldn't reproduce the guest hang, they seem to run fine even with=20
+>> >> queued spinlocks. Might have a different .config.
+>> >>=20
+>> >> I might have got a lockup in the host (although different symptoms th=
+an=20
+>> >> the original report). I'll look into that a bit further.
+>> >=20
+>> > Hello,
+>> >=20
+>> > any progress on this?
+>>=20
+>> No progress, I still wasn't able to reproduce, and it fell off the=20
+>> radar sorry.
+>>=20
+>> I expect hwthred_state must be getting corrupted somewhere or a
+>> secondary thread getting stuck but I couldn't see where. I try pick
+>> it up again thanks for the reminder.
+>=20
+> Hello,
+>=20
+> the fixes pointed out in
+> https://lore.kernel.org/linuxppc-dev/87pmrtbbdt.fsf@mpe.ellerman.id.au/T/=
+#u
+> resolve the problem.
+>=20
+> Thanks
+>=20
+> Michal
 
-Hmm, good point.  I wrote it like this so that the "arch" part is more identifiable
-since that's what needs to be protected by the lock, but I completely agree that
-it's odd when viewed without that lens.
+Hey Michal, great thanks for testing. Sorry I couldn't fix it, but a=20
+good result in the end.
+
+Thanks,
+Nick
