@@ -2,233 +2,95 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0481D445D82
-	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Nov 2021 02:47:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CC8D446841
+	for <lists+kvm-ppc@lfdr.de>; Fri,  5 Nov 2021 19:05:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230333AbhKEBuM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 4 Nov 2021 21:50:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229647AbhKEBuL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 4 Nov 2021 21:50:11 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BBF7C061714
-        for <kvm-ppc@vger.kernel.org>; Thu,  4 Nov 2021 18:47:32 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id p17so7049748pgj.2
-        for <kvm-ppc@vger.kernel.org>; Thu, 04 Nov 2021 18:47:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=RYQvW3gYgNWZLXwXv6LJCFArVSQe9BKw3ODOnU+eVTA=;
-        b=YG8/+XaVLw3Zk8a10TbDgqc/6xZyU/v16HuLL1Q0ISzN5D43c4ckOzoSOycGfw9lLL
-         uCp6qVFuyYwCQJI1VAjfFiGDoiuolUtRFWcflIFeif0iXCQIOz0wyTq6IZsuxExh6zUt
-         tJ0bw1N7uZkkH+y3x31xsueM4cMlJB0BBSoBI1aAnPREHUvCnsrJfEiQzgOaAd0TieQw
-         xHPlHik9jdLXdWr8E5rX+rlu2xQrzdzoJJwyY3/eLcAxuUqASqdyv86qsw2LJF8HVVt2
-         wH/4N6EDE+IO+n5LhbR0hnC/UTV97jAtBjUPxNYBSkqQ0vkHpsDvHdYhO88HyU2KE3KH
-         59tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=RYQvW3gYgNWZLXwXv6LJCFArVSQe9BKw3ODOnU+eVTA=;
-        b=YKGLFSp1L/nX3XwO9Kj+p7UPsoDw4tlYHMyb3m6Hx5UyQwUL0Ju6NzYcGX79/eX/9D
-         OrXcVqOTadbg60utZbhQWCqYLousDN+L6FkQ4ubERfmGWlza5t8y83cA4sof2kdLFQjd
-         MkLo25v4YznFneZEwlAY4gDxS3QbB6iScU1/QyhpV1W+IruUT4pKZ514HMY9lMxZUcdS
-         rxOJLiCXfhRkqowV9mnvZ0FjbWOG2qu2lWbtUaQvHg6gVmvPHDA15yHFYG2hhBQ7tYWE
-         UsHoO3QUjZpFo6WF+pbhVjaI/HEJibcil7bNSaf47hyLGkfHueV7aOHy6hXjx3tI6p2x
-         ganw==
-X-Gm-Message-State: AOAM532w+2r3y5qp4M7a6t2cnCKdc+1akHUkoHXcuPIJ12Ox0rWhvCWo
-        7jBJBB7lQ+Jpaj1FIsn+UBs=
-X-Google-Smtp-Source: ABdhPJytuFT8ksE98hkXQDdKSkJq/n00qK8+qkf7Me1/Ho9Pkj0Sv4VcSk0BY5NyYB28K24l2JTAJw==
-X-Received: by 2002:a05:6a00:1593:b0:492:67eb:355f with SMTP id u19-20020a056a00159300b0049267eb355fmr15414673pfk.32.1636076851947;
-        Thu, 04 Nov 2021 18:47:31 -0700 (PDT)
-Received: from localhost (60-241-46-56.tpgi.com.au. [60.241.46.56])
-        by smtp.gmail.com with ESMTPSA id i68sm5716293pfc.158.2021.11.04.18.47.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Nov 2021 18:47:31 -0700 (PDT)
-Date:   Fri, 05 Nov 2021 11:47:26 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: KVM on POWER8 host lock up since 10d91611f426 ("powerpc/64s:
- Reimplement book3s idle code in C")
-To:     Michal =?iso-8859-1?q?Such=E1nek?= <msuchanek@suse.de>
-Cc:     Hari Bathini <hbathini@linux.ibm.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org,
-        Michael Ellerman <mpe@ellerman.id.au>, ro@suse.de
-References: <20200830201145.GA29521@kitsune.suse.cz>
-        <1598835313.5688ngko4f.astroid@bobo.none>
-        <20200831091523.GC29521@kitsune.suse.cz> <87y2lv1430.fsf@mpe.ellerman.id.au>
-        <1599484062.vgmycu6q5i.astroid@bobo.none>
-        <20201016201410.GH29778@kitsune.suse.cz>
-        <1603066878.gtbyofrzyo.astroid@bobo.none>
-        <1603082970.5545yt7raj.astroid@bobo.none>
-        <20210114124023.GL6564@kitsune.suse.cz>
-        <1610628922.o1ihbt98xg.astroid@bobo.none>
-        <20211102154835.GQ11195@kunlun.suse.cz>
-In-Reply-To: <20211102154835.GQ11195@kunlun.suse.cz>
+        id S234526AbhKESIY (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 5 Nov 2021 14:08:24 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.166]:31561 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233657AbhKESIX (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 5 Nov 2021 14:08:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1636135532;
+    s=strato-dkim-0002; d=xenosoft.de;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=lW6PZrEMoh4YrNGw6p6fcAehMIXj+QcvqFKm6eiG2Ho=;
+    b=PUxjeHeXW9B2GdUVGfUdv2fpN9PMdwa6YU6vlu24/Lgbex16rHHDBqofjsEz41hvl7
+    VGjou1/HH6mnAZI1nhopFNxsku6dDQydiisPTB+Fi0S6HgZOEnlA2xDwioBgWojGvFqr
+    Nu0KY7ZY9K25MZWcZa5KqfJ9LYbuqTwbMqjzSMnNx9TT1SdYLkVy5S0ytjgcVxAz72iV
+    mQsdYblOZa9iZgFGBWrparxjc4TjwOrtcsdaMFE4ovW+GH4fjNEdYgYAndbknlV5rF0H
+    YJsC/0YkUkIt3DUe5YOmrVFB40fjEZCp4LBiYPqGR7F93bjiLRA5AfPAiJ3beNRy5oKi
+    b1Eg==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":L2QefEenb+UdBJSdRCXu93KJ1bmSGnhMdmOod1DhGM4l4Hio94KKxRySfLxnHfJ+Dkjp5DdBJSrwuuqxvPhacCDkZL5G9UYE/q69Nx1/DIB5"
+X-RZG-CLASS-ID: mo00
+Received: from [IPV6:2a02:8109:89c0:ebfc:9f9:e5a3:6af5:bb18]
+    by smtp.strato.de (RZmta 47.34.1 AUTH)
+    with ESMTPSA id w0066dxA5I5VJTy
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Fri, 5 Nov 2021 19:05:31 +0100 (CET)
+Message-ID: <aa9ce992-e48f-31b4-cc3e-3300bd557dc8@xenosoft.de>
+Date:   Fri, 5 Nov 2021 19:05:22 +0100
 MIME-Version: 1.0
-Message-Id: <1636076786.9byigbkr8k.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.3.0
+Subject: Re: [PATCH] drm/virtio: Fix NULL dereference error in virtio_gpu_poll
+Content-Language: de-DE
+To:     Vivek Kasireddy <vivek.kasireddy@intel.com>,
+        dri-devel@lists.freedesktop.org
+Cc:     Gurchetan Singh <gurchetansingh@chromium.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
+        "R.T.Dickinson" <rtd2@xtra.co.nz>,
+        Darren Stevens <darren@stevens-zone.net>,
+        mad skateman <madskateman@gmail.com>,
+        Christian Zigotzky <info@xenosoft.de>
+References: <15731ad7-83ff-c7ef-e4a1-8b11814572c2@xenosoft.de>
+ <20211104214249.1802789-1-vivek.kasireddy@intel.com>
+From:   Christian Zigotzky <chzigotzky@xenosoft.de>
+In-Reply-To: <20211104214249.1802789-1-vivek.kasireddy@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Michal Such=C3=A1nek's message of November 3, 2021 1:48 am:
-> On Thu, Jan 14, 2021 at 11:08:03PM +1000, Nicholas Piggin wrote:
->> Excerpts from Michal Such=C3=A1nek's message of January 14, 2021 10:40 p=
-m:
->> > On Mon, Oct 19, 2020 at 02:50:51PM +1000, Nicholas Piggin wrote:
->> >> Excerpts from Nicholas Piggin's message of October 19, 2020 11:00 am:
->> >> > Excerpts from Michal Such=C3=A1nek's message of October 17, 2020 6:=
-14 am:
->> >> >> On Mon, Sep 07, 2020 at 11:13:47PM +1000, Nicholas Piggin wrote:
->> >> >>> Excerpts from Michael Ellerman's message of August 31, 2020 8:50 =
-pm:
->> >> >>> > Michal Such=C3=A1nek <msuchanek@suse.de> writes:
->> >> >>> >> On Mon, Aug 31, 2020 at 11:14:18AM +1000, Nicholas Piggin wrot=
-e:
->> >> >>> >>> Excerpts from Michal Such=C3=A1nek's message of August 31, 20=
-20 6:11 am:
->> >> >>> >>> > Hello,
->> >> >>> >>> >=20
->> >> >>> >>> > on POWER8 KVM hosts lock up since commit 10d91611f426 ("pow=
-erpc/64s:
->> >> >>> >>> > Reimplement book3s idle code in C").
->> >> >>> >>> >=20
->> >> >>> >>> > The symptom is host locking up completely after some hours =
-of KVM
->> >> >>> >>> > workload with messages like
->> >> >>> >>> >=20
->> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn=
-'t grab cpu 47
->> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn=
-'t grab cpu 71
->> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn=
-'t grab cpu 47
->> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn=
-'t grab cpu 71
->> >> >>> >>> > 2020-08-30T10:51:31+00:00 obs-power8-01 kernel: KVM: couldn=
-'t grab cpu 47
->> >> >>> >>> >=20
->> >> >>> >>> > printed before the host locks up.
->> >> >>> >>> >=20
->> >> >>> >>> > The machines run sandboxed builds which is a mixed workload=
- resulting in
->> >> >>> >>> > IO/single core/mutiple core load over time and there are pe=
-riods of no
->> >> >>> >>> > activity and no VMS runnig as well. The VMs are shortlived =
-so VM
->> >> >>> >>> > setup/terdown is somewhat excercised as well.
->> >> >>> >>> >=20
->> >> >>> >>> > POWER9 with the new guest entry fast path does not seem to =
-be affected.
->> >> >>> >>> >=20
->> >> >>> >>> > Reverted the patch and the followup idle fixes on top of 5.=
-2.14 and
->> >> >>> >>> > re-applied commit a3f3072db6ca ("powerpc/powernv/idle: Rest=
-ore IAMR
->> >> >>> >>> > after idle") which gives same idle code as 5.1.16 and the k=
-ernel seems
->> >> >>> >>> > stable.
->> >> >>> >>> >=20
->> >> >>> >>> > Config is attached.
->> >> >>> >>> >=20
->> >> >>> >>> > I cannot easily revert this commit, especially if I want to=
- use the same
->> >> >>> >>> > kernel on POWER8 and POWER9 - many of the POWER9 fixes are =
-applicable
->> >> >>> >>> > only to the new idle code.
->> >> >>> >>> >=20
->> >> >>> >>> > Any idea what can be the problem?
->> >> >>> >>>=20
->> >> >>> >>> So hwthread_state is never getting back to to HWTHREAD_IN_IDL=
-E on
->> >> >>> >>> those threads. I wonder what they are doing. POWER8 doesn't h=
-ave a good
->> >> >>> >>> NMI IPI and I don't know if it supports pdbg dumping register=
-s from the
->> >> >>> >>> BMC unfortunately.
->> >> >>> >>
->> >> >>> >> It may be possible to set up fadump with a later kernel versio=
-n that
->> >> >>> >> supports it on powernv and dump the whole kernel.
->> >> >>> >=20
->> >> >>> > Your firmware won't support it AFAIK.
->> >> >>> >=20
->> >> >>> > You could try kdump, but if we have CPUs stuck in KVM then ther=
-e's a
->> >> >>> > good chance it won't work :/
->> >> >>>=20
->> >> >>> I haven't had any luck yet reproducing this still. Testing with s=
-ub=20
->> >> >>> cores of various different combinations, etc. I'll keep trying th=
-ough.
->> >> >>=20
->> >> >> Hello,
->> >> >>=20
->> >> >> I tried running some KVM guests to simulate the workload and what =
-I get
->> >> >> is guests failing to start with a rcu stall. Tried both 5.3 and 5.=
-9
->> >> >> kernel and qemu 4.2.1 and 5.1.0
->> >> >>=20
->> >> >> To start some guests I run
->> >> >>=20
->> >> >> for i in $(seq 0 9) ; do /opt/qemu/bin/qemu-system-ppc64 -m 2048 -=
-accel kvm -smp 8 -kernel /boot/vmlinux -initrd /boot/initrd -nodefaults -no=
-graphic -serial mon:telnet::444$i,server,wait & done
->> >> >>=20
->> >> >> To simulate some workload I run
->> >> >>=20
->> >> >> xz -zc9T0 < /dev/zero > /dev/null &
->> >> >> while true; do
->> >> >>     killall -STOP xz; sleep 1; killall -CONT xz; sleep 1;
->> >> >> done &
->> >> >>=20
->> >> >> on the host and add a job that executes this to the ramdisk. Howev=
-er, most
->> >> >> guests never get to the point where the job is executed.
->> >> >>=20
->> >> >> Any idea what might be the problem?
->> >> >=20
->> >> > I would say try without pv queued spin locks (but if the same thing=
- is=20
->> >> > happening with 5.3 then it must be something else I guess).=20
->> >> >=20
->> >> > I'll try to test a similar setup on a POWER8 here.
->> >>=20
->> >> Couldn't reproduce the guest hang, they seem to run fine even with=20
->> >> queued spinlocks. Might have a different .config.
->> >>=20
->> >> I might have got a lockup in the host (although different symptoms th=
-an=20
->> >> the original report). I'll look into that a bit further.
->> >=20
->> > Hello,
->> >=20
->> > any progress on this?
->>=20
->> No progress, I still wasn't able to reproduce, and it fell off the=20
->> radar sorry.
->>=20
->> I expect hwthred_state must be getting corrupted somewhere or a
->> secondary thread getting stuck but I couldn't see where. I try pick
->> it up again thanks for the reminder.
->=20
-> Hello,
->=20
-> the fixes pointed out in
-> https://lore.kernel.org/linuxppc-dev/87pmrtbbdt.fsf@mpe.ellerman.id.au/T/=
-#u
-> resolve the problem.
->=20
-> Thanks
->=20
-> Michal
+On 04 November 2021 at 10:42 pm, Vivek Kasireddy wrote:
 
-Hey Michal, great thanks for testing. Sorry I couldn't fix it, but a=20
-good result in the end.
+ > When virgl is not enabled, vfpriv pointer would not be allocated.
+ > Therefore, check for a valid value before dereferencing.
+ >
+ > Reported-by: Christian Zigotzky <chzigotzky@xenosoft.de>
+ > Cc: Gurchetan Singh <gurchetansingh@chromium.org>
+ > Cc: Gerd Hoffmann <kraxel@redhat.com>
+ > Signed-off-by: Vivek Kasireddy <vivek.kasireddy@intel.com>
+ > ---
+ >  drivers/gpu/drm/virtio/virtgpu_drv.c | 3 ++-
+ >  1 file changed, 2 insertions(+), 1 deletion(-)
+ >
+ > diff --git a/drivers/gpu/drm/virtio/virtgpu_drv.c 
+b/drivers/gpu/drm/virtio/virtgpu_drv.c
+ > index 749db18dcfa2..d86e1ad4a972 100644
+ > --- a/drivers/gpu/drm/virtio/virtgpu_drv.c
+ > +++ b/drivers/gpu/drm/virtio/virtgpu_drv.c
+ > @@ -163,10 +163,11 @@ static __poll_t virtio_gpu_poll(struct file *filp,
+ >      struct drm_file *drm_file = filp->private_data;
+ >      struct virtio_gpu_fpriv *vfpriv = drm_file->driver_priv;
+ >      struct drm_device *dev = drm_file->minor->dev;
+ > +    struct virtio_gpu_device *vgdev = dev->dev_private;
+ >      struct drm_pending_event *e = NULL;
+ >      __poll_t mask = 0;
+ >
+ > -    if (!vfpriv->ring_idx_mask)
+ > +    if (!vgdev->has_virgl_3d || !vfpriv || !vfpriv->ring_idx_mask)
+ >          return drm_poll(filp, wait);
+ >
+ >      poll_wait(filp, &drm_file->event_wait, wait);
 
-Thanks,
-Nick
+Tested-by: Christian Zigotzky <chzigotzky@xenosoft.de> [1]
+
+[1] https://i.ibb.co/N1vL5Kd/Kernel-5-16-alpha3-Power-PC.png
