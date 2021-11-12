@@ -2,52 +2,52 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B77C44DF53
-	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Nov 2021 01:51:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7DDE44DF81
+	for <lists+kvm-ppc@lfdr.de>; Fri, 12 Nov 2021 02:03:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234632AbhKLAx7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 11 Nov 2021 19:53:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55822 "EHLO
+        id S234519AbhKLBGr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 11 Nov 2021 20:06:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234598AbhKLAx6 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 11 Nov 2021 19:53:58 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C015AC061767
-        for <kvm-ppc@vger.kernel.org>; Thu, 11 Nov 2021 16:51:08 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id b11so7050274pld.12
-        for <kvm-ppc@vger.kernel.org>; Thu, 11 Nov 2021 16:51:08 -0800 (PST)
+        with ESMTP id S234587AbhKLBGr (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 11 Nov 2021 20:06:47 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66397C0613F5
+        for <kvm-ppc@vger.kernel.org>; Thu, 11 Nov 2021 17:03:57 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id z6so7064423pfe.7
+        for <kvm-ppc@vger.kernel.org>; Thu, 11 Nov 2021 17:03:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=7VoEwbSPzrTyOh3w99mGEcK1Otv61yXE8VpDyQ7XU/Q=;
-        b=aR0iTUNTxKf6faFpqVLtDxLZ+Z93VjgfuMSy8Y9h3wnwVUTL/oHfhEOsrg0V7yOdYT
-         7fq8GTKIKG9OH6zETAjAXEzMtYxKZ4n8vzmgKUi//wtyVazuE6xgdlSVa2YM1WXEZK7o
-         ckgTdbQk1CrwriNKigDb1ZxyhMDgLtfKnE3RIVuAKQjcg2mMhNzjvwVYycKmLb0GnSZ1
-         GYcRaJBvetbHNGisq5tuHOigfRUZHZConfP9luv9GZtaibkXsyjw/cHwj8DSAwBW3aaZ
-         7VyKPKnacS2ZdpG3N5SRXdGPcXpnFm1QD3uLEDYX71FQ35qKY9q+/DI/dPGPqFGBB6ib
-         ajeg==
+        bh=OqiUBkPNwVtm2ZpjSEzoYhMNAp4tNbVTba3KEv6WN8w=;
+        b=pc7ejE9G9f2/DNPzPS7XIXvJtmGfBaF2LxIzkZwFvEfuQOri3Y1155wjk7xjt2PNCJ
+         kE24TIPjCcGgUSYiX3UWCA1DBdTKkT1C74bahVgNb9tmSS/hJEwGE9hxKY7yJMJ5/gnk
+         kd+TrPPKr0MuJqBAypaAOFEn7+cRqbZm+iMfctLBeivKDevpGMITf+s6vQitBcPNGTgw
+         /amQnFMW1BnWMyjEaECoc/twxm/ddAt9qLXsEQJ21ZE/S+ANAhdIOkrMWTDwWGDr9sqH
+         T2DNYEPOqsm0H4/svC1i15A5EDGrV+fHlrcxZdbN2PUtjvWHGe4Hnq190TEFtTm6CJzc
+         ynvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=7VoEwbSPzrTyOh3w99mGEcK1Otv61yXE8VpDyQ7XU/Q=;
-        b=vueGdAnb2fAbh3QjJPo5tyhaEZmTWsKLncB1C2A3kfd6+rvdBzh8B72KigDteICg/A
-         Td4VWk3PMmvB+dRfQN7vF+d+VsCwErB7RaJOEW2b+4xmqSbRtDLr1USiN3v211Fqsifl
-         PIVEqDML3fWsjj/D4lgJdqa4d+KdSkedgJ4AuOtdtAZzIaDc/snzBef0MjXTorzFHEDO
-         ZNZnQwH48t7bN8kFjcz9gtLhtWyeB26iwqb5AclXgPT8Obsx5AYVZspcq+yc+iAaRIUP
-         2mDActjcGXO03ZDEJS6/xDvhi5TkY16prlt00yel38QHzEKw0MtGi/rie4lYbDpOFMsU
-         TcEA==
-X-Gm-Message-State: AOAM531UTXfAPtJXbf7A1F48m21Gmth5mN8MmXvN+Kf+3smqUaWufe3m
-        KZW+MD9p3eH6INTYWfPoGwZtbw==
-X-Google-Smtp-Source: ABdhPJxC4jGH9js/28DTzQpRvZ4IBLyKiJDKoUfHaiXaxCscmtOSb6+KYszrts8CNNHGQNLMJ/jO0g==
-X-Received: by 2002:a17:90a:c58f:: with SMTP id l15mr12870593pjt.168.1636678268099;
-        Thu, 11 Nov 2021 16:51:08 -0800 (PST)
+        bh=OqiUBkPNwVtm2ZpjSEzoYhMNAp4tNbVTba3KEv6WN8w=;
+        b=FuNcBrAAZ2AgMdvginYDqryU0yKo/optfnATIOjs7v3qsNwOshnVt7OyW8h/4xnXAm
+         bhd99OpWhYFoA0mvB03AMub/AvAQFsZVsPpvixmAPzg+2yppMe35NCKCb+5EZPob3Z9y
+         h5HmjtqwTot8pwUP3fneMpE8RfFQvBYO6W3kWLm2weLYulIofX7x3KMUGJqNf3s3NBDX
+         sHJTyyeCfjXno7EFkBAaiAFj0f7Oloa4q4jiZUoNTxLNkhQCfEhedf9fP0u3NcJs0diI
+         Ajo1xGfeOuNjGk8WEda19JUsXqkAc6Yz7NBG4ZkZ42ykU+oIjKOVPq8HwukPSYoyQp5M
+         eRzQ==
+X-Gm-Message-State: AOAM531F6PGimQG9mkYst/IWltr9wusV2APKgafwJYx48Hpeo1z4A7o0
+        fp6PktPixzAvQ7R6tzOzYcEmQg==
+X-Google-Smtp-Source: ABdhPJxMgoJUa9ek+o+tvzW6z5WeFQCDZekoSsl946lRj2FCOsMM6fcE3+3c50Ng/MtZ8Re7BsLCDg==
+X-Received: by 2002:a63:1441:: with SMTP id 1mr7559189pgu.66.1636679035969;
+        Thu, 11 Nov 2021 17:03:55 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s21sm4279773pfk.3.2021.11.11.16.51.07
+        by smtp.gmail.com with ESMTPSA id t13sm4096818pfl.214.2021.11.11.17.03.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Nov 2021 16:51:07 -0800 (PST)
-Date:   Fri, 12 Nov 2021 00:51:03 +0000
+        Thu, 11 Nov 2021 17:03:55 -0800 (PST)
+Date:   Fri, 12 Nov 2021 01:03:51 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 Cc:     James Morse <james.morse@arm.com>,
@@ -76,88 +76,75 @@ Cc:     James Morse <james.morse@arm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v5.5 26/30] KVM: Keep memslots in tree-based structures
- instead of array-based ones
-Message-ID: <YY26dxv2kM3m2H7Z@google.com>
+Subject: Re: [PATCH v5.5 23/30] KVM: Resolve memslot ID via a hash table
+ instead of via a static array
+Message-ID: <YY29d7Vb6aiv93mu@google.com>
 References: <20211104002531.1176691-1-seanjc@google.com>
- <20211104002531.1176691-27-seanjc@google.com>
- <5f5c80ce-9189-def3-9c50-d5a504925253@oracle.com>
+ <20211104002531.1176691-24-seanjc@google.com>
+ <f0b364ed-bf9e-5de9-0449-6d7ba3682405@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5f5c80ce-9189-def3-9c50-d5a504925253@oracle.com>
+In-Reply-To: <f0b364ed-bf9e-5de9-0449-6d7ba3682405@oracle.com>
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 On Fri, Nov 12, 2021, Maciej S. Szmigiero wrote:
 > On 04.11.2021 01:25, Sean Christopherson wrote:
-> > -	/*
-> > -	 * Remove the old memslot from the hash list and interval tree, copying
-> > -	 * the node data would corrupt the structures.
-> > -	 */
-> > +	int as_id = kvm_memslots_get_as_id(old, new);
-> > +	struct kvm_memslots *slots = kvm_get_inactive_memslots(kvm, as_id);
-> > +	int idx = slots->node_idx;
-> > +
-> >   	if (old) {
-> > -		hash_del(&old->id_node);
-> > -		interval_tree_remove(&old->hva_node, &slots->hva_tree);
-> > +		hash_del(&old->id_node[idx]);
-> > +		interval_tree_remove(&old->hva_node[idx], &slots->hva_tree);
-> > -		if (!new)
-> > +		if ((long)old == atomic_long_read(&slots->last_used_slot))
-> > +			atomic_long_set(&slots->last_used_slot, (long)new);
-> 
-> Open-coding cmpxchg() is way less readable than a direct call.
-
-Doh, I meant to call this out and/or add a comment.
-
-My objection to cmpxchg() is that it implies atomicity is required (the kernel's
-version adds the lock), which is very much not the case.  So this isn't strictly
-an open-coded version of cmpxchg().
-
-> The open-coded version also compiles on x86 to multiple instructions with
-> a branch, instead of just a single instruction.
-
-Yeah.  The lock can't be contended, so that part of cmpxchg is a non-issue.  But
-that's also why I don't love using cmpxchg.
-
-I don't have a strong preference, I just got briefly confused by the atomicity part.
-
-> > +static void kvm_invalidate_memslot(struct kvm *kvm,
-> > +				   struct kvm_memory_slot *old,
-> > +				   struct kvm_memory_slot *working_slot)
+> > From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> > 
+> > Memslot ID to the corresponding memslot mappings are currently kept as
+> > indices in static id_to_index array.
+> > The size of this array depends on the maximum allowed memslot count
+> > (regardless of the number of memslots actually in use).
+> > 
+> > This has become especially problematic recently, when memslot count cap was
+> > removed, so the maximum count is now full 32k memslots - the maximum
+> > allowed by the current KVM API.
+> > 
+> > Keeping these IDs in a hash table (instead of an array) avoids this
+> > problem.
+> > 
+> > Resolving a memslot ID to the actual memslot (instead of its index) will
+> > also enable transitioning away from an array-based implementation of the
+> > whole memslots structure in a later commit.
+> > 
+> > Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> > Co-developed-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   include/linux/kvm_host.h | 16 +++----
+> >   virt/kvm/kvm_main.c      | 96 +++++++++++++++++++++++++++++++---------
+> >   2 files changed, 84 insertions(+), 28 deletions(-)
+> > 
+> (..)
+> > @@ -1259,17 +1257,49 @@ static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
+> >   	return 0;
+> >   }
+> > +static void kvm_replace_memslot(struct kvm_memslots *slots,
+> > +				struct kvm_memory_slot *old,
+> > +				struct kvm_memory_slot *new)
 > > +{
 > > +	/*
-> > +	 * Mark the current slot INVALID.  As with all memslot modifications,
-> > +	 * this must be done on an unreachable slot to avoid modifying the
-> > +	 * current slot in the active tree.
+> > +	 * Remove the old memslot from the hash list, copying the node data
+> > +	 * would corrupt the list.
 > > +	 */
-> > +	kvm_copy_memslot(working_slot, old);
-> > +	working_slot->flags |= KVM_MEMSLOT_INVALID;
-> > +	kvm_replace_memslot(kvm, old, working_slot);
+> > +	if (old) {
+> > +		hash_del(&old->id_node);
 > > +
-> > +	/*
-> > +	 * Activate the slot that is now marked INVALID, but don't propagate
-> > +	 * the slot to the now inactive slots. The slot is either going to be
-> > +	 * deleted or recreated as a new slot.
-> > +	 */
-> > +	kvm_swap_active_memslots(kvm, old->as_id);
+> > +		if (!new)
+> > +			return;
+> > +	}
 > > +
-> > +	/*
-> > +	 * From this point no new shadow pages pointing to a deleted, or moved,
-> > +	 * memslot will be created.  Validation of sp->gfn happens in:
-> > +	 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
-> > +	 *	- kvm_is_visible_gfn (mmu_check_root)
-> > +	 */
-> > +	kvm_arch_flush_shadow_memslot(kvm, old);
+> > +	/* Copy the source *data*, not the pointer, to the destination. */
+> > +	if (old)
+> > +		*new = *old;
 > 
-> This should flush the currently active slot (that is, "working_slot",
-> not "old") to not introduce a behavior change with respect to the existing
-> code.
-> 
-> That's also what the previous version of this patch set did.
+> This way of writing it (that, is re-checking whether "old" is not-NULL)
+> suggests that it could have been set to NULL inside the previous block
+> (since the last check), which isn't true.
 
-Eww.  I would much prefer to "fix" the existing code in a prep patch.  It shouldn't
-matter, but arch code really should not get passed an INVALID slot.
+Yeah, I think I was trying to minimize the logic delta in future patches, but
+looking back at the diffs, that didn't pan out.  I've no objection to folding
+the two together.
