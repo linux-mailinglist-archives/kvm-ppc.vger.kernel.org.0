@@ -2,104 +2,138 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCF2944F43D
-	for <lists+kvm-ppc@lfdr.de>; Sat, 13 Nov 2021 17:53:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB9FD450442
+	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Nov 2021 13:17:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235877AbhKMQ4R (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 13 Nov 2021 11:56:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51196 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235890AbhKMQ4R (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 13 Nov 2021 11:56:17 -0500
-Received: from mail-ua1-x936.google.com (mail-ua1-x936.google.com [IPv6:2607:f8b0:4864:20::936])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF33C061766
-        for <kvm-ppc@vger.kernel.org>; Sat, 13 Nov 2021 08:53:24 -0800 (PST)
-Received: by mail-ua1-x936.google.com with SMTP id p2so25438503uad.11
-        for <kvm-ppc@vger.kernel.org>; Sat, 13 Nov 2021 08:53:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=Y5xrcoQVIg2YEh3v1j5Qs7Wbw0zmiBD1dx0P9N3lmL4=;
-        b=HJd4RFqAIIoP0vGbuMChvAbg2TPafTrwZMtjZ7Bkinzx4j5tbAMw5zaYwWhC0aXniN
-         Rd2agJP711fiPUJ9dG/+FhYhpVQa4yNdYy4z5j4dLeqnIMaEJBu8OBfOrdPMmRfAM3qz
-         MT0oCnoPva8H73F5OINgbkIsDc3wPA+XsbwW65NQ9NK3yb5rqKadOIjiahoXlijqHH8x
-         QM3E4BhAQxeBIOoHyCBPWdKO3lBZ56YMyD+FzzxI8Fet+KcXtuLt2GZ/gb77TVJ3C+OW
-         liZ/GsQFHp5iETNb7fca9iYePu7DU+tQR4PB7qilKiZEvKcOvwSlFuOyMq+2TxJsM792
-         RwPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to:content-transfer-encoding;
-        bh=Y5xrcoQVIg2YEh3v1j5Qs7Wbw0zmiBD1dx0P9N3lmL4=;
-        b=wRzsAo9Smxke3UDEfoB8f4fSxRl84KhIDKcE0TYaoFRFR0OwY1Q8d6faYlG3lXLwes
-         hkWSMyb8o4lLF6JJivmTvJZR0QmLjuGSIWHlJOPcMHZzvbdJdzefGUcg+iguPpv+IG+t
-         vV7OKRRSA7A5mi02koHZs5rmcrvTQWtGLKBraztaN0Yu60J9EE6xmU2TV9DdcOVaApAd
-         maKsCW6LIS73Z8JFmvyOB6h2xMUbI7wH4Fk7TAimYzfKyjhVcEdrxGE5xlkdblGswp50
-         aOebcNvFOpJeM60tkrArKqDXVTWmHsqNEGKSmcZijWOmdxEcPqspa6c38OWnFkyp+VRp
-         ZpoA==
-X-Gm-Message-State: AOAM5320UnkclY8aT4pDbrizkA1CpqkEJioloImYUwVJ5DA2sGtg5S3S
-        170TkQ7arNoZvOnGySZO/P5MwCiJSZZK5LDoDLA=
-X-Google-Smtp-Source: ABdhPJwchWDZN4eTA4gZftZsdxC205SlpJhXpWpM47afpxH2KWLFOW0Gg2jOJlFf8LcKZSlpBvksSstogD8JqyJzdkw=
-X-Received: by 2002:ab0:77c3:: with SMTP id y3mr36534526uar.67.1636822403679;
- Sat, 13 Nov 2021 08:53:23 -0800 (PST)
+        id S231181AbhKOMUD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 15 Nov 2021 07:20:03 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11238 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231329AbhKOMUB (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 15 Nov 2021 07:20:01 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AFAxUCu022822;
+        Mon, 15 Nov 2021 12:16:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=FGzXDLCIzbaoG6sA4ktZGlkzV+djpIiRQi2B3Z+NZpU=;
+ b=VkmEBZBwPQVnrCbrtLJb8LuBfFST5QxmvLrYBaM72yIcJNpUAlxoqB+W1Gq1748d2HFm
+ 2zdB31SnbilqF1+4UBGMFY2+14xwMPfy5oGyW/zIJb9uBGlkXWZ1F3d3c55WYUZYv4d6
+ i4r5BTucQ1+7dHZBCnx/FB7zB6oNuzgxiE0ZpB0ClRIXL0vDf85TPvX2I0JEkhWrc0lM
+ ub8VOO17c5lsBAandpfVJ07IxsLkWsFcc5nPByXLXcozU2JnYJSc5Lfevpuq8dkEPdaQ
+ a3v0oqKymdSBjCInG7CRu/LeRk1s2S6iwQWKhr/JGatmWJ2rbt6kZ5s0x3k605lsK4/U eQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cbcw1ce98-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Nov 2021 12:16:18 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AFC0I4n005497;
+        Mon, 15 Nov 2021 12:16:17 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cbcw1ce8g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Nov 2021 12:16:17 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AFCDkOB002455;
+        Mon, 15 Nov 2021 12:16:14 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03fra.de.ibm.com with ESMTP id 3ca509mh6b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Nov 2021 12:16:14 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AFC9Lml64815552
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 15 Nov 2021 12:09:21 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2429F42049;
+        Mon, 15 Nov 2021 12:16:12 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E5E442042;
+        Mon, 15 Nov 2021 12:16:11 +0000 (GMT)
+Received: from [9.171.56.111] (unknown [9.171.56.111])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 15 Nov 2021 12:16:11 +0000 (GMT)
+Message-ID: <b581f056-e7ea-befa-8c13-50644105c042@de.ibm.com>
+Date:   Mon, 15 Nov 2021 13:16:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 0/5] KVM: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS and
+ re-purpose it on x86
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20211111162746.100598-1-vkuznets@redhat.com>
+ <4a3c7be7-12fa-6e47-64eb-02e6c5be5dbc@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+In-Reply-To: <4a3c7be7-12fa-6e47-64eb-02e6c5be5dbc@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4GM4n7HdUC8wY57Y8aQbGHZR4IYkcALh
+X-Proofpoint-ORIG-GUID: 8BYV8Df_CMNWb7XWAnYRT1TEmZU4UwBJ
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Sender: jameswiliamsjw682@gmail.com
-Received: by 2002:a59:adcd:0:b0:238:c90d:602 with HTTP; Sat, 13 Nov 2021
- 08:53:23 -0800 (PST)
-From:   DINA MCKENNA <dinamckennahowley@gmail.com>
-Date:   Sat, 13 Nov 2021 16:53:23 +0000
-X-Google-Sender-Auth: IO7WUhe3W7VUGcbhKRmRv3tqKWg
-Message-ID: <CAJMpOne8H7TCOOgB-6Gj3yiUE5MrWSNshGa3n-aV3Qu7bUzXOw@mail.gmail.com>
-Subject: Hello,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-15_10,2021-11-15_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1011
+ priorityscore=1501 malwarescore=0 spamscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 mlxscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2111150067
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Hello my dear ,.
+Am 11.11.21 um 17:32 schrieb Paolo Bonzini:
+> On 11/11/21 17:27, Vitaly Kuznetsov wrote:
+>> This is a comtinuation of "KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS"
+>> (https://lore.kernel.org/kvm/20211111134733.86601-1-vkuznets@redhat.com/)
+>> work.
+>>
+>> 1) Enforce KVM_CAP_NR_VCPUS <= KVM_CAP_MAX_VCPUS rule on all
+>>   architectures. [Sean Christopherson]
+>> 2) Make KVM_CAP_NR_VCPUS return num_online_cpus() and not an arbitrary
+>>   value of '710' on x86.
+>>
+>> Everything but x86 was only 'eyeball tested', the change is trivial
+>> but sorry in advance if I screwed up)
+> 
+> Christian, can you look at this for s390?  Returning a fixed value seems wrong for KVM_CAP_NR_VCPUS.
 
- I sent this mail praying it will get to you in a good condition of
-health, since I myself are in a very critical health condition in
-which I sleep every night without knowing if I may be alive to see the
-next day. I bring peace and love to you. It is by the grace of God, I
-had no choice than to do what is lawful and right in the sight of God
-for eternal life and in the sight of man, for witness of God=E2=80=99s merc=
-y
-and glory upon my life. I am Mrs. Dina Mckenna. Howley, a widow. I am
-suffering from a long time brain tumor, It has defiled all forms of
-medical treatment, and right now I have about a few months to leave,
-according to medical experts. The situation has gotten complicated
-recently with my inability to hear proper, am communicating with you
-with the help of the chief nurse herein the hospital, from all
-indication my conditions is really deteriorating and it is quite
-obvious that, according to my doctors they have advised me that I may
-not live too long, Because this illness has gotten to a very bad
-stage. I plead that you will not expose or betray this trust and
-confidence that I am about to repose on you for the mutual benefit of
-the orphans and the less privilege. I have some funds I inherited from
-my late husband, the sum of ($ 11,000,000.00, Eleven Million Dollars).
-Having known my condition, I decided to donate this fund to you
-believing that you will utilize it the way i am going to instruct
-herein. I need you to assist me and reclaim this money and use it for
-Charity works therein your country  for orphanages and gives justice
-and help to the poor, needy and widows says The Lord." Jeremiah
-22:15-16.=E2=80=9C and also build schools for less privilege that will be
-named after my late husband if possible and to promote the word of God
-and the effort that the house of God is maintained. I do not want a
-situation where this money will be used in an ungodly manner. That's
-why I'm taking this decision. I'm not afraid of death, so I know where
-I'm going. I accept this decision because I do not have any child who
-will inherit this money after I die.. Please I want your sincerely and
-urgent answer to know if you will be able to execute this project for
-the glory of God, and I will give you more information on how the fund
-will be transferred to your bank account. May the grace, peace, love
-and the truth in the Word of God be with you and all those that you
-love and care for.
-
-I'm waiting for your immediate reply.
-
-May God Bless you,
-Mrs. Dina. Mckenna.
+will do. (Sorry I was OOO the last days).
+> 
+> Thanks,
+> 
+> Paolo
+> 
+>> Vitaly Kuznetsov (5):
+>>    KVM: arm64: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
+>>    KVM: MIPS: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
+>>    KVM: PPC: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
+>>    KVM: RISC-V: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
+>>    KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS
+>>
+>>   arch/arm64/kvm/arm.c            | 7 ++++++-
+>>   arch/mips/kvm/mips.c            | 2 +-
+>>   arch/powerpc/kvm/powerpc.c      | 4 ++--
+>>   arch/riscv/kvm/vm.c             | 2 +-
+>>   arch/x86/include/asm/kvm_host.h | 1 -
+>>   arch/x86/kvm/x86.c              | 2 +-
+>>   6 files changed, 11 insertions(+), 7 deletions(-)
+>>
+> 
