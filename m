@@ -2,67 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A4E6450478
-	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Nov 2021 13:35:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2BDD45092A
+	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Nov 2021 17:04:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231150AbhKOMh7 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 15 Nov 2021 07:37:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61462 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230438AbhKOMh4 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 15 Nov 2021 07:37:56 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AFBrtdq011652;
-        Mon, 15 Nov 2021 12:34:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=iY1Col5FMwaQrAzLqIT+kCvknRgj+GHBiwaP932CpAc=;
- b=rHm01J9/yZtsmLfgZWnmsAXOyv63fwmQu1nqKqVaZlS5njoWrYRB+hOWtRj2Q4zgX3iJ
- KbHu6bkbviPkKCNV3rZCPKXpd/qhIqKCAJ3xqrihYkCuYSvLcrCHeW5fkwzbf/b2O6nk
- ci+a50UTTB+kf0KxKePW3kBsMXDSO8WWnVmc7Gl+uY5n9RbydndMz7JdfMYBF6S6pWbC
- asEE8oJ3tp6R90J06aKYMEwlc3FKXQQMaRPxakufQawFkceGX6aTveYZG31Q8Pvn2zQ9
- APDMX22OYR3NE7AKukdevwffNueZNTjR3EQiFbWRkgfUWtH3faMIlNIpr3lW2h7Jo8it Yg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cbq348tva-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Nov 2021 12:34:04 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AFBsE1K016059;
-        Mon, 15 Nov 2021 12:34:03 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cbq348tup-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Nov 2021 12:34:03 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AFCJ8oN002492;
-        Mon, 15 Nov 2021 12:34:01 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 3ca509cqq3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Nov 2021 12:34:01 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AFCXwha27787704
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 Nov 2021 12:33:58 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 53F7E4204D;
-        Mon, 15 Nov 2021 12:33:58 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72B9D4205F;
-        Mon, 15 Nov 2021 12:33:57 +0000 (GMT)
-Received: from [9.171.56.111] (unknown [9.171.56.111])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 15 Nov 2021 12:33:57 +0000 (GMT)
-Message-ID: <ecd55383-7089-b3cd-30cc-3f9feb7eadb4@de.ibm.com>
-Date:   Mon, 15 Nov 2021 13:33:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 0/5] KVM: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS and
- re-purpose it on x86
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+        id S236609AbhKOQHI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 15 Nov 2021 11:07:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:21991 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236612AbhKOQHF (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 15 Nov 2021 11:07:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636992249;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kNZ2k+Bbqs2mU+HEeYXnMycgNMTgeh9stKyx+F+r/jk=;
+        b=F1s5w7L7P8sNysHySf1Rj5U5Jx5usAv9UiJEFjn718sGBL6kdcemwBT+YhRFqQsVZ8g4ij
+        nx2oo0dFPcGpb7lCu6Cm24K3yq/c7C0kI6CbNJUY3NLKAPPZUZTa7KXWOAVFX1zFrD98cU
+        aqgHUl7+Ltv5cVB2O3SFHHXVuRjzbdQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-327-fe1cA7hSMrm8MR8Z7rF03w-1; Mon, 15 Nov 2021 11:04:08 -0500
+X-MC-Unique: fe1cA7hSMrm8MR8Z7rF03w-1
+Received: by mail-wr1-f71.google.com with SMTP id k8-20020a5d5248000000b001763e7c9ce5so3745724wrc.22
+        for <kvm-ppc@vger.kernel.org>; Mon, 15 Nov 2021 08:04:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=kNZ2k+Bbqs2mU+HEeYXnMycgNMTgeh9stKyx+F+r/jk=;
+        b=QsI/83UQUcl88gKIFkqpH3/4qlhXjLzl+O78dUQ55tYOgUofVna6SzGmSfmlaB8QbS
+         tTjOlFJLSZXzygfy90x7G87q9H5b1jTRyS1DOGXlww8HDp+lF5t5ujToEkxTe7h9JWZk
+         PTqkjB1cajqXypdu3ssYvB20k/LmybS0k66JyGToeC9m2jiMoGRFPjAIi1coMdmsEAuW
+         j9HkovyCHDn8kD1KuHhg+DcS9BhAGIYGIcl1ASlKo/mmMdnGY9NjK4WBAVSJ+a7rkhnE
+         c9PEhdSz/9YHXSJK99iWsN8MvJEYu99TEuul2iNWw7tGQVlM642lNAJn7ExdSPRsCQsR
+         TrVw==
+X-Gm-Message-State: AOAM533Rvgoh6XUnL74gptmd3U8nutcWo+VdZimYCVcfJ2LrMlnMd8CC
+        RkgAMwmTQUuQtj/oj8x/NJqtyrVdUQyBs1LVXcRzzUnIxYmzYyBhzKSGa6QGsuIeymQNIZtupyJ
+        Cw680Psdv20RN+gmylA==
+X-Received: by 2002:a1c:cc09:: with SMTP id h9mr45662416wmb.191.1636992245696;
+        Mon, 15 Nov 2021 08:04:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwz1gqovDpiBG7rQwvXN0J5DRj1u8GplrLX76hoeAAMPE/ExRbSHuZD82FzagUh/Q8svxu6iw==
+X-Received: by 2002:a1c:cc09:: with SMTP id h9mr45662049wmb.191.1636992243301;
+        Mon, 15 Nov 2021 08:04:03 -0800 (PST)
+Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id h27sm22065673wmc.43.2021.11.15.08.04.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 08:04:02 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -76,44 +66,91 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
         kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/5] KVM: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS and
+ re-purpose it on x86
+In-Reply-To: <ecd55383-7089-b3cd-30cc-3f9feb7eadb4@de.ibm.com>
 References: <20211111162746.100598-1-vkuznets@redhat.com>
  <4a3c7be7-12fa-6e47-64eb-02e6c5be5dbc@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-In-Reply-To: <4a3c7be7-12fa-6e47-64eb-02e6c5be5dbc@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: F_7VLECjtzfz58UlopgCykV9hLKIwLBB
-X-Proofpoint-GUID: Xk7vY1f_lcFudvzcJVI-5_sBZtDokgNi
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+ <ecd55383-7089-b3cd-30cc-3f9feb7eadb4@de.ibm.com>
+Date:   Mon, 15 Nov 2021 17:04:01 +0100
+Message-ID: <877dd9pfri.fsf@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-15_10,2021-11-15_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- lowpriorityscore=0 spamscore=0 malwarescore=0 priorityscore=1501
- impostorscore=0 clxscore=1015 bulkscore=0 mlxlogscore=999 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111150070
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Am 11.11.21 um 17:32 schrieb Paolo Bonzini:
-> On 11/11/21 17:27, Vitaly Kuznetsov wrote:
->> This is a comtinuation of "KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS"
->> (https://lore.kernel.org/kvm/20211111134733.86601-1-vkuznets@redhat.com/)
->> work.
->>
->> 1) Enforce KVM_CAP_NR_VCPUS <= KVM_CAP_MAX_VCPUS rule on all
->>   architectures. [Sean Christopherson]
->> 2) Make KVM_CAP_NR_VCPUS return num_online_cpus() and not an arbitrary
->>   value of '710' on x86.
->>
->> Everything but x86 was only 'eyeball tested', the change is trivial
->> but sorry in advance if I screwed up)
-> 
-> Christian, can you look at this for s390?  Returning a fixed value seems wrong for KVM_CAP_NR_VCPUS.
+Christian Borntraeger <borntraeger@de.ibm.com> writes:
 
-If we talk about recommended number, then num_online_cpus() also seems to make sense on s390 so
-if you change that for s390 as well I can ACK this.
+> Am 11.11.21 um 17:32 schrieb Paolo Bonzini:
+>> On 11/11/21 17:27, Vitaly Kuznetsov wrote:
+>>> This is a comtinuation of "KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS"
+>>> (https://lore.kernel.org/kvm/20211111134733.86601-1-vkuznets@redhat.com=
+/)
+>>> work.
+>>>
+>>> 1) Enforce KVM_CAP_NR_VCPUS <=3D KVM_CAP_MAX_VCPUS rule on all
+>>> =C2=A0 architectures. [Sean Christopherson]
+>>> 2) Make KVM_CAP_NR_VCPUS return num_online_cpus() and not an arbitrary
+>>> =C2=A0 value of '710' on x86.
+>>>
+>>> Everything but x86 was only 'eyeball tested', the change is trivial
+>>> but sorry in advance if I screwed up)
+>>=20
+>> Christian, can you look at this for s390?=C2=A0 Returning a fixed value =
+seems wrong for KVM_CAP_NR_VCPUS.
+>
+> If we talk about recommended number, then num_online_cpus() also seems to=
+ make sense on s390 so
+> if you change that for s390 as well I can ACK this.
+
+Thanks!
+
+For KVM_CAP_MAX_VCPUS s390 code returns one of the three things:
+KVM_S390_BSCA_CPU_SLOTS(64), KVM_MAX_VCPUS(255) or
+KVM_S390_ESCA_CPU_SLOTS(248).
+
+For KVM_CAP_NR_VCPUS, would it be better to return raw
+num_online_cpus():
+
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 6a6dd5e1daf6..fcecbb762a1a 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -578,6 +578,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long =
+ext)
+                r =3D MEM_OP_MAX_SIZE;
+                break;
+        case KVM_CAP_NR_VCPUS:
++               r =3D num_online_cpus();
++               break;
+        case KVM_CAP_MAX_VCPUS:
+        case KVM_CAP_MAX_VCPU_ID:
+                r =3D KVM_S390_BSCA_CPU_SLOTS;
+
+or cap KVM_CAP_MAX_VCPUS value with num_online_cpus(), e.g.
+
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 6a6dd5e1daf6..1cfe36f6432e 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -585,6 +585,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long =
+ext)
+                        r =3D KVM_MAX_VCPUS;
+                else if (sclp.has_esca && sclp.has_64bscao)
+                        r =3D KVM_S390_ESCA_CPU_SLOTS;
++               if (ext =3D=3D KVM_CAP_NR_VCPUS)
++                       r =3D min_t(unsigned int, num_online_cpus(), r);
+                break;
+        case KVM_CAP_S390_COW:
+                r =3D MACHINE_HAS_ESOP;
+
+For reference, see our ARM discussion:
+https://lore.kernel.org/kvm/20211111162746.100598-2-vkuznets@redhat.com/
+though 390's situation is different, the returned value for
+KVM_CAP_MAX_VCPUS is not VM-dependent.
+
+--=20
+Vitaly
+
