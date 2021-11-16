@@ -2,117 +2,91 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA5E34532D0
-	for <lists+kvm-ppc@lfdr.de>; Tue, 16 Nov 2021 14:24:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CA06453349
+	for <lists+kvm-ppc@lfdr.de>; Tue, 16 Nov 2021 14:55:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236716AbhKPN0f (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 16 Nov 2021 08:26:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46579 "EHLO
+        id S236911AbhKPN5p (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 16 Nov 2021 08:57:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:45966 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236709AbhKPN01 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 16 Nov 2021 08:26:27 -0500
+        by vger.kernel.org with ESMTP id S236920AbhKPN5W (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 16 Nov 2021 08:57:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637069010;
+        s=mimecast20190719; t=1637070865;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7QB9Djd7unSuWFppJ6ryGSoufF2SRnNHGOPyI0tESn4=;
-        b=ZIstAnW0E0rBi5YPmzUSbyRKpnq0DuO6PR50Jh4JD3q9SQe/gbMGDETnNGnz20QqQ7PKKd
-        6kLe4ilGFg11hvIySMDKfQ88SS7dHDVNQTQcFU6i/jqtJpfB9fYTj10LmjIGH7yr0JoyvK
-        vf7oU3SyUiZQX2B1YsEZQD29hSCh41c=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-579-xhVqWsBVPg6sRqszW6WLDw-1; Tue, 16 Nov 2021 08:23:29 -0500
-X-MC-Unique: xhVqWsBVPg6sRqszW6WLDw-1
-Received: by mail-wm1-f72.google.com with SMTP id l187-20020a1c25c4000000b0030da46b76daso1197789wml.9
-        for <kvm-ppc@vger.kernel.org>; Tue, 16 Nov 2021 05:23:28 -0800 (PST)
+        bh=L0l8U98gykrEb+6mbIddDuP0F41+6lCqLlmJs6JdFso=;
+        b=Pp8LDO4NClydwzyHNH6XaE92wVnVHs+wJ//i3B5ApZnKMpX8i4gAVHSTshUlBRQn/wDINA
+        KdpB4pKUsXdcY9wkc9I6j5+4BDg+SJlDP9kAePa54nXB9KDl6rVfrVtk93SiOoB3/o7B8u
+        mR33QfX+AIfEQZpUyhUZ0z0bw3A+Fjo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-yT2yr58aM6KxmlNmaxnoIA-1; Tue, 16 Nov 2021 08:54:24 -0500
+X-MC-Unique: yT2yr58aM6KxmlNmaxnoIA-1
+Received: by mail-wr1-f70.google.com with SMTP id d7-20020a5d6447000000b00186a113463dso4488145wrw.10
+        for <kvm-ppc@vger.kernel.org>; Tue, 16 Nov 2021 05:54:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=7QB9Djd7unSuWFppJ6ryGSoufF2SRnNHGOPyI0tESn4=;
-        b=efcGD2R7LLGZ0qf7iYHfETygZbaY09/fgjO3HEUfhzI/PQIPCTvgPWwbE0eDpiyWvE
-         SnDSEeYVZnZ63Dk2cXjUEbZf1cn8dd3aFIMli+9m6/EipTGvFmZeuIBwNJbNQB8YlpSL
-         vLi1EvK5+sesyCc+UwSGxGMWFC8blq6tJoYZ7Uot9ZRNMTbPt1yr+jn1lTAXXbthi5sl
-         oNZK3XzZCk0F7Lvux1oNTdEMruntdWnwkoVMdAwO1EkYkF+x1mnfWS7/uJKvjuPDLe56
-         2uqRWpdDpS5zuZSf78t2732QUEr+L449Quhnejky1SwuzljtlzSpCQ3ZRmaLpVHnWg9m
-         HVAg==
-X-Gm-Message-State: AOAM531G7xjkDa3x0KhuHfYA4z0r+m63aNB0EFqE2Wgg9G7HzJlItmCe
-        gNsiqC06iunWipWmAZFvmcQS1oy6bB0tH5+Tkw1a8cEdxEkuXyLNuFcVXSJRKx0JHASs9zEMvyf
-        TLbQ8c/UZblb6eni8ZA==
-X-Received: by 2002:adf:fd90:: with SMTP id d16mr9035248wrr.385.1637069007864;
-        Tue, 16 Nov 2021 05:23:27 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJypb9wLmwBU+C8U60E20ALWxdPmsGCyP6NgX66fxkM73bNsY5mStZduwVGh4q0guawc8+jIEQ==
-X-Received: by 2002:adf:fd90:: with SMTP id d16mr9035209wrr.385.1637069007612;
-        Tue, 16 Nov 2021 05:23:27 -0800 (PST)
-Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id n7sm17311363wro.68.2021.11.16.05.23.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Nov 2021 05:23:27 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/5] KVM: arm64: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
-In-Reply-To: <ad3534bc-fe3a-55f5-b022-4dbec5f29798@redhat.com>
-References: <20211111162746.100598-1-vkuznets@redhat.com>
- <20211111162746.100598-2-vkuznets@redhat.com>
- <a5cdff6878b7157587e92ebe4d5af362@kernel.org> <875ysxg0s1.fsf@redhat.com>
- <87k0hd8obo.wl-maz@kernel.org>
- <ad3534bc-fe3a-55f5-b022-4dbec5f29798@redhat.com>
-Date:   Tue, 16 Nov 2021 14:23:25 +0100
-Message-ID: <87y25onsj6.fsf@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=L0l8U98gykrEb+6mbIddDuP0F41+6lCqLlmJs6JdFso=;
+        b=5MQVLiborLjQOAATgx/eVazC82kxACU6kX2rhlPtuX7OwCdA1VwU+cz5DZC/cyCUd7
+         EcdQW5hDZboF3VJhedJFQvChlEcrNw5Str82t3RLZq0xmFo9TF29r4t27uzUDfrdDnwy
+         JvVLwn2TDV0CjsO1rywUdQRe2LTuG0Wz61OOuf2WPgEw/FjHB0fWVcP56iN8t2IjuSHo
+         kABv869WIOKlO2dLEA/nV5b94nbuIFFsuxy1dApan9kIynWUmWNmH1Lig2YPltwTbdry
+         OJNmZJIoufNlB0/wwM1zDqn3Jsg17n8F3pKHS123fmPi+W2hY1r7UVgJMmFq1ZCXZ3IO
+         EhZQ==
+X-Gm-Message-State: AOAM531ADy9+tqnP8YEWWVBhOTO28JeEjlqjZKT1UjugRBEt3BnUX+1L
+        k3NJrkuwmLQ7VPKnxRfxNBa2p/X06sd3h5LPP4xype1G8mjL0aUaVi02k/SotcFdk2LOys703Sv
+        AUbDfHFpPKgUMWeVYyTH/GoiTGB7wax8HGg==
+X-Received: by 2002:a05:600c:1ca0:: with SMTP id k32mr8157166wms.74.1637070861991;
+        Tue, 16 Nov 2021 05:54:21 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzkE0ZUdhTupcolHEn3mZwOjI5RxolJG8TsOzucbh8Kv+FGnxDoIbqJ9yNpgl/Dl6oTuf5XlMzsyqFNl9LN+Zk=
+X-Received: by 2002:a05:600c:1ca0:: with SMTP id k32mr8157134wms.74.1637070861810;
+ Tue, 16 Nov 2021 05:54:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20211115165313.549179499@linuxfoundation.org> <20211115165315.847107930@linuxfoundation.org>
+ <CAHc6FU7a+gTDCZMCE6gOH1EDUW5SghPbQbsbeVtdg4tV1VdGxg@mail.gmail.com> <YZMBVdDZzjE6Pziq@sashalap>
+In-Reply-To: <YZMBVdDZzjE6Pziq@sashalap>
+From:   Andreas Gruenbacher <agruenba@redhat.com>
+Date:   Tue, 16 Nov 2021 14:54:10 +0100
+Message-ID: <CAHc6FU4cgAXc2GxYw+N=RACPG0xc=urrrqw8Gc3X1Rpr4255pg@mail.gmail.com>
+Subject: Re: [PATCH 5.4 063/355] powerpc/kvm: Fix kvm_use_magic_page
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        stable <stable@vger.kernel.org>,
+        Mathieu Malaterre <malat@debian.org>,
+        Paul Mackerras <paulus@ozlabs.org>, kvm-ppc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 11/12/21 15:02, Marc Zyngier wrote:
->>> I'd like KVM to be consistent across architectures and have the same
->>> (similar) meaning for KVM_CAP_NR_VCPUS.
->> Sure, but this is a pretty useless piece of information anyway. As
->> Andrew pointed out, the information is available somewhere else, and
->> all we need to do is to cap it to the number of supported vcpus, which
->> is effectively a KVM limitation.
->> 
->> Also, we are talking about representing the architecture to userspace.
->> No amount of massaging is going to make an arm64 box look like an x86.
+On Tue, Nov 16, 2021 at 1:54 AM Sasha Levin <sashal@kernel.org> wrote:
+> On Mon, Nov 15, 2021 at 06:47:41PM +0100, Andreas Gruenbacher wrote:
+> >Greg,
+> >
+> >On Mon, Nov 15, 2021 at 6:10 PM Greg Kroah-Hartman
+> ><gregkh@linuxfoundation.org> wrote:
+> >> From: Andreas Gruenbacher <agruenba@redhat.com>
+> >>
+> >> commit 0c8eb2884a42d992c7726539328b7d3568f22143 upstream.
+> >>
+> >> When switching from __get_user to fault_in_pages_readable, commit
+> >> 9f9eae5ce717 broke kvm_use_magic_page: like __get_user,
+> >> fault_in_pages_readable returns 0 on success.
+> >
+> >I've not heard back from the maintainers about this patch so far, so
+> >it would probably be safer to leave it out of stable for now.
 >
-> Not sure what you mean?  The API is about providing a piece of 
-> information independent of the architecture, while catering for a ppc 
-> weirdness.  Yes it's mostly useless if you don't care about ppc, but 
-> it's not about making arm64 look like x86 or ppc; it's about not having 
-> to special case ppc in userspace.
->
-> If anything, if KVM_CAP_NR_VCPUS returns the same for kvm and !kvm, then 
-> *that* is making an arm64 box look like an x86.  On ARM the max vCPUs 
-> depends on VM's GIC configuration, so KVM_CAP_NR_VCPUS should take that 
-> into account.
+> What do you mean exactly? It's upstream.
 
-(I'm about to send v2 as we have s390 sorted out.)
+Mathieu Malaterre broke this test in 2018 (commit 9f9eae5ce717) but
+that wasn't noticed until now (commit 0c8eb2884a42). This means that
+this fix probably isn't critical, so I shouldn't be backported.
 
-So what do we decide about ARM? 
-- Current approach (kvm->arch.max_vcpus/kvm_arm_default_max_vcpus()
- depending on 'if (kvm)') - that would be my preference.
-- Always kvm_arm_default_max_vcpus to make the output independent on 'if
- (kvm)'.
-- keep the status quo (drop the patch).
-
-Please advise)
-
--- 
-Vitaly
+Thanks,
+Andreas
 
