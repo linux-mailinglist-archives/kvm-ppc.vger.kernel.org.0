@@ -2,113 +2,84 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE16645342E
-	for <lists+kvm-ppc@lfdr.de>; Tue, 16 Nov 2021 15:30:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 57726453663
+	for <lists+kvm-ppc@lfdr.de>; Tue, 16 Nov 2021 16:51:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230020AbhKPOdu (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 16 Nov 2021 09:33:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35651 "EHLO
+        id S238604AbhKPPyI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 16 Nov 2021 10:54:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28019 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229935AbhKPOdt (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 16 Nov 2021 09:33:49 -0500
+        by vger.kernel.org with ESMTP id S238601AbhKPPxy (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 16 Nov 2021 10:53:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637073052;
+        s=mimecast20190719; t=1637077857;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yGLlb2K1KnZJ8ryHE7dGxeg/3e8ozhLXbMUxWhBTJfg=;
-        b=UudBm6wdgmJ4kALlTz63qQNkziF7kXOINDvQI1UAJwgKuUpPKp8UCT0V4j/208G1BFQYTW
-        ax78ilIVQMdNz0vuXFytnkXa5A4NGB85TQ9m4IjovDiFA9Aa7Gqz8prrUSZtpFcM158iHf
-        ORwfLxA83hvoBIdQKV3VvPNhSyCRc88=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-ayR2X0HLP9uzt6nATRJsEA-1; Tue, 16 Nov 2021 09:30:51 -0500
-X-MC-Unique: ayR2X0HLP9uzt6nATRJsEA-1
-Received: by mail-wm1-f71.google.com with SMTP id 145-20020a1c0197000000b0032efc3eb9bcso1307863wmb.0
-        for <kvm-ppc@vger.kernel.org>; Tue, 16 Nov 2021 06:30:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yGLlb2K1KnZJ8ryHE7dGxeg/3e8ozhLXbMUxWhBTJfg=;
-        b=x0z8SGBpu8yiT3NWCFcX2xCpZbiSkyItkxwwXc0DDwJpkRxcovZ6ff3K3iEIaTrZrd
-         IkEJUst8DcojBgHJp0fkfhLmuxJjRIK09B35+jgqLzLyP239oj6rIQYkL6tdIpHb89Lw
-         fOgWZNfJhhKImHKPmEuVZ5FgcAGGnY2NwYAyEjBpspj55TakAQDkbZFqYhL4LJbqHfHw
-         1EW+QJhTGKwmNZKa/MmfustIzzqlcjfolWlHKbsPnV2ZiOGrwG5NmQ9eBiDaaFWsESnH
-         VwcBdRh5pSvcccTiZmtGl38Ig18daT+0vi9FTrLCo11GwgbF3F8es+lFVIy2L1UihGkG
-         mRzQ==
-X-Gm-Message-State: AOAM532mZvCQD9cDjl9Rpo0denrz2PVNF/X+AvDh3X6bFFdUzJRphars
-        ZptSboGhFXJzU3GRQTHcc3TBLhuwuqkp3uWWnIFsNVOzG6NGcbfr+LS93Z1fvfhdbt4GKj7kOgL
-        swd8xk/t7rdCi+qaj1FBuIYbWnZeLw5/jIg==
-X-Received: by 2002:a5d:628f:: with SMTP id k15mr10058477wru.363.1637073048898;
-        Tue, 16 Nov 2021 06:30:48 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwwQ9c1DU7hDbd1YcLisoG+/tIlG+wgenks4qBRCL9wz5r2a/gmGwOMoiIhDt4fczvM+rVPkw3QVsAVHXwsGUM=
-X-Received: by 2002:a5d:628f:: with SMTP id k15mr10058457wru.363.1637073048723;
- Tue, 16 Nov 2021 06:30:48 -0800 (PST)
+        bh=YptFOrP2nGZgxL0dz3Uz+MV2Fy+UJLC/xUWIe94Zh90=;
+        b=LPelSyupXiBaw5GJnbQkcCT1pfgLxk4KfsyqAOX5OJMnZySnbxQykAW11IZuAeUk2XAZ1G
+        28OjaoOetiJkZ+67UATuE9u4xduIFk0PLkhV7rsEpttJi38s/8owzj3xTuUBpVJyKgyWS/
+        +mN2Jf904ZuXt5G6fRFYsl1yBqmz048=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-581-IOu4GPwSPZ2JF_vyWL4whw-1; Tue, 16 Nov 2021 10:50:53 -0500
+X-MC-Unique: IOu4GPwSPZ2JF_vyWL4whw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F1B815721;
+        Tue, 16 Nov 2021 15:50:51 +0000 (UTC)
+Received: from [10.39.192.245] (unknown [10.39.192.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DA1605D6BA;
+        Tue, 16 Nov 2021 15:50:24 +0000 (UTC)
+Message-ID: <ebfa56a6-d444-e82e-bf0d-946765c7f8ae@redhat.com>
+Date:   Tue, 16 Nov 2021 16:50:23 +0100
 MIME-Version: 1.0
-References: <20211115165313.549179499@linuxfoundation.org> <20211115165315.847107930@linuxfoundation.org>
- <CAHc6FU7a+gTDCZMCE6gOH1EDUW5SghPbQbsbeVtdg4tV1VdGxg@mail.gmail.com>
- <YZMBVdDZzjE6Pziq@sashalap> <CAHc6FU4cgAXc2GxYw+N=RACPG0xc=urrrqw8Gc3X1Rpr4255pg@mail.gmail.com>
- <YZO4wIfpjxnzZjuh@kroah.com> <CAHc6FU7BU2-B2x=JV0HtLci6=mGy2XxLNNGh1f4DGtVbeJFcVA@mail.gmail.com>
- <YZO9Bv3yJC5P92c8@kroah.com>
-In-Reply-To: <YZO9Bv3yJC5P92c8@kroah.com>
-From:   Andreas Gruenbacher <agruenba@redhat.com>
-Date:   Tue, 16 Nov 2021 15:30:37 +0100
-Message-ID: <CAHc6FU74ih7Sk7tWmvMy9OsyO2=f0cO7fUoBREKnFQSKf+zyig@mail.gmail.com>
-Subject: Re: [PATCH 5.4 063/355] powerpc/kvm: Fix kvm_use_magic_page
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Sasha Levin <sashal@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        stable <stable@vger.kernel.org>,
-        Mathieu Malaterre <malat@debian.org>,
-        Paul Mackerras <paulus@ozlabs.org>, kvm-ppc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 1/5] KVM: arm64: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20211111162746.100598-1-vkuznets@redhat.com>
+ <20211111162746.100598-2-vkuznets@redhat.com>
+ <a5cdff6878b7157587e92ebe4d5af362@kernel.org> <875ysxg0s1.fsf@redhat.com>
+ <87k0hd8obo.wl-maz@kernel.org>
+ <ad3534bc-fe3a-55f5-b022-4dbec5f29798@redhat.com> <87y25onsj6.fsf@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <87y25onsj6.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 3:15 PM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
-> On Tue, Nov 16, 2021 at 03:00:19PM +0100, Andreas Gruenbacher wrote:
-> > On Tue, Nov 16, 2021 at 2:57 PM Greg Kroah-Hartman
-> > <gregkh@linuxfoundation.org> wrote:
-> > > On Tue, Nov 16, 2021 at 02:54:10PM +0100, Andreas Gruenbacher wrote:
-> > > > On Tue, Nov 16, 2021 at 1:54 AM Sasha Levin <sashal@kernel.org> wrote:
-> > > > > On Mon, Nov 15, 2021 at 06:47:41PM +0100, Andreas Gruenbacher wrote:
-> > > > > >Greg,
-> > > > > >
-> > > > > >On Mon, Nov 15, 2021 at 6:10 PM Greg Kroah-Hartman
-> > > > > ><gregkh@linuxfoundation.org> wrote:
-> > > > > >> From: Andreas Gruenbacher <agruenba@redhat.com>
-> > > > > >>
-> > > > > >> commit 0c8eb2884a42d992c7726539328b7d3568f22143 upstream.
-> > > > > >>
-> > > > > >> When switching from __get_user to fault_in_pages_readable, commit
-> > > > > >> 9f9eae5ce717 broke kvm_use_magic_page: like __get_user,
-> > > > > >> fault_in_pages_readable returns 0 on success.
-> > > > > >
-> > > > > >I've not heard back from the maintainers about this patch so far, so
-> > > > > >it would probably be safer to leave it out of stable for now.
-> > > > >
-> > > > > What do you mean exactly? It's upstream.
-> > > >
-> > > > Mathieu Malaterre broke this test in 2018 (commit 9f9eae5ce717) but
-> > > > that wasn't noticed until now (commit 0c8eb2884a42). This means that
-> > > > this fix probably isn't critical, so I shouldn't be backported.
-> > >
-> > > Then why did you tag it to be explicitly backported to all stable
-> > > kernels newer than 4.18?
-> >
-> > Well, sorry for that. What else do you expect me to do in addition to
-> > pointing out the mistake?
->
-> Ah, I think we are misunderstanding each other here.  I will go drop it,
-> but in the future maybe "hey, I didn't mean to mark this for stable, can
-> you please drop it?" might be a bit more direct and to the point.
+On 11/16/21 14:23, Vitaly Kuznetsov wrote:
+> (I'm about to send v2 as we have s390 sorted out.)
+> 
+> So what do we decide about ARM?
+> - Current approach (kvm->arch.max_vcpus/kvm_arm_default_max_vcpus()
+>   depending on 'if (kvm)') - that would be my preference.
 
-Yes, the stable Cc was an accident on my side (caused by a script that
-takes a SHA1 and spits out Fixes: and Cc: tags). Sorry and thanks for
-dropping the patch.
+That would be mine too.
 
-Andreas
+Paolo
+
+> - Always kvm_arm_default_max_vcpus to make the output independent on 'if
+>   (kvm)'.
+> - keep the status quo (drop the patch).
 
