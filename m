@@ -2,41 +2,58 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 586A34537BD
-	for <lists+kvm-ppc@lfdr.de>; Tue, 16 Nov 2021 17:36:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E3BD453FCE
+	for <lists+kvm-ppc@lfdr.de>; Wed, 17 Nov 2021 06:03:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235072AbhKPQjO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 16 Nov 2021 11:39:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:21914 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234749AbhKPQjI (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 16 Nov 2021 11:39:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637080571;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Fzs/tu22nSIiklxyWhqw5I8HgPrSNduRvkzTjwACmGg=;
-        b=CbBZiUZC8qkT9ia1SOJqC+k5n5AEQKClsAo1qHMg8xaF6UOEuYM+k7eX5QOXqrHj+bIsAn
-        O9AKJbb7iDl/xCxjcJ88zfE8AxL2HcQJRuJpxgmkP4lc53ltBKGj9fF/sMBEBxFWfVjDgv
-        b50W55QlYzL8bXp1kN926tHicDX7xaw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-139-kiLU4MXTPMSt6gKSd-U_OQ-1; Tue, 16 Nov 2021 11:36:08 -0500
-X-MC-Unique: kiLU4MXTPMSt6gKSd-U_OQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 151D6192203A;
-        Tue, 16 Nov 2021 16:36:02 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.192.236])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ADD9160C0F;
-        Tue, 16 Nov 2021 16:35:56 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S229606AbhKQFFa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 17 Nov 2021 00:05:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40030 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229575AbhKQFF3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 17 Nov 2021 00:05:29 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1103C061766
+        for <kvm-ppc@vger.kernel.org>; Tue, 16 Nov 2021 21:02:31 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id w29so2019462wra.12
+        for <kvm-ppc@vger.kernel.org>; Tue, 16 Nov 2021 21:02:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZAvRwiJtBRjHFRCmWgOSCR5R03A+VkMxLTTMBvp3xOo=;
+        b=GAwv8KZH7QoSza11mCj056EEnvOqtVaHQFo/kLuYCRBcZU1JH4Hq/2IL1WzjLJ6BpO
+         Nspwyqrh2//HnesmXMmgpT2dZaCtkaHvEExt4dD4V8EQnuyZF+ehE8jy7/PvfzY8JdpP
+         0oGbTDm155zcUW1iLeK7i2p1k6raVw3QOSIA6J7rnYNA5AxfcOGjmvcCOUoO6TMEzWvz
+         D4zo4ka6/BC+duGUr0a17+RCW1EAJNMFHgye3vZLTjLqu8b5jtlzjqGuKQk1i7OpS4/n
+         /rdHVIm/M6FEt/fJTzKVImD5IX7YnjqN1HZhnolIKr/hvnjL0wwKpRKq2TkiIrTQEBox
+         cQHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZAvRwiJtBRjHFRCmWgOSCR5R03A+VkMxLTTMBvp3xOo=;
+        b=63WcRCnOT7ywjedQzNIR2oKf4kUOWlzOKOeZXahFaw5Y5Ed2ssbdwUELHCE+CK5w6U
+         PMsG7L1lqPKfKSjYfthbKhDXJmsijPPF7hhSTc9lq7JdSZaR3/quJDaJv8ymB3CnGUxk
+         f48Hxr1Ko0WWJm8IE/BOvIqmyK8R167rHwMJwh3K8QIE45RiMlBWObW8ENZE/L8tcqEE
+         kgDqMR08FJ7PU23+uemN79tWAs7mRsQxLBXwPhPxWXa6p8TlCE6GubZE4maLLE1lExoZ
+         AD2EdChH72z14D3nkR80izXUh/olYwmmIy2vxArEUj6ChTp5G1bSAOtcy2h6Lq/40348
+         MpzA==
+X-Gm-Message-State: AOAM533NrfDeynin64rrTt/uIy5pWuK18mojvTQogbKMx0htkcHMnM08
+        Zapr4YhdHDCs6Y+Jbu81m33TwZ4Z2jq7B9hwyIg6UA==
+X-Google-Smtp-Source: ABdhPJzjrfWofPzOBZxD2tEv76Kk7EIV+O42lYkqHli/gBWm8/qTI2cfDKQ7RNWGfhhww3GxDwccPcYXM1XKn0e14eE=
+X-Received: by 2002:a5d:4846:: with SMTP id n6mr15849576wrs.249.1637125350274;
+ Tue, 16 Nov 2021 21:02:30 -0800 (PST)
+MIME-Version: 1.0
+References: <20211116163443.88707-1-vkuznets@redhat.com> <20211116163443.88707-5-vkuznets@redhat.com>
+In-Reply-To: <20211116163443.88707-5-vkuznets@redhat.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Wed, 17 Nov 2021 10:32:18 +0530
+Message-ID: <CAAhSdy3VTfXmt4ub9SWwFQWwcqCS07WkwXdh6ObOcoZSp5oY=Q@mail.gmail.com>
+Subject: Re: [PATCH v2 4/6] KVM: RISC-V: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     KVM General <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
@@ -49,70 +66,48 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>, kvm-ppc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 6/6] KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS
-Date:   Tue, 16 Nov 2021 17:34:43 +0100
-Message-Id: <20211116163443.88707-7-vkuznets@redhat.com>
-In-Reply-To: <20211116163443.88707-1-vkuznets@redhat.com>
-References: <20211116163443.88707-1-vkuznets@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-KVM_CAP_NR_VCPUS is used to get the "recommended" maximum number of
-VCPUs and arm64/mips/riscv report num_online_cpus(). Powerpc reports
-either num_online_cpus() or num_present_cpus(), s390 has multiple
-constants depending on hardware features. On x86, KVM reports an
-arbitrary value of '710' which is supposed to be the maximum tested
-value but it's possible to test all KVM_MAX_VCPUS even when there are
-less physical CPUs available.
+On Tue, Nov 16, 2021 at 10:05 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> It doesn't make sense to return the recommended maximum number of
+> vCPUs which exceeds the maximum possible number of vCPUs.
+>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Drop the arbitrary '710' value and return num_online_cpus() on x86 as
-well. The recommendation will match other architectures and will mean
-'no CPU overcommit'.
+Looks good to me.
 
-For reference, QEMU only queries KVM_CAP_NR_VCPUS to print a warning
-when the requested vCPU number exceeds it. The static limit of '710'
-is quite weird as smaller systems with just a few physical CPUs should
-certainly "recommend" less.
+For KVM RISC-V:
+Acked-by: Anup Patel <anup.patel@wdc.com>
+Reviewed-by: Anup Patel <anup.patel@wdc.com>
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/include/asm/kvm_host.h | 1 -
- arch/x86/kvm/x86.c              | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+Thanks,
+Anup
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 88fce6ab4bbd..0232a00598f2 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -38,7 +38,6 @@
- #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
- 
- #define KVM_MAX_VCPUS 1024
--#define KVM_SOFT_MAX_VCPUS 710
- 
- /*
-  * In x86, the VCPU ID corresponds to the APIC ID, and APIC IDs
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ac83d873d65b..18a00a7c23bc 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4137,7 +4137,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = !static_call(kvm_x86_cpu_has_accelerated_tpr)();
- 		break;
- 	case KVM_CAP_NR_VCPUS:
--		r = KVM_SOFT_MAX_VCPUS;
-+		r = min_t(unsigned int, num_online_cpus(), KVM_MAX_VCPUS);
- 		break;
- 	case KVM_CAP_MAX_VCPUS:
- 		r = KVM_MAX_VCPUS;
--- 
-2.33.1
-
+> ---
+>  arch/riscv/kvm/vm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+> index 26399df15b63..fb18af34a4b5 100644
+> --- a/arch/riscv/kvm/vm.c
+> +++ b/arch/riscv/kvm/vm.c
+> @@ -74,7 +74,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>                 r = 1;
+>                 break;
+>         case KVM_CAP_NR_VCPUS:
+> -               r = num_online_cpus();
+> +               r = min_t(unsigned int, num_online_cpus(), KVM_MAX_VCPUS);
+>                 break;
+>         case KVM_CAP_MAX_VCPUS:
+>                 r = KVM_MAX_VCPUS;
+> --
+> 2.33.1
+>
