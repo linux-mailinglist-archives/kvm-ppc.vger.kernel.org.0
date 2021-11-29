@@ -2,103 +2,60 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 834344626F4
-	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Nov 2021 23:56:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C585462832
+	for <lists+kvm-ppc@lfdr.de>; Tue, 30 Nov 2021 00:20:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235340AbhK2W70 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 29 Nov 2021 17:59:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41720 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235654AbhK2W66 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Nov 2021 17:58:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638226539;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=91gZzrlhgmWTQlrjqIVKNYdue6kA0WgX9BjgXgHlzEM=;
-        b=Ky/9AmthoXvdn79NQKi2zC+UMgPFhBTpMobUzPpGPu67JdN69v5wfYHWbkYf1pa51Y4iuG
-        n0Qq1LgEK357ZNdaU1Z3M6rzkdQVt8nL+O35MOVQu69QC/LcKk+HiyqNAdReUP9CqCxIn4
-        +egf4JldBYy8HMeTHC9a6XwO6sCoxok=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-577-axjhAptPNz-_8ATyvN31yg-1; Mon, 29 Nov 2021 17:55:36 -0500
-X-MC-Unique: axjhAptPNz-_8ATyvN31yg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EB4C190B2A1;
-        Mon, 29 Nov 2021 22:55:32 +0000 (UTC)
-Received: from starship (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0EDF745D60;
-        Mon, 29 Nov 2021 22:55:18 +0000 (UTC)
-Message-ID: <c04c9854be8fc9493739f17c2cbd26dd240a8465.camel@redhat.com>
-Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
- successful
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Date:   Tue, 30 Nov 2021 00:55:17 +0200
-In-Reply-To: <ba8341d6-7ee7-1af1-1385-0a9226bbf952@redhat.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-12-seanjc@google.com>
-         <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
-         <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
-         <YaUNBfJh35WXMV0M@google.com>
-         <ba8341d6-7ee7-1af1-1385-0a9226bbf952@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S229695AbhK2XXp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 29 Nov 2021 18:23:45 -0500
+Received: from sv6135.xserver.jp ([183.181.98.136]:40956 "EHLO
+        sv6135.xserver.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229558AbhK2XXp (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Nov 2021 18:23:45 -0500
+X-Greylist: delayed 507 seconds by postgrey-1.27 at vger.kernel.org; Mon, 29 Nov 2021 18:23:45 EST
+Received: from virusgw6001.xserver.jp (virusgw6001.xserver.jp [183.181.98.243])
+        by sv6135.xserver.jp (Postfix) with ESMTP id 4C30D8432CE92
+        for <kvm-ppc@vger.kernel.org>; Tue, 30 Nov 2021 08:11:59 +0900 (JST)
+Received: from sv6135.xserver.jp (183.181.98.136)
+ by virusgw6001.xserver.jp (F-Secure/fsigk_smtp/521/virusgw6001.xserver.jp);
+ Tue, 30 Nov 2021 08:11:59 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/521/virusgw6001.xserver.jp)
+Received: by sv6135.xserver.jp (Postfix, from userid 20071)
+        id 49A3F8432CE90; Tue, 30 Nov 2021 08:11:59 +0900 (JST)
+To:     kvm-ppc@vger.kernel.org
+Subject: =?UTF-8?B?44CQ6Ieq5YuV6L+U5L+h44CR44GK5ZWP44GE5ZCI44KP44Gb44GC44KK44GM?=  =?UTF-8?B?44Go44GG44GU44GW44GE44G+44GZ?=
+Date:   Mon, 29 Nov 2021 23:11:59 +0000
+From:   =?UTF-8?B?6auY6KaL44OI44Kq44Or?= <prom.consul@gmail.com>
+Reply-To: otoiawase@toru.takami.com
+Message-ID: <e9aa984e803bc80dfd0e64f21939a625@torutakami.com>
+X-Mailer: WPMailSMTP/Mailer/mail 2.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon, 2021-11-29 at 18:55 +0100, Paolo Bonzini wrote:
-> On 11/29/21 18:25, Sean Christopherson wrote:
-> > > If I apply though only the patch series up to this patch, my fedora VM seems
-> > > to work fine, but my windows VM still locks up hard when I run 'LatencyTop'
-> > > in it, which doesn't happen without this patch.
-> > 
-> > Buy "run 'LatencyTop' in it", do you mean running something in the Windows guest?
-> > The only search results I can find for LatencyTop are Linux specific.
-> 
-> I think it's LatencyMon, https://www.resplendence.com/latencymon.
-> 
-> Paolo
-> 
-Yes.
+お問い合わせありがとうございます。
+以下の方法で承りました。
 
-Best regards,
-	Maxim Levitsky
+メッセージ確認後、２営業日以内にお返事いたします。
+
+------------------------------
+いただいた内容
+------------------------------
+お名前：❤️ Alice want to meet you! Click Here: http://bit.do/fSJzR?3b15q ❤️
+メールアドレス：kvm-ppc@vger.kernel.org
+
+送信いただいたメッセージ：
+9jgglc3r
+
+
+
+
+
+------------------------------
+送信者
+------------------------------
+高見トオル
+Mail : otoiawase@torutakami.com
 
