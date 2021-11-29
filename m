@@ -2,15 +2,15 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A33AA46226F
-	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Nov 2021 21:46:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 94DC34624B9
+	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Nov 2021 23:23:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233471AbhK2UuD (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 29 Nov 2021 15:50:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36316 "EHLO
+        id S231500AbhK2W0S (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 29 Nov 2021 17:26:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233051AbhK2UsD (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Nov 2021 15:48:03 -0500
+        with ESMTP id S233679AbhK2WZO (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 29 Nov 2021 17:25:14 -0500
 Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
         by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9101DC08EC1D
         for <kvm-ppc@vger.kernel.org>; Mon, 29 Nov 2021 09:25:30 -0800 (PST)
