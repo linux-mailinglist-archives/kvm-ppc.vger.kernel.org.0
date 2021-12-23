@@ -2,116 +2,95 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A69847E608
-	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Dec 2021 16:50:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D706547E8F1
+	for <lists+kvm-ppc@lfdr.de>; Thu, 23 Dec 2021 22:15:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244383AbhLWPuo (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 23 Dec 2021 10:50:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:54707 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244372AbhLWPun (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Dec 2021 10:50:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640274642;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=a3jSVSDAuP2qAp+ACszG/Ca5tr0drEgmWt1vLgLHWtg=;
-        b=VFGEkU3cExqhUWkSNGmSrA86QB0F+g3W5YtURMUGh75SZP+S84PzmUtilfA9gp6s0FZug0
-        MfUt6Ygwh7NadBZX39FaRMwo3qgm55WQuaJ4cgkXWfb2kdMznc0PBBUyQXmxJXPOEWNba4
-        UVAJhH11KxX8fi5EiatN9zlBdtMGfjY=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-613--bJsLxzpOJCuGAmzoxDrhg-1; Thu, 23 Dec 2021 10:50:41 -0500
-X-MC-Unique: -bJsLxzpOJCuGAmzoxDrhg-1
-Received: by mail-ed1-f71.google.com with SMTP id s12-20020a50ab0c000000b003efdf5a226fso4788241edc.10
-        for <kvm-ppc@vger.kernel.org>; Thu, 23 Dec 2021 07:50:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=a3jSVSDAuP2qAp+ACszG/Ca5tr0drEgmWt1vLgLHWtg=;
-        b=RZ9ELtiM81fwZi/mvQ69OGZmLlh3Bxeik5H5rlutjhXIx9drE1fpewJhx6eltC01XC
-         DrSa8KmVEQ9paFpiwcQ5q55ZIkGR/bxWGd055/gQhedZ9C54KvBQe189gZUuvb3jzjHq
-         jPp8QAyBeeLglSya12K6lhLSAJ6KX17HzP0FVukWOHmqpVd6CHK+YyZLPBxBlYu/Pcty
-         W71C+UZ4KwCY3dNCA7Ae2EcUZ1ZOSZige+vlHjhAoGaJM59wAby+xj7Cym9urksq6Isw
-         8KvttnWWBpdAip5u++bazbVcQJX2QJVJ4TaOq522PaaWqz4p9LqxtKo2tDiQYAY7MIiP
-         9t7w==
-X-Gm-Message-State: AOAM530u5nGsABvZxYhCBdA1abPM4pgz6AkaJSicMV3P8ky7LwK2SRJK
-        elT1+yEj/mA+DfCj/3/EUiAgawZDCOE4Nnn4byn+QrJRasMwE1mHuA21dXdgylP9n1MNwWUltmM
-        QhFWYdA4sUXLT+uWXBA==
-X-Received: by 2002:aa7:d554:: with SMTP id u20mr2537246edr.322.1640274640187;
-        Thu, 23 Dec 2021 07:50:40 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzjvcZiYnGos0+nrz5J+V9LCLpx9dQwps5e8qMO+vSV93vXatkdIeEM4z088mrh1QqbWAP84g==
-X-Received: by 2002:aa7:d554:: with SMTP id u20mr2537236edr.322.1640274640005;
-        Thu, 23 Dec 2021 07:50:40 -0800 (PST)
-Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id dd5sm1897720ejc.99.2021.12.23.07.50.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Dec 2021 07:50:39 -0800 (PST)
-Date:   Thu, 23 Dec 2021 16:50:37 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm-ppc@vger.kernel.org,
-        Eric Auger <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] scripts/arch-run: Mark migration tests as
- SKIP if ncat is not available
-Message-ID: <20211223155037.rt5mhnsepc3u6mra@gator.home>
-References: <20211221092130.444225-1-thuth@redhat.com>
+        id S233835AbhLWVPw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 23 Dec 2021 16:15:52 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61360 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S234130AbhLWVPw (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 23 Dec 2021 16:15:52 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BNKu61e031484;
+        Thu, 23 Dec 2021 21:15:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=IpIC73MytuAgOqJcPQKpx5l+wZPAAosydHwjRx1tXPE=;
+ b=K0Fdq/d0J4KFSilgfz+So0t8zvyi1vrNsqtcmBf2b8m1/ONQ0z+uyEeyXBfJPvOgh6bu
+ pZHmd9K2kozidZI6ll5XVPDQHlDlkfBjP/He/mZcy56/7UG6Oe+TBnDxAwAWZ3xQF6ZN
+ abbzISgEsUD2wOjdT/7lDF/o0prkLtImtKIl9LB6axeLeGd8/9DadIS45RUfwpbX8Vvl
+ bhqFuVWFLBAeDellv2GRxtjY4Bdosml1fsHNxSolRFSAKTpVVAQO2LKUbOnkRMMN4hbo
+ SJIm/ZHLoVOX5v2jvDPrhVtVcZQs6YD+b6FmgxjjvqS+Mt7B6Of1ewoVAWES2q2Ch/KZ zA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3d4yg91fr4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Dec 2021 21:15:39 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BNL0UvJ016968;
+        Thu, 23 Dec 2021 21:15:39 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3d4yg91fqx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Dec 2021 21:15:39 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BNL7Oxt012716;
+        Thu, 23 Dec 2021 21:15:38 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma01dal.us.ibm.com with ESMTP id 3d179cy9pq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 23 Dec 2021 21:15:38 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BNLFZ7q8782670
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 Dec 2021 21:15:35 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9443EAC06D;
+        Thu, 23 Dec 2021 21:15:35 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AEC12AC075;
+        Thu, 23 Dec 2021 21:15:33 +0000 (GMT)
+Received: from farosas.linux.ibm.com.com (unknown [9.163.19.83])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 23 Dec 2021 21:15:33 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
+        mpe@ellerman.id.au, npiggin@gmail.com, aik@ozlabs.ru
+Subject: [PATCH 0/3] KVM: PPC: Minor fixes
+Date:   Thu, 23 Dec 2021 18:15:25 -0300
+Message-Id: <20211223211528.3560711-1-farosas@linux.ibm.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211221092130.444225-1-thuth@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: xHDlItkkEdKUlUyTVLAer96_6nUgzw0F
+X-Proofpoint-GUID: o23DAOUxOeAWIDvQags0OzenFMuigl1O
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-23_04,2021-12-22_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1011
+ suspectscore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 impostorscore=0 mlxscore=0 mlxlogscore=674
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112230106
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Dec 21, 2021 at 10:21:30AM +0100, Thomas Huth wrote:
-> Instead of failing the tests, we should rather skip them if ncat is
-> not available.
-> While we're at it, also mention ncat in the README.md file as a
-> requirement for the migration tests.
-> 
-> Resolves: https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/issues/4
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  README.md             | 4 ++++
->  scripts/arch-run.bash | 2 +-
->  2 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/README.md b/README.md
-> index 6e6a9d0..a82da56 100644
-> --- a/README.md
-> +++ b/README.md
-> @@ -54,6 +54,10 @@ ACCEL=name environment variable:
->  
->      ACCEL=kvm ./x86-run ./x86/msr.flat
->  
-> +For running tests that involve migration from one QEMU instance to another
-> +you also need to have the "ncat" binary (from the nmap.org project) installed,
-> +otherwise the related tests will be skipped.
-> +
->  # Tests configuration file
->  
->  The test case may need specific runtime configurations, for
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 43da998..cd92ed9 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -108,7 +108,7 @@ run_migration ()
->  {
->  	if ! command -v ncat >/dev/null 2>&1; then
->  		echo "${FUNCNAME[0]} needs ncat (netcat)" >&2
-> -		return 2
-> +		return 77
->  	fi
->  
->  	migsock=$(mktemp -u -t mig-helper-socket.XXXXXXXXXX)
-> -- 
-> 2.27.0
->
+Two fixes for MMIO emulation code that don't really affect anything.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+One fix for ioctl return code that is a prerequisite for the selftests
+enablement.
+
+Fabiano Rosas (3):
+  KVM: PPC: Book3S HV: Stop returning internal values to userspace
+  KVM: PPC: Fix vmx/vsx mixup in mmio emulation
+  KVM: PPC: Fix mmio length message
+
+ arch/powerpc/kvm/powerpc.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+-- 
+2.33.1
 
