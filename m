@@ -2,88 +2,112 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7269E492B12
-	for <lists+kvm-ppc@lfdr.de>; Tue, 18 Jan 2022 17:20:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D1614967D3
+	for <lists+kvm-ppc@lfdr.de>; Fri, 21 Jan 2022 23:26:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbiARQUp (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 18 Jan 2022 11:20:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:54174 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235038AbiARQUo (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 18 Jan 2022 11:20:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642522844;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EwrulS3gzA/74heRhQ+jQxvPAPi0xIckrPJaoqht2/c=;
-        b=aXsitatiuS2AX7jhB7Scld+wJMFvVFgE9KUQLIn1eUv/V/aPH5WyxrKiT5I0/nVyyM1VmQ
-        /UEgZhLluZMmzuH1MT/8IgXc30XmChWNvK6gUkGNfodK8wLT252++OxG3NWxMTrcF/ub8S
-        W/JzbGAWxpubBQi+h9lfLNEc6RByPDQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-575-WgZLpHXwM_G4hS4-qRAxMQ-1; Tue, 18 Jan 2022 11:20:41 -0500
-X-MC-Unique: WgZLpHXwM_G4hS4-qRAxMQ-1
-Received: by mail-wm1-f72.google.com with SMTP id o3-20020a05600c4fc300b0034aee9534bdso6318528wmq.2
-        for <kvm-ppc@vger.kernel.org>; Tue, 18 Jan 2022 08:20:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=EwrulS3gzA/74heRhQ+jQxvPAPi0xIckrPJaoqht2/c=;
-        b=UqJtohPKzJrtTM9g7rG+mZWQ2dnF1jsTfWgCK0E457n6DMVzRrsvCgiPNVQrCsMwKl
-         knv2DJC2JMNti1YO+DBZXuw6ehrrV/IrkP2l86VuLyE2x/8ytvz0uN8P8US074e2IECl
-         LAZ/sDlsKn2iIOSHRXH/N0GJOse1lXyXJ6GfOwre8QScfQNkZ2IGk+SgWz2MelPl+zsQ
-         wa7oqzSRs6ZYx+GrqtBRLFv4kK2FtzP9usglkJ9+p4Zgbeyqsq2phuiTaT89xrGcvT1L
-         9Fc8EX8XVDw3aTS0qagjK2aFHoMZO1jQ2xzCMFfLYvwxIjRQgCizleubiaDQFKquAsiK
-         1X3A==
-X-Gm-Message-State: AOAM530A96E6Glg7h/Lb2YOAszDw+2/YBvXBC1AndSjDULaenyGdI97+
-        e6AyVZDtOo5aNZzvQt1fZCESkS7oEJmvemtVaLsBiqxqEFVRDxSilAaLc5jP0oEcxc72qRnPK0/
-        0Xf2Y0b1W9xJHujvBJw==
-X-Received: by 2002:a5d:4c4d:: with SMTP id n13mr25057004wrt.641.1642522840125;
-        Tue, 18 Jan 2022 08:20:40 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwTz1c1QQcAMTiHafm/jmwdXgrf7wUWM5hGJvGgdN/CAmFDEzHQguURZEtsbIR0m3l3jikB/Q==
-X-Received: by 2002:a5d:4c4d:: with SMTP id n13mr25056991wrt.641.1642522839929;
-        Tue, 18 Jan 2022 08:20:39 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id h2sm3124218wmq.2.2022.01.18.08.20.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jan 2022 08:20:39 -0800 (PST)
-Message-ID: <0c3b360a-8b95-0a18-a5df-59249247c291@redhat.com>
-Date:   Tue, 18 Jan 2022 17:20:38 +0100
+        id S233256AbiAUW0r (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 21 Jan 2022 17:26:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26450 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233179AbiAUW0r (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 21 Jan 2022 17:26:47 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20LL5jqv014002;
+        Fri, 21 Jan 2022 22:26:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=8P7wAY09X+BVf2wim9UBW3uBkkcx+9UnV4jleV893ng=;
+ b=M67MhyzBp12Upkr9/iMXBvWrM5wpClyrPHXnMkEqAyhFmNsIGw+nz7HRUQI8htGoluT5
+ 8ZwPcsqH05EKdjOXnippjgqxHrfOA+fmcoql1uwbMhPhKBsg1Na+N9tAv+NvAt6frjOg
+ ZQe6+Pcpcho26OQrUjkvL/O8I4lI78kwUvuD4ouY+ExJFoZ/ltyU6WWsERZxgnp6xJM5
+ ED04+q6EPm5LNOQGogYPlRQhSQiJfqr3PskXV/ExzS3BxO4eYQwHCMi/IHZPwKEcbsTM
+ fZglKyxZMbYJqOmspFqm80JFk9jovP/WXd7ya6bLGZ3PhMxmPQ6O6Tn0L8pu6q0rNqgb Ig== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dr1w3vhhq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Jan 2022 22:26:38 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20LMLISp018235;
+        Fri, 21 Jan 2022 22:26:37 GMT
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dr1w3vhha-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Jan 2022 22:26:37 +0000
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20LMM8V0012802;
+        Fri, 21 Jan 2022 22:26:36 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma04wdc.us.ibm.com with ESMTP id 3dqj1fcb1q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Jan 2022 22:26:36 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20LMQZrB33816832
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Jan 2022 22:26:35 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 63D19AE05C;
+        Fri, 21 Jan 2022 22:26:35 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BABACAE060;
+        Fri, 21 Jan 2022 22:26:32 +0000 (GMT)
+Received: from farosas.linux.ibm.com.com (unknown [9.211.81.234])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 21 Jan 2022 22:26:32 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
+        mpe@ellerman.id.au, npiggin@gmail.com, aik@ozlabs.ru
+Subject: [PATCH v4 0/5] KVM: PPC: MMIO fixes
+Date:   Fri, 21 Jan 2022 19:26:21 -0300
+Message-Id: <20220121222626.972495-1-farosas@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: WPDT0p4l-s74_7NS-mFEuW0oyDcmSHo2
+X-Proofpoint-ORIG-GUID: qSJB_kzWe_zl36AwxTEmczcyr7tr7Wr-
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [kvm-unit-tests] Permitted license for new library
-Content-Language: en-US
-To:     Alexandru Elisei <alexandru.elisei@arm.com>, thuth@redhat.com,
-        lvivier@redhat.com, imbrenda@linux.ibm.com, david@redhat.com,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        kvm-ppc@vger.kernel.org, linux-s390@vger.kernel.org
-References: <YeboYFQQtuQH1+Rf@monolith.localdoman>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YeboYFQQtuQH1+Rf@monolith.localdoman>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-21_10,2022-01-21_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ mlxscore=0 clxscore=1015 priorityscore=1501 malwarescore=0 mlxlogscore=519
+ lowpriorityscore=0 bulkscore=0 suspectscore=0 impostorscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
+ definitions=main-2201210140
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 1/18/22 17:18, Alexandru Elisei wrote:
-> Hello,
-> 
-> I would like to know what licenses are permitted when adding a new library
-> to kvm-unit-tests (similar to libfdt). Is it enough if the library is
-> licensed under one of the GPLv2 compatible licenses [1] or are certain
-> licenses from that list not accepted for kvm-unit-tests?
-> 
-> [1] https://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses
+Changes from v3:
 
-Any GPLv2-compatible license is acceptable.  GPLv2+ compatibility is 
-nice but not required.
+Removed all of the low level messages and altered the pr_emerg in the
+emulate_mmio to a more descriptive message.
 
-Paolo
+Changed the Program interrupt to a Data Storage. There's an ifdef
+needed because this code is shared by HV, PR and booke.
+
+v3:
+https://lore.kernel.org/r/20220107210012.4091153-1-farosas@linux.ibm.com
+
+v2:
+https://lore.kernel.org/r/20220106200304.4070825-1-farosas@linux.ibm.com
+
+v1:
+https://lore.kernel.org/r/20211223211528.3560711-1-farosas@linux.ibm.com
+
+Fabiano Rosas (5):
+  KVM: PPC: Book3S HV: Stop returning internal values to userspace
+  KVM: PPC: Fix vmx/vsx mixup in mmio emulation
+  KVM: PPC: mmio: Reject instructions that access more than mmio.data
+    size
+  KVM: PPC: mmio: Return to guest after emulation failure
+  KVM: PPC: mmio: Deliver DSI after emulation failure
+
+ arch/powerpc/kvm/emulate_loadstore.c | 10 ++----
+ arch/powerpc/kvm/powerpc.c           | 46 ++++++++++++++++++----------
+ 2 files changed, 33 insertions(+), 23 deletions(-)
+
+-- 
+2.34.1
 
