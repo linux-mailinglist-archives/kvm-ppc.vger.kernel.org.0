@@ -2,122 +2,148 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D61849A4F4
-	for <lists+kvm-ppc@lfdr.de>; Tue, 25 Jan 2022 03:10:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B22F549AB77
+	for <lists+kvm-ppc@lfdr.de>; Tue, 25 Jan 2022 06:16:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358380AbiAYAXr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 24 Jan 2022 19:23:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8260 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1838402AbiAXWqc (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 24 Jan 2022 17:46:32 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20OLmm0c013752;
-        Mon, 24 Jan 2022 22:08:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=dP4z4YU7L62darS+kabz/nlYvJcXkoro8oc/W5CdQho=;
- b=aeyYRMZa3Cjkm7FcZzIunSvGeGhBXZbRoimYudXAVY4PWYZg3mhpTusnJWRuwH5NS1LT
- BPhA/DSw+nWYDRwPNw01P4RsOyuHxfuIqqM46koWpOsnZRBBscYNS8gTc1xYI6z57b1a
- gxamxfKBmpnLD2ikOwU5dFSGCYBpRlgSdCGk2g/YrwKWJvqJ+ehgUUg09wy2A+U0AWfg
- 1Z9LXhNZMBswiMCwEhZlyjP3OiX6ADiYXP3ukf2Wjx5Qvn1OAVfLz0TfNb+dlfo/G+0m
- S5zq+TIBt3RdDa39ayUCnvsinrYFJOHFafqr2LFEVQIpOiaLHxpgHvY9zJFwpsNDhgHx TQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dt1m5uy1t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Jan 2022 22:08:22 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 20OLxfGI015787;
-        Mon, 24 Jan 2022 22:08:21 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3dt1m5uy1m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Jan 2022 22:08:21 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 20OM2v8t002311;
-        Mon, 24 Jan 2022 22:08:20 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma02dal.us.ibm.com with ESMTP id 3dt1x8uqw6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Jan 2022 22:08:20 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 20OM8JJM32440646
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 24 Jan 2022 22:08:19 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB1F278067;
-        Mon, 24 Jan 2022 22:08:19 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 042EB7806E;
-        Mon, 24 Jan 2022 22:08:18 +0000 (GMT)
-Received: from farosas.linux.ibm.com.com (unknown [9.163.24.67])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 24 Jan 2022 22:08:17 +0000 (GMT)
-From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
-        mpe@ellerman.id.au, npiggin@gmail.com, aik@ozlabs.ru
-Subject: [PATCH v2 4/4] KVM: PPC: Decrement module refcount if init_vm fails
-Date:   Mon, 24 Jan 2022 19:08:03 -0300
-Message-Id: <20220124220803.1011673-5-farosas@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220124220803.1011673-1-farosas@linux.ibm.com>
-References: <20220124220803.1011673-1-farosas@linux.ibm.com>
+        id S233791AbiAYFPm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 25 Jan 2022 00:15:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S252783AbiAYE3W (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 24 Jan 2022 23:29:22 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40844C061755
+        for <kvm-ppc@vger.kernel.org>; Mon, 24 Jan 2022 19:06:39 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id w190so11851784pfw.7
+        for <kvm-ppc@vger.kernel.org>; Mon, 24 Jan 2022 19:06:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=3MarfPCCwDfAVG2ZqExy3Ax3TYR2XgGtfygVHRV1F2E=;
+        b=qkpWBBXkhVIfatt4l28lQipY/t3sa4euS13sDx2txHAnlEIzNPCDPWEw1IMKnvAW1S
+         h8SnXCVyBZRi/r1LKkCyOvTaY0dZWKV4WsdY8T7vNetXg3DHRduVz7lzZuQhKcJHMRXo
+         aEGt16VVItnTuiZ+OlV/H/gBqCKDGttgrlAFoCnYSfK7sM3Yi64kjIQ7AK940BEbmQaR
+         UTWsOoCP+vfqZp0NNE3ZLw3CxQaOMJr84snmhgpiOo9OAnnPNIYt7Akve1WG+gD7r8gA
+         XK0uNSkK2jgTlMxAMuIbWJynGHi41k46t4i1fuxW0T5vuq3v/qg3YIB+sc6DDgIXpi6r
+         XyRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=3MarfPCCwDfAVG2ZqExy3Ax3TYR2XgGtfygVHRV1F2E=;
+        b=lwvLRJ7M5ducrWtMJZ4zC8G+6FPIPpTqi7lhzsE9/oXfTozwdhxdp6kfSVp/rftFlR
+         qGktAAc9Hh4W3uh+fE7VQESvIyat04kvAe0DtAdis79fURLECVVWPZHNZ8WzfMrlmh76
+         OfhEdly5rbkL9EynC9qV/fW2JzO2UOzUG63cS6OQGAo811iDynWWXCeKVkPXoNTXLnZk
+         G9G+p7E6fvN5MBwL2J9inI3e58MsX8HdgKxHRrpDd1eRPZBEAw4k5pS3Ld3qt+X0CBfk
+         WIFBKHVtZMljskaZylo1XdyMhbeQLfEWdxPrjHyQoJa8Oy6iJu9d1ymeE87GNPhvOC+N
+         xcEQ==
+X-Gm-Message-State: AOAM533sYGAplbFfxxQIoRnOwW1KU0AVkIbbRqAISQB9RfW7g/TaJHUy
+        DEvaimNujm4N9m85zy3S/5U=
+X-Google-Smtp-Source: ABdhPJxoBU+8IRslH4g6ljEVUVpcz4VUfMuCWAi9P/I29saDnqIOIb63QMY7CfB+A87pcsk9b8zdAA==
+X-Received: by 2002:a05:6a00:cc2:b0:4c9:f07d:6abe with SMTP id b2-20020a056a000cc200b004c9f07d6abemr4559841pfv.17.1643079998563;
+        Mon, 24 Jan 2022 19:06:38 -0800 (PST)
+Received: from localhost (193-116-82-75.tpgi.com.au. [193.116.82.75])
+        by smtp.gmail.com with ESMTPSA id q3sm3507213pfu.194.2022.01.24.19.06.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jan 2022 19:06:38 -0800 (PST)
+Date:   Tue, 25 Jan 2022 13:06:32 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v4 3/5] KVM: PPC: mmio: Reject instructions that access
+ more than mmio.data size
+To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
+Cc:     aik@ozlabs.ru, linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
+        paulus@ozlabs.org
+References: <20220121222626.972495-1-farosas@linux.ibm.com>
+        <20220121222626.972495-4-farosas@linux.ibm.com>
+In-Reply-To: <20220121222626.972495-4-farosas@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: nohRpn2q5ZHOVLEtjAAX4HDkT7ejghjw
-X-Proofpoint-GUID: gFsl5y_F-GZxc6JjT2a-udEA47FyJSNw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-24_09,2022-01-24_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- malwarescore=0 clxscore=1015 mlxlogscore=999 bulkscore=0
- priorityscore=1501 spamscore=0 adultscore=0 phishscore=0
- lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2201110000 definitions=main-2201240143
+Message-Id: <1643079951.32ccbyeyjr.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-We increment the reference count for KVM-HV/PR before the call to
-kvmppc_core_init_vm. If that function fails we need to decrement the
-refcount.
+Excerpts from Fabiano Rosas's message of January 22, 2022 8:26 am:
+> The MMIO interface between the kernel and userspace uses a structure
+> that supports a maximum of 8-bytes of data. Instructions that access
+> more than that need to be emulated in parts.
+>=20
+> We currently don't have generic support for splitting the emulation in
+> parts and each set of instructions needs to be explicitly included.
+>=20
+> There's already an error message being printed when a load or store
+> exceeds the mmio.data buffer but we don't fail the emulation until
+> later at kvmppc_complete_mmio_load and even then we allow userspace to
+> make a partial copy of the data, which ends up overwriting some fields
+> of the mmio structure.
+>=20
+> This patch makes the emulation fail earlier at kvmppc_handle_load|store,
+> which will send a Program interrupt to the guest. This is better than
+> allowing the guest to proceed with partial data.
+>=20
+> Note that this was caught in a somewhat artificial scenario using
+> quadword instructions (lq/stq), there's no account of an actual guest
+> in the wild running instructions that are not properly emulated.
+>=20
+> (While here, remove the "bad MMIO" messages. The caller already has an
+> error message.)
+>=20
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
-Caught this while testing Nick's LPID patches by looking at
-/sys/module/kvm_hv/refcnt
----
- arch/powerpc/kvm/powerpc.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
 
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 2ad0ccd202d5..4285d0eac900 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -431,6 +431,8 @@ int kvm_arch_check_processor_compat(void *opaque)
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
- 	struct kvmppc_ops *kvm_ops = NULL;
-+	int r;
-+
- 	/*
- 	 * if we have both HV and PR enabled, default is HV
- 	 */
-@@ -456,7 +458,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 		return -ENOENT;
- 
- 	kvm->arch.kvm_ops = kvm_ops;
--	return kvmppc_core_init_vm(kvm);
-+	r = kvmppc_core_init_vm(kvm);
-+	if (r)
-+		module_put(kvm->arch.kvm_ops->owner);
-+	return r;
- err_out:
- 	return -EINVAL;
- }
--- 
-2.34.1
-
+> ---
+>  arch/powerpc/kvm/powerpc.c | 16 +++++-----------
+>  1 file changed, 5 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index c2bd29e90314..27fb2b70f631 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -1114,10 +1114,8 @@ static void kvmppc_complete_mmio_load(struct kvm_v=
+cpu *vcpu)
+>  	struct kvm_run *run =3D vcpu->run;
+>  	u64 gpr;
+> =20
+> -	if (run->mmio.len > sizeof(gpr)) {
+> -		printk(KERN_ERR "bad MMIO length: %d\n", run->mmio.len);
+> +	if (run->mmio.len > sizeof(gpr))
+>  		return;
+> -	}
+> =20
+>  	if (!vcpu->arch.mmio_host_swabbed) {
+>  		switch (run->mmio.len) {
+> @@ -1236,10 +1234,8 @@ static int __kvmppc_handle_load(struct kvm_vcpu *v=
+cpu,
+>  		host_swabbed =3D !is_default_endian;
+>  	}
+> =20
+> -	if (bytes > sizeof(run->mmio.data)) {
+> -		printk(KERN_ERR "%s: bad MMIO length: %d\n", __func__,
+> -		       run->mmio.len);
+> -	}
+> +	if (bytes > sizeof(run->mmio.data))
+> +		return EMULATE_FAIL;
+> =20
+>  	run->mmio.phys_addr =3D vcpu->arch.paddr_accessed;
+>  	run->mmio.len =3D bytes;
+> @@ -1325,10 +1321,8 @@ int kvmppc_handle_store(struct kvm_vcpu *vcpu,
+>  		host_swabbed =3D !is_default_endian;
+>  	}
+> =20
+> -	if (bytes > sizeof(run->mmio.data)) {
+> -		printk(KERN_ERR "%s: bad MMIO length: %d\n", __func__,
+> -		       run->mmio.len);
+> -	}
+> +	if (bytes > sizeof(run->mmio.data))
+> +		return EMULATE_FAIL;
+> =20
+>  	run->mmio.phys_addr =3D vcpu->arch.paddr_accessed;
+>  	run->mmio.len =3D bytes;
+> --=20
+> 2.34.1
+>=20
+>=20
