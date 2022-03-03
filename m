@@ -2,118 +2,121 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02F714CA9D1
-	for <lists+kvm-ppc@lfdr.de>; Wed,  2 Mar 2022 17:08:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0ED354CC00C
+	for <lists+kvm-ppc@lfdr.de>; Thu,  3 Mar 2022 15:34:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239312AbiCBQJU (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 2 Mar 2022 11:09:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49728 "EHLO
+        id S233413AbiCCOf3 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 3 Mar 2022 09:35:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238457AbiCBQJS (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 2 Mar 2022 11:09:18 -0500
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B8E69281;
-        Wed,  2 Mar 2022 08:08:34 -0800 (PST)
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-        by localhost (Postfix) with ESMTP id 4K7zYs2Xs1z9sSf;
-        Wed,  2 Mar 2022 17:08:33 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-        by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id rxWtBRSv_3dy; Wed,  2 Mar 2022 17:08:33 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase2.c-s.fr (Postfix) with ESMTP id 4K7zYs1qcGz9sSN;
-        Wed,  2 Mar 2022 17:08:33 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 2E7F58B76D;
-        Wed,  2 Mar 2022 17:08:33 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id 3ADqIjmPOceC; Wed,  2 Mar 2022 17:08:33 +0100 (CET)
-Received: from [172.25.230.108] (unknown [172.25.230.108])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id E66A98B763;
-        Wed,  2 Mar 2022 17:08:32 +0100 (CET)
-Message-ID: <4001045b-c404-763d-d1ba-41f6ed05ff8b@csgroup.eu>
-Date:   Wed, 2 Mar 2022 17:08:32 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH] arch: powerpc: kvm: remove unnecessary casting
-Content-Language: fr-FR
-To:     Nour-eddine Taleb <1337.noureddine@gmail.com>, paulus@ozlabs.org,
-        mpe@ellerman.id.au, benh@kernel.crashing.org
+        with ESMTP id S230193AbiCCOf3 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 3 Mar 2022 09:35:29 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47DEA15C9D1;
+        Thu,  3 Mar 2022 06:34:43 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id p9so8130160wra.12;
+        Thu, 03 Mar 2022 06:34:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=GxN8h7L2LXnHB8VpVtq2yQnoP4VfiQvLPMhymszGuv4=;
+        b=Lel/0NQb4buqvKc+9T/sn4AIpQy82QTeubDPa/IAXmzmeMn6SZBELOCSaycLRNXTHD
+         9EmNscSIAej+JsMIpuFm8q0McIYxSxIxq1dWfHZFhHMBXXHXoGA0ApciSWdVR//P+587
+         QJEuJsFwTYSjN2ZedMJepqp/KFz5PnAo827XBdTWJi+QTPBQz2ttPXkNzG3hiB6o0rns
+         nLnkK/8DdMNQVjT91fcEK3RHdiAH18eNc/GqH8sGl348Zs6lqBV2mH8d+lLOAc4khhL8
+         Xt942lE3fo4yEq1lah7IKQAiSxhKTleaE/Wt7UtuLxIF1NZY15ay5Drddl3rQ7WtR9cw
+         sZng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=GxN8h7L2LXnHB8VpVtq2yQnoP4VfiQvLPMhymszGuv4=;
+        b=NJ3/Clmf9VFZ+YjJKExX+ur59sTM1EfpOWPI5PLZBBn1E6TvkMqazbKVKjTrdfCzPo
+         0SEc0Sox4kDgpjzNucSC5RXkAlRDo+Q7AqpOJoHLNbu0I9q/WUSmxyBq+EVj62/bQ1kD
+         Z5Hdvn17sPFztCm0qtE/+APpbAKrtZtdbJgLIkbSwOIF3UILNGkTbsmUvcC9W8+Um4v8
+         pl/22jGkmKWTVDcCNO4AINcNl8EFZbEWQf4yyq3ZRODd61tfxE5iV6ZO2q8Gj58w6BjN
+         3gN4VsIclmyaX1pFs8gHwSOTatHzHgBqvtN3Z+5cc1udSn/wBJhD5+kEDlLw3lC7J7Wy
+         lcBQ==
+X-Gm-Message-State: AOAM531Q/it50wU+JFLJzr44v2yVvIeiDaUnvg+s+m90qs4mZgA4ZPNb
+        DzNZ4Rn8hINShd5EAqzHva1Zpj/SnI0sVA==
+X-Google-Smtp-Source: ABdhPJwycauQBU16hXmq8/RdYtzLbTamgVEta0wBzuUfMQAZDc/8XT6dWw5g2Xq6AzEupFOT02hmjg==
+X-Received: by 2002:adf:f94a:0:b0:1ef:9485:e43d with SMTP id q10-20020adff94a000000b001ef9485e43dmr17061994wrr.552.1646318081857;
+        Thu, 03 Mar 2022 06:34:41 -0800 (PST)
+Received: from localhost.localdomain ([105.66.7.237])
+        by smtp.gmail.com with ESMTPSA id f8-20020a05600c4e8800b00380ee4a78fdsm3018255wmq.4.2022.03.03.06.34.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Mar 2022 06:34:41 -0800 (PST)
+From:   Nour-eddine Taleb <kernel.noureddine@gmail.com>
+To:     christophe.leroy@csgroup.eu, paulus@ozlabs.org, mpe@ellerman.id.au,
+        benh@kernel.crashing.org
 Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-References: <CAJO4vZwtVrYoMPZ9XoEAUJYgo-rND21eGorPrRF5m6rW4WT76w@mail.gmail.com>
-From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <CAJO4vZwtVrYoMPZ9XoEAUJYgo-rND21eGorPrRF5m6rW4WT76w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        kvm-ppc@vger.kernel.org,
+        Nour-eddine Taleb <kernel.noureddine@gmail.com>
+Subject: [PATCH] arch:powerpc:kvm: remove unnecessary type castings
+Date:   Thu,  3 Mar 2022 15:34:16 +0100
+Message-Id: <20220303143416.201851-1-kernel.noureddine@gmail.com>
+X-Mailer: git-send-email 2.33.1
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+remove unnecessary castings, from "void *" to "struct kvmppc_xics *"
 
+Signed-off-by: Nour-eddine Taleb <kernel.noureddine@gmail.com>
+---
+ arch/powerpc/kvm/book3s_xics.c        | 2 +-
+ arch/powerpc/kvm/book3s_xive.c        | 2 +-
+ arch/powerpc/kvm/book3s_xive_native.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-Le 09/05/2021 à 14:00, Nour-eddine Taleb a écrit :
-> remove unnecessary castings, from "void *" to "struct kvmppc_xics *"
-> 
-> Signed-off-by: Nour-eddine Taleb <1337.noureddine@gmail.com>
+diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
+index ebd5d920de8c..ec208d0c8d13 100644
+--- a/arch/powerpc/kvm/book3s_xics.c
++++ b/arch/powerpc/kvm/book3s_xics.c
+@@ -1440,7 +1440,7 @@ static int kvmppc_xics_create(struct kvm_device *dev, u32 type)
+ 
+ static void kvmppc_xics_init(struct kvm_device *dev)
+ {
+-	struct kvmppc_xics *xics = (struct kvmppc_xics *)dev->private;
++	struct kvmppc_xics *xics = dev->private;
+ 
+ 	xics_debugfs_init(xics);
+ }
+diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+index 225008882958..0c1f4819884c 100644
+--- a/arch/powerpc/kvm/book3s_xive.c
++++ b/arch/powerpc/kvm/book3s_xive.c
+@@ -2368,7 +2368,7 @@ static void xive_debugfs_init(struct kvmppc_xive *xive)
+ 
+ static void kvmppc_xive_init(struct kvm_device *dev)
+ {
+-	struct kvmppc_xive *xive = (struct kvmppc_xive *)dev->private;
++	struct kvmppc_xive *xive = dev->private;
+ 
+ 	/* Register some debug interfaces */
+ 	xive_debugfs_init(xive);
+diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+index 99db9ac49901..1405b3f4e94e 100644
+--- a/arch/powerpc/kvm/book3s_xive_native.c
++++ b/arch/powerpc/kvm/book3s_xive_native.c
+@@ -1276,7 +1276,7 @@ static void xive_native_debugfs_init(struct kvmppc_xive *xive)
+ 
+ static void kvmppc_xive_native_init(struct kvm_device *dev)
+ {
+-	struct kvmppc_xive *xive = (struct kvmppc_xive *)dev->private;
++	struct kvmppc_xive *xive = dev->private;
+ 
+ 	/* Register some debug interfaces */
+ 	xive_native_debugfs_init(xive);
+-- 
+2.33.1
 
-This patch doesn't apply. Tabs are broken, they've been replaced by 4 
-space chars.
-
-> ---
->   arch/powerpc/kvm/book3s_xics.c        | 2 +-
->   arch/powerpc/kvm/book3s_xive.c        | 2 +-
->   arch/powerpc/kvm/book3s_xive_native.c | 2 +-
->   3 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
-> index 303e3cb096db..9ae74fa551a6 100644
-> --- a/arch/powerpc/kvm/book3s_xics.c
-> +++ b/arch/powerpc/kvm/book3s_xics.c
-> @@ -1440,7 +1440,7 @@ static int kvmppc_xics_create(struct kvm_device
-> *dev, u32 type)
-> 
->   static void kvmppc_xics_init(struct kvm_device *dev)
->   {
-> -    struct kvmppc_xics *xics = (struct kvmppc_xics *)dev->private;
-> +    struct kvmppc_xics *xics = dev->private;
-> 
->       xics_debugfs_init(xics);
->   }
-> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> index e7219b6f5f9a..05bcaf81a90a 100644
-> --- a/arch/powerpc/kvm/book3s_xive.c
-> +++ b/arch/powerpc/kvm/book3s_xive.c
-> @@ -2242,7 +2242,7 @@ static void xive_debugfs_init(struct kvmppc_xive *xive)
-> 
->   static void kvmppc_xive_init(struct kvm_device *dev)
->   {
-> -    struct kvmppc_xive *xive = (struct kvmppc_xive *)dev->private;
-> +    struct kvmppc_xive *xive = dev->private;
-> 
->       /* Register some debug interfaces */
->       xive_debugfs_init(xive);
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c
-> b/arch/powerpc/kvm/book3s_xive_native.c
-> index 76800c84f2a3..2703432cea78 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -1265,7 +1265,7 @@ static void xive_native_debugfs_init(struct
-> kvmppc_xive *xive)
-> 
->   static void kvmppc_xive_native_init(struct kvm_device *dev)
->   {
-> -    struct kvmppc_xive *xive = (struct kvmppc_xive *)dev->private;
-> +    struct kvmppc_xive *xive = dev->private;
-> 
->       /* Register some debug interfaces */
->       xive_native_debugfs_init(xive);
