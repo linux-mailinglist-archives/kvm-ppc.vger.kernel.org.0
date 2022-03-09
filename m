@@ -2,82 +2,83 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F7C04D1A79
-	for <lists+kvm-ppc@lfdr.de>; Tue,  8 Mar 2022 15:28:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E6F94D2749
+	for <lists+kvm-ppc@lfdr.de>; Wed,  9 Mar 2022 05:07:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231936AbiCHO24 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 8 Mar 2022 09:28:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56020 "EHLO
+        id S229768AbiCIBZK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 8 Mar 2022 20:25:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233300AbiCHO2w (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 8 Mar 2022 09:28:52 -0500
+        with ESMTP id S229966AbiCIBZK (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 8 Mar 2022 20:25:10 -0500
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 925F09FF7
-        for <kvm-ppc@vger.kernel.org>; Tue,  8 Mar 2022 06:27:53 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 228CKVWP023228;
-        Tue, 8 Mar 2022 14:27:41 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7206729CB7
+        for <kvm-ppc@vger.kernel.org>; Tue,  8 Mar 2022 17:24:02 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2290uMKL007900;
+        Wed, 9 Mar 2022 01:23:49 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=SzuB/oix1bOrcb1DwVNc3/y8KKucPYC+QX9r/E+Lhh8=;
- b=Lk+f/x7v9Y9f/5isd9Gz4VJNGl9pCyOwIWh05ndtz4xJhx8v5CaXCXQbd3hEN27qFviI
- XkBnZbG9HWX2pDP8csP0/ZbF6/ca4SxjgPPO0ia/0z/7FVpf4VhdYqk6FqdqQgWL00zM
- fn8mRNBFEEc5zQRCyoB/tKca2Vw3DLtVohs9wOEmE/caMqYSG1oQLAEwi9vOxingo53Z
- 8W+6H+ORyvzmyxFDJrzkXwhY8ht8q35pFaJ/tt/kXPC4OdE4kL/s2sFTwBztQgVgcjWC
- iPaMcJIYwQruNjkhLg7T8nkX1EqyTtAjPlhFhzrmzIpF+7prSQEqsv2V4IEZ+AkO0Kr2 FA== 
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3enx3m5d3j-1
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=lOTmQlCRUmcoW8PwOeHvgAUjYbbv+uP78u9ku8Y/wKs=;
+ b=Mw1b8S2P4nk/8/HClVgCoy3I3E/H2YPwAZ39+o7SOJtKtbCsmc/kPfFUBmgIxkMrMPw3
+ OYAidGa7OLuxMOuDGRgr/8qsuB1KwoO4LWPYxnhBhAwx1XUGHVx1CFhxJSXpX1Mp8HYx
+ 4rvZU0c6Lp0gjZUmbe9fmAoUujhAFh9rledvTVvn+sUn4TtfLL/JQXP7LUGjK9Ag8Y8s
+ JvN3spHYgNBAOqjPfqwOZQJPEQL2vZMI72Smr0ff6CK0kVaBnlI5TyCKngxwiOBo8nX5
+ Q1on0n2IUBCAe8IZWIiArBOYumIeQvYwnwjPuJFswnLA90kER/yvo5dv+FfQ7QI6R7CF 6w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eny18r9c0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Mar 2022 14:27:40 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 228ERMk4007404;
-        Tue, 8 Mar 2022 14:27:39 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02dal.us.ibm.com with ESMTP id 3ekyga2tvu-1
+        Wed, 09 Mar 2022 01:23:49 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22918bBB026203;
+        Wed, 9 Mar 2022 01:23:48 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3eny18r9bp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Mar 2022 14:27:39 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 228ERbtj33554708
+        Wed, 09 Mar 2022 01:23:48 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2291CfdL016744;
+        Wed, 9 Mar 2022 01:23:47 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma03dal.us.ibm.com with ESMTP id 3emy8h4t8v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Mar 2022 01:23:47 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2291NkEE39453162
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 8 Mar 2022 14:27:37 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 52A13AC05E;
-        Tue,  8 Mar 2022 14:27:37 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 14974AC059;
-        Tue,  8 Mar 2022 14:27:36 +0000 (GMT)
-Received: from localhost (unknown [9.211.148.106])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Tue,  8 Mar 2022 14:27:35 +0000 (GMT)
+        Wed, 9 Mar 2022 01:23:46 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 075A57805C;
+        Wed,  9 Mar 2022 01:23:46 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A42DE7805F;
+        Wed,  9 Mar 2022 01:23:43 +0000 (GMT)
+Received: from farosas.linux.ibm.com.com (unknown [9.211.148.106])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Mar 2022 01:23:43 +0000 (GMT)
 From:   Fabiano Rosas <farosas@linux.ibm.com>
-To:     Christophe Leroy <christophe.leroy@csgroup.eu>,
-        kvm-ppc@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, groug@kaod.org,
-        david@gibson.dropbear.id.au
-Subject: Re: [RFC PATCH 2/2] KVM: PPC: Book3S HV: Provide a more accurate
- MAX_VCPU_ID in P9
-In-Reply-To: <f5ec9d55-bac3-b571-dfad-bd501cd364b3@csgroup.eu>
-References: <20210412222656.3466987-1-farosas@linux.ibm.com>
- <20210412222656.3466987-3-farosas@linux.ibm.com>
- <f5ec9d55-bac3-b571-dfad-bd501cd364b3@csgroup.eu>
-Date:   Tue, 08 Mar 2022 11:27:32 -0300
-Message-ID: <87lexka59n.fsf@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+To:     kvm-ppc@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, paulus@ozlabs.org,
+        aneesh.kumar@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
+        david@gibson.dropbear.id.au, clg@kaod.org, danielhb413@gmail.com
+Subject: [RFC PATCH] KVM: PPC: Book3S HV: Add KVM_CAP_PPC_GTSE
+Date:   Tue,  8 Mar 2022 22:23:38 -0300
+Message-Id: <20220309012338.2527143-1-farosas@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: -Wlq7r_-9K9BG57Bfg19phKaE1tQTlgR
-X-Proofpoint-GUID: -Wlq7r_-9K9BG57Bfg19phKaE1tQTlgR
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-GUID: DzijlCT9TcaGoPGc_cQLGzSf3hFoNWR6
+X-Proofpoint-ORIG-GUID: M_f2-IvAeabATHK4MAc9PPpOUBQ9AJS5
+Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-08_03,2022-03-04_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1011
- impostorscore=0 mlxscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
- mlxlogscore=970 priorityscore=1501 spamscore=0 bulkscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203080075
+ definitions=2022-03-08_09,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 mlxlogscore=999 phishscore=0 mlxscore=0 spamscore=0
+ clxscore=1011 priorityscore=1501 impostorscore=0 malwarescore=0
+ suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203090003
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -88,56 +89,88 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Christophe Leroy <christophe.leroy@csgroup.eu> writes:
+This patch adds a new KVM capability to address a crash we're
+currently having inside the nested guest kernel when running with
+GTSE disabled in the nested hypervisor.
 
-> Le 13/04/2021 =C3=A0 00:26, Fabiano Rosas a =C3=A9crit=C2=A0:
->> The KVM_CAP_MAX_VCPU_ID capability was added by commit 0b1b1dfd52a6
->> ("kvm: introduce KVM_MAX_VCPU_ID") to allow for vcpu ids larger than
->> KVM_MAX_VCPU in powerpc.
->>=20
->> For a P9 host we depend on the guest VSMT value to know what is the
->> maximum number of vcpu id we can support:
->>=20
->> kvmppc_core_vcpu_create_hv:
->>      (...)
->>      if (cpu_has_feature(CPU_FTR_ARCH_300)) {
->> -->         if (id >=3D (KVM_MAX_VCPUS * kvm->arch.emul_smt_mode)) {
->>                      pr_devel("KVM: VCPU ID too high\n");
->>                      core =3D KVM_MAX_VCORES;
->>              } else {
->>                      BUG_ON(kvm->arch.smt_mode !=3D 1);
->>                      core =3D kvmppc_pack_vcpu_id(kvm, id);
->>              }
->>      } else {
->>              core =3D id / kvm->arch.smt_mode;
->>      }
->>=20
->> which means that the value being returned by the capability today for
->> a given guest is potentially way larger than what we actually support:
->>=20
->> \#define KVM_MAX_VCPU_ID (MAX_SMT_THREADS * KVM_MAX_VCORES)
->>=20
->> If the capability is queried before userspace enables the
->> KVM_CAP_PPC_SMT ioctl there is not much we can do, but if the emulated
->> smt mode is already known we could provide a more accurate value.
->>=20
->> The only practical effect of this change today is to make the
->> kvm_create_max_vcpus test pass for powerpc. The QEMU spapr machine has
->> a lower max vcpu than what KVM allows so even KVM_MAX_VCPU is not
->> reached.
->>=20
->> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
->
-> This patch won't apply after commit a1c42ddedf35 ("kvm: rename=20
-> KVM_MAX_VCPU_ID to KVM_MAX_VCPU_IDS")
->
-> Feel free to resubmit if still applicable.
+The summary is:
 
-Thanks for the reminder, Christophe.
+We allow any guest a cmdline override of GTSE for migration
+purposes. The nested guest does not know it needs to use the option
+and tries to run 'tlbie' with LPCR_GTSE=0.
 
-I was focusing on enabling the rest of the kvm-selftests:
-https://lore.kernel.org/r/20220120170109.948681-1-farosas@linux.ibm.com
+The details are a bit more intricate:
 
-I'm preparing a v2 for that series and will try to include these patches
-as well.
+QEMU always sets GTSE=1 in OV5 even before calling KVM. At prom_init,
+guests use the OV5 value to set MMU_FTR_GTSE. This setting can be
+overridden by 'radix_hcall_invalidate=on' in the kernel cmdline. The
+option itself depends on the availability of
+FW_FEATURE_RPT_INVALIDATE, which is tied to QEMU's cap-rpt-invalidate
+capability.
+
+The MMU_FTR_GTSE flag leads guests to set PROC_TABLE_GTSE in their
+process tables and after H_REGISTER_PROC_TBL, both QEMU and KVM will
+set LPCR_GTSE=1 for that guest. Unless the guest uses the cmdline
+override, in which case:
+
+  MMU_FTR_GTSE=0 -> PROC_TABLE_GTSE=0 -> LPCR_GTSE=0
+
+We don't allow the nested hypervisor to set some LPCR bits for its
+nested guests, so if the nested HV has LPCR_GTSE=0, its nested guests
+will also have LPCR_GTSE=0. But since the only thing that can really
+flip GTSE is the cmdline override, if a nested guest runs without it,
+then the sequence goes:
+
+  MMU_FTR_GTSE=1 -> PROC_TABLE_GTSE=1 -> LPCR_GTSE=0.
+
+With LPCR_GTSE=0 the HW will treat 'tlbie' as HV privileged.
+
+How the new capability helps:
+
+By having QEMU consult KVM on what the correct GTSE value is, we can
+have the nested hypervisor return the same value that it is currently
+using. QEMU will then put the correct value in the device-tree for the
+nested guest and MMU_FTR_GTSE will match LPCR_GTSE.
+
+Fixes: b87cc116c7e1 ("KVM: PPC: Book3S HV: Add KVM_CAP_PPC_RPT_INVALIDATE capability")
+Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+---
+This supersedes the previous RFC: "KVM: PPC: Book3s HV: Allow setting
+GTSE for the nested guest"*. Aneesh explained to me that we don't want
+to allow L1 and L2 GTSE values to differ.
+
+*- https://lore.kernel.org/r/20220304182657.2489303-1-farosas@linux.ibm.com
+---
+ arch/powerpc/kvm/powerpc.c | 3 +++
+ include/uapi/linux/kvm.h   | 1 +
+ 2 files changed, 4 insertions(+)
+
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 2ad0ccd202d5..dd08b3b729cd 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -677,6 +677,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_PPC_RPT_INVALIDATE:
+ 		r = 1;
+ 		break;
++	case KVM_CAP_PPC_GTSE:
++		r = mmu_has_feature(MMU_FTR_GTSE);
++		break;
+ #endif
+ 	default:
+ 		r = 0;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 507ee1f2aa96..cc581e345d2a 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1135,6 +1135,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_XSAVE2 208
+ #define KVM_CAP_SYS_ATTRIBUTES 209
+ #define KVM_CAP_PPC_AIL_MODE_3 210
++#define KVM_CAP_PPC_GTSE 211
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.34.1
 
