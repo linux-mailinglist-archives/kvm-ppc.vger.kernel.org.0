@@ -2,59 +2,63 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 807934D2B54
-	for <lists+kvm-ppc@lfdr.de>; Wed,  9 Mar 2022 10:05:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C40EC4D6E38
+	for <lists+kvm-ppc@lfdr.de>; Sat, 12 Mar 2022 11:39:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231738AbiCIJGr (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 9 Mar 2022 04:06:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38800 "EHLO
+        id S229379AbiCLKkt (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 12 Mar 2022 05:40:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230353AbiCIJGq (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 9 Mar 2022 04:06:46 -0500
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B15D1409F5
-        for <kvm-ppc@vger.kernel.org>; Wed,  9 Mar 2022 01:05:48 -0800 (PST)
-Received: by gandalf.ozlabs.org (Postfix, from userid 1003)
-        id 4KD5rl1WZ6z4xvJ; Wed,  9 Mar 2022 20:05:43 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ozlabs.org;
-        s=201707; t=1646816743;
-        bh=2T185+CM5zT+UIvWa5+XhJAAAEtv7RH9ZWvqTwtU+mc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=JlVkLfQ9DbssAt8xQ4O1pJCG8OwtSn0FY9oCqLyiSH/EvOH8uCFsvR8p2RbIkeJXR
-         HfYSy2kVE6++P5SWCqXSsR+Rd7ALsoi16h72zAYmz2zooRG/P6VJxiwpXYESOPWdKJ
-         CbRPWSiK/iJTTMDvrPwzMsDsFYR2gTJyxTQSrR6TB4IYCzXD66aqKUV+b6nmHsnfQk
-         IWl/qXLRVznmC9LyTwa8rxekeEcUHZZKe8gncg3sWThUo0cTw3trzOmrnB/fu3Uq3U
-         Ofrovaod7P0tdWQQk86ylAEOfcwlKjXWj8DWIUCSbpZA9JdHczwZFnpvVXKDc2oakQ
-         MFM1Y3j5fT/eA==
-Date:   Wed, 9 Mar 2022 09:05:24 +0000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Fabiano Rosas <farosas@linux.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        aneesh.kumar@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
-        david@gibson.dropbear.id.au, clg@kaod.org, danielhb413@gmail.com
-Subject: Re: [RFC PATCH] KVM: PPC: Book3S HV: Add KVM_CAP_PPC_GTSE
-Message-ID: <Yiht1OBSvh4SK9vY@cleo>
-References: <20220309012338.2527143-1-farosas@linux.ibm.com>
+        with ESMTP id S230271AbiCLKks (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 12 Mar 2022 05:40:48 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3D99BB6
+        for <kvm-ppc@vger.kernel.org>; Sat, 12 Mar 2022 02:39:43 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4KFznp3bJRz4xLT;
+        Sat, 12 Mar 2022 21:39:42 +1100 (AEDT)
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+To:     Fabiano Rosas <farosas@linux.ibm.com>, kvm-ppc@vger.kernel.org
+Cc:     aik@ozlabs.ru, npiggin@gmail.com, linuxppc-dev@lists.ozlabs.org
+In-Reply-To: <20220125155735.1018683-1-farosas@linux.ibm.com>
+References: <20220125155735.1018683-1-farosas@linux.ibm.com>
+Subject: Re: [PATCH v3 0/4] KVM: PPC: KVM module exit fixes
+Message-Id: <164708144610.832402.1913966629226492244.b4-ty@ellerman.id.au>
+Date:   Sat, 12 Mar 2022 21:37:26 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220309012338.2527143-1-farosas@linux.ibm.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 10:23:38PM -0300, Fabiano Rosas wrote:
-> This patch adds a new KVM capability to address a crash we're
-> currently having inside the nested guest kernel when running with
-> GTSE disabled in the nested hypervisor.
+On Tue, 25 Jan 2022 12:57:31 -0300, Fabiano Rosas wrote:
+> changes from v2:
+> 
+> - patch 4: Matched module_put() to try_module_get()
+> 
+> v2:
+> https://lore.kernel.org/r/20220124220803.1011673-1-farosas@linux.ibm.com
+> 
+> [...]
 
-I think the patch needs to add a description of KVM_CAP_PPC_GTSE to
-Documentation/virt/kvm/api.rst.
+Applied to powerpc/topic/ppc-kvm.
 
-Regards,
-Paul.
+[1/4] KVM: PPC: Book3S HV: Check return value of kvmppc_radix_init
+      https://git.kernel.org/powerpc/c/69ab6ac380a00244575de02c406dcb9491bf3368
+[2/4] KVM: PPC: Book3S HV: Delay setting of kvm ops
+      https://git.kernel.org/powerpc/c/c5d0d77b45265905bba2ce6e63c9a02bbd11c43c
+[3/4] KVM: PPC: Book3S HV: Free allocated memory if module init fails
+      https://git.kernel.org/powerpc/c/175be7e5800e2782a7e38ee9e1b64633494c4b44
+[4/4] KVM: PPC: Decrement module refcount if init_vm fails
+      https://git.kernel.org/powerpc/c/4feb74aa64b35b21a4937f96d7a940adee286e5b
+
+cheers
