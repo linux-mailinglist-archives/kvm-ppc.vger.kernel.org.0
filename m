@@ -2,126 +2,94 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66E2A4DDABC
-	for <lists+kvm-ppc@lfdr.de>; Fri, 18 Mar 2022 14:42:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F3754E3E6F
+	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Mar 2022 13:23:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236759AbiCRNnT (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 18 Mar 2022 09:43:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44170 "EHLO
+        id S233438AbiCVMZO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 22 Mar 2022 08:25:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236775AbiCRNnS (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 18 Mar 2022 09:43:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D9E02DCBDD
-        for <kvm-ppc@vger.kernel.org>; Fri, 18 Mar 2022 06:41:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647610914;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DIbniuNolZexjaWhREmeAy3eBGSMYEukIAiBx0oi6HQ=;
-        b=hFqm94/Q2wN0+NnYZyhE0BcwhNDsThb0w64W3d60AkPeiPgLvaoLUFMIfHFvEwqwBioGHH
-        4OJ2OUCY8Kzpet9SCh5xkAeyppLRM7Q0Ey+xdDAAXhhdPotd7tfyy39qagVn1S4/Rh48L8
-        tbs2BuZ3SoH1UsxiVczX11VKCwP48dw=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-410-56haqiCaO4eQNEHsyAMi-A-1; Fri, 18 Mar 2022 09:41:53 -0400
-X-MC-Unique: 56haqiCaO4eQNEHsyAMi-A-1
-Received: by mail-ed1-f70.google.com with SMTP id w8-20020a50d788000000b00418e6810364so4873485edi.13
-        for <kvm-ppc@vger.kernel.org>; Fri, 18 Mar 2022 06:41:53 -0700 (PDT)
+        with ESMTP id S232782AbiCVMZO (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Mar 2022 08:25:14 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35BD47891D
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Mar 2022 05:23:46 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id v130-20020a1cac88000000b00389d0a5c511so2078111wme.5
+        for <kvm-ppc@vger.kernel.org>; Tue, 22 Mar 2022 05:23:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:from:mime-version:content-transfer-encoding
+         :content-description:subject:to:date:reply-to;
+        bh=Pm04dP0+P83KVn44y+vrJDsQ3iwP6pKc5n+Js9E3oKk=;
+        b=VkkmHWPb5uXsSuxmWIB8FGFTWJYgrlZ1SwDn7lLHVDQx/v6mfHXgtlR2RQR88NPWcy
+         B0GZ/6svZEQG6ndLKBeuLHt0snNtw8Hafj6MtV/uOMw6Plv350iHjMjxU29s4IOl+7Pi
+         PUwGKpo3Bbubtg6/FvEbdQfmmc9NrEY4YVkYBbqKFAyuT4Tp+G4eXAPuga0D+6JJq1GG
+         oU8xSmM/A5XSkQv7BwH//V5atUSDxzmBd+AAh5vhG1I7qsUux3YMoKQYXHoufiQTiRif
+         iGDFROApfDq4NLw0rkfqx806c0Ug2LhudjOps6Ufkz+7J0+wo5uDMi38z8rHyosOE5I6
+         vPMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DIbniuNolZexjaWhREmeAy3eBGSMYEukIAiBx0oi6HQ=;
-        b=pukXJgOrpkJgcWViHV8sTLr1uAJv33MWXbjwBVOVUyBGx0xqDTpgtQlzOq9RUSmjR4
-         Qxw9ekgIyQgbPHREFSDw+Z5px+MSkecP3srjsn0pZnvpZgeuoHw7uh+iARrYcK8RlM4i
-         YXKxD5S9iE+cneb0bWU50aT1EaDS5aOHrmzr25w6vbv8a8vXIV53KuOAMM+PbPXgfVKe
-         y7dg8jsQ2FFLpr6fi9Na7CkzOaiAfvPYA97Lxp3wSl1cI0+87aWSJ2AGyyNvpW5xSyGy
-         MmyPqKjBb5AKro8i7QXt0gOfIg9tieXboKxCiQIJyDUWySQamMWhlnH5NBrbU5Ksnrik
-         adHg==
-X-Gm-Message-State: AOAM531wjzRl6I9WfmgA/MDe6sNlIY7Tu63BD9gxdUtlBA9+5A/bc0er
-        4eA4Li7wouvPAOrBuJKfVM4EBSJSYnVSN/qZIbCNPLB3ypMd1ypXAxoMZPcEeFMl5Ds9UOOfGp0
-        vD7o76+hQHrpkHsItlQ==
-X-Received: by 2002:a17:906:1742:b0:6d6:c4f5:84a2 with SMTP id d2-20020a170906174200b006d6c4f584a2mr8868772eje.25.1647610912648;
-        Fri, 18 Mar 2022 06:41:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/BdGNh9JsyvjgFzL96Y9Vz6rTgp8OmTHioc8M6Nr9yVk3fxjLP8PWfjOZehG7pgTumaNf0Q==
-X-Received: by 2002:a17:906:1742:b0:6d6:c4f5:84a2 with SMTP id d2-20020a170906174200b006d6c4f584a2mr8868744eje.25.1647610912407;
-        Fri, 18 Mar 2022 06:41:52 -0700 (PDT)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id i3-20020a1709067a4300b006dd879b4680sm3812678ejo.112.2022.03.18.06.41.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Mar 2022 06:41:52 -0700 (PDT)
-Date:   Fri, 18 Mar 2022 14:41:49 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Bill Wendling <morbo@google.com>
-Cc:     kvm@vger.kernel.org, Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        lvivier@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        david@redhat.com, pbonzini@redhat.com,
-        kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
-        linux-s390@vger.kernel.org, alexandru.elisei@arm.com,
-        thuth@redhat.com, suzuki.poulose@arm.com, mark.rutland@arm.com
-Subject: Re: [kvm-unit-tests PATCH] libfdt: use logical "or" instead of
- bitwise "or" with boolean operands
-Message-ID: <20220318134149.i2dqdaiwk3twbixn@gator>
-References: <20220316060214.2200695-1-morbo@google.com>
- <20220318093601.zqhuzrp2ujgswsiw@gator>
+        h=x-gm-message-state:message-id:from:mime-version
+         :content-transfer-encoding:content-description:subject:to:date
+         :reply-to;
+        bh=Pm04dP0+P83KVn44y+vrJDsQ3iwP6pKc5n+Js9E3oKk=;
+        b=bxgVCJhaIQ/7KHuYci1BPr5u+TmK+8NI9eEWWJZre46oUcKL0upUERB9zlYfubz8Ui
+         HIXsn2J+ska2pUgbNaGyMsYKkGUoFHeVS6mjPLKHqRhRR33tKi1KDlAuFrapxFm0/5go
+         uOxsDk9NGbuWAl/nXGgooTIrrkPN9XV2NBDa0zlItwxwoxh7cdsCljrS48YfUS2xAMVL
+         J/pEofToqHDv2g2uLvJ034NkXMx4Jiodvd1ahQB0IPhZCgO4k2+tVlPF04QOP9NDLzM6
+         nh4amWyrDMJYpFHeKsmhox+7nven2HX/sz3fYumUhvJreFDYxK89u3ulcyIXCH8Hitey
+         FUdw==
+X-Gm-Message-State: AOAM5320mrQ0MC+sxEvrWNeRU3PCu17HFWe8lK0IX3aky4thRyagyjvZ
+        F3/KT3bkgpZd6eibsZO2Xdk=
+X-Google-Smtp-Source: ABdhPJzhogdnSE3Dm75218hWwdx0tx/xusaVT18WXoPBq/vEOHZWoV9x2AKdq+OpyouGQzvSGpf27Q==
+X-Received: by 2002:a05:600c:3ca8:b0:38c:6dc6:6de0 with SMTP id bg40-20020a05600c3ca800b0038c6dc66de0mr3538840wmb.159.1647951824864;
+        Tue, 22 Mar 2022 05:23:44 -0700 (PDT)
+Received: from [192.168.43.30] ([197.211.61.62])
+        by smtp.gmail.com with ESMTPSA id l19-20020a05600c4f1300b0038cb924c3d7sm1206553wmq.45.2022.03.22.05.23.37
+        (version=TLS1 cipher=AES128-SHA bits=128/128);
+        Tue, 22 Mar 2022 05:23:44 -0700 (PDT)
+Message-ID: <6239bfd0.1c69fb81.45ba9.5386@mx.google.com>
+From:   veriahollinkvan@gmail.com
+X-Google-Original-From: eriahollinkvan@gmail.com
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220318093601.zqhuzrp2ujgswsiw@gator>
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: meine Spende
+To:     eriahollinkvan@gmail.com
+Date:   Tue, 22 Mar 2022 05:23:27 -0700
+Reply-To: mariaelisabethschaeffler70@gmail.com
+X-Spam-Status: No, score=3.3 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLYTO,
+        FREEMAIL_REPLYTO_END_DIGIT,LOTS_OF_MONEY,MONEY_FREEMAIL_REPTO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, Mar 18, 2022 at 10:36:01AM +0100, Andrew Jones wrote:
-> On Tue, Mar 15, 2022 at 11:02:14PM -0700, Bill Wendling wrote:
-> > Clang warns about using a bitwise '|' with boolean operands. This seems
-> > to be due to a small typo.
-> > 
-> >   lib/libfdt/fdt_rw.c:438:6: warning: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
-> >           if (can_assume(LIBFDT_ORDER) |
-> > 
-> > Using '||' removes this warnings.
-> > 
-> > Signed-off-by: Bill Wendling <morbo@google.com>
-> > ---
-> >  lib/libfdt/fdt_rw.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/lib/libfdt/fdt_rw.c b/lib/libfdt/fdt_rw.c
-> > index 13854253ff86..3320e5559cac 100644
-> > --- a/lib/libfdt/fdt_rw.c
-> > +++ b/lib/libfdt/fdt_rw.c
-> > @@ -435,7 +435,7 @@ int fdt_open_into(const void *fdt, void *buf, int bufsize)
-> >  			return struct_size;
-> >  	}
-> >  
-> > -	if (can_assume(LIBFDT_ORDER) |
-> > +	if (can_assume(LIBFDT_ORDER) ||
-> >  	    !fdt_blocks_misordered_(fdt, mem_rsv_size, struct_size)) {
-> >  		/* no further work necessary */
-> >  		err = fdt_move(fdt, buf, bufsize);
-> > -- 
-> > 2.35.1.723.g4982287a31-goog
-> >
-> 
-> We're not getting as much interest in the submodule discussion as I hoped.
-> I see one vote against on this thread and one vote for on a different
-> thread[1]. For now I'll just commit a big rebase patch for libfdt. We can
-> revisit it again after we decide what to do for QCBOR.
->
+ Hallo,
 
-Now merged through misc/queue.
+Ich bin Frau Maria Elisabeth Schaeffler, eine deutsche Gesch=E4ftsmagnatin,=
+ Investorin und Philanthropin. Ich bin der Vorsitzende von Wipro Limited. I=
+ch habe 25 Prozent meines pers=F6nlichen Verm=F6gens f=FCr wohlt=E4tige Zwe=
+cke ausgegeben. Und ich habe auch versprochen, den Rest von 25% in diesem J=
+ahr 2021 an Einzelpersonen zu verschenken. Ich habe beschlossen, Ihnen 1.50=
+0.000,00 Euro zu spenden. Wenn Sie an meiner Spende interessiert sind, kont=
+aktieren Sie mich f=FCr weitere Informationen.
 
-Thanks,
-drew 
 
+Sie k=F6nnen auch mehr =FCber mich =FCber den unten stehenden Link lesen
+
+https://en.wikipedia.org/wiki/Maria-Elisabeth_Schaeffler
+
+Sch=F6ne Gr=FC=DFe
+
+Gesch=E4ftsf=FChrer Wipro Limited
+
+Maria Elisabeth Schaeffler
+
+E-Mail: mariaelisabethschaeffler70@gmail.com
