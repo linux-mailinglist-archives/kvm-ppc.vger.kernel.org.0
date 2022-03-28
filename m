@@ -2,139 +2,113 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5D134E3FC5
-	for <lists+kvm-ppc@lfdr.de>; Tue, 22 Mar 2022 14:44:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E35EB4E8D00
+	for <lists+kvm-ppc@lfdr.de>; Mon, 28 Mar 2022 06:16:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235785AbiCVNqK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 22 Mar 2022 09:46:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43698 "EHLO
+        id S237932AbiC1ESF (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 28 Mar 2022 00:18:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235823AbiCVNqJ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 22 Mar 2022 09:46:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 24B632612F
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Mar 2022 06:44:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647956681;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ANKRQzRELaWdzD2QZS9qzovKRV7eroomvX7D4M7GefI=;
-        b=g7+V3JbVs1NjAcpGgaxm0/Cgbl4uHRS89TIIyZS3Cp0FZ91N1661wzHpDz6JJmD31Ei6e8
-        /cPQiPCqqlGXqOBfTuXue6M1SAVpY+Cd+5uhIL+S1JfjttYivA2cujSNtsqofdB2whZ8Kh
-        rDHrp/vvBuu/AJJS8VvFrLCEhhLWAhs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-141-JzP86nxWPL-fIpVfBqNcWQ-1; Tue, 22 Mar 2022 09:44:40 -0400
-X-MC-Unique: JzP86nxWPL-fIpVfBqNcWQ-1
-Received: by mail-wm1-f69.google.com with SMTP id c126-20020a1c3584000000b00380dee8a62cso6910293wma.8
-        for <kvm-ppc@vger.kernel.org>; Tue, 22 Mar 2022 06:44:39 -0700 (PDT)
+        with ESMTP id S229734AbiC1ESD (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 28 Mar 2022 00:18:03 -0400
+Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB62745067
+        for <kvm-ppc@vger.kernel.org>; Sun, 27 Mar 2022 21:16:22 -0700 (PDT)
+Received: by mail-vs1-xe41.google.com with SMTP id i186so14416887vsc.9
+        for <kvm-ppc@vger.kernel.org>; Sun, 27 Mar 2022 21:16:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=3uXPBCjbKDf6MSQFK1r/Wo1P1Nt4GLx/YIZIqkOYc8E=;
+        b=Vw3aw18g3+k1cS80+iiA3ML5SCcImG7PMpDNrq3wLPssHqD08mt7gBtIM4MX43Ze4z
+         8Ho91xd3mt8fwTCJ6+okPhe5CKUkn1OAFqlYbDBW5YYZLHkBL7sSdNE8QuhjAwPb5qbJ
+         l0v3L1Rkz4v+YsFiCKUscEJwXyykymDClT7yX1CORNGipF0/vjv/HuImZeoC+GoOGxHs
+         ajF5FGDqrl4/NM27Sq6m7CHnbkFC9LR/mBxYI9k3xQqwt7tLJtJ25w6La+tAYtfqQSDN
+         7qhmzRCo0S3Ymut0b6S0vgwG/5TjRvn3lImp7in4HoaqewwmlVQlG+jukIB2ZI5ooyel
+         daWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ANKRQzRELaWdzD2QZS9qzovKRV7eroomvX7D4M7GefI=;
-        b=LIdzcMaSzO/THY4l+5W7ahWuLQwG5PV8VWYKFR/OhhIO1JYs6pZagqblS4omx16hpU
-         GZzQYSLbNriToQ7paCdPfOe01D0+ZvhXM/vsx4w58a0HM/MStauoefTCXaVJwWgro28y
-         JMMhjFa4Gp0IIO2dijL5e0Vh33v857VFPTEBbVlwWHVxKMTEkSjyAhTBmCPRFnCvw9uU
-         bsVBCfHMJCurbBYBzvYTU7ZJ1G9kFT3952PZFb0EuactVmguOA+JP88MLzJS0fkPh9fW
-         k9Ir4bLp9vNNsLScP86TCwQh0gwnJwGL6RbHdS5CNv7spiV92F+oBQN7/0k97i38JbKU
-         9KHQ==
-X-Gm-Message-State: AOAM531Ut6QcBBYq6ucQ8qW8NrQN8IuLbDu3f034wQ5HVNTFxI5c3kwb
-        OHz83XBQJIsqYwLnPFLlJNtTi0YiU4T+XTK2LsMAK49AMzXn5Y0CyMjEafOSXK3YxJ6Xn+F/H+p
-        IeKWqzIc61GMslZ5TiA==
-X-Received: by 2002:a05:600c:190e:b0:38c:b1ea:f4ac with SMTP id j14-20020a05600c190e00b0038cb1eaf4acmr3938605wmq.70.1647956678927;
-        Tue, 22 Mar 2022 06:44:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzKzYLnUW0xmdSIOPKaXoGHiETfm21cVrTbD3uRC5iXSe1fa2PPvEzTtyV8TFh7MPCRVt9NLQ==
-X-Received: by 2002:a05:600c:190e:b0:38c:b1ea:f4ac with SMTP id j14-20020a05600c190e00b0038cb1eaf4acmr3938572wmq.70.1647956678543;
-        Tue, 22 Mar 2022 06:44:38 -0700 (PDT)
-Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id e8-20020a056000178800b00203da3bb4d2sm16782777wrg.41.2022.03.22.06.44.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Mar 2022 06:44:37 -0700 (PDT)
-Message-ID: <da339883-fc3a-da42-a071-d6e6c9f88b3e@redhat.com>
-Date:   Tue, 22 Mar 2022 14:44:36 +0100
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=3uXPBCjbKDf6MSQFK1r/Wo1P1Nt4GLx/YIZIqkOYc8E=;
+        b=Yvk8UlIDlmgY+ij1mxvjuew39UAprFLWQYJ/xgqg7avhVFRKAqi6dfIqtVXOKi9lWQ
+         c+SvVXv4hIULKX3cWoNrCHdOCw3/8IKBMH3sW0MjyRp2Ie76cBqSoY2BaYhazYJ9Slb9
+         i6a0ZuGvbJQ3AALO4W1Z2lTDkXMCs6YoD5QExm130fGjYWQlZlR/xHoFdS0EtsmJRJ4S
+         HG/NCXK63ZP7Nu42tFLp9J5H/QYXImQwZkTaFFaB2s81Ta/Ug/mOB0MN+eWlofkciHep
+         o1IrOvrNG16P/RdPAZ3SmznVELCAMig73x32Keu/v/b+yoopuc69llkIxj6BVK/JgJvg
+         GGaA==
+X-Gm-Message-State: AOAM530syGKhJkvQbETfjsmB0JdhebV6C+Eiudub2Dsn+oCG43pT8sCX
+        H2VZ/1D72wEQSGgANw7YO5Zn/qbYe/LO0eashd0=
+X-Google-Smtp-Source: ABdhPJxWfW7bJPAusBkxFk957bTfTTL6VMz2n/EkyFIdrpTMArVia79KK5xw9YAckEt56bWm38/KPbbV/iHUn6DJmU8=
+X-Received: by 2002:a05:6102:3bd2:b0:325:44ac:69c3 with SMTP id
+ a18-20020a0561023bd200b0032544ac69c3mr9451710vsv.63.1648440981449; Sun, 27
+ Mar 2022 21:16:21 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [kvm-unit-tests PATCH] libfdt: use logical "or" instead of
- bitwise "or" with boolean operands
-Content-Language: en-US
-To:     Andrew Jones <drjones@redhat.com>, Bill Wendling <morbo@google.com>
-Cc:     kvm@vger.kernel.org, Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        lvivier@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        david@redhat.com, pbonzini@redhat.com,
-        kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
-        linux-s390@vger.kernel.org, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com
-References: <20220316060214.2200695-1-morbo@google.com>
- <20220318093601.zqhuzrp2ujgswsiw@gator>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220318093601.zqhuzrp2ujgswsiw@gator>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Received: by 2002:a05:612c:218b:b0:296:de20:52fd with HTTP; Sun, 27 Mar 2022
+ 21:16:20 -0700 (PDT)
+Reply-To: michealthompson2019consultant@gmail.com
+From:   "Mr. Michael Thompson" <marketingproposal15@gmail.com>
+Date:   Mon, 28 Mar 2022 06:16:20 +0200
+Message-ID: <CAEBfSqnuG56-xq3=WuB9mGf3Vu2ENxqthvNoKf6NgUeCvvTJNQ@mail.gmail.com>
+Subject: Lets Talk About Financing Your Project.
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=5.7 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_HK_NAME_FM_MR_MRS,T_SCC_BODY_TEXT_LINE,UNDISC_FREEM
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2607:f8b0:4864:20:0:0:0:e41 listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5681]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [marketingproposal15[at]gmail.com]
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [marketingproposal15[at]gmail.com]
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
+        *  0.0 T_HK_NAME_FM_MR_MRS No description available.
+        *  3.9 UNDISC_FREEM Undisclosed recipients + freemail reply-to
+        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
+        *      different freemails
+X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On 18/03/2022 10.36, Andrew Jones wrote:
-> On Tue, Mar 15, 2022 at 11:02:14PM -0700, Bill Wendling wrote:
->> Clang warns about using a bitwise '|' with boolean operands. This seems
->> to be due to a small typo.
->>
->>    lib/libfdt/fdt_rw.c:438:6: warning: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
->>            if (can_assume(LIBFDT_ORDER) |
->>
->> Using '||' removes this warnings.
->>
->> Signed-off-by: Bill Wendling <morbo@google.com>
->> ---
->>   lib/libfdt/fdt_rw.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/lib/libfdt/fdt_rw.c b/lib/libfdt/fdt_rw.c
->> index 13854253ff86..3320e5559cac 100644
->> --- a/lib/libfdt/fdt_rw.c
->> +++ b/lib/libfdt/fdt_rw.c
->> @@ -435,7 +435,7 @@ int fdt_open_into(const void *fdt, void *buf, int bufsize)
->>   			return struct_size;
->>   	}
->>   
->> -	if (can_assume(LIBFDT_ORDER) |
->> +	if (can_assume(LIBFDT_ORDER) ||
->>   	    !fdt_blocks_misordered_(fdt, mem_rsv_size, struct_size)) {
->>   		/* no further work necessary */
->>   		err = fdt_move(fdt, buf, bufsize);
->> -- 
->> 2.35.1.723.g4982287a31-goog
->>
-> 
-> We're not getting as much interest in the submodule discussion as I hoped.
-> I see one vote against on this thread and one vote for on a different
-> thread[1]. For now I'll just commit a big rebase patch for libfdt. We can
-> revisit it again after we decide what to do for QCBOR.
+ATTN: Managing Director,
+Sir/Ma
 
-I recently learnt that there are indeed people who ship kvm-unit-tests with 
-their distro - at least buildroot has a package:
-https://git.busybox.net/buildroot/tree/package/kvm-unit-tests
+My investor will sponsor your project. My name is Mr. Michael Thompson
+a financial consultant and agent, I contact you regarding the
+interested project owners and investors to our project financing
+program. I am the investment consultant & financial officer of a UAE
+based investment private business man who is ready to help you with a
+loan to your company and personal business projects.
 
-So one more argument for copying the files over instead of using submodules: 
-The tarballs for tags will be self-contained, e.g.:
+We are ready to fund projects outside the Dubai or Worldwide, in the
+form of debt finance, we grant loans to both Corporate and Private
+Companies entitles at a low interest rate of 2.5% ROI per year.
 
-https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/archive/v2022-03-08/kvm-unit-tests-v2022-03-08.tar.gz
+The terms and conditions are very interesting. Kindly reply back to me
+for more details if you have projects that need financing, get in
+touch for negotiation.
 
-If we use submodules, I guess the content of the submodule content will be 
-missing in there?
-
-  Thomas
-
+Kind Regards,
+Mr. Michael Thompson,
+Email: michealthompson2019consultant@gmail.com
