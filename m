@@ -2,152 +2,93 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6968D4EA915
-	for <lists+kvm-ppc@lfdr.de>; Tue, 29 Mar 2022 10:19:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB9A04ECA7A
+	for <lists+kvm-ppc@lfdr.de>; Wed, 30 Mar 2022 19:22:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233669AbiC2IVf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 29 Mar 2022 04:21:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58526 "EHLO
+        id S235457AbiC3RYk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 30 Mar 2022 13:24:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232327AbiC2IVe (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 29 Mar 2022 04:21:34 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51198326EA
-        for <kvm-ppc@vger.kernel.org>; Tue, 29 Mar 2022 01:19:51 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id w8so16963323pll.10
-        for <kvm-ppc@vger.kernel.org>; Tue, 29 Mar 2022 01:19:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=+BQQikJPmuFMFFUhgZstKn2ehOJbUcy0wVlEIm+OMNw=;
-        b=Grb80NNNkoGpRBPmdHSOINVeVj5NHWTYZDw4p0Gd4C7kZo5pZ3YO09zzKwGWcc3wzI
-         QUA8OUPiK8AXC1qgRL7j+XEEHEeN4cnAd2GNXADdmo2QXyNHeTr1iJxotobASxgBowha
-         1pdQaBy3ASf508g9+mgoPnW5SQlp36l5cgH9AyA/3b6ocQ+jIgrhkd+OZpEiyRxaYwtw
-         muwHDFoGMSyKlQNaYX8BLb9l81HyYSsuFv3Zg/nXzeOiOtKqIBTY6n3fuNL/N/oP3YrM
-         ZXfQWyrEScXP2KKh3U0z7DyPGbYHnlRFAfcLumsPiKOovquxcI9Mt4isfs6l29RQdzzh
-         d7kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=+BQQikJPmuFMFFUhgZstKn2ehOJbUcy0wVlEIm+OMNw=;
-        b=Wp5g41+2Z24XGzawNoUrrmmCs5RWK8JWR3+DocfUp6ADMeUQ2aJjto/dQVdwWqa72H
-         zgv/JvtPzIEmhKCvX0NqLUtDnmgISrXTnDv7k18Z7Fdnh/zAhLAI5OSsMNwlqII1ebVA
-         aNVHZsR+JYlgvjb2r8LSifowb7jh3k+4Ow+9g1SZf6uoOBM54lAD37fVIN1YBmuWgK4p
-         kQxp2MwpSrWI4vhG8Y/bQwdFd56WTQXWI3EjGHuoopyyuw5GdfZGaArWlgxYQ78BTpQf
-         sa41cC+3TA3vLg9Mo1uIzNtJ+ndm3WoF/TFzmlf0yHfxtASI7jpza2sImLMJBRJVQLMx
-         MzKw==
-X-Gm-Message-State: AOAM533LQMGaXfOrQyk5+Q0ZthTXUQRhLVJHlZos5svEakD62lNgA/0O
-        31mqo2cHEDQD/KngLNaalq6TNokdFnc=
-X-Google-Smtp-Source: ABdhPJx8H9NEeDpOiaemybgKimyOiRyvIy8IwHUL8CApJL3bMWqkTws7fvxZaYRlZcBzs9BqmGaPNg==
-X-Received: by 2002:a17:90a:9294:b0:1b9:48e9:a030 with SMTP id n20-20020a17090a929400b001b948e9a030mr3352342pjo.200.1648541990704;
-        Tue, 29 Mar 2022 01:19:50 -0700 (PDT)
-Received: from localhost (58-6-255-110.tpgi.com.au. [58.6.255.110])
-        by smtp.gmail.com with ESMTPSA id m7-20020a056a00080700b004fb28fafc4csm12672527pfk.97.2022.03.29.01.19.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Mar 2022 01:19:50 -0700 (PDT)
-Date:   Tue, 29 Mar 2022 18:19:42 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix vcore_blocked tracepoint
-To:     Fabiano Rosas <farosas@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, mpe@ellerman.id.au
-References: <20220328215831.320409-1-farosas@linux.ibm.com>
-In-Reply-To: <20220328215831.320409-1-farosas@linux.ibm.com>
+        with ESMTP id S230081AbiC3RYj (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 30 Mar 2022 13:24:39 -0400
+X-Greylist: delayed 3594 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 30 Mar 2022 10:22:52 PDT
+Received: from zsmtp-out1.bppt.go.id (zsmtp-in1.bppt.go.id [103.224.137.202])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5BAA11C11;
+        Wed, 30 Mar 2022 10:22:52 -0700 (PDT)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by zsmtp-out1.bppt.go.id (Postfix) with ESMTP id 651D087B1C;
+        Wed, 30 Mar 2022 22:41:24 +0700 (WIB)
+Received: from zsmtp-out1.bppt.go.id ([127.0.0.1])
+        by localhost (zsmtp-out1.bppt.go.id [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id yyTy9AnQPwON; Wed, 30 Mar 2022 22:41:23 +0700 (WIB)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by zsmtp-out1.bppt.go.id (Postfix) with ESMTP id 1D5968769B;
+        Wed, 30 Mar 2022 22:41:21 +0700 (WIB)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zsmtp-out1.bppt.go.id 1D5968769B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bppt.go.id;
+        s=selector; t=1648654881;
+        bh=VyNFlD7/cu41Triwpcp5Awv70tSUbdDqwtfboErdO+g=;
+        h=Date:From:Message-ID:MIME-Version;
+        b=CDZBw2B6e3/HK2o2T4YC4hke8dpLa0TEQWpClEX9KVIi7U7+vih3QsGPGHeTqOfhz
+         i7jGOGWug5Rr9gtAFwSQF1LlArm8GO5t+1bRgXleb4wY77/sfxciuu5TO3SmDpa4/k
+         trzmQR0s+wG38tFuJ2+LQmG6hn6x3obYZpFfFzE8=
+X-Amavis-Modified: Mail body modified (using disclaimer) -
+        zsmtp-out1.bppt.go.id
+X-Virus-Scanned: amavisd-new at bppt.go.id
+Received: from zsmtp-out1.bppt.go.id ([127.0.0.1])
+        by localhost (zsmtp-out1.bppt.go.id [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id GmNRWCKsnvad; Wed, 30 Mar 2022 22:41:20 +0700 (WIB)
+Received: from mta1.bppt.go.id (mta1.bppt.go.id [10.10.180.6])
+        by zsmtp-out1.bppt.go.id (Postfix) with ESMTPS id 1886587B08;
+        Wed, 30 Mar 2022 22:41:18 +0700 (WIB)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mta1.bppt.go.id (Postfix) with ESMTP id D22B1253E7;
+        Wed, 30 Mar 2022 22:41:14 +0700 (WIB)
+Received: from mta1.bppt.go.id ([127.0.0.1])
+        by localhost (mta1.bppt.go.id [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id VtEi4-DhOobs; Wed, 30 Mar 2022 22:41:14 +0700 (WIB)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mta1.bppt.go.id (Postfix) with ESMTP id 7D03525415;
+        Wed, 30 Mar 2022 22:41:08 +0700 (WIB)
+X-Virus-Scanned: amavisd-new at mta1.bppt.go.id
+Received: from mta1.bppt.go.id ([127.0.0.1])
+        by localhost (mta1.bppt.go.id [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id tdAiWG5_8gpb; Wed, 30 Mar 2022 22:41:07 +0700 (WIB)
+Received: from mbox2.bppt.go.id (mbox2.bppt.go.id [10.10.180.5])
+        by mta1.bppt.go.id (Postfix) with ESMTP id 4B2A125406;
+        Wed, 30 Mar 2022 22:40:52 +0700 (WIB)
+Date:   Wed, 30 Mar 2022 22:40:52 +0700 (WIB)
+From:   Nadirah <nadirah@bppt.go.id>
+Reply-To: huangjinping@winghang.info
+Message-ID: <332096518.4896872.1648654852192.JavaMail.zimbra@bppt.go.id>
+Subject: Aw:Dringende Antwort erforderlich
 MIME-Version: 1.0
-Message-Id: <1648541941.gxj49rdes1.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Mailer: Zimbra 8.8.15_GA_4101 (zclient/8.8.15_GA_4101)
+Thread-Index: NAMa8Zgh+tp2gXu+wyXdyv10+CeanQ==
+Thread-Topic: Dringende Antwort erforderlich
+X-Spam-Status: No, score=3.2 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MIME_QP_LONG_LINE,
+        MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Excerpts from Fabiano Rosas's message of March 29, 2022 7:58 am:
-> We removed most of the vcore logic from the P9 path but there's still
-> a tracepoint that tried to dereference vc->runner.
 
-Thanks for the fix.
 
-Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+Es tut mir leid, dass ich Ihnen diese E-Mail, die in Ihrem Junk-Ordner eing=
+egangen ist, als unerw=C3=BCnschte E-Mail gesendet habe. Ich hei=C3=9Fe Hua=
+ng Jinping. Ich habe einen Gesch=C3=A4ftsvorschlag f=C3=BCr Sie. Ich wei=C3=
+=9F, dass dieser Gesch=C3=A4ftsvorschlag f=C3=BCr Sie von Interesse sein w=
+=C3=BCrde. F=C3=BCr weitere Informationen kontaktieren Sie mich bitte *****=
+***************************************************************************=
+**********#################################################################=
+####################################
+Isi e-mail ini mungkin bersifat rahasia dan penyalahgunaan, penyalinan, atau penyebaran dari e-mail ini dan semua attachment dari e-mail ini dilarang. Komunikasi internet tidak aman dan oleh karena itu Badan Pengkajian dan Penerapan Teknologi tidak menerima tanggung jawab hukum atas isi pesan ini atau untuk setiap kerusakan yang disebabkan oleh virus. Pendapat-pendapat yang diungkapkan di sini tidak selalu mewakili Badan Pengkajian dan Penerapan Teknologi.
 
->=20
-> Fixes: ecb6a7207f92 ("KVM: PPC: Book3S HV P9: Remove most of the vcore lo=
-gic")
-> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
-> ---
->  arch/powerpc/kvm/book3s_hv.c | 8 ++++----
->  arch/powerpc/kvm/trace_hv.h  | 8 ++++----
->  2 files changed, 8 insertions(+), 8 deletions(-)
->=20
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index c886557638a1..5f5b2d0dee8c 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -4218,13 +4218,13 @@ static void kvmppc_vcore_blocked(struct kvmppc_vc=
-ore *vc)
->  	start_wait =3D ktime_get();
-> =20
->  	vc->vcore_state =3D VCORE_SLEEPING;
-> -	trace_kvmppc_vcore_blocked(vc, 0);
-> +	trace_kvmppc_vcore_blocked(vc->runner, 0);
->  	spin_unlock(&vc->lock);
->  	schedule();
->  	finish_rcuwait(&vc->wait);
->  	spin_lock(&vc->lock);
->  	vc->vcore_state =3D VCORE_INACTIVE;
-> -	trace_kvmppc_vcore_blocked(vc, 1);
-> +	trace_kvmppc_vcore_blocked(vc->runner, 1);
->  	++vc->runner->stat.halt_successful_wait;
-> =20
->  	cur =3D ktime_get();
-> @@ -4596,9 +4596,9 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u6=
-4 time_limit,
->  			if (kvmppc_vcpu_check_block(vcpu))
->  				break;
-> =20
-> -			trace_kvmppc_vcore_blocked(vc, 0);
-> +			trace_kvmppc_vcore_blocked(vcpu, 0);
->  			schedule();
-> -			trace_kvmppc_vcore_blocked(vc, 1);
-> +			trace_kvmppc_vcore_blocked(vcpu, 1);
->  		}
->  		finish_rcuwait(wait);
->  	}
-> diff --git a/arch/powerpc/kvm/trace_hv.h b/arch/powerpc/kvm/trace_hv.h
-> index 38cd0ed0a617..32e2cb5811cc 100644
-> --- a/arch/powerpc/kvm/trace_hv.h
-> +++ b/arch/powerpc/kvm/trace_hv.h
-> @@ -409,9 +409,9 @@ TRACE_EVENT(kvmppc_run_core,
->  );
-> =20
->  TRACE_EVENT(kvmppc_vcore_blocked,
-> -	TP_PROTO(struct kvmppc_vcore *vc, int where),
-> +	TP_PROTO(struct kvm_vcpu *vcpu, int where),
-> =20
-> -	TP_ARGS(vc, where),
-> +	TP_ARGS(vcpu, where),
-> =20
->  	TP_STRUCT__entry(
->  		__field(int,	n_runnable)
-> @@ -421,8 +421,8 @@ TRACE_EVENT(kvmppc_vcore_blocked,
->  	),
-> =20
->  	TP_fast_assign(
-> -		__entry->runner_vcpu =3D vc->runner->vcpu_id;
-> -		__entry->n_runnable  =3D vc->n_runnable;
-> +		__entry->runner_vcpu =3D vcpu->vcpu_id;
-> +		__entry->n_runnable  =3D vcpu->arch.vcore->n_runnable;
->  		__entry->where       =3D where;
->  		__entry->tgid	     =3D current->tgid;
->  	),
-> --=20
-> 2.35.1
->=20
->=20
