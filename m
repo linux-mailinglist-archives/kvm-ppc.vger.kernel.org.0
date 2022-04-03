@@ -2,117 +2,70 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED3004ED5F3
-	for <lists+kvm-ppc@lfdr.de>; Thu, 31 Mar 2022 10:41:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 704F74F06CC
+	for <lists+kvm-ppc@lfdr.de>; Sun,  3 Apr 2022 04:36:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232656AbiCaIna (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 31 Mar 2022 04:43:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33438 "EHLO
+        id S231169AbiDCCiQ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 2 Apr 2022 22:38:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232590AbiCaIn3 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 31 Mar 2022 04:43:29 -0400
-X-Greylist: delayed 980 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 31 Mar 2022 01:41:42 PDT
-Received: from mail.jywrepuestos.com (mail.jywrepuestos.com [190.119.242.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 640101F6868;
-        Thu, 31 Mar 2022 01:41:42 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.jywrepuestos.com (Postfix) with ESMTP id 53474AE1934;
-        Thu, 31 Mar 2022 02:49:29 -0500 (-05)
-Received: from mail.jywrepuestos.com ([127.0.0.1])
-        by localhost (mail.jywrepuestos.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id Cxwqpz-KOnjs; Thu, 31 Mar 2022 02:49:28 -0500 (-05)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.jywrepuestos.com (Postfix) with ESMTP id C8E7CAE18E5;
-        Thu, 31 Mar 2022 02:49:28 -0500 (-05)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.jywrepuestos.com C8E7CAE18E5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jywrepuestos.com;
-        s=F71C435A-5232-11EB-AA07-242A54BEB359; t=1648712968;
-        bh=NvV5XMylaq+D0M/CACFcLwdTxmMEUpgGFxTLj2be8kI=;
-        h=MIME-Version:To:From:Date:Message-Id;
-        b=HPKS97OTdxvMn/6dpfrxff+F8dunXdDlPrqC89eI2XeIo05UftTHEXqHBmcCmcIyg
-         dtwtApK3tdaa7FpsaB/hmYoMMDOH2LceTfmIvUPlnik4PqoiFeLQhmkeP7+dtuOs8v
-         SCkwZ/F6I6Wj350AijUgsnOwtMXVn9TxZ+68UGwQyf1fHPUSz+imYZLDsYOcjbgZds
-         tA+49MRpu8+hVyIIuPYvy9zjzLwuucgXJAh5zNCWwE64lw3xEndLcUDWzaVPxMfTto
-         QDZ7lhoQ0WOYVq1sTUa2RcSI84yFY1LbmdAaNIJwaLOuQmXa3x9fsv4NdTqy37vAhR
-         Sc2w/Iw/LGmVQ==
-X-Virus-Scanned: amavisd-new at jywrepuestos.com
-Received: from mail.jywrepuestos.com ([127.0.0.1])
-        by localhost (mail.jywrepuestos.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id G5oreR9PEnlc; Thu, 31 Mar 2022 02:49:28 -0500 (-05)
-Received: from uk.pffbmbdadveenn2130a1ch5mpd.zx.internal.cloudapp.net (unknown [51.145.89.122])
-        by mail.jywrepuestos.com (Postfix) with ESMTPSA id 001E5AE192F;
-        Thu, 31 Mar 2022 02:49:24 -0500 (-05)
-Content-Type: text/plain; charset="iso-8859-1"
+        with ESMTP id S231161AbiDCCiP (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 2 Apr 2022 22:38:15 -0400
+X-Greylist: delayed 334 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 02 Apr 2022 19:36:23 PDT
+Received: from mta-out-01.alice.it (mta-out-01.alice.it [217.169.118.7])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2899132062
+        for <kvm-ppc@vger.kernel.org>; Sat,  2 Apr 2022 19:36:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alice.it; s=20211207; t=1648953383; 
+        bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+        h=Reply-To:From:To:Date:Message-ID:MIME-Version;
+        b=DtesgMytU+66F/VdPrI8PD/IzXcQ2Ud+dE776rJ9UPv7i2ERSUX334oRhmz4K9+HAx+il1dschUs39kTWAx6TFhB2PO1UKuMd2vJ/lHd+AAKmeDqd0MNJq+vb04wLIcQ6b37k+VcUxhPyQLyVRsYFvow1kHtGFnkYblGPE9g66jOvSMVvuu9zKImtmYCegJrMQA58fFIZ6egTZVHlfLjryd0DS8bYlaxwqz7oXkU5uYKpZkKtoeigoKn3CH+oAkqPAZJck12XJLG7vPucNSdjdvbX2kyOEH+RubDZDcHiqmwBUvXPemMbovugqMN4wBDtmlXclPZQvMU6wVrM6YkqQ==
+X-RazorGate-Vade: gggruggvucftvghtrhhoucdtuddrgedvvddrudeiledgheeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuvffgnffgvefqoffkvfetnffktedpqfgfvfenuceurghilhhouhhtmecufedtudenucfgmhhpthihuchsuhgsjhgvtghtucdluddtmdengfhmphhthicusghougihucdlhedtmdenucfjughrpehrhffvfffkggestddtfedttddttdenucfhrhhomhephggvuchhrghvvgcurghnuchofhhfvghruchtohcuihhnvhgvshhtuchinhcuhihouhhrucgtohhunhhtrhihuchunhguvghrucgruchjohhinhhtuchvvghnthhurhgvuchprghrthhnvghrshhhihhpuchplhgvrghsvgcurhgvphhlhicufhhorhcumhhorhgvucguvghtrghilhhsuceofhgpphgvnhhnrgesrghlihgtvgdrihhtqeenucggtffrrghtthgvrhhnpeehjeetgefhleetiedtkeelfffgjeeugeegleekueffgfegtdekkeeifedvvdffteenucfkphepudejiedrvddvjedrvdegvddrudeltdenucevlhhushhtvghrufhiiigvpedugeejnecurfgrrhgrmhephhgvlhhopegrlhhitggvrdhithdpihhnvghtpedujeeirddvvdejrddvgedvrdduledtpdhmrghilhhfrhhomhepfhgpphgvnhhnrgesrghlihgtvgdrihhtpdhnsggprhgtphhtthhopedupdhrtghpthhtohepkhhvmhdqphhptgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-RazorGate-Vade-Verdict: clean 60
+X-RazorGate-Vade-Classification: clean
+Received: from alice.it (176.227.242.190) by mta-out-01.alice.it (5.8.807.04) (authenticated as f_penna@alice.it)
+        id 6244775000E088C8 for kvm-ppc@vger.kernel.org; Sun, 3 Apr 2022 04:30:47 +0200
+Reply-To: dougfield20@inbox.lv
+From:   We have an offer to invest in your country under a
+         joint venture partnership please reply for more
+         details <f_penna@alice.it>
+To:     kvm-ppc@vger.kernel.org
+Date:   02 Apr 2022 19:30:46 -0700
+Message-ID: <20220402193046.D1FD364CFD57461B@alice.it>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Hello Friend
-To:     Recipients <wilson@jywrepuestos.com>
-From:   wilson@jywrepuestos.com
-Date:   Thu, 31 Mar 2022 08:15:09 +0000
-Reply-To: reemalhashimy309@gmail.com
-Message-Id: <20220331074925.001E5AE192F@mail.jywrepuestos.com>
-X-Spam-Status: Yes, score=7.1 required=5.0 tests=ADVANCE_FEE_4_NEW_MONEY,
-        BAYES_99,BAYES_999,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        FREEMAIL_FORGED_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,LOTS_OF_MONEY,
-        MONEY_FREEMAIL_REPTO,SPF_FAIL,SPF_HELO_NONE,TO_EQ_FM_DOM_SPF_FAIL,
-        TO_EQ_FM_SPF_FAIL,T_SCC_BODY_TEXT_LINE,T_US_DOLLARS_3,XFER_LOTSA_MONEY
+X-Spam-Status: Yes, score=5.7 required=5.0 tests=BAYES_50,BODY_EMPTY,
+        DKIM_INVALID,DKIM_SIGNED,EMPTY_MESSAGE,FREEMAIL_FROM,FREEMAIL_REPLYTO,
+        FREEMAIL_REPLYTO_END_DIGIT,MISSING_SUBJECT,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_BL,RCVD_IN_MSPIKE_L3,SPF_HELO_NONE,SPF_PASS
         autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: *  3.5 BAYES_99 BODY: Bayes spam probability is 99 to 100%
-        *      [score: 1.0000]
-        *  0.2 BAYES_999 BODY: Bayes spam probability is 99.9 to 100%
-        *      [score: 1.0000]
-        *  0.0 SPF_FAIL SPF: sender does not match SPF record (fail)
-        *      [SPF failed: Please see http://www.openspf.org/Why?s=mfrom;id=wilson%40jywrepuestos.com;ip=190.119.242.179;r=lindbergh.monkeyblade.net]
+X-Spam-Report: *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5223]
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [f_penna[at]alice.it]
+        *  0.0 RCVD_IN_MSPIKE_L3 RBL: Low reputation (-3)
+        *      [217.169.118.7 listed in bl.mailspike.net]
+        * -0.7 RCVD_IN_DNSWL_LOW RBL: Sender listed at https://www.dnswl.org/,
+        *       low trust
+        *      [217.169.118.7 listed in list.dnswl.org]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
         *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
         *      digit
-        *      [reemalhashimy309[at]gmail.com]
+        *      [dougfield20[at]inbox.lv]
         *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 T_US_DOLLARS_3 BODY: Mentions millions of $ ($NN,NNN,NNN.NN)
         *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
         *       valid
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  0.0 LOTS_OF_MONEY Huge... sums of money
-        *  0.2 MONEY_FREEMAIL_REPTO Lots of money from someone using free
-        *      email?
-        *  2.1 FREEMAIL_FORGED_REPLYTO Freemail in Reply-To, but not From
-        *  0.0 TO_EQ_FM_DOM_SPF_FAIL To domain == From domain and external SPF
-        *       failed
-        *  0.0 TO_EQ_FM_SPF_FAIL To == From and external SPF failed
-        *  1.0 XFER_LOTSA_MONEY Transfer a lot of money
-        *  0.0 ADVANCE_FEE_4_NEW_MONEY Advance Fee fraud and lots of money
-X-Spam-Level: *******
+        *  2.3 EMPTY_MESSAGE Message appears to have no textual parts and no
+        *      Subject: text
+        *  1.8 MISSING_SUBJECT Missing Subject: header
+        *  0.1 DKIM_INVALID DKIM or DK signature exists, but is not valid
+        *  0.0 RCVD_IN_MSPIKE_BL Mailspike blacklisted
+        *  0.0 BODY_EMPTY No body text in message
+        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
+        *      different freemails
+X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-My name is Reem Hashimy, the Emirates Minister of State and Managing Direct=
-or of the United Arab Emirates (Dubai) World Expo 2020 Committee which was =
-postponed to October 2021 to March 2022 because of the Covid-19 pandemic.
-
-I am writing to you to manage the funds I received as financial gratificati=
-on from various foreign companies I assisted to participate in the event th=
-at is taking place as we speak. The amount is $24,762,906.00 United States =
-dollars. But I can not personally manage the fund in my country because of =
-the sensitive nature of my office and the certain restriction on married Mu=
-slim women.
-
-For this reason, an agreement was reached with a consulting firm to direct =
-the various financial gifts to an account with a financial institution wher=
-e it will be possible for me to instruct the transfer of the fund to a thir=
-d party for investment purpose; which is the reason I am contacting you to =
-receive the fund and manage it as my investment partner. Note that the fund=
- is NOT connected to any criminal or terrorist activity.
-
-On your indication of interest with your information; I will instruct the c=
-onsulting firm to process the fund to your country for investment purposes.
-
-Regards.
-Reem Hashimy.
