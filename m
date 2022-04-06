@@ -2,125 +2,379 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B20984F0C48
-	for <lists+kvm-ppc@lfdr.de>; Sun,  3 Apr 2022 21:18:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C3204F6396
+	for <lists+kvm-ppc@lfdr.de>; Wed,  6 Apr 2022 17:48:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346433AbiDCTUk (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 3 Apr 2022 15:20:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60740 "EHLO
+        id S236444AbiDFPg5 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 6 Apr 2022 11:36:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351388AbiDCTUj (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 3 Apr 2022 15:20:39 -0400
-Received: from bee.birch.relay.mailchannels.net (bee.birch.relay.mailchannels.net [23.83.209.14])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99AC49FD1
-        for <kvm-ppc@vger.kernel.org>; Sun,  3 Apr 2022 12:18:42 -0700 (PDT)
-X-Sender-Id: wpengine|x-authuser|248276e101d73445e48e124d1c0950a78c38ce38
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-        by relay.mailchannels.net (Postfix) with ESMTP id 58DE82A149A
-        for <kvm-ppc@vger.kernel.org>; Sun,  3 Apr 2022 19:18:42 +0000 (UTC)
-Received: from pod-100037 (unknown [127.0.0.6])
-        (Authenticated sender: wpengine)
-        by relay.mailchannels.net (Postfix) with ESMTPA id D507E2A0D52
-        for <kvm-ppc@vger.kernel.org>; Sun,  3 Apr 2022 19:18:41 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1649013522; a=rsa-sha256;
-        cv=none;
-        b=ViZd2iC5LW3+jYFSVk2TtuN1cgHFRI4hl4rbsdI3Mr5LpDO4eQAiM5SUV2+vRNBBXoEGEZ
-        PI4adqGztTN5hZVgXlRxTNB8K7qSNiQD5/W6tnAeN07UeVTy74XmjrIVNRd9Av01g5orMy
-        khgZt/9y0SP8Y+468wuUgogSv4RdsjFjrHHAKQ3/fgHuycEau4IrEzU0bgsW5TdGiQlD59
-        h+sR/qPbkCKpI2LNIExpsmVZRiG7RLo0421R4mNStNkgY6/2/B1X3vtdAspkHtqQz1e7r6
-        e6c7krp/lZvev3MoPILWLKLRuCDz0tygMaoHTkmHAtsjIDRioVHsR5uf6SVEEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-        s=arc-2022; t=1649013522;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:dkim-signature; bh=076PhcN8GNvgn3HtbakVj+2GSRN6nzye1ukFXgr6FHQ=;
-        b=pODEQ/13gy9S1WgQNDNlVd8SsXGGdPgZLM30CXezH/E+3WvzQaXV6uhsMv9ULuhZiwYTgU
-        16rSNtTVMa4zZuGvMjEYSIsYjWXYU/Egess+ks2NqvildHfD1bMah3NozaD3r8kq0Q+JUt
-        pwWA230J6Np0oqTTBS++sIuiD4sLhYC9lh3VLEEDfaD3GffsnXsF/d904PfttbbyTaqE0M
-        zniV341BQRmfCCPnK/FQ02Yv6ehZ5+lZ3F/Lz++RHp4Xhixym9N3XVTyYxjr43kCGBraIM
-        Q/PKJ6msGsImaztpZpdi8004H2KmWP3V34wUNuF2rQUKwmYxDZVZ007ZmRMblg==
-ARC-Authentication-Results: i=1;
-        rspamd-786f77c8d-txzc2;
-        auth=pass smtp.auth=wpengine
- smtp.mailfrom="curator=kennedyarts.org@mail1.wpengine.com"
-X-Sender-Id: wpengine|x-authuser|248276e101d73445e48e124d1c0950a78c38ce38
-Received: from pod-100037 (171.117.211.130.bc.googleusercontent.com
- [130.211.117.171])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-        by 100.107.255.190 (trex/6.7.1);
-        Sun, 03 Apr 2022 19:18:42 +0000
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: wpengine|x-authuser|248276e101d73445e48e124d1c0950a78c38ce38
-X-MailChannels-Auth-Id: wpengine
-X-Chief-Tank: 13d61dc44b47ab58_1649013522195_3667831040
-X-MC-Loop-Signature: 1649013522195:1818845380
-X-MC-Ingress-Time: 1649013522195
-Received: from pod-100037 (localhost [127.0.0.1])
-        by pod-100037 (Postfix) with ESMTP id E137641A35
-        for <kvm-ppc@vger.kernel.org>; Sun,  3 Apr 2022 19:18:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mail1.wpengine.com;
-        s=mx; t=1649013520; bh=076PhcN8GNvgn3HtbakVj+2GSRN6nzye1ukFXgr6FHQ=;
-        h=Date:To:Subject:From:From;
-        b=g+VpnITfZQ2xgd2OXtFpQs+rU5jHdsa1qFcnueIdH3ErSNXSvzdTYXfYKpMnPp7U9
-         GyuMZMkVwN+c7CZIEeIVsRqQ9uAzO5YeGf+o2+VScqqE9OGHuzHbZ5uxgfgm39aCeS
-         7YUcXQrfLR4l5188crbXxagVIk1btSDXGlXotroOpaEv9lCuspG86P0ueLI91e/z4K
-         iiZJFIGBvl2Z0AsQoToAUcKXMgIgXgJ0ZQpcVuOeZMomMPxmMXgE5pcFjlNBoeykoE
-         7lRAsOc6g4yPLIdA4OPT/40xhg4tyzsxB43rXfbVCg6MYyDezET1va8uviZ4Xv/lE/
-         4IYAkQbdCxP/Q==
-Received: from pod-100037:apache2_74:241 (localhost [127.0.0.1])
-        by pod-100037 (Postfix) with SMTP id 4DD264255B
-        for <kvm-ppc@vger.kernel.org>; Sun,  3 Apr 2022 17:59:19 +0000 (UTC)
-Received: by pod-100037:apache2_74:241 (sSMTP sendmail emulation); Sun, 03 Apr 2022 17:59:19 +0000
-Date:   Sun, 03 Apr 2022 17:59:19 +0000
-X-AuthUser: 248276e101d73445e48e124d1c0950a78c38ce38
-To:     kvm-ppc@vger.kernel.org
-Subject: Kennedy Heights Arts Center Artist Application
-X-PHP-Originating-Script: 33:process-artist-entry.php
-From:   curator@kennedyarts.org
-Message-Id: <20220403175919.4DD264255B@pod-100037>
-X-Spam-Status: Yes, score=5.7 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,PP_MIME_FAKE_ASCII_TEXT,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SHORT_SHORTNER,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLACK,
-        URIBL_DBL_ABUSE_REDIR autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: *  1.7 URIBL_BLACK Contains an URL listed in the URIBL blacklist
-        *      [URIs: bit.do]
-        * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [23.83.209.14 listed in list.dnswl.org]
-        *  0.0 URIBL_DBL_ABUSE_REDIR Contains an abused redirector URL listed
-        *      in the Spamhaus DBL blocklist
-        *      [URIs: bit.do]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5000]
-        * -0.0 RCVD_IN_MSPIKE_H3 RBL: Good reputation (+3)
-        *      [23.83.209.14 listed in wl.mailspike.net]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.2 HEADER_FROM_DIFFERENT_DOMAINS From and EnvelopeFrom 2nd level
-        *      mail domains are different
-        *  1.0 PP_MIME_FAKE_ASCII_TEXT BODY: MIME text/plain claims to be
-        *      ASCII but isn't
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        * -0.0 RCVD_IN_MSPIKE_WL Mailspike good senders
-        *  2.0 SHORT_SHORTNER Short body with little more than a link to a
-        *      shortener
-X-Spam-Level: *****
+        with ESMTP id S236474AbiDFPgR (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 6 Apr 2022 11:36:17 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8151D3C1581
+        for <kvm-ppc@vger.kernel.org>; Wed,  6 Apr 2022 05:50:38 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 236Bj71k022211;
+        Wed, 6 Apr 2022 12:49:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=f4IAqQiVHH8TYluvTBL6O+Ai/szmIFzwJZQt2AoQ5xY=;
+ b=qfZALiteOSEJ7Gx26R21GK6+IaGG5C/QIwq/3QTvj1Y5PlteC3/ec8dPo8CHqMuEVtZa
+ eur5CgqPNK9haeWBPtZd1TsCswJfRWxPboMVbVxO+LTi4NlSPcqWW6BWEBzc5MbOGhdY
+ OghsejpTGw27Fd4Nb/i7Y00/+/5BA7drLpEwcIL65qD4LWyvT2N8QCVrL6Y9wTJwRZtb
+ UlWS+Vwty3kxWXx3ebSAOHDlASDCwI6wt3KtTtk36O2uBbnPG/QV1OFeZ21hjil5j8n3
+ 52tw9a36SZjhdC7vkxIHUenaR7C0SmXEo+pSWcf8fG1j8hyczBFPW8D+L8hdqGXZuRXp PA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f96s7nqx8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 Apr 2022 12:49:53 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 236BtRKc014651;
+        Wed, 6 Apr 2022 12:49:52 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3f96s7nqwt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 Apr 2022 12:49:52 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 236ClIZP025929;
+        Wed, 6 Apr 2022 12:49:50 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3f6drhqsq5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 Apr 2022 12:49:50 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 236CnmRj35717582
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 6 Apr 2022 12:49:48 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 67F3D11C04C;
+        Wed,  6 Apr 2022 12:49:48 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 19A0211C04A;
+        Wed,  6 Apr 2022 12:49:48 +0000 (GMT)
+Received: from [9.101.4.17] (unknown [9.101.4.17])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  6 Apr 2022 12:49:48 +0000 (GMT)
+Message-ID: <0158864e-8d0b-c717-27f9-24fc0609d88b@linux.ibm.com>
+Date:   Wed, 6 Apr 2022 14:49:47 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH kernel] KVM: PPC: Fix TCE handling for VFIO
+Content-Language: en-US
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, Fabiano Rosas <farosas@linux.ibm.com>
+References: <20220406040416.3608518-1-aik@ozlabs.ru>
+From:   Frederic Barrat <fbarrat@linux.ibm.com>
+In-Reply-To: <20220406040416.3608518-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 14-mX4j4DTiSZhLn9k3kkgJr23G_n7HO
+X-Proofpoint-ORIG-GUID: d3bOt1OrKk0mWySqJiWJc0KhUZ2tM8wO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-04-06_04,2022-04-06_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 bulkscore=0 impostorscore=0 mlxscore=0 phishscore=0
+ adultscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2204060059
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Dear ❤️ Katie want to meet you! Click here: http://bit.do/fT3fH?jdi ❤️,
 
-Your artwork submission has been received. You will be notified of acceptance in the next few weeks after the jury process has concluded.
 
-If you have any questions, feel free to contact us at 513.631.4278.
+On 06/04/2022 06:04, Alexey Kardashevskiy wrote:
+> At the moment the IOMMU page size in a pseries VM is 16MB (the biggest
+> allowed by LoPAPR), this page size is used for an emulated TCE table.
+> If there is a passed though PCI device, that there are hardware IOMMU
+> tables with equal or smaller IOMMU page sizes so one emulated IOMMU pages
+> is backed by power-of-two hardware pages.
+> 
+> The code wrongly uses the emulated TCE index instead of hardware TCE
+> index in error handling. The problem is easier to see on POWER8 with
+> multi-level TCE tables (when only the first level is preallocated)
+> as hash mode uses real mode TCE hypercalls handlers.
+> The kernel starts using indirect tables when VMs get bigger than 128GB
+> (depends on the max page order).
+> The very first real mode hcall is going to fail with H_TOO_HARD as
+> in the real mode we cannot allocate memory for TCEs (we can in the virtual
+> mode) but on the way out the code attempts to clear hardware TCEs using
+> emulated TCE indexes which corrupts random kernel memory because
+> it_offset==1<<59 is subtracted from those indexes and the resulting index
+> is out of the TCE table bounds.
+> 
+> This fixes kvmppc_clear_tce() to use the correct TCE indexes.
+> 
+> While at it, this fixes TCE cache invalidation which uses emulated TCE
+> indexes instead of the hardware ones. This went unnoticed as 64bit DMA
+> is used these days and VMs map all RAM in one go and only then do DMA
+> and this is when the TCE cache gets populated.
+> 
+> Potentially this could slow down mapping, however normally 16MB
+> emulated pages are backed by 64K hardware pages so it is one write to
+> the "TCE Kill" per 256 updates which is not that bad considering the size
+> of the cache (1024 TCEs or so).
+> 
+> Fixes: ca1fc489cfa0 ("KVM: PPC: Book3S: Allow backing bigger guest IOMMU pages with smaller physical pages")
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
 
-Best regards,
 
-KHAC Curator
+FWIW:
+Reviewed-by: Frederic Barrat <fbarrat@linux.ibm.com>
+
+
+
+>   arch/powerpc/kvm/book3s_64_vio.c    | 45 +++++++++++++++--------------
+>   arch/powerpc/kvm/book3s_64_vio_hv.c | 44 ++++++++++++++--------------
+>   2 files changed, 45 insertions(+), 44 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
+> index d42b4b6d4a79..85cfa6328222 100644
+> --- a/arch/powerpc/kvm/book3s_64_vio.c
+> +++ b/arch/powerpc/kvm/book3s_64_vio.c
+> @@ -420,13 +420,19 @@ static void kvmppc_tce_put(struct kvmppc_spapr_tce_table *stt,
+>   	tbl[idx % TCES_PER_PAGE] = tce;
+>   }
+>   
+> -static void kvmppc_clear_tce(struct mm_struct *mm, struct iommu_table *tbl,
+> -		unsigned long entry)
+> +static void kvmppc_clear_tce(struct mm_struct *mm, struct kvmppc_spapr_tce_table *stt,
+> +		struct iommu_table *tbl, unsigned long entry)
+>   {
+> -	unsigned long hpa = 0;
+> -	enum dma_data_direction dir = DMA_NONE;
+> +	unsigned long i;
+> +	unsigned long subpages = 1ULL << (stt->page_shift - tbl->it_page_shift);
+> +	unsigned long io_entry = entry << (stt->page_shift - tbl->it_page_shift);
+>   
+> -	iommu_tce_xchg_no_kill(mm, tbl, entry, &hpa, &dir);
+> +	for (i = 0; i < subpages; ++i) {
+> +		unsigned long hpa = 0;
+> +		enum dma_data_direction dir = DMA_NONE;
+> +
+> +		iommu_tce_xchg_no_kill(mm, tbl, io_entry + i, &hpa, &dir);
+> +	}
+>   }
+>   
+>   static long kvmppc_tce_iommu_mapped_dec(struct kvm *kvm,
+> @@ -485,6 +491,8 @@ static long kvmppc_tce_iommu_unmap(struct kvm *kvm,
+>   			break;
+>   	}
+>   
+> +	iommu_tce_kill(tbl, io_entry, subpages);
+> +
+>   	return ret;
+>   }
+>   
+> @@ -544,6 +552,8 @@ static long kvmppc_tce_iommu_map(struct kvm *kvm,
+>   			break;
+>   	}
+>   
+> +	iommu_tce_kill(tbl, io_entry, subpages);
+> +
+>   	return ret;
+>   }
+>   
+> @@ -590,10 +600,9 @@ long kvmppc_h_put_tce(struct kvm_vcpu *vcpu, unsigned long liobn,
+>   			ret = kvmppc_tce_iommu_map(vcpu->kvm, stt, stit->tbl,
+>   					entry, ua, dir);
+>   
+> -		iommu_tce_kill(stit->tbl, entry, 1);
+>   
+>   		if (ret != H_SUCCESS) {
+> -			kvmppc_clear_tce(vcpu->kvm->mm, stit->tbl, entry);
+> +			kvmppc_clear_tce(vcpu->kvm->mm, stt, stit->tbl, entry);
+>   			goto unlock_exit;
+>   		}
+>   	}
+> @@ -669,13 +678,13 @@ long kvmppc_h_put_tce_indirect(struct kvm_vcpu *vcpu,
+>   		 */
+>   		if (get_user(tce, tces + i)) {
+>   			ret = H_TOO_HARD;
+> -			goto invalidate_exit;
+> +			goto unlock_exit;
+>   		}
+>   		tce = be64_to_cpu(tce);
+>   
+>   		if (kvmppc_tce_to_ua(vcpu->kvm, tce, &ua)) {
+>   			ret = H_PARAMETER;
+> -			goto invalidate_exit;
+> +			goto unlock_exit;
+>   		}
+>   
+>   		list_for_each_entry_lockless(stit, &stt->iommu_tables, next) {
+> @@ -684,19 +693,15 @@ long kvmppc_h_put_tce_indirect(struct kvm_vcpu *vcpu,
+>   					iommu_tce_direction(tce));
+>   
+>   			if (ret != H_SUCCESS) {
+> -				kvmppc_clear_tce(vcpu->kvm->mm, stit->tbl,
+> -						entry);
+> -				goto invalidate_exit;
+> +				kvmppc_clear_tce(vcpu->kvm->mm, stt, stit->tbl,
+> +						 entry + i);
+> +				goto unlock_exit;
+>   			}
+>   		}
+>   
+>   		kvmppc_tce_put(stt, entry + i, tce);
+>   	}
+>   
+> -invalidate_exit:
+> -	list_for_each_entry_lockless(stit, &stt->iommu_tables, next)
+> -		iommu_tce_kill(stit->tbl, entry, npages);
+> -
+>   unlock_exit:
+>   	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>   
+> @@ -735,20 +740,16 @@ long kvmppc_h_stuff_tce(struct kvm_vcpu *vcpu,
+>   				continue;
+>   
+>   			if (ret == H_TOO_HARD)
+> -				goto invalidate_exit;
+> +				return ret;
+>   
+>   			WARN_ON_ONCE(1);
+> -			kvmppc_clear_tce(vcpu->kvm->mm, stit->tbl, entry);
+> +			kvmppc_clear_tce(vcpu->kvm->mm, stt, stit->tbl, entry + i);
+>   		}
+>   	}
+>   
+>   	for (i = 0; i < npages; ++i, ioba += (1ULL << stt->page_shift))
+>   		kvmppc_tce_put(stt, ioba >> stt->page_shift, tce_value);
+>   
+> -invalidate_exit:
+> -	list_for_each_entry_lockless(stit, &stt->iommu_tables, next)
+> -		iommu_tce_kill(stit->tbl, ioba >> stt->page_shift, npages);
+> -
+>   	return ret;
+>   }
+>   EXPORT_SYMBOL_GPL(kvmppc_h_stuff_tce);
+> diff --git a/arch/powerpc/kvm/book3s_64_vio_hv.c b/arch/powerpc/kvm/book3s_64_vio_hv.c
+> index 870b7f0c7ea5..fdeda6a9cff4 100644
+> --- a/arch/powerpc/kvm/book3s_64_vio_hv.c
+> +++ b/arch/powerpc/kvm/book3s_64_vio_hv.c
+> @@ -247,13 +247,19 @@ static void iommu_tce_kill_rm(struct iommu_table *tbl,
+>   		tbl->it_ops->tce_kill(tbl, entry, pages, true);
+>   }
+>   
+> -static void kvmppc_rm_clear_tce(struct kvm *kvm, struct iommu_table *tbl,
+> -		unsigned long entry)
+> +static void kvmppc_rm_clear_tce(struct kvm *kvm, struct kvmppc_spapr_tce_table *stt,
+> +		struct iommu_table *tbl, unsigned long entry)
+>   {
+> -	unsigned long hpa = 0;
+> -	enum dma_data_direction dir = DMA_NONE;
+> +	unsigned long i;
+> +	unsigned long subpages = 1ULL << (stt->page_shift - tbl->it_page_shift);
+> +	unsigned long io_entry = entry << (stt->page_shift - tbl->it_page_shift);
+>   
+> -	iommu_tce_xchg_no_kill_rm(kvm->mm, tbl, entry, &hpa, &dir);
+> +	for (i = 0; i < subpages; ++i) {
+> +		unsigned long hpa = 0;
+> +		enum dma_data_direction dir = DMA_NONE;
+> +
+> +		iommu_tce_xchg_no_kill_rm(kvm->mm, tbl, io_entry + i, &hpa, &dir);
+> +	}
+>   }
+>   
+>   static long kvmppc_rm_tce_iommu_mapped_dec(struct kvm *kvm,
+> @@ -316,6 +322,8 @@ static long kvmppc_rm_tce_iommu_unmap(struct kvm *kvm,
+>   			break;
+>   	}
+>   
+> +	iommu_tce_kill_rm(tbl, io_entry, subpages);
+> +
+>   	return ret;
+>   }
+>   
+> @@ -379,6 +387,8 @@ static long kvmppc_rm_tce_iommu_map(struct kvm *kvm,
+>   			break;
+>   	}
+>   
+> +	iommu_tce_kill_rm(tbl, io_entry, subpages);
+> +
+>   	return ret;
+>   }
+>   
+> @@ -420,10 +430,8 @@ long kvmppc_rm_h_put_tce(struct kvm_vcpu *vcpu, unsigned long liobn,
+>   			ret = kvmppc_rm_tce_iommu_map(vcpu->kvm, stt,
+>   					stit->tbl, entry, ua, dir);
+>   
+> -		iommu_tce_kill_rm(stit->tbl, entry, 1);
+> -
+>   		if (ret != H_SUCCESS) {
+> -			kvmppc_rm_clear_tce(vcpu->kvm, stit->tbl, entry);
+> +			kvmppc_rm_clear_tce(vcpu->kvm, stt, stit->tbl, entry);
+>   			return ret;
+>   		}
+>   	}
+> @@ -561,7 +569,7 @@ long kvmppc_rm_h_put_tce_indirect(struct kvm_vcpu *vcpu,
+>   		ua = 0;
+>   		if (kvmppc_rm_tce_to_ua(vcpu->kvm, tce, &ua)) {
+>   			ret = H_PARAMETER;
+> -			goto invalidate_exit;
+> +			goto unlock_exit;
+>   		}
+>   
+>   		list_for_each_entry_lockless(stit, &stt->iommu_tables, next) {
+> @@ -570,19 +578,15 @@ long kvmppc_rm_h_put_tce_indirect(struct kvm_vcpu *vcpu,
+>   					iommu_tce_direction(tce));
+>   
+>   			if (ret != H_SUCCESS) {
+> -				kvmppc_rm_clear_tce(vcpu->kvm, stit->tbl,
+> -						entry);
+> -				goto invalidate_exit;
+> +				kvmppc_rm_clear_tce(vcpu->kvm, stt, stit->tbl,
+> +						entry + i);
+> +				goto unlock_exit;
+>   			}
+>   		}
+>   
+>   		kvmppc_rm_tce_put(stt, entry + i, tce);
+>   	}
+>   
+> -invalidate_exit:
+> -	list_for_each_entry_lockless(stit, &stt->iommu_tables, next)
+> -		iommu_tce_kill_rm(stit->tbl, entry, npages);
+> -
+>   unlock_exit:
+>   	if (!prereg)
+>   		arch_spin_unlock(&kvm->mmu_lock.rlock.raw_lock);
+> @@ -620,20 +624,16 @@ long kvmppc_rm_h_stuff_tce(struct kvm_vcpu *vcpu,
+>   				continue;
+>   
+>   			if (ret == H_TOO_HARD)
+> -				goto invalidate_exit;
+> +				return ret;
+>   
+>   			WARN_ON_ONCE_RM(1);
+> -			kvmppc_rm_clear_tce(vcpu->kvm, stit->tbl, entry);
+> +			kvmppc_rm_clear_tce(vcpu->kvm, stt, stit->tbl, entry + i);
+>   		}
+>   	}
+>   
+>   	for (i = 0; i < npages; ++i, ioba += (1ULL << stt->page_shift))
+>   		kvmppc_rm_tce_put(stt, ioba >> stt->page_shift, tce_value);
+>   
+> -invalidate_exit:
+> -	list_for_each_entry_lockless(stit, &stt->iommu_tables, next)
+> -		iommu_tce_kill_rm(stit->tbl, ioba >> stt->page_shift, npages);
+> -
+>   	return ret;
+>   }
+>   
