@@ -2,130 +2,214 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A263152991D
-	for <lists+kvm-ppc@lfdr.de>; Tue, 17 May 2022 07:41:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C216752B254
+	for <lists+kvm-ppc@lfdr.de>; Wed, 18 May 2022 08:37:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234068AbiEQFlR (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 17 May 2022 01:41:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55744 "EHLO
+        id S231247AbiERG14 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 18 May 2022 02:27:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238132AbiEQFk7 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 17 May 2022 01:40:59 -0400
-X-Greylist: delayed 5527 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 16 May 2022 22:40:52 PDT
-Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02hn2242.outbound.protection.partner.outlook.cn [139.219.146.242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 931A1AE40;
-        Mon, 16 May 2022 22:40:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NribvH1vFEic4/W+tbJiwJZbi6QzdzKFEFXwU7ugkmoLZ50EGj12pJSh9D7WUWpX5qt7GrvYKoxrFSbKPZVqrgsGj9w4Ck2+NPHewRYao6BVGdAKGO2ctFrouXKRtQvvpguYUxRWmRKCE7S+wmmwzb3Jrnu4obWEfCLJIWvG6xWzA9oohvbBRWT2jzXXCA6meF3Wox3pngHRgi0IJoQQTStLqz1FzdrghuavlXBc0mj0y3efsqwxcONyCL0NcuFL3uE35IgkAP0V319+3yUUkD1oo1UZJSGznmDI/0keCNjLydnZfJJQfqL6dmOiRD5H8l+rSWeslBTjXcoY7Lmd7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O0bN2yFrDuIMFF+d7QRyaVBLs0/VHZTrkLthID1smys=;
- b=k1w2ni/JYRwX5Qk2iTAwUujFuBhWrYrGxLlpKqoe+4QHeEUhy5TvkdAxqImdz4p0KdQfajg8AfIvnyc36jHtzUQsPg7W1vBL41d+7/oEAIeHjZCeF06vnttFBKt6sa2xJNrAL3YEQWmocRh7/oBSXXEatngu/AQGZqCClcKo09SFNo4yDlWpImO9F41X41RwuTG0KPBiXLwz+1MydbcMp/o4eIWAyNpPZaraB4VG60C+WIZDT+8rEfhSgZfrU3lUvNWUw8oNERI2RlzFy/zpGy6JpsVMjDrnZA1LPfCpQtth8XYVvJKf/gFdcdajx5GKCOyvT7NhRnm10zSXL3Q5sg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=gientech.com; dmarc=pass action=none header.from=gientech.com;
- dkim=pass header.d=gientech.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gientech.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O0bN2yFrDuIMFF+d7QRyaVBLs0/VHZTrkLthID1smys=;
- b=ZHKv09EWlzbX3dWJNsyOI21rdOGPXQPcN03K8FuzMpczNQm+5brFyhDe+3qbMxmD/Nm4R7j0JOfjgQoLPQ7oXC+csxOwikHS2SPOSLYiY/zW5dEoZMoMv5asZhi46DE3v+2pWArUjix3Y1GeVJiELr7x3MWY69pVDT2a9i0Dq5bXJ2WeIegSZ0NB3852xWkyhbdVOWv8+P/OoM+zcrrCZnUmqtcoK2qjv+DhqqD7SeuZMOoe7xUqStu3oIgtwCCjByJPshcvcc1zUL66eREyVmaetpz9M6Xlw2LwL7zNYoVKNFT2llFBzgW32flZd8uYmTecaEpKEd/whWUQ2ccBlg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=gientech.com;
-Received: from BJXPR01MB198.CHNPR01.prod.partner.outlook.cn (10.41.52.24) by
- BJXPR01MB0535.CHNPR01.prod.partner.outlook.cn (10.43.32.82) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5250.14; Tue, 17 May 2022 04:08:41 +0000
-Received: from BJXPR01MB198.CHNPR01.prod.partner.outlook.cn ([10.41.52.24]) by
- BJXPR01MB198.CHNPR01.prod.partner.outlook.cn ([10.41.52.24]) with mapi id
- 15.20.5250.018; Tue, 17 May 2022 04:08:41 +0000
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Re;
-To:     Recipients <youchun.wang@gientech.com>
-From:   "J Wu" <youchun.wang@gientech.com>
-Date:   Sat, 14 May 2022 04:31:28 +0000
-Reply-To: contact@jimmywu.online
-X-ClientProxiedBy: SH2PR01CA020.CHNPR01.prod.partner.outlook.cn (10.41.247.30)
- To BJXPR01MB198.CHNPR01.prod.partner.outlook.cn (10.41.52.24)
-Message-ID: <BJXPR01MB19888670F4A672585880640E8CD9@BJXPR01MB198.CHNPR01.prod.partner.outlook.cn>
+        with ESMTP id S231131AbiERG1x (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 18 May 2022 02:27:53 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF74ADE31B
+        for <kvm-ppc@vger.kernel.org>; Tue, 17 May 2022 23:27:48 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id m12so876644plb.4
+        for <kvm-ppc@vger.kernel.org>; Tue, 17 May 2022 23:27:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=75xfyRYdtbbnySXqxmJnPbT1F8O/OC516UJoNDb3t+I=;
+        b=rU4jPYNN5+avyZvAhBPhq7YZ6GjdV3WB7hpSv3vUe8rapXH3vJwLu4MUdpNlxV7Vc7
+         AV8lrXHmL8UpJxDY3siQzlIi1kvlEXBUds9/aloM3MCUVjIMrI4iBAGYA3gy0JSQINos
+         J2NLdYng7g+nuuokCoIgmaPM+rIZ4qqyHTrVrqikCReYskpXMfmVSw50Tuf7ydEKBM2g
+         PUMz0bT1ksqn8xtF4/6i6km4yBy40ueQ2nK1Qg8YPCIwQ/sBVS9ZuWg1r+69cmGh3Cvg
+         9pioG246hcisDKCTphyRZWV73OSMQekwe7OZpLnVyClkygpRM+XSdD6zw+4AQbzOaROG
+         Zvcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=75xfyRYdtbbnySXqxmJnPbT1F8O/OC516UJoNDb3t+I=;
+        b=eDm3K03kBUIqTkS7ZGnPNNL+wLkVXmlyWkKHCvhPLBq62DVYLJUci3JwsAdHU8BjBj
+         tLV0Ql7+3umZfMX41p0R3FJcLK4EAks0kEPdr3P8ne25j+nnitQCdkohr079i8zWd8lg
+         fULfiRKNwEEzbIBHUtnTsudC3VsF19tMB0ypQi30Rs3Y4sXQiYxCR5IqhR+4EYXx5vac
+         tTTFmLUaXpVJf1yaKfLh7RJULX8WDJarUmXbb9HfZq3+IhZvvY03i2m/daZ+iRkoQuON
+         xQI1a/eqi5yuKpLxym22Z+OW9VFl0ZrUTT58aMq9IZNcv1emhK/uuZZZMTcIojuoOT8V
+         1XQg==
+X-Gm-Message-State: AOAM530rVyPOF+zAmYQFwq9cXBbfgfKnbL3N5PQcbP0CNbVSs2qlyMLz
+        JbzHJPiZwczLgUL2Meoyoc9tepJIMi7e9g==
+X-Google-Smtp-Source: ABdhPJw8YU30pDANG+wArZ1ct34zmOOlVc4nOxwpHMfezBscu5qQRFfree+bbOiz/rSK3BWzuNhG2w==
+X-Received: by 2002:a17:90b:4f87:b0:1dd:100b:7342 with SMTP id qe7-20020a17090b4f8700b001dd100b7342mr39908296pjb.64.1652855267956;
+        Tue, 17 May 2022 23:27:47 -0700 (PDT)
+Received: from [10.61.2.177] (110-175-254-242.static.tpgi.com.au. [110.175.254.242])
+        by smtp.gmail.com with ESMTPSA id g3-20020a62f943000000b0050dc762815dsm895132pfm.55.2022.05.17.23.27.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 May 2022 23:27:47 -0700 (PDT)
+Message-ID: <0d4bb0fa-10c6-3f5a-34c8-293144b3fdbb@ozlabs.ru>
+Date:   Wed, 18 May 2022 16:27:41 +1000
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 51b029b7-c1da-4fb6-7dae-08da3562ac86
-X-MS-TrafficTypeDiagnostic: BJXPR01MB0535:EE_
-X-Microsoft-Antispam-PRVS: <BJXPR01MB0535259F82F8758D54EC2D92E8CE9@BJXPR01MB0535.CHNPR01.prod.partner.outlook.cn>
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: =?iso-8859-1?Q?lW39L/CDXWwHAywayJOm/wPEimC52gK2LOhUHKsshWjoqT1o+sQRfi4HSl?=
- =?iso-8859-1?Q?KNqqX88mFSsoN8nCwkbmqRhch0zgFvfYcSkJGJKFgPK7aoNDwl1Mi2aRQh?=
- =?iso-8859-1?Q?612ZBdrnzX9xsSwcjR0LbetTW7aaCg76r7UXJjO8/JMMpXFs/iYdSnM8M8?=
- =?iso-8859-1?Q?dZDDEgULc5oQABMuroFi3EXD/zwPyoGlgzbK/xdYp7t+mkLwpJMvcxq+81?=
- =?iso-8859-1?Q?Z+g+wrWz1uadjRm7izIP9Rm5KMvIHAh6M896bnd6grtRDJQ0P7vcFjnN0k?=
- =?iso-8859-1?Q?bL52XqPN0on3AHNQGJ+KFJFXbcu7HMXOgbieMVzQ8xBACe8YCLQRXkpjtu?=
- =?iso-8859-1?Q?QBH3/rkhm/c9riGh+U5qU1b1PmfVXnfPoCThEjMNSdMdW3gBWaRdR50vqd?=
- =?iso-8859-1?Q?d2kF8/mIvOTcmfpXITbgKQnDYUsumNgj5A3Bc5SbLpG+YFghEkPKgxBTrx?=
- =?iso-8859-1?Q?ndIhJVv54nk786N1vVdZxjN4hPGiHYTEUSaIlAEvLYtKejLWdceZjT8NnU?=
- =?iso-8859-1?Q?JIo6WKlfnu7mtFEbbbYWkdt80oYPrDF2kkiRy12W9bowj5ekIWk/Dbd9qh?=
- =?iso-8859-1?Q?kVhb7SRoQMK3LcQ6BLHexcRJrWJqJawLUey0CH1UYDgGOILS9scy9yzEkT?=
- =?iso-8859-1?Q?pfAWTNMWdnRVx7oyukSLSGiJd8M/n+ttv1gGlEesO2hmY3wtss4CNwKr5t?=
- =?iso-8859-1?Q?9N/oFzHtA16o5m8D5DpPsO+siuZ4JBvSLFbyh8MGuyVTP+h5kVnTVxV/pk?=
- =?iso-8859-1?Q?VcxbJoose5U5REumplxTD/tRVdu7pKvnR6ZJ/WXTqIUsNPYlP3/DEcJkA7?=
- =?iso-8859-1?Q?G5pByYM38gfGRx6grPRVHzmUYBDoPLyHMpAj83s3WXQp0CEt1MqAMFr1uA?=
- =?iso-8859-1?Q?imhc3UhgOsUE+x+sdBxtg5FRiNcJIus/I7d7G86zgXSRKUj8Hgws/1DsPA?=
- =?iso-8859-1?Q?lZweDTUU9GhFg6+TAFeWOAwuazTJk/oWdo0S5IpH3QIa2FxtMtKsZB629d?=
- =?iso-8859-1?Q?mw7wwaeDxzXZMNeA4RQneYSRReCn8co1PiCGjXp35O0hy2BG1xPAaldP5E?=
- =?iso-8859-1?Q?dA=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:BJXPR01MB198.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:OSPM;SFS:(13230001)(366004)(7366002)(7406005)(7416002)(6200100001)(4270600006)(66946007)(33656002)(38350700002)(55016003)(508600001)(40180700001)(66556008)(66476007)(8676002)(6862004)(9686003)(558084003)(186003)(40160700002)(7116003)(3480700007)(38100700002)(19618925003)(6666004)(2906002)(8936002)(26005)(7696005)(52116002)(86362001)(62346012);DIR:OUT;SFP:1501;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?i2X/MIhROyizJgNjMIFuCa/fJ/oZw/eL8M7tqdR2lD1MsHvj79iCamakHp?=
- =?iso-8859-1?Q?JWHRhMN1XBDevEe6fZA6aWYYQQaqE3pcWh+Fyr1w5s4GiNAk0ijxPjAtL4?=
- =?iso-8859-1?Q?sqXlIw6ILLQQTD5rxNPRoHFUhweKfh8wdf4U0tlNxBA2TX2QuJmd6F6ejk?=
- =?iso-8859-1?Q?cwDGNtRCw7SWJkIGQQ5mfmNiPFdIomNFfBTCxZ3uRESxbbVm7avWpYTlXp?=
- =?iso-8859-1?Q?+CkV+SbkbarNad21LIc3ml30ofNrHGCAY5o6NTbT9nd3UdBbSh2dbP3nxy?=
- =?iso-8859-1?Q?0XygK6tHFZWaokZuuXCLZdv84q14zRMmcy9ta/Fc1P34yg93DUH5NZZH7q?=
- =?iso-8859-1?Q?qDfhoZVloIzCmxMwLMWzur+eaFi95Fd342cUC0TMYnu2CheD7ZQfqNOxbT?=
- =?iso-8859-1?Q?v4XYDVTVsTZbxn6SehqSR/WoUj+yPIHv+IGU2kblo1qehoGmKbexDK69Rz?=
- =?iso-8859-1?Q?eeY+srYrhcmJ3lYyu6ESb7Xlrv2p4hhQYwXsNfbx30CIqWvDy8k88wVICZ?=
- =?iso-8859-1?Q?/JtLaIrnQTG4l8e1kP5PCA74RgP+TbgXqZKGcg6ofn/KoS6BztAXhRpD+r?=
- =?iso-8859-1?Q?tfj610Et22l80kvgcAm3nJgz7LiHkRb0xUST9Rv8Wp41soLG0p8O4wR1Zu?=
- =?iso-8859-1?Q?kU9wLWLcRk0t9OO+jbTRatP+kKEnv+T4U2NX4ornvufRQnceQMKcC1F4GW?=
- =?iso-8859-1?Q?5u5CZSPumUE68I+G4Vy90tb7Q78CT5nzOBMTSqlZPFYPEZmqeysyqMYYsA?=
- =?iso-8859-1?Q?FCBheLQli+2Bl+nAuq5ihzeZelnv0wt4p9RrsYvCFncmOUQf9Pr+oxEY0q?=
- =?iso-8859-1?Q?UYxYzTMsVOZw+hu9/CSl2wuvWEsoWISzCCsmjmxVZjtCoMLA8T7PVHIEQJ?=
- =?iso-8859-1?Q?pdVZXunTi7PFTLUytvA55vAat2kjLGhNg8fWxRDz6MbVWwzYF6gKg4WL12?=
- =?iso-8859-1?Q?p4lrV36A+KXXwfTlRNAuEhPDCZHRBj9oADc+Hhm8N8zYk6x/qoAYSZf8CM?=
- =?iso-8859-1?Q?fn2fo0x4hQd5tPFRBdFE2srfaScoudsmyRBLLwZAOd+qsSc7YsvJXYE9jU?=
- =?iso-8859-1?Q?kc4jI2aW1yvgVULDKZg+S3qE9XBk3yLSrtI6RcD7WoX7n2vfysZdlSBffy?=
- =?iso-8859-1?Q?x66l8XAm/3Ixa5dIxoMI+RdrmP2D1dFY4d7dZaFz3qB+ydov1HdqGPU3s+?=
- =?iso-8859-1?Q?jAtsMamoVP7mjCwLApAEZQGxQQqBi5PFJklJj8f4FdF4aBEuE6F1krEn8E?=
- =?iso-8859-1?Q?YUNmkKZkuDpi7vqOn7fCIzAgChUkNbOjzG09gsOvzzwXrXIMwRbffZyieT?=
- =?iso-8859-1?Q?bete8ekAYlCOR1wtm+iVv2PO7j3sbJrlYxbSLJLqfFXSPVlSSHlnqpJXEF?=
- =?iso-8859-1?Q?uGMaJRDRBH8L1g01+cTmi//JWB1imbNF5teNxFi2Y+vnA2Xx6Po+FwxPub?=
- =?iso-8859-1?Q?85pHV9beMTJirnmqic1EIp8mR4VIeUgpstGxOGYsmcjYOfd5o7dSYvo1Cu?=
- =?iso-8859-1?Q?Ge+nu+ymP/9Og7TurhrAh3oTC4JyAIrN83Xg3g4eKeaG8dKqZL00+kCSHO?=
- =?iso-8859-1?Q?g+yZEstd+NgZUG/+iX/oxP9ppFeWamIOgdk6y9BGDf/554kR11/f7cjbIS?=
- =?iso-8859-1?Q?zlrr6g/5gtSogAR/Lre33fkFWLxzuWRyJUVkfY4QknXegyPZyRRM16KxR7?=
- =?iso-8859-1?Q?5jJ2pG7WsDRYzC3zpjblTxqvP5fCog7dhWjnnRrcPCn/npxBJC1yOS/eqU?=
- =?iso-8859-1?Q?rqH88jcXwu18OKzmWSbPQN5TU=3D?=
-X-OriginatorOrg: gientech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51b029b7-c1da-4fb6-7dae-08da3562ac86
-X-MS-Exchange-CrossTenant-AuthSource: BJXPR01MB198.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2022 04:31:54.5627
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 89592e53-6f9d-4b93-82b1-9f8da689f1b4
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: thXQJZBh4hRXRMsZEYnlmuub0Vw1MlHQk48uF8qYKsdmnfrSL4lCedwjxD23GA52mjnVqLgk9GMHY54oSuRHp2n+yJ/nJpTFnz5tNEsoFkI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BJXPR01MB0535
-X-Spam-Status: No, score=1.0 required=5.0 tests=BAYES_50,DKIM_INVALID,
-        DKIM_SIGNED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101
+ Thunderbird/100.0
+Subject: Re: [PATCH kernel] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE platform
+ dependent
+Content-Language: en-US
+To:     kvm-ppc@vger.kernel.org
+Cc:     x86@kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>
+References: <20220504074807.3616813-1-aik@ozlabs.ru>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <20220504074807.3616813-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Can we team up for a job?
+
+
+On 5/4/22 17:48, Alexey Kardashevskiy wrote:
+> When introduced, IRQFD resampling worked on POWER8 with XICS. However
+> KVM on POWER9 has never implemented it - the compatibility mode code
+> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
+> XIVE mode does not handle INTx in KVM at all.
+> 
+> This moved the capability support advertising to platforms and stops
+> advertising it on XIVE, i.e. POWER9 and later.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> 
+> 
+> Or I could move this one together with KVM_CAP_IRQFD. Thoughts?
+
+
+Ping?
+
+> 
+> ---
+>   arch/arm64/kvm/arm.c       | 3 +++
+>   arch/mips/kvm/mips.c       | 3 +++
+>   arch/powerpc/kvm/powerpc.c | 6 ++++++
+>   arch/riscv/kvm/vm.c        | 3 +++
+>   arch/s390/kvm/kvm-s390.c   | 3 +++
+>   arch/x86/kvm/x86.c         | 3 +++
+>   virt/kvm/kvm_main.c        | 1 -
+>   7 files changed, 21 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 523bc934fe2f..092f0614bae3 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -210,6 +210,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_SET_GUEST_DEBUG:
+>   	case KVM_CAP_VCPU_ATTRIBUTES:
+>   	case KVM_CAP_PTP_KVM:
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +	case KVM_CAP_IRQFD_RESAMPLE:
+> +#endif
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_SET_GUEST_DEBUG2:
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index a25e0b73ee70..0f3de470a73e 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -1071,6 +1071,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_READONLY_MEM:
+>   	case KVM_CAP_SYNC_MMU:
+>   	case KVM_CAP_IMMEDIATE_EXIT:
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +	case KVM_CAP_IRQFD_RESAMPLE:
+> +#endif
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_NR_VCPUS:
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index 875c30c12db0..87698ffef3be 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -591,6 +591,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   		break;
+>   #endif
+>   
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +	case KVM_CAP_IRQFD_RESAMPLE:
+> +		r = !xive_enabled();
+> +		break;
+> +#endif
+> +
+>   	case KVM_CAP_PPC_ALLOC_HTAB:
+>   		r = hv_enabled;
+>   		break;
+> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+> index c768f75279ef..b58579b386bb 100644
+> --- a/arch/riscv/kvm/vm.c
+> +++ b/arch/riscv/kvm/vm.c
+> @@ -63,6 +63,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_READONLY_MEM:
+>   	case KVM_CAP_MP_STATE:
+>   	case KVM_CAP_IMMEDIATE_EXIT:
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +	case KVM_CAP_IRQFD_RESAMPLE:
+> +#endif
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_NR_VCPUS:
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 156d1c25a3c1..85e093fc8d13 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -564,6 +564,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_SET_GUEST_DEBUG:
+>   	case KVM_CAP_S390_DIAG318:
+>   	case KVM_CAP_S390_MEM_OP_EXTENSION:
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +	case KVM_CAP_IRQFD_RESAMPLE:
+> +#endif
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_SET_GUEST_DEBUG2:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 0c0ca599a353..a0a7b769483d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4273,6 +4273,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_SYS_ATTRIBUTES:
+>   	case KVM_CAP_VAPIC:
+>   	case KVM_CAP_ENABLE_CAP:
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +	case KVM_CAP_IRQFD_RESAMPLE:
+> +#endif
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_EXIT_HYPERCALL:
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 70e05af5ebea..885e72e668a5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4293,7 +4293,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>   #endif
+>   #ifdef CONFIG_HAVE_KVM_IRQFD
+>   	case KVM_CAP_IRQFD:
+> -	case KVM_CAP_IRQFD_RESAMPLE:
+>   #endif
+>   	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+>   	case KVM_CAP_CHECK_EXTENSION_VM:
+
+-- 
+Alexey
