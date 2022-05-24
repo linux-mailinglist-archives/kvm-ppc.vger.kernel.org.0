@@ -2,34 +2,32 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD0EE532842
-	for <lists+kvm-ppc@lfdr.de>; Tue, 24 May 2022 12:54:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F270532843
+	for <lists+kvm-ppc@lfdr.de>; Tue, 24 May 2022 12:54:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236388AbiEXKyC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 24 May 2022 06:54:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42168 "EHLO
+        id S229534AbiEXKyB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 24 May 2022 06:54:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236386AbiEXKyB (ORCPT
+        with ESMTP id S236383AbiEXKyB (ORCPT
         <rfc822;kvm-ppc@vger.kernel.org>); Tue, 24 May 2022 06:54:01 -0400
 Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 705F74ECD6
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7078350049
         for <kvm-ppc@vger.kernel.org>; Tue, 24 May 2022 03:53:58 -0700 (PDT)
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4L6rfW54fHz4xbd;
-        Tue, 24 May 2022 20:53:55 +1000 (AEST)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4L6rfT4cBTz4xYY;
+        Tue, 24 May 2022 20:53:53 +1000 (AEST)
 From:   Michael Ellerman <patch-notifications@ellerman.id.au>
 To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
-Cc:     Fabiano Rosas <farosas@linux.ibm.com>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        kvm-ppc@vger.kernel.org
-In-Reply-To: <20220506053755.3820702-1-aik@ozlabs.ru>
-References: <20220506053755.3820702-1-aik@ozlabs.ru>
-Subject: Re: [PATCH kernel v2] KVM: PPC: Book3s: Retire H_PUT_TCE/etc real mode handlers
-Message-Id: <165338951112.1711920.752815379112806107.b4-ty@ellerman.id.au>
-Date:   Tue, 24 May 2022 20:51:51 +1000
+Cc:     kvm-ppc@vger.kernel.org
+In-Reply-To: <20220506073737.3823347-1-aik@ozlabs.ru>
+References: <20220506073737.3823347-1-aik@ozlabs.ru>
+Subject: Re: [PATCH kernel] KVM: PPC: Book3s: PR: Enable default TCE hypercalls
+Message-Id: <165338951230.1711920.13309403360351768244.b4-ty@ellerman.id.au>
+Date:   Tue, 24 May 2022 20:51:52 +1000
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -42,24 +40,20 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Fri, 6 May 2022 15:37:55 +1000, Alexey Kardashevskiy wrote:
-> LoPAPR defines guest visible IOMMU with hypercalls to use it -
-> H_PUT_TCE/etc. Implemented first on POWER7 where hypercalls would trap
-> in the KVM in the real mode (with MMU off). The problem with the real mode
-> is some memory is not available and some API usage crashed the host but
-> enabling MMU was an expensive operation.
+On Fri, 6 May 2022 17:37:37 +1000, Alexey Kardashevskiy wrote:
+> When KVM_CAP_PPC_ENABLE_HCALL was introduced, H_GET_TCE and H_PUT_TCE
+> were already implemented and enabled by default; however H_GET_TCE
+> was missed out on PR KVM (probably because the handler was in
+> the real mode code at the time).
 > 
-> The problems with the real mode handlers are:
-> 1. Occasionally these cannot complete the request so the code is
-> copied+modified to work in the virtual mode, very little is shared;
-> 2. The real mode handlers have to be linked into vmlinux to work;
-> 3. An exception in real mode immediately reboots the machine.
+> This enables H_GET_TCE by default. While at this, this wraps
+> the checks in ifdef CONFIG_SPAPR_TCE_IOMMU just like HV KVM.
 > 
 > [...]
 
 Applied to powerpc/topic/ppc-kvm.
 
-[1/1] KVM: PPC: Book3s: Retire H_PUT_TCE/etc real mode handlers
-      https://git.kernel.org/powerpc/c/cad32d9d42e8e6a659786f8a730b221a9fbee227
+[1/1] KVM: PPC: Book3s: PR: Enable default TCE hypercalls
+      https://git.kernel.org/powerpc/c/29592181c5496d93697a23e6dbb9d7cc317ff5ee
 
 cheers
