@@ -2,151 +2,125 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C71253358D
-	for <lists+kvm-ppc@lfdr.de>; Wed, 25 May 2022 04:58:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 323A45337AB
+	for <lists+kvm-ppc@lfdr.de>; Wed, 25 May 2022 09:47:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233654AbiEYC6v (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 24 May 2022 22:58:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56358 "EHLO
+        id S230023AbiEYHr1 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 25 May 2022 03:47:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231514AbiEYC6u (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 24 May 2022 22:58:50 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCC112ED74
-        for <kvm-ppc@vger.kernel.org>; Tue, 24 May 2022 19:58:47 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id u12-20020a17090a1d4c00b001df78c7c209so517892pju.1
-        for <kvm-ppc@vger.kernel.org>; Tue, 24 May 2022 19:58:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language
-         :from:to:cc:references:in-reply-to:content-transfer-encoding;
-        bh=YK1wCpCRboLwffskekgnWbUl6nIZlpuhCNf3mYDZPpU=;
-        b=PtpIRRwFj/q816SmM7zw1Hnj7L8SNrWSU1anLslWGSwN0KfueD4j20tJvQYYyYPMZ7
-         Lx5J1me79HRChl2o6oWtGKZJxIoOPFG2yECi5qX2r6RPrVJbK7RTB9mZ++tO/mcZCuqS
-         8EXUFDXUl/bicPsb6EzbTfeYRBdQ44H/cseK3JOlgHBk0iapBu5aB2AU2JSXq0gMPQTQ
-         n20j+4uEpqHPFD2uFLkP6bWq43rT+WaMJqRqcW6v9Q84Wm7Un6mSSsJKN7nssA3vyMXa
-         wGcllgKlchS+8BIF2KxwQsR+GX9UOecqHDsGsFfmKb2YRNkwLx3KUPl+2dFRx/DMnMtJ
-         VM8Q==
+        with ESMTP id S229854AbiEYHr0 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 25 May 2022 03:47:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 663D160DB6
+        for <kvm-ppc@vger.kernel.org>; Wed, 25 May 2022 00:47:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653464844;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=weQ+tr4ZIW33xmlyie2lq7CER5QpGlbJKLBC5/fkDIo=;
+        b=TE65l8+gUZ8LhQLqy8FCAVz6yb3bdfI1kTgpfVqc7/O+OgjxKZzjDO4U8aPiSgKSLWqGQW
+        4wmgojfiqnZwLHUfS+yn2KE70/4gwFoqzk4fvqPYJEVN994hH+V6MsX7Ezl28ROOycEvPG
+        my6npEboVAPeoxH7dTVkQ8OKi/szzAo=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-626-S90CbGCHPFGSFNh3c8Bseg-1; Wed, 25 May 2022 03:47:22 -0400
+X-MC-Unique: S90CbGCHPFGSFNh3c8Bseg-1
+Received: by mail-ed1-f69.google.com with SMTP id j7-20020a056402238700b0042b9c2e9c64so1952607eda.19
+        for <kvm-ppc@vger.kernel.org>; Wed, 25 May 2022 00:47:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=YK1wCpCRboLwffskekgnWbUl6nIZlpuhCNf3mYDZPpU=;
-        b=AuxMHVazfDMEndn2GPOD8b9D6viQa+4uMUIqQbEDj3iyehRHSQ5573w6i+q6Gnr9i+
-         x/LSqFNbyIhZ7d4zhCuT+TR0ZPwIxjgEeW90c0LL1aqbSUIXZEcRfoOJvLm8l71Yq3L3
-         QY5Mhg0EHdYS2hXhvjdY0MozNZK83gqmypv8OymTOJLzCISilesnNcPRBd45Txbitqwp
-         sJ7wywNqMGod2I7eaIAesX3T+mcMqUFHoCNrNy7ZDRoWgNpLoC8L09ICRt5p6G8twaTc
-         nMKb3B1X1jt2Qgh8LJZ1dH6M/lJtTzTKDonUwwr0zlfq4p+DP2pYeEptpQfViTqDA56n
-         1B1g==
-X-Gm-Message-State: AOAM530bVPHScRpK+pSZIS30i1rBC9OaqnaMN2TmiTxJaXztqS4Nxi0m
-        FjRNrJRkR0NiYxnBGlLwb6s0D3o3JevnPw==
-X-Google-Smtp-Source: ABdhPJwEYgmMAy7wgZWt09CThY9XrTxAbiuM8JQFI5KtQXXlfe79I0fwyydxqgVJ3pr+knW4+NKw5w==
-X-Received: by 2002:a17:90b:1c92:b0:1dd:10ff:8f13 with SMTP id oo18-20020a17090b1c9200b001dd10ff8f13mr7860126pjb.54.1653447527364;
-        Tue, 24 May 2022 19:58:47 -0700 (PDT)
-Received: from [10.61.2.177] (110-175-254-242.static.tpgi.com.au. [110.175.254.242])
-        by smtp.gmail.com with ESMTPSA id l17-20020a629111000000b0050dc76281ccsm9926630pfe.166.2022.05.24.19.58.44
+        bh=weQ+tr4ZIW33xmlyie2lq7CER5QpGlbJKLBC5/fkDIo=;
+        b=djnpiyATYQnY+ZX2fNUqjdf8gfSHw7oHErapDYVJ8z+M3hnOjHoSu+64r3xp4OQ4VZ
+         VkLZcyTSr0fNLODryVLnfzSKqxyzKO1KUHO4vgS6WCUHNYh4pWC3Eo7pT0Rh1iUV22j1
+         W1LSRW7OchIKAMY8IWDG4ddHkYMoj4BM+2cXTxFVmw5wGSRUVIUolqgutTh2ppjOfKES
+         AnF/ATAKqlJO3+N4g3V9woUz0jmSk1v4L12u8I73WN1cxh64g/FAIghJu0XGpbJve3Ai
+         loVm8MDZMOWIXC/yB1qFDLWBQTzok+lcq+oqUtrewoDjo4TxCxjLzZXa5IQrr/3IU0UW
+         +Vew==
+X-Gm-Message-State: AOAM530ojWKuAuyMl0l/5dOwsPK73UV43mrFBSIO53CPcgxx6hYgZkdM
+        lZBoJ64d/KzXXx4m6GDERk7u7GzWxogNP2YUQS8gyzekE/CA0gQIm6xdQKAs2gcUe8C+PwTVH1L
+        nZWkCIPn24FKtMGDD1A==
+X-Received: by 2002:a17:907:9626:b0:6fe:bae9:70bc with SMTP id gb38-20020a170907962600b006febae970bcmr18262773ejc.150.1653464841442;
+        Wed, 25 May 2022 00:47:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzjwVl+JlnNMeUnHXZpGc0oypUonMskZbMaAvtHu0B9VIKa+lK79/enkTX4OIesfF0BVtlNHA==
+X-Received: by 2002:a17:907:9626:b0:6fe:bae9:70bc with SMTP id gb38-20020a170907962600b006febae970bcmr18262748ejc.150.1653464841153;
+        Wed, 25 May 2022 00:47:21 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id 8-20020a170906020800b006fe8b3d8cb6sm7533165ejd.62.2022.05.25.00.47.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 May 2022 19:58:46 -0700 (PDT)
-Message-ID: <6d291eba-1055-51c3-f015-d029a434b2c0@ozlabs.ru>
-Date:   Wed, 25 May 2022 12:58:41 +1000
+        Wed, 25 May 2022 00:47:20 -0700 (PDT)
+Message-ID: <4fdbe38d-0e7d-764f-beab-034a9f172137@redhat.com>
+Date:   Wed, 25 May 2022 09:47:19 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:101.0) Gecko/20100101
- Thunderbird/101.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
 Subject: Re: [PATCH kernel] KVM: Don't null dereference ops->destroy
 Content-Language: en-US
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm-ppc@vger.kernel.org
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
 References: <20220524055208.1269279-1-aik@ozlabs.ru>
  <Yo05tuQZorCO/kc0@google.com>
  <cc19c541-0b5b-423e-4323-493fd8dafdd8@ozlabs.ru>
-In-Reply-To: <cc19c541-0b5b-423e-4323-493fd8dafdd8@ozlabs.ru>
+ <6d291eba-1055-51c3-f015-d029a434b2c0@ozlabs.ru>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <6d291eba-1055-51c3-f015-d029a434b2c0@ozlabs.ru>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-
-
-On 5/25/22 11:52, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 5/25/22 06:01, Sean Christopherson wrote:
->> On Tue, May 24, 2022, Alexey Kardashevskiy wrote:
->>> There are 2 places calling kvm_device_ops::destroy():
->>> 1) when creating a KVM device failed;
->>> 2) when a VM is destroyed: kvm_destroy_devices() destroys all devices
->>> from &kvm->devices.
+On 5/25/22 04:58, Alexey Kardashevskiy wrote:
 >>>
->>> All 3 Book3s's interrupt controller KVM devices (XICS, XIVE, 
->>> XIVE-native)
->>> do not define kvm_device_ops::destroy() and only define release() which
->>> is normally fine as device fds are closed before KVM gets to 2) but
->>> by then the &kvm->devices list is empty.
->>>
->>> However Syzkaller manages to trigger 1).
->>>
->>> This adds checks in 1) and 2).
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>> ---
->>>
->>> I could define empty handlers for XICS/XIVE guys but
->>> kvm_ioctl_create_device() already checks for ops->init() so I guess
->>> kvm_device_ops are expected to not have certain handlers.
->>
->> Oof.  IMO, ->destroy() should be mandatory in order to pair with 
->> ->create().
-
-
-After reading
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2bde9b3ec8bdf60788e9e 
-and neighboring commits, it sounds that each create() should be paired 
-with either destroy() or release() but not necessarily both.
-
-So I'm really not sure dummy handlers is a good idea. Thanks,
-
-
->> kvmppc_xive_create(), kvmppc_xics_create(), and 
->> kvmppc_core_destroy_vm() are doing
->> some truly funky stuff to avoid leaking the device that's allocate in 
->> ->create().
-> 
-> Huh it used to be release() actually, nice:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=5422e95103cf9663bc
 > 
 > 
->> A nop/dummy ->destroy() would be a good place to further document 
->> those shenanigans.
->> There's a comment at the end of the ->release() hooks, but that's 
->> still not very
->> obvious.
-> 
-> I could probably borrow some docs from here:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6f868405faf067e8cfb
-> 
-> 
-> Thanks for the review! At very least I'll add the dummies.
-> 
-> 
->> The comment above kvmppc_xive_get_device() strongly suggests that 
->> keeping the
->> allocation is a hack to avoid having to audit all relevant code paths, 
->> i.e. isn't
->> done for performance reasons.
+> After reading
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2bde9b3ec8bdf60788e9e 
+> and neighboring commits, it sounds that each create() should be paired 
+> with either destroy() or release() but not necessarily both.
 
+I agree, if release() is implemented then destroy() will never be called 
+(except in error situations).
 
+kvm_destroy_devices() should not be touched, except to add a WARN_ON 
+perhaps.
 
+> So I'm really not sure dummy handlers is a good idea. Thanks,
 
--- 
-Alexey
+But in that case shouldn't kvm_ioctl_create_device also try 
+ops->release, i.e.
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6d971fb1b08d..f265e2738d46 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4299,8 +4299,11 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
+  		kvm_put_kvm_no_destroy(kvm);
+  		mutex_lock(&kvm->lock);
+  		list_del(&dev->vm_node);
++		if (ops->release)
++			ops->release(dev);
+  		mutex_unlock(&kvm->lock);
+-		ops->destroy(dev);
++		if (ops->destroy)
++			ops->destroy(dev);
+  		return ret;
+  	}
+
+?
+
+Paolo
+
