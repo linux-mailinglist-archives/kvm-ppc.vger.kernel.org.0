@@ -2,65 +2,76 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C35BD55B42A
-	for <lists+kvm-ppc@lfdr.de>; Sun, 26 Jun 2022 23:16:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0BD955C3E2
+	for <lists+kvm-ppc@lfdr.de>; Tue, 28 Jun 2022 14:49:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232172AbiFZVPj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sun, 26 Jun 2022 17:15:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33552 "EHLO
+        id S243906AbiF1IDa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 28 Jun 2022 04:03:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232155AbiFZVPj (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sun, 26 Jun 2022 17:15:39 -0400
-X-Greylist: delayed 358 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 26 Jun 2022 14:15:35 PDT
-Received: from std004.phy.lolipop.jp (std004.phy.lolipop.jp [163.44.185.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1C432DCA
-        for <kvm-ppc@vger.kernel.org>; Sun, 26 Jun 2022 14:15:35 -0700 (PDT)
-Received: by std004.phy.lolipop.jp (Postfix, from userid 995)
-        id E391B1C0806A6; Mon, 27 Jun 2022 06:09:34 +0900 (JST)
-To:     kvm-ppc@vger.kernel.org
-Subject: =?UTF-8?B?44CQQVXjgJHjgYrllY/jgYTlkIjjgo/jgZvjgYLjgorjgYzjgajjgYbjgZQ=?=  =?UTF-8?B?44GW44GE44G+44GX44Gf44CC?=
-X-PHP-Originating-Script: 1580861:PHPMailer.php
-Date:   Sun, 26 Jun 2022 21:09:34 +0000
-From:   WordPress <contact@au-gold.jp>
-Message-ID: <IlmXcFDQwkRoGpAqlYWuTNtgfcdMoMhQqB4wHtn6USQ@au-gold.jp>
-X-Mailer: PHPMailer 6.6.0 (https://github.com/PHPMailer/PHPMailer)
+        with ESMTP id S243816AbiF1ICd (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 28 Jun 2022 04:02:33 -0400
+Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4A8362CDE4;
+        Tue, 28 Jun 2022 01:02:32 -0700 (PDT)
+Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 91B8A80191;
+        Tue, 28 Jun 2022 04:02:29 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Frederic Barrat <fbarrat@linux.ibm.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH kernel] KVM: PPC: Do not warn when userspace asked for too big TCE table
+Date:   Tue, 28 Jun 2022 18:02:28 +1000
+Message-Id: <20220628080228.1508847-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: Yes, score=5.8 required=5.0 tests=BAYES_99,BAYES_999,
-        HEADER_FROM_DIFFERENT_DOMAINS,PHP_ORIG_SCRIPT,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: *  3.5 BAYES_99 BODY: Bayes spam probability is 99 to 100%
-        *      [score: 1.0000]
-        *  0.2 BAYES_999 BODY: Bayes spam probability is 99.9 to 100%
-        *      [score: 1.0000]
-        *  0.0 SPF_NONE SPF: sender does not publish an SPF Record
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.2 HEADER_FROM_DIFFERENT_DOMAINS From and EnvelopeFrom 2nd level
-        *      mail domains are different
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  1.9 PHP_ORIG_SCRIPT Sent by bot & other signs
-X-Spam-Level: *****
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-e4p45f様、この度はAUへお問い合わせいただき、誠にありがとうございました。
-内容確認させていただいた後、担当者よりご連絡を差し上げます。
+KVM manages emulated TCE tables for guest LIOBNs by a two level table
+which maps up to 128TiB with 16MB IOMMU pages (enabled in QEMU by default)
+and MAX_ORDER=11 (the kernel's default). Note that the last level of
+the table is allocated when actual TCE is updated.
 
-ーーーーーーーーーーーーーーーーー
-【　AU　】
-https://au-gold.jp
-ーーーーーーーーーーーーーーーーー
+However these tables are created via ioctl() on kvmfd and the userspace
+can trigger WARN_ON_ONCE_GFP(order >= MAX_ORDER, gfp) in mm/page_alloc.c
+and flood dmesg.
 
-[ お問い合わせ内容 ]
-会社名：💟 Have you ever tried this sex game before? GIVE IT A TRY: https://queen22.page.link/photos?1cr4 💟
-お名前：e4p45f
-かな：iua22q
-連絡先：256885040261
-メールアドレス：kvm-ppc@vger.kernel.org
-お問い合わせ内容：
-0obpzm
+This adds __GFP_NOWARN.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+
+We could probably switch to vmalloc() to allow even bigger
+emulated tables which we do not really want the userspace
+to create though.
+
+---
+ arch/powerpc/kvm/book3s_64_vio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
+index d6589c4fe889..40864373ef87 100644
+--- a/arch/powerpc/kvm/book3s_64_vio.c
++++ b/arch/powerpc/kvm/book3s_64_vio.c
+@@ -307,7 +307,7 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
+ 		return ret;
+ 
+ 	ret = -ENOMEM;
+-	stt = kzalloc(struct_size(stt, pages, npages), GFP_KERNEL);
++	stt = kzalloc(struct_size(stt, pages, npages), GFP_KERNEL | __GFP_NOWARN);
+ 	if (!stt)
+ 		goto fail_acct;
+ 
+-- 
+2.30.2
 
