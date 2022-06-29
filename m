@@ -2,76 +2,66 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0BD955C3E2
-	for <lists+kvm-ppc@lfdr.de>; Tue, 28 Jun 2022 14:49:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 478855601A5
+	for <lists+kvm-ppc@lfdr.de>; Wed, 29 Jun 2022 15:45:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243906AbiF1IDa (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 28 Jun 2022 04:03:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56752 "EHLO
+        id S232126AbiF2No6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 29 Jun 2022 09:44:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243816AbiF1ICd (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 28 Jun 2022 04:02:33 -0400
-Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4A8362CDE4;
-        Tue, 28 Jun 2022 01:02:32 -0700 (PDT)
-Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 91B8A80191;
-        Tue, 28 Jun 2022 04:02:29 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH kernel] KVM: PPC: Do not warn when userspace asked for too big TCE table
-Date:   Tue, 28 Jun 2022 18:02:28 +1000
-Message-Id: <20220628080228.1508847-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.30.2
+        with ESMTP id S232507AbiF2No5 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 29 Jun 2022 09:44:57 -0400
+Received: from www2055.sakura.ne.jp (www2055.sakura.ne.jp [59.106.171.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E63B12A94;
+        Wed, 29 Jun 2022 06:44:56 -0700 (PDT)
+Received: from fsav412.sakura.ne.jp (fsav412.sakura.ne.jp [133.242.250.111])
+        by www2055.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 25TDD6s1066631;
+        Wed, 29 Jun 2022 22:13:07 +0900 (JST)
+        (envelope-from 1955@kkden.co.jp)
+Received: from www2055.sakura.ne.jp (59.106.171.65)
+ by fsav412.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp);
+ Wed, 29 Jun 2022 22:13:06 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp)
+Received: from www2055.sakura.ne.jp (localhost [127.0.0.1])
+        by www2055.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 25TDD5Nj066609;
+        Wed, 29 Jun 2022 22:13:06 +0900 (JST)
+        (envelope-from 1955@kkden.co.jp)
+Received: (from kkden@localhost)
+        by www2055.sakura.ne.jp (8.15.2/8.15.2/Submit) id 25TDD5BD066608;
+        Wed, 29 Jun 2022 22:13:05 +0900 (JST)
+        (envelope-from 1955@kkden.co.jp)
+Message-Id: <202206291313.25TDD5BD066608@www2055.sakura.ne.jp>
+X-Authentication-Warning: www2055.sakura.ne.jp: kkden set sender to 1955@kkden.co.jp using -f
+Subject: THIS IS VERY CONFIDENTIAL
+From:   Steve Dibenedetto <1955@kkden.co.jp>
+To:     stevedibenedetto177@gmail.com
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Date:   Wed, 29 Jun 2022 22:13:05 +0900
+Content-Type: text/plain; charset="ISO-2022-JP"
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_50,SPF_HELO_NONE,
+        SPF_NONE,SUBJ_ALL_CAPS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-KVM manages emulated TCE tables for guest LIOBNs by a two level table
-which maps up to 128TiB with 16MB IOMMU pages (enabled in QEMU by default)
-and MAX_ORDER=11 (the kernel's default). Note that the last level of
-the table is allocated when actual TCE is updated.
 
-However these tables are created via ioctl() on kvmfd and the userspace
-can trigger WARN_ON_ONCE_GFP(order >= MAX_ORDER, gfp) in mm/page_alloc.c
-and flood dmesg.
+Hello,
 
-This adds __GFP_NOWARN.
+My name is Steve Dibenedetto.
+I apologize to have contacted you this way without a direct relationship. There is an opportunity to collaborate with me in the sourcing of some materials needed by our company for production of the different medicines we are researching.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
+I'm aware that this might be totally outside your professional specialization, but it will be a great source for generating extra revenue. I  discovered a manufacturer who can supply us at a lower rate than our company's previous purchases.
+I will give you more specific details when/if I receive feedback from you showing interest.
 
-We could probably switch to vmalloc() to allow even bigger
-emulated tables which we do not really want the userspace
-to create though.
-
----
- arch/powerpc/kvm/book3s_64_vio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-index d6589c4fe889..40864373ef87 100644
---- a/arch/powerpc/kvm/book3s_64_vio.c
-+++ b/arch/powerpc/kvm/book3s_64_vio.c
-@@ -307,7 +307,7 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
- 		return ret;
- 
- 	ret = -ENOMEM;
--	stt = kzalloc(struct_size(stt, pages, npages), GFP_KERNEL);
-+	stt = kzalloc(struct_size(stt, pages, npages), GFP_KERNEL | __GFP_NOWARN);
- 	if (!stt)
- 		goto fail_acct;
- 
--- 
-2.30.2
-
+Warm Regards  
+Steve Dibenedetto
+Production & Control Manager,
+Green Field Laboratories
+Gothic House, Barker Gate,
+Nottingham, NG1 1JU,
+United Kingdom.
