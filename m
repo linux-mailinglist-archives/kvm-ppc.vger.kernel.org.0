@@ -2,66 +2,114 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 478855601A5
-	for <lists+kvm-ppc@lfdr.de>; Wed, 29 Jun 2022 15:45:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C2DF562B5E
+	for <lists+kvm-ppc@lfdr.de>; Fri,  1 Jul 2022 08:18:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232126AbiF2No6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 29 Jun 2022 09:44:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47670 "EHLO
+        id S234730AbiGAGR6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 1 Jul 2022 02:17:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232507AbiF2No5 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 29 Jun 2022 09:44:57 -0400
-Received: from www2055.sakura.ne.jp (www2055.sakura.ne.jp [59.106.171.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E63B12A94;
-        Wed, 29 Jun 2022 06:44:56 -0700 (PDT)
-Received: from fsav412.sakura.ne.jp (fsav412.sakura.ne.jp [133.242.250.111])
-        by www2055.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 25TDD6s1066631;
-        Wed, 29 Jun 2022 22:13:07 +0900 (JST)
-        (envelope-from 1955@kkden.co.jp)
-Received: from www2055.sakura.ne.jp (59.106.171.65)
- by fsav412.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp);
- Wed, 29 Jun 2022 22:13:06 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp)
-Received: from www2055.sakura.ne.jp (localhost [127.0.0.1])
-        by www2055.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 25TDD5Nj066609;
-        Wed, 29 Jun 2022 22:13:06 +0900 (JST)
-        (envelope-from 1955@kkden.co.jp)
-Received: (from kkden@localhost)
-        by www2055.sakura.ne.jp (8.15.2/8.15.2/Submit) id 25TDD5BD066608;
-        Wed, 29 Jun 2022 22:13:05 +0900 (JST)
-        (envelope-from 1955@kkden.co.jp)
-Message-Id: <202206291313.25TDD5BD066608@www2055.sakura.ne.jp>
-X-Authentication-Warning: www2055.sakura.ne.jp: kkden set sender to 1955@kkden.co.jp using -f
-Subject: THIS IS VERY CONFIDENTIAL
-From:   Steve Dibenedetto <1955@kkden.co.jp>
-To:     stevedibenedetto177@gmail.com
+        with ESMTP id S233903AbiGAGR6 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 1 Jul 2022 02:17:58 -0400
+Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E173F344EB;
+        Thu, 30 Jun 2022 23:17:56 -0700 (PDT)
+Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 9C2B180B11;
+        Fri,  1 Jul 2022 02:17:53 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     kvm@vger.kernel.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Joerg Roedel <jroedel@suse.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm-ppc@vger.kernel.org
+Subject: [RFC PATCH kernel] vfio: Skip checking for IOMMU_CAP_CACHE_COHERENCY on POWER and more
+Date:   Fri,  1 Jul 2022 16:17:51 +1000
+Message-Id: <20220701061751.1955857-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Date:   Wed, 29 Jun 2022 22:13:05 +0900
-Content-Type: text/plain; charset="ISO-2022-JP"
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_50,SPF_HELO_NONE,
-        SPF_NONE,SUBJ_ALL_CAPS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Level: *
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+VFIO on POWER does not implement iommu_ops and therefore iommu_capable()
+always returns false and __iommu_group_alloc_blocking_domain() always
+fails.
 
-Hello,
+iommu_group_claim_dma_owner() in setting container fails for the same
+reason - it cannot allocate a domain.
 
-My name is Steve Dibenedetto.
-I apologize to have contacted you this way without a direct relationship. There is an opportunity to collaborate with me in the sourcing of some materials needed by our company for production of the different medicines we are researching.
+This skips the check for platforms supporting VFIO without implementing
+iommu_ops which to my best knowledge is POWER only.
 
-I'm aware that this might be totally outside your professional specialization, but it will be a great source for generating extra revenue. I  discovered a manufacturer who can supply us at a lower rate than our company's previous purchases.
-I will give you more specific details when/if I receive feedback from you showing interest.
+This also allows setting container in absence of iommu_ops.
 
-Warm Regards  
-Steve Dibenedetto
-Production & Control Manager,
-Green Field Laboratories
-Gothic House, Barker Gate,
-Nottingham, NG1 1JU,
-United Kingdom.
+Fixes: 70693f470848 ("vfio: Set DMA ownership for VFIO devices")
+Fixes: e8ae0e140c05 ("vfio: Require that devices support DMA cache coherence")
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+
+Not quite sure what the proper small fix is and implementing iommu_ops
+on POWER is not going to happen any time soon or ever :-/
+
+---
+ drivers/vfio/vfio.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 61e71c1154be..71408ab26cd0 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -605,7 +605,8 @@ int vfio_register_group_dev(struct vfio_device *device)
+ 	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
+ 	 * restore cache coherency.
+ 	 */
+-	if (!iommu_capable(device->dev->bus, IOMMU_CAP_CACHE_COHERENCY))
++	if (device->dev->bus->iommu_ops &&
++	    !iommu_capable(device->dev->bus, IOMMU_CAP_CACHE_COHERENCY))
+ 		return -EINVAL;
+ 
+ 	return __vfio_register_dev(device,
+@@ -934,7 +935,7 @@ static void __vfio_group_unset_container(struct vfio_group *group)
+ 		driver->ops->detach_group(container->iommu_data,
+ 					  group->iommu_group);
+ 
+-	if (group->type == VFIO_IOMMU)
++	if (group->type == VFIO_IOMMU && iommu_group_dma_owner_claimed(group->iommu_group))
+ 		iommu_group_release_dma_owner(group->iommu_group);
+ 
+ 	group->container = NULL;
+@@ -1010,9 +1011,8 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
+ 	}
+ 
+ 	if (group->type == VFIO_IOMMU) {
+-		ret = iommu_group_claim_dma_owner(group->iommu_group, f.file);
+-		if (ret)
+-			goto unlock_out;
++		if (iommu_group_claim_dma_owner(group->iommu_group, f.file))
++			pr_warn("Failed to claim DMA owner");
+ 	}
+ 
+ 	driver = container->iommu_driver;
+@@ -1021,7 +1021,8 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
+ 						group->iommu_group,
+ 						group->type);
+ 		if (ret) {
+-			if (group->type == VFIO_IOMMU)
++			if (group->type == VFIO_IOMMU &&
++			    iommu_group_dma_owner_claimed(group->iommu_group))
+ 				iommu_group_release_dma_owner(
+ 					group->iommu_group);
+ 			goto unlock_out;
+-- 
+2.30.2
+
