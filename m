@@ -2,131 +2,57 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D05956C61A
-	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Jul 2022 04:56:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC65656C8EA
+	for <lists+kvm-ppc@lfdr.de>; Sat,  9 Jul 2022 12:18:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229456AbiGIC4I (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 8 Jul 2022 22:56:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38402 "EHLO
+        id S229470AbiGIKSK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Sat, 9 Jul 2022 06:18:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiGIC4I (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 8 Jul 2022 22:56:08 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 073D27AB35
-        for <kvm-ppc@vger.kernel.org>; Fri,  8 Jul 2022 19:56:06 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id i8-20020a17090a4b8800b001ef8a65bfbdso311266pjh.1
-        for <kvm-ppc@vger.kernel.org>; Fri, 08 Jul 2022 19:56:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=Iu4+SfGnILNyrtOPbZlqTPcN6ioiSauG+G5Viw8UbkE=;
-        b=4OHZPXkZ7ZnQosBhh/5M+GPXDZj6PxbiJq6JyMh4JF5j0T25k04I3XCtO2DGGzdzOM
-         IjtUMhFqx1+X7jM7QYfThlkXu5EuH46KBixGz4l0EcrTXQA3zU550VcPk3174I5shRkT
-         YWetdbuD9iAa9m6dg9yOvt9CuavyH4vxvfTz+IqkLDDh2g5Rn2VszNv9UMocSs0lb9KM
-         4zvYKkiVFijqRWuZpxM8xYQx20ipNLODpr0PZv9HHnvgHR3Jn/kflZZ5HU2qbPzC52Z+
-         jhyP5kWoKIu9dO0gXB95VIwD00G2E25B5yG50CQjIhBLVhe9AgoNrPplYIgxGRGf95RO
-         5imw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Iu4+SfGnILNyrtOPbZlqTPcN6ioiSauG+G5Viw8UbkE=;
-        b=w8RrCxVc7AxZTAXwtmaWnB93QV2KcXN9RiCI3W3DNmrwGP1G2Iu7AVVuaMzDD7vufU
-         KPkSG37JYDKvECHYQDvVEhJTDLwqqn/3ynTGqsGpvdsxg3+Ib4Z9Ias+Vwfudqw6Yod/
-         FrOsNWMopCB7mmfHSPvlCX3O9zu/yC0YLM9u/wA2WDbTPTKX485FVo17SdiM8QR+Q7mN
-         VVSA9gELe91DVQ+0ZJPhqdDm7XrYwldTmpz/AU2ySFxbRsfZPZj8164nf4JCG4ktzRZl
-         NxDSSkZO2mfG2qVxoZbSeHNikeHp5dwasfDv9ol4iZiMWFFI3VNAp9IQyDy5HF4PDaLC
-         8o0w==
-X-Gm-Message-State: AJIora/Efca12vEwl8U4YhtSuSy1oigVpPp+tEXeq0Wex49MfQrS7MB9
-        GWHZR10Ifn93IBY+SnBsIHkdVA==
-X-Google-Smtp-Source: AGRyM1sNAKGtQSl3OJK31+VZwzSz+l9+Khv93qto99rzXrd44U4TeqYhciXpTToLUGk4X2v1dM98ng==
-X-Received: by 2002:a17:90b:3b43:b0:1ef:d89b:3454 with SMTP id ot3-20020a17090b3b4300b001efd89b3454mr3432246pjb.87.1657335365511;
-        Fri, 08 Jul 2022 19:56:05 -0700 (PDT)
-Received: from [192.168.10.153] (203-7-124-83.dyn.iinet.net.au. [203.7.124.83])
-        by smtp.gmail.com with ESMTPSA id z24-20020aa79498000000b0052542cbff9dsm309688pfk.99.2022.07.08.19.55.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Jul 2022 19:56:04 -0700 (PDT)
-Message-ID: <8329c51a-601e-0d93-41b4-2eb8524c9bcb@ozlabs.ru>
-Date:   Sat, 9 Jul 2022 12:58:00 +1000
+        with ESMTP id S229469AbiGIKSJ (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 9 Jul 2022 06:18:09 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E963CBFA
+        for <kvm-ppc@vger.kernel.org>; Sat,  9 Jul 2022 03:18:08 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Lg5gs0QWjz4xXD;
+        Sat,  9 Jul 2022 20:18:01 +1000 (AEST)
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+To:     linuxppc-dev@lists.ozlabs.org, Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     kvm-ppc@vger.kernel.org
+In-Reply-To: <20220622055235.1139204-1-aik@ozlabs.ru>
+References: <20220622055235.1139204-1-aik@ozlabs.ru>
+Subject: Re: [PATCH kernel] KVM: PPC: Book3s: Fix warning about xics_rm_h_xirr_x
+Message-Id: <165736166219.12236.403684583193029179.b4-ty@ellerman.id.au>
+Date:   Sat, 09 Jul 2022 20:14:22 +1000
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.0
-Subject: Re: [PATCH kernel] powerpc/iommu: Add iommu_ops to report
- capabilities and allow blocking domains
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, Robin Murphy <robin.murphy@arm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Joerg Roedel <jroedel@suse.de>, Joel Stanley <joel@jms.id.au>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Oliver O'Halloran <oohall@gmail.com>, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-References: <20220707135552.3688927-1-aik@ozlabs.ru>
- <20220707151002.GB1705032@nvidia.com>
- <bb8f4c93-6cbc-0106-d4c1-1f3c0751fbba@ozlabs.ru>
- <bbe29694-66a3-275b-5a79-71237ad7388f@ozlabs.ru>
- <20220708115522.GD1705032@nvidia.com>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <20220708115522.GD1705032@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-
-
-On 08/07/2022 21:55, Jason Gunthorpe wrote:
-> On Fri, Jul 08, 2022 at 04:34:55PM +1000, Alexey Kardashevskiy wrote:
+On Wed, 22 Jun 2022 15:52:35 +1000, Alexey Kardashevskiy wrote:
+> This fixes "no previous prototype":
 > 
->> For now I'll add a comment in spapr_tce_iommu_attach_dev() that it is fine
->> to do nothing as tce_iommu_take_ownership() and
->> tce_iommu_take_ownership_ddw() take care of not having active DMA mappings.
+> arch/powerpc/kvm/book3s_hv_rm_xics.c:482:15:
+> warning: no previous prototype for 'xics_rm_h_xirr_x' [-Wmissing-prototypes]
 > 
-> That will still cause a security problem because
-> tce_iommu_take_ownership()/etc are called too late. This is the moment
-> in the flow when the ownershift must change away from the DMA API that
-> power implements and to VFIO, not later.
+> Reported by the kernel test robot.
+> 
+> [...]
 
-Trying to do that.
+Applied to powerpc/topic/ppc-kvm.
 
-vfio_group_set_container:
-     iommu_group_claim_dma_owner
-     driver->ops->attach_group
+[1/1] KVM: PPC: Book3s: Fix warning about xics_rm_h_xirr_x
+      https://git.kernel.org/powerpc/c/a784101f77b1bef4b40f4ad68af3f54fcfa5321b
 
-iommu_group_claim_dma_owner sets a domain to a group. Good. But it 
-attaches devices, not groups. Bad.
-
-driver->ops->attach_group on POWER attaches a group so VFIO claims 
-ownership over a group, not devices. Underlying API 
-(pnv_ioda2_take_ownership()) does not need to keep track of the state, 
-it is one group, one ownership transfer, easy.
-
-
-What is exactly the reason why iommu_group_claim_dma_owner() cannot stay 
-inside Type1 (sorry if it was explained, I could have missed)?
-
-
-
-Also, from another mail, you said iommu_alloc_default_domain() should 
-fail on power but at least IOMMU_DOMAIN_BLOCKED must be supported, or 
-the whole iommu_group_claim_dma_owner() thing falls apart.
-And iommu_ops::domain_alloc() is not told if it is asked to create a 
-default domain, it only takes a type.
-
-
-
--- 
-Alexey
+cheers
