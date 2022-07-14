@@ -2,29 +2,37 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DC93574654
-	for <lists+kvm-ppc@lfdr.de>; Thu, 14 Jul 2022 10:09:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 410FD574689
+	for <lists+kvm-ppc@lfdr.de>; Thu, 14 Jul 2022 10:18:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229805AbiGNIJZ (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 14 Jul 2022 04:09:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35238 "EHLO
+        id S229904AbiGNISl (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 14 Jul 2022 04:18:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbiGNIJY (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 14 Jul 2022 04:09:24 -0400
+        with ESMTP id S229693AbiGNISj (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 14 Jul 2022 04:18:39 -0400
 Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4F8BF2B183;
-        Thu, 14 Jul 2022 01:09:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2E37ADE1;
+        Thu, 14 Jul 2022 01:18:36 -0700 (PDT)
 Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 5B98C804CB;
-        Thu, 14 Jul 2022 04:09:15 -0400 (EDT)
+        by ozlabs.ru (Postfix) with ESMTP id 58DA2804CB;
+        Thu, 14 Jul 2022 04:18:26 -0400 (EDT)
 From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     kvm@vger.kernel.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Deming Wang <wangdeming@inspur.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        kvm-ppc@vger.kernel.org
-Subject: [PATCH kernel] vfio/spapr_tce: Fix the comment
-Date:   Thu, 14 Jul 2022 18:09:12 +1000
-Message-Id: <20220714080912.3713509-1-aik@ozlabs.ru>
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: [PATCH kernel 0/3] powerpc/iommu: Add iommu_ops to report capabilities and allow blocking domains
+Date:   Thu, 14 Jul 2022 18:18:19 +1000
+Message-Id: <20220714081822.3717693-1-aik@ozlabs.ru>
 X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -37,27 +45,37 @@ Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Grepping for "iommu_ops" finds this spot and gives wrong impression
-that iommu_ops is used in here, fix the comment.
+Here is another take on iommu_ops on POWER to make VFIO work
+again on POWERPC64.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- drivers/vfio/vfio_iommu_spapr_tce.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The tree with all prerequisites is here:
+https://github.com/aik/linux/tree/kvm-fixes-wip
 
-diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
-index 708a95e61831..cd7b9c136889 100644
---- a/drivers/vfio/vfio_iommu_spapr_tce.c
-+++ b/drivers/vfio/vfio_iommu_spapr_tce.c
-@@ -1266,7 +1266,7 @@ static int tce_iommu_attach_group(void *iommu_data,
- 		goto unlock_exit;
- 	}
- 
--	/* Check if new group has the same iommu_ops (i.e. compatible) */
-+	/* Check if new group has the same iommu_table_group_ops (i.e. compatible) */
- 	list_for_each_entry(tcegrp, &container->group_list, next) {
- 		struct iommu_table_group *table_group_tmp;
- 
+The previous discussion is here:
+https://patchwork.ozlabs.org/project/linuxppc-dev/patch/20220707135552.3688927-1-aik@ozlabs.ru/
+https://patchwork.ozlabs.org/project/kvm-ppc/patch/20220701061751.1955857-1-aik@ozlabs.ru/
+
+Please comment. Thanks.
+
+
+
+Alexey Kardashevskiy (3):
+  powerpc/iommu: Add "borrowing" iommu_table_group_ops
+  powerpc/pci_64: Init pcibios subsys a bit later
+  powerpc/iommu: Add iommu_ops to report capabilities and allow blocking
+    domains
+
+ arch/powerpc/include/asm/iommu.h          |   6 +-
+ arch/powerpc/include/asm/pci-bridge.h     |   7 +
+ arch/powerpc/platforms/pseries/pseries.h  |   5 +
+ arch/powerpc/kernel/iommu.c               | 257 +++++++++++++++++++++-
+ arch/powerpc/kernel/pci_64.c              |   2 +-
+ arch/powerpc/platforms/powernv/pci-ioda.c |  36 ++-
+ arch/powerpc/platforms/pseries/iommu.c    |  27 +++
+ arch/powerpc/platforms/pseries/setup.c    |   3 +
+ drivers/vfio/vfio_iommu_spapr_tce.c       |  96 ++------
+ 9 files changed, 345 insertions(+), 94 deletions(-)
+
 -- 
 2.30.2
 
