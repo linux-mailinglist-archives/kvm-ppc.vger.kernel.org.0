@@ -2,106 +2,190 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B448057EA0E
-	for <lists+kvm-ppc@lfdr.de>; Sat, 23 Jul 2022 00:50:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A27EB5849AE
+	for <lists+kvm-ppc@lfdr.de>; Fri, 29 Jul 2022 04:22:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235204AbiGVWui (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 22 Jul 2022 18:50:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45728 "EHLO
+        id S232635AbiG2CWB (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 28 Jul 2022 22:22:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230502AbiGVWuh (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 22 Jul 2022 18:50:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D09F622B17
-        for <kvm-ppc@vger.kernel.org>; Fri, 22 Jul 2022 15:50:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658530235;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5G+9XofFYtjcjc9nMklfj+U+SYfTvHOn025PmT4w4OA=;
-        b=gIC0KkPnEczr7Ug7ADupegVWAGTB2FklPDAq3hxZ/LmmuOp10qxOpWYsFBWibdQ7IsitxY
-        Gpuedcw8vUEBdZagNpEHjjsq5RoKaqX+Fwwf2iUCi1AjbtfxCrdZP8NJxkMRYnEP71wF0m
-        1UxqmcF7Bog0SVU/qvKHYavAMjzoxno=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-338-jSItglruNK2dRPScg5BIwQ-1; Fri, 22 Jul 2022 18:50:34 -0400
-X-MC-Unique: jSItglruNK2dRPScg5BIwQ-1
-Received: by mail-il1-f199.google.com with SMTP id g8-20020a92cda8000000b002dcbd57f808so3458183ild.4
-        for <kvm-ppc@vger.kernel.org>; Fri, 22 Jul 2022 15:50:34 -0700 (PDT)
+        with ESMTP id S232260AbiG2CWA (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 28 Jul 2022 22:22:00 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AEDE79EE7
+        for <kvm-ppc@vger.kernel.org>; Thu, 28 Jul 2022 19:21:55 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d10so3445452pfd.9
+        for <kvm-ppc@vger.kernel.org>; Thu, 28 Jul 2022 19:21:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=yL6IUYgPwNHI0oBre6USbbEJkgU31+NcKUw2BdyBE+k=;
+        b=eae2cICrCe2DgCX9GLFxTBoteiX4MJieAZaKj/FXNBqqz+kA0xbDQcfLyg2/L4nHSi
+         GXqHA7bdjUh4pkjMAYqmthaac6V2RLFoI3Cb+GcNJUXMdiUJ+cI3vrsW94gt8pZfl+CB
+         ae/l8S0Vy/hAaH65jA1y7eFyMZm4wOomontpwLkGmWRSercl7oVyxK1CAnu7lZBd1oQr
+         miLqBni30Wy0l+0UDEoUYM21qkgfiLz9D8fjJNxQOyCDUKyiwP+wFyXka41X2X9at+rX
+         imxyd3XpBaseiIBZX965xQaeA6VrkrPD/B2CJOwW2O/BdkZhvJW6qG2eCHHgKsRAkeDw
+         Edgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=5G+9XofFYtjcjc9nMklfj+U+SYfTvHOn025PmT4w4OA=;
-        b=Uuf+ljeA9ozJ9mY4wnUPiCraGNiniaGtDh49W8M3vtEo1nf8Pf2T6a/BOPOLeI+rba
-         kKzS1F19yFQx9qjOsh1L4KRFdsa6HgPWfwvr3smhRqWhDb3dEituxKQYvzMna8GCkGNY
-         La4scQ4y5fai1y4xrDxK+SRWTPTPjHmksDdIZyuDwqrQoSacljYZpIVkX+AXiNrWQXD1
-         LVYfKFfxNpBrAHakvlD0UmaTKk5n1Inj/3IBJJE3P0LfTPdKjCGyyd+sh++IQItakN3n
-         5LlxnZDoxspF3yAgYJrnHWbfPL2jEMw+GJnbQTcWb6a9s7dnfcKz4J9pdvBOHI+Ewk5d
-         MZ+A==
-X-Gm-Message-State: AJIora8lVAtM2YfpGLhfoNaH5y8L2UM8YXpazdZapUoCw9AB/01CC0Tk
-        +q/tKKGNqr52Q/8hWQMFvqDm87I5x86eLqVYJSNSvxqCBVIP0I5TsSIZxrA3ybmW9Ai7uCJ/FS+
-        HUJkaW+CRqlhEdBA5LQ==
-X-Received: by 2002:a6b:146:0:b0:67b:c614:d6bd with SMTP id 67-20020a6b0146000000b0067bc614d6bdmr676747iob.76.1658530233793;
-        Fri, 22 Jul 2022 15:50:33 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sHnPDxfnE1FYRt+HswBN5/Vx6Bm07TqPL4q4XagHh2Kh1ra94En6q+UnhzhVSmG3FYDySiCg==
-X-Received: by 2002:a6b:146:0:b0:67b:c614:d6bd with SMTP id 67-20020a6b0146000000b0067bc614d6bdmr676743iob.76.1658530233576;
-        Fri, 22 Jul 2022 15:50:33 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id f16-20020a022410000000b0033e72ec9d93sm2527322jaa.145.2022.07.22.15.50.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jul 2022 15:50:32 -0700 (PDT)
-Date:   Fri, 22 Jul 2022 16:50:27 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH kernel] vfio/spapr_tce: Fix the comment
-Message-ID: <20220722165027.13dc2045.alex.williamson@redhat.com>
-In-Reply-To: <20220714080912.3713509-1-aik@ozlabs.ru>
-References: <20220714080912.3713509-1-aik@ozlabs.ru>
-Organization: Red Hat
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=yL6IUYgPwNHI0oBre6USbbEJkgU31+NcKUw2BdyBE+k=;
+        b=JmVs+evWa9R3HbgJkTaAngVPNtbwbocvHHtF7fZzWRrymS2G1CS6e9ZjMDq74B/3nA
+         dsQmTMVF+vNRmEZKAvbG0o1vRYoMAUCIwiLgezkWi4BF21BzQmiCNz10xJ8I4FA8AH7Y
+         a0fkQ18psngUX98GRFp9mJHU6f6JDsWlHa7uGv648mujBa+DFm1MSDbwdYiuGuNQRdWt
+         8NVtdF+ZraKzLoK5sBFP3/fPSIB5vrjvjlzfDLSSlRtcKbCV9psRFkcZ8IXD7scKvNFn
+         2tJ4OMsSEHLQDabDy9dyfKOsNSHGHi/328Q9bjAjowQvsORckWmQU+acc4F6sYtsAxLn
+         HpKA==
+X-Gm-Message-State: ACgBeo3/s8XQAEn9iHEhSQtxsLBZi/Wwz7ZnFgCZu7tOKhpAAfPqVHxA
+        7lhWe0mpuW4Z8shv2A7HmlnvUg==
+X-Google-Smtp-Source: AGRyM1vhohbLpRcd05Kr+trC+ZuYAaJC08xuSgp+1X8NvEUQTHTDYL63DHsK5CMUWvyhk7tt2yKF8g==
+X-Received: by 2002:a05:6a00:3388:b0:52a:c018:6cdf with SMTP id cm8-20020a056a00338800b0052ac0186cdfmr1305849pfb.55.1659061314580;
+        Thu, 28 Jul 2022 19:21:54 -0700 (PDT)
+Received: from [192.168.10.153] (203-7-124-83.dyn.iinet.net.au. [203.7.124.83])
+        by smtp.gmail.com with ESMTPSA id s15-20020aa78bcf000000b0052bae7b2af8sm1437727pfd.201.2022.07.28.19.21.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Jul 2022 19:21:54 -0700 (PDT)
+Message-ID: <300aa0fe-31c5-4ed2-d0a2-597c2c305f91@ozlabs.ru>
+Date:   Fri, 29 Jul 2022 12:21:46 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101
+ Thunderbird/103.0
+Subject: Re: [PATCH kernel] powerpc/iommu: Add iommu_ops to report
+ capabilities and allow blocking domains
+Content-Language: en-US
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "Rodel, Jorg" <jroedel@suse.de>, Joel Stanley <joel@jms.id.au>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Oliver O'Halloran <oohall@gmail.com>,
+        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>
+References: <20220707135552.3688927-1-aik@ozlabs.ru>
+ <20220707151002.GB1705032@nvidia.com>
+ <bb8f4c93-6cbc-0106-d4c1-1f3c0751fbba@ozlabs.ru>
+ <bbe29694-66a3-275b-5a79-71237ad7388f@ozlabs.ru>
+ <BN9PR11MB527690152FE449D26576D2FE8C829@BN9PR11MB5276.namprd11.prod.outlook.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <BN9PR11MB527690152FE449D26576D2FE8C829@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, 14 Jul 2022 18:09:12 +1000
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-> Grepping for "iommu_ops" finds this spot and gives wrong impression
-> that iommu_ops is used in here, fix the comment.
+
+On 08/07/2022 17:32, Tian, Kevin wrote:
+>> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> Sent: Friday, July 8, 2022 2:35 PM
+>> On 7/8/22 15:00, Alexey Kardashevskiy wrote:
+>>>
+>>>
+>>> On 7/8/22 01:10, Jason Gunthorpe wrote:
+>>>> On Thu, Jul 07, 2022 at 11:55:52PM +1000, Alexey Kardashevskiy wrote:
+>>>>> Historically PPC64 managed to avoid using iommu_ops. The VFIO driver
+>>>>> uses a SPAPR TCE sub-driver and all iommu_ops uses were kept in
+>>>>> the Type1 VFIO driver. Recent development though has added a
+>> coherency
+>>>>> capability check to the generic part of VFIO and essentially disabled
+>>>>> VFIO on PPC64; the similar story about
+>> iommu_group_dma_owner_claimed().
+>>>>>
+>>>>> This adds an iommu_ops stub which reports support for cache
+>>>>> coherency. Because bus_set_iommu() triggers IOMMU probing of PCI
+>>>>> devices,
+>>>>> this provides minimum code for the probing to not crash.
 > 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->  drivers/vfio/vfio_iommu_spapr_tce.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> stale comment since this patch doesn't use bus_set_iommu() now.
 > 
-> diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
-> index 708a95e61831..cd7b9c136889 100644
-> --- a/drivers/vfio/vfio_iommu_spapr_tce.c
-> +++ b/drivers/vfio/vfio_iommu_spapr_tce.c
-> @@ -1266,7 +1266,7 @@ static int tce_iommu_attach_group(void *iommu_data,
->  		goto unlock_exit;
->  	}
->  
-> -	/* Check if new group has the same iommu_ops (i.e. compatible) */
-> +	/* Check if new group has the same iommu_table_group_ops (i.e. compatible) */
->  	list_for_each_entry(tcegrp, &container->group_list, next) {
->  		struct iommu_table_group *table_group_tmp;
->  
+>>>>> +
+>>>>> +static int spapr_tce_iommu_attach_dev(struct iommu_domain *dom,
+>>>>> +                      struct device *dev)
+>>>>> +{
+>>>>> +    return 0;
+>>>>> +}
+>>>>
+>>>> It is important when this returns that the iommu translation is all
+>>>> emptied. There should be no left over translations from the DMA API at
+>>>> this point. I have no idea how power works in this regard, but it
+>>>> should be explained why this is safe in a comment at a minimum.
+>>>>
+>>>   > It will turn into a security problem to allow kernel mappings to leak
+>>>   > past this point.
+>>>   >
+>>>
+>>> I've added for v2 checking for no valid mappings for a device (or, more
+>>> precisely, in the associated iommu_group), this domain does not need
+>>> checking, right?
+>>
+>>
+>> Uff, not that simple. Looks like once a device is in a group, its
+>> dma_ops is set to iommu_dma_ops and IOMMU code owns DMA. I guess
+>> then
+>> there is a way to set those to NULL or do something similar to let
+>> dma_map_direct() from kernel/dma/mapping.c return "true", is not there?
+> 
+> dev->dma_ops is NULL as long as you don't handle DMA domain type
+> here and don't call iommu_setup_dma_ops().
+> 
+> Given this only supports blocking domain then above should be irrelevant.
+> 
+>>
+>> For now I'll add a comment in spapr_tce_iommu_attach_dev() that it is
+>> fine to do nothing as tce_iommu_take_ownership() and
+>> tce_iommu_take_ownership_ddw() take care of not having active DMA
+>> mappings. Thanks,
+>>
+>>
+>>>
+>>> In general, is "domain" something from hardware or it is a software
+>>> concept? Thanks,
+>>>
+> 
+> 'domain' is a software concept to represent the hardware I/O page
+> table. 
 
-Applied to vfio next branch for v5.20 with a conversion to a multi-line
-comment to avoid the long line.  Thanks,
 
-Alex
+About this. If a platform has a concept of explicit DMA windows (2 or 
+more), is it one domain with 2 windows or 2 domains with one window each?
 
+If it is 2 windows, iommu_domain_ops misses windows manipulation 
+callbacks (I vaguely remember it being there for embedded PPC64 but 
+cannot find it quickly).
+
+If it is 1 window per a domain, then can a device be attached to 2 
+domains at least in theory (I suspect not)?
+
+On server POWER CPUs, each DMA window is backed by an independent IOMMU 
+page table. (reminder) A window is a bus address range where devices are 
+allowed to DMA to/from ;)
+
+Thanks,
+
+
+> A blocking domain means all DMAs from a device attached to
+> this domain are blocked/rejected (equivalent to an empty I/O page
+> table), usually enforced in the .attach_dev() callback.
+> 
+> Yes, a comment for why having a NULL .attach_dev() is OK is welcomed.
+> 
+> Thanks
+> Kevin
+
+-- 
+Alexey
