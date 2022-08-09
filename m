@@ -2,82 +2,43 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78A0B58B73C
-	for <lists+kvm-ppc@lfdr.de>; Sat,  6 Aug 2022 19:14:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ECA458D44B
+	for <lists+kvm-ppc@lfdr.de>; Tue,  9 Aug 2022 09:13:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231736AbiHFROf (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Sat, 6 Aug 2022 13:14:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47650 "EHLO
+        id S237347AbiHIHN6 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 9 Aug 2022 03:13:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229639AbiHFROe (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Sat, 6 Aug 2022 13:14:34 -0400
-X-Greylist: delayed 1096 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 06 Aug 2022 10:14:32 PDT
-Received: from mail.chesp.com.br (mail.chesp.com.br [186.195.108.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36838F5A2;
-        Sat,  6 Aug 2022 10:14:32 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.chesp.com.br (Postfix) with ESMTP id BEAD65229B9;
-        Sat,  6 Aug 2022 13:54:29 -0300 (-03)
-Received: from mail.chesp.com.br ([127.0.0.1])
-        by localhost (mail.chesp.com.br [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id hJeasz2uXq4h; Sat,  6 Aug 2022 13:54:29 -0300 (-03)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.chesp.com.br (Postfix) with ESMTP id BC00B5221A7;
-        Sat,  6 Aug 2022 13:49:44 -0300 (-03)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.chesp.com.br BC00B5221A7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chesp.com.br;
-        s=3C038ADA-7747-11E6-B1D8-1CDF186269DF; t=1659804586;
-        bh=tvQl5Cv0ChD6vA4I/J397OSiPoTe3zGLvZkAUXlzids=;
-        h=MIME-Version:To:From:Date:Message-Id;
-        b=K/9Vjg6uBlMLkxOglZAmFR2neqe+TT2dmoowY+4glLEBY9+osCLtqey1Jx3Tlbm2l
-         K4fDlV3VDUCv1DibsX6UYilmKSf/+TzdrImBbicFN044cHZ6UFFv6laDmbIUlZnA8I
-         y6tX5hgPabVdgMbYQ6mmCksKJmoxmbTB4OaiP+64NcYz+x6pnlPGkuACgqD8ok0BZb
-         ShIJ0aCqJ5GByQYp9mJYgi3xBvZ2pA2pzLLeyKb0QuWOtrZMvOvQyG99Nmhmt5TIh+
-         pPi/chd+5h4sRQ3TsGVWDAMXRlnn8O4bRWGl6RKdNhcb2CybbU7aOiqgpNslzW/0Vs
-         aFo6KiHcOVSnA==
-X-Virus-Scanned: amavisd-new at chesp.com.br
-Received: from mail.chesp.com.br ([127.0.0.1])
-        by localhost (mail.chesp.com.br [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id wqV9UuDw0BDs; Sat,  6 Aug 2022 13:49:44 -0300 (-03)
-Received: from [10.22.18.10] (unknown [154.21.20.55])
-        by mail.chesp.com.br (Postfix) with ESMTPSA id A2C9C522065;
-        Sat,  6 Aug 2022 13:48:47 -0300 (-03)
-Content-Type: text/plain; charset="iso-8859-1"
+        with ESMTP id S235482AbiHIHN6 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 9 Aug 2022 03:13:58 -0400
+X-Greylist: delayed 474 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 09 Aug 2022 00:13:57 PDT
+Received: from vmi299736.contaboserver.net (vmi299736.contaboserver.net [207.180.199.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 659911F617
+        for <kvm-ppc@vger.kernel.org>; Tue,  9 Aug 2022 00:13:57 -0700 (PDT)
+Received: by vmi299736.contaboserver.net (Postfix, from userid 10007)
+        id 0C78557847C5; Tue,  9 Aug 2022 03:06:01 -0400 (-04)
+To:     kvm-ppc@vger.kernel.org
+Subject: =?us-ascii?Q?ARdos_CONSULTORES_"DIE_WELTFINANZKRISE_KANN_SIE?=  =?us-ascii?Q?_SEHR_REICH_MACHEN!"?=
+Date:   Tue, 9 Aug 2022 07:06:00 +0000
+From:   ARdos CONSULTORES <wordpress@ardosconsultores.net>
+Reply-To: info@ardosconsultores.com
+Message-ID: <uxfWE8XFnlhSfvHR1so6StfXSvcU2OQlZ8bEftVw@www.ardosconsultores.com>
+X-Mailer: PHPMailer 6.6.0 (https://github.com/PHPMailer/PHPMailer)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Ress
-To:     Recipients <Edson.pereira@chesp.com.br>
-From:   "Smadar Barber" <Edson.pereira@chesp.com.br>
-Date:   Sat, 06 Aug 2022 22:18:13 +0530
-Reply-To: smadartsadike@gmail.com
-Message-Id: <20220806164847.A2C9C522065@mail.chesp.com.br>
-X-Spam-Status: Yes, score=6.0 required=5.0 tests=BAYES_99,BAYES_999,
-        DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_REPLYTO,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
-X-Spam-Report: *  0.2 BAYES_999 BODY: Bayes spam probability is 99.9 to 100%
-        *      [score: 1.0000]
-        *  3.5 BAYES_99 BODY: Bayes spam probability is 99 to 100%
-        *      [score: 1.0000]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        *  0.1 DKIM_INVALID DKIM or DK signature exists, but is not valid
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  2.1 FREEMAIL_FORGED_REPLYTO Freemail in Reply-To, but not From
-X-Spam-Level: *****
+Content-Type: text/plain; charset=UTF-8
+X-Spam-Status: No, score=1.9 required=5.0 tests=BAYES_50,DKIM_ADSP_NXDOMAIN,
+        HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-How are you doing today? I'm the Chief Executive Officer of the First Inter=
-national Bank of Israel. I have a very lucrative deal to discuss with you.
+Message Body:
+DIE WELTFINANZKRISE KANN SIE REICH MACHEN! https://telegra.ph/Deutschland-hat-eine-neue-Einnahmequelle-von-249240-Euro-pro-Woche-08-07
 
-I will await your response to proceed with the details.
+-- 
+This e-mail was sent from a contact form on ARdos CONSULTORES (https://www.ardosconsultores.net)
 
-Regards.
-Smadar Barber-Tsadik
