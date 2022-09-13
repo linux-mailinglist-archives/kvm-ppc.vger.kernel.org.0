@@ -2,149 +2,226 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C7A75B1C6F
-	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Sep 2022 14:11:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EF0F5B6DA6
+	for <lists+kvm-ppc@lfdr.de>; Tue, 13 Sep 2022 14:51:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231626AbiIHMKM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 8 Sep 2022 08:10:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46140 "EHLO
+        id S231846AbiIMMvM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 13 Sep 2022 08:51:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231639AbiIHMJb (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 8 Sep 2022 08:09:31 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A4011C161
-        for <kvm-ppc@vger.kernel.org>; Thu,  8 Sep 2022 05:09:12 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id gh9so15648433ejc.8
-        for <kvm-ppc@vger.kernel.org>; Thu, 08 Sep 2022 05:09:12 -0700 (PDT)
+        with ESMTP id S232181AbiIMMvC (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 13 Sep 2022 08:51:02 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7192127A
+        for <kvm-ppc@vger.kernel.org>; Tue, 13 Sep 2022 05:51:00 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id o23so9939083pji.4
+        for <kvm-ppc@vger.kernel.org>; Tue, 13 Sep 2022 05:51:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
-         :mime-version:from:to:cc:subject:date;
-        bh=61JNgHFLNVCOHtS3GBlVT+sTDzg02TjYElOUCZQYEf8=;
-        b=R9Pl04L+HYtH9XOMT1prAojUkzXX02fjS1bNFibbuBT6olx4HlO0+hPyXyGy36Wjf7
-         fc+V+v02rIv0F1+PUi5Gq5bAcozARLAAENySyvH6bwth33GnIWLBtyhD0BqhCmxO2dpz
-         ivub6VNQqRlTGIBLnEKGBBvG+n/erC8XgdcGtQtS4ZxU1fCMj17mxKyAPSmXIRlXCN+G
-         qgEJ/LoY0lJKFhSyc/qMiJaJsOp8hcwnTDC90G78UOz1WBNpkHd6SsKQ+SM/ksbYiX7R
-         ihK9grXxTdnzyIG6dqcs1LMPU8x9zSei0JzFlHm8jdLaAb/cgq4lP/Uolu1zZlu6UPJ8
-         Xnkg==
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=m+eZZoFLZFj4EhrhLyyE+g7R7dkUsiwp1ctUGIB8Xyc=;
+        b=jGIh/hBBHB9qngcxAiPKVlNnWoA+4zhrJlHf/7cC6XoKAdqrYm5GcLRzVI69z0CV39
+         /w+Q5i/tkVixk74+Fp4Lhjc8bBaLEBt9cSXeJzBNcWGk1bbmt29VXx+sb3d/UPOKmUs8
+         jtRkKfovsQvEtIMaRisgVTCoGaJAv2JiZu7sapDlXUUZejKRyep20zGPtVQAb1dAtjVO
+         WKha2N36Mc9SKwfEVzRvas+JtOgsGBDvIwik+fsnWhTupgkW+Pqr195kPR6g7BM4ZnZd
+         Bct9AUdOeRH9TAsfLZeB06sIYcOcAirND6uDCVUvlUoMTIWP43dr1J+vIaudr10e4A6O
+         G5Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=61JNgHFLNVCOHtS3GBlVT+sTDzg02TjYElOUCZQYEf8=;
-        b=cgSTAKrbEbzTZPCriBZ3bPT24JV3C3CY+OKpYEbsgJ/qURp+ZNprhwwfPWA2sXv9iO
-         tZaXlJc8VaINs7BrpGqOEltpRurhzFKIswU6uJOHisvpAKUsKgAJIykvz7pZ7m6mJk+3
-         Um6C5SvuC/wiftPOWZzwDxt0DY+B6KmcdCWlr6QM3I8EynpcPIw0IQTMOzt0ukgwPEnT
-         WZGdW1b4bXxOKzNm9quRAk4E70EZDwbhirKbuCksDHnJpOHfxZ0nhJqtQ4v+Yuk/7t9D
-         GTQP77QkYx7y2darhkx9pu4t1DZ+buvEEKeDbhYbMYD1ER3QIFcZlFH6qZfnI9GFgwc3
-         992w==
-X-Gm-Message-State: ACgBeo1UuSZtNyi34fxK47big/zRnkYbAHfKwcc/vrCKv1DYScPYxRbt
-        LXI+98W8I3yPIJNnx/idPqlFazYBvbg+llh0VdI=
-X-Google-Smtp-Source: AA6agR6r95kEbgMMTjLr3HDrzO0XTDdmsa+WpFqU0Oaqu/uFGCKjY771v6eLOVcsNiZpD8tk6J7JVGdCWtgvD4YrkVU=
-X-Received: by 2002:a17:907:2da6:b0:73d:d587:6213 with SMTP id
- gt38-20020a1709072da600b0073dd5876213mr5921767ejc.5.1662638949958; Thu, 08
- Sep 2022 05:09:09 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=m+eZZoFLZFj4EhrhLyyE+g7R7dkUsiwp1ctUGIB8Xyc=;
+        b=135LFMZ/WqCdrLnzHksYZVhcAXwFcjrfrhkuKQ1fXJzNUigm0aKvUug+W9JCqHoKJc
+         ySEZQEPEt5Rf3H4koxB7Ia7W+OmXYKw97OhZKTbH1+MdJlHZev7RPQJj651MiUHXnZCL
+         8MfNpxbQ2XQGqRyw9WKWu5f8f9qvI/x4in0XWqe0vvM1Zjis+vUUsJQHMiV4r4GMSEUi
+         rNVulTE0+yxAUeMwd1jt/KhP4BY72Is8V/zv25SgN9ImkFz8x9WLWSQ4i1mFqIymBbTZ
+         O6uYWg7keSIvf6p2rsPOfGY8Elx4HsA04H4cyvtflRUMDMZAPSr1tXSPEk5k+w1ZmKfz
+         JPvA==
+X-Gm-Message-State: ACgBeo2lBu9O23qIr17qRFf9i4O3TvDaDRLPPDpKTXT2RTC8jp1FPSml
+        zjHdDAxn3M/sq8jHvAFWvgL0y4Mgf5uvHQ==
+X-Google-Smtp-Source: AA6agR6b0dbrm/dWvV5TmvZeUsJCtL2b/PeHdCl4glygOlKhuTzGMSEz5loOjhBvm1OoAAz40VEAKw==
+X-Received: by 2002:a17:902:c245:b0:178:3912:f1f7 with SMTP id 5-20020a170902c24500b001783912f1f7mr7946684plg.75.1663073458500;
+        Tue, 13 Sep 2022 05:50:58 -0700 (PDT)
+Received: from [192.168.10.153] (ppp121-45-204-168.cbr-trn-nor-bras38.tpg.internode.on.net. [121.45.204.168])
+        by smtp.gmail.com with ESMTPSA id i12-20020a170902c94c00b00176da1aae5asm8419873pla.70.2022.09.13.05.50.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Sep 2022 05:50:57 -0700 (PDT)
+Message-ID: <59dfb450-5a91-f27b-6edf-0adfa89729b7@ozlabs.ru>
+Date:   Tue, 13 Sep 2022 22:50:49 +1000
 MIME-Version: 1.0
-Received: by 2002:a17:906:749d:b0:743:2e24:e8cd with HTTP; Thu, 8 Sep 2022
- 05:09:09 -0700 (PDT)
-Reply-To: mrtonyelumelu98@gmail.com
-From:   "Mrs. Cristalina Georgieva" <nastyanastya88889@gmail.com>
-Date:   Thu, 8 Sep 2022 13:09:09 +0100
-Message-ID: <CADsX60Doj=i-SVwOWO92Caq9R=bu94_BKVuSmw_HM6Ny1GWvpg@mail.gmail.com>
-Subject: hi
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_FM_MR_MRS,
-        T_SCC_BODY_TEXT_LINE,UNDISC_FREEM autolearn=no autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101
+ Thunderbird/104.0
+Subject: Re: [PATCH kernel] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE platform
+ dependent
+Content-Language: en-US
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     kvm-ppc@vger.kernel.org
+Cc:     x86@kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>
+References: <20220504074807.3616813-1-aik@ozlabs.ru>
+ <0d4bb0fa-10c6-3f5a-34c8-293144b3fdbb@ozlabs.ru>
+In-Reply-To: <0d4bb0fa-10c6-3f5a-34c8-293144b3fdbb@ozlabs.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
-X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-2LXZhtiv2YjZgiDYp9mE2YbZgtivINin2YTYr9mI2YTZiiAoSS5NLkYpDQrYtNi52KjYqSDYpdiv
-2KfYsdipINin2YTYr9mK2YjZhiDYp9mE2K/ZiNmE2YrYqSDYjA0KIyAxOTAwINiMINi02KfYsdi5
-INin2YTYsdim2YrYsw0KDQrZhdix2K3YqNmL2Kcg2KjZg9mFINmB2Yog2LnZhtmI2KfZhiDYp9mE
-2KjYsdmK2K8g2KfZhNil2YTZg9iq2LHZiNmG2Yog2KfZhNix2LPZhdmKINmE2YTZhdiv2YrYsSBJ
-Lk0uRi4g2YPYsdmK2LPYqtin2YTZitmG2Kcg2KzZiNix2KzZitmB2KcNCg0KDQrYudiy2YrYstmK
-INin2YTZhdiz2KrZgdmK2K8hDQoNCtmE2YLYryDYs9mF2K0g2YTZhtinINmI2LLZitixINin2YTY
-rtiy2KfZhtipINin2YTZhdi52YrZhiDYrdiv2YrYq9mL2Kcg2YjYp9mE2YfZitim2Kkg2KfZhNit
-2KfZg9mF2Kkg2YTZhNiz2YTYt9ipINin2YTZhtmC2K/ZitipDQrZhNmE2KPZhdmFINin2YTZhdiq
-2K3Yr9ipINio2YHYrdi1INin2YTYo9mF2YjYp9mEINin2YTYqtmKINmE2YUg2KrYqtmFINin2YTZ
-hdi32KfZhNio2Kkg2KjZh9inINmI2KfZhNiq2Yog2YTYt9in2YTZhdinINmD2KfZhtiqDQrZhdiv
-2YrZhtipINmE2K3Zg9mI2YXYqSDYp9mE2KPZhdmFINin2YTZhdiq2K3Yr9ipINiMINmE2LDZhNmD
-INiq2YUg2KfYqtmH2KfZhSDZhdin2YTZg9mK2YfYpyDYqNin2YTYp9it2KrZitin2YQuDQrYp9mE
-2YXYrdiq2KfZhNmI2YYg2KfZhNiw2YrZhiDZitiz2KrYrtiv2YXZiNmGINin2LPZhSDYp9mE2KPZ
-hdmFINin2YTZhdiq2K3Yr9ipINiMINmI2YHZgtmL2Kcg2YTYs9is2YQg2KrYrtiy2YrZhiDYp9mE
-2KjZitin2YbYp9iqDQrZhdi5INi52YbZiNin2YYg2KfZhNio2LHZitivINin2YTYpdmE2YPYqtix
-2YjZhtmKINmE2YbYuNin2YXZhtinINij2KvZhtin2KEg2KfZhNiq2K3ZgtmK2YIg2KfZhNiw2Yog
-2KPYrNix2YrZhtin2Ycg2Iwg2YHYpdmGDQrYr9mB2LnYqtmDINmF2K/Ysdis2Kkg2YHZiiDZgtin
-2KbZhdipINiq2LbZhSAxNTAg2YXYs9iq2YHZitiv2YvYpyDZgdmKINin2YTZgdim2KfYqiDYp9mE
-2KrYp9mE2YrYqTog2LXZhtiv2YjZgiDZitin2YbYtdmK2KgNCti62YrYsSDZhdmP2LPZhNmO2ZHZ
-hSAvINi12YbYr9mI2YIg2YrYp9mG2LXZitioINi62YrYsSDZhdiv2YHZiNi5IC8g2YjYsdin2KvY
-qSDZhtmC2YQg2LrZitixINmF2YPYqtmF2YTYqSAvINij2YXZiNin2YQNCtin2YTYudmC2K8uDQoN
-CtmC2KfZhSDZhdiz2KTZiNmE2Ygg2KfZhNio2YbZgyDYp9mE2YHYp9iz2K8g2Iwg2KfZhNiw2YrZ
-hiDYp9ix2KrZg9io2YjYpyDYp9mE2YHYs9in2K8g2YXZhiDYo9is2YQg2KfZhNin2K3YqtmK2KfZ
-hCDYudmE2YkNCtij2YXZiNin2YTZgyDYjCDYqNiq2KPYrtmK2LEg2K/Zgdi52YMg2KjYtNmD2YQg
-2LrZitixINmF2LnZgtmI2YQg2Iwg2YXZhdinINij2K/ZiSDYpdmE2Ykg2KrYrdmF2YTZgyDYp9mE
-2YPYq9mK2LEg2YXZhg0K2KfZhNiq2YPYp9mE2YrZgSDZiNiq2KPYrtmK2LEg2LrZitixINmF2LnZ
-gtmI2YQg2YHZiiDZgtio2YjZhCDZhdiv2YHZiNi52KfYqtmDLiDYp9iu2KrYp9ix2Kog2KfZhNij
-2YXZhSDYp9mE2YXYqtit2K/YqQ0K2YjYtdmG2K/ZiNmCINin2YTZhtmC2K8g2KfZhNiv2YjZhNmK
-IChJTUYpINiv2YHYuSDYrNmF2YrYuSDYp9mE2KrYudmI2YrYttin2Kog2YTZgCAxNTAg2YXYs9iq
-2YHZitiv2YvYpyDYqNin2LPYqtiu2K/Yp9mFDQrYqNi32KfZgtin2KogVmlzYSBBVE0g2YXZhiDY
-o9mF2LHZitmD2Kcg2KfZhNi02YXYp9mE2YrYqSDZiNij2YXYsdmK2YPYpyDYp9mE2KzZhtmI2KjZ
-itipINmI2KfZhNmI2YTYp9mK2KfYqiDYp9mE2YXYqtit2K/YqQ0K2YjYo9mI2LHZiNio2Kcg2YjY
-otiz2YrYpyDZiNit2YjZhCDYp9mE2LnYp9mE2YUg2Iwg2K3ZitirINiq2KrZiNmB2LEg2KrZgtmG
-2YrYqSDYp9mE2K/Zgdi5INin2YTYudin2YTZhdmK2Kkg2YfYsNmHDQrZhNmE2YXYs9iq2YfZhNmD
-2YrZhiDZiNin2YTYtNix2YPYp9iqINmI2KfZhNmF2KTYs9iz2KfYqiDYp9mE2YXYp9mE2YrYqS4g
-2YjZitiz2YXYrSDZhNmE2K3Zg9mI2YXYp9iqINio2KfYs9iq2K7Yr9in2YUg2KfZhNi52YXZhNin
-2KoNCtin2YTYsdmC2YXZitipINio2K/ZhNin2Ysg2YXZhiDYp9mE2YbZgtivINmI2KfZhNi02YrZ
-g9in2KouDQoNCtmE2YLYryDZgtmF2YbYpyDYqNin2YTYqtix2KrZitioINmE2LPYr9in2K8g2YXY
-r9mB2YjYudin2KrZgyDYqNin2LPYqtiu2K/Yp9mFINio2LfYp9mC2KkgVmlzYSBBVE0g2YjYs9mK
-2KrZhSDYpdi12K/Yp9ix2YfYpw0K2YTZgyDZiNil2LHYs9in2YTZh9inINmF2KjYp9i02LHYqdmL
-INil2YTZiSDYudmG2YjYp9mG2YMg2LnYqNixINij2Yog2K7Yr9mF2KfYqiDYqNix2YrYryDYs9ix
-2YrYuSDZhdiq2KfYrdipLiDYqNi52K8NCtin2YTYp9iq2LXYp9mEINio2YbYpyDYjCDYs9mK2KrZ
-hSDYqtit2YjZitmEINmF2KjZhNi6IDHYjDUwMNiMMDAwLjAwINiv2YjZhNin2LEg2KPZhdix2YrZ
-g9mKINil2YTZiSDYqNi32KfZgtipIFZpc2ENCkFUTSDYjCDZiNin2YTYqtmKINiz2KrYs9mF2K0g
-2YTZgyDYqNiz2K3YqCDYo9mF2YjYp9mE2YMg2LnZhiDYt9ix2YrZgiDYs9it2Kgg2YXYpyDZhNin
-INmK2YLZhCDYudmGIDEw2IwwMDAg2K/ZiNmE2KfYsQ0K2KPZhdix2YrZg9mKINmB2Yog2KfZhNmK
-2YjZhSDZhdmGINij2Yog2YXYp9mD2YrZhtipINi12LHYp9mBINii2YTZiiDZgdmKINio2YTYr9mD
-LiDYqNmG2KfYodmLINi52YTZiSDYt9mE2KjZgyDYjCDZitmF2YPZhtmDDQrYstmK2KfYr9ipINin
-2YTYrdivINil2YTZiSAyMNiMMDAwLjAwINiv2YjZhNin2LEg2YHZiiDYp9mE2YrZiNmFLiDZgdmK
-INmH2LDYpyDYp9mE2LXYr9ivINiMINmK2KzYqCDYudmE2YrZgw0K2KfZhNin2KrYtdin2YQg2KjY
-pdiv2KfYsdipINin2YTZhdiv2YHZiNi52KfYqiDZiNin2YTYqtit2YjZitmE2KfYqiDYp9mE2K/Z
-iNmE2YrYqSDZiNiq2YLYr9mK2YUg2KfZhNmF2LnZhNmI2YXYp9iqINin2YTZhdi32YTZiNio2KkN
-CtmF2YYg2K7ZhNin2YQ6DQoNCjEuINin2LPZhdmDINin2YTZg9in2YXZhCAuLi4uLi4uLi4uLi4u
-Lg0KMi4g2LnZhtmI2KfZhtmDINin2YTZg9in2YXZhCAuLi4NCjMuINin2YTYrNmG2LPZitipIC4u
-Li4uLi4uLi4uLi4uLi4NCjQuINiq2KfYsdmK2K4g2KfZhNmF2YrZhNin2K8gLyDYp9mE2KzZhtiz
-IC4uLi4uLi4uLg0KNS4g2KfZhNiq2K7Ytdi1IC4uLg0KNi4g2LHZgtmFINin2YTZh9in2KrZgSAu
-Li4uLi4uLi4NCjcuINi52YbZiNin2YYg2KfZhNio2LHZitivINin2YTYpdmE2YPYqtix2YjZhtmK
-INmE2LTYsdmD2KrZgyAuLi4uLi4NCjguINi52YbZiNin2YYg2KfZhNio2LHZitivINin2YTYpdmE
-2YPYqtix2YjZhtmKINin2YTYtNiu2LXZiiAuLi4uLi4NCg0KDQrZhNiq2K3Yr9mK2K8g2YfYsNin
-INin2YTYsdmF2LIgKNin2YTYsdin2KjYtzogQ0xJRU5ULTk2Ni8xNikg2Iwg2KfYs9iq2K7Yr9mF
-2Ycg2YPZhdmI2LbZiNi5INmE2YTYqNix2YrYrw0K2KfZhNil2YTZg9iq2LHZiNmG2Yog2KfZhNiu
-2KfYtSDYqNmDINmI2K3Yp9mI2YQg2KrZgtiv2YrZhSDYp9mE2YXYudmE2YjZhdin2Kog2KfZhNmF
-2LDZg9mI2LHYqSDYo9i52YTYp9mHINil2YTZiSDYp9mE2YXZiNi42YHZitmGDQrYp9mE2KrYp9mE
-2YrZitmGINmE2KXYtdiv2KfYsSDZiNiq2LPZhNmK2YUg2KjYt9in2YLYqSBWaXNhIEFUTSDYmw0K
-DQrZhtmI2LXZitmDINio2YHYqtitINi52YbZiNin2YYg2KjYsdmK2K8g2KXZhNmD2KrYsdmI2YbZ
-iiDYtNiu2LXZiiDYqNix2YLZhSDYrNiv2YrYryDZhNmE2LPZhdin2K0g2YTZiNmD2YrZhCDYp9mE
-2KjZhtmDINio2KrYqtio2LkNCtmH2LDZhyDYp9mE2YXYr9mB2YjYudin2Kog2YjYqtio2KfYr9mE
-INin2YTYsdiz2KfYptmEINmE2YXZhti5INin2YTZhdiy2YrYryDZhdmGINin2YTYqtij2K7Zitix
-INij2Ygg2KfZhNiq2YjYrNmK2Ycg2KfZhNiu2KfYt9imDQrZhNij2YXZiNin2YTZgy4g2KfYqti1
-2YQg2KjZiNmD2YrZhCDYp9mE2KjZhtmDINin2YTYpdmB2LHZitmC2Yog2KfZhNmF2KrYrdivINin
-2YTYotmGINio2KfYs9iq2K7Yr9in2YUg2YXYudmE2YjZhdin2KoNCtin2YTYp9iq2LXYp9mEINij
-2K/Zhtin2Yc6DQoNCtin2YTYtNiu2LUg2KfZhNmF2LPYpNmI2YQ6INin2YTYs9mK2K8g2KrZiNmG
-2Yog2KXZhNmI2YXZitmE2YgNCtil2K/Yp9ix2Kkg2KrYrdmI2YrZhCDYo9mF2YjYp9mEINin2YTY
-qti52YjZiti22KfYqiDYjCDYrNmH2Kkg2KfZhNin2KrYtdin2YQg2KjYp9mE2KjYsdmK2K8g2KfZ
-hNil2YTZg9iq2LHZiNmG2Yog2YTYqNmG2YMNCtil2YHYsdmK2YLZitinINin2YTZhdiq2K3Yrzog
-KG1ydG9ueWVsdW1lbHU5OEBnbWFpbC5jb20pDQoNCtmG2K3Yqtin2Kwg2KXZhNmJINix2K8g2LPY
-sdmK2Lkg2LnZhNmJINmH2LDYpyDYp9mE2KjYsdmK2K8g2KfZhNil2YTZg9iq2LHZiNmG2Yog2YTY
-qtis2YbYqCDYp9mE2YXYstmK2K8g2YXZhiDYp9mE2KrYo9iu2YrYsS4NCg0K2LXYr9mK2YLZgyDY
-p9mE2YXYrtmE2LUNCtin2YTYs9mR2YrYr9ipLiDZg9ix2YrYs9iq2KfZhNmK2YbYpyDYrNmI2LHY
-rNmK2YHYpw0K
+Ping? It's been a while and probably got lost :-/
+
+On 18/05/2022 16:27, Alexey Kardashevskiy wrote:
+> 
+> 
+> On 5/4/22 17:48, Alexey Kardashevskiy wrote:
+>> When introduced, IRQFD resampling worked on POWER8 with XICS. However
+>> KVM on POWER9 has never implemented it - the compatibility mode code
+>> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
+>> XIVE mode does not handle INTx in KVM at all.
+>>
+>> This moved the capability support advertising to platforms and stops
+>> advertising it on XIVE, i.e. POWER9 and later.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>
+>>
+>> Or I could move this one together with KVM_CAP_IRQFD. Thoughts?
+> 
+> 
+> Ping?
+> 
+>>
+>> ---
+>>   arch/arm64/kvm/arm.c       | 3 +++
+>>   arch/mips/kvm/mips.c       | 3 +++
+>>   arch/powerpc/kvm/powerpc.c | 6 ++++++
+>>   arch/riscv/kvm/vm.c        | 3 +++
+>>   arch/s390/kvm/kvm-s390.c   | 3 +++
+>>   arch/x86/kvm/x86.c         | 3 +++
+>>   virt/kvm/kvm_main.c        | 1 -
+>>   7 files changed, 21 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 523bc934fe2f..092f0614bae3 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -210,6 +210,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>       case KVM_CAP_SET_GUEST_DEBUG:
+>>       case KVM_CAP_VCPU_ATTRIBUTES:
+>>       case KVM_CAP_PTP_KVM:
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>> +#endif
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_SET_GUEST_DEBUG2:
+>> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+>> index a25e0b73ee70..0f3de470a73e 100644
+>> --- a/arch/mips/kvm/mips.c
+>> +++ b/arch/mips/kvm/mips.c
+>> @@ -1071,6 +1071,9 @@ int kvm_vm_ioctl_check_extension(struct kvm 
+>> *kvm, long ext)
+>>       case KVM_CAP_READONLY_MEM:
+>>       case KVM_CAP_SYNC_MMU:
+>>       case KVM_CAP_IMMEDIATE_EXIT:
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>> +#endif
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_NR_VCPUS:
+>> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+>> index 875c30c12db0..87698ffef3be 100644
+>> --- a/arch/powerpc/kvm/powerpc.c
+>> +++ b/arch/powerpc/kvm/powerpc.c
+>> @@ -591,6 +591,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>           break;
+>>   #endif
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>> +        r = !xive_enabled();
+>> +        break;
+>> +#endif
+>> +
+>>       case KVM_CAP_PPC_ALLOC_HTAB:
+>>           r = hv_enabled;
+>>           break;
+>> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+>> index c768f75279ef..b58579b386bb 100644
+>> --- a/arch/riscv/kvm/vm.c
+>> +++ b/arch/riscv/kvm/vm.c
+>> @@ -63,6 +63,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>       case KVM_CAP_READONLY_MEM:
+>>       case KVM_CAP_MP_STATE:
+>>       case KVM_CAP_IMMEDIATE_EXIT:
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>> +#endif
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_NR_VCPUS:
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index 156d1c25a3c1..85e093fc8d13 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -564,6 +564,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>       case KVM_CAP_SET_GUEST_DEBUG:
+>>       case KVM_CAP_S390_DIAG318:
+>>       case KVM_CAP_S390_MEM_OP_EXTENSION:
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>> +#endif
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_SET_GUEST_DEBUG2:
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 0c0ca599a353..a0a7b769483d 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -4273,6 +4273,9 @@ int kvm_vm_ioctl_check_extension(struct kvm 
+>> *kvm, long ext)
+>>       case KVM_CAP_SYS_ATTRIBUTES:
+>>       case KVM_CAP_VAPIC:
+>>       case KVM_CAP_ENABLE_CAP:
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>> +#endif
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_EXIT_HYPERCALL:
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index 70e05af5ebea..885e72e668a5 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -4293,7 +4293,6 @@ static long 
+>> kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>>   #endif
+>>   #ifdef CONFIG_HAVE_KVM_IRQFD
+>>       case KVM_CAP_IRQFD:
+>> -    case KVM_CAP_IRQFD_RESAMPLE:
+>>   #endif
+>>       case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+>>       case KVM_CAP_CHECK_EXTENSION_VM:
+> 
+
+-- 
+Alexey
