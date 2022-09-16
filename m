@@ -2,226 +2,243 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EF0F5B6DA6
-	for <lists+kvm-ppc@lfdr.de>; Tue, 13 Sep 2022 14:51:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3AD65BA3B9
+	for <lists+kvm-ppc@lfdr.de>; Fri, 16 Sep 2022 03:10:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231846AbiIMMvM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 13 Sep 2022 08:51:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37572 "EHLO
+        id S229538AbiIPBKj (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Thu, 15 Sep 2022 21:10:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232181AbiIMMvC (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 13 Sep 2022 08:51:02 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7192127A
-        for <kvm-ppc@vger.kernel.org>; Tue, 13 Sep 2022 05:51:00 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id o23so9939083pji.4
-        for <kvm-ppc@vger.kernel.org>; Tue, 13 Sep 2022 05:51:00 -0700 (PDT)
+        with ESMTP id S229705AbiIPBKh (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 15 Sep 2022 21:10:37 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6371150076;
+        Thu, 15 Sep 2022 18:10:35 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id j12so19711281pfi.11;
+        Thu, 15 Sep 2022 18:10:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=m+eZZoFLZFj4EhrhLyyE+g7R7dkUsiwp1ctUGIB8Xyc=;
-        b=jGIh/hBBHB9qngcxAiPKVlNnWoA+4zhrJlHf/7cC6XoKAdqrYm5GcLRzVI69z0CV39
-         /w+Q5i/tkVixk74+Fp4Lhjc8bBaLEBt9cSXeJzBNcWGk1bbmt29VXx+sb3d/UPOKmUs8
-         jtRkKfovsQvEtIMaRisgVTCoGaJAv2JiZu7sapDlXUUZejKRyep20zGPtVQAb1dAtjVO
-         WKha2N36Mc9SKwfEVzRvas+JtOgsGBDvIwik+fsnWhTupgkW+Pqr195kPR6g7BM4ZnZd
-         Bct9AUdOeRH9TAsfLZeB06sIYcOcAirND6uDCVUvlUoMTIWP43dr1J+vIaudr10e4A6O
-         G5Cg==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date;
+        bh=hr/gJPcU5hvQZ/MKgVwi2KwSsJ/0TzKkNDXlKjCB2Yw=;
+        b=hq/LIZNAoz+v9v5PWfa/0aKD/JB/tXkKxHIojwHn30BdKNQ5Be3G0BaUU/zSYBJeE9
+         ZLRcqcxf0IDv61ZhN3/kOqcYUToLQAGW/EjhSW4TrFFz9Bqw+yJyw6+Y21pYn3ywkugA
+         JniDjX5JcG8m+H85hzbd3loI476IGJYE6L2/G3cL1NfdXgiVnH9OkTHI/WNBlcsCgoy5
+         g9uCl3lHdNcq9lab3lKR95Gy8j5E77OSw8jBZYVJGKBEcNBuiYVGD3iTUzbt+3PGUA5n
+         JN6BFkpeFxXKeqmd35cSdKJ5epc1LwvYjnXD/rPy7wE+YH+9cFaQxJc+tbgJ5HWLDqSc
+         5Zhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=m+eZZoFLZFj4EhrhLyyE+g7R7dkUsiwp1ctUGIB8Xyc=;
-        b=135LFMZ/WqCdrLnzHksYZVhcAXwFcjrfrhkuKQ1fXJzNUigm0aKvUug+W9JCqHoKJc
-         ySEZQEPEt5Rf3H4koxB7Ia7W+OmXYKw97OhZKTbH1+MdJlHZev7RPQJj651MiUHXnZCL
-         8MfNpxbQ2XQGqRyw9WKWu5f8f9qvI/x4in0XWqe0vvM1Zjis+vUUsJQHMiV4r4GMSEUi
-         rNVulTE0+yxAUeMwd1jt/KhP4BY72Is8V/zv25SgN9ImkFz8x9WLWSQ4i1mFqIymBbTZ
-         O6uYWg7keSIvf6p2rsPOfGY8Elx4HsA04H4cyvtflRUMDMZAPSr1tXSPEk5k+w1ZmKfz
-         JPvA==
-X-Gm-Message-State: ACgBeo2lBu9O23qIr17qRFf9i4O3TvDaDRLPPDpKTXT2RTC8jp1FPSml
-        zjHdDAxn3M/sq8jHvAFWvgL0y4Mgf5uvHQ==
-X-Google-Smtp-Source: AA6agR6b0dbrm/dWvV5TmvZeUsJCtL2b/PeHdCl4glygOlKhuTzGMSEz5loOjhBvm1OoAAz40VEAKw==
-X-Received: by 2002:a17:902:c245:b0:178:3912:f1f7 with SMTP id 5-20020a170902c24500b001783912f1f7mr7946684plg.75.1663073458500;
-        Tue, 13 Sep 2022 05:50:58 -0700 (PDT)
-Received: from [192.168.10.153] (ppp121-45-204-168.cbr-trn-nor-bras38.tpg.internode.on.net. [121.45.204.168])
-        by smtp.gmail.com with ESMTPSA id i12-20020a170902c94c00b00176da1aae5asm8419873pla.70.2022.09.13.05.50.52
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date;
+        bh=hr/gJPcU5hvQZ/MKgVwi2KwSsJ/0TzKkNDXlKjCB2Yw=;
+        b=cCBmv2qfxgMP+orlpGYYEHbuJotF8OBPH0PqmNWszLLoIUZKYllO7wHjhb9Kd3uat8
+         BZ9wStvUXe53K23PSTG6kGRc863Q9UXhqP2rrSEMaNAMvcyZ1NFeMy9WJ1eyl/12S94o
+         yn3jAQxDrYBzoXFHjgrdZHKHMEhvDmBIpu++oxkH+XJqV8zUMxlQjpG3rLKgnhfnPNjd
+         SeRN1ZgPRVdFZZTPBDKMA/BwQT7aeAWW6iOk1lvj9u7V2/79cUHfhN9B9bYb6MjdxsUA
+         7MaludLurT4XdU6KrcXUlOyZzjeZdFF/qb4XpxsduSNx6/Na1rPRJ+uSLXQre7yJT2QD
+         54Xg==
+X-Gm-Message-State: ACrzQf13poYiRjnG39LLMcHrxtxWS+J9RATB2lRib5bv9C7HGfr2gqvD
+        82seE5OLJ1u0qimy+8jdNRWYv0/HMkA=
+X-Google-Smtp-Source: AMsMyM5HLVuDEFZ7yFGWlTXtrR5ixkZIR3wBKnru30CnmTKTvOjZydafHw2K7xojMyDBGaMDjl15+A==
+X-Received: by 2002:a05:6a00:1342:b0:545:4d30:eecb with SMTP id k2-20020a056a00134200b005454d30eecbmr2511913pfu.69.1663290634936;
+        Thu, 15 Sep 2022 18:10:34 -0700 (PDT)
+Received: from localhost ([118.210.107.131])
+        by smtp.gmail.com with ESMTPSA id l6-20020a170902f68600b00176b3d7db49sm13769119plg.0.2022.09.15.18.10.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Sep 2022 05:50:57 -0700 (PDT)
-Message-ID: <59dfb450-5a91-f27b-6edf-0adfa89729b7@ozlabs.ru>
-Date:   Tue, 13 Sep 2022 22:50:49 +1000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101
- Thunderbird/104.0
+        Thu, 15 Sep 2022 18:10:33 -0700 (PDT)
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date:   Fri, 16 Sep 2022 11:10:25 +1000
+Message-Id: <CMXFBGZGQCQR.2FRWNY2JHBVL9@bobo>
+Cc:     <linux-s390@vger.kernel.org>, <kvm@vger.kernel.org>,
+        "Fabiano Rosas" <farosas@linux.ibm.com>, <x86@kernel.org>,
+        <linux-mips@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Alex Williamson" <alex.williamson@redhat.com>,
+        <kvm-riscv@lists.infradead.org>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        <linux-riscv@lists.infradead.org>, <linuxppc-dev@lists.ozlabs.org>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>
 Subject: Re: [PATCH kernel] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE platform
  dependent
-Content-Language: en-US
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     kvm-ppc@vger.kernel.org
-Cc:     x86@kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>
+From:   "Nicholas Piggin" <npiggin@gmail.com>
+To:     "Alexey Kardashevskiy" <aik@ozlabs.ru>, <kvm-ppc@vger.kernel.org>
+X-Mailer: aerc 0.11.0
 References: <20220504074807.3616813-1-aik@ozlabs.ru>
  <0d4bb0fa-10c6-3f5a-34c8-293144b3fdbb@ozlabs.ru>
-In-Reply-To: <0d4bb0fa-10c6-3f5a-34c8-293144b3fdbb@ozlabs.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+ <59dfb450-5a91-f27b-6edf-0adfa89729b7@ozlabs.ru>
+In-Reply-To: <59dfb450-5a91-f27b-6edf-0adfa89729b7@ozlabs.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Ping? It's been a while and probably got lost :-/
+Seems okay to me, it probably better go through the KVM tree though.
 
-On 18/05/2022 16:27, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 5/4/22 17:48, Alexey Kardashevskiy wrote:
->> When introduced, IRQFD resampling worked on POWER8 with XICS. However
->> KVM on POWER9 has never implemented it - the compatibility mode code
->> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
->> XIVE mode does not handle INTx in KVM at all.
->>
->> This moved the capability support advertising to platforms and stops
->> advertising it on XIVE, i.e. POWER9 and later.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> ---
->>
->>
->> Or I could move this one together with KVM_CAP_IRQFD. Thoughts?
-> 
-> 
-> Ping?
-> 
->>
->> ---
->>   arch/arm64/kvm/arm.c       | 3 +++
->>   arch/mips/kvm/mips.c       | 3 +++
->>   arch/powerpc/kvm/powerpc.c | 6 ++++++
->>   arch/riscv/kvm/vm.c        | 3 +++
->>   arch/s390/kvm/kvm-s390.c   | 3 +++
->>   arch/x86/kvm/x86.c         | 3 +++
->>   virt/kvm/kvm_main.c        | 1 -
->>   7 files changed, 21 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 523bc934fe2f..092f0614bae3 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -210,6 +210,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
->> long ext)
->>       case KVM_CAP_SET_GUEST_DEBUG:
->>       case KVM_CAP_VCPU_ATTRIBUTES:
->>       case KVM_CAP_PTP_KVM:
->> +#ifdef CONFIG_HAVE_KVM_IRQFD
->> +    case KVM_CAP_IRQFD_RESAMPLE:
->> +#endif
->>           r = 1;
->>           break;
->>       case KVM_CAP_SET_GUEST_DEBUG2:
->> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
->> index a25e0b73ee70..0f3de470a73e 100644
->> --- a/arch/mips/kvm/mips.c
->> +++ b/arch/mips/kvm/mips.c
->> @@ -1071,6 +1071,9 @@ int kvm_vm_ioctl_check_extension(struct kvm 
->> *kvm, long ext)
->>       case KVM_CAP_READONLY_MEM:
->>       case KVM_CAP_SYNC_MMU:
->>       case KVM_CAP_IMMEDIATE_EXIT:
->> +#ifdef CONFIG_HAVE_KVM_IRQFD
->> +    case KVM_CAP_IRQFD_RESAMPLE:
->> +#endif
->>           r = 1;
->>           break;
->>       case KVM_CAP_NR_VCPUS:
->> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
->> index 875c30c12db0..87698ffef3be 100644
->> --- a/arch/powerpc/kvm/powerpc.c
->> +++ b/arch/powerpc/kvm/powerpc.c
->> @@ -591,6 +591,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
->> long ext)
->>           break;
->>   #endif
->> +#ifdef CONFIG_HAVE_KVM_IRQFD
->> +    case KVM_CAP_IRQFD_RESAMPLE:
->> +        r = !xive_enabled();
->> +        break;
->> +#endif
->> +
->>       case KVM_CAP_PPC_ALLOC_HTAB:
->>           r = hv_enabled;
->>           break;
->> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
->> index c768f75279ef..b58579b386bb 100644
->> --- a/arch/riscv/kvm/vm.c
->> +++ b/arch/riscv/kvm/vm.c
->> @@ -63,6 +63,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
->> long ext)
->>       case KVM_CAP_READONLY_MEM:
->>       case KVM_CAP_MP_STATE:
->>       case KVM_CAP_IMMEDIATE_EXIT:
->> +#ifdef CONFIG_HAVE_KVM_IRQFD
->> +    case KVM_CAP_IRQFD_RESAMPLE:
->> +#endif
->>           r = 1;
->>           break;
->>       case KVM_CAP_NR_VCPUS:
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 156d1c25a3c1..85e093fc8d13 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -564,6 +564,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
->> long ext)
->>       case KVM_CAP_SET_GUEST_DEBUG:
->>       case KVM_CAP_S390_DIAG318:
->>       case KVM_CAP_S390_MEM_OP_EXTENSION:
->> +#ifdef CONFIG_HAVE_KVM_IRQFD
->> +    case KVM_CAP_IRQFD_RESAMPLE:
->> +#endif
->>           r = 1;
->>           break;
->>       case KVM_CAP_SET_GUEST_DEBUG2:
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 0c0ca599a353..a0a7b769483d 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -4273,6 +4273,9 @@ int kvm_vm_ioctl_check_extension(struct kvm 
->> *kvm, long ext)
->>       case KVM_CAP_SYS_ATTRIBUTES:
->>       case KVM_CAP_VAPIC:
->>       case KVM_CAP_ENABLE_CAP:
->> +#ifdef CONFIG_HAVE_KVM_IRQFD
->> +    case KVM_CAP_IRQFD_RESAMPLE:
->> +#endif
->>           r = 1;
->>           break;
->>       case KVM_CAP_EXIT_HYPERCALL:
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 70e05af5ebea..885e72e668a5 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -4293,7 +4293,6 @@ static long 
->> kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->>   #endif
->>   #ifdef CONFIG_HAVE_KVM_IRQFD
->>       case KVM_CAP_IRQFD:
->> -    case KVM_CAP_IRQFD_RESAMPLE:
->>   #endif
->>       case KVM_CAP_IOEVENTFD_ANY_LENGTH:
->>       case KVM_CAP_CHECK_EXTENSION_VM:
-> 
+Acked-by: Nicholas Piggin <npiggin@gmail.com>
 
--- 
-Alexey
+Thanks,
+Nick
+
+On Tue Sep 13, 2022 at 10:50 PM AEST, Alexey Kardashevskiy wrote:
+> Ping? It's been a while and probably got lost :-/
+>
+> On 18/05/2022 16:27, Alexey Kardashevskiy wrote:
+> >=20
+> >=20
+> > On 5/4/22 17:48, Alexey Kardashevskiy wrote:
+> >> When introduced, IRQFD resampling worked on POWER8 with XICS. However
+> >> KVM on POWER9 has never implemented it - the compatibility mode code
+> >> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
+> >> XIVE mode does not handle INTx in KVM at all.
+> >>
+> >> This moved the capability support advertising to platforms and stops
+> >> advertising it on XIVE, i.e. POWER9 and later.
+> >>
+> >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >> ---
+> >>
+> >>
+> >> Or I could move this one together with KVM_CAP_IRQFD. Thoughts?
+> >=20
+> >=20
+> > Ping?
+> >=20
+> >>
+> >> ---
+> >> =C2=A0 arch/arm64/kvm/arm.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 3 ++=
++
+> >> =C2=A0 arch/mips/kvm/mips.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 3 ++=
++
+> >> =C2=A0 arch/powerpc/kvm/powerpc.c | 6 ++++++
+> >> =C2=A0 arch/riscv/kvm/vm.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+ 3 +++
+> >> =C2=A0 arch/s390/kvm/kvm-s390.c=C2=A0=C2=A0 | 3 +++
+> >> =C2=A0 arch/x86/kvm/x86.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 | 3 +++
+> >> =C2=A0 virt/kvm/kvm_main.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+ 1 -
+> >> =C2=A0 7 files changed, 21 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> >> index 523bc934fe2f..092f0614bae3 100644
+> >> --- a/arch/arm64/kvm/arm.c
+> >> +++ b/arch/arm64/kvm/arm.c
+> >> @@ -210,6 +210,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,=
+=20
+> >> long ext)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_SET_GUEST_DEBUG:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_VCPU_ATTRIBUTES:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_PTP_KVM:
+> >> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> >> +=C2=A0=C2=A0=C2=A0 case KVM_CAP_IRQFD_RESAMPLE:
+> >> +#endif
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r =3D 1;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_SET_GUEST_DEBUG2:
+> >> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> >> index a25e0b73ee70..0f3de470a73e 100644
+> >> --- a/arch/mips/kvm/mips.c
+> >> +++ b/arch/mips/kvm/mips.c
+> >> @@ -1071,6 +1071,9 @@ int kvm_vm_ioctl_check_extension(struct kvm=20
+> >> *kvm, long ext)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_READONLY_MEM:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_SYNC_MMU:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_IMMEDIATE_EXIT:
+> >> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> >> +=C2=A0=C2=A0=C2=A0 case KVM_CAP_IRQFD_RESAMPLE:
+> >> +#endif
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r =3D 1;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_NR_VCPUS:
+> >> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> >> index 875c30c12db0..87698ffef3be 100644
+> >> --- a/arch/powerpc/kvm/powerpc.c
+> >> +++ b/arch/powerpc/kvm/powerpc.c
+> >> @@ -591,6 +591,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,=
+=20
+> >> long ext)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+> >> =C2=A0 #endif
+> >> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> >> +=C2=A0=C2=A0=C2=A0 case KVM_CAP_IRQFD_RESAMPLE:
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r =3D !xive_enabled();
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+> >> +#endif
+> >> +
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_PPC_ALLOC_HTAB:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r =3D hv_enable=
+d;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+> >> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+> >> index c768f75279ef..b58579b386bb 100644
+> >> --- a/arch/riscv/kvm/vm.c
+> >> +++ b/arch/riscv/kvm/vm.c
+> >> @@ -63,6 +63,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,=20
+> >> long ext)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_READONLY_MEM:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_MP_STATE:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_IMMEDIATE_EXIT:
+> >> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> >> +=C2=A0=C2=A0=C2=A0 case KVM_CAP_IRQFD_RESAMPLE:
+> >> +#endif
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r =3D 1;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_NR_VCPUS:
+> >> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> >> index 156d1c25a3c1..85e093fc8d13 100644
+> >> --- a/arch/s390/kvm/kvm-s390.c
+> >> +++ b/arch/s390/kvm/kvm-s390.c
+> >> @@ -564,6 +564,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,=
+=20
+> >> long ext)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_SET_GUEST_DEBUG:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_S390_DIAG318:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_S390_MEM_OP_EXTENSION:
+> >> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> >> +=C2=A0=C2=A0=C2=A0 case KVM_CAP_IRQFD_RESAMPLE:
+> >> +#endif
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r =3D 1;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_SET_GUEST_DEBUG2:
+> >> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> >> index 0c0ca599a353..a0a7b769483d 100644
+> >> --- a/arch/x86/kvm/x86.c
+> >> +++ b/arch/x86/kvm/x86.c
+> >> @@ -4273,6 +4273,9 @@ int kvm_vm_ioctl_check_extension(struct kvm=20
+> >> *kvm, long ext)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_SYS_ATTRIBUTES:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_VAPIC:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_ENABLE_CAP:
+> >> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> >> +=C2=A0=C2=A0=C2=A0 case KVM_CAP_IRQFD_RESAMPLE:
+> >> +#endif
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r =3D 1;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_EXIT_HYPERCALL:
+> >> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> >> index 70e05af5ebea..885e72e668a5 100644
+> >> --- a/virt/kvm/kvm_main.c
+> >> +++ b/virt/kvm/kvm_main.c
+> >> @@ -4293,7 +4293,6 @@ static long=20
+> >> kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+> >> =C2=A0 #endif
+> >> =C2=A0 #ifdef CONFIG_HAVE_KVM_IRQFD
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_IRQFD:
+> >> -=C2=A0=C2=A0=C2=A0 case KVM_CAP_IRQFD_RESAMPLE:
+> >> =C2=A0 #endif
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case KVM_CAP_CHECK_EXTENSION_VM:
+> >=20
+>
+> --=20
+> Alexey
+
