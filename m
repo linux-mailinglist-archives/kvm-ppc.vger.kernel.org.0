@@ -2,465 +2,172 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 520075BE6AC
-	for <lists+kvm-ppc@lfdr.de>; Tue, 20 Sep 2022 15:05:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CC615BE766
+	for <lists+kvm-ppc@lfdr.de>; Tue, 20 Sep 2022 15:43:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230394AbiITNFX (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 20 Sep 2022 09:05:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38964 "EHLO
+        id S231233AbiITNnU (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 20 Sep 2022 09:43:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230196AbiITNFV (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 20 Sep 2022 09:05:21 -0400
-Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2C2460506;
-        Tue, 20 Sep 2022 06:05:19 -0700 (PDT)
-Received: from ole.1.ozlabs.ru (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 19CCE82ED3;
-        Tue, 20 Sep 2022 09:05:15 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     kvm@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
+        with ESMTP id S229814AbiITNnT (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 20 Sep 2022 09:43:19 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2041.outbound.protection.outlook.com [40.107.220.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCD364DB54;
+        Tue, 20 Sep 2022 06:43:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TOa9Y0QlLWY4zhwn376VOtFlxHn9Bl88vIwYAm6XO1L4l40iiYA85sPceNuOaCxUwSV1QVYNsOC0KZYzwBuWZScbuWWOrKl/l0yS/FUgRmBKSjHHZDh8IMZ8vxFeQlSc7y14+cXxfpzNGRg4ZvG+yBJb1rv4ASCVsJYZVtwghPu0rjNrph8ZwsbGbqHsBaUS8W+lqyTtUaqFx7oyJMVjRpqqhF2uSbZ0gLwSplqjIe6ikKeIMoEgbvIZ85X7IxBpWo0Y9s43+wTEfKujQHNcZwvnTWXSXi/CQB1Qz9q8ETCGtjLVU+X7uvQQaZBPWltZ9vZHxa3hQfHYC2g7AcTKtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sIQpvw0fcqP/hw6v52sf0f2Tf2S5I2VAilsngtVae+k=;
+ b=hhfrp/RbTool/yJ4cdoJdUSWJNCH1apM7qf/TtVWydUtDE6QKX+nBtFSbna/Q2v1F9bSitzOm8Ajts4yigMaHqMBldZNJlH8rKStrsr33UdA1Xc4UkiTQ5tma0Z9n2t6DAjtOB+Td07h7EEC5dnEpTOrmd1gu0gAF1klZYbrixSO27QyB2iQo72WgxIskQpcb4D4ZBuCfxGwCBT8OgHet9hj83NmClGULdhLDU0KUVEpVnRJftrxqSBxb/SdX0w/q53op80R/2WHeVw1CEWZNGYroe+Di5ib/P1r9yX25VKrf5beHFCCi/5b+SWwxU59h6KStxuJFpRsCvriN3Bhhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sIQpvw0fcqP/hw6v52sf0f2Tf2S5I2VAilsngtVae+k=;
+ b=DQLRZNtBrbRtUnUPSonwp37ryLAV+v2DuqcZUBfxxz1ym4N+Lpq3DDgUP0GghL+W830kwfL1BrS52xW23+NKCd/y3JpkLfWzRVXs40ZknTdPM+dd6fkL2zhz1LJ6c7rSJNBFXKUsA8jCUgpp13n7ZVyJ2yvJ+Shf+5dwyjo3mECxPfOkPGObkEZgZy9OyC0XgXQd/SM5I+MoITJBZHp5I2YYJK3jLKkc2sbaddMOn4w5XZW95nBtDzbeYz9VIlQEcFN8jZiuCS6pp8ZasWUJix0+RDsO6CvNFsd/v9N0XHFvBxzhkS4XW44cZmh9WjGvoubtFo5EuNBHKWnnSpRjvw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM4PR12MB5118.namprd12.prod.outlook.com (2603:10b6:5:391::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.21; Tue, 20 Sep
+ 2022 13:43:17 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5632.021; Tue, 20 Sep 2022
+ 13:43:17 +0000
+Date:   Tue, 20 Sep 2022 10:43:16 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        Nicholas Piggin <npiggin@gmail.com>,
         Michael Ellerman <mpe@ellerman.id.au>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
         Frederic Barrat <fbarrat@linux.ibm.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
         Alex Williamson <alex.williamson@redhat.com>,
         kvm-ppc@vger.kernel.org, Deming Wang <wangdeming@inspur.com>,
         Robin Murphy <robin.murphy@arm.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
         Daniel Henrique Barboza <danielhb413@gmail.com>,
         Fabiano Rosas <farosas@linux.ibm.com>,
         Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Subject: [PATCH kernel v2 3/3] powerpc/iommu: Add iommu_ops to report capabilities and allow blocking domains
-Date:   Tue, 20 Sep 2022 23:04:57 +1000
-Message-Id: <20220920130457.29742-4-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20220920130457.29742-1-aik@ozlabs.ru>
+Subject: Re: [PATCH kernel v2 3/3] powerpc/iommu: Add iommu_ops to report
+ capabilities and allow blocking domains
+Message-ID: <YynDdJRr6fCBCm7Z@nvidia.com>
 References: <20220920130457.29742-1-aik@ozlabs.ru>
+ <20220920130457.29742-4-aik@ozlabs.ru>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220920130457.29742-4-aik@ozlabs.ru>
+X-ClientProxiedBy: BLAPR03CA0143.namprd03.prod.outlook.com
+ (2603:10b6:208:32e::28) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4192:EE_|DM4PR12MB5118:EE_
+X-MS-Office365-Filtering-Correlation-Id: 85a7d65f-5c14-4dee-a4fa-08da9b0e12a2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aNlG6rA0dXdgr49W+3vsbZVW8TVVklbNyKnKSiQyN92kfYqqqtaQ55U3Eehs7gwqfuk4G00cNf2XOqbUTXxGocHkYOTRD0enzPJ3dlEr4hy2AKmayKIyHz6QrIAt6B02Ywm4tnpI+4zaVnLb+99fSmnvFbbNiSrjqeYEWIqRDtD8/qU/BY90TrwKn+rfqGwBCf1xvHQCn1DfvrgnsUl86iNARuIyiDqMcUc0FFJ84vp5lvrB4Dzd5k11Qh+2tziKdUEy/tVnPoCODqWiiOFYccrijDzcO15riDeMwkwzyHL6RokJ/3KHuKUaiIJbWC6GN/6bp8ysbUQf2AA5iv8KtKGjuSCBesrKPi2fV73bcTb/50dSEMrIohcWdpWJfMkGgAnkmdVR8udmAzJeRW/lFeXKqQJXOjdFJNyFo6/2fMSgCwm4GObdB9QD5Cv1OoyVfMYoR/KXrIiiLWewSsu0xGuodVChlpid8Bwwaz4XEpIcbqTO3naJgpMSGVl4kefK7jCHJUGoH/0DNCp0tMAoMNijF2BnufZXqtl0G9Q1Gd92igQh+P9nXyzXuGg6JBwxF7J+tqVvTjI4BdNtSyndKUj3x5KrJkXIFgPXdw8lBkcPdHfJSiCnZks00uztXihhdG2v1URjvXTBLMgXoOn3qhh85zrOfRGBwjfbD7wvKTH0byU/+gDYNQ5Ixp6k02sCs+T3o4/eMuDqKSk7dHcxGw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(136003)(376002)(39860400002)(396003)(366004)(451199015)(38100700002)(8936002)(186003)(2616005)(6512007)(2906002)(54906003)(26005)(478600001)(6486002)(6916009)(316002)(36756003)(66946007)(66476007)(66556008)(4326008)(6506007)(8676002)(41300700001)(86362001)(7416002)(5660300002)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DVnT7Fws2onFMMMii77ZWI4CRA2QnyJpcUqyqrwzsMarBn1x5ZQdOWRXCETc?=
+ =?us-ascii?Q?kinxNBJtuK+1KttnX0AWoOVMg47RPZUMsoaeGTsbvuzWGpXCJKYbcF0eGRHq?=
+ =?us-ascii?Q?Ki8kN0vePlbgFEgzshj6At+efBofB1T2ZRFEd1JlBFuT5bME7u9EZGfax9x7?=
+ =?us-ascii?Q?jUTs5eCKiwW51n4jKPIc2dlc53hdNqyKojL3NlDCN1r2/a2nsMjollcAKLwk?=
+ =?us-ascii?Q?E+/qek6a2TcAOGjh5jDPTfCDRKpH8Ihwuu81SjKID4H4NTiBo52c1QZLILnt?=
+ =?us-ascii?Q?fhj2u+POU2k9A8ql02RktgnZ0jPRS3COTURs0WzdKKUCXUxMMr3Hei8aoRoB?=
+ =?us-ascii?Q?ZyjcyVOmS60VtRF7Qq6u3+0g6ew73pWef1mb6j5uylzRTpUEyyQ1E4zgJc2J?=
+ =?us-ascii?Q?W6t0ADrST6IvK1EtN0OHp925EgacPsnP4w3bQU5G6cej4vzBgA1TzuBmVx9i?=
+ =?us-ascii?Q?M17gW+w6vbHgI6MfrSK+yoNXHh5NNsMd+6qrmyoNXT4s/Ji4btY/F9tfWZ9D?=
+ =?us-ascii?Q?WuBYx1Pd/9R+vWMIDJmQXHwqv1ks6/ecqzo+kj1qu3pUa2OmO1Ge5cgjj3Y6?=
+ =?us-ascii?Q?9PO4z52CgGlbc3/K3qhTQ+7d0vTa/8L68UDZlVu914twJ5Ljeszjqi4Zjm1K?=
+ =?us-ascii?Q?79fW5tH2MkzmJdTrocMi8zacCsqGSC/7NohyvnGiy20s2kcerYzsakBFA5Cd?=
+ =?us-ascii?Q?ii850hRK6bmbRbaSR929kUwEuLY+W18RkaGqtmMhjSBSUKFoczmyEqab1ADq?=
+ =?us-ascii?Q?v5xAi/C3GGcmgy7/t8L6VpeysQm97FeSWeTxWv1sT20IxGnl0dDDuRovc7h7?=
+ =?us-ascii?Q?T0/Icnjt+6jv5f9Byg3txYQwifHcS2Z36ecDnX/O6mogWs5SrEDQW7TiFZGc?=
+ =?us-ascii?Q?OUO1fsUIoZTiJNMyzW/Z1b+EE5I/qGsVcy5Igo5QmoO3rDJCwaD1yV/xtatJ?=
+ =?us-ascii?Q?XS4xhbPtpYthOuzdQlAIokjHpXx1sZetHGBf6moiCVFupHeNHdz3dUCiBHbL?=
+ =?us-ascii?Q?JS/E8NVr977Nr/BSXoibXScL0AGdvEqSf72zLpHFZ2NTtyvzGGgiIAK4tELN?=
+ =?us-ascii?Q?YbJHpgljgN3W416dSkvuQ09iIM6zGp4Umr29H9+hfX2lrDOnlOjvGwc3kbfb?=
+ =?us-ascii?Q?gYQRDJlXfcUwYjD42igA114I5vbsE0jK8baJS+oOLwt44I8DHymYCq/Q7q6j?=
+ =?us-ascii?Q?cjGv8Zug/IDjKCwC9oDDx2VAr07ucW0Iqu+hAtRxheMeoqpyd+TUH5/uxQAq?=
+ =?us-ascii?Q?Ip65RwQUfZtAXDcd+YLOJizJ/MV7f1uonOoSC0MfSp+GoTuXasBxjHyueSEm?=
+ =?us-ascii?Q?ZbT99wUvMi73nsTxhFMs4MWmZveReE3y3CkcVl0bwJJVWhWlv9TU5TruC6Ej?=
+ =?us-ascii?Q?oqQs9kZ6qpZT2MLm0LpxxDdUyP4ATcq9R62bc+5uqu2BXl1jcE0AK+82mJhY?=
+ =?us-ascii?Q?UwKXnIsHinlFifMSqqh83Wq4szm2LYugWFPFJvl7tZE9vz9ff8Rd8LtWTFHs?=
+ =?us-ascii?Q?qYYWvJD8zPHG0IswbF+9RrVVBtuLokMbpGRa8cZElYdNmUZ3iBazCzMVbNmG?=
+ =?us-ascii?Q?lW14y+LHYraHBbva0DEwDG32oVpsezesWhBIl9kw?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85a7d65f-5c14-4dee-a4fa-08da9b0e12a2
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2022 13:43:17.2248
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WNVDOrw63NTaVJ7AVD4N+c6G/wxWJxJSdMPUY+cm/dT1oFRwxGm5qE/x+ZGeAmW2
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5118
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Up until now PPC64 managed to avoid using iommu_ops. The VFIO driver
-uses a SPAPR TCE sub-driver and all iommu_ops uses were kept in
-the Type1 VFIO driver. Recent development added 2 uses of iommu_ops to
-the generic VFIO which broke POWER:
-- a coherency capability check;
-- blocking IOMMU domain - iommu_group_dma_owner_claimed()/...
+On Tue, Sep 20, 2022 at 11:04:57PM +1000, Alexey Kardashevskiy wrote:
+> Up until now PPC64 managed to avoid using iommu_ops. The VFIO driver
+> uses a SPAPR TCE sub-driver and all iommu_ops uses were kept in
+> the Type1 VFIO driver. Recent development added 2 uses of iommu_ops to
+> the generic VFIO which broke POWER:
+> - a coherency capability check;
+> - blocking IOMMU domain - iommu_group_dma_owner_claimed()/...
+> 
+> This adds a simple iommu_ops which reports support for cache
+> coherency and provides a basic support for blocking domains. No other
+> domain types are implemented so the default domain is NULL.
+> 
+> Since now iommu_ops controls the group ownership, this takes it out of
+> VFIO.
+> 
+> This adds an IOMMU device into a pci_controller (=PHB) and registers it
+> in the IOMMU subsystem, iommu_ops is registered at this point.
+> This setup is done in postcore_initcall_sync.
+> 
+> This replaces iommu_group_add_device() with iommu_probe_device() as
+> the former misses necessary steps in connecting PCI devices to IOMMU
+> devices. This adds a comment about why explicit iommu_probe_device()
+> is still needed.
+> 
+> Fixes: e8ae0e140c05 ("vfio: Require that devices support DMA cache coherence")
+> Fixes: 70693f470848 ("vfio: Set DMA ownership for VFIO devices")
+> Cc: Deming Wang <wangdeming@inspur.com>
+> Cc: Robin Murphy <robin.murphy@arm.com>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Daniel Henrique Barboza <danielhb413@gmail.com>
+> Cc: Fabiano Rosas <farosas@linux.ibm.com>
+> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+> Cc: Nicholas Piggin <npiggin@gmail.com>
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> Changes:
+> v2:
+> * replaced a default domain with blocked
 
-This adds a simple iommu_ops which reports support for cache
-coherency and provides a basic support for blocking domains. No other
-domain types are implemented so the default domain is NULL.
+Code wise this is much better..
 
-Since now iommu_ops controls the group ownership, this takes it out of
-VFIO.
+But it is a bit unsettling to see the blocked domain co-opted to mean
+'some platform specific VFIO behavior' - don't have a better idea for
+this series though.
 
-This adds an IOMMU device into a pci_controller (=PHB) and registers it
-in the IOMMU subsystem, iommu_ops is registered at this point.
-This setup is done in postcore_initcall_sync.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-This replaces iommu_group_add_device() with iommu_probe_device() as
-the former misses necessary steps in connecting PCI devices to IOMMU
-devices. This adds a comment about why explicit iommu_probe_device()
-is still needed.
-
-Fixes: e8ae0e140c05 ("vfio: Require that devices support DMA cache coherence")
-Fixes: 70693f470848 ("vfio: Set DMA ownership for VFIO devices")
-Cc: Deming Wang <wangdeming@inspur.com>
-Cc: Robin Murphy <robin.murphy@arm.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>
-Cc: Fabiano Rosas <farosas@linux.ibm.com>
-Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-Changes:
-v2:
-* replaced a default domain with blocked
----
- arch/powerpc/include/asm/pci-bridge.h     |   7 +
- arch/powerpc/platforms/pseries/pseries.h  |   4 +
- arch/powerpc/kernel/iommu.c               | 149 +++++++++++++++++++++-
- arch/powerpc/platforms/powernv/pci-ioda.c |  30 +++++
- arch/powerpc/platforms/pseries/iommu.c    |  24 ++++
- arch/powerpc/platforms/pseries/setup.c    |   3 +
- drivers/vfio/vfio_iommu_spapr_tce.c       |   8 --
- 7 files changed, 215 insertions(+), 10 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/pci-bridge.h b/arch/powerpc/include/asm/pci-bridge.h
-index e18c95f4e1d4..fcab0e4b203b 100644
---- a/arch/powerpc/include/asm/pci-bridge.h
-+++ b/arch/powerpc/include/asm/pci-bridge.h
-@@ -8,6 +8,7 @@
- #include <linux/list.h>
- #include <linux/ioport.h>
- #include <linux/numa.h>
-+#include <linux/iommu.h>
- 
- struct device_node;
- 
-@@ -44,6 +45,9 @@ struct pci_controller_ops {
- #endif
- 
- 	void		(*shutdown)(struct pci_controller *hose);
-+
-+	struct iommu_group *(*device_group)(struct pci_controller *hose,
-+					    struct pci_dev *pdev);
- };
- 
- /*
-@@ -131,6 +135,9 @@ struct pci_controller {
- 	struct irq_domain	*dev_domain;
- 	struct irq_domain	*msi_domain;
- 	struct fwnode_handle	*fwnode;
-+
-+	/* iommu_ops support */
-+	struct iommu_device	iommu;
- };
- 
- /* These are used for config access before all the PCI probing
-diff --git a/arch/powerpc/platforms/pseries/pseries.h b/arch/powerpc/platforms/pseries/pseries.h
-index 1d75b7742ef0..f8bce40ebd0c 100644
---- a/arch/powerpc/platforms/pseries/pseries.h
-+++ b/arch/powerpc/platforms/pseries/pseries.h
-@@ -123,5 +123,9 @@ static inline void pseries_lpar_read_hblkrm_characteristics(void) { }
- #endif
- 
- void pseries_rng_init(void);
-+#ifdef CONFIG_SPAPR_TCE_IOMMU
-+struct iommu_group *pSeries_pci_device_group(struct pci_controller *hose,
-+					     struct pci_dev *pdev);
-+#endif
- 
- #endif /* _PSERIES_PSERIES_H */
-diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
-index d873c123ab49..823da727aac7 100644
---- a/arch/powerpc/kernel/iommu.c
-+++ b/arch/powerpc/kernel/iommu.c
-@@ -35,6 +35,7 @@
- #include <asm/vio.h>
- #include <asm/tce.h>
- #include <asm/mmu_context.h>
-+#include <asm/ppc-pci.h>
- 
- #define DBG(...)
- 
-@@ -1158,8 +1159,14 @@ int iommu_add_device(struct iommu_table_group *table_group, struct device *dev)
- 
- 	pr_debug("%s: Adding %s to iommu group %d\n",
- 		 __func__, dev_name(dev),  iommu_group_id(table_group->group));
--
--	return iommu_group_add_device(table_group->group, dev);
-+	/*
-+	 * This is still not adding devices via the IOMMU bus notifier because
-+	 * of pcibios_init() from arch/powerpc/kernel/pci_64.c which calls
-+	 * pcibios_scan_phb() first (and this guy adds devices and triggers
-+	 * the notifier) and only then it calls pci_bus_add_devices() which
-+	 * configures DMA for buses which also creates PEs and IOMMU groups.
-+	 */
-+	return iommu_probe_device(dev);
- }
- EXPORT_SYMBOL_GPL(iommu_add_device);
- 
-@@ -1239,6 +1246,7 @@ static long spapr_tce_take_ownership(struct iommu_table_group *table_group)
- 		rc = iommu_take_ownership(tbl);
- 		if (!rc)
- 			continue;
-+
- 		for (j = 0; j < i; ++j)
- 			iommu_release_ownership(table_group->tables[j]);
- 		return rc;
-@@ -1271,4 +1279,141 @@ struct iommu_table_group_ops spapr_tce_table_group_ops = {
- 	.release_ownership = spapr_tce_release_ownership,
- };
- 
-+/*
-+ * A simple iommu_ops to allow less cruft in generic VFIO code.
-+ */
-+static int spapr_tce_blocking_iommu_attach_dev(struct iommu_domain *dom,
-+					       struct device *dev)
-+{
-+	struct iommu_group *grp = iommu_group_get(dev);
-+	struct iommu_table_group *table_group;
-+	int ret = -EINVAL;
-+
-+	if (!grp)
-+		return -ENODEV;
-+
-+	table_group = iommu_group_get_iommudata(grp);
-+	ret = table_group->ops->take_ownership(table_group);
-+	iommu_group_put(grp);
-+
-+	return ret;
-+}
-+
-+static void spapr_tce_blocking_iommu_detach_dev(struct iommu_domain *dom,
-+						struct device *dev)
-+{
-+	struct iommu_group *grp = iommu_group_get(dev);
-+	struct iommu_table_group *table_group;
-+
-+	table_group = iommu_group_get_iommudata(grp);
-+	table_group->ops->release_ownership(table_group);
-+}
-+
-+static const struct iommu_domain_ops spapr_tce_blocking_domain_ops = {
-+	.attach_dev = spapr_tce_blocking_iommu_attach_dev,
-+	.detach_dev = spapr_tce_blocking_iommu_detach_dev,
-+};
-+
-+static bool spapr_tce_iommu_capable(enum iommu_cap cap)
-+{
-+	switch (cap) {
-+	case IOMMU_CAP_CACHE_COHERENCY:
-+		return true;
-+	default:
-+		break;
-+	}
-+
-+	return false;
-+}
-+
-+static struct iommu_domain *spapr_tce_iommu_domain_alloc(unsigned int type)
-+{
-+	struct iommu_domain *dom;
-+
-+	if (type != IOMMU_DOMAIN_BLOCKED)
-+		return NULL;
-+
-+	dom = kzalloc(sizeof(*dom), GFP_KERNEL);
-+	if (!dom)
-+		return NULL;
-+
-+	dom->ops = &spapr_tce_blocking_domain_ops;
-+
-+	return dom;
-+}
-+
-+static struct iommu_device *spapr_tce_iommu_probe_device(struct device *dev)
-+{
-+	struct pci_dev *pdev;
-+	struct pci_controller *hose;
-+
-+	if (!dev_is_pci(dev))
-+		return ERR_PTR(-EPERM);
-+
-+	pdev = to_pci_dev(dev);
-+	hose = pdev->bus->sysdata;
-+
-+	return &hose->iommu;
-+}
-+
-+static void spapr_tce_iommu_release_device(struct device *dev)
-+{
-+}
-+
-+static struct iommu_group *spapr_tce_iommu_device_group(struct device *dev)
-+{
-+	struct pci_controller *hose;
-+	struct pci_dev *pdev;
-+
-+	pdev = to_pci_dev(dev);
-+	hose = pdev->bus->sysdata;
-+
-+	if (!hose->controller_ops.device_group)
-+		return ERR_PTR(-ENOENT);
-+
-+	return hose->controller_ops.device_group(hose, pdev);
-+}
-+
-+static const struct iommu_ops spapr_tce_iommu_ops = {
-+	.capable = spapr_tce_iommu_capable,
-+	.domain_alloc = spapr_tce_iommu_domain_alloc,
-+	.probe_device = spapr_tce_iommu_probe_device,
-+	.release_device = spapr_tce_iommu_release_device,
-+	.device_group = spapr_tce_iommu_device_group,
-+};
-+
-+static struct attribute *spapr_tce_iommu_attrs[] = {
-+	NULL,
-+};
-+
-+static struct attribute_group spapr_tce_iommu_group = {
-+	.name = "spapr-tce-iommu",
-+	.attrs = spapr_tce_iommu_attrs,
-+};
-+
-+static const struct attribute_group *spapr_tce_iommu_groups[] = {
-+	&spapr_tce_iommu_group,
-+	NULL,
-+};
-+
-+/*
-+ * This registers IOMMU devices of PHBs. This needs to happen
-+ * after core_initcall(iommu_init) + postcore_initcall(pci_driver_init) and
-+ * before subsys_initcall(iommu_subsys_init).
-+ */
-+static int __init spapr_tce_setup_phb_iommus_initcall(void)
-+{
-+	struct pci_controller *hose;
-+
-+	list_for_each_entry(hose, &hose_list, list_node) {
-+		iommu_device_sysfs_add(&hose->iommu, hose->parent,
-+				       spapr_tce_iommu_groups, "iommu-phb%04x",
-+				       hose->global_number);
-+		iommu_device_register(&hose->iommu, &spapr_tce_iommu_ops,
-+				      hose->parent);
-+	}
-+	return 0;
-+}
-+postcore_initcall_sync(spapr_tce_setup_phb_iommus_initcall);
-+
- #endif /* CONFIG_IOMMU_API */
-diff --git a/arch/powerpc/platforms/powernv/pci-ioda.c b/arch/powerpc/platforms/powernv/pci-ioda.c
-index 180965a309b6..683425a77233 100644
---- a/arch/powerpc/platforms/powernv/pci-ioda.c
-+++ b/arch/powerpc/platforms/powernv/pci-ioda.c
-@@ -1897,6 +1897,13 @@ static long pnv_ioda2_take_ownership(struct iommu_table_group *table_group)
- 	/* Store @tbl as pnv_pci_ioda2_unset_window() resets it */
- 	struct iommu_table *tbl = pe->table_group.tables[0];
- 
-+	/*
-+	 * iommu_ops transfers the ownership per a device and we mode
-+	 * the group ownership with the first device in the group.
-+	 */
-+	if (!tbl)
-+		return 0;
-+
- 	pnv_pci_ioda2_set_bypass(pe, false);
- 	pnv_pci_ioda2_unset_window(&pe->table_group, 0);
- 	if (pe->pbus)
-@@ -1913,6 +1920,9 @@ static void pnv_ioda2_release_ownership(struct iommu_table_group *table_group)
- 	struct pnv_ioda_pe *pe = container_of(table_group, struct pnv_ioda_pe,
- 						table_group);
- 
-+	/* See the comment about iommu_ops above */
-+	if (pe->table_group.tables[0])
-+		return;
- 	pnv_pci_ioda2_setup_default_config(pe);
- 	if (pe->pbus)
- 		pnv_ioda_setup_bus_dma(pe, pe->pbus);
-@@ -2918,6 +2928,25 @@ static void pnv_pci_ioda_dma_bus_setup(struct pci_bus *bus)
- 	}
- }
- 
-+static struct iommu_group *pnv_pci_device_group(struct pci_controller *hose,
-+						struct pci_dev *pdev)
-+{
-+	struct pnv_phb *phb = hose->private_data;
-+	struct pnv_ioda_pe *pe;
-+
-+	if (WARN_ON(!phb))
-+		return ERR_PTR(-ENODEV);
-+
-+	pe = pnv_pci_bdfn_to_pe(phb, pdev->devfn | (pdev->bus->number << 8));
-+	if (!pe)
-+		return ERR_PTR(-ENODEV);
-+
-+	if (!pe->table_group.group)
-+		return ERR_PTR(-ENODEV);
-+
-+	return iommu_group_ref_get(pe->table_group.group);
-+}
-+
- static const struct pci_controller_ops pnv_pci_ioda_controller_ops = {
- 	.dma_dev_setup		= pnv_pci_ioda_dma_dev_setup,
- 	.dma_bus_setup		= pnv_pci_ioda_dma_bus_setup,
-@@ -2928,6 +2957,7 @@ static const struct pci_controller_ops pnv_pci_ioda_controller_ops = {
- 	.setup_bridge		= pnv_pci_fixup_bridge_resources,
- 	.reset_secondary_bus	= pnv_pci_reset_secondary_bus,
- 	.shutdown		= pnv_pci_ioda_shutdown,
-+	.device_group		= pnv_pci_device_group,
- };
- 
- static const struct pci_controller_ops pnv_npu_ocapi_ioda_controller_ops = {
-diff --git a/arch/powerpc/platforms/pseries/iommu.c b/arch/powerpc/platforms/pseries/iommu.c
-index 27877033bf32..6dcdfc2d1779 100644
---- a/arch/powerpc/platforms/pseries/iommu.c
-+++ b/arch/powerpc/platforms/pseries/iommu.c
-@@ -1727,3 +1727,27 @@ static int __init tce_iommu_bus_notifier_init(void)
- 	return 0;
- }
- machine_subsys_initcall_sync(pseries, tce_iommu_bus_notifier_init);
-+
-+#ifdef CONFIG_SPAPR_TCE_IOMMU
-+struct iommu_group *pSeries_pci_device_group(struct pci_controller *hose,
-+					     struct pci_dev *pdev)
-+{
-+	struct device_node *pdn, *dn = pdev->dev.of_node;
-+	struct iommu_group *grp;
-+	struct pci_dn *pci;
-+
-+	pdn = pci_dma_find(dn, NULL);
-+	if (!pdn || !PCI_DN(pdn))
-+		return ERR_PTR(-ENODEV);
-+
-+	pci = PCI_DN(pdn);
-+	if (!pci->table_group)
-+		return ERR_PTR(-ENODEV);
-+
-+	grp = pci->table_group->group;
-+	if (!grp)
-+		return ERR_PTR(-ENODEV);
-+
-+	return iommu_group_ref_get(grp);
-+}
-+#endif
-diff --git a/arch/powerpc/platforms/pseries/setup.c b/arch/powerpc/platforms/pseries/setup.c
-index 489f4c4df468..496a63ce749e 100644
---- a/arch/powerpc/platforms/pseries/setup.c
-+++ b/arch/powerpc/platforms/pseries/setup.c
-@@ -1076,6 +1076,9 @@ static int pSeries_pci_probe_mode(struct pci_bus *bus)
- 
- struct pci_controller_ops pseries_pci_controller_ops = {
- 	.probe_mode		= pSeries_pci_probe_mode,
-+#ifdef CONFIG_SPAPR_TCE_IOMMU
-+	.device_group		= pSeries_pci_device_group,
-+#endif
- };
- 
- define_machine(pseries) {
-diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
-index e123efee959d..6c4fdfc42496 100644
---- a/drivers/vfio/vfio_iommu_spapr_tce.c
-+++ b/drivers/vfio/vfio_iommu_spapr_tce.c
-@@ -1151,8 +1151,6 @@ static void tce_iommu_release_ownership(struct tce_container *container,
- 	for (i = 0; i < IOMMU_TABLE_GROUP_MAX_TABLES; ++i)
- 		if (container->tables[i])
- 			table_group->ops->unset_window(table_group, i);
--
--	table_group->ops->release_ownership(table_group);
- }
- 
- static long tce_iommu_take_ownership(struct tce_container *container,
-@@ -1160,10 +1158,6 @@ static long tce_iommu_take_ownership(struct tce_container *container,
- {
- 	long i, ret = 0;
- 
--	ret = table_group->ops->take_ownership(table_group);
--	if (ret)
--		return ret;
--
- 	/* Set all windows to the new group */
- 	for (i = 0; i < IOMMU_TABLE_GROUP_MAX_TABLES; ++i) {
- 		struct iommu_table *tbl = container->tables[i];
-@@ -1182,8 +1176,6 @@ static long tce_iommu_take_ownership(struct tce_container *container,
- 	for (i = 0; i < IOMMU_TABLE_GROUP_MAX_TABLES; ++i)
- 		table_group->ops->unset_window(table_group, i);
- 
--	table_group->ops->release_ownership(table_group);
--
- 	return ret;
- }
- 
--- 
-2.37.3
-
+Jason
