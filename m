@@ -2,132 +2,139 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7270B5BEF53
-	for <lists+kvm-ppc@lfdr.de>; Tue, 20 Sep 2022 23:46:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 490B65BF592
+	for <lists+kvm-ppc@lfdr.de>; Wed, 21 Sep 2022 06:49:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbiITVqd (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 20 Sep 2022 17:46:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44004 "EHLO
+        id S230416AbiIUEts (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 21 Sep 2022 00:49:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbiITVqc (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 20 Sep 2022 17:46:32 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7151C6612E
-        for <kvm-ppc@vger.kernel.org>; Tue, 20 Sep 2022 14:46:29 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id i15-20020a17090a4b8f00b0020073b4ac27so3767757pjh.3
-        for <kvm-ppc@vger.kernel.org>; Tue, 20 Sep 2022 14:46:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=7l/du9tda2XXL7FC7D3+ws6V56vBPTifJOsgn5Df51U=;
-        b=gOwSfOBbOr0MQjW5J+UipqgY2Yw0uaNGsdreNLLUTDAa9oJvasIrAg0xIqNd6JiCJa
-         /lgGQS7Q7nYv6b+T6ZiQMMEBH/BgMj/HFdvRGGgH3smBNXbNaXSmFnTYFomPlG0Z0NGS
-         2cenws1/5V21PiPBEdeHsWTCSLNfKNhlCdt/MAYtvkn9gp6c/7PG4lN9X16+DcF5/ij6
-         e5f5cdzMkb9SYgvYUAkvx/e+KHrZ57z10+mRwcube170/DdHCki9xJNAnreu6apEm/HG
-         zlrEnBZu26IHdG0QI6woc6awnSbNFJ7vtkmuhh2eW8WmicHnxp3rSI+lOebJnCfq36Z3
-         sISg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=7l/du9tda2XXL7FC7D3+ws6V56vBPTifJOsgn5Df51U=;
-        b=B3aM9jpKNn9ztrrGBky22Yx96b1Sa7xH7ao6cBg14Xepc+pVsc/brIjeFoT/b95jIw
-         DxINAP3+QGrFtVeOF0kF7NwBOj/WhIjyQ4n260CUPCPM6KbXraMEs0ESX5Ll0RoMpCoe
-         j1mb7zS9dZes2kcX3sdUlY16mfYzj3Ga/zC1UvrRa8EQrvNxXld/JGU0AwgBXBoa359H
-         7YAOnngDKohKPTKYjN1aZeuuqdJ9H9pLXcsbQpF8NHmIFeYvkA+JPraB6QcZWu0Zm/Nh
-         jnsONftX1sh9+rz2gVB48org6eCgAwu+fKkEC2ugz6j3yAE31cJm/bQtiYrq53npKr9l
-         Y5Aw==
-X-Gm-Message-State: ACrzQf2GjhMIqbHum2Ut8ntYl7yUyb7of2xLqjgEnQPlXeuikFM4YHwI
-        /1PLjn12+RX92nF5NOobCL85zw==
-X-Google-Smtp-Source: AMsMyM4SuFzhjRKjEs3+Aoh19U+sLXTWgvCFX2DZggzYsKqwvyHbVXt9oLg9ZfwFqHhT7+94CUlpUg==
-X-Received: by 2002:a17:902:aa8b:b0:178:8f1d:6936 with SMTP id d11-20020a170902aa8b00b001788f1d6936mr1595515plr.168.1663710388674;
-        Tue, 20 Sep 2022 14:46:28 -0700 (PDT)
-Received: from [192.168.10.153] (ppp121-45-204-168.cbr-trn-nor-bras38.tpg.internode.on.net. [121.45.204.168])
-        by smtp.gmail.com with ESMTPSA id i2-20020a17090332c200b0017834a6966csm367205plr.176.2022.09.20.14.46.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Sep 2022 14:46:27 -0700 (PDT)
-Message-ID: <02490d2a-5e89-f342-f5b3-386406ffb2ea@ozlabs.ru>
-Date:   Wed, 21 Sep 2022 07:46:21 +1000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101
- Thunderbird/104.0
-Subject: Re: [PATCH kernel v2] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
- platform dependent
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm-riscv@lists.infradead.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S230447AbiIUEtq (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 21 Sep 2022 00:49:46 -0400
+Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E598DF3;
+        Tue, 20 Sep 2022 21:49:31 -0700 (PDT)
+Received: from ole.1.ozlabs.ru (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 45AAB82EFA;
+        Wed, 21 Sep 2022 00:49:27 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     kvm@vger.kernel.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
         Anup Patel <anup@brainfault.org>, kvm-ppc@vger.kernel.org,
         Nicholas Piggin <npiggin@gmail.com>
-References: <20220920125143.28009-1-aik@ozlabs.ru>
- <874jx2kp02.wl-maz@kernel.org>
-Content-Language: en-US
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <874jx2kp02.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Subject: [PATCH kernel v3] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support platform dependent
+Date:   Wed, 21 Sep 2022 14:49:25 +1000
+Message-Id: <20220921044925.101802-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.37.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+When introduced, IRQFD resampling worked on POWER8 with XICS. However
+KVM on POWER9 has never implemented it - the compatibility mode code
+("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
+XIVE mode does not handle INTx in KVM at all.
 
+This moved the capability support advertising to platforms and stops
+advertising it on XIVE, i.e. POWER9 and later.
 
-On 21/09/2022 02:08, Marc Zyngier wr
-ote:
-> On Tue, 20 Sep 2022 13:51:43 +0100,
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->>
->> When introduced, IRQFD resampling worked on POWER8 with XICS. However
->> KVM on POWER9 has never implemented it - the compatibility mode code
->> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
->> XIVE mode does not handle INTx in KVM at all.
->>
->> This moved the capability support advertising to platforms and stops
->> advertising it on XIVE, i.e. POWER9 and later.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> Acked-by: Nicholas Piggin <npiggin@gmail.com>
->> [For KVM RISC-V]
->> Acked-by: Anup Patel <anup@brainfault.org>
->> ---
->> Changes:
->> v2:
->> * removed ifdef for ARM64.
-> 
-> The same argument applies to both x86 and s390, which do select
-> HAVE_KVM_IRQFD from the KVM config option. Only power allows this
-> option to be selected depending on the underlying interrupt controller
-> emulation.
-> 
-> As for riscv and mips, they don't select HAVE_KVM_IRQFD, and this
-> isn't a user-selectable option. So why do they get patched at all?
+This stops advertising the capability on MIPS and RISC-V as these
+do not select HAVE_KVM_IRQFD and do not implement IRQFD resampling
+anyway.
 
-Before the patch, the capability was advertised on those, with your 
-proposal it will stop. Which is a change in behavior which some may say 
-requires a separate patch (like, one per platform). I am definitely 
-overthinking it though and you are right.
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Acked-by: Nicholas Piggin <npiggin@gmail.com>
+---
+Changes:
+v3:
+* removed all ifdeferry
+* removed the capability for MIPS and RISCV
+* adjusted the commit log about MIPS and RISCV
 
-> My conclusion is that:
-> 
-> - only power needs the #ifdefery in the arch-specific code
-> - arm64, s390 and x86 can use KVM_CAP_IRQFD_RESAMPLE without a #ifdef
-> - mips and riscv should be left alone
+v2:
+* removed ifdef for ARM64.
+---
+ arch/arm64/kvm/arm.c       | 1 +
+ arch/powerpc/kvm/powerpc.c | 6 ++++++
+ arch/s390/kvm/kvm-s390.c   | 1 +
+ arch/x86/kvm/x86.c         | 1 +
+ virt/kvm/kvm_main.c        | 1 -
+ 5 files changed, 9 insertions(+), 1 deletion(-)
 
-Fair enough, thanks for the review! I'll post v3 shortly.
-
-> 
-> Thanks,
-> 
-> 	M.
-> 
-
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 2ff0ef62abad..d2daa4d375b5 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	case KVM_CAP_PTP_KVM:
+ 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
++	case KVM_CAP_IRQFD_RESAMPLE:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index fb1490761c87..908ce8bd91c9 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		break;
+ #endif
+ 
++#ifdef CONFIG_HAVE_KVM_IRQFD
++	case KVM_CAP_IRQFD_RESAMPLE:
++		r = !xive_enabled();
++		break;
++#endif
++
+ 	case KVM_CAP_PPC_ALLOC_HTAB:
+ 		r = hv_enabled;
+ 		break;
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index edfd4bbd0cba..7521adadb81b 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_S390_DIAG318:
+ 	case KVM_CAP_S390_MEM_OP_EXTENSION:
++	case KVM_CAP_IRQFD_RESAMPLE:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 43a6a7efc6ec..2d6c5a8fdf14 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VAPIC:
+ 	case KVM_CAP_ENABLE_CAP:
+ 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
++	case KVM_CAP_IRQFD_RESAMPLE:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_EXIT_HYPERCALL:
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 584a5bab3af3..05cf94013f02 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4447,7 +4447,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ #endif
+ #ifdef CONFIG_HAVE_KVM_IRQFD
+ 	case KVM_CAP_IRQFD:
+-	case KVM_CAP_IRQFD_RESAMPLE:
+ #endif
+ 	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+ 	case KVM_CAP_CHECK_EXTENSION_VM:
 -- 
-Alexey
+2.37.3
+
