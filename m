@@ -2,141 +2,61 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B04655F3A2E
-	for <lists+kvm-ppc@lfdr.de>; Tue,  4 Oct 2022 01:57:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF88D5F4431
+	for <lists+kvm-ppc@lfdr.de>; Tue,  4 Oct 2022 15:22:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbiJCX5p (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 3 Oct 2022 19:57:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39418 "EHLO
+        id S229986AbiJDNW2 (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 4 Oct 2022 09:22:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbiJCX5h (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 3 Oct 2022 19:57:37 -0400
-Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 773022B257;
-        Mon,  3 Oct 2022 16:57:34 -0700 (PDT)
-Received: from ole.1.ozlabs.ru (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 6E27A833CD;
-        Mon,  3 Oct 2022 19:57:29 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     kvm@vger.kernel.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anup Patel <anup@brainfault.org>, kvm-ppc@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Marc Zyngier <maz@kernel.org>
-Subject: [PATCH kernel v4] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support platform dependent
-Date:   Tue,  4 Oct 2022 10:57:22 +1100
-Message-Id: <20221003235722.2085145-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.37.3
+        with ESMTP id S229669AbiJDNW1 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 4 Oct 2022 09:22:27 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 759BA25F0
+        for <kvm-ppc@vger.kernel.org>; Tue,  4 Oct 2022 06:22:26 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4MhdfN4svqz4xGj;
+        Wed,  5 Oct 2022 00:22:20 +1100 (AEDT)
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+To:     Fabiano Rosas <farosas@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     npiggin@gmail.com, kvm-ppc@vger.kernel.org
+In-Reply-To: <20220816222517.1916391-1-farosas@linux.ibm.com>
+References: <20220816222517.1916391-1-farosas@linux.ibm.com>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix decrementer migration
+Message-Id: <166488970203.778266.13672388386206891818.b4-ty@ellerman.id.au>
+Date:   Wed, 05 Oct 2022 00:21:42 +1100
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-When introduced, IRQFD resampling worked on POWER8 with XICS. However
-KVM on POWER9 has never implemented it - the compatibility mode code
-("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
-XIVE mode does not handle INTx in KVM at all.
+On Tue, 16 Aug 2022 19:25:17 -0300, Fabiano Rosas wrote:
+> We used to have a workaround[1] for a hang during migration that was
+> made ineffective when we converted the decrementer expiry to be
+> relative to guest timebase.
+> 
+> The point of the workaround was that in the absence of an explicit
+> decrementer expiry value provided by userspace during migration, KVM
+> needs to initialize dec_expires to a value that will result in an
+> expired decrementer after subtracting the current guest timebase. That
+> stops the vcpu from hanging after migration due to a decrementer
+> that's too large.
+> 
+> [...]
 
-This moved the capability support advertising to platforms and stops
-advertising it on XIVE, i.e. POWER9 and later.
+Applied to powerpc/topic/ppc-kvm.
 
-This should cause no behavioural change for other architectures.
+[1/1] KVM: PPC: Book3S HV: Fix decrementer migration
+      https://git.kernel.org/powerpc/c/0a5bfb824a6ea35e54b7e5ac6f881beea5e309d2
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Acked-by: Nicholas Piggin <npiggin@gmail.com>
-Acked-by: Marc Zyngier <maz@kernel.org>
----
-Changes:
-v4:
-* removed incorrect clause about changing behavoir on MIPS and RISCV
-
-v3:
-* removed all ifdeferry
-* removed the capability for MIPS and RISCV
-* adjusted the commit log about MIPS and RISCV
-
-v2:
-* removed ifdef for ARM64.
----
- arch/arm64/kvm/arm.c       | 1 +
- arch/powerpc/kvm/powerpc.c | 6 ++++++
- arch/s390/kvm/kvm-s390.c   | 1 +
- arch/x86/kvm/x86.c         | 1 +
- virt/kvm/kvm_main.c        | 1 -
- 5 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 2ff0ef62abad..d2daa4d375b5 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 	case KVM_CAP_PTP_KVM:
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-+	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index fb1490761c87..908ce8bd91c9 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- #endif
- 
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+		r = !xive_enabled();
-+		break;
-+#endif
-+
- 	case KVM_CAP_PPC_ALLOC_HTAB:
- 		r = hv_enabled;
- 		break;
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index edfd4bbd0cba..7521adadb81b 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_S390_DIAG318:
- 	case KVM_CAP_S390_MEM_OP_EXTENSION:
-+	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 43a6a7efc6ec..2d6c5a8fdf14 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VAPIC:
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
-+	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 584a5bab3af3..05cf94013f02 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4447,7 +4447,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #endif
- #ifdef CONFIG_HAVE_KVM_IRQFD
- 	case KVM_CAP_IRQFD:
--	case KVM_CAP_IRQFD_RESAMPLE:
- #endif
- 	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
- 	case KVM_CAP_CHECK_EXTENSION_VM:
--- 
-2.37.3
-
+cheers
