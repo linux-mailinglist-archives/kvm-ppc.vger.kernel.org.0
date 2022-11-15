@@ -2,107 +2,146 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7BE0622B68
-	for <lists+kvm-ppc@lfdr.de>; Wed,  9 Nov 2022 13:21:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC4756290C8
+	for <lists+kvm-ppc@lfdr.de>; Tue, 15 Nov 2022 04:29:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229766AbiKIMVN (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 9 Nov 2022 07:21:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52148 "EHLO
+        id S232160AbiKOD3E (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 14 Nov 2022 22:29:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbiKIMVM (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 9 Nov 2022 07:21:12 -0500
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2285A250
-        for <kvm-ppc@vger.kernel.org>; Wed,  9 Nov 2022 04:21:12 -0800 (PST)
-Received: by mail-pl1-x641.google.com with SMTP id y4so16942788plb.2
-        for <kvm-ppc@vger.kernel.org>; Wed, 09 Nov 2022 04:21:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fbObnRmjFLzcDwNhEwFLaA7JYkgzeFM/bY/YZa9vDN4=;
-        b=LbmcTPPG1s0AmdtCagZ2K3ZSI8C6tv3gwhiB6gE1qrPV1oLt7yFcJjPLxKDzdeUD/o
-         6n/xE2XVwUAVZX1CtkSARV635Qx4IwtlO0o9S+TkCb2vP2lETOKZqrjxS/+9wfGvm+5+
-         PFapCnFrxpH12ZlPHuuMvB20sYUqumlmr6DMg7QGZ8NevEJUnwmaP8euOXp9IJKOakYP
-         Bj3eQFEdqFEKJEibNERTj2BDtb2iJRMqgN4HuCzpUWPGQW2NMi9iAhLh8OB0ivx0B3+B
-         BURNbHqGNQElgIwE7EnudPmyMSUaGgxQmgaFhNub7ipJY0x5gmuBVqFNAkcyTf7fy56T
-         kxYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fbObnRmjFLzcDwNhEwFLaA7JYkgzeFM/bY/YZa9vDN4=;
-        b=p3ZON17G+1RsuGJ2OUaTSO/m7Xa7KjWqHLY7tNQGlMJLuyFFjtX1TpoLmcZDA2uxBB
-         dfnWDQjYtCgdVMy1Z68lOaw04aZjwsbA2KP2Wf5Ka6KhnkOnzLNNhMSRp5bdArqwNYgJ
-         uCCUr2X2PwSJdjfDf8EAH1zD9oJPLyksRmx+59inKMdWVAuStGCwNgHsFzZhZoY0H7fs
-         csb4Yn+5hL+JYIly+n+UvSHRNdFgTXyyx3KVbzlmzIU3bhNYhFajRIl2EopBUPs+a7ev
-         On4QRL1mYSoUQ/RjHV9IWIVFiRD+Au3n0i44pkCodmXSpO/rpFbIRMfxixMBjVPE5auG
-         4tDg==
-X-Gm-Message-State: ACrzQf3NZw/HGYrOAcL+twGoR27l1YVW2y4DAM6ci3AD3J5TMbHpZfpY
-        C/bRNIrTRS3A3K0TaX8ozDH2IGKjY9liKftwC5A=
-X-Google-Smtp-Source: AMsMyM7hF+iyfOnRObKyES9Ul/c9vbO3Z08f3fWxEppUniz/kVIAXJB5dEA5FjCBxecrygJF0CkBk+ZFuKY7ff1LOEM=
-X-Received: by 2002:a17:90a:7786:b0:214:2a4a:4a28 with SMTP id
- v6-20020a17090a778600b002142a4a4a28mr41395924pjk.132.1667996471605; Wed, 09
- Nov 2022 04:21:11 -0800 (PST)
+        with ESMTP id S229802AbiKOD3D (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 14 Nov 2022 22:29:03 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A90A9624C;
+        Mon, 14 Nov 2022 19:28:59 -0800 (PST)
+Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NBBPz29c4zqSHG;
+        Tue, 15 Nov 2022 11:25:11 +0800 (CST)
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 15 Nov 2022 11:28:56 +0800
+Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
+ Halt-polling fixes, cleanups and a new stat)
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+CC:     Wanpeng Li <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        KVM ARM <kvmarm@lists.cs.columbia.edu>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Jon Cargille <jcargill@google.com>,
+        kvm-ppc <kvm-ppc@vger.kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Jim Mattson <jmattson@google.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+ <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
+ <YVHcY6y1GmvGJnMg@google.com>
+ <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
+ <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
+ <CABgObfYtS6wiQe=BhF3t5usr7J6q4PWE4=rwZMMukfC9wT_6fA@mail.gmail.com>
+ <YVIAdVxc+q2UWB+J@google.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <32810c89-44c6-6780-9d05-e49f6b897b6e@huawei.com>
+Date:   Tue, 15 Nov 2022 11:28:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Received: by 2002:a05:7300:8193:b0:83:e6f3:260f with HTTP; Wed, 9 Nov 2022
- 04:21:10 -0800 (PST)
-Reply-To: westernuniontg453@gmail.com
-From:   POST OFFICE <verawinddymelody01@gmail.com>
-Date:   Wed, 9 Nov 2022 12:21:10 +0000
-Message-ID: <CABnZ=7SBiULKAmkUgfjw5XbMiEJ2BP+wCXY4BcmX27K6XdH2yg@mail.gmail.com>
-Subject: =?UTF-8?B?0JTQvtCx0YDQvtCz0L4g0LTQvdGPINC70Y7QsdCw?=
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=4.2 required=5.0 tests=BAYES_40,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
+In-Reply-To: <YVIAdVxc+q2UWB+J@google.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,URI_DOTEDU autolearn=ham
         autolearn_force=no version=3.4.6
-X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-0KjQsNC90L7QstC90LjQuSDQstC70LDRgdC90LjQutGDINC10LvQtdC60YLRgNC+0L3QvdC+0Zcg
-0L/QvtGI0YLQuDsNCg0K0JzRltC20L3QsNGA0L7QtNC90LjQuSDQstCw0LvRjtGC0L3QuNC5INGE
-0L7QvdC0ICjQnNCS0KQpINCy0LjQv9C70LDRh9GD0ZQg0LrQvtC80L/QtdC90YHQsNGG0ZbRjiDQ
-stGB0ZbQvCDQttC10YDRgtCy0LDQvA0K0YjQsNGF0YDQsNC50YHRgtCy0LAg0YLQsCDRgtC40Lws
-INGF0YLQviDQvNCw0ZQg0L3QtdC30LDRgtGA0LXQsdGD0LLQsNC90ZYg0LrQvtGI0YLQuCwg0LAg
-0LLQsNGI0YMg0LXQu9C10LrRgtGA0L7QvdC90YMNCtCw0LTRgNC10YHRgyDQsdGD0LvQviDQt9C9
-0LDQudC00LXQvdC+INCyINGB0L/QuNGB0LrRgyDQvdC10LfQsNGC0YDQtdCx0YPQstCw0L3QuNGF
-INGE0L7QvdC00ZbQsi4g0JzQktCkINGD0L/QvtCy0L3QvtCy0LDQttC40LINCtGG0LXQuSDQvtGE
-0ZbRgSBXZXN0ZXJuIFVuaW9uINC/0LXRgNC10YDQsNGF0YPQstCw0YLQuCDQstCw0Lwg0LLQsNGI
-0YMg0LrQvtC80L/QtdC90YHQsNGG0ZbRjiDQt9CwINC00L7Qv9C+0LzQvtCz0L7Rjg0KV2VzdGVy
-biBVbmlvbiBNb25leSBUcmFuc2Zlci4g0JzQuCDQv9GA0L7QstC10LvQuCDRgNC+0LfRgdC70ZbQ
-tNGD0LLQsNC90L3RjyDRgtCwINC34oCZ0Y/RgdGD0LLQsNC70LgsDQrRidC+INCy0Lgg0ZQg0LfQ
-sNC60L7QvdC90LjQvCDQstC70LDRgdC90LjQutC+0Lwg0YbRjNC+0LPQviDRhNC+0L3QtNGDLg0K
-DQrQntC00L3QsNC6INC80Lgg0L/RgNC40LnRiNC70Lgg0LTQviDQstC40YHQvdC+0LLQutGDINC/
-0YDQviDQv9C10YDQtdC60LDQtyDQstCw0YjQvtCz0L4g0LLQu9Cw0YHQvdC+0LPQviDQv9C70LDR
-gtC10LbRgyDRh9C10YDQtdC3DQrRgdC40YHRgtC10LzRgyBXZXN0ZXJuIFVuaW9uIE1vbmV5IFRy
-YW5zZmVyLCA1MDAwINC00L7Qu9Cw0YDRltCyINCh0KjQkCDRidC+0LTQvdGPLCDQtNC+0LrQuA0K
-0LfQsNCz0LDQu9GM0L3QsCDRgdGD0LzQsCA4MDAgMDAwLDAwINC00L7Qu9Cw0YDRltCyINCh0KjQ
-kCDQvdC1INCx0YPQtNC1INC/0L7QstC90ZbRgdGC0Y4g0L/QtdGA0LXRgNCw0YXQvtCy0LDQvdCw
-DQrQstCw0LwuDQoNCtCc0L7QttC70LjQstC+LCDQvNC4INC90LUg0LfQvNC+0LbQtdC80L4g0L3Q
-sNC00ZbRgdC70LDRgtC4INGG0LXQuSDQv9C70LDRgtGW0LYg0LvQuNGI0LUg0LfQsCDQtNC+0L/Q
-vtC80L7Qs9C+0Y4g0LLQsNGI0L7Rlw0K0LDQtNGA0LXRgdC4INC10LvQtdC60YLRgNC+0L3QvdC+
-0Zcg0L/QvtGI0YLQuCwg0YLQvtC80YMg0L3QsNC8INC/0L7RgtGA0ZbQsdC90LAg0LLQsNGI0LAg
-0ZbQvdGE0L7RgNC80LDRhtGW0Y8g0L/RgNC+INGC0LUsDQrQutGD0LTQuCDQvNC4INCx0YPQtNC1
-0LzQviDQvdCw0LTRgdC40LvQsNGC0Lgg0LLQsNC8INGJ0L7QtNC10L3QvdGWIDUwMDAg0LTQvtC7
-0LDRgNGW0LIsINC90LDQv9GA0LjQutC70LDQtDsNCg0K0IbQvCfRjyDQvtC00LXRgNC20YPQstCw
-0YfQsDogX19fX19fX19fX19fX19fXw0K0JDQtNGA0LXRgdCwOiBfX19fX19fX19fX19fX19fDQrQ
-mtGA0LDRl9C90LA6IF9fX19fX19fX19fX19fX19fXw0K0KDRltC0INC30LDQvdGP0YLRjDogX19f
-X19fX19fX19fX19fX19fDQrQotC10LvQtdGE0L7QvdC90LjQuSDQvdC+0LzQtdGAOl9fX19fX19f
-X19fX19fX18NCtCU0L7QtNCw0L3QsCDQutC+0L/RltGPINCy0LDRiNC+0LPQviDQv9C+0YHQstGW
-0LTRh9C10L3QvdGPINC+0YHQvtCx0Lg6IF9fX19fX19fX19fDQrQktGW0Lo6IF9fX19fX19fX19f
-X19fX19fX19fX19fX19fDQoNCtCc0Lgg0YDQvtC30L/QvtGH0L3QtdC80L4g0L/QtdGA0LXQtNCw
-0YfRgywg0YnQvtC50L3QviDQvtGC0YDQuNC80LDRlNC80L4g0LLQsNGI0YMg0LLQuNGJ0LXQt9Cw
-0LfQvdCw0YfQtdC90YMg0ZbQvdGE0L7RgNC80LDRhtGW0Y4uDQrQmtC+0L3RgtCw0LrRgtC90LAg
-0LXQu9C10LrRgtGA0L7QvdC90LAg0LDQtNGA0LXRgdCwOiAod2VzdGVybnVuaW9udGc0NTNAZ21h
-aWwuY29tKQ0KDQrQqdC40YDQviDQtNGP0LrRg9GOLA0KDQrQn9Cw0L3RliDQnNCw0YDRgtGW0L3R
-gSDQndC10L3QvdGWLCDQtNC40YDQtdC60YLQvtGAIFdlc3Rlcm4gVW5pb24gTW9uZXkgVHJhbnNm
-ZXIsDQrQk9C+0LvQvtCy0L3QuNC5INC+0YTRltGBINCb0L7QvNC1INCi0L7Qs9C+Lg0K
+Hi Sean, Paolo,
+
+I recently also notice the behavior change of param halt_poll_ns.
+Now it loses the ability to:
+1) dynamically disable halt polling for all the running VMs
+by `echo 0 > /sys`
+2) dynamically adjust the halt polling interval for all the
+running VMs by `echo * > /sys`
+
+While in our cases, we usually use above two abilities, and
+KVM_CAP_HALT_POLL is not used yet.
+
+On 2021/9/28 1:33, Sean Christopherson wrote:
+> On Mon, Sep 27, 2021, Paolo Bonzini wrote:
+>> On Mon, Sep 27, 2021 at 5:17 PM Christian Borntraeger
+>> <borntraeger@de.ibm.com> wrote:
+>>>> So I think there are two possibilities that makes sense:
+>>>>
+>>>> * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
+>>> what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
+>> Yes, that's what I meant.  David pointed out that doesn't allow you to
+>> disable halt polling altogether, but for that you can always ask each
+>> VM's userspace one by one, or just not use KVM_CAP_HALT_POLL. (Also, I
+>> don't know about Google's usecase, but mine was actually more about
+>> using KVM_CAP_HALT_POLL to *disable* halt polling on some VMs!).
+> I kinda like the idea if special-casing halt_poll_ns=0, e.g. for testing or
+> in-the-field mitigation if halt-polling is broken.  It'd be trivial to support, e.g.
+Do we have any plan to repost the diff as a fix?
+I would be very nice that this issue can be solved.
+
+Besides, I think we may need some Doc for users to describe
+how halt_poll_ns works with KVM_CAP_HALT_POLL, like
+"Documentation/virt/guest-halt-polling.rst".
+> @@ -3304,19 +3304,23 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+>                  update_halt_poll_stats(vcpu, start, poll_end, !waited);
+>
+>          if (halt_poll_allowed) {
+> +               max_halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
+> +               if (!max_halt_poll_ns || !halt_poll_ns)  <------ squish the max if halt_poll_ns==0
+> +                       max_halt_poll_ns = halt_poll_ns;
+> +
+Does this mean that KVM_CAP_HALT_POLL will not be able to
+disable halt polling for a VM individually when halt_poll_ns !=0?
+>                  if (!vcpu_valid_wakeup(vcpu)) {
+>                          shrink_halt_poll_ns(vcpu);
+> -               } else if (vcpu->kvm->max_halt_poll_ns) {
+> +               } else if (max_halt_poll_ns) {
+>                          if (halt_ns <= vcpu->halt_poll_ns)
+>                                  ;
+>                          /* we had a long block, shrink polling */
+>                          else if (vcpu->halt_poll_ns &&
+> -                                halt_ns > vcpu->kvm->max_halt_poll_ns)
+> +                                halt_ns > max_halt_poll_ns)
+>                                  shrink_halt_poll_ns(vcpu);
+>                          /* we had a short halt and our poll time is too small */
+> -                       else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
+> -                                halt_ns < vcpu->kvm->max_halt_poll_ns)
+> -                               grow_halt_poll_ns(vcpu);
+> +                       else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
+> +                                halt_ns < max_halt_poll_ns)
+> +                               grow_halt_poll_ns(vcpu, max_halt_poll_ns);
+>                  } else {
+>                          vcpu->halt_poll_ns = 0;
+>                  }
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> .
+Thanks,
+Yanan
