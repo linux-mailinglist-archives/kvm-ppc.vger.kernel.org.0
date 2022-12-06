@@ -2,192 +2,88 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E055643C72
-	for <lists+kvm-ppc@lfdr.de>; Tue,  6 Dec 2022 05:40:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 981B4644120
+	for <lists+kvm-ppc@lfdr.de>; Tue,  6 Dec 2022 11:16:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230348AbiLFEkP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 5 Dec 2022 23:40:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42412 "EHLO
+        id S229471AbiLFKQO (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 6 Dec 2022 05:16:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231290AbiLFEj6 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 5 Dec 2022 23:39:58 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A71FCE4
-        for <kvm-ppc@vger.kernel.org>; Mon,  5 Dec 2022 20:39:55 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id v3so12361081pgh.4
-        for <kvm-ppc@vger.kernel.org>; Mon, 05 Dec 2022 20:39:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xqFAh2v1WFBzklz04TP/AWAU1Y1s3gtwJhYETzOXFDc=;
-        b=RbDRgNiJz9xtr32BYRh+f8GcS3c0nxUbEPIp1hnX6CG4hrzfuOJBSUfbDecnbBnA6+
-         P2DXhBTCnwrPQc01XtKp4mfVEKsMk5c1dOmUflMIjV0Tk/LpVkUb4/TATrApVk992Tc2
-         DKeruPykkdLQnhLii4FgB28hUaVeQir2QI8vkSaHBvMH/bzf9N5P5K0tDCGHMb1Yjq2i
-         CRj+iSeCv0HrSY+67Z14pGdgCMSMdAJbs64jcpKFzbdqnqTesMCy/i5hBV6QS9N1WOqG
-         jIxBPQf0FAEICEWnOXwAJs1JduW2dlvTAiD1+oNly76DtPv1PeISuPRpGDSFDdWx522G
-         YhBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xqFAh2v1WFBzklz04TP/AWAU1Y1s3gtwJhYETzOXFDc=;
-        b=fWIhTLE90RFt7j+akjriaQOBW2uiEVdadBb9vlkivlh0Q0MydGZ4UgNhs19nxeH/UX
-         60oS5KWeN72wWgl4oWi6L0PaGGX+cmgm9VMDyenzHT9b5963ppL6wL9JZReU4ZNSkVCR
-         xlSu01r3xtT1yaYPUeo9vvz9Bomi4ZtbtCXvVh+KAGU73E267RD5ifiZLHh3BMaOxgeo
-         t+uwubzgw+BiZq819KH4HZEH5StmxKZ3EP23dVnZnDnTHvXp/Ue3wUWiFmz0p4DqznNK
-         CjZNnG1h5uTzgSewwJ8BSGC7DOAIfo5q24JVqsNCHuUvxJuVpcu56u50Q6FObniaLZN8
-         aoAQ==
-X-Gm-Message-State: ANoB5pmU8PDzqgE37Szu6aTI5amt47YP2VwshZ4UECV21gleccx3NNap
-        Zk4O7HgC/LAGrEB7Ox81aserEQ==
-X-Google-Smtp-Source: AA0mqf70H74bcqANnaDC/TsW/8gS3627MclHUagndhuJZ04rPP179n67SWk/SHm/c9P2dBIwhD9BFw==
-X-Received: by 2002:a63:1609:0:b0:477:467f:3dc0 with SMTP id w9-20020a631609000000b00477467f3dc0mr56706765pgl.504.1670301573310;
-        Mon, 05 Dec 2022 20:39:33 -0800 (PST)
-Received: from [192.168.10.153] (ppp121-45-204-168.cbr-trn-nor-bras38.tpg.internode.on.net. [121.45.204.168])
-        by smtp.gmail.com with ESMTPSA id f14-20020a170902684e00b0018971fba556sm11410996pln.139.2022.12.05.20.39.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Dec 2022 20:39:32 -0800 (PST)
-Message-ID: <5178485f-60d8-0f16-558b-05207102a37e@ozlabs.ru>
-Date:   Tue, 6 Dec 2022 15:39:26 +1100
+        with ESMTP id S229724AbiLFKQJ (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 6 Dec 2022 05:16:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8DAA10DC
+        for <kvm-ppc@vger.kernel.org>; Tue,  6 Dec 2022 02:15:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670321706;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=D8eK2l9TcYTFl3ywtkBaS3gkGap8zKHp2k6yv3JEzzE=;
+        b=VUwRVg+phpQkqu38L6bWiiXOWvzScMXmXX0fi2jGJdlnUPZQwSi3yYyifZKFeoTf4CnQSU
+        n0XenxWV90kRacrKaOj9Yvt6zsrs+OzxQXyJT+CWUIxfTRG6gQ+0JDIJC2GfRexk/3NmfO
+        Eu3kmJd0QphPX8XxWHvCpLTSi8BDWgQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-500-dAxuecrZPPGnrxRo3TeoYQ-1; Tue, 06 Dec 2022 05:15:01 -0500
+X-MC-Unique: dAxuecrZPPGnrxRo3TeoYQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 39037380390B;
+        Tue,  6 Dec 2022 10:15:01 +0000 (UTC)
+Received: from thuth.com (unknown [10.39.192.196])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F2DAB1121333;
+        Tue,  6 Dec 2022 10:14:59 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Subject: [kvm-unit-tests PATCH] powerpc: Fix running the kvm-unit-tests with recent versions of QEMU
+Date:   Tue,  6 Dec 2022 11:14:55 +0100
+Message-Id: <20221206101455.145258-1-thuth@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101
- Thunderbird/108.0
-Subject: Re: [PATCH kernel v4] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
- platform dependent
-Content-Language: en-US
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm-riscv@lists.infradead.org, Anup Patel <anup@brainfault.org>,
-        kvm-ppc@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
-        Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
-References: <20221003235722.2085145-1-aik@ozlabs.ru>
- <7a790aa8-c643-1098-4d28-bd3b10399fcd@ozlabs.ru>
-In-Reply-To: <7a790aa8-c643-1098-4d28-bd3b10399fcd@ozlabs.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-Paolo, ping? :)
+Starting with version 7.0, QEMU starts the pseries guests in 32-bit mode
+instead of 64-bit (see QEMU commit 6e3f09c28a - "spapr: Force 32bit when
+resetting a core"). This causes our test_64bit() in powerpc/emulator.c
+to fail. Let's switch to 64-bit in our startup code instead to fix the
+issue.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ powerpc/cstart64.S | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-On 27/10/2022 18:38, Alexey Kardashevskiy wrote:
-> Paolo, ping?
-> 
-> 
-> On 04/10/2022 10:57, Alexey Kardashevskiy wrote:
->> When introduced, IRQFD resampling worked on POWER8 with XICS. However
->> KVM on POWER9 has never implemented it - the compatibility mode code
->> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
->> XIVE mode does not handle INTx in KVM at all.
->>
->> This moved the capability support advertising to platforms and stops
->> advertising it on XIVE, i.e. POWER9 and later.
->>
->> This should cause no behavioural change for other architectures.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> Acked-by: Nicholas Piggin <npiggin@gmail.com>
->> Acked-by: Marc Zyngier <maz@kernel.org>
->> ---
->> Changes:
->> v4:
->> * removed incorrect clause about changing behavoir on MIPS and RISCV
->>
->> v3:
->> * removed all ifdeferry
->> * removed the capability for MIPS and RISCV
->> * adjusted the commit log about MIPS and RISCV
->>
->> v2:
->> * removed ifdef for ARM64.
->> ---
->>   arch/arm64/kvm/arm.c       | 1 +
->>   arch/powerpc/kvm/powerpc.c | 6 ++++++
->>   arch/s390/kvm/kvm-s390.c   | 1 +
->>   arch/x86/kvm/x86.c         | 1 +
->>   virt/kvm/kvm_main.c        | 1 -
->>   5 files changed, 9 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 2ff0ef62abad..d2daa4d375b5 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
->> long ext)
->>       case KVM_CAP_VCPU_ATTRIBUTES:
->>       case KVM_CAP_PTP_KVM:
->>       case KVM_CAP_ARM_SYSTEM_SUSPEND:
->> +    case KVM_CAP_IRQFD_RESAMPLE:
->>           r = 1;
->>           break;
->>       case KVM_CAP_SET_GUEST_DEBUG2:
->> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
->> index fb1490761c87..908ce8bd91c9 100644
->> --- a/arch/powerpc/kvm/powerpc.c
->> +++ b/arch/powerpc/kvm/powerpc.c
->> @@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
->> long ext)
->>           break;
->>   #endif
->> +#ifdef CONFIG_HAVE_KVM_IRQFD
->> +    case KVM_CAP_IRQFD_RESAMPLE:
->> +        r = !xive_enabled();
->> +        break;
->> +#endif
->> +
->>       case KVM_CAP_PPC_ALLOC_HTAB:
->>           r = hv_enabled;
->>           break;
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index edfd4bbd0cba..7521adadb81b 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
->> long ext)
->>       case KVM_CAP_SET_GUEST_DEBUG:
->>       case KVM_CAP_S390_DIAG318:
->>       case KVM_CAP_S390_MEM_OP_EXTENSION:
->> +    case KVM_CAP_IRQFD_RESAMPLE:
->>           r = 1;
->>           break;
->>       case KVM_CAP_SET_GUEST_DEBUG2:
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 43a6a7efc6ec..2d6c5a8fdf14 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm 
->> *kvm, long ext)
->>       case KVM_CAP_VAPIC:
->>       case KVM_CAP_ENABLE_CAP:
->>       case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
->> +    case KVM_CAP_IRQFD_RESAMPLE:
->>           r = 1;
->>           break;
->>       case KVM_CAP_EXIT_HYPERCALL:
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 584a5bab3af3..05cf94013f02 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -4447,7 +4447,6 @@ static long 
->> kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->>   #endif
->>   #ifdef CONFIG_HAVE_KVM_IRQFD
->>       case KVM_CAP_IRQFD:
->> -    case KVM_CAP_IRQFD_RESAMPLE:
->>   #endif
->>       case KVM_CAP_IOEVENTFD_ANY_LENGTH:
->>       case KVM_CAP_CHECK_EXTENSION_VM:
-> 
-
+diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+index 972851f9..206c518f 100644
+--- a/powerpc/cstart64.S
++++ b/powerpc/cstart64.S
+@@ -23,6 +23,12 @@
+ .globl start
+ start:
+ 	FIXUP_ENDIAN
++	/* Switch to 64-bit mode */
++	mfmsr	r1
++	li	r2,1
++	sldi	r2,r2,63
++	or	r1,r1,r2
++	mtmsrd	r1
+ 	/*
+ 	 * We were loaded at QEMU's kernel load address, but we're not
+ 	 * allowed to link there due to how QEMU deals with linker VMAs,
 -- 
-Alexey
+2.31.1
+
