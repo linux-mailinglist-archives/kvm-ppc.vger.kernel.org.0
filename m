@@ -2,69 +2,192 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66BD863C922
-	for <lists+kvm-ppc@lfdr.de>; Tue, 29 Nov 2022 21:17:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E055643C72
+	for <lists+kvm-ppc@lfdr.de>; Tue,  6 Dec 2022 05:40:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237229AbiK2URm (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 29 Nov 2022 15:17:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56676 "EHLO
+        id S230348AbiLFEkP (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 5 Dec 2022 23:40:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236999AbiK2URa (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 29 Nov 2022 15:17:30 -0500
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 844176D971
-        for <kvm-ppc@vger.kernel.org>; Tue, 29 Nov 2022 12:16:55 -0800 (PST)
-Received: by mail-lj1-x241.google.com with SMTP id x6so4400818lji.10
-        for <kvm-ppc@vger.kernel.org>; Tue, 29 Nov 2022 12:16:55 -0800 (PST)
+        with ESMTP id S231290AbiLFEj6 (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 5 Dec 2022 23:39:58 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A71FCE4
+        for <kvm-ppc@vger.kernel.org>; Mon,  5 Dec 2022 20:39:55 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id v3so12361081pgh.4
+        for <kvm-ppc@vger.kernel.org>; Mon, 05 Dec 2022 20:39:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SzBlYeGeT15Xra75w9IZDBjQ7Da3XKSmRdlnDJDYrko=;
-        b=RTPG0QP7LZ32cfCOAzofH8luZz3/nLG08vWek8mzscp0530F+mpXLsjo8AyYBl7WZ/
-         trvsIBBGpBC/0waQCRayrIpAjihCmK8DvtNYsGNLu23IOdgDog2+mW+2XU5vfrgjoggo
-         0UC9qZM53TJFAK4D9FVO1bsdWQ1S6/yJze86V5g8L/7MPIdOq27AISVKGmJEMzl6XovV
-         qwSS2sWaHXHelzDWozmz89Xawswa0PKnqhfR/hexK9NuRtVmOTtuRo/0G3hUxq3Ljt01
-         qrBRIKfkC+XjtqJlBXcPRreU8H6b40882alQXIuPb7sxZ3swdMecQcY9c1X5+JwXSXMA
-         GYqw==
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xqFAh2v1WFBzklz04TP/AWAU1Y1s3gtwJhYETzOXFDc=;
+        b=RbDRgNiJz9xtr32BYRh+f8GcS3c0nxUbEPIp1hnX6CG4hrzfuOJBSUfbDecnbBnA6+
+         P2DXhBTCnwrPQc01XtKp4mfVEKsMk5c1dOmUflMIjV0Tk/LpVkUb4/TATrApVk992Tc2
+         DKeruPykkdLQnhLii4FgB28hUaVeQir2QI8vkSaHBvMH/bzf9N5P5K0tDCGHMb1Yjq2i
+         CRj+iSeCv0HrSY+67Z14pGdgCMSMdAJbs64jcpKFzbdqnqTesMCy/i5hBV6QS9N1WOqG
+         jIxBPQf0FAEICEWnOXwAJs1JduW2dlvTAiD1+oNly76DtPv1PeISuPRpGDSFDdWx522G
+         YhBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SzBlYeGeT15Xra75w9IZDBjQ7Da3XKSmRdlnDJDYrko=;
-        b=YgVLLRBbx4nRCKrX65i11+h/T+v498WmI/WNo2t4lDjxhWThy9jLXAoB0lw9twea/v
-         drnfl7uKqReeZABlufMPo7DOioJG34+/llBC7mPwOddS1AcRxZZwHhFrAdSxKvG5n2Vx
-         wdxCTZsnCfPWao8uvOr2hcE1hKjFzLA3rxIv+B3LJvgK82stWKodWnes/bpUfmOFP93k
-         Gi/Z5Re5J0wMSb6gMIoAOURxeOFhcutB+Kg4yFRcYuOunWCRu+V31py0KrtKGPGBBEcm
-         1MutfdaGsFX9Wb5bemSTo7lqw78215wN+85N8o3BIEUQyH56oRmJ4bNmoE4vvSPdQFB/
-         1NPA==
-X-Gm-Message-State: ANoB5pmwGS+5X72k5prRwOVOBt2GBLG8B2u1mfTh14l6b7RYoXYdsAly
-        D31klrv3P8feEF1ZlGGYmMikrE94Fs1YbtkCarE=
-X-Google-Smtp-Source: AA0mqf7X10xZ2IKfzXS+xobLbfPRihwyjqP1Bjhi87KP9JDvAevgh3yTPH8Q3yt+uCQGQi0GCEqSbTam47nNan56pLw=
-X-Received: by 2002:a05:651c:50b:b0:26c:5db6:cd84 with SMTP id
- o11-20020a05651c050b00b0026c5db6cd84mr13186663ljp.114.1669753013602; Tue, 29
- Nov 2022 12:16:53 -0800 (PST)
+        bh=xqFAh2v1WFBzklz04TP/AWAU1Y1s3gtwJhYETzOXFDc=;
+        b=fWIhTLE90RFt7j+akjriaQOBW2uiEVdadBb9vlkivlh0Q0MydGZ4UgNhs19nxeH/UX
+         60oS5KWeN72wWgl4oWi6L0PaGGX+cmgm9VMDyenzHT9b5963ppL6wL9JZReU4ZNSkVCR
+         xlSu01r3xtT1yaYPUeo9vvz9Bomi4ZtbtCXvVh+KAGU73E267RD5ifiZLHh3BMaOxgeo
+         t+uwubzgw+BiZq819KH4HZEH5StmxKZ3EP23dVnZnDnTHvXp/Ue3wUWiFmz0p4DqznNK
+         CjZNnG1h5uTzgSewwJ8BSGC7DOAIfo5q24JVqsNCHuUvxJuVpcu56u50Q6FObniaLZN8
+         aoAQ==
+X-Gm-Message-State: ANoB5pmU8PDzqgE37Szu6aTI5amt47YP2VwshZ4UECV21gleccx3NNap
+        Zk4O7HgC/LAGrEB7Ox81aserEQ==
+X-Google-Smtp-Source: AA0mqf70H74bcqANnaDC/TsW/8gS3627MclHUagndhuJZ04rPP179n67SWk/SHm/c9P2dBIwhD9BFw==
+X-Received: by 2002:a63:1609:0:b0:477:467f:3dc0 with SMTP id w9-20020a631609000000b00477467f3dc0mr56706765pgl.504.1670301573310;
+        Mon, 05 Dec 2022 20:39:33 -0800 (PST)
+Received: from [192.168.10.153] (ppp121-45-204-168.cbr-trn-nor-bras38.tpg.internode.on.net. [121.45.204.168])
+        by smtp.gmail.com with ESMTPSA id f14-20020a170902684e00b0018971fba556sm11410996pln.139.2022.12.05.20.39.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Dec 2022 20:39:32 -0800 (PST)
+Message-ID: <5178485f-60d8-0f16-558b-05207102a37e@ozlabs.ru>
+Date:   Tue, 6 Dec 2022 15:39:26 +1100
 MIME-Version: 1.0
-Received: by 2002:a05:651c:a0a:0:0:0:0 with HTTP; Tue, 29 Nov 2022 12:16:52
- -0800 (PST)
-Reply-To: mr.abraham022@gmail.com
-From:   "Mr.Abraham" <chiogb00@gmail.com>
-Date:   Tue, 29 Nov 2022 20:16:52 +0000
-Message-ID: <CAAtWbkEAMQJDfs1SnRLup+F+=QL+vk1rnWR2uLOLtSa-JTS1nA@mail.gmail.com>
-Subject: hi
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=4.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_FM_MR_MRS,
-        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: ****
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101
+ Thunderbird/108.0
+Subject: Re: [PATCH kernel v4] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
+ platform dependent
+Content-Language: en-US
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm-riscv@lists.infradead.org, Anup Patel <anup@brainfault.org>,
+        kvm-ppc@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
+        Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
+References: <20221003235722.2085145-1-aik@ozlabs.ru>
+ <7a790aa8-c643-1098-4d28-bd3b10399fcd@ozlabs.ru>
+In-Reply-To: <7a790aa8-c643-1098-4d28-bd3b10399fcd@ozlabs.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-My Greeting, Did you receive the letter i sent to you. Please answer me.
-Regard, Mr.Abraham
+Paolo, ping? :)
+
+
+On 27/10/2022 18:38, Alexey Kardashevskiy wrote:
+> Paolo, ping?
+> 
+> 
+> On 04/10/2022 10:57, Alexey Kardashevskiy wrote:
+>> When introduced, IRQFD resampling worked on POWER8 with XICS. However
+>> KVM on POWER9 has never implemented it - the compatibility mode code
+>> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
+>> XIVE mode does not handle INTx in KVM at all.
+>>
+>> This moved the capability support advertising to platforms and stops
+>> advertising it on XIVE, i.e. POWER9 and later.
+>>
+>> This should cause no behavioural change for other architectures.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> Acked-by: Nicholas Piggin <npiggin@gmail.com>
+>> Acked-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>> Changes:
+>> v4:
+>> * removed incorrect clause about changing behavoir on MIPS and RISCV
+>>
+>> v3:
+>> * removed all ifdeferry
+>> * removed the capability for MIPS and RISCV
+>> * adjusted the commit log about MIPS and RISCV
+>>
+>> v2:
+>> * removed ifdef for ARM64.
+>> ---
+>>   arch/arm64/kvm/arm.c       | 1 +
+>>   arch/powerpc/kvm/powerpc.c | 6 ++++++
+>>   arch/s390/kvm/kvm-s390.c   | 1 +
+>>   arch/x86/kvm/x86.c         | 1 +
+>>   virt/kvm/kvm_main.c        | 1 -
+>>   5 files changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 2ff0ef62abad..d2daa4d375b5 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>       case KVM_CAP_VCPU_ATTRIBUTES:
+>>       case KVM_CAP_PTP_KVM:
+>>       case KVM_CAP_ARM_SYSTEM_SUSPEND:
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_SET_GUEST_DEBUG2:
+>> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+>> index fb1490761c87..908ce8bd91c9 100644
+>> --- a/arch/powerpc/kvm/powerpc.c
+>> +++ b/arch/powerpc/kvm/powerpc.c
+>> @@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>           break;
+>>   #endif
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>> +        r = !xive_enabled();
+>> +        break;
+>> +#endif
+>> +
+>>       case KVM_CAP_PPC_ALLOC_HTAB:
+>>           r = hv_enabled;
+>>           break;
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index edfd4bbd0cba..7521adadb81b 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>> long ext)
+>>       case KVM_CAP_SET_GUEST_DEBUG:
+>>       case KVM_CAP_S390_DIAG318:
+>>       case KVM_CAP_S390_MEM_OP_EXTENSION:
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_SET_GUEST_DEBUG2:
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 43a6a7efc6ec..2d6c5a8fdf14 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm 
+>> *kvm, long ext)
+>>       case KVM_CAP_VAPIC:
+>>       case KVM_CAP_ENABLE_CAP:
+>>       case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>>           r = 1;
+>>           break;
+>>       case KVM_CAP_EXIT_HYPERCALL:
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index 584a5bab3af3..05cf94013f02 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -4447,7 +4447,6 @@ static long 
+>> kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>>   #endif
+>>   #ifdef CONFIG_HAVE_KVM_IRQFD
+>>       case KVM_CAP_IRQFD:
+>> -    case KVM_CAP_IRQFD_RESAMPLE:
+>>   #endif
+>>       case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+>>       case KVM_CAP_CHECK_EXTENSION_VM:
+> 
+
+-- 
+Alexey
