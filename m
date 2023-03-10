@@ -2,91 +2,78 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7878E6B24D4
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Mar 2023 14:02:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF8CB6B3F36
+	for <lists+kvm-ppc@lfdr.de>; Fri, 10 Mar 2023 13:33:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231217AbjCINCS (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 9 Mar 2023 08:02:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33228 "EHLO
+        id S229906AbjCJMdV (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 10 Mar 2023 07:33:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231225AbjCINCC (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 9 Mar 2023 08:02:02 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DCC11517C;
-        Thu,  9 Mar 2023 05:00:55 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 329BDbhp029568;
-        Thu, 9 Mar 2023 13:00:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=pp1;
- bh=tcBF+ubx6LbtoSD2mJ9Jbkybje1ACfzyNnGR1+3VCmw=;
- b=rldJseDDprnumrd9WVaEIL1BwxvouvxK/caxKc8BJ8Ej0ohtaLgm9u9EKTtowPdNs9QG
- RHBJgUZbkgI/B0rv5WkMhlTdSkdLm8cu3VekLIrLR71UTuFeVYw7oLHl/jizo432An3I
- YtL8Euz8zqlEwCM0Kb3cyRqLAIUs20wFqYDZRBrV6LXAJ+/lSMFSbz+J4ipwOehz7rP1
- EXteoir14JPa3lUdR4wAj3UEVO7nfhbMfTVbp6Nri26dImzSepscPv6eMzGGUYWonzgy
- OVbEDrjU0rDQskHQcY6wOaDhXibrNfswNfGInL1G7wxBIBiHZg+/pQL1yPJbAwdJS/zE 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p6t3bsdau-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Mar 2023 13:00:36 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 329Cs8Qd030902;
-        Thu, 9 Mar 2023 13:00:35 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p6t3bsd8b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Mar 2023 13:00:35 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3294POj1030381;
-        Thu, 9 Mar 2023 13:00:31 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3p6g862b73-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Mar 2023 13:00:31 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 329D0TSY60817736
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Mar 2023 13:00:29 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 58BFB2004E;
-        Thu,  9 Mar 2023 13:00:29 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 422852004F;
-        Thu,  9 Mar 2023 13:00:28 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.43.57.181])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Mar 2023 13:00:27 +0000 (GMT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.400.51.1.1\))
-Subject: Re: [PATCH 3/3] powerpc/kvm: Enable prefixed instructions for HV KVM
- and disable for PR KVM
-From:   Sachin Sant <sachinp@linux.ibm.com>
-In-Reply-To: <ZAgs25dCmLrVkBdU@cleo>
-Date:   Thu, 9 Mar 2023 18:30:17 +0530
-Cc:     linuxppc-dev@ozlabs.org, kvm@vger.kernel.org,
-        Michael Neuling <mikey@neuling.org>,
-        Nick Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org
+        with ESMTP id S229798AbjCJMdU (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 10 Mar 2023 07:33:20 -0500
+Received: from sp13.canonet.ne.jp (sp13.canonet.ne.jp [210.134.168.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F1FE91B57C;
+        Fri, 10 Mar 2023 04:33:16 -0800 (PST)
+Received: from csp13.canonet.ne.jp (unknown [172.21.160.133])
+        by sp13.canonet.ne.jp (Postfix) with ESMTP id B160E1E04A8;
+        Fri, 10 Mar 2023 21:33:14 +0900 (JST)
+Received: from echeck13.canonet.ne.jp ([172.21.160.123])
+        by csp3 with ESMTP
+        id abvup6GIXxJr5abvupoQ33; Fri, 10 Mar 2023 21:33:14 +0900
+X-CNT-CMCheck-Reason: "undefined", "v=2.4 cv=S49nfKgP c=1 sm=1 tr=0
+ ts=640b238a cx=g_jp:t_eml p=ISLhRirdagkA:10 a=c8wCX2VJ6RehaN9m5YqYzw==:117
+ a=yr9NA9NbXb0B05yJHQEWeQ==:17 a=PlGk70OYzacA:10 a=kj9zAlcOel0A:10
+ a=k__wU0fu6RkA:10 a=x7bEGLp0ZPQA:10 a=w-HL7bUrXO_Tk3ELfWAA:9
+ a=CjuIK1q_8ugA:10"
+X-CNT-CMCheck-Score: 100.00
+Received: from echeck13.canonet.ne.jp (localhost [127.0.0.1])
+        by esets.canonet.ne.jp (Postfix) with ESMTP id 6CF921C0252;
+        Fri, 10 Mar 2023 21:33:14 +0900 (JST)
+X-Virus-Scanner: This message was checked by ESET Mail Security
+        for Linux/BSD. For more information on ESET Mail Security,
+        please, visit our website: http://www.eset.com/.
+Received: from smtp13.canonet.ne.jp (unknown [172.21.160.103])
+        by echeck13.canonet.ne.jp (Postfix) with ESMTP id 1A4C01C026A;
+        Fri, 10 Mar 2023 21:33:14 +0900 (JST)
+Received: from nishisan.co.jp (webmail.canonet.ne.jp [210.134.169.250])
+        by smtp13.canonet.ne.jp (Postfix) with ESMTPA id EB55815F962;
+        Fri, 10 Mar 2023 21:33:12 +0900 (JST)
+MIME-Version: 1.0
+Message-ID: <20230310123312.00002160.0474@nishisan.co.jp>
+Date:   Fri, 10 Mar 2023 21:33:12 +0900
+From:   "Mr. Chaoxiang Genghis" <nishinihon@nishisan.co.jp>
+To:     <cgcgcgc@cg.cg>
+Reply-To: <c-genghis0@yandex.com>
+Subject: Hi Best Regards...,
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <A5C10FAF-12FC-4D46-A773-AB95DD2D0FD4@linux.ibm.com>
-References: <ZAgsR04beDcARCiw@cleo> <ZAgs25dCmLrVkBdU@cleo>
-To:     Paul Mackerras <paulus@ozlabs.org>
-X-Mailer: Apple Mail (2.3731.400.51.1.1)
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: WayEQi5nM9uFQmmpPnEv8Fs7ZgnTAZvu
-X-Proofpoint-ORIG-GUID: 5I--WkOycbgz6AnroLHms3kUPxLxOu_w
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-09_06,2023-03-08_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- malwarescore=0 bulkscore=0 mlxlogscore=753 spamscore=0 priorityscore=1501
- lowpriorityscore=0 clxscore=1011 impostorscore=0 phishscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2303090101
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Priority: 3
+ORGANIZATION: SCB Bank
+X-MAILER: Active! mail
+X-EsetResult: clean, %VIRUSNAME%
+X-ESET-AS: R=SPAM;S=100;OP=CALC;TIME=1678451594;VERSION=7947;MC=4037872336;TRN=15;CRV=0;IPC=210.134.169.250;SP=4;SIPS=1;PI=5;F=0
+X-I-ESET-AS: RN=442,624:0;RNP=c-genghis0@yandex.com
+X-ESET-Antispam: SPAM
+X-Spam-Status: Yes, score=6.7 required=5.0 tests=BAYES_50,
+        FREEMAIL_FORGED_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,HK_NAME_MR_MRS,
+        RCVD_IN_MSPIKE_H2,RCVD_IN_VALIDITY_RPBL,SPF_HELO_NONE,SPF_PASS,
+        UNRESOLVED_TEMPLATE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5000]
+        * -0.0 RCVD_IN_MSPIKE_H2 RBL: Average reputation (+2)
+        *      [210.134.168.90 listed in wl.mailspike.net]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  1.3 UNRESOLVED_TEMPLATE Headers contain an unresolved template
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
+        *      digit
+        *      [c-genghis0[at]yandex.com]
+        *  1.3 RCVD_IN_VALIDITY_RPBL RBL: Relay in Validity RPBL,
+        *      https://senderscore.org/blocklistlookup/
+        *      [210.134.168.90 listed in bl.score.senderscore.com]
+        *  1.0 HK_NAME_MR_MRS No description available.
+        *  2.1 FREEMAIL_FORGED_REPLYTO Freemail in Reply-To, but not From
+X-Spam-Level: ******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -94,32 +81,15 @@ List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
+Hi Best Regards...,
 
-> On 08-Mar-2023, at 12:06 PM, Paul Mackerras <paulus@ozlabs.org> wrote:
-> 
-> Now that we can read prefixed instructions from a HV KVM guest and
-> emulate prefixed load/store instructions to emulated MMIO locations,
-> we can add HFSCR_PREFIXED into the set of bits that are set in the
-> HFSCR for a HV KVM guest on POWER10, allowing the guest to use
-> prefixed instructions.
-> 
-> PR KVM has not yet been extended to handle prefixed instructions in
-> all situations where we might need to emulate them, so prevent the
-> guest from enabling prefixed instructions in the FSCR for now.
-> 
-> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
-> Tested-by: Nicholas Piggin <npiggin@gmail.com>
-> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
-> ---
+How are you doing today?
 
-Tested on a Power10 system. Prefixed instructions work correctly.
+I hope this email finds you in good health. You have not responded to my previous emails to you regarding Mr. Husson. Kindly acknowledge my proposal and let me know what your decisions are, if you are taking the offer.
 
-Tested-by: Sachin Sant <sachinp@linux.ibm.com>
+Kindly get back to me as soon as possible for more details.
 
-> arch/powerpc/include/asm/reg.h       | 1 +
-> arch/powerpc/kvm/book3s_hv.c         | 9 +++++++--
-> arch/powerpc/kvm/book3s_pr.c         | 2 ++
-> arch/powerpc/kvm/book3s_rmhandlers.S | 1 +
-> 4 files changed, 11 insertions(+), 2 deletions(-)
-> 
+Best regards,
+Mr. Chaoxiang Genghis.
+
 
