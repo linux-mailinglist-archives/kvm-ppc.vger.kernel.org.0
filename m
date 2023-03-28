@@ -2,125 +2,135 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F2746C9EDC
-	for <lists+kvm-ppc@lfdr.de>; Mon, 27 Mar 2023 11:04:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54C236CB56A
+	for <lists+kvm-ppc@lfdr.de>; Tue, 28 Mar 2023 06:31:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232816AbjC0JEs (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 27 Mar 2023 05:04:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41860 "EHLO
+        id S229671AbjC1EbM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 28 Mar 2023 00:31:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232513AbjC0JEG (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 27 Mar 2023 05:04:06 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D39E4ED5
-        for <kvm-ppc@vger.kernel.org>; Mon, 27 Mar 2023 02:03:12 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id eh3so32807395edb.11
-        for <kvm-ppc@vger.kernel.org>; Mon, 27 Mar 2023 02:03:12 -0700 (PDT)
+        with ESMTP id S229452AbjC1EbL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 28 Mar 2023 00:31:11 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DA621BFF
+        for <kvm-ppc@vger.kernel.org>; Mon, 27 Mar 2023 21:31:08 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id l9-20020a17090a3f0900b0023d32684e7fso573173pjc.1
+        for <kvm-ppc@vger.kernel.org>; Mon, 27 Mar 2023 21:31:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679907791;
-        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IE0Q22t9nDUcBAUVsmYKmeg+5EtHh5OHc8AXl8b80GM=;
-        b=KTeXf5rfD4vjpWQQK16nyr0uP2VOlarPp6TcR+3pwmOjBriTfg6XYZHCStBUeaBUvW
-         eF9WtVab2eXfs+75jn/TRHotBatMCnoAh8XRYBqcILuHWHCmlS0OFcPjzUgLD78R9Wj6
-         bVziZ8Qi8yuQ5uY0y0PGW0szB+/lrSYur2aF3RmswzjT3FdNiPSadC3nzFPpUgIitIqq
-         uU9jQxrR3BhKGWhz06nAdL9wVJqNObI4hwid4UQt3q9B/z/jSDKTaHIUslGkRF9lGDkU
-         po7Mfv0u7H2/i+qIgvgDD0leRrmX3eGKaBzBpd9b49t4Jc/V9qERQRl63VsMj6Nh3dUL
-         UraA==
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112; t=1679977868;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IlAmBP3o3IBDo+zmv5lTsb9tkG3/yK4LL8I9KLZ3MN4=;
+        b=cwWsuHPap/srSYgWbRrcYeIhNt8MkXsGo/yA4rl2A9AZ1VeqMLf5kkm0AXxGjbJP9i
+         stPFThoZaFdla80lTX9q+yQmzC/0rRMo1yAGGvrIcZINJ/eYrtWVC1r5YOEYfClmzGhs
+         /CpEgRO9zODRTos1bSJ+12TMZxDR364TLY1QzNOopoHwdtZizsg2NEwEQyktOFUoiU07
+         B5cE2oo19qQuPUwWvbTkvhsgVCXPhSDIyMCygFq5k2YytWVXnCSxxlMibLb1CcdGtgP3
+         IZHDHtYNArgQgWNfLD/Ip8x894otE2ehheixwB9KGPPzUwUyxIjTU4Xg+xFAn8i2h9Q/
+         NukQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679907791;
-        h=to:subject:message-id:date:from:reply-to:mime-version
+        d=1e100.net; s=20210112; t=1679977868;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IE0Q22t9nDUcBAUVsmYKmeg+5EtHh5OHc8AXl8b80GM=;
-        b=vunI1/kOWp729e0rtpkZltI/bMcElXiAPG3AM6MQ66l1SeRZk1KKbzITQ3OBwd4BpS
-         jlV+tnFS9Vr/w4OOzQToG16T5xOLxUWi7d+s2j/B+th4zdj+tzJqhJKiJmc+xTl3RvM0
-         CiGX8dRPHOnADIkJan3r+4bes2iFJ77J+bp6Co3vEpZj6HdaC2n6K16lLVSAn0Y03erj
-         jv0BfFIJkFpbRdJJYOKTmjLXNNrFHamWL1ck+x2kxRIhh9WRKPqr8QpU8WE4NaIVCweE
-         M0y1+L8jVrFpVs2qljyqV1cbsEMG15pO5AVZCn4EH8eLidaqSO0VTRbzAcVrdwz4d/HM
-         pGOQ==
-X-Gm-Message-State: AAQBX9eUKdWJzBl2ihUGsUOOZBU5xANSpDSJtnSMHnyp8lJDbncfIgQz
-        6GlDlOAJFJ37Yg23hy0FwnLgGSV8GvEX0B+bB5M=
-X-Google-Smtp-Source: AKy350ZD2ESIW02TnCGB9TvafsadwlfYCF6mSKgaGO2EGXA1ya7k8RtgyDUWdLdgzmEByBzu+qLqDRff6xqZbBGOCK4=
-X-Received: by 2002:a17:906:b295:b0:87f:e5af:416e with SMTP id
- q21-20020a170906b29500b0087fe5af416emr5317288ejz.7.1679907790855; Mon, 27 Mar
- 2023 02:03:10 -0700 (PDT)
+        bh=IlAmBP3o3IBDo+zmv5lTsb9tkG3/yK4LL8I9KLZ3MN4=;
+        b=6u3ZQ7swQRw8d25tFSCJ13mCpZNM1rQ7ant08W1qkDAlmxgAKxMzIXeFeCDevVfqvi
+         DeY8Y24QSml9wTTx0+M0WxKFoXOymGtgl3xC8m1AjUmlhnwPOPSUAAyBNetTaQIrL/9p
+         OpUPnp2thXHx41P7FcoZlhiD6wu83+6o1J5HxEIXYBmhjiNqmeM2SnjSwWCNjSyFowx5
+         U4tkjdlHrlca1bbSGzozNpPLwhW+QsaU84lW8wVlyMBJ9Zgnq6qAd+S+1Pc0awKqKgbR
+         TG6mNYspk7FKUstXQEHzC6ycqFCfWLn4FsJ6DAu21bVjVEZtqz7l2eYnNf1rXHSDmbb7
+         u6/A==
+X-Gm-Message-State: AAQBX9dBiCTsmebBLUcDOQdFBtRboQKVKYfVffZdMt5ygOR6qEP1z2to
+        TS6shwJUHyDdRYqbziW6rBf/IQ==
+X-Google-Smtp-Source: AKy350YfSlbkidbsLxSyaZOTsu/hKfDYr24mHSFiR975/0IwpT8nPk2RP7jqhH2NhuRZMCdwI1y9Wg==
+X-Received: by 2002:a17:902:f34d:b0:1a1:eda9:6739 with SMTP id q13-20020a170902f34d00b001a1eda96739mr11291255ple.41.1679977867961;
+        Mon, 27 Mar 2023 21:31:07 -0700 (PDT)
+Received: from [192.168.10.153] (ppp118-208-169-253.cbr-trn-nor-bras39.tpg.internode.on.net. [118.208.169.253])
+        by smtp.gmail.com with ESMTPSA id d3-20020a170902aa8300b001a245b49731sm3334778plr.128.2023.03.27.21.31.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Mar 2023 21:31:07 -0700 (PDT)
+Message-ID: <67d99abd-19bd-8c01-2cac-80102878fa77@ozlabs.ru>
+Date:   Tue, 28 Mar 2023 15:30:59 +1100
 MIME-Version: 1.0
-Received: by 2002:a17:906:a397:b0:88b:66b4:3e87 with HTTP; Mon, 27 Mar 2023
- 02:03:10 -0700 (PDT)
-Reply-To: annamalgorzata587@gmail.com
-From:   "Leszczynska Anna Malgorzata." <va3315021@gmail.com>
-Date:   Mon, 27 Mar 2023 02:03:10 -0700
-Message-ID: <CAJAAtyxpfu+5Jgop=oakHFrU_1rx=msnG4E_4L_g1V4ts-w9UA@mail.gmail.com>
-Subject: Mrs. Leszczynska Anna Malgorzata.
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=7.0 required=5.0 tests=ADVANCE_FEE_5_NEW,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM,UNDISC_MONEY
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2a00:1450:4864:20:0:0:0:52c listed in]
-        [list.dnswl.org]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [va3315021[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [va3315021[at]gmail.com]
-        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
-        *      digit
-        *      [annamalgorzata587[at]gmail.com]
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  2.9 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-        *  0.8 ADVANCE_FEE_5_NEW Appears to be advance fee fraud (Nigerian
-        *      419)
-        *  2.0 UNDISC_MONEY Undisclosed recipients + money/fraud signs
-X-Spam-Level: *******
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101
+ Thunderbird/108.0
+Subject: Re: [PATCH kernel v4] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
+ platform dependent
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm-riscv@lists.infradead.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Anup Patel <anup@brainfault.org>, kvm-ppc@vger.kernel.org,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+References: <20221003235722.2085145-1-aik@ozlabs.ru>
+ <ZBH9fZ3aMnHKtrZj@google.com>
+Content-Language: en-US
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <ZBH9fZ3aMnHKtrZj@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+
+
+On 16/03/2023 04:16, Sean Christopherson wrote:
+> +Michael and KVM s390 maintainers
+> 
+> On Tue, Oct 04, 2022, Alexey Kardashevskiy wrote:
+>> When introduced, IRQFD resampling worked on POWER8 with XICS. However
+>> KVM on POWER9 has never implemented it - the compatibility mode code
+>> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
+>> XIVE mode does not handle INTx in KVM at all.
+>>
+>> This moved the capability support advertising to platforms and stops
+>> advertising it on XIVE, i.e. POWER9 and later.
+>>
+>> This should cause no behavioural change for other architectures.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> Acked-by: Nicholas Piggin <npiggin@gmail.com>
+>> Acked-by: Marc Zyngier <maz@kernel.org>
+>> ---
+> 
+> If no one objects, I'll grab this for 6.4 and route it through kvm-x86/generic.
+> >> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+>> index fb1490761c87..908ce8bd91c9 100644
+>> --- a/arch/powerpc/kvm/powerpc.c
+>> +++ b/arch/powerpc/kvm/powerpc.c
+>> @@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>                  break;
+>>   #endif
+>>
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +       case KVM_CAP_IRQFD_RESAMPLE:
+>> +               r = !xive_enabled();
+>> +               break;
+>> +#endif
+> 
+> @PPC folks, do you want to avoid the #ifdef?  If so, I can tweak to this when
+> applying.
+
+
+I am not PPC folks anymore (this is just my backlog) but I do not see 
+why not (get rid of ifdef), it is just that file uses #ifdef lot more 
+than IS_ENABLED. Thanks,
+
+
+> 	case KVM_CAP_IRQFD_RESAMPLE:
+> 		r = IS_ENABLED(CONFIG_HAVE_KVM_IRQFD) && !xive_enabled();
+> 		break;
+
 -- 
-I am Mrs. Leszczynska Anna Malgorzatafrom  from Germany Presently
-admitted  in one of the hospitals here in Ivory Coast.
-
-I and my late husband do not have any child that is why I am donating
-this money to you having known my condition that I will join my late
-husband soonest.
-
-I wish to donate towards education and the less privileged I ask for
-your assistance. I am suffering from colon cancer I have some few
-weeks to live according to my doctor.
-
-The money should be used for this purpose.
-Motherless babies
-Children orphaned by aids.
-Destitute children
-Widows and Widowers.
-Children who cannot afford education.
-
-My husband stressed the importance of education and the less
-privileged I feel that this is what he would have wanted me to do with
-the money that he left for charity.
-
-These services bring so much joy to the kids. Together we are
-transforming lives and building brighter futures - but without you, it
-just would not be possible.
-
-Sincerely,
-
-Mrs. Leszczynska Anna Malgorzata.
+Alexey
