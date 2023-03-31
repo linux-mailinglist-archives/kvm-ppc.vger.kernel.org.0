@@ -2,135 +2,71 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 54C236CB56A
-	for <lists+kvm-ppc@lfdr.de>; Tue, 28 Mar 2023 06:31:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A83B56D23CE
+	for <lists+kvm-ppc@lfdr.de>; Fri, 31 Mar 2023 17:18:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229671AbjC1EbM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 28 Mar 2023 00:31:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49144 "EHLO
+        id S233173AbjCaPSI (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 31 Mar 2023 11:18:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjC1EbL (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 28 Mar 2023 00:31:11 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DA621BFF
-        for <kvm-ppc@vger.kernel.org>; Mon, 27 Mar 2023 21:31:08 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id l9-20020a17090a3f0900b0023d32684e7fso573173pjc.1
-        for <kvm-ppc@vger.kernel.org>; Mon, 27 Mar 2023 21:31:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112; t=1679977868;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IlAmBP3o3IBDo+zmv5lTsb9tkG3/yK4LL8I9KLZ3MN4=;
-        b=cwWsuHPap/srSYgWbRrcYeIhNt8MkXsGo/yA4rl2A9AZ1VeqMLf5kkm0AXxGjbJP9i
-         stPFThoZaFdla80lTX9q+yQmzC/0rRMo1yAGGvrIcZINJ/eYrtWVC1r5YOEYfClmzGhs
-         /CpEgRO9zODRTos1bSJ+12TMZxDR364TLY1QzNOopoHwdtZizsg2NEwEQyktOFUoiU07
-         B5cE2oo19qQuPUwWvbTkvhsgVCXPhSDIyMCygFq5k2YytWVXnCSxxlMibLb1CcdGtgP3
-         IZHDHtYNArgQgWNfLD/Ip8x894otE2ehheixwB9KGPPzUwUyxIjTU4Xg+xFAn8i2h9Q/
-         NukQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679977868;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IlAmBP3o3IBDo+zmv5lTsb9tkG3/yK4LL8I9KLZ3MN4=;
-        b=6u3ZQ7swQRw8d25tFSCJ13mCpZNM1rQ7ant08W1qkDAlmxgAKxMzIXeFeCDevVfqvi
-         DeY8Y24QSml9wTTx0+M0WxKFoXOymGtgl3xC8m1AjUmlhnwPOPSUAAyBNetTaQIrL/9p
-         OpUPnp2thXHx41P7FcoZlhiD6wu83+6o1J5HxEIXYBmhjiNqmeM2SnjSwWCNjSyFowx5
-         U4tkjdlHrlca1bbSGzozNpPLwhW+QsaU84lW8wVlyMBJ9Zgnq6qAd+S+1Pc0awKqKgbR
-         TG6mNYspk7FKUstXQEHzC6ycqFCfWLn4FsJ6DAu21bVjVEZtqz7l2eYnNf1rXHSDmbb7
-         u6/A==
-X-Gm-Message-State: AAQBX9dBiCTsmebBLUcDOQdFBtRboQKVKYfVffZdMt5ygOR6qEP1z2to
-        TS6shwJUHyDdRYqbziW6rBf/IQ==
-X-Google-Smtp-Source: AKy350YfSlbkidbsLxSyaZOTsu/hKfDYr24mHSFiR975/0IwpT8nPk2RP7jqhH2NhuRZMCdwI1y9Wg==
-X-Received: by 2002:a17:902:f34d:b0:1a1:eda9:6739 with SMTP id q13-20020a170902f34d00b001a1eda96739mr11291255ple.41.1679977867961;
-        Mon, 27 Mar 2023 21:31:07 -0700 (PDT)
-Received: from [192.168.10.153] (ppp118-208-169-253.cbr-trn-nor-bras39.tpg.internode.on.net. [118.208.169.253])
-        by smtp.gmail.com with ESMTPSA id d3-20020a170902aa8300b001a245b49731sm3334778plr.128.2023.03.27.21.31.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Mar 2023 21:31:07 -0700 (PDT)
-Message-ID: <67d99abd-19bd-8c01-2cac-80102878fa77@ozlabs.ru>
-Date:   Tue, 28 Mar 2023 15:30:59 +1100
+        with ESMTP id S233149AbjCaPSH (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 31 Mar 2023 11:18:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3546A2127
+        for <kvm-ppc@vger.kernel.org>; Fri, 31 Mar 2023 08:17:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680275855;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
+        b=SmOBBeTGGb1Re/qAX5XiPsLUsGI9tDNpD0XHIY4wNhATv1au2HDOdTXZsRrn++mM3tSFuj
+        Qnub+rfpk3ICrSN6ZyqZLZhizDRX9akVv+8tzrIt46dMjOhWgsngQ35w1nGxKQS1IQbgUO
+        1tvujoX1EGZFe1xt891G7maXBvnlvrU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-503-KYLKgkf3NweN5pB71c5vQw-1; Fri, 31 Mar 2023 11:17:31 -0400
+X-MC-Unique: KYLKgkf3NweN5pB71c5vQw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E11F285A588;
+        Fri, 31 Mar 2023 15:17:30 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 61FB01415126;
+        Fri, 31 Mar 2023 15:17:29 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     kvm-ppc@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>
+Subject: Re: [PATCH kernel] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE platform dependent
+Date:   Fri, 31 Mar 2023 11:17:24 -0400
+Message-Id: <20230331151724.359934-1-pbonzini@redhat.com>
+In-Reply-To: <20220504074807.3616813-1-aik@ozlabs.ru>
+References: 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101
- Thunderbird/108.0
-Subject: Re: [PATCH kernel v4] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
- platform dependent
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm-riscv@lists.infradead.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Anup Patel <anup@brainfault.org>, kvm-ppc@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-References: <20221003235722.2085145-1-aik@ozlabs.ru>
- <ZBH9fZ3aMnHKtrZj@google.com>
-Content-Language: en-US
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <ZBH9fZ3aMnHKtrZj@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.0 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
+Queued, thanks.
+
+Paolo
 
 
-On 16/03/2023 04:16, Sean Christopherson wrote:
-> +Michael and KVM s390 maintainers
-> 
-> On Tue, Oct 04, 2022, Alexey Kardashevskiy wrote:
->> When introduced, IRQFD resampling worked on POWER8 with XICS. However
->> KVM on POWER9 has never implemented it - the compatibility mode code
->> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
->> XIVE mode does not handle INTx in KVM at all.
->>
->> This moved the capability support advertising to platforms and stops
->> advertising it on XIVE, i.e. POWER9 and later.
->>
->> This should cause no behavioural change for other architectures.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> Acked-by: Nicholas Piggin <npiggin@gmail.com>
->> Acked-by: Marc Zyngier <maz@kernel.org>
->> ---
-> 
-> If no one objects, I'll grab this for 6.4 and route it through kvm-x86/generic.
-> >> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
->> index fb1490761c87..908ce8bd91c9 100644
->> --- a/arch/powerpc/kvm/powerpc.c
->> +++ b/arch/powerpc/kvm/powerpc.c
->> @@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>                  break;
->>   #endif
->>
->> +#ifdef CONFIG_HAVE_KVM_IRQFD
->> +       case KVM_CAP_IRQFD_RESAMPLE:
->> +               r = !xive_enabled();
->> +               break;
->> +#endif
-> 
-> @PPC folks, do you want to avoid the #ifdef?  If so, I can tweak to this when
-> applying.
-
-
-I am not PPC folks anymore (this is just my backlog) but I do not see 
-why not (get rid of ifdef), it is just that file uses #ifdef lot more 
-than IS_ENABLED. Thanks,
-
-
-> 	case KVM_CAP_IRQFD_RESAMPLE:
-> 		r = IS_ENABLED(CONFIG_HAVE_KVM_IRQFD) && !xive_enabled();
-> 		break;
-
--- 
-Alexey
