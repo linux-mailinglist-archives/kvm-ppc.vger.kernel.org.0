@@ -2,485 +2,173 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C1407259A6
-	for <lists+kvm-ppc@lfdr.de>; Wed,  7 Jun 2023 11:10:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6D67727271
+	for <lists+kvm-ppc@lfdr.de>; Thu,  8 Jun 2023 00:56:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233770AbjFGJKh (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Wed, 7 Jun 2023 05:10:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33508 "EHLO
+        id S233114AbjFGW4a (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Wed, 7 Jun 2023 18:56:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239872AbjFGJJ4 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 7 Jun 2023 05:09:56 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2240F1721;
-        Wed,  7 Jun 2023 02:08:49 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b1806264e9so37292985ad.0;
-        Wed, 07 Jun 2023 02:08:49 -0700 (PDT)
+        with ESMTP id S231373AbjFGW4N (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Wed, 7 Jun 2023 18:56:13 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A59026B6
+        for <kvm-ppc@vger.kernel.org>; Wed,  7 Jun 2023 15:55:54 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-977d55ac17bso739366b.3
+        for <kvm-ppc@vger.kernel.org>; Wed, 07 Jun 2023 15:55:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686128928; x=1688720928;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h7zdMICOOfXCMagTI3X9zTXWZ0bDy7cb5wAVqax4nXo=;
-        b=fz5R9Os5W2YAM1xaOxzO3LKuXeh3EizcUiXRZKufgYFnaxI/St+Eg3ZzhOQNOkItdW
-         ueeufDQmUxRJgYF+Pm+mPeYN+3mj4tsAaHwR3ue4egFLGtxJP6iAIL9W2U5qeOyLg0vE
-         7V+OyFERqS5OK7COsRQX9iIxdsBdBd18BGmo1/wBA8rQtlW4tEGTT4I9/vVvzG5OPT5x
-         FpSdTRnXKS8cGQzM0WEKBijY6+albls3h0AuJWX2UtABma27r+5+y7VhrUTBeRctUFAf
-         ynHx6RkT8qRG8zwZFcdnsog6EXrrodC6DW1zSaZx2ZUuBWQXy5C7M01P6BjJ6S0sWaLw
-         UB0Q==
+        d=gmail.com; s=20221208; t=1686178553; x=1688770553;
+        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=lwmqmz3SLTAm/5XHn54kA2Qkz1KiGdBlOiEDAaxIk1A=;
+        b=d8ALJgWgHzWLVbYqm5Xun40Trrtx9u26PJxgDpuM+opU1kagifpoMF3E49HbI3GY2V
+         wVrEz/8VMNXOa34mGDXKD+N7lGOv2QGCP2gi2Pc2YR15Cm6aBUEYMKdxMAaBdTZps5JD
+         wHIIcg7iFPDm6hq2Anc8eetPMFV7Dmp3k3ChvztUfrQawEncim7LlPLb1dcX0GFSQa2Z
+         MpCDoaZndeCwrh4lYpSlY+MIxLpkoT0dvzpzNzmwq8ANq48/S89YAmvR6lG4ID6DJkmg
+         UQBMvZ4NUlogSfe/ccOin4LQnm3S/JQ2MwxZLa7FvZbQYk7vl4nSPeVW9A3WoEossLXw
+         Xp4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686128928; x=1688720928;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=h7zdMICOOfXCMagTI3X9zTXWZ0bDy7cb5wAVqax4nXo=;
-        b=BDcHcrexpEOT/85BxHftxHc0hnzP821ZCKgrqa59v/6pEP5YVm0OFbBXqJ/LWWlNd8
-         m1n4AczFazP9xvxaJqJc6j6q3/CHD+huNJF7gdlB/uaPCcd4YESfgtz+8r7nT4afBPGc
-         q6o2mh/WqV3rKhKRuEvaa3xemGXm8x4NxWFsVhtym02S9+zonMiJzH3vMN9frHrXYh98
-         +z8wk5HBU29IU4ns17pfiv4MDv+Rf2vTP12D54Xv7JSqGt7koDJv2hD1G7FCRDQkCwqb
-         bQlivmiRC545+BIBRpIhbZqAgq/lI9EqAe+c/0lIwqsW6SGvljkm4IVBRcjJqu+224kY
-         xblQ==
-X-Gm-Message-State: AC+VfDz+2pv0mOEZH+lgO4MqsNyXhzAwuVyVxlMNWXczVkCDV9pbVKj9
-        +CkoxoSzYM1PDUQKTzgQquRvzxz5lBQ=
-X-Google-Smtp-Source: ACHHUZ6JgFxx+wi/jgTYI3jaqO5bvm6eTxnvR5CVmefpcjcfIkrAvEAw0p15C3rnM8+zUnfHM0jKpw==
-X-Received: by 2002:a05:6a21:9182:b0:10f:759d:c5b2 with SMTP id tp2-20020a056a21918200b0010f759dc5b2mr739557pzb.45.1686128928064;
-        Wed, 07 Jun 2023 02:08:48 -0700 (PDT)
-Received: from localhost (58-6-224-112.tpgi.com.au. [58.6.224.112])
-        by smtp.gmail.com with ESMTPSA id f11-20020a170902860b00b001b045c9abd2sm9904994plo.143.2023.06.07.02.08.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jun 2023 02:08:47 -0700 (PDT)
-Mime-Version: 1.0
+        d=1e100.net; s=20221208; t=1686178553; x=1688770553;
+        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lwmqmz3SLTAm/5XHn54kA2Qkz1KiGdBlOiEDAaxIk1A=;
+        b=hD9up88ENqpuN0nFv6ijU5zoP15e+rJ1O+aIf9apwuQCKgSopraBO8vhMJthrYPup2
+         JM35X1GUFeEffkdUgTimEtRK/91rpwU41BiA0ENxAePN5lE5p3GCOZIE4DW+qdaQdWYn
+         xPHtYVzhH5NvGB9hrQo7N86qBFS5QJxRZDr9qFl7CB5nbM6D+h++tr2cRk0K/z2+44hX
+         sCuMNXYbeY6Iv5NCLkhBFpOebY2uPz2BXcnv3jPThZ2KhyJGjG1qd4qg+3rYBLXnMCna
+         sfVGJ4b6gPwMlPrRjIM+Xo7GTEhChigpeI+kePsCpDfyRF026nhIID2KWsRGX6TLTkep
+         kn/w==
+X-Gm-Message-State: AC+VfDxkqRRF/O6DCLzgLik6GEDPDsXU7Ejy/rVldV7w8/YRPJlHLROF
+        ic8qfHN0mTtQtzBzVTVnrHbyhUMKBA6npuRb6d+HKbNOnBWECg==
+X-Google-Smtp-Source: ACHHUZ5lc5uNG0II8N/7owu97MNYayebO2FU5BOHITGRdvZTCXANx0Yi1fv5Th/dfzvi0zTuZAaSCLE67mXxoPl8ud4=
+X-Received: by 2002:a17:907:8a08:b0:973:ad8f:ef9b with SMTP id
+ sc8-20020a1709078a0800b00973ad8fef9bmr8009971ejc.5.1686178552696; Wed, 07 Jun
+ 2023 15:55:52 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a54:2409:0:b0:217:72a9:f646 with HTTP; Wed, 7 Jun 2023
+ 15:55:52 -0700 (PDT)
+Reply-To: unitednationcompensationcoordinatortreasury@hotmail.com
+From:   "UNITED NATION DEPUTY SECRETARY-GENERAL (U.N)" 
+        <successikolo@gmail.com>
+Date:   Wed, 7 Jun 2023 15:55:52 -0700
+Message-ID: <CADFNGJ8EwbrtVXBod+yuxOPvcNStu1uNZVywED0Ra-jpG92ATw@mail.gmail.com>
+Subject: CONTACT DHL OFFICE IMMEDIATELY FOR YOUR ATM MASTER CARD 1.5 MILLION,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 07 Jun 2023 19:08:40 +1000
-Message-Id: <CT6ATGRN6KJU.12QZ7TJGGX7LC@wheely>
-Cc:     <kvm@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
-        <mikey@neuling.org>, <paulus@ozlabs.org>,
-        <kautuk.consul.1980@gmail.com>, <vaibhav@linux.ibm.com>,
-        <sbhat@linux.ibm.com>
-Subject: Re: [RFC PATCH v2 5/6] KVM: PPC: Add support for nested PAPR guests
-From:   "Nicholas Piggin" <npiggin@gmail.com>
-To:     "Jordan Niethe" <jpn@linux.vnet.ibm.com>,
-        <linuxppc-dev@lists.ozlabs.org>
-X-Mailer: aerc 0.14.0
-References: <20230605064848.12319-1-jpn@linux.vnet.ibm.com>
- <20230605064848.12319-6-jpn@linux.vnet.ibm.com>
-In-Reply-To: <20230605064848.12319-6-jpn@linux.vnet.ibm.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: Yes, score=6.6 required=5.0 tests=ADVANCE_FEE_3_NEW_FRM_MNY,
+        BAYES_50,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        FILL_THIS_FORM,FORM_FRAUD_5,FREEMAIL_FROM,FREEMAIL_REPLYTO,
+        LOTS_OF_MONEY,MONEY_FORM,MONEY_FRAUD_5,MONEY_FREEMAIL_REPTO,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,SUBJ_ALL_CAPS,
+        T_FILL_THIS_FORM_LOAN,T_SCC_BODY_TEXT_LINE,UNDISC_FREEM,UNDISC_MONEY
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2a00:1450:4864:20:0:0:0:62b listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5000]
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [successikolo[at]gmail.com]
+        *  0.5 SUBJ_ALL_CAPS Subject is all capitals
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        *  0.0 LOTS_OF_MONEY Huge... sums of money
+        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
+        *  2.7 UNDISC_FREEM Undisclosed recipients + freemail reply-to
+        *  0.2 MONEY_FREEMAIL_REPTO Lots of money from someone using free
+        *      email?
+        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
+        *      different freemails
+        *  0.0 FILL_THIS_FORM Fill in a form with personal information
+        *  0.0 T_FILL_THIS_FORM_LOAN Answer loan question(s)
+        *  0.0 MONEY_FORM Lots of money if you fill out a form
+        *  1.3 UNDISC_MONEY Undisclosed recipients + money/fraud signs
+        *  0.0 ADVANCE_FEE_3_NEW_FRM_MNY Advance Fee fraud form and lots of
+        *      money
+        *  0.2 MONEY_FRAUD_5 Lots of money and many fraud phrases
+        *  0.0 FORM_FRAUD_5 Fill a form and many fraud phrases
+X-Spam-Level: ******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Mon Jun 5, 2023 at 4:48 PM AEST, Jordan Niethe wrote:
-> A series of hcalls have been added to the PAPR which allow a regular
-> guest partition to create and manage guest partitions of its own. Add
-> support to KVM to utilize these hcalls to enable running nested guests.
->
-> Overview of the new hcall usage:
->
-> - L1 and L0 negotiate capabilities with
->   H_GUEST_{G,S}ET_CAPABILITIES()
->
-> - L1 requests the L0 create a L2 with
->   H_GUEST_CREATE() and receives a handle to use in future hcalls
->
-> - L1 requests the L0 create a L2 vCPU with
->   H_GUEST_CREATE_VCPU()
->
-> - L1 sets up the L2 using H_GUEST_SET and the
->   H_GUEST_VCPU_RUN input buffer
->
-> - L1 requests the L0 runs the L2 vCPU using H_GUEST_VCPU_RUN()
->
-> - L2 returns to L1 with an exit reason and L1 reads the
->   H_GUEST_VCPU_RUN output buffer populated by the L0
->
-> - L1 handles the exit using H_GET_STATE if necessary
->
-> - L1 reruns L2 vCPU with H_GUEST_VCPU_RUN
->
-> - L1 frees the L2 in the L0 with H_GUEST_DELETE()
->
-> Support for the new API is determined by trying
-> H_GUEST_GET_CAPABILITIES. On a successful return, the new API will then
-> be used.
->
-> Use the vcpu register state setters for tracking modified guest state
-> elements and copy the thread wide values into the H_GUEST_VCPU_RUN input
-> buffer immediately before running a L2. The guest wide
-> elements can not be added to the input buffer so send them with a
-> separate H_GUEST_SET call if necessary.
->
-> Make the vcpu register getter load the corresponding value from the real
-> host with H_GUEST_GET. To avoid unnecessarily calling H_GUEST_GET, track
-> which values have already been loaded between H_GUEST_VCPU_RUN calls. If
-> an element is present in the H_GUEST_VCPU_RUN output buffer it also does
-> not need to be loaded again.
->
-> There is existing support for running nested guests on KVM
-> with powernv. However the interface used for this is not supported by
-> other PAPR hosts. This existing API is still supported.
->
-> Signed-off-by: Jordan Niethe <jpn@linux.vnet.ibm.com>
-> ---
-> v2:
->   - Declare op structs as static
->   - Use expressions in switch case with local variables
->   - Do not use the PVR for the LOGICAL PVR ID
->   - Handle emul_inst as now a double word
->   - Use new GPR(), etc macros
->   - Determine PAPR nested capabilities from cpu features
-> ---
->  arch/powerpc/include/asm/guest-state-buffer.h | 105 +-
->  arch/powerpc/include/asm/hvcall.h             |  30 +
->  arch/powerpc/include/asm/kvm_book3s.h         | 122 ++-
->  arch/powerpc/include/asm/kvm_book3s_64.h      |   6 +
->  arch/powerpc/include/asm/kvm_host.h           |  21 +
->  arch/powerpc/include/asm/kvm_ppc.h            |  64 +-
->  arch/powerpc/include/asm/plpar_wrappers.h     | 198 ++++
->  arch/powerpc/kvm/Makefile                     |   1 +
->  arch/powerpc/kvm/book3s_hv.c                  | 126 ++-
->  arch/powerpc/kvm/book3s_hv.h                  |  74 +-
->  arch/powerpc/kvm/book3s_hv_nested.c           |  38 +-
->  arch/powerpc/kvm/book3s_hv_papr.c             | 940 ++++++++++++++++++
->  arch/powerpc/kvm/emulate_loadstore.c          |   4 +-
->  arch/powerpc/kvm/guest-state-buffer.c         |  49 +
->  14 files changed, 1684 insertions(+), 94 deletions(-)
->  create mode 100644 arch/powerpc/kvm/book3s_hv_papr.c
->
-> diff --git a/arch/powerpc/include/asm/guest-state-buffer.h b/arch/powerpc=
-/include/asm/guest-state-buffer.h
-> index 65a840abf1bb..116126edd8e2 100644
-> --- a/arch/powerpc/include/asm/guest-state-buffer.h
-> +++ b/arch/powerpc/include/asm/guest-state-buffer.h
-> @@ -5,6 +5,7 @@
->  #ifndef _ASM_POWERPC_GUEST_STATE_BUFFER_H
->  #define _ASM_POWERPC_GUEST_STATE_BUFFER_H
-> =20
-> +#include "asm/hvcall.h"
->  #include <linux/gfp.h>
->  #include <linux/bitmap.h>
->  #include <asm/plpar_wrappers.h>
-> @@ -14,16 +15,16 @@
->   ***********************************************************************=
-***/
->  #define GSID_BLANK			0x0000
-> =20
-> -#define GSID_HOST_STATE_SIZE		0x0001 /* Size of Hypervisor Internal Form=
-at VCPU state */
-> -#define GSID_RUN_OUTPUT_MIN_SIZE	0x0002 /* Minimum size of the Run VCPU =
-output buffer */
-> -#define GSID_LOGICAL_PVR		0x0003 /* Logical PVR */
-> -#define GSID_TB_OFFSET			0x0004 /* Timebase Offset */
-> -#define GSID_PARTITION_TABLE		0x0005 /* Partition Scoped Page Table */
-> -#define GSID_PROCESS_TABLE		0x0006 /* Process Table */
-> +#define GSID_HOST_STATE_SIZE		0x0001
-> +#define GSID_RUN_OUTPUT_MIN_SIZE	0x0002
-> +#define GSID_LOGICAL_PVR		0x0003
-> +#define GSID_TB_OFFSET			0x0004
-> +#define GSID_PARTITION_TABLE		0x0005
-> +#define GSID_PROCESS_TABLE		0x0006
+UNITED NATION DEPUTY SECRETARY-GENERAL.
 
-You lost your comments.
+This is to official inform you that we have been having meetings for
+the past three (3) weeks which ended two days ago with MR. JIM YONG
+KIM the world bank president and other seven continent presidents on
+the congress we treated on solution to scam victim problems.
 
-> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include=
-/asm/kvm_book3s.h
-> index 0ca2d8b37b42..c5c57552b447 100644
-> --- a/arch/powerpc/include/asm/kvm_book3s.h
-> +++ b/arch/powerpc/include/asm/kvm_book3s.h
-> @@ -12,6 +12,7 @@
->  #include <linux/types.h>
->  #include <linux/kvm_host.h>
->  #include <asm/kvm_book3s_asm.h>
-> +#include <asm/guest-state-buffer.h>
-> =20
->  struct kvmppc_bat {
->  	u64 raw;
-> @@ -316,6 +317,57 @@ long int kvmhv_nested_page_fault(struct kvm_vcpu *vc=
-pu);
-> =20
->  void kvmppc_giveup_fac(struct kvm_vcpu *vcpu, ulong fac);
-> =20
-> +
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +
-> +extern bool __kvmhv_on_papr;
-> +
-> +static inline bool kvmhv_on_papr(void)
-> +{
-> +	return __kvmhv_on_papr;
-> +}
+ Note: we have decided to contact you following the reports we
+received from anti-fraud international monitoring group your
+name/email has been submitted to us therefore the united nations have
+agreed to compensate you with the sum of (USD$ 1.5 Million) this
+compensation is also including international business that failed you
+in the past due to government problems etc.
 
-It's a nitpick, but kvmhv_on_pseries() is because we're runnning KVM-HV
-on a pseries guest kernel. Which is a papr guest kernel. So this kind of
-doesn't make sense if you read it the same way.
+ We have arranged your payment through our ATM Master Card and
+deposited it in DHL Office to deliver it to you which is the latest
+instruction from the World Bank president MR. JIM YONG KIM, For your
+information=E2=80=99s, the delivery charges already paid by U.N treasury, t=
+he
+only money you will send to DHL office south Korea is
+($500). for security keeping fee, U.N coordinator already paid for
+others charges fees for delivery except the security keeping fee, the
+director of DHL refused to collect the security keeping fee from U.N
+coordinator, the Director of DHL office said that they don=E2=80=99t know
+exactly time you will contact them to reconfirm your details to avoid
+counting demur-rage that is why they refused collecting the ($500) .
+for security keeping fee.
 
-kvmhv_nested_using_papr() or something like that might read a bit
-better.
+ Therefore be advice to contact DHL Office agent south Korea. Rev:John
+Lee Tae-seok
+who is in position to deliver your ATM
+Master Card to your location address, contact DHL Office immediately
+with the bellow email & phone number as listed below.
 
-This could be a static key too.
+ Contact name: John Lee Tae-seok
 
-> @@ -575,6 +593,7 @@ struct kvm_vcpu_arch {
->  	ulong dscr;
->  	ulong amr;
->  	ulong uamor;
-> +	ulong amor;
->  	ulong iamr;
->  	u32 ctrl;
->  	u32 dabrx;
+ Email:( dhlgeneralheadquartersrepublic@gmail.com )
 
-This belongs somewhere else.
+ Do not hesitate to Contact Rev: John Lee Tae-seok, as soon as you
 
-> @@ -829,6 +848,8 @@ struct kvm_vcpu_arch {
->  	u64 nested_hfscr;	/* HFSCR that the L1 requested for the nested guest *=
-/
->  	u32 nested_vcpu_id;
->  	gpa_t nested_io_gpr;
-> +	/* For nested APIv2 guests*/
-> +	struct kvmhv_papr_host papr_host;
->  #endif
+ read this message. Email:( dhlgeneralheadquartersrepublic@gmail.com )
 
-This is not exactly a papr host. Might have to come up with a better
-name especially if we implement a L0 things could get confusing.
+ Make sure you reconfirmed DHL Office your details ASAP as stated
+below to avoid wrong delivery.
 
-> @@ -342,6 +343,203 @@ static inline long plpar_get_cpu_characteristics(st=
-ruct h_cpu_char_result *p)
->  	return rc;
->  }
-> =20
-> +static inline long plpar_guest_create(unsigned long flags, unsigned long=
- *guest_id)
-> +{
-> +	unsigned long retbuf[PLPAR_HCALL_BUFSIZE];
-> +	unsigned long token;
-> +	long rc;
-> +
-> +	token =3D -1UL;
-> +	while (true) {
-> +		rc =3D plpar_hcall(H_GUEST_CREATE, retbuf, flags, token);
-> +		if (rc =3D=3D H_SUCCESS) {
-> +			*guest_id =3D retbuf[0];
-> +			break;
-> +		}
-> +
-> +		if (rc =3D=3D H_BUSY) {
-> +			token =3D retbuf[0];
-> +			cpu_relax();
-> +			continue;
-> +		}
-> +
-> +		if (H_IS_LONG_BUSY(rc)) {
-> +			token =3D retbuf[0];
-> +			mdelay(get_longbusy_msecs(rc));
+ Your full name..........
 
-All of these things need a non-sleeping delay? Can we sleep instead?
-Or if not, might have to think about going back to the caller and it
-can retry.
+ Home address:.........
 
-get/set state might be a bit inconvenient, although I don't expect
-that should potentially take so long as guest and vcpu create/delete,
-so at least those ones would be good if they're called while
-preemptable.
+ Your country...........
 
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 521d84621422..f22ee582e209 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -383,6 +383,11 @@ static void kvmppc_core_vcpu_put_hv(struct kvm_vcpu =
-*vcpu)
->  	spin_unlock_irqrestore(&vcpu->arch.tbacct_lock, flags);
->  }
-> =20
-> +static void kvmppc_set_pvr_hv(struct kvm_vcpu *vcpu, u32 pvr)
-> +{
-> +	vcpu->arch.pvr =3D pvr;
-> +}
+ Your city..............
 
-Didn't you lose this in a previous patch? I thought it must have moved
-to a header but it reappears.
+ Telephone......
 
-> +
->  /* Dummy value used in computing PCR value below */
->  #define PCR_ARCH_31    (PCR_ARCH_300 << 1)
-> =20
-> @@ -1262,13 +1267,14 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu=
-)
->  			return RESUME_HOST;
->  		break;
->  #endif
-> -	case H_RANDOM:
-> +	case H_RANDOM: {
->  		unsigned long rand;
-> =20
->  		if (!arch_get_random_seed_longs(&rand, 1))
->  			ret =3D H_HARDWARE;
->  		kvmppc_set_gpr(vcpu, 4, rand);
->  		break;
-> +	}
->  	case H_RPT_INVALIDATE:
->  		ret =3D kvmppc_h_rpt_invalidate(vcpu, kvmppc_get_gpr(vcpu, 4),
->  					      kvmppc_get_gpr(vcpu, 5),
+ Occupation:.......
 
-Compile fix for a previous patch.
+ Age:=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6..
 
-> @@ -2921,14 +2927,21 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_=
-vcpu *vcpu)
->  	vcpu->arch.shared_big_endian =3D false;
->  #endif
->  #endif
-> -	kvmppc_set_mmcr_hv(vcpu, 0, MMCR0_FC);
-> =20
-> +	if (kvmhv_on_papr()) {
-> +		err =3D kvmhv_papr_vcpu_create(vcpu, &vcpu->arch.papr_host);
-> +		if (err < 0)
-> +			return err;
-> +	}
-> +
-> +	kvmppc_set_mmcr_hv(vcpu, 0, MMCR0_FC);
->  	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
->  		kvmppc_set_mmcr_hv(vcpu, 0, kvmppc_get_mmcr_hv(vcpu, 0) | MMCR0_PMCCEX=
-T);
->  		kvmppc_set_mmcra_hv(vcpu, MMCRA_BHRB_DISABLE);
->  	}
-> =20
->  	kvmppc_set_ctrl_hv(vcpu, CTRL_RUNLATCH);
-> +	kvmppc_set_amor_hv(vcpu, ~0);
+ Let us know as soon as possible you receive your ATM MasterCard
+for proper verification.
 
-This AMOR thing should go somewhere else. Not actually sure why it needs
-to be added to the vcpu since it's always ~0. Maybe just put that in a
-#define somewhere and use that.
+ Regards,
 
-> @@ -4042,6 +4059,50 @@ static void vcpu_vpa_increment_dispatch(struct kvm=
-_vcpu *vcpu)
->  	}
->  }
-> =20
-> +static int kvmhv_vcpu_entry_papr(struct kvm_vcpu *vcpu, u64 time_limit, =
-unsigned long lpcr, u64 *tb)
-> +{
-> +	struct kvmhv_papr_host *ph;
-> +	unsigned long msr, i;
-> +	int trap;
-> +	long rc;
-> +
-> +	ph =3D &vcpu->arch.papr_host;
-> +
-> +	msr =3D mfmsr();
-> +	kvmppc_msr_hard_disable_set_facilities(vcpu, msr);
-> +	if (lazy_irq_pending())
-> +		return 0;
-> +
-> +	kvmhv_papr_flush_vcpu(vcpu, time_limit);
-> +
-> +	accumulate_time(vcpu, &vcpu->arch.in_guest);
-> +	rc =3D plpar_guest_run_vcpu(0, vcpu->kvm->arch.lpid, vcpu->vcpu_id,
-> +				  &trap, &i);
-> +
-> +	if (rc !=3D H_SUCCESS) {
-> +		pr_err("KVM Guest Run VCPU hcall failed\n");
-> +		if (rc =3D=3D H_INVALID_ELEMENT_ID)
-> +			pr_err("KVM: Guest Run VCPU invalid element id at %ld\n", i);
-> +		else if (rc =3D=3D H_INVALID_ELEMENT_SIZE)
-> +			pr_err("KVM: Guest Run VCPU invalid element size at %ld\n", i);
-> +		else if (rc =3D=3D H_INVALID_ELEMENT_VALUE)
-> +			pr_err("KVM: Guest Run VCPU invalid element value at %ld\n", i);
-> +		return 0;
-> +	}
+ Mrs Vivian kakadu.
 
-This needs the proper error handling. Were you going to wait until I
-sent that up for existing code?
-
-> @@ -5119,6 +5183,7 @@ static void kvmppc_core_commit_memory_region_hv(str=
-uct kvm *kvm,
->   */
->  void kvmppc_update_lpcr(struct kvm *kvm, unsigned long lpcr, unsigned lo=
-ng mask)
->  {
-> +	struct kvm_vcpu *vcpu;
->  	long int i;
->  	u32 cores_done =3D 0;
-> =20
-> @@ -5139,6 +5204,12 @@ void kvmppc_update_lpcr(struct kvm *kvm, unsigned =
-long lpcr, unsigned long mask)
->  		if (++cores_done >=3D kvm->arch.online_vcores)
->  			break;
->  	}
-> +
-> +	if (kvmhv_on_papr()) {
-> +		kvm_for_each_vcpu(i, vcpu, kvm) {
-> +			kvmppc_set_lpcr_hv(vcpu, vcpu->arch.vcore->lpcr);
-> +		}
-> +	}
->  }
-
-vcpu define could go in that scope I guess.
-
-> @@ -5405,15 +5476,43 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm=
-)
-> =20
->  	/* Allocate the guest's logical partition ID */
-> =20
-> -	lpid =3D kvmppc_alloc_lpid();
-> -	if ((long)lpid < 0)
-> -		return -ENOMEM;
-> -	kvm->arch.lpid =3D lpid;
-> +	if (!kvmhv_on_papr()) {
-> +		lpid =3D kvmppc_alloc_lpid();
-> +		if ((long)lpid < 0)
-> +			return -ENOMEM;
-> +		kvm->arch.lpid =3D lpid;
-> +	}
-> =20
->  	kvmppc_alloc_host_rm_ops();
-> =20
->  	kvmhv_vm_nested_init(kvm);
-> =20
-> +	if (kvmhv_on_papr()) {
-> +		long rc;
-> +		unsigned long guest_id;
-> +
-> +		rc =3D plpar_guest_create(0, &guest_id);
-> +
-> +		if (rc !=3D H_SUCCESS)
-> +			pr_err("KVM: Create Guest hcall failed, rc=3D%ld\n", rc);
-> +
-> +		switch (rc) {
-> +		case H_PARAMETER:
-> +		case H_FUNCTION:
-> +		case H_STATE:
-> +			return -EINVAL;
-> +		case H_NOT_ENOUGH_RESOURCES:
-> +		case H_ABORTED:
-> +			return -ENOMEM;
-> +		case H_AUTHORITY:
-> +			return -EPERM;
-> +		case H_NOT_AVAILABLE:
-> +			return -EBUSY;
-> +		}
-> +		kvm->arch.lpid =3D guest_id;
-> +	}
-
-I wouldn't mind putting lpid/guest_id in different variables. guest_id
-is 64-bit isn't it? LPIDR is 32. If nothing else that could cause
-issues if the hypervisor does something clever with the token.
-
-> @@ -5573,10 +5675,14 @@ static void kvmppc_core_destroy_vm_hv(struct kvm =
-*kvm)
->  		kvm->arch.process_table =3D 0;
->  		if (kvm->arch.secure_guest)
->  			uv_svm_terminate(kvm->arch.lpid);
-> -		kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
-> +		if (!kvmhv_on_papr())
-> +			kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
->  	}
-
-Would be nice to have a +ve test for the "existing" API. All we have to
-do is think of a name for it.
-
-Thanks,
-Nick
+ DEPUTY SECRETARY-GENERAL (U.N)
