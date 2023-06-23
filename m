@@ -2,29 +2,28 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A931C73B1CA
-	for <lists+kvm-ppc@lfdr.de>; Fri, 23 Jun 2023 09:38:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E424473BBCE
+	for <lists+kvm-ppc@lfdr.de>; Fri, 23 Jun 2023 17:38:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231386AbjFWHiw (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Fri, 23 Jun 2023 03:38:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35716 "EHLO
+        id S232063AbjFWPiM (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Fri, 23 Jun 2023 11:38:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231393AbjFWHiu (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 23 Jun 2023 03:38:50 -0400
-X-Greylist: delayed 110 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 23 Jun 2023 00:38:46 PDT
-Received: from out-32.mta1.migadu.com (out-32.mta1.migadu.com [IPv6:2001:41d0:203:375::20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 743D02683
-        for <kvm-ppc@vger.kernel.org>; Fri, 23 Jun 2023 00:38:46 -0700 (PDT)
-Date:   Fri, 23 Jun 2023 09:38:43 +0200
+        with ESMTP id S231994AbjFWPiL (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Fri, 23 Jun 2023 11:38:11 -0400
+Received: from out-11.mta1.migadu.com (out-11.mta1.migadu.com [IPv6:2001:41d0:203:375::b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42DBA1710
+        for <kvm-ppc@vger.kernel.org>; Fri, 23 Jun 2023 08:38:10 -0700 (PDT)
+Date:   Fri, 23 Jun 2023 17:38:07 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1687505924;
+        t=1687534688;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=PtdwSU4PYelk0dj1Hg4+fs35PD3IHMTgzkjQcNxh7n0=;
-        b=fVBHqdUJhSTW+Dl7P0h9+3UCWC1Nccb6zdJCg5Fw8CzLyPP/MHxcdxJSRFejSnI5C7xJ/F
-        STCP8aT0oCeNDG/GWVn/YiL/FDbQKOWcPL3fCdmVM0hhxSj19nKi1JwXOxnkUfYH9wHvfU
-        BA9bcB2Du+HMiRS5pfMcrFzc3xDNt14=
+        bh=TKui30hBeKIU8S6nTtkc/1wN3VJyZVr89M9JXb7r+aM=;
+        b=IcFjQDuAmt3FOmnMfLMAOfp/R/U7J1q+hdgQ6RX/VAtYdFs7vZgUL8wLkcq/C7k3/1xKz8
+        0D1mww0XFh0vLVDW89gWcwYHJpDyrNzdtLst0PeP6Z+MDju5/OnbZ1tUKgknHF9hRleXNG
+        +RVxFpXwDGKTEVqDriIzQOnMA6ft1C0=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Andrew Jones <andrew.jones@linux.dev>
 To:     Gavin Shan <gshan@redhat.com>
@@ -35,7 +34,7 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         nrb@linux.ibm.com, shan.gavin@gmail.com
 Subject: Re: [kvm-unit-tests PATCH v4] runtime: Allow to specify properties
  for accelerator
-Message-ID: <20230623-285cfe53df170a6175b5369c@orel>
+Message-ID: <20230623-4a8c1d21acfdfe304333173d@orel>
 References: <20230623035750.312679-1-gshan@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -44,8 +43,8 @@ In-Reply-To: <20230623035750.312679-1-gshan@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -257,4 +256,9 @@ On Fri, Jun 23, 2023 at 01:57:50PM +1000, Gavin Shan wrote:
 > 2.40.1
 >
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Applied to arm/queue
+
+https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/arm/queue
+
+Thanks,
+drew
