@@ -2,69 +2,72 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 499B477D8F3
-	for <lists+kvm-ppc@lfdr.de>; Wed, 16 Aug 2023 05:21:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E35877D8F7
+	for <lists+kvm-ppc@lfdr.de>; Wed, 16 Aug 2023 05:22:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237211AbjHPDUq (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Tue, 15 Aug 2023 23:20:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33160 "EHLO
+        id S241439AbjHPDVx (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Tue, 15 Aug 2023 23:21:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241543AbjHPDU0 (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 15 Aug 2023 23:20:26 -0400
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB442682;
-        Tue, 15 Aug 2023 20:20:24 -0700 (PDT)
-Received: by mail-oo1-xc31.google.com with SMTP id 006d021491bc7-56ce156bd37so4321812eaf.3;
-        Tue, 15 Aug 2023 20:20:24 -0700 (PDT)
+        with ESMTP id S241618AbjHPDVs (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Tue, 15 Aug 2023 23:21:48 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6546C26A9;
+        Tue, 15 Aug 2023 20:21:42 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-565334377d0so4516603a12.2;
+        Tue, 15 Aug 2023 20:21:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692156024; x=1692760824;
+        d=gmail.com; s=20221208; t=1692156102; x=1692760902;
         h=content-transfer-encoding:content-language:in-reply-to:mime-version
          :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gmX+B7J+wmAurtUlUbZbOqhkBn25gXv9vA1g9p4CbPA=;
-        b=MW1+Gm5lqAPzUQyo7ltqasF+300upvYWD88MF2EabmJRL5vy2k/dhIOy4Cwiqwt9Uv
-         hClwdqNoYkVvXEni/7FdAamE90NWPj5r5HosFgI7bzfDQUHkArH8yBhBOSb9bRQBm1E+
-         XTxF3HLG79XM+qVqycSPst3WtFcxCX6CohDfxIc4fXco0U6EXazeKz6t7MVHyK5PiY4Z
-         IC06wDNxccFaBWQ9wUxZTPikB1f0TOderj8CZVcjSZJUE8D5N4doDV47UVbwRyvxlLng
-         KDFH7HADIATLCDKwqLJO0JsYtuFFnApvN8F80W6TVgxaM9Fx8l01dDiP2heFfEp0pbJP
-         qn4Q==
+        bh=yLgZ/fh5M5NltE3AWQwyfXy2dGWq1QEmZxlklznfsAg=;
+        b=NQFRZ5iVj7FHi2JAjM2ygQ/W2FNrRIAPpcJgrHNOIdu23BM2e1PWYrzXPLCMlkXoeB
+         Sf8XkZl/yFuuDhv/8MPHV8BGzMMo1LgyIk5B3/B5IbljKG6EgFumXyz/UAdjFWq1hN9x
+         nE9wE/zWw1/HrQ9ApB7NMcZSu+5VEXU3T3BqIopMBwwJxCORVe8qgPUvH11nADoaTuJh
+         BsLwhXwLsx0DAAqvSP4rAy0TOGPIRU/pcw8vmxPe2bgLnEIhsgT29b+JwmA5qW6yHWyM
+         LX3qM3OlVYWbYx+sUGsI3YeR4R6F82MBTE73GZZslXBeDuYGP7w0zrd6C9wBild41vcw
+         0wMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692156024; x=1692760824;
+        d=1e100.net; s=20221208; t=1692156102; x=1692760902;
         h=content-transfer-encoding:content-language:in-reply-to:mime-version
          :user-agent:date:message-id:from:references:cc:to:subject
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gmX+B7J+wmAurtUlUbZbOqhkBn25gXv9vA1g9p4CbPA=;
-        b=Hb2boo14CXrOFKrGWG2WdJBICNfMkiOs7U1gd9y/l5veU3OQeBl7aVd9zBuxxyx8e6
-         XlwKiJyfIXK7nSAD8P19wGTngfOOofNcfPGJeUQlBCniARj2MxnqVJ8NmE8BkLJNlokf
-         wlKRx0kDzQp+p4XVSNUyhlrzuAdlesXlzGwZ4XpNuKrIsulINtTtMCJpSW0pl/QGDKeb
-         tLu5qTuWL0Ll6/0beZ0fxKeB5yxz4KOODg0US2AFTors5xTztJnFnNVbbP15WRrQ77wq
-         DLd/odYt3FVw1u7KImsk1FlPisfu2uLLn8ekLGg/5X4OiUVJ61yfZPGgIXVbs0zclUju
-         UYVg==
-X-Gm-Message-State: AOJu0Yw3El2b9wyctT2NIOkEldLNQ1qU5TpbTS354VKVWXdQKuMRGjhm
-        DsnyvGa9n1J9p4bwH690mM+KpaEKFPAOwQ==
-X-Google-Smtp-Source: AGHT+IHP8Nvbnx53Vi5Az6VTu9OuSy4vtl+Dd/TGFW9dktKQelTl2wk80eGIK6eAd/XQysOa6ji9jA==
-X-Received: by 2002:a05:6358:52d2:b0:139:be3d:d2fa with SMTP id z18-20020a05635852d200b00139be3dd2famr1102039rwz.30.1692156023940;
-        Tue, 15 Aug 2023 20:20:23 -0700 (PDT)
+        bh=yLgZ/fh5M5NltE3AWQwyfXy2dGWq1QEmZxlklznfsAg=;
+        b=YfFePqgU9y7rAjGx4eYw9Ss12HNuggA6hSZLYlGwnIr2iJg3TYI+7ZrV8p8f7qFYpd
+         S100EidgP8NdFUD+pIAMxLdEfN1BIhGhMIStFTklWQm6j+kbN8EvdvKkWSBt6tEYfXYD
+         j9pVFXoHskZco7P4sP+V6w5uPc4Y1GQP2Rzufdf6j8mBJx1+D49UPzHZZfp5vb5FxTKy
+         zg9/J5kECp3xmiUc+JvpYJ0B1Nu3zw+FOk4E0lk4x9P9lDvqtPGmP05tPMWAG8Kdk2KL
+         KE6Q1WW8hV/AYmnfef2h3OnzbKQ5siwhmIpZ9IOnKYDOgmagSWmpnml2JWlYYrcLayjY
+         KWSw==
+X-Gm-Message-State: AOJu0YxAePxZzB0t6JqREHtsLcIOgveazP0bR0PCOM97Vpc2Yqp9PPLc
+        ujn3RN0zJiYp3GOPIQPDrHQ=
+X-Google-Smtp-Source: AGHT+IE7yVdS0kMwy4HCS9A43/hjpM+6g1vzheq8U3+lI6mnkuv35ezpapXAmiqsRXd/mnIEFHG+sQ==
+X-Received: by 2002:a17:90b:3809:b0:268:5c3b:6f37 with SMTP id mq9-20020a17090b380900b002685c3b6f37mr407598pjb.0.1692156101753;
+        Tue, 15 Aug 2023 20:21:41 -0700 (PDT)
 Received: from localhost.localdomain ([146.112.118.69])
-        by smtp.gmail.com with ESMTPSA id s18-20020a17090330d200b001bdbe6c86a9sm9128572plc.225.2023.08.15.20.20.20
+        by smtp.gmail.com with ESMTPSA id u18-20020a170902e5d200b001b892aac5c9sm11786337plf.298.2023.08.15.20.21.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Aug 2023 20:20:23 -0700 (PDT)
-Subject: Re: [PATCH v3 2/6] KVM: PPC: Rename accessor generator macros
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+        Tue, 15 Aug 2023 20:21:41 -0700 (PDT)
+Subject: Re: [PATCH v3 4/6] KVM: PPC: Book3s HV: Hold LPIDs in an unsigned
+ long
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org
 Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, mikey@neuling.org,
         paulus@ozlabs.org, vaibhav@linux.ibm.com, sbhat@linux.ibm.com,
         gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
         amachhiw@linux.vnet.ibm.com
 References: <20230807014553.1168699-1-jniethe5@gmail.com>
- <20230807014553.1168699-3-jniethe5@gmail.com>
- <CUS4J2YPYFAO.3P4R24H4KFJ83@wheely>
+ <20230807014553.1168699-5-jniethe5@gmail.com>
+ <CUS477NDPEQI.27SBUCRNYD0XG@wheely> <87ttt0d1ol.fsf@mail.lhotse>
 From:   Jordan Niethe <jniethe5@gmail.com>
-Message-ID: <efa0e456-1b7e-f12e-c720-076e962c7ca2@gmail.com>
-Date:   Wed, 16 Aug 2023 13:20:18 +1000
+Message-ID: <473611e9-5831-cc6f-ba75-86964fe71b6e@gmail.com>
+Date:   Wed, 16 Aug 2023 13:21:36 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <CUS4J2YPYFAO.3P4R24H4KFJ83@wheely>
+In-Reply-To: <87ttt0d1ol.fsf@mail.lhotse>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,143 +83,57 @@ X-Mailing-List: kvm-ppc@vger.kernel.org
 
 
 
-On 14/8/23 6:27 pm, Nicholas Piggin wrote:
-> On Mon Aug 7, 2023 at 11:45 AM AEST, Jordan Niethe wrote:
->> More "wrapper" style accessor generating macros will be introduced for
->> the nestedv2 guest support. Rename the existing macros with more
->> descriptive names now so there is a consistent naming convention.
+On 15/8/23 8:45 pm, Michael Ellerman wrote:
+> "Nicholas Piggin" <npiggin@gmail.com> writes:
+>> On Mon Aug 7, 2023 at 11:45 AM AEST, Jordan Niethe wrote:
+>>> The LPID register is 32 bits long. The host keeps the lpids for each
+>>> guest in an unsigned word struct kvm_arch. Currently, LPIDs are already
+>>> limited by mmu_lpid_bits and KVM_MAX_NESTED_GUESTS_SHIFT.
+>>>
+>>> The nestedv2 API returns a 64 bit "Guest ID" to be used be the L1 host
+>>> for each L2 guest. This value is used as an lpid, e.g. it is the
+>>> parameter used by H_RPT_INVALIDATE. To minimize needless special casing
+>>> it makes sense to keep this "Guest ID" in struct kvm_arch::lpid.
+>>>
+>>> This means that struct kvm_arch::lpid is too small so prepare for this
+>>> and make it an unsigned long. This is not a problem for the KVM-HV and
+>>> nestedv1 cases as their lpid values are already limited to valid ranges
+>>> so in those contexts the lpid can be used as an unsigned word safely as
+>>> needed.
+>>>
+>>> In the PAPR, the H_RPT_INVALIDATE pid/lpid parameter is already
+>>> specified as an unsigned long so change pseries_rpt_invalidate() to
+>>> match that.  Update the callers of pseries_rpt_invalidate() to also take
+>>> an unsigned long if they take an lpid value.
 >>
->> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
-> 
->> ---
->> v3:
->>    - New to series
->> ---
->>   arch/powerpc/include/asm/kvm_ppc.h | 60 +++++++++++++++---------------
->>   1 file changed, 30 insertions(+), 30 deletions(-)
+>> I don't suppose it would be worth having an lpid_t.
 >>
->> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
->> index d16d80ad2ae4..b66084a81dd0 100644
->> --- a/arch/powerpc/include/asm/kvm_ppc.h
->> +++ b/arch/powerpc/include/asm/kvm_ppc.h
->> @@ -927,19 +927,19 @@ static inline bool kvmppc_shared_big_endian(struct kvm_vcpu *vcpu)
->>   #endif
->>   }
->>   
->> -#define SPRNG_WRAPPER_GET(reg, bookehv_spr)				\
->> +#define KVMPPC_BOOKE_HV_SPRNG_ACESSOR_GET(reg, bookehv_spr)		\
->>   static inline ulong kvmppc_get_##reg(struct kvm_vcpu *vcpu)		\
->>   {									\
->>   	return mfspr(bookehv_spr);					\
->>   }									\
->>   
->> -#define SPRNG_WRAPPER_SET(reg, bookehv_spr)				\
->> +#define KVMPPC_BOOKE_HV_SPRNG_ACESSOR_SET(reg, bookehv_spr)		\
->>   static inline void kvmppc_set_##reg(struct kvm_vcpu *vcpu, ulong val)	\
->>   {									\
->>   	mtspr(bookehv_spr, val);						\
->>   }									\
->>   
->> -#define SHARED_WRAPPER_GET(reg, size)					\
->> +#define KVMPPC_VCPU_SHARED_REGS_ACESSOR_GET(reg, size)			\
->>   static inline u##size kvmppc_get_##reg(struct kvm_vcpu *vcpu)		\
->>   {									\
->>   	if (kvmppc_shared_big_endian(vcpu))				\
->> @@ -948,7 +948,7 @@ static inline u##size kvmppc_get_##reg(struct kvm_vcpu *vcpu)		\
->>   	       return le##size##_to_cpu(vcpu->arch.shared->reg);	\
->>   }									\
->>   
->> -#define SHARED_WRAPPER_SET(reg, size)					\
->> +#define KVMPPC_VCPU_SHARED_REGS_ACESSOR_SET(reg, size)			\
->>   static inline void kvmppc_set_##reg(struct kvm_vcpu *vcpu, u##size val)	\
->>   {									\
->>   	if (kvmppc_shared_big_endian(vcpu))				\
->> @@ -957,36 +957,36 @@ static inline void kvmppc_set_##reg(struct kvm_vcpu *vcpu, u##size val)	\
->>   	       vcpu->arch.shared->reg = cpu_to_le##size(val);		\
->>   }									\
->>   
->> -#define SHARED_WRAPPER(reg, size)					\
->> -	SHARED_WRAPPER_GET(reg, size)					\
->> -	SHARED_WRAPPER_SET(reg, size)					\
->> +#define KVMPPC_VCPU_SHARED_REGS_ACESSOR(reg, size)					\
->> +	KVMPPC_VCPU_SHARED_REGS_ACESSOR_GET(reg, size)					\
->> +	KVMPPC_VCPU_SHARED_REGS_ACESSOR_SET(reg, size)					\
->>   
->> -#define SPRNG_WRAPPER(reg, bookehv_spr)					\
->> -	SPRNG_WRAPPER_GET(reg, bookehv_spr)				\
->> -	SPRNG_WRAPPER_SET(reg, bookehv_spr)				\
->> +#define KVMPPC_BOOKE_HV_SPRNG_ACESSOR(reg, bookehv_spr)					\
->> +	KVMPPC_BOOKE_HV_SPRNG_ACESSOR_GET(reg, bookehv_spr)				\
->> +	KVMPPC_BOOKE_HV_SPRNG_ACESSOR_SET(reg, bookehv_spr)				\
->>   
->>   #ifdef CONFIG_KVM_BOOKE_HV
->>   
->> -#define SHARED_SPRNG_WRAPPER(reg, size, bookehv_spr)			\
->> -	SPRNG_WRAPPER(reg, bookehv_spr)					\
->> +#define KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(reg, size, bookehv_spr)	\
->> +	KVMPPC_BOOKE_HV_SPRNG_ACESSOR(reg, bookehv_spr)			\
->>   
->>   #else
->>   
->> -#define SHARED_SPRNG_WRAPPER(reg, size, bookehv_spr)			\
->> -	SHARED_WRAPPER(reg, size)					\
->> +#define KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(reg, size, bookehv_spr)	\
->> +	KVMPPC_VCPU_SHARED_REGS_ACESSOR(reg, size)			\
+>>> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+>>> index 4adff4f1896d..229f0a1ffdd4 100644
+>>> --- a/arch/powerpc/kvm/book3s_xive.c
+>>> +++ b/arch/powerpc/kvm/book3s_xive.c
+>>> @@ -886,10 +886,10 @@ int kvmppc_xive_attach_escalation(struct kvm_vcpu *vcpu, u8 prio,
+>>>   
+>>>   	if (single_escalation)
+>>>   		name = kasprintf(GFP_KERNEL, "kvm-%d-%d",
+>>> -				 vcpu->kvm->arch.lpid, xc->server_num);
+>>> +				 (unsigned int)vcpu->kvm->arch.lpid, xc->server_num);
+>>>   	else
+>>>   		name = kasprintf(GFP_KERNEL, "kvm-%d-%d-%d",
+>>> -				 vcpu->kvm->arch.lpid, xc->server_num, prio);
+>>> +				 (unsigned int)vcpu->kvm->arch.lpid, xc->server_num, prio);
+>>>   	if (!name) {
+>>>   		pr_err("Failed to allocate escalation irq name for queue %d of VCPU %d\n",
+>>>   		       prio, xc->server_num);
+>>
+>> I would have thought you'd keep the type and change the format.
 > 
-> Not the greatest name I've ever seen :D Hard to be concice and
-> consistent though, this is an odd one.
+> Yeah. Don't we risk having ambigious names by discarding the high bits?
+> Not sure that would be a bug per se, but it could be confusing.
 
-Yes, it is a bit wordy.
+In this context is would always be constrained be the number of LPID 
+bits so wouldn't be ambiguous, but I'm going to change the format.
 
 > 
-> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
-
-Thanks.
-
-> 
->>   
->>   #endif
->>   
->> -SHARED_WRAPPER(critical, 64)
->> -SHARED_SPRNG_WRAPPER(sprg0, 64, SPRN_GSPRG0)
->> -SHARED_SPRNG_WRAPPER(sprg1, 64, SPRN_GSPRG1)
->> -SHARED_SPRNG_WRAPPER(sprg2, 64, SPRN_GSPRG2)
->> -SHARED_SPRNG_WRAPPER(sprg3, 64, SPRN_GSPRG3)
->> -SHARED_SPRNG_WRAPPER(srr0, 64, SPRN_GSRR0)
->> -SHARED_SPRNG_WRAPPER(srr1, 64, SPRN_GSRR1)
->> -SHARED_SPRNG_WRAPPER(dar, 64, SPRN_GDEAR)
->> -SHARED_SPRNG_WRAPPER(esr, 64, SPRN_GESR)
->> -SHARED_WRAPPER_GET(msr, 64)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(critical, 64)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(sprg0, 64, SPRN_GSPRG0)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(sprg1, 64, SPRN_GSPRG1)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(sprg2, 64, SPRN_GSPRG2)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(sprg3, 64, SPRN_GSPRG3)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(srr0, 64, SPRN_GSRR0)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(srr1, 64, SPRN_GSRR1)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(dar, 64, SPRN_GDEAR)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(esr, 64, SPRN_GESR)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR_GET(msr, 64)
->>   static inline void kvmppc_set_msr_fast(struct kvm_vcpu *vcpu, u64 val)
->>   {
->>   	if (kvmppc_shared_big_endian(vcpu))
->> @@ -994,12 +994,12 @@ static inline void kvmppc_set_msr_fast(struct kvm_vcpu *vcpu, u64 val)
->>   	else
->>   	       vcpu->arch.shared->msr = cpu_to_le64(val);
->>   }
->> -SHARED_WRAPPER(dsisr, 32)
->> -SHARED_WRAPPER(int_pending, 32)
->> -SHARED_WRAPPER(sprg4, 64)
->> -SHARED_WRAPPER(sprg5, 64)
->> -SHARED_WRAPPER(sprg6, 64)
->> -SHARED_WRAPPER(sprg7, 64)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(dsisr, 32)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(int_pending, 32)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(sprg4, 64)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(sprg5, 64)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(sprg6, 64)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(sprg7, 64)
->>   
->>   static inline u32 kvmppc_get_sr(struct kvm_vcpu *vcpu, int nr)
->>   {
+> cheers
 > 
