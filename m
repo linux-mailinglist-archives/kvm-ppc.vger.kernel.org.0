@@ -2,80 +2,80 @@ Return-Path: <kvm-ppc-owner@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C04D7AA0EA
-	for <lists+kvm-ppc@lfdr.de>; Thu, 21 Sep 2023 22:51:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 435187D455B
+	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Oct 2023 04:14:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230100AbjIUUuC (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Thu, 21 Sep 2023 16:50:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53528 "EHLO
+        id S231916AbjJXCOK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
+        Mon, 23 Oct 2023 22:14:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231538AbjIUUth (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Thu, 21 Sep 2023 16:49:37 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3E368E685;
-        Thu, 21 Sep 2023 10:44:36 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4RrqpW44ZDz4x5k;
-        Thu, 21 Sep 2023 19:28:51 +1000 (AEST)
-From:   Michael Ellerman <patch-notifications@ellerman.id.au>
-To:     linuxppc-dev@lists.ozlabs.org, Jordan Niethe <jniethe5@gmail.com>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, npiggin@gmail.com,
-        mikey@neuling.org, paulus@ozlabs.org, vaibhav@linux.ibm.com,
-        sbhat@linux.ibm.com, gautam@linux.ibm.com,
-        kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com,
-        David.Laight@ACULAB.COM, sachinp@linux.ibm.com
-In-Reply-To: <20230914030600.16993-1-jniethe5@gmail.com>
-References: <20230914030600.16993-1-jniethe5@gmail.com>
-Subject: Re: [PATCH v5 00/11] KVM: PPC: Nested APIv2 guest support
-Message-Id: <169528846875.874757.8861595746180557787.b4-ty@ellerman.id.au>
-Date:   Thu, 21 Sep 2023 19:27:48 +1000
+        with ESMTP id S229582AbjJXCOJ (ORCPT
+        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 23 Oct 2023 22:14:09 -0400
+X-Greylist: delayed 12923 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 23 Oct 2023 19:14:06 PDT
+Received: from mail.tehinnovacii.ru (mail.tehinnovacii.ru [185.221.212.125])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4599510C0;
+        Mon, 23 Oct 2023 19:14:06 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.tehinnovacii.ru (Postfix) with ESMTP id 8696E845A2D93;
+        Mon, 23 Oct 2023 23:45:17 +0300 (MSK)
+Received: from mail.tehinnovacii.ru ([127.0.0.1])
+        by localhost (mail.tehinnovacii.ru [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id RHKslmN_gKe2; Mon, 23 Oct 2023 23:45:17 +0300 (MSK)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.tehinnovacii.ru (Postfix) with ESMTP id 3757A81139813;
+        Mon, 23 Oct 2023 23:45:14 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.tehinnovacii.ru 3757A81139813
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tehinnovacii.ru;
+        s=mail; t=1698093914;
+        bh=Ws5TcS6EV4V7aiUY6u9eol5cuGGKUQT0mSrLKF+Le3s=;
+        h=MIME-Version:To:From:Date:Message-Id;
+        b=C6xnXDA6LtbVjj4YPiDbte7OI3KojR1b5ODojEbJ/Yq/XbBfVywETLztW9mHYm0nd
+         2Bhf32PuG4VKOZhUeeR8f+pL8Ym6eSMNkmmyL/Ch8S6V6W1HDNYZSuKoJtC/bw2r9r
+         FB/st/VqmrZGZoBiefZN7xtFeEcKM7O3mfZQOPaV5+1MdkwG2b3ch+a/9LWBW/grpR
+         rowvsSN+WhYpw+Dng2bfjG8cRSaAXMPwEZOk2rwtR7/hI9UFzawfu6RuwUJxkl93tX
+         zYe7zzu+bLdyS8bozSMeIJyGmFPdcEl+5YTy8l9deWjoStDToNaAjO+eeBR3kCZtHe
+         6gMVn1jUjgjYw==
+Received: from mail.tehinnovacii.ru ([127.0.0.1])
+        by localhost (mail.tehinnovacii.ru [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id wRfLkjJtkHoR; Mon, 23 Oct 2023 23:45:14 +0300 (MSK)
+Received: from DESKTOP-0AG4O9B.lan (unknown [41.157.248.166])
+        by mail.tehinnovacii.ru (Postfix) with ESMTPSA id 787CE8615DF9A;
+        Mon, 23 Oct 2023 23:45:02 +0300 (MSK)
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: Brauchen Sie einen Kredit?
+To:     Recipients <zp@tehinnovacii.ru>
+From:   Georg Johannes Proksch <zp@tehinnovacii.ru>
+Date:   Mon, 23 Oct 2023 13:44:02 -0700
+Reply-To: kreditschufadeutsch0@gmail.com
+Message-Id: <20231023204502.787CE8615DF9A@mail.tehinnovacii.ru>
+X-Spam-Status: No, score=4.3 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FORGED_REPLYTO,
+        FREEMAIL_REPLYTO_END_DIGIT,RCVD_IN_BL_SPAMCOP_NET,SPF_HELO_NONE,
+        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
 
-On Thu, 14 Sep 2023 13:05:49 +1000, Jordan Niethe wrote:
-> A nested-HV API for PAPR has been developed based on the KVM-specific
-> nested-HV API that is upstream in Linux/KVM and QEMU. The PAPR API had
-> to break compatibility to accommodate implementation in other
-> hypervisors and partitioning firmware. The existing KVM-specific API
-> will be known as the Nested APIv1 and the PAPR API will be known as the
-> Nested APIv2.
-> 
-> [...]
+Brauchen Sie einen Kredit?
+Tr=E4umen Sie davon, ein Unternehmen zu gr=FCnden?
+Sie ben=F6tigen Geld f=FCr Ihre Gesch=E4ftsidee, ben=F6tigen aber eine gro=
+=DFe Finanzierung?
+Besitzen Sie ein Unternehmen und m=F6chten expandieren?
 
-Applied to powerpc/topic/ppc-kvm.
+Wir bieten Gesch=E4ftskredite, Privatkredite, Projektkredite und Autokredit=
+e mit einem Zinssatz von 2 % an.
 
-[01/11] KVM: PPC: Always use the GPR accessors
-        https://git.kernel.org/powerpc/c/0e85b7df9cb0c65f840109159ef6754c783e07a0
-[02/11] KVM: PPC: Introduce FPR/VR accessor functions
-        https://git.kernel.org/powerpc/c/52425a3b3c11cec58cf66e4c897fc1504f3911a9
-[03/11] KVM: PPC: Rename accessor generator macros
-        https://git.kernel.org/powerpc/c/2a64bc673133346a7a3bd163f2e6048bd1788727
-[04/11] KVM: PPC: Use accessors for VCPU registers
-        https://git.kernel.org/powerpc/c/7028ac8d174f28220f0e2de0cb3346cd3c31976d
-[05/11] KVM: PPC: Use accessors for VCORE registers
-        https://git.kernel.org/powerpc/c/c8ae9b3c6e7f22a4b71e42edb0fc3942aa7a7c42
-[06/11] KVM: PPC: Book3S HV: Use accessors for VCPU registers
-        https://git.kernel.org/powerpc/c/ebc88ea7a6ad0ea349df9c765357d3aa4e662aa9
-[07/11] KVM: PPC: Book3S HV: Introduce low level MSR accessor
-        https://git.kernel.org/powerpc/c/6de2e837babb411cfb3cdb570581c3a65576ddaf
-[08/11] KVM: PPC: Add helper library for Guest State Buffers
-        https://git.kernel.org/powerpc/c/6ccbbc33f06adaf79acde18571c6543ad1cb4be6
-[09/11] KVM: PPC: Book3s HV: Hold LPIDs in an unsigned long
-        https://git.kernel.org/powerpc/c/dfcaacc8f970c6b4ea4e32d2186f2bea4a1d5255
-[10/11] KVM: PPC: Add support for nestedv2 guests
-        https://git.kernel.org/powerpc/c/19d31c5f115754c369c0995df47479c384757f82
-[11/11] docs: powerpc: Document nested KVM on POWER
-        https://git.kernel.org/powerpc/c/476652297f94a2e5e5ef29e734b0da37ade94110
+Vollst=E4ndiger Name:
+Kreditbetrag:
+Kreditlaufzeit:
+Land:
+Telefonnummer:
 
-cheers
+Herr Georg Johannes Proksch
+Kreditberater/Berater
