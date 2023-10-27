@@ -1,81 +1,64 @@
-Return-Path: <kvm-ppc-owner@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-1-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 435187D455B
-	for <lists+kvm-ppc@lfdr.de>; Tue, 24 Oct 2023 04:14:11 +0200 (CEST)
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231916AbjJXCOK (ORCPT <rfc822;lists+kvm-ppc@lfdr.de>);
-        Mon, 23 Oct 2023 22:14:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48540 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbjJXCOJ (ORCPT
-        <rfc822;kvm-ppc@vger.kernel.org>); Mon, 23 Oct 2023 22:14:09 -0400
-X-Greylist: delayed 12923 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 23 Oct 2023 19:14:06 PDT
-Received: from mail.tehinnovacii.ru (mail.tehinnovacii.ru [185.221.212.125])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4599510C0;
-        Mon, 23 Oct 2023 19:14:06 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.tehinnovacii.ru (Postfix) with ESMTP id 8696E845A2D93;
-        Mon, 23 Oct 2023 23:45:17 +0300 (MSK)
-Received: from mail.tehinnovacii.ru ([127.0.0.1])
-        by localhost (mail.tehinnovacii.ru [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id RHKslmN_gKe2; Mon, 23 Oct 2023 23:45:17 +0300 (MSK)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.tehinnovacii.ru (Postfix) with ESMTP id 3757A81139813;
-        Mon, 23 Oct 2023 23:45:14 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.tehinnovacii.ru 3757A81139813
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tehinnovacii.ru;
-        s=mail; t=1698093914;
-        bh=Ws5TcS6EV4V7aiUY6u9eol5cuGGKUQT0mSrLKF+Le3s=;
-        h=MIME-Version:To:From:Date:Message-Id;
-        b=C6xnXDA6LtbVjj4YPiDbte7OI3KojR1b5ODojEbJ/Yq/XbBfVywETLztW9mHYm0nd
-         2Bhf32PuG4VKOZhUeeR8f+pL8Ym6eSMNkmmyL/Ch8S6V6W1HDNYZSuKoJtC/bw2r9r
-         FB/st/VqmrZGZoBiefZN7xtFeEcKM7O3mfZQOPaV5+1MdkwG2b3ch+a/9LWBW/grpR
-         rowvsSN+WhYpw+Dng2bfjG8cRSaAXMPwEZOk2rwtR7/hI9UFzawfu6RuwUJxkl93tX
-         zYe7zzu+bLdyS8bozSMeIJyGmFPdcEl+5YTy8l9deWjoStDToNaAjO+eeBR3kCZtHe
-         6gMVn1jUjgjYw==
-Received: from mail.tehinnovacii.ru ([127.0.0.1])
-        by localhost (mail.tehinnovacii.ru [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id wRfLkjJtkHoR; Mon, 23 Oct 2023 23:45:14 +0300 (MSK)
-Received: from DESKTOP-0AG4O9B.lan (unknown [41.157.248.166])
-        by mail.tehinnovacii.ru (Postfix) with ESMTPSA id 787CE8615DF9A;
-        Mon, 23 Oct 2023 23:45:02 +0300 (MSK)
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Brauchen Sie einen Kredit?
-To:     Recipients <zp@tehinnovacii.ru>
-From:   Georg Johannes Proksch <zp@tehinnovacii.ru>
-Date:   Mon, 23 Oct 2023 13:44:02 -0700
-Reply-To: kreditschufadeutsch0@gmail.com
-Message-Id: <20231023204502.787CE8615DF9A@mail.tehinnovacii.ru>
-X-Spam-Status: No, score=4.3 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FORGED_REPLYTO,
-        FREEMAIL_REPLYTO_END_DIGIT,RCVD_IN_BL_SPAMCOP_NET,SPF_HELO_NONE,
-        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: ****
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B317DA3D0
+	for <lists+kvm-ppc@lfdr.de>; Sat, 28 Oct 2023 00:57:02 +0200 (CEST)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96F7EB2143A
+	for <lists+kvm-ppc@lfdr.de>; Fri, 27 Oct 2023 22:56:59 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06663E487;
+	Fri, 27 Oct 2023 22:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Ud4zKv8L"
+X-Original-To: kvm-ppc@vger.kernel.org
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0763038BAC;
+	Fri, 27 Oct 2023 22:56:50 +0000 (UTC)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37BA8E1;
+	Fri, 27 Oct 2023 15:56:49 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2144C433C8;
+	Fri, 27 Oct 2023 22:56:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1698447408;
+	bh=O3zoGBXVfb5WJW2MwxE5HShF9ljYkHcSyGRQbT2KEb8=;
+	h=Date:From:To:Subject:From;
+	b=Ud4zKv8LSo/nrQt/CvxDP4m3ZdOPMrp7tUsSESflhyo08sv10KMAHeGmErEDvX5Wv
+	 X1u6ZpuVUVrc6Xzu0in75RDb1nGIibEKbzfpwR01csDb27MAkb+LeK4Jgt5q379YnJ
+	 1hUFAH97aE4h7ltSnhuO/qZhxpYqsdOIXxgC3zd0=
+Date: Fri, 27 Oct 2023 18:56:47 -0400
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: dccp@vger.kernel.org, dmaengine@vger.kernel.org, 
+	ecryptfs@vger.kernel.org, fio@vger.kernel.org, fstests@vger.kernel.org, 
+	initramfs@vger.kernel.org, io-uring@vger.kernel.org, kernel-janitors@vger.kernel.org, 
+	keyrings@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+Subject: This list is being migrated to the new vger infra (no action
+ required)
+Message-ID: <20231027-strange-debonair-basilisk-cecdab@meerkat>
 Precedence: bulk
-List-ID: <kvm-ppc.vger.kernel.org>
 X-Mailing-List: kvm-ppc@vger.kernel.org
+List-Id: <kvm-ppc.vger.kernel.org>
+List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-Brauchen Sie einen Kredit?
-Tr=E4umen Sie davon, ein Unternehmen zu gr=FCnden?
-Sie ben=F6tigen Geld f=FCr Ihre Gesch=E4ftsidee, ben=F6tigen aber eine gro=
-=DFe Finanzierung?
-Besitzen Sie ein Unternehmen und m=F6chten expandieren?
+Hello:
 
-Wir bieten Gesch=E4ftskredite, Privatkredite, Projektkredite und Autokredit=
-e mit einem Zinssatz von 2 % an.
+This list is being migrated to the new vger infrastructure. This should be a
+fully transparent process and you don't need to change anything about how you
+participate with the list or how you receive mail.
 
-Vollst=E4ndiger Name:
-Kreditbetrag:
-Kreditlaufzeit:
-Land:
-Telefonnummer:
+There will be a brief delay with archives on lore.kernel.org. I will follow up
+once the archive migration has been completed.
 
-Herr Georg Johannes Proksch
-Kreditberater/Berater
+Best regards,
+Konstantin
+
