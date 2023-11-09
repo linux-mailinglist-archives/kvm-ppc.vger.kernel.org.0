@@ -1,64 +1,65 @@
-Return-Path: <kvm-ppc+bounces-5-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-6-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E72177E6BF2
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Nov 2023 15:03:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA07E7E700B
+	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Nov 2023 18:19:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23FA61C209DB
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Nov 2023 14:03:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CBAB280E32
+	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Nov 2023 17:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D57D21DFFF;
-	Thu,  9 Nov 2023 14:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB4E22316;
+	Thu,  9 Nov 2023 17:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K3RN5PsF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z4vz6pVG"
 X-Original-To: kvm-ppc@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA661E522
-	for <kvm-ppc@vger.kernel.org>; Thu,  9 Nov 2023 14:03:08 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 782012D77
-	for <kvm-ppc@vger.kernel.org>; Thu,  9 Nov 2023 06:03:07 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41ECA2231C
+	for <kvm-ppc@vger.kernel.org>; Thu,  9 Nov 2023 17:19:35 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED3E30D5
+	for <kvm-ppc@vger.kernel.org>; Thu,  9 Nov 2023 09:19:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699538587; x=1731074587;
+  t=1699550374; x=1731086374;
   h=date:from:to:cc:subject:message-id:mime-version;
-  bh=mADaHuQaz4lecY4mrCA06VE+sWfe1JKJkNX0cjZX0B8=;
-  b=K3RN5PsF7II2bLg0MljQ/rHzTeVvVEZuQqMjlt/fkXyTiHw3I3lTj2YP
-   y7iuDPbGiCkxGzvLniw3QlyTxcxHv60g6mSl9tz4zOgHdCMvkBwzWv2AC
-   9ozyT6XMg4IipwnawFx+M5Kp7ZK+1V2Z89TyUSdM5PR36cRClz+uYd3Nr
-   Hq8/MeyKeGPdMqqE52meNyxCAa946pg1xPHfLi7J43hVtuvnv3+l4Oa9c
-   Y3AMVgMkSI14D39SC+gn23AMCaklAG8CoMu4k+EypminKKpqdLDTRQGsy
-   rO0mTH21hoLBSNGjZJoB9zI1nL7We8zVioZmNRmeFPcAhDuIly1S/Cxnb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="380379253"
+  bh=aSIpJnrLC5nvszml9GBGiRTP4h1SzuQFN8Xd1BHpRcs=;
+  b=Z4vz6pVGAijuMK0dglvnP8v2iRKQgslgg7OoK9yvd3+CMbw1JSBMBF/Z
+   h2sZUX2nIyVxVEJC5Xil6s7kxHU+nRMtA+TSQmqJbYdpwxyrsiF+nVXm+
+   mFzsxLrDlOB+RBw2tEC6gxPi+UU4WEk7KYwmsyqln6izefx5z6Ydw3UiL
+   xhjim+Nnp5BUTtlDPWZAYD9ymmQkVt0454R9tQ6L19s7JaTqMJ49depW1
+   Mw53UpBYItKwBJ96/lZ0TlPzzUryX7MlrJLQXgVWaeGMCErR4fjckOUJv
+   fjx1dpKzaVw4A6/paLqVwACaRpcnTRa6iwxnoNf2TszTkPzktUoQp2Cu3
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="392902168"
 X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="380379253"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 06:03:01 -0800
+   d="scan'208";a="392902168"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 09:19:33 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="767068448"
 X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="4727962"
+   d="scan'208";a="767068448"
 Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 09 Nov 2023 06:03:00 -0800
+  by fmsmga007.fm.intel.com with ESMTP; 09 Nov 2023 09:19:31 -0800
 Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1r15cX-0008lw-2p;
-	Thu, 09 Nov 2023 14:02:57 +0000
-Date: Thu, 9 Nov 2023 22:02:30 +0800
+	id 1r18gj-0008xK-31;
+	Thu, 09 Nov 2023 17:19:29 +0000
+Date: Fri, 10 Nov 2023 00:46:56 +0800
 From: kernel test robot <lkp@intel.com>
 To: Brijesh Singh <brijesh.singh@amd.com>
 Cc: oe-kbuild-all@lists.linux.dev, kvm-ppc@vger.kernel.org,
 	cloud-init created default user <ec2-user@ip-172-31-5-41.eu-west-1.compute.internal>,
 	Ashish Kalra <ashish.kalra@amd.com>,
 	Michael Roth <michael.roth@amd.com>
-Subject: [agraf-2.6:snp-host-v10 65/108] arch/x86/virt/svm/sev.c:352:6:
- warning: no previous prototype for 'sev_dump_hva_rmpentry'
-Message-ID: <202311092152.UjfN6FW5-lkp@intel.com>
+Subject: [agraf-2.6:snp-host-v10 68/108] arch/x86/virt/svm/sev.c:375:5:
+ warning: no previous prototype for 'psmash'
+Message-ID: <202311092313.6740yf0y-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
@@ -70,27 +71,36 @@ Content-Disposition: inline
 
 tree:   https://github.com/agraf/linux-2.6.git snp-host-v10
 head:   689d7ab69df8f6bff29bd1dbefe7c07bba52a9ac
-commit: 7187f30c29e7c30b39e34bb3ab06ecbf034800ab [65/108] x86/fault: Add helper for dumping RMP entries
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20231109/202311092152.UjfN6FW5-lkp@intel.com/config)
+commit: e57dbd72a4490baee2e82f45835580ac5c2d44bf [68/108] x86/sev: Add helper functions for RMPUPDATE and PSMASH instruction
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20231109/202311092313.6740yf0y-lkp@intel.com/config)
 compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231109/202311092152.UjfN6FW5-lkp@intel.com/reproduce)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231109/202311092313.6740yf0y-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311092152.UjfN6FW5-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311092313.6740yf0y-lkp@intel.com/
 
 All warnings (new ones prefixed by >>):
 
    arch/x86/virt/svm/sev.c:280:5: warning: no previous prototype for 'snp_lookup_rmpentry' [-Wmissing-prototypes]
      280 | int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level)
          |     ^~~~~~~~~~~~~~~~~~~
->> arch/x86/virt/svm/sev.c:352:6: warning: no previous prototype for 'sev_dump_hva_rmpentry' [-Wmissing-prototypes]
+   arch/x86/virt/svm/sev.c:352:6: warning: no previous prototype for 'sev_dump_hva_rmpentry' [-Wmissing-prototypes]
      352 | void sev_dump_hva_rmpentry(unsigned long hva)
          |      ^~~~~~~~~~~~~~~~~~~~~
+>> arch/x86/virt/svm/sev.c:375:5: warning: no previous prototype for 'psmash' [-Wmissing-prototypes]
+     375 | int psmash(u64 pfn)
+         |     ^~~~~~
+>> arch/x86/virt/svm/sev.c:431:5: warning: no previous prototype for 'rmp_make_private' [-Wmissing-prototypes]
+     431 | int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable)
+         |     ^~~~~~~~~~~~~~~~
+>> arch/x86/virt/svm/sev.c:449:5: warning: no previous prototype for 'rmp_make_shared' [-Wmissing-prototypes]
+     449 | int rmp_make_shared(u64 pfn, enum pg_level level)
+         |     ^~~~~~~~~~~~~~~
 
 
-vim +/sev_dump_hva_rmpentry +352 arch/x86/virt/svm/sev.c
+vim +/psmash +375 arch/x86/virt/svm/sev.c
 
    279	
  > 280	int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level)
@@ -166,6 +176,103 @@ vim +/sev_dump_hva_rmpentry +352 arch/x86/virt/svm/sev.c
    350	}
    351	
  > 352	void sev_dump_hva_rmpentry(unsigned long hva)
+   353	{
+   354		unsigned int level;
+   355		pgd_t *pgd;
+   356		pte_t *pte;
+   357	
+   358		pgd = __va(read_cr3_pa());
+   359		pgd += pgd_index(hva);
+   360		pte = lookup_address_in_pgd(pgd, hva, &level);
+   361	
+   362		if (pte) {
+   363			pr_info("Can't dump RMP entry for HVA %lx: no PTE/PFN found\n", hva);
+   364			return;
+   365		}
+   366	
+   367		sev_dump_rmpentry(pte_pfn(*pte));
+   368	}
+   369	EXPORT_SYMBOL_GPL(sev_dump_hva_rmpentry);
+   370	
+   371	/*
+   372	 * PSMASH a 2MB aligned page into 4K pages in the RMP table while preserving the
+   373	 * Validated bit.
+   374	 */
+ > 375	int psmash(u64 pfn)
+   376	{
+   377		unsigned long paddr = pfn << PAGE_SHIFT;
+   378		int ret;
+   379	
+   380		pr_debug("%s: PFN: 0x%llx\n", __func__, pfn);
+   381	
+   382		if (!pfn_valid(pfn))
+   383			return -EINVAL;
+   384	
+   385		if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+   386			return -ENXIO;
+   387	
+   388		/* Binutils version 2.36 supports the PSMASH mnemonic. */
+   389		asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
+   390			      : "=a"(ret)
+   391			      : "a"(paddr)
+   392			      : "memory", "cc");
+   393	
+   394		return ret;
+   395	}
+   396	EXPORT_SYMBOL_GPL(psmash);
+   397	
+   398	static int rmpupdate(u64 pfn, struct rmp_state *val)
+   399	{
+   400		unsigned long paddr = pfn << PAGE_SHIFT;
+   401		int ret, level, npages;
+   402		int attempts = 0;
+   403	
+   404		if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+   405			return -ENXIO;
+   406	
+   407		do {
+   408			/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+   409			asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
+   410				     : "=a"(ret)
+   411				     : "a"(paddr), "c"((unsigned long)val)
+   412				     : "memory", "cc");
+   413	
+   414			attempts++;
+   415		} while (ret == RMPUPDATE_FAIL_OVERLAP);
+   416	
+   417		if (ret) {
+   418			pr_err("RMPUPDATE failed after %d attempts, ret: %d, pfn: %llx, npages: %d, level: %d\n",
+   419			       attempts, ret, pfn, npages, level);
+   420			sev_dump_rmpentry(pfn);
+   421			dump_stack();
+   422			return -EFAULT;
+   423		}
+   424	
+   425		return 0;
+   426	}
+   427	
+   428	/*
+   429	 * Assign a page to guest using the RMPUPDATE instruction.
+   430	 */
+ > 431	int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable)
+   432	{
+   433		struct rmp_state val;
+   434	
+   435		memset(&val, 0, sizeof(val));
+   436		val.assigned = 1;
+   437		val.asid = asid;
+   438		val.immutable = immutable;
+   439		val.gpa = gpa;
+   440		val.pagesize = X86_TO_RMP_PG_LEVEL(level);
+   441	
+   442		return rmpupdate(pfn, &val);
+   443	}
+   444	EXPORT_SYMBOL_GPL(rmp_make_private);
+   445	
+   446	/*
+   447	 * Transition a page to hypervisor/shared state using the RMPUPDATE instruction.
+   448	 */
+ > 449	int rmp_make_shared(u64 pfn, enum pg_level level)
 
 -- 
 0-DAY CI Kernel Test Service
