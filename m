@@ -1,110 +1,124 @@
-Return-Path: <kvm-ppc+bounces-27-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-28-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFBB980C031
-	for <lists+kvm-ppc@lfdr.de>; Mon, 11 Dec 2023 05:01:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94FFD814CAA
+	for <lists+kvm-ppc@lfdr.de>; Fri, 15 Dec 2023 17:13:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2982280BDA
-	for <lists+kvm-ppc@lfdr.de>; Mon, 11 Dec 2023 04:01:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CE5CB21217
+	for <lists+kvm-ppc@lfdr.de>; Fri, 15 Dec 2023 16:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859B7171B7;
-	Mon, 11 Dec 2023 04:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AF73A8EB;
+	Fri, 15 Dec 2023 16:13:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kr8Kvwnz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rzb0vRMv"
 X-Original-To: kvm-ppc@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63ECE168B5;
-	Mon, 11 Dec 2023 04:01:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 142F1C433C7;
-	Mon, 11 Dec 2023 04:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77F53DB80;
+	Fri, 15 Dec 2023 16:13:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7966C433C7;
+	Fri, 15 Dec 2023 16:13:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702267285;
-	bh=5f+pnIiwqhlNQ1ca5+25Zh7b1thsDYAT5RqL0yc+DLw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Kr8KvwnzfaXk+DpQ5+JrMYbrF0txJNWuHCTDeo08vTW3cgZlYGPxVpjASqXmbX2mN
-	 3MwBjg3n3yhzzBzMLP4hK3TqRYhjfeE+FeiWXO5sSdYB8Jvo/pQBxEoVOp9PjgnFiW
-	 g5hdEaoiLv2yavK4NUi11c5fPLzQUh9DNJVLeM3e8rQdxcYJc9dGoYi6bNHDs1VREf
-	 XAAn5cPxNzPCOMAMyucSoHQoSImGNduKYlhulcdLHV4hJq8zE1fSV/IKnoIlzSiDNG
-	 ObhM+VTrq55UZIQ7LPCnhn2TfJ64pWYclUhWuzlza5GCLNd24xB0IFzUG4KF5rgrrA
-	 MnDrs421pFdmQ==
-Message-ID: <086fb48f-ea7c-4b4e-b3b5-c930aa74bbb2@kernel.org>
-Date: Mon, 11 Dec 2023 09:31:17 +0530
+	s=k20201202; t=1702656787;
+	bh=J5U0YPNa7AB26BKYS1W5zmJBF+duoWLKvJ0dL3e/X7E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=rzb0vRMvSulaJmQCd1WxGCX+vJoa+mxO3N+P3GvoG39ZwEN7JjohfqYCg5Ecy+BXS
+	 +nwpi8PXsAyVjbgxjHz64OD09dRbSH2GXFQYUhIP9a3z3cr21ptpUwZpbqky6aKalt
+	 zNLsGYL4OIza0+xnfGjj5+YA+0j1iGFG4V7H7URQk2rYsCJlUSr4SeGXRy8gauPLxl
+	 aCByVKWNB84vUZwAL17bLSZpBQM7sGzft7WxCTvM6FJ7XyuCPHxF64Zie75hSS9C3Q
+	 dAGP+S7uevpQQ5V4k35JQD7UQxrrrz/tzb5Z4bbvgK4TtJ2RThDjNmkA+X/6fZjcGW
+	 VafUSsfRVrmMg==
+X-Mailer: emacs 29.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
+Cc: mikey@neuling.org, sbhat@linux.ibm.com, amachhiw@linux.vnet.ibm.com,
+	Jordan Niethe <jniethe5@gmail.com>, gautam@linux.ibm.com,
+	Nicholas Piggin <npiggin@gmail.com>, David.Laight@ACULAB.COM,
+	kconsul@linux.vnet.ibm.com,
+	Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>
+Subject: Re: [PATCH 01/12] KVM: PPC: Book3S HV nestedv2: Invalidate RPT
+ before deleting a guest
+In-Reply-To: <87jzpolsen.fsf@vajain21.in.ibm.com>
+References: <20231201132618.555031-1-vaibhav@linux.ibm.com>
+ <20231201132618.555031-2-vaibhav@linux.ibm.com>
+ <878r66xtjt.fsf@kernel.org> <87jzpolsen.fsf@vajain21.in.ibm.com>
+Date: Fri, 15 Dec 2023 21:42:59 +0530
+Message-ID: <87r0jntpf8.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 09/12] KVM: PPC: Book3S HV nestedv2: Do not call
- H_COPY_TOFROM_GUEST
-To: Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Cc: Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Jordan Niethe <jniethe5@gmail.com>,
- Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>, mikey@neuling.org,
- paulus@ozlabs.org, sbhat@linux.ibm.com, gautam@linux.ibm.com,
- kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com,
- David.Laight@ACULAB.COM
-References: <20231201132618.555031-1-vaibhav@linux.ibm.com>
- <20231201132618.555031-10-vaibhav@linux.ibm.com> <87sf4dun37.fsf@kernel.org>
- <87jzplmlx5.fsf@vajain21.in.ibm.com>
-Content-Language: en-US
-From: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-In-Reply-To: <87jzplmlx5.fsf@vajain21.in.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 12/11/23 9:26 AM, Vaibhav Jain wrote:
+Vaibhav Jain <vaibhav@linux.ibm.com> writes:
+
 > Hi Aneesh,
-> 
-> Thanks for looking into this patch. My responses inline:
-> 
+>
+> Thanks for looking into this patch. My responses inline below:
+>
 > "Aneesh Kumar K.V (IBM)" <aneesh.kumar@kernel.org> writes:
-> 
-> <snip>
->> May be we should use 
->> firmware_has_feature(FW_FEATURE_H_COPY_TOFROM_GUEST))?
->> 
->> the nestedv2 can end up using the above hcall if it is supported by
->> the hypervisor right? In its absence we will have to translate the
->> guest ea using xlate and then use kvm_guest_read to read location
->> using the guest real address right? That xlate will also involves
->> multiple kvm_guest_read.
->> 
->> 
-> Yes, Agreed and thats a nice suggestion. However ATM the hypervisor 
-> supporting Nestedv2 doesnt have support for this hcall. In future
-> once we have support for this hcall for nestedv2 from the hypervisor
-> we can replace this branch with a firmware_has_feature() test.
-> 
+>
+>> Vaibhav Jain <vaibhav@linux.ibm.com> writes:
+>>
+>>> From: Jordan Niethe <jniethe5@gmail.com>
+>>>
+>>> An L0 must invalidate the L2's RPT during H_GUEST_DELETE if this has not
+>>> already been done. This is a slow operation that means H_GUEST_DELETE
+>>> must return H_BUSY multiple times before completing. Invalidating the
+>>> tables before deleting the guest so there is less work for the L0 to do.
+>>>
+>>> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
+>>> ---
+>>>  arch/powerpc/include/asm/kvm_book3s.h | 1 +
+>>>  arch/powerpc/kvm/book3s_hv.c          | 6 ++++--
+>>>  arch/powerpc/kvm/book3s_hv_nested.c   | 2 +-
+>>>  3 files changed, 6 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
+>>> index 4f527d09c92b..a37736ed3728 100644
+>>> --- a/arch/powerpc/include/asm/kvm_book3s.h
+>>> +++ b/arch/powerpc/include/asm/kvm_book3s.h
+>>> @@ -302,6 +302,7 @@ void kvmhv_nested_exit(void);
+>>>  void kvmhv_vm_nested_init(struct kvm *kvm);
+>>>  long kvmhv_set_partition_table(struct kvm_vcpu *vcpu);
+>>>  long kvmhv_copy_tofrom_guest_nested(struct kvm_vcpu *vcpu);
+>>> +void kvmhv_flush_lpid(u64 lpid);
+>>>  void kvmhv_set_ptbl_entry(u64 lpid, u64 dw0, u64 dw1);
+>>>  void kvmhv_release_all_nested(struct kvm *kvm);
+>>>  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu);
+>>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+>>> index 1ed6ec140701..5543e8490cd9 100644
+>>> --- a/arch/powerpc/kvm/book3s_hv.c
+>>> +++ b/arch/powerpc/kvm/book3s_hv.c
+>>> @@ -5691,10 +5691,12 @@ static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
+>>>  			kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
+>>>  	}
+>>>  
+>>> -	if (kvmhv_is_nestedv2())
+>>> +	if (kvmhv_is_nestedv2()) {
+>>> +		kvmhv_flush_lpid(kvm->arch.lpid);
+>>>  		plpar_guest_delete(0, kvm->arch.lpid);
+>>>
+>>
+>> I am not sure I follow the optimization here. I would expect the
+>> hypervisor to kill all the translation caches as part of guest_delete.
+>> What is the benefit of doing a lpid flush outside the guest delete?
+>>
+> Thats right. However without this optimization the H_GUEST_DELETE hcall
+> in plpar_guest_delete() returns H_BUSY multiple times resulting in
+> multiple hcalls to the hypervisor until it finishes. Flushing the guest
+> translation cache upfront reduces the number of HCALLs L1 guests has to
+> make to delete a L2 guest via H_GUEST_DELETE.
+>
 
-What I am suggesting is we convert that conditional to firmware_has_feature so that
-later when hypervisor supports this hcall all older kernel can make
-use of the copy_tofrom_guest without any code change.
+can we add that as a comment above that kvmhv_flush_lpid()?
 
->>> Signed-off-by: Jordan Niethe <jniethe5@gmail.com> --- 
->>> arch/powerpc/kvm/book3s_64_mmu_radix.c | 3 +++ 1 file changed, 3
->>> insertions(+)
->>> 
->>> diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c
->>> b/arch/powerpc/kvm/book3s_64_mmu_radix.c index
->>> 916af6c153a5..4a1abb9f7c05 100644 ---
->>> a/arch/powerpc/kvm/book3s_64_mmu_radix.c +++
->>> b/arch/powerpc/kvm/book3s_64_mmu_radix.c @@ -40,6 +40,9 @@
->>> unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid, 
->>> unsigned long quadrant, ret = n; bool is_load = !!to;
->>> 
->>> +	if (kvmhv_is_nestedv2()) +		return H_UNSUPPORTED; + /* Can't
->>> access quadrants 1 or 2 in non-HV mode, call the HV to do it */ 
->>> if (kvmhv_on_pseries()) return
->>> plpar_hcall_norets(H_COPY_TOFROM_GUEST, lpid, pid, eaddr, -- 
->>> 2.42.0
-> 
-
+-aneesh
 
