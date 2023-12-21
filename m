@@ -1,155 +1,84 @@
-Return-Path: <kvm-ppc+bounces-32-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-33-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BECA7818458
-	for <lists+kvm-ppc@lfdr.de>; Tue, 19 Dec 2023 10:24:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5321481B422
+	for <lists+kvm-ppc@lfdr.de>; Thu, 21 Dec 2023 11:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB619B2368B
-	for <lists+kvm-ppc@lfdr.de>; Tue, 19 Dec 2023 09:24:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85B581C20FF0
+	for <lists+kvm-ppc@lfdr.de>; Thu, 21 Dec 2023 10:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630981426E;
-	Tue, 19 Dec 2023 09:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F4EcT8ht"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976104F60D;
+	Thu, 21 Dec 2023 10:45:55 +0000 (UTC)
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B31E14282;
-	Tue, 19 Dec 2023 09:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BJ9HR5l011928;
-	Tue, 19 Dec 2023 09:23:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=VBLVLGidWmqFuH7WIg0j7KnZANsKBlDQID8aBmgWBIc=;
- b=F4EcT8htAd21fsFB+2BX/oUK1BvTP/8l0jISOBFWFcTGhr0qslpfzB2P3ZXCDHLkE5VG
- b0maNs6pFUdZc4S0wJJ+VfzLuYdWtR4MoNIVPMD1OKZmi7PVKENZezLCadAAo+EuDRlO
- me4TCCJRr/eA/njPJAjw6OimYC9+TdSs5efSBsSueG3LCw9E69UquzbYssWoL2MStdi7
- Mcd4kfhb0OlshuC4DN3StnjaSZ/28bGhnoAZHnLrMfU4zxI2LoeSZ+vlSMvyuYp/F65n
- Q0VgZSphLnNi3SyYBLU7s9lkLAxdwJEs9ORJrM0ZZFOs0VncEIRMCnqWGo/Uu9yZ5TlV fw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v38djg4nk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Dec 2023 09:23:33 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BJ9JBOK016229;
-	Tue, 19 Dec 2023 09:23:32 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v38djg4mb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Dec 2023 09:23:32 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BJ6cS6W004798;
-	Tue, 19 Dec 2023 09:23:31 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1pkypspe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Dec 2023 09:23:30 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BJ9NRXV63242578
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 19 Dec 2023 09:23:27 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A7CE02004B;
-	Tue, 19 Dec 2023 09:23:27 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 324F020043;
-	Tue, 19 Dec 2023 09:23:20 +0000 (GMT)
-Received: from vaibhav?linux.ibm.com (unknown [9.61.137.171])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Tue, 19 Dec 2023 09:23:19 +0000 (GMT)
-Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Tue, 19 Dec 2023 14:53:17 +0530
-From: Vaibhav Jain <vaibhav@linux.ibm.com>
-To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-Cc: Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Jordan Niethe <jniethe5@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>, mikey@neuling.org,
-        paulus@ozlabs.org, sbhat@linux.ibm.com, gautam@linux.ibm.com,
-        kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com,
-        David.Laight@ACULAB.COM
-Subject: [PATCH] powerpc/hvcall: Reorder Nestedv2 hcall opcodes
-Date: Tue, 19 Dec 2023 14:52:36 +0530
-Message-ID: <20231219092309.118151-1-vaibhav@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F056A011;
+	Thu, 21 Dec 2023 10:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4SwnCN0Kd0z4xdZ;
+	Thu, 21 Dec 2023 21:45:52 +1100 (AEDT)
+From: Michael Ellerman <patch-notifications@ellerman.id.au>
+To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, Vaibhav Jain <vaibhav@linux.ibm.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>, Jordan Niethe <jniethe5@gmail.com>, Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>, mikey@neuling.org, paulus@ozlabs.org, sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com
+In-Reply-To: <20231201132618.555031-1-vaibhav@linux.ibm.com>
+References: <20231201132618.555031-1-vaibhav@linux.ibm.com>
+Subject: Re: [PATCH 00/12] KVM: PPC: Nested APIv2 : Performance improvements
+Message-Id: <170315547865.2197670.7761512990003222623.b4-ty@ellerman.id.au>
+Date: Thu, 21 Dec 2023 21:44:38 +1100
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: AEpyoGmXzVeDABI26oC8SHcjBQmATCEn
-X-Proofpoint-ORIG-GUID: UUpaRrWN_jBKqsdBrDPaqebb87Zb7f6i
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-19_04,2023-12-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- bulkscore=0 clxscore=1015 malwarescore=0 impostorscore=0 mlxlogscore=593
- phishscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2312190069
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-This trivial patch reorders the newly introduced hcall opcodes for Nestedv2
-to follow the increasing-opcode-number convention followed in
-'hvcall.h'. The patch also updates the value for MAX_HCALL_OPCODE which is
-at various places in arch code for range checking.
+On Fri, 01 Dec 2023 18:56:05 +0530, Vaibhav Jain wrote:
+> This patch series introduces series of performance improvements to recently
+> added support for Nested APIv2 PPC64 Guests via [1]. Details for Nested
+> APIv2 for PPC64 Guests is available in Documentation/powerpc/kvm-nested.rst.
+> 
+> This patch series introduces various optimizations for a Nested APIv2
+> guests namely:
+> 
+> [...]
 
-Fixes: 19d31c5f1157 ("KVM: PPC: Add support for nestedv2 guests")
-Suggested-by: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Vaibhav Jain<vaibhav@linux.ibm.com>
----
- arch/powerpc/include/asm/hvcall.h | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+Applied to powerpc/topic/ppc-kvm.
 
-diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
-index ddb99e982917..605ed2b58aff 100644
---- a/arch/powerpc/include/asm/hvcall.h
-+++ b/arch/powerpc/include/asm/hvcall.h
-@@ -349,7 +349,17 @@
- #define H_GET_ENERGY_SCALE_INFO	0x450
- #define H_PKS_SIGNED_UPDATE	0x454
- #define H_WATCHDOG		0x45C
--#define MAX_HCALL_OPCODE	H_WATCHDOG
-+#define H_WATCHDOG		0x45C
-+#define H_GUEST_GET_CAPABILITIES 0x460
-+#define H_GUEST_SET_CAPABILITIES 0x464
-+#define H_GUEST_CREATE		0x470
-+#define H_GUEST_CREATE_VCPU	0x474
-+#define H_GUEST_GET_STATE	0x478
-+#define H_GUEST_SET_STATE	0x47C
-+#define H_GUEST_RUN_VCPU	0x480
-+#define H_GUEST_COPY_MEMORY	0x484
-+#define H_GUEST_DELETE		0x488
-+#define MAX_HCALL_OPCODE	H_GUEST_DELETE
- 
- /* Scope args for H_SCM_UNBIND_ALL */
- #define H_UNBIND_SCOPE_ALL (0x1)
-@@ -393,15 +403,6 @@
- #define H_ENTER_NESTED		0xF804
- #define H_TLB_INVALIDATE	0xF808
- #define H_COPY_TOFROM_GUEST	0xF80C
--#define H_GUEST_GET_CAPABILITIES 0x460
--#define H_GUEST_SET_CAPABILITIES 0x464
--#define H_GUEST_CREATE		0x470
--#define H_GUEST_CREATE_VCPU	0x474
--#define H_GUEST_GET_STATE	0x478
--#define H_GUEST_SET_STATE	0x47C
--#define H_GUEST_RUN_VCPU	0x480
--#define H_GUEST_COPY_MEMORY	0x484
--#define H_GUEST_DELETE		0x488
- 
- /* Flags for H_SVM_PAGE_IN */
- #define H_PAGE_IN_SHARED        0x1
--- 
-2.43.0
+[01/12] KVM: PPC: Book3S HV nestedv2: Invalidate RPT before deleting a guest
+        https://git.kernel.org/powerpc/c/7d370e1812b9a5f5cc68aaa5991bf7d31d8ff52c
+[02/12] KVM: PPC: Book3S HV nestedv2: Avoid reloading the tb offset
+        https://git.kernel.org/powerpc/c/e0d4acbcba3f2d63dc15bc5432c8e26fc9e19675
+[03/12] KVM: PPC: Book3S HV nestedv2: Do not check msr on hcalls
+        https://git.kernel.org/powerpc/c/63ccae78cd88b52fb1d598ae33fa8408ce067b30
+[04/12] KVM: PPC: Book3S HV nestedv2: Get the PID only if needed to copy tofrom a guest
+        https://git.kernel.org/powerpc/c/e678748a8dca5b57041a84a66577f6168587b3f7
+[05/12] KVM: PPC: Book3S HV nestedv2: Ensure LPCR_MER bit is passed to the L0
+        https://git.kernel.org/powerpc/c/ec0f6639fa8853cf6bfdfc3588aada7eeb7e5e37
+[06/12] KVM: PPC: Book3S HV: Handle pending exceptions on guest entry with MSR_EE
+        https://git.kernel.org/powerpc/c/ecd10702baae5c16a91d139bde7eff84ce55daee
+[07/12] KVM: PPC: Book3S HV nestedv2: Do not inject certain interrupts
+        https://git.kernel.org/powerpc/c/df938a5576f3f3b08e1f217c660385c0d58a0b91
+[08/12] KVM: PPC: Book3S HV nestedv2: Avoid msr check in kvmppc_handle_exit_hv()
+        https://git.kernel.org/powerpc/c/a9a3de530d7531bf6cd3f6ccda769cd94c1105a0
+[09/12] KVM: PPC: Book3S HV nestedv2: Do not call H_COPY_TOFROM_GUEST
+        https://git.kernel.org/powerpc/c/4bc8ff6f170c78f64446c5d5f9ef6771eefd3416
+[10/12] KVM: PPC: Book3S HV nestedv2: Register the VPA with the L0
+        https://git.kernel.org/powerpc/c/db1dcfae1dae3c042f348175ac0394e2fc14b1b3
+[11/12] KVM: PPC: Reduce reliance on analyse_instr() in mmio emulation
+        https://git.kernel.org/powerpc/c/797a5af8fc7297b19e5c6b1713956ebf1e6c1cde
+[12/12] KVM: PPC: Book3S HV nestedv2: Do not cancel pending decrementer exception
+        https://git.kernel.org/powerpc/c/180c6b072bf360b686e53d893d8dcf7dbbaec6bb
 
+cheers
 
