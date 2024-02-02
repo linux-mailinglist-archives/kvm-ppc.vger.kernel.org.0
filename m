@@ -1,255 +1,132 @@
-Return-Path: <kvm-ppc+bounces-39-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-40-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D6EF840327
-	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Jan 2024 11:48:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A3BC846773
+	for <lists+kvm-ppc@lfdr.de>; Fri,  2 Feb 2024 06:16:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A20B91C22157
-	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Jan 2024 10:48:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA9531F21B6C
+	for <lists+kvm-ppc@lfdr.de>; Fri,  2 Feb 2024 05:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6617A58108;
-	Mon, 29 Jan 2024 10:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6A4171BF;
+	Fri,  2 Feb 2024 05:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VX9e2rP6"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qHldoEwn"
 X-Original-To: kvm-ppc@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7515A56477;
-	Mon, 29 Jan 2024 10:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE68171CD
+	for <kvm-ppc@vger.kernel.org>; Fri,  2 Feb 2024 05:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706525285; cv=none; b=HJ+fyC09B7oNY4qfAV3WsZ+C0Hemaiax6gRF0Xcs3E45m70Gi3s4fOOxV/oNrP3xY3qwZtQ/MIKHyA5/0W0khA7RY+vBmiVW7mUkt8Df7pHwgyXyfvk631Uqxpa2KHNWCPktNgfk3Z8O08zeokYksYCsDSU/MbIbPu+ZPAALuV8=
+	t=1706850973; cv=none; b=DM70y8k5bkWNgppIz06XE0kPHjN2JNDVRYQqRpgt2K+u2QDH9/w5YzGtp/llMfakHk8dw4G4nbB3h+tfto1NGjq4hvVVlD8MdKRTkvgf8R/QFR7jAlEFKi+/j5IJyEbX0KLngzuZl7epaiKTnoKyzsMVSOk2HBxNlQ5vzUC7zXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706525285; c=relaxed/simple;
-	bh=c9IPpZ4cFHbqHl/lU3bqD7/v37yb5IFOVeyY3t8Gy/w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bL74TZ5FTc+YMab6O8QsDSCdSY+BEcVlOCKspNGCKh6wtwAUl64eZVirRUThD7Vm5uiYjLrwCZKgD2rMDVtZkhNWvvoP0zsB1dHBFZMrpwAxU4zfbe0LIi6fZe1mYqE58YHRFw4u5kG/+NrCDKDChuq3EZtQJsIc/4+24qsEyKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VX9e2rP6; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40T8sO0g012993;
-	Mon, 29 Jan 2024 10:47:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=Ij2Rapdm3IU0nLKbuSjeynA+xLwbQej0VShoWHYQmTI=;
- b=VX9e2rP6cgm1T+3AfvrEovdzvPl+1o9WM1j4gbyF8sPupu5P0r8sbQuT0Oa6/vLHnJ+X
- 4EFj6aeg+zAe5O6DZX7ZyQuwDwv7hku/yCSUP/EWd43Seaiq0/5FkHnIhdAn6h08fHFf
- rs/yupBXAQH7Puc1fs0/qZqBpK9zRoK6yLjyo0Vg3Q/Z73EBEEOr0CeZCTNmlG29l70n
- MWTOW3qKZrM1Fp5QWMnt/yHUzUWHNTK25ewPAoCgJGtUErIb1fnutQFQJosGWZVyI2ZM
- MMRT/8H3qWzi3yyxtFZ4zXTsHXaS9C/klKxIYshMzzOD1Esj0AtWwqHIHBvl99Qkec6v YQ== 
+	s=arc-20240116; t=1706850973; c=relaxed/simple;
+	bh=lBa9z97aI04YQPWv66mk9xlc14kQ7IRIn3iCtoaYSF4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J02kyjvgVWYubWEyRzWgx/LdMekD28VjlMonRkQu+dy73Z4uXqph362pXpo024ZNNZdAAD7VhE+3CPaCIYpdrs8k8qIGYFWoXN80uvAyxyQp9lsSGg0obevwPzY/aNyJhNf8h0YuuxcVivY39MJ2ZZ2ECLWBZaH4W754kAS079c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qHldoEwn; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4124fgsB030291;
+	Fri, 2 Feb 2024 05:15:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=flTRcDDgabpzJcoVA/929pCV0giDxtc0vMtN5csNVdI=;
+ b=qHldoEwnMCUNJ+nymunFIqElYnl1pNDdVw1TH/KHXMU+MEKOBso8HFhaXT3aKzgGImAm
+ JOk6ZUOq3AofPjxDvflf/tMG4TX38OIyBR8IC47h5CFtAlJKbatzY+Ra+7lc0Ls+OYvf
+ 7TTWxS+iwSH77Jty2Sa9iB703ta2qKelZ3r+3loCpFpFmQ9lbv8WFigM34teQZtxj6Kk
+ bIm9FtQJYUdVZvP1XShJKPQ8gevCoaWZnN71fcsSFJJbBwwWx8lkm6hFH6+TWSGJg/70
+ 7bFTNS2dFnEHqoFtl5byUujxe3HXwgKQ6ZxDz1MBsnIvnoIkYXYvfbEwSpD/FYm5X/N+ Ww== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vx75bmtxb-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0s1a9hqr-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jan 2024 10:47:51 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40T9CiDI011814;
-	Mon, 29 Jan 2024 10:47:51 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vx75bmtwv-1
+	Fri, 02 Feb 2024 05:15:57 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4124iWxp005632;
+	Fri, 2 Feb 2024 05:15:57 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0s1a9hqc-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jan 2024 10:47:50 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40TAIF75002319;
-	Mon, 29 Jan 2024 10:47:49 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vwc5syy1j-1
+	Fri, 02 Feb 2024 05:15:57 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4122oBFj017772;
+	Fri, 2 Feb 2024 05:15:56 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vwcj09ck7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jan 2024 10:47:49 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40TAlkHY64750026
+	Fri, 02 Feb 2024 05:15:56 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4125FrEA27394618
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 29 Jan 2024 10:47:46 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C06F520040;
-	Mon, 29 Jan 2024 10:47:46 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4C68B20049;
-	Mon, 29 Jan 2024 10:47:44 +0000 (GMT)
-Received: from li-a83676cc-350e-11b2-a85c-e11f86bb8d73.ibm.com (unknown [9.204.204.156])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 29 Jan 2024 10:47:44 +0000 (GMT)
-Date: Mon, 29 Jan 2024 16:17:41 +0530
-From: Amit Machhiwal <amachhiw@linux.ibm.com>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-Cc: Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Jordan Niethe <jniethe5@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.ibm.com>,
-        "Naveen N . Rao" <naveen.n.rao@linux.ibm.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Amit Machhiwal <amachhiw@linux.ibm.com>, linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH] KVM: PPC: Book3S HV: Fix L2 guest reboot failure due
- to empty 'arch_compat'
-Message-ID: <2p36gb2dfk2s4tro6uekxbngyqwxmiddbh73zs6wz47d5wtnue@ioogh7wwzjdf>
-Mail-Followup-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, 
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, 
-	Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Jordan Niethe <jniethe5@gmail.com>, 
-	Vaidyanathan Srinivasan <svaidy@linux.ibm.com>, "Naveen N . Rao" <naveen.n.rao@linux.ibm.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, linux-kernel@vger.kernel.org
-References: <20240118095653.2588129-1-amachhiw@linux.ibm.com>
- <87v87jp4i4.fsf@kernel.org>
+	Fri, 2 Feb 2024 05:15:54 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DF2492004B;
+	Fri,  2 Feb 2024 05:15:53 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A78F920043;
+	Fri,  2 Feb 2024 05:15:52 +0000 (GMT)
+Received: from r223l.aus.stglabs.ibm.com (unknown [9.3.109.14])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  2 Feb 2024 05:15:52 +0000 (GMT)
+From: Kautuk Consul <kconsul@linux.vnet.ibm.com>
+To: Segher Boessenkool <segher@kernel.crashing.org>,
+        Thomas Huth <thuth@redhat.com>, aik@ozlabs.ru, groug@kaod.org
+Cc: slof@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
+        Kautuk Consul <kconsul@linux.vnet.ibm.com>
+Subject: [PATCH v2] slof/engine.in: refine +COMP and -COMP by not using COMPILE
+Date: Fri,  2 Feb 2024 00:15:48 -0500
+Message-Id: <20240202051548.877087-1-kconsul@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87v87jp4i4.fsf@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: KHp5UWja3MsK7G_MPsaa240H1_-6d7PL
-X-Proofpoint-ORIG-GUID: YqhCIo7KA7Cex_JHgQ2eF__LhzplDpDl
+X-Proofpoint-ORIG-GUID: J4wA75j9sjWvYvzXXSEC4pwRpJcSAo-V
+X-Proofpoint-GUID: 2YBxbN2P7edBTp8JLm9yDqOHH1AaDr6Z
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-29_06,2024-01-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- adultscore=0 malwarescore=0 mlxlogscore=851 spamscore=0 suspectscore=0
- priorityscore=1501 impostorscore=0 clxscore=1015 phishscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2401290078
+ definitions=2024-02-01_10,2024-01-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 bulkscore=0
+ mlxlogscore=999 malwarescore=0 spamscore=0 phishscore=0 clxscore=1011
+ adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402020036
 
-Hi Aneesh,
+Use the standard "DOTICK <word> COMPILE," mechanism in +COMP and -COMP
+as is being used by the rest of the compiler.
+Also use "SEMICOLON" instead of "EXIT" to compile into HERE in -COMP
+as that is more informative as it mirrors the way the col() macro defines
+a colon definition.
 
-Thanks for looking into the patch. My comments are inline below.
+Signed-off-by: Kautuk Consul <kconsul@linux.vnet.ibm.com>
+---
+ slof/engine.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 2024/01/24 01:06 PM, Aneesh Kumar K.V wrote:
-> Amit Machhiwal <amachhiw@linux.ibm.com> writes:
-> 
-> > Currently, rebooting a pseries nested qemu-kvm guest (L2) results in
-> > below error as L1 qemu sends PVR value 'arch_compat' == 0 via
-> > ppc_set_compat ioctl. This triggers a condition failure in
-> > kvmppc_set_arch_compat() resulting in an EINVAL.
-> >
-> > qemu-system-ppc64: Unable to set CPU compatibility mode in KVM: Invalid
-> >
-> > This patch updates kvmppc_set_arch_compat() to use the host PVR value if
-> > 'compat_pvr' == 0 indicating that qemu doesn't want to enforce any
-> > specific PVR compat mode.
-> >
-> > Signed-off-by: Amit Machhiwal <amachhiw@linux.ibm.com>
-> > ---
-> >  arch/powerpc/kvm/book3s_hv.c          |  2 +-
-> >  arch/powerpc/kvm/book3s_hv_nestedv2.c | 12 ++++++++++--
-> >  2 files changed, 11 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> > index 1ed6ec140701..9573d7f4764a 100644
-> > --- a/arch/powerpc/kvm/book3s_hv.c
-> > +++ b/arch/powerpc/kvm/book3s_hv.c
-> > @@ -439,7 +439,7 @@ static int kvmppc_set_arch_compat(struct kvm_vcpu *vcpu, u32 arch_compat)
-> >  	if (guest_pcr_bit > host_pcr_bit)
-> >  		return -EINVAL;
-> >  
-> > -	if (kvmhv_on_pseries() && kvmhv_is_nestedv2()) {
-> > +	if (kvmhv_on_pseries() && kvmhv_is_nestedv2() && arch_compat) {
-> >  		if (!(cap & nested_capabilities))
-> >  			return -EINVAL;
-> >  	}
-> >
-> 
-> Instead of that arch_compat check, would it better to do
-> 
-> 	if (kvmhv_on_pseries() && kvmhv_is_nestedv2()) {
-> 		if (cap && !(cap & nested_capabilities))
-> 			return -EINVAL;
-> 	}
-> 
-> ie, if a capability is requested, then check against nested_capbilites
-> to see if the capability exist.
+diff --git a/slof/engine.in b/slof/engine.in
+index 59e82f1..fa4d82e 100644
+--- a/slof/engine.in
++++ b/slof/engine.in
+@@ -422,8 +422,8 @@ imm(.( LIT(')') PARSE TYPE)
+ col(COMPILE R> CELL+ DUP @ COMPILE, >R)
+ 
+ var(THERE 0)
+-col(+COMP STATE @ 1 STATE +! 0BRANCH(1) EXIT HERE THERE ! COMP-BUFFER DOTO HERE COMPILE DOCOL)
+-col(-COMP -1 STATE +! STATE @ 0BRANCH(1) EXIT COMPILE EXIT THERE @ DOTO HERE COMP-BUFFER EXECUTE)
++col(+COMP STATE @ 1 STATE +! 0BRANCH(1) EXIT HERE THERE ! COMP-BUFFER DOTO HERE DOTICK DOCOL COMPILE,)
++col(-COMP -1 STATE +! STATE @ 0BRANCH(1) EXIT DOTICK SEMICOLON COMPILE, THERE @ DOTO HERE COMP-BUFFER EXECUTE)
+ 
+ // Structure words.
+ col(RESOLVE-ORIG HERE OVER CELL+ - SWAP !)
+-- 
+2.31.1
 
-The above condition check will cause problems when we would try to boot
-a machine below Power 9.
-
-For example, if we passed the arch_compat == PVR_ARCH_207, cap will
-remain 0 resulting the above check into a false condition. Consequently,
-we would never return an -EINVAL in that case resulting the arch
-compatilbility request succeed when it doesn't support nested papr
-guest.
-
-> 
-> 
-> > diff --git a/arch/powerpc/kvm/book3s_hv_nestedv2.c b/arch/powerpc/kvm/book3s_hv_nestedv2.c
-> > index fd3c4f2d9480..069a1fcfd782 100644
-> > --- a/arch/powerpc/kvm/book3s_hv_nestedv2.c
-> > +++ b/arch/powerpc/kvm/book3s_hv_nestedv2.c
-> > @@ -138,6 +138,7 @@ static int gs_msg_ops_vcpu_fill_info(struct kvmppc_gs_buff *gsb,
-> >  	vector128 v;
-> >  	int rc, i;
-> >  	u16 iden;
-> > +	u32 arch_compat = 0;
-> >  
-> >  	vcpu = gsm->data;
-> >  
-> > @@ -347,8 +348,15 @@ static int gs_msg_ops_vcpu_fill_info(struct kvmppc_gs_buff *gsb,
-> >  			break;
-> >  		}
-> >  		case KVMPPC_GSID_LOGICAL_PVR:
-> > -			rc = kvmppc_gse_put_u32(gsb, iden,
-> > -						vcpu->arch.vcore->arch_compat);
-> > +			if (!vcpu->arch.vcore->arch_compat) {
-> > +				if (cpu_has_feature(CPU_FTR_ARCH_31))
-> > +					arch_compat = PVR_ARCH_31;
-> > +				else if (cpu_has_feature(CPU_FTR_ARCH_300))
-> > +					arch_compat = PVR_ARCH_300;
-> > +			} else {
-> > +				arch_compat = vcpu->arch.vcore->arch_compat;
-> > +			}
-> > +			rc = kvmppc_gse_put_u32(gsb, iden, arch_compat);
-> >
-> 
-> Won't a arch_compat = 0 work here?. ie, where you observing the -EINVAL from
-> the first hunk or does this hunk have an impact? 
->
-
-No, an arch_compat == 0 won't work in nested API v2. That's because the
-guest wide PVR cannot be 0, and if arch_compat == 0, then suppported
-host PVR value should be mentioned.
-
-If we were to skip this hunk (keeping the arch_compat == 0), a system
-reboot of L2 guest would fail and result into a kernel trap as below:
-
-[   22.106360] reboot: Restarting system
-KVM: unknown exit, hardware reason ffffffffffffffea
-NIP 0000000000000100   LR 000000000000fe44 CTR 0000000000000000 XER 0000000020040092 CPU#0
-MSR 0000000000001000 HID0 0000000000000000  HF 6c000000 iidx 3 didx 3
-TB 00000000 00000000 DECR 0
-GPR00 0000000000000000 0000000000000000 c000000002a8c300 000000007fe00000
-GPR04 0000000000000000 0000000000000000 0000000000001002 8000000002803033
-GPR08 000000000a000000 0000000000000000 0000000000000004 000000002fff0000
-GPR12 0000000000000000 c000000002e10000 0000000105639200 0000000000000004
-GPR16 0000000000000000 000000010563a090 0000000000000000 0000000000000000
-GPR20 0000000105639e20 00000001056399c8 00007fffe54abab0 0000000105639288
-GPR24 0000000000000000 0000000000000001 0000000000000001 0000000000000000
-GPR28 0000000000000000 0000000000000000 c000000002b30840 0000000000000000
-CR 00000000  [ -  -  -  -  -  -  -  -  ]     RES 000@ffffffffffffffff
- SRR0 0000000000000000  SRR1 0000000000000000    PVR 0000000000800200 VRSAVE 0000000000000000
-SPRG0 0000000000000000 SPRG1 0000000000000000  SPRG2 0000000000000000  SPRG3 0000000000000000
-SPRG4 0000000000000000 SPRG5 0000000000000000  SPRG6 0000000000000000  SPRG7 0000000000000000
-HSRR0 0000000000000000 HSRR1 0000000000000000
- CFAR 0000000000000000
- LPCR 0000000000020400
- PTCR 0000000000000000   DAR 0000000000000000  DSISR 0000000000000000
-
-Message from syslogd@ltcd48-lp1 at Jan 24 08:02:16 ...
- kernel:trap=0xffffffea | pc=0x100 | msr=0x1000
-
-> 
-> >  			break;
-> >  		}
-> >  
-> > -- 
-> > 2.43.0
-> 
-> -aneesh
-
-~Amit
 
