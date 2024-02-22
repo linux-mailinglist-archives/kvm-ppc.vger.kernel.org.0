@@ -1,183 +1,367 @@
-Return-Path: <kvm-ppc+bounces-53-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-54-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8A1385F3DC
-	for <lists+kvm-ppc@lfdr.de>; Thu, 22 Feb 2024 10:04:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E2985F768
+	for <lists+kvm-ppc@lfdr.de>; Thu, 22 Feb 2024 12:46:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21F38B25AE4
-	for <lists+kvm-ppc@lfdr.de>; Thu, 22 Feb 2024 09:04:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 669082851FA
+	for <lists+kvm-ppc@lfdr.de>; Thu, 22 Feb 2024 11:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFA7376F9;
-	Thu, 22 Feb 2024 09:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE10F208A2;
+	Thu, 22 Feb 2024 11:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Er5L3GZA"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F5UzMTyx"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF583717A
-	for <kvm-ppc@vger.kernel.org>; Thu, 22 Feb 2024 09:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D584652D
+	for <kvm-ppc@vger.kernel.org>; Thu, 22 Feb 2024 11:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708592662; cv=none; b=eC0L99h9AIGXdVEg7n1+kwFllGfZ9Y8h94+vWofp6Oem+k+zWVCkQY00GmX+ZaRFLPDU/nMzvwWmdFu2B3Er6NU3iUT9VTKsMT/GnvA/pxIwXRXn+5/Y5ZcQarAmG24WMt4C1oeYgAXn+XE6VPxzcDnM9dHixEyh1o1JvOiD7Wo=
+	t=1708602403; cv=none; b=jLREAmSEyDgopyHFJgmdJOchZSLcrYZMY4oXU9VbS4RklO6jBzlWSyW2DmcqYU/vQ+tMNd9dvpC5AeGf0cRdMlV4CrZnY7b5dhAY32Ce18vXZtMemAGizG9rrd1+zt+ZfndKBzuhVZIvWXFMQ/3Q/rcGw5D7ae4rLDD5+Ah6b+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708592662; c=relaxed/simple;
-	bh=V+KUhcV5pV4loLK3aMLpldKcA0lx9BpLBpSVCdgNspQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kbGlEBHiB6Wkf0taxBBu3muDmemGdLsPRIYtdu0d7LvDCL4dZbGETXVndw/wY6b21mJsQBhrswkfQpYLCpgIB3KihEOwoNo/PkpA0oUDclcUZkov4JJ1JBSEbl5y9pAnqyNOJXo3f6/EEHvWJFiznRk+Way2E83lXVBM5BT+Gpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Er5L3GZA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708592659;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=DH8CDYxrsUQKLgYF9f34RbULBzsINeT617YZ/t1ukes=;
-	b=Er5L3GZAfQsoNbyKn9ycaHoFCpD4FAEg3T7p8NFMIaZk6/pSZNZ2ZwXtUOQlpW2sC6p0g2
-	7mdoj0cIW3BhEnq4gbv4kMUl2PPc+69BPkHy35Jdq57ftgN/NUphqpvD93MJQ4Muw5Xjtc
-	AWZL9CMP99I6pCJdF+yJut0lL7s9oCQ=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-423-IiK8ibAuMtaYN_EDLlmhdg-1; Thu, 22 Feb 2024 04:04:17 -0500
-X-MC-Unique: IiK8ibAuMtaYN_EDLlmhdg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a3ee38c40baso210580266b.0
-        for <kvm-ppc@vger.kernel.org>; Thu, 22 Feb 2024 01:04:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708592656; x=1709197456;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DH8CDYxrsUQKLgYF9f34RbULBzsINeT617YZ/t1ukes=;
-        b=LGFNTf2jl1Z9CIpRxZUho/yi8Lpiv/gBecLEDk4d1J6iciiEPQ6KIODsFYJIbkrd4u
-         xTgUCnYIY3cHMPiphKUzcGCCe07J9nAhf2Iq0PTigA2byojtAhUxhbad7di5pj/UeFQp
-         dv82GFyEYNvTzZPyhtkpHgbGnnXMwqlOHMip4ZgxlgNrv74MjSL6yPe58irxVArCHoOc
-         eb7MsgPK1s5e/yFOiMBaSCfArjmoTG764x9Pfhjw7Nxvmt+nxAgfHR4jwDvACnXJ2l8+
-         fGqy7qfBXUDfxCxFg6uFSbMg/yt8SE/IXpkMeVzf61casg6nMcWtR7bdYDrHk6Q5ct0H
-         t3/g==
-X-Forwarded-Encrypted: i=1; AJvYcCW/PiZg0/Sil6iwmOkjJmLqOjMLP/Pk+DBqlE3dKGhFBBzgcsS+DWLTa3g9M0DUpVM9XQdrmqyy9hGomXzzHEHIIQAhlexKcQ==
-X-Gm-Message-State: AOJu0YyrcY2bJEBdUp9SXXUpAoJrBUbvFS++5sSOKwu16puHebmYWzkX
-	Mg1Z7l0RKYWeyug/KRC4eBJFWGR/gi36bmZKbYSHlhEmTsVQI5zvLG8zur7TkyL4R6bDvYD8PLA
-	94pFNBb9SPBpVBeYdfOtRuRMbCwJ6dNOHEOGzG6zslKwqbmPadORqA1M=
-X-Received: by 2002:a17:906:7c49:b0:a3f:70bc:bfe4 with SMTP id g9-20020a1709067c4900b00a3f70bcbfe4mr1293516ejp.31.1708592656329;
-        Thu, 22 Feb 2024 01:04:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGin2FPt1S2g8Klyq0lqt8+EG4nx2tPRcoJ7+bquXY9KpcHOalq2Yz+RyLVFex1F7VM+wXhAA==
-X-Received: by 2002:a17:906:7c49:b0:a3f:70bc:bfe4 with SMTP id g9-20020a1709067c4900b00a3f70bcbfe4mr1293505ejp.31.1708592655995;
-        Thu, 22 Feb 2024 01:04:15 -0800 (PST)
-Received: from [192.168.52.107] ([37.84.174.18])
-        by smtp.gmail.com with ESMTPSA id s8-20020a170906168800b00a3e7a2d9ac4sm4258918ejd.6.2024.02.22.01.04.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Feb 2024 01:04:15 -0800 (PST)
-Message-ID: <278a0e1e-b257-47ef-a908-801b9a223080@redhat.com>
-Date: Thu, 22 Feb 2024 10:04:14 +0100
+	s=arc-20240116; t=1708602403; c=relaxed/simple;
+	bh=wVPns61KGKrf0eufvQbtVkqK5PtUEq8LzbxjkWaJUYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=UgP3UG/eF8A+ID9OS83mws26Ty10HOBAgsAfANc/5ED8GhIGQ1lignQ7ETvn5cRC38RUUPdL4ZM4O2L6JS/JES+3DQhizYT3jcfBCJrLad8taDKiavZtVchF8EyPGdfmeJdb+FlSnCfJ+VabNeiFdjYXRMaX/BrS/eToDZ32HT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=F5UzMTyx; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41MBegAK015034;
+	Thu, 22 Feb 2024 11:46:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=pp1; bh=Fa6VtVrA+xV1RlZ4bgyFvMt3V3fz3rmAbVcvo9DUJwM=;
+ b=F5UzMTyxX2Jd3w8EzDdbkZU/Q6aSfyw9ahQP9kia+Q1zbWB3yM/h/bZYtBVuuLP1KAGH
+ LjqFeb5NwVjr5JXC2NnZE9Blw0gaXA+iXEyho/nz5esKaa15tBVUYPI5ydRAVV38J1d+
+ 013T62lhrtOXowmYWbklKobHWbnE7CljaojkR/jruRPZ+OjKYl+kOXhpiYhtcKiyVycd
+ CqaGp/Gbzsg16t4iS3Uv8VodejcBuak37MXG1MINXptBS82y0RuNSKDEq+X1Y3+wLTOt
+ L8YJNlNRfdKnNggtptOi7JOqIdu+H11PCradOYbJUaTfVGHFGatL8AlmBFGTbuaW5dki /A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3we5fqr6vh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Feb 2024 11:46:26 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41MBfN2i017336;
+	Thu, 22 Feb 2024 11:46:26 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3we5fqr6v4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Feb 2024 11:46:25 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41MBKJZP013492;
+	Thu, 22 Feb 2024 11:46:24 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wb7h0p2xq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Feb 2024 11:46:24 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41MBkKJZ41943728
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 22 Feb 2024 11:46:22 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 94CED20043;
+	Thu, 22 Feb 2024 11:46:20 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5D41320040;
+	Thu, 22 Feb 2024 11:46:19 +0000 (GMT)
+Received: from li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com (unknown [9.109.216.99])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 22 Feb 2024 11:46:19 +0000 (GMT)
+Date: Thu, 22 Feb 2024 17:16:17 +0530
+From: Kautuk Consul <kconsul@linux.vnet.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Segher Boessenkool <segher@kernel.crashing.org>, aik@ozlabs.ru,
+        groug@kaod.org, slof@lists.ozlabs.org, kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH v2] slof/engine.in: refine +COMP and -COMP by not using
+ COMPILE
+Message-ID: <Zdc0CeOTVeob77Lj@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+References: <20240202051548.877087-1-kconsul@linux.vnet.ibm.com>
+ <Zdb56vX+ZpApmsqK@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+ <278a0e1e-b257-47ef-a908-801b9a223080@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <278a0e1e-b257-47ef-a908-801b9a223080@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: YbyoFiubrlkQ_z70CKSGY_R1PenAVddX
+X-Proofpoint-ORIG-GUID: jy5X-0xmOegAMLP7luUFi2An8fs-TTnF
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] slof/engine.in: refine +COMP and -COMP by not using
- COMPILE
-Content-Language: en-US
-To: Kautuk Consul <kconsul@linux.vnet.ibm.com>,
- Segher Boessenkool <segher@kernel.crashing.org>, aik@ozlabs.ru,
- groug@kaod.org
-Cc: slof@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-References: <20240202051548.877087-1-kconsul@linux.vnet.ibm.com>
- <Zdb56vX+ZpApmsqK@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <Zdb56vX+ZpApmsqK@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-22_09,2024-02-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ bulkscore=0 mlxlogscore=999 clxscore=1015 impostorscore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 spamscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402220094
 
-On 22/02/2024 08.38, Kautuk Consul wrote:
-> Hi Segher/Thomas,
+Hi Thomas,
+
 > 
-> On 2024-02-02 00:15:48, Kautuk Consul wrote:
->> Use the standard "DOTICK <word> COMPILE," mechanism in +COMP and -COMP
->> as is being used by the rest of the compiler.
->> Also use "SEMICOLON" instead of "EXIT" to compile into HERE in -COMP
->> as that is more informative as it mirrors the way the col() macro defines
->> a colon definition.
->>
->> Signed-off-by: Kautuk Consul <kconsul@linux.vnet.ibm.com>
->> ---
->>   slof/engine.in | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/slof/engine.in b/slof/engine.in
->> index 59e82f1..fa4d82e 100644
->> --- a/slof/engine.in
->> +++ b/slof/engine.in
->> @@ -422,8 +422,8 @@ imm(.( LIT(')') PARSE TYPE)
->>   col(COMPILE R> CELL+ DUP @ COMPILE, >R)
->>
->>   var(THERE 0)
->> -col(+COMP STATE @ 1 STATE +! 0BRANCH(1) EXIT HERE THERE ! COMP-BUFFER DOTO HERE COMPILE DOCOL)
->> -col(-COMP -1 STATE +! STATE @ 0BRANCH(1) EXIT COMPILE EXIT THERE @ DOTO HERE COMP-BUFFER EXECUTE)
->> +col(+COMP STATE @ 1 STATE +! 0BRANCH(1) EXIT HERE THERE ! COMP-BUFFER DOTO HERE DOTICK DOCOL COMPILE,)
->> +col(-COMP -1 STATE +! STATE @ 0BRANCH(1) EXIT DOTICK SEMICOLON COMPILE, THERE @ DOTO HERE COMP-BUFFER EXECUTE)
->>
-> Did you get time to review this simple patch ?
-> Is there something wrong in it or the description ?
+>  Hi Kautuk,
+> 
+> could you maybe do some performance checks to see whether this make a
+> difference (e.g. by running the command in a tight loop many times)?
+> You can use "tb@" to get the current value of the timebase counter, so
+> reading that before and after the loop should provide you with a way of
+> measuring the required time.
+> 
+>  Thomas
+> 
+This patch is to improve compilation timings of the 
+IF/AHEAD/THEN/CASE/ENDCASE/BEGIN/AGAIN/UNTIL/DO/?DO/LOOP/+LOOP/ Forth words
+that are NOT within any Forth procedure.
+And it does this in the same way for all of these Forth words because
+all of these words simply utilize the +COMP and -COMP words.
 
-  Hi Kautuk,
+I created a patch on top of this patch file that introduces the older
+implementation of IF and THEN and I called them IF2 and THEN2 as
+follows:
+col(+COMP-BEFORE STATE @ 1 STATE +! 0BRANCH(1) EXIT HERE THERE ! COMP-BUFFER DOTO HERE COMPILE DOCOL)
+col(-COMP-BEFORE -1 STATE +! STATE @ 0BRANCH(1) EXIT COMPILE SEMICOLON THERE @ DOTO HERE COMP-BUFFER EXECUTE)
+imm(IF2 +COMP-BEFORE DOTICK DO0BRANCH COMPILE, HERE 0 COMPILE,)
+imm(THEN2 ?COMP RESOLVE-ORIG -COMP-BEFORE)
 
-could you maybe do some performance checks to see whether this make a 
-difference (e.g. by running the command in a tight loop many times)?
-You can use "tb@" to get the current value of the timebase counter, so 
-reading that before and after the loop should provide you with a way of 
-measuring the required time.
+The IF2 and THEN2 use -COMP-BEFORE and +COMP-BEFORE in order to have the
+changes before I applied my "[PATCH v2] slof/engine.in: refine +COMP and -COMP by not using"
+patch file.
 
-  Thomas
+Now that I have both implementation, I used the timebase in order to
+test what is the difference in timebase before and after invocation of
+numerous IF-THEN and IF2-THEN2 Forth words. I made the following changes
+to ./board-qemu/slof/OF.fs:
+diff --git a/board-qemu/slof/OF.fs b/board-qemu/slof/OF.fs
+index df33c80..56805fc 100644
+--- a/board-qemu/slof/OF.fs
++++ b/board-qemu/slof/OF.fs
+@@ -22,6 +22,7 @@ hex
+ 
+ #include "base.fs"
+ 
++
+ \ Set default load-base to 0x4000
+ 4000 to default-load-base
+ 
+@@ -329,6 +330,151 @@ check-boot-from-ram
+ 
+ 8ff cp
+ 
++." BEFORE-PATCH: BEFORE TB is: " tb@ .
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++1 IF2 0 drop THEN2
++cr ." BEFORE-PATCH: AFTER TB is: " tb@ . cr
++
++." AFTER-PATCH: BEFORE TB is: " tb@ .
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++cr ." AFTER-PATCH: AFTER TB is: " tb@ . cr
++
++." AFTER-PATCH: BEFORE TB is: " tb@ .
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++1 IF 0 drop THEN
++cr ." AFTER-PATCH: AFTER TB is: " tb@ . cr
+
+With the above changes in slof/engine.in and board-qemu/slof/OF.fs I
+complied SLOF and got the following output on running a guest:
+[root@r223l performance_work]# virsh start vm4 --console                
+Domain 'vm4' started
+Connected to domain 'vm4'
+Escape character is ^] (Ctrl + ])
+Populating /vdevice methods
+Populating /vdevice/vty@30000000
+Populating /vdevice/nvram@71000000
+Populating /pci@800000020000000
+                     00 0800 (D) : 1b36 000d    serial bus [ usb-xhci ]
+                     00 1000 (D) : 1af4 1003    virtio [ serial ]
+                     00 1800 (D) : 1af4 1001    virtio [ block ]
+                     00 2000 (D) : 1af4 1002    legacy-device*
+                     00 2800 (D) : 1234 1111    qemu vga
+No NVRAM common partition, re-initializing...
+Installing QEMU fb
 
 
+
+Scanning USB
+  XHCI: Initializing
+    USB Keyboard
+No console specified using screen & keyboard
+BEFORE-PATCH: BEFORE TB is: 9de978a1
+BEFORE-PATCH: AFTER TB is: 9e78efba
+AFTER-PATCH: BEFORE TB is: 9ebb67aa
+AFTER-PATCH: AFTER TB is: 9f2247cc
+AFTER-PATCH: BEFORE TB is: 9f64b9fd
+AFTER-PATCH: AFTER TB is: 9fc33e6c
+
+  Welcome to Open Firmware
+
+  Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
+  This program and the accompanying materials are made available
+  under the terms of the BSD License available at
+  http://www.opensource.org/licenses/bsd-license.php
+
+
+Trying to load:  from: /pci@800000020000000/scsi@3 ...   Successfully loaded
+
+[root@r223l performance_work]# echo $((0x9e78efba-0x9de978a1))
+9402137
+[root@r223l performance_work]# echo $((0x9f2247cc-0x9ebb67aa))                                                                                                                                             
+6742050
+[root@r223l performance_work]# echo $((0x9fc33e6c-0x9f64b9fd))                                                                                                                                             
+6194287
+[root@r223l performance_work]# echo "scale=4;(9402137-6742050)/512" | bc                                                                                                                                   
+5195.4824
+[root@r223l performance_work]# echo "scale=4;(9402137-6194287)/512" | bc                                                                                                                                   
+6265.3320
+[root@r223l performance_work]#
+
+As per the calculations in the output of the BEFORE-PATCH and
+AFTER-PATCH logs I find that there is a very noticeable and consistent improvement
+in multiple runs in terms of microseconds. (My POWER9 bare-metal has 512 MHz timebase-frequency
+so thats why I am dividing by 512).
+
+Note: The above figures include the execution speed of IF-THEN and
+IF2-THEN2 after compilation. But since the actual execution speeds of the IF-THEN and the IF2-THEN2 after
+their compilation should be the same, this should get adjusted in my
+subtraction in the above 2 bc commands.
+> 
 
