@@ -1,20 +1,20 @@
-Return-Path: <kvm-ppc+bounces-64-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-65-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE11B86893F
-	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Feb 2024 07:53:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF486868941
+	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Feb 2024 07:53:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 728281F26F82
-	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Feb 2024 06:53:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AC581F26FC8
+	for <lists+kvm-ppc@lfdr.de>; Tue, 27 Feb 2024 06:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CE753801;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D313C54BDA;
 	Tue, 27 Feb 2024 06:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
 	dkim=pass (2048-bit key) header.d=sonic.net header.i=@sonic.net header.b="RryI5HNK"
-X-Original-To: kvm-ppc+subscribe@vger.kernel.org
+X-Original-To: kvm-ppc@vger.kernel.org
 Received: from c.mail.sonic.net (c.mail.sonic.net [64.142.111.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
