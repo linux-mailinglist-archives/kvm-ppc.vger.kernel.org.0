@@ -1,91 +1,87 @@
-Return-Path: <kvm-ppc+bounces-69-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-70-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A8987E2E8
-	for <lists+kvm-ppc@lfdr.de>; Mon, 18 Mar 2024 06:13:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A199287E2E9
+	for <lists+kvm-ppc@lfdr.de>; Mon, 18 Mar 2024 06:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86FB1281EA8
-	for <lists+kvm-ppc@lfdr.de>; Mon, 18 Mar 2024 05:13:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2F5AB20D6D
+	for <lists+kvm-ppc@lfdr.de>; Mon, 18 Mar 2024 05:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6420C208B6;
-	Mon, 18 Mar 2024 05:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C91208BB;
+	Mon, 18 Mar 2024 05:14:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LY+/d94T"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RcS85Lv0"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BC43214
-	for <kvm-ppc@vger.kernel.org>; Mon, 18 Mar 2024 05:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACEB208B6
+	for <kvm-ppc@vger.kernel.org>; Mon, 18 Mar 2024 05:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710738807; cv=none; b=PNr1tprClFMiArhN41fcQk8eS6f4VDZN8sLQWEmhFTeeixZ863G0Mc9fyDuGNbCZaJdf0HUZnSgSgrte2ESFQIhFlasp2EFpKwwIwYozXmPgtpO8DYC+KSuAzK+HHeQfemfsLmv/pMsFJCzokGMfJByceyQKSPs6dmLjf7uTz5k=
+	t=1710738871; cv=none; b=SHM86qK22HG5wcfwdC6ROcRiHvKFA4sxAmWoG8mcRFDjdhb1SXnqI1BLQe2v17CFNuHCBoMu4XaguflSI2fpvqKRcGipx5vaL0AUSyYYtSW2tD8gh+IELo54Cf25andYg5EFRl2nt+gAw1ENUeQse23D38CnMNTw19+fxxXLYe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710738807; c=relaxed/simple;
-	bh=wFPE6l1ybi0CPTDs/Ly1qb9a3DslSMEh/e7zaxoYYaI=;
+	s=arc-20240116; t=1710738871; c=relaxed/simple;
+	bh=UPAhuaRJLz8zZ1v12sR30qXvnZCGvJDNfY9M64KsiQ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KvMGiq6dqhe3rKQfViR8etA5DZifA7zUjz4lOpqwx5BFxNTHIqCXMuqocyTAb94ndwViDvepEdxMZ4ZEQLOhpttUZEQWyr0ttEPO05YgHL0+mz2o8MAEHT9tuYeb4xQKoFHyIH5sZX8UTTRgKs7fxK1/IFSILF2ZSf96RAd+Wo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LY+/d94T; arc=none smtp.client-ip=148.163.158.5
+	 Content-Type:Content-Disposition:In-Reply-To; b=A3aZanBox46NYeyGEKuNK2tjByJhA2l6FQqvmqPuGb6wXlOuCq1tBQPw7FYKaJXpKtjccQ9uPKNjEYvp1Aq2hRSgXlSi7SOXxzjQ4F04BmiDSI3Swi0gBF3nDji3FLuEIOdFpaRTrNgzNKVEBYX7qrBkDDsjUjiLuEK/2S8IyRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RcS85Lv0; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42I3Sx4H012143;
-	Mon, 18 Mar 2024 05:13:06 GMT
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42I25fYZ025446;
+	Mon, 18 Mar 2024 05:14:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=u6gXO+OCJSrW5ZDl17jJreyfYayRwtkfTIZfl6TJEBw=;
- b=LY+/d94TRiP5IYI6+H/7bHbw33GzYlLaT2PDSwRo6awDiNSF2ikCkCquGUznC5xOFT2T
- ecziz39G6MJ7REeG41cCu53FbCoUgUZlqLvlYXoX9w10y3HfAng+l6DzjAWVoEZm6Ndp
- hU+skNXyEcD58XxEOiPywte5M29x6D0CVM9ar0Mpu65EuSstbc+Mbit+ba5srMuh8yMu
- 3D7yuD9qC/4NJbeID9yKYyfkWsatGa5WAWeayLV4CYk+AjoJe50imuP5WuDSTaGihz4+
- ddmCK4A9G600JDtLSmoB6Irnx76S8dKNL64b78VhnPhvTQcG/KhCwNYDVaZWkbfkpIxW 5g== 
+ in-reply-to; s=pp1; bh=xwkis0vLXtrsYmoeTGmjv0ANasxuIO/VTK3mzsxgX+4=;
+ b=RcS85Lv08vLTh74mC0NRTYVYgeMfhbejmhZMwoW8TbNmyTF9S07wMiGLG8UcsAehdUdb
+ 8tzjD78lm1b7rmFHdo/CwgBCaYKBUV+TtE1ZMXwdS0qhqCVqbhI4V7hUgvk5Hjtr5Em+
+ tAa776EDPpb47Jp2p9qzrMSixja+10/hswIrT5tI3GbRwnjmf+rjay8N48SDJQcUu60D
+ jAlU+u9NMJhmL3SCeIAKEZkSBP9z0LjhdHWMMJzJaRkm8wy4RRPGIbY+jMQyXCz7a3Ez
+ eQfvLKhQ8dMHiSJnqqfeUH/MqqArEgL/LkS/xOpNwSBg5hRnAX4/ef+pzrzV5s8vklau FA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ww9s05p6v-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wx1d2myj2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Mar 2024 05:13:05 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42I5D5Ak019368;
-	Mon, 18 Mar 2024 05:13:05 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ww9s05p6s-1
+	Mon, 18 Mar 2024 05:14:22 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42I59mvo004392;
+	Mon, 18 Mar 2024 05:14:22 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wx1d2myj0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Mar 2024 05:13:05 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42I3CEPK011615;
-	Mon, 18 Mar 2024 05:13:04 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wwq8kpkfs-1
+	Mon, 18 Mar 2024 05:14:22 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42I4SYU8002778;
+	Mon, 18 Mar 2024 05:14:21 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wwrf268th-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Mar 2024 05:13:04 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42I5D0W026935808
+	Mon, 18 Mar 2024 05:14:21 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42I5EHLe46661952
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Mar 2024 05:13:02 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 914D820049;
-	Mon, 18 Mar 2024 05:13:00 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5E6C720040;
-	Mon, 18 Mar 2024 05:12:59 +0000 (GMT)
+	Mon, 18 Mar 2024 05:14:19 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8A1F820043;
+	Mon, 18 Mar 2024 05:14:17 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9C1662004B;
+	Mon, 18 Mar 2024 05:14:16 +0000 (GMT)
 Received: from li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com (unknown [9.109.216.99])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 18 Mar 2024 05:12:59 +0000 (GMT)
-Date: Mon, 18 Mar 2024 10:42:53 +0530
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 18 Mar 2024 05:14:16 +0000 (GMT)
+Date: Mon, 18 Mar 2024 10:44:11 +0530
 From: Kautuk Consul <kconsul@linux.vnet.ibm.com>
-To: Segher Boessenkool <segher@kernel.crashing.org>
-Cc: Thomas Huth <thuth@redhat.com>, aik@ozlabs.ru, groug@kaod.org,
-        slof@lists.ozlabs.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH v2] slof/engine.in: refine +COMP and -COMP by not using
- COMPILE
-Message-ID: <ZffNVdhtAzY32Jsx@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-References: <20240202051548.877087-1-kconsul@linux.vnet.ibm.com>
- <Zcnkzks7D0eHVYZQ@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
- <20240223205723.GO19790@gate.crashing.org>
- <ZdwV/1bmGSGi8MnZ@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
- <ZelfudAMYcXGCgBN@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+To: aik@ozlabs.ru, Thomas Huth <thuth@redhat.com>
+Cc: slof@lists.ozlabs.org, kvm-ppc@vger.kernel.org
+Subject: Re: [PATCH] slof/fs/packages/disk-label.fs: improve checking for DOS
+ boot partitions
+Message-ID: <ZffNo8fEywkKHQPA@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+References: <20240222061046.42572-1-kconsul@linux.vnet.ibm.com>
+ <ZelgMYUM0CzMVjbE@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
@@ -94,60 +90,126 @@ List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZelfudAMYcXGCgBN@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+In-Reply-To: <ZelgMYUM0CzMVjbE@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: JKTZzAFkelqHP6s_NQ5Svk98SEeNaKza
-X-Proofpoint-GUID: ZoB7ZB33WvRcXHiregIhAC6tYJpz5Gby
+X-Proofpoint-ORIG-GUID: TuMqqEwyfXFlaVqQL4pPdjYUSjD0sr0d
+X-Proofpoint-GUID: TI_GrYOSG33VqOjLTrAyQZOCI5lGHEKO
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-03-17_12,2024-03-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 spamscore=0 priorityscore=1501 bulkscore=0 clxscore=1015
- adultscore=0 mlxscore=0 mlxlogscore=537 suspectscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 spamscore=0 adultscore=0 mlxscore=0 phishscore=0
+ clxscore=1015 priorityscore=1501 malwarescore=0 bulkscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2403140000 definitions=main-2403180037
 
-Hi Segher,
+Hi,
 > 
-> > > If you want to improve engine.in, get rid of it completely?  Make the
-> > > whol thing cross-compile perhaps.  Everything from source code.  The
-> > > engine.in thing is essentially an already compiled thing (but not
-> > > relocated yet, not fixed to some address), which is still in mostly
-> > > obvious 1-1 correspondence to it source code, which can be easily
-> > > "uncompiled" as well.  Like:
+> On 2024-02-22 01:10:46, Kautuk Consul wrote:
+> > While testing with a qcow2 with a DOS boot partition it was found that
+> > when we set the logical_block_size in the guest XML to >512 then the
+> > boot would fail in the following interminable loop:
+> > <SNIP>
+> > Trying to load:  from: /pci@800000020000000/scsi@3 ... virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > </SNIP>
 > > 
-> > :-). Getting rid of it completely and making the whole thing
-> > cross-compile would require more time that I'm not so sure that I or
-> > even my manager would be able to spare in our project.
+> > Change the count-dos-logical-partitions Forth subroutine and the Forth
+> > subroutines calling count-dos-logical-partitions to check for this access
+> > beyond end of device error.
 > > 
-> > > 
-> > > col(+COMP STATE @ 1 STATE +! 0BRANCH(1) EXIT HERE THERE ! COMP-BUFFER DOTO HERE COMPILE DOCOL)
-> > > col(-COMP -1 STATE +! STATE @ 0BRANCH(1) EXIT COMPILE EXIT THERE @ DOTO HERE COMP-BUFFER EXECUTE)
-> > > 
-> > > : +comp  ( -- )
-> > >   state @  1 state +!  IF exit THEN
-> > >   here there !
-> > >   comp-buffer to here
-> > >   compile docol ;
-> > > : -comp ( -- )
-> > >   -1 state +!
-> > >   state @ IF exit THEN
-> > >   compile exit
-> > >   there @ to here
-> > >   comp-buffer execute ;
-> > > 
-> > > "['] semicolon compile," is not something a user would ever write.  A
-> > > user would write "compile exit".  It is standard Forth, it works
-> > > anywhere.  It is much more idiomatic..
+> > After making the above changes, it fails properly with the correct error
+> > message as follows:
+> > <SNIP>
+> > Trying to load:  from: /pci@800000020000000/scsi@3 ... virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
+> > virtioblk_transfer: Access beyond end of device!
 > > 
-> > Okay, I can accept the fact that maybe we should use EXIT instead of
-> > SEMICOLON. But at least can we remove the invocation of the "COMPILE"
-> > keyword in +COMP and -COMP ? The rest of the compiler in slof/engine.in
-> > uses the standard "DOTICK <word> COMPILE," format so why cannot we use
-> > this for -COMP as well as +COMP ?
+> > E3404: Not a bootable device!
 > > 
-Do you all agree with the above reasoning as well as the fact that I think
-we would all here (in the KVM team) appreciate even this small
-improvement in performance ?
-Can I send a v3 patch with the "DOTICK EXIT COMPILE," "DOTICK DOCOL COMPILE," changes ?
+> > E3407: Load failed
+> > 
+> >   Type 'boot' and press return to continue booting the system.
+> >   Type 'reset-all' and press return to reboot the system.
+> > 
+> > Ready!
+> > 0 >
+> > </SNIP>
+> > 
+> > Signed-off-by: Kautuk Consul <kconsul@linux.vnet.ibm.com>
+> > ---
+> >  slof/fs/packages/disk-label.fs | 12 +++++++++++-
+> >  1 file changed, 11 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/slof/fs/packages/disk-label.fs b/slof/fs/packages/disk-label.fs
+> > index 661c6b0..e680847 100644
+> > --- a/slof/fs/packages/disk-label.fs
+> > +++ b/slof/fs/packages/disk-label.fs
+> > @@ -139,6 +139,13 @@ CONSTANT /gpt-part-entry
+> >     block block-size read drop    \ read sector
+> >  ;
+> > 
+> > +\ read sector to array "block" and return actual bytes read
+> > +: read-sector-ret ( sector-number -- actual)
+> > +   \ block-size is 0x200 on disks, 0x800 on cdrom drives
+> > +   block-size * 0 seek drop      \ seek to sector
+> > +   block block-size read    \ read sector
+> > +;
+> > +
+> >  : (.part-entry) ( part-entry )
+> >     cr ." part-entry>active:        " dup part-entry>active c@ .d
+> >     cr ." part-entry>start-head:    " dup part-entry>start-head c@ .d
+> > @@ -204,7 +211,8 @@ CONSTANT /gpt-part-entry
+> >           part-entry>sector-offset l@-le    ( current sector )
+> >           dup to part-start to lpart-start  ( current )
+> >           BEGIN
+> > -            part-start read-sector          \ read EBR
+> > +            part-start read-sector-ret          \ read EBR
+> > +            block-size < IF UNLOOP 0 EXIT THEN
+> >              1 partition>start-sector IF
+> >                 \ ." Logical Partition found at " part-start .d cr
+> >                 1+
+> > @@ -279,6 +287,7 @@ CONSTANT /gpt-part-entry
+> >     THEN
+> > 
+> >     count-dos-logical-partitions TO dos-logical-partitions
+> > +   dos-logical-partitions 0= IF false EXIT THEN
+> > 
+> >     debug-disk-label? IF
+> >        ." Found " dos-logical-partitions .d ." logical partitions" cr
+> > @@ -352,6 +361,7 @@ CONSTANT /gpt-part-entry
+> >     no-mbr? IF drop FALSE EXIT THEN  \ read MBR and check for DOS disk-label magic
+> > 
+> >     count-dos-logical-partitions TO dos-logical-partitions
+> > +   dos-logical-partitions 0= IF 0 EXIT THEN
+> > 
+> >     debug-disk-label? IF
+> >        ." Found " dos-logical-partitions .d ." logical partitions" cr
+> > -- 
+> > 2.31.1
+> > 
+
+So how does the patch look ? Any comments from anyone ?
 
