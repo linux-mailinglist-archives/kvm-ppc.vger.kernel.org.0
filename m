@@ -1,212 +1,153 @@
-Return-Path: <kvm-ppc+bounces-72-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-73-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 597BC87E75C
-	for <lists+kvm-ppc@lfdr.de>; Mon, 18 Mar 2024 11:30:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19C3588129A
+	for <lists+kvm-ppc@lfdr.de>; Wed, 20 Mar 2024 14:45:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F910B20B9E
-	for <lists+kvm-ppc@lfdr.de>; Mon, 18 Mar 2024 10:30:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7CF0B2473C
+	for <lists+kvm-ppc@lfdr.de>; Wed, 20 Mar 2024 13:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1968A2A;
-	Mon, 18 Mar 2024 10:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E0541C92;
+	Wed, 20 Mar 2024 13:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PfOaAV2x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GSRll396"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD181FB5
-	for <kvm-ppc@vger.kernel.org>; Mon, 18 Mar 2024 10:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAD04594B;
+	Wed, 20 Mar 2024 13:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710757823; cv=none; b=ugEV1bSVmKNYtvRbM+6rEYcmLNL+5aE3yVjpr7T6VDFiH0GhzuiWNd3ICZC39DGhCLv7GdoFyCaVjg/VCMTKM1IL13kUgM2zZjDcd0b/RW/tlSAz6OJPTaQiOUD0oB28+bjg8J1vT5QcmdAegmJoxZ0tHLD/eeU0lfKW36sj2K4=
+	t=1710942219; cv=none; b=IDfYIN0i4JAmB+wKFGA/ke0Pp7sNm3dkiZ0/9/iqSp9x5of4roFO419HvHLIWW5AdT2rD48vh1qEJ+jk3fllsVXmv61EYHEJMJA0ijU/5UfLcaClCG9bqmJQZ2e+NYf5oXEgqpJATd0cZHoOztB4DX6hM67NBk6YFjkl3DMDhVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710757823; c=relaxed/simple;
-	bh=QvX0oZXylkhEqPRWDw1O64VBpWgsNN0sazKsu8Gk0PE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K9WtGZ0YKbFicU7QUV/r9w0pPFxGhNaiKURu7CbLmhmgxHqkrhWE8JMTjOrKaqR1iLTVv9PacbjcrnC4SsHALefa7PBZnA46rxDG+nHcDbL0QQ1kXtVXbxSUDURgJksP55o4XGPp1Fl89K6/6v+cULTmZQZiQiInchRjYoGCtqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PfOaAV2x; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42I9H2LE021461;
-	Mon, 18 Mar 2024 10:30:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=Wm+UGe9BMmb8ZZc01eg3aTu3oNpLCQvSMfPI26dr3zY=;
- b=PfOaAV2xqYkH1leKxogoqawRIAJrzz8j3nHjV+o0cYR0ZWWQNDzUl2YOzn6v2U2lGHq9
- l01kJ152nzCEonfk26q9FlGqm0E6l84lA5F+x/vkcTWosKp0ki0CiP9pZLiADF5vHpdY
- rlQ0+NpsspZpfR1kmL+c1ALMQcGc8YIvi5bnSVvN7a6XN1graGdZ2cqjahPdjdP+5uzp
- 1tEQAR86s6cunyNbJjeGC5n+zGxyviQO4Gb/3mpqPqezLghRFTm+DilJsVFDYPo6DsmU
- hOZ7KchnnZY1BaYe8m26d31aaE5UrBEdDMyD5BJAL9P1l4lSulAUQ7nTlW/SOth3YLtw /A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wwn5fukc4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Mar 2024 10:30:13 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42IAA9Xp004136;
-	Mon, 18 Mar 2024 10:30:13 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wwn5fukbu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Mar 2024 10:30:12 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42I7wgXH002815;
-	Mon, 18 Mar 2024 10:30:12 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wwrf27r9t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Mar 2024 10:30:12 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42IAU8Q746137604
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Mar 2024 10:30:10 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8670E20040;
-	Mon, 18 Mar 2024 10:30:08 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8B1F920049;
-	Mon, 18 Mar 2024 10:30:07 +0000 (GMT)
-Received: from r223l.aus.stglabs.ibm.com (unknown [9.3.109.14])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 18 Mar 2024 10:30:07 +0000 (GMT)
-From: Kautuk Consul <kconsul@linux.vnet.ibm.com>
-To: aik@ozlabs.ru, Thomas Huth <thuth@redhat.com>
-Cc: slof@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        Kautuk Consul <kconsul@linux.vnet.ibm.com>
-Subject: [PATCH v2] slof/fs/packages/disk-label.fs: improve checking for DOS boot partitions
-Date: Mon, 18 Mar 2024 06:30:03 -0400
-Message-Id: <20240318103003.484602-1-kconsul@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1710942219; c=relaxed/simple;
+	bh=wSDEutJwD2neE7aKCvDQfy1pKH5nxR8yhjkWrLLNsBQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=pNnmL36CHbgABw86k0eyaDtu+BEHaam3k2aPekROZRSqkd/8qFZJ0gYNfMmrtANkrg66tAYEle0qKcmgZlN7nsq2yZ5QXxDDi0pZRkQ7CoTPhVsM27Tfhy2yXFxAARPgaqXUz9X5uSqgudbZb55rwRBbjvn4uj/Ag29q2dxrSrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GSRll396; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5d8b887bb0cso5142408a12.2;
+        Wed, 20 Mar 2024 06:43:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710942217; x=1711547017; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UkcxNUYVeIsC5l1PCS55LiuRgLN92XEeA7AcFx54cFI=;
+        b=GSRll3966gDYZ49S4StZaV/M5IIJhH6Wo3Fu7DvmqJUFdyd6qxsdDHE2B5haBDHHpU
+         ljzy2bcYstO1yKhflZJ9kkIbKS6Tso2SoOJv185GYWWNao1m+lsIh61GIRTqXbkYtMLh
+         n5UyZC0efuoxmaWMniJYydriCTRqTHljm+uFjRIzCoFEVXtjRxApD3wGQT/Ym6k8iOA6
+         0f3K83vxKpkMMxAnQeSgFFk1AVHE1R/yK3Bo27f/2syOTqtsaS1wSJ6WcHta62JwnKpL
+         nolZ+Dpb4fwOXbvKGActI3hIe1VkIkp24nYHS3JBB1U6QoDw4vFS27gEVGWj+NwDOOdO
+         cDWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710942217; x=1711547017;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UkcxNUYVeIsC5l1PCS55LiuRgLN92XEeA7AcFx54cFI=;
+        b=lY2zKJNXBRKpYXZQA1OynfqFl+/26J4w7S9C/Xv8ZAuGmThxcQVE4gvoGJn8RFpCnd
+         fsu8OQ7f/sgGIwkVvK1ld/rlD53zoQOBiPijcbRllV//BFQKseOWUsMwDGFyR3uee6gV
+         oDEW/0BUX1gX8ZzYtey+Tun6QcvIJZ5XtcdB1gbO/kaSs7+ZUPlekKzajSm31VumBlZP
+         Nf67d5pOwUtpubIGTR6UmiE9A2cR05skQVsmUpvD+mVFnQg46XBlCvxVXWm62f1jf6Eb
+         8elt6XqMUF3nE82+xnNhiE7n/keSX/lXm8ZRDAu2qPfOZkd6q5wQz9bXiw3i3WpkwwAy
+         fGDw==
+X-Forwarded-Encrypted: i=1; AJvYcCUY7N2FmDGAim3LIkA3hE7e4SdQqPfwqQDK+yL4t0+h6b4vKPCRVz7IfVdtjXWa4XjSR2oLJ06eNOymiueg6brWXWTGhsqUXHG4P4fsBlnWos86WNVeXhinv6oetQ==
+X-Gm-Message-State: AOJu0YyK5+uHKrPudH4zujEz3rQVbH4/kKNBlKgdJdeT/j1fdEbQcLto
+	bQcTebqRsy86t5wqCGJ7utaWgz30ypAB81CLaicMK8wzeKO51TqH
+X-Google-Smtp-Source: AGHT+IFW67cPx23ALjOO6pVU1+yxckmTH3qtP1K1gSVYZcIrRRBY4tUMK7k8CT+nxZbQGRKfJtAGRQ==
+X-Received: by 2002:a17:90a:a78a:b0:29b:af61:fb34 with SMTP id f10-20020a17090aa78a00b0029baf61fb34mr6607716pjq.34.1710942217140;
+        Wed, 20 Mar 2024 06:43:37 -0700 (PDT)
+Received: from localhost (193-116-208-39.tpgi.com.au. [193.116.208.39])
+        by smtp.gmail.com with ESMTPSA id fy16-20020a17090b021000b0029fc7a754c7sm1588113pjb.25.2024.03.20.06.43.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Mar 2024 06:43:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oKeIvBBX6hIVdT2JhTPU2NBM5S_8z2Wq
-X-Proofpoint-ORIG-GUID: jEPCTUOxTXLkEd5aOaUJVl94LnoVP8m_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-18_01,2024-03-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 suspectscore=0 phishscore=0 mlxlogscore=999
- impostorscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 adultscore=0
- bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403140000 definitions=main-2403180078
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 20 Mar 2024 23:43:28 +1000
+Message-Id: <CZYME80BW9P7.3SC4GLHWCDQ9K@wheely>
+Subject: Re: [PATCH] KVM: PPC: Book3S HV nestedv2: Cancel pending HDEC
+ exception
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Vaibhav Jain" <vaibhav@linux.ibm.com>, <linuxppc-dev@lists.ozlabs.org>,
+ <kvm@vger.kernel.org>, <kvm-ppc@vger.kernel.org>
+Cc: "Michael Ellerman" <mpe@ellerman.id.au>, "Jordan Niethe"
+ <jniethe5@gmail.com>, "Vaidyanathan Srinivasan"
+ <svaidy@linux.vnet.ibm.com>, <mikey@neuling.org>, <paulus@ozlabs.org>,
+ <sbhat@linux.ibm.com>, <gautam@linux.ibm.com>,
+ <kconsul@linux.vnet.ibm.com>, <amachhiw@linux.vnet.ibm.com>,
+ <David.Laight@ACULAB.COM>
+X-Mailer: aerc 0.15.2
+References: <20240313072625.76804-1-vaibhav@linux.ibm.com>
+In-Reply-To: <20240313072625.76804-1-vaibhav@linux.ibm.com>
 
-While testing with a qcow2 with a DOS boot partition it was found that
-when we set the logical_block_size in the guest XML to >512 then the
-boot would fail in the following interminable loop:
-<SNIP>
-Trying to load:  from: /pci@800000020000000/scsi@3 ... virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-</SNIP>
+On Wed Mar 13, 2024 at 5:26 PM AEST, Vaibhav Jain wrote:
+> This reverts commit 180c6b072bf360b686e53d893d8dcf7dbbaec6bb ("KVM: PPC:
+> Book3S HV nestedv2: Do not cancel pending decrementer exception") which
+> prevented cancelling a pending HDEC exception for nestedv2 KVM guests. It
+> was done to avoid overhead of a H_GUEST_GET_STATE hcall to read the 'HDEC
+> expiry TB' register which was higher compared to handling extra decrement=
+er
+> exceptions.
+>
+> This overhead of reading 'HDEC expiry TB' register has been mitigated
+> recently by the L0 hypervisor(PowerVM) by putting the value of this
+> register in L2 guest-state output buffer on trap to L1. From there the
+> value of this register is cached, made available in kvmhv_run_single_vcpu=
+()
+> to compare it against host(L1) timebase and cancel the pending hypervisor
+> decrementer exception if needed.
 
-Change the count-dos-logical-partitions Forth subroutine and the Forth
-subroutines calling count-dos-logical-partitions to check for this access
-beyond end of device error.
+Ah, I figured out the problem here. Guest entry never clears the
+queued dec, because it's level triggered on the DEC MSB so it
+doesn't go away when it's delivered. So upstream code is indeed
+buggy and I think I take the blame for suggesting this nestedv2
+workaround.
 
-After making the above changes, it fails properly with the correct error
-message as follows:
-<SNIP>
-Trying to load:  from: /pci@800000020000000/scsi@3 ... virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
-virtioblk_transfer: Access beyond end of device!
+I actually don't think that is necessary though, we could treat it
+like other interrupts.  I think that would solve the problem without
+having to test dec here.
 
-E3404: Not a bootable device!
+I am wondering though, what workload slows down that this patch
+was needed in the first place. We'd only get here after a cede
+returns, then we'd dequeue the dec and stop having to GET_STATE
+it here.
 
-E3407: Load failed
+Thanks,
+Nick
 
-  Type 'boot' and press return to continue booting the system.
-  Type 'reset-all' and press return to reboot the system.
-
-Ready!
-0 >
-</SNIP>
-
-Signed-off-by: Kautuk Consul <kconsul@linux.vnet.ibm.com>
----
- slof/fs/packages/disk-label.fs | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/slof/fs/packages/disk-label.fs b/slof/fs/packages/disk-label.fs
-index 661c6b0..2630701 100644
---- a/slof/fs/packages/disk-label.fs
-+++ b/slof/fs/packages/disk-label.fs
-@@ -132,11 +132,16 @@ CONSTANT /gpt-part-entry
-    debug-disk-label? IF dup ." actual=" .d cr THEN
- ;
- 
--\ read sector to array "block"
--: read-sector ( sector-number -- )
-+\ read sector to array "block" and return actual bytes read
-+: read-sector-ret ( sector-number -- actual-bytes )
-    \ block-size is 0x200 on disks, 0x800 on cdrom drives
-    block-size * 0 seek drop      \ seek to sector
--   block block-size read drop    \ read sector
-+   block block-size read    \ read sector
-+;
-+
-+\ read sector to array "block"
-+: read-sector ( sector-number -- )
-+   read-sector-ret drop
- ;
- 
- : (.part-entry) ( part-entry )
-@@ -204,7 +209,8 @@ CONSTANT /gpt-part-entry
-          part-entry>sector-offset l@-le    ( current sector )
-          dup to part-start to lpart-start  ( current )
-          BEGIN
--            part-start read-sector          \ read EBR
-+            part-start read-sector-ret          \ read EBR
-+            block-size < IF UNLOOP 0 EXIT THEN
-             1 partition>start-sector IF
-                \ ." Logical Partition found at " part-start .d cr
-                1+
-@@ -279,6 +285,7 @@ CONSTANT /gpt-part-entry
-    THEN
- 
-    count-dos-logical-partitions TO dos-logical-partitions
-+   dos-logical-partitions 0= IF false EXIT THEN
- 
-    debug-disk-label? IF
-       ." Found " dos-logical-partitions .d ." logical partitions" cr
-@@ -352,6 +359,7 @@ CONSTANT /gpt-part-entry
-    no-mbr? IF drop FALSE EXIT THEN  \ read MBR and check for DOS disk-label magic
- 
-    count-dos-logical-partitions TO dos-logical-partitions
-+   dos-logical-partitions 0= IF 0 EXIT THEN
- 
-    debug-disk-label? IF
-       ." Found " dos-logical-partitions .d ." logical partitions" cr
--- 
-2.31.1
+>
+> Fixes: 180c6b072bf3 ("KVM: PPC: Book3S HV nestedv2: Do not cancel pending=
+ decrementer exception")
+> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+> ---
+>  arch/powerpc/kvm/book3s_hv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 0b921704da45..e47b954ce266 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -4856,7 +4856,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u6=
+4 time_limit,
+>  	 * entering a nested guest in which case the decrementer is now owned
+>  	 * by L2 and the L1 decrementer is provided in hdec_expires
+>  	 */
+> -	if (!kvmhv_is_nestedv2() && kvmppc_core_pending_dec(vcpu) &&
+> +	if (kvmppc_core_pending_dec(vcpu) &&
+>  			((tb < kvmppc_dec_expires_host_tb(vcpu)) ||
+>  			 (trap =3D=3D BOOK3S_INTERRUPT_SYSCALL &&
+>  			  kvmppc_get_gpr(vcpu, 3) =3D=3D H_ENTER_NESTED)))
 
 
