@@ -1,74 +1,73 @@
-Return-Path: <kvm-ppc+bounces-108-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-110-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 851548BBDF0
-	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 21:59:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C5448BBDF3
+	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 22:00:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A8191C20C16
-	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 19:59:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0403B21518
+	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 20:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7661EF01;
-	Sat,  4 May 2024 19:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D607318A;
+	Sat,  4 May 2024 20:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Oi1Zz6DL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KCTCoVIJ"
 X-Original-To: kvm-ppc@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEFB1E51E
-	for <kvm-ppc@vger.kernel.org>; Sat,  4 May 2024 19:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB04482485
+	for <kvm-ppc@vger.kernel.org>; Sat,  4 May 2024 20:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714852791; cv=none; b=hbX0XUdsdNUSEKyxAiEnW/g4FBP3M2jNLNPCufMawweoYIoXey1icRTIuSwYFPgWvBtFStcWZBPPULVmcReAHGq0PVRH7GEV5V4tQLgSEhGM1t9WNrMCh7aStF9B7z1l/SIFbWh9KOyQkXlAM1h4R57EtUUWsYTHzSc4yvnO45U=
+	t=1714852850; cv=none; b=TtjLcP0+KxzCyQpR1LaGgmOGR5MQQebFNSZk52PyudDSLkO9T3UAA+92ay1ySGxfnyzTXecQ3MghUDBEQGRfUZDIaT4rgkF1Swzya0DxcKrNcODIHkY7X03U+iJkNs8rHHhDlvBoRUF+SkpN802BXWsHL+krcYcsoJ0Q3AL7T28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714852791; c=relaxed/simple;
-	bh=0T8qAnmBVebpWBS8M13LDypCDlFKWxWQf2LHB7GJ9v0=;
+	s=arc-20240116; t=1714852850; c=relaxed/simple;
+	bh=i1TA1xp2etN08w3JdtDYisB5vD0j8agHbXlWgWTe1Qo=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=NfQdWErfVRfXtUH3JpN+8jear/tgvUgdnAg/yA2Wcl3U/Ep7/wpB76lgyLu96yrl092nRBlxUvNu/AdcnQ6KMX4hnklm4h5T6Lx2+e5StIVUAAiQE5NiQq05ddnTYpRkk2mdnZXyEP4whIsT9Y+5H7l471kEggCbK1NANEsUpoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Oi1Zz6DL; arc=none smtp.client-ip=192.198.163.12
+	 Content-Disposition; b=bl9Hc9kUyDDZeqD9q27oTaVnagIOfqmcGsQLDYwdAQ/z4aDhCR2SB61/capweuPeRi1M7q+ur1NsAr5wYcsOuqkWx93i/Rh3mdMFJiqyHpWuLFozzcfZ/3SsxoJeYVM4G5YAnEAdH8gD99YS9pMbyV4kFFlSIsAaw4xaPpKQayE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KCTCoVIJ; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714852789; x=1746388789;
+  t=1714852849; x=1746388849;
   h=date:from:to:cc:subject:message-id:mime-version;
-  bh=0T8qAnmBVebpWBS8M13LDypCDlFKWxWQf2LHB7GJ9v0=;
-  b=Oi1Zz6DLkvdOrx6oIqyM7FW7mY9Q/1GUHq6DLpj4ZUOfW0Wr9taynMbs
-   YytoEdpeiEY6fFKj7ZILE5Z7jdmeUPxHUd67kj8AAlPMTX25ot4mCXvAt
-   SV6dzWFJmKkqxHGDJ+S9hyLze95peNzCJzbAJszx6OGMMXtYrd0jvfhB4
-   7RQy6r/eK5Wo12UnkW+8ZA8qp5AdTXVf0LkbvdRuTpZJk2CkgFGe0lPJU
-   fMneVbozFFwNvtsMuQKet/bKoFc/e6tA+OTLYSePNDCNeqFSLNhfOJdUJ
-   dDMDQhBlrfL0JuFPvxWdJkLXeL101PrhDcWArGLqUz4XjyDM8eggdxpSP
+  bh=i1TA1xp2etN08w3JdtDYisB5vD0j8agHbXlWgWTe1Qo=;
+  b=KCTCoVIJTHaATxO6vPFgsPgqJCtMIr4C/BsGPgnDnAMZPoRni8RGy53c
+   zrjQL81cb736Zm3tzuCjimkYO5H1KYoM1mXt0D5fED6kezXWc7rt4MD0Y
+   pqSlMrBPqaIKIISrdVkqJ8Ai63PNJECHEaDh0qIBMWD8FWqOzdWoka+oO
+   0nF8aKzW+/6Qq/onrGGpZNvyCoJ/VZBKWOzw+zvtnVYWMnOrCqUlQVHmF
+   CPEFuyGJpMcEz0Gr7bzhrIMRx1TBql/gDQwvPq5UX0MenFdxu+r+TsajZ
+   EPZRcmLVv+XLOPJcdM2T5nB8XUtwCoFGZ0ft+JP+3Vb4n/lVfEMnD1L8X
    g==;
-X-CSE-ConnectionGUID: voHd2y+1Sfqvbtyq9y3ClQ==
-X-CSE-MsgGUID: 4UzOTBYXRTi4TlAmt6lefw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="14447227"
+X-CSE-ConnectionGUID: QPLhVOH/R6e8fwWTwNApdA==
+X-CSE-MsgGUID: bagInVouRK6y1fg8/N+j/g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="14447270"
 X-IronPort-AV: E=Sophos;i="6.07,254,1708416000"; 
-   d="scan'208";a="14447227"
+   d="scan'208";a="14447270"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2024 12:59:48 -0700
-X-CSE-ConnectionGUID: 3Ne6YIspTm2oSwYo88k+gQ==
-X-CSE-MsgGUID: PVf0JD7RRg+Kmw+V5ygjSQ==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2024 13:00:48 -0700
+X-CSE-ConnectionGUID: Yo5Iudx+SfezDb7ykv3uMg==
+X-CSE-MsgGUID: CS1hSfNqRxWFcFq1WSDmzg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,254,1708416000"; 
-   d="scan'208";a="32569588"
+   d="scan'208";a="32570265"
 Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 04 May 2024 12:59:47 -0700
+  by orviesa004.jf.intel.com with ESMTP; 04 May 2024 13:00:47 -0700
 Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1s3LXs-000D8a-2B;
-	Sat, 04 May 2024 19:59:44 +0000
-Date: Sun, 5 May 2024 03:59:40 +0800
+	id 1s3LYq-000D8i-2S;
+	Sat, 04 May 2024 20:00:44 +0000
+Date: Sun, 5 May 2024 03:59:47 +0800
 From: kernel test robot <lkp@intel.com>
 To: Alexander Graf <graf@amazon.com>
 Cc: oe-kbuild-all@lists.linux.dev, kvm-ppc@vger.kernel.org
-Subject: [agraf-2.6:kvm-kho-gmem-test 24/27] drivers/misc/fdbox.c:504:12:
- error: initializing 'ulong *' (aka 'unsigned long *') with an expression of
- type 'const void *' discards qualifiers
-Message-ID: <202405050321.MKZxcasf-lkp@intel.com>
+Subject: [agraf-2.6:kvm-kho-gmem-test 24/27] drivers/misc/fdbox.c:504:47:
+ warning: initialization discards 'const' qualifier from pointer target type
+Message-ID: <202405050305.G2gWY32o-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
@@ -81,37 +80,24 @@ Content-Disposition: inline
 tree:   https://github.com/agraf/linux-2.6.git kvm-kho-gmem-test
 head:   9a58862a298a63bad21d05191e28b857063bb9dc
 commit: eac026594b9dc0e92a0093a3443b9bc973be99a4 [24/27] XXX WIP
-config: i386-randconfig-141-20240505 (https://download.01.org/0day-ci/archive/20240505/202405050321.MKZxcasf-lkp@intel.com/config)
-compiler: clang version 18.1.4 (https://github.com/llvm/llvm-project e6c3289804a67ea0bb6a86fadbe454dd93b8d855)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240505/202405050321.MKZxcasf-lkp@intel.com/reproduce)
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20240505/202405050305.G2gWY32o-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240505/202405050305.G2gWY32o-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405050321.MKZxcasf-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405050305.G2gWY32o-lkp@intel.com/
 
-All errors (new ones prefixed by >>):
+All warnings (new ones prefixed by >>):
 
-   In file included from drivers/misc/fdbox.c:13:
-   include/linux/kexec.h:369:20: error: field has incomplete type 'struct kexec_buf'
-     369 |                 struct kexec_buf dt;
-         |                                  ^
-   include/linux/kexec.h:369:10: note: forward declaration of 'struct kexec_buf'
-     369 |                 struct kexec_buf dt;
-         |                        ^
-   include/linux/kexec.h:370:20: error: field has incomplete type 'struct kexec_buf'
-     370 |                 struct kexec_buf mem_cache;
-         |                                  ^
-   include/linux/kexec.h:369:10: note: forward declaration of 'struct kexec_buf'
-     369 |                 struct kexec_buf dt;
-         |                        ^
->> drivers/misc/fdbox.c:504:12: error: initializing 'ulong *' (aka 'unsigned long *') with an expression of type 'const void *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+   drivers/misc/fdbox.c: In function 'fdbox_kho_recover':
+>> drivers/misc/fdbox.c:504:47: warning: initialization discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
      504 |                                 ulong *link = fdt_getprop(fdt, fd, "link", &l);
-         |                                        ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   3 errors generated.
+         |                                               ^~~~~~~~~~~
 
 
-vim +504 drivers/misc/fdbox.c
+vim +/const +504 drivers/misc/fdbox.c
 
    448	
    449	static void fdbox_kho_recover(void)
