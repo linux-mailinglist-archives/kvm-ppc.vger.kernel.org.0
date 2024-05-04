@@ -1,67 +1,67 @@
-Return-Path: <kvm-ppc+bounces-105-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-107-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAAA78BBDC0
-	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 20:44:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 115E88BBDC9
+	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 21:07:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18C841C20BBD
-	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 18:44:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45637B2136C
+	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 19:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F051E53F;
-	Sat,  4 May 2024 18:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570EC74416;
+	Sat,  4 May 2024 19:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LOuClivj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fhy+sav+"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3622C74416
-	for <kvm-ppc@vger.kernel.org>; Sat,  4 May 2024 18:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8491DDF6
+	for <kvm-ppc@vger.kernel.org>; Sat,  4 May 2024 19:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714848288; cv=none; b=Wpy5AgP28UXg4uJGgApFbO7h0riM3gy9UNutGUKQD7eq758r67CelmDWN+IFjHzzTKMXTNcOEp7s+rKvhy+TMY9fm+WmIgw+JewLCdk+h54cOBYKes+wb1S6AqVbQ2TpHRtjfpc1HxhuDpJuu5LfIELH1XfnHmqoB8WQyZZmMeQ=
+	t=1714849669; cv=none; b=CHp2FskY55D7bPahSpyeOZNHXY7kiKYAv9pbU30q8W3PuPjJG/hUItGPSMa3ZGig8n4OII+N4xiWfMSGxj7XZ2QL5p5wisM/qtHkm+V4DxGjxmlKzItA5vWZZd7/LaPDhM9urpWD6y0hCyFb+giTGAVasmjvf9nJhpJVyVwb2wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714848288; c=relaxed/simple;
-	bh=YeP0bgsGBGJPSt2o1V1tiRCIlXkeWM2GwjMibri9IhY=;
+	s=arc-20240116; t=1714849669; c=relaxed/simple;
+	bh=Bn5OCPgnnnAJgLYB8urvyWd76V5wsD6EF/aRqDYSAZA=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=BhOBfvPafT6MBqZ2SJPhs2tSoaZQGiMvpipn9DwNynT6v8Yk0NobC3WUMQvtmJjhtWzLr8UrdON175UPECGojxu6Kz+1o5EvzTZl7/RM54a6A23+KBEMX3sWLsTKfsf+y598IciOa+xD0/9f2Lk2JeiyF4gjPiCO8CjXhtyRsnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LOuClivj; arc=none smtp.client-ip=198.175.65.10
+	 Content-Disposition; b=eBDegq4i2ZGQWVF/Kxn7FmPSQuMGxwMxaMimyhOpgnDuH2fFetKlE2HyK/91FAJk45ehGshLzeWDU6OODZjgjNLMcW7TdNw7oUr4tRRebW4Sv0GFaUSFkiXDlV2FFJM+NdkNFYGtJ/vfcWHFpSUJX1GUSQ2uXPV+lOOCPBFz9IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fhy+sav+; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714848286; x=1746384286;
+  t=1714849666; x=1746385666;
   h=date:from:to:cc:subject:message-id:mime-version;
-  bh=YeP0bgsGBGJPSt2o1V1tiRCIlXkeWM2GwjMibri9IhY=;
-  b=LOuClivjBJwSVBJSkMDUdkKHJuwZyPM47vT7QYYuvgUoFfKEF+vUOurG
-   +CBJAmNMWymCMeuwIByS7/xqNMYEq3LI6LT6klL3S47wZnnbgW1kB0nqT
-   +PUAgDHs1WtPtADaxpNtL0PnYuK1LicWEzKxJ9tcc14YDNmDNY9N61E//
-   Hcg5+3xR4knZVUb+n8vLsEZstyU5vGukJr34Tkf50TkOEOfDDi3l7ZZ+i
-   RIof0oda5Dhvqn/1y9ExKD9KzluOORi/WHM0ob8hU5OrNIh7s1lCejOXZ
-   CgDONJysMbkflL53dhJHt50F3gbIPT4QYq5QqokNgyUhYFxci5jPAwjaa
-   Q==;
-X-CSE-ConnectionGUID: JE2IZ/lFTqK9gV1H7BntNg==
-X-CSE-MsgGUID: 1UZjA20lRpicRpGrc31Gbg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="28113163"
+  bh=Bn5OCPgnnnAJgLYB8urvyWd76V5wsD6EF/aRqDYSAZA=;
+  b=fhy+sav+siqXmtFAUewuDx2U1prpWqm8YMaH6CJY2SGDRwzS22isAqCb
+   3dQ3UI3qurA35Ml0nPAtJU1pB7hKvsp1l+k2rRcRhHrk35boDD4GOHk3p
+   03022KLCWiFJngLzrl790syLujOl31Mf2gekOctleVePe+qk60nL12fxo
+   iDZEIPmIoFvP9qQxv4aB0wCoay2V2hE0uSfe4R3qH/ZdnZh7u4HSJ4ELd
+   UcINgRtQoDbuHTn6jRt+WcwBjRWsdUWoJgLRhVNVlrvIwUk/fSCU5vLYY
+   PTP7/KN033KQhr1WIu11uOU5OByWHhNXctl2M7IchZEYNafMTF9Y9r36y
+   g==;
+X-CSE-ConnectionGUID: U4myIZNdT2WYbYrBB4gc5Q==
+X-CSE-MsgGUID: wCI+SkYGS5We1iCs1Gd8AA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="21792286"
 X-IronPort-AV: E=Sophos;i="6.07,254,1708416000"; 
-   d="scan'208";a="28113163"
+   d="scan'208";a="21792286"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2024 11:44:45 -0700
-X-CSE-ConnectionGUID: vPJCxT6rRd6KoVrvF2c9dA==
-X-CSE-MsgGUID: 74hSU5XbTp2Owzn2cEO/xw==
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2024 12:07:46 -0700
+X-CSE-ConnectionGUID: tQOCUuirSgmGGGshzxHU3w==
+X-CSE-MsgGUID: fYVl3ue4RYivKjj3/SPGbg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,254,1708416000"; 
-   d="scan'208";a="32225668"
+   d="scan'208";a="32229092"
 Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 04 May 2024 11:44:44 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 04 May 2024 12:07:45 -0700
 Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1s3KNG-000D4m-0o;
-	Sat, 04 May 2024 18:44:42 +0000
-Date: Sun, 5 May 2024 02:44:20 +0800
+	id 1s3KjW-000D6E-3A;
+	Sat, 04 May 2024 19:07:42 +0000
+Date: Sun, 5 May 2024 03:06:47 +0800
 From: kernel test robot <lkp@intel.com>
 To: Alexander Graf <graf@amazon.com>
 Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
@@ -69,7 +69,7 @@ Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
 Subject: [agraf-2.6:kvm-kho-gmem-test 26/27] kernel/time/sched_clock.c:76:49:
  error: call to undeclared function 'read_sysreg'; ISO C99 and later do not
  support implicit function declarations
-Message-ID: <202405050219.81JETL6w-lkp@intel.com>
+Message-ID: <202405050255.uiq0NPjq-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
@@ -82,29 +82,29 @@ Content-Disposition: inline
 tree:   https://github.com/agraf/linux-2.6.git kvm-kho-gmem-test
 head:   9a58862a298a63bad21d05191e28b857063bb9dc
 commit: 12b2509463b155fec805d7fb2ecbef3aafbd2414 [26/27] XXX arm: make early time stamps contiguous
-config: mips-vocore2_defconfig (https://download.01.org/0day-ci/archive/20240505/202405050219.81JETL6w-lkp@intel.com/config)
-compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240505/202405050219.81JETL6w-lkp@intel.com/reproduce)
+config: arm-allnoconfig (https://download.01.org/0day-ci/archive/20240505/202405050255.uiq0NPjq-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 37ae4ad0eef338776c7e2cffb3896153d43dcd90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240505/202405050255.uiq0NPjq-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405050219.81JETL6w-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405050255.uiq0NPjq-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
->> kernel/time/sched_clock.c:76:49: error: call to undeclared function 'read_sysreg'; ISO C99 and later do not support implicit function declarations [-Werror,-Wimplicit-function-declaration]
-                   clocks_calc_mult_shift(&rd->mult, &rd->shift, read_sysreg(cntfrq_el0), NSEC_PER_SEC, 600);
-                                                                 ^
-   kernel/time/sched_clock.c:76:61: error: use of undeclared identifier 'cntfrq_el0'
-                   clocks_calc_mult_shift(&rd->mult, &rd->shift, read_sysreg(cntfrq_el0), NSEC_PER_SEC, 600);
-                                                                             ^
+>> kernel/time/sched_clock.c:76:49: error: call to undeclared function 'read_sysreg'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      76 |                 clocks_calc_mult_shift(&rd->mult, &rd->shift, read_sysreg(cntfrq_el0), NSEC_PER_SEC, 600);
+         |                                                               ^
+>> kernel/time/sched_clock.c:76:61: error: use of undeclared identifier 'cntfrq_el0'
+      76 |                 clocks_calc_mult_shift(&rd->mult, &rd->shift, read_sysreg(cntfrq_el0), NSEC_PER_SEC, 600);
+         |                                                                           ^
    kernel/time/sched_clock.c:183:27: warning: variable 'new_epoch' set but not used [-Wunused-but-set-variable]
-           u64 res, wrap, new_mask, new_epoch, cyc, ns;
-                                    ^
+     183 |         u64 res, wrap, new_mask, new_epoch, cyc, ns;
+         |                                  ^
    kernel/time/sched_clock.c:183:43: warning: variable 'ns' set but not used [-Wunused-but-set-variable]
-           u64 res, wrap, new_mask, new_epoch, cyc, ns;
-                                                    ^
+     183 |         u64 res, wrap, new_mask, new_epoch, cyc, ns;
+         |                                                  ^
    2 warnings and 2 errors generated.
 
 
