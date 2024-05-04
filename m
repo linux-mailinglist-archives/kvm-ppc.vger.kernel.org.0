@@ -1,75 +1,75 @@
-Return-Path: <kvm-ppc+bounces-113-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-114-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E7418BBE2B
-	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 23:23:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 443878BBE2D
+	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 23:34:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 693911C20B83
-	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 21:23:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E80AB2101D
+	for <lists+kvm-ppc@lfdr.de>; Sat,  4 May 2024 21:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8432B6BB5D;
-	Sat,  4 May 2024 21:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC0156B79;
+	Sat,  4 May 2024 21:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a5h6K5A8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IPHOrYtI"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D6457C9A
-	for <kvm-ppc@vger.kernel.org>; Sat,  4 May 2024 21:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7AF1EB5C
+	for <kvm-ppc@vger.kernel.org>; Sat,  4 May 2024 21:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714857834; cv=none; b=S2Yw1Mu0kX4X7RL27EYwbVWjQKrl3FSqkw3SHdPF3KWQQWYfv+8qLqbRlU3HIN5vcC3frmxFOPX0b78R5E+dSEE/Zm/gSSMHhIaL5GO74pz1vec+U7JG3AFlQ/PPjoNl9oS8G/b5SF8R6mWPE+bzBMl9ZI5XF2shUIlSfeVgUak=
+	t=1714858433; cv=none; b=NvSdrYPQqGyd9tGqYAmm6UqL+dBa70OEe6Ox6VD01xEraC873WDzjCtnM1NvW2g4cs+6d9uWz3LwbYQzwzsC6qBISjCoNqQhkkbwKabYl3Z7wl7kagx3t22XyoCTGdoouQuj3WBbVd6LTSZ3MZE2lFHTXdncOOQMJC1Rt4HXaIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714857834; c=relaxed/simple;
-	bh=F6Q2FGeoLbXEOLD1Veo1SGH6gwFHH9X8kTza6lqzIMs=;
+	s=arc-20240116; t=1714858433; c=relaxed/simple;
+	bh=VLa9TCFEiWRjUY9H51EtDHvkaaQHTqGpQdgqcmw2lJk=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZU3A1uA4ZXvF4pQZirvYdV+wIX9gbGuS0763yMi9J+7VJFmlAT7MwrrE0dTs+y7MDKiSltT1lMNTB1VJqTup7TuJtmGWAtbUP44vnykc/c2NrqaTEiIxwKK5AvEoxnAYDSPrfofzSpsuq0xJZ1e7KHnAyM0wTbiLp/RLsrmbvCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a5h6K5A8; arc=none smtp.client-ip=198.175.65.14
+	 Content-Disposition; b=A1xNZtQmBd3bQBFXBf0Ci8cg8HjR2zGB/oKh/aJBbrY7VdLyvp4zZ1QK7os5zUCbE+iYoEHC+NchA2uacJ6votcKy9IdOkRMloVpTwmMfvKrw28MpQEIi00fqlRHnAMx4Oe+G4vfNT9gc2cDqgOXlNeUl/WYK15omr5e7bEskuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IPHOrYtI; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714857832; x=1746393832;
+  t=1714858431; x=1746394431;
   h=date:from:to:cc:subject:message-id:mime-version;
-  bh=F6Q2FGeoLbXEOLD1Veo1SGH6gwFHH9X8kTza6lqzIMs=;
-  b=a5h6K5A8qt3K6DHqc4ZMVl/9R1XJI3SOlWDSb6qjHf4JZeS08wwHAYkG
-   EULoILbEroHdn6nCf9VakEqv6Wf728ujRTsCgF5WA6zWRb7A7uZLul7on
-   lyQvY3GgByySHDMIJziGXJuulQZkFNQrn9pAo6/i+Ium3z4i5vedpUsW2
-   r044aEEt8RQXoyD12qwNoNbJKO3rpp1NPahzzQVCv7u/XU81cs6g0pBfa
-   0y6lKObnazUKzZJdYVRCtb7PJ4ViFqBmfhGJg5S3kSHsbjjCcofd6THG3
-   A9DnP1V6gvYu9xklZbrzUMiaXoVNb5kbGvWP7t1e9XJvAV3k1YdNo0CAj
+  bh=VLa9TCFEiWRjUY9H51EtDHvkaaQHTqGpQdgqcmw2lJk=;
+  b=IPHOrYtIkXuhGPaRZKMR6vyM99UrsDCZnHZS6o67+2XAQXEAQXAWjUZD
+   K6buf+JbKgQ3vp9AqJBSoJGfK5ge/aE5TtlMEGLCeAWYZNvJDSIVJDDt6
+   C3cQe2RdpO0yBD/s2yR5zUqQN949NOPQ+o5J/N+KXhkCxNRspO4KWIuoe
+   YYeQ0Ktnxi6fw8F8qmH3A3SjqA8L6brNiS3FwO84xAWGw/ek8t4x1u3e9
+   ei8o/2E2eKeSCfku8kJGoi9Rk/Pa0ddZYA/PYFxy5gNmwjL8uENqBRy6y
+   1esMnsxQod6opN170yCwEtYg+wyFKmunkcttpUZqTy5t/jMI3510TrkI3
    Q==;
-X-CSE-ConnectionGUID: G+dS126hR8Wv96AqIEGtkA==
-X-CSE-MsgGUID: SRauoOKfQtKC6/GCdg2Aww==
-X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="14457058"
+X-CSE-ConnectionGUID: 2zX0XyCyR0m8PII9qjshpQ==
+X-CSE-MsgGUID: B/L4g9YcT/2JEy9JYr+jow==
+X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="10491959"
 X-IronPort-AV: E=Sophos;i="6.07,255,1708416000"; 
-   d="scan'208";a="14457058"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2024 14:23:51 -0700
-X-CSE-ConnectionGUID: IQJuEMHrS5WDpQdx9+jnwg==
-X-CSE-MsgGUID: lGWBkUYAQJmp7jYEiQFrSA==
+   d="scan'208";a="10491959"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2024 14:33:51 -0700
+X-CSE-ConnectionGUID: eiTgQN+ATty+VOg8Dir75g==
+X-CSE-MsgGUID: Sf/oCDtiQzmtutXLhPPBKw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,255,1708416000"; 
-   d="scan'208";a="32461765"
+   d="scan'208";a="32248767"
 Received: from lkp-server01.sh.intel.com (HELO e434dd42e5a1) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 04 May 2024 14:23:50 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 04 May 2024 14:33:50 -0700
 Received: from kbuild by e434dd42e5a1 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1s3MrD-000DCM-12;
-	Sat, 04 May 2024 21:23:47 +0000
-Date: Sun, 5 May 2024 05:23:32 +0800
+	id 1s3N0t-000DCy-2A;
+	Sat, 04 May 2024 21:33:47 +0000
+Date: Sun, 5 May 2024 05:33:45 +0800
 From: kernel test robot <lkp@intel.com>
 To: Alexander Graf <graf@amazon.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kvm-ppc@vger.kernel.org
-Subject: [agraf-2.6:kvm-kho-gmem-test 20/27] arch/arm64/kvm/mmu.c:1691:92:
- warning: format specifies type 'unsigned long' but the argument has type
- 'gfn_t' (aka 'unsigned long long')
-Message-ID: <202405050550.FRlmlKbI-lkp@intel.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm-ppc@vger.kernel.org
+Subject: [agraf-2.6:kvm-kho-gmem-test 24/27]
+ arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:6808:17: error:
+ 'KVM_ARCH_FLAG_VM_COUNTER_OFFSET' undeclared; did you mean
+ 'KVM_ARM_SET_COUNTER_OFFSET'?
+Message-ID: <202405050557.AzQbDCw0-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
@@ -81,240 +81,175 @@ Content-Disposition: inline
 
 tree:   https://github.com/agraf/linux-2.6.git kvm-kho-gmem-test
 head:   9a58862a298a63bad21d05191e28b857063bb9dc
-commit: dc3f33bb180826ee0bcd0ecc79cad842ff3ffccf [20/27] XXX early kvmm implementation
-config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20240505/202405050550.FRlmlKbI-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 37ae4ad0eef338776c7e2cffb3896153d43dcd90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240505/202405050550.FRlmlKbI-lkp@intel.com/reproduce)
+commit: eac026594b9dc0e92a0093a3443b9bc973be99a4 [24/27] XXX WIP
+config: powerpc-powernv_defconfig (https://download.01.org/0day-ci/archive/20240505/202405050557.AzQbDCw0-lkp@intel.com/config)
+compiler: powerpc64le-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240505/202405050557.AzQbDCw0-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405050550.FRlmlKbI-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405050557.AzQbDCw0-lkp@intel.com/
 
-All warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
-   In file included from arch/arm64/kvm/mmu.c:7:
-   In file included from include/linux/mman.h:5:
-   In file included from include/linux/mm.h:2208:
-   include/linux/vmstat.h:508:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     508 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     509 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:515:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     515 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     516 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:527:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     527 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     528 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:536:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     536 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     537 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/mmu.c:1691:92: warning: format specifies type 'unsigned long' but the argument has type 'gfn_t' (aka 'unsigned long long') [-Wformat]
-    1691 | trace_printk("XXX %s:%d gfn=%lx memslot=%lx hva=%lx write_fault=%d\n", __func__, __LINE__, gfn, memslot, hva, write_fault);
-         |                             ~~~                                                            ^~~
-         |                             %llx
-   include/linux/kernel.h:275:26: note: expanded from macro 'trace_printk'
-     275 |                 do_trace_printk(fmt, ##__VA_ARGS__);    \
-         |                                 ~~~    ^~~~~~~~~~~
-   include/linux/kernel.h:286:37: note: expanded from macro 'do_trace_printk'
-     286 |         __trace_printk_check_format(fmt, ##args);                       \
-         |                                     ~~~    ^~~~
-   include/linux/kernel.h:238:40: note: expanded from macro '__trace_printk_check_format'
-     238 |                 ____trace_printk_check_format(fmt, ##args);             \
-         |                                               ~~~    ^~~~
->> arch/arm64/kvm/mmu.c:1691:97: warning: format specifies type 'unsigned long' but the argument has type 'struct kvm_memory_slot *' [-Wformat]
-    1691 | trace_printk("XXX %s:%d gfn=%lx memslot=%lx hva=%lx write_fault=%d\n", __func__, __LINE__, gfn, memslot, hva, write_fault);
-         |                                         ~~~                                                     ^~~~~~~
-   include/linux/kernel.h:275:26: note: expanded from macro 'trace_printk'
-     275 |                 do_trace_printk(fmt, ##__VA_ARGS__);    \
-         |                                 ~~~    ^~~~~~~~~~~
-   include/linux/kernel.h:286:37: note: expanded from macro 'do_trace_printk'
-     286 |         __trace_printk_check_format(fmt, ##args);                       \
-         |                                     ~~~    ^~~~
-   include/linux/kernel.h:238:40: note: expanded from macro '__trace_printk_check_format'
-     238 |                 ____trace_printk_check_format(fmt, ##args);             \
-         |                                               ~~~    ^~~~
->> arch/arm64/kvm/mmu.c:1691:92: warning: format specifies type 'unsigned long' but the argument has type 'gfn_t' (aka 'unsigned long long') [-Wformat]
-    1691 | trace_printk("XXX %s:%d gfn=%lx memslot=%lx hva=%lx write_fault=%d\n", __func__, __LINE__, gfn, memslot, hva, write_fault);
-         |                             ~~~                                                            ^~~
-         |                             %llx
-   include/linux/kernel.h:275:26: note: expanded from macro 'trace_printk'
-     275 |                 do_trace_printk(fmt, ##__VA_ARGS__);    \
-         |                                 ~~~    ^~~~~~~~~~~
-   include/linux/kernel.h:291:36: note: expanded from macro 'do_trace_printk'
-     291 |                 __trace_printk(_THIS_IP_, fmt, ##args);                 \
-         |                                           ~~~    ^~~~
->> arch/arm64/kvm/mmu.c:1691:97: warning: format specifies type 'unsigned long' but the argument has type 'struct kvm_memory_slot *' [-Wformat]
-    1691 | trace_printk("XXX %s:%d gfn=%lx memslot=%lx hva=%lx write_fault=%d\n", __func__, __LINE__, gfn, memslot, hva, write_fault);
-         |                                         ~~~                                                     ^~~~~~~
-   include/linux/kernel.h:275:26: note: expanded from macro 'trace_printk'
-     275 |                 do_trace_printk(fmt, ##__VA_ARGS__);    \
-         |                                 ~~~    ^~~~~~~~~~~
-   include/linux/kernel.h:291:36: note: expanded from macro 'do_trace_printk'
-     291 |                 __trace_printk(_THIS_IP_, fmt, ##args);                 \
-         |                                           ~~~    ^~~~
-   9 warnings generated.
+   In file included from include/linux/bug.h:5,
+                    from arch/powerpc/include/asm/mmu.h:142,
+                    from arch/powerpc/include/asm/paca.h:18,
+                    from arch/powerpc/include/asm/current.h:13,
+                    from include/linux/mutex.h:14,
+                    from include/linux/kvm_types.h:23,
+                    from include/kvm/iodev.h:6,
+                    from arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:16:
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_kho_write_vcpu':
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:4433:49: error: 'struct kvm_vcpu_arch' has no member named 'ctxt'
+    4433 |                         .addr = __pa(&vcpu->arch.ctxt),
+         |                                                 ^
+   arch/powerpc/include/asm/bug.h:88:32: note: in definition of macro 'WARN_ON'
+      88 |         int __ret_warn_on = !!(x);                              \
+         |                                ^
+   arch/powerpc/include/asm/page.h:217:9: note: in expansion of macro 'VIRTUAL_WARN_ON'
+     217 |         VIRTUAL_WARN_ON((unsigned long)(x) < PAGE_OFFSET);              \
+         |         ^~~~~~~~~~~~~~~
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:4433:33: note: in expansion of macro '__pa'
+    4433 |                         .addr = __pa(&vcpu->arch.ctxt),
+         |                                 ^~~~
+   In file included from arch/powerpc/include/asm/mmu.h:144:
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:4433:49: error: 'struct kvm_vcpu_arch' has no member named 'ctxt'
+    4433 |                         .addr = __pa(&vcpu->arch.ctxt),
+         |                                                 ^
+   arch/powerpc/include/asm/page.h:218:25: note: in definition of macro '__pa'
+     218 |         (unsigned long)(x) & 0x0fffffffffffffffUL;                      \
+         |                         ^
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:4434:49: error: 'struct kvm_vcpu_arch' has no member named 'ctxt'
+    4434 |                         .len = sizeof(vcpu->arch.ctxt),
+         |                                                 ^
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_kho_write_vm':
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:4477:55: error: 'struct kvm_arch' has no member named 'timer_data'
+    4477 |         ret |= fdt_property(fdt, "voffset", &kvm->arch.timer_data.voffset, sizeof(u64));
+         |                                                       ^
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:4478:55: error: 'struct kvm_arch' has no member named 'timer_data'
+    4478 |         ret |= fdt_property(fdt, "poffset", &kvm->arch.timer_data.poffset, sizeof(u64));
+         |                                                       ^
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c: At top level:
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:4524:49: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
+    4524 | int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type);
+         |                                                 ^~~~~~~~~~
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_unwrap_file':
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:4552:58: error: 'struct kvm_arch' has no member named 'mmu'
+    4552 |                 ret = kvm_init_stage2_mmu(kvm, &kvm->arch.mmu, 0);
+         |                                                          ^
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_wrap_vm':
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:4604:48: error: 'struct kvm_arch' has no member named 'mmu'
+    4604 |         r = kvm_init_stage2_mmu(kvm, &kvm->arch.mmu, 0);
+         |                                                ^
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_kho_recover_vcpu':
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:6750:27: error: 'struct kvm_vcpu_arch' has no member named 'ctxt'
+    6750 |         memcpy(&vcpu->arch.ctxt, old_ctxt, sizeof(*old_ctxt));
+         |                           ^
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:6750:50: error: invalid application of 'sizeof' to incomplete type 'struct kvm_cpu_context'
+    6750 |         memcpy(&vcpu->arch.ctxt, old_ctxt, sizeof(*old_ctxt));
+         |                                                  ^
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_kho_recover_vm':
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:6801:18: error: 'struct kvm_arch' has no member named 'timer_data'
+    6801 |         kvm->arch.timer_data.poffset = *poffset;
+         |                  ^
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:6806:18: error: 'struct kvm_arch' has no member named 'timer_data'
+    6806 |         kvm->arch.timer_data.voffset = *voffset;
+         |                  ^
+>> arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:6808:17: error: 'KVM_ARCH_FLAG_VM_COUNTER_OFFSET' undeclared (first use in this function); did you mean 'KVM_ARM_SET_COUNTER_OFFSET'?
+    6808 |         set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         |                 KVM_ARM_SET_COUNTER_OFFSET
+   arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:6808:17: note: each undeclared identifier is reported only once for each function it appears in
+>> arch/powerpc/kvm/../../../virt/kvm/kvm_main.c:6808:60: error: 'struct kvm_arch' has no member named 'flags'
+    6808 |         set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
+         |                                                            ^
 
 
-vim +1691 arch/arm64/kvm/mmu.c
+vim +6808 arch/powerpc/kvm/../../../virt/kvm/kvm_main.c
 
-  1613	
-  1614	/**
-  1615	 * kvm_handle_guest_abort - handles all 2nd stage aborts
-  1616	 * @vcpu:	the VCPU pointer
-  1617	 *
-  1618	 * Any abort that gets to the host is almost guaranteed to be caused by a
-  1619	 * missing second stage translation table entry, which can mean that either the
-  1620	 * guest simply needs more memory and we must allocate an appropriate page or it
-  1621	 * can mean that the guest tried to access I/O memory, which is emulated by user
-  1622	 * space. The distinction is based on the IPA causing the fault and whether this
-  1623	 * memory region has been registered as standard RAM by user space.
-  1624	 */
-  1625	int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-  1626	{
-  1627		unsigned long esr;
-  1628		phys_addr_t fault_ipa;
-  1629		struct kvm_memory_slot *memslot;
-  1630		unsigned long hva;
-  1631		bool is_iabt, write_fault, writable;
-  1632		gfn_t gfn;
-  1633		int ret, idx;
-  1634	
-  1635		esr = kvm_vcpu_get_esr(vcpu);
-  1636	
-  1637		fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-  1638		is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
-  1639	
-  1640		if (esr_fsc_is_permission_fault(esr)) {
-  1641			/* Beyond sanitised PARange (which is the IPA limit) */
-  1642			if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
-  1643				kvm_inject_size_fault(vcpu);
-  1644				return 1;
-  1645			}
-  1646	
-  1647			/* Falls between the IPA range and the PARange? */
-  1648			if (fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
-  1649				fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-  1650	
-  1651				if (is_iabt)
-  1652					kvm_inject_pabt(vcpu, fault_ipa);
-  1653				else
-  1654					kvm_inject_dabt(vcpu, fault_ipa);
-  1655				return 1;
-  1656			}
-  1657		}
-  1658	
-  1659		/* Synchronous External Abort? */
-  1660		if (kvm_vcpu_abt_issea(vcpu)) {
-  1661			/*
-  1662			 * For RAS the host kernel may handle this abort.
-  1663			 * There is no need to pass the error into the guest.
-  1664			 */
-  1665			if (kvm_handle_guest_sea(fault_ipa, kvm_vcpu_get_esr(vcpu)))
-  1666				kvm_inject_vabt(vcpu);
-  1667	
-  1668			return 1;
-  1669		}
-  1670	
-  1671		trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
-  1672				      kvm_vcpu_get_hfar(vcpu), fault_ipa);
-  1673	
-  1674		/* Check the stage-2 fault is trans. fault or write fault */
-  1675		if (!esr_fsc_is_translation_fault(esr) &&
-  1676		    !esr_fsc_is_permission_fault(esr) &&
-  1677		    !esr_fsc_is_access_flag_fault(esr)) {
-  1678			kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
-  1679				kvm_vcpu_trap_get_class(vcpu),
-  1680				(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
-  1681				(unsigned long)kvm_vcpu_get_esr(vcpu));
-  1682			return -EFAULT;
-  1683		}
-  1684	
-  1685		idx = srcu_read_lock(&vcpu->kvm->srcu);
-  1686	
-  1687		gfn = fault_ipa >> PAGE_SHIFT;
-  1688		memslot = gfn_to_memslot(vcpu->kvm, gfn);
-  1689		hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
-  1690		write_fault = kvm_is_write_fault(vcpu);
-> 1691	trace_printk("XXX %s:%d gfn=%lx memslot=%lx hva=%lx write_fault=%d\n", __func__, __LINE__, gfn, memslot, hva, write_fault);
-  1692		if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
-  1693			/*
-  1694			 * The guest has put either its instructions or its page-tables
-  1695			 * somewhere it shouldn't have. Userspace won't be able to do
-  1696			 * anything about this (there's no syndrome for a start), so
-  1697			 * re-inject the abort back into the guest.
-  1698			 */
-  1699			if (is_iabt) {
-  1700				ret = -ENOEXEC;
-  1701				goto out;
-  1702			}
-  1703	
-  1704			if (kvm_vcpu_abt_iss1tw(vcpu)) {
-  1705				kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-  1706				ret = 1;
-  1707				goto out_unlock;
-  1708			}
-  1709	
-  1710			/*
-  1711			 * Check for a cache maintenance operation. Since we
-  1712			 * ended-up here, we know it is outside of any memory
-  1713			 * slot. But we can't find out if that is for a device,
-  1714			 * or if the guest is just being stupid. The only thing
-  1715			 * we know for sure is that this range cannot be cached.
-  1716			 *
-  1717			 * So let's assume that the guest is just being
-  1718			 * cautious, and skip the instruction.
-  1719			 */
-  1720			if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
-  1721				kvm_incr_pc(vcpu);
-  1722				ret = 1;
-  1723				goto out_unlock;
-  1724			}
-  1725	
-  1726			/*
-  1727			 * The IPA is reported as [MAX:12], so we need to
-  1728			 * complement it with the bottom 12 bits from the
-  1729			 * faulting VA. This is always 12 bits, irrespective
-  1730			 * of the page size.
-  1731			 */
-  1732			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
-  1733			ret = io_mem_abort(vcpu, fault_ipa);
-  1734			goto out_unlock;
-  1735		}
-  1736	
-  1737		/* Userspace should not be able to register out-of-bounds IPAs */
-  1738		VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->arch.hw_mmu));
-  1739	
-  1740		if (esr_fsc_is_access_flag_fault(esr)) {
-  1741			handle_access_fault(vcpu, fault_ipa);
-  1742			ret = 1;
-  1743			goto out_unlock;
-  1744		}
-  1745	
-  1746		ret = user_mem_abort(vcpu, fault_ipa, memslot, hva,
-  1747				     esr_fsc_is_permission_fault(esr));
-  1748		if (ret == 0)
-  1749			ret = 1;
-  1750	out:
-  1751		if (ret == -ENOEXEC) {
-  1752			kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-  1753			ret = 1;
-  1754		}
-  1755	out_unlock:
-  1756		srcu_read_unlock(&vcpu->kvm->srcu, idx);
-  1757		return ret;
-  1758	}
-  1759	
+  6765	
+  6766	static int kvm_kho_recover_vm(const void *fdt, int node)
+  6767	{
+  6768		int ret = 0;
+  6769		int vcpu_off;
+  6770		struct kvm *kvm = NULL;
+  6771		struct file *file;
+  6772		const struct kvm_memory_slot *slots;
+  6773		const u64 *voffset, *poffset;
+  6774		const ulong *handle;
+  6775		int nr_slots;
+  6776		int l, i;
+  6777	
+  6778		if (fdt_node_check_compatible(fdt, node, "kvm,vm-v1"))
+  6779			return -EINVAL;
+  6780	
+  6781		handle = fdt_getprop(fdt, node, "handle", &l);
+  6782		if (!handle || l != sizeof(ulong))
+  6783			return -EINVAL;
+  6784	
+  6785		// XXX On aarch64, the type defines IPA size. Needs to recover from original
+  6786		ret = kvm_dev.fops->unlocked_ioctl(NULL, KVM_CREATE_VM, 0);
+  6787		if (ret < 0)
+  6788			return ret;
+  6789	
+  6790		file = fget_raw(ret);
+  6791		kvm = file->private_data;
+  6792	
+  6793		ret = close_fd(ret);
+  6794		if (ret)
+  6795			return ret;
+  6796	
+  6797		/* TODO: Should go into arch code */
+  6798		poffset = fdt_getprop(fdt, node, "poffset", &l);
+  6799		if (!poffset)
+  6800			return -EINVAL;
+  6801		kvm->arch.timer_data.poffset = *poffset;
+  6802	
+  6803		voffset = fdt_getprop(fdt, node, "voffset", &l);
+  6804		if (!voffset)
+  6805			return -EINVAL;
+  6806		kvm->arch.timer_data.voffset = *voffset;
+  6807	
+> 6808		set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
+  6809	
+  6810		/* Recover memslots */
+  6811		slots = fdt_getprop(fdt, node, "slots", &l);
+  6812		if (!slots)
+  6813			return -EINVAL;
+  6814	
+  6815		nr_slots = l / sizeof(*slots);
+  6816		for (i = 0; i < nr_slots; i++) {
+  6817			const struct kvm_memory_slot *slot = &slots[i];
+  6818			struct kvm_userspace_memory_region2 mem = {
+  6819				.slot = slot->id,
+  6820				.flags = slot->flags,
+  6821				.guest_phys_addr = slot->base_gfn << PAGE_SHIFT,
+  6822				.memory_size = slot->npages << PAGE_SHIFT,
+  6823				.userspace_addr = slot->userspace_addr,
+  6824				/* TODO: memfd */
+  6825			};
+  6826	
+  6827			ret = kvm_set_memory_region(kvm, &mem);
+  6828			if (ret)
+  6829				return ret;
+  6830		}
+  6831	
+  6832		/* Put it onto the fdbox dangling queue */
+  6833		ret = fdbox_add_dangling(file, *handle);
+  6834		if (ret)
+  6835			return ret;
+  6836	
+  6837		fdt_for_each_subnode(vcpu_off, fdt, node) {
+  6838			ret = kvm_kho_recover_vcpu(fdt, vcpu_off, kvm, file);
+  6839			if (ret)
+  6840				return ret;
+  6841		}
+  6842	
+  6843		return ret;
+  6844	}
+  6845	
 
 -- 
 0-DAY CI Kernel Test Service
