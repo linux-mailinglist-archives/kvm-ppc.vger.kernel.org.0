@@ -1,149 +1,374 @@
-Return-Path: <kvm-ppc+bounces-128-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-129-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A72B92EA9C
-	for <lists+kvm-ppc@lfdr.de>; Thu, 11 Jul 2024 16:22:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDA3892EF27
+	for <lists+kvm-ppc@lfdr.de>; Thu, 11 Jul 2024 20:49:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E91031F23284
-	for <lists+kvm-ppc@lfdr.de>; Thu, 11 Jul 2024 14:21:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AE701F2323A
+	for <lists+kvm-ppc@lfdr.de>; Thu, 11 Jul 2024 18:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7087916A382;
-	Thu, 11 Jul 2024 14:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F1016CD39;
+	Thu, 11 Jul 2024 18:49:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Vp9D4zD2"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aVnZeCGP"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C431684A6;
-	Thu, 11 Jul 2024 14:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF2628FF;
+	Thu, 11 Jul 2024 18:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720707705; cv=none; b=stouBE3NOawH0IQ5tXFHnvl8LEaY5k5O4rPHnVdBay6ur9T5ja4/Ya9EJxmbOZEqacV+V+I7h9g0xMqhT0u0IXE5An980en96HhYP19k12TW1FfO5fXa+KnUQY1MaFGXCfwZkcWDhImsuho39ppakbC809CaUrlT6ADEI20+tZI=
+	t=1720723788; cv=none; b=cGBCXuIzYmN7FSuQH6FnEaYNADBXQcpYeNKt7wsCo8lfqMhBHgztjdCTa6pLjwtxG/Cdh3UyR2c2gwWIxRlTNxQhoondjCfGPVbOdR5dt0Rawsfajqj+iKDZ/QptsRyYbpSv6oC37crFhfChR6cG8MrTLTfJ5nhhHnECSitkwtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720707705; c=relaxed/simple;
-	bh=9rv9sMOJTNaVCAXVckZJpszdBHzLkx+Y2phucmuy4AY=;
+	s=arc-20240116; t=1720723788; c=relaxed/simple;
+	bh=IiopQ/4JTA3RM1hg6qywsEI0twdXtx9CA6mlED8iGDc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GZSSttIltXb1gb1KCSmDTnuqrG279UypoasjP1G8N9YTwC7WxkNlr0HQsbqns4fzwMQeFw8UyS5vummjcp4qmMhGarSOYX35Kupyf16yGDfVidzy9Df6pS6M6gnOW58tfI8vK345PCkeWUfoGjyT9lGihlcOHE+VcmX69JkPid8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Vp9D4zD2; arc=none smtp.client-ip=148.163.156.1
+	 Content-Type:Content-Disposition:In-Reply-To; b=S/X1dY/Asd1gx8wyIwmyPW28w2j8EvV9h7DU0hs1Ud9qeEiX4uc58P53hr6Tpri0F4YHg1nlahk5Nqb7+VA+/arz4RwSF4t6hnW0QgCxooSKAlcveV/thqR5uPnrXKdiGqteywJfVj34qs5t8gjvR5G3jiBMX1H8J4siPc0gSYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aVnZeCGP; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46BDxDbF029159;
-	Thu, 11 Jul 2024 14:21:31 GMT
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46BHSKwE012625;
+	Thu, 11 Jul 2024 18:49:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
 	:from:to:cc:subject:message-id:references:mime-version
-	:content-type:content-transfer-encoding:in-reply-to; s=pp1; bh=H
-	y7Ow+QuFzjJ8HpKXMdsxifcalcMak4d4YwFzu94KDM=; b=Vp9D4zD2DTnztFWPx
-	4JTvWSirWHljxahtUil6FV8CbRXG1/dxWfsR7npfISHY7xqnCT9AXNnmaI/Uwhs6
-	MAzRkUwjMyCscFRPllshORjUcTwq/GLaqdE/uxMgax9zcB0sGWVL0iABn97JX7Kd
-	5Z/GaRQjSwKV11UEdgXzjHxYYl4HzNW7E4svVSXwIWkUs5X8DwbRx4uBDdy97QEX
-	L75H8hTMxkpU5f/tVBsm0Me+PbMk+e7TexD58x/Hlsgl6KRoztQOuBn0DtoZdRou
-	DbqIWoFscwSUGowvCdRuJEPFBdlYeOpwCy2ciRs1ElR+DFZYVIzjOm2P4x0xE+ov
-	nmEEQ==
+	:content-type:content-transfer-encoding:in-reply-to; s=pp1; bh=p
+	ZO9j8GmuMeCi/bqbRh+LycNGy3Igu5uFZv0+f29TKc=; b=aVnZeCGPJNjKY8L7q
+	CjCGksi7mbth/cMejAwr//SBw76lXflvXeybQFoZq+nfQEWIpkRo+Ldi7NRcYfpQ
+	WAb5LOz6o9lnRgA/cV3KAVgDKtO9pFLbgukUQ197dPRo2ByAw5gO8GU64oNbf6DK
+	MX5CSdU0+on3VlDjeHSxUqD1SZ4/pUIkh2zEDyYMakaN27sVzNuy4LlkoG55PKWt
+	toztxTaebDZnE8I3T54X8oo0gad3+fKlR936oncdRdQaVQs6kLPKgOaYWI9irxzq
+	jsNFnhzUXx0Lj6vggEc0abxpY00diuMdg7GszFT1i3eBkg+YkkDiLg8s9zya8Kk6
+	mBxOQ==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40agrb02d5-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40akts86ma-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Jul 2024 14:21:30 +0000 (GMT)
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46BELU10031657;
-	Thu, 11 Jul 2024 14:21:30 GMT
+	Thu, 11 Jul 2024 18:49:18 +0000 (GMT)
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46BInIKQ007445;
+	Thu, 11 Jul 2024 18:49:18 GMT
 Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40agrb02cy-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40akts86m6-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Jul 2024 14:21:30 +0000 (GMT)
+	Thu, 11 Jul 2024 18:49:18 +0000 (GMT)
 Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46BBDMKW024698;
-	Thu, 11 Jul 2024 14:21:29 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 407g8uhdqy-1
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46BIDTdp024690;
+	Thu, 11 Jul 2024 18:49:17 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 407g8ujmf6-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Jul 2024 14:21:29 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46BELNvx15335856
+	Thu, 11 Jul 2024 18:49:17 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46BInB3P58720608
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 11 Jul 2024 14:21:25 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5D6542004D;
-	Thu, 11 Jul 2024 14:21:23 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AE0B220040;
-	Thu, 11 Jul 2024 14:21:14 +0000 (GMT)
+	Thu, 11 Jul 2024 18:49:13 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C35A120043;
+	Thu, 11 Jul 2024 18:49:11 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 142FB20040;
+	Thu, 11 Jul 2024 18:49:00 +0000 (GMT)
 Received: from li-e7e2bd4c-2dae-11b2-a85c-bfd29497117c.ibm.com (unknown [9.195.44.247])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 11 Jul 2024 14:21:14 +0000 (GMT)
-Date: Thu, 11 Jul 2024 19:51:06 +0530
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 11 Jul 2024 18:48:59 +0000 (GMT)
+Date: Fri, 12 Jul 2024 00:18:47 +0530
 From: Amit Machhiwal <amachhiw@linux.ibm.com>
-To: Rob Herring <robh@kernel.org>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        Bjorn Helgaas <bhelgaas@google.com>, Lizhi Hou <lizhi.hou@amd.com>,
-        Vaibhav Jain <vaibhav@linux.ibm.com>,
+To: Lizhi Hou <lizhi.hou@amd.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-ppc@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+        Rob Herring <robh@kernel.org>, Vaibhav Jain <vaibhav@linux.ibm.com>,
         Nicholas Piggin <npiggin@gmail.com>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Vaidyanathan Srinivasan <svaidy@linux.ibm.com>,
-        Kowshik Jois B S <kowsjois@linux.ibm.com>
+        Kowshik Jois B S <kowsjois@linux.ibm.com>,
+        Lukas Wunner <lukas@wunner.de>
 Subject: Re: [PATCH] PCI: Fix crash during pci_dev hot-unplug on pseries KVM
  guest
-Message-ID: <qcidmczsjdhaqz7hy3cqnpkjiaulxi7277ayzly3zyrrdbcr4w@5s4x5cgd3xk2>
-Mail-Followup-To: Rob Herring <robh@kernel.org>, linux-pci@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org, 
-	Bjorn Helgaas <bhelgaas@google.com>, Lizhi Hou <lizhi.hou@amd.com>, 
-	Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Vaidyanathan Srinivasan <svaidy@linux.ibm.com>, 
-	Kowshik Jois B S <kowsjois@linux.ibm.com>
-References: <20240703141634.2974589-1-amachhiw@linux.ibm.com>
- <CAL_JsqL9hg8Hze4oOP1R55yVXBfTKE=RfwdBraNHiO71K21uNA@mail.gmail.com>
+Message-ID: <k5h7tto6kdwcgtxoeglqncojjwact6xxqnin4inffol74jdows@fj5ujezqwb24>
+Mail-Followup-To: Lizhi Hou <lizhi.hou@amd.com>, 
+	Bjorn Helgaas <helgaas@kernel.org>, linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>, 
+	Rob Herring <robh@kernel.org>, Vaibhav Jain <vaibhav@linux.ibm.com>, 
+	Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Vaidyanathan Srinivasan <svaidy@linux.ibm.com>, Kowshik Jois B S <kowsjois@linux.ibm.com>, 
+	Lukas Wunner <lukas@wunner.de>
+References: <20240705192034.GA73447@bhelgaas>
+ <2359de90-1712-903e-c3c9-1f1f694718db@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL_JsqL9hg8Hze4oOP1R55yVXBfTKE=RfwdBraNHiO71K21uNA@mail.gmail.com>
+In-Reply-To: <2359de90-1712-903e-c3c9-1f1f694718db@amd.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: OdiQBSyMmWoj7PQSjzWTRMr86YEyO3b6
-X-Proofpoint-ORIG-GUID: vNxGWtVZgWNpTeQ951TVzKXP0lr4nCmh
+X-Proofpoint-ORIG-GUID: Gon01WQFtL9qxfZfuloDPHdcqatQhpnD
+X-Proofpoint-GUID: LWsB8du8MknWW_Md0SIc8A3Akzq6_Z3J
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-11_09,2024-07-11_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 mlxscore=0 spamscore=0 mlxlogscore=664 priorityscore=1501
- adultscore=0 bulkscore=0 phishscore=0 clxscore=1015 malwarescore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407110099
+ definitions=2024-07-11_13,2024-07-11_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ lowpriorityscore=0 impostorscore=0 bulkscore=0 suspectscore=0
+ malwarescore=0 mlxlogscore=999 priorityscore=1501 mlxscore=0 spamscore=0
+ phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407110128
 
-Hi Rob,
-
-On 2024/07/11 06:20 AM, Rob Herring wrote:
-> On Wed, Jul 3, 2024 at 8:17â€¯AM Amit Machhiwal <amachhiw@linux.ibm.com> wrote:
-> >
-> > With CONFIG_PCI_DYNAMIC_OF_NODES [1], a hot-plug and hot-unplug sequence
-> > of a PCI device attached to a PCI-bridge causes following kernel Oops on
-> > a pseries KVM guest:
+On 2024/07/10 09:48 PM, Lizhi Hou wrote:
 > 
-> Can I ask why you have this option on in the first place? Do you have
-> a use for it or it's just a case of distros turn on every kconfig
-> option.
+> On 7/5/24 12:20, Bjorn Helgaas wrote:
+> > [+cc Lukas, FYI]
+> > 
+> > On Wed, Jul 03, 2024 at 07:46:34PM +0530, Amit Machhiwal wrote:
+> > > With CONFIG_PCI_DYNAMIC_OF_NODES [1], a hot-plug and hot-unplug sequence
+> > > of a PCI device attached to a PCI-bridge causes following kernel Oops on
+> > > a pseries KVM guest:
+> > > 
+> > >   RTAS: event: 2, Type: Hotplug Event (229), Severity: 1
+> > >   Kernel attempted to read user page (10ec00000048) - exploit attempt? (uid: 0)
+> > >   BUG: Unable to handle kernel data access on read at 0x10ec00000048
+> > >   Faulting instruction address: 0xc0000000012d8728
+> > >   Oops: Kernel access of bad area, sig: 11 [#1]
+> > >   LE PAGE_SIZE=64K MMU=Radix SMP NR_CPUS=2048 NUMA pSeries
+> > > <snip>
+> > >   NIP [c0000000012d8728] __of_changeset_entry_invert+0x10/0x1ac
+> > >   LR [c0000000012da7f0] __of_changeset_revert_entries+0x98/0x180
+> > >   Call Trace:
+> > >   [c00000000bcc3970] [c0000000012daa60] of_changeset_revert+0x58/0xd8
+> > >   [c00000000bcc39c0] [c000000000d0ed78] of_pci_remove_node+0x74/0xb0
+> > >   [c00000000bcc39f0] [c000000000cdcfe0] pci_stop_bus_device+0xf4/0x138
+> > >   [c00000000bcc3a30] [c000000000cdd140] pci_stop_and_remove_bus_device_locked+0x34/0x64
+> > >   [c00000000bcc3a60] [c000000000cf3780] remove_store+0xf0/0x108
+> > >   [c00000000bcc3ab0] [c000000000e89e04] dev_attr_store+0x34/0x78
+> > >   [c00000000bcc3ad0] [c0000000007f8dd4] sysfs_kf_write+0x70/0xa4
+> > >   [c00000000bcc3af0] [c0000000007f7248] kernfs_fop_write_iter+0x1d0/0x2e0
+> > >   [c00000000bcc3b40] [c0000000006c9b08] vfs_write+0x27c/0x558
+> > >   [c00000000bcc3bf0] [c0000000006ca168] ksys_write+0x90/0x170
+> > >   [c00000000bcc3c40] [c000000000033248] system_call_exception+0xf8/0x290
+> > >   [c00000000bcc3e50] [c00000000000d05c] system_call_vectored_common+0x15c/0x2ec
+> > > <snip>
+> > > 
+> > > A git bisect pointed this regression to be introduced via [1] that added
+> > > a mechanism to create device tree nodes for parent PCI bridges when a
+> > > PCI device is hot-plugged.
+> > > 
+> > > The Oops is caused when `pci_stop_dev()` tries to remove a non-existing
+> > > device-tree node associated with the pci_dev that was earlier
+> > > hot-plugged and was attached under a pci-bridge. The PCI dev header
+> > > `dev->hdr_type` being 0, results a conditional check done with
+> > > `pci_is_bridge()` into false. Consequently, a call to
+> > > `of_pci_make_dev_node()` to create a device node is never made. When at
+> > > a later point in time, in the device node removal path, a memcpy is
+> > > attempted in `__of_changeset_entry_invert()`; since the device node was
+> > > never created, results in an Oops due to kernel read access to a bad
+> > > address.
+> > > 
+> > > To fix this issue the patch updates `pci_stop_dev()` to ensure that a
+> > > call to `of_pci_remove_node()` is only made for pci-bridge devices.
+> > > 
+> > > [1] commit 407d1a51921e ("PCI: Create device tree node for bridge")
+> > > 
+> > > Fixes: 407d1a51921e ("PCI: Create device tree node for bridge")
+> > > Reported-by: Kowshik Jois B S <kowsjois@linux.ibm.com>
+> > > Tested-by: Kowshik Jois B S <kowsjois@linux.ibm.com>
+> > > Signed-off-by: Amit Machhiwal <amachhiw@linux.ibm.com>
+> > Thanks for the patch and testing!  Would like a reviewed-by from
+> > Lizhi.
+> 
+> of_pci_make_dev_node() will create of nodes for some endpoint devices (not a
+> bridge) as well. And actually this is the main purpose.
+> 
+> Maybe the patch as below would resolve the Oops?
 
-Yes, this option is turned on in Ubuntu's distro kernel config where the issue
-was originally reported, while Fedora is keeping this turned off.
+Thanks for the patch, Lizhi! I tried out this patch and don't see the issue with
+the same. The hot-plug and hot-unplug of PCI device seem to work fine as
+expected.
 
-    root@ubuntu:~# cat /boot/config-6.8.0-38-generic | grep PCI_DYN
-    CONFIG_PCI_DYNAMIC_OF_NODES=y
-
-    root@fedora:~# cat /boot/config-6.9.7-200.fc40.ppc64le | grep PCI_DYN
-    # CONFIG_PCI_DYNAMIC_OF_NODES is not set
-
-Thanks,
-Amit
+~ Amit
 
 > 
-> Rob
+> diff --git a/drivers/of/dynamic.c b/drivers/of/dynamic.c
+> index dda6092e6d3a..3c693b091ecf 100644
+> --- a/drivers/of/dynamic.c
+> +++ b/drivers/of/dynamic.c
+> @@ -492,21 +492,29 @@ struct device_node *__of_node_dup(const struct
+> device_node *np,
+>   * a given changeset.
+>   *
+>   * @ocs: Pointer to changeset
+> + * @np: Pointer to device node. If it is not null, init it directly instead
+> of
+> + *      allocate a new node.
+>   * @parent: Pointer to parent device node
+>   * @full_name: Node full name
+>   *
+>   * Return: Pointer to the created device node or NULL in case of an error.
+>   */
+>  struct device_node *of_changeset_create_node(struct of_changeset *ocs,
+> +                                            struct device_node *np,
+>                                              struct device_node *parent,
+>                                              const char *full_name)
+>  {
+> -       struct device_node *np;
+>         int ret;
+> 
+> -       np = __of_node_dup(NULL, full_name);
+> -       if (!np)
+> -               return NULL;
+> +       if (!np) {
+> +               np = __of_node_dup(NULL, full_name);
+> +               if (!np)
+> +                       return NULL;
+> +       } else {
+> +               of_node_set_flag(np, OF_DYNAMIC);
+> +               of_node_set_flag(np, OF_DETACHED);
+> +       }
+> +
+>         np->parent = parent;
+> 
+>         ret = of_changeset_attach_node(ocs, np);
+> diff --git a/drivers/of/unittest.c b/drivers/of/unittest.c
+> index 445ad13dab98..087de26852cc 100644
+> --- a/drivers/of/unittest.c
+> +++ b/drivers/of/unittest.c
+> @@ -871,7 +871,7 @@ static void __init of_unittest_changeset(void)
+>         unittest(!of_changeset_add_property(&chgset, parent, ppadd), "fail
+> add prop prop-add\n");
+>         unittest(!of_changeset_update_property(&chgset, parent, ppupdate),
+> "fail update prop\n");
+>         unittest(!of_changeset_remove_property(&chgset, parent, ppremove),
+> "fail remove prop\n");
+> -       n22 = of_changeset_create_node(&chgset, n2, "n22");
+> +       n22 = of_changeset_create_node(&chgset, NULL, n2, "n22");
+>         unittest(n22, "fail create n22\n");
+>         unittest(!of_changeset_add_prop_string(&chgset, n22, "prop-str",
+> "abcd"),
+>                  "fail add prop prop-str");
+> diff --git a/drivers/pci/of.c b/drivers/pci/of.c
+> index 51e3dd0ea5ab..92c079b2e570 100644
+> --- a/drivers/pci/of.c
+> +++ b/drivers/pci/of.c
+> @@ -608,18 +608,28 @@ int devm_of_pci_bridge_init(struct device *dev, struct
+> pci_host_bridge *bridge)
+> 
+>  #ifdef CONFIG_PCI_DYNAMIC_OF_NODES
+> 
+> +void of_pci_free_node(struct device_node *np)
+> +{
+> +       struct of_changeset *cset;
+> +
+> +       cset = (struct of_changeset *)(np + 1);
+> +
+> +       np->data = NULL;
+> +       of_changeset_revert(cset);
+> +       of_changeset_destroy(cset);
+> +       of_node_put(np);
+> +}
+> +
+>  void of_pci_remove_node(struct pci_dev *pdev)
+>  {
+>         struct device_node *np;
+> 
+>         np = pci_device_to_OF_node(pdev);
+> -       if (!np || !of_node_check_flag(np, OF_DYNAMIC))
+> +       if (!np || np->data != of_pci_free_node)
+>                 return;
+>         pdev->dev.of_node = NULL;
+> 
+> -       of_changeset_revert(np->data);
+> -       of_changeset_destroy(np->data);
+> -       of_node_put(np);
+> +       of_pci_free_node(np);
+>  }
+> 
+>  void of_pci_make_dev_node(struct pci_dev *pdev)
+> @@ -655,14 +665,18 @@ void of_pci_make_dev_node(struct pci_dev *pdev)
+>         if (!name)
+>                 return;
+> 
+> -       cset = kmalloc(sizeof(*cset), GFP_KERNEL);
+> -       if (!cset)
+> +       np = kzalloc(sizeof(*np) + sizeof(*cset), GFP_KERNEL);
+> +       if (!np)
+>                 goto out_free_name;
+> +       np->full_name = name;
+> +       of_node_init(np);
+> +
+> +       cset = (struct of_changeset *)(np + 1);
+>         of_changeset_init(cset);
+> 
+> -       np = of_changeset_create_node(cset, ppnode, name);
+> +       np = of_changeset_create_node(cset, np, ppnode, NULL);
+>         if (!np)
+> -               goto out_destroy_cset;
+> +               goto out_free_node;
+> 
+>         ret = of_pci_add_properties(pdev, cset, np);
+>         if (ret)
+> @@ -672,9 +686,8 @@ void of_pci_make_dev_node(struct pci_dev *pdev)
+>         if (ret)
+>                 goto out_free_node;
+> 
+> -       np->data = cset;
+> +       np->data = of_pci_free_node;
+>         pdev->dev.of_node = np;
+> -       kfree(name);
+> 
+>         return;
+> 
+> diff --git a/include/linux/of.h b/include/linux/of.h
+> index a0bedd038a05..f774459d0d84 100644
+> --- a/include/linux/of.h
+> +++ b/include/linux/of.h
+> @@ -1631,6 +1631,7 @@ static inline int of_changeset_update_property(struct
+> of_changeset *ocs,
+>  }
+> 
+>  struct device_node *of_changeset_create_node(struct of_changeset *ocs,
+> +                                            struct device_node *np,
+>                                              struct device_node *parent,
+>                                              const char *full_name);
+>  int of_changeset_add_prop_string(struct of_changeset *ocs,
+> 
+> Thanks,
+> 
+> Lizhi
+> 
+> > 
+> > > ---
+> > >   drivers/pci/remove.c | 3 ++-
+> > >   1 file changed, 2 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/pci/remove.c b/drivers/pci/remove.c
+> > > index d749ea8250d6..4e51c64af416 100644
+> > > --- a/drivers/pci/remove.c
+> > > +++ b/drivers/pci/remove.c
+> > > @@ -22,7 +22,8 @@ static void pci_stop_dev(struct pci_dev *dev)
+> > >   		device_release_driver(&dev->dev);
+> > >   		pci_proc_detach_device(dev);
+> > >   		pci_remove_sysfs_dev_files(dev);
+> > > -		of_pci_remove_node(dev);
+> > > +		if (pci_is_bridge(dev))
+> > > +			of_pci_remove_node(dev);
+> > IIUC, this basically undoes the work that was done by
+> > of_pci_make_dev_node().
+> > 
+> > The call of of_pci_make_dev_node() from pci_bus_add_device() was added
+> > by 407d1a51921e and is conditional on pci_is_bridge(), so it makes
+> > sense to me that the remove needs a similar condition.
+> > 
+> > >   		pci_dev_assign_added(dev, false);
+> > >   	}
+> > > 
+> > > base-commit: e9d22f7a6655941fc8b2b942ed354ec780936b3e
+> > > -- 
+> > > 2.45.2
+> > > 
 
