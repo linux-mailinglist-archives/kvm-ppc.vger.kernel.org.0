@@ -1,210 +1,415 @@
-Return-Path: <kvm-ppc+bounces-136-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-137-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36194931A8F
-	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Jul 2024 20:55:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5E0931C06
+	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Jul 2024 22:38:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDFB028302D
-	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Jul 2024 18:55:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FBF11C21E6A
+	for <lists+kvm-ppc@lfdr.de>; Mon, 15 Jul 2024 20:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3A4763E7;
-	Mon, 15 Jul 2024 18:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C9A13AD3D;
+	Mon, 15 Jul 2024 20:36:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mzM56u57"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GkMDkOz9"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2041.outbound.protection.outlook.com [40.107.94.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0805025E;
-	Mon, 15 Jul 2024 18:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721069748; cv=none; b=Y5WBwW3QRdtlUyPj1eLe5qw3hFDpDYSwJ8n4yJtU8fFZNqvU7U7z/dLl2QI30DkDgMOdXnQ6Bfo1u3D5+RkK5r81j4+k0WP2MLNKtdA/Hf+qfjYx7NGoUOdJNpoVCjCBB/qPxHzC+kqBjkgacgt4xqYIl5u8l8JiUt2wrFkSL2Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721069748; c=relaxed/simple;
-	bh=fTaVUp5ixXjyj/IQvLPoiMP1xh8WB5ilzwlfi5SQ9Uo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N1SFmn5YwaduPOhBvv5lOhT724LOHwwrfnHaWQLKJW1UcrhMVOSCUAnAveO+yEC8kHTT4Ooar3cTghWAALBYBMyaOTk3RXy645Jf7Xv6leQUw07i7zBjZ/D1EP0go/naGlKFLy3WNw4TmTXZurbeeVTa8AwzAlBU+KkW7i05qcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mzM56u57; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56281C4AF0E;
-	Mon, 15 Jul 2024 18:55:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721069748;
-	bh=fTaVUp5ixXjyj/IQvLPoiMP1xh8WB5ilzwlfi5SQ9Uo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=mzM56u57vbSMU7UUmNVR4LLKrqMOvG0VNwKB6Losab0GAaAtgyoVZ5a5yCpA/S/D7
-	 sbovS4flkyFA7smIGcKPNkt9qbdkLfEW/ixpl5yuO288I7N8GcOQbgL7x+TQNGD+B9
-	 wN1PsljQzJSNiOq+B4zKMYjVqY8uAYYuoEtRQG0PFQBy1wmbjyYjtdwlQTnOF4I1A5
-	 33RglqbJ2gLElY1MIjHGK2yB212+Tp/hUw+OwoEpHGQxCpIe+iYzssVx43PRZ8laHU
-	 taaqx9n+A8pb4XwEBlxpYNZkkX5cYFHERPLLHHSNexnZAn/Yy6/RSr3VB5cyR8pl8d
-	 WMu1M4G2Wlrlg==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2eeb2d60efbso55744871fa.1;
-        Mon, 15 Jul 2024 11:55:48 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXumxkft9uq3D7HTZ3tbblkpFb/SHx+MhywvHUaWqaAyXfqs2S3plvWQI05jGYEgBFHAkdj2aPhkFB4DUIjkdh3UX2S1Dg3rWi3HbHReipRa9x40IRGfWp6IPe8oV3zG4XCioVZzMjHVpzk+lMriGs1epP2FLXftXZeBnXYdhO0eNM=
-X-Gm-Message-State: AOJu0Yxsp0S3URk3bakVAfjAKkGaSF7LP2wajKRPRZIDdWR6og0Q8IlA
-	nrGMTcgxgW46ACuQiz8t4aW+OdllKiH44iMWA+2Ie/rLVWUX+wbYpxN7Bat59EVWYDplPkCk1Ze
-	/NUwUnLVqb7N2hbEEJGmr4Xgxdw==
-X-Google-Smtp-Source: AGHT+IG5hZtW/6OyRaCvviup+P1U2Ghou4YKlTCsHtRsWKDMqkEasf58VhGXraqlzg+5tGrRgvrOkOsdfd2CYJKf+h0=
-X-Received: by 2002:a05:651c:1254:b0:2ec:57c7:c740 with SMTP id
- 38308e7fff4ca-2eef41d72bbmr63931fa.39.1721069746552; Mon, 15 Jul 2024
- 11:55:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886174D8C8;
+	Mon, 15 Jul 2024 20:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721075769; cv=fail; b=epEgun4txjr81tlYPn1byEFcsQSl1W0RyIOXcrgXPVG1JJUS7Qi3faMa/MDZFI80Y1v/25EzUbexATzpEIb/v2rUpgsEnCIb9yOVigNEd5rbUQooBA2uQ5D45WnPNCEwyKX2DxFthddOl9MOW3QK0J8tUdpJy7x5Sw6YDAoNYCo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721075769; c=relaxed/simple;
+	bh=lHRo39cRTmaC11pd5d/5hERFbBy7bddea/O62gDLqew=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=B/K2UW29SyVzSRCTiZw/1DN2+w15JaeptH7D9a3CcRCVf0m/VlEeIW74DulazIhq8yexj0xxYNRrvwjcdw44oxjsTC0T1jwBCjiC0y1RV0RIbiFn/KGvj6IaRtN3FE8I6YN7Z7fEhpnZfSeOhm3F3TK0lPavyIbuOFI4/NdxJEc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GkMDkOz9; arc=fail smtp.client-ip=40.107.94.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yCrt6TzlDtKl4qUh/a4j+almd6wxuqPuuvwGZ/a91fP3fmRb+0Y1eb2Sqk1aOXZ6bEzf6RLhdLWAg/yaSfNAx8CeXChI6tZAfD39ZD508wnvXECugmBFlslMePF9MnyZ7EUczjYSCuWRLkJJ6//jCHhmoxoCH/luabAKy7h7G9Ob91BXMjM57vyLAaoq89flc8+/LUqQ61EAENVywMy4fpEniuSA3TD+Mr8OvBKpi7GvBOi9CU8UcPGauLpQRXnhk6OBDvZ6eLJmD1+zISio4zCEoo1dIiS8J26wGIR0DtmRcZYj/c/NYHUyOQRrnb/6aHq+RqcMHSjOeCymojzIuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oWkZuMf4xoXWDZBA/GXz3Wg+dT9Xg/5zg41R1HxBYnc=;
+ b=YKkA/Lnb9nTnWeyy/8B/bg+1F+k2R9TqhMIhd/zArHq1KaCW+KBXbB7B2MpbD1C6ATXRSo4oAnwSd1JBBya87Vwa7yJ3y5qo3RzxzPZ68zn8UjgNOrvEz7DTS7ul0KaXtDiv4uuAxug5+bn2krO3V+Qo3BHfBFnrboBrw2WSTQ90fZLWIyLy9HiQnzoxn+TehiAzbS1SldvEcMMwF0ftvilGrU/fx1D8NoAwUgEKXTmCch67pUjeiXGZa6PyBESNU+Gv7si8m9RvYzSSNoN9DTOErS9wg9iA7mCMksTr4/O9GIK58fKR5cwxmUBIqh6a2wp5dJQeyAgUZcqUaB5SOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oWkZuMf4xoXWDZBA/GXz3Wg+dT9Xg/5zg41R1HxBYnc=;
+ b=GkMDkOz9TQfKHg+K2QVTktla6QW0crJ0VQnnyBuRyCx+y/bEMkKoF/oqEKLmM+0BgHV2SNFfj9gGO2jfpqDRXwkIxXdl0SeNGQYVMIE8fHIsDee7EmCGOcl5/vW4F3KDRMKWqQnQ5A6TSryixed2L19bf1HKbJ0PLMv1JndE5KU=
+Received: from CH0PR03CA0374.namprd03.prod.outlook.com (2603:10b6:610:119::34)
+ by DM4PR12MB7768.namprd12.prod.outlook.com (2603:10b6:8:102::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29; Mon, 15 Jul
+ 2024 20:36:00 +0000
+Received: from CH2PEPF000000A0.namprd02.prod.outlook.com
+ (2603:10b6:610:119:cafe::24) by CH0PR03CA0374.outlook.office365.com
+ (2603:10b6:610:119::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28 via Frontend
+ Transport; Mon, 15 Jul 2024 20:36:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CH2PEPF000000A0.mail.protection.outlook.com (10.167.244.26) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7784.11 via Frontend Transport; Mon, 15 Jul 2024 20:36:00 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 15 Jul
+ 2024 15:35:59 -0500
+Received: from [172.19.71.207] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Mon, 15 Jul 2024 15:35:58 -0500
+Message-ID: <f70e8e07-93e0-09bd-1d90-ee5458fb09f3@amd.com>
+Date: Mon, 15 Jul 2024 13:35:58 -0700
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240715080726.2496198-1-amachhiw@linux.ibm.com>
-In-Reply-To: <20240715080726.2496198-1-amachhiw@linux.ibm.com>
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 15 Jul 2024 12:55:33 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqKKkcXDJ2nz98WNCvsSFzzc3dVXVnxMCntFXsCP=MeKsA@mail.gmail.com>
-Message-ID: <CAL_JsqKKkcXDJ2nz98WNCvsSFzzc3dVXVnxMCntFXsCP=MeKsA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
 Subject: Re: [PATCH v2] PCI: Fix crash during pci_dev hot-unplug on pseries
  KVM guest
-To: Amit Machhiwal <amachhiw@linux.ibm.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-ppc@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>, 
-	Lizhi Hou <lizhi.hou@amd.com>, Saravana Kannan <saravanak@google.com>, 
-	Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Vaidyanathan Srinivasan <svaidy@linux.ibm.com>, 
-	Kowshik Jois B S <kowsjois@linux.ibm.com>, Lukas Wunner <lukas@wunner.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+To: Bjorn Helgaas <helgaas@kernel.org>
+CC: Amit Machhiwal <amachhiw@linux.ibm.com>, <linux-pci@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linuxppc-dev@lists.ozlabs.org>, <kvm-ppc@vger.kernel.org>, Bjorn Helgaas
+	<bhelgaas@google.com>, Rob Herring <robh@kernel.org>, Saravana Kannan
+	<saravanak@google.com>, Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin
+	<npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>, Vaidyanathan
+ Srinivasan <svaidy@linux.ibm.com>, Kowshik Jois B S <kowsjois@linux.ibm.com>,
+	Lukas Wunner <lukas@wunner.de>
+References: <20240715172351.GA434759@bhelgaas>
+From: Lizhi Hou <lizhi.hou@amd.com>
+In-Reply-To: <20240715172351.GA434759@bhelgaas>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: None (SATLEXMB03.amd.com: lizhi.hou@amd.com does not designate
+ permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF000000A0:EE_|DM4PR12MB7768:EE_
+X-MS-Office365-Filtering-Correlation-Id: ad8d4ffe-8776-4c96-b697-08dca50dbcd2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|36860700013|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZWNETlo2ZDdiZXZEWWRjUkdTWC9kL0hBK0UvcHlrM2pEZkRVVXdSZGV0QVRH?=
+ =?utf-8?B?M05zVTI0Tnpjb0RYRUJvSktDdjFSRUp2dW1tMWxLQTFNQ0dvT0xCOXRmcDU3?=
+ =?utf-8?B?a2xzd2pRb1NtUzdieVlsMy81T094bWVNd3BTRnRmbFdoS3ZXd0hrK3IxTkhr?=
+ =?utf-8?B?V3ZBbTJtb1UvWldZT2RsVm5zTHhFTU1HczRxOTAzU09BTjlJNTZpL3c5ZVZw?=
+ =?utf-8?B?OWFHWkx1bUorM0kyOGhTNGEraDhIWTkrNWkrVkh3ZjdvSllhdVJuaFprSDA2?=
+ =?utf-8?B?UDlIUFBZeEg5eUt6eWxZcFdGNnpQTU1IakgwOU13T01sQlhKek5TbWJTRjlE?=
+ =?utf-8?B?OTlWMHIvLzJOZzdid2x3NWUrYTR0UFMxcjNFK3IwMXRqNE9TZUorOWJwQzNO?=
+ =?utf-8?B?U2REZkdGL0RuU1VLT2dPMXBLVjFiNnJZTDcyYlBGVFlyeUZ0ak53dGFmcnZP?=
+ =?utf-8?B?TXp4aDdoZkI1bWFmSW85bUUrOS9yQU5NdmlJMC92TUVGSWV1TDd6RmVzZkxT?=
+ =?utf-8?B?ZmlmRmU3QzJNSEd2OVYwUUxCdWQrYnl0Nko2SWhlZmVIV2dTUWlGRldKSlhS?=
+ =?utf-8?B?TmNWUXExU1FHOWhhbDF0bmlpUUt5NWZVdFRYeGhxUURkOXJQRkNGNWxxRzhF?=
+ =?utf-8?B?MjhYd3hyMDlMdlhBSW91OUM3TndVSVErU2xZcHJVSmI1T1ZFMjNXTnBVVnJG?=
+ =?utf-8?B?TVk4ckNOcDROaTV6eHhBNTVsTnZtSm5ydXdTVGl0eFpneUdKbHErSWIxWkEw?=
+ =?utf-8?B?YWlpOFJXbS9iVVllV2RQYXh6UXBOWDMrQ1NkNVQ2WlN0TUJkbWJzRkwyZG01?=
+ =?utf-8?B?a3BJbUhxY3JLaktqUGNjRjNVRnlRdHBTdE1DWjNRRGZiTDZFMi9VK2VCZ290?=
+ =?utf-8?B?NzREcGNWSDlVTmdPT3MzRFhVaG5GK2RKRHJ6Y3gxUVFLWVA5WkxxSTd5NFpm?=
+ =?utf-8?B?dk51KzZPRHM5dG5YdHJHNnBTUi9WSlJqdExUTGFwbStTK0J6UzE5MzJPNkM2?=
+ =?utf-8?B?eDBsK212c1BUOUtxT2NaZnIzWlFWeDhmeCtrQ1F1ZHd6RVlCMjdGbTBIUjlx?=
+ =?utf-8?B?bllaczhodHVSNjNHZERDLzhTUGpja0NWcnI5T2d2M3VoOWpTZUt0OU1oaWdk?=
+ =?utf-8?B?V0RrOGVZa2I1YkIxdDFnNFlxZFVFTlVMdCtlenh2Y2dVMjB5bElOUmVqVkZX?=
+ =?utf-8?B?V2xPUUFmMFlFUWVORzJMcHBja3N3VEljMFc1cU1LeXR4R0hUNVFXeFE3b1l2?=
+ =?utf-8?B?WjkvS0Q0SXZaNUpqcUN0SjQ3RCt5UStkQ3NRSWl4ajlQTlRxNjlrdklLaFpM?=
+ =?utf-8?B?L1o1a1hWa09OWGIycXNhQVdhc0hLSk1tMTBqK2J6RFRIYW53aDIyRTcvN1Nh?=
+ =?utf-8?B?QUY1SWhSUGtWWVgzbmtDaHpzS0JaK0pJbDNjdzF0TmZVVjVHeU0rMkZmRDhk?=
+ =?utf-8?B?MkI1akUxSHNPLzhBRWZPV2lzY0dsM3ZIVXhXbUhYUW9oSnYzRXUrWnVXakpO?=
+ =?utf-8?B?YnJNQ1FIc1JUL21yTWw1RUo4OTlmQnhmVkk5d1FHZlZxOElqNmpIVXZMMXpm?=
+ =?utf-8?B?MGEreCtJSEtzdENlMU1lOUh0Y0wxUnMrcWpvV2hxcHpSNy9obUprdkUzcmo0?=
+ =?utf-8?B?dTJMYnByekxjUjFwZkh6dnhmZ0NrbTVmZHZQdjZncEFydkx0TzN1NS9FTjU1?=
+ =?utf-8?B?emdPVWN0SnhtT1R5N3E1dFNCQ3NVck5pYzNaNXY1L2xaazhWajlWNDI3SHJL?=
+ =?utf-8?B?V3hiVWRVbi9zeWNKS2k3SXhkb1h3R1RLc05pUUlKVFpFNEZzRGxWZkJlZlpz?=
+ =?utf-8?B?NlZ3cHRyeHJQZnV5eXdpZ1YyRmJPZm15YXAxMHgxRzRnUXZZT1Z1NXltcUsy?=
+ =?utf-8?B?RUtleDJ3SjNSS0RleWxZNlk2eUJmbTBrQUNJU29YVmplQlE9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 20:36:00.0070
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad8d4ffe-8776-4c96-b697-08dca50dbcd2
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF000000A0.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7768
 
-On Mon, Jul 15, 2024 at 2:08=E2=80=AFAM Amit Machhiwal <amachhiw@linux.ibm.=
-com> wrote:
->
-> With CONFIG_PCI_DYNAMIC_OF_NODES [1], a hot-plug and hot-unplug sequence
-> of a PCI device attached to a PCI-bridge causes following kernel Oops on
-> a pseries KVM guest:
->
->  RTAS: event: 2, Type: Hotplug Event (229), Severity: 1
->  Kernel attempted to read user page (10ec00000048) - exploit attempt? (ui=
-d: 0)
->  BUG: Unable to handle kernel data access on read at 0x10ec00000048
->  Faulting instruction address: 0xc0000000012d8728
->  Oops: Kernel access of bad area, sig: 11 [#1]
->  LE PAGE_SIZE=3D64K MMU=3DRadix SMP NR_CPUS=3D2048 NUMA pSeries
-> <snip>
->  NIP [c0000000012d8728] __of_changeset_entry_invert+0x10/0x1ac
->  LR [c0000000012da7f0] __of_changeset_revert_entries+0x98/0x180
->  Call Trace:
->  [c00000000bcc3970] [c0000000012daa60] of_changeset_revert+0x58/0xd8
->  [c00000000bcc39c0] [c000000000d0ed78] of_pci_remove_node+0x74/0xb0
->  [c00000000bcc39f0] [c000000000cdcfe0] pci_stop_bus_device+0xf4/0x138
->  [c00000000bcc3a30] [c000000000cdd140] pci_stop_and_remove_bus_device_loc=
-ked+0x34/0x64
->  [c00000000bcc3a60] [c000000000cf3780] remove_store+0xf0/0x108
->  [c00000000bcc3ab0] [c000000000e89e04] dev_attr_store+0x34/0x78
->  [c00000000bcc3ad0] [c0000000007f8dd4] sysfs_kf_write+0x70/0xa4
->  [c00000000bcc3af0] [c0000000007f7248] kernfs_fop_write_iter+0x1d0/0x2e0
->  [c00000000bcc3b40] [c0000000006c9b08] vfs_write+0x27c/0x558
->  [c00000000bcc3bf0] [c0000000006ca168] ksys_write+0x90/0x170
->  [c00000000bcc3c40] [c000000000033248] system_call_exception+0xf8/0x290
->  [c00000000bcc3e50] [c00000000000d05c] system_call_vectored_common+0x15c/=
-0x2ec
-> <snip>
->
-> A git bisect pointed this regression to be introduced via [1] that added
-> a mechanism to create device tree nodes for parent PCI bridges when a
-> PCI device is hot-plugged.
->
-> The Oops is caused when `pci_stop_dev()` tries to remove a non-existing
-> device-tree node associated with the pci_dev that was earlier
-> hot-plugged and was attached under a pci-bridge. The PCI dev header
-> `dev->hdr_type` being 0, results a conditional check done with
-> `pci_is_bridge()` into false. Consequently, a call to
-> `of_pci_make_dev_node()` to create a device node is never made. When at
-> a later point in time, in the device node removal path, a memcpy is
-> attempted in `__of_changeset_entry_invert()`; since the device node was
-> never created, results in an Oops due to kernel read access to a bad
-> address.
->
-> To fix this issue, the patch updates `of_changeset_create_node()` to
-> allocate a new node only when the device node doesn't exist and init it
-> in case it does already. Also, introduce `of_pci_free_node()` to be
-> called to only revert and destroy the changeset device node that was
-> created via a call to `of_changeset_create_node()`.
->
-> [1] commit 407d1a51921e ("PCI: Create device tree node for bridge")
->
-> Fixes: 407d1a51921e ("PCI: Create device tree node for bridge")
-> Reported-by: Kowshik Jois B S <kowsjois@linux.ibm.com>
-> Signed-off-by: Lizhi Hou <lizhi.hou@amd.com>
-> Signed-off-by: Amit Machhiwal <amachhiw@linux.ibm.com>
-> ---
-> Changes since v1:
->     * Included Lizhi's suggested changes on V1
->     * Fixed below two warnings from Lizhi's changes and rearranged the cl=
-eanup
->       part a bit in `of_pci_make_dev_node`
->         drivers/pci/of.c:611:6: warning: no previous prototype for =E2=80=
-=98of_pci_free_node=E2=80=99 [-Wmissing-prototypes]
->           611 | void of_pci_free_node(struct device_node *np)
->               |      ^~~~~~~~~~~~~~~~
->         drivers/pci/of.c: In function =E2=80=98of_pci_make_dev_node=E2=80=
-=99:
->         drivers/pci/of.c:696:1: warning: label =E2=80=98out_destroy_cset=
-=E2=80=99 defined but not used [-Wunused-label]
->           696 | out_destroy_cset:
->               | ^~~~~~~~~~~~~~~~
->     * V1: https://lore.kernel.org/all/20240703141634.2974589-1-amachhiw@l=
-inux.ibm.com/
->
->  drivers/of/dynamic.c  | 16 ++++++++++++----
->  drivers/of/unittest.c |  2 +-
->  drivers/pci/bus.c     |  3 +--
->  drivers/pci/of.c      | 39 ++++++++++++++++++++++++++-------------
->  drivers/pci/pci.h     |  2 ++
->  include/linux/of.h    |  1 +
->  6 files changed, 43 insertions(+), 20 deletions(-)
->
-> diff --git a/drivers/of/dynamic.c b/drivers/of/dynamic.c
-> index dda6092e6d3a..9bba5e82a384 100644
-> --- a/drivers/of/dynamic.c
-> +++ b/drivers/of/dynamic.c
-> @@ -492,21 +492,29 @@ struct device_node *__of_node_dup(const struct devi=
-ce_node *np,
->   * a given changeset.
->   *
->   * @ocs: Pointer to changeset
-> + * @np: Pointer to device node. If null, allocate a new node. If not, in=
-it an
-> + *     existing one.
->   * @parent: Pointer to parent device node
->   * @full_name: Node full name
->   *
->   * Return: Pointer to the created device node or NULL in case of an erro=
-r.
->   */
->  struct device_node *of_changeset_create_node(struct of_changeset *ocs,
-> +                                            struct device_node *np,
->                                              struct device_node *parent,
->                                              const char *full_name)
->  {
-> -       struct device_node *np;
->         int ret;
->
-> -       np =3D __of_node_dup(NULL, full_name);
-> -       if (!np)
-> -               return NULL;
-> +       if (!np) {
-> +               np =3D __of_node_dup(NULL, full_name);
-> +               if (!np)
-> +                       return NULL;
-> +       } else {
-> +               of_node_set_flag(np, OF_DYNAMIC);
-> +               of_node_set_flag(np, OF_DETACHED);
 
-Are we going to rename the function to
-of_changeset_create_or_maybe_modify_node()? No. The functions here are
-very clear in that they allocate new objects and don't reuse what's
-passed in.
+On 7/15/24 10:23, Bjorn Helgaas wrote:
+> On Mon, Jul 15, 2024 at 09:20:01AM -0700, Lizhi Hou wrote:
+>> On 7/15/24 01:07, Amit Machhiwal wrote:
+>>> With CONFIG_PCI_DYNAMIC_OF_NODES [1], a hot-plug and hot-unplug sequence
+>>> of a PCI device attached to a PCI-bridge causes following kernel Oops on
+>>> a pseries KVM guest:
+>>>
+>>>    RTAS: event: 2, Type: Hotplug Event (229), Severity: 1
+>>>    Kernel attempted to read user page (10ec00000048) - exploit attempt? (uid: 0)
+>>>    BUG: Unable to handle kernel data access on read at 0x10ec00000048
+>>>    Faulting instruction address: 0xc0000000012d8728
+>>>    Oops: Kernel access of bad area, sig: 11 [#1]
+>>>    LE PAGE_SIZE=64K MMU=Radix SMP NR_CPUS=2048 NUMA pSeries
+>>> <snip>
+>>>    NIP [c0000000012d8728] __of_changeset_entry_invert+0x10/0x1ac
+>>>    LR [c0000000012da7f0] __of_changeset_revert_entries+0x98/0x180
+>>>    Call Trace:
+>>>    [c00000000bcc3970] [c0000000012daa60] of_changeset_revert+0x58/0xd8
+>>>    [c00000000bcc39c0] [c000000000d0ed78] of_pci_remove_node+0x74/0xb0
+>>>    [c00000000bcc39f0] [c000000000cdcfe0] pci_stop_bus_device+0xf4/0x138
+>>>    [c00000000bcc3a30] [c000000000cdd140] pci_stop_and_remove_bus_device_locked+0x34/0x64
+>>>    [c00000000bcc3a60] [c000000000cf3780] remove_store+0xf0/0x108
+>>>    [c00000000bcc3ab0] [c000000000e89e04] dev_attr_store+0x34/0x78
+>>>    [c00000000bcc3ad0] [c0000000007f8dd4] sysfs_kf_write+0x70/0xa4
+>>>    [c00000000bcc3af0] [c0000000007f7248] kernfs_fop_write_iter+0x1d0/0x2e0
+>>>    [c00000000bcc3b40] [c0000000006c9b08] vfs_write+0x27c/0x558
+>>>    [c00000000bcc3bf0] [c0000000006ca168] ksys_write+0x90/0x170
+>>>    [c00000000bcc3c40] [c000000000033248] system_call_exception+0xf8/0x290
+>>>    [c00000000bcc3e50] [c00000000000d05c] system_call_vectored_common+0x15c/0x2ec
+>>> <snip>
+>>>
+>>> A git bisect pointed this regression to be introduced via [1] that added
+>>> a mechanism to create device tree nodes for parent PCI bridges when a
+>>> PCI device is hot-plugged.
+>>>
+>>> The Oops is caused when `pci_stop_dev()` tries to remove a non-existing
+>>> device-tree node associated with the pci_dev that was earlier
+>>> hot-plugged and was attached under a pci-bridge. The PCI dev header
+>>> `dev->hdr_type` being 0, results a conditional check done with
+>>> `pci_is_bridge()` into false. Consequently, a call to
+>>> `of_pci_make_dev_node()` to create a device node is never made. When at
+>>> a later point in time, in the device node removal path, a memcpy is
+>>> attempted in `__of_changeset_entry_invert()`; since the device node was
+>>> never created, results in an Oops due to kernel read access to a bad
+>>> address.
+>>>
+>>> To fix this issue, the patch updates `of_changeset_create_node()` to
+>>> allocate a new node only when the device node doesn't exist and init it
+>>> in case it does already. Also, introduce `of_pci_free_node()` to be
+>>> called to only revert and destroy the changeset device node that was
+>>> created via a call to `of_changeset_create_node()`.
+>>>
+>>> [1] commit 407d1a51921e ("PCI: Create device tree node for bridge")
+>>>
+>>> Fixes: 407d1a51921e ("PCI: Create device tree node for bridge")
+>>> Reported-by: Kowshik Jois B S <kowsjois@linux.ibm.com>
+>>> Signed-off-by: Lizhi Hou <lizhi.hou@amd.com>
+>>> Signed-off-by: Amit Machhiwal <amachhiw@linux.ibm.com>
+>>> ---
+>>> Changes since v1:
+>>>       * Included Lizhi's suggested changes on V1
+>>>       * Fixed below two warnings from Lizhi's changes and rearranged the cleanup
+>>>         part a bit in `of_pci_make_dev_node`
+>>> 	drivers/pci/of.c:611:6: warning: no previous prototype for ‘of_pci_free_node’ [-Wmissing-prototypes]
+>>> 	  611 | void of_pci_free_node(struct device_node *np)
+>>> 	      |      ^~~~~~~~~~~~~~~~
+>>> 	drivers/pci/of.c: In function ‘of_pci_make_dev_node’:
+>>> 	drivers/pci/of.c:696:1: warning: label ‘out_destroy_cset’ defined but not used [-Wunused-label]
+>>> 	  696 | out_destroy_cset:
+>>> 	      | ^~~~~~~~~~~~~~~~
+>>>       * V1: https://lore.kernel.org/all/20240703141634.2974589-1-amachhiw@linux.ibm.com/
+>>>
+>>>    drivers/of/dynamic.c  | 16 ++++++++++++----
+>>>    drivers/of/unittest.c |  2 +-
+>>>    drivers/pci/bus.c     |  3 +--
+>>>    drivers/pci/of.c      | 39 ++++++++++++++++++++++++++-------------
+>>>    drivers/pci/pci.h     |  2 ++
+>>>    include/linux/of.h    |  1 +
+>>>    6 files changed, 43 insertions(+), 20 deletions(-)
+>>>
+>>> diff --git a/drivers/of/dynamic.c b/drivers/of/dynamic.c
+>>> index dda6092e6d3a..9bba5e82a384 100644
+>>> --- a/drivers/of/dynamic.c
+>>> +++ b/drivers/of/dynamic.c
+>>> @@ -492,21 +492,29 @@ struct device_node *__of_node_dup(const struct device_node *np,
+>>>     * a given changeset.
+>>>     *
+>>>     * @ocs: Pointer to changeset
+>>> + * @np: Pointer to device node. If null, allocate a new node. If not, init an
+>>> + *	existing one.
+>>>     * @parent: Pointer to parent device node
+>>>     * @full_name: Node full name
+>>>     *
+>>>     * Return: Pointer to the created device node or NULL in case of an error.
+>>>     */
+>>>    struct device_node *of_changeset_create_node(struct of_changeset *ocs,
+>>> +					     struct device_node *np,
+>>>    					     struct device_node *parent,
+>>>    					     const char *full_name)
+>>>    {
+>>> -	struct device_node *np;
+>>>    	int ret;
+>>> -	np = __of_node_dup(NULL, full_name);
+>>> -	if (!np)
+>>> -		return NULL;
+>>> +	if (!np) {
+>>> +		np = __of_node_dup(NULL, full_name);
+>>> +		if (!np)
+>>> +			return NULL;
+>>> +	} else {
+>>> +		of_node_set_flag(np, OF_DYNAMIC);
+>>> +		of_node_set_flag(np, OF_DETACHED);
+>>> +	}
+>>> +
+>>>    	np->parent = parent;
+>>>    	ret = of_changeset_attach_node(ocs, np);
+>>> diff --git a/drivers/of/unittest.c b/drivers/of/unittest.c
+>>> index 445ad13dab98..b1bcc9ed40a6 100644
+>>> --- a/drivers/of/unittest.c
+>>> +++ b/drivers/of/unittest.c
+>>> @@ -871,7 +871,7 @@ static void __init of_unittest_changeset(void)
+>>>    	unittest(!of_changeset_add_property(&chgset, parent, ppadd), "fail add prop prop-add\n");
+>>>    	unittest(!of_changeset_update_property(&chgset, parent, ppupdate), "fail update prop\n");
+>>>    	unittest(!of_changeset_remove_property(&chgset, parent, ppremove), "fail remove prop\n");
+>>> -	n22 = of_changeset_create_node(&chgset, n2, "n22");
+>>> +	n22 = of_changeset_create_node(&chgset, NULL,  n2, "n22");
+>>>    	unittest(n22, "fail create n22\n");
+>>>    	unittest(!of_changeset_add_prop_string(&chgset, n22, "prop-str", "abcd"),
+>>>    		 "fail add prop prop-str");
+>>> diff --git a/drivers/pci/bus.c b/drivers/pci/bus.c
+>>> index 826b5016a101..d7ca20cb146a 100644
+>>> --- a/drivers/pci/bus.c
+>>> +++ b/drivers/pci/bus.c
+>>> @@ -342,8 +342,7 @@ void pci_bus_add_device(struct pci_dev *dev)
+>>>    	 */
+>>>    	pcibios_bus_add_device(dev);
+>>>    	pci_fixup_device(pci_fixup_final, dev);
+>>> -	if (pci_is_bridge(dev))
+>>> -		of_pci_make_dev_node(dev);
+>>> +	of_pci_make_dev_node(dev);
+>> Please undo this change. It should only create the device node for bridges
+>> and the pci endpoints listed in quirks for now.
+> IIUC, you want Amit to post a v3 of this patch that omits this
+> specific pci_bus_add_device() change?
 
-Rob
+Yes.
+
+Lizhi
+
+>
+>>>    	pci_create_sysfs_dev_files(dev);
+>>>    	pci_proc_attach_device(dev);
+>>>    	pci_bridge_d3_update(dev);
+>>> diff --git a/drivers/pci/of.c b/drivers/pci/of.c
+>>> index 51e3dd0ea5ab..883bf15211a5 100644
+>>> --- a/drivers/pci/of.c
+>>> +++ b/drivers/pci/of.c
+>>> @@ -608,18 +608,28 @@ int devm_of_pci_bridge_init(struct device *dev, struct pci_host_bridge *bridge)
+>>>    #ifdef CONFIG_PCI_DYNAMIC_OF_NODES
+>>> +void of_pci_free_node(struct device_node *np)
+>>> +{
+>>> +	struct of_changeset *cset;
+>>> +
+>>> +	cset = (struct of_changeset *)(np + 1);
+>>> +
+>>> +	np->data = NULL;
+>>> +	of_changeset_revert(cset);
+>>> +	of_changeset_destroy(cset);
+>>> +	of_node_put(np);
+>>> +}
+>>> +
+>>>    void of_pci_remove_node(struct pci_dev *pdev)
+>>>    {
+>>>    	struct device_node *np;
+>>>    	np = pci_device_to_OF_node(pdev);
+>>> -	if (!np || !of_node_check_flag(np, OF_DYNAMIC))
+>>> +	if (!np || np->data != of_pci_free_node)
+>>>    		return;
+>>>    	pdev->dev.of_node = NULL;
+>>> -	of_changeset_revert(np->data);
+>>> -	of_changeset_destroy(np->data);
+>>> -	of_node_put(np);
+>>> +	of_pci_free_node(np);
+>>>    }
+>>>    void of_pci_make_dev_node(struct pci_dev *pdev)
+>>> @@ -655,14 +665,18 @@ void of_pci_make_dev_node(struct pci_dev *pdev)
+>>>    	if (!name)
+>>>    		return;
+>>> -	cset = kmalloc(sizeof(*cset), GFP_KERNEL);
+>>> -	if (!cset)
+>>> +	np = kzalloc(sizeof(*np) + sizeof(*cset), GFP_KERNEL);
+>>> +	if (!np)
+>>>    		goto out_free_name;
+>>> +	np->full_name = name;
+>>> +	of_node_init(np);
+>>> +
+>>> +	cset = (struct of_changeset *)(np + 1);
+>>>    	of_changeset_init(cset);
+>>> -	np = of_changeset_create_node(cset, ppnode, name);
+>>> +	np = of_changeset_create_node(cset, np, ppnode, NULL);
+>>>    	if (!np)
+>>> -		goto out_destroy_cset;
+>>> +		goto out_free_node;
+>>>    	ret = of_pci_add_properties(pdev, cset, np);
+>>>    	if (ret)
+>>> @@ -670,19 +684,18 @@ void of_pci_make_dev_node(struct pci_dev *pdev)
+>>>    	ret = of_changeset_apply(cset);
+>>>    	if (ret)
+>>> -		goto out_free_node;
+>>> +		goto out_destroy_cset;
+>>> -	np->data = cset;
+>>> +	np->data = of_pci_free_node;
+>>>    	pdev->dev.of_node = np;
+>>> -	kfree(name);
+>>>    	return;
+>>> -out_free_node:
+>>> -	of_node_put(np);
+>>>    out_destroy_cset:
+>>>    	of_changeset_destroy(cset);
+>>>    	kfree(cset);
+>>> +out_free_node:
+>>> +	of_node_put(np);
+>>>    out_free_name:
+>>>    	kfree(name);
+>>>    }
+>>> diff --git a/drivers/pci/pci.h b/drivers/pci/pci.h
+>>> index fd44565c4756..7b1a455306b8 100644
+>>> --- a/drivers/pci/pci.h
+>>> +++ b/drivers/pci/pci.h
+>>> @@ -702,11 +702,13 @@ struct of_changeset;
+>>>    #ifdef CONFIG_PCI_DYNAMIC_OF_NODES
+>>>    void of_pci_make_dev_node(struct pci_dev *pdev);
+>>> +void of_pci_free_node(struct device_node *np);
+>>>    void of_pci_remove_node(struct pci_dev *pdev);
+>>>    int of_pci_add_properties(struct pci_dev *pdev, struct of_changeset *ocs,
+>>>    			  struct device_node *np);
+>>>    #else
+>>>    static inline void of_pci_make_dev_node(struct pci_dev *pdev) { }
+>>> +static inline void of_pci_free_node(struct device_node *np) { }
+>>>    static inline void of_pci_remove_node(struct pci_dev *pdev) { }
+>>>    #endif
+>>> diff --git a/include/linux/of.h b/include/linux/of.h
+>>> index a0bedd038a05..f774459d0d84 100644
+>>> --- a/include/linux/of.h
+>>> +++ b/include/linux/of.h
+>>> @@ -1631,6 +1631,7 @@ static inline int of_changeset_update_property(struct of_changeset *ocs,
+>>>    }
+>>>    struct device_node *of_changeset_create_node(struct of_changeset *ocs,
+>>> +					     struct device_node *np,
+>>>    					     struct device_node *parent,
+>>>    					     const char *full_name);
+>>>    int of_changeset_add_prop_string(struct of_changeset *ocs,
+>>>
+>>> base-commit: 43db1e03c086ed20cc75808d3f45e780ec4ca26e
 
