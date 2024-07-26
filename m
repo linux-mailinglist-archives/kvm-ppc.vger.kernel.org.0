@@ -1,108 +1,122 @@
-Return-Path: <kvm-ppc+bounces-148-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-149-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF4093D374
-	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Jul 2024 14:49:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2579593D7D2
+	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Jul 2024 19:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 119BC280D73
-	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Jul 2024 12:49:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 576891C22982
+	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Jul 2024 17:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF3D17B434;
-	Fri, 26 Jul 2024 12:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15E117C7DF;
+	Fri, 26 Jul 2024 17:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="ko+oh1yW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAQh8Rs8"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306FB2B9DB;
-	Fri, 26 Jul 2024 12:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC07E17C7CF;
+	Fri, 26 Jul 2024 17:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721998177; cv=none; b=HAuqpP0lE9eLwCFSuNpMNEv4FuRlLLQ/b4xfMDXeyp7bh3RNRS9/Lkf/QqWxn0PPZ3JY/ZsAUHl40FIcr7N0PqQlb3prJC9Jla9fxQilt/jf5JIN3rkC/9FAfLv7iNePbMmQ8CMb9ikddJaSSEFrmgU5CvwEVX2g52EKbONclf8=
+	t=1722016381; cv=none; b=n4hiQZiFISouNQKYR3HbG3v46iCNns4z8W4CF/BoqpTb2AaPfyIBGE6PgMVPRW6Zuzuq8poKFb0LIsqMD+Xg3uy41BbqOW2/vJ6T9j9mU4y2RmOuMvISYNXs9YSLaW5p7SwAlkRB+shdznjUEjMNp9oi6fVqnvhYUWXR0lQvI30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721998177; c=relaxed/simple;
-	bh=CG58Cw01rwsoyFtR++iSV0HzK97O4jr4VBnptMsETWA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=f70B+IuW4F7ClW0V/7s5CvdAo6J2N3+zhIvku6Sqse779aNZpvaU1RnI0OGwSZWMrKcOzo4fxVfsvmkEoCtfJZj4EwRAl3WhGgks/HQspq5r8KB5Ih2ItcNxRiF6jlHH+meeDj/lAlzFzXm/BKeO7RW8JkLxMrVLbddst+fwGX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=ko+oh1yW; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1721998173;
-	bh=FbjGrZAf4KleDcOMWprQnrXa/ICyg2tclBDC0d6LUpM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=ko+oh1yWmHuJ28MuSfSmWMSNvw/3PNVTmZhhgZO3y/QcEE8E5mIEiGRDDVZtk5SA3
-	 DSwzeimB8ywiZbBMODXyn6E3xM1JH0JxV/aLtd1QGSvDmH0yzkKKa9bG8hiA5NgRKC
-	 xgyhcypHpdkzlJONdYHOJh1PbUY+RfLi2lOLNVXFZ2Mtu8zBkRBjE+WI0vLEP3z9P+
-	 nX0VvkHtfXlv+O+hkN8NjHNWCrXdHF7EVn8l3kuxbFtZYJJgzZUSv0ZI3+4XmjYaAj
-	 XXn1CNLfxSLNtpFcC7HVKXAo4pfHsaM5mjhG0xQrBqhT3aKb+lDVY8fI/M6cV8UPKG
-	 FtP423ZOyfizA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WVndS1hY7z4w2M;
-	Fri, 26 Jul 2024 22:49:32 +1000 (AEST)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Amit Machhiwal <amachhiw@linux.ibm.com>, Bjorn Helgaas <helgaas@kernel.org>
-Cc: Lizhi Hou <lizhi.hou@amd.com>, Rob Herring <robh@kernel.org>,
- linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-ppc@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>, Saravana
- Kannan <saravanak@google.com>, Vaibhav Jain <vaibhav@linux.ibm.com>,
- Nicholas Piggin <npiggin@gmail.com>, Vaidyanathan Srinivasan
- <svaidy@linux.ibm.com>, Kowshik Jois B S <kowsjois@linux.ibm.com>, Lukas
- Wunner <lukas@wunner.de>
-Subject: Re: [PATCH v2] PCI: Fix crash during pci_dev hot-unplug on pseries
- KVM guest
-In-Reply-To: <dx32q3sa4oopk3fnm2zyeplotuq6gq3rmnbmaw3mo4q3lgjpe7@gvpgu4rdk4f4>
-References: <p6cs4fxzistpyqkc5bv2sb76inrw7fterocdcu3snnyjpqydbr@thxna6v2umrl>
- <20240725205537.GA858788@bhelgaas>
- <dx32q3sa4oopk3fnm2zyeplotuq6gq3rmnbmaw3mo4q3lgjpe7@gvpgu4rdk4f4>
-Date: Fri, 26 Jul 2024 22:49:31 +1000
-Message-ID: <87sevwuxlw.fsf@mail.lhotse>
+	s=arc-20240116; t=1722016381; c=relaxed/simple;
+	bh=gbriWgUniQV5sMUGUpc7uG99BGb3pVKbc+1MWsqJxl0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hE6qn3bSLV0GC6OV1EmH0jS3N4bO8AQiDlA33tUi+R53UMKJ3kunolWxOUTabSu7H8uU9vtmAmlfshiHKB047KhdqB5QUOfsAO0NUySYoH5S8gSAg6rZE8FuXTNzhXkrbGKrKkhAD4DqPi4B60B/rJ1T2f+R7EvQ7HRIQ3RHfKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VAQh8Rs8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DAC7C32782;
+	Fri, 26 Jul 2024 17:53:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722016381;
+	bh=gbriWgUniQV5sMUGUpc7uG99BGb3pVKbc+1MWsqJxl0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=VAQh8Rs86BVc0bQxBQpsw7E3oB7YUvEzDioyvNYyYRWg3/YE7BJZ9Bb5yeZktWUpE
+	 1jI2lNv0JjHBTeMrqFoOx4732CF0GlVQ8ls/qKpBs5EaMagA0+TzO3hURk91b+c2nJ
+	 GYh/ZaOkeTJ/Ehvehu29zHCbM1rfeyyShv0iZfQnHzViqUZtSQh7WwhFsgBPAwKaaR
+	 nXKjVlm1GJwtqXN4zJMB6FcsT14q3jUJG4IAHR0gTYtnyeAzTexMgGLCGw3OqNya4Y
+	 gHCfIMUscJ9mctMB6SDLSpL1yVxgIEmLbOAyZax3r6DQVedli9R+6goBy+Yf/JOwlD
+	 YhO2AP739onfg==
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ef248ab2aeso22825781fa.0;
+        Fri, 26 Jul 2024 10:53:01 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVrsVPzPygjIKRSXvxldVLhsgDZ1wWrePEaktv6iuCfZkgR8IOsVkkD3ubu1EvUjwYDyLSku+2H5lbS941ejyByE2fYCCm0HR7a7IgZClId9VQ5axIR3x2Bbb2gkIqGwQgfHGRjutTEa6fJg0vwDkJmBVxJoR3/R/Wf0GIkAxwx1hE=
+X-Gm-Message-State: AOJu0YwOV0vHjL9EaHuV4O/3uqHs+KDvdwDGhncAp0QXY0QWnuSbh5ph
+	ZKBggRmt0lpf2mw7FO7mCzy1T5z8dKc3QXzkUaJRaA217EytR4VapUci2TymQJKMagA0XKYz7Id
+	iC1WcR0bXmIuIxzigZ5C2mu4j+A==
+X-Google-Smtp-Source: AGHT+IGIboFhjpqofVqlOelOMvR4+RrtFqzfu/57gAtHLJz3rx7lzmCVwhoRpixh1COmKEuQcel3sDSsZgJ8oYzdKa4=
+X-Received: by 2002:a05:651c:a09:b0:2ef:2d54:f590 with SMTP id
+ 38308e7fff4ca-2f12ee278bamr4650001fa.24.1722016379634; Fri, 26 Jul 2024
+ 10:52:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240715080726.2496198-1-amachhiw@linux.ibm.com>
+ <CAL_JsqKKkcXDJ2nz98WNCvsSFzzc3dVXVnxMCntFXsCP=MeKsA@mail.gmail.com>
+ <a6c92c73-13fb-8e9c-29de-1437654c3880@amd.com> <20240723162107.GA501469-robh@kernel.org>
+ <a8d2e310-9446-6cfa-fe00-4ef83cdb6590@amd.com> <CAL_JsqJjhaLFm9jiswJTfi4yZFYGKJUdC+HV662RLWEkJjxACw@mail.gmail.com>
+ <ac3aeec4-70fc-cd9e-498c-acab0b218d9b@amd.com> <p6cs4fxzistpyqkc5bv2sb76inrw7fterocdcu3snnyjpqydbr@thxna6v2umrl>
+ <d20b78cd-ed34-3e5a-0176-c20ee5afd0db@amd.com>
+In-Reply-To: <d20b78cd-ed34-3e5a-0176-c20ee5afd0db@amd.com>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 26 Jul 2024 12:52:46 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqJAuVexFAz6gWWuTtX1Go-FnHe6vJapv0znHBERSCtv+Q@mail.gmail.com>
+Message-ID: <CAL_JsqJAuVexFAz6gWWuTtX1Go-FnHe6vJapv0znHBERSCtv+Q@mail.gmail.com>
+Subject: Re: [PATCH v2] PCI: Fix crash during pci_dev hot-unplug on pseries
+ KVM guest
+To: Lizhi Hou <lizhi.hou@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-ppc@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>, 
+	Saravana Kannan <saravanak@google.com>, Vaibhav Jain <vaibhav@linux.ibm.com>, 
+	Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Vaidyanathan Srinivasan <svaidy@linux.ibm.com>, Kowshik Jois B S <kowsjois@linux.ibm.com>, 
+	Lukas Wunner <lukas@wunner.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Amit Machhiwal <amachhiw@linux.ibm.com> writes:
-> Hi Bjorn,
+On Thu, Jul 25, 2024 at 6:06=E2=80=AFPM Lizhi Hou <lizhi.hou@amd.com> wrote=
+:
 >
-> On 2024/07/25 03:55 PM, Bjorn Helgaas wrote:
->> On Thu, Jul 25, 2024 at 11:15:39PM +0530, Amit Machhiwal wrote:
->> > ...
->> > The crash in question is a critical issue that we would want to have
->> > a fix for soon. And while this is still being figured out, is it
->> > okay to go with the fix I proposed in the V1 of this patch?
->> 
->> v6.10 has been released already, and it will be a couple months before
->> the v6.11 release.
->> 
->> It looks like the regression is 407d1a51921e, which appeared in v6.6,
->> almost a year ago, so it's fairly old.
->> 
->> What target are you thinking about for the V1 patch?  I guess if we
->> add it as a v6.11 post-merge window fix, it might get backported to
->> stable kernels before v6.11?  
+> Hi Amit,
 >
-> Yes, I think we can go ahead with taking V1 patch for v6.11 post-merge window to
-> fix the current bug and ask Ubuntu to pick it while Lizhi's proposed patch goes
-> under test and review.
+>
+> I try to follow the option which add a OF flag. If Rob is ok with this,
+> I would suggest to use it instead of V1 patch
+>
+> diff --git a/drivers/of/dynamic.c b/drivers/of/dynamic.c
+> index dda6092e6d3a..a401ed0463d9 100644
+> --- a/drivers/of/dynamic.c
+> +++ b/drivers/of/dynamic.c
+> @@ -382,6 +382,11 @@ void of_node_release(struct kobject *kobj)
+>                                 __func__, node);
+>          }
+>
+> +       if (of_node_check_flag(node, OF_CREATED_WITH_CSET)) {
+> +               of_changeset_revert(node->data);
+> +               of_changeset_destroy(node->data);
+> +       }
 
-Lizhi's proposed patch (v3?) looks pretty small and straight forward.
-It should be possible to get it tested and reviewed and merge it as a
-fix during the v6.11-rc series.
+What happens if multiple nodes are created in the changeset?
 
-Or if the CONFIG option is completely broken as Rob suggests then it
-should just be forced off in Kconfig.
+> +
+>          if (node->child)
+>                  pr_err("ERROR: %s() unexpected children for %pOF/%s\n",
+>                          __func__, node->parent, node->full_name);
+> @@ -507,6 +512,7 @@ struct device_node *of_changeset_create_node(struct
+> of_changeset *ocs,
+>          np =3D __of_node_dup(NULL, full_name);
+>          if (!np)
+>                  return NULL;
+> +       of_node_set_flag(np, OF_CREATED_WITH_CSET);
 
-cheers
+This should be set where the data ptr is set.
+
+Rob
 
