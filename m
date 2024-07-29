@@ -1,101 +1,102 @@
-Return-Path: <kvm-ppc+bounces-150-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-151-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D89D393D880
-	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Jul 2024 20:45:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41BE093F3C3
+	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Jul 2024 13:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D789285BCA
-	for <lists+kvm-ppc@lfdr.de>; Fri, 26 Jul 2024 18:45:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62CF61C2102F
+	for <lists+kvm-ppc@lfdr.de>; Mon, 29 Jul 2024 11:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D24F405E6;
-	Fri, 26 Jul 2024 18:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5C6145B0B;
+	Mon, 29 Jul 2024 11:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SPzIDdh0"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="I7dUGmPZ"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2066.outbound.protection.outlook.com [40.107.93.66])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847C3433DF;
-	Fri, 26 Jul 2024 18:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722019512; cv=fail; b=UC4QxssB2LqJuBaXYPEbSJjBFTj4j1YlIxw2QZWI/dRGPTFvFdRtPeq+wFCZ8AYFRDxCbXJo0CyffUngOyS/o5phHcOShhyy+ZXuMOWkbyIOZymbg90GAGEavICq3sxwPnDZoORg1uB4dkSf1LXp2ttul8XcMmm7V4FCJnMSxUQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722019512; c=relaxed/simple;
-	bh=AYzZBJeO+f2UP8lQZgCtTbdE4sC8VnW6g/w5PwMgJ0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QnT4yuCaYtRm9nTuX/MvUYjfVIB5iPTBLUEEf/9d2jO1X9BNyQil+2t3O6pVrG9zXsMtdMWf4JPvmQvct2xzWaZ2a3Rl+04t2e2okPEg6Qj+1Fq6YK4ZXwwCrfOt80AoW0QJQxvrt6WP6cLF0AQLIUYHzQvT9Vcyfj5ITxtErlo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SPzIDdh0; arc=fail smtp.client-ip=40.107.93.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JjSvRAUq/8PPA2CslvLuKUUpKfUPzHmdjyQm6EIjwCYqRzjhs5V17Rnn+Hrb8twSI6o91Rl6uYLkwlbHQOwjkWmV1lXWHskByn4cKwvAT+xT3JVL3QuuUfB3YWp/asflmDs2IaIe1OuTeFEu1ek0H8B/ZP6d0uDPiaGFbDn5rDiMwiucGgN5RBoQL3hZA6kWQvAooyvXC2oCq1l9JlrrdKOkQ7E/OI9NJedgfXoWLH8PjtpaPRdZiAGQggnTaSosOG9meDUarnQ0+U4QdZK1XoXAdd0OgejEiR4xNjSkxpB2vGPtFAmnZUkBwlBm93z7JVCvIAVfmLfUTtRdeB4pvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g9Azu0YU9Rv9RzatF4DxeJMq+5AvqzQvxgRTAjY1XOE=;
- b=wokuexyHBO4CCC02AXKieA0Nc3j0vmbjfjIqTX6rQ+N/DUBq0q2Q2EgGnlkwsyqL3edqftp4w1uwTbjAFWcH8RP66NPooU9tio7GDO+M60knDOI9B4cUXvJRgY95kiwERs1jq3PM3DSvU2PkAvdKT8N6uNwSxGjyqcFdBbpwKLB1A1UFA8Nma6MkSQDADs4TVDqfI6N3ZPlA+LbOpj4pmhm0YZfzOymBAAbNRrHL/PJ4ejR5C4q/AUEX2rxQHai5DAUHVoN81AxBYxNXnoEze5UFtWF9Jihz+VqQzNvYlCo2lPKRK9Gcbd+L3p0ywxL0GikQO8Ctk32xvrLzWWk0xw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g9Azu0YU9Rv9RzatF4DxeJMq+5AvqzQvxgRTAjY1XOE=;
- b=SPzIDdh0gU0yHAIVV/W7l9aWSwqr0R9rxnWwCVmC+zPGmn+FR6cOvkpNSw/uoAYGQpFaD9mRQdCTN0wQnf8YFyQDkUdsb/qHALvG7sVUNWpFUQx+ziF/Z/i+lKbReKOlPQ7mK7q/fI4DZ6QtVFyCSmjtsa9Y2TeKsrefKsQgqkU=
-Received: from MN2PR19CA0026.namprd19.prod.outlook.com (2603:10b6:208:178::39)
- by DS7PR12MB6007.namprd12.prod.outlook.com (2603:10b6:8:7e::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.28; Fri, 26 Jul
- 2024 18:45:05 +0000
-Received: from BL02EPF00021F68.namprd02.prod.outlook.com
- (2603:10b6:208:178:cafe::36) by MN2PR19CA0026.outlook.office365.com
- (2603:10b6:208:178::39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.28 via Frontend
- Transport; Fri, 26 Jul 2024 18:45:04 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- BL02EPF00021F68.mail.protection.outlook.com (10.167.249.4) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7784.11 via Frontend Transport; Fri, 26 Jul 2024 18:45:04 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 26 Jul
- 2024 13:45:04 -0500
-Received: from [172.19.71.207] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Fri, 26 Jul 2024 13:45:03 -0500
-Message-ID: <0b1be7b7-e65b-8d8e-0659-388dec303039@amd.com>
-Date: Fri, 26 Jul 2024 11:45:03 -0700
-Precedence: bulk
-X-Mailing-List: kvm-ppc@vger.kernel.org
-List-Id: <kvm-ppc.vger.kernel.org>
-List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9DE140363;
+	Mon, 29 Jul 2024 11:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722251654; cv=none; b=PeJjFxB65f4xS+8irshbjHMjMLMjmGsmQ+85gcImWe12TMAGnO735DPXKNqfm1oNdh7sSJDB7h3MN/QYi6roepGrYfB9XIgqO0/aBRpwHF/xSNyKCrnwwcpPFnGI6yeOi3N1rmywsA2B++8Bxvs3HkCjD6J8AgxB01mm3OHuykU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722251654; c=relaxed/simple;
+	bh=t7wX+aL1HlfiwcGy2buh3bECW1GJ9PGepZeKPA+JOp0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P0Wky3JzPPHqYLmg6hCCLXOEItdb6Q86TeINHFQOLLdyW8ZUHQCsWOOI04erVkleoFyyzsii5NkiXBUhiYq2LCxbPGRcOrv11EZfyleF/aF2mhWmNUET2sQUT+pyGnRu27PZVsGIzyyLo+sqkxyI7XovTfZ/PljydE3dP0Bv2wU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=I7dUGmPZ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46TAc8Cm001491;
+	Mon, 29 Jul 2024 11:14:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:references:mime-version
+	:content-type:content-transfer-encoding:in-reply-to; s=pp1; bh=1
+	gs6YnTcqP0KDMgj9iXPwFr3Dpb/8bcmwNBHWzaJYYs=; b=I7dUGmPZuFjYgLTif
+	kmcQYm9gLQbTC2gYu1LiD+AzTgn76nDLNeBbyEd6qWEAlNYb4hqpS0ZFiwb5OIKY
+	aCiKuXA/VDZPW4K3ryh+Nc3Vt3nGU80pREx7jajBTEN2dLtZ7rAZcvMGaXmh0R5d
+	HthGOxBdNJeoqHCN+k3+tV0FeYLKzr+ep51WpAjwzApmDyGmBTD5Nr7ck+IjJdzq
+	dblg1Tq+XJTivOp5o7OhBqHyD4ZiQXWh7oWkue8aSeltW/G+7sjbN8eMMfbvuLdr
+	NfAneQ2N4Z8dIcRgxFA4Dsl+7li3cxLzkm1KPD7O1dE3rqNXU6OZHAEVUyOvdyOv
+	dtzRQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40p10294b8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jul 2024 11:13:59 +0000 (GMT)
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46TBDxH2029072;
+	Mon, 29 Jul 2024 11:13:59 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40p10294b5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jul 2024 11:13:59 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46T9QucQ007479;
+	Mon, 29 Jul 2024 11:13:58 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40nb7txhp3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jul 2024 11:13:58 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46TBDqpg56557926
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Jul 2024 11:13:54 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BA0892004D;
+	Mon, 29 Jul 2024 11:13:52 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AEBB62004B;
+	Mon, 29 Jul 2024 11:13:49 +0000 (GMT)
+Received: from li-e7e2bd4c-2dae-11b2-a85c-bfd29497117c.ibm.com (unknown [9.109.198.40])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 29 Jul 2024 11:13:49 +0000 (GMT)
+Date: Mon, 29 Jul 2024 16:43:43 +0530
+From: Amit Machhiwal <amachhiw@linux.ibm.com>
+To: Lizhi Hou <lizhi.hou@amd.com>
+Cc: Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+        Saravana Kannan <saravanak@google.com>,
+        Kowshik Jois B S <kowsjois@linux.ibm.com>, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Vaidyanathan Srinivasan <svaidy@linux.ibm.com>,
+        Lukas Wunner <lukas@wunner.de>, Nicholas Piggin <npiggin@gmail.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org
 Subject: Re: [PATCH v2] PCI: Fix crash during pci_dev hot-unplug on pseries
  KVM guest
-Content-Language: en-US
-To: Rob Herring <robh@kernel.org>
-CC: <linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-	<kvm-ppc@vger.kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Saravana
- Kannan <saravanak@google.com>, Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas
- Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
-	Vaidyanathan Srinivasan <svaidy@linux.ibm.com>, Kowshik Jois B S
-	<kowsjois@linux.ibm.com>, Lukas Wunner <lukas@wunner.de>
-References: <20240715080726.2496198-1-amachhiw@linux.ibm.com>
- <CAL_JsqKKkcXDJ2nz98WNCvsSFzzc3dVXVnxMCntFXsCP=MeKsA@mail.gmail.com>
+Message-ID: <6mjt477ltxhr4sudizyzbspkqb7yspxvnoiblzeiwxw5kwwsmq@bchicp4bmtzq>
+Mail-Followup-To: Lizhi Hou <lizhi.hou@amd.com>, 
+	Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org, 
+	Saravana Kannan <saravanak@google.com>, Kowshik Jois B S <kowsjois@linux.ibm.com>, 
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org, 
+	Vaidyanathan Srinivasan <svaidy@linux.ibm.com>, Lukas Wunner <lukas@wunner.de>, 
+	Nicholas Piggin <npiggin@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org
+References: <CAL_JsqKKkcXDJ2nz98WNCvsSFzzc3dVXVnxMCntFXsCP=MeKsA@mail.gmail.com>
  <a6c92c73-13fb-8e9c-29de-1437654c3880@amd.com>
  <20240723162107.GA501469-robh@kernel.org>
  <a8d2e310-9446-6cfa-fe00-4ef83cdb6590@amd.com>
@@ -104,143 +105,143 @@ References: <20240715080726.2496198-1-amachhiw@linux.ibm.com>
  <p6cs4fxzistpyqkc5bv2sb76inrw7fterocdcu3snnyjpqydbr@thxna6v2umrl>
  <d20b78cd-ed34-3e5a-0176-c20ee5afd0db@amd.com>
  <CAL_JsqJAuVexFAz6gWWuTtX1Go-FnHe6vJapv0znHBERSCtv+Q@mail.gmail.com>
-From: Lizhi Hou <lizhi.hou@amd.com>
-In-Reply-To: <CAL_JsqJAuVexFAz6gWWuTtX1Go-FnHe6vJapv0znHBERSCtv+Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+ <0b1be7b7-e65b-8d8e-0659-388dec303039@amd.com>
+Precedence: bulk
+X-Mailing-List: kvm-ppc@vger.kernel.org
+List-Id: <kvm-ppc.vger.kernel.org>
+List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: None (SATLEXMB03.amd.com: lizhi.hou@amd.com does not designate
- permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00021F68:EE_|DS7PR12MB6007:EE_
-X-MS-Office365-Filtering-Correlation-Id: 27ef26d3-52f8-478c-63a7-08dcada31091
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|7416014|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UkIvQmpQT2lQNzlLNkNJVVpveWtSTjNEYnBIaXVjWmRLVUhiUWpITzg2RDJp?=
- =?utf-8?B?Q2s3WTkwbGRudS9xK3dhV3l2UEs0OW1MOUdDREorMExHa0Q0ejNaaCt4dFZy?=
- =?utf-8?B?SmJuQjFOUG45SXUyV29qRWtna3A4MDcrZ0ZHTnRreTB6ekNCaURyWmJ0YnZy?=
- =?utf-8?B?UmJoc3J5UGZ1TXBmT0NwbVJWOERuWkl4ejlrZHFiODNSSjh5N0pkcnAxUFNl?=
- =?utf-8?B?NUFlejljcFJFdElST1BCNXJkN3ZMb0NnUzFPWlZEUEJSUXpTNERoREcyQWl0?=
- =?utf-8?B?Y1NLeUlCTm5FaUtvMlNiN3VOdjN6WTZFUFlIWENPSDl1NjBhOENhaEtnWGNB?=
- =?utf-8?B?Z2RIdWRsMjF1cjk1MWpxNFgySTV4OWIzaHlxV2xTL1ZVVFhvNGZORlRMQkZI?=
- =?utf-8?B?R3ZieFpaRG8rdG5sT29YQk54bVZpOHg5MDkrUzB5SGRrYk9pVitycVRuTVRr?=
- =?utf-8?B?UmRsbmE5L25DajZYNlZDS0RyOVhsc1ZONVQrTmtBSUpzWDh0OEczUURhU1Rm?=
- =?utf-8?B?aDNnRlFaNHlsN2ZIbHJlZDMybldrSk1tdk5ScUJDMk9RUk5aV3M1dWdmNmxC?=
- =?utf-8?B?MjZ4LzVnZkwweG1vbXUrbnVYakQxKzdrM00wYzhNU3FibE9JdXQvaUkycjhX?=
- =?utf-8?B?clR5azlJL0tMWHUvRFV1ck9FMHorRzNrSDJwVUx4L0FUSnczOVlOV3JXQ0x1?=
- =?utf-8?B?bDM3bnAybFFMZHJBQTl2dkx0M200N2c3aDdpYmJUSU92TjBKRmlZTkxLUSs3?=
- =?utf-8?B?NlNyd2tEMEZvT2Ztb2pxRTc3TzFXVnhRYjliaEk5UWxHd1Y2RDRrVmIrT0s2?=
- =?utf-8?B?UFdMcVQveXJYRytmL0pWQ3BrY0FPdEgxMmxNRzZoY29mYkY0bkk5MlRIVWJt?=
- =?utf-8?B?dllEMHpoRTRHclQ0THlJZFg3dmFweW5ocnd2T3k4Z1BpVno1VkxCNWRRK2d3?=
- =?utf-8?B?SEFwWHBaZHZOVjA1UmpJOEtuMFpXR1ZlS094djIvM3VERVJsTFRGd2NORDl2?=
- =?utf-8?B?Y1NoVnVBdzNwUUxGcVpyaS9XMHk4clFXYzJvOWtXMER6Q2FaTmZQUExxTDlS?=
- =?utf-8?B?Q2FEY1YveEg3MWkzNmhkQkErMVJqVmlEWkR2UUhBenZobWJBay9nQlZIbFh4?=
- =?utf-8?B?eFp2TEJ1TTZBc1N2MHU5b3ovTEl6b29DQUhpOVBtei9GcU1Fd2NUSk96dDJk?=
- =?utf-8?B?OGJwWVh0YjNjV0U1eXF5TDNhSXVLbGNFYVVEYkdDcU8vc1lrcmNEaStPRFk3?=
- =?utf-8?B?cUhlei9qNUwyRVpLdUtVc3lOTzQ5SGp2eUEyallXcTBiTVpvQVp0VVFwUHU4?=
- =?utf-8?B?aXRJVWVkckVRRFZ6N0w4SUtSMkE2dUhxbjhMYy9acm1DalRSSDlVZmtBVnVy?=
- =?utf-8?B?Wm1FZ1FFa1BXeGF1eE1KK1k2SDIrOWowWWdER0ora1hBUEJyUzN4azdwYXpC?=
- =?utf-8?B?dWpYTTNhZm9jRWRHYUkyVm1QaTBua1RrWkF4aWpoNVlDamhqQ0ltNkZGRGtS?=
- =?utf-8?B?K3FHK1ZjNXliRGExclFTTnlhMk1CTjFqSjMraHIrSXArSzdLMk9HM1BySk9w?=
- =?utf-8?B?NkJOeXdVQlkxaW02bU14UzlKNlF4UkxhcnAxQ1NOSE5DeW5VbmhCUWhmc1pZ?=
- =?utf-8?B?ZUY0ZmN1L0M1OUwxb3djY2hMYlV5ZHI3akh5WlBwRDU3c2NkY2dveXVzNTZu?=
- =?utf-8?B?SkM2dGkzbXo5MjZsa05YNm1FZlNIbmM5UTlKeFFRcEdFcEcwRlBXZ255T2h1?=
- =?utf-8?B?WEViMWxacHJHc3IzN3hQN0NRSnVTMnUzMnhNamFXeVV3UTNIY1pIWVZtTFVq?=
- =?utf-8?B?MEhnaEZ6S1FMNGFScU1qWDhoRXIvck1VZWdzY3ZTVVFrYkZWNEV2RERrMmg0?=
- =?utf-8?B?YkV2SjFETjJMdUE1TTNPZnluRFNMak0rblVzRlVxbUNrc1lzTGpGTENtdmE0?=
- =?utf-8?Q?KoEdZ61qaTS6vyl77i5vjULStD4RrfVQ?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(7416014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2024 18:45:04.8224
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27ef26d3-52f8-478c-63a7-08dcada31091
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00021F68.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6007
+In-Reply-To: <0b1be7b7-e65b-8d8e-0659-388dec303039@amd.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: rc17lGWPFBYXtbMfuL_DVAKA2x0JxuLl
+X-Proofpoint-GUID: 4tGW0z5h9ARYRTEuJ_avk15AcJCpM8FZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-29_09,2024-07-26_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 malwarescore=0 mlxscore=0 adultscore=0 mlxlogscore=999
+ priorityscore=1501 bulkscore=0 phishscore=0 impostorscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2407290073
 
+Hi Lizhi,
 
-On 7/26/24 10:52, Rob Herring wrote:
-> On Thu, Jul 25, 2024 at 6:06 PM Lizhi Hou <lizhi.hou@amd.com> wrote:
->> Hi Amit,
->>
->>
->> I try to follow the option which add a OF flag. If Rob is ok with this,
->> I would suggest to use it instead of V1 patch
->>
->> diff --git a/drivers/of/dynamic.c b/drivers/of/dynamic.c
->> index dda6092e6d3a..a401ed0463d9 100644
->> --- a/drivers/of/dynamic.c
->> +++ b/drivers/of/dynamic.c
->> @@ -382,6 +382,11 @@ void of_node_release(struct kobject *kobj)
->>                                  __func__, node);
->>           }
->>
->> +       if (of_node_check_flag(node, OF_CREATED_WITH_CSET)) {
->> +               of_changeset_revert(node->data);
->> +               of_changeset_destroy(node->data);
->> +       }
-> What happens if multiple nodes are created in the changeset?
-Ok. multiple nodes will not work.
->
->> +
->>           if (node->child)
->>                   pr_err("ERROR: %s() unexpected children for %pOF/%s\n",
->>                           __func__, node->parent, node->full_name);
->> @@ -507,6 +512,7 @@ struct device_node *of_changeset_create_node(struct
->> of_changeset *ocs,
->>           np = __of_node_dup(NULL, full_name);
->>           if (!np)
->>                   return NULL;
->> +       of_node_set_flag(np, OF_CREATED_WITH_CSET);
-> This should be set where the data ptr is set.
+On 2024/07/26 11:45 AM, Lizhi Hou wrote:
+> 
+> On 7/26/24 10:52, Rob Herring wrote:
+> > On Thu, Jul 25, 2024 at 6:06 PM Lizhi Hou <lizhi.hou@amd.com> wrote:
+> > > Hi Amit,
+> > > 
+> > > 
+> > > I try to follow the option which add a OF flag. If Rob is ok with this,
+> > > I would suggest to use it instead of V1 patch
+> > > 
+> > > diff --git a/drivers/of/dynamic.c b/drivers/of/dynamic.c
+> > > index dda6092e6d3a..a401ed0463d9 100644
+> > > --- a/drivers/of/dynamic.c
+> > > +++ b/drivers/of/dynamic.c
+> > > @@ -382,6 +382,11 @@ void of_node_release(struct kobject *kobj)
+> > >                                  __func__, node);
+> > >           }
+> > > 
+> > > +       if (of_node_check_flag(node, OF_CREATED_WITH_CSET)) {
+> > > +               of_changeset_revert(node->data);
+> > > +               of_changeset_destroy(node->data);
+> > > +       }
+> > What happens if multiple nodes are created in the changeset?
+> Ok. multiple nodes will not work.
+> > 
+> > > +
+> > >           if (node->child)
+> > >                   pr_err("ERROR: %s() unexpected children for %pOF/%s\n",
+> > >                           __func__, node->parent, node->full_name);
+> > > @@ -507,6 +512,7 @@ struct device_node *of_changeset_create_node(struct
+> > > of_changeset *ocs,
+> > >           np = __of_node_dup(NULL, full_name);
+> > >           if (!np)
+> > >                   return NULL;
+> > > +       of_node_set_flag(np, OF_CREATED_WITH_CSET);
+> > This should be set where the data ptr is set.
+> 
+> Ok. It sounds the fix could be simplified to 3 lines change.
 
-Ok. It sounds the fix could be simplified to 3 lines change.
+Thanks for the patch. The hot-plug and hot-unplug of PCI device seem to work
+fine as expected. I see this patch would attempt to remove only the nodes which
+were created in `of_pci_make_dev_node()` with the help of the newly introduced
+flag, which looks good to me.
 
+Also, since a call to `of_pci_make_dev_node()` from `pci_bus_add_device()`, that
+creates devices nodes only for bridge devices, is conditional on
+`pci_is_bridge()`, it only makes sense to retain the logical symmetry and call
+`of_pci_remove_node()` conditionally on `pci_is_bridge()` as well in
+`pci_stop_dev()`. Hence, I would like to propose the below change along with the
+above patch:
 
-diff --git a/drivers/pci/of.c b/drivers/pci/of.c
-index 51e3dd0ea5ab..0b3ba1e1b18c 100644
---- a/drivers/pci/of.c
-+++ b/drivers/pci/of.c
-@@ -613,7 +613,7 @@ void of_pci_remove_node(struct pci_dev *pdev)
-         struct device_node *np;
+diff --git a/drivers/pci/remove.c b/drivers/pci/remove.c
+index 910387e5bdbf..c6394bf562cd 100644
+--- a/drivers/pci/remove.c
++++ b/drivers/pci/remove.c
+@@ -23,7 +23,8 @@ static void pci_stop_dev(struct pci_dev *dev)
+                device_release_driver(&dev->dev);
+                pci_proc_detach_device(dev);
+                pci_remove_sysfs_dev_files(dev);
+-               of_pci_remove_node(dev);
++               if (pci_is_bridge(dev))
++                       of_pci_remove_node(dev);
+ 
+                pci_dev_assign_added(dev, false);
+        }
 
-         np = pci_device_to_OF_node(pdev);
--       if (!np || !of_node_check_flag(np, OF_DYNAMIC))
-+       if (!np || !of_node_check_flag(np, OF_CREATED_WITH_CSET))
-                 return;
-         pdev->dev.of_node = NULL;
+Please let me know of your thoughts on this and based on that I can spin the v3
+of this patch.
 
-@@ -672,6 +672,7 @@ void of_pci_make_dev_node(struct pci_dev *pdev)
-         if (ret)
-                 goto out_free_node;
+In addition to this, can this patch be taken as part of 6.11 as a bug fix?
 
-+       of_node_set_flag(np, OF_CREATED_WITH_CSET);
-         np->data = cset;
-         pdev->dev.of_node = np;
-         kfree(name);
-diff --git a/include/linux/of.h b/include/linux/of.h
-index a0bedd038a05..a46317f6626e 100644
---- a/include/linux/of.h
-+++ b/include/linux/of.h
-@@ -153,6 +153,7 @@ extern struct device_node *of_stdout;
-  #define OF_POPULATED_BUS       4 /* platform bus created for children */
-  #define OF_OVERLAY             5 /* allocated for an overlay */
-  #define OF_OVERLAY_FREE_CSET   6 /* in overlay cset being freed */
-+#define OF_CREATED_WITH_CSET    7 /* created by of_changeset_create_node */
+Thanks,
+Amit
 
-  #define OF_BAD_ADDR    ((u64)-1)
-
-
-Lizhi
-
->
-> Rob
+> 
+> 
+> diff --git a/drivers/pci/of.c b/drivers/pci/of.c
+> index 51e3dd0ea5ab..0b3ba1e1b18c 100644
+> --- a/drivers/pci/of.c
+> +++ b/drivers/pci/of.c
+> @@ -613,7 +613,7 @@ void of_pci_remove_node(struct pci_dev *pdev)
+>         struct device_node *np;
+> 
+>         np = pci_device_to_OF_node(pdev);
+> -       if (!np || !of_node_check_flag(np, OF_DYNAMIC))
+> +       if (!np || !of_node_check_flag(np, OF_CREATED_WITH_CSET))
+>                 return;
+>         pdev->dev.of_node = NULL;
+> 
+> @@ -672,6 +672,7 @@ void of_pci_make_dev_node(struct pci_dev *pdev)
+>         if (ret)
+>                 goto out_free_node;
+> 
+> +       of_node_set_flag(np, OF_CREATED_WITH_CSET);
+>         np->data = cset;
+>         pdev->dev.of_node = np;
+>         kfree(name);
+> diff --git a/include/linux/of.h b/include/linux/of.h
+> index a0bedd038a05..a46317f6626e 100644
+> --- a/include/linux/of.h
+> +++ b/include/linux/of.h
+> @@ -153,6 +153,7 @@ extern struct device_node *of_stdout;
+>  #define OF_POPULATED_BUS       4 /* platform bus created for children */
+>  #define OF_OVERLAY             5 /* allocated for an overlay */
+>  #define OF_OVERLAY_FREE_CSET   6 /* in overlay cset being freed */
+> +#define OF_CREATED_WITH_CSET    7 /* created by of_changeset_create_node */
+> 
+>  #define OF_BAD_ADDR    ((u64)-1)
+> 
+> 
+> Lizhi
+> 
+> > 
+> > Rob
 
