@@ -1,109 +1,90 @@
-Return-Path: <kvm-ppc+bounces-164-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-165-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 107F095695F
-	for <lists+kvm-ppc@lfdr.de>; Mon, 19 Aug 2024 13:34:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAE24986592
+	for <lists+kvm-ppc@lfdr.de>; Wed, 25 Sep 2024 19:28:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC468282ECA
-	for <lists+kvm-ppc@lfdr.de>; Mon, 19 Aug 2024 11:34:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E848A286DD1
+	for <lists+kvm-ppc@lfdr.de>; Wed, 25 Sep 2024 17:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD65E15DBB2;
-	Mon, 19 Aug 2024 11:34:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B41C481AA;
+	Wed, 25 Sep 2024 17:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HL2ztUyN"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="x40VMY8W";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="dZmGLEdK";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="x40VMY8W";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="dZmGLEdK"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F84167D83;
-	Mon, 19 Aug 2024 11:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC57210E9;
+	Wed, 25 Sep 2024 17:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724067272; cv=none; b=U2nq8t4eqCcSYw5ys9eGoimg7voJkY2UdOzh1isaOiNbxfPB9ArNJE8Z/V0f3LLbepW0c95SioeEf5141z2/PW7Ckd++14Z/HwVcKjE1pVYwTimi8oMqRxYZd3770hs3xI6bzoouKjAkTw8mfXUzcgNf3kE5B336hTGrOVJltXk=
+	t=1727285280; cv=none; b=gSvFo5TKcMca+9fM7ilvPgmYXRJNg/XMeSbCnQa+pf7klR94Y4Px/CrrJIUEWz5Xhto36MIVEVKLfB8xJARAflfebWGH3m834pT4E9/h1yTzJNjwEdP2RjvLM/4mtGm+bC3aYD/+StjZV0AdP5sxEC2JiHw0GE01TZswqDIB+yY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724067272; c=relaxed/simple;
-	bh=malUEUP13/IZNGpr+qi6kyLlVM4LzUUH3UWhcU+50PQ=;
+	s=arc-20240116; t=1727285280; c=relaxed/simple;
+	bh=jM92NAr0tspG01nateusrF19Yw58W5D2DlP6X6V/8Pk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HJXMRb0ftQiNx6Z1wMgOwjHwlKn5GJRx7PlfArgpM/IyuO7xAdtHWio6+cmmTj3Curws8IRmNWl778bBPr4ga3cwhwHdU1KXc8lMtmwADgAEM/4sPX/CISm2huuPgACMpri3C8hNYhDVje0SUeIW9QIl8NO+Ta1N4Cu1pl0G/Ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HL2ztUyN; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47JA19qd027356;
-	Mon, 19 Aug 2024 11:34:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pp1; bh=UsqDIMpxDyemRi4fPPsg3jRzMi1
-	OTL9ET/Uu1vaJCGc=; b=HL2ztUyNsMroxcQqGesnYXyjwOaobOAHrRdJdhWS0Vc
-	cIDdfOs7afU1fMD292vRj4tee3vSeer/2UbUegXnDwWZnl0ghVcQ5D1Yc0cpwc3t
-	MzmjstUQm/v734SWkhsyvAr0P8XVnkBoRvLLnYTXhIoytzDxfI55ssT0M0PBuYJK
-	tLwcQzTAj05qrgFR9utA6QP9jJ85US6zRcgvR63aTfJt8RCToDljYTXSJjkdW6BN
-	QGx/m7mEE1gok/j2OWbECQ/Lzoax1ejPZr9dxF4T0TgWG5tMIgWHloiNFvRf1PfR
-	n2mMXqJZNOVa5RSge2hua7auyjBaYBEw8Tf76Qe4Kkw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mc4g26v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 11:34:00 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47JBXxq2006657;
-	Mon, 19 Aug 2024 11:33:59 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mc4g26p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 11:33:59 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47JA0j1g030060;
-	Mon, 19 Aug 2024 11:33:58 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4138dm5n4y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 11:33:58 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47JBXr8a43647404
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 19 Aug 2024 11:33:55 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3B8CF20040;
-	Mon, 19 Aug 2024 11:33:53 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CA5F320049;
-	Mon, 19 Aug 2024 11:33:47 +0000 (GMT)
-Received: from li-e7e2bd4c-2dae-11b2-a85c-bfd29497117c.ibm.com (unknown [9.195.39.27])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 19 Aug 2024 11:33:47 +0000 (GMT)
-Date: Mon, 19 Aug 2024 17:03:42 +0530
-From: Amit Machhiwal <amachhiw@linux.ibm.com>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Bjorn Helgaas <helgaas@kernel.org>, Rob Herring <robh@kernel.org>,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-ppc@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-        Lizhi Hou <lizhi.hou@amd.com>, Saravana Kannan <saravanak@google.com>,
-        Vaibhav Jain <vaibhav@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.ibm.com>,
-        Kowshik Jois B S <kowsjois@linux.ibm.com>,
-        Lukas Wunner <lukas@wunner.de>, kernel-team@lists.ubuntu.com,
-        Stefan Bader <stefan.bader@canonical.com>
-Subject: Re: [PATCH v3] PCI: Fix crash during pci_dev hot-unplug on pseries
- KVM guest
-Message-ID: <20240819165310.cab26333-b8-amachhiw@linux.ibm.com>
-Mail-Followup-To: Michael Ellerman <mpe@ellerman.id.au>, 
-	Bjorn Helgaas <helgaas@kernel.org>, Rob Herring <robh@kernel.org>, linux-pci@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-ppc@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>, 
-	Lizhi Hou <lizhi.hou@amd.com>, Saravana Kannan <saravanak@google.com>, 
-	Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>, 
-	Vaidyanathan Srinivasan <svaidy@linux.ibm.com>, Kowshik Jois B S <kowsjois@linux.ibm.com>, 
-	Lukas Wunner <lukas@wunner.de>, kernel-team@lists.ubuntu.com, 
-	Stefan Bader <stefan.bader@canonical.com>
-References: <20240806200059.GA74866@bhelgaas>
- <87h6bm1ngo.fsf@mail.lhotse>
- <20240816180441.81f4d694-3b-amachhiw@linux.ibm.com>
- <87o75s2hxa.fsf@mail.lhotse>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NO4H9AdAZuXogrzmlrCQCQ4zA/eCRn8tPD78vuFF+VQVpiyc3hypoW72088HsXA1Mxz7vI01dBugrgSivZ/j8omgc3rTyXBf1/stzGPlvAI+EVe6n8N//AhMcUPqeShy0R2all/2XOZcmK27PWteaesuLf51z728hvgFgljhHyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=x40VMY8W; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=dZmGLEdK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=x40VMY8W; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=dZmGLEdK; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from kitsune.suse.cz (unknown [10.100.12.127])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 97FBC1F814;
+	Wed, 25 Sep 2024 17:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727285276; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s9nEIBh9bKtyhxEMUs1oljP3B338usBJA+Fw8kqru4I=;
+	b=x40VMY8WljWjgdchHwE5oB5B7HNYeFwxRy4ugQvUe9ScSvDgn5hgo+jBDzBzwl9slGtRGu
+	nRblpQAy9a7dnmbfKSPb/nh/xyOqREI5WLHtHK6K3ypJWdbOKALN5VWTs0VkO7OlKWsYlH
+	EniUdAnV4uD56KReH1qvsjWXvIa/KW8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727285276;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s9nEIBh9bKtyhxEMUs1oljP3B338usBJA+Fw8kqru4I=;
+	b=dZmGLEdKRQ82+qaGqYr5BdUOAyXSNtqmCn1uKdNz9pkA9b4cfGCdaJ8wTt49FREtm9TzfK
+	d6+HaefTqO12k+Bw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727285276; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s9nEIBh9bKtyhxEMUs1oljP3B338usBJA+Fw8kqru4I=;
+	b=x40VMY8WljWjgdchHwE5oB5B7HNYeFwxRy4ugQvUe9ScSvDgn5hgo+jBDzBzwl9slGtRGu
+	nRblpQAy9a7dnmbfKSPb/nh/xyOqREI5WLHtHK6K3ypJWdbOKALN5VWTs0VkO7OlKWsYlH
+	EniUdAnV4uD56KReH1qvsjWXvIa/KW8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727285276;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s9nEIBh9bKtyhxEMUs1oljP3B338usBJA+Fw8kqru4I=;
+	b=dZmGLEdKRQ82+qaGqYr5BdUOAyXSNtqmCn1uKdNz9pkA9b4cfGCdaJ8wTt49FREtm9TzfK
+	d6+HaefTqO12k+Bw==
+Date: Wed, 25 Sep 2024 19:27:55 +0200
+From: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To: Jordan Niethe <jniethe5@gmail.com>
+Cc: linuxppc-dev@lists.ozlabs.org, mikey@neuling.org, sbhat@linux.ibm.com,
+	kvm@vger.kernel.org, amachhiw@linux.vnet.ibm.com,
+	gautam@linux.ibm.com, npiggin@gmail.com, David.Laight@aculab.com,
+	kvm-ppc@vger.kernel.org, sachinp@linux.ibm.com,
+	vaibhav@linux.ibm.com, kconsul@linux.vnet.ibm.com
+Subject: Re: [PATCH v5 00/11] KVM: PPC: Nested APIv2 guest support
+Message-ID: <ZvRIG1LHwqa5_kgP@kitsune.suse.cz>
+References: <20230914030600.16993-1-jniethe5@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
@@ -112,114 +93,251 @@ List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87o75s2hxa.fsf@mail.lhotse>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: R8VUjQv28xiQn-SzJOjpJVh2xfSErgDy
-X-Proofpoint-GUID: Fexqrs0yQr5cj37s8xkX5FhhOebrt9J9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-19_10,2024-08-19_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_spam_definite policy=outbound score=100 bulkscore=0
- mlxscore=100 clxscore=1015 priorityscore=1501 mlxlogscore=-999
- adultscore=0 phishscore=0 impostorscore=0 suspectscore=0 spamscore=100
- lowpriorityscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408190077
+In-Reply-To: <20230914030600.16993-1-jniethe5@gmail.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-0.999];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_ZERO(0.00)[0];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lists.ozlabs.org,neuling.org,linux.ibm.com,vger.kernel.org,linux.vnet.ibm.com,gmail.com,aculab.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_EQ_ENVFROM(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-Hi Michael,
-
-On 2024/08/17 08:59 AM, Michael Ellerman wrote:
-> Amit Machhiwal <amachhiw@linux.ibm.com> writes:
-> > On 2024/08/15 01:20 PM, Michael Ellerman wrote:
-> >> Bjorn Helgaas <helgaas@kernel.org> writes:
-> >> > On Sat, Aug 03, 2024 at 12:03:25AM +0530, Amit Machhiwal wrote:
-> >> >> With CONFIG_PCI_DYNAMIC_OF_NODES [1], a hot-plug and hot-unplug sequence
-> >> >> of a PCI device attached to a PCI-bridge causes following kernel Oops on
-> >> >> a pseries KVM guest:
-> >> >
-> >> > What is unique about pseries here?  There's nothing specific to
-> >> > pseries in the patch, so I would expect this to be a generic problem
-> >> > on any arch.
-> >> >
-> >> >>  RTAS: event: 2, Type: Hotplug Event (229), Severity: 1
-> >> >>  Kernel attempted to read user page (10ec00000048) - exploit attempt? (uid: 0)
-> >> >>  BUG: Unable to handle kernel data access on read at 0x10ec00000048
-> >> >
-> >> > Weird address.  I would expect NULL or something.  Where did this
-> >> > non-NULL pointer come from?
-> >> 
-> >> It originally comes from np->data, which is supposed to be an
-> >> of_changeset.
-> >> 
-> >> The powerpc code also uses np->data for the struct pci_dn pointer, see
-> >> pci_add_device_node_info().
-> >> 
-> >> I wonder if that's why it's non-NULL?
-> >
-> > I'm also looking into the code to figure out where's that value coming from. I
-> > will update as soon as I get there.
+On Thu, Sep 14, 2023 at 01:05:49PM +1000, Jordan Niethe wrote:
 > 
-> Thanks.
->  
-> >> Amit, do we have exact steps to reproduce this? I poked around a bit but
-> >> couldn't get it to trigger.
-> >
-> > Sure, below are the steps:
-> >
-> > 1. Set CONFIG_PCI_DYNAMIC_OF_NODES=y in the kernel config and compile (Fedora
-> >    has it disabled in it's distro config, Ubuntu has it enabled but will have it
-> >    disabled in the next update)
-> >
-> > 2. If you are using Fedora cloud images, make sure you've these packages
-> >    installed:
-> >     $ rpm -qa | grep -e 'ppc64-diag\|powerpc-utils'
-> >     powerpc-utils-core-1.3.11-6.fc40.ppc64le
-> >     powerpc-utils-1.3.11-6.fc40.ppc64le
-> >     ppc64-diag-rtas-2.7.9-6.fc40.ppc64le
-> >     ppc64-diag-2.7.9-6.fc40.ppc64le
-> >
-> > 3. Hotplug a pci device as follows:
-> >     virsh attach-interface <domain_name> bridge --source virbr0
+> A nested-HV API for PAPR has been developed based on the KVM-specific
+> nested-HV API that is upstream in Linux/KVM and QEMU. The PAPR API had
+> to break compatibility to accommodate implementation in other
+> hypervisors and partitioning firmware. The existing KVM-specific API
+> will be known as the Nested APIv1 and the PAPR API will be known as the
+> Nested APIv2. 
 > 
-> I don't use virsh :)
+> The control flow and interrupt processing between L0, L1, and L2 in
+> the Nested APIv2 are conceptually unchanged. Where Nested APIv1 is almost
+> stateless, the Nested APIv2 is stateful, with the L1 registering L2 virtual
+> machines and vCPUs with the L0. Supervisor-privileged register switching
+> duty is now the responsibility for the L0, which holds canonical L2
+> register state and handles all switching. This new register handling
+> motivates the "getters and setters" wrappers to assist in syncing the
+> L2s state in the L1 and the L0.
 
-No worries. Fortunately, we do have a way to do it with qemu monitor.
+Hello,
+
+are there any machines on which this is supposed to work?
+
+On a 9105-22A with ML1050_fw1050.20 (78) and
+Linux 6.11.0-lp155.4.gce149d2-default I get:
+
+[   29.228161] kvm-hv: nestedv2 get capabilities hcall failed, falling back to nestedv1 (rc=-2)
+[   29.228168] kvm-hv: Parent hypervisor does not support nesting (rc=-2)
+
+Can the hardware requirements be clarified?
+
+Thanks
+
+Michal
+
 
 > 
-> Any idea how to do it with just qemu monitor commands?
+> Broadly, the new hcalls will be used for  creating and managing guests
+> by a regular partition in the following way:
 > 
-
-1. Boot the guest with the below included in the qemu cmdline:
-
-    -netdev bridge,id=<net_name>,br=virbr0,helper=/usr/libexec/qemu-bridge-helper
-
-2. Once the guest boots, run the below command on qemu monitor to hot-plug a pci
-   device:
-
-    device_add rtl8139,netdev=<net_name>,mac=52:54:00:88:31:28,id=<net_id>
-
-    dmesg
-    =====
-    [  116.968210] pci 0000:00:01.0: [10ec:8139] type 00 class 0x020000 conventional PCI endpoint
-    [  116.969260] pci 0000:00:01.0: BAR 0 [io  0x10000-0x100ff]
-    [  116.969904] pci 0000:00:01.0: BAR 1 [mem 0x00000000-0x000000ff]
-    [  116.970745] pci 0000:00:01.0: ROM [mem 0x00000000-0x0003ffff pref]
-    [  116.971456] pci 0000:00:01.0: No hypervisor support for SR-IOV on this device, IOV BARs disabled.
-    [  116.972583] pci 0000:00:01.0: Adding to iommu group 0
-    [  116.978466] pci 0000:00:01.0: ROM [mem 0x200080080000-0x2000800bffff pref]: assigned
-    [  116.979347] pci 0000:00:01.0: BAR 0 [io  0x10400-0x104ff]: assigned
-    [  116.980063] pci 0000:00:01.0: BAR 1 [mem 0x200080001000-0x2000800010ff]: assigned
-    [  117.017187] 8139cp: 8139cp: 10/100 PCI Ethernet driver v1.3 (Mar 22, 2004)
-    [  117.018577] 8139cp 0000:00:01.0: enabling device (0000 -> 0003)
-    [  117.025414] 8139cp 0000:00:01.0 eth1: RTL-8139C+ at 0x00000000fbf09e59, 52:54:00:88:31:28, IRQ 26
-    [  117.051028] 8139too: 8139too Fast Ethernet driver 0.9.28
-    [  117.076577] 8139cp 0000:00:01.0 eth1: link up, 100Mbps, full-duplex, lpa 0x05E1
-
-3. Try hot-unplug of the device to recreate the kernel Oops.
-
-    device_del <net_id>
-
-Thanks,
-Amit
-
-> cheers
+>   - L1 and L0 negotiate capabilities with
+>     H_GUEST_{G,S}ET_CAPABILITIES
+> 
+>   - L1 requests the L0 create a L2 with
+>     H_GUEST_CREATE and receives a handle to use in future hcalls
+> 
+>   - L1 requests the L0 create a L2 vCPU with
+>     H_GUEST_CREATE_VCPU
+> 
+>   - L1 sets up the L2 using H_GUEST_SET and the
+>     H_GUEST_VCPU_RUN input buffer
+> 
+>   - L1 requests the L0 runs the L2 vCPU using H_GUEST_VCPU_RUN
+> 
+>   - L2 returns to L1 with an exit reason and L1 reads the
+>     H_GUEST_VCPU_RUN output buffer populated by the L0
+> 
+>   - L1 handles the exit using H_GET_STATE if necessary
+> 
+>   - L1 reruns L2 vCPU with H_GUEST_VCPU_RUN
+> 
+>   - L1 frees the L2 in the L0 with H_GUEST_DELETE
+> 
+> Further details are available in Documentation/powerpc/kvm-nested.rst.
+> 
+> This series adds KVM support for using this hcall interface as a regular
+> PAPR partition, i.e. the L1. It does not add support for running as the
+> L0.
+> 
+> The new hcalls have been implemented in the spapr qemu model for
+> testing.
+> 
+> This is available at https://github.com/planetharsh/qemu/tree/upstream-0714-kop
+> 
+> There are scripts available to assist in setting up an environment for
+> testing nested guests at https://github.com/iamjpn/kvm-powervm-test
+> 
+> A tree with this series is available at
+> https://github.com/iamjpn/linux/tree/features/kvm-nestedv2-v5
+> 
+> Thanks to Amit Machhiwal, Kautuk Consul, Vaibhav Jain, Michael Neuling,
+> Shivaprasad Bhat, Harsh Prateek Bora, Paul Mackerras and Nicholas
+> Piggin.
+> 
+> Change overview in v5:
+>   - KVM: PPC: Add helper library for Guest State Buffers:
+>     - Fix mismatched function comments
+>   - KVM: PPC: Add support for nestedv2 guests:
+>     - Check H_BUSY for {g,s}etting capabilities
+>     - Message if plpar_guest_get_capabilities() fails and nestedv1
+>       support will be attempted.
+>     - Remove unused amor variable
+>   - KVM: PPC: Book3S HV: Use accessors for VCPU registers:
+>     - Remove unneeded trailing comment for line length
+> 
+> 
+> Change overview in v4:
+>   - Split previous "KVM: PPC: Use getters and setters for vcpu register
+>     state" into a number of seperate patches
+>     - Remove _hv suffix from VCORE wrappers
+>     - Do not create arch_compat and lpcr setters, use the existing ones
+>     - Use #ifdef ALTIVEC
+>   - KVM: PPC: Rename accessor generator macros
+>     - Fix typo
+>   - KVM: PPC: Book3s HV: Hold LPIDs in an unsigned long
+>     - Use u64
+>     - Change format strings instead of casting
+>   - KVM: PPC: Add support for nestedv2 guests
+>     - Batch H_GUEST_GET calls in kvmhv_nestedv2_reload_ptregs()
+>     - Fix compile without CONFIG_PSERIES
+>     - Fix maybe uninitialized 'trap' in kvmhv_p9_guest_entry()
+>     - Extend existing setters for arch_compat and lpcr
+> 
+> 
+> Change overview in v3:
+>   - KVM: PPC: Use getters and setters for vcpu register state
+>       - Do not add a helper for pvr
+>       - Use an expression when declaring variable in case
+>       - Squash in all getters and setters
+>       - Pass vector registers by reference
+>   - KVM: PPC: Rename accessor generator macros
+>       - New to series
+>   - KVM: PPC: Add helper library for Guest State Buffers
+>       - Use EXPORT_SYMBOL_GPL()
+>       - Use the kvmppc namespace
+>       - Move kvmppc_gsb_reset() out of kvmppc_gsm_fill_info()
+>       - Comments for GSID elements
+>       - Pass vector elements by reference
+>       - Remove generic put and get functions
+>   - KVM: PPC: Book3s HV: Hold LPIDs in an unsigned long
+>       - New to series
+>   - KVM: PPC: Add support for nestedv2 guests
+>       - Use EXPORT_SYMBOL_GPL()
+>       - Change to kvmhv_nestedv2 namespace
+>       - Make kvmhv_enable_nested() return -ENODEV on NESTEDv2 L1 hosts
+>       - s/kvmhv_on_papr/kvmhv_is_nestedv2/
+>       - mv book3s_hv_papr.c book3s_hv_nestedv2.c
+>       - Handle shared regs without a guest state id in the same wrapper
+>       - Use a static key for API version
+>       - Add a positive test for NESTEDv1
+>       - Give the amor a static value
+>       - s/struct kvmhv_nestedv2_host/struct kvmhv_nestedv2_io/
+>       - Propagate failure in kvmhv_vcpu_entry_nestedv2()
+>       - WARN if getters and setters fail
+>       - Progagate failure from kvmhv_nestedv2_parse_output()
+>       - Replace delay with sleep in plpar_guest_{create,delete,create_vcpu}()
+>       - Add logical PVR handling
+>       - Replace kvmppc_gse_{get,put} with specific version
+>   - docs: powerpc: Document nested KVM on POWER
+>       - Fix typos
+> 
+> 
+> Change overview in v2:
+>   - Rebase on top of kvm ppc prefix instruction support
+>   - Make documentation an individual patch
+>   - Move guest state buffer files from arch/powerpc/lib/ to
+>     arch/powerpc/kvm/
+>   - Use kunit for testing guest state buffer
+>   - Fix some build errors
+>   - Change HEIR element from 4 bytes to 8 bytes
+> 
+> Previous revisions:
+> 
+>   - v1: https://lore.kernel.org/linuxppc-dev/20230508072332.2937883-1-jpn@linux.vnet.ibm.com/
+>   - v2: https://lore.kernel.org/linuxppc-dev/20230605064848.12319-1-jpn@linux.vnet.ibm.com/
+>   - v3: https://lore.kernel.org/linuxppc-dev/20230807014553.1168699-1-jniethe5@gmail.com/
+>   - v4: https://lore.kernel.org/linuxppc-dev/20230905034658.82835-1-jniethe5@gmail.com/
+> 
+> Jordan Niethe (10):
+>   KVM: PPC: Always use the GPR accessors
+>   KVM: PPC: Introduce FPR/VR accessor functions
+>   KVM: PPC: Rename accessor generator macros
+>   KVM: PPC: Use accessors for VCPU registers
+>   KVM: PPC: Use accessors for VCORE registers
+>   KVM: PPC: Book3S HV: Use accessors for VCPU registers
+>   KVM: PPC: Book3S HV: Introduce low level MSR accessor
+>   KVM: PPC: Add helper library for Guest State Buffers
+>   KVM: PPC: Book3s HV: Hold LPIDs in an unsigned long
+>   KVM: PPC: Add support for nestedv2 guests
+> 
+> Michael Neuling (1):
+>   docs: powerpc: Document nested KVM on POWER
+> 
+>  Documentation/powerpc/index.rst               |   1 +
+>  Documentation/powerpc/kvm-nested.rst          | 636 +++++++++++
+>  arch/powerpc/Kconfig.debug                    |  12 +
+>  arch/powerpc/include/asm/guest-state-buffer.h | 995 ++++++++++++++++++
+>  arch/powerpc/include/asm/hvcall.h             |  30 +
+>  arch/powerpc/include/asm/kvm_book3s.h         | 220 +++-
+>  arch/powerpc/include/asm/kvm_book3s_64.h      |   8 +-
+>  arch/powerpc/include/asm/kvm_booke.h          |  10 +
+>  arch/powerpc/include/asm/kvm_host.h           |  22 +-
+>  arch/powerpc/include/asm/kvm_ppc.h            | 102 +-
+>  arch/powerpc/include/asm/plpar_wrappers.h     | 267 ++++-
+>  arch/powerpc/kvm/Makefile                     |   4 +
+>  arch/powerpc/kvm/book3s.c                     |  38 +-
+>  arch/powerpc/kvm/book3s_64_mmu_hv.c           |   7 +-
+>  arch/powerpc/kvm/book3s_64_mmu_radix.c        |  31 +-
+>  arch/powerpc/kvm/book3s_64_vio.c              |   4 +-
+>  arch/powerpc/kvm/book3s_hv.c                  | 358 +++++--
+>  arch/powerpc/kvm/book3s_hv.h                  |  76 ++
+>  arch/powerpc/kvm/book3s_hv_builtin.c          |  11 +-
+>  arch/powerpc/kvm/book3s_hv_nested.c           |  44 +-
+>  arch/powerpc/kvm/book3s_hv_nestedv2.c         | 994 +++++++++++++++++
+>  arch/powerpc/kvm/book3s_hv_p9_entry.c         |   4 +-
+>  arch/powerpc/kvm/book3s_hv_ras.c              |   4 +-
+>  arch/powerpc/kvm/book3s_hv_rm_mmu.c           |   8 +-
+>  arch/powerpc/kvm/book3s_hv_rm_xics.c          |   4 +-
+>  arch/powerpc/kvm/book3s_hv_uvmem.c            |   2 +-
+>  arch/powerpc/kvm/book3s_xive.c                |  12 +-
+>  arch/powerpc/kvm/emulate_loadstore.c          |   6 +-
+>  arch/powerpc/kvm/guest-state-buffer.c         | 621 +++++++++++
+>  arch/powerpc/kvm/powerpc.c                    |  76 +-
+>  arch/powerpc/kvm/test-guest-state-buffer.c    | 328 ++++++
+>  31 files changed, 4672 insertions(+), 263 deletions(-)
+>  create mode 100644 Documentation/powerpc/kvm-nested.rst
+>  create mode 100644 arch/powerpc/include/asm/guest-state-buffer.h
+>  create mode 100644 arch/powerpc/kvm/book3s_hv_nestedv2.c
+>  create mode 100644 arch/powerpc/kvm/guest-state-buffer.c
+>  create mode 100644 arch/powerpc/kvm/test-guest-state-buffer.c
+> 
+> -- 
+> 2.39.3
+> 
 
