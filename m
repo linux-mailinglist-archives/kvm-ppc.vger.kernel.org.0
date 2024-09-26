@@ -1,169 +1,148 @@
-Return-Path: <kvm-ppc+bounces-166-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-167-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 363EC986BFB
-	for <lists+kvm-ppc@lfdr.de>; Thu, 26 Sep 2024 07:24:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49F9D98734C
+	for <lists+kvm-ppc@lfdr.de>; Thu, 26 Sep 2024 14:10:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2967B24322
-	for <lists+kvm-ppc@lfdr.de>; Thu, 26 Sep 2024 05:24:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79D7C1C21C7C
+	for <lists+kvm-ppc@lfdr.de>; Thu, 26 Sep 2024 12:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE974120B;
-	Thu, 26 Sep 2024 05:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77AD816DEDF;
+	Thu, 26 Sep 2024 12:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y9Gt7jjb"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xypqOioA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tQ3HjyUZ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xypqOioA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tQ3HjyUZ"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1315D3F9CC;
-	Thu, 26 Sep 2024 05:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A4C78C90;
+	Thu, 26 Sep 2024 12:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727328258; cv=none; b=rloFCr97mBxLuDbqthh9g4dPYAtZwpgY9QtPOLE3EttU7Wl23Am+llB/a0EJp6g2gN7bp3jt/Qn2ux4klGt8Ffkjkw45LO68iYpVOvC7rGem718Gop4+UNjut/u485C034t1mNPxb/8jGCo1hGywumSifmHOXr/3B7yP8k2UHMw=
+	t=1727352644; cv=none; b=aMNpGvmBjWwCW0XgX8vNvmZjK7m43M9tbDi/h1YZNQGlCo0iE5eeJmd/clFmHwGhgJzH5Eu36VlKNugvkV8dmC3Dcy0iLnSadMJ/QB0XcILm0AMrQAVSfq/lkeFeg4UmbE+LZ6SaY4Qq/WM8HjMpLSO7mK58+NUwb0SKDug6nkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727328258; c=relaxed/simple;
-	bh=tR9boOkxVA2Fp7Nq5M6s6v1huD+lQLn+U+jYMGZVotE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 Content-Type:MIME-Version; b=sVxQM4dXdPWuozLSzXWXsS0HsBfo5EeVcIPLFEzycV1cqJBUlpLwLZK3QV13a9GE2nALZlWean7TJe0KzRemNvNXwSruNybRmFNplh2tgFKxQkJmcxgdCFEcB9kyxhUujPMyZEt0nunaexoL4P1RggLVIupCahrYWIHAU2IpD7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Y9Gt7jjb; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48PMgGab017093;
-	Thu, 26 Sep 2024 05:23:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:in-reply-to:references:date:message-id
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	7DorH646rEbOAMl9jNYhRSv2I7SNoOVSt8xABaxCUWU=; b=Y9Gt7jjb3fkCCKUn
-	hQ26bPdGQk6jxXnCpJ5iCFEyrYHLY0Uqyrlw/6MO2iWsSztmQ0esVSoBMkUwwG1d
-	QdzdD9vl14qSf+NPSgubNtTu3tV6aZhKf1IA9p3eIPEP3gU2nZ0e/JbEa+YS47jR
-	VEb7eM2KvAc/nBqV1Klc79ndc1nkMuvReiC5rV0YKjYhESOu20uGFRDpffex/Cy4
-	rmT/4vL2hqGw6hI6lHJ3G9cNjkNbiVXED8hbBTcEBMb/S4lHW2IJ/QyodjgU6eZC
-	QXlppaEwYUiTO693gqurNEf/qPmSW7exl2D31SbDf2K6e3kO/rnflvfAjOaNMXfx
-	KXbLNg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41sntwm6p1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Sep 2024 05:23:55 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48Q5NtTj003909;
-	Thu, 26 Sep 2024 05:23:55 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41sntwm6nx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Sep 2024 05:23:55 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48Q3vDwI008701;
-	Thu, 26 Sep 2024 05:23:54 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41t8v1dj37-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Sep 2024 05:23:53 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48Q5NoFM20644278
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 26 Sep 2024 05:23:50 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 39C5E20043;
-	Thu, 26 Sep 2024 05:23:50 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 640F320040;
-	Thu, 26 Sep 2024 05:23:46 +0000 (GMT)
-Received: from vaibhav?linux.ibm.com (unknown [9.124.209.36])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu, 26 Sep 2024 05:23:46 +0000 (GMT)
-Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Thu, 26 Sep 2024 10:53:45 +0530
-From: Vaibhav Jain <vaibhav@linux.ibm.com>
-To: Michal =?utf-8?Q?Such=C3=A1nek?= <msuchanek@suse.de>,
-        Jordan Niethe
- <jniethe5@gmail.com>
-Cc: linuxppc-dev@lists.ozlabs.org, mikey@neuling.org, sbhat@linux.ibm.com,
-        kvm@vger.kernel.org, amachhiw@linux.vnet.ibm.com, gautam@linux.ibm.com,
-        npiggin@gmail.com, David.Laight@aculab.com, kvm-ppc@vger.kernel.org,
-        sachinp@linux.ibm.com, kconsul@linux.vnet.ibm.com
+	s=arc-20240116; t=1727352644; c=relaxed/simple;
+	bh=2JosmBuvO1uzpshMRCBoVMz1FQum5GKJW/gaxu6C7NU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=be4kzvUfV84SDUcJ0rtcylyJuvym0XHDgvXZO5TgTwvrHG+vYd75w0ydZeUn5ltMVmJ9GGX6YVMv+BDWWZApLmhM628vIHlrjdCHqxuT9CC4xOAoXyOweO1OZMtYkuys1/cn80uSypwoxXIk7BD1PUnYvLgtrUxjVHR7OnZ+QEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xypqOioA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tQ3HjyUZ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xypqOioA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tQ3HjyUZ; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from kitsune.suse.cz (unknown [10.100.12.127])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 7BB011F853;
+	Thu, 26 Sep 2024 12:10:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727352634; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mO+mBgqQ/T6X+tSWYJekgurpKW0Dnm8xbzizv8ba9T8=;
+	b=xypqOioAmz3znrCC0ei4IJzk5VUn5OhOzGsdS/R0MwtXqBZMP3BsT1mp5mKXFJuGn0bh1e
+	sAUrAoxgHeS4vLbI1w8Zf4a4rFzR2hl8NsTEWwF0sAqezLt+M4gLLOszNmvyaYJoe0hH3N
+	FWE96gOnF0RdB7Xw6mlYwzLKl+4n96k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727352634;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mO+mBgqQ/T6X+tSWYJekgurpKW0Dnm8xbzizv8ba9T8=;
+	b=tQ3HjyUZ+i6qEqCkzhCWjFTO7FEy2dx6rGn5HaE37/gpFbhVNIlTNWsj3vTeBfPbZrWJr6
+	ddCuNn3fdMiLEtBg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727352634; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mO+mBgqQ/T6X+tSWYJekgurpKW0Dnm8xbzizv8ba9T8=;
+	b=xypqOioAmz3znrCC0ei4IJzk5VUn5OhOzGsdS/R0MwtXqBZMP3BsT1mp5mKXFJuGn0bh1e
+	sAUrAoxgHeS4vLbI1w8Zf4a4rFzR2hl8NsTEWwF0sAqezLt+M4gLLOszNmvyaYJoe0hH3N
+	FWE96gOnF0RdB7Xw6mlYwzLKl+4n96k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727352634;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mO+mBgqQ/T6X+tSWYJekgurpKW0Dnm8xbzizv8ba9T8=;
+	b=tQ3HjyUZ+i6qEqCkzhCWjFTO7FEy2dx6rGn5HaE37/gpFbhVNIlTNWsj3vTeBfPbZrWJr6
+	ddCuNn3fdMiLEtBg==
+Date: Thu, 26 Sep 2024 14:10:33 +0200
+From: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>
+Cc: Jordan Niethe <jniethe5@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+	mikey@neuling.org, sbhat@linux.ibm.com, kvm@vger.kernel.org,
+	amachhiw@linux.vnet.ibm.com, gautam@linux.ibm.com,
+	npiggin@gmail.com, David.Laight@aculab.com, kvm-ppc@vger.kernel.org,
+	sachinp@linux.ibm.com, kconsul@linux.vnet.ibm.com
 Subject: Re: [PATCH v5 00/11] KVM: PPC: Nested APIv2 guest support
-In-Reply-To: <ZvRIG1LHwqa5_kgP@kitsune.suse.cz>
+Message-ID: <ZvVPOW-GmK3G7wnH@kitsune.suse.cz>
 References: <20230914030600.16993-1-jniethe5@gmail.com>
  <ZvRIG1LHwqa5_kgP@kitsune.suse.cz>
-Date: Thu, 26 Sep 2024 10:53:45 +0530
-Message-ID: <874j636l9a.fsf@vajain21.in.ibm.com>
-Content-Type: text/plain; charset=utf-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ikh_DBkdvnHpXsKlmsGdy9lwXO2QQfYN
-X-Proofpoint-GUID: Flv9va43B6Jy4B5E0lT03z78XQ4EWgfz
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+ <874j636l9a.fsf@vajain21.in.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-25_16,2024-09-26_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- mlxscore=0 lowpriorityscore=0 suspectscore=0 clxscore=1011
- priorityscore=1501 adultscore=0 mlxlogscore=999 bulkscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409260029
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <874j636l9a.fsf@vajain21.in.ibm.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_ZERO(0.00)[0];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lists.ozlabs.org,neuling.org,linux.ibm.com,vger.kernel.org,linux.vnet.ibm.com,aculab.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-Hi Michal,
+On Thu, Sep 26, 2024 at 10:53:45AM +0530, Vaibhav Jain wrote:
+> Hi Michal,
+> 
+> Michal Suchánek <msuchanek@suse.de> writes:
+> 
+> <snip>
+> 
+> > Hello,
+> >
+> > are there any machines on which this is supposed to work?
+> >
+> > On a 9105-22A with ML1050_fw1050.20 (78) and
+> 
+> On 9105-22A you need atleast:
+> Firmware level: FW1060.10
 
-Michal Such=C3=A1nek <msuchanek@suse.de> writes:
+Indeed, upgrading to FW1060 makes the KVM functionality available.
 
-<snip>
+Thanks
 
-> Hello,
->
-> are there any machines on which this is supposed to work?
->
-> On a 9105-22A with ML1050_fw1050.20 (78) and
-
-On 9105-22A you need atleast:
-Firmware level: FW1060.10
-
-> Linux 6.11.0-lp155.4.gce149d2-default I get:
-Kernel version is fine. ATM anything >=3D6.10 is good
-
->
-> [   29.228161] kvm-hv: nestedv2 get capabilities hcall failed, falling ba=
-ck to nestedv1 (rc=3D-2)
-> [   29.228168] kvm-hv: Parent hypervisor does not support nesting (rc=3D-=
-2)
->
-If you are still getting this error after switching to FW1060.10 than
-you need to enable KVM mode for the LPAR following instructions here:
-
-https://www.ibm.com/docs/en/linux-on-systems?topic=3Dservers-kvm-in-powervm=
--lpar#kvm_in_powervm_lpar__title__9
-
-TLDR; Just need to enable 'KVM Mode' in the LPAR configuration from HMC.
-
-> Can the hardware requirements be clarified?
-Further clarified at
-https://www.ibm.com/docs/en/linux-on-systems?topic=3Dservers-kvm-in-powervm=
--lpar
-
-There is a qemu model based on tcg, that was merged in v9.0.0 some time bac=
-k via
-https://lore.kernel.org/all/20240308111940.1617660-1-harshpb@linux.ibm.com/
-
-If you want to try this, then following can be helpful in setting up the
-environment:
-https://github.com/iamjpn/kvm-powervm-test
-
-
-> Thanks
->
-> Michal
->
-<snip>
-
---=20
-Cheers
-~ Vaibhav
+Michal
 
