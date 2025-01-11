@@ -1,145 +1,148 @@
-Return-Path: <kvm-ppc+bounces-183-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-184-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93C69A07737
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jan 2025 14:22:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE090A0A1D3
+	for <lists+kvm-ppc@lfdr.de>; Sat, 11 Jan 2025 08:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB7B83A8207
-	for <lists+kvm-ppc@lfdr.de>; Thu,  9 Jan 2025 13:22:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B356E16BCF8
+	for <lists+kvm-ppc@lfdr.de>; Sat, 11 Jan 2025 07:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCAAC218E8F;
-	Thu,  9 Jan 2025 13:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CDEA156F54;
+	Sat, 11 Jan 2025 07:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O41+eNVw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ni6sDhlU"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFB4218AC6;
-	Thu,  9 Jan 2025 13:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF126FBF;
+	Sat, 11 Jan 2025 07:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736428906; cv=none; b=PL3Wru/RclgfT/dzdGjLclNYLbpc45lyCBGnfZYZMkdcWAz4yX1pdDkefiavs1EQS2HByUm1CRXyRFJ4qbU9XegEF1uHT+9dAg24yxNJT3lS4mLlO0uuB2+mJdqdRlVqGN+koqtGTPt4npMFrBnc2NjkKHRNxodCEUyuvjZR2GY=
+	t=1736580253; cv=none; b=ezvccxbNptXnLMD53vgEHEEBX6A3FHLzYEJ+4b9zO1B0o41/zlcZI2UvxZNN6VAIN7cFwkrt5dea0YllQd09IB23QLKZD7gMDxSMyF6NTByqk23bfbZP1mmJ5dreYkORNQ7Jqgj0pqckav2PibuZfJZyyNUlEhQlyvNMSOVpv4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736428906; c=relaxed/simple;
-	bh=uA1KoJ0EVn4JPa8fEqid30FHAIr6fqP4vqAv435NFUE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Du+mHZ9ET3nuNQytTKa23EiGOf8cKGzhXEc6ABQ20PWEV9cK29IinadhvtKmzW5UwWLozSfAnYUIuWLxsEHC/RhaydL5bk1K97wf0xU7EYZpJS1RXV19miAUeu0zKhjTk8GOkVvOvxbZQ4UOkmw65fXaJ7a5GmvrfPg//XurPxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=O41+eNVw; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5090abXX000770;
-	Thu, 9 Jan 2025 13:21:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=PIYv3HT1t7t/RxD2CzYvxMvKNpNRTsobx9e1PcdHI
-	4Q=; b=O41+eNVwrjnbtCpkyRE2aGtUtngxpY51WzYFvlZQgEYCEIM/sAyJJ5TfD
-	JWKJGeUodawGaNpBvTJzaOnJJyvJAsskDLBsYFYfxaFd0GvARVTImtEEkTzTa/Xw
-	yHRC0Z2VsxEait13k/A9XLOmmzPzKyOVQ7IOpbEEv3Yx8x//d74jJxXzo4NYXFci
-	3/f0DxUbfIyRgwT/GOz6KCJb947Na1pnZIT4lyihZ5hdCxD/gLDqQdJVh2punLkG
-	5DCZP5lxiC340r1RFlJND+sQlHYdFDUk1HUdQvfG3LRpFKElM3uPH6olsUsh6VSf
-	7tyZya6e6NQfybnRbd0/tdx6doxQA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441tu5n7e1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Jan 2025 13:21:26 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 509DFhi6008704;
-	Thu, 9 Jan 2025 13:21:25 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441tu5n7dx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Jan 2025 13:21:25 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 509BNhsI003601;
-	Thu, 9 Jan 2025 13:21:25 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yfatdedn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Jan 2025 13:21:24 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 509DLLnI15073628
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 9 Jan 2025 13:21:21 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4637A20043;
-	Thu,  9 Jan 2025 13:21:21 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4CE5320040;
-	Thu,  9 Jan 2025 13:21:18 +0000 (GMT)
-Received: from li-e7e2bd4c-2dae-11b2-a85c-bfd29497117c.ibm.com.com (unknown [9.124.223.189])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  9 Jan 2025 13:21:18 +0000 (GMT)
-From: Amit Machhiwal <amachhiw@linux.ibm.com>
-To: Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Cc: Amit Machhiwal <amachhiw@linux.ibm.com>,
-        Vaibhav Jain <vaibhav@linux.ibm.com>,
-        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH] KVM: PPC: Enable CAP_SPAPR_TCE_VFIO on pSeries KVM guests
-Date: Thu,  9 Jan 2025 18:50:53 +0530
-Message-ID: <20250109132053.158436-1-amachhiw@linux.ibm.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1736580253; c=relaxed/simple;
+	bh=4eDODf6YVlMxxHhe8LGOO9x1o9/F2MO9Vs0a9pn6VBc=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=T46KN5u7f9AeH+pUksGHtwaKptGQTZywxKzYJN1D54rF7rG/e+YvCvbuHx3bf2OYAYtYa78ht2wsO2IGZxm8R4wphp7jU+TN/7z1dExVZXzQ9IDo0Q99F08a+Q+FvMCZhISG/p/Z0ijKb2ppOxvjuNXn9xwmJeNNIUud5KXhaPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ni6sDhlU; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2ee989553c1so4532625a91.3;
+        Fri, 10 Jan 2025 23:24:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736580250; x=1737185050; darn=vger.kernel.org;
+        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NH2/R/mmwYipmvjxTmPJfojr+0VZHua5pp0k9YchVg4=;
+        b=ni6sDhlUqzb6WCs/izaUVnVlJtcxZGyShhaMISxoemFfFMLrgiUKiYGn2e+J9fhzes
+         u//O88POs/hyhBVXWTuSY61OlFd6dwZm5vS80Y2mjfcIgzR1Gn6lp0E7oxbR20J0fUuz
+         7C7ZzVlYFjjBju9uNLSz16LRrGneySCWlxCZo1PHFK+L+3D20erZQlGG1p8gEsDn/Khd
+         gYUR+qwMk2Mju3Xm4gHQoHrdSjaH06yEETwvnaPdn1418Hm4KPnDupiypppqncr5EnVH
+         aBcRC0/vAkXxRl+HOEGXL8OBTw7R92CrDA3ZNRLtVMQJG9Tps1017ngwQcPBKk/wwacV
+         fMFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736580250; x=1737185050;
+        h=references:message-id:date:in-reply-to:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NH2/R/mmwYipmvjxTmPJfojr+0VZHua5pp0k9YchVg4=;
+        b=UVGHNmFCeKO0cNU6EjRe6SNOwOieKIUIp8fBDR5pGV+PacfH+67r5Tmu0XBlE2LwXS
+         3gPHNfcviSjAGa5hHvgiQxaKGDAwdAfSda/Orq1z0VgaV9U1uMcY67QWsqd24I9scGdF
+         4/4m2r/Bk29UypIZV4Ljwm53VuyEXtNBXzqD7q17i3xwQ6C/1OCfADDAReLTdxuu1Prv
+         Ei0qw70Z3C32imIrOJ5x0IPPfmDBBRJ2DSWmmwSnNX637+HYqrcsotqA8l756N8UuKyi
+         lNit0aogrQcp0yImu/gqKCML/hlpwPSBvpdvVkqmK963pItkZ7jaxkRFdbugLemPjYud
+         jhug==
+X-Forwarded-Encrypted: i=1; AJvYcCUOtFXlzxbOOr0PjyyDs8Ub6dnT7jOK6cscqKFe3XG0s8OXvwK+Gll1wxgSmGigmjtFszqSxpsK@vger.kernel.org, AJvYcCUVDQoml9UHf626Nt44vZ3BWK4aBgBfd5yS9en6UH9Yj4Wsjfj6nd/mB+Wi1zu8AQQ9+rza@vger.kernel.org, AJvYcCUzBXerfN3mDBhwGLSUjNgsk1dOkapdbWTKS3Xs4uJci5D4XF0KQ/Bv7wVYBNMm8FtDXSh7NwgL@vger.kernel.org, AJvYcCXzvDxDJGs3u0FVPd5HpoS3tGWXv3tCz9zaKqqMwrrkM9dQt4Idf8EGNtjoYSWSWfn05Gvu0vtghCJwpwyS@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz78KAmWq3GWHonYCK/jQArQ+Vf6mxJ9KPDEQL7Jp1NbfEijxr8
+	hXWLwNPBvakjSx2c6EEO74Fveo1CKuwiQQUlXfYfyx5illH2/V2DmDWlkCGAD/s=
+X-Gm-Gg: ASbGncs32uVflWZ4t22HccaR6fhldvt1R6vS8zKONmNRUzgpKadLmKY4EV3H3+OLgQK
+	OikP4xLnts60Co6vIBzz2rQmDE2fjmtZSl2KkDxsvlX3p+iVcSzQDf0mi90CGhVOW5LLdzxOd96
+	dzyEO0mJQcAK6gPrtA7NQNZaZaIWSV8g3a0X3ixZTLVkSyffYJTHHVATdmDHy+maAc6MGaWHw6q
+	sMqbthuyejrxwD7ast/N7ZjVFFMJ5AIi/kuFKbMy94aU5LOLw==
+X-Google-Smtp-Source: AGHT+IEgeQ0GUy0bLna4m1uiMu79PJdAeK7ijLAotzT9V4CjzfxBB6JltsCSAZHszPCb+4sri3ib1w==
+X-Received: by 2002:a05:6a00:340c:b0:72a:9ddf:55ab with SMTP id d2e1a72fcca58-72d21f3ececmr18299223b3a.10.1736580250208;
+        Fri, 10 Jan 2025 23:24:10 -0800 (PST)
+Received: from dw-tp ([49.205.218.89])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d40658c56sm2637590b3a.93.2025.01.10.23.24.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jan 2025 23:24:09 -0800 (PST)
+From: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+To: Amit Machhiwal <amachhiw@linux.ibm.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc: Amit Machhiwal <amachhiw@linux.ibm.com>, Vaibhav Jain <vaibhav@linux.ibm.com>, Shivaprasad G Bhat <sbhat@linux.ibm.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: PPC: Enable CAP_SPAPR_TCE_VFIO on pSeries KVM guests
+In-Reply-To: <20250109132053.158436-1-amachhiw@linux.ibm.com>
+Date: Sat, 11 Jan 2025 11:49:49 +0530
+Message-ID: <87r059vpmi.fsf@gmail.com>
+References: <20250109132053.158436-1-amachhiw@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hvpgz_N-ryofrwSI8xwElybReki8Q0Ff
-X-Proofpoint-ORIG-GUID: GT_WvY8RHmULRGyFL4N4ZliWEMN7eZqS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- mlxlogscore=808 adultscore=0 bulkscore=0 impostorscore=0 clxscore=1011
- suspectscore=0 phishscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501090104
 
-Currently, on book3s-hv, the capability KVM_CAP_SPAPR_TCE_VFIO is only
-available for KVM Guests running on PowerNV and not for the KVM guests
-running on pSeries hypervisors. This prevents a pSeries hypervisor from
-leveraging the in-kernel acceleration for H_PUT_TCE_INDIRECT and
-H_STUFF_TCE hcalls that results in slow startup times for large memory
-guests.
+Amit Machhiwal <amachhiw@linux.ibm.com> writes:
 
-Fix this by enabling the CAP_SPAPR_TCE_VFIO on the pSeries hosts for the
-nested PAPR guests.
+> Currently, on book3s-hv, the capability KVM_CAP_SPAPR_TCE_VFIO is only
+> available for KVM Guests running on PowerNV and not for the KVM guests
+> running on pSeries hypervisors. 
 
-Fixes: f431a8cde7f1 ("powerpc/iommu: Reimplement the iommu_table_group_ops for pSeries")
-Cc: stable@vger.kernel.org
-Signed-off-by: Amit Machhiwal <amachhiw@linux.ibm.com>
----
- arch/powerpc/kvm/powerpc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+IIUC it was said here [1] that this capability is not available on
+pSeries, hence it got removed. Could you please give a background on
+why this can be enabled now for pSeries? Was there any additional
+support added for this? 
+[1]:
+https://lore.kernel.org/linuxppc-dev/20181214052910.23639-2-sjitindarsingh@gmail.com/
 
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index ce1d91eed231..9c479c7381e4 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -554,7 +554,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = 1;
- 		break;
- 	case KVM_CAP_SPAPR_TCE_VFIO:
--		r = !!cpu_has_feature(CPU_FTR_HVMODE);
-+		r = !!cpu_has_feature(CPU_FTR_HVMODE) || is_kvmppc_hv_enabled(kvm);
- 		break;
- 	case KVM_CAP_PPC_RTAS:
- 	case KVM_CAP_PPC_FIXUP_HCALL:
+... Ohh thinking back a little, are you saying that after the patch...
+f431a8cde7f1 ("powerpc/iommu: Reimplement the iommu_table_group_ops for pSeries")
+ ...we can bring back this capability for kvm guest running on pseries
+as well. Because all underlying issues in using VFIO on pseries were
+fixed. Is this understanding correct? 
 
-base-commit: eea6e4b4dfb8859446177c32961c96726d0117be
--- 
-2.47.1
 
+> This prevents a pSeries hypervisor from
+> leveraging the in-kernel acceleration for H_PUT_TCE_INDIRECT and
+> H_STUFF_TCE hcalls that results in slow startup times for large memory
+> guests.
+
+By any chance could you share the startup time improvements for above?
+IIUC, other than the boot up time, we should also see the performance
+improvements while using VFIO device in nested pSeries kvm guest too right?
+
+>
+> Fix this by enabling the CAP_SPAPR_TCE_VFIO on the pSeries hosts for the
+> nested PAPR guests.
+>
+> Fixes: f431a8cde7f1 ("powerpc/iommu: Reimplement the iommu_table_group_ops for pSeries")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Amit Machhiwal <amachhiw@linux.ibm.com>
+> ---
+>  arch/powerpc/kvm/powerpc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index ce1d91eed231..9c479c7381e4 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -554,7 +554,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_SPAPR_TCE_VFIO:
+> -		r = !!cpu_has_feature(CPU_FTR_HVMODE);
+> +		r = !!cpu_has_feature(CPU_FTR_HVMODE) || is_kvmppc_hv_enabled(kvm);
+>  		break;
+
+In above you said - "Fix this by enabling the CAP_SPAPR_TCE_VFIO on the pSeries hosts for the nested PAPR guests."
+So why can't this simply be r = 1? Or maybe you meant only for HV KVM module is it?
+
+-ritesh
+
+>  	case KVM_CAP_PPC_RTAS:
+>  	case KVM_CAP_PPC_FIXUP_HCALL:
+>
+> base-commit: eea6e4b4dfb8859446177c32961c96726d0117be
+> -- 
+> 2.47.1
 
