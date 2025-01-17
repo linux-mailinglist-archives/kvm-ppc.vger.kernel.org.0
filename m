@@ -1,288 +1,153 @@
-Return-Path: <kvm-ppc+bounces-192-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-193-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5291EA12647
-	for <lists+kvm-ppc@lfdr.de>; Wed, 15 Jan 2025 15:41:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F54BA1484B
+	for <lists+kvm-ppc@lfdr.de>; Fri, 17 Jan 2025 03:34:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A25E818894A0
-	for <lists+kvm-ppc@lfdr.de>; Wed, 15 Jan 2025 14:41:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDDAF18894B1
+	for <lists+kvm-ppc@lfdr.de>; Fri, 17 Jan 2025 02:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB4BB12EBDB;
-	Wed, 15 Jan 2025 14:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD782B9B9;
+	Fri, 17 Jan 2025 02:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jYpr2Dj2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OEJH24o5"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03CE778C9C;
-	Wed, 15 Jan 2025 14:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A2725A620;
+	Fri, 17 Jan 2025 02:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736952040; cv=none; b=FWDoPJD7zSFUk3S6n3EVT3cWJGtzCrlt7SioRv/JDnlZTZFAqvMnCfjhL+N1oofrMqP93jqE9mDEiSX8/3mnZuWr80cDdk5RFCTzwZ2G+N1D6CDkmAfbNcgBtSmASO2yg1wTvmNLPbEhUfvlbIPYWXHk3uI1XU9TnEDZ0Emcsjo=
+	t=1737081274; cv=none; b=RjTqnK5DIh+zJ1+ZXiSg1WGhY+Q2WebWu23I0yFkurAYR5jNQcnhtYAN4DNPiDoEoO0Dj2JaO5JlKEWSu1sVZZe7391n9spVz9VMahkNTZLgX79SKzEDAoQGFiBFSadYIqVsk5Y7LmrHmtjQrC+IDIBxG/bjgNwxG9dR4ISwVmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736952040; c=relaxed/simple;
-	bh=b9rSrI+wmfXupI6ty1Lm5OaLAVK44CSHypgS8CgzYZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hY08ukFB7+uSw/ZIlXyEXMwuQ3AiHn61VFif0DfRXkO8sXknDV4sTrAjWFLLgL6i9PirPD6I/GesAPy4alk+UVJRaEwLRwCUCbPIzgL0NzEM0hBPRzh4+PyMZyaw3fHnCjULeDdC9+H+04tAAospo9r6Vr6QelIMJ3yzkIRmU7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jYpr2Dj2; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50FE6HOY022130;
-	Wed, 15 Jan 2025 14:40:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=tlXKaSEkpPN95aRVt
-	sqo4dTAoEIhvpeOu83lqneYylY=; b=jYpr2Dj2zM23FqsOdxolIiX6+PmfHyEr5
-	EG5SHsfXHNuB3CTaRDYMRP1nAJjtbMDyt9oS5tNYF9TAkW+raZCHDKdfT/q4CnZF
-	VQQ5RsqbwA0IjRFBi5LFjvx4YSk5Ii3cO5hJra21eGLNWMX9hwUCFhOWOxPp8tcB
-	89U5Z3C63MJFZ4naSW3FoVVBnyIOdshp1IXXACgX3C6Gpn/rAVXmKU+Ov9IaQWA5
-	m2zMVCnbMd3LysOErki9i6wtvepgzNYzIUbP3A/SxPlsjiTV5nxvp80itFhtobZ5
-	u+s3yQgkTjGG891rTHdhI/kmLyzoScLq+NPb1a1Vt77fLIy0A/emA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446eg5r6e5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 14:40:29 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50FEZJZD028671;
-	Wed, 15 Jan 2025 14:40:28 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446eg5r6e1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 14:40:28 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50FBeclv001089;
-	Wed, 15 Jan 2025 14:40:27 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44456k0hcs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 14:40:27 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50FEeO4054788530
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 Jan 2025 14:40:24 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6869F20043;
-	Wed, 15 Jan 2025 14:40:24 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B138920040;
-	Wed, 15 Jan 2025 14:40:20 +0000 (GMT)
-Received: from vaibhav?linux.ibm.com (unknown [9.39.24.117])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Wed, 15 Jan 2025 14:40:20 +0000 (GMT)
-Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Wed, 15 Jan 2025 20:10:19 +0530
-From: Vaibhav Jain <vaibhav@linux.ibm.com>
-To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-Cc: Vaibhav Jain <vaibhav@linux.ibm.com>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.ibm.com,
-        amachhiw@linux.ibm.com
-Subject: [PATCH v2 6/6] kvm powerpc/book3s-hv-pmu: Add perf-events for Hostwide counters
-Date: Wed, 15 Jan 2025 20:09:47 +0530
-Message-ID: <20250115143948.369379-7-vaibhav@linux.ibm.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250115143948.369379-1-vaibhav@linux.ibm.com>
-References: <20250115143948.369379-1-vaibhav@linux.ibm.com>
+	s=arc-20240116; t=1737081274; c=relaxed/simple;
+	bh=IbpOuCB0PVCg0GMj7JYqLyLPivC2fAXTi2lfyteKyjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N+NfY9ISsEW6AFVsqEqgW3YTat0OSkK123EH5x1u549bg+Pn6o+fiIIMjl88G3vTjh11Ai/I8pW/mcJkZrBapAas/94iv3qrgOoSu1EHr0EVhoaO1BEIE0yMtlbxxAmdBmA8qUbJfdIDkTEuzlR7WQwjdFapOw5kirK8qYcl3LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OEJH24o5; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737081272; x=1768617272;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IbpOuCB0PVCg0GMj7JYqLyLPivC2fAXTi2lfyteKyjw=;
+  b=OEJH24o5H+MUxDPyLnMKvA/VGrqI3y2srPvOuUO6d/QtQLso7lT7Ax+a
+   2b25YqcBrxjC/R3wZVuMVT0l3BNbJmP/sgqvmHobDEmkTelwBpu5L7YSx
+   ooE16G+L9bFCO6yUGw/nGe2yg5rbRZCjS6TXVf2f8C/QlvovM4/BVjKDd
+   8++UeShDF1GOJy5nJLQ4djXqcWyxphQ6Xz6QZm3OzRzke+ivktcSWYw6E
+   l3XTKF7A8OfGPadEpkSC3pqaRP/hEc43nqWtLKIRAu/tALiVAcTmwQ9ZY
+   Mf8fBwUulockL2S9zkx8k4D12zX4FzQchNjjukIc7+vuBD4uEGNyzJlnj
+   Q==;
+X-CSE-ConnectionGUID: N0JlleUZSDeB+E/+4BG5ug==
+X-CSE-MsgGUID: /Mv/0S3mRMKPwSwyrYQoVA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="37735280"
+X-IronPort-AV: E=Sophos;i="6.13,211,1732608000"; 
+   d="scan'208";a="37735280"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 18:34:32 -0800
+X-CSE-ConnectionGUID: pLWp/igBRTWuqm7bF9lITA==
+X-CSE-MsgGUID: TrgTChtERluJ67P28x4/yA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="128928043"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 16 Jan 2025 18:34:29 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tYcBn-000SdL-09;
+	Fri, 17 Jan 2025 02:34:27 +0000
+Date: Fri, 17 Jan 2025 10:34:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Vaibhav Jain <vaibhav@linux.ibm.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+	sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.ibm.com,
+	amachhiw@linux.ibm.com
+Subject: Re: [PATCH v2 4/6] kvm powerpc/book3s-apiv2: Introduce kvm-hv
+ specific PMU
+Message-ID: <202501171030.3x0gqW8G-lkp@intel.com>
+References: <20250115143948.369379-5-vaibhav@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Uogkg42FCU1rqIOyDqtQTkwcqaugRvG1
-X-Proofpoint-ORIG-GUID: 0SbFgFNfu5Z_duYw56oS9XWYoGnlxbXH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-15_05,2025-01-15_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
- clxscore=1015 phishscore=0 malwarescore=0 spamscore=0 adultscore=0
- mlxscore=0 impostorscore=0 lowpriorityscore=0 mlxlogscore=999
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501150110
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250115143948.369379-5-vaibhav@linux.ibm.com>
 
-Update 'book3s_hv_pmu.c' to add five new perf-events mapped to the five
-Hostwide counters. Since these newly introduced perf events are at system
-wide scope and can be read from any L1-Lpar CPU, 'kvmppv_pmu's scope and
-capabilities are updated appropriately.
+Hi Vaibhav,
 
-Also introduce two new helpers. First is kvmppc_update_l0_stats() that uses
-the infrastructure introduced in previous patches to issues the
-H_GUEST_GET_STATE hcall L0-PowerVM to fetch guest-state-buffer holding the
-latest values of these counters which is then parsed and 'l0_stats'
-variable updated.
+kernel test robot noticed the following build warnings:
 
-Second helper is kvmppc_pmu_event_update() which is called from
-'kvmppv_pmu' callbacks and uses kvmppc_update_l0_stats() to update
-'l0_stats' and the update the 'struct perf_event's event-counter.
+[auto build test WARNING on powerpc/topic/ppc-kvm]
+[also build test WARNING on powerpc/next powerpc/fixes kvm/queue kvm/next mst-vhost/linux-next linus/master v6.13-rc7 next-20250116]
+[cannot apply to kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Some minor updates to kvmppc_pmu_{add, del, read}() to remove some debug
-scaffolding code.
+url:    https://github.com/intel-lab-lkp/linux/commits/Vaibhav-Jain/powerpc-Document-APIv2-KVM-hcall-spec-for-Hostwide-counters/20250116-024240
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git topic/ppc-kvm
+patch link:    https://lore.kernel.org/r/20250115143948.369379-5-vaibhav%40linux.ibm.com
+patch subject: [PATCH v2 4/6] kvm powerpc/book3s-apiv2: Introduce kvm-hv specific PMU
+config: powerpc-allnoconfig (https://download.01.org/0day-ci/archive/20250117/202501171030.3x0gqW8G-lkp@intel.com/config)
+compiler: powerpc-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250117/202501171030.3x0gqW8G-lkp@intel.com/reproduce)
 
-Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_hv_pmu.c | 92 +++++++++++++++++++++++++++++++-
- 1 file changed, 91 insertions(+), 1 deletion(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501171030.3x0gqW8G-lkp@intel.com/
 
-diff --git a/arch/powerpc/kvm/book3s_hv_pmu.c b/arch/powerpc/kvm/book3s_hv_pmu.c
-index 0107ed3b03e3..4c14c5885269 100644
---- a/arch/powerpc/kvm/book3s_hv_pmu.c
-+++ b/arch/powerpc/kvm/book3s_hv_pmu.c
-@@ -30,6 +30,11 @@
- #include "asm/guest-state-buffer.h"
- 
- enum kvmppc_pmu_eventid {
-+	KVMPPC_EVENT_HOST_HEAP,
-+	KVMPPC_EVENT_HOST_HEAP_MAX,
-+	KVMPPC_EVENT_HOST_PGTABLE,
-+	KVMPPC_EVENT_HOST_PGTABLE_MAX,
-+	KVMPPC_EVENT_HOST_PGTABLE_RECLAIM,
- 	KVMPPC_EVENT_MAX,
- };
- 
-@@ -51,8 +56,14 @@ static DEFINE_SPINLOCK(lock_l0_stats);
- /* GSB related structs needed to talk to L0 */
- static struct kvmppc_gs_msg *gsm_l0_stats;
- static struct kvmppc_gs_buff *gsb_l0_stats;
-+static struct kvmppc_gs_parser gsp_l0_stats;
- 
- static struct attribute *kvmppc_pmu_events_attr[] = {
-+	KVMPPC_PMU_EVENT_ATTR(host_heap, KVMPPC_EVENT_HOST_HEAP),
-+	KVMPPC_PMU_EVENT_ATTR(host_heap_max, KVMPPC_EVENT_HOST_HEAP_MAX),
-+	KVMPPC_PMU_EVENT_ATTR(host_pagetable, KVMPPC_EVENT_HOST_PGTABLE),
-+	KVMPPC_PMU_EVENT_ATTR(host_pagetable_max, KVMPPC_EVENT_HOST_PGTABLE_MAX),
-+	KVMPPC_PMU_EVENT_ATTR(host_pagetable_reclaim, KVMPPC_EVENT_HOST_PGTABLE_RECLAIM),
- 	NULL,
- };
- 
-@@ -61,7 +72,7 @@ static const struct attribute_group kvmppc_pmu_events_group = {
- 	.attrs = kvmppc_pmu_events_attr,
- };
- 
--PMU_FORMAT_ATTR(event, "config:0");
-+PMU_FORMAT_ATTR(event, "config:0-5");
- static struct attribute *kvmppc_pmu_format_attr[] = {
- 	&format_attr_event.attr,
- 	NULL,
-@@ -78,6 +89,79 @@ static const struct attribute_group *kvmppc_pmu_attr_groups[] = {
- 	NULL,
- };
- 
-+/*
-+ * Issue the hcall to get the L0-host stats.
-+ * Should be called with l0-stat lock held
-+ */
-+static int kvmppc_update_l0_stats(void)
-+{
-+	int rc;
-+
-+	/* With HOST_WIDE flags guestid and vcpuid will be ignored */
-+	rc = kvmppc_gsb_recv(gsb_l0_stats, KVMPPC_GS_FLAGS_HOST_WIDE);
-+	if (rc)
-+		goto out;
-+
-+	/* Parse the guest state buffer is successful */
-+	rc = kvmppc_gse_parse(&gsp_l0_stats, gsb_l0_stats);
-+	if (rc)
-+		goto out;
-+
-+	/* Update the l0 returned stats*/
-+	memset(&l0_stats, 0, sizeof(l0_stats));
-+	rc = kvmppc_gsm_refresh_info(gsm_l0_stats, gsb_l0_stats);
-+
-+out:
-+	return rc;
-+}
-+
-+/* Update the value of the given perf_event */
-+static int kvmppc_pmu_event_update(struct perf_event *event)
-+{
-+	int rc;
-+	u64 curr_val, prev_val;
-+	unsigned long flags;
-+	unsigned int config = event->attr.config;
-+
-+	/* Ensure no one else is modifying the l0_stats */
-+	spin_lock_irqsave(&lock_l0_stats, flags);
-+
-+	rc = kvmppc_update_l0_stats();
-+	if (!rc) {
-+		switch (config) {
-+		case KVMPPC_EVENT_HOST_HEAP:
-+			curr_val = l0_stats.guest_heap;
-+			break;
-+		case KVMPPC_EVENT_HOST_HEAP_MAX:
-+			curr_val = l0_stats.guest_heap_max;
-+			break;
-+		case KVMPPC_EVENT_HOST_PGTABLE:
-+			curr_val = l0_stats.guest_pgtable_size;
-+			break;
-+		case KVMPPC_EVENT_HOST_PGTABLE_MAX:
-+			curr_val = l0_stats.guest_pgtable_size_max;
-+			break;
-+		case KVMPPC_EVENT_HOST_PGTABLE_RECLAIM:
-+			curr_val = l0_stats.guest_pgtable_reclaim;
-+			break;
-+		default:
-+			rc = -ENOENT;
-+			break;
-+		}
-+	}
-+
-+	spin_unlock_irqrestore(&lock_l0_stats, flags);
-+
-+	/* If no error than update the perf event */
-+	if (!rc) {
-+		prev_val = local64_xchg(&event->hw.prev_count, curr_val);
-+		if (curr_val > prev_val)
-+			local64_add(curr_val - prev_val, &event->count);
-+	}
-+
-+	return rc;
-+}
-+
- static int kvmppc_pmu_event_init(struct perf_event *event)
- {
- 	unsigned int config = event->attr.config;
-@@ -100,15 +184,19 @@ static int kvmppc_pmu_event_init(struct perf_event *event)
- 
- static void kvmppc_pmu_del(struct perf_event *event, int flags)
- {
-+	/* Do nothing */
- }
- 
- static int kvmppc_pmu_add(struct perf_event *event, int flags)
- {
-+	if (flags & PERF_EF_START)
-+		return kvmppc_pmu_event_update(event);
- 	return 0;
- }
- 
- static void kvmppc_pmu_read(struct perf_event *event)
- {
-+	kvmppc_pmu_event_update(event);
- }
- 
- /* Return the size of the needed guest state buffer */
-@@ -292,6 +380,8 @@ static struct pmu kvmppc_pmu = {
- 	.read = kvmppc_pmu_read,
- 	.attr_groups = kvmppc_pmu_attr_groups,
- 	.type = -1,
-+	.scope = PERF_PMU_SCOPE_SYS_WIDE,
-+	.capabilities = PERF_PMU_CAP_NO_EXCLUDE | PERF_PMU_CAP_NO_INTERRUPT,
- };
- 
- int kvmppc_register_pmu(void)
+All warnings (new ones prefixed by >>):
+
+   In file included from arch/powerpc/include/asm/kvm_ppc.h:22,
+                    from arch/powerpc/include/asm/dbell.h:17,
+                    from arch/powerpc/kernel/asm-offsets.c:36:
+>> arch/powerpc/include/asm/kvm_book3s.h:357:13: warning: 'kvmppc_unregister_pmu' defined but not used [-Wunused-function]
+     357 | static void kvmppc_unregister_pmu(void)
+         |             ^~~~~~~~~~~~~~~~~~~~~
+>> arch/powerpc/include/asm/kvm_book3s.h:352:12: warning: 'kvmppc_register_pmu' defined but not used [-Wunused-function]
+     352 | static int kvmppc_register_pmu(void)
+         |            ^~~~~~~~~~~~~~~~~~~
+--
+   In file included from arch/powerpc/include/asm/kvm_ppc.h:22,
+                    from arch/powerpc/include/asm/dbell.h:17,
+                    from arch/powerpc/kernel/asm-offsets.c:36:
+>> arch/powerpc/include/asm/kvm_book3s.h:357:13: warning: 'kvmppc_unregister_pmu' defined but not used [-Wunused-function]
+     357 | static void kvmppc_unregister_pmu(void)
+         |             ^~~~~~~~~~~~~~~~~~~~~
+>> arch/powerpc/include/asm/kvm_book3s.h:352:12: warning: 'kvmppc_register_pmu' defined but not used [-Wunused-function]
+     352 | static int kvmppc_register_pmu(void)
+         |            ^~~~~~~~~~~~~~~~~~~
+
+
+vim +/kvmppc_unregister_pmu +357 arch/powerpc/include/asm/kvm_book3s.h
+
+   351	
+ > 352	static int kvmppc_register_pmu(void)
+   353	{
+   354		return 0;
+   355	}
+   356	
+ > 357	static void kvmppc_unregister_pmu(void)
+   358	{
+   359	}
+   360	
+
 -- 
-2.47.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
