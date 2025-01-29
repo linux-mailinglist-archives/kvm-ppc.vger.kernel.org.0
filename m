@@ -1,159 +1,170 @@
-Return-Path: <kvm-ppc+bounces-212-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-213-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73D05A20A05
-	for <lists+kvm-ppc@lfdr.de>; Tue, 28 Jan 2025 12:58:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C970DA21A17
+	for <lists+kvm-ppc@lfdr.de>; Wed, 29 Jan 2025 10:41:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 909707A33E9
-	for <lists+kvm-ppc@lfdr.de>; Tue, 28 Jan 2025 11:57:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E53753A515D
+	for <lists+kvm-ppc@lfdr.de>; Wed, 29 Jan 2025 09:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A4DC19DF75;
-	Tue, 28 Jan 2025 11:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55871AA1D9;
+	Wed, 29 Jan 2025 09:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ayYcsvup"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OQEX4LS4"
 X-Original-To: kvm-ppc@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6150A199E94;
-	Tue, 28 Jan 2025 11:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB4C19D07C;
+	Wed, 29 Jan 2025 09:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738065478; cv=none; b=BPIlVpE5eLiC2ULPXjfpG2Fz2k9x/Jq1+NLkNRPz4Aqdt9Aq0BE82pprAMSSuGyu6pSFr6/UqDH73jjbWFr4psLNciLND8MqnkwMQ0bhqK1OP40p/wiZlYQkvLc+VmvGETsxfSw8ztg9OosyxBq4a6DqOn7eYicLfPOxgKujfb4=
+	t=1738143689; cv=none; b=aQbg+hXErUb1eKomJSshP3XNvuuAeTWkSSfdzoEUKHMAbJDUnx5UqUtPFXgTFj+zeCUraSoeJDmSZ34+KKEoHXuPMmR7UhbnM7PanE00Vrrh5KUFKLEx02Q1BDVd3A0oYnlOGGEpe2BIyvLMih9j2VCmI5ghE+KVeZqypgFpPfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738065478; c=relaxed/simple;
-	bh=F0/9IQ0AYzRMcpDNLidcpn2pdwdSs/7SE5pzI5AlAq0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZZ6bM1aObm6on88OfKMYRrP4XzeDepSW/gP98vIylgb691gQm+Ng5UghzSB2eyd+73nCm3xYhkBWb3ksOEyTk2G4VorovUqoIG2UkdXHuFr7xH1MSBjqhaKNT+shQj7t0Q8+535gcTyaYArcINeVDMrT7ZZzHS0UMmFAm16q2uY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ayYcsvup; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1738143689; c=relaxed/simple;
+	bh=+H7TZ0haIWjqdVTXbCyYPtbLhDabfj5908jj5j3zc3M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZPua3SJFBmsLjCnOQqO/al5LkFIM0eP+Ud5ahBZ1ibxaLgOgjANQL1wJK9iG8u1ncfsrTVUl2AX5gDiKTNOu3WVEOakZi2pBRxcOvlfj/sHl0c5Pft6N+/eMLqrTo4sSsASbivxjEnxKT3n4HU0vk+aKwf9DsSrOwXz5psUmN2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OQEX4LS4; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50S7X5hL023185;
-	Tue, 28 Jan 2025 11:57:45 GMT
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50T20YvY028471;
+	Wed, 29 Jan 2025 09:41:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=r7X8KG
-	ofGjzXyiXmNpCqfsbsuZB60462r6ZQo2dzXl8=; b=ayYcsvupPRKoRP/G+OPys1
-	QycJqFRxlExFL71+Y+8MCKAm6S1eALhR9up6ADp3MbVEqBKOshE/ZYtSHJiMqyL5
-	tmr2CCEkfCgeCMaAnWbOYrn43csIYdq6hgajcdaDtRWbQQifCae0mL/R2u++ata5
-	ogooXpH9EldEpu4pukHkOVBLdOeKtWYstJ6YFhIpqIGCaRfJJaLQ0AOkyLMTdp+e
-	ulQ+nD402A07THf8Qw6jVJEamD4nKzuZvkoBm3w/O5OksjGmS1ci+dQFIEFte1+D
-	GPJqES0cmvlqnKilTldeOzX14lQd5/w2D0I5G9KrgTIM9LVcpCFyQIPrqekhN+gw
-	==
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=oNZkm1uX7U/WwtMtAAdmr5FSLoJzcomJRfKSuLi+Y
+	y0=; b=OQEX4LS4kn4Xy37Yh8WrCQsHr35kGTxrrelBLOPH60eapDFgvEqzmIc6t
+	Eifbfhmr22jYNUwxJ+ZBe/jghVpLDraMjfJpLOxrnVJq2i6WZiX/WNwbgPwXyF4Q
+	7PxqGkLvYsYYhBUpB9yWshiZ7LcuytgPtnQbGMpyHhinBkRnIxklnzSfov0WV7lH
+	/N+YGpf2eji921olBWSB3sJwf9Qeb/FDeSglAzbPYplROKw50QL4Vfl8LGXPls3I
+	TUqqm8tg0qsLV40eVkag/7oGuSfTlfoyjz4T685tDM1deW0w4Ww45O03FNX1WB5U
+	JzRA6N5+A1XQSAVT2nH44z4/F7saQ==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44etxrs2p0-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44fb609g2t-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Jan 2025 11:57:45 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50SBs3oD013874;
-	Tue, 28 Jan 2025 11:57:44 GMT
+	Wed, 29 Jan 2025 09:41:09 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50T9aY8E006602;
+	Wed, 29 Jan 2025 09:41:09 GMT
 Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44etxrs2nw-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44fb609g2p-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Jan 2025 11:57:44 +0000 (GMT)
+	Wed, 29 Jan 2025 09:41:09 +0000 (GMT)
 Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50S88cr2012444;
-	Tue, 28 Jan 2025 11:57:43 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44dany38gc-1
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50T8lO2u012336;
+	Wed, 29 Jan 2025 09:41:08 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44dany83k8-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Jan 2025 11:57:43 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50SBvg2M22282896
+	Wed, 29 Jan 2025 09:41:08 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50T9f4rb20250894
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 28 Jan 2025 11:57:42 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 64A8D58055;
-	Tue, 28 Jan 2025 11:57:42 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6B5505803F;
-	Tue, 28 Jan 2025 11:57:38 +0000 (GMT)
-Received: from [9.204.206.207] (unknown [9.204.206.207])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 28 Jan 2025 11:57:38 +0000 (GMT)
-Message-ID: <27978f31-6b66-4d4c-886b-e2bfb41d5261@linux.ibm.com>
-Date: Tue, 28 Jan 2025 17:27:36 +0530
+	Wed, 29 Jan 2025 09:41:04 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A1EA520040;
+	Wed, 29 Jan 2025 09:41:04 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E859920073;
+	Wed, 29 Jan 2025 09:41:01 +0000 (GMT)
+Received: from li-e7e2bd4c-2dae-11b2-a85c-bfd29497117c.in.ibm.com (unknown [9.109.198.84])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 29 Jan 2025 09:41:01 +0000 (GMT)
+From: Amit Machhiwal <amachhiw@linux.ibm.com>
+To: Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Cc: Amit Machhiwal <amachhiw@linux.ibm.com>,
+        Vaibhav Jain <vaibhav@linux.ibm.com>,
+        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Naveen N Rao <naveen@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: [PATCH v2] KVM: PPC: Enable CAP_SPAPR_TCE_VFIO on pSeries KVM guests
+Date: Wed, 29 Jan 2025 15:10:33 +0530
+Message-ID: <20250129094033.2265211-1-amachhiw@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/6] kvm powerpc/book3s-apiv2: Introduce kvm-hv
- specific PMU
-To: Vaibhav Jain <vaibhav@linux.ibm.com>,
-        Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.ibm.com,
-        amachhiw@linux.ibm.com
-References: <20250123120749.90505-1-vaibhav@linux.ibm.com>
- <20250123120749.90505-5-vaibhav@linux.ibm.com>
- <40C19755-ABE4-4E23-A75A-1F6F6DDC505A@linux.vnet.ibm.com>
- <87y0ywu2ri.fsf@vajain21.in.ibm.com>
-Content-Language: en-US
-From: Madhavan Srinivasan <maddy@linux.ibm.com>
-In-Reply-To: <87y0ywu2ri.fsf@vajain21.in.ibm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MNESt_Kp7udNeKkgSEzO62Q2Ay1u4sAz
-X-Proofpoint-GUID: ENHdIdwhxCCLeW6MK-1CsGIb68TQgiQs
+X-Proofpoint-GUID: TWdhonsq_87KGcTRAxAYs1iT1N1D-B3f
+X-Proofpoint-ORIG-GUID: -jAVV3X5Wcjma1oMS2g6sROUOl1lkTg4
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-28_04,2025-01-27_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- impostorscore=0 bulkscore=0 suspectscore=0 mlxlogscore=710
- priorityscore=1501 phishscore=0 adultscore=0 malwarescore=0
- lowpriorityscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2411120000 definitions=main-2501280089
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 clxscore=1015 lowpriorityscore=0 mlxlogscore=793
+ bulkscore=0 spamscore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501290077
 
+Currently on book3s-hv, the capability KVM_CAP_SPAPR_TCE_VFIO is only
+available for KVM Guests running on PowerNV and not for the KVM guests
+running on pSeries hypervisors. This prevents a pSeries L2 guest from
+leveraging the in-kernel acceleration for H_PUT_TCE_INDIRECT and
+H_STUFF_TCE hcalls that results in slow startup times for large memory
+guests.
 
+Fix this by enabling the CAP_SPAPR_TCE_VFIO on the pSeries hosts as well
+for the nested PAPR guests. With the patch, booting an L2 guest with
+128G memory results in an average improvement of 11% in the startup
+times.
 
-On 1/27/25 1:06 PM, Vaibhav Jain wrote:
-> Hi Athira,
-> 
-> Thanks for reviewing this patch series. My responses to your review
-> comment inline below:
-> 
-> 
-> Athira Rajeev <atrajeev@linux.vnet.ibm.com> writes:
-> 
->>> On 23 Jan 2025, at 5:37 PM, Vaibhav Jain <vaibhav@linux.ibm.com> wrote:
->>>
->>> Introduce a new PMU named 'kvm-hv' to report Book3s kvm-hv specific
-> <snip>
->>
->> Hi Vaibhav
->>
->> All PMU specific code is under “arch/powerpc/perf in the kernel source. Here since we are introducing a kvm-hv specific PMU, can we please have it in arch/powerpc/perf ?
-> 
-> Is it common convention to put PMU specific code in
-> arch/powerpc/perf across ppc achitecture variants ? If its there can you
-> please mention the reasons behind it.
-> 
+Fixes: f431a8cde7f1 ("powerpc/iommu: Reimplement the iommu_table_group_ops for pSeries")
+Cc: stable@vger.kernel.org
+Signed-off-by: Amit Machhiwal <amachhiw@linux.ibm.com>
+---
+Changes since v1:
+    * Addressed review comments from Ritesh
+    * v1: https://lore.kernel.org/all/20250109132053.158436-1-amachhiw@linux.ibm.com/
 
-My concern is about fragmentation. Would prefer to have
-the pmu code under perf folder. Secondly, we did handle
-module case for vpa-pmu.
+ arch/powerpc/kvm/powerpc.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Maddy
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index ce1d91eed231..a7138eb18d59 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -543,26 +543,23 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = !hv_enabled;
+ 		break;
+ #ifdef CONFIG_KVM_MPIC
+ 	case KVM_CAP_IRQ_MPIC:
+ 		r = 1;
+ 		break;
+ #endif
 
+ #ifdef CONFIG_PPC_BOOK3S_64
+ 	case KVM_CAP_SPAPR_TCE:
++		fallthrough;
+ 	case KVM_CAP_SPAPR_TCE_64:
+-		r = 1;
+-		break;
+ 	case KVM_CAP_SPAPR_TCE_VFIO:
+-		r = !!cpu_has_feature(CPU_FTR_HVMODE);
+-		break;
+ 	case KVM_CAP_PPC_RTAS:
+ 	case KVM_CAP_PPC_FIXUP_HCALL:
+ 	case KVM_CAP_PPC_ENABLE_HCALL:
+ #ifdef CONFIG_KVM_XICS
+ 	case KVM_CAP_IRQ_XICS:
+ #endif
+ 	case KVM_CAP_PPC_GET_CPU_CHAR:
+ 		r = 1;
+ 		break;
+ #ifdef CONFIG_KVM_XIVE
 
-> Also the code for this PMU, will be part of kvm-hv kernel module as it
-> utilizes the functionality implemented there. Moving this PMU code to
-> arch/powerpc/perf will need this to be converted in yet another new
-> kernel module, adding a dependency to kvm-hv module and exporting a
-> bunch of functionality from kvm-hv. Which looks bit messy to me
-> 
-> <snip>
-> 
+base-commit: 6d61a53dd6f55405ebcaea6ee38d1ab5a8856c2c
+-- 
+2.48.1
 
 
