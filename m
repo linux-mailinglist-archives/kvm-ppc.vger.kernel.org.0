@@ -1,94 +1,74 @@
-Return-Path: <kvm-ppc+bounces-260-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-261-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7489AB15D6
-	for <lists+kvm-ppc@lfdr.de>; Fri,  9 May 2025 15:52:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 506FFAB240E
+	for <lists+kvm-ppc@lfdr.de>; Sat, 10 May 2025 15:59:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 236CF4E0DC6
-	for <lists+kvm-ppc@lfdr.de>; Fri,  9 May 2025 13:51:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAEA717D846
+	for <lists+kvm-ppc@lfdr.de>; Sat, 10 May 2025 13:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE5D293466;
-	Fri,  9 May 2025 13:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE7B1E8356;
+	Sat, 10 May 2025 13:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Hc8nLPs+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lmpk4wlK"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CBA2918DC;
-	Fri,  9 May 2025 13:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E61C28E8
+	for <kvm-ppc@vger.kernel.org>; Sat, 10 May 2025 13:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746798605; cv=none; b=q3RrYqPq2MQbWruy7gmOhFy9ejnWTlRVdwOadrd0C6K+HHOPZu04MKEErCwvZKPryjCyvKAHx7ktfdx0SLvje/uuBKEh08fi8Rw5VpuwCIMjLdqTNvQz3VN/F7SP8RNx8GRvf0CQRdb6VEIDHmUFK4quzJeFhrd1ZrzLawEG08U=
+	t=1746885564; cv=none; b=lnLVTiMy767Z4WMncRyUWxl/HTFnNajmjqERUO4A4/BjJiYvmKnDOMGsXihnvUHFzSbTe584Cs8fjjkanRiBARqWLuVAR+u+ePlm7udkM984FLgQMsytNoFfOy8uZr+sGK7RwokJ3eV6KINLgTdLrd6O2IWQR8LTXJr0gfgtIfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746798605; c=relaxed/simple;
-	bh=qL35tfjqtvRbZWZeDNm4gyYoQKOGEeBiDKDQQJ0f6xM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UaPH//KGtmw/pJE3nBKw8R0S0XZRtj+cIbsUQj3/73FX0aslEGMokCJ7BVPHCufMfwBXcbBNEXGpWCBo57dWwnwO5/lPGakjnZ6J6WVKcUa8Olj6mtP8f6dSV/4d+ZCMfioGk7V/4zbCtw4FJBI8egrCqh72UfV5it2zHRMJ6ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Hc8nLPs+; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 549DYmZw031546;
-	Fri, 9 May 2025 13:49:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=qL35tfjqtvRbZWZeDNm4gyYoQKOGEe
-	BiDKDQQJ0f6xM=; b=Hc8nLPs+GogWCY8kTHyiFY0gIrg0TzimptS2a6fDT6zcwR
-	Ohdi4qF3WkLRiVni2zrKvQAsZvGtjESE421Gl3ef74BUhq8ufOHx5ENWgcdztvBK
-	6dsRagf/J4hItu87AgWYZlXna5zVHNXTe6q/jEzOtB5p44DcCrt5E4VGeZ1yZknv
-	+zDt/pFeUArs+TtfIDFQh2m7cctqd7k5UYUmgHXvmWJNy/Lfiw2c1SuXszLJyU3L
-	PgwCfvPxjdKozvlHPcI/7+JMTGMxpch7gD6GzDqmnLcInh3c3wJxfIgl2A8bpPsa
-	ytKUM0VB8cPum0ce6Q9krW7tjRTkySv5wZrxc5DQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46h4rwc0gp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 09 May 2025 13:49:47 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 549DhFHQ030863;
-	Fri, 9 May 2025 13:49:46 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46h4rwc0gk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 09 May 2025 13:49:46 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 549DIKC8014097;
-	Fri, 9 May 2025 13:49:45 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 46dypm3b49-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 09 May 2025 13:49:45 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 549DnfBA55378284
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 9 May 2025 13:49:41 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BBEAC200F6;
-	Fri,  9 May 2025 13:49:41 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DE822200F8;
-	Fri,  9 May 2025 13:49:38 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.39.24.79])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri,  9 May 2025 13:49:38 +0000 (GMT)
-Date: Fri, 9 May 2025 19:19:36 +0530
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: Amit Machhiwal <amachhiw@linux.ibm.com>
-Cc: Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, Vaibhav Jain <vaibhav@linux.ibm.com>,
-        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix IRQ map warnings with XICS on
- pSeries KVM Guest
-Message-ID: <m2a54sgts6stdrdiduzhkiqsp3wlfmlueelxivjsy5qpd3f3oz@3lgtuy5bl4x2>
-References: <20250425185641.1611857-1-amachhiw@linux.ibm.com>
+	s=arc-20240116; t=1746885564; c=relaxed/simple;
+	bh=lCaAI2cQ3dxuEfRcnaH+9DmU/OE4Xz25OdfT36yxlIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RmHfgCBfOKTynjq8J5iOkO5pJmYOx1Zjch5fGBk5O4KteSzQv6oTKpdCjWrzgTFpWs5Fl2ga7yyzXp+4PmzhYFifsMMtrjA3vSE7r6fP4ipUzNT0/NGTlquzgCJHtgFg0iHXBCEWk4aSGGj5GuIVEuHLboZE0vxI9qLA9lpB77Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lmpk4wlK; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746885564; x=1778421564;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=lCaAI2cQ3dxuEfRcnaH+9DmU/OE4Xz25OdfT36yxlIU=;
+  b=Lmpk4wlKQlzTtVywyHpbrKNBsnnQkPnWGDymKodlPJV+ojhNcknzpSFI
+   SOhSt73evmN4r/HiPYwJwGlebZnI9gLeWKHe0oGwrpOsUE3joHsCAYpbB
+   f19pfPfI+nWMRSEV+i6Rm3OHBr0gxCOk4T0RqsgTbY6JGYg39O3aL6Rk2
+   F+ztDcAJO9qTFbgwZ1qjDqmgFiY2lCSAFgLgBiYGb4XZtumBUrM+2pHvB
+   sMd7AytIVPWrxLVOyPfwl7ZQJ5c+DIJ22hEiF6wwttHYYKM2dQkj9eLnw
+   ApHFIzNJ5WlUAwxsHwtsKzrI1IR0sN1VI66moGI9kF7Z1vk3QmzL6XjA7
+   Q==;
+X-CSE-ConnectionGUID: tJg18u8TRbudZn8CJhw8Vg==
+X-CSE-MsgGUID: q9/fWLHzSfWpLSr8HP4ABQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11429"; a="59708175"
+X-IronPort-AV: E=Sophos;i="6.15,278,1739865600"; 
+   d="scan'208";a="59708175"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2025 06:59:23 -0700
+X-CSE-ConnectionGUID: FO+VVi07S4OYzvqVrHVQig==
+X-CSE-MsgGUID: czEDFO97SuqdJmJAHS0T8Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,278,1739865600"; 
+   d="scan'208";a="141802918"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 10 May 2025 06:59:21 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uDkjW-000D7h-1Y;
+	Sat, 10 May 2025 13:59:18 +0000
+Date: Sat, 10 May 2025 21:59:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Alexander Graf <graf@amazon.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	kvm-ppc@vger.kernel.org
+Subject: [agraf-2.6:kexec-cma 2/2] kernel/kexec_file.c:661:45: warning:
+ format specifies type 'int' but the argument has type 'unsigned long'
+Message-ID: <202505102142.kLGAquhf-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
@@ -97,25 +77,72 @@ List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250425185641.1611857-1-amachhiw@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=QIxoRhLL c=1 sm=1 tr=0 ts=681e07fb cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=v01Bmm9WW5sV4C35fbgA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: HaN2FDaQ0WR_SGqBR-G2bMzjMEx0FPeF
-X-Proofpoint-ORIG-GUID: 0neBe9qo4vhcaef3bA8JcpV8S5vxVVwP
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA5MDEyOCBTYWx0ZWRfX+ZwY+iQm1GHY paAeBzeUc7BYyHlO61eGEeVHBhPzZnvdEYKQCFlIO2ee0Ir+SJ2Y6p1BSFxukZhlC117CrAasR/ 088CaR/oeWz0vzgPkjM2rDlxkiHtFRvekaaDNeDg8AJsTQhIBxhj+AE3EIvcuQZOrtZZGZ1ahsu
- enZ4Ad0sFzTQJDRoGH5xAPdw3LjZrMjF6U8f4cl5YjZToZADVvHbm3oc4LgIPJrIt2Q8cWWozdN ZEPdEaUJDyfqqhgpuhOf2on3ai+EzMfeEtaOPkpWOThz4dnJsczs0N96pfz365ziBe5Z9a6gPkP KaxZKY3bi9qyzGtAjRYQXjTr1rOJq4iWZ8nLcvIUYvwQY9bVoSYO3bDA/gLRxn92Px5SuhhZk4X
- a+ILzqMnlb/5ibD9RkZvGujtcIG/h9YDcDyfdh1oJ2oSrElr3ay+Xpoauc+UJ9kDvSKFdbBV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-09_05,2025-05-08_04,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- suspectscore=0 lowpriorityscore=0 phishscore=0 clxscore=1015
- malwarescore=0 bulkscore=0 adultscore=0 mlxlogscore=568 spamscore=0
- priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2505090128
 
-I tested this on both KOP and PowerNV, LGTM
+tree:   https://github.com/agraf/linux-2.6.git kexec-cma
+head:   752619bbe38c535612b1a9e5b47ea7d962c63449
+commit: 752619bbe38c535612b1a9e5b47ea7d962c63449 [2/2] XXX
+config: x86_64-buildonly-randconfig-001-20250510 (https://download.01.org/0day-ci/archive/20250510/202505102142.kLGAquhf-lkp@intel.com/config)
+compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250510/202505102142.kLGAquhf-lkp@intel.com/reproduce)
 
-Tested-by: Gautam Menghani <gautam@linux.ibm.com>
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505102142.kLGAquhf-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> kernel/kexec_file.c:661:45: warning: format specifies type 'int' but the argument has type 'unsigned long' [-Wformat]
+     661 |         pr_warn("Allocated %d pages DMA memory\n", kbuf->memsz >> PAGE_SHIFT);
+         |                            ~~                      ^~~~~~~~~~~~~~~~~~~~~~~~~
+         |                            %lu
+   include/linux/printk.h:560:37: note: expanded from macro 'pr_warn'
+     560 |         printk(KERN_WARNING pr_fmt(fmt), ##__VA_ARGS__)
+         |                                    ~~~     ^~~~~~~~~~~
+   include/linux/printk.h:507:60: note: expanded from macro 'printk'
+     507 | #define printk(fmt, ...) printk_index_wrap(_printk, fmt, ##__VA_ARGS__)
+         |                                                     ~~~    ^~~~~~~~~~~
+   include/linux/printk.h:479:19: note: expanded from macro 'printk_index_wrap'
+     479 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
+         |                         ~~~~    ^~~~~~~~~~~
+   1 warning generated.
+
+
+vim +661 kernel/kexec_file.c
+
+   635	
+   636	static int kexec_alloc_contig(struct kexec_buf *kbuf)
+   637	{
+   638		struct page *p;
+   639		unsigned long mem;
+   640		u32 i;
+   641	
+   642		p = dma_alloc_from_contiguous(NULL, kbuf->memsz >> PAGE_SHIFT,
+   643					      get_order(kbuf->buf_align), true);
+   644	
+   645		if (!p)
+   646			return -EADDRNOTAVAIL;
+   647	
+   648		/* Add the relevant pages to our dest_pages list so we find them later */
+   649		for (i = 0; i < kbuf->memsz >> PAGE_SHIFT; i++)
+   650			list_add(&p[i].lru, &kbuf->image->dest_pages);
+   651	
+   652		mem = page_to_boot_pfn(p) << PAGE_SHIFT;
+   653	
+   654		if (kimage_is_destination_range(kbuf->image, mem, mem + kbuf->memsz)) {
+   655			/* Our region is already in use by a statically defined one. Bail out. */
+   656			pr_warn("kexec: CMA overlaps existing mem: 0x%lx+0x%lx\n", mem, kbuf->memsz);
+   657			return -EADDRNOTAVAIL;
+   658		}
+   659	
+   660		kbuf->mem = page_to_boot_pfn(p) << PAGE_SHIFT;
+ > 661		pr_warn("Allocated %d pages DMA memory\n", kbuf->memsz >> PAGE_SHIFT);
+   662	
+   663		return 0;
+   664	}
+   665	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
