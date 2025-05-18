@@ -1,194 +1,139 @@
-Return-Path: <kvm-ppc+bounces-264-lists+kvm-ppc=lfdr.de@vger.kernel.org>
+Return-Path: <kvm-ppc+bounces-265-lists+kvm-ppc=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm-ppc@lfdr.de
 Delivered-To: lists+kvm-ppc@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58790AB5751
-	for <lists+kvm-ppc@lfdr.de>; Tue, 13 May 2025 16:38:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 105ACABAD9D
+	for <lists+kvm-ppc@lfdr.de>; Sun, 18 May 2025 05:44:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9930A861DFC
-	for <lists+kvm-ppc@lfdr.de>; Tue, 13 May 2025 14:38:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4C881796F5
+	for <lists+kvm-ppc@lfdr.de>; Sun, 18 May 2025 03:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47321E5B9E;
-	Tue, 13 May 2025 14:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE7318A6A5;
+	Sun, 18 May 2025 03:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tsnaREyj"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KvhfQlew"
 X-Original-To: kvm-ppc@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D401D5CD1
-	for <kvm-ppc@vger.kernel.org>; Tue, 13 May 2025 14:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B559C4CB5B;
+	Sun, 18 May 2025 03:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747147106; cv=none; b=hSxSYp2fpuBwZSjMqSML2YeDvMDVoRX6JchS8VidmYNlNxy5tOJ3v9qbZAy8pV5GTdsnOcb95yJZzq62Atj+rTmzR8zGIADfNTXhKCQyGaKEMckXlv99te5MAaCJF5dvbThLBt5HYSfpAYSUzENBlRTgUjQxHymrMOI7bS+wrLY=
+	t=1747539870; cv=none; b=eMU/cN/mP+WTY645eoJMUepeqo50fyXS0uL1jYSdEv8JWuuYebnVM7uNDSWYDa7/aRCQS/9mTiSS+MK7D5vHYl4tO5lxwxUAooHp3R+eFurKPvhh1ubhI9RHcQJfPbTAOYEAM1oadKQOxzWhQlmDrwGUw4Hok1iRkBODpFQmsTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747147106; c=relaxed/simple;
-	bh=W4iM/prlPhxEGSomxxf3DcBMCZYpDfHGzwjarEdqCIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=umwUs+csVeib1DCB0okVWpUGvz9ImmEJ2v1BY21L3e0NIqZSx9pAVExs04EjgKLiJ+hNIjBliC8qzkKuGCz3GNlvxo7BZWuHY6D4MZSBojfVU6KszcZ/hNmi9eV29B5mYGUYttavk6JInDpW64lmlNxHMQHkTVHIVEMiX/ll890=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tsnaREyj; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a0b6aa08e5so4304081f8f.1
-        for <kvm-ppc@vger.kernel.org>; Tue, 13 May 2025 07:38:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1747147103; x=1747751903; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OqRKb7ngH3ntLnw87YWN+YBlBs4u08NQKjb6q0IBoZg=;
-        b=tsnaREyjXhvV1jbXNc2AUyq9HgwlcX6CMdfKtHmjQZh+n/xcyjwxhOxc4ruXtVM3SQ
-         POrIwALKasUOpCI2hP7FI9uHWOkmD625kzvHzZrq7daqjINmkkfi2dCXtJENFudhIt8x
-         tWFG/KBPX+vuVpGgzFzocdm9DcBKbtyW5Aairw+eWDbL1wBrBVFe7t88gSTLbnN1V9KD
-         hSLsHmUeruVMquOfbesr1li0hF6Cz4EPGWA/v+BanKk0r/kyUjO3j07bSvjoUfjyr4j/
-         4fpFfZR5AvFXC0Ho/+Sp7W3wbeILdg+5Eew2zZM5OVljkwTa2LxDbwtrqeG9G6J/gLlV
-         SmQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747147103; x=1747751903;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OqRKb7ngH3ntLnw87YWN+YBlBs4u08NQKjb6q0IBoZg=;
-        b=Ioml6F9WLdfVYTZ2/rrhnG3oLUmh+pjhzxZwwePDWkgoT9UYQVga+T5BF1bUaFE9i2
-         wP5Dmy970pBfMlzPegJV3+zEdL1155MLTMJbNYDL9X10Npeg9N4YAuY7WJvM6ENQTJtt
-         QAtIWWviniQ0enWaNszyVZXO2ncNjTvtagTUa3tCC4ZK5v8G6eiO/9snOX8d/VzHn7+W
-         w/hy8RSlHDio+zk30Ns696Nsa5u1adppD6Txqjvl7cwiDrqQcfbsvMaOCY/NgCakohtz
-         H6PGitIy9fBcUf8Pd3G4IvJZ2cb+IYE+TorbnCEAmRmFmGBmmUXj8+jeI4PtbrOcMPFQ
-         0x3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVRLEUtxZG0aOQPcW7xzaGv9r4tG9zPIShUxLKA133/bvALOD5o1IIUrjWrLUPANlISDLbPvKDW@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv9FpuDm80iQqQwryGk+IpFBa22POGeFza+RdnXJ5tnWf4iXpv
-	Uv9EZ7ILLZ3R357qYRAFMnBFcB/E0TMFZG9zjSp32k0uU64VxtDF/PFpXLfWNZ0=
-X-Gm-Gg: ASbGnctcv4nfnaNnpD3ZbrMt7XfDew+1ZGlUy9kKBTxmd2hC7NJ4Sdj6guqf7Og/7y4
-	GtESNIaSt/TeiebfQ9T8/v7JG52yZKo/k2831vTcaJiNeUjCszIrlKlV5wftB90B7v1h+q2/TPc
-	uhbIfNx379pCkBEXzViBHf/a4bhpVTRx+2WpnLD2T9ibuvZa7EF6DM/PgtnLs9XeI6fVw001s0q
-	pI2N/3jQ8/KjGzodPZAErKPPh0oYRDLTQ9mGEPtcQfDr1tZyTf3jUHhwlApyu944T9T64UAluUX
-	i2R+nM5AYGgPVwP081oqRCevx8ukokvt/WwtzgdzXfLYGE3xBicnztCvdlMUh2KFTQgP6cY5pLj
-	oOuCBIA==
-X-Google-Smtp-Source: AGHT+IEUqSemEdzKu4pnmG//NeUfgyzzj+7NjQMrdsDA+9dSpSvRry26837zLtZcLCYlPTMamRR8jA==
-X-Received: by 2002:adf:f2c4:0:b0:391:1218:d5f4 with SMTP id ffacd0b85a97d-3a340d22fc1mr3010847f8f.23.1747147102819;
-        Tue, 13 May 2025 07:38:22 -0700 (PDT)
-Received: from localhost (110.8.30.213.rev.vodafone.pt. [213.30.8.110])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f5a4d21esm16703967f8f.99.2025.05.13.07.38.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 May 2025 07:38:22 -0700 (PDT)
-Date: Tue, 13 May 2025 17:38:20 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Alexander Graf <graf@amazon.com>
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, kvm-ppc@vger.kernel.org
-Subject: [agraf-2.6:kexec-cma 1/2] kernel/kexec_core.c:801
- kimage_load_normal_segment() error: uninitialized symbol 'result'.
-Message-ID: <8f74c790-0241-408e-be1f-d55a083e4447@suswa.mountain>
+	s=arc-20240116; t=1747539870; c=relaxed/simple;
+	bh=0i2+Vr76XwhwW9ZjElJpUde+sTsNe9RK1XMXBsEOaFo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J/imIlxaO/f8ny00n50KJ++9x8m88dQMhjCx1HRkkY3/CmF88Xsat7ock7qJ+7aS8cTWtgkxuhKY0JQ8h8RpxLZDatL4mCyAjjQDj5TVzIr6W05huscZzb4CTs1H4tw+U04zd5ks6cFlBudHGoJlQW2hPAP4GBu1w7LWWlJk3As=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KvhfQlew; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54HMihsj020479;
+	Sun, 18 May 2025 03:44:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=0NLtNd
+	PGsOUTdZQw/eVOOi/FkxfDbggK1oiQt93kmz8=; b=KvhfQlewEgC4N1wBFspJsu
+	+pjj2Qk7agH2AROaJcluH32K1NtUz9TDL4M96OIEZdK4+7zTkzemu8ukVlcmUi2H
+	bYwxlIaEFL0jRWkVhgRsZX2h14JiP1kFQjggZM9ysk1XlpaUDBiK5iHfaJT8Or3x
+	XkRA2BFJL45EQFVXb1Z/6o0cV2u1VsY3YBYN7WqvM961eObeI1BN+CL3DS3TAAmg
+	R4A7JyN+X8Kkb+ao1TUFfuUMyD4Lk7hDeFX1KzzInWBg5we/4nW+DnHsQXs5ylKD
+	T331vea7uiZPNgb/Ou1NO0JGyh6sPPb04wV9RvjnGEOEpq40uoxcsM049iS98GcA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46pqagav81-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 18 May 2025 03:44:08 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 54I3i7Ig016891;
+	Sun, 18 May 2025 03:44:07 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46pqagav7x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 18 May 2025 03:44:07 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54I1rRV8005342;
+	Sun, 18 May 2025 03:44:06 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46q69m09td-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 18 May 2025 03:44:06 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54I3i3ba60031304
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 18 May 2025 03:44:03 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0172C200A8;
+	Sun, 18 May 2025 03:44:03 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F5B5200A7;
+	Sun, 18 May 2025 03:43:57 +0000 (GMT)
+Received: from li-c439904c-24ed-11b2-a85c-b284a6847472.ibm.com.com (unknown [9.43.51.82])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Sun, 18 May 2025 03:43:57 +0000 (GMT)
+From: Madhavan Srinivasan <maddy@linux.ibm.com>
+To: Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        Amit Machhiwal <amachhiw@linux.ibm.com>
+Cc: Vaibhav Jain <vaibhav@linux.ibm.com>,
+        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Naveen N Rao <naveen@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Fix IRQ map warnings with XICS on pSeries KVM Guest
+Date: Sun, 18 May 2025 09:13:54 +0530
+Message-ID: <174753967072.24504.4432466115640773880.b4-ty@linux.ibm.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250425185641.1611857-1-amachhiw@linux.ibm.com>
+References: <20250425185641.1611857-1-amachhiw@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm-ppc@vger.kernel.org
 List-Id: <kvm-ppc.vger.kernel.org>
 List-Subscribe: <mailto:kvm-ppc+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm-ppc+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: tyUeVwDId6Zm-0XCldTvL7iXgQl1Kio4
+X-Authority-Analysis: v=2.4 cv=LLNmQIW9 c=1 sm=1 tr=0 ts=68295788 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=KkMZSTVgx2o7lePJ6WsA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: vS4vSUQTl0senht3RLC4EYfGSIrtNcO2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE4MDAzMSBTYWx0ZWRfX/wK0ImeA93m3 YmKcWsC6lmvG4xm7DGtua1R3RbWjL5RgmwrTjoe2/mMf+8CUrT7oFHgrP0lXAup1ZFSxxDv6BfV 8kHuQAckleB4T//zK7xBLmRHkKXqEbFePAnaqaFwd8RziHKsyCiYv9KLL0xLWVSmbuQ2U94KcSU
+ WpPFOHnXqm/UNyN+Py2HnTaej3G5SJAmKkSIUMIt9hwoJjrsYfEFsL6cJ0bhKm9FHbDLdrlA0gt wNHN0w2Hu16R9VX8v9KvuUWICedAe5bQrM2JAYTB6ChOKhx4ekndm8XjDlNbkccsfQwUWsWeezB UwKTzV3IY9zKy4TwE4FQl1qUOeB7GhB/Cy3Eti4SP7ZF3wppeJvx5zeVD6S/MuhxPncq2k6xItH
+ c3vycgH29mROFJ0EFuLCaKLVxfrWL5RRKPUV47QMEai2HnAvZ3TJGoA4bUxoG1UZQ+Tr7ggp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-18_02,2025-05-16_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ phishscore=0 impostorscore=0 mlxlogscore=833 lowpriorityscore=0
+ suspectscore=0 priorityscore=1501 bulkscore=0 spamscore=0 mlxscore=0
+ clxscore=1011 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505070000
+ definitions=main-2505180031
 
-tree:   https://github.com/agraf/linux-2.6.git kexec-cma
-head:   752619bbe38c535612b1a9e5b47ea7d962c63449
-commit: 1e91ce490239e53ac0b4ad9aea3ebed48d1edf51 [1/2] kexec: Use CMA
-config: x86_64-randconfig-161-20250510 (https://download.01.org/0day-ci/archive/20250511/202505111109.zkW7PHWQ-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+On Sat, 26 Apr 2025 00:26:41 +0530, Amit Machhiwal wrote:
+> The commit 9576730d0e6e ("KVM: PPC: select IRQ_BYPASS_MANAGER") enabled
+> IRQ_BYPASS_MANAGER when CONFIG_KVM was set. Subsequently, commit
+> c57875f5f9be ("KVM: PPC: Book3S HV: Enable IRQ bypass") enabled IRQ
+> bypass and added the necessary callbacks to create/remove the mappings
+> between host real IRQ and the guest GSI.
+> 
+> The availability of IRQ bypass is determined by the arch-specific
+> function kvm_arch_has_irq_bypass(), which invokes
+> kvmppc_irq_bypass_add_producer_hv(). This function, in turn, calls
+> kvmppc_set_passthru_irq_hv() to create a mapping in the passthrough IRQ
+> map, associating a host IRQ to a guest GSI.
+> 
+> [...]
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202505111109.zkW7PHWQ-lkp@intel.com/
+Applied to powerpc/next.
 
-smatch warnings:
-kernel/kexec_core.c:801 kimage_load_normal_segment() error: uninitialized symbol 'result'.
+[1/1] KVM: PPC: Book3S HV: Fix IRQ map warnings with XICS on pSeries KVM Guest
+      https://git.kernel.org/powerpc/c/ccdb36cbe65fe05fd5349c7ee5a59e53be7fe195
 
-vim +/result +801 kernel/kexec_core.c
-
-2965faa5e03d1e Dave Young            2015-09-09  734  static int kimage_load_normal_segment(struct kimage *image,
-2965faa5e03d1e Dave Young            2015-09-09  735  					 struct kexec_segment *segment)
-2965faa5e03d1e Dave Young            2015-09-09  736  {
-2965faa5e03d1e Dave Young            2015-09-09  737  	unsigned long maddr;
-2965faa5e03d1e Dave Young            2015-09-09  738  	size_t ubytes, mbytes;
-2965faa5e03d1e Dave Young            2015-09-09  739  	int result;
-2965faa5e03d1e Dave Young            2015-09-09  740  	unsigned char __user *buf = NULL;
-2965faa5e03d1e Dave Young            2015-09-09  741  	unsigned char *kbuf = NULL;
-1e91ce490239e5 Alexander Graf        2025-05-09  742  	bool dest_intact = false;
-2965faa5e03d1e Dave Young            2015-09-09  743  
-2965faa5e03d1e Dave Young            2015-09-09  744  	if (image->file_mode)
-2965faa5e03d1e Dave Young            2015-09-09  745  		kbuf = segment->kbuf;
-2965faa5e03d1e Dave Young            2015-09-09  746  	else
-2965faa5e03d1e Dave Young            2015-09-09  747  		buf = segment->buf;
-2965faa5e03d1e Dave Young            2015-09-09  748  	ubytes = segment->bufsz;
-2965faa5e03d1e Dave Young            2015-09-09  749  	mbytes = segment->memsz;
-2965faa5e03d1e Dave Young            2015-09-09  750  	maddr = segment->mem;
-2965faa5e03d1e Dave Young            2015-09-09  751  
-2965faa5e03d1e Dave Young            2015-09-09  752  	while (mbytes) {
-2965faa5e03d1e Dave Young            2015-09-09  753  		struct page *page;
-2965faa5e03d1e Dave Young            2015-09-09  754  		char *ptr;
-2965faa5e03d1e Dave Young            2015-09-09  755  		size_t uchunk, mchunk;
-2965faa5e03d1e Dave Young            2015-09-09  756  
-2965faa5e03d1e Dave Young            2015-09-09  757  		page = kimage_alloc_page(image, GFP_HIGHUSER, maddr);
-2965faa5e03d1e Dave Young            2015-09-09  758  		if (!page) {
-2965faa5e03d1e Dave Young            2015-09-09  759  			result  = -ENOMEM;
-2965faa5e03d1e Dave Young            2015-09-09  760  			goto out;
-2965faa5e03d1e Dave Young            2015-09-09  761  		}
-1e91ce490239e5 Alexander Graf        2025-05-09  762  
-1e91ce490239e5 Alexander Graf        2025-05-09  763  		/* Add page to copy list if it's not already in place */
-1e91ce490239e5 Alexander Graf        2025-05-09  764  		if (page_to_boot_pfn(page) << PAGE_SHIFT != maddr) {
-1e91ce490239e5 Alexander Graf        2025-05-09  765  			if (!dest_intact) {
-1e91ce490239e5 Alexander Graf        2025-05-09  766  				result = kimage_set_destination(image, maddr);
-1e91ce490239e5 Alexander Graf        2025-05-09  767  				if (result < 0)
-1e91ce490239e5 Alexander Graf        2025-05-09  768  					goto out;
-1e91ce490239e5 Alexander Graf        2025-05-09  769  				dest_intact = true;
-1e91ce490239e5 Alexander Graf        2025-05-09  770  			}
-1e91ce490239e5 Alexander Graf        2025-05-09  771  
-43546d8669d62d Russell King          2016-08-02  772  			result = kimage_add_page(image, page_to_boot_pfn(page)
-2965faa5e03d1e Dave Young            2015-09-09  773  									<< PAGE_SHIFT);
-2965faa5e03d1e Dave Young            2015-09-09  774  			if (result < 0)
-2965faa5e03d1e Dave Young            2015-09-09  775  				goto out;
-1e91ce490239e5 Alexander Graf        2025-05-09  776  		} else {
-1e91ce490239e5 Alexander Graf        2025-05-09  777  			dest_intact = false;
-
-result not set on this path.
-
-1e91ce490239e5 Alexander Graf        2025-05-09  778  		}
-2965faa5e03d1e Dave Young            2015-09-09  779  
-948084f0f6959f Fabio M. De Francesco 2022-08-21  780  		ptr = kmap_local_page(page);
-2965faa5e03d1e Dave Young            2015-09-09  781  		/* Start with a clear page */
-2965faa5e03d1e Dave Young            2015-09-09  782  		clear_page(ptr);
-2965faa5e03d1e Dave Young            2015-09-09  783  		ptr += maddr & ~PAGE_MASK;
-2965faa5e03d1e Dave Young            2015-09-09  784  		mchunk = min_t(size_t, mbytes,
-2965faa5e03d1e Dave Young            2015-09-09  785  				PAGE_SIZE - (maddr & ~PAGE_MASK));
-2965faa5e03d1e Dave Young            2015-09-09  786  		uchunk = min(ubytes, mchunk);
-2965faa5e03d1e Dave Young            2015-09-09  787  
-4bb7be96fc8871 yang.zhang            2024-02-22  788  		if (uchunk) {
-2965faa5e03d1e Dave Young            2015-09-09  789  			/* For file based kexec, source pages are in kernel memory */
-2965faa5e03d1e Dave Young            2015-09-09  790  			if (image->file_mode)
-2965faa5e03d1e Dave Young            2015-09-09  791  				memcpy(ptr, kbuf, uchunk);
-2965faa5e03d1e Dave Young            2015-09-09  792  			else
-2965faa5e03d1e Dave Young            2015-09-09  793  				result = copy_from_user(ptr, buf, uchunk);
-4bb7be96fc8871 yang.zhang            2024-02-22  794  			ubytes -= uchunk;
-4bb7be96fc8871 yang.zhang            2024-02-22  795  			if (image->file_mode)
-4bb7be96fc8871 yang.zhang            2024-02-22  796  				kbuf += uchunk;
-4bb7be96fc8871 yang.zhang            2024-02-22  797  			else
-4bb7be96fc8871 yang.zhang            2024-02-22  798  				buf += uchunk;
-4bb7be96fc8871 yang.zhang            2024-02-22  799  		}
-948084f0f6959f Fabio M. De Francesco 2022-08-21  800  		kunmap_local(ptr);
-2965faa5e03d1e Dave Young            2015-09-09 @801  		if (result) {
-2965faa5e03d1e Dave Young            2015-09-09  802  			result = -EFAULT;
-2965faa5e03d1e Dave Young            2015-09-09  803  			goto out;
-2965faa5e03d1e Dave Young            2015-09-09  804  		}
-2965faa5e03d1e Dave Young            2015-09-09  805  		maddr  += mchunk;
-2965faa5e03d1e Dave Young            2015-09-09  806  		mbytes -= mchunk;
-a8311f647e4196 Jarrett Farnitano     2018-06-14  807  
-a8311f647e4196 Jarrett Farnitano     2018-06-14  808  		cond_resched();
-2965faa5e03d1e Dave Young            2015-09-09  809  	}
-2965faa5e03d1e Dave Young            2015-09-09  810  out:
-2965faa5e03d1e Dave Young            2015-09-09  811  	return result;
-2965faa5e03d1e Dave Young            2015-09-09  812  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+Thanks
 
